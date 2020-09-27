@@ -1,0 +1,26 @@
+[package]
+name = "darwinia-bridger"
+version = "0.0.1"
+authors = ["clearloop <udtrokia@gmail.com>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = ["src/**/*", "Cargo.toml", "./README.md"]
+keywords = ["blockchain"]
+readme = './README.md'
+edition = "2018"
+
+
+[[bin]]
+name = "bridger"
+path = "src/bin/bridger.rs"
+
+[dependencies]
+async-std = { version = "1.6.4", features = ["attributes"] }
+env_logger = "0.7.1"
+sp-keyring = "2.0.0"
+structopt = "0.3.18"
+substrate-subxt = "0.12.0"
+toml = "0.5.6"

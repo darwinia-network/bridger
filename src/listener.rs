@@ -55,7 +55,7 @@ impl Listener {
             ));
         }
 
-        let http = <EthereumService<Http>>::new(&config)?;
+        let http = <EthereumService<Http>>::new_http(&config)?;
         l.register(http)?;
         Ok(l)
     }

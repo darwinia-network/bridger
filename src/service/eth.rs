@@ -70,7 +70,7 @@ impl<T: Transport> EthereumService<T> {
     }
 
     /// New Ethereum Service with http
-    pub fn new(config: &Config) -> BridgerResult<EthereumService<Http>> {
+    pub fn new_http(config: &Config) -> BridgerResult<EthereumService<Http>> {
         Ok(EthereumService {
             contract: Self::parse_contract(&config),
             filter: Self::parse_filter(&config)?,

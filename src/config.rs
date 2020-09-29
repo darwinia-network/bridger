@@ -5,16 +5,16 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 /// Ethereum Contract Tuple
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EthereumContractTuple {
     /// Contract Address
     pub address: String,
     /// Contract Topic
-    pub topic: String,
+    pub topics: Vec<String>,
 }
 
 /// Ethereum Contracts
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EthereumContract {
     /// Ring Contract
     pub ring: EthereumContractTuple,
@@ -27,7 +27,7 @@ pub struct EthereumContract {
 }
 
 /// Ethereum Config
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EthereumConfig {
     /// Ethereum start block number
     ///
@@ -40,7 +40,7 @@ pub struct EthereumConfig {
 }
 
 /// Bridger Config
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     /// Darwinia node url
     pub node: String,
@@ -67,22 +67,28 @@ impl Default for Config {
                 contract: EthereumContract {
                     ring: EthereumContractTuple {
                         address: "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0".to_string(),
-                        topic: "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
-                            .to_string(),
+                        topics: vec![
+                            "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
+                                .to_string(),
+                        ],
                     },
                     kton: EthereumContractTuple {
                         address: "0x1994100c58753793D52c6f457f189aa3ce9cEe94".to_string(),
-                        topic: "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
-                            .to_string(),
+                        topics: vec![
+                            "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
+                                .to_string(),
+                        ],
                     },
                     bank: EthereumContractTuple {
                         address: "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e".to_string(),
-                        topic: "0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12"
-                            .to_string(),
+                        topics: vec![
+                            "0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12"
+                                .to_string(),
+                        ],
                     },
                     issuing: EthereumContractTuple {
                         address: "0x49262B932E439271d05634c32978294C7Ea15d0C".to_string(),
-                        topic: "".to_string(),
+                        topics: vec![],
                     },
                 },
             },

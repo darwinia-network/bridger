@@ -22,6 +22,7 @@ async-trait = "0.1.40"
 dirs = "3.0.1"
 env_logger = "0.7.1"
 etc = "0.1.11"
+log = "0.4.11"
 sp-keyring = "2.0.0"
 structopt = "0.3.18"
 substrate-subxt = "0.12.0"
@@ -32,6 +33,10 @@ web3 = "0.13.0"
 package = "async-std"
 version = "1.6.4"
 features = ["attributes"]
+
+[dependencies.primitives]
+package = "darwinia-bridge-primitives"
+version = "0.0.6"
 
 [dependencies.serde]
 package = "serde"

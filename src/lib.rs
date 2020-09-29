@@ -3,10 +3,10 @@
 mod api;
 mod config;
 mod listener;
-mod pool;
 mod runtime;
 
 pub mod cmd;
+pub mod pool;
 pub mod result;
 pub mod service;
 

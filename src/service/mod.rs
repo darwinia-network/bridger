@@ -1,5 +1,5 @@
 //! Bridger services
-use crate::{result::Result, Config};
+use crate::result::Result;
 use async_trait::async_trait;
 
 mod eth;
@@ -12,5 +12,5 @@ pub trait Service {
     /// Service name
     fn name<'c>(&self) -> &'c str;
     /// Run target service
-    async fn run(&self, config: &Config) -> Result<()>;
+    async fn run(&self) -> Result<()>;
 }

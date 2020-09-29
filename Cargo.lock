@@ -665,14 +665,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "darwinia-bridge-primitives"
+version = "0.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ad4af8574bf204c820d483522e3ae91dbd8d92c83d746a334149a3c2c08f4ce0"
+dependencies = [
+ "parity-scale-codec",
+ "rlp",
+ "serde",
+ "uint",
+]
+
+[[package]]
 name = "darwinia-bridger"
 version = "0.0.1"
 dependencies = [
  "async-std",
  "async-trait",
+ "darwinia-bridge-primitives",
  "dirs",
  "env_logger",
  "etc",
+ "log",
  "serde",
  "sp-keyring",
  "structopt",

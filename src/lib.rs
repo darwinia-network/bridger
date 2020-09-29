@@ -10,4 +10,4 @@ pub mod cmd;
 pub mod result;
 pub mod service;
 
-pub use self::{config::Config, listener::Listener, pool::Pool};
+pub use self::{config::Config, listener::Listener, pool::Pool, service::Service};

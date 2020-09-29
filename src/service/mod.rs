@@ -2,6 +2,10 @@
 use crate::{result::Result, Config};
 use async_trait::async_trait;
 
+mod eth;
+
+pub use eth::EthereumService;
+
 /// Bridge service
 #[async_trait]
 pub trait Service {

@@ -6,12 +6,12 @@ pub struct Listener(Vec<Box<dyn Service>>);
 
 impl Listener {
     /// Get service
-    pub fn entry<'e>(&self, name: &str) -> Option<&Box<dyn Service>> {
+    pub fn entry(&self, name: &str) -> Option<&dyn Service> {
         for s in &self.0 {
             if s.name() == name {
-                return Some(s);
+                return Some(s.as_ref());
             }
         }
-        return None;
+        None
     }
 }

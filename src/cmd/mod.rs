@@ -1,5 +1,6 @@
 //! Sup Commands
 use crate::result::Result;
+use std::path::PathBuf;
 use structopt::{clap::AppSettings, StructOpt};
 
 mod run;
@@ -8,14 +9,21 @@ mod run;
 #[structopt(setting = AppSettings::InferSubcommands)]
 enum Opt {
     /// Run the bridger
-    Run,
+    Run {
+        /// Config path of bridger
+        #[structopt(short, long)]
+        config: Option<PathBuf>,
+        /// Run bridger in verbose mode
+        #[structopt(short, long)]
+        verbose: bool,
+    },
 }
 
 /// Exec commands
 pub async fn exec() -> Result<()> {
     let opt = Opt::from_args();
     match opt {
-        Opt::Run => run::exec().await?,
+        Opt::Run { config, verbose } => run::exec(config, verbose).await?,
     }
 
     Ok(())

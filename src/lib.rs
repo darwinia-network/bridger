@@ -1,8 +1,17 @@
-#![warn(missing_docs)]
 //! Darwinia bridger
+#![warn(missing_docs)]
+
+#[macro_use]
+extern crate log;
+
 mod api;
+mod config;
+mod listener;
 mod runtime;
 
 pub mod cmd;
-pub mod config;
+pub mod pool;
 pub mod result;
+pub mod service;
+
+pub use self::{config::Config, listener::Listener, pool::Pool, service::Service};

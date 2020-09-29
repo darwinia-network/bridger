@@ -7,6 +7,7 @@ use std::{
     result::Result as StdResult,
 };
 use toml::{de::Error as DeToml, ser::Error as SerToml};
+use web3::Error as Web3;
 
 /// The custom bridger error
 pub struct Bridger(String);
@@ -46,7 +47,7 @@ macro_rules! error {
     };
 }
 
-error! {Io, Bridger, DeToml, SerToml, Etc}
+error! {Io, Bridger, DeToml, SerToml, Etc, Web3}
 
-/// Sup Result
+/// Bridger Result
 pub type Result<T> = StdResult<T, Error>;

@@ -1,20 +1,21 @@
 //! Bridger Config
 use crate::result::{Error, Result};
-use etc::{Etc, Read};
+use etc::{Etc, Meta, Read, Write};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use toml::Serializer;
 
 /// Ethereum Contract Tuple
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EthereumContractTuple {
     /// Contract Address
     pub address: String,
     /// Contract Topic
-    pub topic: String,
+    pub topics: Vec<String>,
 }
 
 /// Ethereum Contracts
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EthereumContract {
     /// Ring Contract
     pub ring: EthereumContractTuple,
@@ -27,20 +28,26 @@ pub struct EthereumContract {
 }
 
 /// Ethereum Config
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EthereumConfig {
+    /// Ethereum rpc url
+    pub rpc: String,
     /// Ethereum start block number
     ///
     /// Ethereum bridger will scan start from this block
     pub start: u64,
-    /// Ethereum rpc url
-    pub rpc: String,
     /// Ethereum contracts
     pub contract: EthereumContract,
 }
 
+/// Service step
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Step {
+    ethereum: usize,
+}
+
 /// Bridger Config
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     /// Darwinia node url
     pub node: String,
@@ -52,6 +59,8 @@ pub struct Config {
     pub shadow: String,
     /// Ethereum Config
     pub eth: EthereumConfig,
+    /// Service steps
+    pub step: Step,
 }
 
 impl Default for Config {
@@ -67,30 +76,45 @@ impl Default for Config {
                 contract: EthereumContract {
                     ring: EthereumContractTuple {
                         address: "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0".to_string(),
-                        topic: "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
-                            .to_string(),
+                        topics: vec![
+                            "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
+                                .to_string(),
+                        ],
                     },
                     kton: EthereumContractTuple {
                         address: "0x1994100c58753793D52c6f457f189aa3ce9cEe94".to_string(),
-                        topic: "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
-                            .to_string(),
+                        topics: vec![
+                            "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
+                                .to_string(),
+                        ],
                     },
                     bank: EthereumContractTuple {
                         address: "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e".to_string(),
-                        topic: "0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12"
-                            .to_string(),
+                        topics: vec![
+                            "0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12"
+                                .to_string(),
+                        ],
                     },
                     issuing: EthereumContractTuple {
                         address: "0x49262B932E439271d05634c32978294C7Ea15d0C".to_string(),
-                        topic: "".to_string(),
+                        topics: vec![],
                     },
                 },
             },
+            step: Step { ethereum: 30 },
         }
     }
 }
 
 impl Config {
+    fn write(c: Etc) -> Result<Config> {
+        let config = Config::default();
+        let mut dst = String::with_capacity(128);
+        config.serialize(Serializer::pretty(&mut dst).pretty_array(true))?;
+        c.write(dst)?;
+        Ok(config)
+    }
+
     /// New config from pathbuf
     pub fn new(path: Option<PathBuf>) -> Result<Self> {
         let c = Etc::from(if let Some(conf) = path {
@@ -102,10 +126,12 @@ impl Config {
             return Err(Error::Bridger("Could not open home dir".to_string()));
         });
 
-        if let Ok(config) = toml::from_slice(&c.read()?) {
+        if !c.real_path()?.exists() {
+            Self::write(c)
+        } else if let Ok(config) = toml::from_slice(&c.read()?) {
             Ok(config)
         } else {
-            Ok(Config::default())
+            Self::write(c)
         }
     }
 }

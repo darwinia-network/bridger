@@ -2,7 +2,7 @@
 //! Darwinia bridger
 mod api;
 mod runtime;
-mod toml;
 
 pub mod cmd;
+pub mod config;
 pub mod result;

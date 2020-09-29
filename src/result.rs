@@ -1,4 +1,5 @@
 //! Bridger Result
+use etc::Error as Etc;
 use std::{
     error::Error as ErrorTrait,
     fmt::{Display, Formatter, Result as FmtResult},
@@ -45,7 +46,7 @@ macro_rules! error {
     };
 }
 
-error! {Io, Bridger, DeToml, SerToml}
+error! {Io, Bridger, DeToml, SerToml, Etc}
 
 /// Sup Result
 pub type Result<T> = StdResult<T, Error>;

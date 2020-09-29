@@ -48,5 +48,5 @@ macro_rules! error {
 
 error! {Io, Bridger, DeToml, SerToml, Etc}
 
-/// Sup Result
+/// Bridger Result
 pub type Result<T> = StdResult<T, Error>;

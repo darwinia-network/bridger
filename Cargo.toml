@@ -18,6 +18,7 @@ name = "bridger"
 path = "src/bin/bridger.rs"
 
 [dependencies]
+async-trait = "0.1.40"
 dirs = "3.0.1"
 env_logger = "0.7.1"
 etc = "0.1.11"

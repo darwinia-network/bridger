@@ -1,5 +1,6 @@
 name: bridger
 
+branch: [master]
 on: [push, pull_request]
 
 jobs:

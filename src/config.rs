@@ -1,8 +1,9 @@
 //! Bridger Config
 use crate::result::{Error, Result};
-use etc::{Etc, Read};
+use etc::{Etc, Read, Write};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use toml::Serializer;
 
 /// Ethereum Contract Tuple
 #[derive(Debug, Serialize, Deserialize)]
@@ -29,14 +30,20 @@ pub struct EthereumContract {
 /// Ethereum Config
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EthereumConfig {
+    /// Ethereum contracts
+    pub contract: EthereumContract,
+    /// Ethereum rpc url
+    pub rpc: String,
     /// Ethereum start block number
     ///
     /// Ethereum bridger will scan start from this block
     pub start: u64,
-    /// Ethereum rpc url
-    pub rpc: String,
-    /// Ethereum contracts
-    pub contract: EthereumContract,
+}
+
+/// Service step
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Step {
+    ethereum: usize,
 }
 
 /// Bridger Config
@@ -52,6 +59,8 @@ pub struct Config {
     pub shadow: String,
     /// Ethereum Config
     pub eth: EthereumConfig,
+    /// Service steps
+    pub step: Step,
 }
 
 impl Default for Config {
@@ -92,6 +101,7 @@ impl Default for Config {
                     },
                 },
             },
+            step: Step { ethereum: 30 },
         }
     }
 }
@@ -111,7 +121,11 @@ impl Config {
         if let Ok(config) = toml::from_slice(&c.read()?) {
             Ok(config)
         } else {
-            Ok(Config::default())
+            let config = Config::default();
+            let mut dst = String::with_capacity(128);
+            config.serialize(Serializer::pretty(&mut dst).pretty_array(true))?;
+            c.write(dst)?;
+            Ok(config)
         }
     }
 }

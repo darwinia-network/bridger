@@ -7,7 +7,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use primitives::bytes;
-use std::time::Duration;
+use std::{cell::RefCell, sync::Arc, time::Duration};
 use web3::{
     transports::{http::Http, ws::WebSocket},
     types::{BlockNumber, FilterBuilder, H160, H256, U64},
@@ -40,9 +40,9 @@ impl<T: Transport> EthereumService<T> {
     fn parse_contract(config: &Config) -> ContractAddress {
         let contract = &config.eth.contract;
         ContractAddress {
-            bank: H256::from_slice(&bytes!(contract.bank.address.as_str())),
-            kton: H256::from_slice(&bytes!(contract.kton.address.as_str())),
-            ring: H256::from_slice(&bytes!(contract.ring.address.as_str())),
+            bank: H256::from_slice(&bytes!(contract.bank.topics[0].as_str())),
+            kton: H256::from_slice(&bytes!(contract.kton.topics[0].as_str())),
+            ring: H256::from_slice(&bytes!(contract.ring.topics[0].as_str())),
         }
     }
 
@@ -70,7 +70,7 @@ impl<T: Transport> EthereumService<T> {
     }
 
     /// New Ethereum Service with http
-    pub async fn new_http(config: &Config) -> BridgerResult<EthereumService<Http>> {
+    pub fn new(config: &Config) -> BridgerResult<EthereumService<Http>> {
         Ok(EthereumService {
             contract: Self::parse_contract(&config),
             filter: Self::parse_filter(&config)?,
@@ -126,7 +126,7 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, pool: &mut Pool) -> BridgerResult<()> {
+    async fn run(&mut self, pool: Arc<RefCell<Pool>>) -> BridgerResult<()> {
         let eth = self.web3.eth();
         let mut block_number: u64;
         let mut start = self.start;
@@ -134,11 +134,13 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         loop {
             block_number = eth.block_number().await?.as_u64();
             if block_number == start {
-                async_std::task::sleep(Duration::from_secs(30)).await;
+                tokio::time::delay_for(Duration::from_secs(30)).await;
                 continue;
             }
 
-            pool.eth.append(&mut self.scan(start, block_number).await?);
+            let mut txs = self.scan(start, block_number).await?;
+            info!("Found {} txs from {} to {}", txs.len(), start, block_number);
+            pool.borrow_mut().eth.append(&mut txs);
             start = block_number;
         }
     }

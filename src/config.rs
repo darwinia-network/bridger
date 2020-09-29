@@ -1,6 +1,6 @@
 //! Bridger Config
 use crate::result::{Error, Result};
-use etc::{Etc, Read, Write};
+use etc::{Etc, Meta, Read, Write};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use toml::Serializer;
@@ -30,14 +30,14 @@ pub struct EthereumContract {
 /// Ethereum Config
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EthereumConfig {
-    /// Ethereum contracts
-    pub contract: EthereumContract,
     /// Ethereum rpc url
     pub rpc: String,
     /// Ethereum start block number
     ///
     /// Ethereum bridger will scan start from this block
     pub start: u64,
+    /// Ethereum contracts
+    pub contract: EthereumContract,
 }
 
 /// Service step
@@ -107,6 +107,14 @@ impl Default for Config {
 }
 
 impl Config {
+    fn write(c: Etc) -> Result<Config> {
+        let config = Config::default();
+        let mut dst = String::with_capacity(128);
+        config.serialize(Serializer::pretty(&mut dst).pretty_array(true))?;
+        c.write(dst)?;
+        Ok(config)
+    }
+
     /// New config from pathbuf
     pub fn new(path: Option<PathBuf>) -> Result<Self> {
         let c = Etc::from(if let Some(conf) = path {
@@ -118,14 +126,12 @@ impl Config {
             return Err(Error::Bridger("Could not open home dir".to_string()));
         });
 
-        if let Ok(config) = toml::from_slice(&c.read()?) {
+        if !c.real_path()?.exists() {
+            Self::write(c)
+        } else if let Ok(config) = toml::from_slice(&c.read()?) {
             Ok(config)
         } else {
-            let config = Config::default();
-            let mut dst = String::with_capacity(128);
-            config.serialize(Serializer::pretty(&mut dst).pretty_array(true))?;
-            c.write(dst)?;
-            Ok(config)
+            Self::write(c)
         }
     }
 }

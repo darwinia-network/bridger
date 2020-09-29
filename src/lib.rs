@@ -1,5 +1,9 @@
-#![warn(missing_docs)]
 //! Darwinia bridger
+#![warn(missing_docs)]
+
+#[macro_use]
+extern crate log;
+
 mod api;
 mod config;
 mod listener;

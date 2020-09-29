@@ -1,6 +1,6 @@
 use darwinia_bridger::cmd;
 
-#[async_std::main]
+#[tokio::main]
 async fn main() {
     cmd::exec().await.unwrap();
 }

@@ -10,6 +10,7 @@ pub enum EthereumTransaction {
 }
 
 /// Transaction pool
+#[derive(Default)]
 pub struct Pool {
     /// Ethereum transactions
     pub eth: Vec<EthereumTransaction>,

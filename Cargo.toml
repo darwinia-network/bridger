@@ -12,7 +12,6 @@ keywords = ["blockchain"]
 readme = './README.md'
 edition = "2018"
 
-
 [[bin]]
 name = "bridger"
 path = "src/bin/bridger.rs"

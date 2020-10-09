@@ -8,7 +8,7 @@ license = "MIT"
 documentation = "https://docs.rs/bridger"
 homepage = "https://github.com/darwinia-network/bridger"
 include = ["src/**/*", "Cargo.toml", "./README.md"]
-keywords = ["blockchain"]
+keywords = ["substrate", "darwinia"]
 readme = './README.md'
 edition = "2018"
 
@@ -36,7 +36,9 @@ features = ["full"]
 
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"
-version = "0.0.6"
+version = "0.0.7"
+# path = "../bridge-primitives"
+features = ["runtime"]
 
 [dependencies.serde]
 package = "serde"

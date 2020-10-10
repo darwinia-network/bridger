@@ -681,7 +681,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridge-primitives"
-version = "0.0.7"
+version = "0.0.8"
+source = "git+https://github.com/darwinia-network/bridge-primitives.git?branch=runtime#7516fbd0bec74551d945d1b6a0dd9d78d0ba2a46"
 dependencies = [
  "frame-support",
  "pallet-im-online",
@@ -690,6 +691,7 @@ dependencies = [
  "rlp",
  "serde",
  "substrate-subxt",
+ "substrate-subxt-proc-macro",
  "uint",
 ]
 

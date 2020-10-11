@@ -40,5 +40,7 @@ mod byte;
 
 pub mod array;
 pub mod chain;
+pub mod frame;
 pub mod result;
 pub mod rpc;
+pub mod runtime;

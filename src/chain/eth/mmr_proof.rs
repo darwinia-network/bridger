@@ -1,9 +1,9 @@
 use crate::chain::eth::{EthHeader, EthashProof};
-use parity_scale_codec::{Decode, Encode};
+use codec::{Decode, Encode};
 use serde::Serialize;
 
 /// Darwinia eth relay header thing
-#[derive(Decode, Encode, Default)]
+#[derive(Clone, Debug, Decode, Encode, Default, PartialEq, Eq)]
 pub struct HeaderStuffs {
     eth_header: EthHeader,
     ethash_proof: Vec<EthashProof>,
@@ -12,7 +12,7 @@ pub struct HeaderStuffs {
 }
 
 /// MMR Proof Json
-#[derive(Decode, Encode, Default)]
+#[derive(Clone, Decode, Debug, Encode, Default, PartialEq, Eq)]
 pub struct MMRProof {
     /// The index of member leaf
     member_leaf_index: u64,
@@ -23,7 +23,7 @@ pub struct MMRProof {
 }
 
 /// MMR Proof Json
-#[derive(Decode, Encode, Default, Serialize)]
+#[derive(Clone, Decode, Encode, Default, Serialize, PartialEq, Eq)]
 pub struct MMRProofJson {
     /// The index of member leaf
     pub member_leaf_index: u64,

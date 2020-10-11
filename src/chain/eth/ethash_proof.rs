@@ -3,11 +3,11 @@ use crate::{
     array::{H128, H512},
     hex,
 };
-use parity_scale_codec::{Decode, Encode};
+use codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
 /// Ethash proof
-#[derive(Encode, Decode, Debug, PartialEq, Eq, Deserialize, Serialize, Default)]
+#[derive(Clone, Encode, Decode, Debug, PartialEq, Eq, Deserialize, Serialize, Default)]
 pub struct EthashProof {
     /// Dag nodes
     pub dag_nodes: [H512; 2],

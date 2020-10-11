@@ -1,5 +1,5 @@
 //! Custom byte array
-use parity_scale_codec::{Decode, Encode};
+use codec::{Decode, Encode};
 use serde::{
     de::{Deserialize, Deserializer, Error, SeqAccess, Visitor},
     ser::{Serialize, SerializeTuple, Serializer},
@@ -29,13 +29,16 @@ construct_uint! {
 }
 
 construct_hash_bytes! {
+    #[derive(Clone)]
     pub struct H128(16);
 }
 
 construct_hash_bytes! {
+    #[derive(Clone)]
     pub struct H512(64);
 }
 
 construct_hash_bytes! {
+    #[derive(Clone)]
     pub struct H1024(256);
 }

@@ -1,5 +1,5 @@
 //! Darwinia shadow API
-use crate::result::Result;
+use crate::{result::Result, Config};
 use primitives::chain::eth::{
     EthereumReceiptProofThing, EthereumReceiptProofThingJson, HeaderStuff, HeaderStuffJson,
     HeaderThing, HeaderThingWithConfirmationJson,
@@ -21,10 +21,18 @@ pub struct Shadow {
     /// Shadow API
     pub api: String,
     /// HTTP Client
-    pub client: Client,
+    pub http: Client,
 }
 
 impl Shadow {
+    /// Init Shadow API from config
+    pub fn new(config: &Config) -> Shadow {
+        Shadow {
+            api: config.shadow.clone(),
+            http: Client::new(),
+        }
+    }
+
     /// Get HeaderThing
     ///
     /// ```
@@ -45,7 +53,7 @@ impl Shadow {
     /// ```
     pub async fn header_thing(&self, number: usize) -> Result<HeaderThing> {
         let json: HeaderThingWithConfirmationJson = self
-            .client
+            .http
             .get(&format!("{}/eth/header/{}", &self.api, number))
             .send()
             .await?
@@ -75,7 +83,7 @@ impl Shadow {
     /// ```
     pub async fn receipt(&self, tx: &str) -> Result<EthereumReceiptProofThing> {
         let json: EthereumReceiptProofThingJson = self
-            .client
+            .http
             .get(&format!("{}/eth/receipt/{}", &self.api, tx))
             .send()
             .await?
@@ -111,7 +119,7 @@ impl Shadow {
         })?;
 
         let json: HeaderStuffJson = self
-            .client
+            .http
             .post(&format!("{}/eth/proposal", self.api))
             .json(&map)
             .send()

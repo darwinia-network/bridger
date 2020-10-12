@@ -1,5 +1,11 @@
 //! Relay Service
-use crate::{api::Shadow, config::Config, result::Result as BridgerResult, service::Service, Pool};
+use crate::{
+    api::{Darwinia, Shadow},
+    config::Config,
+    result::Result as BridgerResult,
+    service::Service,
+    Pool,
+};
 use async_trait::async_trait;
 use std::{cell::RefCell, sync::Arc, time::Duration};
 
@@ -7,24 +13,27 @@ use std::{cell::RefCell, sync::Arc, time::Duration};
 const SERVICE_NAME: &str = "relay";
 
 /// Relay Service
-pub struct RelayService<'r> {
+pub struct RelayService {
     step: u64,
     /// Shadow API
-    pub shadow: &'r Shadow,
+    pub shadow: Arc<Shadow>,
+    /// Dawrinia API
+    pub darwinia: Arc<Darwinia>,
 }
 
-impl<'r> RelayService<'r> {
+impl RelayService {
     /// New relay service
-    pub async fn new(config: &'r Config, shadow: &'r Shadow) -> RelayService<'r> {
+    pub fn new(config: &Config, shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> RelayService {
         RelayService {
-            step: config.step.relay,
+            darwinia,
             shadow,
+            step: config.step.relay,
         }
     }
 }
 
 #[async_trait(?Send)]
-impl<'r> Service for RelayService<'r> {
+impl Service for RelayService {
     fn name<'e>(&self) -> &'e str {
         SERVICE_NAME
     }
@@ -32,6 +41,8 @@ impl<'r> Service for RelayService<'r> {
     async fn run(&mut self, _pool: Arc<RefCell<Pool>>) -> BridgerResult<()> {
         loop {
             tokio::time::delay_for(Duration::from_secs(self.step)).await;
+            let last = self.darwinia.last_confirmed().await;
+            info!("The last confirmed block is {:?}", last);
         }
         // let eth = self.web3.eth();
         // let mut block_number: u64;

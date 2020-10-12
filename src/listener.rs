@@ -1,8 +1,9 @@
 //! Bridger Listener
 use crate::{
+    api::{Darwinia, Shadow},
     pool::Pool,
     result::{Error, Result},
-    service::{EthereumService, Service},
+    service::{EthereumService, RelayService, Service},
     Config,
 };
 use std::{cell::RefCell, sync::Arc};
@@ -47,7 +48,7 @@ impl Listener {
     }
 
     /// Generate listener from `Config`
-    pub fn from_config(config: Config) -> Result<Self> {
+    pub async fn from_config(config: Config) -> Result<Self> {
         let mut l = Self::default();
         if config.eth.rpc.starts_with("ws") {
             return Err(Error::Bridger(
@@ -55,11 +56,18 @@ impl Listener {
             ));
         }
 
-        // 1. Transaction Listener
-        let http = <EthereumService<Http>>::new_http(&config)?;
-        l.register(http)?;
+        // APIs
+        let shadow = Arc::new(Shadow::new(&config));
+        let darwinia = Arc::new(Darwinia::new(&config).await?);
 
+        // 1. Transaction Listener
         // 2. Relay Listener
+        let http = <EthereumService<Http>>::new_http(&config)?;
+        let relay = RelayService::new(&config, shadow, darwinia);
+
+        // Register
+        l.register(http)?;
+        l.register(relay)?;
         Ok(l)
     }
 }

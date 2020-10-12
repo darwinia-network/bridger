@@ -38,11 +38,33 @@ impl Service for RelayService {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, _pool: Arc<RefCell<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, pool: Arc<RefCell<Pool>>) -> BridgerResult<()> {
         loop {
             tokio::time::delay_for(Duration::from_secs(self.step)).await;
-            let last = self.darwinia.last_confirmed().await;
+
+            let last = self
+                .darwinia
+                .last_confirmed()
+                .await
+                .unwrap_or(Some(0))
+                .unwrap_or(0);
             info!("The last confirmed block is {:?}", last);
+
+            // Try to relay
+            if let Some(max) = pool.borrow_mut().ethereum.iter().max() {
+                if max.block > last {
+                    let parcel = self.shadow.proposal(last, max.block + 1, max.block).await;
+                    if parcel.is_err() {
+                        error!("{:?}", parcel);
+                        continue;
+                    }
+
+                    match self.darwinia.submit_proposal(vec![parcel?]).await {
+                        Ok(hash) => info!("Summited proposal {:?}", hash),
+                        Err(err) => error!("{:?}", err),
+                    }
+                }
+            }
         }
         // let eth = self.web3.eth();
         // let mut block_number: u64;

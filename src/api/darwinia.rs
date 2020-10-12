@@ -1,12 +1,16 @@
 //! Darwinia API
 use crate::{result::Result, Config};
 use primitives::{
-    chain::eth::PendingHeader,
-    frame::ethereum::{game::PendingHeadersStoreExt, relay::ConfirmedBlockNumbersStoreExt},
+    chain::eth::{HeaderStuff, PendingHeader},
+    frame::ethereum::{
+        game::PendingHeadersStoreExt,
+        relay::{ConfirmedBlockNumbersStoreExt, SubmitProposalCallExt},
+    },
     runtime::DarwiniaRuntime,
 };
 use sp_keyring::sr25519::sr25519::Pair;
 use substrate_subxt::{sp_core::Pair as PairTrait, Client, ClientBuilder, PairSigner};
+use web3::types::H256;
 
 /// Dawrinia API
 pub struct Darwinia {
@@ -48,5 +52,10 @@ impl Darwinia {
     /// Get pending headers
     pub async fn pending_headers(&self) -> Result<Vec<PendingHeader>> {
         Ok(self.client.pending_headers(None).await?)
+    }
+
+    /// Submit Proposal
+    pub async fn submit_proposal(&self, proposal: Vec<HeaderStuff>) -> Result<H256> {
+        Ok(self.client.submit_proposal(&self.signer, proposal).await?)
     }
 }

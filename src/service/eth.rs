@@ -1,6 +1,6 @@
 //! Ethereum transaction service
 use crate::{
-    pool::{EthereumTransaction, Pool},
+    pool::{EthereumTransaction, EthereumTransactionHash, Pool},
     result::Result as BridgerResult,
     service::Service,
     Config,
@@ -108,12 +108,23 @@ impl<T: Transport> EthereumService<T> {
                     .await?
                     .iter()
                     .map(|l| {
+                        let block = l.block_number.unwrap_or_default().low_u64();
                         if l.topics.contains(&self.contract.ring)
                             || l.topics.contains(&self.contract.kton)
                         {
-                            EthereumTransaction::Token(l.transaction_hash.unwrap_or_default())
+                            EthereumTransaction {
+                                hash: EthereumTransactionHash::Token(
+                                    l.transaction_hash.unwrap_or_default(),
+                                ),
+                                block,
+                            }
                         } else {
-                            EthereumTransaction::Deposit(l.transaction_hash.unwrap_or_default())
+                            EthereumTransaction {
+                                hash: EthereumTransactionHash::Deposit(
+                                    l.transaction_hash.unwrap_or_default(),
+                                ),
+                                block,
+                            }
                         }
                     })
                     .collect::<Vec<EthereumTransaction>>(),
@@ -143,7 +154,7 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
 
             let mut txs = self.scan(start, block_number).await?;
             info!("Found {} txs from {} to {}", txs.len(), start, block_number);
-            pool.borrow_mut().eth.append(&mut txs);
+            (*pool.borrow_mut()).ethereum.append(&mut txs);
             start = block_number;
         }
     }

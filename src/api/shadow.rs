@@ -112,6 +112,10 @@ impl Shadow {
     /// }
     /// ```
     pub async fn proposal(&self, member: u64, target: u64, last_leaf: u64) -> Result<HeaderStuff> {
+        info!(
+            "Requesting proposal - member: {}, target: {}, last_leaf: {}",
+            member, target, last_leaf
+        );
         let map: Value = serde_json::to_value(Proposal {
             member,
             target,

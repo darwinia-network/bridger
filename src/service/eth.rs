@@ -33,6 +33,7 @@ pub struct EthereumService<T: Transport> {
     filter: [FilterBuilder; 2],
     web3: Web3<T>,
     start: u64,
+    step: u64,
 }
 
 impl<T: Transport> EthereumService<T> {
@@ -76,6 +77,7 @@ impl<T: Transport> EthereumService<T> {
             filter: Self::parse_filter(&config)?,
             start: config.eth.start,
             web3: Web3::new(Http::new(&config.eth.rpc)?),
+            step: config.step.ethereum,
         })
     }
 
@@ -86,6 +88,7 @@ impl<T: Transport> EthereumService<T> {
             filter: Self::parse_filter(&config)?,
             start: config.eth.start,
             web3: Web3::new(WebSocket::new(&config.eth.rpc).await?),
+            step: config.step.ethereum,
         })
     }
 
@@ -134,7 +137,7 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         loop {
             block_number = eth.block_number().await?.as_u64();
             if block_number == start {
-                tokio::time::delay_for(Duration::from_secs(30)).await;
+                tokio::time::delay_for(Duration::from_secs(self.step)).await;
                 continue;
             }
 

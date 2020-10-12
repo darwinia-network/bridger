@@ -55,8 +55,11 @@ impl Listener {
             ));
         }
 
+        // 1. Transaction Listener
         let http = <EthereumService<Http>>::new_http(&config)?;
         l.register(http)?;
+
+        // 2. Relay Listener
         Ok(l)
     }
 }

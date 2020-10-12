@@ -4,8 +4,9 @@ use async_trait::async_trait;
 use std::{cell::RefCell, sync::Arc};
 
 mod eth;
+mod relay;
 
-pub use eth::EthereumService;
+pub use self::{eth::EthereumService, relay::RelayService};
 
 /// Bridge service
 #[async_trait(?Send)]

@@ -8,6 +8,7 @@ use std::{
     io::Error as Io,
     result::Result as StdResult,
 };
+use substrate_subxt::Error as Subxt;
 use toml::{de::Error as DeToml, ser::Error as SerToml};
 use web3::Error as Web3;
 
@@ -49,7 +50,7 @@ macro_rules! error {
     };
 }
 
-error! {Io, Bridger, DeToml, SerToml, Etc, Web3, Reqwest, SerdeJson}
+error! {Io, Bridger, DeToml, SerToml, Etc, Web3, Reqwest, SerdeJson, Subxt}
 
 /// Bridger Result
 pub type Result<T> = StdResult<T, Error>;

@@ -43,7 +43,10 @@ pub struct EthereumConfig {
 /// Service step
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Step {
-    ethereum: usize,
+    /// Ethereum step
+    pub ethereum: u64,
+    /// Relay Step
+    pub relay: u64,
 }
 
 /// Bridger Config
@@ -101,7 +104,10 @@ impl Default for Config {
                     },
                 },
             },
-            step: Step { ethereum: 30 },
+            step: Step {
+                ethereum: 30,
+                relay: 60,
+            },
         }
     }
 }

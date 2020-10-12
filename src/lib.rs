@@ -4,11 +4,11 @@
 #[macro_use]
 extern crate log;
 
-mod api;
 mod config;
 mod listener;
 mod runtime;
 
+pub mod api;
 pub mod cmd;
 pub mod pool;
 pub mod result;

@@ -1,5 +1,5 @@
 //! Ethereum Relay
-use crate::chain::eth::HeaderStuffs;
+use crate::chain::eth::HeaderStuff;
 use codec::Encode;
 use core::marker::PhantomData;
 use substrate_subxt::system::{System, SystemEventsDecoder};
@@ -21,7 +21,7 @@ pub struct ConfirmedBlockNumbers<T: EthereumRelay> {
 #[derive(Clone, Debug, PartialEq, Call, Encode)]
 pub struct SubmitProposalCall<T: EthereumRelay> {
     /// Ethereum Headerthings
-    pub proposal: Vec<HeaderStuffs>,
+    pub proposal: Vec<HeaderStuff>,
     /// Runtime marker
     pub _runtime: PhantomData<T>,
 }

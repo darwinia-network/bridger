@@ -32,25 +32,41 @@ impl EthashProof {
 }
 
 /// Json string format of `EthashProof`
-#[derive(Serialize, Encode)]
+#[derive(Serialize, Encode, Deserialize, PartialEq, Eq, Clone)]
 pub struct EthashProofJson {
     dag_nodes: Vec<String>,
     proof: Vec<String>,
 }
 
-impl From<&EthashProof> for EthashProofJson {
-    fn from(e: &EthashProof) -> EthashProofJson {
+impl Into<EthashProofJson> for EthashProof {
+    fn into(self) -> EthashProofJson {
         EthashProofJson {
-            dag_nodes: e
+            dag_nodes: self
                 .dag_nodes
                 .as_ref()
                 .iter()
                 .map(|n| format!("0x{}", hex!(n.0.to_vec())))
                 .collect(),
-            proof: e
+            proof: self
                 .proof
                 .iter()
                 .map(|p| format!("0x{}", hex!(p.0.to_vec())))
+                .collect(),
+        }
+    }
+}
+
+impl Into<EthashProof> for EthashProofJson {
+    fn into(self) -> EthashProof {
+        EthashProof {
+            dag_nodes: [
+                H512(bytes!(self.dag_nodes[0].as_str(), 64)),
+                H512(bytes!(self.dag_nodes[1].as_str(), 64)),
+            ],
+            proof: self
+                .proof
+                .iter()
+                .map(|p| H128(bytes!(p.as_str(), 16)))
                 .collect(),
         }
     }

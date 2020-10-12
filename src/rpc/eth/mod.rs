@@ -2,7 +2,7 @@
 mod block;
 mod header;
 
-use crate::{chain::eth::EthHeader, result::Result, rpc::RPC};
+use crate::{chain::eth::EthereumHeader, result::Result, rpc::RPC};
 use async_trait::async_trait;
 use reqwest::Client;
 
@@ -25,7 +25,7 @@ impl<'r> EthereumRPC<'r> {
 
 #[async_trait]
 impl<'r> RPC for EthereumRPC<'r> {
-    type Header = EthHeader;
+    type Header = EthereumHeader;
 
     async fn get_header_by_number(&self, block: u64) -> Result<Self::Header> {
         Ok(header::EthHeaderRPCResp::get(self.client, self.rpc, block)

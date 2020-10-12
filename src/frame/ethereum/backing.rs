@@ -1,5 +1,5 @@
 //! Darwinia Ethereum Backing
-use crate::chain::eth::{EthereumReceiptProof, RedeemFor};
+use crate::chain::eth::{EthereumReceiptProofThing, RedeemFor};
 use codec::Encode;
 use core::marker::PhantomData;
 use substrate_subxt::system::{System, SystemEventsDecoder};
@@ -15,7 +15,7 @@ pub struct SubmitProposalCall<T: EthereumBacking> {
     /// Ethereum Headerthings
     pub act: RedeemFor,
     /// Ethereum Receipt Proof
-    pub proof: EthereumReceiptProof,
+    pub proof: EthereumReceiptProofThing,
     /// Runtime marker
     pub _runtime: PhantomData<T>,
 }

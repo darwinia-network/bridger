@@ -1,5 +1,5 @@
 //! Ethereum rpcs
-use crate::{chain::eth::EthHeaderRPC, result::Result};
+use crate::{chain::eth::EthereumHeaderRPC, result::Result};
 use reqwest::Client;
 use serde_json::Value;
 
@@ -9,7 +9,7 @@ pub struct EthHeaderRPCResp {
     jsonrpc: String,
     id: i32,
     /// Header Result of RPC
-    pub result: EthHeaderRPC,
+    pub result: EthereumHeaderRPC,
 }
 
 impl EthHeaderRPCResp {

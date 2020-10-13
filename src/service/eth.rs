@@ -112,6 +112,7 @@ impl<T: Transport> EthereumService<T> {
                     .iter()
                     .map(|l| {
                         let block = l.block_number.unwrap_or_default().low_u64();
+                        let index = l.transaction_index.unwrap_or_default().low_u64();
                         if l.topics.contains(&self.contract.ring)
                             || l.topics.contains(&self.contract.kton)
                         {
@@ -120,6 +121,7 @@ impl<T: Transport> EthereumService<T> {
                                     l.transaction_hash.unwrap_or_default(),
                                 ),
                                 block,
+                                index,
                             }
                         } else {
                             EthereumTransaction {
@@ -127,6 +129,7 @@ impl<T: Transport> EthereumService<T> {
                                     l.transaction_hash.unwrap_or_default(),
                                 ),
                                 block,
+                                index,
                             }
                         }
                     })

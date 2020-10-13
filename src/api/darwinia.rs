@@ -1,11 +1,13 @@
 //! Darwinia API
 use crate::{
+    pool::EthereumTransaction,
     result::{Error, Result},
     Config,
 };
 use primitives::{
     chain::eth::{HeaderStuff, PendingHeader},
     frame::ethereum::{
+        backing::VerifiedProofStoreExt,
         game::{PendingHeadersStoreExt, RelayProposalT, RelayProposalsStoreExt},
         relay::{ConfirmedBlockNumbersStoreExt, SubmitProposalCallExt},
     },
@@ -83,13 +85,33 @@ impl Darwinia {
         Ok(self.client.submit_proposal(&self.signer, proposal).await?)
     }
 
+    /// Check if should redeem
+    pub async fn should_redeem(&self, tx: EthereumTransaction) -> Result<()> {
+        if let Some(res) = self
+            .client
+            .verified_proof(tx.hash(), tx.index, None)
+            .await?
+        {
+            if res {
+                Err(Error::Bridger(format!(
+                    "The tx {:?} has been redeemed",
+                    tx.hash,
+                )))
+            } else {
+                Ok(())
+            }
+        } else {
+            Ok(())
+        }
+    }
+
     /// Check if should relay
     pub async fn should_relay(&self, target: u64) -> Result<u64> {
         let last_confirmed = self.last_confirmed().await?;
         if target <= last_confirmed {
             return Err(Error::Bridger(format!(
                 "The target block {} is not greater than the last confirmed {}",
-                target, last_confirmed
+                target, last_confirmed,
             )));
         }
 
@@ -97,7 +119,7 @@ impl Darwinia {
         let confirmed_blocks = self.confirmed_block_numbers().await?;
         if confirmed_blocks.contains(&target) {
             return Err(Error::Bridger(format!(
-                "The target block {} has already been relayed",
+                "The target block {} has already been submitted",
                 target,
             )));
         }
@@ -113,10 +135,11 @@ impl Darwinia {
             }
         }
 
+        // Check if the target block is in relayer game
         let proposals = self.current_proposals().await?;
         if proposals.contains(&target) {
             return Err(Error::Bridger(format!(
-                "The target block {} has been submitted",
+                "The target block {} has been in relayer game",
                 target,
             )));
         }

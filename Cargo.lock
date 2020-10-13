@@ -683,7 +683,7 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-primitives"
 version = "0.0.8"
-source = "git+https://github.com/darwinia-network/bridge-primitives.git?branch=checker#835ccc5506b3d086b5ec7a6717f6e41f0da856c0"
+source = "git+https://github.com/darwinia-network/bridge-primitives.git?branch=checker#cac02e08f78905fc3a7bc365e134251ee76b4fb6"
 dependencies = [
  "frame-support",
  "pallet-im-online",
@@ -2649,9 +2649,9 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "pkg-config"
-version = "0.3.18"
+version = "0.3.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d36492546b6af1463394d46f0c834346f31548646f6ba10849802c9c9a27ac33"
+checksum = "3831453b3449ceb48b6d9c7ad7c96d5ea673e9b470a1dc578c2ce6521230884c"
 
 [[package]]
 name = "polling"

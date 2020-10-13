@@ -40,6 +40,23 @@ impl Darwinia {
         Ok(self.client.relay_proposals(None).await?)
     }
 
+    /// Get current proposals
+    pub async fn current_proposals(&self) -> Result<Vec<u64>> {
+        let proposals = self.relay_proposals().await?;
+        let mut blocks = vec![];
+        for p in proposals {
+            blocks.append(
+                &mut p
+                    .bonded_proposal
+                    .iter()
+                    .map(|bp| bp.1.header.number)
+                    .collect(),
+            )
+        }
+
+        Ok(blocks)
+    }
+
     /// Get confirmed block numbers
     pub async fn confirmed_block_numbers(&self) -> Result<Vec<u64>> {
         Ok(self.client.confirmed_block_numbers(None).await?)
@@ -96,6 +113,13 @@ impl Darwinia {
             }
         }
 
+        let proposals = self.current_proposals().await?;
+        if proposals.contains(&target) {
+            return Err(Error::Bridger(format!(
+                "The target block {} has been submitted",
+                target,
+            )));
+        }
         Ok(last_confirmed)
     }
 }

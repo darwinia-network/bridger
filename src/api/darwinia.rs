@@ -1,5 +1,8 @@
 //! Darwinia API
-use crate::{result::Result, Config};
+use crate::{
+    result::{Error, Result},
+    Config,
+};
 use primitives::{
     chain::eth::{HeaderStuff, PendingHeader},
     frame::ethereum::{
@@ -32,19 +35,18 @@ impl Darwinia {
         Ok(Darwinia { client, signer })
     }
 
+    /// Get confirmed block numbers
+    pub async fn confirmed_block_numbers(&self) -> Result<Vec<u64>> {
+        Ok(self.client.confirmed_block_numbers(None).await?)
+    }
+
     /// Get the last confirmed block
-    pub async fn last_confirmed(&self) -> Result<Option<u64>> {
+    pub async fn last_confirmed(&self) -> Result<u64> {
         Ok(
-            if let Some(confirmed) = self
-                .client
-                .confirmed_block_numbers(None)
-                .await?
-                .iter()
-                .max()
-            {
-                Some(*confirmed)
+            if let Some(confirmed) = self.confirmed_block_numbers().await?.iter().max() {
+                *confirmed
             } else {
-                None
+                0
             },
         )
     }
@@ -57,5 +59,38 @@ impl Darwinia {
     /// Submit Proposal
     pub async fn submit_proposal(&self, proposal: Vec<HeaderStuff>) -> Result<H256> {
         Ok(self.client.submit_proposal(&self.signer, proposal).await?)
+    }
+
+    /// Check if should relay
+    pub async fn should_relay(&self, target: u64) -> Result<u64> {
+        let last_confirmed = self.last_confirmed().await?;
+        if target <= last_confirmed {
+            return Err(Error::Bridger(format!(
+                "The target block {} is not greater than the last confirmed {}",
+                target, last_confirmed
+            )));
+        }
+
+        // Check if confirmed
+        let confirmed_blocks = self.confirmed_block_numbers().await?;
+        if confirmed_blocks.contains(&target) {
+            return Err(Error::Bridger(format!(
+                "The target block {} has already been relayed",
+                target,
+            )));
+        }
+
+        // Check if the target block is pending
+        let pending_headers = self.pending_headers().await?;
+        for p in pending_headers {
+            if p.1 == target {
+                return Err(Error::Bridger(format!(
+                    "The target block {} is pending",
+                    target,
+                )));
+            }
+        }
+
+        Ok(last_confirmed)
     }
 }

@@ -45,19 +45,15 @@ impl Service for RelayService {
         loop {
             tokio::time::delay_for(Duration::from_secs(self.step)).await;
 
-            let last = self
-                .darwinia
-                .last_confirmed()
-                .await
-                .unwrap_or(Some(0))
-                .unwrap_or(0);
-            info!("The last confirmed block is {:?}", last);
-
             // Try to relay
-            let pool = pool.lock().unwrap();
-            if let Some(max) = pool.ethereum.iter().max() {
-                if max.block > last {
-                    let parcel = self.shadow.proposal(last, max.block + 1, max.block).await;
+            let pool_clone = pool.lock().unwrap();
+            if let Some(max) = pool_clone.ethereum.iter().max() {
+                let max = max.block.to_owned();
+                drop(pool_clone);
+
+                if let Ok(last) = self.darwinia.should_relay(max).await {
+                    let parcel = self.shadow.proposal(last, max + 1, max).await;
+
                     if parcel.is_err() {
                         error!("{:?}", parcel);
                         continue;

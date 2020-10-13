@@ -6,7 +6,6 @@ extern crate log;
 
 mod config;
 mod listener;
-mod runtime;
 
 pub mod api;
 pub mod cmd;

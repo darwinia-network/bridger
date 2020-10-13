@@ -1,11 +1,12 @@
 //! Bridger Listener
 use crate::{
+    api::{Darwinia, Shadow},
     pool::Pool,
     result::{Error, Result},
-    service::{EthereumService, Service},
+    service::{EthereumService, RelayService, Service},
     Config,
 };
-use std::{cell::RefCell, sync::Arc};
+use std::sync::{Arc, Mutex};
 use web3::transports::http::Http;
 
 /// Bridger listener
@@ -34,10 +35,10 @@ impl Listener {
 
     /// Start services
     pub async fn start(&mut self) -> Result<()> {
-        let pool = Arc::new(RefCell::new(Pool::default()));
+        let pool = Arc::new(Mutex::new(Pool::default()));
         let result = futures::future::join_all(self.0.iter_mut().map(|s| {
             info!("Start service {}", s.name());
-            s.run(pool.clone())
+            s.run(Arc::clone(&pool))
         }))
         .await;
         for r in result {
@@ -47,7 +48,7 @@ impl Listener {
     }
 
     /// Generate listener from `Config`
-    pub fn from_config(config: Config) -> Result<Self> {
+    pub async fn from_config(config: Config) -> Result<Self> {
         let mut l = Self::default();
         if config.eth.rpc.starts_with("ws") {
             return Err(Error::Bridger(
@@ -55,8 +56,18 @@ impl Listener {
             ));
         }
 
+        // APIs
+        let shadow = Arc::new(Shadow::new(&config));
+        let darwinia = Arc::new(Darwinia::new(&config).await?);
+
+        // 1. Transaction Listener
+        // 2. Relay Listener
         let http = <EthereumService<Http>>::new_http(&config)?;
+        let relay = RelayService::new(&config, shadow, darwinia);
+
+        // Register
         l.register(http)?;
+        l.register(relay)?;
         Ok(l)
     }
 }

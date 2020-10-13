@@ -1,13 +1,16 @@
 //! Ethereum transaction service
 use crate::{
-    pool::{EthereumTransaction, Pool},
+    pool::{EthereumTransaction, EthereumTransactionHash, Pool},
     result::Result as BridgerResult,
     service::Service,
     Config,
 };
 use async_trait::async_trait;
 use primitives::bytes;
-use std::{cell::RefCell, sync::Arc, time::Duration};
+use std::{
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 use web3::{
     transports::{http::Http, ws::WebSocket},
     types::{BlockNumber, FilterBuilder, H160, H256, U64},
@@ -33,6 +36,7 @@ pub struct EthereumService<T: Transport> {
     filter: [FilterBuilder; 2],
     web3: Web3<T>,
     start: u64,
+    step: u64,
 }
 
 impl<T: Transport> EthereumService<T> {
@@ -76,6 +80,7 @@ impl<T: Transport> EthereumService<T> {
             filter: Self::parse_filter(&config)?,
             start: config.eth.start,
             web3: Web3::new(Http::new(&config.eth.rpc)?),
+            step: config.step.ethereum,
         })
     }
 
@@ -86,6 +91,7 @@ impl<T: Transport> EthereumService<T> {
             filter: Self::parse_filter(&config)?,
             start: config.eth.start,
             web3: Web3::new(WebSocket::new(&config.eth.rpc).await?),
+            step: config.step.ethereum,
         })
     }
 
@@ -105,12 +111,26 @@ impl<T: Transport> EthereumService<T> {
                     .await?
                     .iter()
                     .map(|l| {
+                        let block = l.block_number.unwrap_or_default().low_u64();
+                        let index = l.transaction_index.unwrap_or_default().low_u64();
                         if l.topics.contains(&self.contract.ring)
                             || l.topics.contains(&self.contract.kton)
                         {
-                            EthereumTransaction::Token(l.transaction_hash.unwrap_or_default())
+                            EthereumTransaction {
+                                hash: EthereumTransactionHash::Token(
+                                    l.transaction_hash.unwrap_or_default(),
+                                ),
+                                block,
+                                index,
+                            }
                         } else {
-                            EthereumTransaction::Deposit(l.transaction_hash.unwrap_or_default())
+                            EthereumTransaction {
+                                hash: EthereumTransactionHash::Deposit(
+                                    l.transaction_hash.unwrap_or_default(),
+                                ),
+                                block,
+                                index,
+                            }
                         }
                     })
                     .collect::<Vec<EthereumTransaction>>(),
@@ -126,7 +146,7 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, pool: Arc<RefCell<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         let eth = self.web3.eth();
         let mut block_number: u64;
         let mut start = self.start;
@@ -134,13 +154,15 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         loop {
             block_number = eth.block_number().await?.as_u64();
             if block_number == start {
-                tokio::time::delay_for(Duration::from_secs(30)).await;
+                tokio::time::delay_for(Duration::from_secs(self.step)).await;
                 continue;
             }
 
             let mut txs = self.scan(start, block_number).await?;
             info!("Found {} txs from {} to {}", txs.len(), start, block_number);
-            pool.borrow_mut().eth.append(&mut txs);
+
+            let mut pool = pool.lock().unwrap();
+            pool.ethereum.append(&mut txs);
             start = block_number;
         }
     }

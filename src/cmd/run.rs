@@ -12,7 +12,7 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     }
     env_logger::init();
 
-    let mut listener = Listener::from_config(Config::new(path)?)?;
+    let mut listener = Listener::from_config(Config::new(path)?).await?;
     listener.start().await?;
     Ok(())
 }

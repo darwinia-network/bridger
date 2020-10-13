@@ -41,10 +41,10 @@ features = ["full"]
 
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"
-version = "0.0.8"
-git = "https://github.com/darwinia-network/bridge-primitives.git"
+# version = "0.0.8"
+# git = "https://github.com/darwinia-network/bridge-primitives.git"
 # branch = "types"
-# path = "../bridge-primitives"
+path = "../bridge-primitives"
 features = ["runtime"]
 
 [dependencies.serde]

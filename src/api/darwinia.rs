@@ -6,7 +6,7 @@ use crate::{
 use primitives::{
     chain::eth::{HeaderStuff, PendingHeader},
     frame::ethereum::{
-        game::PendingHeadersStoreExt,
+        game::{PendingHeadersStoreExt, RelayProposalT, RelayProposalsStoreExt},
         relay::{ConfirmedBlockNumbersStoreExt, SubmitProposalCallExt},
     },
     runtime::DarwiniaRuntime,
@@ -33,6 +33,11 @@ impl Darwinia {
             .await?;
 
         Ok(Darwinia { client, signer })
+    }
+
+    /// Get relay proposals
+    pub async fn relay_proposals(&self) -> Result<Vec<RelayProposalT>> {
+        Ok(self.client.relay_proposals(None).await?)
     }
 
     /// Get confirmed block numbers

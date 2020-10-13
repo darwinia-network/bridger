@@ -7,7 +7,10 @@ use crate::{
 };
 use async_trait::async_trait;
 use primitives::bytes;
-use std::{cell::RefCell, sync::Arc, time::Duration};
+use std::{
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 use web3::{
     transports::{http::Http, ws::WebSocket},
     types::{BlockNumber, FilterBuilder, H160, H256, U64},
@@ -140,7 +143,7 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, pool: Arc<RefCell<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         let eth = self.web3.eth();
         let mut block_number: u64;
         let mut start = self.start;
@@ -154,7 +157,9 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
 
             let mut txs = self.scan(start, block_number).await?;
             info!("Found {} txs from {} to {}", txs.len(), start, block_number);
-            (*pool.borrow_mut()).ethereum.append(&mut txs);
+
+            let mut pool = pool.lock().unwrap();
+            pool.ethereum.append(&mut txs);
             start = block_number;
         }
     }

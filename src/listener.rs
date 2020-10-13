@@ -6,7 +6,7 @@ use crate::{
     service::{EthereumService, RelayService, Service},
     Config,
 };
-use std::{cell::RefCell, sync::Arc};
+use std::sync::{Arc, Mutex};
 use web3::transports::http::Http;
 
 /// Bridger listener
@@ -35,10 +35,10 @@ impl Listener {
 
     /// Start services
     pub async fn start(&mut self) -> Result<()> {
-        let pool = Arc::new(RefCell::new(Pool::default()));
+        let pool = Arc::new(Mutex::new(Pool::default()));
         let result = futures::future::join_all(self.0.iter_mut().map(|s| {
             info!("Start service {}", s.name());
-            s.run(pool.clone())
+            s.run(Arc::clone(&pool))
         }))
         .await;
         for r in result {

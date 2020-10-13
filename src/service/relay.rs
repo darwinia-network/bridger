@@ -7,7 +7,10 @@ use crate::{
     Pool,
 };
 use async_trait::async_trait;
-use std::{cell::RefCell, sync::Arc, time::Duration};
+use std::{
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 
 /// Attributes
 const SERVICE_NAME: &str = "relay";
@@ -38,7 +41,7 @@ impl Service for RelayService {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, pool: Arc<RefCell<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         loop {
             tokio::time::delay_for(Duration::from_secs(self.step)).await;
 
@@ -51,7 +54,8 @@ impl Service for RelayService {
             info!("The last confirmed block is {:?}", last);
 
             // Try to relay
-            if let Some(max) = pool.borrow_mut().ethereum.iter().max() {
+            let pool = pool.lock().unwrap();
+            if let Some(max) = pool.ethereum.iter().max() {
                 if max.block > last {
                     let parcel = self.shadow.proposal(last, max.block + 1, max.block).await;
                     if parcel.is_err() {
@@ -66,21 +70,5 @@ impl Service for RelayService {
                 }
             }
         }
-        // let eth = self.web3.eth();
-        // let mut block_number: u64;
-        // let mut start = self.start;
-        //
-        // loop {
-        //     block_number = eth.block_number().await?.as_u64();
-        //     if block_number == start {
-        //         tokio::time::delay_for(Duration::from_secs(30)).await;
-        //         continue;
-        //     }
-        //
-        //     let mut txs = self.scan(start, block_number).await?;
-        //     info!("Found {} txs from {} to {}", txs.len(), start, block_number);
-        //     pool.borrow_mut().eth.append(&mut txs);
-        //     start = block_number;
-        // }
     }
 }

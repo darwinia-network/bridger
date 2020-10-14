@@ -5,9 +5,9 @@ use crate::{
     Config,
 };
 use primitives::{
-    chain::eth::{HeaderStuff, PendingHeader},
+    chain::eth::{EthereumReceiptProofThing, HeaderStuff, PendingHeader, RedeemFor},
     frame::ethereum::{
-        backing::VerifiedProofStoreExt,
+        backing::{RedeemCallExt, VerifiedProofStoreExt},
         game::{PendingHeadersStoreExt, RelayProposalT, RelayProposalsStoreExt},
         relay::{ConfirmedBlockNumbersStoreExt, SubmitProposalCallExt},
     },
@@ -85,23 +85,29 @@ impl Darwinia {
         Ok(self.client.submit_proposal(&self.signer, proposal).await?)
     }
 
+    /// Redeem
+    pub async fn redeem(
+        &self,
+        redeem_for: RedeemFor,
+        proof: EthereumReceiptProofThing,
+    ) -> Result<H256> {
+        Ok(self.client.redeem(&self.signer, redeem_for, proof).await?)
+    }
+
     /// Check if should redeem
-    pub async fn should_redeem(&self, tx: EthereumTransaction) -> Result<()> {
+    pub async fn should_redeem(&self, tx: &EthereumTransaction) -> Result<bool> {
         if let Some(res) = self
             .client
             .verified_proof(tx.hash(), tx.index, None)
             .await?
         {
             if res {
-                Err(Error::Bridger(format!(
-                    "The tx {:?} has been redeemed",
-                    tx.hash,
-                )))
+                Ok(false)
             } else {
-                Ok(())
+                Ok(true)
             }
         } else {
-            Ok(())
+            Ok(true)
         }
     }
 

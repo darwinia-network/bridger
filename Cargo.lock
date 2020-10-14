@@ -683,7 +683,7 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-primitives"
 version = "0.0.8"
-source = "git+https://github.com/darwinia-network/bridge-primitives.git?branch=checker#b1f568678e57376c36cebee264c14ab59670a8a9"
+source = "git+https://github.com/darwinia-network/bridge-primitives.git?branch=checker#99a93d865119084740a913f70d3fba7fe8523d77"
 dependencies = [
  "frame-support",
  "pallet-im-online",

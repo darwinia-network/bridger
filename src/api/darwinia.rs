@@ -96,30 +96,19 @@ impl Darwinia {
 
     /// Check if should redeem
     pub async fn should_redeem(&self, tx: &EthereumTransaction) -> Result<bool> {
-        let last = self.last_confirmed().await?;
-        debug!(
-            "Check if should redeem block: {}, last_comfirmed: {}",
-            &tx.block, &last,
-        );
-        if tx.block > last {
+        if tx.block > self.last_confirmed().await? {
             return Ok(false);
         }
 
-        if let Some(res) = self
+        if self
             .client
-            .verified_proof(tx.hash(), tx.index, None)
+            .verified_proof((tx.hash(), tx.index), None)
             .await?
+            .is_some()
         {
-            if res {
-                debug!("Should not redeem");
-                Ok(false)
-            } else {
-                debug!("Should redeem");
-                Ok(true)
-            }
-        } else {
-            debug!("Should redeem");
             Ok(true)
+        } else {
+            Ok(false)
         }
     }
 
@@ -154,13 +143,13 @@ impl Darwinia {
         }
 
         // Check if the target block is in relayer game
-        // let proposals = self.current_proposals().await?;
-        // if proposals.contains(&target) {
-        //     return Err(Error::Bridger(format!(
-        //         "The target block {} has been in relayer game",
-        //         target,
-        //     )));
-        // }
+        let proposals = self.current_proposals().await?;
+        if proposals.contains(&target) {
+            return Err(Error::Bridger(format!(
+                "The target block {} has been in relayer game",
+                target,
+            )));
+        }
         Ok(last_confirmed)
     }
 }

@@ -49,21 +49,18 @@ impl Service for RelayService {
                 let max = max.block.to_owned();
                 drop(pool_clone);
 
-                match self.darwinia.should_relay(max).await {
-                    Ok(last) => {
-                        trace!("Trying to relay block {}...", max + 1);
-                        let parcel = self.shadow.proposal(last, max + 1, max).await;
-                        if parcel.is_err() {
-                            error!("{:?}", parcel);
-                            continue;
-                        }
-
-                        match self.darwinia.submit_proposal(vec![parcel?]).await {
-                            Ok(hash) => info!("Summited proposal {:?}", hash),
-                            Err(err) => error!("{:?}", err),
-                        }
+                if let Ok(last) = self.darwinia.should_relay(max).await {
+                    trace!("Trying to relay block {}...", max + 1);
+                    let parcel = self.shadow.proposal(last, max + 1, max).await;
+                    if parcel.is_err() {
+                        error!("{:?}", parcel);
+                        continue;
                     }
-                    Err(err) => warn!("{:?}", err),
+
+                    match self.darwinia.submit_proposal(vec![parcel?]).await {
+                        Ok(hash) => info!("Summited proposal {:?}", hash),
+                        Err(err) => error!("{:?}", err),
+                    }
                 }
             } else {
                 drop(pool_clone);

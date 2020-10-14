@@ -62,12 +62,12 @@ impl Listener {
 
         // 1. Transaction Listener
         // 2. Relay Listener
-        let http = <EthereumService<Http>>::new_http(&config)?;
+        let ethereum = <EthereumService<Http>>::new_http(&config)?;
         let relay = RelayService::new(&config, shadow.clone(), darwinia.clone());
         let redeem = RedeemService::new(&config, shadow, darwinia);
 
         // Register
-        l.register(http)?;
+        l.register(ethereum)?;
         l.register(relay)?;
         l.register(redeem)?;
         Ok(l)

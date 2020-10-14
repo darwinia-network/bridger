@@ -152,6 +152,7 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         let mut start = self.start;
 
         loop {
+            trace!("Looking for darwinia ethereum transactions...");
             block_number = eth.block_number().await?.as_u64();
             if block_number == start {
                 tokio::time::delay_for(Duration::from_secs(self.step)).await;
@@ -159,11 +160,14 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
             }
 
             let mut txs = self.scan(start, block_number).await?;
-            info!("Found {} txs from {} to {}", txs.len(), start, block_number);
+            if txs.len() > 0 {
+                info!("Found {} txs from {} to {}", txs.len(), start, block_number);
+            }
 
-            let mut pool = pool.lock().unwrap();
-            pool.ethereum.append(&mut txs);
+            let mut pool_cloned = pool.lock().unwrap();
+            pool_cloned.ethereum.append(&mut txs);
             start = block_number;
+            drop(pool_cloned);
         }
     }
 }

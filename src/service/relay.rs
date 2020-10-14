@@ -43,24 +43,30 @@ impl Service for RelayService {
 
     async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         loop {
+            trace!("Checking if need to relay a new ethereum block...");
             let pool_clone = pool.lock().unwrap();
             if let Some(max) = pool_clone.ethereum.iter().max() {
                 let max = max.block.to_owned();
                 drop(pool_clone);
 
-                if let Ok(last) = self.darwinia.should_relay(max).await {
-                    let parcel = self.shadow.proposal(last, max + 1, max).await;
+                match self.darwinia.should_relay(max).await {
+                    Ok(last) => {
+                        trace!("Trying to relay block {}...", max + 1);
+                        let parcel = self.shadow.proposal(last, max + 1, max).await;
+                        if parcel.is_err() {
+                            error!("{:?}", parcel);
+                            continue;
+                        }
 
-                    if parcel.is_err() {
-                        error!("{:?}", parcel);
-                        continue;
+                        match self.darwinia.submit_proposal(vec![parcel?]).await {
+                            Ok(hash) => info!("Summited proposal {:?}", hash),
+                            Err(err) => error!("{:?}", err),
+                        }
                     }
-
-                    match self.darwinia.submit_proposal(vec![parcel?]).await {
-                        Ok(hash) => info!("Summited proposal {:?}", hash),
-                        Err(err) => error!("{:?}", err),
-                    }
+                    Err(err) => warn!("{:?}", err),
                 }
+            } else {
+                drop(pool_clone);
             }
 
             // sleep

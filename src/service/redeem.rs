@@ -46,20 +46,29 @@ impl Service for RedeemService {
 
     async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         loop {
+            trace!("Looking for redeemable ethereum transactions...");
             let mut pool_clone = pool.lock().unwrap();
+            trace!(
+                "Currently we have {} txs need to be redeemed",
+                pool_clone.ethereum.len()
+            );
+            let last = self.darwinia.last_confirmed().await?;
             for index in 0..pool_clone.ethereum.len() {
                 let tx = &pool_clone.ethereum[index];
-                if self.darwinia.should_redeem(&tx).await? {
-                    let proof = self.shadow.receipt(hex!(&tx.hash()).as_str()).await?;
-                    let redeem_for = match tx.hash {
-                        EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
-                        EthereumTransactionHash::Token(_) => RedeemFor::Token,
-                    };
-                    let hash = self.darwinia.redeem(redeem_for, proof).await?;
-                    info!("Redeem tx {}", hash);
-                }
+                // if self.darwinia.should_redeem(&tx).await? {
+                let proof = self
+                    .shadow
+                    .receipt(&format!("0x{}", hex!(&tx.hash()).as_str()), last)
+                    .await?;
+                let redeem_for = match tx.hash {
+                    EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
+                    EthereumTransactionHash::Token(_) => RedeemFor::Token,
+                };
+                let hash = self.darwinia.redeem(redeem_for, proof).await?;
+                info!("Redeemed tx {}", hash);
 
                 pool_clone.ethereum.remove(index);
+                // }
             }
 
             // sleep

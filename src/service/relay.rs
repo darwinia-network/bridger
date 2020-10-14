@@ -44,26 +44,30 @@ impl Service for RelayService {
     async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         loop {
             trace!("Checking if need to relay a new ethereum block...");
+            debug!("Lock tx pool in relay service");
             let pool_clone = pool.lock().unwrap();
-            if let Some(max) = pool_clone.ethereum.iter().max() {
+            let txs = pool_clone.ethereum.to_owned();
+            debug!("UnLock tx pool in relay service");
+            drop(pool_clone);
+            if let Some(max) = txs.iter().max() {
                 let max = max.block.to_owned();
-                drop(pool_clone);
+                match self.darwinia.should_relay(max).await {
+                    Ok(Some(last)) => {
+                        trace!("Trying to relay block {}...", max + 1);
+                        let parcel = self.shadow.proposal(last, max + 1, max).await;
+                        if parcel.is_err() {
+                            error!("{:?}", parcel);
+                            continue;
+                        }
 
-                if let Ok(last) = self.darwinia.should_relay(max).await {
-                    trace!("Trying to relay block {}...", max + 1);
-                    let parcel = self.shadow.proposal(last, max + 1, max).await;
-                    if parcel.is_err() {
-                        error!("{:?}", parcel);
-                        continue;
+                        match self.darwinia.submit_proposal(vec![parcel?]).await {
+                            Ok(hash) => info!("Summited proposal {:?}", hash),
+                            Err(err) => error!("{:?}", err),
+                        }
                     }
-
-                    match self.darwinia.submit_proposal(vec![parcel?]).await {
-                        Ok(hash) => info!("Summited proposal {:?}", hash),
-                        Err(err) => error!("{:?}", err),
-                    }
+                    Ok(None) => {}
+                    Err(err) => warn!("{:?}", err),
                 }
-            } else {
-                drop(pool_clone);
             }
 
             // sleep

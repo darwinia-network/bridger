@@ -164,9 +164,11 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
                 info!("Found {} txs from {} to {}", txs.len(), start, block_number);
             }
 
+            debug!("Lock tx pool in ethereum service");
             let mut pool_cloned = pool.lock().unwrap();
             pool_cloned.ethereum.append(&mut txs);
             start = block_number;
+            debug!("UnLock tx pool in ethereum service");
             drop(pool_cloned);
         }
     }

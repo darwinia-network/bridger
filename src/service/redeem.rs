@@ -1,5 +1,4 @@
 //! Redeem Service
-
 use crate::{
     api::{Darwinia, Shadow},
     config::Config,
@@ -47,10 +46,11 @@ impl Service for RedeemService {
     async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         loop {
             trace!("Looking for redeemable ethereum transactions...");
+            debug!("Lock tx pool in relay service");
             let mut pool_clone = pool.lock().unwrap();
             trace!(
                 "Currently we have {} txs might need to be redeemed",
-                pool_clone.ethereum.len()
+                pool_clone.ethereum.len(),
             );
             let last = self.darwinia.last_confirmed().await?;
             let mut redeemed = vec![];
@@ -59,7 +59,7 @@ impl Service for RedeemService {
                     break;
                 }
                 let tx = &pool_clone.ethereum[index];
-                if self.darwinia.should_redeem(&tx).await? {
+                if self.darwinia.should_redeem(&tx).await? && tx.block < last {
                     let proof = self
                         .shadow
                         .receipt(&format!("0x{}", hex!(&tx.hash()).as_str()), last)
@@ -70,8 +70,8 @@ impl Service for RedeemService {
                     };
                     let hash = self.darwinia.redeem(redeem_for, proof).await?;
                     info!("Redeemed tx {}", hash);
+                    redeemed.push(index);
                 }
-                redeemed.push(index);
             }
 
             // sleep
@@ -83,6 +83,7 @@ impl Service for RedeemService {
                 .map(|(_, tx)| tx.clone())
                 .collect();
             drop(pool_clone);
+            debug!("UnLock tx pool in redeem service");
             tokio::time::delay_for(Duration::from_secs(self.step)).await;
         }
     }

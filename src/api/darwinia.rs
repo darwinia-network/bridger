@@ -1,9 +1,5 @@
 //! Darwinia API
-use crate::{
-    pool::EthereumTransaction,
-    result::{Error, Result},
-    Config,
-};
+use crate::{pool::EthereumTransaction, result::Result, Config};
 use primitives::{
     chain::eth::{EthereumReceiptProofThing, HeaderStuff, PendingHeader, RedeemFor},
     frame::ethereum::{
@@ -38,20 +34,24 @@ impl Darwinia {
     }
 
     /// Get relay proposals
-    pub async fn relay_proposals(&self) -> Result<Vec<RelayProposalT>> {
+    pub async fn proposals(&self) -> Result<Vec<RelayProposalT>> {
         Ok(self.client.proposals(None).await?)
     }
 
     /// Get current proposals
     pub async fn current_proposals(&self) -> Result<Vec<u64>> {
-        let proposals = self.relay_proposals().await?;
+        info!("Getting proposals...");
+        let proposals = self.proposals().await?;
         let mut blocks = vec![];
         for p in proposals {
             blocks.append(
                 &mut p
                     .bonded_proposal
                     .iter()
-                    .map(|bp| bp.1.header.number)
+                    .map(|bp| {
+                        println!("{:?}", bp);
+                        bp.1.header.number
+                    })
                     .collect(),
             )
         }
@@ -96,60 +96,39 @@ impl Darwinia {
 
     /// Check if should redeem
     pub async fn should_redeem(&self, tx: &EthereumTransaction) -> Result<bool> {
-        if tx.block > self.last_confirmed().await? {
-            return Ok(false);
-        }
-
-        if self
+        Ok(!self
             .client
             .verified_proof((tx.hash(), tx.index), None)
             .await?
-            .is_some()
-        {
-            Ok(true)
-        } else {
-            Ok(false)
-        }
+            .unwrap_or(true))
     }
 
     /// Check if should relay
-    pub async fn should_relay(&self, target: u64) -> Result<u64> {
+    pub async fn should_relay(&self, target: u64) -> Result<Option<u64>> {
         let last_confirmed = self.last_confirmed().await?;
         if target <= last_confirmed {
-            return Err(Error::Bridger(format!(
-                "The target block {} is not greater than the last confirmed {}",
-                target, last_confirmed,
-            )));
+            return Ok(None);
         }
 
         // Check if confirmed
         let confirmed_blocks = self.confirmed_block_numbers().await?;
         if confirmed_blocks.contains(&target) {
-            return Err(Error::Bridger(format!(
-                "The target block {} has already been submitted",
-                target,
-            )));
+            return Ok(None);
         }
 
         // Check if the target block is pending
         let pending_headers = self.pending_headers().await?;
         for p in pending_headers {
             if p.1 == target {
-                return Err(Error::Bridger(format!(
-                    "The target block {} is pending",
-                    target,
-                )));
+                return Ok(None);
             }
         }
 
         // Check if the target block is in relayer game
         let proposals = self.current_proposals().await?;
         if proposals.contains(&target) {
-            return Err(Error::Bridger(format!(
-                "The target block {} has been in relayer game",
-                target,
-            )));
+            return Ok(None);
         }
-        Ok(last_confirmed)
+        Ok(Some(last_confirmed))
     }
 }

@@ -46,9 +46,6 @@ impl Service for RedeemService {
 
     async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         loop {
-            tokio::time::delay_for(Duration::from_secs(self.step)).await;
-
-            // Try to relay
             let mut pool_clone = pool.lock().unwrap();
             for index in 0..pool_clone.ethereum.len() {
                 let tx = &pool_clone.ethereum[index];
@@ -58,11 +55,16 @@ impl Service for RedeemService {
                         EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
                         EthereumTransactionHash::Token(_) => RedeemFor::Token,
                     };
-                    self.darwinia.redeem(redeem_for, proof).await?;
+                    let hash = self.darwinia.redeem(redeem_for, proof).await?;
+                    info!("Redeem tx {}", hash);
                 }
 
                 pool_clone.ethereum.remove(index);
             }
+
+            // sleep
+            drop(pool_clone);
+            tokio::time::delay_for(Duration::from_secs(self.step)).await;
         }
     }
 }

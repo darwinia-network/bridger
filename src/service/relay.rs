@@ -43,9 +43,6 @@ impl Service for RelayService {
 
     async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         loop {
-            tokio::time::delay_for(Duration::from_secs(self.step)).await;
-
-            // Try to relay
             let pool_clone = pool.lock().unwrap();
             if let Some(max) = pool_clone.ethereum.iter().max() {
                 let max = max.block.to_owned();
@@ -65,6 +62,9 @@ impl Service for RelayService {
                     }
                 }
             }
+
+            // sleep
+            tokio::time::delay_for(Duration::from_secs(self.step)).await;
         }
     }
 }

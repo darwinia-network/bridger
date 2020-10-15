@@ -67,7 +67,8 @@ impl Into<EthereumHeader> for EthereumHeaderRPC {
 pub struct EthereumHeader {
     parent_hash: [u8; 32],
     timestamp: u64,
-    number: u64,
+    /// Block number
+    pub number: u64,
     author: [u8; 20],
     transactions_root: [u8; 32],
     uncles_hash: [u8; 32],

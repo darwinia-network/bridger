@@ -19,7 +19,7 @@ pub struct ConfirmedBlockNumbers<T: EthereumRelay> {
 
 /// Submit proposal call
 #[derive(Clone, Debug, PartialEq, Call, Encode)]
-pub struct SubmitProposalCall<T: EthereumRelay> {
+pub struct SubmitProposal<T: EthereumRelay> {
     /// Ethereum Headerthings
     pub proposal: Vec<HeaderStuff>,
     /// Runtime marker

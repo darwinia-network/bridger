@@ -7,7 +7,7 @@ use crate::{
 use codec::{Decode, Encode};
 
 /// Ethereum HeaderThing
-#[derive(Encode, Decode, Debug)]
+#[derive(Encode, Decode, Debug, Default)]
 pub struct HeaderThing {
     /// Ethereum header
     pub header: EthereumHeader,

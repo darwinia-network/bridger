@@ -1,10 +1,10 @@
 //! Darwinia API
 use crate::{pool::EthereumTransaction, result::Result, Config};
 use primitives::{
-    chain::eth::{EthereumReceiptProofThing, HeaderStuff, PendingHeader, RedeemFor},
+    chain::eth::{EthereumReceiptProofThing, HeaderStuff, RedeemFor},
     frame::ethereum::{
         backing::{RedeemCallExt, VerifiedProofStoreExt},
-        game::{PendingHeadersStoreExt, ProposalsStoreExt, RelayProposalT},
+        game::{EthereumRelayerGame, PendingHeadersStoreExt, ProposalsStoreExt},
         relay::{ConfirmedBlockNumbersStoreExt, SubmitProposalCallExt},
     },
     runtime::DarwiniaRuntime,
@@ -12,6 +12,10 @@ use primitives::{
 use sp_keyring::sr25519::sr25519::Pair;
 use substrate_subxt::{sp_core::Pair as PairTrait, Client, ClientBuilder, PairSigner};
 use web3::types::H256;
+
+// Types
+type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingHeader;
+type RelayProposal = <DarwiniaRuntime as EthereumRelayerGame>::RelayProposal;
 
 /// Dawrinia API
 pub struct Darwinia {
@@ -34,7 +38,7 @@ impl Darwinia {
     }
 
     /// Get relay proposals
-    pub async fn proposals(&self) -> Result<Vec<RelayProposalT>> {
+    pub async fn proposals(&self) -> Result<Vec<RelayProposal>> {
         Ok(self.client.proposals(None).await?)
     }
 
@@ -48,10 +52,7 @@ impl Darwinia {
                 &mut p
                     .bonded_proposal
                     .iter()
-                    .map(|bp| {
-                        println!("{:?}", bp);
-                        bp.1.header.number
-                    })
+                    .map(|bp| bp.1.header.number)
                     .collect(),
             )
         }
@@ -100,7 +101,7 @@ impl Darwinia {
             .client
             .verified_proof((tx.hash(), tx.index), None)
             .await?
-            .unwrap_or(true))
+            .unwrap_or(false))
     }
 
     /// Check if should relay
@@ -125,10 +126,10 @@ impl Darwinia {
         }
 
         // Check if the target block is in relayer game
-        let proposals = self.current_proposals().await?;
-        if proposals.contains(&target) {
-            return Ok(None);
-        }
+        // let proposals = self.current_proposals().await?;
+        // if proposals.contains(&target) {
+        //     return Ok(None);
+        // }
         Ok(Some(last_confirmed))
     }
 }

@@ -1,8 +1,8 @@
 //! Darwinia shadow API
 use crate::{result::Result, Config};
 use primitives::chain::eth::{
-    EthereumReceiptProofThing, EthereumReceiptProofThingJson, HeaderStuff, HeaderStuffJson,
-    HeaderThing, HeaderThingWithConfirmationJson,
+    EthereumHeaderThing, EthereumHeaderThingWithConfirmationJson, EthereumReceiptProofThing,
+    EthereumReceiptProofThingJson, HeaderStuff, HeaderStuffJson,
 };
 use reqwest::Client;
 use serde::Serialize;
@@ -51,8 +51,8 @@ impl Shadow {
     ///   shadow.header_thing(42).await.unwrap();
     /// }
     /// ```
-    pub async fn header_thing(&self, number: usize) -> Result<HeaderThing> {
-        let json: HeaderThingWithConfirmationJson = self
+    pub async fn header_thing(&self, number: usize) -> Result<EthereumHeaderThing> {
+        let json: EthereumHeaderThingWithConfirmationJson = self
             .http
             .get(&format!("{}/eth/header/{}", &self.api, number))
             .send()

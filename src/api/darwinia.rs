@@ -39,12 +39,16 @@ impl Darwinia {
 
     /// Get relay proposals
     pub async fn proposals(&self) -> Result<Vec<RelayProposal>> {
-        Ok(self.client.proposals(None).await?)
+        let mut proposals = vec![];
+        let mut iter = self.client.proposals_iter(None).await?;
+        for (_, mut p) in iter.next().await? {
+            proposals.append(&mut p);
+        }
+        Ok(proposals)
     }
 
     /// Get current proposals
     pub async fn current_proposals(&self) -> Result<Vec<u64>> {
-        info!("Getting proposals...");
         let proposals = self.proposals().await?;
         let mut blocks = vec![];
         for p in proposals {
@@ -52,7 +56,10 @@ impl Darwinia {
                 &mut p
                     .bonded_proposal
                     .iter()
-                    .map(|bp| bp.1.header.number)
+                    .map(|bp| {
+                        info!("{}", bp.1.header.number);
+                        bp.1.header.number
+                    })
                     .collect(),
             )
         }
@@ -126,10 +133,11 @@ impl Darwinia {
         }
 
         // Check if the target block is in relayer game
-        // let proposals = self.current_proposals().await?;
-        // if proposals.contains(&target) {
-        //     return Ok(None);
-        // }
+        let proposals = self.current_proposals().await?;
+        if !proposals.contains(&target) {
+            return Ok(None);
+        }
+
         Ok(Some(last_confirmed))
     }
 }

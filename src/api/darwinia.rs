@@ -41,7 +41,7 @@ impl Darwinia {
     pub async fn proposals(&self) -> Result<Vec<RelayProposal>> {
         let mut proposals = vec![];
         let mut iter = self.client.proposals_iter(None).await?;
-        for (_, mut p) in iter.next().await? {
+        if let Some((_, mut p)) = iter.next().await? {
             proposals.append(&mut p);
         }
         Ok(proposals)

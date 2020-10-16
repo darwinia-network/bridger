@@ -3,10 +3,11 @@ use crate::{pool::Pool, result::Result};
 use async_trait::async_trait;
 use std::sync::{Arc, Mutex};
 
-mod eth;
+mod ethereum;
+mod redeem;
 mod relay;
 
-pub use self::{eth::EthereumService, relay::RelayService};
+pub use self::{ethereum::EthereumService, redeem::RedeemService, relay::RelayService};
 
 /// Bridge service
 #[async_trait(?Send)]

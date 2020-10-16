@@ -683,7 +683,8 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-primitives"
 version = "0.0.8"
-source = "git+https://github.com/darwinia-network/bridge-primitives.git?branch=checker#cac02e08f78905fc3a7bc365e134251ee76b4fb6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b01e6e31295465ebab6ee9737ca138165e4212bccbecd40219129d0cb5ebf78c"
 dependencies = [
  "frame-support",
  "pallet-im-online",
@@ -698,7 +699,7 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridger"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "async-trait",
  "darwinia-bridge-primitives",
@@ -3049,9 +3050,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.4.0"
+version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36f45b719a674bf4b828ff318906d6c133264c793eff7a41e30074a45b5099e2"
+checksum = "8963b85b8ce3074fecffde43b4b0dded83ce2f367dc8d363afc56679f3ee820b"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -3071,9 +3072,9 @@ dependencies = [
 
 [[package]]
 name = "regex-syntax"
-version = "0.6.19"
+version = "0.6.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c17be88d9eaa858870aa5e48cc406c206e4600e983fc4f06bbe5750d93d09761"
+checksum = "8cab7a364d15cde1e505267766a2d3c4e22a843e1a601f0fa7564c0f82ced11c"
 
 [[package]]
 name = "remove_dir_all"

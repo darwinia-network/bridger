@@ -139,7 +139,6 @@ impl<T: Transport> EthereumService<T> {
         Ok(txs)
     }
 }
-
 #[async_trait(?Send)]
 impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
     fn name<'e>(&self) -> &'e str {
@@ -152,18 +151,25 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         let mut start = self.start;
 
         loop {
-            block_number = eth.block_number().await?.as_u64();
-            if block_number == start {
-                tokio::time::delay_for(Duration::from_secs(self.step)).await;
-                continue;
+            if let Ok(mut pool_cloned) = pool.try_lock() {
+                trace!("Looking for darwinia ethereum transactions...");
+                block_number = eth.block_number().await?.as_u64();
+                if block_number == start {
+                    tokio::time::delay_for(Duration::from_secs(self.step)).await;
+                    continue;
+                }
+
+                let mut txs = self.scan(start, block_number).await?;
+                if !txs.is_empty() {
+                    info!("Found {} txs from {} to {}", txs.len(), start, block_number);
+                }
+
+                pool_cloned.ethereum.append(&mut txs);
+                start = block_number;
+                drop(pool_cloned);
             }
 
-            let mut txs = self.scan(start, block_number).await?;
-            info!("Found {} txs from {} to {}", txs.len(), start, block_number);
-
-            let mut pool = pool.lock().unwrap();
-            pool.ethereum.append(&mut txs);
-            start = block_number;
+            tokio::time::delay_for(Duration::from_secs(self.step)).await;
         }
     }
 }

@@ -47,6 +47,8 @@ pub struct Step {
     pub ethereum: u64,
     /// Relay Step
     pub relay: u64,
+    /// Relay Step
+    pub redeem: u64,
 }
 
 /// Bridger Config
@@ -107,6 +109,7 @@ impl Default for Config {
             step: Step {
                 ethereum: 30,
                 relay: 60,
+                redeem: 90,
             },
         }
     }

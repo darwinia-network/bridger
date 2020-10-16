@@ -3,7 +3,7 @@ use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 
 /// Ethereum transaction event with hash
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub enum EthereumTransactionHash {
     /// Deposit event
     Deposit(H256),
@@ -12,7 +12,7 @@ pub enum EthereumTransactionHash {
 }
 
 /// Reedeemable Ethereum transaction
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone)]
 pub struct EthereumTransaction {
     /// Transaction event with hash
     pub hash: EthereumTransactionHash,

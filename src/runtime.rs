@@ -1,12 +1,11 @@
 //! Darwinia Runtime
 #![cfg(feature = "runtime")]
+
 use crate::{
-    chain::{
-        eth::{HeaderThing, PendingHeader},
-        RelayProposal,
-    },
+    chain::{eth::EthereumHeaderThing, RelayProposal},
     frame::ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay},
 };
+
 use substrate_subxt::{
     balances::{AccountData, Balances},
     extrinsic::DefaultExtra,
@@ -52,9 +51,9 @@ impl EthereumRelayerGame for DarwiniaRuntime {
     type RelayProposal = RelayProposal<
         <Self as System>::AccountId,
         <Self as Balances>::Balance,
-        HeaderThing,
+        EthereumHeaderThing,
         <Self as System>::Hash,
     >;
-    type PendingHeader = PendingHeader;
+    type PendingHeader = (<Self as System>::BlockNumber, u64, EthereumHeaderThing);
 }
 impl EthereumBacking for DarwiniaRuntime {}

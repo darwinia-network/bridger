@@ -56,10 +56,7 @@ impl Darwinia {
                 &mut p
                     .bonded_proposal
                     .iter()
-                    .map(|bp| {
-                        info!("{}", bp.1.header.number);
-                        bp.1.header.number
-                    })
+                    .map(|bp| bp.1.header.number)
                     .collect(),
             )
         }
@@ -134,7 +131,7 @@ impl Darwinia {
 
         // Check if the target block is in relayer game
         let proposals = self.current_proposals().await?;
-        if !proposals.contains(&target) {
+        if !proposals.is_empty() && proposals.contains(&target) {
             return Ok(None);
         }
 

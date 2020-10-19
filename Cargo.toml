@@ -1,6 +1,6 @@
 [package]
 name = "darwinia-bridger"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["clearloop <udtrokia@gmail.com>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -25,7 +25,7 @@ futures = "0.3.5"
 log = "0.4.11"
 sp-keyring = "2.0.0"
 structopt = "0.3.18"
-substrate-subxt = "0.12.0"
+substrate-subxt = "0.13.0"
 toml = "0.5.6"
 web3 = "0.13.0"
 serde_json = "1.0"
@@ -41,9 +41,9 @@ features = ["full"]
 
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"
-version = "0.0.8"
-# git = "https://github.com/darwinia-network/bridge-primitives.git"
-# branch = "checker"
+version = "0.0.10"
+git = "https://github.com/darwinia-network/bridge-primitives.git"
+# branch = "bump"
 # path = "../bridge-primitives"
 features = ["runtime"]
 

@@ -56,10 +56,7 @@ impl Darwinia {
                 &mut p
                     .bonded_proposal
                     .iter()
-                    .map(|bp| {
-                        info!("{}", bp.1.header.number);
-                        bp.1.header.number
-                    })
+                    .map(|bp| bp.1.header.number)
                     .collect(),
             )
         }
@@ -112,7 +109,8 @@ impl Darwinia {
     }
 
     /// Check if should relay
-    pub async fn should_relay(&self, target: u64) -> Result<Option<u64>> {
+    pub async fn should_relay(&self, mut target: u64) -> Result<Option<u64>> {
+        target += 1;
         let last_confirmed = self.last_confirmed().await?;
         if target <= last_confirmed {
             return Ok(None);
@@ -134,7 +132,7 @@ impl Darwinia {
 
         // Check if the target block is in relayer game
         let proposals = self.current_proposals().await?;
-        if !proposals.contains(&target) {
+        if !proposals.is_empty() && proposals.contains(&target) {
             return Ok(None);
         }
 

@@ -41,7 +41,7 @@ features = ["full"]
 
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"
-version = "0.0.9"
+version = "0.0.10"
 git = "https://github.com/darwinia-network/bridge-primitives.git"
 # branch = "bump"
 # path = "../bridge-primitives"

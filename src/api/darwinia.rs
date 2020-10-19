@@ -109,8 +109,7 @@ impl Darwinia {
     }
 
     /// Check if should relay
-    pub async fn should_relay(&self, mut target: u64) -> Result<Option<u64>> {
-        target += 1;
+    pub async fn should_relay(&self, target: u64) -> Result<Option<u64>> {
         let last_confirmed = self.last_confirmed().await?;
         if target <= last_confirmed {
             return Ok(None);

@@ -48,7 +48,7 @@ impl Service for RelayService {
                 let txs = &pool_clone.ethereum;
                 if let Some(max) = txs.iter().max() {
                     let max = max.block.to_owned();
-                    match self.darwinia.should_relay(max).await {
+                    match self.darwinia.should_relay(max + 1).await {
                         Ok(Some(last)) => {
                             trace!("Trying to relay block {}...", max + 1);
                             let parcel = self.shadow.proposal(last, max + 1, max).await;

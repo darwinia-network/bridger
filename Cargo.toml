@@ -1,6 +1,6 @@
 [package]
 name = "darwinia-bridger"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["clearloop <udtrokia@gmail.com>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -41,9 +41,9 @@ features = ["full"]
 
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"
-# version = "0.0.8"
+version = "0.0.9"
 git = "https://github.com/darwinia-network/bridge-primitives.git"
-branch = "bump"
+# branch = "bump"
 # path = "../bridge-primitives"
 features = ["runtime"]
 

@@ -3,7 +3,11 @@
 
 use crate::{
     chain::{eth::EthereumHeaderThing, RelayProposal},
-    frame::ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay},
+    frame::{
+        collective::Council,
+        ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay},
+        sudo::Sudo,
+    },
 };
 
 use substrate_subxt::{
@@ -15,7 +19,6 @@ use substrate_subxt::{
         traits::{BlakeTwo256, IdentifyAccount, Verify},
         MultiSignature, OpaqueExtrinsic,
     },
-    sudo::Sudo,
     system::System,
     Runtime,
 };
@@ -23,7 +26,6 @@ use substrate_subxt::{
 /// Darwinia Runtime
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct DarwiniaRuntime;
-
 impl Runtime for DarwiniaRuntime {
     type Signature = MultiSignature;
     type Extra = DefaultExtra<Self>;
@@ -45,6 +47,7 @@ impl System for DarwiniaRuntime {
     type AccountData = AccountData<<Self as Balances>::Balance>;
 }
 
+impl Council for DarwiniaRuntime {}
 impl Sudo for DarwiniaRuntime {}
 impl EthereumRelay for DarwiniaRuntime {}
 impl EthereumRelayerGame for DarwiniaRuntime {

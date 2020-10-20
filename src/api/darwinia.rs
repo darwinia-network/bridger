@@ -60,19 +60,14 @@ impl Darwinia {
 
         let pk = signer.signer().public().to_string();
         let sudo = client.key(None).await?.to_string();
-        let council = client
-            .members(None)
-            .await?
-            .iter()
-            .map(|a| a.to_string())
-            .collect::<Vec<String>>();
+        let council = client.members(None).await?;
 
         Ok(Darwinia {
             client,
             signer,
             role: if sudo == pk {
                 Role::Sudo
-            } else if council.contains(&pk) {
+            } else if council.iter().any(|cpk| cpk.to_string() == pk) {
                 Role::Council
             } else {
                 Role::Normal

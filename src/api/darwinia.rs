@@ -17,11 +17,23 @@ use web3::types::H256;
 type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingHeader;
 type RelayProposal = <DarwiniaRuntime as EthereumRelayerGame>::RelayProposal;
 
+/// Account Role
+pub enum Role {
+    /// Sudo Account
+    Sudo,
+    /// Council Member
+    Council,
+    /// Normal Account
+    Normal,
+}
+
 /// Dawrinia API
 pub struct Darwinia {
     client: Client<DarwiniaRuntime>,
     /// Keyring signer
     pub signer: PairSigner<DarwiniaRuntime, Pair>,
+    /// Account Role
+    pub role: Role,
 }
 
 impl Darwinia {
@@ -34,7 +46,11 @@ impl Darwinia {
             .build()
             .await?;
 
-        Ok(Darwinia { client, signer })
+        Ok(Darwinia {
+            client,
+            signer,
+            role: Role::Normal,
+        })
     }
 
     /// Get relay proposals

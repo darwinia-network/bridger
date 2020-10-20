@@ -2,10 +2,14 @@
 use crate::{pool::EthereumTransaction, result::Result, Config};
 use primitives::{
     chain::eth::{EthereumReceiptProofThing, HeaderStuff, RedeemFor},
-    frame::ethereum::{
-        backing::{RedeemCallExt, VerifiedProofStoreExt},
-        game::{EthereumRelayerGame, PendingHeadersStoreExt, ProposalsStoreExt},
-        relay::{ConfirmedBlockNumbersStoreExt, SubmitProposalCallExt},
+    frame::{
+        collective::MembersStoreExt,
+        ethereum::{
+            backing::{RedeemCallExt, VerifiedProofStoreExt},
+            game::{EthereumRelayerGame, PendingHeadersStoreExt, ProposalsStoreExt},
+            relay::{ConfirmedBlockNumbersStoreExt, SubmitProposalCallExt},
+        },
+        sudo::KeyStoreExt,
     },
     runtime::DarwiniaRuntime,
 };
@@ -45,6 +49,24 @@ impl Darwinia {
             .set_url(&config.node)
             .build()
             .await?;
+
+        let pk = signer.signer().public().to_string();
+        let sudo = client.key(None).await?.to_string();
+        // let council: Vec<String> = client
+        //     .members(None)
+        //     .await?
+        //     .iter()
+        //     .map(|a| a.to_string())
+        //     .collect();
+
+        println!(
+            "pk {:?} \n\
+             sudo {:?} \n\
+             ",
+            // council {:?}",
+            pk,
+            sudo, // council
+        );
 
         Ok(Darwinia {
             client,

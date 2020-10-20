@@ -50,12 +50,12 @@ impl Service for GuardService {
             trace!("Checking pending headers...");
             let pending_headers = self.darwinia.pending_headers().await?;
             for header in pending_headers {
-                let json = self
+                let ht = self
                     .shadow
                     .header_thing(header.2.header.number as usize)
                     .await?;
 
-                if header.2 == json.into() {
+                if header.2 == ht {
                     info!("Approved header {}", header.1);
                     self.darwinia.approve_pending_header(header.1).await
                 } else {

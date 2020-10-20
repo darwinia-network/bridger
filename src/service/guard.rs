@@ -1,6 +1,6 @@
 //! Guard Service
 use crate::{
-    api::{Darwinia, Shadow},
+    api::{Darwinia, Role, Shadow},
     config::Config,
     result::Result as BridgerResult,
     service::Service,
@@ -42,8 +42,28 @@ impl Service for GuardService {
     }
 
     async fn run(&mut self, _: Arc<Mutex<Pool>>) -> BridgerResult<()> {
+        if self.darwinia.role == Role::Normal {
+            return Ok(());
+        }
+
         loop {
-            // let pending_headers = self.darwinia.pending_headers().await?;
+            trace!("Checking pending headers...");
+            let pending_headers = self.darwinia.pending_headers().await?;
+            for header in pending_headers {
+                let json = self
+                    .shadow
+                    .header_thing(header.2.header.number as usize)
+                    .await?;
+
+                if header.2 == json.into() {
+                    info!("Approved header {}", header.1);
+                    self.darwinia.approve_pending_header(header.1).await
+                } else {
+                    info!("Rejected header {}", header.1);
+                    self.darwinia.reject_pending_header(header.1).await
+                }?;
+            }
+
             tokio::time::delay_for(Duration::from_secs(self.step)).await;
         }
     }

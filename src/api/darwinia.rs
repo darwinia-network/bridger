@@ -1,20 +1,27 @@
 //! Darwinia API
 use crate::{pool::EthereumTransaction, result::Result, Config};
+use core::marker::PhantomData;
 use primitives::{
     chain::eth::{EthereumReceiptProofThing, HeaderStuff, RedeemFor},
     frame::{
-        collective::MembersStoreExt,
+        collective::{ExecuteCallExt, MembersStoreExt},
         ethereum::{
             backing::{RedeemCallExt, VerifiedProofStoreExt},
             game::{EthereumRelayerGame, PendingHeadersStoreExt, ProposalsStoreExt},
-            relay::{ConfirmedBlockNumbersStoreExt, SubmitProposalCallExt},
+            relay::{
+                ApprovePendingHeader, ConfirmedBlockNumbersStoreExt, RejectPendingHeader,
+                SubmitProposalCallExt,
+            },
         },
-        sudo::KeyStoreExt,
+        sudo::{KeyStoreExt, SudoCallExt},
     },
     runtime::DarwiniaRuntime,
 };
 use sp_keyring::sr25519::sr25519::Pair;
-use substrate_subxt::{sp_core::Pair as PairTrait, Client, ClientBuilder, PairSigner};
+use substrate_subxt::{
+    sp_core::{Encode, Pair as PairTrait},
+    Client, ClientBuilder, PairSigner,
+};
 use web3::types::H256;
 
 // Types
@@ -22,6 +29,7 @@ type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingHeader;
 type RelayProposal = <DarwiniaRuntime as EthereumRelayerGame>::RelayProposal;
 
 /// Account Role
+#[derive(PartialEq, Eq)]
 pub enum Role {
     /// Sudo Account
     Sudo,
@@ -52,26 +60,57 @@ impl Darwinia {
 
         let pk = signer.signer().public().to_string();
         let sudo = client.key(None).await?.to_string();
-        // let council: Vec<String> = client
-        //     .members(None)
-        //     .await?
-        //     .iter()
-        //     .map(|a| a.to_string())
-        //     .collect();
-
-        println!(
-            "pk {:?} \n\
-             sudo {:?} \n\
-             ",
-            // council {:?}",
-            pk,
-            sudo, // council
-        );
+        let council = client
+            .members(None)
+            .await?
+            .iter()
+            .map(|a| a.to_string())
+            .collect::<Vec<String>>();
 
         Ok(Darwinia {
             client,
             signer,
-            role: Role::Normal,
+            role: if sudo == pk {
+                Role::Sudo
+            } else if council.contains(&pk) {
+                Role::Council
+            } else {
+                Role::Normal
+            },
+        })
+    }
+
+    /// Approve pending header
+    pub async fn approve_pending_header(&self, pending: u64) -> Result<H256> {
+        let ex = self.client.encode(ApprovePendingHeader {
+            pending,
+            _runtime: PhantomData::default(),
+        })?;
+        Ok(match self.role {
+            Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
+            Role::Council => {
+                self.client
+                    .execute(&self.signer, &ex, ex.size_hint() as u32)
+                    .await?
+            }
+            Role::Normal => H256::from([0; 32]),
+        })
+    }
+
+    /// Reject pending header
+    pub async fn reject_pending_header(&self, pending: u64) -> Result<H256> {
+        let ex = self.client.encode(RejectPendingHeader {
+            pending,
+            _runtime: PhantomData::default(),
+        })?;
+        Ok(match self.role {
+            Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
+            Role::Council => {
+                self.client
+                    .execute(&self.signer, &ex, ex.size_hint() as u32)
+                    .await?
+            }
+            Role::Normal => H256::from([0; 32]),
         })
     }
 

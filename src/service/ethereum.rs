@@ -18,7 +18,7 @@ use web3::{
 };
 
 /// Attributes
-const SERVICE_NAME: &str = "ethereum";
+const SERVICE_NAME: &str = "ETHEREUM";
 
 /// Darwinia contract addresses
 pub struct ContractAddress {

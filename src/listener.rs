@@ -3,7 +3,7 @@ use crate::{
     api::{Darwinia, Shadow},
     pool::Pool,
     result::{Error, Result},
-    service::{EthereumService, RedeemService, RelayService, Service},
+    service::{EthereumService, GuardService, RedeemService, RelayService, Service},
     Config,
 };
 use std::sync::{Arc, Mutex};
@@ -64,12 +64,14 @@ impl Listener {
         // 2. Relay Listener
         let ethereum = <EthereumService<Http>>::new_http(&config)?;
         let relay = RelayService::new(&config, shadow.clone(), darwinia.clone());
-        let redeem = RedeemService::new(&config, shadow, darwinia);
+        let redeem = RedeemService::new(&config, shadow.clone(), darwinia.clone());
+        let guard = GuardService::new(&config, shadow, darwinia);
 
         // Register
         l.register(ethereum)?;
         l.register(relay)?;
         l.register(redeem)?;
+        l.register(guard)?;
         Ok(l)
     }
 }

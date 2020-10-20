@@ -43,7 +43,7 @@ features = ["full"]
 package = "darwinia-bridge-primitives"
 version = "0.0.10"
 git = "https://github.com/darwinia-network/bridge-primitives.git"
-# branch = "bump"
+# branch = "sudo"
 # path = "../bridge-primitives"
 features = ["runtime"]
 

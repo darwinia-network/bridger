@@ -1,13 +1,17 @@
-//! Bridger services
+//! Bridger Services
 use crate::{pool::Pool, result::Result};
 use async_trait::async_trait;
 use std::sync::{Arc, Mutex};
 
 mod ethereum;
+mod guard;
 mod redeem;
 mod relay;
+mod subscribe;
 
-pub use self::{ethereum::EthereumService, redeem::RedeemService, relay::RelayService};
+pub use self::{
+    ethereum::EthereumService, guard::GuardService, redeem::RedeemService, relay::RelayService,
+};
 
 /// Bridge service
 #[async_trait(?Send)]

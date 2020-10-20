@@ -15,7 +15,7 @@ use std::{
 };
 
 /// Attributes
-const SERVICE_NAME: &str = "redeem";
+const SERVICE_NAME: &str = "REDEEM";
 
 /// Redeem Service
 pub struct RedeemService {

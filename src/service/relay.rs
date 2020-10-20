@@ -13,7 +13,7 @@ use std::{
 };
 
 /// Attributes
-const SERVICE_NAME: &str = "relay";
+const SERVICE_NAME: &str = "RELAY";
 
 /// Relay Service
 pub struct RelayService {

@@ -1,7 +1,7 @@
 //! Darwinia shadow API
 use crate::{result::Result, Config};
-use primitives::chain::eth::{
-    EthereumHeaderThing, EthereumHeaderThingWithConfirmationJson, EthereumReceiptProofThing,
+use primitives::chain::ethereum::{
+    EthereumHeaderParcel, EthereumHeaderParcelJson, EthereumReceiptProofThing,
     EthereumReceiptProofThingJson, HeaderStuff, HeaderStuffJson,
 };
 use reqwest::Client;
@@ -33,7 +33,7 @@ impl Shadow {
         }
     }
 
-    /// Get HeaderThing
+    /// Get HeaderParcel
     ///
     /// ```
     /// use darwinia_bridger::api::Shadow;
@@ -47,12 +47,12 @@ impl Shadow {
     ///      client: client,
     ///   };
     ///
-    ///   // Get the HeaderThing of block 42
+    ///   // Get the HeaderParcel of block 42
     ///   shadow.header_thing(42).await.unwrap();
     /// }
     /// ```
-    pub async fn header_thing(&self, number: usize) -> Result<EthereumHeaderThing> {
-        let json: EthereumHeaderThingWithConfirmationJson = self
+    pub async fn header_parcel(&self, number: usize) -> Result<EthereumHeaderParcel> {
+        let json: EthereumHeaderParcelJson = self
             .http
             .get(&format!("{}/eth/header/{}", &self.api, number))
             .send()
@@ -60,7 +60,7 @@ impl Shadow {
             .json()
             .await?;
 
-        Ok(json.header_thing.into())
+        Ok(json.into())
     }
 
     /// Get Receipt
@@ -77,7 +77,7 @@ impl Shadow {
     ///      client: client,
     ///   };
     ///
-    ///   // Get the HeaderThing of block 42
+    ///   // Get the HeaderParcel of block 42
     ///   shadow.receipt("0x3b82a55f5e752c23359d5c3c4c3360455ce0e485ed37e1faabe9ea10d5db3e7a/66666").await.unwrap();
     /// }
     /// ```
@@ -107,7 +107,7 @@ impl Shadow {
     ///      client: client,
     ///   };
     ///
-    ///   // Get the HeaderThing of block 42
+    ///   // Get the HeaderParcel of block 42
     ///   shadow.proposal(10, 20, 19).await.unwrap();
     /// }
     /// ```

@@ -8,7 +8,7 @@ use crate::{
     Pool,
 };
 use async_trait::async_trait;
-use primitives::{chain::eth::RedeemFor, hex};
+use primitives::{chain::ethereum::RedeemFor, hex};
 use std::{
     sync::{Arc, Mutex},
     time::Duration,

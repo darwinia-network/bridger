@@ -52,7 +52,7 @@ impl Service for GuardService {
             for header in pending_headers {
                 let ht = self
                     .shadow
-                    .header_thing(header.2.header.number as usize)
+                    .header_parcel(header.2.header.number as usize)
                     .await?;
 
                 if header.2 == ht {

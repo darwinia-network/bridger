@@ -2,7 +2,7 @@
 use crate::{pool::EthereumTransaction, result::Result, Config};
 use core::marker::PhantomData;
 use primitives::{
-    chain::eth::{EthereumReceiptProofThing, HeaderStuff, RedeemFor},
+    chain::ethereum::{EthereumReceiptProofThing, HeaderStuff, RedeemFor},
     frame::{
         collective::{ExecuteCallExt, MembersStoreExt},
         ethereum::{

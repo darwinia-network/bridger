@@ -162,6 +162,9 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
                 let mut txs = self.scan(start, block_number).await?;
                 if !txs.is_empty() {
                     info!("Found {} txs from {} to {}", txs.len(), start, block_number);
+                    for tx in &txs {
+                        trace!("\t{:?}", &tx.hash);
+                    }
                 }
 
                 pool_cloned.ethereum.append(&mut txs);

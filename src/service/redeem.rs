@@ -82,6 +82,12 @@ impl Service for RedeemService {
                     .map(|(_, tx)| tx.clone())
                     .collect();
 
+                if !redeemed.is_empty() {
+                    trace!(
+                        "Currently we have {} txs might need to be redeemed",
+                        pool_clone.ethereum.len(),
+                    );
+                }
                 drop(pool_clone);
             }
 

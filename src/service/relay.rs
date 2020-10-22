@@ -57,7 +57,7 @@ impl Service for RelayService {
                                 continue;
                             }
 
-                            match self.darwinia.submit_proposal(vec![parcel?]).await {
+                            match self.darwinia.affirm(parcel?).await {
                                 Ok(hash) => info!("Summited proposal {:?}", hash),
                                 Err(err) => error!("{:?}", err),
                             }

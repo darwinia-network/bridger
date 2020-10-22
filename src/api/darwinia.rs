@@ -2,15 +2,15 @@
 use crate::{pool::EthereumTransaction, result::Result, Config};
 use core::marker::PhantomData;
 use primitives::{
-    chain::eth::{EthereumReceiptProofThing, HeaderStuff, RedeemFor},
+    chain::ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
     frame::{
         collective::{ExecuteCallExt, MembersStoreExt},
         ethereum::{
             backing::{RedeemCallExt, VerifiedProofStoreExt},
-            game::{EthereumRelayerGame, PendingHeadersStoreExt, ProposalsStoreExt},
+            game::{AffirmationsStoreExt, EthereumRelayerGame, PendingRelayHeaderParcelsStoreExt},
             relay::{
-                ApprovePendingHeader, ConfirmedBlockNumbersStoreExt, RejectPendingHeader,
-                SubmitProposalCallExt,
+                AffirmCallExt, ApprovePendingRelayHeaderParcel, ConfirmedBlockNumbersStoreExt,
+                RejectPendingRelayHeaderParcel, SetConfirmedParcel,
             },
         },
         sudo::{KeyStoreExt, SudoCallExt},
@@ -25,8 +25,8 @@ use substrate_subxt::{
 use web3::types::H256;
 
 // Types
-type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingHeader;
-type RelayProposal = <DarwiniaRuntime as EthereumRelayerGame>::RelayProposal;
+type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeaderParcel;
+type RelayProposal = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
 
 /// Account Role
 #[derive(PartialEq, Eq)]
@@ -75,9 +75,18 @@ impl Darwinia {
         })
     }
 
+    /// set confirmed with sudo privilege
+    pub async fn set_confirmed_parcel(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
+        let ex = self.client.encode(SetConfirmedParcel {
+            ethereum_relay_header_parcel: parcel,
+            _runtime: PhantomData::default(),
+        })?;
+        Ok(self.client.sudo(&self.signer, &ex).await?)
+    }
+
     /// Approve pending header
     pub async fn approve_pending_header(&self, pending: u64) -> Result<H256> {
-        let ex = self.client.encode(ApprovePendingHeader {
+        let ex = self.client.encode(ApprovePendingRelayHeaderParcel {
             pending,
             _runtime: PhantomData::default(),
         })?;
@@ -94,7 +103,7 @@ impl Darwinia {
 
     /// Reject pending header
     pub async fn reject_pending_header(&self, pending: u64) -> Result<H256> {
-        let ex = self.client.encode(RejectPendingHeader {
+        let ex = self.client.encode(RejectPendingRelayHeaderParcel {
             pending,
             _runtime: PhantomData::default(),
         })?;
@@ -112,7 +121,7 @@ impl Darwinia {
     /// Get relay proposals
     pub async fn proposals(&self) -> Result<Vec<RelayProposal>> {
         let mut proposals = vec![];
-        let mut iter = self.client.proposals_iter(None).await?;
+        let mut iter = self.client.affirmations_iter(None).await?;
         if let Some((_, mut p)) = iter.next().await? {
             proposals.append(&mut p);
         }
@@ -126,9 +135,9 @@ impl Darwinia {
         for p in proposals {
             blocks.append(
                 &mut p
-                    .bonded_proposal
+                    .relay_header_parcels
                     .iter()
-                    .map(|bp| bp.1.header.number)
+                    .map(|bp| bp.header.number)
                     .collect(),
             )
         }
@@ -154,12 +163,12 @@ impl Darwinia {
 
     /// Get pending headers
     pub async fn pending_headers(&self) -> Result<Vec<PendingHeader>> {
-        Ok(self.client.pending_headers(None).await?)
+        Ok(self.client.pending_relay_header_parcels(None).await?)
     }
 
     /// Submit Proposal
-    pub async fn submit_proposal(&self, proposal: Vec<HeaderStuff>) -> Result<H256> {
-        Ok(self.client.submit_proposal(&self.signer, proposal).await?)
+    pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
+        Ok(self.client.affirm(&self.signer, parcel, None).await?)
     }
 
     /// Redeem
@@ -184,12 +193,17 @@ impl Darwinia {
     pub async fn should_relay(&self, target: u64) -> Result<Option<u64>> {
         let last_confirmed = self.last_confirmed().await?;
         if target <= last_confirmed {
+            trace!(
+                "The target block {} is less than the last_confirmed",
+                &last_confirmed
+            );
             return Ok(None);
         }
 
         // Check if confirmed
         let confirmed_blocks = self.confirmed_block_numbers().await?;
         if confirmed_blocks.contains(&target) {
+            trace!("The target block {} has been confirmed", &target);
             return Ok(None);
         }
 
@@ -197,6 +211,7 @@ impl Darwinia {
         let pending_headers = self.pending_headers().await?;
         for p in pending_headers {
             if p.1 == target {
+                trace!("The target block {} is pending", &target);
                 return Ok(None);
             }
         }
@@ -204,6 +219,7 @@ impl Darwinia {
         // Check if the target block is in relayer game
         let proposals = self.current_proposals().await?;
         if !proposals.is_empty() && proposals.contains(&target) {
+            trace!("The target block {} is in the relayer game", &target);
             return Ok(None);
         }
 

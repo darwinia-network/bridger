@@ -49,15 +49,15 @@ impl Service for RelayService {
                 if let Some(max) = txs.iter().max() {
                     let max = max.block.to_owned();
                     match self.darwinia.should_relay(max + 1).await {
-                        Ok(Some(last)) => {
+                        Ok(Some(_)) => {
                             trace!("Trying to relay block {}...", max + 1);
-                            let parcel = self.shadow.proposal(last, max + 1, max).await;
+                            let parcel = self.shadow.parcel((max + 1) as usize).await;
                             if parcel.is_err() {
                                 error!("{:?}", parcel);
                                 continue;
                             }
 
-                            match self.darwinia.submit_proposal(vec![parcel?]).await {
+                            match self.darwinia.affirm(parcel?).await {
                                 Ok(hash) => info!("Summited proposal {:?}", hash),
                                 Err(err) => error!("{:?}", err),
                             }

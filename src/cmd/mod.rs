@@ -3,6 +3,7 @@ use crate::result::Result;
 use std::path::PathBuf;
 use structopt::{clap::AppSettings, StructOpt};
 
+mod confirm;
 mod run;
 
 #[derive(StructOpt, Debug)]
@@ -17,6 +18,12 @@ enum Opt {
         #[structopt(short, long)]
         verbose: bool,
     },
+    /// Set Confirmed block with sudo privilege
+    Confirm {
+        /// The confirmed block number
+        #[structopt(short, long)]
+        block: u64,
+    },
 }
 
 /// Exec commands
@@ -24,6 +31,7 @@ pub async fn exec() -> Result<()> {
     let opt = Opt::from_args();
     match opt {
         Opt::Run { config, verbose } => run::exec(config, verbose).await?,
+        Opt::Confirm { block } => confirm::exec(block).await?,
     }
 
     Ok(())

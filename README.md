@@ -8,9 +8,17 @@
 
 The Darwinia Bridger
 
+## Installation
 
 ```
-darwinia-bridger 0.0.1
+$ cargo install darwinia-bridger
+```
+
+## Usage
+
+```
+$ bridger
+darwinia-bridger 0.0.3
 
 USAGE:
     bridger <SUBCOMMAND>
@@ -20,6 +28,11 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    help    Prints this message or the help of the given subcommand(s)
-    run     Run the bridger
+    confirm    Set Confirmed block with sudo privilege
+    help       Prints this message or the help of the given subcommand(s)
+    run        Run the bridger
 ```
+
+## LICENSE
+
+GPL-3.0

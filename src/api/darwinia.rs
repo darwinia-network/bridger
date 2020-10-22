@@ -2,7 +2,7 @@
 use crate::{pool::EthereumTransaction, result::Result, Config};
 use core::marker::PhantomData;
 use primitives::{
-    chain::ethereum::{EthereumReceiptProofThing, HeaderStuff, RedeemFor},
+    chain::ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
     frame::{
         collective::{ExecuteCallExt, MembersStoreExt},
         ethereum::{
@@ -158,7 +158,7 @@ impl Darwinia {
     }
 
     /// Submit Proposal
-    pub async fn submit_proposal(&self, proposal: Vec<HeaderStuff>) -> Result<H256> {
+    pub async fn submit_proposal(&self, proposal: Vec<EthereumRelayHeaderParcel>) -> Result<H256> {
         Ok(self.client.submit_proposal(&self.signer, proposal).await?)
     }
 

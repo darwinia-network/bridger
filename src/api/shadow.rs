@@ -1,8 +1,8 @@
 //! Darwinia shadow API
 use crate::{result::Result, Config};
 use primitives::chain::ethereum::{
-    EthereumHeaderParcel, EthereumHeaderParcelJson, EthereumReceiptProofThing,
-    EthereumReceiptProofThingJson, HeaderStuff, HeaderStuffJson,
+    EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
+    EthereumRelayHeaderParcelJson, EthereumRelayProofs, EthereumRelayProofsJson,
 };
 use reqwest::Client;
 use serde::Serialize;
@@ -51,10 +51,10 @@ impl Shadow {
     ///   shadow.header_thing(42).await.unwrap();
     /// }
     /// ```
-    pub async fn header_parcel(&self, number: usize) -> Result<EthereumHeaderParcel> {
-        let json: EthereumHeaderParcelJson = self
+    pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
+        let json: EthereumRelayHeaderParcelJson = self
             .http
-            .get(&format!("{}/eth/header/{}", &self.api, number))
+            .get(&format!("{}/ethereum/parcel/{}", &self.api, number))
             .send()
             .await?
             .json()
@@ -84,7 +84,7 @@ impl Shadow {
     pub async fn receipt(&self, tx: &str, last: u64) -> Result<EthereumReceiptProofThing> {
         let json: EthereumReceiptProofThingJson = self
             .http
-            .get(&format!("{}/eth/receipt/{}/{}", &self.api, tx, last))
+            .get(&format!("{}/ethereum/receipt/{}/{}", &self.api, tx, last))
             .send()
             .await?
             .json()
@@ -108,10 +108,15 @@ impl Shadow {
     ///   };
     ///
     ///   // Get the HeaderParcel of block 42
-    ///   shadow.proposal(10, 20, 19).await.unwrap();
+    ///   shadow.proof(10, 20, 19).await.unwrap();
     /// }
     /// ```
-    pub async fn proposal(&self, member: u64, target: u64, last_leaf: u64) -> Result<HeaderStuff> {
+    pub async fn proof(
+        &self,
+        member: u64,
+        target: u64,
+        last_leaf: u64,
+    ) -> Result<EthereumRelayProofs> {
         info!(
             "Requesting proposal - member: {}, target: {}, last_leaf: {}",
             member, target, last_leaf
@@ -122,9 +127,9 @@ impl Shadow {
             last_leaf,
         })?;
 
-        let json: HeaderStuffJson = self
+        let json: EthereumRelayProofsJson = self
             .http
-            .post(&format!("{}/eth/proposal", self.api))
+            .post(&format!("{}/ethereum/proof", self.api))
             .json(&map)
             .send()
             .await?

@@ -1,5 +1,5 @@
 //! Ethereum rpcs
-use crate::{chain::eth::EthereumHeaderRPC, result::Result};
+use crate::{chain::ethereum::EthereumHeaderRPC, result::Result};
 use reqwest::Client;
 use serde_json::Value;
 

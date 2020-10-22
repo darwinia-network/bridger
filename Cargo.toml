@@ -1,6 +1,6 @@
 [package]
 name = "darwinia-bridge-primitives"
-version = "0.0.10"
+version = "0.0.12"
 authors = ["clearloop <udtrokia@gmail.com>"]
 description = "Darwinia bridge primitives"
 repository = "https://github.com/darwinia-network/bridge-primitives"
@@ -11,6 +11,9 @@ include = ["src/**/*", "Cargo.toml", "./README.md"]
 keywords = ["blockchain"]
 readme = './README.md'
 edition = "2018"
+
+[package.metadata.docs.rs]
+all-features = true
 
 [dependencies]
 uint = "0.8.5"

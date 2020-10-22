@@ -1,7 +1,7 @@
 //! RPC calls for primitives
 #![cfg(feature = "rpc")]
 
-pub mod eth;
+pub mod ethereum;
 
 use crate::result::Result;
 use async_trait::async_trait;
@@ -26,4 +26,4 @@ pub trait RPC {
     async fn block_number(&self) -> Result<u64>;
 }
 
-pub use eth::EthereumRPC;
+pub use ethereum::EthereumRPC;

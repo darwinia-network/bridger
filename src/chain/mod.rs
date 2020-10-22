@@ -1,5 +1,5 @@
 //! Relayable chains
-pub mod eth;
-mod proposal;
+mod affirmation;
+pub mod ethereum;
 
-pub use self::proposal::RelayProposal;
+pub use self::affirmation::{RelayAffirmation, RelayAffirmationId};

@@ -1,7 +1,7 @@
 //! Ethereum receipt
 use crate::{
     bytes,
-    chain::eth::{EthereumHeader, EthereumHeaderJson, MMRProof, MMRProofJson},
+    chain::ethereum::{EthereumHeader, EthereumHeaderJson, MMRProof, MMRProofJson},
     hex,
 };
 use codec::Encode;

@@ -2,7 +2,7 @@
 mod block;
 mod header;
 
-use crate::{chain::eth::EthereumHeader, result::Result, rpc::RPC};
+use crate::{chain::ethereum::EthereumHeader, result::Result, rpc::RPC};
 use async_trait::async_trait;
 use reqwest::Client;
 

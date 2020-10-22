@@ -1,5 +1,5 @@
 //! Ethereum Relay
-use crate::chain::eth::HeaderStuff;
+use crate::chain::ethereum::{EthereumRelayHeaderParcel, EthereumRelayProofs};
 use codec::Encode;
 use core::marker::PhantomData;
 use substrate_subxt::system::{System, SystemEventsDecoder};
@@ -9,6 +9,26 @@ use substrate_subxt_proc_macro::{module, Call, Store};
 #[module]
 pub trait EthereumRelay: System {}
 
+/// Affirm Call
+#[derive(Clone, Debug, PartialEq, Call, Encode)]
+pub struct Affirm<T: EthereumRelay> {
+    /// Ethereum relay headr parcel
+    pub ethereum_relay_header_parcel: EthereumRelayHeaderParcel,
+    /// Ethereum relay proofs
+    pub ethereum_relay_proofs: Option<EthereumRelayProofs>,
+    /// Runtime marker
+    pub _runtime: PhantomData<T>,
+}
+
+/// Set confirmed header parcel
+#[derive(Clone, Debug, PartialEq, Call, Encode)]
+pub struct SetConfirmedParcel<T: EthereumRelay> {
+    /// Ethereum relay headr parcel
+    pub ethereum_relay_header_parcel: EthereumRelayHeaderParcel,
+    /// Runtime marker
+    pub _runtime: PhantomData<T>,
+}
+
 /// PendingHeaders Storage
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
 pub struct ConfirmedBlockNumbers<T: EthereumRelay> {
@@ -17,18 +37,9 @@ pub struct ConfirmedBlockNumbers<T: EthereumRelay> {
     pub _runtime: PhantomData<T>,
 }
 
-/// Submit proposal call
-#[derive(Clone, Debug, PartialEq, Call, Encode)]
-pub struct SubmitProposal<T: EthereumRelay> {
-    /// Ethereum Headerthings
-    pub proposal: Vec<HeaderStuff>,
-    /// Runtime marker
-    pub _runtime: PhantomData<T>,
-}
-
 /// Approve pending header call
 #[derive(Clone, Debug, PartialEq, Call, Encode)]
-pub struct ApprovePendingHeader<T: EthereumRelay> {
+pub struct ApprovePendingRelayHeaderParcel<T: EthereumRelay> {
     /// pending block number
     pub pending: u64,
     /// Runtime marker
@@ -37,7 +48,7 @@ pub struct ApprovePendingHeader<T: EthereumRelay> {
 
 /// Reject pending header call
 #[derive(Clone, Debug, PartialEq, Call, Encode)]
-pub struct RejectPendingHeader<T: EthereumRelay> {
+pub struct RejectPendingRelayHeaderParcel<T: EthereumRelay> {
     /// pending block number
     pub pending: u64,
     /// Runtime marker

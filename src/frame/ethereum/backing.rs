@@ -1,5 +1,5 @@
 //! Darwinia Ethereum Backing
-use crate::chain::eth::{EthereumReceiptProofThing, RedeemFor};
+use crate::chain::ethereum::{EthereumReceiptProofThing, RedeemFor};
 use codec::Encode;
 use core::marker::PhantomData;
 use substrate_subxt::system::{System, SystemEventsDecoder};

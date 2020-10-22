@@ -8,23 +8,23 @@ use substrate_subxt_proc_macro::{module, Store};
 #[module]
 pub trait EthereumRelayerGame: System {
     /// Ethereum Pending Header
-    type PendingHeader: 'static + Encode + Decode + Send + Default;
+    type PendingRelayHeaderParcel: 'static + Encode + Decode + Send + Default;
     /// Ethereum Relay Proposal
-    type RelayProposal: 'static + Encode + Decode + Send + Default;
+    type RelayAffirmation: 'static + Encode + Decode + Send + Default;
 }
 
 /// PendingHeaders Storage
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct PendingHeaders<T: EthereumRelayerGame> {
-    #[store(returns = Vec<T::PendingHeader>)]
+pub struct PendingRelayHeaderParcels<T: EthereumRelayerGame> {
+    #[store(returns = Vec<T::PendingRelayHeaderParcel>)]
     /// Runtime marker
     pub _runtime: PhantomData<T>,
 }
 
 /// Relay Proposals Storage
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct Proposals<T: EthereumRelayerGame> {
-    #[store(returns = Vec<T::RelayProposal>)]
+pub struct Affirmations<T: EthereumRelayerGame> {
+    #[store(returns = Vec<T::RelayAffirmation>)]
     /// map hasher(blake2_128_concat) GameId<TcBlockNumber<T, I>>
     pub map: ([u8; 32], u64),
     /// Runtime marker

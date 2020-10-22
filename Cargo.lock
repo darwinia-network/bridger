@@ -682,8 +682,9 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridge-primitives"
-version = "0.0.10"
-source = "git+https://github.com/darwinia-network/bridge-primitives.git#a1c7d09f96e1c1cd1038af5ed980fa8d42ad9048"
+version = "0.0.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "78db6504f3430e4437cef5af0f69f67377b43b545b0e07c9c452db8e18c281ca"
 dependencies = [
  "frame-support",
  "pallet-im-online",

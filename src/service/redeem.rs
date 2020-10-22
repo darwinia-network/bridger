@@ -8,7 +8,7 @@ use crate::{
     Pool,
 };
 use async_trait::async_trait;
-use primitives::{chain::eth::RedeemFor, hex};
+use primitives::{chain::ethereum::RedeemFor, hex};
 use std::{
     sync::{Arc, Mutex},
     time::Duration,
@@ -82,6 +82,12 @@ impl Service for RedeemService {
                     .map(|(_, tx)| tx.clone())
                     .collect();
 
+                if !redeemed.is_empty() {
+                    trace!(
+                        "Currently we have {} txs might need to be redeemed",
+                        pool_clone.ethereum.len(),
+                    );
+                }
                 drop(pool_clone);
             }
 

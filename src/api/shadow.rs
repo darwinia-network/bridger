@@ -44,11 +44,11 @@ impl Shadow {
     ///   let client = Client::new();
     ///   let shadow = Shadow {
     ///      api: "https://testnet.shadow.darwinia.network".to_string(),
-    ///      client: client,
+    ///      http: client,
     ///   };
     ///
     ///   // Get the HeaderParcel of block 42
-    ///   shadow.header_thing(42).await.unwrap();
+    ///   shadow.parcel(42).await.unwrap();
     /// }
     /// ```
     pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
@@ -74,11 +74,11 @@ impl Shadow {
     ///   let client = Client::new();
     ///   let shadow = Shadow {
     ///      api: "https://testnet.shadow.darwinia.network".to_string(),
-    ///      client: client,
+    ///      http: client,
     ///   };
     ///
     ///   // Get the HeaderParcel of block 42
-    ///   shadow.receipt("0x3b82a55f5e752c23359d5c3c4c3360455ce0e485ed37e1faabe9ea10d5db3e7a/66666").await.unwrap();
+    ///   shadow.receipt("0x3b82a55f5e752c23359d5c3c4c3360455ce0e485ed37e1faabe9ea10d5db3e7a", 66666).await.unwrap();
     /// }
     /// ```
     pub async fn receipt(&self, tx: &str, last: u64) -> Result<EthereumReceiptProofThing> {
@@ -104,7 +104,7 @@ impl Shadow {
     ///   let client = Client::new();
     ///   let shadow = Shadow {
     ///      api: "https://testnet.shadow.darwinia.network".to_string(),
-    ///      client: client,
+    ///      http: client,
     ///   };
     ///
     ///   // Get the HeaderParcel of block 42

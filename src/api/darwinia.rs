@@ -228,21 +228,23 @@ impl Darwinia {
     }
 
     /// Check if should relay
-    pub async fn should_relay(&self, target: u64) -> Result<Option<u64>> {
+    pub async fn should_relay(&self, target: u64) -> Result<bool> {
         let last_confirmed = self.last_confirmed().await?;
+
         if target <= last_confirmed {
             trace!(
-                "The target block {} is less than the last_confirmed",
+                "The target block {} is less than the last_confirmed {}",
+                &target,
                 &last_confirmed
             );
-            return Ok(None);
+            return Ok(false);
         }
 
         // Check if confirmed
         let confirmed_blocks = self.confirmed_block_numbers().await?;
         if confirmed_blocks.contains(&target) {
             trace!("The target block {} has been confirmed", &target);
-            return Ok(None);
+            return Ok(false);
         }
 
         // Check if the target block is pending
@@ -250,7 +252,7 @@ impl Darwinia {
         for p in pending_headers {
             if p.1 == target {
                 trace!("The target block {} is pending", &target);
-                return Ok(None);
+                return Ok(false);
             }
         }
 
@@ -258,9 +260,9 @@ impl Darwinia {
         let proposals = self.current_proposals().await?;
         if !proposals.is_empty() && proposals.contains(&target) {
             trace!("The target block {} is in the relayer game", &target);
-            return Ok(None);
+            return Ok(false);
         }
 
-        Ok(Some(last_confirmed))
+        Ok(true)
     }
 }

@@ -5,6 +5,7 @@ use structopt::{clap::AppSettings, StructOpt};
 
 mod confirm;
 mod run;
+mod affirm;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -24,6 +25,12 @@ enum Opt {
         #[structopt(short, long)]
         block: u64,
     },
+    /// Affirm target block
+    Affirm {
+        /// The block number to affirm
+        #[structopt(short, long)]
+        block: u64,
+    },
 }
 
 /// Exec commands
@@ -32,6 +39,7 @@ pub async fn exec() -> Result<()> {
     match opt {
         Opt::Run { config, verbose } => run::exec(config, verbose).await?,
         Opt::Confirm { block } => confirm::exec(block).await?,
+        Opt::Affirm { block} => affirm::exec(block).await?,
     }
 
     Ok(())

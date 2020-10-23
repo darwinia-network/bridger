@@ -1,20 +1,19 @@
-//! Bridger Result
-use etc::Error as Etc;
-use reqwest::Error as Reqwest;
-use serde_json::Error as SerdeJson;
+//! Bridge Result
 use std::{
     error::Error as ErrorTrait,
     fmt::{Display, Formatter, Result as FmtResult},
     io::Error as Io,
     result::Result as StdResult,
 };
-use substrate_subxt::Error as Subxt;
-use toml::{de::Error as DeToml, ser::Error as SerToml};
-use web3::Error as Web3;
+
+#[cfg(feature = "rpc")]
+use reqwest::Error as Reqwest;
+#[cfg(feature = "rpc")]
+use serde_json::Error as SerdeJson;
 
 /// The custom bridger error
-pub struct Bridger(String);
-impl Display for Bridger {
+pub struct Bridge(String);
+impl Display for Bridge {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         f.write_str(&self.0)
     }
@@ -22,35 +21,43 @@ impl Display for Bridger {
 
 /// Error generator
 macro_rules! error {
-    ($($e:ident),*) => {
-        /// Bridger Error
+    ($($(#[$attr:meta])* $e:ident),*) => {
+        /// Bridge Error
         #[derive(Debug)]
         #[allow(missing_docs)]
         pub enum Error {
-            $($e(String),)+
+            $($(#[$attr])* $e(String),)+
         }
 
         impl Display for Error {
             fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
                 match self {
-                    $(Error::$e(e) => e.fmt(f),)+
+                    $($(#[$attr])* Error::$e(e) => e.fmt(f),)+
                 }
             }
         }
 
         impl ErrorTrait for Error {}
-
         $(
+            $(#[$attr])*
             impl From<$e> for Error {
                 fn from(e: $e) -> Error {
                     Error::$e(format!("{}", e))
                 }
             }
-        )+
+        )*
+
     };
 }
 
-error! {Io, Bridger, DeToml, SerToml, Etc, Web3, Reqwest, SerdeJson, Subxt}
+error! {
+    Io,
+    Bridge,
+    #[cfg(feature = "rpc")]
+    Reqwest,
+    #[cfg(feature = "rpc")]
+    SerdeJson
+}
 
-/// Bridger Result
+/// Sup Result
 pub type Result<T> = StdResult<T, Error>;

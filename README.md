@@ -1,30 +1,37 @@
-## Darwinia bridge primitives
+## Bridger
 
-[![bridge-primtives](https://github.com/darwinia-network/bridge-primitives/workflows/bridge-primtives/badge.svg)](https://github.com/darwinia-network/bridge-primitives)
-[![crate](https://img.shields.io/crates/v/darwinia-bridge-primitives.svg)](https://crates.io/crates/darwinia-bridge-primitives)
-[![doc](https://img.shields.io/badge/current-docs-brightgreen.svg)](https://docs.rs/darwinia-bridge-primitives/)
-[![downloads](https://img.shields.io/crates/d/darwinia-bridge-primitives.svg)](https://crates.io/crates/darwinia-bridge-primitives)
-[![LICENSE](https://img.shields.io/crates/l/darwinia-bridge-primitives.svg)](https://choosealicense.com/licenses/gpl-3.0/)
+[![bridger](https://github.com/darwinia-network/bridger/workflows/bridger/badge.svg)](https://github.com/darwinia-network/bridger)
+[![crate](https://img.shields.io/crates/v/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
+[![doc](https://img.shields.io/badge/current-docs-brightgreen.svg)](https://docs.rs/darwinia-bridger/)
+[![downloads](https://img.shields.io/crates/d/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
+[![LICENSE](https://img.shields.io/crates/l/darwinia-bridger.svg)](https://choosealicense.com/licenses/gpl/)
 
-The Darwinia bridge primtives
+The Darwinia Bridger
 
+## Installation
 
-+ [x] [Ethereum](https://github.com/darwinia-network/bridge-primitives/tree/master/src/eth)
-+ [ ] [Your chain?](https://github.com/darwinia-network/bridge-primitives/pulls)
-
-## Features
-
-### `rpc`
-
-If you want to trigger rpc feature to get data which described in this repo, please 
-import `darwinia-bridge-primitives` as below in your `Cargo.toml`
-
-```toml
-[dependencies.darwinia-bridge-primitives]
-version = "^0"
-features = [ "rpc" ]
+```
+$ cargo install darwinia-bridger
 ```
 
+## Usage
+
+```
+$ bridger
+darwinia-bridger 0.0.3
+
+USAGE:
+    bridger <SUBCOMMAND>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    confirm    Set Confirmed block with sudo privilege
+    help       Prints this message or the help of the given subcommand(s)
+    run        Run the bridger
+```
 
 ## LICENSE
 

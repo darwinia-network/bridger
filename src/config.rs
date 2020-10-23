@@ -53,13 +53,20 @@ pub struct Step {
     pub guard: u64,
 }
 
+/// Proxy config
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Proxy {
+    /// proxy real
+    pub real: String,
+}
+
 /// Bridger Config
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     /// Darwinia node url
     pub node: String,
     /// Darwinia relayer proxy address
-    pub relayer: String,
+    pub proxy: Proxy,
     /// Darwinia account seed
     pub seed: String,
     /// Shadow service url
@@ -74,7 +81,9 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             node: "wss://crab.darwinia.network".to_string(),
-            relayer: "".to_string(),
+            proxy: Proxy {
+                real: "".to_string()
+            },
             seed: "//Alice".to_string(),
             shadow: "http://localhost:3000".to_string(),
             eth: EthereumConfig {

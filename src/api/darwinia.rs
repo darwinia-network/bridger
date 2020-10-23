@@ -2,7 +2,10 @@
 use crate::{pool::EthereumTransaction, result::Result, Config};
 use core::marker::PhantomData;
 use primitives::{
-    chain::ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
+    chain::{
+        ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
+        proxy_type::ProxyType,
+    },
     frame::{
         collective::{ExecuteCallExt, MembersStoreExt},
         ethereum::{
@@ -11,9 +14,11 @@ use primitives::{
             relay::{
                 AffirmCallExt, ApprovePendingRelayHeaderParcel, ConfirmedBlockNumbersStoreExt,
                 RejectPendingRelayHeaderParcel, SetConfirmedParcel,
+                Affirm,
             },
         },
         sudo::{KeyStoreExt, SudoCallExt},
+        proxy::ProxyCallExt,
     },
     runtime::DarwiniaRuntime,
 };
@@ -21,6 +26,7 @@ use sp_keyring::sr25519::sr25519::Pair;
 use substrate_subxt::{
     sp_core::{Encode, Pair as PairTrait},
     Client, ClientBuilder, PairSigner,
+    system::System,
 };
 use web3::types::H256;
 
@@ -46,6 +52,8 @@ pub struct Darwinia {
     pub signer: PairSigner<DarwiniaRuntime, Pair>,
     /// Account Role
     pub role: Role,
+    /// Proxy real
+    pub proxy_real: Option<<DarwiniaRuntime as System>::AccountId>,
 }
 
 impl Darwinia {
@@ -53,6 +61,23 @@ impl Darwinia {
     pub async fn new(config: &Config) -> Result<Darwinia> {
         let pair = Pair::from_string(&config.seed, None).unwrap();
         let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
+
+        // proxy
+        let proxy_real = if config.proxy.real == "" {
+            None
+        } else {
+            match hex::decode(&config.proxy.real) {
+                Ok(real) => {
+                    let mut data: [u8; 32] = [0u8; 32];
+                    data.copy_from_slice(&real[..]);
+                    let real = <DarwiniaRuntime as System>::AccountId::from(data);
+                    Some(real)
+                },
+                Err(_e) => None
+            }
+        };
+
+        // client
         let client = ClientBuilder::<DarwiniaRuntime>::new()
             .set_url(&config.node)
             .build()
@@ -72,6 +97,7 @@ impl Darwinia {
             } else {
                 Role::Normal
             },
+            proxy_real
         })
     }
 
@@ -168,7 +194,22 @@ impl Darwinia {
 
     /// Submit Proposal
     pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
-        Ok(self.client.affirm(&self.signer, parcel, None).await?)
+        match &self.proxy_real {
+            Some(real) => {
+                trace!("Call 'affirm' for {:?}", real);
+                let affirm = Affirm {
+                    ethereum_relay_header_parcel: parcel,
+                    ethereum_relay_proofs: None,
+                    _runtime: PhantomData::default()
+                };
+
+                let ex = self.client.encode(affirm).unwrap();
+                Ok(self.client.proxy(&self.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
+            },
+            None => {
+                Ok(self.client.affirm(&self.signer, parcel, None).await?)
+            }
+        }
     }
 
     /// Redeem
@@ -190,21 +231,23 @@ impl Darwinia {
     }
 
     /// Check if should relay
-    pub async fn should_relay(&self, target: u64) -> Result<Option<u64>> {
+    pub async fn should_relay(&self, target: u64) -> Result<bool> {
         let last_confirmed = self.last_confirmed().await?;
+
         if target <= last_confirmed {
             trace!(
-                "The target block {} is less than the last_confirmed",
+                "The target block {} is less than the last_confirmed {}",
+                &target,
                 &last_confirmed
             );
-            return Ok(None);
+            return Ok(false);
         }
 
         // Check if confirmed
         let confirmed_blocks = self.confirmed_block_numbers().await?;
         if confirmed_blocks.contains(&target) {
             trace!("The target block {} has been confirmed", &target);
-            return Ok(None);
+            return Ok(false);
         }
 
         // Check if the target block is pending
@@ -212,7 +255,7 @@ impl Darwinia {
         for p in pending_headers {
             if p.1 == target {
                 trace!("The target block {} is pending", &target);
-                return Ok(None);
+                return Ok(false);
             }
         }
 
@@ -220,9 +263,9 @@ impl Darwinia {
         let proposals = self.current_proposals().await?;
         if !proposals.is_empty() && proposals.contains(&target) {
             trace!("The target block {} is in the relayer game", &target);
-            return Ok(None);
+            return Ok(false);
         }
 
-        Ok(Some(last_confirmed))
+        Ok(true)
     }
 }

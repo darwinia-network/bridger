@@ -3,6 +3,7 @@ use crate::{
     api::{Darwinia, Shadow},
     config::Config,
     result::Result as BridgerResult,
+    result::Error,
     service::Service,
     Pool,
 };
@@ -11,6 +12,7 @@ use std::{
     sync::{Arc, Mutex},
     time::Duration,
 };
+use substrate_subxt::sp_core::H256;
 
 /// Attributes
 const SERVICE_NAME: &str = "RELAY";
@@ -48,23 +50,10 @@ impl Service for RelayService {
                 let txs = &pool_clone.ethereum;
                 if let Some(max) = txs.iter().max() {
                     let max = max.block.to_owned();
-                    match self.darwinia.should_relay(max + 1).await {
-                        Ok(Some(_)) => {
-                            trace!("Trying to relay block {}...", max + 1);
-                            let parcel = self.shadow.parcel((max + 1) as usize).await;
-                            if parcel.is_err() {
-                                error!("{:?}", parcel);
-                                continue;
-                            }
-
-                            match self.darwinia.affirm(parcel?).await {
-                                Ok(hash) => info!("Summited proposal {:?}", hash),
-                                Err(err) => error!("{:?}", err),
-                            }
-                        }
-                        Ok(None) => {}
-                        Err(err) => warn!("{:?}", err),
-                    }
+                    if let Err(err) = self.affirm(max + 1).await {
+                        error!("{:?}", err);
+                        continue;
+                    };
                 }
 
                 drop(pool_clone);
@@ -72,6 +61,31 @@ impl Service for RelayService {
 
             // sleep
             tokio::time::delay_for(Duration::from_secs(self.step)).await;
+        }
+    }
+}
+
+impl RelayService {
+    /// affirm target block
+    pub async fn affirm(&mut self, target: u64) -> BridgerResult<H256> {
+
+        match self.darwinia.should_relay(target).await {
+            Ok(true) => {
+                trace!("Trying to relay block {}...", target);
+                let parcel = self.shadow.parcel(target as usize).await?;
+
+                match self.darwinia.affirm(parcel).await {
+                    Ok(hash) => {
+                        info!("Summited proposal {:?}", hash);
+                        Ok(hash)
+                    },
+                    Err(err) => Err(err),
+                }
+            }
+            Ok(false) => {
+                Err(Error::Etc(format!("No need to affirm block {}.", target)))
+            },
+            Err(err) => Err(err),
         }
     }
 }

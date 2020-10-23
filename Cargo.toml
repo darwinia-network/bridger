@@ -29,6 +29,7 @@ substrate-subxt = "0.13.0"
 toml = "0.5.6"
 web3 = "0.13.0"
 serde_json = "1.0"
+hex = "0.4.2"
 
 [dependencies.reqwest]
 version = "0.10"
@@ -42,9 +43,9 @@ features = ["full"]
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"
 version = "0.0.12"
-# git = "https://github.com/darwinia-network/bridge-primitives.git"
-# branch = "relay"
-# path = "../bridge-primitives"
+git = "https://github.com/darwinia-network/bridge-primitives.git"
+branch = "feature/proxy"
+#path = "../bridge-primitives"
 features = ["runtime"]
 
 [dependencies.serde]

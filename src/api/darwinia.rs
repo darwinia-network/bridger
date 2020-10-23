@@ -26,10 +26,9 @@ use sp_keyring::sr25519::sr25519::Pair;
 use substrate_subxt::{
     sp_core::{Encode, Pair as PairTrait},
     Client, ClientBuilder, PairSigner,
+    system::System,
 };
 use web3::types::H256;
-use substrate_subxt::sp_core::crypto::AccountId32;
-use substrate_subxt::sp_runtime::sp_std::convert::TryFrom;
 
 // Types
 type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeaderParcel;
@@ -54,7 +53,7 @@ pub struct Darwinia {
     /// Account Role
     pub role: Role,
     /// Proxy real
-    pub proxy_real: Option<AccountId32>,
+    pub proxy_real: Option<<DarwiniaRuntime as System>::AccountId>,
 }
 
 impl Darwinia {
@@ -68,9 +67,11 @@ impl Darwinia {
             None
         } else {
             match hex::decode(&config.proxy.real) {
-                Ok(relayer) => {
-                    let relayer = relayer.as_slice();
-                    AccountId32::try_from(relayer).ok()
+                Ok(real) => {
+                    let mut data: [u8; 32] = [0u8; 32];
+                    data.copy_from_slice(&real[..]);
+                    let real = <DarwiniaRuntime as System>::AccountId::from(data);
+                    Some(real)
                 },
                 Err(_e) => None
             }
@@ -195,11 +196,13 @@ impl Darwinia {
     pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
         match &self.proxy_real {
             Some(real) => {
+                println!("- into proxy ------------");
                 let affirm = Affirm {
                     ethereum_relay_header_parcel: parcel,
                     ethereum_relay_proofs: None,
                     _runtime: PhantomData::default()
                 };
+
                 let ex = self.client.encode(affirm).unwrap();
                 Ok(self.client.proxy(&self.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
             },

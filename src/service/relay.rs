@@ -83,7 +83,7 @@ impl RelayService {
                 }
             }
             Ok(false) => {
-                Err(Error::Etc(String::from(format!("No need to affirm block {}.", target))))
+                Err(Error::Etc(format!("No need to affirm block {}.", target)))
             },
             Err(err) => Err(err),
         }

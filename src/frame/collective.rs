@@ -8,7 +8,7 @@ use substrate_subxt::{
 };
 use substrate_subxt_proc_macro::{module, Call, Store};
 
-/// The subset of the `frame_sudo::Trait` that a client must implement.
+/// The subset of the `frame_council::Trait` that a client must implement.
 #[module]
 pub trait Council: System {}
 

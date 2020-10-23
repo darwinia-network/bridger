@@ -2,7 +2,10 @@
 use crate::{pool::EthereumTransaction, result::Result, Config};
 use core::marker::PhantomData;
 use primitives::{
-    chain::ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
+    chain::{
+        ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
+        proxy_type::ProxyType,
+    },
     frame::{
         collective::{ExecuteCallExt, MembersStoreExt},
         ethereum::{
@@ -11,9 +14,11 @@ use primitives::{
             relay::{
                 AffirmCallExt, ApprovePendingRelayHeaderParcel, ConfirmedBlockNumbersStoreExt,
                 RejectPendingRelayHeaderParcel, SetConfirmedParcel,
+                Affirm,
             },
         },
         sudo::{KeyStoreExt, SudoCallExt},
+        proxy::ProxyCallExt,
     },
     runtime::DarwiniaRuntime,
 };
@@ -23,6 +28,8 @@ use substrate_subxt::{
     Client, ClientBuilder, PairSigner,
 };
 use web3::types::H256;
+use substrate_subxt::sp_core::crypto::AccountId32;
+use substrate_subxt::sp_runtime::sp_std::convert::TryFrom;
 
 // Types
 type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeaderParcel;
@@ -46,6 +53,8 @@ pub struct Darwinia {
     pub signer: PairSigner<DarwiniaRuntime, Pair>,
     /// Account Role
     pub role: Role,
+    /// Proxy real
+    pub proxy_real: Option<AccountId32>,
 }
 
 impl Darwinia {
@@ -53,6 +62,21 @@ impl Darwinia {
     pub async fn new(config: &Config) -> Result<Darwinia> {
         let pair = Pair::from_string(&config.seed, None).unwrap();
         let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
+
+        // proxy
+        let proxy_real = if config.relayer == "" {
+            None
+        } else {
+            match hex::decode(&config.relayer) {
+                Ok(relayer) => {
+                    let relayer = relayer.as_slice();
+                    AccountId32::try_from(relayer).ok()
+                },
+                Err(_e) => None
+            }
+        };
+
+        // client
         let client = ClientBuilder::<DarwiniaRuntime>::new()
             .set_url(&config.node)
             .build()
@@ -72,6 +96,7 @@ impl Darwinia {
             } else {
                 Role::Normal
             },
+            proxy_real
         })
     }
 
@@ -168,7 +193,20 @@ impl Darwinia {
 
     /// Submit Proposal
     pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
-        Ok(self.client.affirm(&self.signer, parcel, None).await?)
+        match &self.proxy_real {
+            Some(real) => {
+                let affirm = Affirm {
+                    ethereum_relay_header_parcel: parcel,
+                    ethereum_relay_proofs: None,
+                    _runtime: PhantomData::default()
+                };
+                let ex = self.client.encode(affirm).unwrap();
+                Ok(self.client.proxy(&self.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
+            },
+            None => {
+                Ok(self.client.affirm(&self.signer, parcel, None).await?)
+            }
+        }
     }
 
     /// Redeem

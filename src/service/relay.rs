@@ -50,7 +50,7 @@ impl Service for RelayService {
                 let txs = &pool_clone.ethereum;
                 if let Some(max) = txs.iter().max() {
                     let max = max.block.to_owned();
-                    if let Err(err) = self.affirm(max).await {
+                    if let Err(err) = self.affirm(max + 1).await {
                         error!("{:?}", err);
                         continue;
                     };
@@ -68,12 +68,11 @@ impl Service for RelayService {
 impl RelayService {
     /// affirm target block
     pub async fn affirm(&mut self, target: u64) -> BridgerResult<H256> {
-        let last_leaf = target + 1;
 
-        match self.darwinia.should_relay(last_leaf).await {
+        match self.darwinia.should_relay(target).await {
             Ok(true) => {
-                trace!("Trying to relay block {}...", last_leaf);
-                let parcel = self.shadow.parcel(last_leaf as usize).await?;
+                trace!("Trying to relay block {}...", target);
+                let parcel = self.shadow.parcel(target as usize).await?;
 
                 match self.darwinia.affirm(parcel).await {
                     Ok(hash) => {

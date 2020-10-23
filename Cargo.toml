@@ -1,54 +1,37 @@
 [package]
-name = "darwinia-bridger"
-version = "0.0.3"
+name = "darwinia-bridge-primitives"
+version = "0.0.6"
 authors = ["clearloop <udtrokia@gmail.com>"]
-description = "Darwinia bridger"
-repository = "https://github.com/darwinia-network/bridger"
-license = "MIT"
-documentation = "https://docs.rs/bridger"
-homepage = "https://github.com/darwinia-network/bridger"
+description = "Darwinia bridge primitives"
+repository = "https://github.com/darwinia-network/bridge-primitives"
+license = "GPL-3.0"
+documentation = "https://docs.rs/darwinia-bridge-primitives"
+homepage = "https://github.com/darwinia-network/bridge-primitives"
 include = ["src/**/*", "Cargo.toml", "./README.md"]
-keywords = ["substrate", "darwinia"]
+keywords = ["blockchain"]
 readme = './README.md'
 edition = "2018"
 
-[[bin]]
-name = "bridger"
-path = "src/bin/bridger.rs"
-
 [dependencies]
-async-trait = "0.1.40"
-dirs = "3.0.1"
-env_logger = "0.7.1"
-etc = "0.1.11"
-futures = "0.3.5"
-log = "0.4.11"
-sp-keyring = "2.0.0"
-structopt = "0.3.18"
-substrate-subxt = "0.13.0"
-toml = "0.5.6"
-web3 = "0.13.0"
-serde_json = "1.0"
-hex = "0.4.2"
+uint = "0.8.5"
+rlp = "0.4.5"
 
-[dependencies.reqwest]
-version = "0.10"
-features = ["json"]
+## Optional featrues
+async-trait = { version = "0.1.40", optional = true }
+reqwest = { version = "0.10", features = ["json"], optional = true }
+serde_json = { version = "1.0", optional = true }
 
-[dependencies.tokio]
-package = "tokio"
-version = "0.2.22"
-features = ["full"]
-
-[dependencies.primitives]
-package = "darwinia-bridge-primitives"
-version = "0.0.12"
-git = "https://github.com/darwinia-network/bridge-primitives.git"
-branch = "feature/proxy"
-#path = "../bridge-primitives"
-features = ["runtime"]
 
 [dependencies.serde]
 package = "serde"
 version = "1"
 features = ["derive"]
+
+[dependencies.parity-scale-codec]
+package = "parity-scale-codec"
+version = "1"
+features = ["derive"]
+
+[features]
+rpc = ["async-trait", "reqwest", "serde_json"]
+default = []

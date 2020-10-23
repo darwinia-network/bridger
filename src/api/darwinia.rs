@@ -64,10 +64,10 @@ impl Darwinia {
         let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
 
         // proxy
-        let proxy_real = if config.relayer == "" {
+        let proxy_real = if config.proxy.real == "" {
             None
         } else {
-            match hex::decode(&config.relayer) {
+            match hex::decode(&config.proxy.real) {
                 Ok(relayer) => {
                     let relayer = relayer.as_slice();
                     AccountId32::try_from(relayer).ok()

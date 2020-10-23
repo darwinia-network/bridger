@@ -196,7 +196,7 @@ impl Darwinia {
     pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
         match &self.proxy_real {
             Some(real) => {
-                println!("- into proxy ------------");
+                trace!("Call 'affirm' for {:?}", real);
                 let affirm = Affirm {
                     ethereum_relay_header_parcel: parcel,
                     ethereum_relay_proofs: None,

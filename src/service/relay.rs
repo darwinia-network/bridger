@@ -83,7 +83,7 @@ impl RelayService {
                 }
             }
             Ok(Some(reason)) => {
-                Err(Error::Etc(format!("The `affirm` action was canceled: {}.", reason)))
+                Err(Error::Bridger(format!("The `affirm` action was canceled: {}.", reason)))
             },
             Err(err) => Err(err),
         }

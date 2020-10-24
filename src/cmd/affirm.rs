@@ -22,7 +22,7 @@ pub async fn exec(target_block_number: u64) -> Result<()> {
 
     // affirm
     match relay_service.affirm(target_block_number).await {
-        Ok(hash) => info!("Affirmation extrinsic hash: {:?}", hash),
+        Ok(hash) => info!("`affirm` extrinsic hash: {:?}", hash),
         Err(err) => error!("{:?}", err)
     }
 

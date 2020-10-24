@@ -9,7 +9,7 @@ use primitives::{
     frame::{
         collective::{ExecuteCallExt, MembersStoreExt},
         ethereum::{
-            backing::{RedeemCallExt, VerifiedProofStoreExt},
+            backing::{RedeemCallExt, VerifiedProofStoreExt, Redeem},
             game::{AffirmationsStoreExt, EthereumRelayerGame, PendingRelayHeaderParcelsStoreExt},
             relay::{
                 AffirmCallExt, ApprovePendingRelayHeaderParcel, ConfirmedBlockNumbersStoreExt,
@@ -55,6 +55,8 @@ pub struct Darwinia {
     /// Proxy real
     pub proxy_real: Option<<DarwiniaRuntime as System>::AccountId>,
 }
+
+type NotRelayReason = String;
 
 impl Darwinia {
     /// New darwinia API
@@ -196,11 +198,11 @@ impl Darwinia {
     pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
         match &self.proxy_real {
             Some(real) => {
-                trace!("Call 'affirm' for {:?}", real);
+                trace!("Proxy call `affirm` for {:?}", real);
                 let affirm = Affirm {
+                    _runtime: PhantomData::default(),
                     ethereum_relay_header_parcel: parcel,
                     ethereum_relay_proofs: None,
-                    _runtime: PhantomData::default()
                 };
 
                 let ex = self.client.encode(affirm).unwrap();
@@ -218,7 +220,22 @@ impl Darwinia {
         redeem_for: RedeemFor,
         proof: EthereumReceiptProofThing,
     ) -> Result<H256> {
-        Ok(self.client.redeem(&self.signer, redeem_for, proof).await?)
+        match &self.proxy_real {
+            Some(real) => {
+                trace!("Proxy call `redeem` for {:?}", real);
+                let redeem = Redeem {
+                    _runtime: PhantomData::default(),
+                    act: redeem_for,
+                    proof,
+                };
+
+                let ex = self.client.encode(redeem).unwrap();
+                Ok(self.client.proxy(&self.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
+            },
+            None => {
+                Ok(self.client.redeem(&self.signer, redeem_for, proof).await?)
+            }
+        }
     }
 
     /// Check if should redeem
@@ -230,42 +247,48 @@ impl Darwinia {
             .unwrap_or(false))
     }
 
+
     /// Check if should relay
-    pub async fn should_relay(&self, target: u64) -> Result<bool> {
+    pub async fn should_relay(&self, target: u64) -> Result<Option<NotRelayReason>> {
         let last_confirmed = self.last_confirmed().await?;
 
         if target <= last_confirmed {
-            trace!(
-                "The target block {} is less than the last_confirmed {}",
-                &target,
-                &last_confirmed
-            );
-            return Ok(false);
+            let reason =
+                format!(
+                    "The target block {} is less than the last_confirmed {}",
+                    &target,
+                    &last_confirmed
+                );
+            trace!("{}", &reason);
+            return Ok(Some(reason));
         }
 
         // Check if confirmed
         let confirmed_blocks = self.confirmed_block_numbers().await?;
         if confirmed_blocks.contains(&target) {
-            trace!("The target block {} has been confirmed", &target);
-            return Ok(false);
+            let reason = format!("The target block {} has been confirmed", &target);
+            trace!("{}", &reason);
+            return Ok(Some(reason));
         }
 
         // Check if the target block is pending
         let pending_headers = self.pending_headers().await?;
         for p in pending_headers {
             if p.1 == target {
-                trace!("The target block {} is pending", &target);
-                return Ok(false);
+                let reason = format!("The target block {} is pending", &target);
+                trace!("{}", &reason);
+                return Ok(Some(reason));
             }
         }
 
         // Check if the target block is in relayer game
         let proposals = self.current_proposals().await?;
         if !proposals.is_empty() && proposals.contains(&target) {
-            trace!("The target block {} is in the relayer game", &target);
-            return Ok(false);
+            let reason = format!("The target block {} is in the relayer game", &target);
+            trace!("{}", &reason);
+            return Ok(Some(reason));
         }
 
-        Ok(true)
+        Ok(None)
     }
 }

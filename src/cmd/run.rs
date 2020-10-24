@@ -23,10 +23,10 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     info!("      Ethereum: {}", config.eth.rpc);
     let pair = Pair::from_string(&config.seed, None).unwrap();
     match &config.proxy {
-        None => info!("🔨 Relayer account: {:?}", pair.public()),
+        None => info!("🔨 Relayer: {:?}", pair.public()),
         Some(proxy) => {
-            info!("🔨   Proxy account: {:?}", pair.public());
-            info!("🙌🔨  Real account: {}", proxy.real);
+            info!("🔨   Proxy: {:?}", pair.public());
+            info!("🙌🔨  Real: {}", proxy.real);
         }
     }
     info!("Relay from block: {}", config.eth.start);

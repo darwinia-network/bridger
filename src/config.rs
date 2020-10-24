@@ -141,7 +141,7 @@ impl Config {
         let c = Etc::from(if let Some(conf) = path {
             conf
         } else if let Some(mut conf) = dirs::home_dir() {
-            conf.push(".darwinia/config.toml");
+            conf.push(".bridger/config.toml");
             conf
         } else {
             return Err(Error::Bridger("Could not open home dir".to_string()));

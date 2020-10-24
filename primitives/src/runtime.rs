@@ -4,7 +4,7 @@
 use crate::{
     chain::{ethereum::EthereumRelayHeaderParcel, RelayAffirmation, RelayAffirmationId, proxy_type::ProxyType},
     frame::{
-        collective::Council,
+        collective::TechnicalCommittee,
         ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay},
         sudo::Sudo,
         proxy::Proxy,
@@ -48,7 +48,7 @@ impl System for DarwiniaRuntime {
     type AccountData = AccountData<<Self as Balances>::Balance>;
 }
 
-impl Council for DarwiniaRuntime {}
+impl TechnicalCommittee for DarwiniaRuntime {}
 impl Sudo for DarwiniaRuntime {}
 impl EthereumRelay for DarwiniaRuntime {}
 impl EthereumRelayerGame for DarwiniaRuntime {

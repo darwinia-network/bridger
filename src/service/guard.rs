@@ -47,6 +47,9 @@ impl Service for GuardService {
         }
 
         loop {
+            let last_confirmed = self.darwinia.last_confirmed().await?;
+            info!("Last confirmed ethereum block number is {}", last_confirmed);
+
             trace!("Checking pending headers...");
             let pending_headers = self.darwinia.pending_headers().await?;
             for header in pending_headers {

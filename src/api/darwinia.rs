@@ -65,17 +65,18 @@ impl Darwinia {
         let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
 
         // proxy
-        let proxy_real = if config.proxy.real == "" {
-            None
-        } else {
-            match hex::decode(&config.proxy.real) {
-                Ok(real) => {
-                    let mut data: [u8; 32] = [0u8; 32];
-                    data.copy_from_slice(&real[..]);
-                    let real = <DarwiniaRuntime as System>::AccountId::from(data);
-                    Some(real)
-                },
-                Err(_e) => None
+        let proxy_real = match &config.proxy {
+            None => None,
+            Some(proxy) => {
+                match hex::decode(&proxy.real) {
+                    Ok(real) => {
+                        let mut data: [u8; 32] = [0u8; 32];
+                        data.copy_from_slice(&real[..]);
+                        let real = <DarwiniaRuntime as System>::AccountId::from(data);
+                        Some(real)
+                    },
+                    Err(_e) => None
+                }
             }
         };
 

@@ -76,7 +76,7 @@ impl RelayService {
 
                 match self.darwinia.affirm(parcel).await {
                     Ok(hash) => {
-                        info!("Affirmed block {:?}", hash);
+                        info!("Extrinsic hash for affirming {}: {:?}", target, hash);
                         Ok(hash)
                     },
                     Err(err) => Err(err),

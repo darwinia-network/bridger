@@ -8,7 +8,7 @@ use crate::{
     Pool,
 };
 use async_trait::async_trait;
-use primitives::{chain::ethereum::RedeemFor, hex};
+use primitives::{chain::ethereum::RedeemFor};
 use std::{
     sync::{Arc, Mutex},
     time::Duration,
@@ -58,17 +58,25 @@ impl Service for RedeemService {
                         break;
                     }
                     let tx = &pool_clone.ethereum[index];
-                    if self.darwinia.should_redeem(&tx).await? && tx.block < last {
+
+                    if !self.darwinia.should_redeem(&tx).await? {
+                        info!("This ethereum tx {:?} has already been redeemed.", tx.tx_hash);
+
+                        continue;
+                    }
+
+                    if tx.block < last {
+                        info!("Prepare to redeem ethereum tx {:?}", tx.tx_hash);
                         let proof = self
                             .shadow
-                            .receipt(&format!("0x{}", hex!(&tx.hash()).as_str()), last)
+                            .receipt(&format!("{:?}", tx.enclosed_hash()), last)
                             .await?;
-                        let redeem_for = match tx.hash {
+                        let redeem_for = match tx.tx_hash {
                             EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
                             EthereumTransactionHash::Token(_) => RedeemFor::Token,
                         };
                         let hash = self.darwinia.redeem(redeem_for, proof).await?;
-                        info!("Redeemed tx {}", hash);
+                        info!("Redeemed with extrinsic {:?}", hash);
                         redeemed.push(index);
                     }
                 }

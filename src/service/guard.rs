@@ -43,6 +43,7 @@ impl Service for GuardService {
 
     async fn run(&mut self, _: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         if self.darwinia.role == Role::Normal {
+            trace!("Current account is not Sudo account or technical committee, ending...");
             return Ok(());
         }
 

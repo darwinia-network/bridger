@@ -70,20 +70,20 @@ impl RelayService {
     pub async fn affirm(&mut self, target: u64) -> BridgerResult<H256> {
 
         match self.darwinia.should_relay(target).await {
-            Ok(true) => {
-                trace!("Trying to relay block {}...", target);
+            Ok(None) => {
+                trace!("Trying to affirm block {}...", target);
                 let parcel = self.shadow.parcel(target as usize).await?;
 
                 match self.darwinia.affirm(parcel).await {
                     Ok(hash) => {
-                        info!("Summited proposal {:?}", hash);
+                        info!("Affirmed block {:?}", hash);
                         Ok(hash)
                     },
                     Err(err) => Err(err),
                 }
             }
-            Ok(false) => {
-                Err(Error::Etc(format!("No need to affirm block {}.", target)))
+            Ok(Some(reason)) => {
+                Err(Error::Etc(format!("The `affirm` action was canceled: {}.", reason)))
             },
             Err(err) => Err(err),
         }

@@ -22,10 +22,10 @@ pub struct VerifiedProof<T: EthereumBacking> {
 /// Submit proposal call
 #[derive(Clone, Debug, PartialEq, Call, Encode)]
 pub struct Redeem<T: EthereumBacking> {
+    /// Runtime marker
+    pub _runtime: PhantomData<T>,
     /// Token type
     pub act: RedeemFor,
     /// Ethereum Receipt Proof
     pub proof: EthereumReceiptProofThing,
-    /// Runtime marker
-    pub _runtime: PhantomData<T>,
 }

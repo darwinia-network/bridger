@@ -4,7 +4,10 @@ use crate::{
 };
 use substrate_subxt::ClientBuilder;
 use primitives::runtime::DarwiniaRuntime;
-use primitives::frame::collective::MembersStoreExt;
+use primitives::frame::{
+    collective::MembersStoreExt,
+    sudo::KeyStoreExt,
+};
 
 /// technical committee members
 pub async fn exec() -> Result<()> {
@@ -17,9 +20,12 @@ pub async fn exec() -> Result<()> {
         .set_url(&config.node)
         .build()
         .await?;
+    let sudo = client.key(None).await?;
+    // let sudo_ss58 = sudo.to_string();
     let technical_committee_members = client.members(None).await?;
 
-    println!("{:?}", technical_committee_members);
+    println!("sudo key: {:?}", sudo);
+    println!("technical committee members: {:?}", technical_committee_members);
 
     Ok(())
 }

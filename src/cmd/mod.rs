@@ -6,7 +6,7 @@ use structopt::{clap::AppSettings, StructOpt};
 mod confirm;
 mod run;
 mod affirm;
-mod tc;
+mod keys;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -33,7 +33,7 @@ enum Opt {
         block: u64,
     },
     /// Show technical committee members
-    Tc
+    Keys
 }
 
 /// Exec commands
@@ -43,7 +43,7 @@ pub async fn exec() -> Result<()> {
         Opt::Run { config, verbose } => run::exec(config, verbose).await?,
         Opt::Confirm { block } => confirm::exec(block).await?,
         Opt::Affirm { block} => affirm::exec(block).await?,
-        Opt::Tc => tc::exec().await?,
+        Opt::Keys => keys::exec().await?,
     }
 
     Ok(())

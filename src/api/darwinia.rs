@@ -56,6 +56,8 @@ pub struct Darwinia {
     pub proxy_real: Option<<DarwiniaRuntime as System>::AccountId>,
 }
 
+type NotRelayReason = String;
+
 impl Darwinia {
     /// New darwinia API
     pub async fn new(config: &Config) -> Result<Darwinia> {
@@ -230,42 +232,48 @@ impl Darwinia {
             .unwrap_or(false))
     }
 
+
     /// Check if should relay
-    pub async fn should_relay(&self, target: u64) -> Result<bool> {
+    pub async fn should_relay(&self, target: u64) -> Result<Option<NotRelayReason>> {
         let last_confirmed = self.last_confirmed().await?;
 
         if target <= last_confirmed {
-            trace!(
-                "The target block {} is less than the last_confirmed {}",
-                &target,
-                &last_confirmed
-            );
-            return Ok(false);
+            let reason =
+                format!(
+                    "The target block {} is less than the last_confirmed {}",
+                    &target,
+                    &last_confirmed
+                );
+            trace!("{}", &reason);
+            return Ok(Some(reason));
         }
 
         // Check if confirmed
         let confirmed_blocks = self.confirmed_block_numbers().await?;
         if confirmed_blocks.contains(&target) {
-            trace!("The target block {} has been confirmed", &target);
-            return Ok(false);
+            let reason = format!("The target block {} has been confirmed", &target);
+            trace!("{}", &reason);
+            return Ok(Some(reason));
         }
 
         // Check if the target block is pending
         let pending_headers = self.pending_headers().await?;
         for p in pending_headers {
             if p.1 == target {
-                trace!("The target block {} is pending", &target);
-                return Ok(false);
+                let reason = format!("The target block {} is pending", &target);
+                trace!("{}", &reason);
+                return Ok(Some(reason));
             }
         }
 
         // Check if the target block is in relayer game
         let proposals = self.current_proposals().await?;
         if !proposals.is_empty() && proposals.contains(&target) {
-            trace!("The target block {} is in the relayer game", &target);
-            return Ok(false);
+            let reason = format!("The target block {} is in the relayer game", &target);
+            trace!("{}", &reason);
+            return Ok(Some(reason));
         }
 
-        Ok(true)
+        Ok(None)
     }
 }

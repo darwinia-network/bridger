@@ -226,7 +226,7 @@ impl Darwinia {
                 let redeem = Redeem {
                     _runtime: PhantomData::default(),
                     act: redeem_for,
-                    proof: proof,
+                    proof,
                 };
 
                 let ex = self.client.encode(redeem).unwrap();

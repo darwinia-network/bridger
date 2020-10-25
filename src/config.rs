@@ -4,9 +4,10 @@ use etc::{Etc, Meta, Read, Write};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use toml::Serializer;
+use crate::result::Error::Bridger;
 
 /// Ethereum Contract Tuple
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EthereumContractTuple {
     /// Contract Address
     pub address: String,
@@ -15,7 +16,7 @@ pub struct EthereumContractTuple {
 }
 
 /// Ethereum Contracts
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EthereumContract {
     /// Ring Contract
     pub ring: EthereumContractTuple,
@@ -28,7 +29,7 @@ pub struct EthereumContract {
 }
 
 /// Ethereum Config
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EthereumConfig {
     /// Ethereum rpc url
     pub rpc: String,
@@ -41,7 +42,7 @@ pub struct EthereumConfig {
 }
 
 /// Service step
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Step {
     /// Ethereum step
     pub ethereum: u64,
@@ -54,14 +55,14 @@ pub struct Step {
 }
 
 /// Proxy config
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Proxy {
     /// proxy real
     pub real: String,
 }
 
 /// Bridger Config
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     /// Darwinia node url
     pub node: String,
@@ -149,7 +150,18 @@ impl Config {
         // if file exist
         if c.real_path()?.exists() {
             // if read fail, do not overwrite the exist one
-            let config = toml::from_slice(&c.read()?)?;
+            let mut config :Config = toml::from_slice(&c.read()?)?;
+
+            // proxy real's length check
+            if let Some(proxy) = config.clone().proxy {
+                if proxy.real.len() != 64 && proxy.real.len() != 66 {
+                    return Err(Bridger("Config proxy real's length is wrong".to_string()));
+                }
+                if proxy.real.len() == 64 {
+                    config.proxy = Some(Proxy { real: format!("0x{}", proxy.real) });
+                }
+            }
+
             Ok(config)
         } else {
             Self::write(c)

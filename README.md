@@ -63,7 +63,7 @@ You will need to prepare several services before using bridger:
 - Account Seed for signing extrinsics, you can also using a proxy seed to signing extrinsic for your real account. To use proxy, you need to
     + Using [Extrinsic](https://apps.darwinia.network/#/extrinsics) to setting up the proxy using your real account. Calling ```proxy.addProxy(proxy_account, ProxyType.EthereumBridge, 0)```
     + Changing the seed settings to the proxy account's seed.
-    + Make sure the proxy.real key in config.toml is set to the real account's address to enable proxy feature. (Currently must be hex format without 0x prefix, Here is an [address conversion tool](https://crab.subscan.io/tools/ss58_transform))
+    + Make sure the proxy.real key in config.toml is set to the real account's address to enable proxy feature. (Currently must be public key hex format, Here is an [tool](https://crab.subscan.io/tools/ss58_transform) which can help address conversion.)
 
 #### Run
 

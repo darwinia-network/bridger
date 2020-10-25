@@ -222,7 +222,7 @@ impl Darwinia {
     ) -> Result<H256> {
         match &self.proxy_real {
             Some(real) => {
-                trace!("Proxy call `redeem` for {:?}", real);
+                trace!("Proxy call `redeem` for real acount {:?}", real);
                 let redeem = Redeem {
                     _runtime: PhantomData::default(),
                     act: redeem_for,
@@ -242,7 +242,7 @@ impl Darwinia {
     pub async fn should_redeem(&self, tx: &EthereumTransaction) -> Result<bool> {
         Ok(!self
             .client
-            .verified_proof((tx.hash(), tx.index), None)
+            .verified_proof((tx.block_hash.to_fixed_bytes(), tx.index), None)
             .await?
             .unwrap_or(false))
     }

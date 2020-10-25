@@ -74,7 +74,7 @@ impl RelayService {
         // pendings check
 
         // affirmations check
-        match self.darwinia.should_relay(target).await {
+        match self.darwinia.should_relay(target, &parcel).await {
             Ok(None) => {
                 match self.darwinia.affirm(parcel).await {
                     Ok(hash) => {

@@ -254,7 +254,7 @@ impl Darwinia {
 
 
     /// Check if should relay
-    pub async fn should_relay(&self, target: u64, parcel: EthereumRelayHeaderParcel) -> Result<Option<NotRelayReason>> {
+    pub async fn should_relay(&self, target: u64, parcel: &EthereumRelayHeaderParcel) -> Result<Option<NotRelayReason>> {
         let last_confirmed = self.last_confirmed().await?;
 
         if target <= last_confirmed {
@@ -284,28 +284,53 @@ impl Darwinia {
             let round_id = item.1;
             let affirmations = item.2;
 
-            for affirmation in affirmations {
-                let blocks: &Vec<u64> =
-                    &affirmation.relay_header_parcels.iter().map(|bp| bp.header.number).collect();
-                if blocks.contains(&target) {
-                    //
-                    let reason = format!("The target block {} is in the relayer game", &target);
-                    trace!("{}", &reason);
+            if contains_block(&affirmations, target) {
 
-                    //
-                    // if round_id == 0 {
-                    //
-                    // } else {
-                    //
-                    // }
-                    return Ok(Some(reason));
-                }
+                //
+                let reason = format!("The target block {} is in the relayer game", &target);
+                trace!("{}", &reason);
+
+                // //
+                // if round_id == 0 {
+                //     if parcel.is_same(&affirmations[0].relay_header_parcels[0]) {
+                //         // agree
+                //         if affirmations.len() > 1 {
+                //             // dispute exist, join the game
+                //
+                //         } else {
+                //             // dispute not exist, do not relay
+                //             return Ok(Some(reason));
+                //         }
+                //     } else {
+                //         // disagree
+                //
+                //     }
+                //
+                // } else {
+                //
+                // }
+
+                return Ok(Some(reason));
             }
         }
 
         Ok(None)
     }
 
+}
+
+fn contains_block(affirmations: &Vec<RelayAffirmation>, block: u64) -> bool {
+    for affirmation in affirmations {
+        let blocks: &Vec<u64> = &affirmation
+            .relay_header_parcels
+            .iter()
+            .map(|bp| bp.header.number)
+            .collect();
+        if blocks.contains(&block) {
+            return true;
+        }
+    }
+    return false;
 }
 
 

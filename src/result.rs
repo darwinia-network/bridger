@@ -1,5 +1,4 @@
 //! Bridger Result
-use etc::Error as Etc;
 use reqwest::Error as Reqwest;
 use serde_json::Error as SerdeJson;
 use std::{
@@ -50,7 +49,7 @@ macro_rules! error {
     };
 }
 
-error! {Io, Bridger, DeToml, SerToml, Etc, Web3, Reqwest, SerdeJson, Subxt}
+error! {Io, Bridger, DeToml, SerToml, Web3, Reqwest, SerdeJson, Subxt}
 
 /// Bridger Result
 pub type Result<T> = StdResult<T, Error>;

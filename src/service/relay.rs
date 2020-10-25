@@ -70,19 +70,19 @@ impl RelayService {
 
         match self.darwinia.should_relay(target).await {
             Ok(None) => {
-                trace!("Trying to affirm block {}...", target);
+                trace!("Prepare to affirm ethereum block: {}", target);
                 let parcel = self.shadow.parcel(target as usize).await?;
 
                 match self.darwinia.affirm(parcel).await {
                     Ok(hash) => {
-                        info!("Affirmed block {:?}", hash);
+                        info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
                         Ok(hash)
                     },
                     Err(err) => Err(err),
                 }
             }
             Ok(Some(reason)) => {
-                Err(Error::Etc(format!("The `affirm` action was canceled: {}.", reason)))
+                Err(Error::Bridger(format!("Cancel the `affirm` action: {}.", reason)))
             },
             Err(err) => Err(err),
         }

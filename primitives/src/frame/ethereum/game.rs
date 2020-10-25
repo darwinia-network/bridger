@@ -9,7 +9,7 @@ use substrate_subxt_proc_macro::{module, Store};
 pub trait EthereumRelayerGame: System {
     /// Ethereum Pending Header
     type PendingRelayHeaderParcel: 'static + Encode + Decode + Send + Default;
-    /// Ethereum Relay Proposal
+    /// Ethereum Relay Affirmation
     type RelayAffirmation: 'static + Encode + Decode + Send + Default;
 }
 
@@ -21,7 +21,7 @@ pub struct PendingRelayHeaderParcels<T: EthereumRelayerGame> {
     pub _runtime: PhantomData<T>,
 }
 
-/// Relay Proposals Storage
+/// Relay Affirmations Storage
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
 pub struct Affirmations<T: EthereumRelayerGame> {
     #[store(returns = Vec<T::RelayAffirmation>)]

@@ -2,12 +2,15 @@
 #![cfg(feature = "runtime")]
 
 use crate::{
-    chain::{ethereum::EthereumRelayHeaderParcel, RelayAffirmation, RelayAffirmationId, proxy_type::ProxyType},
+    chain::{
+        ethereum::EthereumRelayHeaderParcel, proxy_type::ProxyType, RelayAffirmation,
+        RelayAffirmationId,
+    },
     frame::{
         collective::TechnicalCommittee,
         ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay},
-        sudo::Sudo,
         proxy::Proxy,
+        sudo::Sudo,
     },
 };
 
@@ -63,7 +66,9 @@ impl EthereumRelayerGame for DarwiniaRuntime {
         u64,
         EthereumRelayHeaderParcel,
     );
+    type RelayHeaderId = u64;
 }
+
 impl EthereumBacking for DarwiniaRuntime {}
 
 impl Proxy for DarwiniaRuntime {

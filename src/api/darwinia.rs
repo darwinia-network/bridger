@@ -32,7 +32,7 @@ use web3::types::H256;
 
 // Types
 type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeaderParcel;
-type RelayProposal = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
+type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
 
 /// Account Role
 #[derive(PartialEq, Eq)]
@@ -146,31 +146,14 @@ impl Darwinia {
         })
     }
 
-    /// Get relay proposals
-    pub async fn proposals(&self) -> Result<Vec<RelayProposal>> {
-        let mut proposals = vec![];
+    /// Get all active games' affirmations
+    pub async fn affirmations(&self) -> Result<Vec<RelayAffirmation>> {
+        let mut affirmations = vec![];
         let mut iter = self.client.affirmations_iter(None).await?;
         if let Some((_, mut p)) = iter.next().await? {
-            proposals.append(&mut p);
+            affirmations.append(&mut p);
         }
-        Ok(proposals)
-    }
-
-    /// Get current proposals
-    pub async fn current_proposals(&self) -> Result<Vec<u64>> {
-        let proposals = self.proposals().await?;
-        let mut blocks = vec![];
-        for p in proposals {
-            blocks.append(
-                &mut p
-                    .relay_header_parcels
-                    .iter()
-                    .map(|bp| bp.header.number)
-                    .collect(),
-            )
-        }
-
-        Ok(blocks)
+        Ok(affirmations)
     }
 
     /// Get confirmed block numbers
@@ -194,7 +177,7 @@ impl Darwinia {
         Ok(self.client.pending_relay_header_parcels(None).await?)
     }
 
-    /// Submit Proposal
+    /// Submit affirmation
     pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
         match &self.proxy_real {
             Some(real) => {
@@ -281,12 +264,15 @@ impl Darwinia {
             }
         }
 
-        // Check if the target block is in relayer game
-        let proposals = self.current_proposals().await?;
-        if !proposals.is_empty() && proposals.contains(&target) {
-            let reason = format!("The target block {} is in the relayer game", &target);
-            trace!("{}", &reason);
-            return Ok(Some(reason));
+        // Check if the target block is in affirmations
+        for affirmation in self.affirmations().await? {
+            let blocks_of_affirmation: &Vec<u64> =
+                &affirmation.relay_header_parcels.iter().map(|bp| bp.header.number).collect();
+            if blocks_of_affirmation.contains(&target) {
+                let reason = format!("The target block {} is in the relayer game", &target);
+                trace!("{}", &reason);
+                return Ok(Some(reason));
+            }
         }
 
         Ok(None)

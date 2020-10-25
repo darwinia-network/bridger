@@ -35,7 +35,7 @@ type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeade
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
 
 /// Account Role
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug)]
 pub enum Role {
     /// Sudo Account
     Sudo,

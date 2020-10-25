@@ -1,7 +1,12 @@
-use crate::{listener::Listener, result::Result, Config};
+use crate::{listener::Listener, result::{Result, Error}, Config};
 use std::path::PathBuf;
-use substrate_subxt::sp_runtime::app_crypto::Pair as PairTrait;
-use sp_keyring::sr25519::sr25519::Pair;
+use crate::{
+    api::{Darwinia, Shadow},
+    service::{EthereumService, GuardService, RedeemService, RelayService},
+};
+use std::sync::Arc;
+use web3::transports::http::Http;
+use substrate_subxt::sp_core::Pair;
 
 /// Run the bridger
 pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
@@ -17,21 +22,46 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
 
     let config = Config::new(path)?;
 
-    info!("⛓ Connect to");
+    if config.eth.rpc.starts_with("ws") {
+        return Err(Error::Bridger(
+            "Bridger currently doesn't support ethereum websocket transport".to_string(),
+        ));
+    }
+
+    // APIs
+    let shadow = Arc::new(Shadow::new(&config));
+    let darwinia = Arc::new(Darwinia::new(&config).await?);
+
+    // Services
+    let ethereum = <EthereumService<Http>>::new_http(&config)?;
+    let relay = RelayService::new(&config, shadow.clone(), darwinia.clone());
+    let redeem = RedeemService::new(&config, shadow.clone(), darwinia.clone());
+    let guard = GuardService::new(&config, shadow, darwinia.clone());
+
+    let mut listener = Listener::default();
+
+    listener.register(ethereum)?;
+    listener.register(relay)?;
+    listener.register(redeem)?;
+    listener.register(guard)?;
+
+    // Startup infomations
+    info!("🔗 Connect to");
     info!("      Darwinia: {}", config.node);
     info!("        Shadow: {}", config.shadow);
     info!("      Ethereum: {}", config.eth.rpc);
-    let pair = Pair::from_string(&config.seed, None).unwrap();
+    let signer_public = &darwinia.signer.signer().public();
     match &config.proxy {
-        None => info!("🔨 Relayer: {:?}", pair.public()),
+        None => {
+            info!("🧔 {:?} Relayer: {:?}", darwinia.role, signer_public);
+        },
         Some(proxy) => {
-            info!("🔨   Proxy: {:?}", pair.public());
-            info!("🙌🔨  Real: {}", proxy.real);
+            info!("🧔 Proxy {:?} Relayer: {:?}", darwinia.role, signer_public);
+            info!("👴 Real Account: {}", proxy.real);
         }
     }
-    info!("Relay from block: {}", config.eth.start);
+    info!("🌱 Relay from ethereum block: {}", config.eth.start);
 
-    let mut listener = Listener::from_config(config).await?;
     listener.start().await?;
     Ok(())
 }

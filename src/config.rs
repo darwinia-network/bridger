@@ -146,14 +146,13 @@ impl Config {
         };
         let c = Etc::from(path);
 
-        if !c.real_path()?.exists() {
-            Self::write(c)
+        // if file exist
+        if c.real_path()?.exists() {
+            // if read fail, do not overwrite the exist one
+            let config = toml::from_slice(&c.read()?)?;
+            Ok(config)
         } else {
-            if let Ok(config) = toml::from_slice(&c.read()?) {
-                Ok(config)
-            } else {
-                Self::write(c)
-            }
+            Self::write(c)
         }
     }
 }

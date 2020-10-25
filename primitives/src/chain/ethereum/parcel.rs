@@ -15,6 +15,12 @@ pub struct EthereumRelayHeaderParcel {
     pub mmr_root: [u8; 32],
 }
 
+impl EthereumRelayHeaderParcel {
+    pub fn is_same(&self, another: EthereumRelayHeaderParcel) -> bool {
+        self.header.hash == another.header.hash && self.mmr_root == another.mmr_root
+    }
+}
+
 /// Ethereum EthereumRelayHeaderParcel JSON
 #[derive(Default, Deserialize, Serialize)]
 pub struct EthereumRelayHeaderParcelJson {

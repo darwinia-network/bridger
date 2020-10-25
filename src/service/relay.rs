@@ -66,12 +66,16 @@ impl Service for RelayService {
 impl RelayService {
     /// affirm target block
     pub async fn affirm(&mut self, target: u64) -> BridgerResult<H256> {
-        trace!("Checking if need to relay a new ethereum block...");
+        trace!("Prepare to affirm ethereum block: {}", target);
+        let parcel = self.shadow.parcel(target as usize).await?;
+
+        // last confirmed check
+
+        // pendings check
+
+        // affirmations check
         match self.darwinia.should_relay(target).await {
             Ok(None) => {
-                trace!("Prepare to affirm ethereum block: {}", target);
-                let parcel = self.shadow.parcel(target as usize).await?;
-
                 match self.darwinia.affirm(parcel).await {
                     Ok(hash) => {
                         info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
@@ -86,4 +90,6 @@ impl RelayService {
             Err(err) => Err(err),
         }
     }
+
+
 }

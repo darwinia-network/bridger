@@ -41,6 +41,16 @@ impl Service for GuardService {
         SERVICE_NAME
     }
 
+    // async fn check_pending(parcel: &EthereumRelayHeaderParcel, pending_parcels: Vec<PendingRelayHeaderParcel>) {
+    //     for p in pending_parcels {
+    //         let parcel_p = p.2;
+    //         // I disagree the parcel from pending
+    //         if parcel.header.hash != parcel_p.header.hash || parcel.mmr_root != parcel_p.mmr_root {
+    //             warn!("The parcel from chain is different from local calculation, please check!");
+    //         }
+    //     }
+    // }
+
     async fn run(&mut self, _: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         if self.darwinia.role == Role::Normal {
             trace!("Current account is not Sudo account or technical committee, ending...");
@@ -52,16 +62,16 @@ impl Service for GuardService {
             info!("Last confirmed ethereum block number is {}", last_confirmed);
 
             trace!("Checking pending headers...");
-            let pending_headers = self.darwinia.pending_headers().await?;
-            for header in pending_headers {
-                let ht = self.shadow.parcel(header.2.header.number as usize).await?;
+            let pending_header_parcels = self.darwinia.pending_headers().await?;
+            for pending_parcel in pending_header_parcels {
+                let parcel = self.shadow.parcel(pending_parcel.2.header.number as usize).await?;
 
-                if header.2 == ht {
-                    info!("Approved header {}", header.1);
-                    self.darwinia.approve_pending_header(header.1).await
+                if pending_parcel.2.mmr_root == parcel.mmr_root && pending_parcel.2.header.hash == parcel.header.hash {
+                    info!("Approved header {}", pending_parcel.1);
+                    self.darwinia.approve_pending_header(pending_parcel.1).await
                 } else {
-                    info!("Rejected header {}", header.1);
-                    self.darwinia.reject_pending_header(header.1).await
+                    info!("Rejected header {}", pending_parcel.1);
+                    self.darwinia.reject_pending_header(pending_parcel.1).await
                 }?;
             }
 

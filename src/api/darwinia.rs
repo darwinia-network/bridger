@@ -31,7 +31,7 @@ use substrate_subxt::{
 use web3::types::H256;
 
 // Types
-type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeaderParcel;
+type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeaderParcel;
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
 
 /// Account Role
@@ -157,13 +157,25 @@ impl Darwinia {
     }
 
     /// Get all active games' affirmations
-    pub async fn affirmations(&self) -> Result<Vec<RelayAffirmation>> {
-        let mut affirmations = vec![];
+    pub async fn affirmations(&self) -> Result<Vec<(u64, u32, Vec<RelayAffirmation>)>> {
+        let mut result = vec![];
         let mut iter = self.client.affirmations_iter(None).await?;
-        if let Some((_, mut p)) = iter.next().await? {
-            affirmations.append(&mut p);
+        loop {
+            if let Some((mut storage_key, affirmations)) = iter.next().await? {
+                let game_id: &mut [u8] = &mut storage_key.0[32..40];
+                game_id.reverse();
+                let game_id = u64::from_str_radix(hex::encode(game_id).as_str(), 16).unwrap();
+
+                let round_id: &mut [u8] = &mut storage_key.0[40..44];
+                round_id.reverse();
+                let round_id = u32::from_str_radix(hex::encode(round_id).as_str(), 16).unwrap();
+
+                result.push((game_id, round_id, affirmations));
+            } else {
+                break;
+            }
         }
-        Ok(affirmations)
+        Ok(result)
     }
 
     /// Get confirmed block numbers
@@ -183,7 +195,7 @@ impl Darwinia {
     }
 
     /// Get pending headers
-    pub async fn pending_headers(&self) -> Result<Vec<PendingHeader>> {
+    pub async fn pending_headers(&self) -> Result<Vec<PendingRelayHeaderParcel>> {
         Ok(self.client.pending_relay_header_parcels(None).await?)
     }
 
@@ -242,7 +254,7 @@ impl Darwinia {
 
 
     /// Check if should relay
-    pub async fn should_relay(&self, target: u64) -> Result<Option<NotRelayReason>> {
+    pub async fn should_relay(&self, target: u64, parcel: EthereumRelayHeaderParcel) -> Result<Option<NotRelayReason>> {
         let last_confirmed = self.last_confirmed().await?;
 
         if target <= last_confirmed {
@@ -256,18 +268,10 @@ impl Darwinia {
             return Ok(Some(reason));
         }
 
-        // Check if confirmed
-        let confirmed_blocks = self.confirmed_block_numbers().await?;
-        if confirmed_blocks.contains(&target) {
-            let reason = format!("The target block {} has been confirmed", &target);
-            trace!("{}", &reason);
-            return Ok(Some(reason));
-        }
-
         // Check if the target block is pending
         let pending_headers = self.pending_headers().await?;
         for p in pending_headers {
-            if p.1 == target {
+            if p.1 >= target {
                 let reason = format!("The target block {} is pending", &target);
                 trace!("{}", &reason);
                 return Ok(Some(reason));
@@ -275,16 +279,33 @@ impl Darwinia {
         }
 
         // Check if the target block is in affirmations
-        for affirmation in self.affirmations().await? {
-            let blocks_of_affirmation: &Vec<u64> =
-                &affirmation.relay_header_parcels.iter().map(|bp| bp.header.number).collect();
-            if blocks_of_affirmation.contains(&target) {
-                let reason = format!("The target block {} is in the relayer game", &target);
-                trace!("{}", &reason);
-                return Ok(Some(reason));
+        for item in self.affirmations().await? {
+            let game_id = item.0;
+            let round_id = item.1;
+            let affirmations = item.2;
+
+            for affirmation in affirmations {
+                let blocks: &Vec<u64> =
+                    &affirmation.relay_header_parcels.iter().map(|bp| bp.header.number).collect();
+                if blocks.contains(&target) {
+                    //
+                    let reason = format!("The target block {} is in the relayer game", &target);
+                    trace!("{}", &reason);
+
+                    //
+                    // if round_id == 0 {
+                    //
+                    // } else {
+                    //
+                    // }
+                    return Ok(Some(reason));
+                }
             }
         }
 
         Ok(None)
     }
+
 }
+
+

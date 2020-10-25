@@ -1,0 +1,52 @@
+# darwinia node websocket json-rpc endpoint
+node = 'ws://35.201.137.190:9944'
+
+# private key of relayer, or, private key of proxy
+seed = '//Alice'
+
+# shadow http restful endpoint, refer https://github.com/darwinia-network/shadow
+shadow = 'https://testnet.shadow.darwinia.network'
+
+[eth]
+# ethereum json-rpc endpoint
+rpc = 'https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016'
+start = 8647036
+
+[eth.contract.ring]
+# erc20 contract of ring
+address = '0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0'
+# cross transfer topic
+topics = ['0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10']
+
+[eth.contract.kton]
+# erc20 contract of kton
+address = '0x1994100c58753793D52c6f457f189aa3ce9cEe94'
+# cross transfer topic
+topics = ['0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10']
+
+[eth.contract.bank]
+# gringotts bank contract
+address = '0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e'
+# cross transfer topic
+topics = ['0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12']
+
+[eth.contract.issuing]
+# erc20 ring and kton issuing contract
+address = '0x49262B932E439271d05634c32978294C7Ea15d0C'
+topics = []
+
+[step]
+# ethereum service polling interval in seconds
+ethereum = 30
+# relay service polling interval in seconds
+relay = 60
+# redeem service polling interval in seconds
+redeem = 90
+# guard service polling interval in seconds
+guard = 30
+
+# allowing `real` account to give permission to `proxy` account to dispatch calls
+[proxy]
+# The account (32 bytes) that the proxy will make a call on behalf of
+# Set to a zero-length string if there is no proxy need
+real = ''

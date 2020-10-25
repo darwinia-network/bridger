@@ -32,15 +32,15 @@ use web3::types::H256;
 
 // Types
 type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeaderParcel;
-type RelayProposal = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
+type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
 
 /// Account Role
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug)]
 pub enum Role {
     /// Sudo Account
     Sudo,
-    /// Council Member
-    Council,
+    /// Technical Committee Member
+    TechnicalCommittee,
     /// Normal Account
     Normal,
 }
@@ -65,17 +65,18 @@ impl Darwinia {
         let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
 
         // proxy
-        let proxy_real = if config.proxy.real == "" {
-            None
-        } else {
-            match hex::decode(&config.proxy.real) {
-                Ok(real) => {
-                    let mut data: [u8; 32] = [0u8; 32];
-                    data.copy_from_slice(&real[..]);
-                    let real = <DarwiniaRuntime as System>::AccountId::from(data);
-                    Some(real)
-                },
-                Err(_e) => None
+        let proxy_real = match &config.proxy {
+            None => None,
+            Some(proxy) => {
+                match hex::decode(&proxy.real) {
+                    Ok(real) => {
+                        let mut data: [u8; 32] = [0u8; 32];
+                        data.copy_from_slice(&real[..]);
+                        let real = <DarwiniaRuntime as System>::AccountId::from(data);
+                        Some(real)
+                    },
+                    Err(_e) => None
+                }
             }
         };
 
@@ -87,15 +88,15 @@ impl Darwinia {
 
         let pk = signer.signer().public().to_string();
         let sudo = client.key(None).await?.to_string();
-        let council = client.members(None).await?;
+        let technical_committee_members = client.members(None).await?;
 
         Ok(Darwinia {
             client,
             signer,
             role: if sudo == pk {
                 Role::Sudo
-            } else if council.iter().any(|cpk| cpk.to_string() == pk) {
-                Role::Council
+            } else if technical_committee_members.iter().any(|cpk| cpk.to_string() == pk) {
+                Role::TechnicalCommittee
             } else {
                 Role::Normal
             },
@@ -120,7 +121,7 @@ impl Darwinia {
         })?;
         Ok(match self.role {
             Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
-            Role::Council => {
+            Role::TechnicalCommittee => {
                 self.client
                     .execute(&self.signer, &ex, ex.size_hint() as u32)
                     .await?
@@ -137,7 +138,7 @@ impl Darwinia {
         })?;
         Ok(match self.role {
             Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
-            Role::Council => {
+            Role::TechnicalCommittee => {
                 self.client
                     .execute(&self.signer, &ex, ex.size_hint() as u32)
                     .await?
@@ -146,31 +147,14 @@ impl Darwinia {
         })
     }
 
-    /// Get relay proposals
-    pub async fn proposals(&self) -> Result<Vec<RelayProposal>> {
-        let mut proposals = vec![];
+    /// Get all active games' affirmations
+    pub async fn affirmations(&self) -> Result<Vec<RelayAffirmation>> {
+        let mut affirmations = vec![];
         let mut iter = self.client.affirmations_iter(None).await?;
         if let Some((_, mut p)) = iter.next().await? {
-            proposals.append(&mut p);
+            affirmations.append(&mut p);
         }
-        Ok(proposals)
-    }
-
-    /// Get current proposals
-    pub async fn current_proposals(&self) -> Result<Vec<u64>> {
-        let proposals = self.proposals().await?;
-        let mut blocks = vec![];
-        for p in proposals {
-            blocks.append(
-                &mut p
-                    .relay_header_parcels
-                    .iter()
-                    .map(|bp| bp.header.number)
-                    .collect(),
-            )
-        }
-
-        Ok(blocks)
+        Ok(affirmations)
     }
 
     /// Get confirmed block numbers
@@ -194,7 +178,7 @@ impl Darwinia {
         Ok(self.client.pending_relay_header_parcels(None).await?)
     }
 
-    /// Submit Proposal
+    /// Submit affirmation
     pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
         match &self.proxy_real {
             Some(real) => {
@@ -281,12 +265,15 @@ impl Darwinia {
             }
         }
 
-        // Check if the target block is in relayer game
-        let proposals = self.current_proposals().await?;
-        if !proposals.is_empty() && proposals.contains(&target) {
-            let reason = format!("The target block {} is in the relayer game", &target);
-            trace!("{}", &reason);
-            return Ok(Some(reason));
+        // Check if the target block is in affirmations
+        for affirmation in self.affirmations().await? {
+            let blocks_of_affirmation: &Vec<u64> =
+                &affirmation.relay_header_parcels.iter().map(|bp| bp.header.number).collect();
+            if blocks_of_affirmation.contains(&target) {
+                let reason = format!("The target block {} is in the relayer game", &target);
+                trace!("{}", &reason);
+                return Ok(Some(reason));
+            }
         }
 
         Ok(None)

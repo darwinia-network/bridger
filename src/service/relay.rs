@@ -46,7 +46,6 @@ impl Service for RelayService {
     async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         loop {
             if let Ok(pool_clone) = pool.try_lock() {
-                trace!("Checking if need to relay a new ethereum block...");
                 let txs = &pool_clone.ethereum;
                 if let Some(max) = txs.iter().max() {
                     let max = max.block.to_owned();
@@ -67,7 +66,7 @@ impl Service for RelayService {
 impl RelayService {
     /// affirm target block
     pub async fn affirm(&mut self, target: u64) -> BridgerResult<H256> {
-
+        trace!("Checking if need to relay a new ethereum block...");
         match self.darwinia.should_relay(target).await {
             Ok(None) => {
                 trace!("Prepare to affirm ethereum block: {}", target);
@@ -82,7 +81,7 @@ impl RelayService {
                 }
             }
             Ok(Some(reason)) => {
-                Err(Error::Bridger(format!("Cancel the `affirm` action: {}.", reason)))
+                Err(Error::Bridger(format!("The `affirm` action was canceled: {}.", reason)))
             },
             Err(err) => Err(err),
         }

@@ -158,7 +158,7 @@ impl Config {
                     return Err(Bridger("Config proxy real's length is wrong".to_string()));
                 }
                 if proxy.real.len() == 64 {
-                    config.proxy = Some(Proxy { real: format!("0x{}", proxy.real).to_string() });
+                    config.proxy = Some(Proxy { real: format!("0x{}", proxy.real) });
                 }
             }
 

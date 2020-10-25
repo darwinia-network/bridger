@@ -33,7 +33,7 @@ pub struct EthereumConfig {
     /// Ethereum rpc url
     pub rpc: String,
     /// Ethereum start block number
-    ///z
+    ///
     /// Ethereum bridger will scan start from this block
     pub start: u64,
     /// Ethereum contracts

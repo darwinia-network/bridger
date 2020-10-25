@@ -39,8 +39,8 @@ type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmati
 pub enum Role {
     /// Sudo Account
     Sudo,
-    /// Council Member
-    Council,
+    /// Technical Committee Member
+    TechnicalCommittee,
     /// Normal Account
     Normal,
 }
@@ -65,17 +65,18 @@ impl Darwinia {
         let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
 
         // proxy
-        let proxy_real = if config.proxy.real == "" {
-            None
-        } else {
-            match hex::decode(&config.proxy.real) {
-                Ok(real) => {
-                    let mut data: [u8; 32] = [0u8; 32];
-                    data.copy_from_slice(&real[..]);
-                    let real = <DarwiniaRuntime as System>::AccountId::from(data);
-                    Some(real)
-                },
-                Err(_e) => None
+        let proxy_real = match &config.proxy {
+            None => None,
+            Some(proxy) => {
+                match hex::decode(&proxy.real) {
+                    Ok(real) => {
+                        let mut data: [u8; 32] = [0u8; 32];
+                        data.copy_from_slice(&real[..]);
+                        let real = <DarwiniaRuntime as System>::AccountId::from(data);
+                        Some(real)
+                    },
+                    Err(_e) => None
+                }
             }
         };
 
@@ -87,15 +88,15 @@ impl Darwinia {
 
         let pk = signer.signer().public().to_string();
         let sudo = client.key(None).await?.to_string();
-        let council = client.members(None).await?;
+        let technical_committee_members = client.members(None).await?;
 
         Ok(Darwinia {
             client,
             signer,
             role: if sudo == pk {
                 Role::Sudo
-            } else if council.iter().any(|cpk| cpk.to_string() == pk) {
-                Role::Council
+            } else if technical_committee_members.iter().any(|cpk| cpk.to_string() == pk) {
+                Role::TechnicalCommittee
             } else {
                 Role::Normal
             },
@@ -120,7 +121,7 @@ impl Darwinia {
         })?;
         Ok(match self.role {
             Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
-            Role::Council => {
+            Role::TechnicalCommittee => {
                 self.client
                     .execute(&self.signer, &ex, ex.size_hint() as u32)
                     .await?
@@ -137,7 +138,7 @@ impl Darwinia {
         })?;
         Ok(match self.role {
             Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
-            Role::Council => {
+            Role::TechnicalCommittee => {
                 self.client
                     .execute(&self.signer, &ex, ex.size_hint() as u32)
                     .await?

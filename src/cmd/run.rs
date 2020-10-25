@@ -22,11 +22,12 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     info!("        Shadow: {}", config.shadow);
     info!("      Ethereum: {}", config.eth.rpc);
     let pair = Pair::from_string(&config.seed, None).unwrap();
-    if config.proxy.real == "" {
-        info!("🔨 Relayer account: {:?}", pair.public());
-    } else {
-        info!("🔨   Proxy account: {:?}", pair.public());
-        info!("🙌🔨  Real account: {}", config.proxy.real);
+    match &config.proxy {
+        None => info!("🔨 Relayer: {:?}", pair.public()),
+        Some(proxy) => {
+            info!("🔨   Proxy: {:?}", pair.public());
+            info!("🙌🔨  Real: {}", proxy.real);
+        }
     }
     info!("Relay from block: {}", config.eth.start);
 

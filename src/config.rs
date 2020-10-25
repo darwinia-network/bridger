@@ -74,7 +74,7 @@ pub struct Config {
     /// Service steps
     pub step: Step,
     /// Darwinia relayer proxy address
-    pub proxy: Proxy,
+    pub proxy: Option<Proxy>,
 }
 
 impl Default for Config {
@@ -120,9 +120,7 @@ impl Default for Config {
                 redeem: 90,
                 guard: 30,
             },
-            proxy: Proxy {
-                real: "".to_string(),
-            },
+            proxy: None,
         }
     }
 }
@@ -138,18 +136,20 @@ impl Config {
 
     /// New config from pathbuf
     pub fn new(path: Option<PathBuf>) -> Result<Self> {
-        let c = Etc::from(if let Some(conf) = path {
+        let path = if let Some(conf) = path {
             conf
         } else if let Some(mut conf) = dirs::home_dir() {
             conf.push(".bridger/config.toml");
             conf
         } else {
             return Err(Error::Bridger("Could not open home dir".to_string()));
-        });
+        };
+        let c = Etc::from(path);
 
-        if !c.real_path()?.exists() {
-            Self::write(c)
-        } else if let Ok(config) = toml::from_slice(&c.read()?) {
+        // if file exist
+        if c.real_path()?.exists() {
+            // if read fail, do not overwrite the exist one
+            let config = toml::from_slice(&c.read()?)?;
             Ok(config)
         } else {
             Self::write(c)

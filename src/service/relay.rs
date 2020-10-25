@@ -74,14 +74,14 @@ impl RelayService {
 
                 match self.darwinia.affirm(parcel).await {
                     Ok(hash) => {
-                        info!("Affirmed block {:?}", hash);
+                        info!("Extrinsic hash for affirming {}: {:?}", target, hash);
                         Ok(hash)
                     },
                     Err(err) => Err(err),
                 }
             }
             Ok(Some(reason)) => {
-                Err(Error::Etc(format!("The `affirm` action was canceled: {}.", reason)))
+                Err(Error::Bridger(format!("The `affirm` action was canceled: {}.", reason)))
             },
             Err(err) => Err(err),
         }

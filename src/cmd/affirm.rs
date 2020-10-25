@@ -21,11 +21,9 @@ pub async fn exec(target_block_number: u64) -> Result<()> {
     let mut relay_service = RelayService::new(&config, shadow.clone(), darwinia.clone());
 
     // affirm
-    match relay_service.affirm(target_block_number).await {
-        Ok(hash) => info!("`affirm` extrinsic hash: {:?}", hash),
-        Err(err) => error!("{:?}", err)
+    if let Err(err) = relay_service.affirm(target_block_number).await {
+        error!("{:?}", err);
     }
-
 
     Ok(())
 }

@@ -69,7 +69,9 @@ impl EthereumRelayerGame for DarwiniaRuntime {
     type RelayHeaderId = u64;
 }
 
-impl EthereumBacking for DarwiniaRuntime {}
+impl EthereumBacking for DarwiniaRuntime {
+    type EthereumTransactionIdex = u64;
+}
 
 impl Proxy for DarwiniaRuntime {
     type ProxyType = ProxyType;

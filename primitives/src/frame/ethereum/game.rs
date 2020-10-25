@@ -15,29 +15,9 @@ pub trait EthereumRelayerGame: System {
     type RelayHeaderId: 'static + Encode + Decode + Send + Default + Clone + Sync;
 }
 
-/////
-// Storage
-/////
-
-/// PendingHeaders Storage
-#[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct PendingRelayHeaderParcels<T: EthereumRelayerGame> {
-    #[store(returns = Vec<T::PendingRelayHeaderParcel>)]
-    /// Runtime marker
-    pub _runtime: PhantomData<T>,
-}
-
-/// Relay Affirmations Storage
-#[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct Affirmations<T: EthereumRelayerGame> {
-    #[store(returns = Vec<T::RelayAffirmation>)]
-    /// map hasher(blake2_128_concat) GameId<TcBlockNumber<T, I>>
-    pub map: ([u8; 32], T::RelayHeaderId),
-}
-
-/////
+//////
 // Events
-/////
+//////
 
 /// A new relay parcel affirmed. [game id, round, index, relayer]
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
@@ -94,4 +74,24 @@ pub struct PendingRelayHeaderParcelApproved<T: EthereumRelayerGame> {
 pub struct PendingRelayHeaderParcelRejected<T: EthereumRelayerGame> {
     /// Ethereum Relay Header Id
     pub relay_header_id: T::RelayHeaderId,
+}
+
+//////
+// Storage
+//////
+
+/// PendingHeaders Storage
+#[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
+pub struct PendingRelayHeaderParcels<T: EthereumRelayerGame> {
+    #[store(returns = Vec<T::PendingRelayHeaderParcel>)]
+    /// Runtime marker
+    pub _runtime: PhantomData<T>,
+}
+
+/// Relay Affirmations Storage
+#[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
+pub struct Affirmations<T: EthereumRelayerGame> {
+    #[store(returns = Vec<T::RelayAffirmation>)]
+    /// map hasher(blake2_128_concat) GameId<TcBlockNumber<T, I>>
+    pub map: ([u8; 32], T::RelayHeaderId),
 }

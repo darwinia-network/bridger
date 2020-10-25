@@ -19,7 +19,7 @@ pub struct VerifiedProof<T: EthereumBacking> {
     pub _runtime: PhantomData<T>,
 }
 
-/// Submit proposal call
+/// Submit redeem call
 #[derive(Clone, Debug, PartialEq, Call, Encode)]
 pub struct Redeem<T: EthereumBacking> {
     /// Runtime marker

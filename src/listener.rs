@@ -1,13 +1,10 @@
 //! Bridger Listener
 use crate::{
-    api::{Darwinia, Shadow},
     pool::Pool,
-    result::{Error, Result},
-    service::{EthereumService, GuardService, RedeemService, RelayService, Service},
-    Config,
+    result::Result,
+    service::Service,
 };
 use std::sync::{Arc, Mutex};
-use web3::transports::http::Http;
 
 /// Bridger listener
 #[derive(Default)]
@@ -45,33 +42,5 @@ impl Listener {
             r?;
         }
         Ok(())
-    }
-
-    /// Generate listener from `Config`
-    pub async fn from_config(config: Config) -> Result<Self> {
-        let mut l = Self::default();
-        if config.eth.rpc.starts_with("ws") {
-            return Err(Error::Bridger(
-                "Bridger currently doesn't support ethereum websocket transport".to_string(),
-            ));
-        }
-
-        // APIs
-        let shadow = Arc::new(Shadow::new(&config));
-        let darwinia = Arc::new(Darwinia::new(&config).await?);
-
-        // 1. Transaction Listener
-        // 2. Relay Listener
-        let ethereum = <EthereumService<Http>>::new_http(&config)?;
-        let relay = RelayService::new(&config, shadow.clone(), darwinia.clone());
-        let redeem = RedeemService::new(&config, shadow.clone(), darwinia.clone());
-        let guard = GuardService::new(&config, shadow, darwinia);
-
-        // Register
-        l.register(ethereum)?;
-        l.register(relay)?;
-        l.register(redeem)?;
-        l.register(guard)?;
-        Ok(l)
     }
 }

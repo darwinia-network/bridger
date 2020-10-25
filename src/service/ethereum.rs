@@ -117,17 +117,19 @@ impl<T: Transport> EthereumService<T> {
                             || l.topics.contains(&self.contract.kton)
                         {
                             EthereumTransaction {
-                                hash: EthereumTransactionHash::Token(
+                                tx_hash: EthereumTransactionHash::Token(
                                     l.transaction_hash.unwrap_or_default(),
                                 ),
+                                block_hash: l.block_hash.unwrap_or_default(),
                                 block,
                                 index,
                             }
                         } else {
                             EthereumTransaction {
-                                hash: EthereumTransactionHash::Deposit(
+                                tx_hash: EthereumTransactionHash::Deposit(
                                     l.transaction_hash.unwrap_or_default(),
                                 ),
+                                block_hash: l.block_hash.unwrap_or_default(),
                                 block,
                                 index,
                             }
@@ -163,7 +165,7 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
                 if !txs.is_empty() {
                     info!("Found {} txs from {} to {}", txs.len(), start, block_number);
                     for tx in &txs {
-                        trace!("\t{:?}", &tx.hash);
+                        trace!("\t{:?}", &tx.tx_hash);
                     }
                 }
 

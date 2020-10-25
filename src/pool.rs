@@ -14,8 +14,10 @@ pub enum EthereumTransactionHash {
 /// Reedeemable Ethereum transaction
 #[derive(PartialEq, Eq, Clone)]
 pub struct EthereumTransaction {
-    /// Transaction event with hash
-    pub hash: EthereumTransactionHash,
+    /// Transaction hash for the event
+    pub tx_hash: EthereumTransactionHash,
+    /// Block Hash for the event
+    pub block_hash: H256,
     /// Transaction block
     pub block: u64,
     /// Transaction index
@@ -24,12 +26,11 @@ pub struct EthereumTransaction {
 
 impl EthereumTransaction {
     /// Get the hash
-    pub fn hash(&self) -> [u8; 32] {
-        match self.hash {
+    pub fn enclosed_hash(&self) -> H256 {
+        match self.tx_hash {
             EthereumTransactionHash::Token(h) => h,
             EthereumTransactionHash::Deposit(h) => h,
         }
-        .to_fixed_bytes()
     }
 }
 

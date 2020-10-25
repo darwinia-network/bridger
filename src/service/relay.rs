@@ -52,7 +52,6 @@ impl Service for RelayService {
                     let max = max.block.to_owned();
                     if let Err(err) = self.affirm(max + 1).await {
                         error!("{:?}", err);
-                        continue;
                     };
                 }
 

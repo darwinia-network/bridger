@@ -43,10 +43,14 @@ impl Service for GuardService {
 
     async fn run(&mut self, _: Arc<Mutex<Pool>>) -> BridgerResult<()> {
         if self.darwinia.role == Role::Normal {
+            trace!("Current account is not Sudo account or technical committee, ending...");
             return Ok(());
         }
 
         loop {
+            let last_confirmed = self.darwinia.last_confirmed().await?;
+            info!("Last confirmed ethereum block number is {}", last_confirmed);
+
             trace!("Checking pending headers...");
             let pending_headers = self.darwinia.pending_headers().await?;
             for header in pending_headers {

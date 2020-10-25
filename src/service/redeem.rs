@@ -78,6 +78,8 @@ impl Service for RedeemService {
                         let hash = self.darwinia.redeem(redeem_for, proof).await?;
                         info!("Redeemed with extrinsic {:?}", hash);
                         redeemed.push(index);
+
+                        tokio::time::delay_for(Duration::from_secs(6)).await;
                     }
                 }
 

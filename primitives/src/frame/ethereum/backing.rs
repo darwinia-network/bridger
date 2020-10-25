@@ -31,20 +31,6 @@ pub struct Redeem<T: EthereumBacking> {
 }
 
 //////
-/// Store
-//////
-
-/// PendingHeaders Storage
-#[derive(Clone, Debug, Eq, PartialEq, Store, Decode, Encode)]
-pub struct VerifiedProof<T: EthereumBacking> {
-    #[store(returns = Option<bool>)]
-    /// Receipt tx hash
-    pub map: ([u8; 32], u64),
-    /// Runtime marker
-    pub _runtime: PhantomData<T>,
-}
-
-//////
 // Events
 //////
 
@@ -79,4 +65,18 @@ pub struct RedeemDeposit<T: EthereumBacking> {
     pub balance: <T as Balances>::Balance,
     /// Transaction Id
     pub tx_id: u64,
+}
+
+//////
+/// Store
+//////
+
+/// PendingHeaders Storage
+#[derive(Clone, Debug, Eq, PartialEq, Store, Decode, Encode)]
+pub struct VerifiedProof<T: EthereumBacking> {
+    #[store(returns = Option<bool>)]
+    /// Receipt tx hash
+    pub map: ([u8; 32], u64),
+    /// Runtime marker
+    pub _runtime: PhantomData<T>,
 }

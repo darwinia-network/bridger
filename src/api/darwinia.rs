@@ -68,7 +68,16 @@ impl Darwinia {
         let proxy_real = match &config.proxy {
             None => None,
             Some(proxy) => {
-                match hex::decode(&proxy.real) {
+
+                // get real account str
+                let real = if &proxy.real[0..2] == "0x" {
+                    &proxy.real[2..]
+                } else {
+                    &proxy.real
+                };
+
+                // convert to account id
+                match hex::decode(real) {
                     Ok(real) => {
                         let mut data: [u8; 32] = [0u8; 32];
                         data.copy_from_slice(&real[..]);

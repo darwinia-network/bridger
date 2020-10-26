@@ -11,6 +11,7 @@ mod subscribe;
 
 pub use self::{
     ethereum::EthereumService, guard::GuardService, redeem::RedeemService, relay::RelayService,
+    subscribe::SubscribeService,
 };
 
 /// Bridge service

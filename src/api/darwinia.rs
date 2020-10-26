@@ -9,24 +9,23 @@ use primitives::{
     frame::{
         collective::{ExecuteCallExt, MembersStoreExt},
         ethereum::{
-            backing::{RedeemCallExt, VerifiedProofStoreExt, Redeem},
+            backing::{Redeem, RedeemCallExt, VerifiedProofStoreExt},
             game::{AffirmationsStoreExt, EthereumRelayerGame, PendingRelayHeaderParcelsStoreExt},
             relay::{
-                AffirmCallExt, ApprovePendingRelayHeaderParcel, ConfirmedBlockNumbersStoreExt,
-                RejectPendingRelayHeaderParcel, SetConfirmedParcel,
-                Affirm,
+                Affirm, AffirmCallExt, ApprovePendingRelayHeaderParcel,
+                ConfirmedBlockNumbersStoreExt, RejectPendingRelayHeaderParcel, SetConfirmedParcel,
             },
         },
-        sudo::{KeyStoreExt, SudoCallExt},
         proxy::ProxyCallExt,
+        sudo::{KeyStoreExt, SudoCallExt},
     },
     runtime::DarwiniaRuntime,
 };
 use sp_keyring::sr25519::sr25519::Pair;
 use substrate_subxt::{
     sp_core::{Encode, Pair as PairTrait},
-    Client, ClientBuilder, PairSigner,
     system::System,
+    Client, ClientBuilder, PairSigner,
 };
 use web3::types::H256;
 
@@ -47,7 +46,8 @@ pub enum Role {
 
 /// Dawrinia API
 pub struct Darwinia {
-    client: Client<DarwiniaRuntime>,
+    /// Exports the client field for external usages
+    pub client: Client<DarwiniaRuntime>,
     /// Keyring signer
     pub signer: PairSigner<DarwiniaRuntime, Pair>,
     /// Account Role
@@ -67,17 +67,15 @@ impl Darwinia {
         // proxy
         let proxy_real = match &config.proxy {
             None => None,
-            Some(proxy) => {
-                match hex::decode(&proxy.real) {
-                    Ok(real) => {
-                        let mut data: [u8; 32] = [0u8; 32];
-                        data.copy_from_slice(&real[..]);
-                        let real = <DarwiniaRuntime as System>::AccountId::from(data);
-                        Some(real)
-                    },
-                    Err(_e) => None
+            Some(proxy) => match hex::decode(&proxy.real) {
+                Ok(real) => {
+                    let mut data: [u8; 32] = [0u8; 32];
+                    data.copy_from_slice(&real[..]);
+                    let real = <DarwiniaRuntime as System>::AccountId::from(data);
+                    Some(real)
                 }
-            }
+                Err(_e) => None,
+            },
         };
 
         // client
@@ -95,12 +93,15 @@ impl Darwinia {
             signer,
             role: if sudo == pk {
                 Role::Sudo
-            } else if technical_committee_members.iter().any(|cpk| cpk.to_string() == pk) {
+            } else if technical_committee_members
+                .iter()
+                .any(|cpk| cpk.to_string() == pk)
+            {
                 Role::TechnicalCommittee
             } else {
                 Role::Normal
             },
-            proxy_real
+            proxy_real,
         })
     }
 
@@ -190,11 +191,17 @@ impl Darwinia {
                 };
 
                 let ex = self.client.encode(affirm).unwrap();
-                Ok(self.client.proxy(&self.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
-            },
-            None => {
-                Ok(self.client.affirm(&self.signer, parcel, None).await?)
+                Ok(self
+                    .client
+                    .proxy(
+                        &self.signer,
+                        real.clone(),
+                        Some(ProxyType::EthereumBridge),
+                        &ex,
+                    )
+                    .await?)
             }
+            None => Ok(self.client.affirm(&self.signer, parcel, None).await?),
         }
     }
 
@@ -214,11 +221,17 @@ impl Darwinia {
                 };
 
                 let ex = self.client.encode(redeem).unwrap();
-                Ok(self.client.proxy(&self.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
-            },
-            None => {
-                Ok(self.client.redeem(&self.signer, redeem_for, proof).await?)
+                Ok(self
+                    .client
+                    .proxy(
+                        &self.signer,
+                        real.clone(),
+                        Some(ProxyType::EthereumBridge),
+                        &ex,
+                    )
+                    .await?)
             }
+            None => Ok(self.client.redeem(&self.signer, redeem_for, proof).await?),
         }
     }
 
@@ -231,18 +244,15 @@ impl Darwinia {
             .unwrap_or(false))
     }
 
-
     /// Check if should relay
     pub async fn should_relay(&self, target: u64) -> Result<Option<NotRelayReason>> {
         let last_confirmed = self.last_confirmed().await?;
 
         if target <= last_confirmed {
-            let reason =
-                format!(
-                    "The target block {} is less than the last_confirmed {}",
-                    &target,
-                    &last_confirmed
-                );
+            let reason = format!(
+                "The target block {} is less than the last_confirmed {}",
+                &target, &last_confirmed
+            );
             trace!("{}", &reason);
             return Ok(Some(reason));
         }
@@ -267,8 +277,11 @@ impl Darwinia {
 
         // Check if the target block is in affirmations
         for affirmation in self.affirmations().await? {
-            let blocks_of_affirmation: &Vec<u64> =
-                &affirmation.relay_header_parcels.iter().map(|bp| bp.header.number).collect();
+            let blocks_of_affirmation: &Vec<u64> = &affirmation
+                .relay_header_parcels
+                .iter()
+                .map(|bp| bp.header.number)
+                .collect();
             if blocks_of_affirmation.contains(&target) {
                 let reason = format!("The target block {} is in the relayer game", &target);
                 trace!("{}", &reason);

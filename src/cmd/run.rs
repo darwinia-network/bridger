@@ -38,12 +38,9 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     let redeem = RedeemService::new(&config, shadow.clone(), darwinia.clone());
     let guard = GuardService::new(&config, shadow, darwinia.clone());
 
-    let mut listener = Listener::default();
 
-    listener.register(ethereum)?;
-    listener.register(relay)?;
-    listener.register(redeem)?;
-    listener.register(guard)?;
+
+
 
     // Startup infomations
     info!("🔗 Connect to");
@@ -61,6 +58,17 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
         }
     }
     info!("🌱 Relay from ethereum block: {}", config.eth.start);
+
+    let mut listener = Listener::default();
+
+    listener.register(ethereum)?;
+    listener.register(relay)?;
+    listener.register(redeem)?;
+    if let Err(err) = guard.role_checking() {
+        warn!("{}", err.to_string());
+    } else {
+        listener.register(guard)?;
+    }
 
     listener.start().await?;
     Ok(())

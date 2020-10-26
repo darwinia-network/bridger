@@ -157,13 +157,38 @@ impl Darwinia {
     }
 
     /// Get all active games' affirmations
-    pub async fn affirmations(&self) -> Result<Vec<RelayAffirmation>> {
-        let mut affirmations = vec![];
+    /// games = {
+    ///   game_id: {
+    ///     round_id: [...]
+    ///   }
+    /// }
+    pub async fn affirmations(&self) -> Result<AffirmationsReturn> {
+        let mut result = HashMap::new();
         let mut iter = self.client.affirmations_iter(None).await?;
-        if let Some((_, mut p)) = iter.next().await? {
-            affirmations.append(&mut p);
+        loop {
+            if let Some((mut storage_key, affirmations)) = iter.next().await? {
+                // get game id
+                let game_id: &mut [u8] = &mut storage_key.0[32..40];
+                game_id.reverse();
+                let game_id = u64::from_str_radix(hex::encode(game_id).as_str(), 16).unwrap();
+
+                //
+                if let None = result.get(&game_id) {
+                    result.insert(game_id, HashMap::<u32, Vec<RelayAffirmation>>::new());
+                }
+                let game = result.get_mut(&game_id).unwrap();
+
+                // get round id
+                let round_id: &mut [u8] = &mut storage_key.0[40..44];
+                round_id.reverse();
+                let round_id = u32::from_str_radix(hex::encode(round_id).as_str(), 16).unwrap();
+
+                game.insert(round_id, affirmations);
+            } else {
+                break;
+            }
         }
-        Ok(affirmations)
+        Ok(result)
     }
 
     /// Get confirmed block numbers

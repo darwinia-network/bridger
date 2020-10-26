@@ -8,6 +8,7 @@ mod run;
 mod affirm;
 mod keys;
 mod affirmations;
+mod guard;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -33,10 +34,12 @@ enum Opt {
         #[structopt(short, long)]
         block: u64,
     },
-    /// Show technical committee members
+    /// Show sudo and technical committee members
     Keys,
     /// Show technical committee members
     Affirmations,
+    /// Run guard standalone
+    Guard,
 }
 
 /// Exec commands
@@ -48,6 +51,7 @@ pub async fn exec() -> Result<()> {
         Opt::Affirm { block} => affirm::exec(block).await?,
         Opt::Keys => keys::exec().await?,
         Opt::Affirmations => affirmations::exec().await?,
+        Opt::Guard => guard::exec().await?,
     }
 
     Ok(())

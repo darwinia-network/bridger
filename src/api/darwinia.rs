@@ -175,7 +175,7 @@ impl Darwinia {
 
                 //
                 if let None = result.get(&game_id) {
-                    result.insert(game_id, HashMap::<u32, Vec<RelayAffirmation>>::new()).unwrap();
+                    result.insert(game_id, HashMap::<u32, Vec<RelayAffirmation>>::new());
                 }
                 let game = result.get_mut(&game_id).unwrap();
 

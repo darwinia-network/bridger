@@ -148,28 +148,24 @@ impl Darwinia {
     pub async fn affirmations(&self) -> Result<AffirmationsReturn> {
         let mut result = HashMap::new();
         let mut iter = self.client.affirmations_iter(None).await?;
-        loop {
-            if let Some((mut storage_key, affirmations)) = iter.next().await? {
-                // get game id
-                let game_id: &mut [u8] = &mut storage_key.0[32..40];
-                game_id.reverse();
-                let game_id = u64::from_str_radix(hex::encode(game_id).as_str(), 16).unwrap();
+        while let Some((mut storage_key, affirmations)) = iter.next().await? {
+            // get game id
+            let game_id: &mut [u8] = &mut storage_key.0[32..40];
+            game_id.reverse();
+            let game_id = u64::from_str_radix(hex::encode(game_id).as_str(), 16).unwrap();
 
-                //
-                if let None = result.get(&game_id) {
-                    result.insert(game_id, HashMap::<u32, Vec<RelayAffirmation>>::new());
-                }
-                let game = result.get_mut(&game_id).unwrap();
-
-                // get round id
-                let round_id: &mut [u8] = &mut storage_key.0[40..44];
-                round_id.reverse();
-                let round_id = u32::from_str_radix(hex::encode(round_id).as_str(), 16).unwrap();
-
-                game.insert(round_id, affirmations);
-            } else {
-                break;
+            //
+            if result.get(&game_id).is_none() {
+                result.insert(game_id, HashMap::<u32, Vec<RelayAffirmation>>::new());
             }
+            let game = result.get_mut(&game_id).unwrap();
+
+            // get round id
+            let round_id: &mut [u8] = &mut storage_key.0[40..44];
+            round_id.reverse();
+            let round_id = u32::from_str_radix(hex::encode(round_id).as_str(), 16).unwrap();
+
+            game.insert(round_id, affirmations);
         }
         Ok(result)
     }
@@ -249,7 +245,7 @@ impl Darwinia {
     }
 
     /// large_block_exists
-    pub fn large_block_exists(affirmations: &Vec<RelayAffirmation>, block: u64) -> bool {
+    pub fn large_block_exists(affirmations: &[RelayAffirmation], block: u64) -> bool {
         for affirmation in affirmations {
             let blocks: &Vec<u64> = &affirmation
                 .relay_header_parcels
@@ -260,11 +256,9 @@ impl Darwinia {
                 if max > &block {
                     return true;
                 }
-            } else {
-                return false;
             }
         }
-        return false;
+        false
     }
 
 }

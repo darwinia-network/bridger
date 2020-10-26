@@ -24,17 +24,17 @@ pub fn handle(event: RawEvent) -> Result<()> {
 
 fn redeem_ring(event: RawEvent) {
     if let Ok(res) = RedeemRing::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
-        println!("{:?}", res);
+        trace!(">> {}::{}\n\t{:?}", event.module, event.variant, res);
     }
 }
 
 fn redeem_kton(event: RawEvent) {
     if let Ok(res) = RedeemKton::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
-        println!("{:?}", res);
+        trace!(">> {}::{}\n\t{:?}", event.module, event.variant, res);
     }
 }
 fn redeem_deposit(event: RawEvent) {
     if let Ok(res) = RedeemDeposit::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
-        println!("{:?}", res);
+        trace!(">> {}::{}\n\t{:?}", event.module, event.variant, res);
     }
 }

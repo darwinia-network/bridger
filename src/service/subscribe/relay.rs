@@ -22,12 +22,12 @@ pub fn handle(event: RawEvent) -> Result<()> {
 
 fn remove_confirmed_parcel(event: RawEvent) {
     if let Ok(res) = RemoveConfirmedParcel::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
-        println!("{:?}", res);
+        trace!(">> {}::{}\n\t{:?}", event.module, event.variant, res);
     }
 }
 
 fn verify_receipt(event: RawEvent) {
     if let Ok(res) = VerifyReceipt::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
-        println!("{:?}", res);
+        trace!(">> {}::{}\n\t{:?}", event.module, event.variant, res);
     }
 }

@@ -16,8 +16,15 @@ use primitives::{
 use std::sync::{Arc, Mutex};
 use substrate_subxt::{EventSubscription, EventsDecoder};
 
+mod backing;
+mod game;
+mod relay;
+
 /// Attributes
 const SERVICE_NAME: &str = "SUBSCRIBE";
+const ETHEREUM_RELAYER_GAME: &str = "EthereumRelayerGame";
+const ETHEREUM_RELAY: &str = "EthereumRelay";
+const ETHEREUM_BACKING: &str = "EthereumBacking";
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
@@ -53,8 +60,13 @@ impl Service for SubscribeService {
         // Build subscriber
         let mut sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
         for raw in sub.next().await {
-            if let Ok(package) = raw {
-                println!("Event {}", package.module);
+            if let Ok(event) = raw {
+                match event.module.as_str() {
+                    ETHEREUM_RELAY => relay::handle(event),
+                    ETHEREUM_BACKING => backing::handle(event),
+                    ETHEREUM_RELAYER_GAME => game::handle(event),
+                    _ => continue,
+                }?;
             }
         }
 

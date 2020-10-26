@@ -265,15 +265,15 @@ impl Darwinia {
             return Ok(Some(reason));
         }
 
-        // Check if the target block is pending
-        let pending_headers = self.pending_headers().await?;
-        for p in pending_headers {
-            if p.1 == target {
-                let reason = format!("The target block {} is pending", &target);
-                trace!("{}", &reason);
-                return Ok(Some(reason));
-            }
-        }
+        // // Check if the target block is pending
+        // let pending_headers = self.pending_headers().await?;
+        // for p in pending_headers {
+        //     if p.1 == target {
+        //         let reason = format!("The target block {} is pending", &target);
+        //         trace!("{}", &reason);
+        //         return Ok(Some(reason));
+        //     }
+        // }
 
         // Check if the target block is in affirmations
         for affirmation in self.affirmations().await? {

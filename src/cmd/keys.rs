@@ -5,7 +5,7 @@ use crate::{
 use substrate_subxt::ClientBuilder;
 use primitives::runtime::DarwiniaRuntime;
 use primitives::frame::{
-    collective::MembersStoreExt,
+    technical_committee::MembersStoreExt,
     sudo::KeyStoreExt,
 };
 

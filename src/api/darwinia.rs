@@ -1,4 +1,5 @@
 //! Darwinia API
+use crate::result::Error::Bridger;
 use crate::{pool::EthereumTransaction, result::Result, Config};
 use core::marker::PhantomData;
 use primitives::{
@@ -7,31 +8,32 @@ use primitives::{
         proxy_type::ProxyType,
     },
     frame::{
-        collective::{ExecuteCallExt, MembersStoreExt},
         ethereum::{
             backing::{Redeem, RedeemCallExt, VerifiedProofStoreExt},
-            game::{AffirmationsStoreExt, EthereumRelayerGame, PendingRelayHeaderParcelsStoreExt},
+            game::{AffirmationsStoreExt, EthereumRelayerGame},
             relay::{
-                Affirm, AffirmCallExt, ApprovePendingRelayHeaderParcel,
-                ConfirmedBlockNumbersStoreExt, RejectPendingRelayHeaderParcel, SetConfirmedParcel,
+                Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
+                PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
+                VotePendingRelayHeaderParcelCallExt,
             },
         },
         proxy::ProxyCallExt,
         sudo::{KeyStoreExt, SudoCallExt},
+        technical_committee::MembersStoreExt,
     },
     runtime::DarwiniaRuntime,
 };
 use sp_keyring::sr25519::sr25519::Pair;
+use std::collections::HashMap;
 use substrate_subxt::{
-    sp_core::{Encode, Pair as PairTrait},
-    system::System,
-    Client, ClientBuilder, PairSigner,
+    sp_core::Pair as PairTrait, system::System, Client, ClientBuilder, PairSigner,
 };
 use web3::types::H256;
 
 // Types
-type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeaderParcel;
+type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
+type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
 
 /// Account Role
 #[derive(PartialEq, Eq, Debug)]
@@ -55,8 +57,6 @@ pub struct Darwinia {
     /// Proxy real
     pub proxy_real: Option<<DarwiniaRuntime as System>::AccountId>,
 }
-
-type NotRelayReason = String;
 
 impl Darwinia {
     /// New darwinia API
@@ -124,48 +124,49 @@ impl Darwinia {
         Ok(self.client.sudo(&self.signer, &ex).await?)
     }
 
-    /// Approve pending header
-    pub async fn approve_pending_header(&self, pending: u64) -> Result<H256> {
-        let ex = self.client.encode(ApprovePendingRelayHeaderParcel {
-            pending,
-            _runtime: PhantomData::default(),
-        })?;
-        Ok(match self.role {
-            Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
+    /// Vote pending relay header parcel
+    pub async fn vote_pending_relay_header_parcel(&self, pending: u64, aye: bool) -> Result<H256> {
+        match self.role {
             Role::TechnicalCommittee => {
-                self.client
-                    .execute(&self.signer, &ex, ex.size_hint() as u32)
-                    .await?
+                let ex_hash = self
+                    .client
+                    .vote_pending_relay_header_parcel(&self.signer, pending, aye)
+                    .await?;
+                Ok(ex_hash)
             }
-            Role::Normal => H256::from([0; 32]),
-        })
-    }
-
-    /// Reject pending header
-    pub async fn reject_pending_header(&self, pending: u64) -> Result<H256> {
-        let ex = self.client.encode(RejectPendingRelayHeaderParcel {
-            pending,
-            _runtime: PhantomData::default(),
-        })?;
-        Ok(match self.role {
-            Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
-            Role::TechnicalCommittee => {
-                self.client
-                    .execute(&self.signer, &ex, ex.size_hint() as u32)
-                    .await?
-            }
-            Role::Normal => H256::from([0; 32]),
-        })
+            _ => Err(Bridger("Not technical committee member".to_string())),
+        }
     }
 
     /// Get all active games' affirmations
-    pub async fn affirmations(&self) -> Result<Vec<RelayAffirmation>> {
-        let mut affirmations = vec![];
+    /// games = {
+    ///   game_id: {
+    ///     round_id: [...]
+    ///   }
+    /// }
+    pub async fn affirmations(&self) -> Result<AffirmationsReturn> {
+        let mut result = HashMap::new();
         let mut iter = self.client.affirmations_iter(None).await?;
-        if let Some((_, mut p)) = iter.next().await? {
-            affirmations.append(&mut p);
+        while let Some((mut storage_key, affirmations)) = iter.next().await? {
+            // get game id
+            let game_id: &mut [u8] = &mut storage_key.0[32..40];
+            game_id.reverse();
+            let game_id = u64::from_str_radix(hex::encode(game_id).as_str(), 16).unwrap();
+
+            //
+            if result.get(&game_id).is_none() {
+                result.insert(game_id, HashMap::<u32, Vec<RelayAffirmation>>::new());
+            }
+            let game = result.get_mut(&game_id).unwrap();
+
+            // get round id
+            let round_id: &mut [u8] = &mut storage_key.0[40..44];
+            round_id.reverse();
+            let round_id = u32::from_str_radix(hex::encode(round_id).as_str(), 16).unwrap();
+
+            game.insert(round_id, affirmations);
         }
-        Ok(affirmations)
+        Ok(result)
     }
 
     /// Get confirmed block numbers
@@ -185,7 +186,7 @@ impl Darwinia {
     }
 
     /// Get pending headers
-    pub async fn pending_headers(&self) -> Result<Vec<PendingHeader>> {
+    pub async fn pending_headers(&self) -> Result<Vec<PendingRelayHeaderParcel>> {
         Ok(self.client.pending_relay_header_parcels(None).await?)
     }
 
@@ -254,51 +255,21 @@ impl Darwinia {
             .unwrap_or(false))
     }
 
-    /// Check if should relay
-    pub async fn should_relay(&self, target: u64) -> Result<Option<NotRelayReason>> {
-        let last_confirmed = self.last_confirmed().await?;
-
-        if target <= last_confirmed {
-            let reason = format!(
-                "The target block {} is less than the last_confirmed {}",
-                &target, &last_confirmed
-            );
-            trace!("{}", &reason);
-            return Ok(Some(reason));
-        }
-
-        // Check if confirmed
-        let confirmed_blocks = self.confirmed_block_numbers().await?;
-        if confirmed_blocks.contains(&target) {
-            let reason = format!("The target block {} has been confirmed", &target);
-            trace!("{}", &reason);
-            return Ok(Some(reason));
-        }
-
-        // // Check if the target block is pending
-        // let pending_headers = self.pending_headers().await?;
-        // for p in pending_headers {
-        //     if p.1 == target {
-        //         let reason = format!("The target block {} is pending", &target);
-        //         trace!("{}", &reason);
-        //         return Ok(Some(reason));
-        //     }
-        // }
-
-        // Check if the target block is in affirmations
-        for affirmation in self.affirmations().await? {
-            let blocks_of_affirmation: &Vec<u64> = &affirmation
+    /// large_block_exists
+    pub fn large_block_exists(affirmations: &[RelayAffirmation], block: u64) -> bool {
+        for affirmation in affirmations {
+            let blocks: &Vec<u64> = &affirmation
                 .relay_header_parcels
                 .iter()
                 .map(|bp| bp.header.number)
                 .collect();
-            if blocks_of_affirmation.contains(&target) {
-                let reason = format!("The target block {} is in the relayer game", &target);
-                trace!("{}", &reason);
-                return Ok(Some(reason));
+
+            if let Some(max) = blocks.iter().max() {
+                if max > &block {
+                    return true;
+                }
             }
         }
-
-        Ok(None)
+        false
     }
 }

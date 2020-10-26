@@ -7,6 +7,7 @@ mod confirm;
 mod run;
 mod affirm;
 mod keys;
+mod affirmations;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -33,7 +34,9 @@ enum Opt {
         block: u64,
     },
     /// Show technical committee members
-    Keys
+    Keys,
+    /// Show technical committee members
+    Affirmations,
 }
 
 /// Exec commands
@@ -44,6 +47,7 @@ pub async fn exec() -> Result<()> {
         Opt::Confirm { block } => confirm::exec(block).await?,
         Opt::Affirm { block} => affirm::exec(block).await?,
         Opt::Keys => keys::exec().await?,
+        Opt::Affirmations => affirmations::exec().await?,
     }
 
     Ok(())

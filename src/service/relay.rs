@@ -66,24 +66,77 @@ impl Service for RelayService {
 impl RelayService {
     /// affirm target block
     pub async fn affirm(&mut self, target: u64) -> BridgerResult<H256> {
-        trace!("Checking if need to relay a new ethereum block...");
-        match self.darwinia.should_relay(target).await {
-            Ok(None) => {
-                trace!("Prepare to affirm ethereum block: {}", target);
-                let parcel = self.shadow.parcel(target as usize).await?;
+        trace!("Prepare to affirm ethereum block: {}", target);
+        let parcel = self.shadow.parcel(target as usize).await?;
 
-                match self.darwinia.affirm(parcel).await {
-                    Ok(hash) => {
-                        info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
-                        Ok(hash)
-                    },
-                    Err(err) => Err(err),
+        // /////////////////////////
+        // checking before affirm
+        // /////////////////////////
+        // 1. last confirmed check
+        let last_confirmed = self.darwinia.last_confirmed().await?;
+        if target <= last_confirmed {
+            let reason =
+                format!(
+                    "The target block {} is less than the last_confirmed {}",
+                    &target,
+                    &last_confirmed
+                );
+            return Err(Error::Bridger(reason));
+        }
+
+        // 2. pendings check
+        let pending_headers = self.darwinia.pending_headers().await?;
+        for pending_header in pending_headers {
+            let pending_block_number = pending_header.1.header.number;
+            if pending_block_number >= target {
+                let reason = format!("The target block {} is pending", &target);
+                return Err(Error::Bridger(reason));
+            }
+        }
+
+        // 3. affirmations check
+        for (_game_id, game) in self.darwinia.affirmations().await?.iter() {
+            for (_round_id, affirmations) in game.iter() {
+                if Darwinia::large_block_exists(&affirmations, target) {
+                    let reason = format!("The target block {} is in the relayer game", &target);
+                    return Err(Error::Bridger(reason));
+
+                    // //
+                    // if round_id == 0 {
+                    //     if parcel.is_same_as(&affirmations[0].relay_header_parcels[0]) {
+                    //         // agree
+                    //         if affirmations.len() > 1 {
+                    //             // dispute exist, join the game
+                    //
+                    //         } else {
+                    //             // dispute not exist, do not relay
+                    //             return Ok(Some(reason));
+                    //         }
+                    //     } else {
+                    //         // disagree
+                    //
+                    //     }
+                    //
+                    // } else {
+                    //
+                    // }
+
                 }
             }
-            Ok(Some(reason)) => {
-                Err(Error::Bridger(format!("The `affirm` action was canceled: {}.", reason)))
+        }
+
+        // /////////////////////////
+        // do affirm
+        // /////////////////////////
+        match self.darwinia.affirm(parcel).await {
+            Ok(hash) => {
+                info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
+                Ok(hash)
             },
             Err(err) => Err(err),
         }
+
     }
+
 }
+

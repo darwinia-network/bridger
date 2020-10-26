@@ -7,8 +7,6 @@ use substrate_subxt_proc_macro::{module, Event, Store};
 /// Ethereum Relay Pallet
 #[module]
 pub trait EthereumRelayerGame: System {
-    /// Ethereum Pending Header
-    type PendingRelayHeaderParcel: 'static + Encode + Decode + Send + Default;
     /// Ethereum Relay Affirmation
     type RelayAffirmation: 'static + Encode + Decode + Send + Default;
     /// Ethereum Relay Header ID
@@ -92,6 +90,11 @@ pub struct PendingRelayHeaderParcels<T: EthereumRelayerGame> {
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
 pub struct Affirmations<T: EthereumRelayerGame> {
     #[store(returns = Vec<T::RelayAffirmation>)]
-    /// map hasher(blake2_128_concat) GameId<TcBlockNumber<T, I>>
-    pub map: ([u8; 32], T::RelayHeaderId),
+
+    /// game id
+    pub game_id: u64,
+    /// round id
+    pub round_id: u32,
+    /// Runtime marker
+    pub _runtime: PhantomData<T>,
 }

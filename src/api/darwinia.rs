@@ -122,39 +122,19 @@ impl Darwinia {
         Ok(self.client.sudo(&self.signer, &ex).await?)
     }
 
-    /// Approve pending header
-    pub async fn approve_pending_header(&self, pending: u64) -> Result<H256> {
-        let ex = self.client.encode(ApprovePendingRelayHeaderParcel {
-            pending,
-            _runtime: PhantomData::default(),
-        })?;
-        Ok(match self.role {
-            Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
+    /// Vote pending relay header parcel
+    pub async fn vote_pending_relay_header_parcel(&self, pending: u64, aye: bool) -> Result<H256> {
+        match self.role {
             Role::TechnicalCommittee => {
-                self.client
-                    .execute(&self.signer, &ex, ex.size_hint() as u32)
-                    .await?
+                let ex_hash = self.client
+                    .vote_pending_relay_header_parcel(&self.signer, pending, aye)
+                    .await?;
+                Ok(ex_hash)
             }
-            Role::Normal => H256::from([0; 32]),
-        })
+            _ => Err(Bridger("Not technical committee member".to_string()))
+        }
     }
 
-    /// Reject pending header
-    pub async fn reject_pending_header(&self, pending: u64) -> Result<H256> {
-        let ex = self.client.encode(RejectPendingRelayHeaderParcel {
-            pending,
-            _runtime: PhantomData::default(),
-        })?;
-        Ok(match self.role {
-            Role::Sudo => self.client.sudo(&self.signer, &ex).await?,
-            Role::TechnicalCommittee => {
-                self.client
-                    .execute(&self.signer, &ex, ex.size_hint() as u32)
-                    .await?
-            }
-            Role::Normal => H256::from([0; 32]),
-        })
-    }
 
     /// Get all active games' affirmations
     /// games = {

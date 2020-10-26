@@ -5,7 +5,7 @@ members = [
 
 [package]
 name = "darwinia-bridger"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["clearloop <udtrokia@gmail.com>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"

@@ -58,10 +58,13 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     let signer_public = &darwinia.signer.signer().public();
     match &config.proxy {
         None => {
-            info!("🧔 {:?} Relayer: {:?}", darwinia.role, signer_public);
+            info!("🧔 Relayer({:?}): 0x{:?}", darwinia.role, signer_public);
         }
         Some(proxy) => {
-            info!("🧔 Proxy {:?} Relayer: {:?}", darwinia.role, signer_public);
+            info!(
+                "🧔 Proxy Relayer({:?}): 0x{:?}",
+                darwinia.role, signer_public
+            );
             info!("👴 Real Account: {}", proxy.real);
         }
     }

@@ -69,12 +69,12 @@ impl RelayService {
         trace!("Checking if need to relay a new ethereum block...");
         match self.darwinia.should_relay(target).await {
             Ok(None) => {
-                trace!("Trying to affirm block {}...", target);
+                trace!("Prepare to affirm ethereum block: {}", target);
                 let parcel = self.shadow.parcel(target as usize).await?;
 
                 match self.darwinia.affirm(parcel).await {
                     Ok(hash) => {
-                        info!("Extrinsic hash for affirming {}: {:?}", target, hash);
+                        info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
                         Ok(hash)
                     },
                     Err(err) => Err(err),

@@ -1,12 +1,12 @@
 [package]
 name = "darwinia-bridge-primitives"
-version = "0.0.12"
+version = "0.0.13"
 authors = ["clearloop <udtrokia@gmail.com>"]
 description = "Darwinia bridge primitives"
-repository = "https://github.com/darwinia-network/bridge-primitives"
+repository = "https://github.com/darwinia-network/bridger"
 license = "GPL-3.0"
 documentation = "https://docs.rs/darwinia-bridge-primitives"
-homepage = "https://github.com/darwinia-network/bridge-primitives"
+homepage = "https://github.com/darwinia-network/bridger/tree/master/primitives"
 include = ["src/**/*", "Cargo.toml", "./README.md"]
 keywords = ["blockchain"]
 readme = './README.md'

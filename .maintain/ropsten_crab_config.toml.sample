@@ -46,7 +46,8 @@ redeem = 90
 guard = 30
 
 # allowing `real` account to give permission to `proxy` account to dispatch calls
-[proxy]
 # The account (32 bytes) that the proxy will make a call on behalf of
-# Set to a zero-length string if there is no proxy need
-real = ''
+# Disable proxy by remove or comment
+
+# [proxy]
+# real = '0x4ee6172cb89e63801666c174eeedc51e9abe7e5823d31d1715c814138c0e4d7a'

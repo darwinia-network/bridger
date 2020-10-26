@@ -16,7 +16,8 @@ pub struct EthereumRelayHeaderParcel {
 }
 
 impl EthereumRelayHeaderParcel {
-    pub fn is_same(&self, another: &EthereumRelayHeaderParcel) -> bool {
+    /// is same as
+    pub fn is_same_as(&self, another: &EthereumRelayHeaderParcel) -> bool {
         self.header.hash == another.header.hash && self.mmr_root == another.mmr_root
     }
 }

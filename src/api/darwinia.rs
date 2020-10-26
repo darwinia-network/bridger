@@ -10,11 +10,13 @@ use primitives::{
         technical_committee::MembersStoreExt,
         ethereum::{
             backing::{RedeemCallExt, VerifiedProofStoreExt, Redeem},
-            game::{AffirmationsStoreExt, EthereumRelayerGame, PendingRelayHeaderParcelsStoreExt},
+            game::{AffirmationsStoreExt, EthereumRelayerGame},
             relay::{
-                AffirmCallExt, ApprovePendingRelayHeaderParcel, ConfirmedBlockNumbersStoreExt,
-                RejectPendingRelayHeaderParcel, SetConfirmedParcel,
+                AffirmCallExt, ConfirmedBlockNumbersStoreExt,
+                SetConfirmedParcel, PendingRelayHeaderParcelsStoreExt,
                 Affirm,
+                EthereumRelay,
+                VotePendingRelayHeaderParcelCallExt,
             },
         },
         sudo::{KeyStoreExt, SudoCallExt},
@@ -24,15 +26,18 @@ use primitives::{
 };
 use sp_keyring::sr25519::sr25519::Pair;
 use substrate_subxt::{
-    sp_core::{Encode, Pair as PairTrait},
+    sp_core::Pair as PairTrait,
     Client, ClientBuilder, PairSigner,
     system::System,
 };
 use web3::types::H256;
+use std::collections::HashMap;
+use crate::result::Error::Bridger;
 
 // Types
-type PendingHeader = <DarwiniaRuntime as EthereumRelayerGame>::PendingRelayHeaderParcel;
+type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
+type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
 
 /// Account Role
 #[derive(PartialEq, Eq, Debug)]
@@ -55,8 +60,6 @@ pub struct Darwinia {
     /// Proxy real
     pub proxy_real: Option<<DarwiniaRuntime as System>::AccountId>,
 }
-
-type NotRelayReason = String;
 
 impl Darwinia {
     /// New darwinia API
@@ -188,7 +191,7 @@ impl Darwinia {
     }
 
     /// Get pending headers
-    pub async fn pending_headers(&self) -> Result<Vec<PendingHeader>> {
+    pub async fn pending_headers(&self) -> Result<Vec<PendingRelayHeaderParcel>> {
         Ok(self.client.pending_relay_header_parcels(None).await?)
     }
 
@@ -245,51 +248,23 @@ impl Darwinia {
             .unwrap_or(false))
     }
 
-
-    /// Check if should relay
-    pub async fn should_relay(&self, target: u64) -> Result<Option<NotRelayReason>> {
-        let last_confirmed = self.last_confirmed().await?;
-
-        if target <= last_confirmed {
-            let reason =
-                format!(
-                    "The target block {} is less than the last_confirmed {}",
-                    &target,
-                    &last_confirmed
-                );
-            trace!("{}", &reason);
-            return Ok(Some(reason));
-        }
-
-        // Check if confirmed
-        let confirmed_blocks = self.confirmed_block_numbers().await?;
-        if confirmed_blocks.contains(&target) {
-            let reason = format!("The target block {} has been confirmed", &target);
-            trace!("{}", &reason);
-            return Ok(Some(reason));
-        }
-
-        // Check if the target block is pending
-        let pending_headers = self.pending_headers().await?;
-        for p in pending_headers {
-            if p.1 == target {
-                let reason = format!("The target block {} is pending", &target);
-                trace!("{}", &reason);
-                return Ok(Some(reason));
+    /// large_block_exists
+    pub fn large_block_exists(affirmations: &Vec<RelayAffirmation>, block: u64) -> bool {
+        for affirmation in affirmations {
+            let blocks: &Vec<u64> = &affirmation
+                .relay_header_parcels
+                .iter()
+                .map(|bp| bp.header.number)
+                .collect();
+            if let Some(max) = blocks.iter().max() {
+                if max > &block {
+                    return true;
+                }
+            } else {
+                return false;
             }
         }
-
-        // Check if the target block is in affirmations
-        for affirmation in self.affirmations().await? {
-            let blocks_of_affirmation: &Vec<u64> =
-                &affirmation.relay_header_parcels.iter().map(|bp| bp.header.number).collect();
-            if blocks_of_affirmation.contains(&target) {
-                let reason = format!("The target block {} is in the relayer game", &target);
-                trace!("{}", &reason);
-                return Ok(Some(reason));
-            }
-        }
-
-        Ok(None)
+        return false;
     }
+
 }

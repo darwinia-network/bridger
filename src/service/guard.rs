@@ -53,15 +53,17 @@ impl Service for GuardService {
 
             trace!("Checking pending headers...");
             let pending_headers = self.darwinia.pending_headers().await?;
-            for header in pending_headers {
-                let ht = self.shadow.parcel(header.2.header.number as usize).await?;
+            for pending in pending_headers {
+                let pending_parcel = pending.1;
+                let pending_block_number = pending_parcel.header.number;
+                let parcel = self.shadow.parcel(pending_block_number as usize).await?;
 
-                if header.2 == ht {
-                    info!("Approved header {}", header.1);
-                    self.darwinia.approve_pending_header(header.1).await
+                if parcel.is_same_as(&pending_parcel) {
+                    info!("Approved header {}", pending_block_number);
+                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await
                 } else {
-                    info!("Rejected header {}", header.1);
-                    self.darwinia.reject_pending_header(header.1).await
+                    info!("Rejected header {}", pending_block_number);
+                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await
                 }?;
             }
 

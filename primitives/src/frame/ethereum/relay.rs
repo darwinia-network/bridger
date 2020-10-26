@@ -1,13 +1,16 @@
 //! Ethereum Relay
 use crate::chain::ethereum::{EthereumRelayHeaderParcel, EthereumRelayProofs};
-use codec::Encode;
+use codec::{Encode, Decode};
 use core::marker::PhantomData;
 use substrate_subxt::system::{System, SystemEventsDecoder};
 use substrate_subxt_proc_macro::{module, Call, Store};
 
 /// Ethereum Relay Pallet
 #[module]
-pub trait EthereumRelay: System {}
+pub trait EthereumRelay: System {
+    /// Ethereum Pending Header
+    type PendingRelayHeaderParcel: 'static + Encode + Decode + Send + Default;
+}
 
 /// Affirm Call
 #[derive(Clone, Debug, PartialEq, Call, Encode)]
@@ -48,6 +51,10 @@ pub struct VotePendingRelayHeaderParcel<T: EthereumRelay> {
     pub _runtime: PhantomData<T>,
 }
 
+/// Pending Headers Storage
+#[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
+pub struct PendingRelayHeaderParcels<T: EthereumRelay> {
+    #[store(returns = Vec<T::PendingRelayHeaderParcel>)]
     /// Runtime marker
     pub _runtime: PhantomData<T>,
 }

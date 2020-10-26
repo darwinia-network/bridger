@@ -1,7 +1,7 @@
 //! Darwinia Frame
 #![cfg(feature = "runtime")]
 
-pub mod collective;
+pub mod technical_committee;
 pub mod ethereum;
 pub mod sudo;
 /// proxy

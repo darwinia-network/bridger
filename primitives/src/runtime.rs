@@ -4,7 +4,7 @@
 use crate::{
     chain::{ethereum::EthereumRelayHeaderParcel, RelayAffirmation, RelayAffirmationId, proxy_type::ProxyType},
     frame::{
-        collective::TechnicalCommittee,
+        technical_committee::TechnicalCommittee,
         ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay},
         sudo::Sudo,
         proxy::Proxy,

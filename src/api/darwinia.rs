@@ -7,7 +7,7 @@ use primitives::{
         proxy_type::ProxyType,
     },
     frame::{
-        collective::{ExecuteCallExt, MembersStoreExt},
+        technical_committee::MembersStoreExt,
         ethereum::{
             backing::{RedeemCallExt, VerifiedProofStoreExt, Redeem},
             game::{AffirmationsStoreExt, EthereumRelayerGame, PendingRelayHeaderParcelsStoreExt},

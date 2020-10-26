@@ -78,14 +78,6 @@ pub struct PendingRelayHeaderParcelRejected<T: EthereumRelayerGame> {
 // Storage
 //////
 
-/// PendingHeaders Storage
-#[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct PendingRelayHeaderParcels<T: EthereumRelayerGame> {
-    #[store(returns = Vec<T::PendingRelayHeaderParcel>)]
-    /// Runtime marker
-    pub _runtime: PhantomData<T>,
-}
-
 /// Relay Affirmations Storage
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
 pub struct Affirmations<T: EthereumRelayerGame> {

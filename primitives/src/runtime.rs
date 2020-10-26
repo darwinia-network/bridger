@@ -67,11 +67,6 @@ impl EthereumRelayerGame for DarwiniaRuntime {
         <Self as Balances>::Balance,
         RelayAffirmationId<u64>,
     >;
-    type PendingRelayHeaderParcel = (
-        <Self as System>::BlockNumber,
-        u64,
-        EthereumRelayHeaderParcel,
-    );
     type RelayHeaderId = u64;
 }
 

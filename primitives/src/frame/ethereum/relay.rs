@@ -1,6 +1,8 @@
 //! Ethereum Relay
 
-use crate::chain::ethereum::{EthereumRelayHeaderParcel, EthereumRelayProofs};
+use crate::chain::ethereum::{
+    EthereumHeader, EthereumReceipt, EthereumRelayHeaderParcel, EthereumRelayProofs,
+};
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use substrate_subxt::system::{System, SystemEventsDecoder};

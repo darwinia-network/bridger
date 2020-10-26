@@ -67,6 +67,7 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     listener.register(ethereum)?;
     listener.register(relay)?;
     listener.register(redeem)?;
+    listener.register(subscribe)?;
     if let Err(err) = guard.role_checking() {
         warn!("{}", err.to_string());
     } else {

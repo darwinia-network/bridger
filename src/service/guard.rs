@@ -42,8 +42,8 @@ impl Service for GuardService {
     }
 
     async fn run(&mut self, _: Arc<Mutex<Pool>>) -> BridgerResult<()> {
-        if self.darwinia.role == Role::Normal {
-            trace!("Current account is not Sudo account or technical committee, ending...");
+        if self.darwinia.role != Role::TechnicalCommittee {
+            trace!("Current account is not technical committee member, ending...");
             return Ok(());
         }
 
@@ -55,16 +55,16 @@ impl Service for GuardService {
             let pending_headers = self.darwinia.pending_headers().await?;
             for pending in pending_headers {
                 let pending_parcel = pending.1;
-                let pending_block_number = pending_parcel.header.number;
+                let pending_block_number: u64 = pending_parcel.header.number;
                 let parcel = self.shadow.parcel(pending_block_number as usize).await?;
 
                 if parcel.is_same_as(&pending_parcel) {
-                    info!("Approved header {}", pending_block_number);
-                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await
+                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
+                    info!("Voted to approve {}", pending_block_number);
                 } else {
-                    info!("Rejected header {}", pending_block_number);
-                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await
-                }?;
+                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
+                    info!("Voted to reject {}", pending_block_number);
+                };
             }
 
             tokio::time::delay_for(Duration::from_secs(self.step)).await;

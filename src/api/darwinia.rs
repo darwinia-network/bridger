@@ -67,9 +67,7 @@ impl Darwinia {
         // proxy
         let proxy_real = match &config.proxy {
             None => None,
-
             Some(proxy) => {
-
                 // get real account str
                 let real = if &proxy.real[0..2] == "0x" {
                     &proxy.real[2..]
@@ -84,11 +82,10 @@ impl Darwinia {
                         data.copy_from_slice(&real[..]);
                         let real = <DarwiniaRuntime as System>::AccountId::from(data);
                         Some(real)
-                    },
-                    Err(_e) => None
+                    }
+                    Err(_e) => None,
                 }
-                Err(_e) => None,
-            },
+            }
         };
 
         // client

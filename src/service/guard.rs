@@ -11,6 +11,7 @@ use std::{
     sync::{Arc, Mutex},
     time::Duration,
 };
+use crate::result::Error::Bridger;
 
 /// Attributes
 const SERVICE_NAME: &str = "GUARD";
@@ -42,10 +43,7 @@ impl Service for GuardService {
     }
 
     async fn run(&mut self, _: Arc<Mutex<Pool>>) -> BridgerResult<()> {
-        if self.darwinia.role != Role::TechnicalCommittee {
-            trace!("Current account is not technical committee member, ending...");
-            return Ok(());
-        }
+        self.role_checking()?;
 
         loop {
             let last_confirmed = self.darwinia.last_confirmed().await?;
@@ -68,6 +66,18 @@ impl Service for GuardService {
             }
 
             tokio::time::delay_for(Duration::from_secs(self.step)).await;
+        }
+    }
+}
+
+impl GuardService {
+    /// check permission
+    pub fn role_checking(&self) -> BridgerResult<()> {
+        if self.darwinia.role != Role::TechnicalCommittee {
+            let msg = "Guard service is not running because the relayer is not a member of the technical committee!!!".to_string();
+            Err(Bridger(msg))
+        } else {
+            Ok(())
         }
     }
 }

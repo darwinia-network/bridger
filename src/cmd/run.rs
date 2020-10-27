@@ -41,13 +41,13 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     info!("      Darwinia: {}", config.node);
     info!("        Shadow: {}", config.shadow);
     info!("      Ethereum: {}", config.eth.rpc);
-    let signer_public = &darwinia.relayer.account_id;
+    let signer_public = &darwinia.account.account_id;
     match &config.proxy {
         None => {
-            info!("🧔 Relayer({:?}): 0x{:?}", darwinia.relayer.role_names(), signer_public);
+            info!("🧔 Relayer({:?}): 0x{:?}", darwinia.account.role_names().await?, signer_public);
         },
         Some(proxy) => {
-            info!("🧔 Proxy Relayer({:?}): 0x{:?}", darwinia.relayer.role_names(), signer_public);
+            info!("🧔 Proxy Relayer({:?}): 0x{:?}", darwinia.account.role_names().await?, signer_public);
             info!("👴 Real Account: {}", proxy.real);
         }
     }
@@ -58,7 +58,7 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     listener.register(ethereum)?;
     listener.register(relay)?;
     listener.register(redeem)?;
-    if let Err(err) = guard.role_checking() {
+    if let Err(err) = guard.role_checking().await {
         warn!("{}", err.to_string());
     } else {
         listener.register(guard)?;

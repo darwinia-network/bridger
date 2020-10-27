@@ -28,7 +28,7 @@ enum Opt {
         #[structopt(short, long)]
         block: u64,
     },
-    /// Affirm target block
+    /// Affirm a target block
     Affirm {
         /// The block number to affirm
         #[structopt(short, long)]
@@ -36,7 +36,7 @@ enum Opt {
     },
     /// Show sudo and technical committee members
     Keys,
-    /// Show technical committee members
+    /// List affirmations from chain
     Affirmations,
     /// Run guard standalone
     Guard,

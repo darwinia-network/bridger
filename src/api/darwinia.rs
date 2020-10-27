@@ -152,8 +152,18 @@ impl Darwinia {
     }
 
     /// roles
-    pub fn role_list(&self) -> Vec<&'static str> {
+    pub fn role_names(&self) -> Vec<&'static str> {
         decode_roles(self.roles)
+    }
+
+    /// is_sudo_key
+    pub fn is_sudo_key(&self) -> bool {
+        contains_role(self.roles, ROLE_SUDO.1)
+    }
+
+    /// is_tech_comm_member
+    pub fn is_tech_comm_member(&self) -> bool {
+        contains_role(self.roles, ROLE_TECHNICAL_COMMITTEE.1)
     }
 
     /// set confirmed with sudo privilege
@@ -167,7 +177,7 @@ impl Darwinia {
 
     /// Vote pending relay header parcel
     pub async fn vote_pending_relay_header_parcel(&self, pending: u64, aye: bool) -> Result<H256> {
-        if contains_role(self.roles, ROLE_TECHNICAL_COMMITTEE.1) {
+        if self.is_tech_comm_member() {
             let ex_hash = self.client
                 .vote_pending_relay_header_parcel(&self.signer, pending, aye)
                 .await?;
@@ -176,7 +186,6 @@ impl Darwinia {
             Err(Bridger("Not technical committee member".to_string()))
         }
     }
-
 
     /// Get all active games' affirmations
     /// games = {

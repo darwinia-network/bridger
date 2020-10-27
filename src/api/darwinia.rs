@@ -110,10 +110,8 @@ impl Account {
     pub fn from_seed(seed: &str, sudo: &AccountId, tech_comm_members: &[AccountId]) -> Account {
         let pair = Pair::from_string(seed, None).unwrap();
         let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
-        let pk_raw = &signer.signer().to_raw_vec();
-        let mut data: [u8; 32] = [0u8; 32];
-        data.copy_from_slice(&pk_raw[..]);
-        let account_id = AccountId::from(data);
+        let public = signer.signer().public().0;
+        let account_id = AccountId::from(public);
         let roles = account_roles(&account_id, sudo, tech_comm_members);
         Account {
             account_id,
@@ -194,9 +192,8 @@ impl Darwinia {
                 }
             }
         };
-
-        let proxy_real = real
-            .map(
+        let proxy_real =
+            real.map(
                 |id| {
                     Account::from_account_id(id, &sudo, &tech_comm_members)
                 }

@@ -41,14 +41,16 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     info!("      Darwinia: {}", config.node);
     info!("        Shadow: {}", config.shadow);
     info!("      Ethereum: {}", config.eth.rpc);
-    let signer_public = &darwinia.account.account_id;
-    match &config.proxy {
+    let account_id = &darwinia.account.account_id;
+    let roles = darwinia.account.role_names().await?;
+    match &darwinia.account.real {
         None => {
-            info!("🧔 Relayer({:?}): 0x{:?}", darwinia.account.role_names().await?, signer_public);
+            info!("🧔 Relayer({:?}): 0x{:?}", roles, account_id);
         },
-        Some(proxy) => {
-            info!("🧔 Proxy Relayer({:?}): 0x{:?}", darwinia.account.role_names().await?, signer_public);
-            info!("👴 Real Account: {}", proxy.real);
+        Some(real_account_id) => {
+            info!("🧔 Proxy Relayer: 0x{:?}", account_id);
+            info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
+
         }
     }
     info!("🌱 Relay from ethereum block: {}", config.eth.start);

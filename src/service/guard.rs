@@ -1,6 +1,6 @@
 //! Guard Service
 use crate::{
-    api::{Darwinia, Role, Shadow},
+    api::{Darwinia, Shadow, darwinia::{contains_role, ROLE_TECHNICAL_COMMITTEE}},
     config::Config,
     result::Result as BridgerResult,
     service::Service,
@@ -73,8 +73,8 @@ impl Service for GuardService {
 impl GuardService {
     /// check permission
     pub fn role_checking(&self) -> BridgerResult<()> {
-        if self.darwinia.role != Role::TechnicalCommittee {
-            let msg = "Guard service is not running because the relayer is not a member of the technical committee!!!".to_string();
+        if !contains_role(self.darwinia.roles, ROLE_TECHNICAL_COMMITTEE.1) {
+            let msg = "Guard service is not running because the relayer is not a member of the technical committee!".to_string();
             Err(Bridger(msg))
         } else {
             Ok(())

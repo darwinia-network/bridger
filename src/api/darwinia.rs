@@ -39,15 +39,46 @@ type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelay
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
 type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
 
-/// Account Role
-#[derive(PartialEq, Eq, Debug)]
-pub enum Role {
-    /// Sudo Account
-    Sudo,
-    /// Technical Committee Member
-    TechnicalCommittee,
-    /// Normal Account
-    Normal,
+/// Sudo Account
+pub const ROLE_SUDO: (&str, u8) = ("SUDO", 1);
+/// Technical Committee Member
+pub const ROLE_TECHNICAL_COMMITTEE: (&str, u8) = ("TECHNICAL_COMMITTEE", 2);
+/// Normal Account
+pub const ROLE_NORMAL: (&str, u8) = ("NORMAL", 4);
+
+/// contains_role
+pub fn contains_role(roles: u8, mask: u8) -> bool {
+    roles & mask > 0
+}
+
+/// decode_roles
+pub fn decode_roles(roles: u8) -> Vec<&'static str> {
+    let mut result = vec![];
+    if contains_role(roles, ROLE_SUDO.1) {
+        result.push(ROLE_SUDO.0);
+    }
+    if contains_role(roles, ROLE_TECHNICAL_COMMITTEE.1) {
+        result.push(ROLE_TECHNICAL_COMMITTEE.0);
+    }
+    if contains_role(roles, ROLE_NORMAL.1) {
+        result.push(ROLE_NORMAL.0);
+    }
+    result
+}
+
+/// encode_roles
+pub fn encode_roles(roles: Vec<&'static str>) -> u8 {
+    let mut result = 0u8;
+    if roles.contains(&ROLE_SUDO.0) {
+        result += ROLE_SUDO.1;
+    }
+    if roles.contains(&ROLE_TECHNICAL_COMMITTEE.0) {
+        result += ROLE_TECHNICAL_COMMITTEE.1;
+    }
+    if roles.contains(&ROLE_NORMAL.0) {
+        result += ROLE_NORMAL.1;
+    }
+    result
 }
 
 /// Dawrinia API
@@ -55,8 +86,8 @@ pub struct Darwinia {
     client: Client<DarwiniaRuntime>,
     /// Keyring signer
     pub signer: PairSigner<DarwiniaRuntime, Pair>,
-    /// Account Role
-    pub role: Role,
+    /// Account Roles
+    pub roles: u8,
     /// Proxy real
     pub proxy_real: Option<<DarwiniaRuntime as System>::AccountId>,
 }
@@ -102,18 +133,27 @@ impl Darwinia {
         let sudo = client.key(None).await?.to_string();
         let technical_committee_members = client.members(None).await?;
 
+        // roles
+        let mut roles = vec![];
+        roles.push(ROLE_NORMAL.0);
+        if sudo == pk {
+            roles.push(ROLE_SUDO.0);
+        }
+        if technical_committee_members.iter().any(|cpk| cpk.to_string() == pk) {
+            roles.push(ROLE_TECHNICAL_COMMITTEE.0);
+        }
+
         Ok(Darwinia {
             client,
             signer,
-            role: if sudo == pk {
-                Role::Sudo
-            } else if technical_committee_members.iter().any(|cpk| cpk.to_string() == pk) {
-                Role::TechnicalCommittee
-            } else {
-                Role::Normal
-            },
+            roles: encode_roles(roles),
             proxy_real
         })
+    }
+
+    /// roles
+    pub fn role_list(&self) -> Vec<&'static str> {
+        decode_roles(self.roles)
     }
 
     /// set confirmed with sudo privilege
@@ -127,14 +167,13 @@ impl Darwinia {
 
     /// Vote pending relay header parcel
     pub async fn vote_pending_relay_header_parcel(&self, pending: u64, aye: bool) -> Result<H256> {
-        match self.role {
-            Role::TechnicalCommittee => {
-                let ex_hash = self.client
-                    .vote_pending_relay_header_parcel(&self.signer, pending, aye)
-                    .await?;
-                Ok(ex_hash)
-            }
-            _ => Err(Bridger("Not technical committee member".to_string()))
+        if contains_role(self.roles, ROLE_TECHNICAL_COMMITTEE.1) {
+            let ex_hash = self.client
+                .vote_pending_relay_header_parcel(&self.signer, pending, aye)
+                .await?;
+            Ok(ex_hash)
+        } else {
+            Err(Bridger("Not technical committee member".to_string()))
         }
     }
 

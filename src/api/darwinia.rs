@@ -17,6 +17,7 @@ use primitives::{
                 Affirm,
                 EthereumRelay,
                 VotePendingRelayHeaderParcelCallExt,
+                VotePendingRelayHeaderParcel,
             },
         },
         sudo::{KeyStoreExt, SudoCallExt},
@@ -150,7 +151,7 @@ impl Account {
 pub struct Darwinia {
     client: Client<DarwiniaRuntime>,
     /// Keyring signer
-    pub signer: Account,
+    pub relayer: Account,
     /// Proxy real
     pub proxy_real: Option<Account>,
 }
@@ -201,14 +202,14 @@ impl Darwinia {
 
         Ok(Darwinia {
             client,
-            signer,
+            relayer: signer,
             proxy_real
         })
     }
 
     /// helper to get signer
     pub fn signer(&self) -> &PairSigner<DarwiniaRuntime, Pair> {
-        &self.signer.signer.as_ref().unwrap()
+        &self.relayer.signer.as_ref().unwrap()
     }
 
     /// set confirmed with sudo privilege
@@ -222,13 +223,32 @@ impl Darwinia {
 
     /// Vote pending relay header parcel
     pub async fn vote_pending_relay_header_parcel(&self, pending: u64, aye: bool) -> Result<H256> {
-        if self.signer.is_tech_comm_member() {
-            let ex_hash = self.client
-                .vote_pending_relay_header_parcel(self.signer(), pending, aye)
-                .await?;
-            Ok(ex_hash)
-        } else {
-            Err(Bridger("Not technical committee member".to_string()))
+        match &self.proxy_real {
+            Some(real) => { // do vote for proxy real
+                trace!("Proxy vote for {:?}", real.account_id);
+                if real.is_tech_comm_member() {
+                    let vote = VotePendingRelayHeaderParcel {
+                        block_number: pending,
+                        aye,
+                        _runtime: PhantomData::default(),
+                    };
+
+                    let ex = self.client.encode(vote).unwrap();
+                    Ok(self.client.proxy(self.signer(), real.account_id.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
+                } else {
+                    Err(Bridger("Proxy real is not technical committee member".to_string()))
+                }
+            },
+            None => { // no proxy
+                if self.relayer.is_tech_comm_member() {
+                    let ex_hash = self.client
+                        .vote_pending_relay_header_parcel(self.signer(), pending, aye)
+                        .await?;
+                    Ok(ex_hash)
+                } else {
+                    Err(Bridger("Relayer is not technical committee member".to_string()))
+                }
+            }
         }
     }
 

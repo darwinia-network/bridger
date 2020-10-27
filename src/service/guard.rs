@@ -80,7 +80,7 @@ impl GuardService {
             }
         }
 
-        if !self.darwinia.signer.is_tech_comm_member() {
+        if !self.darwinia.relayer.is_tech_comm_member() {
             let msg = "Guard service is not running because the relayer is not a member of the technical committee!".to_string();
             Err(Bridger(msg))
         } else {

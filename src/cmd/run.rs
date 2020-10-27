@@ -6,7 +6,6 @@ use crate::{
 };
 use std::sync::Arc;
 use web3::transports::http::Http;
-use substrate_subxt::sp_core::Pair;
 
 /// Run the bridger
 pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
@@ -19,9 +18,8 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     }
     env_logger::init();
 
-
+    // config
     let config = Config::new(path)?;
-
     if config.eth.rpc.starts_with("ws") {
         return Err(Error::Bridger(
             "Bridger currently doesn't support ethereum websocket transport".to_string(),
@@ -38,38 +36,36 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     let redeem = RedeemService::new(&config, shadow.clone(), darwinia.clone());
     let guard = GuardService::new(&config, shadow, darwinia.clone());
 
-
-
-
-
     // Startup infomations
     info!("🔗 Connect to");
     info!("      Darwinia: {}", config.node);
     info!("        Shadow: {}", config.shadow);
     info!("      Ethereum: {}", config.eth.rpc);
-    let signer_public = &darwinia.signer.signer().public();
-    match &config.proxy {
+    let account_id = &darwinia.account.account_id;
+    let roles = darwinia.account.role_names().await?;
+    match &darwinia.account.real {
         None => {
-            info!("🧔 Relayer({:?}): 0x{:?}", darwinia.role_list(), signer_public);
+            info!("🧔 Relayer({:?}): 0x{:?}", roles, account_id);
         },
-        Some(proxy) => {
-            info!("🧔 Proxy Relayer({:?}): 0x{:?}", darwinia.role_list(), signer_public);
-            info!("👴 Real Account: {}", proxy.real);
+        Some(real_account_id) => {
+            info!("🧔 Proxy Relayer: 0x{:?}", account_id);
+            info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
+
         }
     }
     info!("🌱 Relay from ethereum block: {}", config.eth.start);
 
+    // listeners
     let mut listener = Listener::default();
-
     listener.register(ethereum)?;
     listener.register(relay)?;
     listener.register(redeem)?;
-    if let Err(err) = guard.role_checking() {
+    if let Err(err) = guard.role_checking().await {
         warn!("{}", err.to_string());
     } else {
         listener.register(guard)?;
     }
-
     listener.start().await?;
+
     Ok(())
 }

@@ -6,7 +6,6 @@ use crate::{
 };
 use std::sync::Arc;
 use web3::transports::http::Http;
-use substrate_subxt::sp_core::Pair;
 
 /// Run the bridger
 pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
@@ -42,13 +41,13 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     info!("      Darwinia: {}", config.node);
     info!("        Shadow: {}", config.shadow);
     info!("      Ethereum: {}", config.eth.rpc);
-    let signer_public = &darwinia.signer.signer().public();
+    let signer_public = &darwinia.signer.account_id;
     match &config.proxy {
         None => {
-            info!("🧔 Relayer({:?}): 0x{:?}", darwinia.role_names(), signer_public);
+            info!("🧔 Relayer({:?}): 0x{:?}", darwinia.signer.role_names(), signer_public);
         },
         Some(proxy) => {
-            info!("🧔 Proxy Relayer({:?}): 0x{:?}", darwinia.role_names(), signer_public);
+            info!("🧔 Proxy Relayer({:?}): 0x{:?}", darwinia.signer.role_names(), signer_public);
             info!("👴 Real Account: {}", proxy.real);
         }
     }

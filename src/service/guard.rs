@@ -73,11 +73,18 @@ impl Service for GuardService {
 impl GuardService {
     /// check permission
     pub fn role_checking(&self) -> BridgerResult<()> {
-        if !self.darwinia.is_tech_comm_member() {
+        if let Some(real) = &self.darwinia.proxy_real {
+            if !real.is_tech_comm_member() {
+                let msg = "GUARD service is not running because the proxy real is not a member of the technical committee!".to_string();
+                return Err(Bridger(msg));
+            }
+        }
+
+        if !self.darwinia.signer.is_tech_comm_member() {
             let msg = "Guard service is not running because the relayer is not a member of the technical committee!".to_string();
             Err(Bridger(msg))
         } else {
             Ok(())
         }
-    }
+}
 }

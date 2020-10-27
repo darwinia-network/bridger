@@ -1,8 +1,8 @@
 //! Briger APIs
-mod darwinia;
+pub mod darwinia;
 mod shadow;
 
 pub use self::{
-    darwinia::{Darwinia, Role},
+    darwinia::{Darwinia},
     shadow::Shadow,
 };

@@ -66,11 +66,27 @@ You will need to prepare several services before using bridger:
 - Darwinia node websocket json-rpc endpoint
 - Ethereum json-rpc endpoint, e.g. [Infura](https://infura.io/)
 - Darwinia Shadow http restful endpoint, for more details: https://github.com/darwinia-network/shadow
-- Account Seed for signing extrinsics, you can also using a proxy seed to signing extrinsic for your real account. To use proxy, you need to
+- Account Seed for signing extrinsics. You can use this account for `affirm` and `redeem`
+  ```toml
+  ...
+  seed = '<account seed>'
+  ...
+  ```
+- you can also using a proxy seed to signing extrinsic for your real account. To use proxy, you need to
     + Using [Extrinsic](https://apps.darwinia.network/#/extrinsics) to setting up the proxy using your real account. Calling ```proxy.addProxy(proxy_account, ProxyType.EthereumBridge, 0)```
     + Changing the seed settings to the proxy account's seed.
-    + Make sure the proxy.real key in config.toml is set to the real account's address to enable proxy feature. (Currently must be public key hex format, Here is an [tool](https://crab.subscan.io/tools/ss58_transform) which can help address conversion.)
-
+    + Make sure the proxy.real key in config.toml is set to the real account's address to enable proxy feature. (Currently must be public key hex format, Here is an [tool](https://crab.subscan.io/tools/ss58_transform) which can help address conversion.)    
+  
+  ```toml
+  ...
+  seed = '<proxy account seed>' 
+  ...
+  [proxy]
+  real = '<real account public key>'
+  ``` 
+      
+  If you are a member of the technical committee, This is the recommended. The proxy account can do `affirm`, `guard` and `redeem` for the real account.
+      
 #### Run
 
 `bridger run` will run the bridger fully. You can also using ```bridger run -v``` to enter verbose model which can help print more trace logs.    

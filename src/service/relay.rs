@@ -97,30 +97,9 @@ impl RelayService {
         // 3. affirmations check
         for (_game_id, game) in self.darwinia.affirmations().await?.iter() {
             for (_round_id, affirmations) in game.iter() {
-                if Darwinia::large_block_exists(&affirmations, target) {
+                if Darwinia::contains(&affirmations, target) {
                     let reason = format!("The target block {} is in the relayer game", &target);
                     return Err(Error::Bridger(reason));
-
-                    // //
-                    // if round_id == 0 {
-                    //     if parcel.is_same_as(&affirmations[0].relay_header_parcels[0]) {
-                    //         // agree
-                    //         if affirmations.len() > 1 {
-                    //             // dispute exist, join the game
-                    //
-                    //         } else {
-                    //             // dispute not exist, do not relay
-                    //             return Ok(Some(reason));
-                    //         }
-                    //     } else {
-                    //         // disagree
-                    //
-                    //     }
-                    //
-                    // } else {
-                    //
-                    // }
-
                 }
             }
         }

@@ -331,18 +331,16 @@ impl Darwinia {
             .unwrap_or(false))
     }
 
-    /// large_block_exists
-    pub fn large_block_exists(affirmations: &[RelayAffirmation], block: u64) -> bool {
+    /// affirmations contains block?
+    pub fn contains(affirmations: &[RelayAffirmation], block: u64) -> bool {
         for affirmation in affirmations {
             let blocks: &Vec<u64> = &affirmation
                 .relay_header_parcels
                 .iter()
                 .map(|bp| bp.header.number)
                 .collect();
-            if let Some(max) = blocks.iter().max() {
-                if max > &block {
-                    return true;
-                }
+            if blocks.contains(&block) {
+                return true;
             }
         }
         false

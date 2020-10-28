@@ -1,6 +1,6 @@
 //! Ethereum transaction service
 use crate::{
-    pool::{EthereumTransaction, EthereumTransactionHash, Pool},
+    memcache::{EthereumTransaction, EthereumTransactionHash, MemCache},
     result::Result as BridgerResult,
     service::Service,
     Config,
@@ -35,7 +35,6 @@ pub struct EthereumService<T: Transport> {
     contract: ContractAddress,
     filter: [FilterBuilder; 2],
     web3: Web3<T>,
-    start: u64,
     step: u64,
 }
 
@@ -78,7 +77,6 @@ impl<T: Transport> EthereumService<T> {
         Ok(EthereumService {
             contract: Self::parse_contract(&config),
             filter: Self::parse_filter(&config)?,
-            start: config.eth.start,
             web3: Web3::new(Http::new(&config.eth.rpc)?),
             step: config.step.ethereum,
         })
@@ -89,7 +87,6 @@ impl<T: Transport> EthereumService<T> {
         Ok(EthereumService {
             contract: Self::parse_contract(&config),
             filter: Self::parse_filter(&config)?,
-            start: config.eth.start,
             web3: Web3::new(WebSocket::new(&config.eth.rpc).await?),
             step: config.step.ethereum,
         })
@@ -147,15 +144,14 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
         let eth = self.web3.eth();
-        let mut block_number: u64;
-        let mut start = self.start;
 
         loop {
-            if let Ok(mut pool_cloned) = pool.try_lock() {
-                trace!("Looking for darwinia ethereum transactions...");
-                block_number = eth.block_number().await?.as_u64();
+            if let Ok(mut cache_cloned) = cache.try_lock() {
+                trace!("Scanning on ethereum for new cross-chain transactions...");
+                let block_number = eth.block_number().await?.as_u64();
+                let start = cache_cloned.start;
                 if block_number == start {
                     tokio::time::delay_for(Duration::from_secs(self.step)).await;
                     continue;
@@ -169,9 +165,9 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
                     }
                 }
 
-                pool_cloned.ethereum.append(&mut txs);
-                start = block_number;
-                drop(pool_cloned);
+                cache_cloned.txpool.append(&mut txs);
+                cache_cloned.start = block_number;
+                drop(cache_cloned);
             }
 
             tokio::time::delay_for(Duration::from_secs(self.step)).await;

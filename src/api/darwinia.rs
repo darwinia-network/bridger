@@ -4,7 +4,7 @@ use core::marker::PhantomData;
 use primitives::{
     chain::{
         ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
-        proxy_type::ProxyType,
+        proxy_type::ProxyType, RelayVotingState,
     },
     frame::{
         technical_committee::MembersStoreExt,
@@ -162,7 +162,13 @@ impl Account {
         Ok(contains_role(self.roles().await?, ROLE_TECHNICAL_COMMITTEE.1))
     }
 
-
+    /// has_voted
+    pub fn has_voted(&self, voting_state: RelayVotingState<AccountId>) -> bool {
+        match &self.real {
+            None => voting_state.contains(&self.account_id),
+            Some(real) => voting_state.contains(real)
+        }
+    }
 }
 
 /// Dawrinia API

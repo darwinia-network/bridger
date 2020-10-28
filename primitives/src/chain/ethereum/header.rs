@@ -4,6 +4,8 @@ use crate::{
 };
 use codec::{Decode, Encode};
 use std::{fmt::Debug, str::FromStr};
+use uint::static_assertions::_core::fmt::Formatter;
+use substrate_subxt::sp_core::bytes::to_hex;
 
 /// Raw EthereumHeader from Ethereum rpc
 #[derive(Serialize, Deserialize, Debug)]
@@ -82,6 +84,36 @@ pub struct EthereumHeader {
     seal: Vec<Vec<u8>>,
     /// Ethereum header hash
     pub hash: Option<[u8; 32]>,
+}
+
+impl std::fmt::Display for EthereumHeader {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut msgs = vec![];
+        msgs.push(format!("{:>19}{}", "parent_hash: ", to_hex(&self.parent_hash, false)));
+        msgs.push(format!("{:>19}{}", "timestamp: ", &self.timestamp));
+        msgs.push(format!("{:>19}{}", "number: ", &self.number));
+        msgs.push(format!("{:>19}{}", "author: ", to_hex(&self.author, false)));
+        msgs.push(format!("{:>19}{}", "transactions_root: ", to_hex(&self.transactions_root, false)));
+        msgs.push(format!("{:>19}{}", "uncles_hash: ", to_hex(&self.uncles_hash, false)));
+        msgs.push(format!("{:>19}{}", "extra_data: ", to_hex(&self.extra_data, false)));
+        msgs.push(format!("{:>19}{}", "state_root: ", to_hex(&self.state_root, false)));
+        msgs.push(format!("{:>19}{}", "receipts_root: ", to_hex(&self.receipts_root, false)));
+        msgs.push(format!("{:>19}{}", "log_bloom: ", &self.log_bloom.to_string()));
+        msgs.push(format!("{:>19}{}", "gas_used: ", &self.gas_used.as_u128()));
+        msgs.push(format!("{:>19}{}", "gas_limit: ", &self.gas_limit.as_u128()));
+        msgs.push(format!("{:>19}{}", "difficulty: ", &self.difficulty.as_u128()));
+        for (i, item) in self.seal.iter().enumerate() {
+            if i == 0 {
+                msgs.push(format!("{:>19}{}", "seal: ", to_hex(item, false)));
+            } else {
+                msgs.push(format!("{:>19}{}", "", to_hex(item, false)));
+            }
+        }
+        if let Some(hash) = &self.hash {
+            msgs.push(format!("{:>19}{}", "hash: ", to_hex(hash, false)));
+        }
+        write!(f, "{}", msgs.join("\n"))
+    }
 }
 
 /// Darwinia Eth header Json foramt

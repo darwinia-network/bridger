@@ -5,9 +5,11 @@ use crate::{
     hex,
 };
 use codec::{Decode, Encode};
+use uint::static_assertions::_core::fmt::Formatter;
+use substrate_subxt::sp_core::bytes::to_hex;
 
 /// Ethereum EthereumRelayHeaderParcel
-#[derive(Encode, Decode, Debug, Default, PartialEq, Eq, Clone)]
+#[derive(Encode, Decode, Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct EthereumRelayHeaderParcel {
     /// Ethereum header
     pub header: EthereumHeader,
@@ -19,6 +21,14 @@ impl EthereumRelayHeaderParcel {
     /// Is same as another parcel
     pub fn is_same_as(&self, another: &EthereumRelayHeaderParcel) -> bool {
         self.header.hash == another.header.hash && self.mmr_root == another.mmr_root
+    }
+}
+
+impl std::fmt::Display for EthereumRelayHeaderParcel {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let header = &self.header.to_string();
+        let msg = format!("{}\n{:>19}{}", header, "mmr_root: ", to_hex(&self.mmr_root, false));
+        write!(f, "{}", msg)
     }
 }
 

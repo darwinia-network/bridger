@@ -1,6 +1,6 @@
 [package]
 name = "darwinia-bridge-primitives"
-version = "0.0.13"
+version = "0.0.15"
 authors = ["clearloop <udtrokia@gmail.com>"]
 description = "Darwinia bridge primitives"
 repository = "https://github.com/darwinia-network/bridger"

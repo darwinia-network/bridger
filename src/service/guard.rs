@@ -2,16 +2,15 @@
 use crate::{
     api::{Darwinia, Shadow},
     config::Config,
-    result::Result as BridgerResult,
+    result::{Result as BridgerResult, Error::Bridger},
     service::Service,
-    Pool,
+    memcache::MemCache,
 };
 use async_trait::async_trait;
 use std::{
     sync::{Arc, Mutex},
     time::Duration,
 };
-use crate::result::Error::Bridger;
 
 /// Attributes
 const SERVICE_NAME: &str = "GUARD";
@@ -42,7 +41,7 @@ impl Service for GuardService {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, _: Arc<Mutex<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, _: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
         self.role_checking().await?;
 
         loop {
@@ -52,17 +51,19 @@ impl Service for GuardService {
             trace!("Checking pending headers...");
             let pending_headers = self.darwinia.pending_headers().await?;
             for pending in pending_headers {
-                let pending_parcel = pending.1;
-                let pending_block_number: u64 = pending_parcel.header.number;
-                let parcel = self.shadow.parcel(pending_block_number as usize).await?;
+                if !self.darwinia.account.has_voted(pending.2) {
+                    let pending_parcel = pending.1;
+                    let pending_block_number: u64 = pending_parcel.header.number;
+                    let parcel = self.shadow.parcel(pending_block_number as usize).await?;
 
-                if parcel.is_same_as(&pending_parcel) {
-                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
-                    info!("Voted to approve {}", pending_block_number);
-                } else {
-                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
-                    info!("Voted to reject {}", pending_block_number);
-                };
+                    if parcel.is_same_as(&pending_parcel) {
+                        self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
+                        info!("Voted to approve {}", pending_block_number);
+                    } else {
+                        self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
+                        info!("Voted to reject {}", pending_block_number);
+                    };
+                }
             }
 
             tokio::time::delay_for(Duration::from_secs(self.step)).await;

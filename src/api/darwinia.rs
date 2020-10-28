@@ -39,7 +39,8 @@ use crate::result::Error::Bridger;
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
 type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
-type AccountId = <DarwiniaRuntime as System>::AccountId;
+/// AccountId
+pub type AccountId = <DarwiniaRuntime as System>::AccountId;
 
 /// Sudo Account
 pub const ROLE_SUDO: (&str, u8) = ("SUDO", 1);
@@ -160,6 +161,8 @@ impl Account {
     pub async fn is_tech_comm_member(&self) -> Result<bool> {
         Ok(contains_role(self.roles().await?, ROLE_TECHNICAL_COMMITTEE.1))
     }
+
+
 }
 
 /// Dawrinia API

@@ -4,7 +4,7 @@ use core::marker::PhantomData;
 use primitives::{
     chain::{
         ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
-        proxy_type::ProxyType,
+        proxy_type::ProxyType, RelayVotingState,
     },
     frame::{
         technical_committee::MembersStoreExt,
@@ -39,7 +39,8 @@ use crate::result::Error::Bridger;
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
 type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
-type AccountId = <DarwiniaRuntime as System>::AccountId;
+/// AccountId
+pub type AccountId = <DarwiniaRuntime as System>::AccountId;
 
 /// Sudo Account
 pub const ROLE_SUDO: (&str, u8) = ("SUDO", 1);
@@ -159,6 +160,14 @@ impl Account {
     /// is_tech_comm_member
     pub async fn is_tech_comm_member(&self) -> Result<bool> {
         Ok(contains_role(self.roles().await?, ROLE_TECHNICAL_COMMITTEE.1))
+    }
+
+    /// has_voted
+    pub fn has_voted(&self, voting_state: RelayVotingState<AccountId>) -> bool {
+        match &self.real {
+            None => voting_state.contains(&self.account_id),
+            Some(real) => voting_state.contains(real)
+        }
     }
 }
 
@@ -331,18 +340,16 @@ impl Darwinia {
             .unwrap_or(false))
     }
 
-    /// large_block_exists
-    pub fn large_block_exists(affirmations: &[RelayAffirmation], block: u64) -> bool {
+    /// affirmations contains block?
+    pub fn contains(affirmations: &[RelayAffirmation], block: u64) -> bool {
         for affirmation in affirmations {
             let blocks: &Vec<u64> = &affirmation
                 .relay_header_parcels
                 .iter()
                 .map(|bp| bp.header.number)
                 .collect();
-            if let Some(max) = blocks.iter().max() {
-                if max > &block {
-                    return true;
-                }
+            if blocks.contains(&block) {
+                return true;
             }
         }
         false

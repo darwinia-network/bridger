@@ -2,15 +2,16 @@
 use crate::result::Result;
 use primitives::{
     frame::ethereum::relay::{
-        Affirmed, Extended, GameOver, Pended, NewRound, PendingRelayHeaderParcelApproved,
-        PendingRelayHeaderParcelRejected, RemoveConfirmedParcel, VerifyReceipt, DisputedAndAffirmed
+        Affirmed, DisputedAndAffirmed, Extended, GameOver, NewRound, Pended,
+        PendingRelayHeaderParcelApproved, PendingRelayHeaderParcelRejected, RemoveConfirmedParcel,
+        VerifyReceipt,
     },
     runtime::DarwiniaRuntime,
 };
 use substrate_subxt::{sp_core::Decode, RawEvent};
 
 // Attributes
-const AFFIRMED: &str = "affirmed";
+const AFFIRMED: &str = "Affirmed";
 const DISPUTED_AND_AFFIRMED: &str = "disputed_and_affirmed";
 const EXTENDED: &str = "extended";
 const GAME_OVER: &str = "game_over";

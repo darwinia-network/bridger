@@ -54,13 +54,16 @@ impl System for DarwiniaRuntime {
 impl TechnicalCommittee for DarwiniaRuntime {}
 impl Sudo for DarwiniaRuntime {}
 impl EthereumRelay for DarwiniaRuntime {
+    type RingBalance = u128;
+    type EthereumBlockNumber = u64;
     type PendingRelayHeaderParcel = (
         <Self as System>::BlockNumber,
         EthereumRelayHeaderParcel,
         RelayVotingState<<Self as System>::AccountId>,
     );
-    type RelayHeaderId = u64;
+    type RelayAffirmationId = RelayAffirmationId<Self::EthereumBlockNumber>;
 }
+
 impl EthereumRelayerGame for DarwiniaRuntime {
     type RelayAffirmation = RelayAffirmation<
         EthereumRelayHeaderParcel,

@@ -17,12 +17,10 @@ use std::sync::{Arc, Mutex};
 use substrate_subxt::{EventSubscription, EventsDecoder};
 
 mod backing;
-mod game;
 mod relay;
 
 /// Attributes
 const SERVICE_NAME: &str = "SUBSCRIBE";
-const ETHEREUM_RELAYER_GAME: &str = "EthereumRelayerGame";
 const ETHEREUM_RELAY: &str = "EthereumRelay";
 const ETHEREUM_BACKING: &str = "EthereumBacking";
 
@@ -64,7 +62,6 @@ impl Service for SubscribeService {
                 match event.module.as_str() {
                     ETHEREUM_RELAY => relay::handle(event)?,
                     ETHEREUM_BACKING => backing::handle(event)?,
-                    ETHEREUM_RELAYER_GAME => game::handle(event)?,
                     _ => {}
                 };
             }

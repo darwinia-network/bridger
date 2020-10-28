@@ -59,6 +59,7 @@ impl EthereumRelay for DarwiniaRuntime {
         EthereumRelayHeaderParcel,
         RelayVotingState<<Self as System>::AccountId>,
     );
+    type RelayHeaderId = u64;
 }
 impl EthereumRelayerGame for DarwiniaRuntime {
     type RelayAffirmation = RelayAffirmation<
@@ -67,7 +68,6 @@ impl EthereumRelayerGame for DarwiniaRuntime {
         <Self as Balances>::Balance,
         RelayAffirmationId<u64>,
     >;
-    type RelayHeaderId = u64;
 }
 
 impl EthereumBacking for DarwiniaRuntime {

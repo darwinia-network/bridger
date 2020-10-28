@@ -13,6 +13,8 @@ use substrate_subxt_proc_macro::{module, Call, Event, Store};
 pub trait EthereumRelay: System {
     /// Ethereum Pending Header
     type PendingRelayHeaderParcel: 'static + Encode + Decode + Send + Default;
+    /// Ethereum Relay Header ID
+    type RelayHeaderId: 'static + Encode + Decode + Send + Default + Clone + Sync;
 }
 
 //////
@@ -50,28 +52,62 @@ pub struct VotePendingRelayHeaderParcel<T: EthereumRelay> {
     pub _runtime: PhantomData<T>,
 }
 
-/// Pending Headers Storage
-#[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct PendingRelayHeaderParcels<T: EthereumRelay> {
-    #[store(returns = Vec<T::PendingRelayHeaderParcel>)]
-    /// Runtime marker
-    pub _runtime: PhantomData<T>,
+//////
+// Events
+//////
+
+/// A new relay parcel affirmed. [relayer, relay affirmation id]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct Affirmed<T: EthereumRelay> {
+    /// Account Id
+    pub account_id: <T as System>::AccountId,
+    /// Ethereum Relay Header Id
+    pub relay_header_id: T::RelayHeaderId,
 }
 
-//////
-// Event
-//////
-/// Remove confirmed parcel
-#[derive(Clone, Debug, PartialEq, Event, Decode)]
+/// A different affirmation submitted, dispute found. [relayer, relay affirmation id]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct DisputedAndAffirmed<T: EthereumRelay> {
+    /// Account Id
+    pub account_id: <T as System>::AccountId,
+    /// Ethereum Relay Header Id
+    pub relay_header_id: T::RelayHeaderId,
+}
+
+/// An extended affirmation submitted, dispute go on. [relayer, relay affirmation id]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct Extended<T: EthereumRelay> {
+    /// Account Id
+    pub account_id: <T as System>::AccountId,
+    /// Ethereum Relay Header Id
+    pub relay_header_id: T::RelayHeaderId,
+}
+
+/// A new round started. [game id, game sample points]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct NewRound<T: EthereumRelay> {
+    /// Ethereum Relay Header Id
+    pub relay_header_id: T::RelayHeaderId,
+    /// Required Headers
+    pub required_headers: Vec<T::RelayHeaderId>,
+}
+
+/// A game has been settled. [game id]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct GameOver<T: EthereumRelay> {
+    /// Ethereum Relay Header Id
+    pub relay_header_id: T::RelayHeaderId,
+}
+
+/// The specific confirmed parcel removed. [block number]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
 pub struct RemoveConfirmedParcel<T: EthereumRelay> {
-    /// The block number of Ethereum header parcel
-    pub block: u64,
-    /// Runtime marker
-    pub _runtime: PhantomData<T>,
+    /// Ethereum Relay Header Id
+    pub relay_header_id: T::RelayHeaderId,
 }
 
-/// Remove confirmed parcel
-#[derive(Clone, Debug, PartialEq, Event, Decode)]
+/// EthereumReceipt verification. [account, ethereum receipt, ethereum header]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
 pub struct VerifyReceipt<T: EthereumRelay> {
     /// The block number of Ethereum header parcel
     pub account_id: <T as System>::AccountId,
@@ -83,9 +119,40 @@ pub struct VerifyReceipt<T: EthereumRelay> {
     pub _runtime: PhantomData<T>,
 }
 
+/// Pended(EthereumBlockNumber),
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct Pended<T: EthereumRelay> {
+    /// Ethereum Relay Header Id
+    pub relay_header_id: T::RelayHeaderId,
+}
+
+/// Pending relay header parcel approved. [block number, reason]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct PendingRelayHeaderParcelApproved<T: EthereumRelay> {
+    /// Ethereum Relay Header Id
+    pub relay_header_id: T::RelayHeaderId,
+    /// reason
+    pub reason: Vec<u8>,
+}
+
+/// Pending relay header parcel rejected. [block number]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct PendingRelayHeaderParcelRejected<T: EthereumRelay> {
+    /// Ethereum Relay Header Id
+    pub relay_header_id: T::RelayHeaderId,
+}
+
 //////
 // Store
 //////
+
+/// Pending Headers Storage
+#[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
+pub struct PendingRelayHeaderParcels<T: EthereumRelay> {
+    #[store(returns = Vec<T::PendingRelayHeaderParcel>)]
+    /// Runtime marker
+    pub _runtime: PhantomData<T>,
+}
 
 /// PendingHeaders Storage
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]

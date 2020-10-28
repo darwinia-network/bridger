@@ -160,7 +160,8 @@ impl Account {
 
 /// Dawrinia API
 pub struct Darwinia {
-    client: Client<DarwiniaRuntime>,
+    /// client
+    pub client: Client<DarwiniaRuntime>,
     /// account
     pub account: Account,
 }
@@ -290,7 +291,6 @@ impl Darwinia {
             None => {
                 Ok(self.client.affirm(&self.account.signer, parcel, None).await?)
             }
-            None => Ok(self.client.affirm(&self.signer, parcel, None).await?),
         }
     }
 
@@ -315,7 +315,6 @@ impl Darwinia {
             None => {
                 Ok(self.client.redeem(&self.account.signer, redeem_for, proof).await?)
             }
-            None => Ok(self.client.redeem(&self.signer, redeem_for, proof).await?),
         }
     }
 

@@ -1,6 +1,6 @@
 use crate::{
     api::{Darwinia, Shadow},
-    service::{EthereumService, GuardService, RedeemService, RelayService, SubscribeService},
+    service::{EthereumService, GuardService, RedeemService, RelayService},
 };
 use crate::{
     listener::Listener,

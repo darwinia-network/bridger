@@ -57,13 +57,15 @@ impl Service for SubscribeService {
 
         // Build subscriber
         let mut sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
-        if let Some(raw) = sub.next().await {
-            if let Ok(event) = raw {
-                match event.module.as_str() {
-                    ETHEREUM_RELAY => relay::handle(event)?,
-                    ETHEREUM_BACKING => backing::handle(event)?,
-                    _ => {}
-                };
+        loop {
+            if let Some(raw) = sub.next().await {
+                if let Ok(event) = raw {
+                    match event.module.as_str() {
+                        ETHEREUM_RELAY => relay::handle(event)?,
+                        ETHEREUM_BACKING => backing::handle(event)?,
+                        _ => {}
+                    };
+                }
             }
         }
 

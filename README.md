@@ -10,6 +10,12 @@ The Darwinia Bridger
 
 ## Installation
 
+### Install using cargo
+
+```
+$ cargo install darwinia-bridger
+```
+
 ### Build from source
 
 ```
@@ -20,17 +26,11 @@ cd ./target/release/
 ./bridger run -v
 ```
 
-### [Outdated]Install from https://crates.io/
-
-```
-$ cargo install darwinia-bridger
-```
-
 ## Usage
 
 ```
 $ bridger
-darwinia-bridger 0.0.15
+darwinia-bridger 0.1.0
 
 USAGE:
     bridger <SUBCOMMAND>

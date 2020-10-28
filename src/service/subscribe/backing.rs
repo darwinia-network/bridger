@@ -7,9 +7,9 @@ use primitives::{
 use substrate_subxt::{sp_core::Decode, RawEvent};
 
 // Attributes
-const REDEEM_DEPOSIT: &str = "redeem_deposit";
-const REDEEM_KTON: &str = "redeem_kton";
-const REDEEM_RING: &str = "redeem_ring";
+const REDEEM_DEPOSIT: &str = "RedeemDeposit";
+const REDEEM_KTON: &str = "RedeemKton";
+const REDEEM_RING: &str = "RedeemRing";
 
 /// Handle the Ethereum Backing Events
 pub fn handle(event: RawEvent) -> Result<()> {

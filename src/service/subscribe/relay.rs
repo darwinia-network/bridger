@@ -12,15 +12,15 @@ use substrate_subxt::{sp_core::Decode, RawEvent};
 
 // Attributes
 const AFFIRMED: &str = "Affirmed";
-const DISPUTED_AND_AFFIRMED: &str = "disputed_and_affirmed";
-const EXTENDED: &str = "extended";
-const GAME_OVER: &str = "game_over";
-const REMOVE_CONFIRMED_PARCEL: &str = "remove_confirmed_parcel";
-const VERIFY_RECEIPT: &str = "verify_receipt";
-const PENDED: &str = "pended";
-const NEW_ROUND: &str = "new_round";
-const PENDING_RELAY_HEADER_PARCEL_APPROVED: &str = "pending_relay_header_parcel_approved";
-const PENDING_RELAY_HEADER_PARCEL_REJECTED: &str = "pending_relay_header_parcel_rejected";
+const DISPUTED_AND_AFFIRMED: &str = "DisputedAndAffirmed";
+const EXTENDED: &str = "Extended";
+const NEW_ROUND: &str = "NewRound";
+const GAME_OVER: &str = "GameOver";
+const REMOVE_CONFIRMED_PARCEL: &str = "RemoveConfirmedParcel";
+const VERIFY_RECEIPT: &str = "VerifyReceipt";
+const PENDED: &str = "Pended";
+const PENDING_RELAY_HEADER_PARCEL_APPROVED: &str = "PendingRelayHeaderParcelApproved";
+const PENDING_RELAY_HEADER_PARCEL_REJECTED: &str = "PendingRelayHeaderParcelRejected";
 
 /// Handle the Ethereum Relayer Game Events
 pub fn handle(event: RawEvent) -> Result<()> {

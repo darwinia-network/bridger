@@ -46,9 +46,21 @@ impl Ord for EthereumTransaction {
     }
 }
 
-/// Transaction pool
+/// Memory Cache
 #[derive(Default)]
-pub struct Pool {
+pub struct MemCache {
+    /// Start ethereum block to scan with
+    pub start: u64,
     /// Ethereum transactions
-    pub ethereum: Vec<EthereumTransaction>,
+    pub txpool: Vec<EthereumTransaction>,
+}
+
+impl MemCache {
+    /// New an instance of the MemCache
+    pub fn new(start: u64) -> Self {
+        MemCache {
+            start,
+            txpool: Vec::new()
+        }
+    }
 }

@@ -3,7 +3,7 @@ use crate::{
     result::Result,
     Config,
     service::{Service, GuardService},
-    pool::Pool,
+    memcache::MemCache,
 };
 use std::sync::{Arc, Mutex};
 
@@ -22,8 +22,8 @@ pub async fn exec() -> Result<()> {
     let mut guard = GuardService::new(&config, shadow, darwinia.clone());
 
     // run guard
-    let pool = Arc::new(Mutex::new(Pool::default()));
-    if let Err(err) = guard.run(pool).await {
+    let cache = Arc::new(Mutex::new(MemCache::new(config.eth.start)));
+    if let Err(err) = guard.run(cache).await {
         error!("{:?}", err);
     }
 

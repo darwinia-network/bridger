@@ -1,6 +1,6 @@
 //! Bridger Listener
 use crate::{
-    pool::Pool,
+    memcache::MemCache,
     result::Result,
     service::Service,
 };
@@ -31,8 +31,8 @@ impl Listener {
     }
 
     /// Start services
-    pub async fn start(&mut self) -> Result<()> {
-        let pool = Arc::new(Mutex::new(Pool::default()));
+    pub async fn start(&mut self, start: u64) -> Result<()> {
+        let pool = Arc::new(Mutex::new(MemCache::new(start)));
         let result = futures::future::join_all(self.0.iter_mut().map(|s| {
             info!("Start service {}", s.name());
             s.run(Arc::clone(&pool))

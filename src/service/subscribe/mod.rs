@@ -3,7 +3,7 @@ use crate::{
     api::{Darwinia, Shadow},
     result::Result as BridgerResult,
     service::Service,
-    Pool,
+    MemCache,
 };
 use async_trait::async_trait;
 use primitives::{
@@ -45,7 +45,7 @@ impl Service for SubscribeService {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, _: Arc<Mutex<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, _: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
         let client = &self.darwinia.client;
         let scratch = client.subscribe_events().await?;
         let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());

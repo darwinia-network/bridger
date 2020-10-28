@@ -9,8 +9,8 @@ mod listener;
 
 pub mod api;
 pub mod cmd;
-pub mod pool;
+pub mod memcache;
 pub mod result;
 pub mod service;
 
-pub use self::{config::Config, listener::Listener, pool::Pool, service::Service};
+pub use self::{config::Config, listener::Listener, memcache::MemCache, service::Service};

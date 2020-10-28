@@ -1,5 +1,5 @@
 //! Bridger Services
-use crate::{pool::Pool, result::Result};
+use crate::{memcache::MemCache, result::Result};
 use async_trait::async_trait;
 use std::sync::{Arc, Mutex};
 
@@ -20,5 +20,5 @@ pub trait Service {
     /// Service name
     fn name<'c>(&self) -> &'c str;
     /// Run target service
-    async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> Result<()>;
+    async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> Result<()>;
 }

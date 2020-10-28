@@ -68,7 +68,5 @@ impl Service for SubscribeService {
                 }
             }
         }
-
-        Ok(())
     }
 }

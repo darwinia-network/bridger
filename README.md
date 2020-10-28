@@ -30,7 +30,7 @@ $ cargo install darwinia-bridger
 
 ```
 $ bridger
-darwinia-bridger 0.0.4
+darwinia-bridger 0.0.15
 
 USAGE:
     bridger <SUBCOMMAND>

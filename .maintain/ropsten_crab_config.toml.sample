@@ -1,5 +1,5 @@
 # darwinia node websocket json-rpc endpoint
-node = 'ws://35.201.137.190:9944'
+node = 'ws://your.darwinia.node:9944'
 
 # private key of relayer, or, private key of proxy
 seed = '//Alice'

@@ -13,7 +13,7 @@ mod guard;
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
 enum Opt {
-    /// Run the bridger
+    /// Run the bridger, this will start `ethereum`, `relay`, `redeem` and `guard` services
     Run {
         /// Config path of bridger
         #[structopt(short, long)]
@@ -28,17 +28,17 @@ enum Opt {
         #[structopt(short, long)]
         block: u64,
     },
-    /// Affirm a target block
+    /// Affirm one target block
     Affirm {
         /// The block number to affirm
         #[structopt(short, long)]
         block: u64,
     },
-    /// Show sudo and technical committee members
+    /// Show sudo and technical committee members' public key
     Keys,
     /// List affirmations from chain
     Affirmations,
-    /// Run guard standalone
+    /// Run `guard` service standalone
     Guard,
 }
 

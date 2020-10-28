@@ -34,3 +34,10 @@ pub struct RelayVotingState<TechnicalMember> {
     /// The current set of technical members that rejected it.
     pub nays: Vec<TechnicalMember>,
 }
+
+impl<TechnicalMember: PartialEq> RelayVotingState<TechnicalMember> {
+    /// contains the vote of the account
+    pub fn contains(&self, account: &TechnicalMember) -> bool {
+        self.ayes.contains(account) || self.nays.contains(account)
+    }
+}

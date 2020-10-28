@@ -5,7 +5,11 @@ use crate::{
     hex,
 };
 use codec::{Decode, Encode};
+
+#[cfg(feature = "runtime")]
 use uint::static_assertions::_core::fmt::Formatter;
+
+#[cfg(feature = "runtime")]
 use substrate_subxt::sp_core::bytes::to_hex;
 
 /// Ethereum EthereumRelayHeaderParcel
@@ -24,6 +28,7 @@ impl EthereumRelayHeaderParcel {
     }
 }
 
+#[cfg(feature = "runtime")]
 impl std::fmt::Display for EthereumRelayHeaderParcel {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let header = &self.header.to_string();

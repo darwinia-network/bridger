@@ -4,7 +4,9 @@ use crate::{
 };
 use codec::{Decode, Encode};
 use std::{fmt::Debug, str::FromStr};
+#[cfg(feature = "runtime")]
 use uint::static_assertions::_core::fmt::Formatter;
+#[cfg(feature = "runtime")]
 use substrate_subxt::sp_core::bytes::to_hex;
 
 /// Raw EthereumHeader from Ethereum rpc
@@ -86,6 +88,7 @@ pub struct EthereumHeader {
     pub hash: Option<[u8; 32]>,
 }
 
+#[cfg(feature = "runtime")]
 impl std::fmt::Display for EthereumHeader {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut msgs = vec![];

@@ -1,6 +1,5 @@
 //! Darwinia API
-use crate::result::Error::Bridger;
-use crate::{pool::EthereumTransaction, result::Result, Config};
+use crate::{memcache::EthereumTransaction, result::{Result, Error::Bridger}, Config};
 use core::marker::PhantomData;
 use primitives::{
     chain::{

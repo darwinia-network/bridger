@@ -2,10 +2,10 @@
 use crate::{
     api::{Darwinia, Shadow},
     config::Config,
-    pool::EthereumTransactionHash,
+    memcache::EthereumTransactionHash,
     result::Result as BridgerResult,
     service::Service,
-    Pool,
+    memcache::MemCache,
 };
 use async_trait::async_trait;
 use primitives::{chain::ethereum::RedeemFor};
@@ -43,24 +43,25 @@ impl Service for RedeemService {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
         loop {
-            if let Ok(mut pool_clone) = pool.try_lock() {
+            if let Ok(mut cache_cloned) = cache.try_lock() {
                 trace!("Looking for redeemable ethereum transactions...");
                 trace!(
                     "Currently we have {} txs might need to be redeemed",
-                    pool_clone.ethereum.len(),
+                    cache_cloned.txpool.len(),
                 );
                 let last = self.darwinia.last_confirmed().await?;
                 let mut redeemed = vec![];
-                for index in 0..pool_clone.ethereum.len() {
-                    if index >= pool_clone.ethereum.len() {
+                for index in 0..cache_cloned.txpool.len() {
+                    if index >= cache_cloned.txpool.len() {
                         break;
                     }
-                    let tx = &pool_clone.ethereum[index];
+                    let tx = &cache_cloned.txpool[index];
 
                     if !self.darwinia.should_redeem(&tx).await? {
                         info!("This ethereum tx {:?} has already been redeemed.", tx.tx_hash);
+                        redeemed.push(index);
 
                         continue;
                     }
@@ -84,8 +85,8 @@ impl Service for RedeemService {
                 }
 
                 // sleep
-                pool_clone.ethereum = pool_clone
-                    .ethereum
+                cache_cloned.txpool = cache_cloned
+                    .txpool
                     .iter()
                     .enumerate()
                     .filter(|(idx, _)| !redeemed.contains(idx))
@@ -95,10 +96,10 @@ impl Service for RedeemService {
                 if !redeemed.is_empty() {
                     trace!(
                         "Currently we have {} txs might need to be redeemed",
-                        pool_clone.ethereum.len(),
+                        cache_cloned.txpool.len(),
                     );
                 }
-                drop(pool_clone);
+                drop(cache_cloned);
             }
 
             tokio::time::delay_for(Duration::from_secs(self.step)).await;

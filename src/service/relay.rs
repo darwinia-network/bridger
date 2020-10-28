@@ -5,7 +5,7 @@ use crate::{
     result::Result as BridgerResult,
     result::Error,
     service::Service,
-    Pool,
+    memcache::MemCache,
 };
 use async_trait::async_trait;
 use std::{
@@ -43,10 +43,10 @@ impl Service for RelayService {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, pool: Arc<Mutex<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
         loop {
-            if let Ok(pool_clone) = pool.try_lock() {
-                let txs = &pool_clone.ethereum;
+            if let Ok(cache_cloned) = cache.try_lock() {
+                let txs = &cache_cloned.txpool;
                 if let Some(max) = txs.iter().max() {
                     let max = max.block.to_owned();
                     if let Err(err) = self.affirm(max + 1).await {
@@ -54,7 +54,7 @@ impl Service for RelayService {
                     };
                 }
 
-                drop(pool_clone);
+                drop(cache_cloned);
             }
 
             // sleep

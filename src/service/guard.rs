@@ -2,16 +2,15 @@
 use crate::{
     api::{Darwinia, Shadow},
     config::Config,
-    result::Result as BridgerResult,
+    result::{Result as BridgerResult, Error::Bridger},
     service::Service,
-    Pool,
+    memcache::MemCache,
 };
 use async_trait::async_trait;
 use std::{
     sync::{Arc, Mutex},
     time::Duration,
 };
-use crate::result::Error::Bridger;
 
 /// Attributes
 const SERVICE_NAME: &str = "GUARD";
@@ -42,7 +41,7 @@ impl Service for GuardService {
         SERVICE_NAME
     }
 
-    async fn run(&mut self, _: Arc<Mutex<Pool>>) -> BridgerResult<()> {
+    async fn run(&mut self, _: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
         self.role_checking().await?;
 
         loop {

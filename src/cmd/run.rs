@@ -68,7 +68,7 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     } else {
         listener.register(guard)?;
     }
-    listener.start().await?;
+    listener.start(config.eth.start).await?;
 
     Ok(())
 }

@@ -352,6 +352,12 @@ impl Darwinia {
                 return true;
             }
         }
+
+        // TODO: Checking the equality of the affirmations
+
+        // TODO: If there is an affirmation with larger block number, then agree and join in the game.
+
+        // TODO: How to play and join the game
         false
     }
 

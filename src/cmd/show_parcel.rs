@@ -1,8 +1,4 @@
-use crate::{
-    api::Shadow,
-    result::Result,
-    Config,
-};
+use crate::{api::Shadow, result::Result, Config};
 use std::sync::Arc;
 
 /// Affirm a faked affirmation
@@ -14,7 +10,7 @@ pub async fn exec(block: u64, json: bool) -> Result<()> {
     let config = Config::new(None)?;
     let shadow = Arc::new(Shadow::new(&config));
 
-    //
+    // Get parcel
     let parcel = shadow.parcel(block as usize).await?;
 
     // print
@@ -23,7 +19,6 @@ pub async fn exec(block: u64, json: bool) -> Result<()> {
     } else {
         println!("{}", parcel);
     }
-
 
     Ok(())
 }

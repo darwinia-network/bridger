@@ -2,10 +2,10 @@
 use crate::{
     api::{Darwinia, Shadow},
     config::Config,
-    result::Result as BridgerResult,
-    result::Error,
-    service::Service,
     memcache::MemCache,
+    result::Error,
+    result::Result as BridgerResult,
+    service::Service,
 };
 use async_trait::async_trait;
 use std::{
@@ -13,6 +13,7 @@ use std::{
     time::Duration,
 };
 use substrate_subxt::sp_core::H256;
+use primitives::chain::ethereum::EthereumHeader;
 
 /// Attributes
 const SERVICE_NAME: &str = "RELAY";
@@ -66,21 +67,16 @@ impl Service for RelayService {
 impl RelayService {
     /// affirm target block
     pub async fn affirm(&mut self, target: u64) -> BridgerResult<H256> {
-        trace!("Prepare to affirm ethereum block: {}", target);
-        let parcel = self.shadow.parcel(target as usize).await?;
-
         // /////////////////////////
         // checking before affirm
         // /////////////////////////
         // 1. last confirmed check
         let last_confirmed = self.darwinia.last_confirmed().await?;
         if target <= last_confirmed {
-            let reason =
-                format!(
-                    "The target block {} is less than the last_confirmed {}",
-                    &target,
-                    &last_confirmed
-                );
+            let reason = format!(
+                "The target block {} is less than the last_confirmed {}",
+                &target, &last_confirmed
+            );
             return Err(Error::Bridger(reason));
         }
 
@@ -104,6 +100,16 @@ impl RelayService {
             }
         }
 
+        trace!("Prepare to affirm ethereum block: {}", target);
+        let parcel = self.shadow.parcel(target as usize).await?;
+
+        if parcel.header == EthereumHeader::default()
+            || parcel.mmr_root == [0u8;32]
+        {
+            let reason = format!("Shadow service failed to provide parcel for block {}", &target);
+            return Err(Error::Bridger(reason));
+        }
+
         // /////////////////////////
         // do affirm
         // /////////////////////////
@@ -111,11 +117,8 @@ impl RelayService {
             Ok(hash) => {
                 info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
                 Ok(hash)
-            },
+            }
             Err(err) => Err(err),
         }
-
     }
-
 }
-

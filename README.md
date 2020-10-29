@@ -30,7 +30,7 @@ cd ./target/release/
 
 ```
 $ bridger
-darwinia-bridger 0.1.1
+darwinia-bridger 0.1.2
 
 USAGE:
     bridger <SUBCOMMAND>
@@ -61,6 +61,8 @@ When you first run subcommand like ```bridger run```, it will generate an ```con
 
 Here is an [sample](./.maintain/ropsten_crab_config.toml.sample) for bridgers which want to work on ropsten-crab bridge.
 You can also read the more docs about the settings in the sample.
+
+If you running for mainet, here is the [mainet sample](./.maintain/mainet_config.toml.sample) for reference.
 
 You will need to prepare several services before using bridger:
 - Darwinia node websocket json-rpc endpoint

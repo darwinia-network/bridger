@@ -1,3 +1,4 @@
+//! Frame Proxy
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use substrate_subxt::{

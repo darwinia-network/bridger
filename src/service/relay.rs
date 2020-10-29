@@ -2,10 +2,10 @@
 use crate::{
     api::{Darwinia, Shadow},
     config::Config,
-    result::Result as BridgerResult,
-    result::Error,
-    service::Service,
     memcache::MemCache,
+    result::Error,
+    result::Result as BridgerResult,
+    service::Service,
 };
 use async_trait::async_trait;
 use std::{
@@ -75,12 +75,10 @@ impl RelayService {
         // 1. last confirmed check
         let last_confirmed = self.darwinia.last_confirmed().await?;
         if target <= last_confirmed {
-            let reason =
-                format!(
-                    "The target block {} is less than the last_confirmed {}",
-                    &target,
-                    &last_confirmed
-                );
+            let reason = format!(
+                "The target block {} is less than the last_confirmed {}",
+                &target, &last_confirmed
+            );
             return Err(Error::Bridger(reason));
         }
 
@@ -111,11 +109,8 @@ impl RelayService {
             Ok(hash) => {
                 info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
                 Ok(hash)
-            },
+            }
             Err(err) => Err(err),
         }
-
     }
-
 }
-

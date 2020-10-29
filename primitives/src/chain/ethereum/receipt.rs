@@ -1,10 +1,11 @@
 //! Ethereum receipt
 use crate::{
+    array::{H1024, U256},
     bytes,
     chain::ethereum::{EthereumHeader, EthereumHeaderJson, MMRProof, MMRProofJson},
     hex,
 };
-use codec::Encode;
+use codec::{Decode, Encode};
 use serde::Deserialize;
 
 /// Redeem for
@@ -106,4 +107,39 @@ impl Into<EthereumReceiptProofThing> for EthereumReceiptProofThingJson {
             mmr_proof: self.mmr_proof.into(),
         }
     }
+}
+
+/// Ethereum receipt log entry
+#[derive(Clone, PartialEq, Eq, Encode, Decode, Debug)]
+pub struct LogEntry {
+    /// The address of the contract executing at the point of the `LOG` operation.
+    pub address: [u8; 20],
+    /// The topics associated with the `LOG` operation.
+    pub topics: Vec<[u8; 32]>,
+    /// The data associated with the `LOG` operation.
+    pub data: Vec<u8>,
+}
+
+/// Ethereum receipt transaction out come
+#[derive(Clone, PartialEq, Eq, Encode, Decode, Debug)]
+pub enum TransactionOutcome {
+    /// Status and state root are unknown under EIP-98 rules.
+    Unknown,
+    /// State root is known. Pre EIP-98 and EIP-658 rules.
+    StateRoot([u8; 32]),
+    /// Status code is known. EIP-658 rules.
+    StatusCode(u8),
+}
+
+/// Ethereum Receipt
+#[derive(Clone, PartialEq, Eq, Encode, Decode, Debug)]
+pub struct EthereumReceipt {
+    /// The total gas used in the block following execution of the transaction.
+    pub gas_used: U256,
+    /// The OR-wide combination of all logs' blooms for this transaction.
+    pub log_bloom: H1024,
+    /// The logs stemming from this transaction.
+    pub logs: Vec<LogEntry>,
+    /// Transaction outcome.
+    pub outcome: TransactionOutcome,
 }

@@ -1,8 +1,11 @@
 //! Darwinia shadow API
 use crate::{result::Result, Config};
-use primitives::chain::ethereum::{
-    EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
-    EthereumRelayHeaderParcelJson, EthereumRelayProofs, EthereumRelayProofsJson,
+use primitives::{
+    chain::ethereum::{
+        EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
+        EthereumRelayProofs, EthereumRelayProofsJson, MMRRoot, MMRRootJson,
+    },
+    rpc::{EthereumRPC, RPC},
 };
 use reqwest::Client;
 use serde::Serialize;
@@ -20,6 +23,8 @@ struct Proposal {
 pub struct Shadow {
     /// Shadow API
     pub api: String,
+    /// Ethereum API
+    pub eth: String,
     /// HTTP Client
     pub http: Client,
 }
@@ -29,8 +34,40 @@ impl Shadow {
     pub fn new(config: &Config) -> Shadow {
         Shadow {
             api: config.shadow.clone(),
+            eth: config.eth.rpc.clone(),
             http: Client::new(),
         }
+    }
+
+    /// Get mmr
+    ///
+    /// ```
+    /// use darwinia_bridger::api::Shadow;
+    /// use reqwest::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///   let client = Client::new();
+    ///   let shadow = Shadow {
+    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
+    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///      http: client,
+    ///   };
+    ///
+    ///   // Get the HeaderParcel of block 42
+    ///   shadow.parcel(42).await.unwrap();
+    /// }
+    /// ```
+    pub async fn mmr(&self, number: usize) -> Result<MMRRoot> {
+        let json: MMRRootJson = self
+            .http
+            .get(&format!("{}/ethereum/mmr_root/{}", &self.api, number))
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(json.into())
     }
 
     /// Get HeaderParcel
@@ -43,7 +80,8 @@ impl Shadow {
     /// async fn main() {
     ///   let client = Client::new();
     ///   let shadow = Shadow {
-    ///      api: "https://testnet.shadow.darwinia.network".to_string(),
+    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
+    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
     ///      http: client,
     ///   };
     ///
@@ -52,15 +90,15 @@ impl Shadow {
     /// }
     /// ```
     pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
-        let json: EthereumRelayHeaderParcelJson = self
-            .http
-            .get(&format!("{}/ethereum/parcel/{}", &self.api, number))
-            .send()
-            .await?
-            .json()
+        let mmr_root = self.mmr(number).await?;
+        let header = EthereumRPC::new(&self.http, &self.eth)
+            .get_header_by_number(number as u64)
             .await?;
 
-        Ok(json.into())
+        Ok(EthereumRelayHeaderParcel {
+            header,
+            mmr_root: mmr_root.mmr_root,
+        })
     }
 
     /// Get Receipt
@@ -74,6 +112,7 @@ impl Shadow {
     ///   let client = Client::new();
     ///   let shadow = Shadow {
     ///      api: "https://testnet.shadow.darwinia.network".to_string(),
+    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
     ///      http: client,
     ///   };
     ///
@@ -104,6 +143,7 @@ impl Shadow {
     ///   let client = Client::new();
     ///   let shadow = Shadow {
     ///      api: "https://testnet.shadow.darwinia.network".to_string(),
+    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
     ///      http: client,
     ///   };
     ///

@@ -682,7 +682,7 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridge-primitives"
-version = "0.1.1"
+version = "0.1.2-alpha.0"
 dependencies = [
  "async-trait",
  "frame-support",
@@ -700,7 +700,7 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridger"
-version = "0.1.1"
+version = "0.1.2-alpha.0"
 dependencies = [
  "async-trait",
  "darwinia-bridge-primitives",

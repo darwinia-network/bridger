@@ -107,8 +107,7 @@ impl RelayService {
         trace!("Prepare to affirm ethereum block: {}", target);
         let parcel = self.shadow.parcel(target as usize).await?;
 
-        if parcel == EthereumRelayHeaderParcel::default()
-            || parcel.header == EthereumHeader::default()
+        if parcel.header == EthereumHeader::default()
             || parcel.mmr_root == [0u8;32]
         {
             let reason = format!("Shadow service failed to provide parcel for block {}", &target);

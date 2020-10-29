@@ -1,0 +1,53 @@
+name: Publish
+
+on:
+  push:
+    tags: ["*"]
+
+jobs:
+  publish-on-crates-io:
+    name: Publish on crates.io
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: release # Use subdir to make sure git workspace clean
+          fetch-depth: 0
+
+      - uses: actions/checkout@v2
+        with:
+          repository: itering/actions
+          path: .github/actions
+          persist-credentials: false
+          ssh-key: "${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}"
+
+      - name: Assert the versions have been bumped
+        run: |
+          cd release
+          cargo install toml-cli
+
+          V_GIT_TAG=${GITHUB_REF#refs/tags/v}
+          V_BRIDGER=$(    toml get Cargo.toml package.version            | jq -r . )
+          V_PRIMITIVES=$( toml get primitives/Cargo.toml package.version | jq -r . )
+
+          test -n "$V_GIT_TAG"
+          test "$V_GIT_TAG" = "$V_BRIDGER"
+          test "$V_GIT_TAG" = "$V_PRIMITIVES"
+
+      - name: Publish primitives
+        run: |
+          cd release/primitives
+          cargo publish --token "${{ secrets.CRATES_IO_TOKEN }}"
+
+      - name: Wait 60s for primitives becomes available
+        run: sleep 60
+
+      - name: Publish bridger
+        run: |
+          cd release
+          cargo publish --token "${{ secrets.CRATES_IO_TOKEN }}"
+
+      - uses: ./.github/actions/dingtalk-notify
+        if: failure()
+        with:
+          dingtalk_bot_token: ${{ secrets.DINGTALK_BOT_TOKEN }}

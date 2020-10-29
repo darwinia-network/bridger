@@ -10,7 +10,7 @@ mod receipt;
 pub use self::{
     ethash::{EthashProof, EthashProofJson},
     header::{EthereumHeader, EthereumHeaderJson, EthereumHeaderRPC},
-    mmr::{MMRProof, MMRProofJson},
+    mmr::{MMRProof, MMRProofJson, MMRRoot, MMRRootJson},
     parcel::{EthereumRelayHeaderParcel, EthereumRelayHeaderParcelJson},
     proof::{EthereumRelayProofs, EthereumRelayProofsJson},
     receipt::{

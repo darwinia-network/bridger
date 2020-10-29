@@ -1,8 +1,11 @@
 //! Darwinia shadow API
 use crate::{result::Result, Config};
-use primitives::chain::ethereum::{
-    EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
-    EthereumRelayHeaderParcelJson, EthereumRelayProofs, EthereumRelayProofsJson,
+use primitives::{
+    chain::ethereum::{
+        EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
+        EthereumRelayProofs, EthereumRelayProofsJson, MMRRoot, MMRRootJson,
+    },
+    rpc::{EthereumRPC, RPC},
 };
 use reqwest::Client;
 use serde::Serialize;
@@ -20,6 +23,8 @@ struct Proposal {
 pub struct Shadow {
     /// Shadow API
     pub api: String,
+    /// Ethereum API
+    pub eth: String,
     /// HTTP Client
     pub http: Client,
 }
@@ -29,8 +34,26 @@ impl Shadow {
     pub fn new(config: &Config) -> Shadow {
         Shadow {
             api: config.shadow.clone(),
+            eth: config.eth.rpc.clone(),
             http: Client::new(),
         }
+    }
+
+    /// Get mmr root
+    ///
+    /// TODO: test
+    ///
+    /// Could not write test because the new shadow hasn't been deploy
+    pub async fn mmr(&self, number: usize) -> Result<MMRRoot> {
+        let json: MMRRootJson = self
+            .http
+            .get(&format!("{}/ethereum/mmr/{}", &self.api, number))
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(json.into())
     }
 
     /// Get HeaderParcel
@@ -52,15 +75,15 @@ impl Shadow {
     /// }
     /// ```
     pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
-        let json: EthereumRelayHeaderParcelJson = self
-            .http
-            .get(&format!("{}/ethereum/parcel/{}", &self.api, number))
-            .send()
-            .await?
-            .json()
+        let mmr_root = self.mmr(number).await?;
+        let header = EthereumRPC::new(&self.http, &self.eth)
+            .get_header_by_number(number as u64)
             .await?;
 
-        Ok(json.into())
+        Ok(EthereumRelayHeaderParcel {
+            header,
+            mmr_root: mmr_root.mmr_root,
+        })
     }
 
     /// Get Receipt

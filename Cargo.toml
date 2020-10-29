@@ -51,7 +51,7 @@ features = ["full"]
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"
 path = "./primitives"
-features = ["runtime"]
+features = ["runtime", "rpc"]
 
 [dependencies.serde]
 package = "serde"

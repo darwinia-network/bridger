@@ -100,6 +100,8 @@ impl Service for RedeemService {
                     );
                 }
                 drop(cache_cloned);
+            } else {
+                error!("try_lock failed");
             }
 
             tokio::time::delay_for(Duration::from_secs(self.step)).await;

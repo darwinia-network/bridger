@@ -51,17 +51,19 @@ impl Service for GuardService {
             trace!("Checking pending headers...");
             let pending_headers = self.darwinia.pending_headers().await?;
             for pending in pending_headers {
-                let pending_parcel = pending.1;
-                let pending_block_number: u64 = pending_parcel.header.number;
-                let parcel = self.shadow.parcel(pending_block_number as usize).await?;
+                if !self.darwinia.account.has_voted(pending.2) {
+                    let pending_parcel = pending.1;
+                    let pending_block_number: u64 = pending_parcel.header.number;
+                    let parcel = self.shadow.parcel(pending_block_number as usize).await?;
 
-                if parcel.is_same_as(&pending_parcel) {
-                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
-                    info!("Voted to approve {}", pending_block_number);
-                } else {
-                    self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
-                    info!("Voted to reject {}", pending_block_number);
-                };
+                    if parcel.is_same_as(&pending_parcel) {
+                        self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
+                        info!("Voted to approve {}", pending_block_number);
+                    } else {
+                        self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
+                        info!("Voted to reject {}", pending_block_number);
+                    };
+                }
             }
 
             tokio::time::delay_for(Duration::from_secs(self.step)).await;

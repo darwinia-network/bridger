@@ -7,7 +7,7 @@ use crate::{
 use std::sync::Arc;
 
 /// Affirm
-pub async fn exec(target_block_number: u64) -> Result<()> {
+pub async fn exec(block: u64) -> Result<()> {
     std::env::set_var("RUST_LOG", "info,darwinia_bridger");
     env_logger::init();
 
@@ -21,7 +21,7 @@ pub async fn exec(target_block_number: u64) -> Result<()> {
     let mut relay_service = RelayService::new(&config, shadow.clone(), darwinia.clone());
 
     // affirm
-    if let Err(err) = relay_service.affirm(target_block_number).await {
+    if let Err(err) = relay_service.affirm(block).await {
         error!("{:?}", err);
     }
 

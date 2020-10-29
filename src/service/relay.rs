@@ -13,9 +13,7 @@ use std::{
     time::Duration,
 };
 use substrate_subxt::sp_core::H256;
-use primitives::chain::ethereum::{
-    EthereumHeader, EthereumRelayHeaderParcel,
-};
+use primitives::chain::ethereum::EthereumHeader;
 
 /// Attributes
 const SERVICE_NAME: &str = "RELAY";

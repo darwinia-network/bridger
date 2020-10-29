@@ -1,0 +1,11 @@
+[Unit]
+Description=Darwinia relayer client and watchtower in rust
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/bridger
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

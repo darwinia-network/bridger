@@ -14,7 +14,7 @@ pub use self::{
     parcel::{EthereumRelayHeaderParcel, EthereumRelayHeaderParcelJson},
     proof::{EthereumRelayProofs, EthereumRelayProofsJson},
     receipt::{
-        EthereumReceiptProof, EthereumReceiptProofJson, EthereumReceiptProofThing,
+        EthereumReceipt, EthereumReceiptProof, EthereumReceiptProofJson, EthereumReceiptProofThing,
         EthereumReceiptProofThingJson, RedeemFor,
     },
 };

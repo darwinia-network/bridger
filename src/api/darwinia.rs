@@ -1,5 +1,5 @@
 //! Darwinia API
-use crate::{memcache::EthereumTransaction, result::Result, Config};
+use crate::{memcache::EthereumTransaction, result::{Result, Error::Bridger}, Config};
 use core::marker::PhantomData;
 use primitives::{
     chain::{
@@ -7,33 +7,28 @@ use primitives::{
         proxy_type::ProxyType, RelayVotingState,
     },
     frame::{
-        technical_committee::MembersStoreExt,
         ethereum::{
-            backing::{RedeemCallExt, VerifiedProofStoreExt, Redeem},
+            backing::{Redeem, RedeemCallExt, VerifiedProofStoreExt},
             game::{AffirmationsStoreExt, EthereumRelayerGame},
             relay::{
-                AffirmCallExt, ConfirmedBlockNumbersStoreExt,
-                SetConfirmedParcel, PendingRelayHeaderParcelsStoreExt,
-                Affirm,
-                EthereumRelay,
+                Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
+                PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
                 VotePendingRelayHeaderParcelCallExt,
                 VotePendingRelayHeaderParcel,
             },
         },
-        sudo::{KeyStoreExt, SudoCallExt},
         proxy::ProxyCallExt,
+        sudo::{KeyStoreExt, SudoCallExt},
+        technical_committee::MembersStoreExt,
     },
     runtime::DarwiniaRuntime,
 };
 use sp_keyring::sr25519::sr25519::Pair;
+use std::collections::HashMap;
 use substrate_subxt::{
-    sp_core::Pair as PairTrait,
-    Client, ClientBuilder, PairSigner,
-    system::System,
+    sp_core::Pair as PairTrait, system::System, Client, ClientBuilder, PairSigner,
 };
 use web3::types::H256;
-use std::collections::HashMap;
-use crate::result::Error::Bridger;
 
 // Types
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
@@ -173,7 +168,8 @@ impl Account {
 
 /// Dawrinia API
 pub struct Darwinia {
-    client: Client<DarwiniaRuntime>,
+    /// client
+    pub client: Client<DarwiniaRuntime>,
     /// account
     pub account: Account,
 }
@@ -185,7 +181,6 @@ impl Darwinia {
             .set_url(&config.node)
             .build()
             .await?;
-
 
         let account = Account::new(
             config.seed.clone(),
@@ -354,5 +349,4 @@ impl Darwinia {
         }
         false
     }
-
 }

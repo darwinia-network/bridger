@@ -46,7 +46,7 @@ impl Service for RedeemService {
     async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
         loop {
             if let Ok(mut cache_cloned) = cache.try_lock() {
-                trace!("Looking for redeemable ethereum transactions...");
+                trace!("Heartbeat>>>Looking for redeemable ethereum transactions...");
                 trace!(
                     "Currently we have {} txs might need to be redeemed",
                     cache_cloned.txpool.len(),

@@ -1,9 +1,13 @@
-use crate::{listener::Listener, result::{Result, Error}, Config};
-use std::path::PathBuf;
 use crate::{
     api::{Darwinia, Shadow},
-    service::{EthereumService, GuardService, RedeemService, RelayService},
+    service::{EthereumService, GuardService, RedeemService, RelayService, SubscribeService},
 };
+use crate::{
+    listener::Listener,
+    result::{Error, Result},
+    Config,
+};
+use std::path::PathBuf;
 use std::sync::Arc;
 use web3::transports::http::Http;
 
@@ -34,7 +38,8 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     let ethereum = <EthereumService<Http>>::new_http(&config)?;
     let relay = RelayService::new(&config, shadow.clone(), darwinia.clone());
     let redeem = RedeemService::new(&config, shadow.clone(), darwinia.clone());
-    let guard = GuardService::new(&config, shadow, darwinia.clone());
+    let guard = GuardService::new(&config, shadow.clone(), darwinia.clone());
+    let subscribe = SubscribeService::new(shadow, darwinia.clone());
 
     // Startup infomations
     info!("🔗 Connect to");
@@ -46,11 +51,10 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     match &darwinia.account.real {
         None => {
             info!("🧔 Relayer({:?}): 0x{:?}", roles, account_id);
-        },
+        }
         Some(real_account_id) => {
             info!("🧔 Proxy Relayer: 0x{:?}", account_id);
             info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
-
         }
     }
     info!("🌱 Relay from ethereum block: {}", config.eth.start);
@@ -60,6 +64,7 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     listener.register(ethereum)?;
     listener.register(relay)?;
     listener.register(redeem)?;
+    listener.register(subscribe)?;
     if let Err(err) = guard.role_checking().await {
         warn!("{}", err.to_string());
     } else {

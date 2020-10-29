@@ -2,5 +2,7 @@ use darwinia_bridger::cmd;
 
 #[tokio::main]
 async fn main() {
-    cmd::exec().await.unwrap();
+    if let Ok(err) = cmd::exec().await {
+        log::error!("{:?}", err);
+    }
 }

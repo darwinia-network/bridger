@@ -47,7 +47,7 @@ impl Shadow {
     pub async fn mmr(&self, number: usize) -> Result<MMRRoot> {
         let json: MMRRootJson = self
             .http
-            .get(&format!("{}/ethereum/mmr/{}", &self.api, number))
+            .get(&format!("{}/ethereum/mmr_root/{}", &self.api, number))
             .send()
             .await?
             .json()

@@ -13,6 +13,7 @@ use std::{
     time::Duration,
 };
 use substrate_subxt::sp_core::H256;
+use primitives::chain::ethereum::EthereumHeader;
 
 /// Attributes
 const SERVICE_NAME: &str = "RELAY";
@@ -66,9 +67,6 @@ impl Service for RelayService {
 impl RelayService {
     /// affirm target block
     pub async fn affirm(&mut self, target: u64) -> BridgerResult<H256> {
-        trace!("Prepare to affirm ethereum block: {}", target);
-        let parcel = self.shadow.parcel(target as usize).await?;
-
         // /////////////////////////
         // checking before affirm
         // /////////////////////////
@@ -100,6 +98,16 @@ impl RelayService {
                     return Err(Error::Bridger(reason));
                 }
             }
+        }
+
+        trace!("Prepare to affirm ethereum block: {}", target);
+        let parcel = self.shadow.parcel(target as usize).await?;
+
+        if parcel.header == EthereumHeader::default()
+            || parcel.mmr_root == [0u8;32]
+        {
+            let reason = format!("Shadow service failed to provide parcel for block {}", &target);
+            return Err(Error::Bridger(reason));
         }
 
         // /////////////////////////

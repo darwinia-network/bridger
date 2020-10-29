@@ -1,8 +1,14 @@
 # darwinia node websocket json-rpc endpoint
-node = 'ws://your.darwinia.node:9944'
+node = 'ws://<YOUR_DARWINIA_NODE_URL>'
 
 # private key of relayer, or, private key of proxy
-seed = '//Alice'
+seed = '<YOUR_SEED>'
+
+# allowing `real` account to give permission to `proxy` account to dispatch calls
+# The account (32 bytes) that the proxy will make a call on behalf of
+# Disable proxy by remove or comment
+# [proxy]
+# real = '<YOUR_REAL_PUBLIC_KEY>'
 
 # shadow http restful endpoint, refer https://github.com/darwinia-network/shadow
 shadow = 'https://testnet.shadow.darwinia.network'
@@ -37,17 +43,10 @@ topics = []
 
 [step]
 # ethereum service polling interval in seconds
-ethereum = 30
+ethereum = 120
 # relay service polling interval in seconds
 relay = 60
 # redeem service polling interval in seconds
-redeem = 90
+redeem = 150
 # guard service polling interval in seconds
 guard = 30
-
-# allowing `real` account to give permission to `proxy` account to dispatch calls
-# The account (32 bytes) that the proxy will make a call on behalf of
-# Disable proxy by remove or comment
-
-# [proxy]
-# real = '0x4ee6172cb89e63801666c174eeedc51e9abe7e5823d31d1715c814138c0e4d7a'

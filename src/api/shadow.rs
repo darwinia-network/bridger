@@ -39,11 +39,25 @@ impl Shadow {
         }
     }
 
-    /// Get mmr root
+    /// Get mmr
     ///
-    /// TODO: test
+    /// ```
+    /// use darwinia_bridger::api::Shadow;
+    /// use reqwest::Client;
     ///
-    /// Could not write test because the new shadow hasn't been deploy
+    /// #[tokio::main]
+    /// async fn main() {
+    ///   let client = Client::new();
+    ///   let shadow = Shadow {
+    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
+    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///      http: client,
+    ///   };
+    ///
+    ///   // Get the HeaderParcel of block 42
+    ///   shadow.parcel(42).await.unwrap();
+    /// }
+    /// ```
     pub async fn mmr(&self, number: usize) -> Result<MMRRoot> {
         let json: MMRRootJson = self
             .http
@@ -66,7 +80,8 @@ impl Shadow {
     /// async fn main() {
     ///   let client = Client::new();
     ///   let shadow = Shadow {
-    ///      api: "https://testnet.shadow.darwinia.network".to_string(),
+    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
+    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
     ///      http: client,
     ///   };
     ///
@@ -97,6 +112,7 @@ impl Shadow {
     ///   let client = Client::new();
     ///   let shadow = Shadow {
     ///      api: "https://testnet.shadow.darwinia.network".to_string(),
+    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
     ///      http: client,
     ///   };
     ///
@@ -127,6 +143,7 @@ impl Shadow {
     ///   let client = Client::new();
     ///   let shadow = Shadow {
     ///      api: "https://testnet.shadow.darwinia.network".to_string(),
+    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
     ///      http: client,
     ///   };
     ///

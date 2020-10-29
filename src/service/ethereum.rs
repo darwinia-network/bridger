@@ -138,6 +138,7 @@ impl<T: Transport> EthereumService<T> {
         Ok(txs)
     }
 }
+
 #[async_trait(?Send)]
 impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
     fn name<'e>(&self) -> &'e str {

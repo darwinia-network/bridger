@@ -1,7 +1,37 @@
 use codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
-/// MMR Proof Json
+/// Single MMR struct
+#[derive(Clone, Decode, Debug, Encode, Default, PartialEq, Eq)]
+pub struct MMRRoot {
+    /// MMR Root
+    pub mmr_root: [u8; 32],
+}
+
+/// MMR Root Json
+#[derive(Clone, Debug, Decode, Encode, Default, Serialize, Deserialize, PartialEq, Eq)]
+pub struct MMRRootJson {
+    /// MMR root string
+    pub mmr_root: String,
+}
+
+impl Into<MMRRoot> for MMRRootJson {
+    fn into(self) -> MMRRoot {
+        MMRRoot {
+            mmr_root: bytes!(self.mmr_root.as_str(), 32),
+        }
+    }
+}
+
+impl Into<MMRRootJson> for MMRRoot {
+    fn into(self) -> MMRRootJson {
+        MMRRootJson {
+            mmr_root: hex!(&self.mmr_root),
+        }
+    }
+}
+
+/// MMR Proof
 #[derive(Clone, Decode, Debug, Encode, Default, PartialEq, Eq)]
 pub struct MMRProof {
     /// The index of member leaf

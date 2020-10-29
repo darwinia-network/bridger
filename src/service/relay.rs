@@ -56,6 +56,8 @@ impl Service for RelayService {
                 }
 
                 drop(cache_cloned);
+            } else {
+                error!("try_lock failed");
             }
 
             // sleep

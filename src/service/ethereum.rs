@@ -169,6 +169,8 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
                 cache_cloned.txpool.append(&mut txs);
                 cache_cloned.start = block_number;
                 drop(cache_cloned);
+            } else {
+                error!("try_lock failed");
             }
 
             tokio::time::delay_for(Duration::from_secs(self.step)).await;

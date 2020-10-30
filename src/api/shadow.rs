@@ -43,7 +43,7 @@ impl Shadow {
     ///
     /// ```
     /// use darwinia_bridger::api::Shadow;
-    /// use darwinia_bridge_primitives::rpc::ethereum::EthereumRPC;
+    /// use primitives::rpc::ethereum::EthereumRPC;
     /// use reqwest::Client;
     ///
     /// #[tokio::main]
@@ -83,7 +83,7 @@ impl Shadow {
     ///
     /// ```
     /// use darwinia_bridger::api::Shadow;
-    /// use darwinia_bridge_primitives::rpc::ethereum::EthereumRPC;
+    /// use primitives::rpc::ethereum::EthereumRPC;
     /// use reqwest::Client;
     ///
     /// #[tokio::main]
@@ -121,7 +121,7 @@ impl Shadow {
     ///
     /// ```
     /// use darwinia_bridger::api::Shadow;
-    /// use darwinia_bridge_primitives::rpc::ethereum::EthereumRPC;
+    /// use primitives::rpc::ethereum::EthereumRPC;
     /// use reqwest::Client;
     ///
     /// #[tokio::main]
@@ -161,7 +161,7 @@ impl Shadow {
     ///
     /// ```
     /// use darwinia_bridger::api::Shadow;
-    /// use darwinia_bridge_primitives::rpc::ethereum::EthereumRPC;
+    /// use primitives::rpc::ethereum::EthereumRPC;
     /// use reqwest::Client;
     ///
     /// #[tokio::main]

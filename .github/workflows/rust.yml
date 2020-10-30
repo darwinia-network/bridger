@@ -20,8 +20,8 @@ jobs:
           rustup update
           rustup component add clippy
       - name: Build
-        run: cargo build --all --all-features --all-targets --verbose
+        run: cargo build --all --verbose
       - name: Lint
-        run: cargo clippy --all --all-features --all-targets -- -D warnings
+        run: cargo clippy --all -- -D warnings
       - name: Run tests
-        run: cargo test --all --all-features --all-targets --verbose
+        run: cargo test --all --verbose

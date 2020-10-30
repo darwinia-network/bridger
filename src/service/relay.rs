@@ -47,15 +47,18 @@ impl Service for RelayService {
     async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
         loop {
             if let Ok(cache_cloned) = cache.try_lock() {
+                trace!("Heartbeat>>>");
                 let txs = &cache_cloned.txpool;
                 if let Some(max) = txs.iter().max() {
                     let max = max.block.to_owned();
                     if let Err(err) = self.affirm(max + 1).await {
-                        error!("{:?}", err);
+                        trace!("{:?}", err);
                     };
                 }
 
                 drop(cache_cloned);
+            } else {
+                error!("try_lock failed");
             }
 
             // sleep

@@ -149,26 +149,36 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         let eth = self.web3.eth();
 
         loop {
+            trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions...");
+            let block_number = eth.block_number().await?.as_u64();
+            let mut start = u64::MAX;
+
+            if let Ok(cache_cloned) = cache.try_lock() {
+                start = cache_cloned.start;
+                drop(cache_cloned);
+            } else {
+                error!("try_lock failed");
+            }
+
+            if block_number == start || start == u64::MAX{
+                tokio::time::delay_for(Duration::from_secs(self.step)).await;
+                continue;
+            }
+
+            let mut txs = self.scan(start, block_number).await?;
+            if !txs.is_empty() {
+                info!("Found {} txs from {} to {}", txs.len(), start, block_number);
+                for tx in &txs {
+                    trace!("\t{:?}", &tx.tx_hash);
+                }
+            }
+
             if let Ok(mut cache_cloned) = cache.try_lock() {
-                trace!("Scanning on ethereum for new cross-chain transactions...");
-                let block_number = eth.block_number().await?.as_u64();
-                let start = cache_cloned.start;
-                if block_number == start {
-                    tokio::time::delay_for(Duration::from_secs(self.step)).await;
-                    continue;
-                }
-
-                let mut txs = self.scan(start, block_number).await?;
-                if !txs.is_empty() {
-                    info!("Found {} txs from {} to {}", txs.len(), start, block_number);
-                    for tx in &txs {
-                        trace!("\t{:?}", &tx.tx_hash);
-                    }
-                }
-
                 cache_cloned.txpool.append(&mut txs);
                 cache_cloned.start = block_number;
                 drop(cache_cloned);
+            } else {
+                error!("try_lock failed");
             }
 
             tokio::time::delay_for(Duration::from_secs(self.step)).await;

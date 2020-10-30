@@ -10,18 +10,18 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 pub use self::{block::EthBlockNumberResp, header::EthHeaderRPCResp};
 
 /// Ethereum rpc set
-pub struct EthereumRPC<'r> {
+pub struct EthereumRPC {
     /// Reqwest client
-    pub client: &'r Client,
+    pub client: Client,
     /// Rpc host
-    pub rpc: Vec<&'r str>,
+    pub rpc: Vec<String>,
     /// Counter
     pub atom: AtomicUsize,
 }
 
-impl<'r> EthereumRPC<'r> {
+impl EthereumRPC {
     /// New EthereumRPC
-    pub fn new(client: &'r Client, rpc: Vec<&'r str>) -> Self {
+    pub fn new(client: Client, rpc: Vec<String>) -> Self {
         EthereumRPC {
             client,
             rpc,
@@ -30,19 +30,19 @@ impl<'r> EthereumRPC<'r> {
     }
 
     /// Generate random RPC
-    pub fn rpc(&self) -> &'r str {
+    pub fn rpc<'r>(&self) -> &str {
         self.atom.fetch_add(1, Ordering::SeqCst);
-        self.rpc[self.atom.load(Ordering::SeqCst) % self.rpc.len()]
+        &self.rpc[self.atom.load(Ordering::SeqCst) % self.rpc.len()]
     }
 }
 
 #[async_trait]
-impl<'r> RPC for EthereumRPC<'r> {
+impl RPC for EthereumRPC {
     type Header = EthereumHeader;
 
     async fn get_header_by_number(&self, block: u64) -> Result<Self::Header> {
         Ok(
-            header::EthHeaderRPCResp::get(self.client, self.rpc(), block)
+            header::EthHeaderRPCResp::get(&self.client, &self.rpc(), block)
                 .await?
                 .result
                 .into(),
@@ -51,7 +51,7 @@ impl<'r> RPC for EthereumRPC<'r> {
 
     async fn get_header_by_hash(&self, block: &str) -> Result<Self::Header> {
         Ok(
-            header::EthHeaderRPCResp::get_by_hash(self.client, self.rpc(), block)
+            header::EthHeaderRPCResp::get_by_hash(&self.client, &self.rpc(), block)
                 .await?
                 .result
                 .into(),
@@ -59,6 +59,6 @@ impl<'r> RPC for EthereumRPC<'r> {
     }
 
     async fn block_number(&self) -> Result<u64> {
-        block::block_number(self.client, self.rpc()).await
+        block::block_number(&self.client, &self.rpc()).await
     }
 }

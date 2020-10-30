@@ -19,12 +19,11 @@ struct Proposal {
 }
 
 /// Shadow API
-#[derive(Debug)]
 pub struct Shadow {
     /// Shadow API
     pub api: String,
-    /// Ethereum API
-    pub eth: Vec<String>,
+    /// Ethereum RPC
+    pub eth: EthereumRPC,
     /// HTTP Client
     pub http: Client,
 }
@@ -32,10 +31,11 @@ pub struct Shadow {
 impl Shadow {
     /// Init Shadow API from config
     pub fn new(config: &Config) -> Shadow {
+        let http = Client::new();
         Shadow {
             api: config.shadow.clone(),
-            eth: vec![config.eth.rpc.clone()],
-            http: Client::new(),
+            eth: EthereumRPC::new(http.clone(), vec![config.eth.rpc.clone()]),
+            http,
         }
     }
 
@@ -91,9 +91,7 @@ impl Shadow {
     /// ```
     pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
         let mmr_root = self.mmr(number).await?;
-        let header = EthereumRPC::new(&self.http, self.eth.iter().map(|s| s.as_ref()).collect())
-            .get_header_by_number(number as u64)
-            .await?;
+        let header = self.eth.get_header_by_number(number as u64).await?;
 
         Ok(EthereumRelayHeaderParcel {
             header,

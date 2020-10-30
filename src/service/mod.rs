@@ -10,15 +10,15 @@ mod relay;
 mod subscribe;
 
 pub use self::{
-    ethereum::EthereumService, guard::GuardService, redeem::RedeemService, relay::RelayService,
-    subscribe::SubscribeService,
+	ethereum::EthereumService, guard::GuardService, redeem::RedeemService, relay::RelayService,
+	subscribe::SubscribeService,
 };
 
 /// Bridge service
 #[async_trait(?Send)]
 pub trait Service {
-    /// Service name
-    fn name<'c>(&self) -> &'c str;
-    /// Run target service
-    async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> Result<()>;
+	/// Service name
+	fn name<'c>(&self) -> &'c str;
+	/// Run target service
+	async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> Result<()>;
 }

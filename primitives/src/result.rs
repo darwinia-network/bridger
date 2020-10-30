@@ -1,9 +1,9 @@
 //! Bridge Result
 use std::{
-    error::Error as ErrorTrait,
-    fmt::{Display, Formatter, Result as FmtResult},
-    io::Error as Io,
-    result::Result as StdResult,
+	error::Error as ErrorTrait,
+	fmt::{Display, Formatter, Result as FmtResult},
+	io::Error as Io,
+	result::Result as StdResult,
 };
 
 #[cfg(feature = "rpc")]
@@ -14,9 +14,9 @@ use serde_json::Error as SerdeJson;
 /// The custom bridger error
 pub struct Bridge(String);
 impl Display for Bridge {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        f.write_str(&self.0)
-    }
+	fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+		f.write_str(&self.0)
+	}
 }
 
 /// Error generator
@@ -51,12 +51,12 @@ macro_rules! error {
 }
 
 error! {
-    Io,
-    Bridge,
-    #[cfg(feature = "rpc")]
-    Reqwest,
-    #[cfg(feature = "rpc")]
-    SerdeJson
+	Io,
+	Bridge,
+	#[cfg(feature = "rpc")]
+	Reqwest,
+	#[cfg(feature = "rpc")]
+	SerdeJson
 }
 
 /// Sup Result

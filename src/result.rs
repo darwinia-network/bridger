@@ -4,10 +4,10 @@ use primitives::result::Error as Primitives;
 use reqwest::Error as Reqwest;
 use serde_json::Error as SerdeJson;
 use std::{
-    error::Error as ErrorTrait,
-    fmt::{Display, Formatter, Result as FmtResult},
-    io::Error as Io,
-    result::Result as StdResult,
+	error::Error as ErrorTrait,
+	fmt::{Display, Formatter, Result as FmtResult},
+	io::Error as Io,
+	result::Result as StdResult,
 };
 use substrate_subxt::Error as Subxt;
 use toml::{de::Error as DeToml, ser::Error as SerToml};
@@ -16,9 +16,9 @@ use web3::Error as Web3;
 /// The custom bridger error
 pub struct Bridger(String);
 impl Display for Bridger {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        f.write_str(&self.0)
-    }
+	fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+		f.write_str(&self.0)
+	}
 }
 
 /// Error generator

@@ -30,12 +30,16 @@ impl EthereumRPC {
     }
 
     /// Generate random RPC
-    pub fn rpc<'r>(&self) -> &str {
+    pub fn rpc(&self) -> &str {
         self.atom.fetch_add(1, Ordering::SeqCst);
         &self.rpc[self.atom.load(Ordering::SeqCst) % self.rpc.len()]
     }
 }
 
+/// TODO:
+///
+/// Verify the result of infura will not response empty header with hash
+/// 0x00000...
 #[async_trait]
 impl RPC for EthereumRPC {
     type Header = EthereumHeader;

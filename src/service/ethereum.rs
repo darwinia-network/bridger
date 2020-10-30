@@ -153,7 +153,7 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
             let block_number = eth.block_number().await?.as_u64();
             let mut start = u64::MAX;
 
-            if let Ok(mut cache_cloned) = cache.try_lock() {
+            if let Ok(cache_cloned) = cache.try_lock() {
                 start = cache_cloned.start;
                 drop(cache_cloned);
             } else {

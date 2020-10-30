@@ -30,6 +30,21 @@ impl EthereumRPC {
     }
 
     /// Generate random RPC
+    ///
+    /// ```
+    /// use darwinia_bridge_primitives::rpc::ethereum::EthereumRPC;
+    /// use reqwest::Client;
+    ///
+    /// let rpc = EthereumRPC::new(
+    ///   Client::new(),
+    ///   vec![
+    ///     "https://mainnet.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///     "https://mainnet.infura.io/v3/74a9b1b5816b47aa853c23fcc4f2f3b6".to_string(),
+    ///   ],
+    /// );
+    ///
+    /// assert_ne!(rpc.rpc(), rpc.rpc());
+    /// ```
     pub fn rpc(&self) -> &str {
         self.atom.fetch_add(1, Ordering::SeqCst);
         &self.rpc[self.atom.load(Ordering::SeqCst) % self.rpc.len()]

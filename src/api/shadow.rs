@@ -43,14 +43,23 @@ impl Shadow {
     ///
     /// ```
     /// use darwinia_bridger::api::Shadow;
+    /// use darwinia_bridge_primitives::rpc::ethereum::EthereumRPC;
     /// use reqwest::Client;
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///   let rpc = EthereumRPC::new(
+    ///     Client::new(),
+    ///     vec![
+    ///       "https://mainnet.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///       "https://mainnet.infura.io/v3/74a9b1b5816b47aa853c23fcc4f2f3b6".to_string(),
+    ///     ],
+    ///   );
+    ///
     ///   let client = Client::new();
     ///   let shadow = Shadow {
     ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
-    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///      eth: rpc,
     ///      http: client,
     ///   };
     ///
@@ -74,14 +83,23 @@ impl Shadow {
     ///
     /// ```
     /// use darwinia_bridger::api::Shadow;
+    /// use darwinia_bridge_primitives::rpc::ethereum::EthereumRPC;
     /// use reqwest::Client;
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///   let rpc = EthereumRPC::new(
+    ///     Client::new(),
+    ///     vec![
+    ///       "https://mainnet.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///       "https://mainnet.infura.io/v3/74a9b1b5816b47aa853c23fcc4f2f3b6".to_string(),
+    ///     ],
+    ///   );
+    ///
     ///   let client = Client::new();
     ///   let shadow = Shadow {
     ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
-    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///      eth: rpc,
     ///      http: client,
     ///   };
     ///
@@ -103,14 +121,23 @@ impl Shadow {
     ///
     /// ```
     /// use darwinia_bridger::api::Shadow;
+    /// use darwinia_bridge_primitives::rpc::ethereum::EthereumRPC;
     /// use reqwest::Client;
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///   let rpc = EthereumRPC::new(
+    ///     Client::new(),
+    ///     vec![
+    ///       "https://mainnet.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///       "https://mainnet.infura.io/v3/74a9b1b5816b47aa853c23fcc4f2f3b6".to_string(),
+    ///     ],
+    ///   );
+    ///
     ///   let client = Client::new();
     ///   let shadow = Shadow {
-    ///      api: "https://testnet.shadow.darwinia.network".to_string(),
-    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
+    ///      eth: rpc,
     ///      http: client,
     ///   };
     ///
@@ -134,14 +161,23 @@ impl Shadow {
     ///
     /// ```
     /// use darwinia_bridger::api::Shadow;
+    /// use darwinia_bridge_primitives::rpc::ethereum::EthereumRPC;
     /// use reqwest::Client;
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///   let rpc = EthereumRPC::new(
+    ///     Client::new(),
+    ///     vec![
+    ///       "https://mainnet.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///       "https://mainnet.infura.io/v3/74a9b1b5816b47aa853c23fcc4f2f3b6".to_string(),
+    ///     ],
+    ///   );
+    ///
     ///   let client = Client::new();
     ///   let shadow = Shadow {
-    ///      api: "https://testnet.shadow.darwinia.network".to_string(),
-    ///      eth: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
+    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
+    ///      eth: rpc,
     ///      http: client,
     ///   };
     ///

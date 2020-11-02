@@ -75,7 +75,7 @@ pub async fn exec() -> Result<()> {
 			}
 			env_logger::init();
 
-			while let Err(_) = run::exec(config.clone()).await {
+			while run::exec(config.clone()).await.is_err() {
 				task::sleep(Duration::from_secs(5)).await;
 			}
 		}

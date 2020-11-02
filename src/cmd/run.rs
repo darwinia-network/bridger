@@ -72,8 +72,8 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     };
     let exit_on_ws_close = async {
         loop {
-            if let Some(_) = killer.lock().await.next().await {
-                Err(Error::Bridger("WS Closed".into()))?;
+            if killer.lock().await.next().await.is_some() {
+                return Err(Error::Bridger("WS Closed".into()));
             }
         }
     };

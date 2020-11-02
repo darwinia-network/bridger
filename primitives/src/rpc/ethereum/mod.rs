@@ -46,8 +46,9 @@ impl EthereumRPC {
     /// assert_ne!(rpc.rpc(), rpc.rpc());
     /// ```
     pub fn rpc(&self) -> &str {
-        self.atom.fetch_add(1, Ordering::SeqCst);
-        &self.rpc[self.atom.load(Ordering::SeqCst) % self.rpc.len()]
+        let next = (self.atom.load(Ordering::SeqCst) + 1) % self.rpc.len();
+        self.atom.store(next, Ordering::SeqCst);
+        &self.rpc[next]
     }
 }
 

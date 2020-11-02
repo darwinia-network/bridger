@@ -68,14 +68,18 @@ impl Shadow {
     /// }
     /// ```
     pub async fn mmr(&self, number: usize) -> Result<MMRRoot> {
-        let json: MMRRootJson = self
-            .http
-            .get(&format!("{}/ethereum/mmr_root/{}", &self.api, number))
-            .send()
-            .await?
-            .json()
-            .await?;
 
+        let url = &format!("{}/ethereum/mmr_root/{}", &self.api, number);
+        println!("{}", url);
+        let json = self
+            .http
+            .get("https://www.baidu.com")
+            .send()
+            .await?;
+        println!("{:?}", json);
+        let json: MMRRootJson = json.json()
+            .await?;
+        println!("-------------");
         Ok(json.into())
     }
 
@@ -108,9 +112,11 @@ impl Shadow {
     /// }
     /// ```
     pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
+        println!("rpc: {:?}", &self.eth);
         let mmr_root = self.mmr(number).await?;
         let header = self.eth.get_header_by_number(number as u64).await?;
 
+        println!("header: {:?}", header);
         Ok(EthereumRelayHeaderParcel {
             header,
             mmr_root: mmr_root.mmr_root,

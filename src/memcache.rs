@@ -12,7 +12,7 @@ pub enum EthereumTransactionHash {
 }
 
 /// Reedeemable Ethereum transaction
-#[derive(PartialEq, Eq, Clone)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub struct EthereumTransaction {
     /// Transaction hash for the event
     pub tx_hash: EthereumTransactionHash,

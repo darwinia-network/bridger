@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex};
 mod ethereum;
 mod guard;
 mod redeem;
-mod relay;
+pub mod relay;
 mod subscribe;
 
 pub use self::{

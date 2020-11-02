@@ -18,7 +18,8 @@ pub async fn exec(block: u64) -> Result<()> {
     info!("Init API succeed!");
 
     // service
-    let mut relay_service = RelayService::new(&config, shadow.clone(), darwinia.clone());
+    let last_confirmed = darwinia.last_confirmed().await.unwrap();
+    let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed);
 
     // affirm
     if let Err(err) = relay_service.affirm(block).await {

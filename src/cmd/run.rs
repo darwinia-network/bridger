@@ -1,6 +1,6 @@
 use crate::{
     api::{Darwinia, Shadow},
-    service::{EthereumService, GuardService, RedeemService, RelayService, SubscribeService},
+    service::{EthereumService, GuardService, RedeemService, SubscribeService},
 };
 use crate::{
     listener::Listener,
@@ -32,7 +32,6 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
 
     // Services
     let ethereum = <EthereumService<Http>>::new_http(&config)?;
-    let relay = RelayService::new(&config, shadow.clone(), darwinia.clone());
     let redeem = RedeemService::new(&config, shadow.clone(), darwinia.clone());
     let guard = GuardService::new(&config, shadow.clone(), darwinia.clone());
     let subscribe = SubscribeService::new(shadow, darwinia.clone());
@@ -58,7 +57,6 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     // listeners
     let mut listener = Listener::default();
     listener.register(ethereum)?;
-    listener.register(relay)?;
     listener.register(redeem)?;
     listener.register(subscribe)?;
     if let Err(err) = guard.role_checking().await {

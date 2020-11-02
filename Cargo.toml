@@ -25,6 +25,7 @@ name = "bridger"
 path = "src/bin/bridger.rs"
 
 [dependencies]
+async-macros = "2.0.0"
 async-trait = "0.1.40"
 dirs = "3.0.1"
 env_logger = "0.7.1"
@@ -58,3 +59,14 @@ features = ["runtime", "rpc"]
 package = "serde"
 version = "1"
 features = ["derive"]
+
+[patch.crates-io]
+# jsonrpsee = { path = "../jsonrpsee", features = ["ws"] }
+# substrate-subxt = { path = "../substrate-subxt" }
+jsonrpsee = { git = "https://github.com/AurevoirXavier/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
+substrate-subxt = { git = "https://github.com/AurevoirXavier/substrate-subxt", branch = "xavier-send-error" }
+[patch.'https://github.com/paritytech/jsonrpsee']
+# jsonrpsee = { path = "../jsonrpsee", features = ["ws"] }
+# substrate-subxt = { path = "../substrate-subxt" }
+jsonrpsee = { git = "https://github.com/AurevoirXavier/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
+substrate-subxt = { git = "https://github.com/AurevoirXavier/substrate-subxt", branch = "xavier-send-error" }

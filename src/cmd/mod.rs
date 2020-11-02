@@ -2,6 +2,8 @@
 use crate::result::Result;
 use std::path::PathBuf;
 use structopt::{clap::AppSettings, StructOpt};
+use std::time::Duration;
+use tokio::time;
 
 mod confirm;
 mod run;
@@ -63,7 +65,20 @@ enum Opt {
 pub async fn exec() -> Result<()> {
     let opt = Opt::from_args();
     match opt {
-        Opt::Run { config, verbose } => run::exec(config, verbose).await?,
+        Opt::Run { config, verbose } => {
+			if std::env::var("RUST_LOG").is_err() {
+				if verbose {
+					std::env::set_var("RUST_LOG", "info,darwinia_bridger");
+				} else {
+					std::env::set_var("RUST_LOG", "info");
+				}
+			}
+			env_logger::init();
+
+			while run::exec(config.clone()).await.is_err() {
+				time::delay_for(Duration::from_secs(5)).await;
+			}
+		}
         Opt::Confirm { block } => confirm::exec(block).await?,
         Opt::Affirm { block} => affirm::exec(block).await?,
         Opt::AffirmRaw { json } => affirm_raw::exec(json).await?,

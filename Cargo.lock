@@ -198,6 +198,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-macros"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "644a5a8de80f2085a1e7e57cd1544a2a7438f6e003c0790999bd43b92a77cdb2"
+dependencies = [
+ "futures-core",
+ "pin-utils",
+]
+
+[[package]]
 name = "async-mutex"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -694,7 +704,7 @@ dependencies = [
  "serde",
  "serde_json",
  "substrate-subxt",
- "substrate-subxt-proc-macro",
+ "substrate-subxt-proc-macro 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "uint",
 ]
 
@@ -702,6 +712,7 @@ dependencies = [
 name = "darwinia-bridger"
 version = "0.1.4"
 dependencies = [
+ "async-macros",
  "async-trait",
  "darwinia-bridge-primitives",
  "dirs",
@@ -1759,8 +1770,7 @@ dependencies = [
 [[package]]
 name = "jsonrpsee"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cc8a1da5a54b417cfb7edb9f932024d833dc333de50c21c0e1b28d0e8b4f853"
+source = "git+https://github.com/AurevoirXavier/jsonrpsee?branch=xavier-send-error#d56bd6af5429a9e45a515013d7a76759b1e0ef3a"
 dependencies = [
  "async-std",
  "async-tls",
@@ -1791,9 +1801,8 @@ dependencies = [
 
 [[package]]
 name = "jsonrpsee-proc-macros"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1ed1b5f6937dd2c6c79a9ac6e0e3f41bbc64edb5d443840bdc73e606009ed70"
+version = "1.0.0"
+source = "git+https://github.com/AurevoirXavier/jsonrpsee?branch=xavier-send-error#d56bd6af5429a9e45a515013d7a76759b1e0ef3a"
 dependencies = [
  "Inflector",
  "proc-macro2",
@@ -4359,8 +4368,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed693047c3c907a660aa97a71a30af33cec878316d75df60967d73b673ff4fd3"
+source = "git+https://github.com/AurevoirXavier/substrate-subxt?branch=xavier-send-error#e16b5da188fd9baaa3b32555fa1babadbcc95011"
 dependencies = [
  "frame-metadata",
  "frame-support",
@@ -4386,7 +4394,7 @@ dependencies = [
  "sp-std",
  "sp-transaction-pool",
  "sp-version",
- "substrate-subxt-proc-macro",
+ "substrate-subxt-proc-macro 0.13.0 (git+https://github.com/AurevoirXavier/substrate-subxt?branch=xavier-send-error)",
  "thiserror",
  "url 2.1.1",
 ]
@@ -4396,6 +4404,20 @@ name = "substrate-subxt-proc-macro"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "74975f373430ec447afaeb2925f2bac77e113733b08263f4df75e0a0e5998090"
+dependencies = [
+ "heck",
+ "proc-macro-crate",
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "synstructure",
+]
+
+[[package]]
+name = "substrate-subxt-proc-macro"
+version = "0.13.0"
+source = "git+https://github.com/AurevoirXavier/substrate-subxt?branch=xavier-send-error#e16b5da188fd9baaa3b32555fa1babadbcc95011"
 dependencies = [
  "heck",
  "proc-macro-crate",

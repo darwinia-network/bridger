@@ -7,23 +7,16 @@ use crate::{
     result::{Error, Result},
     Config,
 };
+use async_macros::select;
+use futures::StreamExt;
 use std::path::PathBuf;
 use std::sync::Arc;
 use web3::transports::http::Http;
 
 /// Run the bridger
-pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
-    if std::env::var("RUST_LOG").is_err() {
-        if verbose {
-            std::env::set_var("RUST_LOG", "info,darwinia_bridger");
-        } else {
-            std::env::set_var("RUST_LOG", "info");
-        }
-    }
-    env_logger::init();
-
+pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     // config
-    let config = Config::new(path)?;
+    let config = Config::new(path.clone())?;
     if config.eth.rpc.starts_with("ws") {
         return Err(Error::Bridger(
             "Bridger currently doesn't support ethereum websocket transport".to_string(),
@@ -33,6 +26,7 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     // APIs
     let shadow = Arc::new(Shadow::new(&config));
     let darwinia = Arc::new(Darwinia::new(&config).await?);
+    let killer = darwinia.client.rpc.client.killer.clone();
 
     // Services
     let ethereum = <EthereumService<Http>>::new_http(&config)?;
@@ -70,7 +64,19 @@ pub async fn exec(path: Option<PathBuf>, verbose: bool) -> Result<()> {
     } else {
         listener.register(guard)?;
     }
-    listener.start(config.eth.start).await?;
 
-    Ok(())
+    let never_exit = async {
+        listener.start(config.eth.start).await?;
+
+        Ok::<(), Error>(())
+    };
+    let exit_on_ws_close = async {
+        loop {
+            if killer.lock().await.next().await.is_some() {
+                return Err(Error::Bridger("WS Closed".into()));
+            }
+        }
+    };
+
+    select!(never_exit, exit_on_ws_close).await
 }

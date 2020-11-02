@@ -24,6 +24,10 @@ path = "src/lib.rs"
 name = "bridger"
 path = "src/bin/bridger.rs"
 
+[[bin]]
+name = "logtrim"
+path = "src/bin/logtrim.rs"
+
 [dependencies]
 async-trait = "0.1.40"
 dirs = "3.0.1"

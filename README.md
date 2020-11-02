@@ -10,6 +10,8 @@ The Darwinia Bridger
 
 ## Installation
 
+> Note: rustc toolchain `nightly-2020-10-05` will be installed along with this package, due to: https://github.com/paritytech/substrate/issues/7282
+
 ### Install using cargo
 
 ```

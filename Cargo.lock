@@ -713,7 +713,6 @@ name = "darwinia-bridger"
 version = "0.1.4"
 dependencies = [
  "async-macros",
- "async-std",
  "async-trait",
  "darwinia-bridge-primitives",
  "dirs",

@@ -25,7 +25,6 @@ name = "bridger"
 path = "src/bin/bridger.rs"
 
 [dependencies]
-async-std = "1.6.5"
 async-macros = "2.0.0"
 async-trait = "0.1.40"
 dirs = "3.0.1"

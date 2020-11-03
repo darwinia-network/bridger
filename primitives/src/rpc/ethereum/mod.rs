@@ -1,5 +1,4 @@
 //! Ethereum RPC calls
-mod block;
 mod header;
 
 use crate::{chain::ethereum::EthereumHeader, result::Result, rpc::RPC};
@@ -7,7 +6,7 @@ use async_trait::async_trait;
 use reqwest::Client;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-pub use self::{block::EthBlockNumberResp, header::EthHeaderRPCResp};
+pub use self::header::EthHeaderRPCResp;
 
 /// Ethereum rpc set
 pub struct EthereumRPC {
@@ -79,6 +78,13 @@ impl RPC for EthereumRPC {
     }
 
     async fn block_number(&self) -> Result<u64> {
-        block::block_number(&self.client, &self.rpc()).await
+        let header: Self::Header  = header::EthHeaderRPCResp::latest(&self.client, &self.rpc())
+            .await?
+            .result
+            .into();
+
+        Ok(
+            header.number
+        )
     }
 }

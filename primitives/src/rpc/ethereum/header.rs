@@ -40,4 +40,18 @@ impl EthHeaderRPCResp {
 
         Ok(client.post(rpc).json(&map).send().await?.json().await?)
     }
+
+    /// Get ethereum block number
+    pub async fn latest(client: &Client, rpc: &str) -> Result<EthHeaderRPCResp> {
+        let map: Value = serde_json::from_str(&format! {
+            "{{{}}}", vec![
+                r#""jsonrpc":"2.0","#,
+                r#""method":"eth_getBlockByNumber","#,
+                r#""params":["latest", false],"#,
+                r#""id": 1"#,
+            ].concat(),
+        })?;
+
+        Ok(client.post(rpc).json(&map).send().await?.json().await?)
+    }
 }

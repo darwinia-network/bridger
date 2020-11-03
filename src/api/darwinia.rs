@@ -335,8 +335,8 @@ impl Darwinia {
     }
 
     /// Check if should redeem
-    pub async fn should_redeem(&self, tx: &EthereumTransaction) -> Result<bool> {
-        Ok(!self
+    pub async fn verified(&self, tx: &EthereumTransaction) -> Result<bool> {
+        Ok(self
             .client
             .verified_proof((tx.block_hash.to_fixed_bytes(), tx.index), None)
             .await?

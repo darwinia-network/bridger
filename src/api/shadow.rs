@@ -68,18 +68,14 @@ impl Shadow {
     /// }
     /// ```
     pub async fn mmr(&self, number: usize) -> Result<MMRRoot> {
-
         let url = &format!("{}/ethereum/mmr_root/{}", &self.api, number);
-        println!("{}", url);
         let json = self
             .http
-            .get("https://www.baidu.com")
+            .get(url)
             .send()
             .await?;
-        println!("{:?}", json);
         let json: MMRRootJson = json.json()
             .await?;
-        println!("-------------");
         Ok(json.into())
     }
 

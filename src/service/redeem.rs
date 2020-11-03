@@ -1,21 +1,29 @@
 //! Redeem Service
 use crate::{
     api::{Darwinia, Shadow},
-    config::Config,
     memcache::EthereumTransactionHash,
     result::Result as BridgerResult,
-    service::Service,
-    memcache::MemCache,
+    result::Error,
 };
-use async_trait::async_trait;
 use primitives::{chain::ethereum::RedeemFor};
 use std::{
-    sync::{Arc, Mutex},
+    sync::Arc,
     time::Duration,
 };
 
-/// Attributes
-const SERVICE_NAME: &str = "REDEEM";
+use actix::prelude::*;
+use crate::memcache::EthereumTransaction;
+
+/// message 'EthereumTransaction'
+#[derive(Clone, Debug)]
+pub struct MsgEthereumTransaction {
+    /// Transaction hash for the event
+    pub tx: EthereumTransaction,
+}
+
+impl Message for MsgEthereumTransaction {
+    type Result = ();
+}
 
 /// Redeem Service
 pub struct RedeemService {
@@ -26,85 +34,76 @@ pub struct RedeemService {
     pub darwinia: Arc<Darwinia>,
 }
 
-impl RedeemService {
-    /// New redeem service
-    pub fn new(config: &Config, shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> RedeemService {
-        RedeemService {
-            darwinia,
-            shadow,
-            step: config.step.redeem,
-        }
+
+impl Actor for RedeemService {
+    type Context = Context<Self>;
+}
+
+impl Handler<MsgEthereumTransaction> for RedeemService {
+    type Result = AtomicResponse<Self, ()>;
+
+    fn handle(&mut self, msg: MsgEthereumTransaction, _: &mut Context<Self>) -> Self::Result {
+        let msg_clone = msg.clone();
+        AtomicResponse::new(Box::pin(
+            async {}
+                .into_actor(self)
+                .then(move |_, this, _| {
+                    let f = RedeemService::redeem(this.shadow.clone(), this.darwinia.clone(), msg_clone.tx);
+                    f.into_actor(this)
+                })
+                .then(|r, this, ctx| {
+                    if let Err(err) = r {
+                        if err.to_string().contains("wait") {
+                            ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
+                        }
+                    }
+                    let f = async {Result::<(), Error>::Ok(())};
+                    f.into_actor(this)
+                })
+                .map(|_, _, _| {}),
+        ))
     }
 }
 
-#[async_trait(?Send)]
-impl Service for RedeemService {
-    fn name<'e>(&self) -> &'e str {
-        SERVICE_NAME
-    }
 
-    async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
-        loop {
-            if let Ok(mut cache_cloned) = cache.try_lock() {
-                trace!("Heartbeat>>>Looking for redeemable ethereum transactions...");
-                trace!(
-                    "Currently we have {} txs might need to be redeemed",
-                    cache_cloned.txpool.len(),
-                );
-                let last = self.darwinia.last_confirmed().await?;
-                let mut redeemed = vec![];
-                for index in 0..cache_cloned.txpool.len() {
-                    if index >= cache_cloned.txpool.len() {
-                        break;
-                    }
-                    let tx = &cache_cloned.txpool[index];
-
-                    if !self.darwinia.should_redeem(&tx).await? {
-                        info!("This ethereum tx {:?} has already been redeemed.", tx.tx_hash);
-                        redeemed.push(index);
-
-                        continue;
-                    }
-
-                    if tx.block < last {
-                        info!("Prepare to redeem ethereum tx {:?}", tx.tx_hash);
-                        let proof = self
-                            .shadow
-                            .receipt(&format!("{:?}", tx.enclosed_hash()), last)
-                            .await?;
-                        let redeem_for = match tx.tx_hash {
-                            EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
-                            EthereumTransactionHash::Token(_) => RedeemFor::Token,
-                        };
-                        let hash = self.darwinia.redeem(redeem_for, proof).await?;
-                        info!("Redeemed with extrinsic {:?}", hash);
-                        redeemed.push(index);
-
-                        tokio::time::delay_for(Duration::from_secs(6)).await;
-                    }
-                }
-
-                // sleep
-                cache_cloned.txpool = cache_cloned
-                    .txpool
-                    .iter()
-                    .enumerate()
-                    .filter(|(idx, _)| !redeemed.contains(idx))
-                    .map(|(_, tx)| tx.clone())
-                    .collect();
-
-                if !redeemed.is_empty() {
-                    trace!(
-                        "Currently we have {} txs might need to be redeemed",
-                        cache_cloned.txpool.len(),
-                    );
-                }
-                drop(cache_cloned);
-            } else {
-                error!("try_lock failed");
-            }
-
-            tokio::time::delay_for(Duration::from_secs(self.step)).await;
+impl RedeemService {
+    /// New redeem service
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64) -> RedeemService {
+        RedeemService {
+            darwinia,
+            shadow,
+            step,
         }
     }
+
+    async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction) -> BridgerResult<()> {
+        trace!("Redeem ethereum tx {:?}...", tx.tx_hash);
+
+        // 1. Checking before redeem
+        if darwinia.verified(&tx).await? {
+            let msg = format!("This ethereum tx {:?} has already been redeemed.", tx.tx_hash);
+            return Err(Error::Bridger(msg));
+        }
+
+        let last_confirmed = darwinia.last_confirmed().await?;
+        if tx.block >= last_confirmed {
+            let msg = format!("This ethereum tx {:?}'s block {} not exist, please wait.", tx.tx_hash, tx.block);
+            return Err(Error::Bridger(msg));
+        }
+
+        // 2. Do redeem
+        info!("Prepare to redeem ethereum tx {:?}", tx.tx_hash);
+        let proof = shadow
+            .receipt(&format!("{:?}", tx.enclosed_hash()), last_confirmed)
+            .await?;
+        let redeem_for = match tx.tx_hash {
+            EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
+            EthereumTransactionHash::Token(_) => RedeemFor::Token,
+        };
+        let hash = darwinia.redeem(redeem_for, proof).await?;
+        info!("Redeemed with extrinsic {:?}", hash);
+
+        Ok(())
+    }
+
 }

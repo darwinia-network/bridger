@@ -1,13 +1,15 @@
 //! Bridger Services
-use crate::{memcache::MemCache, result::Result};
+pub use crate::{memcache::{
+    MemCache, EthereumTransactionHash
+}, result::Result};
 use async_trait::async_trait;
 use std::sync::{Arc, Mutex};
 
-mod ethereum;
-mod guard;
-mod redeem;
+pub mod ethereum;
+pub mod guard;
+pub mod redeem;
 pub mod relay;
-mod subscribe;
+pub mod subscribe;
 
 pub use self::{
     ethereum::EthereumService, guard::GuardService, redeem::RedeemService, relay::RelayService,

@@ -25,8 +25,8 @@ name = "bridger"
 path = "src/bin/bridger.rs"
 
 [[bin]]
-name = "test_relay"
-path = "src/bin/test_relay.rs"
+name = "test_actor"
+path = "src/bin/test_actor.rs"
 
 [dependencies]
 jsonrpsee = "0.1.0"
@@ -46,6 +46,7 @@ serde_json = "1.0"
 hex = "0.4.2"
 actix = "0.10"
 actix-rt = "1.1.1"
+async-io = "1.1.10"
 
 [dependencies.reqwest]
 version = "0.10"

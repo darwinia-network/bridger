@@ -1,18 +1,18 @@
 //! Sup Commands
 use crate::result::Result;
 use std::path::PathBuf;
-use structopt::{clap::AppSettings, StructOpt};
 use std::time::Duration;
+use structopt::{clap::AppSettings, StructOpt};
 use tokio::time;
 
-mod confirm;
-mod run;
 mod affirm;
-mod keys;
-mod affirmations;
-mod guard;
-mod show_parcel;
 mod affirm_raw;
+mod affirmations;
+mod confirm;
+mod guard;
+mod keys;
+mod run;
+mod show_parcel;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -66,21 +66,21 @@ pub async fn exec() -> Result<()> {
     let opt = Opt::from_args();
     match opt {
         Opt::Run { config, verbose } => {
-			if std::env::var("RUST_LOG").is_err() {
-				if verbose {
-					std::env::set_var("RUST_LOG", "info,darwinia_bridger");
-				} else {
-					std::env::set_var("RUST_LOG", "info");
-				}
-			}
-			env_logger::init();
+            if std::env::var("RUST_LOG").is_err() {
+                if verbose {
+                    std::env::set_var("RUST_LOG", "info,darwinia_bridger");
+                } else {
+                    std::env::set_var("RUST_LOG", "info");
+                }
+            }
+            env_logger::init();
 
-			while run::exec(config.clone()).await.is_err() {
-				time::delay_for(Duration::from_secs(5)).await;
-			}
-		}
+            while run::exec(config.clone()).await.is_err() {
+                time::delay_for(Duration::from_secs(5)).await;
+            }
+        }
         Opt::Confirm { block } => confirm::exec(block).await?,
-        Opt::Affirm { block} => affirm::exec(block).await?,
+        Opt::Affirm { block } => affirm::exec(block).await?,
         Opt::AffirmRaw { json } => affirm_raw::exec(json).await?,
         Opt::ShowParcel { block, json } => show_parcel::exec(block, json).await?,
         Opt::Keys => keys::exec().await?,

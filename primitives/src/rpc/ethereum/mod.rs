@@ -91,7 +91,9 @@ impl RPC for EthereumRPC {
                 )
             },
             serde_json::Value::Object(o) => {
-                u64::from_str_radix(o["currentBlock"].as_str().trim_start_matches("0x").unwrap_or_default())
+                Ok(
+                    u64::from_str_radix(o["currentBlock"].as_str().unwrap_or_default().trim_start_matches("0x"), 16).unwrap_or(0)
+                )
             },
             _ => {
                 let header: Self::Header  = header::EthHeaderRPCResp::latest(&self.client, &self.rpc())

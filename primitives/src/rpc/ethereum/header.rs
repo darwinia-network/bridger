@@ -63,6 +63,7 @@ impl EthHeaderRPCResp {
         Ok(client.post(rpc).json(&map).send().await?.json().await?)
     }
 
+    /// Get ethereum syncing info
     pub async fn syncing(client: &Client, rpc: &str) -> Result<EthSyncingRPCResp> {
         let map: Value = serde_json::from_str(&format! {
             "{{{}}}", vec![

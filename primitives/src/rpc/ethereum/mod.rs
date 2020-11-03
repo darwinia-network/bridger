@@ -78,13 +78,31 @@ impl RPC for EthereumRPC {
     }
 
     async fn block_number(&self) -> Result<u64> {
-        let header: Self::Header  = header::EthHeaderRPCResp::latest(&self.client, &self.rpc())
-            .await?
-            .result
-            .into();
+        let v: serde_json::Value = header::EthHeaderRPCResp::syncing(&self.client, &self.rpc()).await?.result;
+        match v {
+            serde_json::Value::Bool(false) => {
+                let header: Self::Header  = header::EthHeaderRPCResp::latest(&self.client, &self.rpc())
+                    .await?
+                    .result
+                    .into();
 
-        Ok(
-            header.number
-        )
+                Ok(
+                    header.number
+                )
+            },
+            serde_json::Value::Object(o) => {
+                u64::from_str_radix(o["currentBlock"].as_str().trim_start_matches("0x").unwrap_or_default())
+            },
+            _ => {
+                let header: Self::Header  = header::EthHeaderRPCResp::latest(&self.client, &self.rpc())
+                    .await?
+                    .result
+                    .into();
+
+                Ok(
+                    header.number
+                )
+            }
+        }
     }
 }

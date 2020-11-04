@@ -37,9 +37,9 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
 
     // Startup infomations
     info!("🔗 Connect to");
-    info!("      Darwinia: {}", config.node);
-    info!("        Shadow: {}", config.shadow);
-    info!("      Ethereum: {}", config.eth.rpc);
+    info!("      Darwinia: {}", &config.node);
+    info!("        Shadow: {}", &config.shadow);
+    info!("      Ethereum: {}", &config.eth.rpc);
     let account_id = &darwinia.account.account_id;
     let roles = darwinia.account.role_names().await?;
     match &darwinia.account.real {
@@ -51,7 +51,7 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
             info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
         }
     }
-    info!("🌱 Relay from ethereum block: {}", config.eth.start);
+    info!("🌱 Relay from ethereum block: {}", &config.eth.start);
 
     // listeners
     let mut listener = Listener::default();

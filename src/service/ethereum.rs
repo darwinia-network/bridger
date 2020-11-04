@@ -109,7 +109,7 @@ impl<T: Transport> EthereumService<T> {
             {
                 Ok(logs) => logs,
                 Err(e) => {
-                    error!("Failed to get logs, due to {}", e);
+                    error!("Failed to get logs, due to `{}`", e);
 
                     continue;
                 }
@@ -164,7 +164,7 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
 			let block_number = match eth.block_number().await {
 				Ok(block_number) => block_number.as_u64(),
 				Err(e) => {
-					error!("Failed to get ethereum block height, due to {}", e);
+					error!("Failed to get ethereum block height, due to `{}`", e);
 
 					time::delay_for(Duration::from_secs(5)).await;
 

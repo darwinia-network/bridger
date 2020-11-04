@@ -182,7 +182,7 @@ impl Darwinia {
             Err(e) => {
                 error!("Failed to connect to `{}`, due to {}", &config.node, e);
 
-                return Err(Bridger(format!("Failed to connect to `{}`, due to {}", &config.node, e)));
+                return Err(Bridger(format!("Failed to connect to `{}`, due to `{}`", &config.node, e)));
             }
         };
         let client = ClientBuilder::<DarwiniaRuntime>::new()

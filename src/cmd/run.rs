@@ -31,9 +31,9 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     let killer = &darwinia.client.rpc.client.killer;
 
     // Services
-    let ethereum = <EthereumService<Http>>::new_http(&config)?;
+    // let ethereum = <EthereumService<Http>>::new_http(&config)?;
     // let redeem = RedeemService::new(&config, shadow.clone(), darwinia.clone());
-    let guard = GuardService::new(&config, shadow.clone(), darwinia.clone());
+    // let guard = GuardService::new(&config, shadow.clone(), darwinia.clone());
     let subscribe = SubscribeService::new(shadow, darwinia.clone());
 
     // Startup infomations
@@ -56,14 +56,14 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
 
     // listeners
     let mut listener = Listener::default();
-    listener.register(ethereum)?;
+    // listener.register(ethereum)?;
     // listener.register(redeem)?;
     listener.register(subscribe)?;
-    if let Err(err) = guard.role_checking().await {
-        warn!("{}", err.to_string());
-    } else {
-        listener.register(guard)?;
-    }
+    // if let Err(err) = GuardService::role_checking(darwinia).await {
+    //     warn!("{}", err.to_string());
+    // } else {
+    //     listener.register(guard)?;
+    // }
 
     let never_exit = async {
         listener.start(config.eth.start).await?;

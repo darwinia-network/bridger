@@ -57,14 +57,12 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                             ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
                         }
                     }
-                    let f = async {Result::<(), Error>::Ok(())};
-                    f.into_actor(this)
+                    async {Result::<(), Error>::Ok(())}.into_actor(this)
                 })
                 .map(|_, _, _| {}),
         ))
     }
 }
-
 
 impl RedeemService {
     /// New redeem service

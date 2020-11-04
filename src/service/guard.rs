@@ -1,19 +1,21 @@
 //! Guard Service
+use std::{
+    sync::Arc, time::Duration
+};
+use actix::prelude::*;
+
 use crate::{
     api::{Darwinia, Shadow},
-    config::Config,
-    result::{Result as BridgerResult, Error::Bridger},
-    service::Service,
-    memcache::MemCache,
-};
-use async_trait::async_trait;
-use std::{
-    sync::{Arc, Mutex},
-    time::Duration,
+    result::{Result as BridgerResult, Error},
 };
 
-/// Attributes
-const SERVICE_NAME: &str = "GUARD";
+/// message 'Start'
+#[derive(Clone, Debug)]
+pub struct MsgStart;
+
+impl Message for MsgStart {
+    type Result = ();
+}
 
 /// Redeem Service
 pub struct GuardService {
@@ -24,67 +26,78 @@ pub struct GuardService {
     pub darwinia: Arc<Darwinia>,
 }
 
+impl Actor for GuardService {
+    type Context = Context<Self>;
+}
+
+impl Handler<MsgStart> for GuardService {
+    type Result = AtomicResponse<Self, ()>;
+
+    fn handle(&mut self, msg: MsgStart, _: &mut Context<Self>) -> Self::Result {
+        AtomicResponse::new(Box::pin(
+            async {}
+                .into_actor(self)
+                .then(|_, this, _| {
+                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone());
+                    f.into_actor(this)
+                })
+                .then(|r, this, ctx| {
+                    ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
+                    async {r}.into_actor(this)
+                })
+                .map(|_, _, _| {}),
+        ))
+    }
+}
+
 impl GuardService {
     /// New redeem service
-    pub fn new(config: &Config, shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> GuardService {
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64) -> GuardService {
         GuardService {
             darwinia,
             shadow,
-            step: config.step.redeem,
+            step,
         }
     }
-}
 
-#[async_trait(?Send)]
-impl Service for GuardService {
-    fn name<'e>(&self) -> &'e str {
-        SERVICE_NAME
-    }
+    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> BridgerResult<()> {
+        trace!("Checking pending headers...");
 
-    async fn run(&mut self, _: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
-        self.role_checking().await?;
+        let pending_headers = darwinia.pending_headers().await?;
+        for pending in pending_headers {
+            let pending_parcel = pending.1;
+            let voting_state = pending.2;
 
-        loop {
-            let last_confirmed = self.darwinia.last_confirmed().await?;
-            info!("Last confirmed ethereum block number is {}", last_confirmed);
+            if !darwinia.account.has_voted(voting_state) {
+                let pending_block_number: u64 = pending_parcel.header.number;
+                let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
 
-            trace!("Checking pending headers...");
-            let pending_headers = self.darwinia.pending_headers().await?;
-            for pending in pending_headers {
-                if !self.darwinia.account.has_voted(pending.2) {
-                    let pending_parcel = pending.1;
-                    let pending_block_number: u64 = pending_parcel.header.number;
-                    let parcel = self.shadow.parcel(pending_block_number as usize).await?;
+                let parcel_fulfilled = !(
+                    parcel_from_shadow.header.hash.is_none()
+                    || parcel_from_shadow.header.hash.unwrap() == [0u8; 32]
+                    || parcel_from_shadow.mmr_root == [0u8; 32]
+                );
 
-                    let parcel_fulfilled = !(
-                        parcel.header.hash.is_none()
-                        || parcel.header.hash.unwrap() == [0u8; 32]
-                        || parcel.mmr_root == [0u8; 32]
-                    );
-
-                    if parcel_fulfilled {
-                        if parcel.is_same_as(&pending_parcel) {
-                            self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
-                            info!("Voted to approve {}", pending_block_number);
-                        } else {
-                            self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
-                            info!("Voted to reject {}", pending_block_number);
-                        };
-                    }
+                if parcel_fulfilled {
+                    if pending_parcel.is_same_as(&parcel_from_shadow) {
+                        darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
+                        info!("Voted to approve {}", pending_block_number);
+                    } else {
+                        darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
+                        info!("Voted to reject {}", pending_block_number);
+                    };
                 }
             }
-
-            tokio::time::delay_for(Duration::from_secs(self.step)).await;
         }
-    }
-}
 
-impl GuardService {
+        Ok(())
+    }
+
     /// check permission
-    pub async fn role_checking(&self) -> BridgerResult<()> {
-        if !self.darwinia.account.is_tech_comm_member().await? {
+    pub async fn role_checking(darwinia: Arc<Darwinia>) -> BridgerResult<()> {
+        if !darwinia.account.is_tech_comm_member().await? {
             let msg = "Guard service is not running because the account is not a member of the technical committee!".to_string();
-            Err(Bridger(msg))
+            Err(Error::Bridger(msg))
         } else {
             Ok(())
         }

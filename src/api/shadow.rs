@@ -108,7 +108,6 @@ impl Shadow {
     /// }
     /// ```
     pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
-        println!("rpc: {:?}", &self.eth);
         let mmr_root = self.mmr(number).await?;
         let header = self.eth.get_header_by_number(number as u64).await?;
 

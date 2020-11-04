@@ -177,16 +177,23 @@ pub struct Darwinia {
 impl Darwinia {
     /// New darwinia API
     pub async fn new(config: &Config) -> Result<Darwinia> {
+		let client = if let Ok(client) = jsonrpsee::ws_client(&config.node).await {
+			client
+		} else {
+			error!("Failed to connect to `{}`", config.node);
+
+			return Err(Bridger(format!("Failed to connect to `{}`", config.node)));
+		};
         let client = ClientBuilder::<DarwiniaRuntime>::new()
-            .set_url(&config.node)
+            .set_client(client)
             .build()
             .await?;
-
         let account = Account::new(
             config.seed.clone(),
             config.proxy.clone().map(|proxy| proxy.real[2..].to_string()),
                 client.clone()
-        );
+		);
+
         Ok(Darwinia {
             client,
             account,

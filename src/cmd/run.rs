@@ -1,46 +1,47 @@
+use crate::api::{Darwinia, Shadow};
 use crate::{
-    api::{Darwinia, Shadow},
-    service::{EthereumService, GuardService, /*RedeemService,*/ SubscribeService},
-};
-use crate::{
-    listener::Listener,
+    // listener::Listener,
     result::{Error, Result},
     Config,
 };
 use async_macros::select;
-use futures::StreamExt;
+// use futures::StreamExt;
 use std::path::PathBuf;
 use std::sync::Arc;
-use web3::transports::http::Http;
+use web3::{
+    transports::http::Http,
+    Web3,
+};
+use actix::Actor;
+
+use crate::service::{EthereumService, ethereum::MsgStart as MsgStartEthereumService};
+use crate::service::RelayService;
+use crate::service::RedeemService;
+// use crate::service::GuardService;
+// use crate::service::SubscribeService;
 
 /// Run the bridger
 pub async fn exec(path: Option<PathBuf>) -> Result<()> {
-    info!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 
-    // config
-    let config = Config::new(path)?;
+    // --- Load config ---
+    let config = Config::new(path.clone())?;
     if config.eth.rpc.starts_with("ws") {
         return Err(Error::Bridger(
             "Bridger currently doesn't support ethereum websocket transport".to_string(),
         ));
     }
+    // print info
+    info!("🔗 Connect to");
+    info!("      Darwinia: {}", config.node);
+    info!("        Shadow: {}", config.shadow);
+    info!("      Ethereum: {}", config.eth.rpc);
 
-    // APIs
+
+    // --- Init APIs ---
     let shadow = Arc::new(Shadow::new(&config));
     let darwinia = Arc::new(Darwinia::new(&config).await?);
-    let killer = &darwinia.client.rpc.client.killer;
-
-    // Services
-    // let ethereum = <EthereumService<Http>>::new_http(&config)?;
-    // let redeem = RedeemService::new(&config, shadow.clone(), darwinia.clone());
-    // let guard = GuardService::new(&config, shadow.clone(), darwinia.clone());
-    let subscribe = SubscribeService::new(shadow, darwinia.clone());
-
-    // Startup infomations
-    info!("🔗 Connect to");
-    info!("      Darwinia: {}", &config.node);
-    info!("        Shadow: {}", &config.shadow);
-    info!("      Ethereum: {}", &config.eth.rpc);
+    let web3 = Web3::new(Http::new(&config.eth.rpc).unwrap());
+    // print info
     let account_id = &darwinia.account.account_id;
     let roles = darwinia.account.role_names().await?;
     match &darwinia.account.real {
@@ -52,31 +53,39 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
             info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
         }
     }
-    info!("🌱 Relay from ethereum block: {}", &config.eth.start);
+    info!("🌱 Relay from ethereum block: {}", config.eth.start);
 
-    // listeners
-    let mut listener = Listener::default();
-    // listener.register(ethereum)?;
-    // listener.register(redeem)?;
-    listener.register(subscribe)?;
-    // if let Err(err) = GuardService::role_checking(darwinia).await {
-    //     warn!("{}", err.to_string());
-    // } else {
-    //     listener.register(guard)?;
-    // }
+    // --- Start service with killer patch ---
+    start_services(&config, &shadow, &darwinia, &web3).await
+    // let killer = darwinia.client.rpc.client.killer.clone();
+    // let never_exit = async {
+    //     start_services(&config, &shadow, &darwinia, &web3).await;
+    //     Ok::<(), Error>(())
+    // };
+    // let exit_on_ws_close = async {
+    //     loop {
+    //         if killer.lock().await.next().await.is_some() {
+    //             return Err(Error::Bridger("WS Closed".into()));
+    //         }
+    //     }
+    // };
 
-    let never_exit = async {
-        listener.start(config.eth.start).await?;
+    // select!(never_exit, exit_on_ws_close).await
+}
 
-        Ok::<(), Error>(())
-    };
-    let exit_on_ws_close = async {
-        loop {
-            if killer.lock().await.next().await.is_some() {
-                return Err(Error::Bridger("WS Closed".into()));
-            }
-        }
-    };
+async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>) -> Result<()> {
+    // ethereum service
+    let contracts = EthereumService::parse_contract(config);
+    let filters = EthereumService::parse_filter(config)?;
+    let ethereum_service = EthereumService::new(web3.clone(), contracts, filters, config.eth.start, 10).start();
+    let _ = ethereum_service.send(MsgStartEthereumService {}).await;
 
-    select!(never_exit, exit_on_ws_close).await
+    // relay service
+    let last_confirmed = darwinia.last_confirmed().await.unwrap();
+    let _relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed).start();
+
+    // redeem service
+    let _redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), 5).start();
+
+    Ok(())
 }

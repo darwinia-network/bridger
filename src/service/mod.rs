@@ -12,7 +12,10 @@ pub mod relay;
 pub mod subscribe;
 
 pub use self::{
-    ethereum::EthereumService, guard::GuardService, redeem::RedeemService, relay::RelayService,
+    ethereum::EthereumService,
+    redeem::RedeemService,
+    relay::RelayService,
+    guard::GuardService,
     subscribe::SubscribeService,
 };
 

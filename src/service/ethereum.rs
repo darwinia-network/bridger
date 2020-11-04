@@ -182,7 +182,7 @@ impl EthereumService {
     }
 
     async fn run(web3: Web3<Http>, contracts: ContractAddress, filters: [FilterBuilder; 2], scan_from: u64) -> BridgerResult<u64> {
-        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions...");
+        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {}...", scan_from);
 
         let eth = web3.eth();
         let latest_block_number = eth.block_number().await?.as_u64();

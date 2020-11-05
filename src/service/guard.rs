@@ -56,13 +56,21 @@ impl Service for GuardService {
                     let pending_block_number: u64 = pending_parcel.header.number;
                     let parcel = self.shadow.parcel(pending_block_number as usize).await?;
 
-                    if parcel.is_same_as(&pending_parcel) {
-                        self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
-                        info!("Voted to approve {}", pending_block_number);
-                    } else {
-                        self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
-                        info!("Voted to reject {}", pending_block_number);
-                    };
+                    let parcel_fulfilled = !(
+                        parcel.header.hash.is_none()
+                        || parcel.header.hash.unwrap() == [0u8; 32]
+                        || parcel.mmr_root == [0u8; 32]
+                    );
+
+                    if parcel_fulfilled {
+                        if parcel.is_same_as(&pending_parcel) {
+                            self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
+                            info!("Voted to approve {}", pending_block_number);
+                        } else {
+                            self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
+                            info!("Voted to reject {}", pending_block_number);
+                        };
+                    }
                 }
             }
 

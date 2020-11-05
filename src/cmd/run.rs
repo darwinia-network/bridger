@@ -16,7 +16,7 @@ use web3::transports::http::Http;
 /// Run the bridger
 pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     // config
-    let config = Config::new(path.clone())?;
+    let config = Config::new(path)?;
     if config.eth.rpc.starts_with("ws") {
         return Err(Error::Bridger(
             "Bridger currently doesn't support ethereum websocket transport".to_string(),
@@ -26,7 +26,7 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     // APIs
     let shadow = Arc::new(Shadow::new(&config));
     let darwinia = Arc::new(Darwinia::new(&config).await?);
-    let killer = darwinia.client.rpc.client.killer.clone();
+    let killer = &darwinia.client.rpc.client.killer;
 
     // Services
     let ethereum = <EthereumService<Http>>::new_http(&config)?;
@@ -37,9 +37,9 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
 
     // Startup infomations
     info!("🔗 Connect to");
-    info!("      Darwinia: {}", config.node);
-    info!("        Shadow: {}", config.shadow);
-    info!("      Ethereum: {}", config.eth.rpc);
+    info!("      Darwinia: {}", &config.node);
+    info!("        Shadow: {}", &config.shadow);
+    info!("      Ethereum: {}", &config.eth.rpc);
     let account_id = &darwinia.account.account_id;
     let roles = darwinia.account.role_names().await?;
     match &darwinia.account.real {
@@ -51,7 +51,7 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
             info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
         }
     }
-    info!("🌱 Relay from ethereum block: {}", config.eth.start);
+    info!("🌱 Relay from ethereum block: {}", &config.eth.start);
 
     // listeners
     let mut listener = Listener::default();

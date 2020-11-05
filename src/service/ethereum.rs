@@ -16,6 +16,7 @@ use web3::{
     types::{BlockNumber, FilterBuilder, H160, H256, U64},
     Transport, Web3,
 };
+use tokio::time;
 
 /// Attributes
 const SERVICE_NAME: &str = "ETHEREUM";
@@ -97,15 +98,25 @@ impl<T: Transport> EthereumService<T> {
         let mut txs = vec![];
         let eth = self.web3.eth();
         for f in self.filter.iter() {
+            let logs = match eth
+                .logs(
+                    f.clone()
+                        .from_block(BlockNumber::Number(U64::from(from)))
+                        .to_block(BlockNumber::Number(U64::from(to)))
+                        .build(),
+                )
+                .await
+            {
+                Ok(logs) => logs,
+                Err(e) => {
+                    error!("Failed to get logs, due to `{}`", e);
+
+                    continue;
+                }
+            };
+
             txs.append(
-                &mut eth
-                    .logs(
-                        f.clone()
-                            .from_block(BlockNumber::Number(U64::from(from)))
-                            .to_block(BlockNumber::Number(U64::from(to)))
-                            .build(),
-                    )
-                    .await?
+                &mut logs
                     .iter()
                     .map(|l| {
                         let block = l.block_number.unwrap_or_default().low_u64();
@@ -149,8 +160,17 @@ impl<T: Transport + std::marker::Sync> Service for EthereumService<T> {
         let eth = self.web3.eth();
 
         loop {
-            trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions...");
-            let block_number = eth.block_number().await?.as_u64();
+			trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions...");
+			let block_number = match eth.block_number().await {
+				Ok(block_number) => block_number.as_u64(),
+				Err(e) => {
+					error!("Failed to get ethereum block height, due to `{}`", e);
+
+					time::delay_for(Duration::from_secs(5)).await;
+
+					continue;
+				}
+			};
             let mut start = u64::MAX;
 
             if let Ok(cache_cloned) = cache.try_lock() {

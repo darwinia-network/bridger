@@ -720,6 +720,7 @@ dependencies = [
  "etc",
  "futures 0.3.7",
  "hex",
+ "jsonrpsee",
  "log",
  "reqwest",
  "serde",

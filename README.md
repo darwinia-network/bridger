@@ -10,9 +10,11 @@ The Darwinia Bridger
 
 ## Installation
 
-> Note: rustc toolchain `nightly-2020-10-05` will be installed along with this package, due to: https://github.com/paritytech/substrate/issues/7282
+### Install from github releases
 
-### Install using cargo
+Download binary from [latest release](https://github.com/darwinia-network/bridger/releases/latest).
+
+### [ Deprecated due to [#76](https://github.com/darwinia-network/bridger/issues/76) ]Install using cargo
 
 ```
 $ cargo install darwinia-bridger
@@ -28,11 +30,15 @@ cd ./target/release/
 ./bridger run -v
 ```
 
+> Note: rustc toolchain `nightly-2020-10-06` will be installed along with this package, due to: https://github.com/paritytech/substrate/issues/7282
+>
+> ```rustup default nightly-2020-10-06```
+
 ## Usage
 
 ```
 $ bridger
-darwinia-bridger 0.1.5
+darwinia-bridger 0.1.6
 
 USAGE:
     bridger <SUBCOMMAND>

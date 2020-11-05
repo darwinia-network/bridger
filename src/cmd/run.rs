@@ -15,6 +15,8 @@ use web3::transports::http::Http;
 
 /// Run the bridger
 pub async fn exec(path: Option<PathBuf>) -> Result<()> {
+    info!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+
     // config
     let config = Config::new(path)?;
     if config.eth.rpc.starts_with("ws") {

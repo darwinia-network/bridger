@@ -4,10 +4,11 @@ use actix::System;
 #[actix_rt::main]
 async fn main() {
     if let Err(err) = cmd::exec().await {
-        log::error!("{:?}", err);
+        log::error!("{}", err.to_string());
+        System::current().stop();
+    } else {
+        tokio::signal::ctrl_c().await.unwrap();
+        log::info!("Ctrl-C received, shutting down");
+        System::current().stop();
     }
-
-    tokio::signal::ctrl_c().await.unwrap();
-    log::info!("Ctrl-C received, shutting down");
-    System::current().stop();
 }

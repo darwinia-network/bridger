@@ -63,6 +63,8 @@ impl Service for GuardService {
                     );
 
                     if parcel_fulfilled {
+                        // delay to wait for possible previous extrinsics
+                        tokio::time::delay_for(Duration::from_secs(12)).await;
                         if parcel.is_same_as(&pending_parcel) {
                             self.darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
                             info!("Voted to approve {}", pending_block_number);
@@ -70,9 +72,6 @@ impl Service for GuardService {
                             self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
                             info!("Voted to reject {}", pending_block_number);
                         };
-
-                        // delay to wait for possible previous extrinsics
-                        tokio::time::delay_for(Duration::from_secs(6)).await;
                     }
                 }
             }

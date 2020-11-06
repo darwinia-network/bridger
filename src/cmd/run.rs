@@ -4,7 +4,7 @@ use crate::{
     result::{Error, Result},
     Config,
 };
-use async_macros::select;
+// use async_macros::select;
 // use futures::StreamExt;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -17,7 +17,7 @@ use actix::Actor;
 use crate::service::{EthereumService, ethereum::MsgStart as MsgStartEthereumService};
 use crate::service::RelayService;
 use crate::service::RedeemService;
-// use crate::service::GuardService;
+use crate::service::GuardService;
 // use crate::service::SubscribeService;
 
 /// Run the bridger
@@ -77,7 +77,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     // ethereum service
     let contracts = EthereumService::parse_contract(config);
     let filters = EthereumService::parse_filter(config)?;
-    let ethereum_service = EthereumService::new(web3.clone(), contracts, filters, config.eth.start, 10).start();
+    let ethereum_service = EthereumService::new(web3.clone(), contracts, filters, config.eth.start, config.step.ethereum).start();
     let _ = ethereum_service.send(MsgStartEthereumService {}).await;
 
     // relay service
@@ -85,7 +85,10 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     let _relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed).start();
 
     // redeem service
-    let _redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), 5).start();
+    let _redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem).start();
+
+    // guard service
+    GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard).start();
 
     Ok(())
 }

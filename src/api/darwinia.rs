@@ -180,8 +180,6 @@ impl Darwinia {
         let client = match jsonrpsee::ws_client(&config.node).await {
             Ok(client) => client,
             Err(e) => {
-                error!("Failed to connect to `{}`, due to {}", &config.node, e);
-
                 return Err(Bridger(format!("Failed to connect to `{}`, due to `{}`", &config.node, e)));
             }
         };

@@ -30,7 +30,7 @@ impl GuardService {
         GuardService {
             darwinia,
             shadow,
-            step: config.step.redeem,
+            step: config.step.guard,
         }
     }
 }
@@ -70,6 +70,9 @@ impl Service for GuardService {
                             self.darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
                             info!("Voted to reject {}", pending_block_number);
                         };
+
+                        // delay to wait for possible previous extrinsics
+                        tokio::time::delay_for(Duration::from_secs(6)).await;
                     }
                 }
             }

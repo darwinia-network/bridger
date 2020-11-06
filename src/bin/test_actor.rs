@@ -4,7 +4,7 @@ use std::sync::Arc;
 use darwinia_bridger::api::{Shadow, Darwinia};
 use actix::{Actor, System};
 
-use darwinia_bridger::service::{EthereumService, ethereum::{MsgStart}};
+use darwinia_bridger::service::EthereumService;
 use web3::{
     transports::http::Http,
     Web3,
@@ -28,9 +28,7 @@ async fn main() {
     let web3 = Web3::new(Http::new(&config.eth.rpc).unwrap());
     let contracts = EthereumService::parse_contract(&config);
     let filters = EthereumService::parse_filter(&config).unwrap();
-    let my_ethereum_service = EthereumService::new(web3, contracts, filters, 100, 10).start();
-    let res = my_ethereum_service.send(MsgStart{}).await;
-    println!("{:?}", res);
+    let _my_ethereum_service = EthereumService::new(web3, contracts, filters, 100, 10).start();
 
     // let shadow = Arc::new(Shadow::new(&config));
     // let darwinia = Arc::new(Darwinia::new(&config).await.unwrap());

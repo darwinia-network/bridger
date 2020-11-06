@@ -9,11 +9,10 @@ use crate::{
     result::{Result as BridgerResult, Error},
 };
 
-/// message 'Start'
 #[derive(Clone, Debug)]
-pub struct MsgStart;
+struct MsgGuard;
 
-impl Message for MsgStart {
+impl Message for MsgGuard {
     type Result = ();
 }
 
@@ -28,22 +27,25 @@ pub struct GuardService {
 
 impl Actor for GuardService {
     type Context = Context<Self>;
+
+    fn started(&mut self, ctx: &mut Self::Context) {
+        info!("   🌟 SERVICE STARTED: GUARD");
+        ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
+            ctx.notify(MsgGuard {});
+        });
+    }
 }
 
-impl Handler<MsgStart> for GuardService {
+impl Handler<MsgGuard> for GuardService {
     type Result = AtomicResponse<Self, ()>;
 
-    fn handle(&mut self, msg: MsgStart, _: &mut Context<Self>) -> Self::Result {
+    fn handle(&mut self, _msg: MsgGuard, _: &mut Context<Self>) -> Self::Result {
         AtomicResponse::new(Box::pin(
             async {}
                 .into_actor(self)
                 .then(|_, this, _| {
                     let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone());
                     f.into_actor(this)
-                })
-                .then(|r, this, ctx| {
-                    ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
-                    async {r}.into_actor(this)
                 })
                 .map(|_, _, _| {}),
         ))

@@ -36,6 +36,10 @@ pub struct RelayService {
 
 impl Actor for RelayService {
     type Context = Context<Self>;
+
+    fn started(&mut self, _ctx: &mut Self::Context) {
+        info!("   🌟 SERVICE STARTED: RELAY");
+    }
 }
 
 impl Handler<MsgBlockNumber> for RelayService {

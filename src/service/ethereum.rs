@@ -16,11 +16,10 @@ use web3::{
 use actix::prelude::*;
 use crate::result::Error;
 
-/// message 'Start'
 #[derive(Clone, Debug)]
-pub struct MsgStart;
+struct MsgScan;
 
-impl Message for MsgStart {
+impl Message for MsgScan {
     type Result = ();
 }
 
@@ -49,22 +48,25 @@ pub struct EthereumService {
 
 impl Actor for EthereumService {
     type Context = Context<Self>;
+
+    fn started(&mut self, ctx: &mut Self::Context) {
+        info!("🌟 SERVICE STARTED: ETHEREUM");
+        ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
+            ctx.notify(MsgScan {});
+        });
+    }
 }
 
-impl Handler<MsgStart> for EthereumService {
+impl Handler<MsgScan> for EthereumService {
     type Result = AtomicResponse<Self, ()>;
 
-    fn handle(&mut self, msg: MsgStart, _: &mut Context<Self>) -> Self::Result {
+    fn handle(&mut self, _msg: MsgScan, _: &mut Context<Self>) -> Self::Result {
         AtomicResponse::new(Box::pin(
             async {}
                 .into_actor(self)
                 .then(move |_, this, _| {
-                    let f = EthereumService::run(this.web3.clone(), this.contracts.clone(), this.filters.clone(), this.scan_from);
+                    let f = EthereumService::scan(this.web3.clone(), this.contracts.clone(), this.filters.clone(), this.scan_from);
                     f.into_actor(this)
-                })
-                .then(|r, this, ctx| {
-                    ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
-                    async {r}.into_actor(this)
                 })
                 .map(|r, this, _| {
                     if let Ok(latest_block_number) = r {
@@ -126,7 +128,7 @@ impl EthereumService {
     }
 
     /// Scan ethereum transactions
-    pub async fn scan(web3: Web3<Http>, contracts: ContractAddress, filters: [FilterBuilder; 2], from: u64, to: u64) -> BridgerResult<Vec<EthereumTransaction>> {
+    async fn do_scan(web3: Web3<Http>, contracts: ContractAddress, filters: [FilterBuilder; 2], from: u64, to: u64) -> BridgerResult<Vec<EthereumTransaction>> {
         let mut txs = vec![];
         let eth = web3.eth();
         for f in filters.iter() {
@@ -181,7 +183,7 @@ impl EthereumService {
         Ok(txs)
     }
 
-    async fn run(web3: Web3<Http>, contracts: ContractAddress, filters: [FilterBuilder; 2], scan_from: u64) -> BridgerResult<u64> {
+    async fn scan(web3: Web3<Http>, contracts: ContractAddress, filters: [FilterBuilder; 2], scan_from: u64) -> BridgerResult<u64> {
         trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {}...", scan_from);
 
         let eth = web3.eth();
@@ -199,7 +201,7 @@ impl EthereumService {
         }
 
         // 2. Scan tx from ethereum
-        let txs = EthereumService::scan(web3, contracts, filters, scan_from, latest_block_number).await?;
+        let txs = EthereumService::do_scan(web3, contracts, filters, scan_from, latest_block_number).await?;
         if !txs.is_empty() {
             info!("Found {} txs from {} to {}", txs.len(), scan_from, latest_block_number);
             for tx in &txs {

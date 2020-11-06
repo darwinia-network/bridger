@@ -1,3 +1,4 @@
+#![feature(async_closure)]
 use darwinia_bridger::cmd;
 use actix::System;
 

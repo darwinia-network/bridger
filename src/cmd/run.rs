@@ -14,7 +14,7 @@ use web3::{
 };
 use actix::Actor;
 
-use crate::service::{EthereumService, ethereum::MsgStart as MsgStartEthereumService};
+use crate::service::EthereumService;
 use crate::service::RelayService;
 use crate::service::RedeemService;
 use crate::service::GuardService;
@@ -77,8 +77,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     // ethereum service
     let contracts = EthereumService::parse_contract(config);
     let filters = EthereumService::parse_filter(config)?;
-    let ethereum_service = EthereumService::new(web3.clone(), contracts, filters, config.eth.start, config.step.ethereum).start();
-    let _ = ethereum_service.send(MsgStartEthereumService {}).await;
+    let _ethereum_service = EthereumService::new(web3.clone(), contracts, filters, config.eth.start, config.step.ethereum).start();
 
     // relay service
     let last_confirmed = darwinia.last_confirmed().await.unwrap();

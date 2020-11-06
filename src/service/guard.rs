@@ -29,10 +29,23 @@ impl Actor for GuardService {
     type Context = Context<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        info!("   🌟 SERVICE STARTED: GUARD");
-        ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
-            ctx.notify(MsgGuard {});
-        });
+        // if not tech comm member, do not start guard servie
+        let darwinia = self.darwinia.clone();
+        let mut is_tech_comm_member = false;
+        ctx.wait(async move {
+            if let Ok(result) = darwinia.account.is_tech_comm_member().await {
+                is_tech_comm_member = result;
+            }
+        }.into_actor(self));
+
+        if !is_tech_comm_member {
+            ctx.stop();
+        } else {
+            info!("   🌟 SERVICE STARTED: GUARD");
+            ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
+                ctx.notify(MsgGuard {});
+            });
+        }
     }
 }
 
@@ -93,15 +106,5 @@ impl GuardService {
         }
 
         Ok(())
-    }
-
-    /// check permission
-    pub async fn role_checking(darwinia: Arc<Darwinia>) -> BridgerResult<()> {
-        if !darwinia.account.is_tech_comm_member().await? {
-            let msg = "Guard service is not running because the account is not a member of the technical committee!".to_string();
-            Err(Error::Bridger(msg))
-        } else {
-            Ok(())
-        }
     }
 }

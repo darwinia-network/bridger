@@ -94,6 +94,8 @@ impl GuardService {
                 );
 
                 if parcel_fulfilled {
+                    // delay to wait for possible previous extrinsics
+                    tokio::time::delay_for(Duration::from_secs(12)).await;
                     if pending_parcel.is_same_as(&parcel_from_shadow) {
                         darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
                         info!("Voted to approve {}", pending_block_number);

@@ -2,8 +2,8 @@
 use crate::result::Result;
 use std::path::PathBuf;
 use structopt::{clap::AppSettings, StructOpt};
-// use std::time::Duration;
-// use tokio::time;
+use std::time::Duration;
+use tokio::time;
 
 mod affirm;
 mod affirm_raw;
@@ -75,10 +75,9 @@ pub async fn exec() -> Result<()> {
             }
             env_logger::init();
 
-            run::exec(config.clone()).await?
-			// while run::exec(config.clone()).await.is_err() {
-			// 	time::delay_for(Duration::from_secs(5)).await;
-			// }
+			while run::exec(config.clone()).await.is_err() {
+				time::delay_for(Duration::from_secs(5)).await;
+			}
 		}
         Opt::Confirm { block } => confirm::exec(block).await?,
         Opt::Affirm { block } => affirm::exec(block).await?,

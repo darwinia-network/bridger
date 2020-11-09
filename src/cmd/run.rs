@@ -4,15 +4,15 @@ use crate::{
     result::{Error, Result},
     Config,
 };
-// use async_macros::select;
-// use futures::StreamExt;
+use async_macros::select;
+use futures::StreamExt;
 use std::path::PathBuf;
 use std::sync::Arc;
 use web3::{
     transports::http::Http,
     Web3,
 };
-use actix::Actor;
+use actix::{Actor, System};
 
 use crate::service::EthereumService;
 use crate::service::RelayService;
@@ -55,22 +55,25 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     }
     info!("🌱 Relay from ethereum block: {}", config.eth.start);
 
-    // --- Start service with killer patch ---
-    start_services(&config, &shadow, &darwinia, &web3).await
-    // let killer = darwinia.client.rpc.client.killer.clone();
-    // let never_exit = async {
-    //     start_services(&config, &shadow, &darwinia, &web3).await;
-    //     Ok::<(), Error>(())
-    // };
-    // let exit_on_ws_close = async {
-    //     loop {
-    //         if killer.lock().await.next().await.is_some() {
-    //             return Err(Error::Bridger("WS Closed".into()));
-    //         }
-    //     }
-    // };
+    // --- Start services
+    let killer = darwinia.client.rpc.client.killer.clone();
+    let never_exit = async {
+        start_services(&config, &shadow, &darwinia, &web3).await?;
 
-    // select!(never_exit, exit_on_ws_close).await
+        log::info!("Ctrl-C to shut down");
+        tokio::signal::ctrl_c().await.unwrap();
+        log::info!("Ctrl-C received, shutting down");
+        System::current().stop();
+        Ok::<(), Error>(())
+    };
+    let exit_on_ws_close = async {
+        loop {
+            if killer.lock().await.next().await.is_some() {
+                return Err(Error::Bridger("WS Closed".into()));
+            }
+        }
+    };
+    select!(never_exit, exit_on_ws_close).await
 }
 
 async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>) -> Result<()> {

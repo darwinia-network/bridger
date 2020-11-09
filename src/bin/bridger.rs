@@ -7,9 +7,5 @@ async fn main() {
     if let Err(err) = cmd::exec().await {
         log::error!("{}", err.to_string());
         System::current().stop();
-    } else {
-        tokio::signal::ctrl_c().await.unwrap();
-        log::info!("Ctrl-C received, shutting down");
-        System::current().stop();
     }
 }

@@ -82,6 +82,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     // relay service
     let last_confirmed = darwinia.last_confirmed().await.unwrap();
     let _relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed).start();
+    let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed, config.step.relay).start();
 
     // redeem service
     let _redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem).start();

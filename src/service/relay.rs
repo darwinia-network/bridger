@@ -6,6 +6,7 @@ use primitives::chain::ethereum::EthereumHeader;
 
 use actix::prelude::*;
 use actix::fut::Either;
+use std::time::Duration;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
@@ -32,13 +33,17 @@ pub struct RelayService {
 
     target: u64,
     relayed: u64,
+    step: u64,
 }
 
 impl Actor for RelayService {
     type Context = Context<Self>;
 
-    fn started(&mut self, _ctx: &mut Self::Context) {
+    fn started(&mut self, ctx: &mut Self::Context) {
         info!("   🌟 SERVICE STARTED: RELAY");
+        ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
+            ctx.notify(MsgExecute {});
+        });
     }
 }
 
@@ -79,12 +84,13 @@ impl Handler<MsgExecute> for RelayService {
 impl RelayService {
 
     /// create new relay service actor
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, last_confirmed: u64) -> Self {
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, last_confirmed: u64, step: u64) -> Self {
         RelayService {
             darwinia,
             shadow,
             target: last_confirmed,
             relayed: last_confirmed,
+            step,
         }
     }
 

@@ -26,37 +26,36 @@ pub struct SubscribeService {
     pub shadow: Arc<Shadow>,
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
+
+    sub: EventSubscription<DarwiniaRuntime>,
 }
 
 impl SubscribeService {
     /// New redeem service
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> SubscribeService {
-        SubscribeService { darwinia, shadow }
+    pub async fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> BridgerResult<SubscribeService> {
+        let sub = SubscribeService::build_event_subscription(darwinia.clone()).await?;
+        Ok(SubscribeService {
+            darwinia,
+            shadow,
+            sub
+        })
     }
-}
 
-impl SubscribeService {
-    /// run
-    pub async fn run(&mut self) -> BridgerResult<()> {
-        let client = &self.darwinia.client;
-        let scratch = client.subscribe_events().await?;
-        let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());
-
-        // Register decoders
-        decoder.with_ethereum_backing();
-        decoder.with_ethereum_relayer_game();
-        decoder.with_ethereum_relay();
-
-        // Build subscriber
-        let mut sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
+    /// start
+    pub async fn start(&mut self) {
         loop {
-            if let Some(raw) = sub.next().await {
-                if let Ok(event) = raw {
-                    // Remove the system events temporarily because it`s too verbose.
-                    if &event.module == "System" {
-                        continue;
-                    }
+            if let Err(e) = self.process_next_event().await {
+                error!("Fail to process next event: {:?}", e);
+            }
+        }
+    }
 
+    /// process_next_event
+    async fn process_next_event(&mut self) -> BridgerResult<()> {
+        if let Some(raw) = self.sub.next().await {
+            if let Ok(event) = raw {
+                // Remove the system events temporarily because it`s too verbose.
+                if &event.module != "System" {
                     // Common events to debug
                     debug!(">> Event - {}::{}", &event.module, &event.variant);
                     match event.module.as_str() {
@@ -67,5 +66,21 @@ impl SubscribeService {
                 }
             }
         }
+        Ok(())
+    }
+
+    async fn build_event_subscription(darwinia: Arc<Darwinia>) -> BridgerResult<EventSubscription<DarwiniaRuntime>> {
+        let client = &darwinia.client;
+        let scratch = client.subscribe_events().await?;
+        let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());
+
+        // Register decoders
+        decoder.with_ethereum_backing();
+        decoder.with_ethereum_relayer_game();
+        decoder.with_ethereum_relay();
+
+        // Build subscriber
+        let sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
+        Ok(sub)
     }
 }

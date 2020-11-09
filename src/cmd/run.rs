@@ -18,7 +18,7 @@ use crate::service::EthereumService;
 use crate::service::RelayService;
 use crate::service::RedeemService;
 use crate::service::GuardService;
-// use crate::service::SubscribeService;
+use crate::service::SubscribeService;
 
 /// Run the bridger
 pub async fn exec(path: Option<PathBuf>) -> Result<()> {
@@ -59,6 +59,8 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     let killer = darwinia.client.rpc.client.killer.clone();
     let never_exit = async {
         start_services(&config, &shadow, &darwinia, &web3).await?;
+        let mut subscribe = SubscribeService::new(shadow.clone(), darwinia.clone());
+        subscribe.run().await?;
 
         log::info!("Ctrl-C to shut down");
         tokio::signal::ctrl_c().await.unwrap();

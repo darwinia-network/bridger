@@ -31,7 +31,7 @@ use substrate_subxt::{
 use web3::types::H256;
 
 // Types
-pub type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
+type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
 type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
 /// AccountId

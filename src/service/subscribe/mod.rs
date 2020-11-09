@@ -2,10 +2,7 @@
 use crate::{
     api::{Darwinia, Shadow},
     result::Result as BridgerResult,
-    service::Service,
-    MemCache,
 };
-use async_trait::async_trait;
 use primitives::{
     frame::ethereum::{
         backing::EthereumBackingEventsDecoder, game::EthereumRelayerGameEventsDecoder,
@@ -13,14 +10,13 @@ use primitives::{
     },
     runtime::DarwiniaRuntime,
 };
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use substrate_subxt::{EventSubscription, EventsDecoder};
 
 mod backing;
 mod relay;
 
 /// Attributes
-const SERVICE_NAME: &str = "SUBSCRIBE";
 const ETHEREUM_RELAY: &str = "EthereumRelay";
 const ETHEREUM_BACKING: &str = "EthereumBacking";
 
@@ -39,13 +35,9 @@ impl SubscribeService {
     }
 }
 
-#[async_trait(?Send)]
-impl Service for SubscribeService {
-    fn name<'e>(&self) -> &'e str {
-        SERVICE_NAME
-    }
-
-    async fn run(&mut self, _: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
+impl SubscribeService {
+    /// run
+    pub async fn run(&mut self) -> BridgerResult<()> {
         let client = &self.darwinia.client;
         let scratch = client.subscribe_events().await?;
         let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());

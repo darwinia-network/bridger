@@ -24,10 +24,6 @@ path = "src/lib.rs"
 name = "bridger"
 path = "src/bin/bridger.rs"
 
-[[bin]]
-name = "test_actor"
-path = "src/bin/test_actor.rs"
-
 [dependencies]
 jsonrpsee = "0.1.0"
 async-macros = "2.0.0"

@@ -64,6 +64,8 @@ pub struct Proxy {
 /// Bridger Config
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
+    /// network
+    pub mainnet: Option<bool>,
     /// Darwinia node url
     pub node: String,
     /// Darwinia account seed
@@ -81,6 +83,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Config {
+            mainnet: Some(true),
             node: "wss://crab.darwinia.network".to_string(),
             seed: "//Alice".to_string(),
             shadow: "http://localhost:3000".to_string(),

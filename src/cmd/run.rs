@@ -13,6 +13,7 @@ use web3::{
     Web3,
 };
 use actix::{Actor, System};
+use substrate_subxt::sp_core::crypto::*;
 
 use crate::service::EthereumService;
 use crate::service::RelayService;
@@ -30,11 +31,17 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
             "Bridger currently doesn't support ethereum websocket transport".to_string(),
         ));
     }
+    let network = if let Some(true) = config.mainnet {
+        set_default_ss58_version(Ss58AddressFormat::DarwiniaAccount);
+        "Mainnet"
+    } else {
+        "Crab"
+    };
     // print info
     info!("🔗 Connect to");
-    info!("      Darwinia: {}", config.node);
-    info!("        Shadow: {}", config.shadow);
-    info!("      Ethereum: {}", config.eth.rpc);
+    info!("     Darwinia {}: {}", network, config.node);
+    info!("     Shadow: {}", config.shadow);
+    info!("     Ethereum: {}", config.eth.rpc);
 
 
     // --- Init APIs ---
@@ -54,6 +61,7 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
         }
     }
     info!("🌱 Relay from ethereum block: {}", config.eth.start);
+
 
     // --- Start services
     let killer = darwinia.client.rpc.client.killer.clone();

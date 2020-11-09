@@ -40,6 +40,7 @@ impl Actor for GuardService {
 
         if !is_tech_comm_member {
             ctx.stop();
+            info!("   💩 SERVICE NOT STARTED: GUARD, YOU ARE NOT TECH COMM MEMBER");
         } else {
             info!("   🌟 SERVICE STARTED: GUARD");
             ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {

@@ -18,7 +18,7 @@ impl Message for MsgBlockNumber {
 
 /// message 'execute'
 #[derive(Clone, Debug)]
-pub struct MsgExecute;
+struct MsgExecute;
 
 impl Message for MsgExecute {
     type Result = ();

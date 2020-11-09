@@ -58,7 +58,10 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                 .then(|r, this, ctx| {
                     if let Err(err) = r {
                         if err.to_string().contains("wait") {
+                            warn!("{}", err.to_string());
                             ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
+                        } else {
+                            error!("{}", err.to_string());
                         }
                     }
                     async {Result::<(), Error>::Ok(())}.into_actor(this)
@@ -79,7 +82,7 @@ impl RedeemService {
     }
 
     async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction) -> BridgerResult<()> {
-        trace!("Redeem ethereum tx {:?}...", tx.tx_hash);
+        trace!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
 
         // 1. Checking before redeem
         if darwinia.verified(&tx).await? {

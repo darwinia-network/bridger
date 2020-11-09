@@ -6,8 +6,9 @@ use actix::prelude::*;
 
 use crate::{
     api::{Darwinia, Shadow},
-    result::{Result as BridgerResult, Error},
+    result::{Result as BridgerResult},
 };
+use crate::result::Error::Bridger;
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -29,24 +30,10 @@ impl Actor for GuardService {
     type Context = Context<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        // if not tech comm member, do not start guard servie
-        let darwinia = self.darwinia.clone();
-        let mut is_tech_comm_member = false;
-        ctx.wait(async move {
-            if let Ok(result) = darwinia.account.is_tech_comm_member().await {
-                is_tech_comm_member = result;
-            }
-        }.into_actor(self));
-
-        if !is_tech_comm_member {
-            ctx.stop();
-            info!("   💩 SERVICE NOT STARTED: GUARD, YOU ARE NOT TECH COMM MEMBER");
-        } else {
-            info!("   🌟 SERVICE STARTED: GUARD");
-            ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
-                ctx.notify(MsgGuard {});
-            });
-        }
+        info!("   🌟 SERVICE STARTED: GUARD");
+        ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
+            ctx.notify(MsgGuard {});
+        });
     }
 }
 
@@ -68,11 +55,18 @@ impl Handler<MsgGuard> for GuardService {
 
 impl GuardService {
     /// New redeem service
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64) -> GuardService {
-        GuardService {
-            darwinia,
-            shadow,
-            step,
+    pub async fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64) -> BridgerResult<GuardService> {
+        let is_tech_comm_member = darwinia.account.is_tech_comm_member().await?;
+
+        if is_tech_comm_member {
+            Ok(GuardService {
+                darwinia,
+                shadow,
+                step,
+            })
+        } else {
+            info!("   💩 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
+            Err(Bridger("Not tech comm member".to_string()))
         }
     }
 

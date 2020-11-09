@@ -94,7 +94,9 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     ).start();
 
     // guard service
-    GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard).start();
+    if let Ok(guard_servcie) = GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard).await {
+        guard_servcie.start();
+    }
 
     Ok(())
 }

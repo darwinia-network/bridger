@@ -7,7 +7,6 @@ use crate::{
 use std::sync::Arc;
 use actix::{Actor, System};
 use crate::result::Error::Bridger;
-use std::time::Duration;
 
 /// Run guard
 pub async fn exec() -> Result<()> {
@@ -21,9 +20,9 @@ pub async fn exec() -> Result<()> {
     info!("Init API succeed!");
 
     // guard service
-    let guard_service = GuardService::new(shadow, darwinia, config.step.guard).start();
-    tokio::time::delay_for(Duration::from_secs(2)).await;
-    if guard_service.connected() {
+    if let Ok(guard_servcie) = GuardService::new(shadow, darwinia, config.step.guard).await {
+        guard_servcie.start();
+
         log::info!("Ctrl-C to shut down");
         tokio::signal::ctrl_c().await.unwrap();
         log::info!("Ctrl-C received, shutting down");
@@ -32,5 +31,4 @@ pub async fn exec() -> Result<()> {
     } else {
         Err(Bridger("Guard service is not running.".to_string()))
     }
-
 }

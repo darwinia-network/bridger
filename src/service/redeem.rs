@@ -58,10 +58,10 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                 .then(|r, this, ctx| {
                     if let Err(err) = r {
                         if err.to_string().contains("wait") {
-                            warn!("{}", err.to_string());
+                            trace!("{}", err.to_string());
                             ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
                         } else {
-                            error!("{}", err.to_string());
+                            trace!("{}", err.to_string());
                         }
                     }
                     async {Result::<(), Error>::Ok(())}.into_actor(this)
@@ -82,22 +82,22 @@ impl RedeemService {
     }
 
     async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction) -> BridgerResult<()> {
-        trace!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
+        trace!("Try to redeem ethereum tx {:?}...", tx.enclosed_hash());
 
         // 1. Checking before redeem
         if darwinia.verified(&tx).await? {
-            let msg = format!("This ethereum tx {:?} has already been redeemed.", tx.tx_hash);
+            let msg = format!("This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
             return Err(Error::Bridger(msg));
         }
 
         let last_confirmed = darwinia.last_confirmed().await?;
         if tx.block >= last_confirmed {
-            let msg = format!("This ethereum tx {:?}'s block {} not exist, please wait.", tx.tx_hash, tx.block);
+            let msg = format!("This ethereum tx {:?}'s block {} not exist, please wait.", tx.enclosed_hash(), tx.block);
             return Err(Error::Bridger(msg));
         }
 
         // 2. Do redeem
-        info!("Prepare to redeem ethereum tx {:?}", tx.tx_hash);
+        info!("Prepare to redeem ethereum tx {:?}", tx.enclosed_hash());
         let proof = shadow
             .receipt(&format!("{:?}", tx.enclosed_hash()), last_confirmed)
             .await?;

@@ -44,6 +44,9 @@ pub struct EthereumService {
     web3: Web3<Http>,
     scan_from: u64,
     step: u64,
+
+    relay_service: Recipient<MsgBlockNumber>,
+    redeem_service: Recipient<MsgEthereumTransaction>,
 }
 
 impl Actor for EthereumService {
@@ -65,7 +68,14 @@ impl Handler<MsgScan> for EthereumService {
             async {}
                 .into_actor(self)
                 .then(move |_, this, _| {
-                    let f = EthereumService::scan(this.web3.clone(), this.contracts.clone(), this.filters.clone(), this.scan_from);
+                    let f = EthereumService::scan(
+                        this.web3.clone(),
+                        this.contracts.clone(),
+                        this.filters.clone(),
+                        this.scan_from,
+                        this.relay_service.clone(),
+                        this.redeem_service.clone(),
+                    );
                     f.into_actor(this)
                 })
                 .map(|r, this, _| {
@@ -77,6 +87,9 @@ impl Handler<MsgScan> for EthereumService {
     }
 }
 use primitives::bytes;
+use crate::service::relay::MsgBlockNumber;
+use crate::service::redeem::MsgEthereumTransaction;
+
 impl EthereumService {
     /// Parse contract addresses
     pub fn parse_contract(config: &Config) -> ContractAddress {
@@ -116,7 +129,10 @@ impl EthereumService {
     pub fn new(
         web3: Web3<Http>,
         contracts: ContractAddress, filters: [FilterBuilder; 2],
-        scan_from: u64, step: u64) -> EthereumService
+        scan_from: u64, step: u64,
+        relay_service: Recipient<MsgBlockNumber>,
+        redeem_service: Recipient<MsgEthereumTransaction>,
+    ) -> EthereumService
     {
         EthereumService {
             contracts,
@@ -124,6 +140,8 @@ impl EthereumService {
             web3,
             scan_from,
             step,
+            relay_service,
+            redeem_service,
         }
     }
 
@@ -183,7 +201,12 @@ impl EthereumService {
         Ok(txs)
     }
 
-    async fn scan(web3: Web3<Http>, contracts: ContractAddress, filters: [FilterBuilder; 2], scan_from: u64) -> BridgerResult<u64> {
+    async fn scan(web3: Web3<Http>,
+                  contracts: ContractAddress, filters: [FilterBuilder; 2],
+                  scan_from: u64,
+                  relay_service: Recipient<MsgBlockNumber>,
+                  redeem_service: Recipient<MsgEthereumTransaction>,
+    ) -> BridgerResult<u64> {
         trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {}...", scan_from);
 
         let eth = web3.eth();
@@ -207,7 +230,14 @@ impl EthereumService {
             for tx in &txs {
                 trace!("\t{:?}", &tx.tx_hash);
 
-                // TODO: send msg to relay and redeem service
+                // send msg to relay and redeem service
+                if let Err(e) = relay_service.send(MsgBlockNumber(tx.block)).await {
+                    error!("Send block number to relay service fail: {:?}", e);
+                }
+
+                if let Err(e) = redeem_service.send(MsgEthereumTransaction{ tx: tx.clone() }).await {
+                    error!("Send tx to redeem service fail: {:?}", e);
+                }
             }
         }
 

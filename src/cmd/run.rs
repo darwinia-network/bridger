@@ -74,18 +74,21 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
 }
 
 async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>) -> Result<()> {
-    // ethereum service
-    let contracts = EthereumService::parse_contract(config);
-    let filters = EthereumService::parse_filter(config)?;
-    let _ethereum_service = EthereumService::new(web3.clone(), contracts, filters, config.eth.start, config.step.ethereum).start();
-
     // relay service
     let last_confirmed = darwinia.last_confirmed().await.unwrap();
-    let _relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed).start();
     let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed, config.step.relay).start();
 
     // redeem service
-    let _redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem).start();
+    let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem).start();
+
+    // ethereum service
+    let contracts = EthereumService::parse_contract(config);
+    let filters = EthereumService::parse_filter(config)?;
+    let _ethereum_service = EthereumService::new(
+        web3.clone(),
+        contracts, filters, config.eth.start, config.step.ethereum,
+        relay_service.recipient(), redeem_service.recipient()
+    ).start();
 
     // guard service
     GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard).start();

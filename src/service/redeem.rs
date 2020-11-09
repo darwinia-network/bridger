@@ -126,17 +126,17 @@ impl RedeemService {
     }
 
     async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction) -> BridgerResult<()> {
-        trace!("Try to redeem ethereum tx {:?}...", tx.enclosed_hash());
+        trace!("      Try to redeem ethereum tx {:?}...", tx.enclosed_hash());
 
         // 1. Checking before redeem
         if darwinia.verified(&tx).await? {
-            let msg = format!("This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
+            let msg = format!("      This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
             return Err(Error::Bridger(msg));
         }
 
         let last_confirmed = darwinia.last_confirmed().await?;
         if tx.block >= last_confirmed {
-            let msg = format!("This ethereum tx {:?}'s block {} not exist, please wait.", tx.enclosed_hash(), tx.block);
+            let msg = format!("      This ethereum tx {:?}'s block {} not exist, please wait.", tx.enclosed_hash(), tx.block);
             return Err(Error::Bridger(msg));
         }
 

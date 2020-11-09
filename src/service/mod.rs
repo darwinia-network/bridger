@@ -1,9 +1,5 @@
 //! Bridger Services
-pub use crate::{memcache::{
-    MemCache, EthereumTransactionHash
-}, result::Result};
-use async_trait::async_trait;
-use std::sync::{Arc, Mutex};
+pub use crate::result::Result;
 
 pub mod ethereum;
 pub mod guard;
@@ -19,11 +15,3 @@ pub use self::{
     subscribe::SubscribeService,
 };
 
-/// Bridge service
-#[async_trait(?Send)]
-pub trait Service {
-    /// Service name
-    fn name<'c>(&self) -> &'c str;
-    /// Run target service
-    async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> Result<()>;
-}

@@ -1,6 +1,6 @@
 //! Ethereum transaction service
 use crate::{
-    memcache::{EthereumTransaction, EthereumTransactionHash},
+    service::redeem::{EthereumTransaction, EthereumTransactionHash},
     result::Result as BridgerResult,
     Config,
 };

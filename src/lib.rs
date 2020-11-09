@@ -10,6 +10,5 @@ pub mod api;
 pub mod cmd;
 pub mod result;
 pub mod service;
-pub mod memcache;
 
-pub use self::{config::Config, service::Service};
+pub use self::config::Config;

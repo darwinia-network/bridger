@@ -74,8 +74,12 @@ impl Handler<MsgExecute> for RelayService {
                         Either::Right(f.into_actor(this))
                     }
                 })
-                .map(|_, this, _| {
-                    this.relayed = this.target
+                .map(|r, this, _| {
+                    if let Err(e) = r {
+                        error!("{:?}", e.to_string());
+                    } else {
+                        this.relayed = this.target
+                    }
                 }),
         ))
     }
@@ -143,7 +147,7 @@ impl RelayService {
         // /////////////////////////
         match darwinia.affirm(parcel).await {
             Ok(hash) => {
-                println!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
+                info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
                 Ok(hash)
             }
             Err(err) => Err(err),

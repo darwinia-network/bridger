@@ -228,7 +228,7 @@ impl EthereumService {
         if !txs.is_empty() {
             info!("Found {} txs from {} to {}", txs.len(), scan_from, latest_block_number);
             for tx in &txs {
-                trace!("    {:?}", &tx.enclosed_hash());
+                trace!("    {:?}", &tx.tx_hash);
 
                 // send msg to relay and redeem service
                 if let Err(e) = relay_service.send(MsgBlockNumber(tx.block)).await {

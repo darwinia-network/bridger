@@ -141,7 +141,7 @@ impl RedeemService {
         }
 
         // 2. Do redeem
-        info!("Prepare to redeem ethereum tx {:?}", tx.enclosed_hash());
+        info!("      Prepare to redeem ethereum tx {:?}", tx.enclosed_hash());
         let proof = shadow
             .receipt(&format!("{:?}", tx.enclosed_hash()), last_confirmed)
             .await?;
@@ -150,7 +150,7 @@ impl RedeemService {
             EthereumTransactionHash::Token(_) => RedeemFor::Token,
         };
         let hash = darwinia.redeem(redeem_for, proof).await?;
-        info!("Redeemed with extrinsic {:?}", hash);
+        info!("      Redeemed with extrinsic {:?}", hash);
 
         Ok(())
     }

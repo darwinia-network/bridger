@@ -24,6 +24,8 @@ pub struct GuardService {
     pub shadow: Arc<Shadow>,
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
+
+    voted: Vec<u64>,
 }
 
 impl Actor for GuardService {
@@ -45,10 +47,14 @@ impl Handler<MsgGuard> for GuardService {
             async {}
                 .into_actor(self)
                 .then(|_, this, _| {
-                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone());
+                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone(), this.voted.clone());
                     f.into_actor(this)
                 })
-                .map(|_, _, _| {}),
+                .map(|r, this, _| {
+                    if let Ok(mut vote_result) = r {
+                        this.voted.append(&mut vote_result);
+                    }
+                }),
         ))
     }
 }
@@ -63,6 +69,7 @@ impl GuardService {
                 darwinia,
                 shadow,
                 step,
+                voted: vec![]
             })
         } else {
             info!("   💩 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
@@ -70,16 +77,17 @@ impl GuardService {
         }
     }
 
-    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> BridgerResult<()> {
+    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, voted: Vec<u64>) -> BridgerResult<Vec<u64>> {
         trace!("Checking pending headers...");
 
+        let mut result = vec![];
         let pending_headers = darwinia.pending_headers().await?;
         for pending in pending_headers {
             let pending_parcel = pending.1;
             let voting_state = pending.2;
+            let pending_block_number: u64 = pending_parcel.header.number;
 
-            if !darwinia.account.has_voted(voting_state) {
-                let pending_block_number: u64 = pending_parcel.header.number;
+            if !voted.contains(&pending_block_number) && !darwinia.account.has_voted(voting_state) {
                 let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
 
                 let parcel_fulfilled = !(
@@ -98,10 +106,11 @@ impl GuardService {
                         let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
                         info!("Voted to reject: {}, ex hash: {:?}", pending_block_number, ex_hash);
                     };
+                    result.push(pending_block_number);
                 }
             }
         }
 
-        Ok(())
+        Ok(result)
     }
 }

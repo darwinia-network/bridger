@@ -1,3 +1,5 @@
+mainnet = true
+
 # darwinia node websocket json-rpc endpoint
 node = 'ws://<YOUR_DARWINIA_NODE_URL>'
 

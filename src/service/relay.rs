@@ -1,7 +1,6 @@
 //! Relay Service
 use crate::{api::{Darwinia, Shadow}, result::Error, result::Result as BridgerResult};
 use std::sync::Arc;
-use substrate_subxt::sp_core::H256;
 use primitives::chain::ethereum::EthereumHeader;
 
 use actix::prelude::*;
@@ -69,14 +68,13 @@ impl Handler<MsgExecute> for RelayService {
                         let f = RelayService::affirm(this.darwinia.clone(), this.shadow.clone(), this.target);
                         Either::Left(f.into_actor(this))
                     } else {
-                        let error_reason = "No need to relay".to_string();
-                        let f = async {Err(Error::Bridger(error_reason)) };
+                        let f = async {Ok(())};
                         Either::Right(f.into_actor(this))
                     }
                 })
                 .map(|r, this, _| {
                     if let Err(e) = r {
-                        error!("{:?}", e.to_string());
+                        error!("{}", e.to_string());
                     } else {
                         this.relayed = this.target
                     }
@@ -99,7 +97,7 @@ impl RelayService {
     }
 
     /// affirm target block
-    pub async fn affirm(darwinia: Arc<Darwinia>, shadow: Arc<Shadow>, target: u64) -> BridgerResult<H256> {
+    pub async fn affirm(darwinia: Arc<Darwinia>, shadow: Arc<Shadow>, target: u64) -> BridgerResult<()> {
         // /////////////////////////
         // checking before affirm
         // /////////////////////////
@@ -148,7 +146,7 @@ impl RelayService {
         match darwinia.affirm(parcel).await {
             Ok(hash) => {
                 info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
-                Ok(hash)
+                Ok(())
             }
             Err(err) => Err(err),
         }

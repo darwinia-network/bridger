@@ -111,7 +111,6 @@ impl Shadow {
         let mmr_root = self.mmr(number).await?;
         let header = self.eth.get_header_by_number(number as u64).await?;
 
-        println!("header: {:?}", header);
         Ok(EthereumRelayHeaderParcel {
             header,
             mmr_root: mmr_root.mmr_root,

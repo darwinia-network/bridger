@@ -1,5 +1,3 @@
-mainnet = true
-
 # darwinia node websocket json-rpc endpoint
 node = 'ws://<YOUR_DARWINIA_NODE_URL>'
 
@@ -34,7 +32,7 @@ topics = []
 
 [step]
 # ethereum service polling interval in seconds
-ethereum = 120
+ethereum = 160
 # relay service polling interval in seconds
 relay = 60
 # redeem service polling interval in seconds

@@ -821,6 +821,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sp-keyring",
+ "sp-version",
  "structopt",
  "substrate-subxt",
  "tokio",

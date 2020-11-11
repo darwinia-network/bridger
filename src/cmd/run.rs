@@ -31,24 +31,30 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
             "Bridger currently doesn't support ethereum websocket transport".to_string(),
         ));
     }
-    let network = if let Some(true) = config.mainnet {
-        set_default_ss58_version(Ss58AddressFormat::DarwiniaAccount);
-        "Mainnet"
-    } else {
-        "Crab"
-    };
+
+
     // print info
-    info!("🔗 Connect to");
-    info!("     Darwinia {}: {}", network, config.node);
-    info!("     Shadow: {}", config.shadow);
-    info!("     Ethereum: {}", config.eth.rpc);
+
 
 
     // --- Init APIs ---
     let shadow = Arc::new(Shadow::new(&config));
     let darwinia = Arc::new(Darwinia::new(&config).await?);
     let web3 = Web3::new(Http::new(&config.eth.rpc).unwrap());
+
+    let runtime_version: sp_version::RuntimeVersion = darwinia.client.rpc.runtime_version(None).await?;
+    let network = if runtime_version.spec_name.to_string() == "Crab" {
+        "Crab"
+    } else {
+        set_default_ss58_version(Ss58AddressFormat::DarwiniaAccount);
+        "Mainnet"
+    };
+
     // print info
+    info!("🔗 Connect to");
+    info!("     Darwinia {}: {}", network, config.node);
+    info!("     Shadow: {}", config.shadow);
+    info!("     Ethereum: {}", config.eth.rpc);
     let account_id = &darwinia.account.account_id;
     let roles = darwinia.account.role_names().await?;
     match &darwinia.account.real {

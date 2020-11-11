@@ -107,7 +107,7 @@ impl EthereumService {
     }
 
     /// Parse log filter from config
-    pub fn parse_filter(config: &Config) -> BridgerResult<[FilterBuilder; 2]> {
+    pub fn parse_filter(config: &Config) -> [FilterBuilder; 2] {
         let filters = [&config.eth.contract.bank, &config.eth.contract.issuing]
             .iter()
             .map(|c| {
@@ -126,19 +126,23 @@ impl EthereumService {
                     )
             })
             .collect::<Vec<FilterBuilder>>();
-        Ok([filters[0].clone(), filters[1].clone()])
+        [filters[0].clone(), filters[1].clone()]
     }
 
     /// New Ethereum Service with http
     pub fn new(
+        config: Config,
         web3: Web3<Http>,
         darwinia: Arc<Darwinia>,
-        contracts: ContractAddress, filters: [FilterBuilder; 2],
-        scan_from: u64, step: u64,
         relay_service: Recipient<MsgBlockNumber>,
         redeem_service: Recipient<MsgEthereumTransaction>,
     ) -> EthereumService
     {
+        let scan_from = config.eth.start;
+        let step = config.step.ethereum;
+        let contracts = EthereumService::parse_contract(&config);
+        let filters = EthereumService::parse_filter(&config);
+
         EthereumService {
             contracts,
             filters,

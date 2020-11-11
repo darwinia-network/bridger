@@ -99,12 +99,13 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem).start();
 
     // ethereum service
-    let contracts = EthereumService::parse_contract(config);
-    let filters = EthereumService::parse_filter(config)?;
+
     EthereumService::new(
-        web3.clone(), darwinia.clone(),
-        contracts, filters, config.eth.start, config.step.ethereum,
-        relay_service.recipient(), redeem_service.recipient()
+        config.clone(),
+        web3.clone(),
+        darwinia.clone(),
+        relay_service.recipient(),
+        redeem_service.recipient()
     ).start();
 
     // guard service

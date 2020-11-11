@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use structopt::{clap::AppSettings, StructOpt};
 use std::time::Duration;
 use tokio::time;
+use actix::System;
 
 mod affirm;
 mod affirm_raw;
@@ -79,6 +80,7 @@ pub async fn exec() -> Result<()> {
                 if let Err(e) = run::exec(config.clone()).await {
                     if &e.to_string() == "CodeUpdated" || &e.to_string() == "WS Closed" {
                         info!("Restart by {}", e.to_string());
+                        System::current().stop();
                         time::delay_for(Duration::from_secs(5)).await;
                     } else {
                         error!("Stopped by {}", e.to_string());

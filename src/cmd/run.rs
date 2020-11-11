@@ -101,8 +101,8 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     // ethereum service
     let contracts = EthereumService::parse_contract(config);
     let filters = EthereumService::parse_filter(config)?;
-    let _ethereum_service = EthereumService::new(
-        web3.clone(),
+    EthereumService::new(
+        web3.clone(), darwinia.clone(),
         contracts, filters, config.eth.start, config.step.ethereum,
         relay_service.recipient(), redeem_service.recipient()
     ).start();

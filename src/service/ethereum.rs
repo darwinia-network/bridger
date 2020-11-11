@@ -42,6 +42,7 @@ pub struct EthereumService {
     contracts: ContractAddress,
     filters: [FilterBuilder; 2],
     web3: Web3<Http>,
+    darwinia: Arc<Darwinia>,
     scan_from: u64,
     step: u64,
 
@@ -70,6 +71,7 @@ impl Handler<MsgScan> for EthereumService {
                 .then(move |_, this, _| {
                     let f = EthereumService::scan(
                         this.web3.clone(),
+                        this.darwinia.clone(),
                         this.contracts.clone(),
                         this.filters.clone(),
                         this.scan_from,
@@ -89,6 +91,8 @@ impl Handler<MsgScan> for EthereumService {
 use primitives::bytes;
 use crate::service::relay::MsgBlockNumber;
 use crate::service::redeem::MsgEthereumTransaction;
+use crate::api::Darwinia;
+use std::sync::Arc;
 
 impl EthereumService {
     /// Parse contract addresses
@@ -128,6 +132,7 @@ impl EthereumService {
     /// New Ethereum Service with http
     pub fn new(
         web3: Web3<Http>,
+        darwinia: Arc<Darwinia>,
         contracts: ContractAddress, filters: [FilterBuilder; 2],
         scan_from: u64, step: u64,
         relay_service: Recipient<MsgBlockNumber>,
@@ -138,6 +143,7 @@ impl EthereumService {
             contracts,
             filters,
             web3,
+            darwinia,
             scan_from,
             step,
             relay_service,
@@ -201,7 +207,7 @@ impl EthereumService {
         Ok(txs)
     }
 
-    async fn scan(web3: Web3<Http>,
+    async fn scan(web3: Web3<Http>, darwinia: Arc<Darwinia>,
                   contracts: ContractAddress, filters: [FilterBuilder; 2],
                   scan_from: u64,
                   relay_service: Recipient<MsgBlockNumber>,
@@ -236,10 +242,14 @@ impl EthereumService {
             }
 
             for tx in &txs {
-                // delay to wait for possible previous extrinsics
-                tokio::time::delay_for(Duration::from_secs(12)).await;
-                if let Err(e) = redeem_service.send(MsgEthereumTransaction{ tx: tx.clone() }).await {
-                    error!("Send tx to redeem service fail: {:?}", e);
+                if darwinia.verified(&tx).await? {
+                    warn!("    This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
+                } else {
+                    // delay to wait for possible previous extrinsics
+                    tokio::time::delay_for(Duration::from_secs(12)).await;
+                    if let Err(e) = redeem_service.send(MsgEthereumTransaction{ tx: tx.clone() }).await {
+                        error!("Send tx to redeem service fail: {:?}", e);
+                    }
                 }
             }
         }

@@ -5,7 +5,7 @@ members = [
 
 [package]
 name = "darwinia-bridger"
-version = "0.1.11"
+version = "0.1.12"
 authors = ["clearloop <udtrokia@gmail.com>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -56,7 +56,7 @@ features = ["full"]
 
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"
-version = "0.1.11"
+version = "0.1.12"
 path = "./primitives"
 features = ["runtime", "rpc"]
 

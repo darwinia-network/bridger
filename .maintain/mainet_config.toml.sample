@@ -32,7 +32,7 @@ topics = []
 
 [step]
 # ethereum service polling interval in seconds
-ethereum = 120
+ethereum = 160
 # relay service polling interval in seconds
 relay = 60
 # redeem service polling interval in seconds

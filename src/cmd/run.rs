@@ -67,8 +67,6 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     let killer = darwinia.client.rpc.client.killer.clone();
     let never_exit = async {
         start_services(&config, &shadow, &darwinia, &web3).await?;
-        let mut subscribe = SubscribeService::new(shadow.clone(), darwinia.clone()).await?;
-        subscribe.start().await;
 
         log::info!("Ctrl-C to shut down");
         tokio::signal::ctrl_c().await.unwrap();
@@ -104,9 +102,12 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     ).start();
 
     // guard service
-    if let Ok(guard_servcie) = GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard).await {
-        guard_servcie.start();
-    }
+    let guard_service = GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard).await?;
+    guard_service.start();
+
+    // subscribe service
+    let mut subscribe = SubscribeService::new(shadow.clone(), darwinia.clone()).await?;
+    subscribe.start().await?;
 
     Ok(())
 }

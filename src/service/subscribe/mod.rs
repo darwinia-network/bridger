@@ -2,6 +2,7 @@
 use crate::{
     api::{Darwinia, Shadow},
     result::Result as BridgerResult,
+    result::Error,
 };
 use primitives::{
     frame::ethereum::{
@@ -42,10 +43,15 @@ impl SubscribeService {
     }
 
     /// start
-    pub async fn start(&mut self) {
+    pub async fn start(&mut self) -> BridgerResult<()> {
+        info!("🌟 SERVICE STARTED: SUBSCRIBE");
         loop {
             if let Err(e) = self.process_next_event().await {
-                error!("Fail to process next event: {:?}", e);
+                if &e.to_string() != "CodeUpdated" {
+                    error!("Fail to process next event: {:?}", e);
+                } else {
+                    return Err(e);
+                }
             }
         }
     }
@@ -55,7 +61,11 @@ impl SubscribeService {
         if let Some(raw) = self.sub.next().await {
             if let Ok(event) = raw {
                 // Remove the system events temporarily because it`s too verbose.
-                if &event.module != "System" {
+                if &event.module == "System" {
+                    if event.variant.as_str() == "CodeUpdated" {
+                        return Err(Error::Bridger("CodeUpdated".to_string()));
+                    }
+                } else {
                     // Common events to debug
                     debug!(">> Event - {}::{}", &event.module, &event.variant);
                     match event.module.as_str() {

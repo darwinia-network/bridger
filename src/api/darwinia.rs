@@ -1,5 +1,5 @@
 //! Darwinia API
-use crate::{memcache::EthereumTransaction, result::{Result, Error::Bridger}, Config};
+use crate::{service::redeem::EthereumTransaction, result::{Result, Error::Bridger}, Config};
 use core::marker::PhantomData;
 use primitives::{
     chain::{
@@ -180,8 +180,6 @@ impl Darwinia {
         let client = match jsonrpsee::ws_client(&config.node).await {
             Ok(client) => client,
             Err(e) => {
-                error!("Failed to connect to `{}`, due to {}", &config.node, e);
-
                 return Err(Bridger(format!("Failed to connect to `{}`, due to `{}`", &config.node, e)));
             }
         };
@@ -316,9 +314,12 @@ impl Darwinia {
         redeem_for: RedeemFor,
         proof: EthereumReceiptProofThing,
     ) -> Result<H256> {
+        let ethereum_tx_hash = proof.header.hash
+            .map(|hash| hex::encode(&hash))
+            .ok_or_else(|| Bridger("No hash in header".to_string()))?;
         match &self.account.real {
             Some(real) => {
-                trace!("Proxy call `redeem` for real acount {:?}", real);
+                trace!("      Proxy redeem ethereum tx 0x{:?} for real account {:?}", ethereum_tx_hash, real);
                 let redeem = Redeem {
                     _runtime: PhantomData::default(),
                     act: redeem_for,
@@ -329,14 +330,15 @@ impl Darwinia {
                 Ok(self.client.proxy(&self.account.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
             },
             None => {
+                trace!("      Redeem ethereum tx 0x{:?} with account {:?}", ethereum_tx_hash, &self.account.account_id);
                 Ok(self.client.redeem(&self.account.signer, redeem_for, proof).await?)
             }
         }
     }
 
     /// Check if should redeem
-    pub async fn should_redeem(&self, tx: &EthereumTransaction) -> Result<bool> {
-        Ok(!self
+    pub async fn verified(&self, tx: &EthereumTransaction) -> Result<bool> {
+        Ok(self
             .client
             .verified_proof((tx.block_hash.to_fixed_bytes(), tx.index), None)
             .await?

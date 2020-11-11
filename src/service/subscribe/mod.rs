@@ -2,10 +2,8 @@
 use crate::{
     api::{Darwinia, Shadow},
     result::Result as BridgerResult,
-    service::Service,
-    MemCache,
+    result::Error,
 };
-use async_trait::async_trait;
 use primitives::{
     frame::ethereum::{
         backing::EthereumBackingEventsDecoder, game::EthereumRelayerGameEventsDecoder,
@@ -13,14 +11,13 @@ use primitives::{
     },
     runtime::DarwiniaRuntime,
 };
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use substrate_subxt::{EventSubscription, EventsDecoder};
 
 mod backing;
 mod relay;
 
 /// Attributes
-const SERVICE_NAME: &str = "SUBSCRIBE";
 const ETHEREUM_RELAY: &str = "EthereumRelay";
 const ETHEREUM_BACKING: &str = "EthereumBacking";
 
@@ -30,41 +27,45 @@ pub struct SubscribeService {
     pub shadow: Arc<Shadow>,
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
+
+    sub: EventSubscription<DarwiniaRuntime>,
 }
 
 impl SubscribeService {
     /// New redeem service
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> SubscribeService {
-        SubscribeService { darwinia, shadow }
-    }
-}
-
-#[async_trait(?Send)]
-impl Service for SubscribeService {
-    fn name<'e>(&self) -> &'e str {
-        SERVICE_NAME
+    pub async fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> BridgerResult<SubscribeService> {
+        let sub = SubscribeService::build_event_subscription(darwinia.clone()).await?;
+        Ok(SubscribeService {
+            darwinia,
+            shadow,
+            sub
+        })
     }
 
-    async fn run(&mut self, _: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
-        let client = &self.darwinia.client;
-        let scratch = client.subscribe_events().await?;
-        let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());
-
-        // Register decoders
-        decoder.with_ethereum_backing();
-        decoder.with_ethereum_relayer_game();
-        decoder.with_ethereum_relay();
-
-        // Build subscriber
-        let mut sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
+    /// start
+    pub async fn start(&mut self) -> BridgerResult<()> {
+        info!("🌟 SERVICE STARTED: SUBSCRIBE");
         loop {
-            if let Some(raw) = sub.next().await {
-                if let Ok(event) = raw {
-                    // Remove the system events temporarily because it`s too verbose.
-                    if &event.module == "System" {
-                        continue;
-                    }
+            if let Err(e) = self.process_next_event().await {
+                if &e.to_string() != "CodeUpdated" {
+                    error!("Fail to process next event: {:?}", e);
+                } else {
+                    return Err(e);
+                }
+            }
+        }
+    }
 
+    /// process_next_event
+    async fn process_next_event(&mut self) -> BridgerResult<()> {
+        if let Some(raw) = self.sub.next().await {
+            if let Ok(event) = raw {
+                // Remove the system events temporarily because it`s too verbose.
+                if &event.module == "System" {
+                    if event.variant.as_str() == "CodeUpdated" {
+                        return Err(Error::Bridger("CodeUpdated".to_string()));
+                    }
+                } else {
                     // Common events to debug
                     debug!(">> Event - {}::{}", &event.module, &event.variant);
                     match event.module.as_str() {
@@ -75,5 +76,21 @@ impl Service for SubscribeService {
                 }
             }
         }
+        Ok(())
+    }
+
+    async fn build_event_subscription(darwinia: Arc<Darwinia>) -> BridgerResult<EventSubscription<DarwiniaRuntime>> {
+        let client = &darwinia.client;
+        let scratch = client.subscribe_events().await?;
+        let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());
+
+        // Register decoders
+        decoder.with_ethereum_backing();
+        decoder.with_ethereum_relayer_game();
+        decoder.with_ethereum_relay();
+
+        // Build subscriber
+        let sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
+        Ok(sub)
     }
 }

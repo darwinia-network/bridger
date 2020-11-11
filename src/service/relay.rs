@@ -1,80 +1,108 @@
 //! Relay Service
-use crate::{
-    api::{Darwinia, Shadow},
-    config::Config,
-    memcache::MemCache,
-    result::Error,
-    result::Result as BridgerResult,
-    service::Service,
-};
-use async_trait::async_trait;
-use std::{
-    sync::{Arc, Mutex},
-    time::Duration,
-};
-use substrate_subxt::sp_core::H256;
+use crate::{api::{Darwinia, Shadow}, result::Error, result::Result as BridgerResult};
+use std::sync::Arc;
 use primitives::chain::ethereum::EthereumHeader;
 
-/// Attributes
-const SERVICE_NAME: &str = "RELAY";
+use actix::prelude::*;
+use actix::fut::Either;
+use std::time::Duration;
+
+/// message 'block_number'
+#[derive(Clone, Debug)]
+pub struct MsgBlockNumber(pub u64);
+
+impl Message for MsgBlockNumber {
+    type Result = ();
+}
+
+/// message 'execute'
+#[derive(Clone, Debug)]
+struct MsgExecute;
+
+impl Message for MsgExecute {
+    type Result = ();
+}
 
 /// Relay Service
 pub struct RelayService {
-    step: u64,
     /// Shadow API
     pub shadow: Arc<Shadow>,
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
+
+    target: u64,
+    relayed: u64,
+    step: u64,
+}
+
+impl Actor for RelayService {
+    type Context = Context<Self>;
+
+    fn started(&mut self, ctx: &mut Self::Context) {
+        info!("    🌟 SERVICE STARTED: RELAY");
+        ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
+            ctx.notify(MsgExecute {});
+        });
+    }
+}
+
+impl Handler<MsgBlockNumber> for RelayService {
+    type Result = ();
+
+    fn handle(&mut self, msg: MsgBlockNumber, _: &mut Context<Self>) -> Self::Result {
+        if msg.0> self.relayed && msg.0 > self.target {
+            self.target = msg.0;
+        }
+    }
+}
+
+impl Handler<MsgExecute> for RelayService {
+    type Result = AtomicResponse<Self, ()>;
+
+    fn handle(&mut self, _: MsgExecute, _: &mut Context<Self>) -> Self::Result {
+        AtomicResponse::new(Box::pin(
+            async {}
+                .into_actor(self)
+                .then(|_, this, _| {
+                    if this.target > this.relayed {
+                        let f = RelayService::affirm(this.darwinia.clone(), this.shadow.clone(), this.target);
+                        Either::Left(f.into_actor(this))
+                    } else {
+                        let f = async {Ok(())};
+                        Either::Right(f.into_actor(this))
+                    }
+                })
+                .map(|r, this, _| {
+                    if let Err(e) = r {
+                        warn!("{}", e.to_string());
+                    } else {
+                        this.relayed = this.target
+                    }
+                }),
+        ))
+    }
 }
 
 impl RelayService {
-    /// New relay service
-    pub fn new(config: &Config, shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> RelayService {
+
+    /// create new relay service actor
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, last_confirmed: u64, step: u64) -> Self {
         RelayService {
             darwinia,
             shadow,
-            step: config.step.relay,
+            target: last_confirmed,
+            relayed: last_confirmed,
+            step,
         }
     }
-}
 
-#[async_trait(?Send)]
-impl Service for RelayService {
-    fn name<'e>(&self) -> &'e str {
-        SERVICE_NAME
-    }
-
-    async fn run(&mut self, cache: Arc<Mutex<MemCache>>) -> BridgerResult<()> {
-        loop {
-            if let Ok(cache_cloned) = cache.try_lock() {
-                trace!("Heartbeat>>>");
-                let txs = &cache_cloned.txpool;
-                if let Some(max) = txs.iter().max() {
-                    let max = max.block.to_owned();
-                    if let Err(err) = self.affirm(max + 1).await {
-                        trace!("{:?}", err);
-                    };
-                }
-
-                drop(cache_cloned);
-            } else {
-                error!("try_lock failed");
-            }
-
-            // sleep
-            tokio::time::delay_for(Duration::from_secs(self.step)).await;
-        }
-    }
-}
-
-impl RelayService {
     /// affirm target block
-    pub async fn affirm(&mut self, target: u64) -> BridgerResult<H256> {
+    pub async fn affirm(darwinia: Arc<Darwinia>, shadow: Arc<Shadow>, target: u64) -> BridgerResult<()> {
         // /////////////////////////
         // checking before affirm
         // /////////////////////////
         // 1. last confirmed check
-        let last_confirmed = self.darwinia.last_confirmed().await?;
+        let last_confirmed = darwinia.last_confirmed().await?;
         if target <= last_confirmed {
             let reason = format!(
                 "The target block {} is less than the last_confirmed {}",
@@ -84,7 +112,7 @@ impl RelayService {
         }
 
         // 2. pendings check
-        let pending_headers = self.darwinia.pending_headers().await?;
+        let pending_headers = darwinia.pending_headers().await?;
         for pending_header in pending_headers {
             let pending_block_number = pending_header.1.header.number;
             if pending_block_number >= target {
@@ -94,7 +122,7 @@ impl RelayService {
         }
 
         // 3. affirmations check
-        for (_game_id, game) in self.darwinia.affirmations().await?.iter() {
+        for (_game_id, game) in darwinia.affirmations().await?.iter() {
             for (_round_id, affirmations) in game.iter() {
                 if Darwinia::contains(&affirmations, target) {
                     let reason = format!("The target block {} is in the relayer game", &target);
@@ -104,8 +132,7 @@ impl RelayService {
         }
 
         trace!("Prepare to affirm ethereum block: {}", target);
-        let parcel = self.shadow.parcel(target as usize).await?;
-
+        let parcel = shadow.parcel(target as usize).await?;
         if parcel.header == EthereumHeader::default()
             || parcel.mmr_root == [0u8;32]
         {
@@ -116,10 +143,10 @@ impl RelayService {
         // /////////////////////////
         // do affirm
         // /////////////////////////
-        match self.darwinia.affirm(parcel).await {
+        match darwinia.affirm(parcel).await {
             Ok(hash) => {
                 info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
-                Ok(hash)
+                Ok(())
             }
             Err(err) => Err(err),
         }

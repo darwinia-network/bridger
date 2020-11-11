@@ -17,11 +17,8 @@ pub async fn exec(block: u64) -> Result<()> {
     let darwinia =  Arc::new(Darwinia::new(&config).await?);
     info!("Init API succeed!");
 
-    // service
-    let mut relay_service = RelayService::new(&config, shadow.clone(), darwinia.clone());
-
     // affirm
-    if let Err(err) = relay_service.affirm(block).await {
+    if let Err(err) = RelayService::affirm(darwinia, shadow, block).await {
         error!("{:?}", err);
     }
 

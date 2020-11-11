@@ -43,7 +43,7 @@ pub fn handle(event: RawEvent) -> Result<()> {
 fn affirmed(event: RawEvent) {
     if let Ok(res) = Affirmed::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res
@@ -54,7 +54,7 @@ fn affirmed(event: RawEvent) {
 fn disputed_and_affirmed(event: RawEvent) {
     if let Ok(res) = DisputedAndAffirmed::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res
@@ -64,7 +64,7 @@ fn disputed_and_affirmed(event: RawEvent) {
 fn extended(event: RawEvent) {
     if let Ok(res) = Extended::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res
@@ -75,7 +75,7 @@ fn extended(event: RawEvent) {
 fn new_round(event: RawEvent) {
     if let Ok(res) = NewRound::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res
@@ -86,7 +86,7 @@ fn new_round(event: RawEvent) {
 fn game_over(event: RawEvent) {
     if let Ok(res) = GameOver::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res
@@ -97,7 +97,7 @@ fn game_over(event: RawEvent) {
 fn pended(event: RawEvent) {
     if let Ok(res) = Pended::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res
@@ -110,7 +110,7 @@ fn pending_relay_header_parcel_approved(event: RawEvent) {
         PendingRelayHeaderParcelApproved::<DarwiniaRuntime>::decode(&mut &event.data[..])
     {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res
@@ -123,7 +123,7 @@ fn pending_relay_header_parcel_rejected(event: RawEvent) {
         PendingRelayHeaderParcelRejected::<DarwiniaRuntime>::decode(&mut &event.data[..])
     {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res
@@ -134,7 +134,7 @@ fn pending_relay_header_parcel_rejected(event: RawEvent) {
 fn remove_confirmed_parcel(event: RawEvent) {
     if let Ok(res) = RemoveConfirmedParcel::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res
@@ -145,7 +145,7 @@ fn remove_confirmed_parcel(event: RawEvent) {
 fn verify_receipt(event: RawEvent) {
     if let Ok(res) = VerifyReceipt::<DarwiniaRuntime>::decode(&mut &event.data[..]) {
         trace!(
-            ">> Event - {}::{}\n\t{:#?}",
+            ">> Event - {}::{}\n{:#?}",
             event.module,
             event.variant,
             res

@@ -102,10 +102,10 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                 .then(|r, this, ctx| {
                     if let Err(err) = r {
                         if err.to_string().contains("wait") {
-                            trace!("{}", err.to_string());
+                            warn!("{}", err.to_string());
                             ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
                         } else {
-                            trace!("{}", err.to_string());
+                            error!("{}", err.to_string());
                         }
                     }
                     async {Result::<(), Error>::Ok(())}.into_actor(this)

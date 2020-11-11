@@ -230,11 +230,14 @@ impl EthereumService {
             for tx in &txs {
                 trace!("    {:?}", &tx.tx_hash);
 
-                // send msg to relay and redeem service
                 if let Err(e) = relay_service.send(MsgBlockNumber(tx.block)).await {
                     error!("Send block number to relay service fail: {:?}", e);
                 }
+            }
 
+            for tx in &txs {
+                // delay to wait for possible previous extrinsics
+                tokio::time::delay_for(Duration::from_secs(12)).await;
                 if let Err(e) = redeem_service.send(MsgEthereumTransaction{ tx: tx.clone() }).await {
                     error!("Send tx to redeem service fail: {:?}", e);
                 }

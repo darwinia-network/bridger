@@ -22,20 +22,16 @@ use crate::service::GuardService;
 use crate::service::SubscribeService;
 
 /// Run the bridger
-pub async fn exec(path: Option<PathBuf>) -> Result<()> {
+pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
+    let data_dir = data_dir.unwrap_or(Config::default_data_dir()?);
 
     // --- Load config ---
-    let config = Config::new(path.clone())?;
+    let config = Config::new(data_dir.clone())?;
     if config.eth.rpc.starts_with("ws") {
         return Err(Error::Bridger(
             "Bridger currently doesn't support ethereum websocket transport".to_string(),
         ));
     }
-
-
-    // print info
-
-
 
     // --- Init APIs ---
     let shadow = Arc::new(Shadow::new(&config));
@@ -69,7 +65,7 @@ pub async fn exec(path: Option<PathBuf>) -> Result<()> {
     info!("🌱 Relay from ethereum block: {}", config.eth.start);
 
 
-    // --- Start services
+    // --- Start services ---
     let killer = darwinia.client.rpc.client.killer.clone();
     let never_exit = async {
         start_services(&config, &shadow, &darwinia, &web3).await?;

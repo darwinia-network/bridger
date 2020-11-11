@@ -1,5 +1,5 @@
 //! Bridger Config
-use crate::result::{Error, Result};
+use crate::result::{Result, Error};
 use etc::{Etc, Meta, Read, Write};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -136,16 +136,9 @@ impl Config {
     }
 
     /// New config from pathbuf
-    pub fn new(path: Option<PathBuf>) -> Result<Self> {
-        let path = if let Some(conf) = path {
-            conf
-        } else if let Some(mut conf) = dirs::home_dir() {
-            conf.push(".bridger/config.toml");
-            conf
-        } else {
-            return Err(Error::Bridger("Could not open home dir".to_string()));
-        };
-        let c = Etc::from(path);
+    pub fn new(mut data_dir: PathBuf) -> Result<Self> {
+        data_dir.push("config.toml");
+        let c = Etc::from(data_dir);
 
         // if file exist
         if c.real_path()?.exists() {
@@ -166,5 +159,13 @@ impl Config {
         } else {
             Self::write(c)
         }
+    }
+
+    /// default_data_dir
+    pub fn default_data_dir() -> Result<PathBuf> {
+        let mut dir = dirs::home_dir().ok_or_else(|| Error::Bridger("Could not open home dir".to_string()))?;
+        dir.push(".bridger");
+
+        Ok(dir)
     }
 }

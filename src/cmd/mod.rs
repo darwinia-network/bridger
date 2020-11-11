@@ -22,7 +22,7 @@ enum Opt {
     Run {
         /// Config path of bridger
         #[structopt(short, long)]
-        config: Option<PathBuf>,
+        data_dir: Option<PathBuf>,
         /// Run bridger in verbose mode
         #[structopt(short, long)]
         verbose: bool,
@@ -66,7 +66,7 @@ enum Opt {
 pub async fn exec() -> Result<()> {
     let opt = Opt::from_args();
     match opt {
-        Opt::Run { config, verbose } => {
+        Opt::Run { data_dir, verbose } => {
             if std::env::var("RUST_LOG").is_err() {
                 if verbose {
                     std::env::set_var("RUST_LOG", "info,darwinia_bridger");
@@ -77,7 +77,7 @@ pub async fn exec() -> Result<()> {
             env_logger::init();
 
             loop {
-                if let Err(e) = run::exec(config.clone()).await {
+                if let Err(e) = run::exec(data_dir.clone()).await {
                     if &e.to_string() == "CodeUpdated" || &e.to_string() == "WS Closed" {
                         info!("Restart by {}", e.to_string());
                         System::current().stop();

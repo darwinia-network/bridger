@@ -23,7 +23,6 @@ use crate::service::SubscribeService;
 
 /// Run the bridger
 pub async fn exec(path: Option<PathBuf>) -> Result<()> {
-    info!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 
     // --- Load config ---
     let config = Config::new(path.clone())?;

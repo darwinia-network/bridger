@@ -9,7 +9,7 @@ use std::{
 };
 use web3::{
     transports::http::Http,
-    types::{BlockNumber, FilterBuilder, H160, H256, U64},
+    types::{BlockNumber, FilterBuilder, H160, H256, U64, SyncState},
     Web3,
 };
 
@@ -220,7 +220,13 @@ impl EthereumService {
         trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {}...", scan_from);
 
         let eth = web3.eth();
-        let latest_block_number = eth.block_number().await?.as_u64();
+        let sync_state = eth.syncing().await?;
+
+        let latest_block_number = match sync_state {
+            // TOOD: what the difference between eth_blockNumber and eth_getBlockByNumber("latest", false)
+            SyncState::NotSyncing=> eth.block_number().await?.as_u64(),
+            SyncState::Syncing(info) => info.current_block.as_u64()
+        };
 
         // 1. Checking start from a right block number
         if scan_from == latest_block_number {

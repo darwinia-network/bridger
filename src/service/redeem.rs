@@ -136,7 +136,7 @@ impl RedeemService {
 
         let last_confirmed = darwinia.last_confirmed().await?;
         if tx.block >= last_confirmed {
-            let msg = format!("      This ethereum tx {:?}'s block {} not exist, please wait.", tx.enclosed_hash(), tx.block);
+            let msg = format!("      This ethereum tx {:?}'s block {} not confirmed, please wait.", tx.enclosed_hash(), tx.block);
             return Err(Error::Bridger(msg));
         }
 

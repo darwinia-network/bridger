@@ -72,7 +72,7 @@ impl GuardService {
                 voted: vec![]
             })
         } else {
-            info!("   💩 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
+            info!("    💩 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
             Err(Bridger("Not tech comm member".to_string()))
         }
     }

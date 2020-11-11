@@ -83,7 +83,7 @@ impl Actor for RedeemService {
     type Context = Context<Self>;
 
     fn started(&mut self, _ctx: &mut Self::Context) {
-        info!("  🌟 SERVICE STARTED: REDEEM");
+        info!("   🌟 SERVICE STARTED: REDEEM");
     }
 }
 
@@ -105,7 +105,7 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                             warn!("{}", err.to_string());
                             ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
                         } else {
-                            error!("{}", err.to_string());
+                            warn!("{}", err.to_string());
                         }
                     }
                     async {Result::<(), Error>::Ok(())}.into_actor(this)

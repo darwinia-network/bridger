@@ -39,7 +39,7 @@ impl Actor for RelayService {
     type Context = Context<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        info!("   🌟 SERVICE STARTED: RELAY");
+        info!("    🌟 SERVICE STARTED: RELAY");
         ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
             ctx.notify(MsgExecute {});
         });
@@ -74,7 +74,7 @@ impl Handler<MsgExecute> for RelayService {
                 })
                 .map(|r, this, _| {
                     if let Err(e) = r {
-                        error!("{}", e.to_string());
+                        warn!("{}", e.to_string());
                     } else {
                         this.relayed = this.target
                     }

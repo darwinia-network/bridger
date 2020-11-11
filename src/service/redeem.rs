@@ -126,7 +126,7 @@ impl RedeemService {
     }
 
     async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction) -> BridgerResult<()> {
-        trace!("      Try to redeem ethereum tx {:?}...", tx.tx_hash);
+        info!("      Try to redeem ethereum tx {:?}...", tx.tx_hash);
 
         // 1. Checking before redeem
         if darwinia.verified(&tx).await? {
@@ -141,7 +141,6 @@ impl RedeemService {
         }
 
         // 2. Do redeem
-        info!("      Prepare to redeem ethereum tx {:?}", tx.enclosed_hash());
         let proof = shadow
             .receipt(&format!("{:?}", tx.enclosed_hash()), last_confirmed)
             .await?;
@@ -150,7 +149,7 @@ impl RedeemService {
             EthereumTransactionHash::Token(_) => RedeemFor::Token,
         };
         let hash = darwinia.redeem(redeem_for, proof).await?;
-        info!("      Redeemed with extrinsic {:?}", hash);
+        info!("      Redeemed ethereum tx {:?} with extrinsic {:?}", tx.enclosed_hash(), hash);
 
         Ok(())
     }

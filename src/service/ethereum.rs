@@ -236,7 +236,7 @@ impl EthereumService {
             for tx in &txs {
                 trace!("    {:?}", &tx.tx_hash);
 
-                if let Err(e) = relay_service.send(MsgBlockNumber(tx.block)).await {
+                if let Err(e) = relay_service.send(MsgBlockNumber(tx.block + 1)).await {
                     error!("Send block number to relay service fail: {:?}", e);
                 }
             }

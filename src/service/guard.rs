@@ -8,7 +8,7 @@ use crate::{
     api::{Darwinia, Shadow},
     result::{Result as BridgerResult},
 };
-use crate::result::Error::Bridger;
+use crate::service::MsgStop;
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -32,10 +32,14 @@ impl Actor for GuardService {
     type Context = Context<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        info!("    🌟 SERVICE STARTED: GUARD");
+        info!("    🟢 SERVICE STARTED: GUARD");
         ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
             ctx.notify(MsgGuard {});
         });
+    }
+
+    fn stopped(&mut self, _: &mut Self::Context) {
+        info!("    🔴 SERVICE STOPPED: GUARD")
     }
 }
 
@@ -59,21 +63,27 @@ impl Handler<MsgGuard> for GuardService {
     }
 }
 
+impl Handler<MsgStop> for GuardService {
+    type Result = ();
+
+    fn handle(&mut self, _: MsgStop, ctx: &mut Context<Self>) -> Self::Result {
+        ctx.stop();
+    }
+}
+
 impl GuardService {
     /// New redeem service
-    pub async fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64) -> BridgerResult<GuardService> {
-        let is_tech_comm_member = darwinia.account.is_tech_comm_member().await?;
-
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64, is_tech_comm_member: bool) -> Option<GuardService> {
         if is_tech_comm_member {
-            Ok(GuardService {
+            Some(GuardService {
                 darwinia,
                 shadow,
                 step,
                 voted: vec![]
             })
         } else {
-            info!("    💩 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
-            Err(Bridger("Not tech comm member".to_string()))
+            info!("    🔴 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
+            None
         }
     }
 

@@ -13,6 +13,7 @@ use actix::prelude::*;
 
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
+use crate::service::MsgStop;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -83,7 +84,11 @@ impl Actor for RedeemService {
     type Context = Context<Self>;
 
     fn started(&mut self, _ctx: &mut Self::Context) {
-        info!("   🌟 SERVICE STARTED: REDEEM");
+        info!("   🟢 SERVICE STARTED: REDEEM");
+    }
+
+    fn stopped(&mut self, _: &mut Self::Context) {
+        info!("   🔴 SERVICE STOPPED: REDEEM")
     }
 }
 
@@ -112,6 +117,14 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                 })
                 .map(|_, _, _| {}),
         ))
+    }
+}
+
+impl Handler<MsgStop> for RedeemService {
+    type Result = ();
+
+    fn handle(&mut self, _: MsgStop, ctx: &mut Context<Self>) -> Self::Result {
+        ctx.stop();
     }
 }
 

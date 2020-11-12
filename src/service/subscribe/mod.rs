@@ -29,6 +29,7 @@ pub struct SubscribeService {
     pub darwinia: Arc<Darwinia>,
 
     sub: EventSubscription<DarwiniaRuntime>,
+    stop: bool,
 }
 
 impl SubscribeService {
@@ -38,35 +39,41 @@ impl SubscribeService {
         Ok(SubscribeService {
             darwinia,
             shadow,
-            sub
+            sub,
+            stop: false
         })
     }
 
     /// start
-    pub async fn start(&mut self) -> BridgerResult<()> {
-        info!("🌟 SERVICE STARTED: SUBSCRIBE");
+    pub async fn start(mut self) {
+        info!("🟢 SERVICE STARTED: SUBSCRIBE");
         loop {
             if let Err(e) = self.process_next_event().await {
-                if &e.to_string() != "CodeUpdated" {
-                    error!("Fail to process next event: {:?}", e);
-                } else {
-                    return Err(e);
-                }
+                error!("Fail to process next event: {:?}", e);
+            }
+            if self.stop {
+                break;
             }
         }
+    }
+
+    /// stop
+    pub async fn stop(&mut self) {
+        info!("🔴 SERVICE STOPPED: SUBSCRIBE");
+        self.stop = true;
     }
 
     /// process_next_event
     async fn process_next_event(&mut self) -> BridgerResult<()> {
         if let Some(raw) = self.sub.next().await {
             if let Ok(event) = raw {
-                debug!(">> Event - {}::{}", &event.module, &event.variant);
                 // Remove the system events temporarily because it`s too verbose.
                 if &event.module == "System" {
                     if event.variant.as_str() == "CodeUpdated" {
                         return Err(Error::Bridger("CodeUpdated".to_string()));
                     }
                 } else {
+                    debug!(">> Event - {}::{}", &event.module, &event.variant);
                     // Common events to debug
                     match event.module.as_str() {
                         ETHEREUM_RELAY => relay::handle(event)?,

@@ -13,8 +13,11 @@ use web3::{
     Web3,
 };
 use actix::{Actor, System};
+use std::time::Duration;
+use tokio::time;
 use substrate_subxt::sp_core::crypto::*;
 
+use crate::service::MsgStop;
 use crate::service::EthereumService;
 use crate::service::RelayService;
 use crate::service::RedeemService;
@@ -22,10 +25,27 @@ use crate::service::GuardService;
 use crate::service::SubscribeService;
 
 /// Run the bridger
-pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
-    log::info!("✌️  {} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
+    if std::env::var("RUST_LOG").is_err() {
+        if verbose {
+            std::env::set_var("RUST_LOG", "info,darwinia_bridger");
+        } else {
+            std::env::set_var("RUST_LOG", "info");
+        }
+    }
+    env_logger::init();
 
-    // --- Data dir
+    while let Err(e) = run(data_dir.clone()).await {
+        error!("Restart for: {:?}", e.to_string());
+        System::current().stop();
+        time::delay_for(Duration::from_secs(5)).await;
+    }
+}
+
+async fn run(data_dir: Option<PathBuf>) -> Result<()> {
+    info!("✌️  {} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+
+    // --- Data dir ---
     let data_dir = data_dir.unwrap_or(Config::default_data_dir()?);
     info!("💾 Data dir: {}", data_dir.to_str().unwrap());
 
@@ -71,28 +91,12 @@ pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
     }
 
     // --- Start services ---
-    let killer = darwinia.client.rpc.client.killer.clone();
-    let never_exit = async {
-        start_services(&config, &shadow, &darwinia, &web3, data_dir).await?;
+    start_services(&config, &shadow, &darwinia, &web3, data_dir).await?;
 
-        log::info!("Ctrl-C to shut down");
-        tokio::signal::ctrl_c().await.unwrap();
-        log::info!("Ctrl-C received, shutting down");
-        System::current().stop();
-        Ok::<(), Error>(())
-    };
-    let exit_on_ws_close = async {
-        loop {
-            if killer.lock().await.next().await.is_some() {
-                return Err(Error::Bridger("WS Closed".into()));
-            }
-        }
-    };
-    select!(never_exit, exit_on_ws_close).await
+    Ok(())
 }
 
 async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>, data_dir: PathBuf) -> Result<()> {
-    // --- Read ethereum start from cache ---
     let ethereum_start = EthereumService::get_ethereum_start(data_dir.clone(), web3.clone()).await?;
     info!("🌱 Relay from ethereum block: {}", ethereum_start);
 
@@ -104,23 +108,52 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem).start();
 
     // ethereum service
-    EthereumService::new(
+    let ethereum_service = EthereumService::new(
         config.clone(),
         web3.clone(),
         darwinia.clone(),
-        relay_service.recipient(),
-        redeem_service.recipient(),
+        relay_service.clone().recipient(),
+        redeem_service.clone().recipient(),
         data_dir
     ).start();
 
     // guard service
-    if let Ok(guard_service) = GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard).await {
-        guard_service.start();
+    let is_tech_comm_member = darwinia.account.is_tech_comm_member().await?;
+    let guard_service =
+        GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard, is_tech_comm_member).map(|g| {
+            g.start()
+        });
+
+    //
+    let b = async {
+        match SubscribeService::new(shadow.clone(), darwinia.clone()).await {
+            Ok(subscribe) => {
+                subscribe.start().await;
+                Result::<()>::Ok(())
+            },
+            Err(e) => Err(e)
+        }
+    };
+
+    let killer = darwinia.client.rpc.client.killer.clone();
+    let c = async {
+        loop {
+            if killer.lock().await.next().await.is_some() {
+                break;
+                // return Result::<()>::Err(Error::Bridger("WS Closed".into()));
+            }
+        }
+        Ok(())
+    };
+
+    select!(b, c).await?;
+
+    ethereum_service.send(MsgStop{}).await.unwrap();
+    relay_service.send(MsgStop{}).await.unwrap();
+    redeem_service.send(MsgStop{}).await.unwrap();
+    if let Some(guard_service) = guard_service {
+        guard_service.send(MsgStop{}).await.unwrap();
     }
 
-    // subscribe service
-    let mut subscribe = SubscribeService::new(shadow.clone(), darwinia.clone()).await?;
-    subscribe.start().await?;
-
-    Ok(())
+    Result::<()>::Err(Error::Bridger("WS Closed".into()))
 }

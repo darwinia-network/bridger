@@ -2,9 +2,6 @@
 use crate::result::Result;
 use std::path::PathBuf;
 use structopt::{clap::AppSettings, StructOpt};
-use std::time::Duration;
-use tokio::time;
-use actix::System;
 
 mod affirm;
 mod affirm_raw;
@@ -76,29 +73,7 @@ enum Opt {
 pub async fn exec() -> Result<()> {
     let opt = Opt::from_args();
     match opt {
-        Opt::Run { data_dir, verbose } => {
-            if std::env::var("RUST_LOG").is_err() {
-                if verbose {
-                    std::env::set_var("RUST_LOG", "info,darwinia_bridger");
-                } else {
-                    std::env::set_var("RUST_LOG", "info");
-                }
-            }
-            env_logger::init();
-
-            loop {
-                if let Err(e) = run::exec(data_dir.clone()).await {
-                    // if &e.to_string() == "CodeUpdated" || &e.to_string() == "WS Closed" {
-                    info!("Restart by {}", e.to_string());
-                    System::current().stop();
-                    time::delay_for(Duration::from_secs(15)).await;
-                    // } else {
-                    //     error!("Stopped by {}", e.to_string());
-                    //     break;
-                    // }
-                }
-            }
-		}
+        Opt::Run { data_dir, verbose } => run::exec(data_dir, verbose).await,
         Opt::Confirm { block } => confirm::exec(block).await?,
         Opt::Affirm { block } => affirm::exec(block).await?,
         Opt::AffirmRaw { json } => affirm_raw::exec(json).await?,

@@ -91,7 +91,7 @@ pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
 
 async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>, data_dir: PathBuf) -> Result<()> {
     // --- Read ethereum start from cache ---
-    let ethereum_start = EthereumService::get_ethereum_start(&data_dir, &web3).await?;
+    let ethereum_start = EthereumService::get_ethereum_start(data_dir.clone(), web3.clone()).await?;
     info!("🌱 Relay from ethereum block: {}", ethereum_start);
 
     // relay service
@@ -108,8 +108,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
         darwinia.clone(),
         relay_service.recipient(),
         redeem_service.recipient(),
-        data_dir,
-        ethereum_start,
+        data_dir
     ).start();
 
     // guard service

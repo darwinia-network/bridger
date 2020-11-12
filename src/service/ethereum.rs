@@ -23,6 +23,8 @@ use std::time::Duration;
 use std::io::prelude::*;
 use std::path::PathBuf;
 use std::fs::File;
+use actix::fut::Either;
+use crate::result::Error::Bridger;
 
 #[derive(Clone, Debug)]
 struct MsgScan;
@@ -51,7 +53,6 @@ pub struct EthereumService {
     filters: [FilterBuilder; 2],
     web3: Web3<Http>,
     darwinia: Arc<Darwinia>,
-    start: u64,
     step: u64,
 
     relay_service: Recipient<MsgBlockNumber>,
@@ -79,23 +80,39 @@ impl Handler<MsgScan> for EthereumService {
             async {}
                 .into_actor(self)
                 .then(move |_, this, _| {
-                    let f = EthereumService::scan(
-                        this.web3.clone(),
-                        this.darwinia.clone(),
-                        this.contracts.clone(),
-                        this.filters.clone(),
-                        this.start,
-                        this.relay_service.clone(),
-                        this.redeem_service.clone(),
-                    );
-                    f.into_actor(this)
+                    EthereumService::get_ethereum_start(this.data_dir.clone(), this.web3.clone()).into_actor(this)
                 })
-                .map(|r, this, _| {
-                    if let Ok(latest_block_number) = r {
-                        this.start = latest_block_number;
-                        let _ = EthereumService::set_ethereum_start(&this.data_dir, latest_block_number);
+                .then(move |r, this, _| {
+                    match r {
+                        Ok(start) => {
+                            let f = EthereumService::scan(
+                                this.web3.clone(),
+                                this.darwinia.clone(),
+                                this.contracts.clone(),
+                                this.filters.clone(),
+                                start,
+                                this.relay_service.clone(),
+                                this.redeem_service.clone(),
+                            );
+                            Either::Left(f.into_actor(this))
+                        },
+                        Err(e) => {
+                            let f = async { Err(e) };
+                            Either::Right(f.into_actor(this))
+                        }
                     }
-                }),
+                })
+                .then(|r, this, _| {
+                    let result = r.and_then(|latest_block_number| {
+                        EthereumService::set_ethereum_start(this.data_dir.clone(), latest_block_number)
+                    });
+                    if result.is_err() {
+                        error!("{:?}", result);
+                    }
+
+                    async { Result::<(), Error>::Ok(()) }.into_actor(this)
+                })
+                .map(|_, _, _| {})
         ))
     }
 }
@@ -109,7 +126,6 @@ impl EthereumService {
         relay_service: Recipient<MsgBlockNumber>,
         redeem_service: Recipient<MsgEthereumTransaction>,
         data_dir: PathBuf,
-        start: u64,
     ) -> EthereumService
     {
         let step = config.step.ethereum;
@@ -120,7 +136,6 @@ impl EthereumService {
             filters,
             web3,
             darwinia,
-            start,
             step,
             relay_service,
             redeem_service,
@@ -283,23 +298,26 @@ impl EthereumService {
     const ETHEREUM_START_CACHE_FILE_NAME: &'static str = "ethereum_start";
 
     /// get_ethereum_start
-    pub async fn get_ethereum_start(data_dir: &PathBuf, web3: &Web3<Http>) -> BridgerResult<u64> {
+    pub async fn get_ethereum_start(data_dir: PathBuf, web3: Web3<Http>) -> BridgerResult<u64> {
         let mut filepath = data_dir.clone();
         filepath.push(EthereumService::ETHEREUM_START_CACHE_FILE_NAME);
         if File::open(&filepath).is_err() {
             let latest_block_number = EthereumService::get_latest_block_number(&web3).await?;
-            EthereumService::set_ethereum_start(data_dir, latest_block_number)?;
+            EthereumService::set_ethereum_start(data_dir.clone(), latest_block_number)?;
         }
 
         let mut file = File::open(filepath)?;
         let mut buffer = String::new();
         file.read_to_string(&mut buffer)?;
-        Ok(buffer.parse().unwrap())
+        match buffer.trim().parse() {
+            Ok(start) => Ok(start),
+            Err(e) => Err(Bridger(e.to_string()))
+        }
     }
 
     /// set_ethereum_start
-    pub fn set_ethereum_start(data_dir: &PathBuf, value: u64) -> BridgerResult<()> {
-        let mut filepath = data_dir.clone();
+    pub fn set_ethereum_start(data_dir: PathBuf, value: u64) -> BridgerResult<()> {
+        let mut filepath = data_dir;
         filepath.push(EthereumService::ETHEREUM_START_CACHE_FILE_NAME);
         let mut file = File::create(filepath)?;
         file.write_all(value.to_string().as_bytes())?;

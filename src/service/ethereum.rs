@@ -218,9 +218,9 @@ impl EthereumService {
                   relay_service: Recipient<MsgBlockNumber>,
                   redeem_service: Recipient<MsgEthereumTransaction>,
     ) -> BridgerResult<u64> {
-        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {}...", scan_from);
-
         let latest_block_number = EthereumService::get_latest_block_number(&web3).await?;
+
+        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {} to {} ...", scan_from, latest_block_number);
 
         // 1. Checking start from a right block number
         if scan_from == latest_block_number {

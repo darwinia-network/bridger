@@ -46,6 +46,8 @@ pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
     let runtime_version: sp_version::RuntimeVersion = darwinia.client.rpc.runtime_version(None).await?;
     let network = if runtime_version.spec_name.to_string() == "Crab" {
         "Crab"
+    } else if runtime_version.spec_name.to_string() == "node-template" {
+        "Dev"
     } else {
         set_default_ss58_version(Ss58AddressFormat::DarwiniaAccount);
         "Mainnet"

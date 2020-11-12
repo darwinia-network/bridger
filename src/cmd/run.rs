@@ -23,9 +23,11 @@ use crate::service::SubscribeService;
 
 /// Run the bridger
 pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
-    log::info!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+    log::info!("✌️  {} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 
+    // --- Data dir
     let data_dir = data_dir.unwrap_or(Config::default_data_dir()?);
+    info!("💾 Data dir: {}", data_dir.to_str().unwrap());
 
     // --- Load config ---
     let config = Config::new(&data_dir)?;
@@ -51,9 +53,9 @@ pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
 
     // --- Print startup info ---
     info!("🔗 Connect to");
-    info!("     Darwinia {}: {}", network, config.node);
-    info!("     Shadow: {}", config.shadow);
-    info!("     Ethereum: {}", config.eth.rpc);
+    info!("   Darwinia {}: {}", network, config.node);
+    info!("   Shadow: {}", config.shadow);
+    info!("   Ethereum: {}", config.eth.rpc);
     let account_id = &darwinia.account.account_id;
     let roles = darwinia.account.role_names().await?;
     match &darwinia.account.real {

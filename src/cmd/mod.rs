@@ -88,14 +88,14 @@ pub async fn exec() -> Result<()> {
 
             loop {
                 if let Err(e) = run::exec(data_dir.clone()).await {
-                    if &e.to_string() == "CodeUpdated" || &e.to_string() == "WS Closed" {
-                        info!("Restart by {}", e.to_string());
-                        System::current().stop();
-                        time::delay_for(Duration::from_secs(5)).await;
-                    } else {
-                        error!("Stopped by {}", e.to_string());
-                        break;
-                    }
+                    // if &e.to_string() == "CodeUpdated" || &e.to_string() == "WS Closed" {
+                    info!("Restart by {}", e.to_string());
+                    System::current().stop();
+                    time::delay_for(Duration::from_secs(15)).await;
+                    // } else {
+                    //     error!("Stopped by {}", e.to_string());
+                    //     break;
+                    // }
                 }
             }
 		}

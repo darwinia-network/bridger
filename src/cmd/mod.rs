@@ -14,13 +14,14 @@ mod guard;
 mod keys;
 mod run;
 mod show_parcel;
+mod set_start;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
 enum Opt {
     /// Run the bridger, this will start `ethereum`, `relay`, `redeem` and `guard` services
     Run {
-        /// Config path of bridger
+        /// Data dir of bridger
         #[structopt(short, long)]
         data_dir: Option<PathBuf>,
         /// Run bridger in verbose mode
@@ -60,6 +61,15 @@ enum Opt {
         #[structopt(short, long)]
         json: bool,
     },
+    /// Set ethereum scan from 'start';
+    SetStart {
+        /// Data dir of bridger
+        #[structopt(short, long)]
+        data_dir: Option<PathBuf>,
+        /// The new ethereum start
+        #[structopt(short, long)]
+        block: u64,
+    },
 }
 
 /// Exec commands
@@ -96,6 +106,7 @@ pub async fn exec() -> Result<()> {
         Opt::Keys => keys::exec().await?,
         Opt::Affirmations => affirmations::exec().await?,
         Opt::Guard => guard::exec().await?,
+        Opt::SetStart { data_dir, block }  => set_start::exec(data_dir, block).await?,
     }
 
     Ok(())

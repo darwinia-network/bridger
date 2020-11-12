@@ -60,6 +60,7 @@ impl SubscribeService {
     async fn process_next_event(&mut self) -> BridgerResult<()> {
         if let Some(raw) = self.sub.next().await {
             if let Ok(event) = raw {
+                debug!(">> Event - {}::{}", &event.module, &event.variant);
                 // Remove the system events temporarily because it`s too verbose.
                 if &event.module == "System" {
                     if event.variant.as_str() == "CodeUpdated" {
@@ -67,7 +68,6 @@ impl SubscribeService {
                     }
                 } else {
                     // Common events to debug
-                    debug!(">> Event - {}::{}", &event.module, &event.variant);
                     match event.module.as_str() {
                         ETHEREUM_RELAY => relay::handle(event)?,
                         ETHEREUM_BACKING => backing::handle(event)?,

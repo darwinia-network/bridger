@@ -23,10 +23,12 @@ use crate::service::SubscribeService;
 
 /// Run the bridger
 pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
+    log::info!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+
     let data_dir = data_dir.unwrap_or(Config::default_data_dir()?);
 
     // --- Load config ---
-    let config = Config::new(data_dir.clone())?;
+    let config = Config::new(&data_dir)?;
     if config.eth.rpc.starts_with("ws") {
         return Err(Error::Bridger(
             "Bridger currently doesn't support ethereum websocket transport".to_string(),
@@ -38,6 +40,7 @@ pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
     let darwinia = Arc::new(Darwinia::new(&config).await?);
     let web3 = Web3::new(Http::new(&config.eth.rpc).unwrap());
 
+    // --- Network ---
     let runtime_version: sp_version::RuntimeVersion = darwinia.client.rpc.runtime_version(None).await?;
     let network = if runtime_version.spec_name.to_string() == "Crab" {
         "Crab"
@@ -46,7 +49,7 @@ pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
         "Mainnet"
     };
 
-    // print info
+    // --- Print startup info ---
     info!("🔗 Connect to");
     info!("     Darwinia {}: {}", network, config.node);
     info!("     Shadow: {}", config.shadow);
@@ -62,13 +65,11 @@ pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
             info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
         }
     }
-    info!("🌱 Relay from ethereum block: {}", config.eth.start);
-
 
     // --- Start services ---
     let killer = darwinia.client.rpc.client.killer.clone();
     let never_exit = async {
-        start_services(&config, &shadow, &darwinia, &web3).await?;
+        start_services(&config, &shadow, &darwinia, &web3, data_dir).await?;
 
         log::info!("Ctrl-C to shut down");
         tokio::signal::ctrl_c().await.unwrap();
@@ -86,7 +87,11 @@ pub async fn exec(data_dir: Option<PathBuf>) -> Result<()> {
     select!(never_exit, exit_on_ws_close).await
 }
 
-async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>) -> Result<()> {
+async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>, data_dir: PathBuf) -> Result<()> {
+    // --- Read ethereum start from cache ---
+    let ethereum_start = EthereumService::get_ethereum_start(&data_dir, &web3).await?;
+    info!("🌱 Relay from ethereum block: {}", ethereum_start);
+
     // relay service
     let last_confirmed = darwinia.last_confirmed().await.unwrap();
     let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed, config.step.relay).start();
@@ -95,13 +100,14 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem).start();
 
     // ethereum service
-
     EthereumService::new(
         config.clone(),
         web3.clone(),
         darwinia.clone(),
         relay_service.recipient(),
-        redeem_service.recipient()
+        redeem_service.recipient(),
+        data_dir,
+        ethereum_start,
     ).start();
 
     // guard service

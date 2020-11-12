@@ -14,7 +14,7 @@ pub async fn exec() -> Result<()> {
     env_logger::init();
 
     // apis
-    let config = Config::new(Config::default_data_dir()?)?; // TODO: add --data-dir
+    let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
     let shadow = Arc::new(Shadow::new(&config));
     let darwinia =  Arc::new(Darwinia::new(&config).await?);
     info!("Init API succeed!");

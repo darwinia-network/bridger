@@ -1,20 +1,28 @@
 //! Ethereum transaction service
 use crate::{
-    service::redeem::{EthereumTransaction, EthereumTransactionHash},
-    result::Result as BridgerResult,
+    service::{
+        redeem::{MsgEthereumTransaction, EthereumTransaction, EthereumTransactionHash},
+        relay::MsgBlockNumber,
+    },
+    result::{
+        Result as BridgerResult, Error
+    },
     Config,
+    api::Darwinia,
 };
-use std::{
-    time::Duration,
-};
+use primitives::bytes;
+
 use web3::{
     transports::http::Http,
     types::{BlockNumber, FilterBuilder, H160, H256, U64, SyncState},
     Web3,
 };
-
 use actix::prelude::*;
-use crate::result::Error;
+use std::sync::Arc;
+use std::time::Duration;
+use std::io::prelude::*;
+use std::path::PathBuf;
+use std::fs::File;
 
 #[derive(Clone, Debug)]
 struct MsgScan;
@@ -43,11 +51,13 @@ pub struct EthereumService {
     filters: [FilterBuilder; 2],
     web3: Web3<Http>,
     darwinia: Arc<Darwinia>,
-    scan_from: u64,
+    start: u64,
     step: u64,
 
     relay_service: Recipient<MsgBlockNumber>,
     redeem_service: Recipient<MsgEthereumTransaction>,
+
+    data_dir: PathBuf,
 }
 
 impl Actor for EthereumService {
@@ -74,7 +84,7 @@ impl Handler<MsgScan> for EthereumService {
                         this.darwinia.clone(),
                         this.contracts.clone(),
                         this.filters.clone(),
-                        this.scan_from,
+                        this.start,
                         this.relay_service.clone(),
                         this.redeem_service.clone(),
                     );
@@ -82,53 +92,15 @@ impl Handler<MsgScan> for EthereumService {
                 })
                 .map(|r, this, _| {
                     if let Ok(latest_block_number) = r {
-                        this.scan_from = latest_block_number
+                        this.start = latest_block_number;
+                        let _ = EthereumService::set_ethereum_start(&this.data_dir, latest_block_number);
                     }
                 }),
         ))
     }
 }
-use primitives::bytes;
-use crate::service::relay::MsgBlockNumber;
-use crate::service::redeem::MsgEthereumTransaction;
-use crate::api::Darwinia;
-use std::sync::Arc;
 
 impl EthereumService {
-    /// Parse contract addresses
-    pub fn parse_contract(config: &Config) -> ContractAddress {
-        let contract = &config.eth.contract;
-        let a = contract.bank.topics[0].as_str();
-        ContractAddress {
-            bank: H256::from_slice(&bytes!(a)),
-            kton: H256::from_slice(&bytes!(contract.kton.topics[0].as_str())),
-            ring: H256::from_slice(&bytes!(contract.ring.topics[0].as_str())),
-        }
-    }
-
-    /// Parse log filter from config
-    pub fn parse_filter(config: &Config) -> [FilterBuilder; 2] {
-        let filters = [&config.eth.contract.bank, &config.eth.contract.issuing]
-            .iter()
-            .map(|c| {
-                FilterBuilder::default()
-                    .address(vec![H160::from_slice(&bytes!(c.address.as_str()))])
-                    .topics(
-                        Some(
-                            c.topics
-                                .iter()
-                                .map(|t| H256::from_slice(&bytes!(t.as_str())))
-                                .collect(),
-                        ),
-                        None,
-                        None,
-                        None,
-                    )
-            })
-            .collect::<Vec<FilterBuilder>>();
-        [filters[0].clone(), filters[1].clone()]
-    }
-
     /// New Ethereum Service with http
     pub fn new(
         config: Config,
@@ -136,22 +108,23 @@ impl EthereumService {
         darwinia: Arc<Darwinia>,
         relay_service: Recipient<MsgBlockNumber>,
         redeem_service: Recipient<MsgEthereumTransaction>,
+        data_dir: PathBuf,
+        start: u64,
     ) -> EthereumService
     {
-        let scan_from = config.eth.start;
         let step = config.step.ethereum;
         let contracts = EthereumService::parse_contract(&config);
         let filters = EthereumService::parse_filter(&config);
-
         EthereumService {
             contracts,
             filters,
             web3,
             darwinia,
-            scan_from,
+            start,
             step,
             relay_service,
             redeem_service,
+            data_dir
         }
     }
 
@@ -219,14 +192,7 @@ impl EthereumService {
     ) -> BridgerResult<u64> {
         trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {}...", scan_from);
 
-        let eth = web3.eth();
-        let sync_state = eth.syncing().await?;
-
-        let latest_block_number = match sync_state {
-            // TOOD: what the difference between eth_blockNumber and eth_getBlockByNumber("latest", false)
-            SyncState::NotSyncing=> eth.block_number().await?.as_u64(),
-            SyncState::Syncing(info) => info.current_block.as_u64()
-        };
+        let latest_block_number = EthereumService::get_latest_block_number(&web3).await?;
 
         // 1. Checking start from a right block number
         if scan_from == latest_block_number {
@@ -266,4 +232,78 @@ impl EthereumService {
 
         Ok(latest_block_number)
     }
+
+    /// Parse contract addresses
+    pub fn parse_contract(config: &Config) -> ContractAddress {
+        let contract = &config.eth.contract;
+        let a = contract.bank.topics[0].as_str();
+        ContractAddress {
+            bank: H256::from_slice(&bytes!(a)),
+            kton: H256::from_slice(&bytes!(contract.kton.topics[0].as_str())),
+            ring: H256::from_slice(&bytes!(contract.ring.topics[0].as_str())),
+        }
+    }
+
+    /// Parse log filter from config
+    pub fn parse_filter(config: &Config) -> [FilterBuilder; 2] {
+        let filters = [&config.eth.contract.bank, &config.eth.contract.issuing]
+            .iter()
+            .map(|c| {
+                FilterBuilder::default()
+                    .address(vec![H160::from_slice(&bytes!(c.address.as_str()))])
+                    .topics(
+                        Some(
+                            c.topics
+                                .iter()
+                                .map(|t| H256::from_slice(&bytes!(t.as_str())))
+                                .collect(),
+                        ),
+                        None,
+                        None,
+                        None,
+                    )
+            })
+            .collect::<Vec<FilterBuilder>>();
+        [filters[0].clone(), filters[1].clone()]
+    }
+
+    /// get_latest_block_number
+    pub async fn get_latest_block_number(web3: &Web3<Http>) -> BridgerResult<u64> {
+        let eth = web3.eth();
+        let sync_state = eth.syncing().await?;
+
+        let latest_block_number = match sync_state {
+            // TOOD: what the difference between eth_blockNumber and eth_getBlockByNumber("latest", false)
+            SyncState::NotSyncing => eth.block_number().await?.as_u64(),
+            SyncState::Syncing(info) => info.current_block.as_u64()
+        };
+        Ok(latest_block_number)
+    }
+
+    const ETHEREUM_START_CACHE_FILE_NAME: &'static str = "ethereum_start";
+
+    /// get_ethereum_start
+    pub async fn get_ethereum_start(data_dir: &PathBuf, web3: &Web3<Http>) -> BridgerResult<u64> {
+        let mut filepath = data_dir.clone();
+        filepath.push(EthereumService::ETHEREUM_START_CACHE_FILE_NAME);
+        if File::open(&filepath).is_err() {
+            let latest_block_number = EthereumService::get_latest_block_number(&web3).await?;
+            EthereumService::set_ethereum_start(data_dir, latest_block_number)?;
+        }
+
+        let mut file = File::open(filepath)?;
+        let mut buffer = String::new();
+        file.read_to_string(&mut buffer)?;
+        Ok(buffer.parse().unwrap())
+    }
+
+    /// set_ethereum_start
+    pub fn set_ethereum_start(data_dir: &PathBuf, value: u64) -> BridgerResult<()> {
+        let mut filepath = data_dir.clone();
+        filepath.push(EthereumService::ETHEREUM_START_CACHE_FILE_NAME);
+        let mut file = File::create(filepath)?;
+        file.write_all(value.to_string().as_bytes())?;
+        Ok(())
+    }
+
 }

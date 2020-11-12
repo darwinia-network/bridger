@@ -33,10 +33,6 @@ pub struct EthereumContract {
 pub struct EthereumConfig {
     /// Ethereum rpc url
     pub rpc: String,
-    /// Ethereum start block number
-    ///
-    /// Ethereum bridger will scan start from this block
-    pub start: u64,
     /// Ethereum contracts
     pub contract: EthereumContract,
 }
@@ -86,7 +82,6 @@ impl Default for Config {
             shadow: "http://localhost:3000".to_string(),
             eth: EthereumConfig {
                 rpc: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
-                start: 8647036,
                 contract: EthereumContract {
                     ring: EthereumContractTuple {
                         address: "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0".to_string(),
@@ -136,9 +131,10 @@ impl Config {
     }
 
     /// New config from pathbuf
-    pub fn new(mut data_dir: PathBuf) -> Result<Self> {
-        data_dir.push("config.toml");
-        let c = Etc::from(data_dir);
+    pub fn new(data_dir: &PathBuf) -> Result<Self> {
+        let mut config_file = data_dir.clone();
+        config_file.push("config.toml");
+        let c = Etc::from(config_file);
 
         // if file exist
         if c.real_path()?.exists() {

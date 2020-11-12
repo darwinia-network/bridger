@@ -45,20 +45,25 @@ impl SubscribeService {
     }
 
     /// start
-    pub async fn start(mut self) {
+    pub async fn start(&mut self) -> BridgerResult<SubscribeService> {
         info!("🟢 SERVICE STARTED: SUBSCRIBE");
         loop {
             if let Err(e) = self.process_next_event().await {
-                error!("Fail to process next event: {:?}", e);
+                if e.to_string() == "CodeUpdated" {
+                    self.stop();
+                    return Err(e);
+                } else {
+                    error!("Fail to process next event: {:?}", e);
+                }
             }
             if self.stop {
-                break;
+                return Err(Error::Bridger("Force stop".to_string()));
             }
         }
     }
 
     /// stop
-    pub async fn stop(&mut self) {
+    pub fn stop(&mut self) {
         info!("🔴 SERVICE STOPPED: SUBSCRIBE");
         self.stop = true;
     }

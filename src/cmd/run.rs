@@ -12,7 +12,7 @@ use web3::{
     transports::http::Http,
     Web3,
 };
-use actix::{Actor, System};
+use actix::Actor;
 use std::time::Duration;
 use tokio::time;
 use substrate_subxt::sp_core::crypto::*;
@@ -36,9 +36,10 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
     env_logger::init();
 
     while let Err(e) = run(data_dir.clone()).await {
-        error!("Restart for: {:?}", e.to_string());
-        System::current().stop();
-        time::delay_for(Duration::from_secs(5)).await;
+        error!("Stopped for: {:?}", e.to_string());
+        info!("Bridger will restart in 30 seconds...");
+        time::delay_for(Duration::from_secs(30)).await;
+
     }
 }
 
@@ -125,35 +126,40 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
         });
 
     //
-    let b = async {
-        match SubscribeService::new(shadow.clone(), darwinia.clone()).await {
-            Ok(subscribe) => {
-                subscribe.start().await;
-                Result::<()>::Ok(())
-            },
-            Err(e) => Err(e)
+    let mut subscribe = match SubscribeService::new(shadow.clone(), darwinia.clone()).await {
+        Ok(subscribe) => {
+            subscribe
+        },
+        Err(e) => {
+            return Err(e);
         }
+    };
+    let b = async {
+        if let Err(e) = subscribe.start().await {
+            return Err(e);
+        }
+        Ok(())
     };
 
     let killer = darwinia.client.rpc.client.killer.clone();
     let c = async {
         loop {
             if killer.lock().await.next().await.is_some() {
-                break;
-                // return Result::<()>::Err(Error::Bridger("WS Closed".into()));
+                return Err(Error::Bridger("WS Closed".into()));
             }
         }
-        Ok(())
     };
 
-    select!(b, c).await?;
-
-    ethereum_service.send(MsgStop{}).await.unwrap();
-    relay_service.send(MsgStop{}).await.unwrap();
-    redeem_service.send(MsgStop{}).await.unwrap();
-    if let Some(guard_service) = guard_service {
-        guard_service.send(MsgStop{}).await.unwrap();
+    if let Err(e) = select!(b, c).await {
+        ethereum_service.send(MsgStop{}).await.unwrap();
+        relay_service.send(MsgStop{}).await.unwrap();
+        redeem_service.send(MsgStop{}).await.unwrap();
+        if let Some(guard_service) = guard_service {
+            guard_service.send(MsgStop{}).await.unwrap();
+        }
+        subscribe.stop();
+        Err(e)
+    } else {
+        Ok(())
     }
-
-    Result::<()>::Err(Error::Bridger("WS Closed".into()))
 }

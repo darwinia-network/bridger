@@ -1,6 +1,6 @@
 use crate::result::Result;
 use std::path::PathBuf;
-use crate::service::EthereumService;
+use crate::service::RedeemService;
 use crate::Config;
 
 /// set ethereum start
@@ -9,8 +9,8 @@ pub async fn exec(data_dir: Option<PathBuf>, start: u64) -> Result<()> {
     env_logger::init();
 
     let data_dir = data_dir.unwrap_or(Config::default_data_dir()?);
-    EthereumService::set_ethereum_start(data_dir, start)?;
-    println!("Set");
+    RedeemService::set_last_redeemed(data_dir, start)?;
+    println!("OK");
 
     Ok(())
 }

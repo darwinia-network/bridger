@@ -36,10 +36,14 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
     env_logger::init();
 
     while let Err(e) = run(data_dir.clone()).await {
-        error!("Stopped for: {:?}", e.to_string());
-        info!("Bridger will restart in 30 seconds...");
-        time::delay_for(Duration::from_secs(30)).await;
-
+        if e.to_string().contains("No ethereum start") {
+            error!("{}", e.to_string());
+            break;
+        } else {
+            error!("Stopped for: {:?}", e.to_string());
+            info!("Bridger will restart in 30 seconds...");
+            time::delay_for(Duration::from_secs(30)).await;
+        }
     }
 }
 
@@ -65,9 +69,10 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 
     // --- Network ---
     let runtime_version: sp_version::RuntimeVersion = darwinia.client.rpc.runtime_version(None).await?;
-    let network = if runtime_version.spec_name.to_string() == "Crab" {
+    let spec_name = runtime_version.spec_name.to_string();
+    let network = if spec_name == "Crab" {
         "Crab"
-    } else if runtime_version.spec_name.to_string() == "node-template" {
+    } else if spec_name == "node-template" || spec_name.contains("Dev") {
         "Dev"
     } else {
         set_default_ss58_version(Ss58AddressFormat::DarwiniaAccount);
@@ -92,13 +97,11 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
     }
 
     // --- Start services ---
-    start_services(&config, &shadow, &darwinia, &web3, data_dir).await?;
-
-    Ok(())
+    start_services(&config, &shadow, &darwinia, &web3, data_dir).await
 }
 
 async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>, data_dir: PathBuf) -> Result<()> {
-    let ethereum_start = EthereumService::get_ethereum_start(data_dir.clone(), web3.clone()).await?;
+    let ethereum_start = RedeemService::get_last_redeemed(data_dir.clone()).await?;
     info!("🌱 Relay from ethereum block: {}", ethereum_start);
 
     // relay service
@@ -106,16 +109,16 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed, config.step.relay).start();
 
     // redeem service
-    let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem).start();
+    let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem, data_dir.clone()).start();
 
     // ethereum service
     let ethereum_service = EthereumService::new(
         config.clone(),
         web3.clone(),
         darwinia.clone(),
+        ethereum_start,
         relay_service.clone().recipient(),
         redeem_service.clone().recipient(),
-        data_dir
     ).start();
 
     // guard service

@@ -14,6 +14,10 @@ use actix::prelude::*;
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 use crate::service::MsgStop;
+use crate::result::Error::Bridger;
+use std::fs::File;
+use std::io::{Read, Write};
+use std::path::PathBuf;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -77,6 +81,8 @@ pub struct RedeemService {
     pub shadow: Arc<Shadow>,
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
+
+    data_dir: PathBuf,
 }
 
 
@@ -101,7 +107,7 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
             async {}
                 .into_actor(self)
                 .then(move |_, this, _| {
-                    let f = RedeemService::redeem(this.shadow.clone(), this.darwinia.clone(), msg_clone.tx);
+                    let f = RedeemService::redeem(this.shadow.clone(), this.darwinia.clone(), msg_clone.tx, this.data_dir.clone());
                     f.into_actor(this)
                 })
                 .then(|r, this, ctx| {
@@ -130,15 +136,16 @@ impl Handler<MsgStop> for RedeemService {
 
 impl RedeemService {
     /// New redeem service
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64) -> RedeemService {
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64, data_dir: PathBuf) -> RedeemService {
         RedeemService {
             darwinia,
             shadow,
             step,
+            data_dir,
         }
     }
 
-    async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction) -> BridgerResult<()> {
+    async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction, data_dir: PathBuf) -> BridgerResult<()> {
         info!("      Try to redeem ethereum tx {:?}...", tx.tx_hash);
 
         // 1. Checking before redeem
@@ -164,6 +171,39 @@ impl RedeemService {
         let hash = darwinia.redeem(redeem_for, proof).await?;
         info!("      Redeemed ethereum tx {:?} with extrinsic {:?}", tx.enclosed_hash(), hash);
 
+        // 3. Update cache
+        RedeemService::set_last_redeemed(data_dir, tx.block)?;
+        Ok(())
+    }
+
+    const LAST_REDEEMED_CACHE_FILE_NAME: &'static str = "last-redeemed";
+
+    /// get_ethereum_start
+    pub async fn get_last_redeemed(data_dir: PathBuf) -> BridgerResult<u64> {
+        let mut filepath = data_dir;
+        filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);
+
+        // if cache file not exist
+        if File::open(&filepath).is_err() {
+            return Err(Bridger("No ethereum start, run 'bridger set-start --block start' to set".to_string()));
+        }
+
+        // read start from cache file
+        let mut file = File::open(filepath)?;
+        let mut buffer = String::new();
+        file.read_to_string(&mut buffer)?;
+        match buffer.trim().parse() {
+            Ok(start) => Ok(start),
+            Err(e) => Err(Bridger(e.to_string()))
+        }
+    }
+
+    /// set_ethereum_start
+    pub fn set_last_redeemed(data_dir: PathBuf, value: u64) -> BridgerResult<()> {
+        let mut filepath = data_dir;
+        filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);
+        let mut file = File::create(filepath)?;
+        file.write_all(value.to_string().as_bytes())?;
         Ok(())
     }
 

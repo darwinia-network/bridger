@@ -90,11 +90,11 @@ impl Actor for RedeemService {
     type Context = Context<Self>;
 
     fn started(&mut self, _ctx: &mut Self::Context) {
-        info!("   🟢 SERVICE STARTED: REDEEM");
+        info!("   ✨ SERVICE STARTED: REDEEM");
     }
 
     fn stopped(&mut self, _: &mut Self::Context) {
-        info!("   🔴 SERVICE STOPPED: REDEEM")
+        info!("   💤 SERVICE STOPPED: REDEEM")
     }
 }
 

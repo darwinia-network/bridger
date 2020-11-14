@@ -32,14 +32,14 @@ impl Actor for GuardService {
     type Context = Context<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        info!("    🟢 SERVICE STARTED: GUARD");
+        info!("    ✨ SERVICE STARTED: GUARD");
         ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
             ctx.notify(MsgGuard {});
         });
     }
 
     fn stopped(&mut self, _: &mut Self::Context) {
-        info!("    🔴 SERVICE STOPPED: GUARD")
+        info!("    💤 SERVICE STOPPED: GUARD")
     }
 }
 
@@ -82,7 +82,7 @@ impl GuardService {
                 voted: vec![]
             })
         } else {
-            warn!("    🟡 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
+            warn!("    🙌 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
             None
         }
     }

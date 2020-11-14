@@ -46,7 +46,7 @@ impl SubscribeService {
 
     /// start
     pub async fn start(&mut self) -> BridgerResult<SubscribeService> {
-        info!("🟢 SERVICE STARTED: SUBSCRIBE");
+        info!("✨ SERVICE STARTED: SUBSCRIBE");
         loop {
             if let Err(e) = self.process_next_event().await {
                 if e.to_string() == "CodeUpdated" {
@@ -64,7 +64,7 @@ impl SubscribeService {
 
     /// stop
     pub fn stop(&mut self) {
-        info!("🔴 SERVICE STOPPED: SUBSCRIBE");
+        info!("💤 SERVICE STOPPED: SUBSCRIBE");
         self.stop = true;
     }
 

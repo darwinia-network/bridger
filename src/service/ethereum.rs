@@ -91,8 +91,16 @@ impl Handler<MsgScan> for EthereumService {
                     f.into_actor(this)
                 })
                 .map(|r, this, _| {
-                    if let Ok(latest_block_number) = r {
-                        this.scan_from = latest_block_number
+                    match r {
+                        Ok(latest_block_number) => {
+                            this.scan_from = latest_block_number
+                        },
+                        Err(e) => {
+                            let err_msg = e.to_string();
+                            if !err_msg.contains("Scanning ethereum too fast") {
+                                warn!("{}", err_msg);
+                            }
+                        }
                     }
                 }),
         ))

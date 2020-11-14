@@ -55,8 +55,13 @@ impl Handler<MsgGuard> for GuardService {
                     f.into_actor(this)
                 })
                 .map(|r, this, _| {
-                    if let Ok(mut vote_result) = r {
-                        this.voted.append(&mut vote_result);
+                    match r {
+                        Ok(mut vote_result) => {
+                            this.voted.append(&mut vote_result);
+                        },
+                        Err(e) => {
+                            warn!("{}", e.to_string());
+                        },
                     }
                 }),
         ))
@@ -89,36 +94,55 @@ impl GuardService {
 
     async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, voted: Vec<u64>) -> BridgerResult<Vec<u64>> {
         trace!("Checking pending headers...");
-
         let mut result = vec![];
+
+        let last_confirmed = darwinia.last_confirmed().await.unwrap();
         let pending_headers = darwinia.pending_headers().await?;
         for pending in pending_headers {
             let pending_parcel = pending.1;
             let voting_state = pending.2;
             let pending_block_number: u64 = pending_parcel.header.number;
 
-            if !voted.contains(&pending_block_number) && !darwinia.account.has_voted(voting_state) {
-                let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
-
-                let parcel_fulfilled = !(
-                    parcel_from_shadow.header.hash.is_none()
-                    || parcel_from_shadow.header.hash.unwrap() == [0u8; 32]
-                    || parcel_from_shadow.mmr_root == [0u8; 32]
-                );
-
-                if parcel_fulfilled {
-                    // delay to wait for possible previous extrinsics
-                    tokio::time::delay_for(Duration::from_secs(12)).await;
-                    if pending_parcel.is_same_as(&parcel_from_shadow) {
-                        let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
-                        info!("Voted to approve: {}, ex hash: {:?}", pending_block_number, ex_hash);
-                    } else {
-                        let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
-                        info!("Voted to reject: {}, ex hash: {:?}", pending_block_number, ex_hash);
-                    };
-                    result.push(pending_block_number);
-                }
+            // https://github.com/darwinia-network/bridger/issues/33
+            if pending_block_number <= last_confirmed {
+                continue;
             }
+
+            // Local voted check
+            if voted.contains(&pending_block_number) {
+                continue;
+            }
+
+            // On chain voted check
+            if darwinia.account.has_voted(voting_state) {
+                continue;
+            }
+
+            let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
+
+            // Parcel from shadow fulfilled check
+            let parcel_fulfilled = !(
+                parcel_from_shadow.header.hash.is_none()
+                || parcel_from_shadow.header.hash.unwrap() == [0u8; 32]
+                || parcel_from_shadow.mmr_root == [0u8; 32]
+            );
+            if !parcel_fulfilled {
+                continue;
+            }
+
+            // Delay to wait for possible previous extrinsics
+            tokio::time::delay_for(Duration::from_secs(12)).await;
+
+            // Do vote
+            if pending_parcel.is_same_as(&parcel_from_shadow) {
+                let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
+                info!("Voted to approve: {}, ex hash: {:?}", pending_block_number, ex_hash);
+            } else {
+                let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
+                info!("Voted to reject: {}, ex hash: {:?}", pending_block_number, ex_hash);
+            };
+
+            result.push(pending_block_number);
         }
 
         Ok(result)

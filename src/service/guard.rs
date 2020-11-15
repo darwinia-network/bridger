@@ -103,44 +103,38 @@ impl GuardService {
             let voting_state = pending.2;
             let pending_block_number: u64 = pending_parcel.header.number;
 
-            // https://github.com/darwinia-network/bridger/issues/33
-            if pending_block_number <= last_confirmed {
-                continue;
-            }
-
             // Local voted check
             if voted.contains(&pending_block_number) {
                 continue;
             }
 
-            // On chain voted check
-            if darwinia.account.has_voted(voting_state) {
-                continue;
-            }
-
-            let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
-
             // Parcel from shadow fulfilled check
+            let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
             let parcel_fulfilled = !(
                 parcel_from_shadow.header.hash.is_none()
-                || parcel_from_shadow.header.hash.unwrap() == [0u8; 32]
-                || parcel_from_shadow.mmr_root == [0u8; 32]
+                    || parcel_from_shadow.header.hash.unwrap() == [0u8; 32]
+                    || parcel_from_shadow.mmr_root == [0u8; 32]
             );
             if !parcel_fulfilled {
                 continue;
             }
 
-            // Delay to wait for possible previous extrinsics
-            tokio::time::delay_for(Duration::from_secs(12)).await;
+            // high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
+            // and,
+            // have not voted
+            if pending_block_number > last_confirmed && !darwinia.account.has_voted(voting_state) {
+                // Delay to wait for possible previous extrinsics
+                tokio::time::delay_for(Duration::from_secs(12)).await;
 
-            // Do vote
-            if pending_parcel.is_same_as(&parcel_from_shadow) {
-                let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
-                info!("Voted to approve: {}, ex hash: {:?}", pending_block_number, ex_hash);
-            } else {
-                let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
-                info!("Voted to reject: {}, ex hash: {:?}", pending_block_number, ex_hash);
-            };
+                // Do vote
+                if pending_parcel.is_same_as(&parcel_from_shadow) {
+                    let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
+                    info!("Voted to approve: {}, ex hash: {:?}", pending_block_number, ex_hash);
+                } else {
+                    let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
+                    info!("Voted to reject: {}, ex hash: {:?}", pending_block_number, ex_hash);
+                };
+            }
 
             result.push(pending_block_number);
         }

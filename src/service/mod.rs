@@ -14,3 +14,13 @@ pub use self::{
     guard::GuardService,
     subscribe::SubscribeService,
 };
+use actix::Message;
+
+/// Msg to stop service
+#[derive(Clone, Debug)]
+pub struct MsgStop;
+
+impl Message for MsgStop {
+    type Result = ();
+}
+

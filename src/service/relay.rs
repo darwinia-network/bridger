@@ -6,6 +6,7 @@ use primitives::chain::ethereum::EthereumHeader;
 use actix::prelude::*;
 use actix::fut::Either;
 use std::time::Duration;
+use crate::service::MsgStop;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
@@ -39,10 +40,14 @@ impl Actor for RelayService {
     type Context = Context<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        info!("    🌟 SERVICE STARTED: RELAY");
+        info!("    ✨ SERVICE STARTED: RELAY");
         ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
             ctx.notify(MsgExecute {});
         });
+    }
+
+    fn stopped(&mut self, _: &mut Self::Context) {
+        info!("    💤 SERVICE STOPPED: RELAY")
     }
 }
 
@@ -74,12 +79,25 @@ impl Handler<MsgExecute> for RelayService {
                 })
                 .map(|r, this, _| {
                     if let Err(e) = r {
-                        warn!("{}", e.to_string());
+                        let err_msg = e.to_string();
+                        // TODO: Error::Affirmed
+                        if err_msg.contains("less than the last_confirmed") {
+                            this.relayed = this.target
+                        }
+                        warn!("{}", err_msg);
                     } else {
                         this.relayed = this.target
                     }
                 }),
         ))
+    }
+}
+
+impl Handler<MsgStop> for RelayService {
+    type Result = ();
+
+    fn handle(&mut self, _: MsgStop, ctx: &mut Context<Self>) -> Self::Result {
+        ctx.stop();
     }
 }
 

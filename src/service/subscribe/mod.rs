@@ -29,6 +29,7 @@ pub struct SubscribeService {
     pub darwinia: Arc<Darwinia>,
 
     sub: EventSubscription<DarwiniaRuntime>,
+    stop: bool,
 }
 
 impl SubscribeService {
@@ -38,22 +39,33 @@ impl SubscribeService {
         Ok(SubscribeService {
             darwinia,
             shadow,
-            sub
+            sub,
+            stop: false
         })
     }
 
     /// start
-    pub async fn start(&mut self) -> BridgerResult<()> {
-        info!("🌟 SERVICE STARTED: SUBSCRIBE");
+    pub async fn start(&mut self) -> BridgerResult<SubscribeService> {
+        info!("✨ SERVICE STARTED: SUBSCRIBE");
         loop {
             if let Err(e) = self.process_next_event().await {
-                if &e.to_string() != "CodeUpdated" {
-                    error!("Fail to process next event: {:?}", e);
-                } else {
+                if e.to_string() == "CodeUpdated" {
+                    self.stop();
                     return Err(e);
+                } else {
+                    error!("Fail to process next event: {:?}", e);
                 }
             }
+            if self.stop {
+                return Err(Error::Bridger("Force stop".to_string()));
+            }
         }
+    }
+
+    /// stop
+    pub fn stop(&mut self) {
+        info!("💤 SERVICE STOPPED: SUBSCRIBE");
+        self.stop = true;
     }
 
     /// process_next_event
@@ -66,8 +78,8 @@ impl SubscribeService {
                         return Err(Error::Bridger("CodeUpdated".to_string()));
                     }
                 } else {
-                    // Common events to debug
                     debug!(">> Event - {}::{}", &event.module, &event.variant);
+                    // Common events to debug
                     match event.module.as_str() {
                         ETHEREUM_RELAY => relay::handle(event)?,
                         ETHEREUM_BACKING => backing::handle(event)?,

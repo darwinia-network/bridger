@@ -1,20 +1,26 @@
 //! Ethereum transaction service
 use crate::{
-    service::redeem::{EthereumTransaction, EthereumTransactionHash},
-    result::Result as BridgerResult,
+    service::{
+        redeem::{MsgEthereumTransaction, EthereumTransaction, EthereumTransactionHash},
+        relay::MsgBlockNumber,
+        MsgStop
+    },
+    result::{
+        Result as BridgerResult, Error
+    },
     Config,
+    api::Darwinia,
 };
-use std::{
-    time::Duration,
-};
+use primitives::bytes;
+
 use web3::{
     transports::http::Http,
     types::{BlockNumber, FilterBuilder, H160, H256, U64, SyncState},
     Web3,
 };
-
 use actix::prelude::*;
-use crate::result::Error;
+use std::sync::Arc;
+use std::time::Duration;
 
 #[derive(Clone, Debug)]
 struct MsgScan;
@@ -54,10 +60,14 @@ impl Actor for EthereumService {
     type Context = Context<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        info!(" 🌟 SERVICE STARTED: ETHEREUM");
+        info!(" ✨ SERVICE STARTED: ETHEREUM");
         ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
             ctx.notify(MsgScan {});
         });
+    }
+
+    fn stopped(&mut self, _: &mut Self::Context) {
+        info!(" 💤 SERVICE STOPPED: ETHEREUM")
     }
 }
 
@@ -81,68 +91,44 @@ impl Handler<MsgScan> for EthereumService {
                     f.into_actor(this)
                 })
                 .map(|r, this, _| {
-                    if let Ok(latest_block_number) = r {
-                        this.scan_from = latest_block_number
+                    match r {
+                        Ok(latest_block_number) => {
+                            this.scan_from = latest_block_number
+                        },
+                        Err(e) => {
+                            let err_msg = e.to_string();
+                            if !err_msg.contains("Scanning ethereum too fast") {
+                                warn!("{}", err_msg);
+                            }
+                        }
                     }
                 }),
         ))
     }
 }
-use primitives::bytes;
-use crate::service::relay::MsgBlockNumber;
-use crate::service::redeem::MsgEthereumTransaction;
-use crate::api::Darwinia;
-use std::sync::Arc;
+
+impl Handler<MsgStop> for EthereumService {
+    type Result = ();
+
+    fn handle(&mut self, _: MsgStop, ctx: &mut Context<Self>) -> Self::Result {
+        ctx.stop();
+    }
+}
 
 impl EthereumService {
-    /// Parse contract addresses
-    pub fn parse_contract(config: &Config) -> ContractAddress {
-        let contract = &config.eth.contract;
-        let a = contract.bank.topics[0].as_str();
-        ContractAddress {
-            bank: H256::from_slice(&bytes!(a)),
-            kton: H256::from_slice(&bytes!(contract.kton.topics[0].as_str())),
-            ring: H256::from_slice(&bytes!(contract.ring.topics[0].as_str())),
-        }
-    }
-
-    /// Parse log filter from config
-    pub fn parse_filter(config: &Config) -> [FilterBuilder; 2] {
-        let filters = [&config.eth.contract.bank, &config.eth.contract.issuing]
-            .iter()
-            .map(|c| {
-                FilterBuilder::default()
-                    .address(vec![H160::from_slice(&bytes!(c.address.as_str()))])
-                    .topics(
-                        Some(
-                            c.topics
-                                .iter()
-                                .map(|t| H256::from_slice(&bytes!(t.as_str())))
-                                .collect(),
-                        ),
-                        None,
-                        None,
-                        None,
-                    )
-            })
-            .collect::<Vec<FilterBuilder>>();
-        [filters[0].clone(), filters[1].clone()]
-    }
-
     /// New Ethereum Service with http
     pub fn new(
         config: Config,
         web3: Web3<Http>,
         darwinia: Arc<Darwinia>,
+        scan_from: u64,
         relay_service: Recipient<MsgBlockNumber>,
         redeem_service: Recipient<MsgEthereumTransaction>,
     ) -> EthereumService
     {
-        let scan_from = config.eth.start;
         let step = config.step.ethereum;
         let contracts = EthereumService::parse_contract(&config);
         let filters = EthereumService::parse_filter(&config);
-
         EthereumService {
             contracts,
             filters,
@@ -217,16 +203,9 @@ impl EthereumService {
                   relay_service: Recipient<MsgBlockNumber>,
                   redeem_service: Recipient<MsgEthereumTransaction>,
     ) -> BridgerResult<u64> {
-        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {}...", scan_from);
+        let latest_block_number = EthereumService::get_latest_block_number(&web3).await?;
 
-        let eth = web3.eth();
-        let sync_state = eth.syncing().await?;
-
-        let latest_block_number = match sync_state {
-            // TOOD: what the difference between eth_blockNumber and eth_getBlockByNumber("latest", false)
-            SyncState::NotSyncing=> eth.block_number().await?.as_u64(),
-            SyncState::Syncing(info) => info.current_block.as_u64()
-        };
+        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {} to {} ...", scan_from, latest_block_number);
 
         // 1. Checking start from a right block number
         if scan_from == latest_block_number {
@@ -264,6 +243,53 @@ impl EthereumService {
             }
         }
 
+        Ok(latest_block_number)
+    }
+
+    /// Parse contract addresses
+    pub fn parse_contract(config: &Config) -> ContractAddress {
+        let contract = &config.eth.contract;
+        let a = contract.bank.topics[0].as_str();
+        ContractAddress {
+            bank: H256::from_slice(&bytes!(a)),
+            kton: H256::from_slice(&bytes!(contract.kton.topics[0].as_str())),
+            ring: H256::from_slice(&bytes!(contract.ring.topics[0].as_str())),
+        }
+    }
+
+    /// Parse log filter from config
+    pub fn parse_filter(config: &Config) -> [FilterBuilder; 2] {
+        let filters = [&config.eth.contract.bank, &config.eth.contract.issuing]
+            .iter()
+            .map(|c| {
+                FilterBuilder::default()
+                    .address(vec![H160::from_slice(&bytes!(c.address.as_str()))])
+                    .topics(
+                        Some(
+                            c.topics
+                                .iter()
+                                .map(|t| H256::from_slice(&bytes!(t.as_str())))
+                                .collect(),
+                        ),
+                        None,
+                        None,
+                        None,
+                    )
+            })
+            .collect::<Vec<FilterBuilder>>();
+        [filters[0].clone(), filters[1].clone()]
+    }
+
+    /// get_latest_block_number
+    pub async fn get_latest_block_number(web3: &Web3<Http>) -> BridgerResult<u64> {
+        let eth = web3.eth();
+        let sync_state = eth.syncing().await?;
+
+        let latest_block_number = match sync_state {
+            // TOOD: what the difference between eth_blockNumber and eth_getBlockByNumber("latest", false)
+            SyncState::NotSyncing => eth.block_number().await?.as_u64(),
+            SyncState::Syncing(info) => info.current_block.as_u64()
+        };
         Ok(latest_block_number)
     }
 }

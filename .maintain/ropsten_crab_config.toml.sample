@@ -16,7 +16,6 @@ shadow = 'https://testnet.shadow.darwinia.network'
 [eth]
 # ethereum json-rpc endpoint
 rpc = 'https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016'
-start = 8647036
 
 [eth.contract.ring]
 # erc20 contract of ring

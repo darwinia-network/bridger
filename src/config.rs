@@ -1,5 +1,5 @@
 //! Bridger Config
-use crate::result::{Error, Result};
+use crate::result::{Result, Error};
 use etc::{Etc, Meta, Read, Write};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -33,10 +33,6 @@ pub struct EthereumContract {
 pub struct EthereumConfig {
     /// Ethereum rpc url
     pub rpc: String,
-    /// Ethereum start block number
-    ///
-    /// Ethereum bridger will scan start from this block
-    pub start: u64,
     /// Ethereum contracts
     pub contract: EthereumContract,
 }
@@ -86,7 +82,6 @@ impl Default for Config {
             shadow: "http://localhost:3000".to_string(),
             eth: EthereumConfig {
                 rpc: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
-                start: 8647036,
                 contract: EthereumContract {
                     ring: EthereumContractTuple {
                         address: "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0".to_string(),
@@ -136,16 +131,10 @@ impl Config {
     }
 
     /// New config from pathbuf
-    pub fn new(path: Option<PathBuf>) -> Result<Self> {
-        let path = if let Some(conf) = path {
-            conf
-        } else if let Some(mut conf) = dirs::home_dir() {
-            conf.push(".bridger/config.toml");
-            conf
-        } else {
-            return Err(Error::Bridger("Could not open home dir".to_string()));
-        };
-        let c = Etc::from(path);
+    pub fn new(data_dir: &PathBuf) -> Result<Self> {
+        let mut config_file = data_dir.clone();
+        config_file.push("config.toml");
+        let c = Etc::from(config_file);
 
         // if file exist
         if c.real_path()?.exists() {
@@ -166,5 +155,13 @@ impl Config {
         } else {
             Self::write(c)
         }
+    }
+
+    /// default_data_dir
+    pub fn default_data_dir() -> Result<PathBuf> {
+        let mut dir = dirs::home_dir().ok_or_else(|| Error::Bridger("Could not open home dir".to_string()))?;
+        dir.push(".bridger");
+
+        Ok(dir)
     }
 }

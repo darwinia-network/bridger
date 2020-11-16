@@ -14,7 +14,7 @@ pub async fn exec() -> Result<()> {
     std::env::set_var("RUST_LOG", "info,darwinia_bridger");
     env_logger::init();
 
-    let config = Config::new(None)?;
+    let config = Config::new(&Config::default_data_dir()?)?;  // TODO: add --data-dir
 
     let client = ClientBuilder::<DarwiniaRuntime>::new()
         .set_url(&config.node)

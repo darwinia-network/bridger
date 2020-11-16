@@ -11,7 +11,7 @@ pub async fn exec(json: String) -> Result<()> {
     env_logger::init();
 
     // apis
-    let config = Config::new(None)?;
+    let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
     let darwinia =  Arc::new(Darwinia::new(&config).await?);
 
     // build from json string

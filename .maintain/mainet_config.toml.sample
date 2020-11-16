@@ -13,7 +13,7 @@ shadow = 'https://shadow.darwinia.network'
 [eth]
 # ethereum json-rpc endpoint
 rpc = 'https://mainnet.infura.io/v3/<YOUR_KEY>'
-start = 11149205
+
 [eth.contract.ring]
 address = '0x9469d013805bffb7d3debe5e7839237e535ec483'
 topics = ['0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10']

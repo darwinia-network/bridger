@@ -178,14 +178,14 @@ impl RedeemService {
 
     const LAST_REDEEMED_CACHE_FILE_NAME: &'static str = "last-redeemed";
 
-    /// get_ethereum_start
+    /// Get last redeemed block number
     pub async fn get_last_redeemed(data_dir: PathBuf) -> BridgerResult<u64> {
         let mut filepath = data_dir;
         filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);
 
         // if cache file not exist
         if File::open(&filepath).is_err() {
-            return Err(Bridger("No ethereum start, run 'bridger set-start --block start' to set".to_string()));
+            return Err(Bridger("The last redeemed block number is not set".to_string()));
         }
 
         // read start from cache file
@@ -198,7 +198,7 @@ impl RedeemService {
         }
     }
 
-    /// set_ethereum_start
+    /// Set last redeemed block number
     pub fn set_last_redeemed(data_dir: PathBuf, value: u64) -> BridgerResult<()> {
         let mut filepath = data_dir;
         filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);

@@ -58,7 +58,7 @@ enum Opt {
         #[structopt(short, long)]
         json: bool,
     },
-    /// Set ethereum scan from 'start';
+    /// Set where to start the ethereum scan
     SetStart {
         /// Data dir of bridger
         #[structopt(short, long)]

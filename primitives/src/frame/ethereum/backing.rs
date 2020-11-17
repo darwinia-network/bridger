@@ -12,7 +12,7 @@ use substrate_subxt_proc_macro::{module, Call, Event, Store};
 #[module]
 pub trait EthereumBacking: System + Balances {
     /// Ethereum transaction index
-    type EthereumTransactionIdex: 'static + Encode + Decode + Send + Default + Clone + Sync;
+    type EthereumTransactionIndex: 'static + Encode + Decode + Send + Default + Clone + Sync;
 }
 
 //////

@@ -22,6 +22,10 @@ use actix::prelude::*;
 use std::sync::Arc;
 use std::time::Duration;
 
+use tokio::fs::File;
+use std::path::PathBuf;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
 #[derive(Clone, Debug)]
 struct MsgScan;
 
@@ -49,11 +53,12 @@ pub struct EthereumService {
     filters: [FilterBuilder; 2],
     web3: Web3<Http>,
     darwinia: Arc<Darwinia>,
-    scan_from: u64,
     step: u64,
 
     relay_service: Recipient<MsgBlockNumber>,
     redeem_service: Recipient<MsgEthereumTransaction>,
+
+    data_dir: PathBuf,
 }
 
 impl Actor for EthereumService {
@@ -84,22 +89,19 @@ impl Handler<MsgScan> for EthereumService {
                         this.darwinia.clone(),
                         this.contracts.clone(),
                         this.filters.clone(),
-                        this.scan_from,
                         this.relay_service.clone(),
                         this.redeem_service.clone(),
+                        this.data_dir.clone(),
                     );
                     f.into_actor(this)
                 })
-                .map(|r, this, _| {
-                    match r {
-                        Ok(latest_block_number) => {
-                            this.scan_from = latest_block_number
-                        },
-                        Err(e) => {
-                            let err_msg = e.to_string();
-                            if !err_msg.contains("Scanning ethereum too fast") {
-                                warn!("{}", err_msg);
-                            }
+                .map(|r, _, _| {
+                    if let Err(e) = r {
+                        let err_msg = e.to_string();
+                        if err_msg.contains("Scanning ethereum too fast") {
+                            warn!("{}", err_msg);
+                        } else {
+                            error!("{}", err_msg);
                         }
                     }
                 }),
@@ -121,9 +123,9 @@ impl EthereumService {
         config: Config,
         web3: Web3<Http>,
         darwinia: Arc<Darwinia>,
-        scan_from: u64,
         relay_service: Recipient<MsgBlockNumber>,
         redeem_service: Recipient<MsgEthereumTransaction>,
+        data_dir: PathBuf,
     ) -> EthereumService
     {
         let step = config.step.ethereum;
@@ -134,10 +136,10 @@ impl EthereumService {
             filters,
             web3,
             darwinia,
-            scan_from,
             step,
             relay_service,
             redeem_service,
+            data_dir
         }
     }
 
@@ -199,16 +201,18 @@ impl EthereumService {
 
     async fn scan(web3: Web3<Http>, darwinia: Arc<Darwinia>,
                   contracts: ContractAddress, filters: [FilterBuilder; 2],
-                  scan_from: u64,
                   relay_service: Recipient<MsgBlockNumber>,
                   redeem_service: Recipient<MsgEthereumTransaction>,
+                  data_dir: PathBuf,
     ) -> BridgerResult<u64> {
+        let scan_from = EthereumService::get_scan_from(&darwinia, &web3, &data_dir).await?;
+
         let latest_block_number = EthereumService::get_latest_block_number(&web3).await?;
 
         trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {} to {} ...", scan_from, latest_block_number);
 
         // 1. Checking start from a right block number
-        if scan_from == latest_block_number {
+        if scan_from >= latest_block_number {
             let msg = format!("Scanning ethereum too fast: {}", scan_from);
             return Err(Error::Bridger(msg));
         }
@@ -291,5 +295,56 @@ impl EthereumService {
             SyncState::Syncing(info) => info.current_block.as_u64()
         };
         Ok(latest_block_number)
+    }
+
+    const ETHEREUM_START_FILE_NAME: &'static str = "ethereum-start";
+
+    /// Get ethereum start from file
+    pub async fn get_ethereum_start(data_dir: PathBuf) -> BridgerResult<u64> {
+        let mut filepath = data_dir;
+        filepath.push(EthereumService::ETHEREUM_START_FILE_NAME);
+
+        // if cache file not exist
+        if File::open(&filepath).await.is_err() {
+            return Err(Error::Bridger("The ethereum start is not set".to_string()));
+        }
+
+        // read start from cache file
+        let mut file = File::open(filepath).await?;
+        let mut buffer = String::new();
+        file.read_to_string(&mut buffer).await?;
+        match buffer.trim().parse() {
+            Ok(start) => Ok(start),
+            Err(e) => Err(Error::Bridger(e.to_string()))
+        }
+    }
+
+    /// Set ethereum start to file
+    pub async fn set_ethereum_start(data_dir: PathBuf, value: u64) -> BridgerResult<()> {
+        let mut filepath = data_dir;
+        filepath.push(EthereumService::ETHEREUM_START_FILE_NAME);
+        let mut file = File::create(filepath).await?;
+        file.write_all(value.to_string().as_bytes()).await?;
+        Ok(())
+    }
+
+    async fn get_scan_from(darwinia: &Arc<Darwinia>, web3: &Web3<Http>, data_dir: &PathBuf) -> BridgerResult<u64> {
+        if let Ok(block_hash) = darwinia.last_redeemed_ethereum_block().await {
+            let block = web3.eth().block(web3::types::BlockId::Hash(block_hash)).await;
+            if let Ok(Some(block)) = block {
+                return Ok(block.number.unwrap().as_u64());
+            }
+        }
+
+        match EthereumService::get_ethereum_start(data_dir.clone()).await {
+            Ok(ethereum_start) => Ok(ethereum_start),
+            Err(e) => {
+                return if e.to_string() == "The ethereum start is not set" {
+                    Err(Error::Bridger("No ethereum start, run 'bridger set-start --block start' to set one".into()))
+                } else {
+                    Err(e)
+                }
+            },
+        }
     }
 }

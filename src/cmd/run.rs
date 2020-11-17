@@ -101,30 +101,21 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 }
 
 async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>, data_dir: PathBuf) -> Result<()> {
-    let last_redeemed = RedeemService::get_last_redeemed(data_dir.clone()).await;
-    if let Err(e) = &last_redeemed {
-        if e.to_string() == "The last redeemed block number is not set" {
-            return Err(Error::Bridger("No ethereum start, run 'bridger set-start --block start' to set one".into()));
-        }
-    }
-    let ethereum_start = last_redeemed.unwrap();
-    info!("🌱 Relay from ethereum block: {}", ethereum_start);
-
     // relay service
     let last_confirmed = darwinia.last_confirmed().await.unwrap();
     let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed, config.step.relay).start();
 
     // redeem service
-    let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem, data_dir.clone()).start();
+    let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem).start();
 
     // ethereum service
     let ethereum_service = EthereumService::new(
         config.clone(),
         web3.clone(),
         darwinia.clone(),
-        ethereum_start,
         relay_service.clone().recipient(),
         redeem_service.clone().recipient(),
+        data_dir,
     ).start();
 
     // guard service

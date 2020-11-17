@@ -15,9 +15,9 @@ use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 use crate::service::MsgStop;
 use crate::result::Error::Bridger;
-use std::fs::File;
-use std::io::{Read, Write};
+use tokio::fs::File;
 use std::path::PathBuf;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -172,7 +172,7 @@ impl RedeemService {
         info!("      Redeemed ethereum tx {:?} with extrinsic {:?}", tx.enclosed_hash(), hash);
 
         // 3. Update cache
-        RedeemService::set_last_redeemed(data_dir, tx.block)?;
+        RedeemService::set_last_redeemed(data_dir, tx.block).await?;
         Ok(())
     }
 
@@ -184,14 +184,14 @@ impl RedeemService {
         filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);
 
         // if cache file not exist
-        if File::open(&filepath).is_err() {
+        if File::open(&filepath).await.is_err() {
             return Err(Bridger("The last redeemed block number is not set".to_string()));
         }
 
         // read start from cache file
-        let mut file = File::open(filepath)?;
+        let mut file = File::open(filepath).await?;
         let mut buffer = String::new();
-        file.read_to_string(&mut buffer)?;
+        file.read_to_string(&mut buffer).await?;
         match buffer.trim().parse() {
             Ok(start) => Ok(start),
             Err(e) => Err(Bridger(e.to_string()))
@@ -199,11 +199,11 @@ impl RedeemService {
     }
 
     /// Set last redeemed block number
-    pub fn set_last_redeemed(data_dir: PathBuf, value: u64) -> BridgerResult<()> {
+    pub async fn set_last_redeemed(data_dir: PathBuf, value: u64) -> BridgerResult<()> {
         let mut filepath = data_dir;
         filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);
-        let mut file = File::create(filepath)?;
-        file.write_all(value.to_string().as_bytes())?;
+        let mut file = File::create(filepath).await?;
+        file.write_all(value.to_string().as_bytes()).await?;
         Ok(())
     }
 

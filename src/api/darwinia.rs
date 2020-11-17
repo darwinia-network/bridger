@@ -339,10 +339,14 @@ impl Darwinia {
     /// Check if should redeem
     pub async fn last_redeemed_ethereum_block(&self) -> Result<H256> {
         let mut iter = self.client.verified_proof_iter(None).await?;
-        while let Some((mut storage_key, true)) = iter.next().await? {
-            let len = storage_key.0.len();
-            let block_hash: &mut [u8] = &mut storage_key.0[len-40..len-8];
-            return Ok(H256::from_slice(block_hash));
+        while let Some((mut storage_key, verified)) = iter.next().await? {
+            if verified {
+                let len = storage_key.0.len();
+                let block_hash: &mut [u8] = &mut storage_key.0[len-40..len-8];
+                return Ok(H256::from_slice(block_hash));
+            } else {
+                continue;
+            }
         }
 
         return Err(Bridger("No redeemed block on chain".to_string()))

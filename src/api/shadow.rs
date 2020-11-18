@@ -1,5 +1,5 @@
 //! Darwinia shadow API
-use crate::{result::Result, Config};
+use crate::{error::Result, Config};
 use primitives::{
     chain::ethereum::{
         EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,

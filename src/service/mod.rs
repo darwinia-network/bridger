@@ -1,5 +1,5 @@
 //! Bridger Services
-pub use crate::result::Result;
+pub use crate::error::Result;
 
 pub mod ethereum;
 pub mod guard;

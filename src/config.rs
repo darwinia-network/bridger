@@ -1,10 +1,10 @@
 //! Bridger Config
-use crate::result::{Result, Error};
+use crate::error::{Result, Error};
 use etc::{Etc, Meta, Read, Write};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use toml::Serializer;
-use crate::result::Error::Bridger;
+use crate::error::Error::Bridger;
 
 /// Ethereum Contract Tuple
 #[derive(Debug, Serialize, Deserialize, Clone)]

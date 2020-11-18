@@ -1,5 +1,5 @@
 //! Ethereum Backing Events Handler
-use crate::result::Result;
+use crate::error::Result;
 use primitives::{
     frame::ethereum::backing::{RedeemDeposit, RedeemKton, RedeemRing},
     runtime::DarwiniaRuntime,

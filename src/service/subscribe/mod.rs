@@ -1,8 +1,8 @@
 //! Darwinia Subscribe
 use crate::{
     api::{Darwinia, Shadow},
-    result::Result as BridgerResult,
-    result::Error,
+    error::Result,
+    error::Error,
 };
 use primitives::{
     frame::ethereum::{
@@ -34,7 +34,7 @@ pub struct SubscribeService {
 
 impl SubscribeService {
     /// New redeem service
-    pub async fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> BridgerResult<SubscribeService> {
+    pub async fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> Result<SubscribeService> {
         let sub = SubscribeService::build_event_subscription(darwinia.clone()).await?;
         Ok(SubscribeService {
             darwinia,
@@ -45,7 +45,7 @@ impl SubscribeService {
     }
 
     /// start
-    pub async fn start(&mut self) -> BridgerResult<SubscribeService> {
+    pub async fn start(&mut self) -> Result<SubscribeService> {
         info!("✨ SERVICE STARTED: SUBSCRIBE");
         loop {
             if let Err(e) = self.process_next_event().await {
@@ -69,7 +69,7 @@ impl SubscribeService {
     }
 
     /// process_next_event
-    async fn process_next_event(&mut self) -> BridgerResult<()> {
+    async fn process_next_event(&mut self) -> Result<()> {
         if let Some(raw) = self.sub.next().await {
             if let Ok(event) = raw {
                 // Remove the system events temporarily because it`s too verbose.
@@ -91,7 +91,7 @@ impl SubscribeService {
         Ok(())
     }
 
-    async fn build_event_subscription(darwinia: Arc<Darwinia>) -> BridgerResult<EventSubscription<DarwiniaRuntime>> {
+    async fn build_event_subscription(darwinia: Arc<Darwinia>) -> Result<EventSubscription<DarwiniaRuntime>> {
         let client = &darwinia.client;
         let scratch = client.subscribe_events().await?;
         let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());

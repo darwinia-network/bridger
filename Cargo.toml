@@ -44,6 +44,7 @@ actix = "0.10"
 actix-rt = "1.1.1"
 async-io = "1.1.10"
 sp-version = "2.0.0"
+thiserror = "1.0"
 
 [dependencies.reqwest]
 version = "0.10"

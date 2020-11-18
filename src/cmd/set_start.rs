@@ -1,4 +1,4 @@
-use crate::result::Result;
+use crate::error::Result;
 use std::path::PathBuf;
 use crate::service::RedeemService;
 use crate::Config;
@@ -9,7 +9,7 @@ pub async fn exec(data_dir: Option<PathBuf>, start: u64) -> Result<()> {
     env_logger::init();
 
     let data_dir = data_dir.unwrap_or(Config::default_data_dir()?);
-    RedeemService::set_last_redeemed(data_dir, start)?;
+    RedeemService::set_last_redeemed(data_dir, start).await?;
     println!("OK");
 
     Ok(())

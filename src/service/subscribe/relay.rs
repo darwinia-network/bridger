@@ -1,5 +1,5 @@
 //! Ethereum Relayer Game Events Handler
-use crate::result::Result;
+use crate::error::Result;
 use primitives::{
     frame::ethereum::relay::{
         Affirmed, DisputedAndAffirmed, Extended, GameOver, NewRound, Pended,

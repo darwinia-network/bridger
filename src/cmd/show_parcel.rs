@@ -1,4 +1,4 @@
-use crate::{api::Shadow, result::Result, Config};
+use crate::{api::Shadow, error::Result, Config};
 use std::sync::Arc;
 
 /// Affirm a faked affirmation

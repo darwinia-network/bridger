@@ -349,7 +349,7 @@ impl Darwinia {
             }
         }
 
-        return Err(Bridger("No redeemed block on chain".to_string()))
+        Err(Bridger("No redeemed block on chain".to_string()))
     }
 
     /// Check if should redeem

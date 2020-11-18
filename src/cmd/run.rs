@@ -127,6 +127,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
         ethereum_start,
         relay_service.clone().recipient(),
         redeem_service.clone().recipient(),
+        data_dir
     ).start();
 
     // guard service

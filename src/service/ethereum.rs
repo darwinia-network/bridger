@@ -21,6 +21,8 @@ use web3::{
 use actix::prelude::*;
 use std::sync::Arc;
 use std::time::Duration;
+use crate::service::RedeemService;
+use std::path::PathBuf;
 
 #[derive(Clone, Debug)]
 struct MsgScan;
@@ -54,6 +56,7 @@ pub struct EthereumService {
 
     relay_service: Recipient<MsgBlockNumber>,
     redeem_service: Recipient<MsgEthereumTransaction>,
+    data_dir: PathBuf,
 }
 
 impl Actor for EthereumService {
@@ -87,6 +90,7 @@ impl Handler<MsgScan> for EthereumService {
                         this.scan_from,
                         this.relay_service.clone(),
                         this.redeem_service.clone(),
+                        this.data_dir.clone()
                     );
                     f.into_actor(this)
                 })
@@ -124,6 +128,7 @@ impl EthereumService {
         scan_from: u64,
         relay_service: Recipient<MsgBlockNumber>,
         redeem_service: Recipient<MsgEthereumTransaction>,
+        data_dir: PathBuf,
     ) -> EthereumService
     {
         let step = config.step.ethereum;
@@ -138,6 +143,7 @@ impl EthereumService {
             step,
             relay_service,
             redeem_service,
+            data_dir,
         }
     }
 
@@ -197,11 +203,15 @@ impl EthereumService {
         Ok(txs)
     }
 
-    async fn scan(web3: Web3<Http>, darwinia: Arc<Darwinia>,
-                  contracts: ContractAddress, filters: [FilterBuilder; 2],
+    #[allow(clippy::too_many_arguments)]
+    async fn scan(web3: Web3<Http>,
+                  darwinia: Arc<Darwinia>,
+                  contracts: ContractAddress,
+                  filters: [FilterBuilder; 2],
                   scan_from: u64,
                   relay_service: Recipient<MsgBlockNumber>,
                   redeem_service: Recipient<MsgEthereumTransaction>,
+                  data_dir: PathBuf,
     ) -> BridgerResult<u64> {
         let latest_block_number = EthereumService::get_latest_block_number(&web3).await?;
 
@@ -233,6 +243,7 @@ impl EthereumService {
             for tx in &txs {
                 if darwinia.verified(&tx).await? {
                     warn!("    This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
+                    RedeemService::set_last_redeemed(data_dir.clone(), tx.block).await?;
                 } else {
                     // delay to wait for possible previous extrinsics
                     tokio::time::delay_for(Duration::from_secs(12)).await;

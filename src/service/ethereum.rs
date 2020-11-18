@@ -5,7 +5,7 @@ use crate::{
         relay::MsgBlockNumber,
         MsgStop
     },
-    result::{
+    error::{
         Result as BridgerResult, Error
     },
     Config,

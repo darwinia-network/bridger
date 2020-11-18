@@ -1,7 +1,7 @@
 use crate::api::{Darwinia, Shadow};
 use crate::{
     // listener::Listener,
-    result::{Error, Result},
+    error::{Error, Result},
     Config,
 };
 use async_macros::select;
@@ -36,11 +36,11 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
     env_logger::init();
 
     while let Err(e) = run(data_dir.clone()).await {
-        if e.to_string().contains("No ethereum start") {
-            error!("{}", e.to_string());
+        if let Error::NoEthereumStart = e {
+            error!("{}", e);
             break;
         } else {
-            error!("Stopped for: {:?}", e.to_string());
+            error!("{:?}", e);
             info!("Bridger will restart in 30 seconds...");
             time::delay_for(Duration::from_secs(30)).await;
         }
@@ -101,13 +101,15 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 }
 
 async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>, data_dir: PathBuf) -> Result<()> {
-    let last_redeemed = RedeemService::get_last_redeemed(data_dir.clone()).await;
-    if let Err(e) = &last_redeemed {
-        if e.to_string() == "The last redeemed block number is not set" {
-            return Err(Error::Bridger("No ethereum start, run 'bridger set-start --block start' to set one".into()));
-        }
-    }
-    let ethereum_start = last_redeemed.unwrap();
+    let last_redeemed =
+        RedeemService::get_last_redeemed(data_dir.clone()).await.map_err(|e| {
+            if let Error::LastRedeemedFileNotExists = e {
+                Error::NoEthereumStart
+            } else {
+                e
+            }
+        })?;
+    let ethereum_start = last_redeemed;
     info!("🌱 Relay from ethereum block: {}", ethereum_start);
 
     // relay service
@@ -154,7 +156,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     let c = async {
         loop {
             if killer.lock().await.next().await.is_some() {
-                return Err(Error::Bridger("WS Closed".into()));
+                return Err(Error::Bridger("Jsonrpsee's ws connection closed".into()));
             }
         }
     };

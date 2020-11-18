@@ -1,4 +1,4 @@
-use crate::result::Result;
+use crate::error::Result;
 use std::path::PathBuf;
 use crate::service::RedeemService;
 use crate::Config;

@@ -1,6 +1,6 @@
 use crate::{
     api::Darwinia,
-    result::Result,
+    error::Result,
     Config,
 };
 use std::sync::Arc;

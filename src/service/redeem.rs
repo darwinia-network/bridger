@@ -1,8 +1,8 @@
 //! Redeem Service
 use crate::{
     api::{Darwinia, Shadow},
-    result::Result as BridgerResult,
-    result::Error,
+    error::Result,
+    error::Error,
 };
 use primitives::{chain::ethereum::RedeemFor};
 use std::{
@@ -14,7 +14,7 @@ use actix::prelude::*;
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 use crate::service::MsgStop;
-use crate::result::Error::Bridger;
+use crate::error::Error::Bridger;
 use tokio::fs::File;
 use std::path::PathBuf;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -112,14 +112,14 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                 })
                 .then(|r, this, ctx| {
                     if let Err(err) = r {
-                        if err.to_string().contains("wait") {
-                            warn!("{}", err.to_string());
+                        if let Error::RedeemingBlockLargeThanLastConfirmed(..) = err {
+                            warn!("{}, please wait!", err);
                             ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
                         } else {
-                            warn!("{}", err.to_string());
+                            warn!("{}", err);
                         }
                     }
-                    async {Result::<(), Error>::Ok(())}.into_actor(this)
+                    async {Result::<()>::Ok(())}.into_actor(this)
                 })
                 .map(|_, _, _| {}),
         ))
@@ -145,19 +145,17 @@ impl RedeemService {
         }
     }
 
-    async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction, data_dir: PathBuf) -> BridgerResult<()> {
-        info!("      Try to redeem ethereum tx {:?}...", tx.tx_hash);
+    async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction, data_dir: PathBuf) -> Result<()> {
+        info!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
 
         // 1. Checking before redeem
         if darwinia.verified(&tx).await? {
-            let msg = format!("      This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
-            return Err(Error::Bridger(msg));
+            return Err(Error::TxRedeemed(tx.tx_hash));
         }
 
         let last_confirmed = darwinia.last_confirmed().await?;
         if tx.block >= last_confirmed {
-            let msg = format!("      This ethereum tx {:?}'s block {} not confirmed, please wait.", tx.enclosed_hash(), tx.block);
-            return Err(Error::Bridger(msg));
+            return Err(Error::RedeemingBlockLargeThanLastConfirmed(tx.tx_hash, tx.block, last_confirmed));
         }
 
         // 2. Do redeem
@@ -169,7 +167,7 @@ impl RedeemService {
             EthereumTransactionHash::Token(_) => RedeemFor::Token,
         };
         let hash = darwinia.redeem(redeem_for, proof).await?;
-        info!("      Redeemed ethereum tx {:?} with extrinsic {:?}", tx.enclosed_hash(), hash);
+        info!("Redeemed ethereum tx {:?} with extrinsic {:?}", tx.enclosed_hash(), hash);
 
         // 3. Update cache
         RedeemService::set_last_redeemed(data_dir, tx.block).await?;
@@ -179,13 +177,13 @@ impl RedeemService {
     const LAST_REDEEMED_CACHE_FILE_NAME: &'static str = "last-redeemed";
 
     /// Get last redeemed block number
-    pub async fn get_last_redeemed(data_dir: PathBuf) -> BridgerResult<u64> {
+    pub async fn get_last_redeemed(data_dir: PathBuf) -> Result<u64> {
         let mut filepath = data_dir;
         filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);
 
         // if cache file not exist
         if File::open(&filepath).await.is_err() {
-            return Err(Bridger("The last redeemed block number is not set".to_string()));
+            return Err(Error::LastRedeemedFileNotExists);
         }
 
         // read start from cache file
@@ -199,7 +197,7 @@ impl RedeemService {
     }
 
     /// Set last redeemed block number
-    pub async fn set_last_redeemed(data_dir: PathBuf, value: u64) -> BridgerResult<()> {
+    pub async fn set_last_redeemed(data_dir: PathBuf, value: u64) -> Result<()> {
         let mut filepath = data_dir;
         filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);
         let mut file = File::create(filepath).await?;

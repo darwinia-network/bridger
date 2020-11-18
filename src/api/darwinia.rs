@@ -1,5 +1,5 @@
 //! Darwinia API
-use crate::{service::redeem::EthereumTransaction, result::{Result, Error::Bridger}, Config};
+use crate::{service::redeem::EthereumTransaction, error::{Result, Error}, Config};
 use core::marker::PhantomData;
 use primitives::{
     chain::{
@@ -177,12 +177,15 @@ pub struct Darwinia {
 impl Darwinia {
     /// New darwinia API
     pub async fn new(config: &Config) -> Result<Darwinia> {
-        let client = match jsonrpsee::ws_client(&config.node).await {
-            Ok(client) => client,
-            Err(e) => {
-                return Err(Bridger(format!("Failed to connect to `{}`, due to `{}`", &config.node, e)));
-            }
-        };
+        let client =
+            jsonrpsee::ws_client(&config.node).await
+                .map_err(|e| {
+                    Error::FailToConnectDarwinia {
+                        url: config.node.clone(),
+                        source: e
+                    }
+                })?;
+
         let client = ClientBuilder::<DarwiniaRuntime>::new()
             .set_client(client)
             .build()
@@ -232,7 +235,7 @@ impl Darwinia {
                 }
             }
         } else {
-            Err(Bridger("Not technical committee member".to_string()))
+            Err(Error::Bridger("Not technical committee member".to_string()))
         }
     }
 
@@ -316,7 +319,7 @@ impl Darwinia {
     ) -> Result<H256> {
         let ethereum_tx_hash = proof.header.hash
             .map(|hash| hex::encode(&hash))
-            .ok_or_else(|| Bridger("No hash in header".to_string()))?;
+            .ok_or_else(|| Error::Bridger("No hash in header".to_string()))?;
         match &self.account.real {
             Some(real) => {
                 trace!("      Proxy redeem ethereum tx 0x{:?} for real account {:?}", ethereum_tx_hash, real);

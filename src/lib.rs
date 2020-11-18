@@ -8,7 +8,7 @@ mod config;
 
 pub mod api;
 pub mod cmd;
-pub mod result;
+pub mod error;
 pub mod service;
 
 pub use self::config::Config;

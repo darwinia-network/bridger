@@ -1,5 +1,5 @@
 use crate::{
-    result::Result,
+    error::Result,
     Config,
 };
 use std::sync::Arc;

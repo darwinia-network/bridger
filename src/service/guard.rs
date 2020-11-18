@@ -6,7 +6,7 @@ use actix::prelude::*;
 
 use crate::{
     api::{Darwinia, Shadow},
-    result::{Result as BridgerResult},
+    error::Result,
 };
 use crate::service::MsgStop;
 
@@ -92,7 +92,7 @@ impl GuardService {
         }
     }
 
-    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, voted: Vec<u64>) -> BridgerResult<Vec<u64>> {
+    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, voted: Vec<u64>) -> Result<Vec<u64>> {
         trace!("Checking pending headers...");
         let mut result = vec![];
 

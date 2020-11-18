@@ -1,5 +1,5 @@
 //! Relay Service
-use crate::{api::{Darwinia, Shadow}, result::Error, result::Result as BridgerResult};
+use crate::{api::{Darwinia, Shadow}, error::Error, error::Result};
 use std::sync::Arc;
 use primitives::chain::ethereum::EthereumHeader;
 
@@ -78,15 +78,15 @@ impl Handler<MsgExecute> for RelayService {
                     }
                 })
                 .map(|r, this, _| {
-                    if let Err(e) = r {
-                        let err_msg = e.to_string();
-                        // TODO: Error::Affirmed
-                        if err_msg.contains("less than the last_confirmed") {
-                            this.relayed = this.target
+                    match r {
+                        Ok(_) => this.relayed = this.target,
+                        Err(e@Error::AffirmingBlockLessThanLastConfirmed(..)) => {
+                            this.relayed = this.target;
+                            warn!("{}", e);
+                        },
+                        Err(e) => {
+                            warn!("{}", e);
                         }
-                        warn!("{}", err_msg);
-                    } else {
-                        this.relayed = this.target
                     }
                 }),
         ))
@@ -115,18 +115,14 @@ impl RelayService {
     }
 
     /// affirm target block
-    pub async fn affirm(darwinia: Arc<Darwinia>, shadow: Arc<Shadow>, target: u64) -> BridgerResult<()> {
+    pub async fn affirm(darwinia: Arc<Darwinia>, shadow: Arc<Shadow>, target: u64) -> Result<()> {
         // /////////////////////////
         // checking before affirm
         // /////////////////////////
         // 1. last confirmed check
         let last_confirmed = darwinia.last_confirmed().await?;
         if target <= last_confirmed {
-            let reason = format!(
-                "The target block {} is less than the last_confirmed {}",
-                &target, &last_confirmed
-            );
-            return Err(Error::Bridger(reason));
+            return Err(Error::AffirmingBlockLessThanLastConfirmed(target, last_confirmed));
         }
 
         // 2. pendings check
@@ -134,8 +130,7 @@ impl RelayService {
         for pending_header in pending_headers {
             let pending_block_number = pending_header.1.header.number;
             if pending_block_number >= target {
-                let reason = format!("The target block {} is pending", &target);
-                return Err(Error::Bridger(reason));
+                return Err(Error::AffirmingBlockInPending(target));
             }
         }
 
@@ -143,8 +138,7 @@ impl RelayService {
         for (_game_id, game) in darwinia.affirmations().await?.iter() {
             for (_round_id, affirmations) in game.iter() {
                 if Darwinia::contains(&affirmations, target) {
-                    let reason = format!("The target block {} is in the relayer game", &target);
-                    return Err(Error::Bridger(reason));
+                    return Err(Error::AffirmingBlockInGame(target));
                 }
             }
         }
@@ -154,8 +148,7 @@ impl RelayService {
         if parcel.header == EthereumHeader::default()
             || parcel.mmr_root == [0u8;32]
         {
-            let reason = format!("Shadow service failed to provide parcel for block {}", &target);
-            return Err(Error::Bridger(reason));
+            return Err(Error::AffirmingBlockInGame(target));
         }
 
         // /////////////////////////

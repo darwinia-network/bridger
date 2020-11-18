@@ -824,6 +824,7 @@ dependencies = [
  "sp-version",
  "structopt",
  "substrate-subxt",
+ "thiserror",
  "tokio",
  "toml",
  "web3",

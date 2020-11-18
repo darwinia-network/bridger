@@ -1,6 +1,6 @@
 use crate::{
     api::{Darwinia, Shadow},
-    result::Result,
+    error::Result,
     Config,
     service::RelayService,
 };

@@ -1,5 +1,5 @@
 //! Sup Commands
-use crate::result::Result;
+use crate::error::Result;
 use std::path::PathBuf;
 use structopt::{clap::AppSettings, StructOpt};
 

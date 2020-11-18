@@ -162,11 +162,11 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     };
 
     if let Err(e) = select!(b, c).await {
-        ethereum_service.send(MsgStop{}).await.unwrap();
-        relay_service.send(MsgStop{}).await.unwrap();
-        redeem_service.send(MsgStop{}).await.unwrap();
+        ethereum_service.do_send(MsgStop{});
+        relay_service.do_send(MsgStop{});
+        redeem_service.do_send(MsgStop{});
         if let Some(guard_service) = guard_service {
-            guard_service.send(MsgStop{}).await.unwrap();
+            guard_service.do_send(MsgStop{});
         }
         subscribe.stop();
         Err(e)

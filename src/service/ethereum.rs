@@ -99,10 +99,11 @@ impl Handler<MsgScan> for EthereumService {
                         Ok(latest_block_number) => {
                             this.scan_from = latest_block_number
                         },
-                        Err(e) => {
-                            let err_msg = e.to_string();
-                            if !err_msg.contains("Scanning ethereum too fast") {
-                                warn!("{}", err_msg);
+                        Err(err) => {
+                            if let Error::ScanningEthereumTooFast(..) = err {
+                                trace!("{}", err);
+                            } else {
+                                warn!("{}", err);
                             }
                         }
                     }
@@ -215,18 +216,12 @@ impl EthereumService {
     ) -> BridgerResult<u64> {
         let latest_block_number = EthereumService::get_latest_block_number(&web3).await?;
 
-        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {} to {} ...", scan_from, latest_block_number);
-
         // 1. Checking start from a right block number
-        if scan_from == latest_block_number {
-            let msg = format!("Scanning ethereum too fast: {}", scan_from);
-            return Err(Error::Bridger(msg));
+        if scan_from >= latest_block_number {
+            return Err(Error::ScanningEthereumTooFast(scan_from, latest_block_number));
         }
 
-        if scan_from == u64::MAX {
-            let msg = "Scanning ethereum to u64::MAX".to_string();
-            return Err(Error::Bridger(msg));
-        }
+        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {} to {} ...", scan_from, latest_block_number);
 
         // 2. Scan tx from ethereum
         let txs = EthereumService::do_scan(web3, contracts, filters, scan_from, latest_block_number).await?;

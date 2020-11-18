@@ -45,8 +45,11 @@ pub enum Error {
     #[error("The last redeemed block number is not set")]
     LastRedeemedFileNotExists,
 
-    #[error("No ethereum start, run 'bridger set-start --block start' to set one")]
+    #[error("No ethereum start, run 'bridger set-start --data-dir <data_dir> --block <redeem_scan_start>' to set one")]
     NoEthereumStart,
+
+    #[error("Heartbeat>>> Scanning ethereum too fast from {0}, but the latest block number is {1}")]
+    ScanningEthereumTooFast(u64, u64),
 
     #[error("The affirming target block {0} is less than the last_confirmed {0}")]
     AffirmingBlockLessThanLastConfirmed(u64, u64),

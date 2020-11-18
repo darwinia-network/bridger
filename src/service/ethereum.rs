@@ -339,7 +339,7 @@ impl EthereumService {
         match EthereumService::get_ethereum_start(data_dir.clone()).await {
             Ok(ethereum_start) => Ok(ethereum_start),
             Err(e) => {
-                return if e.to_string() == "The ethereum start is not set" {
+                if e.to_string() == "The ethereum start is not set" {
                     Err(Error::Bridger("No ethereum start, run 'bridger set-start --block start' to set one".into()))
                 } else {
                     Err(e)

@@ -323,7 +323,7 @@ impl Darwinia {
             .ok_or_else(|| BizError::Bridger("No hash in header".to_string()))?;
         match &self.account.real {
             Some(real) => {
-                trace!("      Proxy redeem ethereum tx 0x{:?} for real account {:?}", ethereum_tx_hash, real);
+                trace!("Proxy redeem ethereum tx 0x{:?} for real account {:?}", ethereum_tx_hash, real);
                 let redeem = Redeem {
                     _runtime: PhantomData::default(),
                     act: redeem_for,
@@ -334,7 +334,7 @@ impl Darwinia {
                 Ok(self.client.proxy(&self.account.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
             },
             None => {
-                trace!("      Redeem ethereum tx 0x{:?} with account {:?}", ethereum_tx_hash, &self.account.account_id);
+                trace!("Redeem ethereum tx 0x{:?} with account {:?}", ethereum_tx_hash, &self.account.account_id);
                 Ok(self.client.redeem(&self.account.signer, redeem_for, proof).await?)
             }
         }

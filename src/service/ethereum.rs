@@ -21,6 +21,8 @@ use web3::{
 use actix::prelude::*;
 use std::sync::Arc;
 use std::time::Duration;
+use crate::service::RedeemService;
+use std::path::PathBuf;
 
 #[derive(Clone, Debug)]
 struct MsgScan;
@@ -54,6 +56,7 @@ pub struct EthereumService {
 
     relay_service: Recipient<MsgBlockNumber>,
     redeem_service: Recipient<MsgEthereumTransaction>,
+    data_dir: PathBuf,
 }
 
 impl Actor for EthereumService {
@@ -87,6 +90,7 @@ impl Handler<MsgScan> for EthereumService {
                         this.scan_from,
                         this.relay_service.clone(),
                         this.redeem_service.clone(),
+                        this.data_dir.clone()
                     );
                     f.into_actor(this)
                 })
@@ -95,10 +99,11 @@ impl Handler<MsgScan> for EthereumService {
                         Ok(latest_block_number) => {
                             this.scan_from = latest_block_number
                         },
-                        Err(e) => {
-                            let err_msg = e.to_string();
-                            if !err_msg.contains("Scanning ethereum too fast") {
-                                warn!("{}", err_msg);
+                        Err(err) => {
+                            if let Error::ScanningEthereumTooFast(..) = err {
+                                trace!("{}", err);
+                            } else {
+                                warn!("{}", err);
                             }
                         }
                     }
@@ -124,6 +129,7 @@ impl EthereumService {
         scan_from: u64,
         relay_service: Recipient<MsgBlockNumber>,
         redeem_service: Recipient<MsgEthereumTransaction>,
+        data_dir: PathBuf,
     ) -> EthereumService
     {
         let step = config.step.ethereum;
@@ -138,6 +144,7 @@ impl EthereumService {
             step,
             relay_service,
             redeem_service,
+            data_dir,
         }
     }
 
@@ -197,26 +204,24 @@ impl EthereumService {
         Ok(txs)
     }
 
-    async fn scan(web3: Web3<Http>, darwinia: Arc<Darwinia>,
-                  contracts: ContractAddress, filters: [FilterBuilder; 2],
+    #[allow(clippy::too_many_arguments)]
+    async fn scan(web3: Web3<Http>,
+                  darwinia: Arc<Darwinia>,
+                  contracts: ContractAddress,
+                  filters: [FilterBuilder; 2],
                   scan_from: u64,
                   relay_service: Recipient<MsgBlockNumber>,
                   redeem_service: Recipient<MsgEthereumTransaction>,
+                  data_dir: PathBuf,
     ) -> BridgerResult<u64> {
         let latest_block_number = EthereumService::get_latest_block_number(&web3).await?;
 
-        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {} to {} ...", scan_from, latest_block_number);
-
         // 1. Checking start from a right block number
-        if scan_from == latest_block_number {
-            let msg = format!("Scanning ethereum too fast: {}", scan_from);
-            return Err(Error::Bridger(msg));
+        if scan_from >= latest_block_number {
+            return Err(Error::ScanningEthereumTooFast(scan_from, latest_block_number));
         }
 
-        if scan_from == u64::MAX {
-            let msg = "Scanning ethereum to u64::MAX".to_string();
-            return Err(Error::Bridger(msg));
-        }
+        trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {} to {} ...", scan_from, latest_block_number);
 
         // 2. Scan tx from ethereum
         let txs = EthereumService::do_scan(web3, contracts, filters, scan_from, latest_block_number).await?;
@@ -233,6 +238,7 @@ impl EthereumService {
             for tx in &txs {
                 if darwinia.verified(&tx).await? {
                     warn!("    This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
+                    RedeemService::set_last_redeemed(data_dir.clone(), tx.block).await?;
                 } else {
                     // delay to wait for possible previous extrinsics
                     tokio::time::delay_for(Duration::from_secs(12)).await;

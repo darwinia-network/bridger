@@ -1,7 +1,7 @@
 //! Ethereum RPC calls
 mod header;
 
-use crate::{chain::ethereum::EthereumHeader, result::Result, rpc::RPC};
+use crate::{chain::ethereum::EthereumHeader, result::{Result, Error}, rpc::RPC};
 use async_trait::async_trait;
 use reqwest::Client;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -59,15 +59,6 @@ impl EthereumRPC {
 impl RPC for EthereumRPC {
     type Header = EthereumHeader;
 
-    async fn get_header_by_number(&self, block: u64) -> Result<Self::Header> {
-        Ok(
-            header::EthHeaderRPCResp::get(&self.client, &self.rpc(), block)
-                .await?
-                .result
-                .into(),
-        )
-    }
-
     async fn get_header_by_hash(&self, block: &str) -> Result<Self::Header> {
         Ok(
             header::EthHeaderRPCResp::get_by_hash(&self.client, &self.rpc(), block)
@@ -75,6 +66,16 @@ impl RPC for EthereumRPC {
                 .result
                 .into(),
         )
+    }
+
+    async fn get_header_by_number(&self, block: u64) -> Result<Self::Header> {
+        let result = header::EthHeaderRPCResp::get(&self.client, &self.rpc(), block)
+            .await;
+        result
+            .map(|resp| resp.result.into())
+            .map_err(|err|
+                Error::FailToGetEthereumHeader(format!("{:?}", err), block)
+            )
     }
 
     async fn block_number(&self) -> Result<u64> {

@@ -14,6 +14,9 @@ pub enum Error {
     #[cfg(feature = "rpc")]
     #[error(transparent)]
     SerdeJson(#[from] serde_json::Error),
+
+    #[error("Fail to get ethereum header of block {1}: {0}")]
+    FailToGetEthereumHeader(String, u64),
 }
 
 /// Sup Result

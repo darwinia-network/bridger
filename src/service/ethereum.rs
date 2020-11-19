@@ -6,7 +6,7 @@ use crate::{
         MsgStop
     },
     error::{
-        Result as BridgerResult, Error
+        Result as BridgerResult, Error, BizError,
     },
     Config,
     api::Darwinia,
@@ -100,10 +100,10 @@ impl Handler<MsgScan> for EthereumService {
                             this.scan_from = latest_block_number
                         },
                         Err(err) => {
-                            if let Error::ScanningEthereumTooFast(..) = err {
+                            if let Error::BizError(..) = err {
                                 trace!("{}", err);
                             } else {
-                                warn!("{}", err);
+                                error!("{:?}", err);
                             }
                         }
                     }
@@ -218,7 +218,7 @@ impl EthereumService {
 
         // 1. Checking start from a right block number
         if scan_from >= latest_block_number {
-            return Err(Error::ScanningEthereumTooFast(scan_from, latest_block_number));
+            return Err(BizError::ScanningEthereumTooFast(scan_from, latest_block_number).into());
         }
 
         trace!("Heartbeat>>> Scanning on ethereum for new cross-chain transactions from {} to {} ...", scan_from, latest_block_number);

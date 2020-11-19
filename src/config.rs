@@ -1,10 +1,9 @@
 //! Bridger Config
-use crate::error::{Result, Error};
+use crate::error::{Result, BizError};
 use etc::{Etc, Meta, Read, Write};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use toml::Serializer;
-use crate::error::Error::Bridger;
 
 /// Ethereum Contract Tuple
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -144,7 +143,7 @@ impl Config {
             // proxy real's length check
             if let Some(proxy) = config.clone().proxy {
                 if proxy.real.len() != 64 && proxy.real.len() != 66 {
-                    return Err(Bridger("Config proxy real's length is wrong".to_string()));
+                    return Err(BizError::Bridger("Config proxy real's length is wrong".to_string()).into());
                 }
                 if proxy.real.len() == 64 {
                     config.proxy = Some(Proxy { real: format!("0x{}", proxy.real) });
@@ -159,7 +158,7 @@ impl Config {
 
     /// default_data_dir
     pub fn default_data_dir() -> Result<PathBuf> {
-        let mut dir = dirs::home_dir().ok_or_else(|| Error::Bridger("Could not open home dir".to_string()))?;
+        let mut dir = dirs::home_dir().ok_or_else(|| BizError::Bridger("Could not open home dir".to_string()))?;
         dir.push(".bridger");
 
         Ok(dir)

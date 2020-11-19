@@ -14,10 +14,10 @@ use actix::prelude::*;
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 use crate::service::MsgStop;
-use crate::error::Error::Bridger;
 use tokio::fs::File;
 use std::path::PathBuf;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use crate::error::BizError;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -112,11 +112,11 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                 })
                 .then(|r, this, ctx| {
                     if let Err(err) = r {
-                        if let Error::RedeemingBlockLargeThanLastConfirmed(..) = err {
+                        if let Error::BizError(..) = err {
                             warn!("{}, please wait!", err);
                             ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
                         } else {
-                            warn!("{}", err);
+                            error!("{:?}", err);
                         }
                     }
                     async {Result::<()>::Ok(())}.into_actor(this)
@@ -150,12 +150,12 @@ impl RedeemService {
 
         // 1. Checking before redeem
         if darwinia.verified(&tx).await? {
-            return Err(Error::TxRedeemed(tx.tx_hash));
+            return Err(BizError::TxRedeemed(tx.tx_hash).into());
         }
 
         let last_confirmed = darwinia.last_confirmed().await?;
         if tx.block >= last_confirmed {
-            return Err(Error::RedeemingBlockLargeThanLastConfirmed(tx.tx_hash, tx.block, last_confirmed));
+            return Err(BizError::RedeemingBlockLargeThanLastConfirmed(tx.tx_hash, tx.block, last_confirmed).into());
         }
 
         // 2. Do redeem
@@ -192,7 +192,7 @@ impl RedeemService {
         file.read_to_string(&mut buffer).await?;
         match buffer.trim().parse() {
             Ok(start) => Ok(start),
-            Err(e) => Err(Bridger(e.to_string()))
+            Err(e) => Err(BizError::Bridger(e.to_string()).into())
         }
     }
 

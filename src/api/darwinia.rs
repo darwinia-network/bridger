@@ -29,6 +29,7 @@ use substrate_subxt::{
     sp_core::Pair as PairTrait, system::System, Client, ClientBuilder, PairSigner,
 };
 use web3::types::H256;
+use crate::error::BizError;
 
 // Types
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
@@ -235,7 +236,7 @@ impl Darwinia {
                 }
             }
         } else {
-            Err(Error::Bridger("Not technical committee member".to_string()))
+            Err(BizError::Bridger("Not technical committee member".to_string()).into())
         }
     }
 
@@ -319,7 +320,7 @@ impl Darwinia {
     ) -> Result<H256> {
         let ethereum_tx_hash = proof.header.hash
             .map(|hash| hex::encode(&hash))
-            .ok_or_else(|| Error::Bridger("No hash in header".to_string()))?;
+            .ok_or_else(|| BizError::Bridger("No hash in header".to_string()))?;
         match &self.account.real {
             Some(real) => {
                 trace!("      Proxy redeem ethereum tx 0x{:?} for real account {:?}", ethereum_tx_hash, real);

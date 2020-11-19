@@ -23,6 +23,7 @@ use crate::service::RelayService;
 use crate::service::RedeemService;
 use crate::service::GuardService;
 use crate::service::SubscribeService;
+use crate::error::BizError;
 
 /// Run the bridger
 pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
@@ -57,9 +58,9 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
     // --- Load config ---
     let config = Config::new(&data_dir)?;
     if config.eth.rpc.starts_with("ws") {
-        return Err(Error::Bridger(
+        return Err(BizError::Bridger(
             "Bridger currently doesn't support ethereum websocket transport".to_string(),
-        ));
+        ).into());
     }
 
     // --- Init APIs ---
@@ -157,7 +158,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     let c = async {
         loop {
             if killer.lock().await.next().await.is_some() {
-                return Err(Error::Bridger("Jsonrpsee's ws connection closed".into()));
+                return Err(BizError::Bridger("Jsonrpsee's ws connection closed".into()).into());
             }
         }
     };

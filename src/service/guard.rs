@@ -9,6 +9,7 @@ use crate::{
     error::Result,
 };
 use crate::service::MsgStop;
+use crate::error::Error;
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -59,8 +60,12 @@ impl Handler<MsgGuard> for GuardService {
                         Ok(mut vote_result) => {
                             this.voted.append(&mut vote_result);
                         },
-                        Err(e) => {
-                            warn!("{}", e.to_string());
+                        Err(err) => {
+                            if let Error::BizError(..) = err {
+                                trace!("{}", err);
+                            } else {
+                                error!("{:?}", err);
+                            }
                         },
                     }
                 }),

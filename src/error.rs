@@ -74,6 +74,9 @@ pub enum BizError {
 
     #[error("{0:?} has already been redeemed")]
     TxRedeemed(EthereumTransactionHash),
+
+    #[error("Mmr root for ethereum block {0} is not filled yet")]
+    BlankEthereumMmrRoot(usize),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

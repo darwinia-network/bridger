@@ -81,12 +81,15 @@ impl Handler<MsgExecute> for RelayService {
                 .map(|r, this, _| {
                     match r {
                         Ok(_) => this.relayed = this.target,
-                        Err(e@Error::BizError(..)) => {
-                            this.relayed = this.target;
-                            warn!("{}", e);
+                        Err(err@Error::BizError(BizError::AffirmingBlockLessThanLastConfirmed(..))) => {
+                            this.relayed = this.target; // not try again
+                            trace!("{}", err);
                         },
-                        Err(e) => {
-                            warn!("{}", e);
+                        Err(err@Error::BizError(..)) => {
+                            trace!("{}", err);
+                        },
+                        Err(err) => {
+                            error!("{:?}", err);
                         }
                     }
                 }),

@@ -110,18 +110,18 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                     let f = RedeemService::redeem(this.shadow.clone(), this.darwinia.clone(), msg_clone.tx, this.data_dir.clone());
                     f.into_actor(this)
                 })
-                .then(|r, this, ctx| {
+                .map(|r, this, ctx| {
                     if let Err(err) = r {
-                        if let Error::BizError(..) = err {
-                            warn!("{}, please wait!", err);
+                        if let Error::BizError(BizError::RedeemingBlockLargeThanLastConfirmed(..)) = err {
+                            trace!("{}, please wait!", err);
                             ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
+                        } else if let Error::BizError(..) = err {
+                            trace!("{}", err);
                         } else {
                             error!("{:?}", err);
                         }
                     }
-                    async {Result::<()>::Ok(())}.into_actor(this)
-                })
-                .map(|_, _, _| {}),
+                }),
         ))
     }
 }
@@ -146,7 +146,7 @@ impl RedeemService {
     }
 
     async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction, data_dir: PathBuf) -> Result<()> {
-        info!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
+        trace!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
 
         // 1. Checking before redeem
         if darwinia.verified(&tx).await? {

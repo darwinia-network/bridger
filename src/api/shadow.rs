@@ -1,5 +1,7 @@
 //! Darwinia shadow API
-use crate::{error::Result, Config};
+use crate::{error::{
+    Result, BizError
+}, Config};
 use primitives::{
     chain::ethereum::{
         EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
@@ -76,7 +78,12 @@ impl Shadow {
             .await?;
         let json: MMRRootJson = json.json()
             .await?;
-        Ok(json.into())
+        let result = json.into();
+        if result == MMRRoot::default() {
+            Err(BizError::BlankEthereumMmrRoot(number).into())
+        } else {
+            Ok(result)
+        }
     }
 
     /// Get HeaderParcel

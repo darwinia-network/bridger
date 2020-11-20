@@ -33,8 +33,8 @@ pub enum Error {
     #[error(transparent)]
     Etc(#[from] etc::Error),
 
-    #[error("{0}")]
-    Bridger(String),
+    #[error(transparent)]
+    BizError(#[from] BizError),
 
     #[error("Failed to connect to darwinia node {url}")]
     FailToConnectDarwinia {
@@ -47,8 +47,14 @@ pub enum Error {
 
     #[error("No ethereum start, run 'bridger set-start --data-dir <data_dir> --block <redeem_scan_start>' to set one")]
     NoEthereumStart,
+}
 
-    #[error("Heartbeat>>> Scanning ethereum too fast from {0}, but the latest block number is {1}")]
+#[derive(ThisError, Debug)]
+pub enum BizError {
+    #[error("{0}")]
+    Bridger(String),
+
+    #[error("Heartbeat>>> Scanning ethereum too fast from {0}, the latest block number is {1}")]
     ScanningEthereumTooFast(u64, u64),
 
     #[error("The affirming target block {0} is less than the last_confirmed {0}")]
@@ -68,6 +74,9 @@ pub enum Error {
 
     #[error("{0:?} has already been redeemed")]
     TxRedeemed(EthereumTransactionHash),
+
+    #[error("Mmr root for ethereum block {0} is not filled yet")]
+    BlankEthereumMmrRoot(usize),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

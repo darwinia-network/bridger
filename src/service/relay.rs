@@ -7,6 +7,7 @@ use actix::prelude::*;
 use actix::fut::Either;
 use std::time::Duration;
 use crate::service::MsgStop;
+use crate::error::BizError;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
@@ -80,12 +81,15 @@ impl Handler<MsgExecute> for RelayService {
                 .map(|r, this, _| {
                     match r {
                         Ok(_) => this.relayed = this.target,
-                        Err(e@Error::AffirmingBlockLessThanLastConfirmed(..)) => {
-                            this.relayed = this.target;
-                            warn!("{}", e);
+                        Err(err@Error::BizError(BizError::AffirmingBlockLessThanLastConfirmed(..))) => {
+                            this.relayed = this.target; // not try again
+                            trace!("{}", err);
                         },
-                        Err(e) => {
-                            warn!("{}", e);
+                        Err(err@Error::BizError(..)) => {
+                            trace!("{}", err);
+                        },
+                        Err(err) => {
+                            error!("{:?}", err);
                         }
                     }
                 }),
@@ -122,7 +126,7 @@ impl RelayService {
         // 1. last confirmed check
         let last_confirmed = darwinia.last_confirmed().await?;
         if target <= last_confirmed {
-            return Err(Error::AffirmingBlockLessThanLastConfirmed(target, last_confirmed));
+            return Err(BizError::AffirmingBlockLessThanLastConfirmed(target, last_confirmed).into());
         }
 
         // 2. pendings check
@@ -130,7 +134,7 @@ impl RelayService {
         for pending_header in pending_headers {
             let pending_block_number = pending_header.1.header.number;
             if pending_block_number >= target {
-                return Err(Error::AffirmingBlockInPending(target));
+                return Err(BizError::AffirmingBlockInPending(target).into());
             }
         }
 
@@ -138,7 +142,7 @@ impl RelayService {
         for (_game_id, game) in darwinia.affirmations().await?.iter() {
             for (_round_id, affirmations) in game.iter() {
                 if Darwinia::contains(&affirmations, target) {
-                    return Err(Error::AffirmingBlockInGame(target));
+                    return Err(BizError::AffirmingBlockInGame(target).into());
                 }
             }
         }
@@ -148,7 +152,7 @@ impl RelayService {
         if parcel.header == EthereumHeader::default()
             || parcel.mmr_root == [0u8;32]
         {
-            return Err(Error::AffirmingBlockInGame(target));
+            return Err(BizError::ParcelFromShadowIsEmpty(target).into());
         }
 
         // /////////////////////////

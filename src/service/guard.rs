@@ -9,6 +9,7 @@ use crate::{
     error::Result,
 };
 use crate::service::MsgStop;
+use crate::error::Error;
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -59,8 +60,12 @@ impl Handler<MsgGuard> for GuardService {
                         Ok(mut vote_result) => {
                             this.voted.append(&mut vote_result);
                         },
-                        Err(e) => {
-                            warn!("{}", e.to_string());
+                        Err(err) => {
+                            if let Error::BizError(..) = err {
+                                trace!("{}", err);
+                            } else {
+                                error!("{:?}", err);
+                            }
                         },
                     }
                 }),
@@ -108,17 +113,6 @@ impl GuardService {
                 continue;
             }
 
-            // Parcel from shadow fulfilled check
-            let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
-            let parcel_fulfilled = !(
-                parcel_from_shadow.header.hash.is_none()
-                    || parcel_from_shadow.header.hash.unwrap() == [0u8; 32]
-                    || parcel_from_shadow.mmr_root == [0u8; 32]
-            );
-            if !parcel_fulfilled {
-                continue;
-            }
-
             // high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
             // and,
             // have not voted
@@ -127,6 +121,7 @@ impl GuardService {
                 tokio::time::delay_for(Duration::from_secs(12)).await;
 
                 // Do vote
+                let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
                 if pending_parcel.is_same_as(&parcel_from_shadow) {
                     let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
                     info!("Voted to approve: {}, ex hash: {:?}", pending_block_number, ex_hash);

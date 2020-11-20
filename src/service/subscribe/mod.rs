@@ -2,7 +2,6 @@
 use crate::{
     api::{Darwinia, Shadow},
     error::Result,
-    error::Error,
 };
 use primitives::{
     frame::ethereum::{
@@ -13,6 +12,7 @@ use primitives::{
 };
 use std::sync::Arc;
 use substrate_subxt::{EventSubscription, EventsDecoder};
+use crate::error::BizError;
 
 mod backing;
 mod relay;
@@ -57,7 +57,7 @@ impl SubscribeService {
                 }
             }
             if self.stop {
-                return Err(Error::Bridger("Force stop".to_string()));
+                return Err(BizError::Bridger("Force stop".to_string()).into());
             }
         }
     }
@@ -75,7 +75,7 @@ impl SubscribeService {
                 // Remove the system events temporarily because it`s too verbose.
                 if &event.module == "System" {
                     if event.variant.as_str() == "CodeUpdated" {
-                        return Err(Error::Bridger("CodeUpdated".to_string()));
+                        return Err(BizError::Bridger("CodeUpdated".to_string()).into());
                     }
                 } else {
                     debug!(">> Event - {}::{}", &event.module, &event.variant);

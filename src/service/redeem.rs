@@ -14,10 +14,10 @@ use actix::prelude::*;
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 use crate::service::MsgStop;
-use crate::error::Error::Bridger;
 use tokio::fs::File;
 use std::path::PathBuf;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use crate::error::BizError;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -110,18 +110,18 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                     let f = RedeemService::redeem(this.shadow.clone(), this.darwinia.clone(), msg_clone.tx, this.data_dir.clone());
                     f.into_actor(this)
                 })
-                .then(|r, this, ctx| {
+                .map(|r, this, ctx| {
                     if let Err(err) = r {
-                        if let Error::RedeemingBlockLargeThanLastConfirmed(..) = err {
-                            warn!("{}, please wait!", err);
+                        if let Error::BizError(BizError::RedeemingBlockLargeThanLastConfirmed(..)) = err {
+                            trace!("{}, please wait!", err);
                             ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
+                        } else if let Error::BizError(..) = err {
+                            trace!("{}", err);
                         } else {
-                            warn!("{}", err);
+                            error!("{:?}", err);
                         }
                     }
-                    async {Result::<()>::Ok(())}.into_actor(this)
-                })
-                .map(|_, _, _| {}),
+                }),
         ))
     }
 }
@@ -146,16 +146,16 @@ impl RedeemService {
     }
 
     async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction, data_dir: PathBuf) -> Result<()> {
-        info!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
+        trace!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
 
         // 1. Checking before redeem
         if darwinia.verified(&tx).await? {
-            return Err(Error::TxRedeemed(tx.tx_hash));
+            return Err(BizError::TxRedeemed(tx.tx_hash).into());
         }
 
         let last_confirmed = darwinia.last_confirmed().await?;
         if tx.block >= last_confirmed {
-            return Err(Error::RedeemingBlockLargeThanLastConfirmed(tx.tx_hash, tx.block, last_confirmed));
+            return Err(BizError::RedeemingBlockLargeThanLastConfirmed(tx.tx_hash, tx.block, last_confirmed).into());
         }
 
         // 2. Do redeem
@@ -167,7 +167,7 @@ impl RedeemService {
             EthereumTransactionHash::Token(_) => RedeemFor::Token,
         };
         let hash = darwinia.redeem(redeem_for, proof).await?;
-        info!("Redeemed ethereum tx {:?} with extrinsic {:?}", tx.enclosed_hash(), hash);
+        info!("Redeemed ethereum tx {:?} with extrinsic {:?}", tx.tx_hash, hash);
 
         // 3. Update cache
         RedeemService::set_last_redeemed(data_dir, tx.block).await?;
@@ -192,7 +192,7 @@ impl RedeemService {
         file.read_to_string(&mut buffer).await?;
         match buffer.trim().parse() {
             Ok(start) => Ok(start),
-            Err(e) => Err(Bridger(e.to_string()))
+            Err(e) => Err(BizError::Bridger(e.to_string()).into())
         }
     }
 

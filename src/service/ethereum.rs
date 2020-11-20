@@ -237,7 +237,7 @@ impl EthereumService {
 
             for tx in &txs {
                 if darwinia.verified(&tx).await? {
-                    warn!("    This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
+                    trace!("    This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
                     RedeemService::set_last_redeemed(data_dir.clone(), tx.block).await?;
                 } else {
                     // delay to wait for possible previous extrinsics

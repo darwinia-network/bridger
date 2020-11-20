@@ -167,7 +167,7 @@ impl RedeemService {
             EthereumTransactionHash::Token(_) => RedeemFor::Token,
         };
         let hash = darwinia.redeem(redeem_for, proof).await?;
-        info!("Redeemed ethereum tx {:?} with extrinsic {:?}", tx.enclosed_hash(), hash);
+        info!("Redeemed ethereum tx {:?} with extrinsic {:?}", tx.tx_hash, hash);
 
         // 3. Update cache
         RedeemService::set_last_redeemed(data_dir, tx.block).await?;

@@ -115,7 +115,7 @@ impl Shadow {
     /// }
     /// ```
     pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
-        let mmr_root = self.mmr(number).await?;
+        let mmr_root = self.mmr(number + 1).await?;
         let header = self.eth.get_header_by_number(number as u64).await?;
 
         Ok(EthereumRelayHeaderParcel {

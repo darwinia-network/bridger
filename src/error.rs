@@ -47,6 +47,9 @@ pub enum Error {
 
     #[error("No ethereum start, run 'bridger set-start --data-dir <data_dir> --block <redeem_scan_start>' to set one")]
     NoEthereumStart,
+
+    #[error("{0}")]
+    ShadowInternalServerError(String),
 }
 
 #[derive(ThisError, Debug)]

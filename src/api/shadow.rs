@@ -9,9 +9,10 @@ use primitives::{
     },
     rpc::{EthereumRPC, RPC},
 };
-use reqwest::Client;
+use reqwest::{Client, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
+use crate::error::Error;
 
 #[derive(Serialize)]
 struct Proposal {
@@ -72,18 +73,22 @@ impl Shadow {
     pub async fn get_mmr_root(&self, leaf_index: usize) -> Result<MMRRoot> {
         let block_number = leaf_index + 1;
         let url = &format!("{}/ethereum/parent_mmr_root/{}", &self.api, block_number);
-        let json = self
+        let resp = self
             .http
             .get(url)
             .send()
             .await?;
-        let json: MMRRootJson = json.json()
-            .await?;
-        let result = json.into();
-        if result == MMRRoot::default() {
-            Err(BizError::BlankEthereumMmrRoot(leaf_index).into())
+        if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
+            Err(Error::ShadowInternalServerError(resp.text().await?))
         } else {
-            Ok(result)
+            let json: MMRRootJson = resp.json()
+                .await?;
+            let result = json.into();
+            if result == MMRRoot::default() {
+                Err(BizError::BlankEthereumMmrRoot(leaf_index).into())
+            } else {
+                Ok(result)
+            }
         }
     }
 
@@ -154,15 +159,17 @@ impl Shadow {
     /// }
     /// ```
     pub async fn receipt(&self, tx: &str, last: u64) -> Result<EthereumReceiptProofThing> {
-        let json: EthereumReceiptProofThingJson = self
+        let resp = self
             .http
             .get(&format!("{}/ethereum/receipt/{}/{}", &self.api, tx, last))
             .send()
-            .await?
-            .json()
             .await?;
-
-        Ok(json.into())
+        if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
+            Err(Error::ShadowInternalServerError(resp.text().await?))
+        } else {
+            let json: EthereumReceiptProofThingJson = resp.json().await?;
+            Ok(json.into())
+        }
     }
 
     /// Get Proposal
@@ -209,15 +216,18 @@ impl Shadow {
             last_leaf,
         })?;
 
-        let json: EthereumRelayProofsJson = self
+        let resp = self
             .http
             .post(&format!("{}/ethereum/proof", self.api))
             .json(&map)
             .send()
-            .await?
-            .json()
             .await?;
 
-        Ok(json.into())
+        if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
+            Err(Error::ShadowInternalServerError(resp.text().await?))
+        } else {
+            let json: EthereumRelayProofsJson = resp.json().await?;
+            Ok(json.into())
+        }
     }
 }

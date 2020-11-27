@@ -43,33 +43,6 @@ impl Shadow {
     }
 
     /// Get mmr
-    ///
-    /// ```
-    /// use darwinia_bridger::api::Shadow;
-    /// use primitives::rpc::ethereum::EthereumRPC;
-    /// use reqwest::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///   let rpc = EthereumRPC::new(
-    ///     Client::new(),
-    ///     vec![
-    ///       "https://mainnet.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
-    ///       "https://mainnet.infura.io/v3/74a9b1b5816b47aa853c23fcc4f2f3b6".to_string(),
-    ///     ],
-    ///   );
-    ///
-    ///   let client = Client::new();
-    ///   let shadow = Shadow {
-    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
-    ///      eth: rpc,
-    ///      http: client,
-    ///   };
-    ///
-    ///   // Get the HeaderParcel of block 42
-    ///   shadow.parcel(42).await.unwrap();
-    /// }
-    /// ```
     pub async fn get_mmr_root(&self, leaf_index: usize) -> Result<MMRRoot> {
         let block_number = leaf_index + 1;
         let url = &format!("{}/ethereum/parent_mmr_root/{}", &self.api, block_number);
@@ -93,33 +66,6 @@ impl Shadow {
     }
 
     /// Get HeaderParcel
-    ///
-    /// ```
-    /// use darwinia_bridger::api::Shadow;
-    /// use primitives::rpc::ethereum::EthereumRPC;
-    /// use reqwest::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///   let rpc = EthereumRPC::new(
-    ///     Client::new(),
-    ///     vec![
-    ///       "https://mainnet.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
-    ///       "https://mainnet.infura.io/v3/74a9b1b5816b47aa853c23fcc4f2f3b6".to_string(),
-    ///     ],
-    ///   );
-    ///
-    ///   let client = Client::new();
-    ///   let shadow = Shadow {
-    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
-    ///      eth: rpc,
-    ///      http: client,
-    ///   };
-    ///
-    ///   // Get the HeaderParcel of block 43 with mmr_root_of_42(which treat as an item in header of 43)
-    ///   shadow.parcel(42).await.unwrap();
-    /// }
-    /// ```
     pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
         let mmr_root = self.get_mmr_root(number).await?;
         let header = self.eth.get_header_by_number(number as u64 + 1).await?;
@@ -131,33 +77,6 @@ impl Shadow {
     }
 
     /// Get Receipt
-    ///
-    /// ```
-    /// use darwinia_bridger::api::Shadow;
-    /// use primitives::rpc::ethereum::EthereumRPC;
-    /// use reqwest::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///   let rpc = EthereumRPC::new(
-    ///     Client::new(),
-    ///     vec![
-    ///       "https://mainnet.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
-    ///       "https://mainnet.infura.io/v3/74a9b1b5816b47aa853c23fcc4f2f3b6".to_string(),
-    ///     ],
-    ///   );
-    ///
-    ///   let client = Client::new();
-    ///   let shadow = Shadow {
-    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
-    ///      eth: rpc,
-    ///      http: client,
-    ///   };
-    ///
-    ///   // Get the HeaderParcel of block 42
-    ///   shadow.receipt("0x3b82a55f5e752c23359d5c3c4c3360455ce0e485ed37e1faabe9ea10d5db3e7a", 66666).await.unwrap();
-    /// }
-    /// ```
     pub async fn receipt(&self, tx: &str, last: u64) -> Result<EthereumReceiptProofThing> {
         let resp = self
             .http
@@ -173,33 +92,6 @@ impl Shadow {
     }
 
     /// Get Proposal
-    ///
-    /// ```
-    /// use darwinia_bridger::api::Shadow;
-    /// use primitives::rpc::ethereum::EthereumRPC;
-    /// use reqwest::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///   let rpc = EthereumRPC::new(
-    ///     Client::new(),
-    ///     vec![
-    ///       "https://mainnet.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
-    ///       "https://mainnet.infura.io/v3/74a9b1b5816b47aa853c23fcc4f2f3b6".to_string(),
-    ///     ],
-    ///   );
-    ///
-    ///   let client = Client::new();
-    ///   let shadow = Shadow {
-    ///      api: "https://testnet.shadow.darwinia.network.l2me.com".to_string(),
-    ///      eth: rpc,
-    ///      http: client,
-    ///   };
-    ///
-    ///   // Get the HeaderParcel of block 42
-    ///   shadow.proof(10, 20, 19).await.unwrap();
-    /// }
-    /// ```
     pub async fn proof(
         &self,
         member: u64,

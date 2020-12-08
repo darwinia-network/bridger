@@ -11,6 +11,7 @@ use crate::{
         proxy::Proxy,
         sudo::Sudo,
         technical_committee::TechnicalCommittee,
+        bridge::relay_authorities::RelayAuthorities,
     },
 };
 
@@ -80,3 +81,5 @@ impl EthereumBacking for DarwiniaRuntime {
 impl Proxy for DarwiniaRuntime {
     type ProxyType = ProxyType;
 }
+
+impl RelayAuthorities for DarwiniaRuntime {}

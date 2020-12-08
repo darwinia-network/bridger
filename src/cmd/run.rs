@@ -139,7 +139,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
         });
 
     //
-    let mut subscribe = match SubscribeService::new(shadow.clone(), darwinia.clone()).await {
+    let mut subscribe = match SubscribeService::new(darwinia.clone()).await {
         Ok(subscribe) => {
             subscribe
         },

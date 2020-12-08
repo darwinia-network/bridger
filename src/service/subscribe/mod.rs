@@ -17,8 +17,6 @@ const ETHEREUM_BACKING: &str = "EthereumBacking";
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
-    /// Shadow API
-    pub shadow: Arc<Shadow>,
     sub: EventSubscription<DarwiniaRuntime>,
     stop: bool,
 }

@@ -1,17 +1,11 @@
 //! Darwinia Subscribe
 use crate::{
-    api::{Darwinia, Shadow},
+    api::Darwinia,
     error::Result,
 };
-use primitives::{
-    frame::ethereum::{
-        backing::EthereumBackingEventsDecoder, game::EthereumRelayerGameEventsDecoder,
-        relay::EthereumRelayEventsDecoder,
-    },
-    runtime::DarwiniaRuntime,
-};
+use primitives::runtime::DarwiniaRuntime;
 use std::sync::Arc;
-use substrate_subxt::{EventSubscription, EventsDecoder};
+use substrate_subxt::EventSubscription;
 use crate::error::BizError;
 
 mod backing;
@@ -25,21 +19,15 @@ const ETHEREUM_BACKING: &str = "EthereumBacking";
 pub struct SubscribeService {
     /// Shadow API
     pub shadow: Arc<Shadow>,
-    /// Dawrinia API
-    pub darwinia: Arc<Darwinia>,
-
     sub: EventSubscription<DarwiniaRuntime>,
     stop: bool,
 }
 
 impl SubscribeService {
     /// New redeem service
-    pub async fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> Result<SubscribeService> {
-        let sub = SubscribeService::build_event_subscription(darwinia.clone()).await?;
+    pub async fn new(darwinia: Arc<Darwinia>) -> Result<SubscribeService> {
         Ok(SubscribeService {
-            darwinia,
-            shadow,
-            sub,
+            sub: darwinia.build_event_subscription().await?,
             stop: false
         })
     }
@@ -91,18 +79,5 @@ impl SubscribeService {
         Ok(())
     }
 
-    async fn build_event_subscription(darwinia: Arc<Darwinia>) -> Result<EventSubscription<DarwiniaRuntime>> {
-        let client = &darwinia.client;
-        let scratch = client.subscribe_events().await?;
-        let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());
 
-        // Register decoders
-        decoder.with_ethereum_backing();
-        decoder.with_ethereum_relayer_game();
-        decoder.with_ethereum_relay();
-
-        // Build subscriber
-        let sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
-        Ok(sub)
-    }
 }

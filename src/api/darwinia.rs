@@ -8,13 +8,14 @@ use primitives::{
     },
     frame::{
         ethereum::{
-            backing::{Redeem, RedeemCallExt, VerifiedProofStoreExt},
-            game::{AffirmationsStoreExt, EthereumRelayerGame},
+            backing::{Redeem, RedeemCallExt, VerifiedProofStoreExt, EthereumBackingEventsDecoder},
+            game::{AffirmationsStoreExt, EthereumRelayerGame, EthereumRelayerGameEventsDecoder},
             relay::{
                 Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
                 PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
                 VotePendingRelayHeaderParcelCallExt,
                 VotePendingRelayHeaderParcel,
+                EthereumRelayEventsDecoder
             },
         },
         proxy::ProxyCallExt,
@@ -25,9 +26,7 @@ use primitives::{
 };
 use sp_keyring::sr25519::sr25519::Pair;
 use std::collections::HashMap;
-use substrate_subxt::{
-    sp_core::Pair as PairTrait, system::System, Client, ClientBuilder, PairSigner,
-};
+use substrate_subxt::{sp_core::Pair as PairTrait, system::System, Client, ClientBuilder, PairSigner, EventSubscription, EventsDecoder};
 use web3::types::H256;
 use crate::error::BizError;
 
@@ -368,5 +367,20 @@ impl Darwinia {
 
         // TODO: How to play and join the game
         false
+    }
+
+    /// Build event subscription
+    pub async fn build_event_subscription(&self) -> Result<EventSubscription<DarwiniaRuntime>> {
+        let scratch = self.client.subscribe_events().await?;
+        let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(self.client.metadata().clone());
+
+        // Register decoders
+        decoder.with_ethereum_backing();
+        decoder.with_ethereum_relayer_game();
+        decoder.with_ethereum_relay();
+
+        // Build subscriber
+        let sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
+        Ok(sub)
     }
 }

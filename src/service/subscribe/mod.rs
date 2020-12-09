@@ -2,32 +2,35 @@
 use crate::{
     api::Darwinia,
     error::Result,
+    service::sign::MsgSign,
 };
-use primitives::runtime::DarwiniaRuntime;
+use primitives::{
+    frame::bridge::relay_authorities::NewAuthorities,
+    runtime::DarwiniaRuntime
+};
 use std::sync::Arc;
 use substrate_subxt::EventSubscription;
 use crate::error::BizError;
+use actix::Recipient;
+use substrate_subxt::sp_core::Decode;
 
-mod backing;
-mod relay;
-
-/// Attributes
-const ETHEREUM_RELAY: &str = "EthereumRelay";
-const ETHEREUM_BACKING: &str = "EthereumBacking";
-const ETHEREUM_RELAY_AUTHORITIES: &str = "EthereumRelayAuthorities";
+// mod backing;
+// mod relay;
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
     sub: EventSubscription<DarwiniaRuntime>,
     stop: bool,
+    sign_service: Option<Recipient<MsgSign>>,
 }
 
 impl SubscribeService {
     /// New redeem service
-    pub async fn new(darwinia: Arc<Darwinia>) -> Result<SubscribeService> {
+    pub async fn new(darwinia: Arc<Darwinia>, sign_service: Option<Recipient<MsgSign>>) -> Result<SubscribeService> {
         Ok(SubscribeService {
             sub: darwinia.build_event_subscription().await?,
-            stop: false
+            stop: false,
+            sign_service
         })
     }
 
@@ -65,19 +68,25 @@ impl SubscribeService {
                         return Err(BizError::Bridger("CodeUpdated".to_string()).into());
                     }
                 } else {
-                    debug!(">> Event - {}::{}", &event.module, &event.variant);
-                    // Common events to debug
-                    match event.module.as_str() {
-                        ETHEREUM_RELAY => relay::handle(event)?,
-                        ETHEREUM_BACKING => backing::handle(event)?,
-                        ETHEREUM_RELAY_AUTHORITIES => {},
-                        _ => {}
-                    };
+                    self.handle(&event.module, &event.variant, event.data).await;
                 }
             }
         }
         Ok(())
     }
 
+    async fn handle(&mut self, module: &str, variant: &str, event_data: Vec<u8>) {
+        debug!(">> Event - {}::{}", module, variant);
 
+        if let ("EthereumRelayAuthorities", "NewAuthorities") = (module, variant) {
+            if let Some(sign_service) = &self.sign_service {
+                if let Ok(decoded) = NewAuthorities::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
+                    let msg = MsgSign { message: decoded.message };
+                    if let Err(e) = sign_service.send(msg).await {
+                        error!("Send msg to sign service fail: {:?}", e);
+                    }
+                }
+            }
+        }
+    }
 }

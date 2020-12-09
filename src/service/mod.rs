@@ -6,6 +6,7 @@ pub mod guard;
 pub mod redeem;
 pub mod relay;
 pub mod subscribe;
+pub mod sign;
 
 pub use self::{
     ethereum::EthereumService,
@@ -13,6 +14,7 @@ pub use self::{
     relay::RelayService,
     guard::GuardService,
     subscribe::SubscribeService,
+    sign::SignService,
 };
 use actix::Message;
 

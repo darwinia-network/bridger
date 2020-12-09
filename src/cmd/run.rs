@@ -22,6 +22,7 @@ use crate::service::RelayService;
 use crate::service::RedeemService;
 use crate::service::GuardService;
 use crate::service::SubscribeService;
+use crate::service::SignService;
 use crate::error::BizError;
 
 /// Run the bridger
@@ -130,8 +131,18 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
             g.start()
         });
 
+    // sign service
+    let is_authority = darwinia.sender.is_authority().await?;
+    let sign_service =
+        SignService::new(darwinia.clone(), is_authority).map(|sign_service| {
+            sign_service.start()
+        });
+
     //
-    let mut subscribe = match SubscribeService::new(darwinia.clone()).await {
+    let mut subscribe = match SubscribeService::new(
+        darwinia.clone(),
+        sign_service.clone().map(|s| s.recipient())).await
+    {
         Ok(subscribe) => {
             subscribe
         },
@@ -145,6 +156,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
         }
         Ok(())
     };
+
 
     let killer = darwinia.client.rpc.client.killer.clone();
     let c = async {
@@ -163,6 +175,9 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
             guard_service.do_send(MsgStop{});
         }
         subscribe.stop();
+        if let Some(sign_service) = sign_service {
+            sign_service.do_send(MsgStop{});
+        }
         Err(e)
     } else {
         Ok(())

@@ -20,7 +20,10 @@ use primitives::{
         },
         proxy::ProxyCallExt,
         sudo::SudoCallExt,
-        bridge::relay_authorities::EthereumRelayAuthoritiesEventsDecoder
+        bridge::relay_authorities::{
+            EthereumRelayAuthoritiesEventsDecoder,
+            SubmitSignedAuthoritiesCallExt
+        }
     },
     runtime::DarwiniaRuntime,
 };
@@ -61,7 +64,7 @@ impl Darwinia {
             .set_client(client)
             .build()
             .await?;
-        let account = DarwiniaSender::new(
+        let sender = DarwiniaSender::new(
             config.seed.clone(),
             config.proxy.clone().map(|proxy| proxy.real[2..].to_string()),
                 client.clone()
@@ -69,7 +72,7 @@ impl Darwinia {
 
         Ok(Darwinia {
             client,
-            sender: account,
+            sender,
         })
     }
 
@@ -208,6 +211,12 @@ impl Darwinia {
                 Ok(self.client.redeem(&self.sender.signer, redeem_for, proof).await?)
             }
         }
+    }
+
+    /// submit_signed_authorities
+    pub async fn sign_submit_signed_authorities(&self, message: &[u8]) -> Result<H256> {
+        let signature = self.sender.ecdsa_sign(message)?;
+        Ok(self.client.submit_signed_authorities(&self.sender.signer, signature).await?)
     }
 
     /// Check if should redeem

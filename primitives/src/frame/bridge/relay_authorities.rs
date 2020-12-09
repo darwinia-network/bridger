@@ -1,9 +1,12 @@
 //! Darwinia Bridge Relay Authorities
 use codec::{Encode, Decode};
 use substrate_subxt::{system::{System, SystemEventsDecoder}};
-use substrate_subxt_proc_macro::{module, Event, Store};
+use substrate_subxt_proc_macro::{module, Event, Store, Call};
 use frame_support::sp_runtime::app_crypto::sp_core::H256;
 use core::marker::PhantomData;
+
+/// EcdsaSignature
+pub type RelaySignature = [u8; 65];
 
 /// Relay Authority
 #[derive(Clone, Encode, Decode, Default, Debug)]
@@ -29,30 +32,50 @@ pub trait EthereumRelayAuthorities: System {
 // Calls
 //////
 
+/// Submit authorities signature
+#[derive(Clone, Debug, PartialEq, Call, Encode)]
+pub struct SubmitSignedAuthorities<T: EthereumRelayAuthorities> {
+    /// Runtime marker
+    pub _runtime: PhantomData<T>,
+    /// Token type
+    pub signature: RelaySignature,
+}
 
 //////
 // Events
 //////
 
-/// EcdsaSignature
-pub type RelaySignature = [u8; 65];
-
-/// SignedAuthoritySet. [new_authorities, signatures]
+/// Authorities Signed. [term, message, signatures]
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
-pub struct SignedAuthoritySet<T: EthereumRelayAuthorities> {
-    /// new_authorities
-    pub new_authorities: Vec<u8>,
+pub struct AuthoritiesSetSigned<T: EthereumRelayAuthorities> {
+    /// term
+    pub term: u32,
+    /// message
+    pub message: Vec<u8>,
+    /// signatures
+    pub signatures: Vec<(<T as System>::AccountId, RelaySignature)>,
+}
+
+/// MMR Root Signed. [block number, mmr root, message, signatures]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct MMRRootSigned<T: EthereumRelayAuthorities> {
+    /// block number
+    pub block_number: u128,
+    /// mmr root
+    pub mmr_root: H256,
+    /// message
+    pub message: Vec<u8>,
     /// The redeemed balance
     pub signatures: Vec<(<T as System>::AccountId, RelaySignature)>,
 }
 
-/// SignedMMRRoot. [mmr_root, signatures]
+/// NewAuthorities. [message to sign]
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
-pub struct SignedMMRRoot<T: EthereumRelayAuthorities> {
-    /// mmr root
-    pub mmr_root: H256,
-    /// The redeemed balance
-    pub signatures: Vec<(<T as System>::AccountId, RelaySignature)>,
+pub struct NewAuthorities<T: EthereumRelayAuthorities> {
+    /// message
+    pub message: Vec<u8>,
+    /// marker
+    pub _marker: PhantomData<T>,
 }
 
 //////

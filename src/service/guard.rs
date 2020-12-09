@@ -116,7 +116,7 @@ impl GuardService {
             // high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
             // and,
             // have not voted
-            if pending_block_number > last_confirmed && !darwinia.account.has_voted(voting_state) {
+            if pending_block_number > last_confirmed && !darwinia.sender.has_voted(voting_state) {
                 // Delay to wait for possible previous extrinsics
                 tokio::time::delay_for(Duration::from_secs(12)).await;
 

@@ -14,6 +14,7 @@ mod relay;
 /// Attributes
 const ETHEREUM_RELAY: &str = "EthereumRelay";
 const ETHEREUM_BACKING: &str = "EthereumBacking";
+const ETHEREUM_RELAY_AUTHORITIES: &str = "EthereumRelayAuthorities";
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
@@ -69,6 +70,7 @@ impl SubscribeService {
                     match event.module.as_str() {
                         ETHEREUM_RELAY => relay::handle(event)?,
                         ETHEREUM_BACKING => backing::handle(event)?,
+                        ETHEREUM_RELAY_AUTHORITIES => {},
                         _ => {}
                     };
                 }

@@ -19,7 +19,7 @@ pub async fn exec() -> Result<()> {
     info!("Init API succeed!");
 
     // guard service
-    let is_tech_comm_member = darwinia.account.is_tech_comm_member().await?;
+    let is_tech_comm_member = darwinia.sender.is_tech_comm_member().await?;
     let _guard_service =
         GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard, is_tech_comm_member).map(|g| {
             g.start()

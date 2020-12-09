@@ -4,7 +4,7 @@ use core::marker::PhantomData;
 use primitives::{
     chain::{
         ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
-        proxy_type::ProxyType, RelayVotingState,
+        proxy_type::ProxyType,
     },
     frame::{
         ethereum::{
@@ -19,16 +19,16 @@ use primitives::{
             },
         },
         proxy::ProxyCallExt,
-        sudo::{KeyStoreExt, SudoCallExt},
-        technical_committee::MembersStoreExt,
+        sudo::SudoCallExt,
+        bridge::relay_authorities::EthereumRelayAuthoritiesEventsDecoder
     },
     runtime::DarwiniaRuntime,
 };
-use sp_keyring::sr25519::sr25519::Pair;
 use std::collections::HashMap;
-use substrate_subxt::{sp_core::Pair as PairTrait, system::System, Client, ClientBuilder, PairSigner, EventSubscription, EventsDecoder};
+use substrate_subxt::{system::System, Client, ClientBuilder, EventSubscription, EventsDecoder};
 use web3::types::H256;
 use crate::error::BizError;
+use crate::api::darwinia_sender::DarwiniaSender;
 
 // Types
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
@@ -37,141 +37,12 @@ type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
 /// AccountId
 pub type AccountId = <DarwiniaRuntime as System>::AccountId;
 
-/// Sudo Account
-pub const ROLE_SUDO: (&str, u8) = ("SUDO", 1);
-/// Technical Committee Member
-pub const ROLE_TECHNICAL_COMMITTEE: (&str, u8) = ("TECHNICAL_COMMITTEE", 2);
-/// Normal Account
-pub const ROLE_NORMAL: (&str, u8) = ("NORMAL", 4);
-
-/// contains_role
-pub fn contains_role(roles: u8, mask: u8) -> bool {
-    roles & mask > 0
-}
-
-/// decode_roles
-pub fn decode_roles(roles: u8) -> Vec<&'static str> {
-    let mut result = vec![];
-    if contains_role(roles, ROLE_SUDO.1) {
-        result.push(ROLE_SUDO.0);
-    }
-    if contains_role(roles, ROLE_TECHNICAL_COMMITTEE.1) {
-        result.push(ROLE_TECHNICAL_COMMITTEE.0);
-    }
-    if contains_role(roles, ROLE_NORMAL.1) {
-        result.push(ROLE_NORMAL.0);
-    }
-    result
-}
-
-/// encode_roles
-pub fn encode_roles(roles: Vec<&'static str>) -> u8 {
-    let mut result = 0u8;
-    if roles.contains(&ROLE_SUDO.0) {
-        result += ROLE_SUDO.1;
-    }
-    if roles.contains(&ROLE_TECHNICAL_COMMITTEE.0) {
-        result += ROLE_TECHNICAL_COMMITTEE.1;
-    }
-    if roles.contains(&ROLE_NORMAL.0) {
-        result += ROLE_NORMAL.1;
-    }
-    result
-}
-
-/// account_roles
-pub fn calc_account_roles(account: &AccountId, sudo: &AccountId, tech_comm_members: &[AccountId]) -> u8 {
-    let mut roles = vec![];
-    roles.push(ROLE_NORMAL.0);
-    if sudo == account {
-        roles.push(ROLE_SUDO.0);
-    }
-    if tech_comm_members.contains(&account) {
-        roles.push(ROLE_TECHNICAL_COMMITTEE.0);
-    }
-    encode_roles(roles)
-}
-
-/// Account
-pub struct Account {
-    /// client
-    pub client: Client<DarwiniaRuntime>,
-    /// Account Id
-    pub account_id: AccountId,
-    /// signer of the account
-    pub signer: PairSigner<DarwiniaRuntime, Pair>,
-    /// proxy real
-    pub real: Option<AccountId>,
-}
-
-impl Account {
-    /// Create a new Account
-    pub fn new(seed: String, real: Option<String>, client: Client<DarwiniaRuntime>) -> Account {
-        let pair = Pair::from_string(&seed, None).unwrap(); // if not a valid seed
-        let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
-        let public = signer.signer().public().0;
-        let account_id = AccountId::from(public);
-
-        // convert to account id
-        let real = real.map(|real| {
-            let real = hex::decode(real).unwrap(); // if decode fail
-            let mut data: [u8; 32] = [0u8; 32];
-            data.copy_from_slice(&real[..]);
-            AccountId::from(data)
-        });
-
-        Account {
-            client,
-            account_id,
-            signer,
-            real,
-        }
-    }
-
-    /// roles
-    pub async fn roles(&self) -> Result<u8> {
-        let sudo = self.client.key(None).await?;
-        let tech_comm_members = self.client.members(None).await?;
-
-        let roles = if let Some(real_account_id) = &self.real {
-            calc_account_roles(real_account_id, &sudo, &tech_comm_members)
-        } else {
-            calc_account_roles(&self.account_id, &sudo, &tech_comm_members)
-        };
-
-        Ok(roles)
-    }
-
-    /// role names
-    pub async fn role_names(&self) -> Result<Vec<&'static str>> {
-        Ok(decode_roles(self.roles().await?))
-    }
-
-    /// is_sudo_key
-    pub async fn is_sudo_key(&self) -> Result<bool> {
-        Ok(contains_role(self.roles().await?, ROLE_SUDO.1))
-    }
-
-    /// is_tech_comm_member
-    pub async fn is_tech_comm_member(&self) -> Result<bool> {
-        Ok(contains_role(self.roles().await?, ROLE_TECHNICAL_COMMITTEE.1))
-    }
-
-    /// has_voted
-    pub fn has_voted(&self, voting_state: RelayVotingState<AccountId>) -> bool {
-        match &self.real {
-            None => voting_state.contains(&self.account_id),
-            Some(real) => voting_state.contains(real)
-        }
-    }
-}
-
 /// Dawrinia API
 pub struct Darwinia {
     /// client
     pub client: Client<DarwiniaRuntime>,
     /// account
-    pub account: Account,
+    pub sender: DarwiniaSender,
 }
 
 impl Darwinia {
@@ -190,7 +61,7 @@ impl Darwinia {
             .set_client(client)
             .build()
             .await?;
-        let account = Account::new(
+        let account = DarwiniaSender::new(
             config.seed.clone(),
             config.proxy.clone().map(|proxy| proxy.real[2..].to_string()),
                 client.clone()
@@ -198,7 +69,7 @@ impl Darwinia {
 
         Ok(Darwinia {
             client,
-            account,
+            sender: account,
         })
     }
 
@@ -208,13 +79,13 @@ impl Darwinia {
             ethereum_relay_header_parcel: parcel,
             _runtime: PhantomData::default(),
         })?;
-        Ok(self.client.sudo(&self.account.signer, &ex).await?)
+        Ok(self.client.sudo(&self.sender.signer, &ex).await?)
     }
 
     /// Vote pending relay header parcel
     pub async fn vote_pending_relay_header_parcel(&self, pending: u64, aye: bool) -> Result<H256> {
-        if self.account.is_tech_comm_member().await? {
-            match &self.account.real {
+        if self.sender.is_tech_comm_member().await? {
+            match &self.sender.real {
                 Some(real) => { // proxy
                     trace!("Proxy vote for {:?}", real);
                     let vote = VotePendingRelayHeaderParcel {
@@ -224,12 +95,12 @@ impl Darwinia {
                     };
 
                     let ex = self.client.encode(vote).unwrap();
-                    let ex_hash = self.client.proxy(&self.account.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?;
+                    let ex_hash = self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?;
                     Ok(ex_hash)
                 },
                 None => { // no proxy
                     let ex_hash = self.client
-                        .vote_pending_relay_header_parcel(&self.account.signer, pending, aye)
+                        .vote_pending_relay_header_parcel(&self.sender.signer, pending, aye)
                         .await?;
                     Ok(ex_hash)
                 }
@@ -293,7 +164,7 @@ impl Darwinia {
 
     /// Submit affirmation
     pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
-        match &self.account.real {
+        match &self.sender.real {
             Some(real) => {
                 trace!("Proxy call `affirm` for {:?}", real);
                 let affirm = Affirm {
@@ -303,10 +174,10 @@ impl Darwinia {
                 };
 
                 let ex = self.client.encode(affirm).unwrap();
-                Ok(self.client.proxy(&self.account.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
+                Ok(self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
             },
             None => {
-                Ok(self.client.affirm(&self.account.signer, parcel, None).await?)
+                Ok(self.client.affirm(&self.sender.signer, parcel, None).await?)
             }
         }
     }
@@ -320,7 +191,7 @@ impl Darwinia {
         let ethereum_tx_hash = proof.header.hash
             .map(|hash| hex::encode(&hash))
             .ok_or_else(|| BizError::Bridger("No hash in header".to_string()))?;
-        match &self.account.real {
+        match &self.sender.real {
             Some(real) => {
                 trace!("Proxy redeem ethereum tx 0x{:?} for real account {:?}", ethereum_tx_hash, real);
                 let redeem = Redeem {
@@ -330,11 +201,11 @@ impl Darwinia {
                 };
 
                 let ex = self.client.encode(redeem).unwrap();
-                Ok(self.client.proxy(&self.account.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
+                Ok(self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
             },
             None => {
-                trace!("Redeem ethereum tx 0x{:?} with account {:?}", ethereum_tx_hash, &self.account.account_id);
-                Ok(self.client.redeem(&self.account.signer, redeem_for, proof).await?)
+                trace!("Redeem ethereum tx 0x{:?} with account {:?}", ethereum_tx_hash, &self.sender.account_id);
+                Ok(self.client.redeem(&self.sender.signer, redeem_for, proof).await?)
             }
         }
     }
@@ -378,6 +249,7 @@ impl Darwinia {
         decoder.with_ethereum_backing();
         decoder.with_ethereum_relayer_game();
         decoder.with_ethereum_relay();
+        decoder.with_ethereum_relay_authorities();
 
         // Build subscriber
         let sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);

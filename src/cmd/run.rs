@@ -15,7 +15,6 @@ use web3::{
 use actix::Actor;
 use std::time::Duration;
 use tokio::time;
-use substrate_subxt::sp_core::crypto::*;
 
 use crate::service::MsgStop;
 use crate::service::EthereumService;
@@ -71,23 +70,16 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
     // --- Network ---
     let runtime_version: sp_version::RuntimeVersion = darwinia.client.rpc.runtime_version(None).await?;
     let spec_name = runtime_version.spec_name.to_string();
-    let network = if spec_name == "Crab" {
-        "Crab"
-    } else if spec_name == "node-template" || spec_name.contains("Dev") {
-        "Dev"
-    } else {
-        set_default_ss58_version(Ss58AddressFormat::DarwiniaAccount);
-        "Mainnet"
-    };
+    let network = spec_name;
 
     // --- Print startup info ---
     info!("🔗 Connect to");
     info!("   Darwinia {}: {}", network, config.node);
     info!("   Shadow: {}", config.shadow);
     info!("   Ethereum: {}", config.eth.rpc);
-    let account_id = &darwinia.account.account_id;
-    let roles = darwinia.account.role_names().await?;
-    match &darwinia.account.real {
+    let account_id = &darwinia.sender.account_id;
+    let roles = darwinia.sender.role_names().await?;
+    match &darwinia.sender.real {
         None => {
             info!("🧔 Relayer({:?}): 0x{:?}", roles, account_id);
         }
@@ -132,7 +124,7 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     ).start();
 
     // guard service
-    let is_tech_comm_member = darwinia.account.is_tech_comm_member().await?;
+    let is_tech_comm_member = darwinia.sender.is_tech_comm_member().await?;
     let guard_service =
         GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard, is_tech_comm_member).map(|g| {
             g.start()

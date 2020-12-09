@@ -11,7 +11,7 @@ use crate::{
         proxy::Proxy,
         sudo::Sudo,
         technical_committee::TechnicalCommittee,
-        bridge::relay_authorities::RelayAuthorities,
+        bridge::relay_authorities::EthereumRelayAuthorities,
     },
 };
 
@@ -27,6 +27,7 @@ use substrate_subxt::{
     system::System,
     Runtime,
 };
+use crate::frame::bridge::relay_authorities::RelayAuthority;
 
 /// Darwinia Runtime
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -82,4 +83,11 @@ impl Proxy for DarwiniaRuntime {
     type ProxyType = ProxyType;
 }
 
-impl RelayAuthorities for DarwiniaRuntime {}
+impl EthereumRelayAuthorities for DarwiniaRuntime {
+    type RelayAuthority = RelayAuthority<
+        <Self as System>::AccountId,
+        [u8; 20],
+        <Self as Balances>::Balance,
+        <Self as System>::BlockNumber
+    >;
+}

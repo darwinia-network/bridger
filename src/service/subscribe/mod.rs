@@ -14,9 +14,6 @@ use std::sync::Arc;
 use substrate_subxt::sp_core::Decode;
 use substrate_subxt::EventSubscription;
 
-// mod backing;
-// mod relay;
-
 /// Dawrinia Subscribe
 pub struct SubscribeService {
 	sub: EventSubscription<DarwiniaRuntime>,

@@ -65,6 +65,8 @@ pub struct Config {
     pub seed: String,
     /// Shadow service url
     pub shadow: String,
+    /// send_authorities_signatures_to_ethereum switch
+    pub send_authorities_to_ethereum: bool,
     /// Ethereum Config
     pub eth: EthereumConfig,
     /// Service steps
@@ -79,6 +81,7 @@ impl Default for Config {
             node: "wss://crab.darwinia.network".to_string(),
             seed: "//Alice".to_string(),
             shadow: "http://localhost:3000".to_string(),
+            send_authorities_to_ethereum: false,
             eth: EthereumConfig {
                 rpc: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
                 contract: EthereumContract {

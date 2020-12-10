@@ -43,6 +43,13 @@ pub struct SubmitSignedAuthorities<T: EthereumRelayAuthorities> {
 // Events
 //////
 
+/// A New MMR Root Request to be Signed. [block number]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct NewMMRRoot<T: EthereumRelayAuthorities> {
+    /// BlockNumber
+    pub block_number: <T as System>::BlockNumber,
+}
+
 /// Authorities Signed. [term, message, signatures]
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
 pub struct AuthoritiesSetSigned<T: EthereumRelayAuthorities> {

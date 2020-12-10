@@ -91,3 +91,6 @@ impl EthereumRelayAuthorities for DarwiniaRuntime {
         <Self as System>::BlockNumber
     >;
 }
+
+/// EcdsaSignature
+pub type EcdsaSignature = [u8; 65];

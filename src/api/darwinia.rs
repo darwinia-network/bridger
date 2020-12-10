@@ -8,7 +8,13 @@ use primitives::{
     },
     frame::{
         ethereum::{
-            backing::{Redeem, RedeemCallExt, VerifiedProofStoreExt, EthereumBackingEventsDecoder},
+            backing::{
+                Redeem,
+                RedeemCallExt,
+                SubmitSignedMmrRootCallExt,
+                VerifiedProofStoreExt,
+                EthereumBackingEventsDecoder
+            },
             game::{AffirmationsStoreExt, EthereumRelayerGame, EthereumRelayerGameEventsDecoder},
             relay::{
                 Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
@@ -32,6 +38,7 @@ use substrate_subxt::{system::System, Client, ClientBuilder, EventSubscription, 
 use web3::types::H256;
 use crate::error::BizError;
 use crate::api::darwinia_sender::DarwiniaSender;
+use parity_scale_codec::{Compact, Encode};
 
 // Types
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
@@ -39,6 +46,7 @@ type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmati
 type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
 /// AccountId
 pub type AccountId = <DarwiniaRuntime as System>::AccountId;
+type BlockNumber = <DarwiniaRuntime as System>::BlockNumber;
 
 /// Dawrinia API
 pub struct Darwinia {
@@ -214,9 +222,19 @@ impl Darwinia {
     }
 
     /// submit_signed_authorities
-    pub async fn sign_submit_signed_authorities(&self, message: &[u8]) -> Result<H256> {
+    pub async fn ecdsa_sign_and_submit_signed_authorities(&self, message: &[u8]) -> Result<H256> {
         let signature = self.sender.ecdsa_sign(message)?;
         Ok(self.client.submit_signed_authorities(&self.sender.signer, signature).await?)
+    }
+
+    /// submit_signed_mmr_root
+    pub async fn ecdsa_sign_and_submit_signed_mmr_root(&self, spec_name: &str, block_number: BlockNumber, mmr_root: H256) -> Result<H256> {
+        let mut encoded: Vec<u8> = vec![];
+        encoded.append(&mut spec_name.encode());
+        encoded.append(&mut Compact(block_number).encode());
+        encoded.append(&mut mmr_root.encode());
+        let signature = self.sender.ecdsa_sign(&encoded)?;
+        Ok(self.client.submit_signed_mmr_root(&self.sender.signer, block_number, mmr_root, signature).await?)
     }
 
     /// Check if should redeem

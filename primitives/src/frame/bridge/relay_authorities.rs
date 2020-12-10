@@ -4,9 +4,7 @@ use substrate_subxt::{system::{System, SystemEventsDecoder}};
 use substrate_subxt_proc_macro::{module, Event, Store, Call};
 use frame_support::sp_runtime::app_crypto::sp_core::H256;
 use core::marker::PhantomData;
-
-/// EcdsaSignature
-pub type RelaySignature = [u8; 65];
+use crate::runtime::EcdsaSignature;
 
 /// Relay Authority
 #[derive(Clone, Encode, Decode, Default, Debug)]
@@ -37,8 +35,8 @@ pub trait EthereumRelayAuthorities: System {
 pub struct SubmitSignedAuthorities<T: EthereumRelayAuthorities> {
     /// Runtime marker
     pub _runtime: PhantomData<T>,
-    /// Token type
-    pub signature: RelaySignature,
+    /// signature
+    pub signature: EcdsaSignature,
 }
 
 //////
@@ -53,7 +51,7 @@ pub struct AuthoritiesSetSigned<T: EthereumRelayAuthorities> {
     /// message
     pub message: Vec<u8>,
     /// signatures
-    pub signatures: Vec<(<T as System>::AccountId, RelaySignature)>,
+    pub signatures: Vec<(<T as System>::AccountId, EcdsaSignature)>,
 }
 
 /// MMR Root Signed. [block number, mmr root, message, signatures]
@@ -66,7 +64,7 @@ pub struct MMRRootSigned<T: EthereumRelayAuthorities> {
     /// message
     pub message: Vec<u8>,
     /// The redeemed balance
-    pub signatures: Vec<(<T as System>::AccountId, RelaySignature)>,
+    pub signatures: Vec<(<T as System>::AccountId, EcdsaSignature)>,
 }
 
 /// NewAuthorities. [message to sign]

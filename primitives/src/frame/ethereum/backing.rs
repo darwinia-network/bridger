@@ -7,6 +7,8 @@ use substrate_subxt::{
     system::{System, SystemEventsDecoder},
 };
 use substrate_subxt_proc_macro::{module, Call, Event, Store};
+use crate::runtime::EcdsaSignature;
+use frame_support::sp_runtime::app_crypto::sp_core::H256;
 
 /// Ethereum Relay Pallet
 #[module]
@@ -16,7 +18,7 @@ pub trait EthereumBacking: System + Balances {
 }
 
 //////
-/// Call
+// Call
 //////
 
 /// Submit redeem call
@@ -28,6 +30,17 @@ pub struct Redeem<T: EthereumBacking> {
     pub act: RedeemFor,
     /// Ethereum Receipt Proof
     pub proof: EthereumReceiptProofThing,
+}
+
+/// Submit redeem call
+#[derive(Clone, Debug, PartialEq, Call, Encode)]
+pub struct SubmitSignedMmrRoot<T: EthereumBacking> {
+    /// block_number
+    pub block_number: <T as System>::BlockNumber,
+    /// mmr_root
+    pub mmr_root: H256,
+    /// signature
+    pub signature: EcdsaSignature,
 }
 
 //////
@@ -65,6 +78,35 @@ pub struct RedeemDeposit<T: EthereumBacking> {
     pub balance: <T as Balances>::Balance,
     /// Transaction Id
     pub tx_id: u64,
+}
+
+/// Ethereum address
+pub type EcdsaAddress = [u8; 20];
+
+/// Someone lock some *RING*. [account, ecdsa address, asset type, amount]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct LockRing<T: EthereumBacking> {
+    /// Account Id
+    pub account_id: <T as System>::AccountId,
+    /// Ecdsa address
+    pub ecdsa_address: EcdsaAddress,
+    /// Asset type
+    pub asset_type: u8,
+    /// amount
+    pub amount: <T as Balances>::Balance
+}
+
+/// Someone lock some *KTON*. [account, ecdsa address, asset type, amount]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct LockKton<T: EthereumBacking> {
+    /// Account Id
+    pub account_id: <T as System>::AccountId,
+    /// Ecdsa address
+    pub ecdsa_address: EcdsaAddress,
+    /// Asset type
+    pub asset_type: u8,
+    /// amount
+    pub amount: <T as Balances>::Balance
 }
 
 //////

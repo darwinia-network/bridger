@@ -34,11 +34,12 @@ use primitives::{
     runtime::DarwiniaRuntime,
 };
 use std::collections::HashMap;
-use substrate_subxt::{system::System, Client, ClientBuilder, EventSubscription, EventsDecoder};
+use substrate_subxt::{system::System, BlockNumber, Client, ClientBuilder, EventSubscription, EventsDecoder};
 use web3::types::H256;
 use crate::error::BizError;
 use crate::api::darwinia_sender::DarwiniaSender;
 use parity_scale_codec::{Compact, Encode};
+use substrate_subxt::sp_runtime::traits::Header;
 
 // Types
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
@@ -46,7 +47,6 @@ type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmati
 type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
 /// AccountId
 pub type AccountId = <DarwiniaRuntime as System>::AccountId;
-type BlockNumber = <DarwiniaRuntime as System>::BlockNumber;
 
 /// Dawrinia API
 pub struct Darwinia {
@@ -224,17 +224,66 @@ impl Darwinia {
     /// submit_signed_authorities
     pub async fn ecdsa_sign_and_submit_signed_authorities(&self, message: &[u8]) -> Result<H256> {
         let signature = self.sender.ecdsa_sign(message)?;
-        Ok(self.client.submit_signed_authorities(&self.sender.signer, signature).await?)
+        Ok(self
+            .client
+            .submit_signed_authorities(&self.sender.signer, signature)
+            .await?)
     }
 
     /// submit_signed_mmr_root
-    pub async fn ecdsa_sign_and_submit_signed_mmr_root(&self, spec_name: &str, block_number: BlockNumber, mmr_root: H256) -> Result<H256> {
+    pub async fn ecdsa_sign_and_submit_signed_mmr_root(
+        &self,
+        spec_name: String,
+        block_number: u32,
+    ) -> Result<H256> {
+        // 1. Get mmr_root from block number + 1
+        // TODO: 是否需要考虑finalized
+        let block_hash = self
+            .client
+            .block_hash(Some(BlockNumber::from(block_number + 1)))
+            .await?;
+        let header = self.client.header(block_hash).await?;
+        let mmr_root = if let Some(header) = header {
+            // get digest_item from header
+            let log = header
+                .digest()
+                .logs()
+                .iter()
+                .find(|&x| x.as_other().is_some());
+            if let Some(digest_item) = log {
+                // get mmr_root from log
+                let parent_mmr_root = digest_item.as_other().unwrap().to_vec();
+                if parent_mmr_root.len() != 32 {
+                    return Err(BizError::Bridger(format!(
+                        "Wrong parent_mmr_root len: {}",
+                        parent_mmr_root.len()
+                    ))
+                        .into());
+                }
+                let mut mmr_root: [u8; 32] = [0; 32];
+                mmr_root.copy_from_slice(&parent_mmr_root);
+                H256(mmr_root)
+            } else {
+                return Err(
+                    BizError::Bridger("Wrong header with no parent_mmr_root".to_string()).into(),
+                );
+            }
+        } else {
+            return Err(BizError::Bridger("No header fetched".to_string()).into());
+        };
+
+        // 2. scale encode & sign
         let mut encoded: Vec<u8> = vec![];
         encoded.append(&mut spec_name.encode());
         encoded.append(&mut Compact(block_number).encode());
         encoded.append(&mut mmr_root.encode());
         let signature = self.sender.ecdsa_sign(&encoded)?;
-        Ok(self.client.submit_signed_mmr_root(&self.sender.signer, block_number, mmr_root, signature).await?)
+
+        // 3. submit
+        Ok(self
+            .client
+            .submit_signed_mmr_root(&self.sender.signer, block_number, mmr_root, signature)
+            .await?)
     }
 
     /// Check if should redeem

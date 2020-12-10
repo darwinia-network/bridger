@@ -24,6 +24,7 @@ use crate::service::GuardService;
 use crate::service::SubscribeService;
 use crate::service::SignService;
 use crate::error::BizError;
+use crate::service::sign::MsgToSignMMRRoot;
 
 /// Run the bridger
 pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
@@ -71,11 +72,10 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
     // --- Network ---
     let runtime_version: sp_version::RuntimeVersion = darwinia.client.rpc.runtime_version(None).await?;
     let spec_name = runtime_version.spec_name.to_string();
-    let network = spec_name;
 
     // --- Print startup info ---
     info!("🔗 Connect to");
-    info!("   Darwinia {}: {}", network, config.node);
+    info!("   Darwinia {}: {}", &spec_name, config.node);
     info!("   Shadow: {}", config.shadow);
     info!("   Ethereum: {}", config.eth.rpc);
     let account_id = &darwinia.sender.account_id;
@@ -91,12 +91,20 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
     }
 
     // --- Start services ---
-    start_services(&config, &shadow, &darwinia, &web3, data_dir).await
+    start_services(&config, &shadow, &darwinia, &web3, data_dir, spec_name).await
 }
 
-async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>, data_dir: PathBuf) -> Result<()> {
-    let last_redeemed =
-        RedeemService::get_last_redeemed(data_dir.clone()).await.map_err(|e| {
+async fn start_services(
+    config: &Config,
+    shadow: &Arc<Shadow>,
+    darwinia: &Arc<Darwinia>,
+    web3: &Web3<Http>,
+    data_dir: PathBuf,
+    spec_name: String,
+) -> Result<()> {
+    let last_redeemed = RedeemService::get_last_redeemed(data_dir.clone())
+        .await
+        .map_err(|e| {
             if let Error::LastRedeemedFileNotExists = e {
                 Error::NoEthereumStart
             } else {
@@ -134,14 +142,18 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     // sign service
     let is_authority = darwinia.sender.is_authority().await?;
     let sign_service =
-        SignService::new(darwinia.clone(), is_authority).map(|sign_service| {
+        SignService::new(darwinia.clone(), is_authority, spec_name).map(|sign_service| {
             sign_service.start()
         });
 
     //
+    let sign_authorities = sign_service.clone().map(|s| s.recipient());
+    let sign_mmr_root = sign_service.clone().map(|s| s.recipient::<MsgToSignMMRRoot>());
     let mut subscribe = match SubscribeService::new(
         darwinia.clone(),
-        sign_service.clone().map(|s| s.recipient())).await
+        sign_authorities,
+        sign_mmr_root
+    ).await
     {
         Ok(subscribe) => {
             subscribe
@@ -157,7 +169,6 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
         Ok(())
     };
 
-
     let killer = darwinia.client.rpc.client.killer.clone();
     let c = async {
         loop {
@@ -168,15 +179,15 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     };
 
     if let Err(e) = select!(b, c).await {
-        ethereum_service.do_send(MsgStop{});
-        relay_service.do_send(MsgStop{});
-        redeem_service.do_send(MsgStop{});
+        ethereum_service.do_send(MsgStop {});
+        relay_service.do_send(MsgStop {});
+        redeem_service.do_send(MsgStop {});
         if let Some(guard_service) = guard_service {
-            guard_service.do_send(MsgStop{});
+            guard_service.do_send(MsgStop {});
         }
         subscribe.stop();
         if let Some(sign_service) = sign_service {
-            sign_service.do_send(MsgStop{});
+            sign_service.do_send(MsgStop {});
         }
         Err(e)
     } else {

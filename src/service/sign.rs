@@ -1,24 +1,25 @@
 //! Guard Service
-use std::{
-    sync::Arc
-};
+use std::sync::Arc;
+
 use actix::prelude::*;
 
-use crate::{
-    api::Darwinia,
-    error::Result,
-};
-use crate::service::MsgStop;
+use crate::{api::Darwinia, error::Result};
 use crate::error::Error;
+use crate::service::MsgStop;
 
 /// MsgSign
 #[derive(Clone, Debug)]
-pub struct MsgSign {
-    /// message
-    pub message: Vec<u8>,
+pub struct MsgToSignAuthorities(pub Vec<u8>);
+
+impl Message for MsgToSignAuthorities {
+    type Result = ();
 }
 
-impl Message for MsgSign {
+/// MsgToSignMMRRoot
+#[derive(Clone, Debug)]
+pub struct MsgToSignMMRRoot(pub u32);
+
+impl Message for MsgToSignMMRRoot {
     type Result = ();
 }
 
@@ -26,6 +27,8 @@ impl Message for MsgSign {
 pub struct SignService {
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
+    /// spec name
+    pub spec_name: String,
 }
 
 impl Actor for SignService {
@@ -40,15 +43,46 @@ impl Actor for SignService {
     }
 }
 
-impl Handler<MsgSign> for SignService {
+impl Handler<MsgToSignAuthorities> for SignService {
     type Result = AtomicResponse<Self, ()>;
 
-    fn handle(&mut self, msg: MsgSign, _: &mut Context<Self>) -> Self::Result {
+    fn handle(&mut self, msg: MsgToSignAuthorities, _: &mut Context<Self>) -> Self::Result {
         AtomicResponse::new(Box::pin(
             async {}
                 .into_actor(self)
                 .then(|_, this, _| {
-                    let f = SignService::sign(this.darwinia.clone(), msg.message);
+                    let f = SignService::ecdsa_sign_and_submit_signed_authorities(
+                        this.darwinia.clone(),
+                        msg.0,
+                    );
+                    f.into_actor(this)
+                })
+                .map(|r, _, _| {
+                    if let Err(err) = r {
+                        if let Error::BizError(..) = err {
+                            trace!("{}", err);
+                        } else {
+                            error!("{:?}", err);
+                        }
+                    }
+                }),
+        ))
+    }
+}
+
+impl Handler<MsgToSignMMRRoot> for SignService {
+    type Result = AtomicResponse<Self, ()>;
+
+    fn handle(&mut self, msg: MsgToSignMMRRoot, _: &mut Context<Self>) -> Self::Result {
+        AtomicResponse::new(Box::pin(
+            async {}
+                .into_actor(self)
+                .then(move |_, this, _| {
+                    let f = SignService::ecdsa_sign_and_submit_signed_mmr_root(
+                        this.darwinia.clone(),
+                        this.spec_name.clone(),
+                        msg.0,
+                    );
                     f.into_actor(this)
                 })
                 .map(|r, _, _| {
@@ -74,10 +108,15 @@ impl Handler<MsgStop> for SignService {
 
 impl SignService {
     /// New sign service
-    pub fn new(darwinia: Arc<Darwinia>, is_authority: bool) -> Option<SignService> {
+    pub fn new(
+        darwinia: Arc<Darwinia>,
+        is_authority: bool,
+        spec_name: String,
+    ) -> Option<SignService> {
         if is_authority {
             Some(SignService {
                 darwinia,
+                spec_name,
             })
         } else {
             warn!("    🙌 SIGN SERVICE NOT STARTED, YOU ARE NOT AUTHORITY");
@@ -85,9 +124,26 @@ impl SignService {
         }
     }
 
-    async fn sign(darwinia: Arc<Darwinia>, message: Vec<u8>) -> Result<()> {
-        trace!("Sign and sending ...");
-        darwinia.sign_submit_signed_authorities(&message).await?;
+    async fn ecdsa_sign_and_submit_signed_authorities(
+        darwinia: Arc<Darwinia>,
+        message: Vec<u8>,
+    ) -> Result<()> {
+        trace!("Sign and sending authorities...");
+        darwinia
+            .ecdsa_sign_and_submit_signed_authorities(&message)
+            .await?;
+        Ok(())
+    }
+
+    async fn ecdsa_sign_and_submit_signed_mmr_root(
+        darwinia: Arc<Darwinia>,
+        spec_name: String,
+        block_number: u32,
+    ) -> Result<()> {
+        trace!("Sign and sending mmr_root...");
+        darwinia
+            .ecdsa_sign_and_submit_signed_mmr_root(spec_name, block_number)
+            .await?;
         Ok(())
     }
 }

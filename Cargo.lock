@@ -818,6 +818,7 @@ dependencies = [
  "hex",
  "jsonrpsee",
  "log",
+ "parity-scale-codec",
  "reqwest",
  "serde",
  "serde_json",

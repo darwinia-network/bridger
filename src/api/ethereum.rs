@@ -12,7 +12,6 @@ use primitives::runtime::EcdsaSignature;
 use crypto::sha3::Sha3;
 use crypto::digest::Digest;
 
-
 /// Ethereum
 pub struct Ethereum {
     web3: Web3<Http>,
@@ -25,7 +24,7 @@ impl Ethereum {
     /// new
     pub fn new(web3: Web3<Http>, config: &Config) -> Result<Self> {
         let relay_contract_address = Ethereum::build_address(&config.darwinia_to_ethereum.relay_contract_address)?;
-        let private_key = hex::decode(&config.darwinia_to_ethereum.seed)?;
+        let private_key = hex::decode(&config.darwinia_to_ethereum.seed[2..])?;
         let secret_key = SecretKey::from_slice(&private_key)?;
         Ok(Ethereum {
             web3,
@@ -59,7 +58,7 @@ impl Ethereum {
                 .collect::<Vec<_>>();
 
             // benefit account id
-            let benefit = hex::decode(benefit)?;
+            let benefit = hex::decode(&benefit[2..])?;
 
             contract.signed_call_with_confirmations(
                 "updateRelayer",
@@ -74,7 +73,7 @@ impl Ethereum {
     }
 
     fn build_address(str: &str) -> Result<H160> {
-        let address = hex::decode(str)?;
+        let address = hex::decode(&str[2..])?;
         let mut address_buffer = [0u8; 20];
         address_buffer.copy_from_slice(&address);
         Ok(Address::from(address_buffer))

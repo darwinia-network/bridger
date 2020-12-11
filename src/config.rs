@@ -69,7 +69,8 @@ pub struct DarwiniaToEthereum {
 	pub seed: String,
 
     /// the darwinia account id who will get the reward
-    pub benefit: String,
+    /// Do not do submit authorities if None
+    pub benefit: Option<String>,
 }
 
 /// Bridger Config
@@ -138,7 +139,7 @@ impl Default for Config {
                 send_authorities_to_ethereum: false,
                 relay_contract_address: "".to_string(),
 				seed: "".to_string(),
-                benefit: "".to_string(),
+                benefit: None,
             }
         }
     }

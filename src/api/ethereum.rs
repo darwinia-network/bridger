@@ -18,7 +18,7 @@ pub struct Ethereum {
     web3: Web3<Http>,
     relay_contract_address: Address,
     secret_key: SecretKey,
-    benefit: String,
+    benefit: Option<String>,
 }
 
 impl Ethereum {
@@ -37,36 +37,38 @@ impl Ethereum {
 
     /// submit_authorities_set
     pub async fn submit_authorities_set(&self, _term: u32, message: Vec<u8>, signatures: Vec<(AccountId, EcdsaSignature)>) -> Result<()> {
-        let key_ref = SecretKeyRef::new(&self.secret_key);
+        if let Some(benefit) = &self.benefit {
+            let key_ref = SecretKeyRef::new(&self.secret_key);
 
-        let contract = Contract::from_json(
-            self.web3.eth(),
-            self.relay_contract_address,
-            include_bytes!("Relay.json"),
-        )?;
+            let contract = Contract::from_json(
+                self.web3.eth(),
+                self.relay_contract_address,
+                include_bytes!("Relay.json"),
+            )?;
 
-        // hash
-        let mut hasher = Sha3::sha3_256();
-        hasher.input(&message);
-        let hash: &mut [u8] = &mut [];
-        hasher.result(hash);
+            // hash
+            let mut hasher = Sha3::sha3_256();
+            hasher.input(&message);
+            let hash: &mut [u8] = &mut [];
+            hasher.result(hash);
 
-        // signatures
-        let signature_list = signatures
-            .iter()
-            .map(|item| item.1.to_vec())
-            .collect::<Vec<_>>();
+            // signatures
+            let signature_list = signatures
+                .iter()
+                .map(|item| item.1.to_vec())
+                .collect::<Vec<_>>();
 
-        // benefit account id
-        let benefit = hex::decode(&self.benefit)?;
+            // benefit account id
+            let benefit = hex::decode(benefit)?;
 
-        contract.signed_call_with_confirmations(
-            "updateRelayer",
-            (hash.to_vec(), message, signature_list, benefit),
-            Options::default(),
-            12,
-            key_ref
-        ).await?;
+            contract.signed_call_with_confirmations(
+                "updateRelayer",
+                (hash.to_vec(), message, signature_list, benefit),
+                Options::default(),
+                12,
+                key_ref
+            ).await?;
+        }
 
         Ok(())
     }

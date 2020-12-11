@@ -63,4 +63,5 @@ seed = '<YOUR_ETHEREUM_SEED>'
 
 # the darwinia account id who will get the reward
 # if `seed` submit a authorities changed tx
+# Disable proxy by remove or comment
 benefit = "<YOUR_BENEFIT_PUBLIC_KEY>"

@@ -1,4 +1,5 @@
 //! Darwinia Subscribe
+use crate::api::Ethereum;
 use crate::error::BizError;
 use crate::{
 	api::Darwinia,
@@ -7,7 +8,7 @@ use crate::{
 };
 use actix::Recipient;
 use primitives::{
-	frame::bridge::relay_authorities::{NewAuthorities, NewMMRRoot},
+	frame::bridge::relay_authorities::{AuthoritiesSetSigned, NewAuthorities, NewMMRRoot},
 	runtime::DarwiniaRuntime,
 };
 use std::sync::Arc;
@@ -17,6 +18,7 @@ use substrate_subxt::EventSubscription;
 /// Dawrinia Subscribe
 pub struct SubscribeService {
 	sub: EventSubscription<DarwiniaRuntime>,
+	ethereum: Ethereum,
 	stop: bool,
 	sign_authorities: Option<Recipient<MsgToSignAuthorities>>,
 	sign_mmr_root: Option<Recipient<MsgToSignMMRRoot>>,
@@ -26,11 +28,13 @@ impl SubscribeService {
 	/// New redeem service
 	pub async fn new(
 		darwinia: Arc<Darwinia>,
+		ethereum: Ethereum,
 		sign_authorities: Option<Recipient<MsgToSignAuthorities>>,
 		sign_mmr_root: Option<Recipient<MsgToSignMMRRoot>>,
 	) -> Result<SubscribeService> {
 		Ok(SubscribeService {
 			sub: darwinia.build_event_subscription().await?,
+			ethereum,
 			stop: false,
 			sign_authorities,
 			sign_mmr_root,
@@ -99,7 +103,15 @@ impl SubscribeService {
 			}
 
 			("EthereumRelayAuthorities", "AuthoritiesSetSigned") => {
-				// optional, send authorities signatures to ethereum
+				if let Ok(decoded) =
+					AuthoritiesSetSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
+				{
+					self.ethereum.submit_authorities_set(
+						decoded.term,
+						decoded.message,
+						decoded.signatures,
+					).await?;
+				}
 			}
 
 			("EthereumRelayAuthorities", "NewMMRRoot") => {

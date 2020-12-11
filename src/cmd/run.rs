@@ -25,6 +25,7 @@ use crate::service::SubscribeService;
 use crate::service::SignService;
 use crate::error::BizError;
 use crate::service::sign::MsgToSignMMRRoot;
+use crate::api::Ethereum;
 
 /// Run the bridger
 pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
@@ -149,8 +150,10 @@ async fn start_services(
     //
     let sign_authorities = sign_service.clone().map(|s| s.recipient());
     let sign_mmr_root = sign_service.clone().map(|s| s.recipient::<MsgToSignMMRRoot>());
+    let ethereum = Ethereum::new(web3.clone(), &config.clone())?;
     let mut subscribe = match SubscribeService::new(
         darwinia.clone(),
+        ethereum,
         sign_authorities,
         sign_mmr_root
     ).await

@@ -52,14 +52,12 @@ redeem = 150
 guard = 30
 
 [darwinia_to_ethereum]
-# send authorities to ethereum switch
-send_authorities_to_ethereum = false
-
-# relay contract address
-relay_contract_address = "0xeb931f1a197f3a230d2dfe220ac6674880f827d6"
 
 # ethereum private key
 seed = '<YOUR_ETHEREUM_SEED>'
+
+# relay contract address
+relay_contract_address = "0xeb931f1a197f3a230d2dfe220ac6674880f827d6"
 
 # the darwinia account id who will get the reward
 # if `seed` submit a authorities changed tx

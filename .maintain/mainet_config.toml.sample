@@ -42,3 +42,16 @@ relay = 60
 redeem = 150
 # guard service polling interval in seconds
 guard = 30
+
+[darwinia_to_ethereum]
+
+# ethereum private key
+seed = '<YOUR_ETHEREUM_SEED>'
+
+# relay contract address
+relay_contract_address = "<WAIT_FOR_SETTING>"
+
+# the darwinia account id who will get the reward
+# if `seed` submit a authorities changed tx
+# Disable proxy by remove or comment
+benefit = "<YOUR_BENEFIT_PUBLIC_KEY>"

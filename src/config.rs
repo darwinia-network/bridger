@@ -59,9 +59,6 @@ pub struct Proxy {
 /// Darwinia to ethereum config
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DarwiniaToEthereum {
-    /// send_authorities_signatures_to_ethereum switch
-    pub send_authorities_to_ethereum: bool,
-
     /// relay contract address
     pub relay_contract_address: String,
 
@@ -136,7 +133,6 @@ impl Default for Config {
             },
             proxy: None,
             darwinia_to_ethereum: DarwiniaToEthereum {
-                send_authorities_to_ethereum: false,
                 relay_contract_address: "".to_string(),
 				seed: "".to_string(),
                 benefit: None,

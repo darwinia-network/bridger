@@ -13,7 +13,6 @@ seed = '<YOUR_SEED>'
 # shadow http restful endpoint, refer https://github.com/darwinia-network/shadow
 shadow = 'https://testnet.shadow.darwinia.network'
 
-
 [eth]
 # ethereum json-rpc endpoint
 rpc = 'https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016'

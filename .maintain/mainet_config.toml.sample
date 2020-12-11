@@ -7,9 +7,6 @@ seed = '<YOUR_SEED>'
 # shadow http restful endpoint, refer https://github.com/darwinia-network/shadow
 shadow = 'https://shadow.darwinia.network'
 
-# send authorities to ethereum switch
-send_authorities_to_ethereum = false
-
 # [proxy]
 # real = '<YOUR_REAL_PUBLIC_KEY>'
 

@@ -67,15 +67,16 @@ impl Darwinia {
                         source: e
                     }
                 })?;
-
         let client = ClientBuilder::<DarwiniaRuntime>::new()
             .set_client(client)
             .build()
             .await?;
+
         let sender = DarwiniaSender::new(
             config.seed.clone(),
             config.proxy.clone().map(|proxy| proxy.real[2..].to_string()),
-                client.clone()
+            client.clone(),
+            config.darwinia_to_ethereum.seed.clone()
 		);
 
         Ok(Darwinia {

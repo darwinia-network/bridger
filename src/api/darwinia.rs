@@ -11,7 +11,6 @@ use primitives::{
             backing::{
                 Redeem,
                 RedeemCallExt,
-                SubmitSignedMmrRootCallExt,
                 VerifiedProofStoreExt,
                 EthereumBackingEventsDecoder
             },
@@ -28,7 +27,10 @@ use primitives::{
         sudo::SudoCallExt,
         bridge::relay_authorities::{
             EthereumRelayAuthoritiesEventsDecoder,
-            SubmitSignedAuthoritiesCallExt
+            SubmitSignedAuthorities,
+            SubmitSignedAuthoritiesCallExt,
+            SubmitSignedMmrRoot,
+            SubmitSignedMmrRootCallExt,
         }
     },
     runtime::DarwiniaRuntime,
@@ -224,11 +226,32 @@ impl Darwinia {
 
     /// submit_signed_authorities
     pub async fn ecdsa_sign_and_submit_signed_authorities(&self, message: &[u8]) -> Result<H256> {
-        let signature = self.sender.ecdsa_sign(message)?;
-        Ok(self
-            .client
-            .submit_signed_authorities(&self.sender.signer, signature)
-            .await?)
+        if self.sender.is_authority().await? {
+            let signature = self.sender.ecdsa_sign(message)?;
+            match &self.sender.real { // proxy
+                Some(real) => {
+                    trace!("Proxyed ecdsa sign and submit authorities to darwinia");
+                    let submit_signed_authorities = SubmitSignedAuthorities {
+                        _runtime: PhantomData::default(),
+                        signature,
+                    };
+
+                    let ex = self.client.encode(submit_signed_authorities).unwrap();
+                    let tx_hash = self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?;
+                    Ok(tx_hash)
+                },
+                None => {
+                    trace!("Ecdsa sign and submit authorities to darwinia");
+                    let tx_hash = self
+                        .client
+                        .submit_signed_authorities(&self.sender.signer, signature)
+                        .await?;
+                    Ok(tx_hash)
+                }
+            }
+        } else {
+            Err(BizError::Bridger("Not authority".to_string()).into())
+        }
     }
 
     /// submit_signed_mmr_root
@@ -237,13 +260,56 @@ impl Darwinia {
         spec_name: String,
         block_number: u32,
     ) -> Result<H256> {
-        // 1. Get mmr_root from block number + 1
+        if self.sender.is_authority().await? {
+            // get mmr root from darwinia
+            let leaf_index = block_number;
+            let mmr_root = self.get_mmr_root(leaf_index).await?;
+
+            // scale encode & sign
+            let mut encoded: Vec<u8> = vec![];
+            encoded.append(&mut spec_name.encode());
+            encoded.append(&mut Compact(block_number).encode());
+            encoded.append(&mut mmr_root.encode());
+            let signature = self.sender.ecdsa_sign(&encoded)?;
+
+            match &self.sender.real { // proxy
+                Some(real) => {
+                    trace!("Proxyed ecdsa sign and submit mmr_root to darwinia, block_number: {}", block_number);
+                    let submit_signed_mmr_root = SubmitSignedMmrRoot {
+                        block_number,
+                        mmr_root,
+                        signature,
+                    };
+
+                    let ex = self.client.encode(submit_signed_mmr_root).unwrap();
+                    let tx_hash = self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?;
+                    Ok(tx_hash)
+                },
+                None => {
+                    trace!("Ecdsa sign and submit mmr_root to darwinia, block_number: {}", block_number);
+                    let tx_hash = self
+                        .client
+                        .submit_signed_mmr_root(&self.sender.signer, block_number, mmr_root, signature)
+                        .await?;
+                    Ok(tx_hash)
+                }
+            }
+        } else {
+            Err(BizError::Bridger("Not authority".to_string()).into())
+        }
+    }
+
+    async fn get_mmr_root(&self, leaf_index: u32) -> Result<H256> {
+        // Get mmr_root from block number == leaf_index + 1
+        let block_number = leaf_index + 1;
+
         // TODO: 是否需要考虑finalized
         let block_hash = self
             .client
-            .block_hash(Some(BlockNumber::from(block_number + 1)))
+            .block_hash(Some(BlockNumber::from(block_number)))
             .await?;
         let header = self.client.header(block_hash).await?;
+
         let mmr_root = if let Some(header) = header {
             // get digest_item from header
             let log = header
@@ -273,18 +339,7 @@ impl Darwinia {
             return Err(BizError::Bridger("No header fetched".to_string()).into());
         };
 
-        // 2. scale encode & sign
-        let mut encoded: Vec<u8> = vec![];
-        encoded.append(&mut spec_name.encode());
-        encoded.append(&mut Compact(block_number).encode());
-        encoded.append(&mut mmr_root.encode());
-        let signature = self.sender.ecdsa_sign(&encoded)?;
-
-        // 3. submit
-        Ok(self
-            .client
-            .submit_signed_mmr_root(&self.sender.signer, block_number, mmr_root, signature)
-            .await?)
+        Ok(mmr_root)
     }
 
     /// Check if should redeem

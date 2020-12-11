@@ -60,3 +60,7 @@ relay_contract_address = "0xeb931f1a197f3a230d2dfe220ac6674880f827d6"
 
 # ethereum private key
 seed = '<YOUR_ETHEREUM_SEED>'
+
+# the darwinia account id who will get the reward
+# if `seed` submit a authorities changed tx
+benefit = "<YOUR_BENEFIT_PUBLIC_KEY>"

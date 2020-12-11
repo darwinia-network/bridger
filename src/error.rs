@@ -19,10 +19,20 @@ pub enum Error {
     Web3(#[from] web3::Error),
 
     #[error(transparent)]
+    EthAbiError(#[from] web3::ethabi::Error),
+
+    #[error(transparent)]
     Reqwest(#[from] reqwest::Error),
 
     #[error(transparent)]
     MailboxError(#[from] actix::MailboxError),
+
+    #[error(transparent)]
+    Secp256k1Error(#[from] secp256k1::Error),
+
+    #[error(transparent)]
+    FromHexError(#[from] hex::FromHexError),
+
 
     #[error(transparent)]
     SerdeJson(#[from] serde_json::Error),

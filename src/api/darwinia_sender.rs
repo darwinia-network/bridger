@@ -11,7 +11,6 @@ use primitives::{
         bridge::relay_authorities::AuthoritiesStoreExt
     }
 };
-use crate::api::Ethereum;
 use web3::Web3;
 use web3::transports::Http;
 use secp256k1::SecretKey;

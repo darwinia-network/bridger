@@ -7,8 +7,6 @@ use substrate_subxt::{
     system::{System, SystemEventsDecoder},
 };
 use substrate_subxt_proc_macro::{module, Call, Event, Store};
-use crate::runtime::EcdsaSignature;
-use frame_support::sp_runtime::app_crypto::sp_core::H256;
 
 /// Ethereum Relay Pallet
 #[module]
@@ -30,17 +28,6 @@ pub struct Redeem<T: EthereumBacking> {
     pub act: RedeemFor,
     /// Ethereum Receipt Proof
     pub proof: EthereumReceiptProofThing,
-}
-
-/// Submit redeem call
-#[derive(Clone, Debug, PartialEq, Call, Encode)]
-pub struct SubmitSignedMmrRoot<T: EthereumBacking> {
-    /// block_number
-    pub block_number: <T as System>::BlockNumber,
-    /// mmr_root
-    pub mmr_root: H256,
-    /// signature
-    pub signature: EcdsaSignature,
 }
 
 //////

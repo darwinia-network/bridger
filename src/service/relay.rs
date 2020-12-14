@@ -8,6 +8,7 @@ use actix::fut::Either;
 use std::time::Duration;
 use crate::service::MsgStop;
 use crate::error::BizError;
+use anyhow::Context as AnyhowContext;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
@@ -91,7 +92,7 @@ impl Handler<MsgExecute> for RelayService {
                                     _ => trace!("{}", err)
                                 }
                             } else {
-                                error!("{:?}", err);
+                                error!("{:#?}", err);
                             }
                         }
                     }
@@ -151,7 +152,7 @@ impl RelayService {
         }
 
         trace!("Prepare to affirm ethereum block: {}", target);
-        let parcel = shadow.parcel(target as usize).await?;
+        let parcel = shadow.parcel(target as usize).await.with_context(|| format!("Fail to get parcel from shadow when affirming ethereum block {}", target))?;
         if parcel.header == EthereumHeader::default()
             || parcel.mmr_root == [0u8;32]
         {

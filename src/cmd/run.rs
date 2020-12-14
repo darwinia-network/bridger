@@ -40,10 +40,10 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
 
     while let Err(e) = run(data_dir.clone()).await {
         if let Some(Error::NoEthereumStart) = e.downcast_ref() {
-            error!("{}", e);
+            error!("{:#?}", e);
             break;
         } else {
-            error!("{:?}", e);
+            error!("{:#?}", e);
             info!("Bridger will restart in 30 seconds...");
             time::delay_for(Duration::from_secs(30)).await;
         }

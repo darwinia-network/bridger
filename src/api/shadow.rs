@@ -13,6 +13,7 @@ use reqwest::{Client, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
 use crate::error::Error;
+use anyhow::Context as AnyhowContext;
 
 #[derive(Serialize)]
 struct Proposal {
@@ -55,7 +56,7 @@ impl Shadow {
             Err(Error::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let json: MMRRootJson = resp.json()
-                .await?;
+                .await.context(format!("Fail to parse json to MMRRootJson: {}", url).to_string())?;
             let result = json.into();
             if result == MMRRoot::default() {
                 Err(BizError::BlankEthereumMmrRoot(leaf_index).into())

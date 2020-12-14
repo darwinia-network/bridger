@@ -4,7 +4,7 @@ use std::sync::Arc;
 use actix::prelude::*;
 
 use crate::{api::Darwinia, error::Result};
-use crate::error::Error;
+use crate::error::BizError;
 use crate::service::MsgStop;
 
 /// MsgSign
@@ -59,7 +59,7 @@ impl Handler<MsgToSignAuthorities> for SignService {
                 })
                 .map(|r, _, _| {
                     if let Err(err) = r {
-                        if let Error::BizError(..) = err {
+                        if err.downcast_ref::<BizError>().is_some() {
                             trace!("{}", err);
                         } else {
                             error!("{:?}", err);
@@ -87,7 +87,7 @@ impl Handler<MsgToSignMMRRoot> for SignService {
                 })
                 .map(|r, _, _| {
                     if let Err(err) = r {
-                        if let Error::BizError(..) = err {
+                        if err.downcast_ref::<BizError>().is_some() {
                             trace!("{}", err);
                         } else {
                             error!("{:?}", err);
@@ -119,7 +119,7 @@ impl SignService {
                 spec_name,
             })
         } else {
-            warn!("    🙌 SIGN SERVICE NOT STARTED, YOU ARE NOT AUTHORITY");
+            warn!("     🙌 SIGN SERVICE NOT STARTED, YOU ARE NOT AUTHORITY");
             None
         }
     }

@@ -1,5 +1,5 @@
 //! Relay Service
-use crate::{api::{Darwinia, Shadow}, error::Error, error::Result};
+use crate::{api::{Darwinia, Shadow}, error::Result};
 use std::sync::Arc;
 use primitives::chain::ethereum::EthereumHeader;
 
@@ -81,15 +81,18 @@ impl Handler<MsgExecute> for RelayService {
                 .map(|r, this, _| {
                     match r {
                         Ok(_) => this.relayed = this.target,
-                        Err(err@Error::BizError(BizError::AffirmingBlockLessThanLastConfirmed(..))) => {
-                            this.relayed = this.target; // not try again
-                            trace!("{}", err);
-                        },
-                        Err(err@Error::BizError(..)) => {
-                            trace!("{}", err);
-                        },
                         Err(err) => {
-                            error!("{:?}", err);
+                            if let Some(e) = err.downcast_ref::<BizError>() {
+                                match e {
+                                    BizError::AffirmingBlockLessThanLastConfirmed(..) => {
+                                        this.relayed = this.target; // not try again
+                                        trace!("{}", err);
+                                    },
+                                    _ => trace!("{}", err)
+                                }
+                            } else {
+                                error!("{:?}", err);
+                            }
                         }
                     }
                 }),

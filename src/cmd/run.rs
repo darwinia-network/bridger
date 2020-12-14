@@ -39,7 +39,7 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
     env_logger::init();
 
     while let Err(e) = run(data_dir.clone()).await {
-        if let Error::NoEthereumStart = e {
+        if let Some(Error::NoEthereumStart) = e.downcast_ref() {
             error!("{}", e);
             break;
         } else {
@@ -103,15 +103,7 @@ async fn start_services(
     data_dir: PathBuf,
     spec_name: String,
 ) -> Result<()> {
-    let last_redeemed = RedeemService::get_last_redeemed(data_dir.clone())
-        .await
-        .map_err(|e| {
-            if let Error::LastRedeemedFileNotExists = e {
-                Error::NoEthereumStart
-            } else {
-                e
-            }
-        })?;
+    let last_redeemed = RedeemService::get_last_redeemed(data_dir.clone()).await?;
     let ethereum_start = last_redeemed;
     info!("🌱 Relay from ethereum block: {}", ethereum_start);
 

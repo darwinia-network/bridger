@@ -52,7 +52,7 @@ impl Shadow {
             .send()
             .await?;
         if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
-            Err(Error::ShadowInternalServerError(resp.text().await?))
+            Err(Error::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let json: MMRRootJson = resp.json()
                 .await?;
@@ -84,7 +84,7 @@ impl Shadow {
             .send()
             .await?;
         if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
-            Err(Error::ShadowInternalServerError(resp.text().await?))
+            Err(Error::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let json: EthereumReceiptProofThingJson = resp.json().await?;
             Ok(json.into())
@@ -116,7 +116,7 @@ impl Shadow {
             .await?;
 
         if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
-            Err(Error::ShadowInternalServerError(resp.text().await?))
+            Err(Error::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let json: EthereumRelayProofsJson = resp.json().await?;
             Ok(json.into())

@@ -112,11 +112,14 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
                 })
                 .map(|r, this, ctx| {
                     if let Err(err) = r {
-                        if let Error::BizError(BizError::RedeemingBlockLargeThanLastConfirmed(..)) = err {
-                            trace!("{}, please wait!", err);
-                            ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
-                        } else if let Error::BizError(..) = err {
-                            trace!("{}", err);
+                        if let Some(e) = err.downcast_ref::<BizError>() {
+                            match e {
+                                BizError::RedeemingBlockLargeThanLastConfirmed(..) => {
+                                    trace!("{}, please wait!", err);
+                                    ctx.notify_later(msg, Duration::from_millis(this.step * 1000));
+                                },
+                                _ => trace!("{}", err)
+                            }
                         } else {
                             error!("{:?}", err);
                         }
@@ -183,7 +186,7 @@ impl RedeemService {
 
         // if cache file not exist
         if File::open(&filepath).await.is_err() {
-            return Err(Error::LastRedeemedFileNotExists);
+            return Err(Error::LastRedeemedFileNotExists.into());
         }
 
         // read start from cache file

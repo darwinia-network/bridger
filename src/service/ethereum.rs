@@ -6,7 +6,7 @@ use crate::{
         MsgStop
     },
     error::{
-        Result as BridgerResult, Error, BizError,
+        Result as BridgerResult, BizError,
     },
     Config,
     api::Darwinia,
@@ -100,8 +100,8 @@ impl Handler<MsgScan> for EthereumService {
                             this.scan_from = latest_block_number
                         },
                         Err(err) => {
-                            if let Error::BizError(..) = err {
-                                trace!("{}", err);
+                            if let Some(e) = err.downcast_ref::<BizError>() {
+                                trace!("{}", e);
                             } else {
                                 error!("{:?}", err);
                             }

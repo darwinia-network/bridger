@@ -6,49 +6,6 @@ use crate::service::redeem::EthereumTransactionHash;
 
 #[derive(ThisError, Debug)]
 pub enum Error {
-    #[error(transparent)]
-    Io(#[from] std::io::Error),
-
-    #[error(transparent)]
-    DeToml(#[from] toml::de::Error),
-
-    #[error(transparent)]
-    SerToml(#[from] toml::ser::Error),
-
-    #[error(transparent)]
-    Web3(#[from] web3::Error),
-
-    #[error(transparent)]
-    EthAbiError(#[from] web3::ethabi::Error),
-
-    #[error(transparent)]
-    Reqwest(#[from] reqwest::Error),
-
-    #[error(transparent)]
-    MailboxError(#[from] actix::MailboxError),
-
-    #[error(transparent)]
-    Secp256k1Error(#[from] secp256k1::Error),
-
-    #[error(transparent)]
-    FromHexError(#[from] hex::FromHexError),
-
-
-    #[error(transparent)]
-    SerdeJson(#[from] serde_json::Error),
-
-    #[error(transparent)]
-    Subxt(#[from] substrate_subxt::Error),
-
-    #[error(transparent)]
-    Primitives(#[from] primitives::result::Error),
-
-    #[error(transparent)]
-    Etc(#[from] etc::Error),
-
-    #[error(transparent)]
-    BizError(#[from] BizError),
-
     #[error("Failed to connect to darwinia node {url}")]
     FailToConnectDarwinia {
         url: String,
@@ -95,4 +52,4 @@ pub enum BizError {
     BlankEthereumMmrRoot(usize),
 }
 
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<T> = anyhow::Result<T>;

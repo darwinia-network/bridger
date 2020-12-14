@@ -6,10 +6,9 @@ use actix::prelude::*;
 
 use crate::{
     api::{Darwinia, Shadow},
-    error::Result,
+    error::{Result, BizError},
 };
 use crate::service::MsgStop;
-use crate::error::Error;
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -61,7 +60,7 @@ impl Handler<MsgGuard> for GuardService {
                             this.voted.append(&mut vote_result);
                         },
                         Err(err) => {
-                            if let Error::BizError(..) = err {
+                            if err.downcast_ref::<BizError>().is_some() {
                                 trace!("{}", err);
                             } else {
                                 error!("{:?}", err);

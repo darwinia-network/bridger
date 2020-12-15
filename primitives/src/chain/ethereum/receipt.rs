@@ -191,7 +191,7 @@ impl Into<EthereumReceipt> for EthReceiptBody {
                             .iter()
                             .map(|t|H256::from(bytes!(t.as_str(), 32)))
                             .collect(),
-                            data: bytes!(l.data.as_str()),
+                        data: bytes!(l.data.as_str()),
                     }
                 }).collect(),
                 outcome: {

@@ -1,7 +1,8 @@
 //! Ethereum RPC calls
 mod header;
+mod receipt;
 
-use crate::{chain::ethereum::EthereumHeader, result::{Result, Error}, rpc::RPC};
+use crate::{chain::ethereum::{EthereumHeader, EthReceiptBody}, result::{Result, Error}, rpc::RPC};
 use async_trait::async_trait;
 use reqwest::Client;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -58,6 +59,7 @@ impl EthereumRPC {
 #[async_trait]
 impl RPC for EthereumRPC {
     type Header = EthereumHeader;
+    type Receipt = EthReceiptBody;
 
     async fn get_header_by_hash(&self, block: &str) -> Result<Self::Header> {
         Ok(
@@ -76,6 +78,14 @@ impl RPC for EthereumRPC {
             .map_err(|err|
                 Error::FailToGetEthereumHeader(format!("{:?}", err), block)
             )
+    }
+
+    async fn get_receipt(&self, txhash: &str) -> Result<Self::Receipt> {
+        Ok(
+            receipt::EthReceiptRPCResp::get(&self.client, &self.rpc(), txhash)
+                .await?
+                .result,
+        )
     }
 
     async fn block_number(&self) -> Result<u64> {

@@ -17,7 +17,6 @@ all-features = true
 
 [dependencies]
 uint = "0.8.5"
-rlp = "0.4.5"
 thiserror = "1.0"
 
 ## Optional featrues
@@ -29,6 +28,9 @@ reqwest = { version = "0.10", features = ["json"], optional = true }
 serde_json = { version = "1.0", optional = true }
 substrate-subxt = { version = "0.13.0", optional = true }
 substrate-subxt-proc-macro = { version = "0.13.0", optional = true }
+primitive-types = { default-features = false, features = ["codec", "rlp"], git = "https://github.com/darwinia-network/parity-common.git" }
+ethbloom        = { default-features = false, git = "https://github.com/darwinia-network/parity-common.git" }
+rlp             = { default-features = false, git = "https://github.com/darwinia-network/parity-common.git" }
 
 [dependencies.serde]
 package = "serde"

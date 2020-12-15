@@ -11,6 +11,8 @@ use async_trait::async_trait;
 pub trait RPC {
     /// Block Header
     type Header;
+    /// Transaction Receipt
+    type Receipt;
 
     /// Get header by block hash hex
     async fn get_header_by_hash(&self, block: &str) -> Result<Self::Header>
@@ -24,6 +26,11 @@ pub trait RPC {
 
     /// Get current highest block
     async fn block_number(&self) -> Result<u64>;
+
+    /// Get receipt
+    async fn get_receipt(&self, txhash: &str) -> Result<Self::Receipt>
+    where
+        Self: Sized;
 }
 
 pub use ethereum::EthereumRPC;

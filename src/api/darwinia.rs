@@ -78,7 +78,7 @@ impl Darwinia {
             config.seed.clone(),
             config.proxy.clone().map(|proxy| proxy.real[2..].to_string()),
             client.clone(),
-            config.darwinia_to_ethereum.seed.clone()
+            config.darwinia_to_ethereum.seed.clone()[2..].to_string()
 		);
 
         Ok(Darwinia {
@@ -320,6 +320,7 @@ impl Darwinia {
             if let Some(digest_item) = log {
                 // get mmr_root from log
                 let parent_mmr_root = digest_item.as_other().unwrap().to_vec();
+                let parent_mmr_root = &parent_mmr_root[4..];
                 if parent_mmr_root.len() != 32 {
                     return Err(BizError::Bridger(format!(
                         "Wrong parent_mmr_root len: {}",

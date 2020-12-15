@@ -91,7 +91,7 @@ impl GuardService {
                 voted: vec![]
             })
         } else {
-            warn!("    🙌 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
+            warn!("    🔒 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
             None
         }
     }

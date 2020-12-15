@@ -119,7 +119,7 @@ impl SignService {
                 spec_name,
             })
         } else {
-            warn!("     🙌 SIGN SERVICE NOT STARTED, YOU ARE NOT AUTHORITY");
+            warn!("     🔒 SIGN SERVICE NOT STARTED, YOU ARE NOT AUTHORITY");
             None
         }
     }

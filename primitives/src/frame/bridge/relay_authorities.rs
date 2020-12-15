@@ -24,6 +24,8 @@ pub struct RelayAuthority<AccountId, Signer, RingBalance, BlockNumber> {
 pub trait EthereumRelayAuthorities: System {
     /// Relay Authority
     type RelayAuthority: 'static + Encode + Decode + Send + Default;
+    /// EcdsaAddress
+    type EcdsaAddress: 'static + Encode + Decode + Send + Default;
 }
 
 //////

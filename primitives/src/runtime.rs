@@ -84,13 +84,16 @@ impl Proxy for DarwiniaRuntime {
 }
 
 impl EthereumRelayAuthorities for DarwiniaRuntime {
+    type EcdsaAddress = EcdsaAddress;
     type RelayAuthority = RelayAuthority<
         <Self as System>::AccountId,
-        [u8; 20],
+        Self::EcdsaAddress,
         <Self as Balances>::Balance,
         <Self as System>::BlockNumber
     >;
 }
 
+/// EcdsaAddress
+pub type EcdsaAddress = [u8; 20];
 /// EcdsaSignature
 pub type EcdsaSignature = [u8; 65];

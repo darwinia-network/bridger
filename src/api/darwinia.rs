@@ -267,10 +267,15 @@ impl Darwinia {
             let mmr_root = self.get_mmr_root(leaf_index).await?;
 
             // scale encode & sign
-            let mut encoded: Vec<u8> = vec![];
-            encoded.append(&mut spec_name.encode());
-            encoded.append(&mut Compact(block_number).encode());
-            encoded.append(&mut mmr_root.encode());
+            let encoded = {
+				_S {
+					_1: spec_name,
+					_2: block_number,
+					_3: mmr_root
+				}
+				.encode()
+			};
+
             let signature = self.sender.ecdsa_sign(&encoded)?;
 
             match &self.sender.real { // proxy
@@ -389,4 +394,16 @@ impl Darwinia {
         let sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
         Ok(sub)
     }
+}
+#[derive(Encode)]
+struct _S<_1, _2, _3>
+where
+	_1: Encode,
+	_2: Encode,
+	_3: Encode,
+{
+	_1: _1,
+	#[codec(compact)]
+	_2: _2,
+	_3: _3,
 }

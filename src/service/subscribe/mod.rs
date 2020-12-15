@@ -68,10 +68,15 @@ impl SubscribeService {
 	/// process_next_event
 	async fn process_next_event(&mut self) -> Result<()> {
 		if let Some(raw) = self.sub.next().await {
-			if let Ok(event) = raw {
-				self.handle_event(&event.module, &event.variant, event.data)
-					.await?;
-			}
+            match raw {
+                Ok(event) => {
+                    self.handle_event(&event.module, &event.variant, event.data)
+                        .await?;
+                },
+                Err(err) => {
+                    error!("{:?}", err);
+                }
+            }
 		}
 		Ok(())
 	}

@@ -146,4 +146,16 @@ impl DarwiniaSender {
         buffer.copy_from_slice(signature.0.as_slice());
         Ok(buffer)
     }
+
+}
+#[test]
+fn test_ecdsa() {
+    let message = &[32, 80, 97, 110, 103, 111, 108, 105, 110, 200, 38, 199, 154, 103, 135, 242, 210, 106, 168, 120, 216, 232, 234, 114, 194, 69, 189, 238, 196, 220, 4, 5, 74, 15, 181, 223, 155, 200, 224, 204, 189, 1];
+        let web3 = Web3::new(Http::new("https://ropsten.infura.io/v3/60703fcc6b4e48079cfc5e385ee7af80").unwrap());
+        let private_key = hex::decode("8bd012fd2433d4fea852f437d6bb22d1e57dee7657cc1e703460ddeaae1a67ca").unwrap();
+        let secret_key = SecretKey::from_slice(&private_key).unwrap();
+        let signature = web3.accounts().sign(message, SecretKeyRef::new(&secret_key)).signature;
+        let mut buffer = [0u8; 65];
+        buffer.copy_from_slice(signature.0.as_slice());
+        println!("{:?}", buffer);
 }

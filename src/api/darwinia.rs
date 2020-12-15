@@ -78,7 +78,8 @@ impl Darwinia {
             config.seed.clone(),
             config.proxy.clone().map(|proxy| proxy.real[2..].to_string()),
             client.clone(),
-            config.darwinia_to_ethereum.seed.clone()[2..].to_string()
+            config.darwinia_to_ethereum.seed.clone()[2..].to_string(),
+            config.eth.rpc.to_string(),
 		);
 
         Ok(Darwinia {

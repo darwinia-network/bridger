@@ -51,13 +51,15 @@ pub struct DarwiniaSender {
     /// proxy real
     pub real: Option<AccountId>,
 
+    /// ethereum url
+    pub ethereum_url: String,
     /// raw ethereum seed
     pub ethereum_seed: String,
 }
 
 impl DarwiniaSender {
     /// Create a new Account
-    pub fn new(seed: String, real: Option<String>, client: Client<DarwiniaRuntime>, ethereum_seed: String) -> DarwiniaSender {
+    pub fn new(seed: String, real: Option<String>, client: Client<DarwiniaRuntime>, ethereum_seed: String, ethereum_url: String) -> DarwiniaSender {
         // signer to sign darwinia extrinsic
         let pair = Pair::from_string(&seed, None).unwrap(); // if not a valid seed
         let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
@@ -77,6 +79,7 @@ impl DarwiniaSender {
             account_id,
             signer,
             real,
+            ethereum_url,
             ethereum_seed,
         }
     }
@@ -135,7 +138,7 @@ impl DarwiniaSender {
 
     /// sign
     pub fn ecdsa_sign(&self, message: &[u8]) -> Result<[u8; 65]> {
-        let web3 = Web3::new(Http::new("")?);
+        let web3 = Web3::new(Http::new(&self.ethereum_url)?);
         let private_key = hex::decode(&self.ethereum_seed)?;
         let secret_key = SecretKey::from_slice(&private_key)?;
         let signature = web3.accounts().sign(message, SecretKeyRef::new(&secret_key)).signature;

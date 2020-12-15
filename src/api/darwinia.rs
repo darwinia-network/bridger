@@ -276,7 +276,8 @@ impl Darwinia {
 				.encode()
 			};
 
-            let signature = self.sender.ecdsa_sign(&encoded)?;
+            let hash = web3::signing::keccak256(&encoded);
+            let signature = self.sender.ecdsa_sign(&hash)?;
 
             match &self.sender.real { // proxy
                 Some(real) => {

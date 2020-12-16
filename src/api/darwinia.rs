@@ -40,7 +40,7 @@ use substrate_subxt::{system::System, BlockNumber, Client, ClientBuilder, EventS
 use web3::types::H256;
 use crate::error::BizError;
 use crate::api::darwinia_sender::DarwiniaSender;
-use parity_scale_codec::{Compact, Encode};
+use parity_scale_codec::Encode;
 use substrate_subxt::sp_runtime::traits::Header;
 
 // Types

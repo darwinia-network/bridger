@@ -9,14 +9,13 @@ use primitives::{
         sudo::KeyStoreExt,
         technical_committee::MembersStoreExt,
         bridge::relay_authorities::AuthoritiesStoreExt
-    }
     },
     runtime::EcdsaSignature,
 };
 use web3::Web3;
 use web3::transports::Http;
 use secp256k1::SecretKey;
-use web3::signing::{keccak256, SecretKeyRef};
+use web3::signing::SecretKeyRef;
 
 #[derive(Debug, PartialEq)]
 enum Role {

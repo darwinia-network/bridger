@@ -54,7 +54,7 @@ impl Ethereum {
             // signatures
             let signature_list = signatures
                 .iter()
-                .map(|item| item.1.to_vec())
+                .map(|item| item.1.0.to_vec())
                 .collect::<Vec<_>>();
 
             // benefit account id

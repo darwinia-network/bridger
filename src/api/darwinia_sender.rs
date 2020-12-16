@@ -10,6 +10,8 @@ use primitives::{
         technical_committee::MembersStoreExt,
         bridge::relay_authorities::AuthoritiesStoreExt
     }
+    },
+    runtime::EcdsaSignature,
 };
 use web3::Web3;
 use web3::transports::Http;
@@ -137,14 +139,14 @@ impl DarwiniaSender {
     }
 
     /// sign
-    pub fn ecdsa_sign(&self, message: &[u8]) -> Result<[u8; 65]> {
+    pub fn ecdsa_sign(&self, message: &[u8]) -> Result<EcdsaSignature> {
         let web3 = Web3::new(Http::new(&self.ethereum_url)?);
         let private_key = hex::decode(&self.ethereum_seed)?;
         let secret_key = SecretKey::from_slice(&private_key)?;
         let signature = web3.accounts().sign(message, SecretKeyRef::new(&secret_key)).signature;
         let mut buffer = [0u8; 65];
         buffer.copy_from_slice(signature.0.as_slice());
-        Ok(buffer)
+        Ok(EcdsaSignature(buffer))
     }
 
 }

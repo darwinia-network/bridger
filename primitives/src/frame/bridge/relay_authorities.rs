@@ -26,6 +26,8 @@ pub trait EthereumRelayAuthorities: System {
     type RelayAuthority: 'static + Encode + Decode + Send + Default;
     /// EcdsaAddress
     type EcdsaAddress: 'static + Encode + Decode + Send + Default;
+    /// Relay signature
+    type RelaySignature: 'static + Encode + Decode + Send + Sync + Default;
 }
 
 //////
@@ -38,7 +40,7 @@ pub struct SubmitSignedAuthorities<T: EthereumRelayAuthorities> {
     /// Runtime marker
     pub _runtime: PhantomData<T>,
     /// signature
-    pub signature: EcdsaSignature,
+    pub signature: T::RelaySignature,
 }
 
 /// Submit redeem call

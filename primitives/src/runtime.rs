@@ -91,9 +91,19 @@ impl EthereumRelayAuthorities for DarwiniaRuntime {
         <Self as Balances>::Balance,
         <Self as System>::BlockNumber
     >;
+    type RelaySignature = EcdsaSignature;
 }
 
+use codec::{Encode, Decode};
 /// EcdsaAddress
 pub type EcdsaAddress = [u8; 20];
+
 /// EcdsaSignature
-pub type EcdsaSignature = [u8; 65];
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
+pub struct EcdsaSignature(pub [u8; 65]);
+
+impl Default for EcdsaSignature {
+    fn default() -> Self {
+        Self([0u8; 65])
+    }
+}

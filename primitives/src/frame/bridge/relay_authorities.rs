@@ -51,7 +51,7 @@ pub struct SubmitSignedMmrRoot<T: EthereumRelayAuthorities> {
     /// mmr_root
     pub mmr_root: H256,
     /// signature
-    pub signature: EcdsaSignature,
+    pub signature: T::RelaySignature
 }
 
 //////

@@ -79,3 +79,15 @@ impl Ethereum {
         Ok(Address::from(address_buffer))
     }
 }
+
+#[test]
+fn test_load_abi() {
+    let web3 = Web3::new(Http::new("https://ropsten.infura.io/v3/60703fcc6b4e48079cfc5e385ee7af80").unwrap());
+    let relay_contract_address = Ethereum::build_address("0xeb931f1a197f3a230d2dfe220ac6674880f827d6").unwrap();
+    let contract = Contract::from_json(
+        web3.eth(),
+        relay_contract_address,
+        include_bytes!("Relay.json"),
+    ).unwrap();
+    println!("{:?}", contract);
+}

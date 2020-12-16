@@ -96,6 +96,8 @@ impl SubscribeService {
 				return Err(BizError::Bridger("CodeUpdated".to_string()).into());
 			}
 
+            // call ethereum_relay_authorities.request_authority and then sudo call
+            // EthereumRelayAuthorities.add_authority will emit the event
 			("EthereumRelayAuthorities", "NewAuthorities") => {
 				if let Some(sign_authorities) = &self.sign_authorities {
 					if let Ok(decoded) =
@@ -107,6 +109,7 @@ impl SubscribeService {
 				}
 			}
 
+            // authority set changed will emit this event
 			("EthereumRelayAuthorities", "AuthoritiesSetSigned") => {
 				if let Ok(decoded) =
 					AuthoritiesSetSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
@@ -119,6 +122,7 @@ impl SubscribeService {
 				}
 			}
 
+            // call ethereum_backing.lock will emit the event
 			("EthereumRelayAuthorities", "NewMMRRoot") => {
 				if let Some(sign_mmr_root) = &self.sign_mmr_root {
 					if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])

@@ -50,7 +50,7 @@ impl SubscribeService {
 					self.stop();
 					return Err(e);
 				} else {
-					error!("Fail to process next event: {:?}", e);
+					error!("{:#?}", e);
 				}
 			}
 			if self.stop {
@@ -74,10 +74,10 @@ impl SubscribeService {
                         .await?;
                 },
                 Err(err) => {
-                    error!("{:?}", err);
+                    return Err(err.into()); 
                 }
             }
-		}
+        }
 		Ok(())
 	}
 
@@ -116,8 +116,7 @@ impl SubscribeService {
 					AuthoritiesSetSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
 				{
 					self.ethereum.submit_authorities_set(
-						decoded.term,
-						decoded.message,
+                        decoded.new_authorities,
 						decoded.signatures,
 					).await?;
                     info!("Authorities submitted to ethereum");

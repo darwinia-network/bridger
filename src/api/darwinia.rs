@@ -33,7 +33,7 @@ use primitives::{
             SubmitSignedMmrRootCallExt,
         }
     },
-    runtime::DarwiniaRuntime,
+    runtime::{DarwiniaRuntime, EcdsaMessage},
 };
 use std::collections::HashMap;
 use substrate_subxt::{system::System, BlockNumber, Client, ClientBuilder, EventSubscription, EventsDecoder};
@@ -226,14 +226,13 @@ impl Darwinia {
     }
 
     /// submit_signed_authorities
-    pub async fn ecdsa_sign_and_submit_signed_authorities(&self, message: &[u8]) -> Result<H256> {
+    pub async fn ecdsa_sign_and_submit_signed_authorities(&self, message: EcdsaMessage) -> Result<H256> {
         if self.sender.is_authority().await? {
-            let signature = self.sender.ecdsa_sign(message)?;
+            let signature = self.sender.ecdsa_sign(&message)?;
             match &self.sender.real { // proxy
                 Some(real) => {
                     trace!("Proxyed ecdsa sign and submit authorities to darwinia");
                     let submit_signed_authorities = SubmitSignedAuthorities {
-                        _runtime: PhantomData::default(),
                         signature,
                     };
 

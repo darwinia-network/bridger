@@ -9,8 +9,8 @@ use web3::signing::SecretKeyRef;
 use secp256k1::SecretKey;
 use crate::api::darwinia::AccountId;
 use primitives::runtime::EcdsaSignature;
-use crypto::sha3::Sha3;
-use crypto::digest::Digest;
+use web3::contract::tokens::Tokenize;
+use primitives::runtime::EcdsaAddress;
 
 /// Ethereum
 pub struct Ethereum {
@@ -35,7 +35,7 @@ impl Ethereum {
     }
 
     /// submit_authorities_set
-    pub async fn submit_authorities_set(&self, _term: u32, message: Vec<u8>, signatures: Vec<(AccountId, EcdsaSignature)>) -> Result<()> {
+    pub async fn submit_authorities_set(&self, new_authorities: Vec<EcdsaAddress>, signatures: Vec<(AccountId, EcdsaSignature)>) -> Result<()> {
         if let Some(benefit) = &self.benefit {
             let key_ref = SecretKeyRef::new(&self.secret_key);
 
@@ -45,11 +45,11 @@ impl Ethereum {
                 include_bytes!("Relay.json"),
             )?;
 
-            // hash
-            let mut hasher = Sha3::sha3_256();
-            hasher.input(&message);
-            let hash: &mut [u8] = &mut [];
-            hasher.result(hash);
+            let message = new_authorities
+                .iter()
+                .map(|authority| authority.to_vec())
+                .collect::<Vec<_>>()
+                .join(&[][..]);
 
             // signatures
             let signature_list = signatures
@@ -60,9 +60,12 @@ impl Ethereum {
             // benefit account id
             let benefit = hex::decode(&benefit[2..])?;
 
+            let input = (message, signature_list, benefit);
+            println!("{:?}", input.clone().into_tokens());
+
             contract.signed_call_with_confirmations(
                 "updateRelayer",
-                (hash.to_vec(), message, signature_list, benefit),
+                input,
                 Options::default(),
                 12,
                 key_ref

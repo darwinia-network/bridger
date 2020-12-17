@@ -12,6 +12,7 @@ use crate::service::MsgStop;
 use crate::service::RedeemService;
 use crate::service::redeem::EthereumTransaction;
 use std::path::PathBuf;
+use primitives::runtime::EcdsaMessage;
 use primitives::chain::ethereum::{
     EthereumRelayHeaderParcel,
     RedeemFor, EthereumReceiptProofThing,
@@ -23,7 +24,7 @@ pub enum Extrinsic {
     Redeem(RedeemFor, EthereumReceiptProofThing, EthereumTransaction),
     GuardVote(u64, bool),
     SignAndSendMmrRoot(u32),
-    SignAndSendAuthorities(Vec<u8>),
+    SignAndSendAuthorities(EcdsaMessage),
 }
 
 /// MsgSign
@@ -47,11 +48,11 @@ impl Actor for ExtrinsicsService {
     type Context = Context<Self>;
 
     fn started(&mut self, _: &mut Self::Context) {
-        info!("✨ SERVICE STARTED: EX SENDER");
+        info!("✨ SERVICE STARTED: EX SENDER QUEUE");
     }
 
     fn stopped(&mut self, _: &mut Self::Context) {
-        info!("💤 SERVICE STOPPED: EX SENDER")
+        info!("💤 SERVICE STOPPED: EX SENDER QUEUE")
     }
 }
 
@@ -147,7 +148,7 @@ impl ExtrinsicsService {
             Extrinsic::SignAndSendAuthorities(message) => {
                 trace!("Sign and sending authorities...");
                 let ex_hash = darwinia
-                    .ecdsa_sign_and_submit_signed_authorities(&message)
+                    .ecdsa_sign_and_submit_signed_authorities(message)
                     .await?;
                 info!("Sign and send authorities in extrinsic {:?}", ex_hash);
             },

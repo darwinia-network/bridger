@@ -30,7 +30,7 @@ pub enum BizError {
     #[error("Heartbeat>>> Scanning ethereum too fast from {0}, the latest block number is {1}")]
     ScanningEthereumTooFast(u64, u64),
 
-    #[error("The affirming target block {0} is less than the last_confirmed {0}")]
+    #[error("The affirming target block {0} is less than the last_confirmed {1}")]
     AffirmingBlockLessThanLastConfirmed(u64, u64),
 
     #[error("The affirming target block {0} is in pending")]

@@ -4,7 +4,7 @@ use crate::error::BizError;
 use crate::{
 	api::Darwinia,
 	error::Result,
-	service::sign::{MsgToSignAuthorities, MsgToSignMMRRoot},
+    service::extrinsics::{Extrinsic, MsgExtrinsic},
 };
 use actix::Recipient;
 use primitives::{
@@ -17,11 +17,11 @@ use substrate_subxt::EventSubscription;
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
+    darwinia: Arc<Darwinia>,
 	sub: EventSubscription<DarwiniaRuntime>,
 	ethereum: Ethereum,
 	stop: bool,
-	sign_authorities: Option<Recipient<MsgToSignAuthorities>>,
-	sign_mmr_root: Option<Recipient<MsgToSignMMRRoot>>,
+	extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
 impl SubscribeService {
@@ -29,15 +29,15 @@ impl SubscribeService {
 	pub async fn new(
 		darwinia: Arc<Darwinia>,
 		ethereum: Ethereum,
-		sign_authorities: Option<Recipient<MsgToSignAuthorities>>,
-		sign_mmr_root: Option<Recipient<MsgToSignMMRRoot>>,
+		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> Result<SubscribeService> {
+        let sub = darwinia.build_event_subscription().await?;
 		Ok(SubscribeService {
-			sub: darwinia.build_event_subscription().await?,
+            darwinia,
+			sub,
 			ethereum,
 			stop: false,
-			sign_authorities,
-			sign_mmr_root,
+            extrinsics_service,
 		})
 	}
 
@@ -99,14 +99,15 @@ impl SubscribeService {
             // call ethereum_relay_authorities.request_authority and then sudo call
             // EthereumRelayAuthorities.add_authority will emit the event
 			("EthereumRelayAuthorities", "NewAuthorities") => {
-				if let Some(sign_authorities) = &self.sign_authorities {
-					if let Ok(decoded) =
-						NewAuthorities::<DarwiniaRuntime>::decode(&mut &event_data[..])
-					{
-						let msg = MsgToSignAuthorities(decoded.message);
-						sign_authorities.send(msg).await?;
-					}
-				}
+                if self.darwinia.sender.is_authority().await? {
+                    if let Ok(decoded) =
+                        NewAuthorities::<DarwiniaRuntime>::decode(&mut &event_data[..])
+                    {
+                        let ex = Extrinsic::SignAndSendAuthorities(decoded.message);
+                        let msg = MsgExtrinsic(ex);
+                        self.extrinsics_service.send(msg).await?;
+                    }
+                }
 			}
 
             // authority set changed will emit this event
@@ -119,19 +120,21 @@ impl SubscribeService {
 						decoded.message,
 						decoded.signatures,
 					).await?;
+                    info!("Authorities submitted to ethereum");
 				}
 			}
 
             // call ethereum_backing.lock will emit the event
 			("EthereumRelayAuthorities", "NewMMRRoot") => {
-				if let Some(sign_mmr_root) = &self.sign_mmr_root {
-					if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
-					{
-						let msg = MsgToSignMMRRoot(decoded.block_number);
-						sign_mmr_root.send(msg).await?;
-					}
-				}
-			}
+                if self.darwinia.sender.is_authority().await? {
+                    if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
+                    {
+                        let ex = Extrinsic::SignAndSendMmrRoot(decoded.block_number);
+                        let msg = MsgExtrinsic(ex);
+                        self.extrinsics_service.send(msg).await?;
+                    }
+			    }
+            }
 
 			_ => {}
 		}

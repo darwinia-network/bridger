@@ -18,6 +18,7 @@ use tokio::fs::File;
 use std::path::PathBuf;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use crate::error::BizError;
+use crate::service::extrinsics::{Extrinsic, MsgExtrinsic};
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -82,7 +83,7 @@ pub struct RedeemService {
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
 
-    data_dir: PathBuf,
+    extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
 
@@ -107,7 +108,7 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
             async {}
                 .into_actor(self)
                 .then(move |_, this, _| {
-                    let f = RedeemService::redeem(this.shadow.clone(), this.darwinia.clone(), msg_clone.tx, this.data_dir.clone());
+                    let f = RedeemService::redeem(this.shadow.clone(), this.darwinia.clone(), msg_clone.tx, this.extrinsics_service.clone());
                     f.into_actor(this)
                 })
                 .map(|r, this, ctx| {
@@ -139,16 +140,16 @@ impl Handler<MsgStop> for RedeemService {
 
 impl RedeemService {
     /// New redeem service
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64, data_dir: PathBuf) -> RedeemService {
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64, extrinsics_service: Recipient<MsgExtrinsic>) -> RedeemService {
         RedeemService {
             darwinia,
             shadow,
             step,
-            data_dir,
+            extrinsics_service,
         }
     }
 
-    async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction, data_dir: PathBuf) -> Result<()> {
+    async fn redeem(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, tx: EthereumTransaction, extrinsics_service: Recipient<MsgExtrinsic>) -> Result<()> {
         trace!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
 
         // 1. Checking before redeem
@@ -169,11 +170,11 @@ impl RedeemService {
             EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
             EthereumTransactionHash::Token(_) => RedeemFor::Token,
         };
-        let hash = darwinia.redeem(redeem_for, proof).await?;
-        info!("Redeemed ethereum tx {:?} with extrinsic {:?}", tx.tx_hash, hash);
 
-        // 3. Update cache
-        RedeemService::set_last_redeemed(data_dir, tx.block).await?;
+        let ex = Extrinsic::Redeem(redeem_for, proof, tx);
+        let msg = MsgExtrinsic(ex);
+        extrinsics_service.send(msg).await?;
+
         Ok(())
     }
 

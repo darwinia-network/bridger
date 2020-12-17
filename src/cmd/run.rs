@@ -22,9 +22,8 @@ use crate::service::RelayService;
 use crate::service::RedeemService;
 use crate::service::GuardService;
 use crate::service::SubscribeService;
-use crate::service::SignService;
+use crate::service::ExtrinsicsService;
 use crate::error::BizError;
-use crate::service::sign::MsgToSignMMRRoot;
 use crate::api::Ethereum;
 
 /// Run the bridger
@@ -107,12 +106,15 @@ async fn start_services(
     let ethereum_start = last_redeemed;
     info!("🌱 Relay from ethereum block: {}", ethereum_start);
 
+    // extrinsic sender
+    let extrinsics_service = ExtrinsicsService::new(darwinia.clone(), spec_name, data_dir.clone()).start();
+
     // relay service
     let last_confirmed = darwinia.last_confirmed().await.unwrap();
-    let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed, config.step.relay).start();
+    let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed, config.step.relay, extrinsics_service.clone().recipient()).start();
 
     // redeem service
-    let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem, data_dir.clone()).start();
+    let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem, extrinsics_service.clone().recipient()).start();
 
     // ethereum service
     let ethereum_service = EthereumService::new(
@@ -128,26 +130,16 @@ async fn start_services(
     // guard service
     let is_tech_comm_member = darwinia.sender.is_tech_comm_member().await?;
     let guard_service =
-        GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard, is_tech_comm_member).map(|g| {
+        GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard, is_tech_comm_member, extrinsics_service.clone().recipient()).map(|g| {
             g.start()
         });
 
-    // sign service
-    let is_authority = darwinia.sender.is_authority().await?;
-    let sign_service =
-        SignService::new(darwinia.clone(), is_authority, spec_name).map(|sign_service| {
-            sign_service.start()
-        });
-
     //
-    let sign_authorities = sign_service.clone().map(|s| s.recipient());
-    let sign_mmr_root = sign_service.clone().map(|s| s.recipient::<MsgToSignMMRRoot>());
     let ethereum = Ethereum::new(web3.clone(), &config.clone())?;
     let mut subscribe = match SubscribeService::new(
         darwinia.clone(),
         ethereum,
-        sign_authorities,
-        sign_mmr_root
+        extrinsics_service.clone().recipient(),
     ).await
     {
         Ok(subscribe) => {
@@ -181,9 +173,7 @@ async fn start_services(
             guard_service.do_send(MsgStop {});
         }
         subscribe.stop();
-        if let Some(sign_service) = sign_service {
-            sign_service.do_send(MsgStop {});
-        }
+        extrinsics_service.do_send(MsgStop {});
         Err(e)
     } else {
         Ok(())

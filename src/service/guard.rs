@@ -9,6 +9,7 @@ use crate::{
     error::{Result, BizError},
 };
 use crate::service::MsgStop;
+use crate::service::extrinsics::{Extrinsic, MsgExtrinsic};
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -26,6 +27,7 @@ pub struct GuardService {
     pub darwinia: Arc<Darwinia>,
 
     voted: Vec<u64>,
+    extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
 impl Actor for GuardService {
@@ -51,7 +53,7 @@ impl Handler<MsgGuard> for GuardService {
             async {}
                 .into_actor(self)
                 .then(|_, this, _| {
-                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone(), this.voted.clone());
+                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone(), this.voted.clone(), this.extrinsics_service.clone());
                     f.into_actor(this)
                 })
                 .map(|r, this, _| {
@@ -82,13 +84,14 @@ impl Handler<MsgStop> for GuardService {
 
 impl GuardService {
     /// New redeem service
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64, is_tech_comm_member: bool) -> Option<GuardService> {
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64, is_tech_comm_member: bool, extrinsics_service: Recipient<MsgExtrinsic>) -> Option<GuardService> {
         if is_tech_comm_member {
             Some(GuardService {
                 darwinia,
                 shadow,
                 step,
-                voted: vec![]
+                voted: vec![],
+                extrinsics_service,
             })
         } else {
             warn!("    🔒 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
@@ -96,7 +99,7 @@ impl GuardService {
         }
     }
 
-    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, voted: Vec<u64>) -> Result<Vec<u64>> {
+    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, voted: Vec<u64>, extrinsics_service: Recipient<MsgExtrinsic>) -> Result<Vec<u64>> {
         trace!("Checking pending headers...");
         let mut result = vec![];
 
@@ -121,13 +124,12 @@ impl GuardService {
 
                 // Do vote
                 let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
-                if pending_parcel.is_same_as(&parcel_from_shadow) {
-                    let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
-                    info!("Voted to approve: {}, ex hash: {:?}", pending_block_number, ex_hash);
+                let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
+                    Extrinsic::GuardVote(pending_block_number, true)
                 } else {
-                    let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
-                    info!("Voted to reject: {}, ex hash: {:?}", pending_block_number, ex_hash);
+                    Extrinsic::GuardVote(pending_block_number, false)
                 };
+                extrinsics_service.send(MsgExtrinsic(ex)).await?;
             }
 
             result.push(pending_block_number);

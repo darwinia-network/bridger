@@ -264,6 +264,7 @@ impl Darwinia {
             let leaf_index = block_number;
             let mmr_root = self.get_mmr_root(leaf_index).await?;
 
+            debug!("{}, {}, {:?}", spec_name.clone(), block_number, mmr_root);
             // scale encode & sign
             let message = _S {
 					_1: spec_name,
@@ -314,6 +315,7 @@ impl Darwinia {
         let header = self.client.header(block_hash).await?;
 
         let mmr_root = if let Some(header) = header {
+            debug!("Header for mmr root: {:?}", header);
             // get digest_item from header
             let log = header
                 .digest()
@@ -386,7 +388,7 @@ impl Darwinia {
         decoder.register_type_size::<u128>("Balance");
         decoder.register_type_size::<u128>("RingBalance");
         decoder.register_type_size::<u128>("KtonBalance");
-        decoder.register_type_size::<[u8; 20]>("EcdsaAddress");
+        decoder.register_type_size::<[u8; 20]>("EthereumAddress");
 
         let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
         for (_, raw) in raw_events {
@@ -395,7 +397,7 @@ impl Darwinia {
                     events.push(event);
                 },
                 Raw::Error(err) => {
-                    error!("{:#?}", err);
+                    error!("Error found in raw events: {:#?}", err);
                 }
             }
         }
@@ -443,4 +445,29 @@ fn test_encode() {
 		_3: [38u8, 199, 154, 103, 135, 242, 210, 106, 168, 120, 216, 232, 234, 114, 194, 69, 189, 238, 196, 220, 4, 5, 74, 15, 181, 223, 155, 200, 224, 204, 189, 1],
 	};
 	println!("{:?}", s.encode());
+}
+
+#[actix_rt::test]
+async fn test_get_block_hash() {
+    let client =
+        jsonrpsee::ws_client("ws://100.64.200.3:9944").await
+        .map_err(|e| {
+            Error::FailToConnectDarwinia {
+                url: "ws://100.64.200.3:9944".to_string(),
+                source: e
+            }
+        }).unwrap();
+
+    let client = ClientBuilder::<DarwiniaRuntime>::new()
+        .set_client(client)
+        .build()
+        .await.unwrap();
+
+    let block_hash = 
+        client
+        .block_hash(Some(BlockNumber::from(100)))
+        .await.unwrap();
+
+    println!("block hash: {:?}", block_hash);
+    // let header = self.client.header(block_hash).await.unwrap();
 }

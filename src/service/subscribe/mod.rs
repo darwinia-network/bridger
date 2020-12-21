@@ -11,11 +11,14 @@ use primitives::{
 	frame::bridge::relay_authorities::{AuthoritiesSetSigned, NewAuthorities, NewMMRRoot},
 	runtime::DarwiniaRuntime,
 };
-use std::sync::Arc;
+use std::{
+    sync::Arc
+};
 use substrate_subxt::sp_core::Decode;
 use jsonrpsee::client::Subscription;
 use substrate_subxt::RawEvent;
 use substrate_subxt::system::System;
+use std::collections::HashMap;
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
@@ -23,6 +26,7 @@ pub struct SubscribeService {
 	ethereum: Ethereum,
 	stop: bool,
 	extrinsics_service: Recipient<MsgExtrinsic>,
+    delayed_extrinsics: HashMap<u32, Extrinsic>,
 }
 
 impl SubscribeService {
@@ -37,6 +41,7 @@ impl SubscribeService {
 			ethereum,
 			stop: false,
             extrinsics_service,
+            delayed_extrinsics: HashMap::new(),
 		}
 	}
 
@@ -48,6 +53,10 @@ impl SubscribeService {
             let header = sub.next().await;
             let hash = header.hash();
             trace!("Block {}", header.number);
+
+            if let Err(err) = self.handle_delayed_extrinsics(&header).await {
+                error!("Encounter error when handle delayed extrinsics: {:#?}", err);
+            }
 
             // events
             let events = self.darwinia.get_raw_events(hash).await;
@@ -66,6 +75,21 @@ impl SubscribeService {
 		info!("💤 SERVICE STOPPED: SUBSCRIBE");
 		self.stop = true;
 	}
+
+    async fn handle_delayed_extrinsics(&mut self, header: &<DarwiniaRuntime as System>::Header) -> Result<()> {
+        let mut to_removes = vec![];
+        for (delayed_to, delayed_ex) in self.delayed_extrinsics.iter() {
+            if header.number >= *delayed_to {
+                let msg = MsgExtrinsic(delayed_ex.clone());
+                self.extrinsics_service.send(msg).await?;
+                to_removes.push(delayed_to.clone());
+            }
+        }
+        for to_remove in to_removes {
+            self.delayed_extrinsics.remove(&to_remove);
+        }
+        Ok(())
+    }
 
     async fn handle_events(&mut self, header: &<DarwiniaRuntime as System>::Header, events: Result<Vec<RawEvent>>) -> Result<()> {
         match events {
@@ -134,8 +158,7 @@ impl SubscribeService {
                     if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
                     {
                         let ex = Extrinsic::SignAndSendMmrRoot(decoded.block_number);
-                        let msg = MsgExtrinsic(ex);
-                        self.extrinsics_service.send(msg).await?;
+                            self.delayed_extrinsics.insert(decoded.block_number, ex);
                     }
 			    }
             }

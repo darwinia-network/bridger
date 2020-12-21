@@ -138,7 +138,7 @@ impl ExtrinsicsService {
             },
 
             Extrinsic::SignAndSendMmrRoot(block_number) => {
-                trace!("Sign and sending mmr_root...");
+                trace!("Start sign and send mmr_root...");
                 let ex_hash = darwinia
                     .ecdsa_sign_and_submit_signed_mmr_root(spec_name, block_number)
                     .await?;
@@ -146,7 +146,7 @@ impl ExtrinsicsService {
             },
 
             Extrinsic::SignAndSendAuthorities(message) => {
-                trace!("Sign and sending authorities...");
+                trace!("Start sign and send authorities...");
                 let ex_hash = darwinia
                     .ecdsa_sign_and_submit_signed_authorities(message)
                     .await?;

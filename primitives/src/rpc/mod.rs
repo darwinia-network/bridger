@@ -13,6 +13,18 @@ pub trait RPC {
     type Header;
     /// Transaction Receipt
     type Receipt;
+    /// Block
+    type Block;
+
+    /// Get block by block hash hex
+    async fn get_block_by_hash(&self, block: &str) -> Result<Self::Block>
+    where
+        Self: Sized;
+
+    /// Get block by block number
+    async fn get_block_by_number(&self, block: u64) -> Result<Self::Block>
+    where
+        Self: Sized;
 
     /// Get header by block hash hex
     async fn get_header_by_hash(&self, block: &str) -> Result<Self::Header>

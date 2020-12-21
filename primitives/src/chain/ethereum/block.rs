@@ -9,10 +9,10 @@ use uint::static_assertions::_core::fmt::Formatter;
 #[cfg(feature = "runtime")]
 use substrate_subxt::sp_core::bytes::to_hex;
 
-/// Raw EthereumHeader from Ethereum rpc
+/// Raw EthereumBlock from Ethereum rpc
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct EthereumHeaderRPC {
+pub struct EthereumBlockRPC {
     difficulty: String,
     extra_data: String,
     gas_limit: String,
@@ -32,12 +32,13 @@ pub struct EthereumHeaderRPC {
     state_root: String,
     timestamp: String,
     total_difficulty: String,
-    transactions: Vec<String>,
     transactions_root: String,
+    /// Block transactions
+    pub transactions: Vec<String>,
     uncles: Vec<String>,
 }
 
-impl Into<EthereumHeader> for EthereumHeaderRPC {
+impl Into<EthereumHeader> for EthereumBlockRPC {
     fn into(self) -> EthereumHeader {
         let seal: Vec<Vec<u8>> = vec![
             rlp::encode(&bytes!(self.mix_hash.as_str())),
@@ -58,7 +59,6 @@ impl Into<EthereumHeader> for EthereumHeaderRPC {
             gas_limit: U256::from_str(&self.gas_limit[2..]).unwrap_or_default(),
             difficulty: U256::from_str(&self.difficulty[2..]).unwrap_or_default(),
             seal,
-            transactions: self.transactions,
             hash: match self.hash.is_empty() {
                 true => None,
                 false => Some(bytes!(self.hash.as_str(), 32)),
@@ -85,7 +85,6 @@ pub struct EthereumHeader {
     gas_limit: U256,
     difficulty: U256,
     seal: Vec<Vec<u8>>,
-    transactions: Vec<String>,
     /// Ethereum header hash
     pub hash: Option<[u8; 32]>,
 }
@@ -114,13 +113,6 @@ impl std::fmt::Display for EthereumHeader {
                 msgs.push(format!("{:>19}{}", "", to_hex(item, false)));
             }
         }
-        for (i, item) in self.transactions.iter().enumerate() {
-            if i == 0 {
-                msgs.push(format!("{:>19}{}", "transactions: ", item));
-            } else {
-                msgs.push(format!("{:>19}{}", "", item));
-            }
-        }
         if let Some(hash) = &self.hash {
             msgs.push(format!("{:>19}{}", "hash: ", to_hex(hash, false)));
         }
@@ -146,8 +138,6 @@ pub struct EthereumHeaderJson {
     gas_limit: u128,
     difficulty: u128,
     seal: Vec<String>,
-    /// Transactions in block
-    pub transactions: Vec<String>,
     hash: String,
 }
 
@@ -172,7 +162,6 @@ impl Into<EthereumHeaderJson> for EthereumHeader {
                 .iter()
                 .map(|s| format!("0x{}", hex!(s.to_vec())))
                 .collect(),
-            transactions: self.transactions,
             hash: format!("0x{}", hex!(self.hash.unwrap_or_default().to_vec())),
         }
     }
@@ -195,7 +184,6 @@ impl Into<EthereumHeader> for EthereumHeaderJson {
             gas_limit: U256::from(self.gas_limit),
             difficulty: U256::from(self.difficulty),
             seal: self.seal.iter().map(|s| bytes!(s.as_str())).collect(),
-            transactions: self.transactions,
             hash: Some(bytes!(self.hash.as_str(), 32)),
         }
     }

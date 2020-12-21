@@ -1,12 +1,15 @@
 //! Ethereum receipt
 use crate::{
-    array::{H1024, U256},
     bytes,
     chain::ethereum::{EthereumHeader, EthereumHeaderJson, MMRProof, MMRProofJson},
     hex,
 };
 use codec::{Decode, Encode};
 use serde::Deserialize;
+use std::{fmt::Debug};
+use rlp::{RlpStream, Encodable};
+use primitive_types::{H256, H160};
+use ethbloom::{Bloom};
 
 /// Redeem for
 #[derive(Clone, Debug, Encode, PartialEq, Eq)]
@@ -113,9 +116,9 @@ impl Into<EthereumReceiptProofThing> for EthereumReceiptProofThingJson {
 #[derive(Clone, PartialEq, Eq, Encode, Decode, Debug)]
 pub struct LogEntry {
     /// The address of the contract executing at the point of the `LOG` operation.
-    pub address: [u8; 20],
+    pub address: H160,
     /// The topics associated with the `LOG` operation.
-    pub topics: Vec<[u8; 32]>,
+    pub topics: Vec<H256>,
     /// The data associated with the `LOG` operation.
     pub data: Vec<u8>,
 }
@@ -126,7 +129,7 @@ pub enum TransactionOutcome {
     /// Status and state root are unknown under EIP-98 rules.
     Unknown,
     /// State root is known. Pre EIP-98 and EIP-658 rules.
-    StateRoot([u8; 32]),
+    StateRoot(H256),
     /// Status code is known. EIP-658 rules.
     StatusCode(u8),
 }
@@ -135,11 +138,100 @@ pub enum TransactionOutcome {
 #[derive(Clone, PartialEq, Eq, Encode, Decode, Debug)]
 pub struct EthereumReceipt {
     /// The total gas used in the block following execution of the transaction.
-    pub gas_used: U256,
+    pub gas_used: u64,
     /// The OR-wide combination of all logs' blooms for this transaction.
-    pub log_bloom: H1024,
+    pub log_bloom: Bloom,
     /// The logs stemming from this transaction.
     pub logs: Vec<LogEntry>,
     /// Transaction outcome.
     pub outcome: TransactionOutcome,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LogJson {
+    address: String,
+    topics: Vec<String>,
+    data: String,
+}
+
+/// Ethereum rsp response body
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct EthReceiptBody {
+    /// the block hash
+    pub block_hash: String,
+    block_number: String,
+    cumulative_gas_used: String,
+    from: String,
+    gas_used: String,
+    logs: Vec<LogJson>,
+    logs_bloom: String,
+    #[serde(alias = "root")]
+    status: String,
+    to: String,
+    transaction_hash: String,
+    /// the transaction index
+    pub transaction_index: String,
+}
+
+impl Into<EthereumReceipt> for EthReceiptBody {
+    fn into(self) -> EthereumReceipt {
+        EthereumReceipt {
+            gas_used: u64::from_str_radix(&self.cumulative_gas_used.as_str()[2..], 16).unwrap_or_default(),
+            log_bloom: Bloom::from(bytes!(self.logs_bloom.as_str(), 256)),
+            logs: self
+                .logs
+                .iter()
+                .map(|l|->LogEntry {
+                    LogEntry {
+                        address: H160::from(bytes!(l.address.as_str(), 20)),
+                        topics:
+                            l
+                            .topics
+                            .iter()
+                            .map(|t|H256::from(bytes!(t.as_str(), 32)))
+                            .collect(),
+                        data: bytes!(l.data.as_str()),
+                    }
+                }).collect(),
+                outcome: {
+                    if self.status.len() == 66 {
+                        TransactionOutcome::StateRoot(H256::from(bytes!(self.status.as_str(), 32)))
+                    } else {
+                        TransactionOutcome::StatusCode(u8::from_str_radix(&self.status.as_str()[2..], 16).unwrap_or(0))
+                    }
+                }
+        }
+    }
+}
+
+impl Encodable for LogEntry {
+    fn rlp_append(&self, s: &mut RlpStream) {
+        s.begin_list(3);
+        s.append(&self.address);
+        s.append_list(&self.topics);
+        s.append_list(&self.data);
+    }
+}
+
+impl Encodable for EthereumReceipt {
+    fn rlp_append(&self, s: &mut RlpStream) {
+        match self.outcome {
+            TransactionOutcome::Unknown => {
+                s.begin_list(3);
+            }
+            TransactionOutcome::StateRoot(ref root) => {
+                s.begin_list(4);
+                s.append(root);
+            }
+            TransactionOutcome::StatusCode(ref status_code) => {
+                s.begin_list(4);
+                s.append(status_code);
+            }
+        }
+        s.append(&self.gas_used);
+        s.append(&self.log_bloom);
+        s.append_list(&self.logs);
+    }
+}
+

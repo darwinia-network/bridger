@@ -1,7 +1,7 @@
 //! Ethereum types
 // mod confirmation;
 mod ethash;
-mod header;
+mod block;
 mod mmr;
 mod parcel;
 mod proof;
@@ -9,12 +9,12 @@ mod receipt;
 
 pub use self::{
     ethash::{EthashProof, EthashProofJson},
-    header::{EthereumHeader, EthereumHeaderJson, EthereumHeaderRPC},
+    block::{EthereumHeader, EthereumHeaderJson, EthereumBlockRPC},
     mmr::{MMRProof, MMRProofJson, MMRRoot, MMRRootJson},
     parcel::{EthereumRelayHeaderParcel, EthereumRelayHeaderParcelJson},
     proof::{EthereumRelayProofs, EthereumRelayProofsJson},
     receipt::{
-        EthereumReceipt, EthereumReceiptProof, EthereumReceiptProofJson, EthereumReceiptProofThing,
+        EthereumReceipt, EthReceiptBody, EthereumReceiptProof, EthereumReceiptProofJson, EthereumReceiptProofThing,
         EthereumReceiptProofThingJson, RedeemFor,
     },
 };

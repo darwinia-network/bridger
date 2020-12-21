@@ -1,15 +1,15 @@
 //! Ethereum rpcs
-use crate::{chain::ethereum::EthereumHeaderRPC, result::Result};
+use crate::{chain::ethereum::EthereumBlockRPC, result::Result};
 use reqwest::Client;
 use serde_json::Value;
 
 /// Ethereum JSON rpc response
 #[derive(Serialize, Deserialize, Debug)]
-pub struct EthHeaderRPCResp {
+pub struct EthBlockRPCResp {
     jsonrpc: String,
     id: i32,
     /// Header Result of RPC
-    pub result: EthereumHeaderRPC,
+    pub result: EthereumBlockRPC,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -20,9 +20,9 @@ pub struct EthSyncingRPCResp {
     pub result: Value,
 }
 
-impl EthHeaderRPCResp {
+impl EthBlockRPCResp {
     /// Get `EthHeader` by number
-    pub async fn get_by_hash(client: &Client, rpc: &str, block: &str) -> Result<EthHeaderRPCResp> {
+    pub async fn get_by_hash(client: &Client, rpc: &str, block: &str) -> Result<EthBlockRPCResp> {
         let map: Value = serde_json::from_str(&format! {
             "{{{}}}", vec![
                 r#""jsonrpc":"2.0","#,
@@ -36,7 +36,7 @@ impl EthHeaderRPCResp {
     }
 
     /// Get `EthHeader` by number
-    pub async fn get(client: &Client, rpc: &str, block: u64) -> Result<EthHeaderRPCResp> {
+    pub async fn get(client: &Client, rpc: &str, block: u64) -> Result<EthBlockRPCResp> {
         let map: Value = serde_json::from_str(&format! {
             "{{{}}}", vec![
                 r#""jsonrpc":"2.0","#,
@@ -50,7 +50,7 @@ impl EthHeaderRPCResp {
     }
 
     /// Get ethereum block number
-    pub async fn latest(client: &Client, rpc: &str) -> Result<EthHeaderRPCResp> {
+    pub async fn latest(client: &Client, rpc: &str) -> Result<EthBlockRPCResp> {
         let map: Value = serde_json::from_str(&format! {
             "{{{}}}", vec![
                 r#""jsonrpc":"2.0","#,

@@ -9,10 +9,10 @@ use uint::static_assertions::_core::fmt::Formatter;
 #[cfg(feature = "runtime")]
 use substrate_subxt::sp_core::bytes::to_hex;
 
-/// Raw EthereumHeader from Ethereum rpc
+/// Raw EthereumBlock from Ethereum rpc
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct EthereumHeaderRPC {
+pub struct EthereumBlockRPC {
     difficulty: String,
     extra_data: String,
     gas_limit: String,
@@ -32,12 +32,13 @@ pub struct EthereumHeaderRPC {
     state_root: String,
     timestamp: String,
     total_difficulty: String,
-    transactions: Vec<String>,
     transactions_root: String,
+    /// Block transactions
+    pub transactions: Vec<String>,
     uncles: Vec<String>,
 }
 
-impl Into<EthereumHeader> for EthereumHeaderRPC {
+impl Into<EthereumHeader> for EthereumBlockRPC {
     fn into(self) -> EthereumHeader {
         let seal: Vec<Vec<u8>> = vec![
             rlp::encode(&bytes!(self.mix_hash.as_str())),

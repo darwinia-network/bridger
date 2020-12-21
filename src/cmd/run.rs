@@ -136,19 +136,11 @@ async fn start_services(
 
     //
     let ethereum = Ethereum::new(web3.clone(), &config.clone())?;
-    let mut subscribe = match SubscribeService::new(
+    let mut subscribe = SubscribeService::new(
         darwinia.clone(),
         ethereum,
         extrinsics_service.clone().recipient(),
-    ).await
-    {
-        Ok(subscribe) => {
-            subscribe
-        },
-        Err(e) => {
-            return Err(e);
-        }
-    };
+    );
     let b = async {
         if let Err(e) = subscribe.start().await {
             return Err(e);

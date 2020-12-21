@@ -12,21 +12,18 @@ use primitives::{
                 Redeem,
                 RedeemCallExt,
                 VerifiedProofStoreExt,
-                EthereumBackingEventsDecoder
             },
-            game::{AffirmationsStoreExt, EthereumRelayerGame, EthereumRelayerGameEventsDecoder},
+            game::{AffirmationsStoreExt, EthereumRelayerGame,},
             relay::{
                 Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
                 PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
                 VotePendingRelayHeaderParcelCallExt,
                 VotePendingRelayHeaderParcel,
-                EthereumRelayEventsDecoder
             },
         },
         proxy::ProxyCallExt,
         sudo::SudoCallExt,
         bridge::relay_authorities::{
-            EthereumRelayAuthoritiesEventsDecoder,
             SubmitSignedAuthorities,
             SubmitSignedAuthoritiesCallExt,
             SubmitSignedMmrRoot,
@@ -36,12 +33,14 @@ use primitives::{
     runtime::{DarwiniaRuntime, EcdsaMessage},
 };
 use std::collections::HashMap;
-use substrate_subxt::{system::System, BlockNumber, Client, ClientBuilder, EventSubscription, EventsDecoder};
-use web3::types::H256;
+use substrate_subxt::{system::System, BlockNumber, Client, ClientBuilder, EventsDecoder, RawEvent};
 use crate::error::BizError;
 use crate::api::darwinia_sender::DarwiniaSender;
 use parity_scale_codec::Encode;
 use substrate_subxt::sp_runtime::traits::Header;
+use substrate_subxt::sp_core::{twox_128, H256};
+use substrate_subxt::sp_core::storage::{StorageKey, StorageData};
+use substrate_subxt::events::Raw;
 
 // Types
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
@@ -266,14 +265,12 @@ impl Darwinia {
             let mmr_root = self.get_mmr_root(leaf_index).await?;
 
             // scale encode & sign
-            let encoded = {
-				_S {
+            let message = _S {
 					_1: spec_name,
 					_2: block_number,
 					_3: mmr_root
-				}
-				.encode()
-			};
+				};
+			let encoded = message.encode();
 
             let hash = web3::signing::keccak256(&encoded);
             let signature = self.sender.ecdsa_sign(&hash)?;
@@ -379,20 +376,50 @@ impl Darwinia {
         false
     }
 
-    /// Build event subscription
-    pub async fn build_event_subscription(&self) -> Result<EventSubscription<DarwiniaRuntime>> {
-        let scratch = self.client.subscribe_events().await?;
+    /// get_raw_events
+    pub async fn get_raw_events(&self, header_hash: H256) -> Result<Vec<RawEvent>> {
+        let mut events = vec![];
+
+        let storage_data = self.get_storage_data("System", "Events", header_hash).await?;
+
         let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(self.client.metadata().clone());
+        decoder.register_type_size::<u128>("Balance");
+        decoder.register_type_size::<u128>("RingBalance");
+        decoder.register_type_size::<u128>("KtonBalance");
+        decoder.register_type_size::<[u8; 20]>("EcdsaAddress");
 
-        // Register decoders
-        decoder.with_ethereum_backing();
-        decoder.with_ethereum_relayer_game();
-        decoder.with_ethereum_relay();
-        decoder.with_ethereum_relay_authorities();
+        let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
+        for (_, raw) in raw_events {
+            match raw {
+                Raw::Event(event) => {
+                    events.push(event);
+                },
+                Raw::Error(err) => {
+                    error!("{:#?}", err);
+                }
+            }
+        }
 
-        // Build subscriber
-        let sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
-        Ok(sub)
+        Ok(events)
+    }
+
+    /// get_storage_data
+    pub async fn get_storage_data(&self, module_name: &str, storage_name: &str, header_hash: H256) -> Result<StorageData> {
+        let mut storage_key = twox_128(module_name.as_bytes()).to_vec();
+        storage_key.extend(twox_128(storage_name.as_bytes()).to_vec());
+
+        let keys = vec![StorageKey(storage_key)];
+
+        let change_sets = self.client.query_storage(keys, header_hash, Some(header_hash)).await?;
+        for change_set in change_sets {
+            for (_key, data) in change_set.changes {
+                if let Some(data) = data {
+                    return Ok(data)
+                }
+            }
+        }
+        
+        Err(anyhow::anyhow!("StorageData not found"))
     }
 }
 #[derive(Encode)]

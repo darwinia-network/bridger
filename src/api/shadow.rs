@@ -56,7 +56,7 @@ impl Shadow {
             Err(Error::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let json: MMRRootJson = resp.json()
-                .await.context(format!("Fail to parse json to MMRRootJson: {}", url).to_string())?;
+                .await.context(format!("Fail to parse json to MMRRootJson: {}", url))?;
             let result = json.into();
             if result == MMRRoot::default() {
                 Err(BizError::BlankEthereumMmrRoot(leaf_index).into())

@@ -12,6 +12,7 @@ mod keys;
 mod run;
 mod show_parcel;
 mod set_start;
+mod ecdsa;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -67,6 +68,12 @@ enum Opt {
         #[structopt(short, long)]
         block: u64,
     },
+    /// Ecdsa sign and send
+    Ecdsa {
+        /// The new ethereum start
+        #[structopt(short, long)]
+        message: String,
+    },
 }
 
 /// Exec commands
@@ -82,6 +89,7 @@ pub async fn exec() -> Result<()> {
         Opt::Affirmations => affirmations::exec().await?,
         Opt::Guard => guard::exec().await?,
         Opt::SetStart { data_dir, block }  => set_start::exec(data_dir, block).await?,
+        Opt::Ecdsa { message }  => ecdsa::exec(message).await?,
     }
 
     Ok(())

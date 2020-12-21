@@ -13,51 +13,53 @@ use primitives::{
 };
 use std::sync::Arc;
 use substrate_subxt::sp_core::Decode;
-use substrate_subxt::EventSubscription;
+use jsonrpsee::client::Subscription;
+use substrate_subxt::RawEvent;
+use substrate_subxt::system::System;
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
     darwinia: Arc<Darwinia>,
-	sub: EventSubscription<DarwiniaRuntime>,
 	ethereum: Ethereum,
 	stop: bool,
 	extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
 impl SubscribeService {
-	/// New redeem service
-	pub async fn new(
+	/// New subscribe service
+	pub fn new(
 		darwinia: Arc<Darwinia>,
 		ethereum: Ethereum,
 		extrinsics_service: Recipient<MsgExtrinsic>,
-	) -> Result<SubscribeService> {
-        let sub = darwinia.build_event_subscription().await?;
-		Ok(SubscribeService {
+	) -> SubscribeService {
+		SubscribeService {
             darwinia,
-			sub,
 			ethereum,
 			stop: false,
             extrinsics_service,
-		})
-	}
-
-	/// start
-	pub async fn start(&mut self) -> Result<SubscribeService> {
-		info!("✨ SERVICE STARTED: SUBSCRIBE");
-		loop {
-			if let Err(e) = self.process_next_event().await {
-				if e.to_string() == "CodeUpdated" {
-					self.stop();
-					return Err(e);
-				} else {
-					error!("{:#?}", e);
-				}
-			}
-			if self.stop {
-				return Err(BizError::Bridger("Force stop".to_string()).into());
-			}
 		}
 	}
+
+    /// start
+    pub async fn start(&mut self) -> Result<()> {
+        let mut sub: Subscription<<DarwiniaRuntime as System>::Header> = self.darwinia.client.subscribe_finalized_blocks().await?;
+        info!("✨ SERVICE STARTED: SUBSCRIBE");
+        loop {
+            let header = sub.next().await;
+            let hash = header.hash();
+            trace!("Block {}", header.number);
+
+            // events
+            let events = self.darwinia.get_raw_events(hash).await;
+            if let Err(err) = self.handle_events(&header, events).await {
+                error!("Encounter error when handle events of block {}: {:#?}", header.number, err);
+            }
+
+            if self.stop {
+                return Err(BizError::Bridger("Force stop".to_string()).into());
+            }
+        }
+    }
 
 	/// stop
 	pub fn stop(&mut self) {
@@ -65,24 +67,27 @@ impl SubscribeService {
 		self.stop = true;
 	}
 
-	/// process_next_event
-	async fn process_next_event(&mut self) -> Result<()> {
-		if let Some(raw) = self.sub.next().await {
-            match raw {
-                Ok(event) => {
-                    self.handle_event(&event.module, &event.variant, event.data)
-                        .await?;
-                },
-                Err(err) => {
-                    return Err(err.into()); 
+    async fn handle_events(&mut self, header: &<DarwiniaRuntime as System>::Header, events: Result<Vec<RawEvent>>) -> Result<()> {
+        match events {
+            Ok(events) => {
+                for event in events {
+                    let module = event.module.as_str();
+                    let variant = event.variant.as_str();
+                    let event_data = event.data;
+
+                    self.handle_event(header, module, variant, event_data).await?;
                 }
+            },
+            Err(err) => {
+                error!("{:#?}", err);
             }
         }
-		Ok(())
-	}
+        Ok(())
+    }
 
 	async fn handle_event(
 		&mut self,
+        _header: &<DarwiniaRuntime as System>::Header,
 		module: &str,
 		variant: &str,
 		event_data: Vec<u8>,

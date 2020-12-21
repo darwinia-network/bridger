@@ -4608,7 +4608,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.13.0"
-source = "git+https://github.com/AurevoirXavier/substrate-subxt?branch=xavier-send-error#e16b5da188fd9baaa3b32555fa1babadbcc95011"
+source = "git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error#ef03e498003c9197e9380739378588fef6312983"
 dependencies = [
  "frame-metadata",
  "frame-support",
@@ -4634,7 +4634,7 @@ dependencies = [
  "sp-std",
  "sp-transaction-pool",
  "sp-version",
- "substrate-subxt-proc-macro 0.13.0 (git+https://github.com/AurevoirXavier/substrate-subxt?branch=xavier-send-error)",
+ "substrate-subxt-proc-macro 0.13.0 (git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error)",
  "thiserror",
  "url 2.1.1",
 ]
@@ -4657,7 +4657,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.13.0"
-source = "git+https://github.com/AurevoirXavier/substrate-subxt?branch=xavier-send-error#e16b5da188fd9baaa3b32555fa1babadbcc95011"
+source = "git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error#ef03e498003c9197e9380739378588fef6312983"
 dependencies = [
  "heck",
  "proc-macro-crate",
@@ -5085,7 +5085,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.7.3",
+ "rand 0.3.23",
  "static_assertions",
 ]
 

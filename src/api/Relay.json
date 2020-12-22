@@ -42,25 +42,6 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      }
-    ],
-    "name": "ResetLatestIndexEvent",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": false,
         "internalType": "bytes32",
         "name": "root",
         "type": "bytes32"
@@ -142,49 +123,6 @@
     "inputs": [
       {
         "internalType": "bytes",
-        "name": "prefix",
-        "type": "bytes"
-      }
-    ],
-    "name": "_checkNetworkPrefix",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "index",
-        "type": "uint32"
-      }
-    ],
-    "name": "_getMMRRoot",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "hash",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes",
         "name": "message",
         "type": "bytes"
       },
@@ -202,13 +140,51 @@
   {
     "inputs": [
       {
+        "internalType": "bytes",
+        "name": "prefix",
+        "type": "bytes"
+      }
+    ],
+    "name": "checkNetworkPrefix",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "nonce",
+        "type": "uint32"
+      }
+    ],
+    "name": "checkRelayerNonce",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "root",
         "type": "bytes32"
       },
       {
         "internalType": "bytes",
-        "name": "proofstr",
+        "name": "eventsProofStr",
         "type": "bytes"
       },
       {
@@ -223,6 +199,90 @@
         "internalType": "bytes",
         "name": "",
         "type": "bytes"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "index",
+        "type": "uint32"
+      }
+    ],
+    "name": "getMMRRoot",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getNetworkPrefix",
+    "outputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRelayer",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRelayerCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRelayerNonce",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRelayerThreshold",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "stateMutability": "view",
@@ -267,13 +327,19 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "latestIndex",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "isRelayer",
     "outputs": [
       {
-        "internalType": "uint32",
+        "internalType": "bool",
         "name": "",
-        "type": "uint32"
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -293,19 +359,6 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "networkPrefix",
-    "outputs": [
-      {
-        "internalType": "bytes",
-        "name": "",
-        "type": "bytes"
       }
     ],
     "stateMutability": "view",
@@ -354,12 +407,30 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "index",
-        "type": "uint32"
+        "internalType": "bytes",
+        "name": "_prefix",
+        "type": "bytes"
       }
     ],
-    "name": "resetLatestIndex",
+    "name": "resetNetworkPrefix",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "nonce",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address[]",
+        "name": "accounts",
+        "type": "address[]"
+      }
+    ],
+    "name": "resetRelayer",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -404,11 +475,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "hash",
-        "type": "bytes32"
-      },
       {
         "internalType": "bytes",
         "name": "message",
@@ -508,7 +574,7 @@
       },
       {
         "internalType": "bytes",
-        "name": "proofstr",
+        "name": "eventsProofStr",
         "type": "bytes"
       },
       {

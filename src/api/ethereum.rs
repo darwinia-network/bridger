@@ -2,15 +2,12 @@
 use crate::{error::Result, Config};
 
 use web3::contract::{Contract, Options};
-use web3::types::{Address, H160};
+use web3::types::{Address, H160, H256};
 use web3::Web3;
 use web3::transports::Http;
 use web3::signing::SecretKeyRef;
 use secp256k1::SecretKey;
-use crate::api::darwinia::AccountId;
 use primitives::runtime::EcdsaSignature;
-use web3::contract::tokens::Tokenize;
-use primitives::runtime::EcdsaAddress;
 
 /// Ethereum
 pub struct Ethereum {
@@ -34,8 +31,68 @@ impl Ethereum {
         })
     }
 
+    /// resetRelayer
+    pub async fn reset_relayer(&self) -> Result<()> {
+
+        let key_ref = SecretKeyRef::new(&self.secret_key);
+        let contract = Contract::from_json(
+            self.web3.eth(),
+            self.relay_contract_address,
+            include_bytes!("Relay.json"),
+        )?;
+        contract.signed_call_with_confirmations(
+            "resetRelayer",
+            (1, vec![Address::from_low_u64_be(1), Address::from_low_u64_be(2)]),
+            Options::default(),
+            1,
+            key_ref
+        ).await?;
+
+        Ok(())
+    }
+
+    /// resetNetworkPrefix
+    pub async fn reset_network_prefix(&self, message: Vec<u8>) -> Result<()> {
+
+        let key_ref = SecretKeyRef::new(&self.secret_key);
+        let contract = Contract::from_json(
+            self.web3.eth(),
+            self.relay_contract_address,
+            include_bytes!("Relay.json"),
+        )?;
+        contract.signed_call_with_confirmations(
+            "resetNetworkPrefix",
+            message,
+            Options::default(),
+            12,
+            key_ref
+        ).await?;
+
+        Ok(())
+    }
+
+    /// resetRoot
+    pub async fn reset_root(&self, index: u32, root: H256) -> Result<()> {
+
+        let key_ref = SecretKeyRef::new(&self.secret_key);
+        let contract = Contract::from_json(
+            self.web3.eth(),
+            self.relay_contract_address,
+            include_bytes!("Relay.json"),
+        )?;
+        contract.signed_call_with_confirmations(
+            "resetRoot",
+            (index, root),
+            Options::default(),
+            1,
+            key_ref
+        ).await?;
+
+        Ok(())
+    }
+
     /// submit_authorities_set
-    pub async fn submit_authorities_set(&self, new_authorities: Vec<EcdsaAddress>, signatures: Vec<(AccountId, EcdsaSignature)>) -> Result<()> {
+    pub async fn submit_authorities_set(&self, message: Vec<u8>, signatures: Vec<EcdsaSignature>) -> Result<()> {
         if let Some(benefit) = &self.benefit {
             let key_ref = SecretKeyRef::new(&self.secret_key);
 
@@ -45,24 +102,25 @@ impl Ethereum {
                 include_bytes!("Relay.json"),
             )?;
 
-            let message = new_authorities
-                .iter()
-                .map(|authority| authority.to_vec())
-                .collect::<Vec<_>>()
-                .join(&[][..]);
-
             // signatures
             let signature_list = signatures
                 .iter()
-                .map(|item| item.1.0.to_vec())
+                .map(|item| item.0.to_vec() )
                 .collect::<Vec<_>>();
 
             // benefit account id
             let benefit = hex::decode(&benefit[2..])?;
+            let mut benefit_buffer = [0u8; 32];
+            benefit_buffer.copy_from_slice(&benefit);
 
-            let input = (message, signature_list, benefit);
-            println!("{:?}", input.clone().into_tokens());
+            // debug
+            debug!("message: 0x{}", hex::encode(message.clone()));
+            for signature in signature_list.clone() {
+                debug!("signature: 0x{}", hex::encode(signature));
+            }
+            debug!("benefit: 0x{}", hex::encode(benefit_buffer));
 
+            let input = (message, signature_list, benefit_buffer);
             contract.signed_call_with_confirmations(
                 "updateRelayer",
                 input,

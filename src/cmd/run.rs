@@ -107,7 +107,7 @@ async fn start_services(
     info!("🌱 Relay from ethereum block: {}", ethereum_start);
 
     // extrinsic sender
-    let extrinsics_service = ExtrinsicsService::new(darwinia.clone(), spec_name, data_dir.clone()).start();
+    let extrinsics_service = ExtrinsicsService::new(darwinia.clone(), spec_name.clone(), data_dir.clone()).start();
 
     // relay service
     let last_confirmed = darwinia.last_confirmed().await.unwrap();
@@ -140,6 +140,7 @@ async fn start_services(
         darwinia.clone(),
         ethereum,
         extrinsics_service.clone().recipient(),
+        spec_name
     );
     let b = async {
         if let Err(e) = subscribe.start().await {

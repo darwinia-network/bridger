@@ -27,6 +27,7 @@ pub struct SubscribeService {
 	stop: bool,
 	extrinsics_service: Recipient<MsgExtrinsic>,
     delayed_extrinsics: HashMap<u32, Extrinsic>,
+    spec_name: String,
 }
 
 impl SubscribeService {
@@ -35,6 +36,7 @@ impl SubscribeService {
 		darwinia: Arc<Darwinia>,
 		ethereum: Ethereum,
 		extrinsics_service: Recipient<MsgExtrinsic>,
+        spec_name: String,
 	) -> SubscribeService {
 		SubscribeService {
             darwinia,
@@ -42,6 +44,7 @@ impl SubscribeService {
 			stop: false,
             extrinsics_service,
             delayed_extrinsics: HashMap::new(),
+            spec_name,
 		}
 	}
 
@@ -82,7 +85,7 @@ impl SubscribeService {
             if header.number >= *delayed_to {
                 let msg = MsgExtrinsic(delayed_ex.clone());
                 self.extrinsics_service.send(msg).await?;
-                to_removes.push(delayed_to.clone());
+                to_removes.push(*delayed_to);
             }
         }
         for to_remove in to_removes {
@@ -92,19 +95,12 @@ impl SubscribeService {
     }
 
     async fn handle_events(&mut self, header: &<DarwiniaRuntime as System>::Header, events: Result<Vec<RawEvent>>) -> Result<()> {
-        match events {
-            Ok(events) => {
-                for event in events {
-                    let module = event.module.as_str();
-                    let variant = event.variant.as_str();
-                    let event_data = event.data;
+        for event in events? {
+            let module = event.module.as_str();
+            let variant = event.variant.as_str();
+            let event_data = event.data;
 
-                    self.handle_event(header, module, variant, event_data).await?;
-                }
-            },
-            Err(err) => {
-                error!("{:#?}", err);
-            }
+            self.handle_event(header, module, variant, event_data).await?;
         }
         Ok(())
     }
@@ -144,9 +140,11 @@ impl SubscribeService {
 				if let Ok(decoded) =
 					AuthoritiesSetSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
 				{
+                    let signatures = decoded.signatures.iter().map(|s| s.1.clone()).collect::<Vec<_>>();
+                    let message = Darwinia::construct_ethereum_message(self.spec_name.clone(), decoded.term, decoded.new_authorities);
 					self.ethereum.submit_authorities_set(
-                        decoded.new_authorities,
-						decoded.signatures,
+                        message,
+						signatures,
 					).await?;
                     info!("Authorities submitted to ethereum");
 				}
@@ -158,7 +156,7 @@ impl SubscribeService {
                     if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
                     {
                         let ex = Extrinsic::SignAndSendMmrRoot(decoded.block_number);
-                            self.delayed_extrinsics.insert(decoded.block_number, ex);
+                        self.delayed_extrinsics.insert(decoded.block_number, ex);
                     }
 			    }
             }

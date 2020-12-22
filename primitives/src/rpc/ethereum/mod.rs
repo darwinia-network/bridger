@@ -1,12 +1,13 @@
 //! Ethereum RPC calls
-mod header;
+mod block;
+mod receipt;
 
-use crate::{chain::ethereum::EthereumHeader, result::{Result, Error}, rpc::RPC};
+use crate::{chain::ethereum::{EthereumHeader, EthReceiptBody, EthereumBlockRPC}, result::{Result, Error}, rpc::RPC};
 use async_trait::async_trait;
 use reqwest::Client;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-pub use self::header::EthHeaderRPCResp;
+pub use self::block::EthBlockRPCResp;
 
 /// Ethereum rpc set
 pub struct EthereumRPC {
@@ -58,31 +59,56 @@ impl EthereumRPC {
 #[async_trait]
 impl RPC for EthereumRPC {
     type Header = EthereumHeader;
+    type Receipt = EthReceiptBody;
+    type Block = EthereumBlockRPC;
 
-    async fn get_header_by_hash(&self, block: &str) -> Result<Self::Header> {
+    async fn get_block_by_hash(&self, block: &str) -> Result<Self::Block> {
         Ok(
-            header::EthHeaderRPCResp::get_by_hash(&self.client, &self.rpc(), block)
+            EthBlockRPCResp::get_by_hash(&self.client, &self.rpc(), block)
                 .await?
                 .result
-                .into(),
         )
     }
 
-    async fn get_header_by_number(&self, block: u64) -> Result<Self::Header> {
-        let result = header::EthHeaderRPCResp::get(&self.client, &self.rpc(), block)
+    async fn get_block_by_number(&self, block: u64) -> Result<Self::Block> {
+        let result = EthBlockRPCResp::get(&self.client, &self.rpc(), block)
             .await;
         result
-            .map(|resp| resp.result.into())
+            .map(|resp| resp.result)
             .map_err(|err|
                 Error::FailToGetEthereumHeader(format!("{:?}", err), block)
             )
     }
 
+    async fn get_header_by_hash(&self, block: &str) -> Result<Self::Header> {
+        Ok (
+            self.get_block_by_hash(block)
+                .await?
+                .into()
+        )
+    }
+
+    async fn get_header_by_number(&self, block: u64) -> Result<Self::Header> {
+        Ok (
+            self.get_block_by_number(block)
+                .await?
+                .into()
+        )
+    }
+
+    async fn get_receipt(&self, txhash: &str) -> Result<Self::Receipt> {
+        Ok(
+            receipt::EthReceiptRPCResp::get(&self.client, &self.rpc(), txhash)
+                .await?
+                .result,
+        )
+    }
+
     async fn block_number(&self) -> Result<u64> {
-        let v: serde_json::Value = header::EthHeaderRPCResp::syncing(&self.client, &self.rpc()).await?.result;
+        let v: serde_json::Value = EthBlockRPCResp::syncing(&self.client, &self.rpc()).await?.result;
         match v {
             serde_json::Value::Bool(false) => {
-                let header: Self::Header  = header::EthHeaderRPCResp::latest(&self.client, &self.rpc())
+                let header: Self::Header  = EthBlockRPCResp::latest(&self.client, &self.rpc())
                     .await?
                     .result
                     .into();
@@ -97,7 +123,7 @@ impl RPC for EthereumRPC {
                 )
             },
             _ => {
-                let header: Self::Header  = header::EthHeaderRPCResp::latest(&self.client, &self.rpc())
+                let header: Self::Header  = EthBlockRPCResp::latest(&self.client, &self.rpc())
                     .await?
                     .result
                     .into();

@@ -2,7 +2,7 @@
 use crate::{error::Result, Config};
 
 use web3::contract::{Contract, Options};
-use web3::types::{Address, H160, H256};
+use web3::types::{Address, H160};
 use web3::Web3;
 use web3::transports::Http;
 use web3::signing::SecretKeyRef;
@@ -29,66 +29,6 @@ impl Ethereum {
             secret_key,
             benefit: config.darwinia_to_ethereum.benefit.clone(),
         })
-    }
-
-    /// resetRelayer
-    pub async fn reset_relayer(&self) -> Result<()> {
-
-        let key_ref = SecretKeyRef::new(&self.secret_key);
-        let contract = Contract::from_json(
-            self.web3.eth(),
-            self.relay_contract_address,
-            include_bytes!("Relay.json"),
-        )?;
-        contract.signed_call_with_confirmations(
-            "resetRelayer",
-            (1, vec![Address::from_low_u64_be(1), Address::from_low_u64_be(2)]),
-            Options::default(),
-            1,
-            key_ref
-        ).await?;
-
-        Ok(())
-    }
-
-    /// resetNetworkPrefix
-    pub async fn reset_network_prefix(&self, message: Vec<u8>) -> Result<()> {
-
-        let key_ref = SecretKeyRef::new(&self.secret_key);
-        let contract = Contract::from_json(
-            self.web3.eth(),
-            self.relay_contract_address,
-            include_bytes!("Relay.json"),
-        )?;
-        contract.signed_call_with_confirmations(
-            "resetNetworkPrefix",
-            message,
-            Options::default(),
-            12,
-            key_ref
-        ).await?;
-
-        Ok(())
-    }
-
-    /// resetRoot
-    pub async fn reset_root(&self, index: u32, root: H256) -> Result<()> {
-
-        let key_ref = SecretKeyRef::new(&self.secret_key);
-        let contract = Contract::from_json(
-            self.web3.eth(),
-            self.relay_contract_address,
-            include_bytes!("Relay.json"),
-        )?;
-        contract.signed_call_with_confirmations(
-            "resetRoot",
-            (index, root),
-            Options::default(),
-            1,
-            key_ref
-        ).await?;
-
-        Ok(())
     }
 
     /// submit_authorities_set

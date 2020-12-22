@@ -784,7 +784,7 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridge-primitives"
-version = "0.1.13"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "ethbloom 0.8.1",
@@ -805,7 +805,7 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridger"
-version = "0.1.13"
+version = "0.2.0"
 dependencies = [
  "actix",
  "actix-rt",

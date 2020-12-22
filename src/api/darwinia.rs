@@ -402,6 +402,11 @@ impl Darwinia {
         decoder.register_type_size::<u128>("RingBalance");
         decoder.register_type_size::<u128>("KtonBalance");
         decoder.register_type_size::<[u8; 20]>("EthereumAddress");
+        decoder.register_type_size::<[u8; 20]>("EcdsaAddress");
+        decoder.register_type_size::<H256>("MMRRoot");
+        decoder.register_type_size::<[u8; 32]>("RelayAuthorityMessage");
+        decoder.register_type_size::<[u8; 20]>("RelayAuthoritySigner");
+        decoder.register_type_size::<EcdsaSignature>("RelayAuthoritySignature");
 
         let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
         for (_, raw) in raw_events {

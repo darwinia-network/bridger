@@ -30,7 +30,7 @@ use primitives::{
             SubmitSignedMmrRootCallExt,
         }
     },
-    runtime::{DarwiniaRuntime, EcdsaMessage},
+    runtime::{DarwiniaRuntime, EcdsaMessage, EcdsaSignature, EcdsaAddress},
 };
 use std::collections::HashMap;
 use substrate_subxt::{system::System, BlockNumber, Client, ClientBuilder, EventsDecoder, RawEvent};
@@ -251,6 +251,19 @@ impl Darwinia {
         } else {
             Err(BizError::Bridger("Not authority".to_string()).into())
         }
+    }
+
+    /// construct_message
+    pub fn construct_ethereum_message(first: String, second: u32, third: Vec<EcdsaAddress>) -> Vec<u8> {
+        debug!("{:?}, {:?}, {:?}", first, second, third.iter().map(|a| hex::encode(&a)).collect::<Vec<_>>().join(", "));
+        // scale encode & sign
+        let message = _S {
+            _1: first,
+            _2: second,
+            _3: third 
+        };
+        let encoded: &[u8] = &message.encode();
+        encoded.to_vec()
     }
 
     /// submit_signed_mmr_root

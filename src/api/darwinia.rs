@@ -260,7 +260,7 @@ impl Darwinia {
         let message = _S {
             _1: first,
             _2: second,
-            _3: third 
+            _3: third
         };
         let encoded: &[u8] = &message.encode();
         encoded.to_vec()
@@ -438,7 +438,7 @@ impl Darwinia {
                 }
             }
         }
-        
+
         Err(anyhow::anyhow!("StorageData not found"))
     }
 }
@@ -463,29 +463,4 @@ fn test_encode() {
 		_3: [38u8, 199, 154, 103, 135, 242, 210, 106, 168, 120, 216, 232, 234, 114, 194, 69, 189, 238, 196, 220, 4, 5, 74, 15, 181, 223, 155, 200, 224, 204, 189, 1],
 	};
 	println!("{:?}", s.encode());
-}
-
-#[actix_rt::test]
-async fn test_get_block_hash() {
-    let client =
-        jsonrpsee::ws_client("ws://100.64.200.3:9944").await
-        .map_err(|e| {
-            Error::FailToConnectDarwinia {
-                url: "ws://100.64.200.3:9944".to_string(),
-                source: e
-            }
-        }).unwrap();
-
-    let client = ClientBuilder::<DarwiniaRuntime>::new()
-        .set_client(client)
-        .build()
-        .await.unwrap();
-
-    let block_hash = 
-        client
-        .block_hash(Some(BlockNumber::from(100)))
-        .await.unwrap();
-
-    println!("block hash: {:?}", block_hash);
-    // let header = self.client.header(block_hash).await.unwrap();
 }

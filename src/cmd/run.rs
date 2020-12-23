@@ -25,6 +25,7 @@ use crate::service::SubscribeService;
 use crate::service::ExtrinsicsService;
 use crate::error::BizError;
 use crate::api::Ethereum;
+use crate::tools;
 
 /// Run the bridger
 pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
@@ -39,10 +40,13 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
 
     while let Err(e) = run(data_dir.clone()).await {
         if let Some(Error::NoEthereumStart) = e.downcast_ref() {
-            error!("{:#?}", e);
+            error!("{:?}", e);
+            break;
+        } else if let Some(Error::NoDarwiniaStart) = e.downcast_ref() {
+            error!("{:?}", e);
             break;
         } else {
-            error!("{:#?}", e);
+            error!("{:?}", e);
             info!("Bridger will restart in 30 seconds...");
             time::delay_for(Duration::from_secs(30)).await;
         }
@@ -102,9 +106,11 @@ async fn start_services(
     data_dir: PathBuf,
     spec_name: String,
 ) -> Result<()> {
-    let last_redeemed = RedeemService::get_last_redeemed(data_dir.clone()).await?;
-    let ethereum_start = last_redeemed;
-    info!("🌱 Relay from ethereum block: {}", ethereum_start);
+    let last_redeemed = tools::get_cache(data_dir.clone(), tools::LAST_REDEEMED_CACHE_FILE_NAME, Error::NoEthereumStart).await?;
+    info!("🌱 Relay from ethereum block: {}", last_redeemed + 1);
+
+    let last_tracked_ethereum_block = tools::get_cache(data_dir.clone(), tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME, Error::NoDarwiniaStart).await?;
+    info!("🌱 Scan darwinia from block: {}", last_tracked_ethereum_block + 1);
 
     // extrinsic sender
     let extrinsics_service = ExtrinsicsService::new(darwinia.clone(), spec_name.clone(), data_dir.clone()).start();
@@ -121,10 +127,10 @@ async fn start_services(
         config.clone(),
         web3.clone(),
         darwinia.clone(),
-        ethereum_start,
+        last_redeemed + 1,
         relay_service.clone().recipient(),
         redeem_service.clone().recipient(),
-        data_dir
+        data_dir.clone()
     ).start();
 
     // guard service
@@ -140,7 +146,9 @@ async fn start_services(
         darwinia.clone(),
         ethereum,
         extrinsics_service.clone().recipient(),
-        spec_name
+        spec_name,
+        (last_tracked_ethereum_block as u32) + 1,
+        data_dir.clone()
     );
     let b = async {
         if let Err(e) = subscribe.start().await {

@@ -9,7 +9,6 @@ use actix::prelude::*;
 use crate::{api::Darwinia, error::Result};
 use crate::error::BizError;
 use crate::service::MsgStop;
-use crate::service::RedeemService;
 use crate::service::redeem::EthereumTransaction;
 use std::path::PathBuf;
 use primitives::runtime::EcdsaMessage;
@@ -17,6 +16,7 @@ use primitives::chain::ethereum::{
     EthereumRelayHeaderParcel,
     RedeemFor, EthereumReceiptProofThing,
 };
+use crate::tools;
 
 #[derive(Clone, Debug)]
 pub enum Extrinsic {
@@ -97,7 +97,7 @@ impl ExtrinsicsService {
     /// New sign service
     pub fn new(
         darwinia: Arc<Darwinia>,
-        spec_name: String, 
+        spec_name: String,
         data_dir: PathBuf
     ) -> ExtrinsicsService {
         ExtrinsicsService {
@@ -125,7 +125,7 @@ impl ExtrinsicsService {
                 info!("Redeemed ethereum tx {:?} with extrinsic {:?}", ethereum_tx.tx_hash, ex_hash);
 
                 // Update cache
-                RedeemService::set_last_redeemed(data_dir, ethereum_tx.block).await?;
+                tools::set_cache(data_dir, tools::LAST_REDEEMED_CACHE_FILE_NAME, ethereum_tx.block ).await?;
             },
 
             Extrinsic::GuardVote(pending_block_number, aye) => {

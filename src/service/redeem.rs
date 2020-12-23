@@ -2,7 +2,6 @@
 use crate::{
     api::{Darwinia, Shadow},
     error::Result,
-    error::Error,
 };
 use primitives::{chain::ethereum::RedeemFor};
 use std::{
@@ -14,9 +13,6 @@ use actix::prelude::*;
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 use crate::service::MsgStop;
-use tokio::fs::File;
-use std::path::PathBuf;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use crate::error::BizError;
 use crate::service::extrinsics::{Extrinsic, MsgExtrinsic};
 
@@ -177,36 +173,4 @@ impl RedeemService {
 
         Ok(())
     }
-
-    const LAST_REDEEMED_CACHE_FILE_NAME: &'static str = "last-redeemed";
-
-    /// Get last redeemed block number
-    pub async fn get_last_redeemed(data_dir: PathBuf) -> Result<u64> {
-        let mut filepath = data_dir;
-        filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);
-
-        // if cache file not exist
-        if File::open(&filepath).await.is_err() {
-            return Err(Error::LastRedeemedFileNotExists.into());
-        }
-
-        // read start from cache file
-        let mut file = File::open(filepath).await?;
-        let mut buffer = String::new();
-        file.read_to_string(&mut buffer).await?;
-        match buffer.trim().parse() {
-            Ok(start) => Ok(start),
-            Err(e) => Err(BizError::Bridger(e.to_string()).into())
-        }
-    }
-
-    /// Set last redeemed block number
-    pub async fn set_last_redeemed(data_dir: PathBuf, value: u64) -> Result<()> {
-        let mut filepath = data_dir;
-        filepath.push(RedeemService::LAST_REDEEMED_CACHE_FILE_NAME);
-        let mut file = File::create(filepath).await?;
-        file.write_all(value.to_string().as_bytes()).await?;
-        Ok(())
-    }
-
 }

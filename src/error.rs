@@ -15,8 +15,11 @@ pub enum Error {
     #[error("The last redeemed block number is not set")]
     LastRedeemedFileNotExists,
 
-    #[error("No ethereum start, run 'bridger set-start --data-dir <data_dir> --block <redeem_scan_start>' to set one")]
+    #[error("No ethereum start, run 'bridger set-start --block <redeem_scan_start> [--data-dir <data_dir>]' to set one")]
     NoEthereumStart,
+
+    #[error("No darwinia scan start, run 'bridger set-darwinia-start --block <scan_start> [--data-dir <data_dir>]' to set one")]
+    NoDarwiniaStart,
 
     #[error("{0}")]
     ShadowInternalServerError(String),

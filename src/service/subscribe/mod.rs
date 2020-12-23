@@ -1,4 +1,6 @@
 //! Darwinia Subscribe
+mod darwinia_tracker;
+
 use crate::api::Ethereum;
 use crate::error::BizError;
 use crate::{
@@ -15,10 +17,13 @@ use std::{
     sync::Arc
 };
 use substrate_subxt::sp_core::Decode;
-use jsonrpsee::client::Subscription;
 use substrate_subxt::RawEvent;
 use substrate_subxt::system::System;
 use std::collections::HashMap;
+use crate::service::subscribe::darwinia_tracker::DarwiniaBlockTracker;
+use crate::tools;
+use std::path::PathBuf;
+
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
@@ -28,6 +33,8 @@ pub struct SubscribeService {
 	extrinsics_service: Recipient<MsgExtrinsic>,
     delayed_extrinsics: HashMap<u32, Extrinsic>,
     spec_name: String,
+    scan_from: u32,
+    data_dir: PathBuf,
 }
 
 impl SubscribeService {
@@ -37,6 +44,8 @@ impl SubscribeService {
 		ethereum: Ethereum,
 		extrinsics_service: Recipient<MsgExtrinsic>,
         spec_name: String,
+        scan_from: u32,
+        data_dir: PathBuf,
 	) -> SubscribeService {
 		SubscribeService {
             darwinia,
@@ -45,27 +54,37 @@ impl SubscribeService {
             extrinsics_service,
             delayed_extrinsics: HashMap::new(),
             spec_name,
+            scan_from,
+            data_dir
 		}
 	}
 
     /// start
     pub async fn start(&mut self) -> Result<()> {
-        let mut sub: Subscription<<DarwiniaRuntime as System>::Header> = self.darwinia.client.subscribe_finalized_blocks().await?;
+        let mut tracker = DarwiniaBlockTracker::new(self.darwinia.clone(), self.scan_from);
         info!("✨ SERVICE STARTED: SUBSCRIBE");
         loop {
-            let header = sub.next().await;
-            let hash = header.hash();
-            trace!("Block {}", header.number);
+            let header = tracker.next_block().await;
 
+            // debug trace
+            // if header.number % 50 == 0 {
+            //     trace!("Darwinia {} ~ {} blocks tracked", header.number - 50, header.number - 1);
+            // }
+            trace!("Darwinia {}", header.number);
+
+            // handle the 'mmr root sign and send extrinsics' only block height reached
             if let Err(err) = self.handle_delayed_extrinsics(&header).await {
-                error!("Encounter error when handle delayed extrinsics: {:#?}", err);
+                error!("Encounter error when handle delayed extrinsics: {:?}", err);
             }
 
-            // events
+            // handle events of the block
+            let hash = header.hash();
             let events = self.darwinia.get_raw_events(hash).await;
             if let Err(err) = self.handle_events(&header, events).await {
-                error!("Encounter error when handle events of block {}: {:#?}", header.number, err);
+                error!("Encounter error when handle events of block {}: {}", header.number, err);
             }
+
+            tools::set_cache(self.data_dir.clone(), tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME, header.number as u64).await?;
 
             if self.stop {
                 return Err(BizError::Bridger("Force stop".to_string()).into());

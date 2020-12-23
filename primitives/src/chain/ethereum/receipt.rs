@@ -3,13 +3,12 @@ use crate::{
     bytes,
     chain::ethereum::{EthereumHeader, EthereumHeaderJson, MMRProof, MMRProofJson},
     hex,
+    array::{Bloom, H256, H160},
 };
 use codec::{Decode, Encode};
 use serde::Deserialize;
 use std::{fmt::Debug};
 use rlp::{RlpStream, Encodable};
-use primitive_types::{H256, H160};
-use ethbloom::{Bloom};
 
 /// Redeem for
 #[derive(Clone, Debug, Encode, PartialEq, Eq)]
@@ -178,25 +177,25 @@ impl Into<EthereumReceipt> for EthReceiptBody {
     fn into(self) -> EthereumReceipt {
         EthereumReceipt {
             gas_used: u64::from_str_radix(&self.cumulative_gas_used.as_str()[2..], 16).unwrap_or_default(),
-            log_bloom: Bloom::from(bytes!(self.logs_bloom.as_str(), 256)),
+            log_bloom: Bloom(bytes!(self.logs_bloom.as_str(), 256)),
             logs: self
                 .logs
                 .iter()
                 .map(|l|->LogEntry {
                     LogEntry {
-                        address: H160::from(bytes!(l.address.as_str(), 20)),
+                        address: H160(bytes!(l.address.as_str(), 20)),
                         topics:
                             l
                             .topics
                             .iter()
-                            .map(|t|H256::from(bytes!(t.as_str(), 32)))
+                            .map(|t|H256(bytes!(t.as_str(), 32)))
                             .collect(),
                         data: bytes!(l.data.as_str()),
                     }
                 }).collect(),
                 outcome: {
                     if self.status.len() == 66 {
-                        TransactionOutcome::StateRoot(H256::from(bytes!(self.status.as_str(), 32)))
+                        TransactionOutcome::StateRoot(H256(bytes!(self.status.as_str(), 32)))
                     } else {
                         TransactionOutcome::StatusCode(u8::from_str_radix(&self.status.as_str()[2..], 16).unwrap_or(0))
                     }

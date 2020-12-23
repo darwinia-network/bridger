@@ -1,5 +1,5 @@
 use crate::{
-    array::{H1024, U256},
+    array::{Bloom, U256},
     hex,
 };
 use codec::{Decode, Encode};
@@ -54,7 +54,7 @@ impl Into<EthereumHeader> for EthereumBlockRPC {
             extra_data: bytes!(self.extra_data.as_str()),
             state_root: bytes!(self.state_root.as_str(), 32),
             receipts_root: bytes!(self.receipts_root.as_str(), 32),
-            log_bloom: H1024(bytes!(self.logs_bloom.as_str(), 256)),
+            log_bloom: Bloom(bytes!(self.logs_bloom.as_str(), 256)),
             gas_used: U256::from_str(&self.gas_used[2..]).unwrap_or_default(),
             gas_limit: U256::from_str(&self.gas_limit[2..]).unwrap_or_default(),
             difficulty: U256::from_str(&self.difficulty[2..]).unwrap_or_default(),
@@ -80,7 +80,7 @@ pub struct EthereumHeader {
     extra_data: Vec<u8>,
     state_root: [u8; 32],
     receipts_root: [u8; 32],
-    log_bloom: H1024,
+    log_bloom: Bloom,
     gas_used: U256,
     gas_limit: U256,
     difficulty: U256,
@@ -179,7 +179,7 @@ impl Into<EthereumHeader> for EthereumHeaderJson {
             extra_data: bytes!(self.extra_data.as_str()),
             state_root: bytes!(self.state_root.as_str(), 32),
             receipts_root: bytes!(self.receipts_root.as_str(), 32),
-            log_bloom: H1024(bytes!(self.log_bloom.as_str(), 256)),
+            log_bloom: Bloom(bytes!(self.log_bloom.as_str(), 256)),
             gas_used: U256::from(self.gas_used),
             gas_limit: U256::from(self.gas_limit),
             difficulty: U256::from(self.difficulty),

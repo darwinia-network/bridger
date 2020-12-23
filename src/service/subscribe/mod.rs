@@ -67,10 +67,9 @@ impl SubscribeService {
             let header = tracker.next_block().await;
 
             // debug trace
-            // if header.number % 50 == 0 {
-            //     trace!("Darwinia {} ~ {} blocks tracked", header.number - 50, header.number - 1);
-            // }
-            trace!("Darwinia {}", header.number);
+            if header.number % 50 == 0 {
+                trace!("Darwinia block {}", header.number);
+            }
 
             // handle the 'mmr root sign and send extrinsics' only block height reached
             if let Err(err) = self.handle_delayed_extrinsics(&header).await {

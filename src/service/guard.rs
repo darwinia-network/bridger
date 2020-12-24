@@ -56,18 +56,13 @@ impl Handler<MsgGuard> for GuardService {
                     let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone(), this.voted.clone(), this.extrinsics_service.clone());
                     f.into_actor(this)
                 })
-                .map(|r, this, _| {
-                    match r {
-                        Ok(mut vote_result) => {
-                            this.voted.append(&mut vote_result);
-                        },
-                        Err(err) => {
-                            if err.downcast_ref::<BizError>().is_some() {
-                                trace!("{}", err);
-                            } else {
-                                error!("{:?}", err);
-                            }
-                        },
+                .map(|r, _this, _| {
+                    if let Err(err) = r {
+                        if err.downcast_ref::<BizError>().is_some() {
+                            trace!("{}", err);
+                        } else {
+                            error!("{:?}", err);
+                        }
                     }
                 }),
         ))
@@ -99,21 +94,16 @@ impl GuardService {
         }
     }
 
-    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, voted: Vec<u64>, extrinsics_service: Recipient<MsgExtrinsic>) -> Result<Vec<u64>> {
+    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, _voted: Vec<u64>, extrinsics_service: Recipient<MsgExtrinsic>) -> Result<()> {
         trace!("Checking pending headers...");
-        let mut result = vec![];
 
         let last_confirmed = darwinia.last_confirmed().await.unwrap();
         let pending_headers = darwinia.pending_headers().await?;
+        debug!("pending headers: {:?}", pending_headers.clone().iter().map(|p| p.1.header.number.to_string()).collect::<Vec<_>>().join(", "));
         for pending in pending_headers {
             let pending_parcel = pending.1;
             let voting_state = pending.2;
             let pending_block_number: u64 = pending_parcel.header.number;
-
-            // Local voted check
-            if voted.contains(&pending_block_number) {
-                continue;
-            }
 
             // high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
             // and,
@@ -128,9 +118,8 @@ impl GuardService {
                 extrinsics_service.send(MsgExtrinsic(ex)).await?;
             }
 
-            result.push(pending_block_number);
         }
 
-        Ok(result)
+        Ok(())
     }
 }

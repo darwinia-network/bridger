@@ -25,8 +25,6 @@ pub struct GuardService {
     pub shadow: Arc<Shadow>,
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
-
-    voted: Vec<u64>,
 }
 
 impl Actor for GuardService {
@@ -52,21 +50,16 @@ impl Handler<MsgGuard> for GuardService {
             async {}
                 .into_actor(self)
                 .then(|_, this, _| {
-                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone(), this.voted.clone());
+                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone());
                     f.into_actor(this)
                 })
-                .map(|r, this, _| {
-                    match r {
-                        Ok(mut vote_result) => {
-                            this.voted.append(&mut vote_result);
-                        },
-                        Err(err) => {
-                            if let Error::BizError(..) = err {
-                                trace!("{}", err);
-                            } else {
-                                error!("{:?}", err);
-                            }
-                        },
+                .map(|r, _this, _| {
+                    if let Err(err) = r {
+                        if let Error::BizError(..) = err {
+                            trace!("{}", err);
+                        } else {
+                            error!("{:?}", err);
+                        }
                     }
                 }),
         ))
@@ -89,7 +82,6 @@ impl GuardService {
                 darwinia,
                 shadow,
                 step,
-                voted: vec![]
             })
         } else {
             warn!("    🙌 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
@@ -97,9 +89,8 @@ impl GuardService {
         }
     }
 
-    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, voted: Vec<u64>) -> Result<Vec<u64>> {
+    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> Result<()> {
         trace!("Checking pending headers...");
-        let mut result = vec![];
 
         let last_confirmed = darwinia.last_confirmed().await.unwrap();
         let pending_headers = darwinia.pending_headers().await?;
@@ -107,11 +98,6 @@ impl GuardService {
             let pending_parcel = pending.1;
             let voting_state = pending.2;
             let pending_block_number: u64 = pending_parcel.header.number;
-
-            // Local voted check
-            if voted.contains(&pending_block_number) {
-                continue;
-            }
 
             // high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
             // and,
@@ -130,10 +116,8 @@ impl GuardService {
                     info!("Voted to reject: {}, ex hash: {:?}", pending_block_number, ex_hash);
                 };
             }
-
-            result.push(pending_block_number);
         }
 
-        Ok(result)
+        Ok(())
     }
 }

@@ -148,7 +148,7 @@ impl RelayService {
         }
 
         trace!("Prepare to affirm ethereum block: {}", target);
-        let parcel = shadow.parcel(target as usize).await?;
+        let parcel = shadow.parcel(target as usize + 1).await?;
         if parcel.header == EthereumHeader::default()
             || parcel.mmr_root == [0u8;32]
         {

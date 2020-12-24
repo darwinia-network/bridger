@@ -119,10 +119,6 @@ impl GuardService {
             // and,
             // have not voted
             if pending_block_number > last_confirmed && !darwinia.sender.has_voted(voting_state) {
-                // Delay to wait for possible previous extrinsics
-                tokio::time::delay_for(Duration::from_secs(12)).await;
-
-                // Do vote
                 let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
                 let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
                     Extrinsic::GuardVote(pending_block_number, true)

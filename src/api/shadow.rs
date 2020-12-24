@@ -45,7 +45,7 @@ impl Shadow {
     /// Get mmr
     pub async fn get_mmr_root(&self, leaf_index: usize) -> Result<MMRRoot> {
         let block_number = leaf_index + 1;
-        let url = &format!("{}/ethereum/parent_mmr_root/{}", &self.api, block_number);
+        let url = &format!("{}/ethereum/mmr_root/{}", &self.api, block_number);
         let resp = self
             .http
             .get(url)

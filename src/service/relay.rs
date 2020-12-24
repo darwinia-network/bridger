@@ -76,8 +76,8 @@ impl Handler<MsgExecute> for RelayService {
                 .then(|_, this, _| {
                     if this.target > this.relayed {
                         let f = RelayService::affirm(
-                            this.darwinia.clone(), 
-                            this.shadow.clone(), 
+                            this.darwinia.clone(),
+                            this.shadow.clone(),
                             this.target,
                             this.extrinsics_service.clone()
                         );
@@ -161,7 +161,7 @@ impl RelayService {
         }
 
         trace!("Prepare to affirm ethereum block: {}", target);
-        let parcel = shadow.parcel(target as usize).await.with_context(|| format!("Fail to get parcel from shadow when affirming ethereum block {}", target))?;
+        let parcel = shadow.parcel(target as usize + 1).await.with_context(|| format!("Fail to get parcel from shadow when affirming ethereum block {}", target))?;
         if parcel.header == EthereumHeader::default()
             || parcel.mmr_root == [0u8;32]
         {

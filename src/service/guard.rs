@@ -25,8 +25,6 @@ pub struct GuardService {
     pub shadow: Arc<Shadow>,
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
-
-    voted: Vec<u64>,
     extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
@@ -53,7 +51,7 @@ impl Handler<MsgGuard> for GuardService {
             async {}
                 .into_actor(self)
                 .then(|_, this, _| {
-                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone(), this.voted.clone(), this.extrinsics_service.clone());
+                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone(), this.extrinsics_service.clone());
                     f.into_actor(this)
                 })
                 .map(|r, _this, _| {
@@ -85,7 +83,6 @@ impl GuardService {
                 darwinia,
                 shadow,
                 step,
-                voted: vec![],
                 extrinsics_service,
             })
         } else {
@@ -94,7 +91,7 @@ impl GuardService {
         }
     }
 
-    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, _voted: Vec<u64>, extrinsics_service: Recipient<MsgExtrinsic>) -> Result<()> {
+    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, extrinsics_service: Recipient<MsgExtrinsic>) -> Result<()> {
         trace!("Checking pending headers...");
 
         let last_confirmed = darwinia.last_confirmed().await.unwrap();
@@ -117,7 +114,6 @@ impl GuardService {
                 };
                 extrinsics_service.send(MsgExtrinsic(ex)).await?;
             }
-
         }
 
         Ok(())

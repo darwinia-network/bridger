@@ -43,8 +43,7 @@ impl Shadow {
     }
 
     /// Get mmr
-    pub async fn get_mmr_root(&self, leaf_index: usize) -> Result<MMRRoot> {
-        let block_number = leaf_index + 1;
+    pub async fn get_parent_mmr_root(&self, block_number: usize) -> Result<MMRRoot> {
         let url = &format!("{}/ethereum/parent_mmr_root/{}", &self.api, block_number);
         let resp = self
             .http
@@ -58,7 +57,7 @@ impl Shadow {
                 .await?;
             let result = json.into();
             if result == MMRRoot::default() {
-                Err(BizError::BlankEthereumMmrRoot(leaf_index).into())
+                Err(BizError::BlankEthereumMmrRoot(block_number).into())
             } else {
                 Ok(result)
             }
@@ -67,8 +66,8 @@ impl Shadow {
 
     /// Get HeaderParcel
     pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
-        let mmr_root = self.get_mmr_root(number).await?;
-        let header = self.eth.get_header_by_number(number as u64 + 1).await?;
+        let mmr_root = self.get_parent_mmr_root(number).await?;
+        let header = self.eth.get_header_by_number(number as u64).await?;
 
         Ok(EthereumRelayHeaderParcel {
             header,

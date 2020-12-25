@@ -154,3 +154,15 @@ macro_rules! construct_hash_bytes {
         impl Eq for $name {}
     };
 }
+
+/// Add RLP serialization support to a hash type.
+#[macro_export]
+macro_rules! impl_hash_rlp {
+    ($name: ident, $size: expr) => {
+        impl rlp::Encodable for $name {
+            fn rlp_append(&self, s: &mut rlp::RlpStream) {
+                s.encoder().encode_value(&self.0);
+            }
+        }
+    };
+}

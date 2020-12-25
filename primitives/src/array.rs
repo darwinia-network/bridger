@@ -35,10 +35,30 @@ construct_hash_bytes! {
 
 construct_hash_bytes! {
     #[derive(Clone)]
+    pub struct H160(20);
+}
+
+construct_hash_bytes! {
+    #[derive(Clone)]
+    pub struct H256(32);
+}
+
+construct_hash_bytes! {
+    #[derive(Clone)]
     pub struct H512(64);
 }
 
 construct_hash_bytes! {
     #[derive(Clone)]
-    pub struct H1024(256);
+    pub struct H1024(128);
 }
+
+construct_hash_bytes! {
+    #[derive(Clone)]
+    pub struct Bloom(256);
+}
+
+impl_hash_rlp!(Bloom, 256);
+impl_hash_rlp!(H256, 32);
+impl_hash_rlp!(H160, 20);
+

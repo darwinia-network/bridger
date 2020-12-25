@@ -606,9 +606,9 @@ checksum = "631ae5198c9be5e753e5cc215e1bd73c2b466a3565173db433f52bb9d3e66dba"
 
 [[package]]
 name = "cc"
-version = "1.0.41"
+version = "1.0.66"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8dae9c4b8fedcae85592ba623c4fd08cfdab3e3b72d6df780c6ead964a69bfff"
+checksum = "4c0496836a84f8d0495758516b8621a622beb77c0fed418570e50764093ced48"
 
 [[package]]
 name = "cfg-if"
@@ -1881,7 +1881,7 @@ checksum = "489b9c612e60c766f751ab40fcb43cbb55a1e10bb44a9b4307ed510ca598cbd7"
 dependencies = [
  "failure",
  "futures 0.1.30",
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "jsonrpc-pubsub",
  "log",
  "serde",
@@ -1896,6 +1896,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0745a6379e3edc893c84ec203589790774e4247420033e71a76d3ab4687991fa"
 dependencies = [
  "futures 0.1.30",
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
+name = "jsonrpc-core"
+version = "16.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a47c4c3ac843f9a4238943f97620619033dadef4b378cd1e8addd170de396b3"
+dependencies = [
+ "futures 0.3.8",
  "log",
  "serde",
  "serde_derive",
@@ -1929,7 +1942,7 @@ version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "639558e0604013be9787ae52f798506ae42bf4220fe587bdc5625871cc8b9c77"
 dependencies = [
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "log",
  "parking_lot 0.10.2",
  "rand 0.7.3",
@@ -2554,9 +2567,9 @@ checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
 name = "openssl"
-version = "0.10.31"
+version = "0.10.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d008f51b1acffa0d3450a68606e6a51c123012edaacb0f4e1426bd978869187"
+checksum = "038d43985d1ddca7a9900630d8cd031b56e4794eecc2e9ea39dd17aa04399a70"
 dependencies = [
  "bitflags",
  "cfg-if 1.0.0",
@@ -2574,9 +2587,9 @@ checksum = "77af24da69f9d9341038eba93a073b1fdaaa1b788221b00a69bce9e762cb32de"
 
 [[package]]
 name = "openssl-sys"
-version = "0.9.59"
+version = "0.9.60"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de52d8eabd217311538a39bba130d7dea1f1e118010fee7a033d966845e7d5fe"
+checksum = "921fc71883267538946025deffb622905ecad223c28efbfdef9bb59a0175f3e6"
 dependencies = [
  "autocfg 1.0.1",
  "cc",
@@ -3471,13 +3484,13 @@ dependencies = [
 
 [[package]]
 name = "ring"
-version = "0.16.12"
+version = "0.16.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ba5a8ec64ee89a76c98c549af81ff14813df09c3e6dc4766c3856da48597a0c"
+checksum = "024a1e66fea74c66c66624ee5622a7ff0e4b73a13b4f5c326ddb50c708944226"
 dependencies = [
  "cc",
- "lazy_static",
  "libc",
+ "once_cell",
  "spin",
  "untrusted",
  "web-sys",
@@ -3589,7 +3602,7 @@ checksum = "cfb4b79b9b6b410c745a00eb4ead11b2ef0819e6eac970a5ec6415abf82777be"
 dependencies = [
  "derive_more",
  "futures 0.3.8",
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "jsonrpc-pubsub",
@@ -4864,9 +4877,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "0.3.5"
+version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a12a3eb39ee2c231be64487f1fcbe726c8f2514876a55480a5ab8559fc374252"
+checksum = "720ba21c25078711bf456d607987d95bce90f7c3bea5abe1db587862e7a1e87c"
 dependencies = [
  "autocfg 1.0.1",
  "pin-project-lite 0.2.0",
@@ -4920,7 +4933,7 @@ dependencies = [
  "futures-sink",
  "log",
  "pin-project-lite 0.2.0",
- "tokio 0.3.5",
+ "tokio 0.3.6",
 ]
 
 [[package]]
@@ -5099,7 +5112,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.3.23",
+ "rand 0.7.3",
  "static_assertions",
 ]
 
@@ -5397,7 +5410,7 @@ dependencies = [
 [[package]]
 name = "web3"
 version = "0.14.0"
-source = "git+https://github.com/tomusdrw/rust-web3.git#22c21004e06e2bdd1f9594dcdf30f3b1d5a4ea3a"
+source = "git+https://github.com/tomusdrw/rust-web3.git#fdf11dc4193e385513a0fdef8e5191743ed38044"
 dependencies = [
  "arrayvec 0.5.2",
  "async-native-tls",
@@ -5411,7 +5424,7 @@ dependencies = [
  "hyper",
  "hyper-proxy",
  "hyper-tls",
- "jsonrpc-core",
+ "jsonrpc-core 16.0.0",
  "log",
  "native-tls",
  "parking_lot 0.11.1",
@@ -5430,9 +5443,9 @@ dependencies = [
 
 [[package]]
 name = "webpki"
-version = "0.21.2"
+version = "0.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1f50e1972865d6b1adb54167d1c8ed48606004c2c9d0ea5f1eeb34d95e863ef"
+checksum = "b8e38c0608262c46d4a56202ebabdeb094cef7e560ca7a226c6bf055188aa4ea"
 dependencies = [
  "ring",
  "untrusted",

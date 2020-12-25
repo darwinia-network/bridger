@@ -1881,7 +1881,7 @@ checksum = "489b9c612e60c766f751ab40fcb43cbb55a1e10bb44a9b4307ed510ca598cbd7"
 dependencies = [
  "failure",
  "futures 0.1.30",
- "jsonrpc-core 15.1.0",
+ "jsonrpc-core",
  "jsonrpc-pubsub",
  "log",
  "serde",
@@ -1896,19 +1896,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0745a6379e3edc893c84ec203589790774e4247420033e71a76d3ab4687991fa"
 dependencies = [
  "futures 0.1.30",
- "log",
- "serde",
- "serde_derive",
- "serde_json",
-]
-
-[[package]]
-name = "jsonrpc-core"
-version = "16.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a47c4c3ac843f9a4238943f97620619033dadef4b378cd1e8addd170de396b3"
-dependencies = [
- "futures 0.3.8",
  "log",
  "serde",
  "serde_derive",
@@ -1942,7 +1929,7 @@ version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "639558e0604013be9787ae52f798506ae42bf4220fe587bdc5625871cc8b9c77"
 dependencies = [
- "jsonrpc-core 15.1.0",
+ "jsonrpc-core",
  "log",
  "parking_lot 0.10.2",
  "rand 0.7.3",
@@ -3602,7 +3589,7 @@ checksum = "cfb4b79b9b6b410c745a00eb4ead11b2ef0819e6eac970a5ec6415abf82777be"
 dependencies = [
  "derive_more",
  "futures 0.3.8",
- "jsonrpc-core 15.1.0",
+ "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "jsonrpc-pubsub",
@@ -5410,7 +5397,7 @@ dependencies = [
 [[package]]
 name = "web3"
 version = "0.14.0"
-source = "git+https://github.com/tomusdrw/rust-web3.git#fdf11dc4193e385513a0fdef8e5191743ed38044"
+source = "git+https://github.com/tomusdrw/rust-web3.git#22c21004e06e2bdd1f9594dcdf30f3b1d5a4ea3a"
 dependencies = [
  "arrayvec 0.5.2",
  "async-native-tls",
@@ -5424,7 +5411,7 @@ dependencies = [
  "hyper",
  "hyper-proxy",
  "hyper-tls",
- "jsonrpc-core 16.0.0",
+ "jsonrpc-core",
  "log",
  "native-tls",
  "parking_lot 0.11.1",

@@ -102,7 +102,7 @@ impl SubscribeService {
         let mut to_removes = vec![];
         for (delayed_to, delayed_ex) in self.delayed_extrinsics.iter() {
             if header.number >= *delayed_to {
-                if self.darwinia.sender.need_to_sign_mmr_root_of(header.number as u128).await? {
+                if self.darwinia.sender.need_to_sign_mmr_root_of(*delayed_to).await? {
                     let msg = MsgExtrinsic(delayed_ex.clone());
                     self.extrinsics_service.send(msg).await?;
                 }

@@ -134,7 +134,7 @@ pub struct AuthorityTerm<T: EthereumRelayAuthorities> {
 
 /// AuthorityTerm
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct MmrRootsToSign<T: EthereumRelayAuthorities> {
+pub struct MMRRootsToSign<T: EthereumRelayAuthorities> {
     #[store(returns = MmrRootsToSignReturn<T>)]
     /// Block number
     pub block_number: u128,

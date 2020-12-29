@@ -12,9 +12,7 @@ pub type AuthoritiesToSignReturn<T> = (
 );
 
 /// AuthoritiesToSignReturn
-pub type MmrRootsToSignReturn<T> = Option<
-    Vec<(<T as System>::AccountId, <T as EthereumRelayAuthorities>::RelayAuthoritySignature)>
->;
+pub type MmrRootsToSignReturn<T> = Vec<(<T as System>::AccountId, <T as EthereumRelayAuthorities>::RelayAuthoritySignature)>;
 
 /// Relay Authority
 #[derive(Clone, Encode, Decode, Default, Debug)]
@@ -137,7 +135,7 @@ pub struct AuthorityTerm<T: EthereumRelayAuthorities> {
 pub struct MMRRootsToSign<T: EthereumRelayAuthorities> {
     #[store(returns = MmrRootsToSignReturn<T>)]
     /// Block number
-    pub block_number: u128,
+    pub block_number: <T as System>::BlockNumber,
     /// Runtime marker
     pub _runtime: PhantomData<T>,
 }

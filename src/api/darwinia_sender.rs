@@ -12,8 +12,6 @@ use primitives::{
             AuthoritiesStoreExt,
             AuthoritiesToSignStoreExt,
             AuthoritiesToSignReturn,
-            MmrRootsToSignStoreExt,
-            MmrRootsToSignReturn,
         }
     },
     runtime::EcdsaSignature,
@@ -166,13 +164,15 @@ impl DarwiniaSender {
     }
 
     /// need_to_mmr_root_of
-    pub async fn need_to_sign_mmr_root_of(&self, block_number: u128) -> Result<bool> {
-        let ret: MmrRootsToSignReturn<DarwiniaRuntime> = self.client.mmr_roots_to_sign(block_number, None).await?;
-        if let Some(signs) = ret {
-            let includes = signs.iter().any(|a| a.0 == self.account_id);
-            Ok(!includes)
-        } else {
-            Ok(false)
+    pub async fn need_to_sign_mmr_root_of(&self, block_number: u32) -> Result<bool> {
+        let finalized_block_hash = self.client.finalized_head().await?;
+        match self.client.block(Some(finalized_block_hash)).await? {
+            Some(finalized_block) => {
+                let finalized_block_number = finalized_block.block.header.number;
+                // TODO: Fix
+                Ok(block_number > finalized_block_number - 50)
+            },
+            None => Ok(false)
         }
     }
 }

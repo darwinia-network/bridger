@@ -28,6 +28,7 @@ use primitives::{
             SubmitSignedAuthoritiesCallExt,
             SubmitSignedMmrRoot,
             SubmitSignedMmrRootCallExt,
+            AuthorityTermStoreExt,
         }
     },
     runtime::{DarwiniaRuntime, EcdsaMessage, EcdsaSignature, EcdsaAddress},
@@ -254,7 +255,7 @@ impl Darwinia {
     }
 
     /// construct_message
-    pub fn construct_ethereum_message(first: String, second: u32, third: Vec<EcdsaAddress>) -> Vec<u8> {
+    pub fn construct_authorities_message(first: String, second: u32, third: Vec<EcdsaAddress>) -> Vec<u8> {
         debug!("{:?}, {:?}, {:?}", first, second, third.iter().map(|a| hex::encode(&a)).collect::<Vec<_>>().join(", "));
         // scale encode & sign
         let message = _S {
@@ -361,6 +362,7 @@ impl Darwinia {
         Ok(mmr_root)
     }
 
+
     /// Check if should redeem
     pub async fn verified(&self, tx: &EthereumTransaction) -> Result<bool> {
         Ok(self
@@ -441,6 +443,11 @@ impl Darwinia {
         }
 
         Err(anyhow::anyhow!("StorageData not found"))
+    }
+
+    /// get_current_term
+    pub async fn get_current_authority_term(&self) -> Result<u32>{
+        Ok(self.client.authority_term(None).await?)
     }
 }
 #[derive(Encode)]

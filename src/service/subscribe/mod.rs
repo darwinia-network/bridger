@@ -13,9 +13,7 @@ use primitives::{
 	frame::bridge::relay_authorities::{AuthoritiesSetSigned, NewAuthorities, NewMMRRoot},
 	runtime::DarwiniaRuntime,
 };
-use std::{
-    sync::Arc
-};
+use std::sync::Arc;
 use substrate_subxt::sp_core::Decode;
 use substrate_subxt::RawEvent;
 use substrate_subxt::system::System;
@@ -101,8 +99,10 @@ impl SubscribeService {
         let mut to_removes = vec![];
         for (delayed_to, delayed_ex) in self.delayed_extrinsics.iter() {
             if header.number >= *delayed_to {
-                let msg = MsgExtrinsic(delayed_ex.clone());
-                self.extrinsics_service.send(msg).await?;
+                if self.darwinia.sender.need_to_sign_mmr_root_of(header.number as u128).await? {
+                    let msg = MsgExtrinsic(delayed_ex.clone());
+                    self.extrinsics_service.send(msg).await?;
+                }
                 to_removes.push(*delayed_to);
             }
         }
@@ -142,7 +142,9 @@ impl SubscribeService {
             // call ethereum_relay_authorities.request_authority and then sudo call
             // EthereumRelayAuthorities.add_authority will emit the event
 			("EthereumRelayAuthorities", "NewAuthorities") => {
-                if self.darwinia.sender.is_authority().await? {
+                if self.darwinia.sender.is_authority().await? &&
+                    self.darwinia.sender.need_to_sign_authorities().await?
+                {
                     if let Ok(decoded) =
                         NewAuthorities::<DarwiniaRuntime>::decode(&mut &event_data[..])
                     {
@@ -158,13 +160,22 @@ impl SubscribeService {
 				if let Ok(decoded) =
 					AuthoritiesSetSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
 				{
-                    let signatures = decoded.signatures.iter().map(|s| s.1.clone()).collect::<Vec<_>>();
-                    let message = Darwinia::construct_ethereum_message(self.spec_name.clone(), decoded.term, decoded.new_authorities);
-					self.ethereum.submit_authorities_set(
-                        message,
-						signatures,
-					).await?;
-                    info!("Authorities submitted to ethereum");
+                    let current_term = self.darwinia.get_current_authority_term().await?;
+                    if decoded.term == current_term {
+                        let message = Darwinia::construct_authorities_message(
+                            self.spec_name.clone(),
+                            decoded.term,
+                            decoded.new_authorities
+                        );
+                        let signatures = decoded.signatures
+                            .iter()
+                            .map(|s| s.1.clone()).collect::<Vec<_>>();
+                        self.ethereum.submit_authorities_set(
+                            message,
+                            signatures,
+                        ).await?;
+                        info!("Authorities submitted to ethereum");
+                    }
 				}
 			}
 

@@ -1,14 +1,20 @@
 use crate::api::darwinia::AccountId;
 use sp_keyring::sr25519::sr25519::Pair;
 use substrate_subxt::{Client, sp_core::Pair as PairTrait, PairSigner};
-use primitives::runtime::DarwiniaRuntime;
+use primitives::runtime::{DarwiniaRuntime, EcdsaMessage};
 use crate::error::Result;
 use primitives::{
     chain::RelayVotingState,
     frame::{
         sudo::KeyStoreExt,
         technical_committee::MembersStoreExt,
-        bridge::relay_authorities::AuthoritiesStoreExt
+        bridge::relay_authorities::{
+            AuthoritiesStoreExt,
+            AuthoritiesToSignStoreExt,
+            AuthoritiesToSignReturn,
+            MmrRootsToSignStoreExt,
+            MmrRootsToSignReturn,
+        }
     },
     runtime::EcdsaSignature,
 };
@@ -148,6 +154,30 @@ impl DarwiniaSender {
         Ok(EcdsaSignature(buffer))
     }
 
+    /// need_to_sign_authorities
+    pub async fn need_to_sign_authorities(&self) -> Result<bool> {
+        let ret: AuthoritiesToSignReturn<DarwiniaRuntime> = self.client.authorities_to_sign(None).await?;
+        if ret.0 == EcdsaMessage::default() {
+            Ok(false)
+        } else {
+            let signs = ret.1;
+            let signed_authorities =
+                signs.iter().map(|a| a.0.clone()).collect::<Vec<AccountId>>();
+            Ok(!signed_authorities.contains(&self.account_id))
+        }
+    }
+
+    /// need_to_mmr_root_of
+    pub async fn need_to_sign_mmr_root_of(&self, block_number: u128) -> Result<bool> {
+        let ret: MmrRootsToSignReturn<DarwiniaRuntime> = self.client.mmr_roots_to_sign(block_number, None).await?;
+        if let Some(signs) = ret {
+            let signed_authorities =
+                signs.iter().map(|a| a.0.clone()).collect::<Vec<AccountId>>();
+            Ok(!signed_authorities.contains(&self.account_id))
+        } else {
+            Ok(false)
+        }
+    }
 }
 #[test]
 fn test_ecdsa() {

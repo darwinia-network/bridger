@@ -21,6 +21,7 @@ use std::collections::HashMap;
 use crate::service::subscribe::darwinia_tracker::DarwiniaBlockTracker;
 use crate::tools;
 use std::path::PathBuf;
+use tokio::time::{delay_for, Duration};
 
 
 /// Dawrinia Subscribe
@@ -72,6 +73,8 @@ impl SubscribeService {
             // handle the 'mmr root sign and send extrinsics' only block height reached
             if let Err(err) = self.handle_delayed_extrinsics(&header).await {
                 error!("Encounter error when handle delayed extrinsics: {:?}", err);
+                // Prevent too fast refresh errors
+                delay_for(Duration::from_secs(30)).await;
             }
 
             // handle events of the block

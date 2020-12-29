@@ -74,11 +74,11 @@
       {
         "indexed": false,
         "internalType": "bytes32",
-        "name": "benifit",
+        "name": "beneficiary",
         "type": "bytes32"
       }
     ],
-    "name": "SetAuthritiesEvent",
+    "name": "SetAuthoritiesEvent",
     "type": "event"
   },
   {
@@ -438,6 +438,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint8",
+        "name": "_threshold",
+        "type": "uint8"
+      }
+    ],
+    "name": "resetRelayerThreshold",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint32",
         "name": "index",
         "type": "uint32"
@@ -487,7 +500,7 @@
       },
       {
         "internalType": "bytes32",
-        "name": "benefit",
+        "name": "beneficiary",
         "type": "bytes32"
       }
     ],

@@ -64,7 +64,9 @@ impl Ethereum {
             contract.signed_call_with_confirmations(
                 "updateRelayer",
                 input,
-                Options::default(),
+                Options::with(|options| {
+                    options.gas = Some(500_000.into());
+                }),
                 12,
                 key_ref
             ).await?;

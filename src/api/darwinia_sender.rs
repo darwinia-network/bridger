@@ -160,10 +160,8 @@ impl DarwiniaSender {
         if ret.0 == EcdsaMessage::default() {
             Ok(false)
         } else {
-            let signs = ret.1;
-            let signed_authorities =
-                signs.iter().map(|a| a.0.clone()).collect::<Vec<AccountId>>();
-            Ok(!signed_authorities.contains(&self.account_id))
+            let includes = ret.1.iter().any(|a| a.0 == self.account_id);
+            Ok(!includes)
         }
     }
 
@@ -171,9 +169,8 @@ impl DarwiniaSender {
     pub async fn need_to_sign_mmr_root_of(&self, block_number: u128) -> Result<bool> {
         let ret: MmrRootsToSignReturn<DarwiniaRuntime> = self.client.mmr_roots_to_sign(block_number, None).await?;
         if let Some(signs) = ret {
-            let signed_authorities =
-                signs.iter().map(|a| a.0.clone()).collect::<Vec<AccountId>>();
-            Ok(!signed_authorities.contains(&self.account_id))
+            let includes = signs.iter().any(|a| a.0 == self.account_id);
+            Ok(!includes)
         } else {
             Ok(false)
         }

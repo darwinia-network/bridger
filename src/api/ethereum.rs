@@ -61,7 +61,7 @@ impl Ethereum {
             debug!("benefit: 0x{}", hex::encode(benefit_buffer));
 
             let input = (message, signature_list, benefit_buffer);
-            contract.signed_call_with_confirmations(
+            let receipt = contract.signed_call_with_confirmations(
                 "updateRelayer",
                 input,
                 Options::with(|options| {
@@ -70,6 +70,7 @@ impl Ethereum {
                 12,
                 key_ref
             ).await?;
+            trace!("Submit authorities to eth with tx: {}, status: {:?}", receipt.transaction_hash, receipt.status);
         }
 
         Ok(())

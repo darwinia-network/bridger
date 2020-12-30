@@ -1939,7 +1939,7 @@ dependencies = [
 [[package]]
 name = "jsonrpsee"
 version = "0.1.0"
-source = "git+https://github.com/AurevoirXavier/jsonrpsee?branch=xavier-send-error#d56bd6af5429a9e45a515013d7a76759b1e0ef3a"
+source = "git+https://github.com/darwinia-network/jsonrpsee?branch=xavier-send-error#d56bd6af5429a9e45a515013d7a76759b1e0ef3a"
 dependencies = [
  "async-std",
  "async-tls",
@@ -1971,7 +1971,7 @@ dependencies = [
 [[package]]
 name = "jsonrpsee-proc-macros"
 version = "1.0.0"
-source = "git+https://github.com/AurevoirXavier/jsonrpsee?branch=xavier-send-error#d56bd6af5429a9e45a515013d7a76759b1e0ef3a"
+source = "git+https://github.com/darwinia-network/jsonrpsee?branch=xavier-send-error#d56bd6af5429a9e45a515013d7a76759b1e0ef3a"
 dependencies = [
  "Inflector",
  "proc-macro2",
@@ -4613,7 +4613,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.13.0"
-source = "git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error#1749ac289e475cf44ae63457f396601fd707b296"
+source = "git+https://github.com/darwinia-network/substrate-subxt?branch=xavier-send-error#1749ac289e475cf44ae63457f396601fd707b296"
 dependencies = [
  "frame-metadata",
  "frame-support",
@@ -4639,7 +4639,7 @@ dependencies = [
  "sp-std",
  "sp-transaction-pool",
  "sp-version",
- "substrate-subxt-proc-macro 0.13.0 (git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error)",
+ "substrate-subxt-proc-macro 0.13.0 (git+https://github.com/darwinia-network/substrate-subxt?branch=xavier-send-error)",
  "thiserror",
  "url 2.2.0",
 ]
@@ -4662,7 +4662,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.13.0"
-source = "git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error#1749ac289e475cf44ae63457f396601fd707b296"
+source = "git+https://github.com/darwinia-network/substrate-subxt?branch=xavier-send-error#1749ac289e475cf44ae63457f396601fd707b296"
 dependencies = [
  "heck",
  "proc-macro-crate",

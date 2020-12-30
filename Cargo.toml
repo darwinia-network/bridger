@@ -73,12 +73,12 @@ features = ["derive"]
 [patch.crates-io]
 # jsonrpsee = { path = "../jsonrpsee", features = ["ws"] }
 # substrate-subxt = { path = "../substrate-subxt" }
-jsonrpsee = { git = "https://github.com/AurevoirXavier/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
-substrate-subxt = { git = "https://github.com/wuminzhe/substrate-subxt", branch = "xavier-send-error" }
+jsonrpsee = { git = "https://github.com/darwinia-network/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
+substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt", branch = "xavier-send-error" }
 [patch.'https://github.com/paritytech/jsonrpsee']
 # jsonrpsee = { path = "../jsonrpsee", features = ["ws"] }
 # substrate-subxt = { path = "../substrate-subxt" }
-jsonrpsee = { git = "https://github.com/AurevoirXavier/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
-substrate-subxt = { git = "https://github.com/wuminzhe/substrate-subxt", branch = "xavier-send-error" }
+jsonrpsee = { git = "https://github.com/darwinia-network/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
+substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt", branch = "xavier-send-error" }
 
 

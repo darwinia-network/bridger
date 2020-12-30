@@ -10,5 +10,6 @@ pub mod api;
 pub mod cmd;
 pub mod error;
 pub mod service;
+pub mod tools;
 
 pub use self::config::Config;

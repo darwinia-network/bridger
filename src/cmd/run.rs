@@ -15,7 +15,6 @@ use web3::{
 use actix::Actor;
 use std::time::Duration;
 use tokio::time;
-use substrate_subxt::sp_core::crypto::*;
 
 use crate::service::MsgStop;
 use crate::service::EthereumService;
@@ -23,7 +22,10 @@ use crate::service::RelayService;
 use crate::service::RedeemService;
 use crate::service::GuardService;
 use crate::service::SubscribeService;
+use crate::service::ExtrinsicsService;
 use crate::error::BizError;
+use crate::api::Ethereum;
+use crate::tools;
 
 /// Run the bridger
 pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
@@ -37,8 +39,11 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
     env_logger::init();
 
     while let Err(e) = run(data_dir.clone()).await {
-        if let Error::NoEthereumStart = e {
-            error!("{}", e);
+        if let Some(Error::NoEthereumStart) = e.downcast_ref() {
+            error!("{:?}", e);
+            break;
+        } else if let Some(Error::NoDarwiniaStart) = e.downcast_ref() {
+            error!("{:?}", e);
             break;
         } else {
             error!("{:?}", e);
@@ -71,23 +76,15 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
     // --- Network ---
     let runtime_version: sp_version::RuntimeVersion = darwinia.client.rpc.runtime_version(None).await?;
     let spec_name = runtime_version.spec_name.to_string();
-    let network = if spec_name == "Crab" {
-        "Crab"
-    } else if spec_name == "node-template" || spec_name.contains("Dev") {
-        "Dev"
-    } else {
-        set_default_ss58_version(Ss58AddressFormat::DarwiniaAccount);
-        "Mainnet"
-    };
 
     // --- Print startup info ---
     info!("🔗 Connect to");
-    info!("   Darwinia {}: {}", network, config.node);
+    info!("   Darwinia {}: {}", &spec_name, config.node);
     info!("   Shadow: {}", config.shadow);
     info!("   Ethereum: {}", config.eth.rpc);
-    let account_id = &darwinia.account.account_id;
-    let roles = darwinia.account.role_names().await?;
-    match &darwinia.account.real {
+    let account_id = &darwinia.sender.account_id;
+    let roles = darwinia.sender.role_names().await?;
+    match &darwinia.sender.real {
         None => {
             info!("🧔 Relayer({:?}): 0x{:?}", roles, account_id);
         }
@@ -98,55 +95,61 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
     }
 
     // --- Start services ---
-    start_services(&config, &shadow, &darwinia, &web3, data_dir).await
+    start_services(&config, &shadow, &darwinia, &web3, data_dir, spec_name).await
 }
 
-async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Darwinia>, web3: &Web3<Http>, data_dir: PathBuf) -> Result<()> {
-    let last_redeemed =
-        RedeemService::get_last_redeemed(data_dir.clone()).await.map_err(|e| {
-            if let Error::LastRedeemedFileNotExists = e {
-                Error::NoEthereumStart
-            } else {
-                e
-            }
-        })?;
-    let ethereum_start = last_redeemed;
-    info!("🌱 Relay from ethereum block: {}", ethereum_start);
+async fn start_services(
+    config: &Config,
+    shadow: &Arc<Shadow>,
+    darwinia: &Arc<Darwinia>,
+    web3: &Web3<Http>,
+    data_dir: PathBuf,
+    spec_name: String,
+) -> Result<()> {
+    let last_redeemed = tools::get_cache(data_dir.clone(), tools::LAST_REDEEMED_CACHE_FILE_NAME, Error::NoEthereumStart).await?;
+    info!("🌱 Relay from ethereum block: {}", last_redeemed + 1);
+
+    let last_tracked_ethereum_block = tools::get_cache(data_dir.clone(), tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME, Error::NoDarwiniaStart).await?;
+    info!("🌱 Scan darwinia from block: {}", last_tracked_ethereum_block + 1);
+
+    // extrinsic sender
+    let extrinsics_service = ExtrinsicsService::new(darwinia.clone(), spec_name.clone(), data_dir.clone()).start();
 
     // relay service
     let last_confirmed = darwinia.last_confirmed().await.unwrap();
-    let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed, config.step.relay).start();
+    let relay_service = RelayService::new(shadow.clone(), darwinia.clone(), last_confirmed, config.step.relay, extrinsics_service.clone().recipient()).start();
 
     // redeem service
-    let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem, data_dir.clone()).start();
+    let redeem_service = RedeemService::new(shadow.clone(), darwinia.clone(), config.step.redeem, extrinsics_service.clone().recipient()).start();
 
     // ethereum service
     let ethereum_service = EthereumService::new(
         config.clone(),
         web3.clone(),
         darwinia.clone(),
-        ethereum_start,
+        last_redeemed + 1,
         relay_service.clone().recipient(),
         redeem_service.clone().recipient(),
-        data_dir
+        data_dir.clone()
     ).start();
 
     // guard service
-    let is_tech_comm_member = darwinia.account.is_tech_comm_member().await?;
+    let is_tech_comm_member = darwinia.sender.is_tech_comm_member().await?;
     let guard_service =
-        GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard, is_tech_comm_member).map(|g| {
+        GuardService::new(shadow.clone(), darwinia.clone(), config.step.guard, is_tech_comm_member, extrinsics_service.clone().recipient()).map(|g| {
             g.start()
         });
 
     //
-    let mut subscribe = match SubscribeService::new(shadow.clone(), darwinia.clone()).await {
-        Ok(subscribe) => {
-            subscribe
-        },
-        Err(e) => {
-            return Err(e);
-        }
-    };
+    let ethereum = Ethereum::new(web3.clone(), &config.clone())?;
+    let mut subscribe = SubscribeService::new(
+        darwinia.clone(),
+        ethereum,
+        extrinsics_service.clone().recipient(),
+        spec_name,
+        (last_tracked_ethereum_block as u32) + 1,
+        data_dir.clone()
+    );
     let b = async {
         if let Err(e) = subscribe.start().await {
             return Err(e);
@@ -164,13 +167,14 @@ async fn start_services(config: &Config, shadow: &Arc<Shadow>, darwinia: &Arc<Da
     };
 
     if let Err(e) = select!(b, c).await {
-        ethereum_service.do_send(MsgStop{});
-        relay_service.do_send(MsgStop{});
-        redeem_service.do_send(MsgStop{});
+        ethereum_service.do_send(MsgStop {});
+        relay_service.do_send(MsgStop {});
+        redeem_service.do_send(MsgStop {});
         if let Some(guard_service) = guard_service {
-            guard_service.do_send(MsgStop{});
+            guard_service.do_send(MsgStop {});
         }
         subscribe.stop();
+        extrinsics_service.do_send(MsgStop {});
         Err(e)
     } else {
         Ok(())

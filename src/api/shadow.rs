@@ -13,6 +13,7 @@ use reqwest::{Client, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
 use crate::error::Error;
+use anyhow::Context as AnyhowContext;
 
 #[derive(Serialize)]
 struct Proposal {
@@ -51,10 +52,10 @@ impl Shadow {
             .send()
             .await?;
         if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
-            Err(Error::ShadowInternalServerError(resp.text().await?))
+            Err(Error::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let json: MMRRootJson = resp.json()
-                .await?;
+                .await.context(format!("Fail to parse json to MMRRootJson: {}", url))?;
             let result = json.into();
             if result == MMRRoot::default() {
                 Err(BizError::BlankEthereumMmrRoot(block_number).into())
@@ -83,7 +84,7 @@ impl Shadow {
             .send()
             .await?;
         if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
-            Err(Error::ShadowInternalServerError(resp.text().await?))
+            Err(Error::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let json: EthereumReceiptProofThingJson = resp.json().await?;
             Ok(json.into())
@@ -115,7 +116,7 @@ impl Shadow {
             .await?;
 
         if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
-            Err(Error::ShadowInternalServerError(resp.text().await?))
+            Err(Error::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let json: EthereumRelayProofsJson = resp.json().await?;
             Ok(json.into())

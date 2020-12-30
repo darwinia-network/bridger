@@ -4,12 +4,16 @@ use core::marker::PhantomData;
 use primitives::{
     chain::{
         ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
-        proxy_type::ProxyType, RelayVotingState,
+        proxy_type::ProxyType,
     },
     frame::{
         ethereum::{
-            backing::{Redeem, RedeemCallExt, VerifiedProofStoreExt},
-            game::{AffirmationsStoreExt, EthereumRelayerGame},
+            backing::{
+                Redeem,
+                RedeemCallExt,
+                VerifiedProofStoreExt,
+            },
+            game::{AffirmationsStoreExt, EthereumRelayerGame,},
             relay::{
                 Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
                 PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
@@ -18,18 +22,26 @@ use primitives::{
             },
         },
         proxy::ProxyCallExt,
-        sudo::{KeyStoreExt, SudoCallExt},
-        technical_committee::MembersStoreExt,
+        sudo::SudoCallExt,
+        bridge::relay_authorities::{
+            SubmitSignedAuthorities,
+            SubmitSignedAuthoritiesCallExt,
+            SubmitSignedMmrRoot,
+            SubmitSignedMmrRootCallExt,
+            AuthorityTermStoreExt,
+        }
     },
-    runtime::DarwiniaRuntime,
+    runtime::{DarwiniaRuntime, EcdsaMessage, EcdsaSignature, EcdsaAddress},
 };
-use sp_keyring::sr25519::sr25519::Pair;
 use std::collections::HashMap;
-use substrate_subxt::{
-    sp_core::Pair as PairTrait, system::System, Client, ClientBuilder, PairSigner,
-};
-use web3::types::H256;
+use substrate_subxt::{system::System, BlockNumber, Client, ClientBuilder, EventsDecoder, RawEvent};
 use crate::error::BizError;
+use crate::api::darwinia_sender::DarwiniaSender;
+use parity_scale_codec::Encode;
+use substrate_subxt::sp_runtime::traits::Header;
+use substrate_subxt::sp_core::{twox_128, H256};
+use substrate_subxt::sp_core::storage::{StorageKey, StorageData};
+use substrate_subxt::events::Raw;
 
 // Types
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
@@ -38,141 +50,12 @@ type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
 /// AccountId
 pub type AccountId = <DarwiniaRuntime as System>::AccountId;
 
-/// Sudo Account
-pub const ROLE_SUDO: (&str, u8) = ("SUDO", 1);
-/// Technical Committee Member
-pub const ROLE_TECHNICAL_COMMITTEE: (&str, u8) = ("TECHNICAL_COMMITTEE", 2);
-/// Normal Account
-pub const ROLE_NORMAL: (&str, u8) = ("NORMAL", 4);
-
-/// contains_role
-pub fn contains_role(roles: u8, mask: u8) -> bool {
-    roles & mask > 0
-}
-
-/// decode_roles
-pub fn decode_roles(roles: u8) -> Vec<&'static str> {
-    let mut result = vec![];
-    if contains_role(roles, ROLE_SUDO.1) {
-        result.push(ROLE_SUDO.0);
-    }
-    if contains_role(roles, ROLE_TECHNICAL_COMMITTEE.1) {
-        result.push(ROLE_TECHNICAL_COMMITTEE.0);
-    }
-    if contains_role(roles, ROLE_NORMAL.1) {
-        result.push(ROLE_NORMAL.0);
-    }
-    result
-}
-
-/// encode_roles
-pub fn encode_roles(roles: Vec<&'static str>) -> u8 {
-    let mut result = 0u8;
-    if roles.contains(&ROLE_SUDO.0) {
-        result += ROLE_SUDO.1;
-    }
-    if roles.contains(&ROLE_TECHNICAL_COMMITTEE.0) {
-        result += ROLE_TECHNICAL_COMMITTEE.1;
-    }
-    if roles.contains(&ROLE_NORMAL.0) {
-        result += ROLE_NORMAL.1;
-    }
-    result
-}
-
-/// account_roles
-pub fn calc_account_roles(account: &AccountId, sudo: &AccountId, tech_comm_members: &[AccountId]) -> u8 {
-    let mut roles = vec![];
-    roles.push(ROLE_NORMAL.0);
-    if sudo == account {
-        roles.push(ROLE_SUDO.0);
-    }
-    if tech_comm_members.contains(&account) {
-        roles.push(ROLE_TECHNICAL_COMMITTEE.0);
-    }
-    encode_roles(roles)
-}
-
-/// Account
-pub struct Account {
-    /// client
-    pub client: Client<DarwiniaRuntime>,
-    /// Account Id
-    pub account_id: AccountId,
-    /// signer of the account
-    pub signer: PairSigner<DarwiniaRuntime, Pair>,
-    /// proxy real
-    pub real: Option<AccountId>,
-}
-
-impl Account {
-    /// Create a new Account
-    pub fn new(seed: String, real: Option<String>, client: Client<DarwiniaRuntime>) -> Account {
-        let pair = Pair::from_string(&seed, None).unwrap(); // if not a valid seed
-        let signer = PairSigner::<DarwiniaRuntime, Pair>::new(pair);
-        let public = signer.signer().public().0;
-        let account_id = AccountId::from(public);
-
-        // convert to account id
-        let real = real.map(|real| {
-            let real = hex::decode(real).unwrap(); // if decode fail
-            let mut data: [u8; 32] = [0u8; 32];
-            data.copy_from_slice(&real[..]);
-            AccountId::from(data)
-        });
-
-        Account {
-            client,
-            account_id,
-            signer,
-            real,
-        }
-    }
-
-    /// roles
-    pub async fn roles(&self) -> Result<u8> {
-        let sudo = self.client.key(None).await?;
-        let tech_comm_members = self.client.members(None).await?;
-
-        let roles = if let Some(real_account_id) = &self.real {
-            calc_account_roles(real_account_id, &sudo, &tech_comm_members)
-        } else {
-            calc_account_roles(&self.account_id, &sudo, &tech_comm_members)
-        };
-
-        Ok(roles)
-    }
-
-    /// role names
-    pub async fn role_names(&self) -> Result<Vec<&'static str>> {
-        Ok(decode_roles(self.roles().await?))
-    }
-
-    /// is_sudo_key
-    pub async fn is_sudo_key(&self) -> Result<bool> {
-        Ok(contains_role(self.roles().await?, ROLE_SUDO.1))
-    }
-
-    /// is_tech_comm_member
-    pub async fn is_tech_comm_member(&self) -> Result<bool> {
-        Ok(contains_role(self.roles().await?, ROLE_TECHNICAL_COMMITTEE.1))
-    }
-
-    /// has_voted
-    pub fn has_voted(&self, voting_state: RelayVotingState<AccountId>) -> bool {
-        match &self.real {
-            None => voting_state.contains(&self.account_id),
-            Some(real) => voting_state.contains(real)
-        }
-    }
-}
-
 /// Dawrinia API
 pub struct Darwinia {
     /// client
     pub client: Client<DarwiniaRuntime>,
     /// account
-    pub account: Account,
+    pub sender: DarwiniaSender,
 }
 
 impl Darwinia {
@@ -186,20 +69,22 @@ impl Darwinia {
                         source: e
                     }
                 })?;
-
         let client = ClientBuilder::<DarwiniaRuntime>::new()
             .set_client(client)
             .build()
             .await?;
-        let account = Account::new(
+
+        let sender = DarwiniaSender::new(
             config.seed.clone(),
             config.proxy.clone().map(|proxy| proxy.real[2..].to_string()),
-                client.clone()
+            client.clone(),
+            config.darwinia_to_ethereum.seed.clone()[2..].to_string(),
+            config.eth.rpc.to_string(),
 		);
 
         Ok(Darwinia {
             client,
-            account,
+            sender,
         })
     }
 
@@ -209,13 +94,13 @@ impl Darwinia {
             ethereum_relay_header_parcel: parcel,
             _runtime: PhantomData::default(),
         })?;
-        Ok(self.client.sudo(&self.account.signer, &ex).await?)
+        Ok(self.client.sudo(&self.sender.signer, &ex).await?)
     }
 
     /// Vote pending relay header parcel
     pub async fn vote_pending_relay_header_parcel(&self, pending: u64, aye: bool) -> Result<H256> {
-        if self.account.is_tech_comm_member().await? {
-            match &self.account.real {
+        if self.sender.is_tech_comm_member().await? {
+            match &self.sender.real {
                 Some(real) => { // proxy
                     trace!("Proxy vote for {:?}", real);
                     let vote = VotePendingRelayHeaderParcel {
@@ -225,12 +110,12 @@ impl Darwinia {
                     };
 
                     let ex = self.client.encode(vote).unwrap();
-                    let ex_hash = self.client.proxy(&self.account.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?;
+                    let ex_hash = self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?;
                     Ok(ex_hash)
                 },
                 None => { // no proxy
                     let ex_hash = self.client
-                        .vote_pending_relay_header_parcel(&self.account.signer, pending, aye)
+                        .vote_pending_relay_header_parcel(&self.sender.signer, pending, aye)
                         .await?;
                     Ok(ex_hash)
                 }
@@ -294,7 +179,7 @@ impl Darwinia {
 
     /// Submit affirmation
     pub async fn affirm(&self, parcel: EthereumRelayHeaderParcel) -> Result<H256> {
-        match &self.account.real {
+        match &self.sender.real {
             Some(real) => {
                 trace!("Proxy call `affirm` for {:?}", real);
                 let affirm = Affirm {
@@ -304,10 +189,10 @@ impl Darwinia {
                 };
 
                 let ex = self.client.encode(affirm).unwrap();
-                Ok(self.client.proxy(&self.account.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
+                Ok(self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
             },
             None => {
-                Ok(self.client.affirm(&self.account.signer, parcel, None).await?)
+                Ok(self.client.affirm(&self.sender.signer, parcel, None).await?)
             }
         }
     }
@@ -321,7 +206,7 @@ impl Darwinia {
         let ethereum_tx_hash = proof.header.hash
             .map(|hash| hex::encode(&hash))
             .ok_or_else(|| BizError::Bridger("No hash in header".to_string()))?;
-        match &self.account.real {
+        match &self.sender.real {
             Some(real) => {
                 trace!("Proxy redeem ethereum tx 0x{:?} for real account {:?}", ethereum_tx_hash, real);
                 let redeem = Redeem {
@@ -331,14 +216,151 @@ impl Darwinia {
                 };
 
                 let ex = self.client.encode(redeem).unwrap();
-                Ok(self.client.proxy(&self.account.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
+                Ok(self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?)
             },
             None => {
-                trace!("Redeem ethereum tx 0x{:?} with account {:?}", ethereum_tx_hash, &self.account.account_id);
-                Ok(self.client.redeem(&self.account.signer, redeem_for, proof).await?)
+                trace!("Redeem ethereum tx 0x{:?} with account {:?}", ethereum_tx_hash, &self.sender.account_id);
+                Ok(self.client.redeem(&self.sender.signer, redeem_for, proof).await?)
             }
         }
     }
+
+    /// submit_signed_authorities
+    pub async fn ecdsa_sign_and_submit_signed_authorities(&self, message: EcdsaMessage) -> Result<H256> {
+        if self.sender.is_authority().await? {
+            let signature = self.sender.ecdsa_sign(&message)?;
+            match &self.sender.real { // proxy
+                Some(real) => {
+                    trace!("Proxyed ecdsa sign and submit authorities to darwinia");
+                    let submit_signed_authorities = SubmitSignedAuthorities {
+                        signature,
+                    };
+
+                    let ex = self.client.encode(submit_signed_authorities).unwrap();
+                    let tx_hash = self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?;
+                    Ok(tx_hash)
+                },
+                None => {
+                    trace!("Ecdsa sign and submit authorities to darwinia");
+                    let tx_hash = self
+                        .client
+                        .submit_signed_authorities(&self.sender.signer, signature)
+                        .await?;
+                    Ok(tx_hash)
+                }
+            }
+        } else {
+            Err(BizError::Bridger("Not authority".to_string()).into())
+        }
+    }
+
+    /// construct_message
+    pub fn construct_authorities_message(first: String, second: u32, third: Vec<EcdsaAddress>) -> Vec<u8> {
+        debug!("Infos to construct eth authorities message: {:?}, {:?}, {:?}", first, second, third.iter().map(|a| hex::encode(&a)).collect::<Vec<_>>().join(", "));
+        // scale encode & sign
+        let message = _S {
+            _1: first,
+            _2: second,
+            _3: third
+        };
+        let encoded: &[u8] = &message.encode();
+        encoded.to_vec()
+    }
+
+    /// submit_signed_mmr_root
+    pub async fn ecdsa_sign_and_submit_signed_mmr_root(
+        &self,
+        spec_name: String,
+        block_number: u32,
+    ) -> Result<H256> {
+        if self.sender.is_authority().await? {
+            // get mmr root from darwinia
+            let leaf_index = block_number;
+            let mmr_root = self.get_mmr_root(leaf_index).await?;
+
+            debug!("Infos to construct mmr_root message: {}, {}, {:?}", spec_name.clone(), block_number, mmr_root);
+            // scale encode & sign
+            let message = _S {
+					_1: spec_name,
+					_2: block_number,
+					_3: mmr_root
+				};
+			let encoded = message.encode();
+
+            let hash = web3::signing::keccak256(&encoded);
+            let signature = self.sender.ecdsa_sign(&hash)?;
+
+            match &self.sender.real { // proxy
+                Some(real) => {
+                    trace!("Proxyed ecdsa sign and submit mmr_root to darwinia, block_number: {}", block_number);
+                    let submit_signed_mmr_root = SubmitSignedMmrRoot {
+                        block_number,
+                        mmr_root,
+                        signature,
+                    };
+
+                    let ex = self.client.encode(submit_signed_mmr_root).unwrap();
+                    let tx_hash = self.client.proxy(&self.sender.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex).await?;
+                    Ok(tx_hash)
+                },
+                None => {
+                    trace!("Ecdsa sign and submit mmr_root to darwinia, block_number: {}", block_number);
+                    let tx_hash = self
+                        .client
+                        .submit_signed_mmr_root(&self.sender.signer, block_number, mmr_root, signature)
+                        .await?;
+                    Ok(tx_hash)
+                }
+            }
+        } else {
+            Err(BizError::Bridger("Not authority".to_string()).into())
+        }
+    }
+
+    async fn get_mmr_root(&self, leaf_index: u32) -> Result<H256> {
+        // Get mmr_root from block number == leaf_index + 1
+        let block_number = leaf_index + 1;
+
+        // TODO: 是否需要考虑finalized
+        let block_hash = self
+            .client
+            .block_hash(Some(BlockNumber::from(block_number)))
+            .await?;
+        let header = self.client.header(block_hash).await?;
+
+        let mmr_root = if let Some(header) = header {
+            // get digest_item from header
+            let log = header
+                .digest()
+                .logs()
+                .iter()
+                .find(|&x| x.as_other().is_some());
+            if let Some(digest_item) = log {
+                // get mmr_root from log
+                let parent_mmr_root = digest_item.as_other().unwrap().to_vec();
+                let parent_mmr_root = &parent_mmr_root[4..];
+                if parent_mmr_root.len() != 32 {
+                    return Err(BizError::Bridger(format!(
+                        "Wrong parent_mmr_root len: {}",
+                        parent_mmr_root.len()
+                    ))
+                        .into());
+                }
+                let mut mmr_root: [u8; 32] = [0; 32];
+                mmr_root.copy_from_slice(&parent_mmr_root);
+                H256(mmr_root)
+            } else {
+                return Err(
+                    BizError::Bridger("Wrong header with no parent_mmr_root".to_string()).into(),
+                );
+            }
+        } else {
+            return Err(BizError::Bridger("No header fetched".to_string()).into());
+        };
+
+        Ok(mmr_root)
+    }
+
 
     /// Check if should redeem
     pub async fn verified(&self, tx: &EthereumTransaction) -> Result<bool> {
@@ -369,4 +391,84 @@ impl Darwinia {
         // TODO: How to play and join the game
         false
     }
+
+    /// get_raw_events
+    pub async fn get_raw_events(&self, header_hash: H256) -> Result<Vec<RawEvent>> {
+        let mut events = vec![];
+
+        let storage_data = self.get_storage_data("System", "Events", header_hash).await?;
+
+        let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(self.client.metadata().clone());
+        decoder.register_type_size::<u128>("Balance");
+        decoder.register_type_size::<u128>("RingBalance");
+        decoder.register_type_size::<u128>("KtonBalance");
+        decoder.register_type_size::<[u8; 20]>("EthereumAddress");
+        decoder.register_type_size::<[u8; 20]>("EcdsaAddress");
+        decoder.register_type_size::<H256>("MMRRoot");
+        decoder.register_type_size::<[u8; 32]>("RelayAuthorityMessage");
+        decoder.register_type_size::<[u8; 20]>("RelayAuthoritySigner");
+        decoder.register_type_size::<EcdsaSignature>("RelayAuthoritySignature");
+        decoder.register_type_size::<u8>("ElectionCompute"); // just a hack
+        decoder.register_type_size::<u32>("Term");
+
+        let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
+        for (_, raw) in raw_events {
+            match raw {
+                Raw::Event(event) => {
+                    events.push(event);
+                },
+                Raw::Error(err) => {
+                    error!("Error found in raw events: {:#?}", err);
+                }
+            }
+        }
+
+        Ok(events)
+    }
+
+    /// get_storage_data
+    pub async fn get_storage_data(&self, module_name: &str, storage_name: &str, header_hash: H256) -> Result<StorageData> {
+        let mut storage_key = twox_128(module_name.as_bytes()).to_vec();
+        storage_key.extend(twox_128(storage_name.as_bytes()).to_vec());
+
+        let keys = vec![StorageKey(storage_key)];
+
+        let change_sets = self.client.query_storage(keys, header_hash, Some(header_hash)).await?;
+        for change_set in change_sets {
+            for (_key, data) in change_set.changes {
+                if let Some(data) = data {
+                    return Ok(data)
+                }
+            }
+        }
+
+        Err(anyhow::anyhow!("StorageData not found"))
+    }
+
+    /// get_current_term
+    pub async fn get_current_authority_term(&self) -> Result<u32>{
+        Ok(self.client.authority_term(None).await?)
+    }
+}
+#[derive(Encode)]
+struct _S<_1, _2, _3>
+where
+	_1: Encode,
+	_2: Encode,
+	_3: Encode,
+{
+	_1: _1,
+	#[codec(compact)]
+	_2: _2,
+	_3: _3,
+}
+
+#[test]
+fn test_encode() {
+	let s = _S {
+		_1: "Pangolin",
+		_2: 50u32,
+		_3: [38u8, 199, 154, 103, 135, 242, 210, 106, 168, 120, 216, 232, 234, 114, 194, 69, 189, 238, 196, 220, 4, 5, 74, 15, 181, 223, 155, 200, 224, 204, 189, 1],
+	};
+	println!("{:?}", s.encode());
 }

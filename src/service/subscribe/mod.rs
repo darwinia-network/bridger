@@ -1,108 +1,200 @@
 //! Darwinia Subscribe
+mod darwinia_tracker;
+
+use crate::api::Ethereum;
+use crate::error::BizError;
 use crate::{
-    api::{Darwinia, Shadow},
-    error::Result,
+	api::Darwinia,
+	error::Result,
+    service::extrinsics::{Extrinsic, MsgExtrinsic},
 };
+use actix::Recipient;
 use primitives::{
-    frame::ethereum::{
-        backing::EthereumBackingEventsDecoder, game::EthereumRelayerGameEventsDecoder,
-        relay::EthereumRelayEventsDecoder,
-    },
-    runtime::DarwiniaRuntime,
+	frame::bridge::relay_authorities::{AuthoritiesSetSigned, NewAuthorities, NewMMRRoot},
+	runtime::DarwiniaRuntime,
 };
 use std::sync::Arc;
-use substrate_subxt::{EventSubscription, EventsDecoder};
-use crate::error::BizError;
+use substrate_subxt::sp_core::Decode;
+use substrate_subxt::RawEvent;
+use substrate_subxt::system::System;
+use std::collections::HashMap;
+use crate::service::subscribe::darwinia_tracker::DarwiniaBlockTracker;
+use crate::tools;
+use std::path::PathBuf;
+use tokio::time::{delay_for, Duration};
 
-mod backing;
-mod relay;
-
-/// Attributes
-const ETHEREUM_RELAY: &str = "EthereumRelay";
-const ETHEREUM_BACKING: &str = "EthereumBacking";
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
-    /// Shadow API
-    pub shadow: Arc<Shadow>,
-    /// Dawrinia API
-    pub darwinia: Arc<Darwinia>,
-
-    sub: EventSubscription<DarwiniaRuntime>,
-    stop: bool,
+    darwinia: Arc<Darwinia>,
+	ethereum: Ethereum,
+	stop: bool,
+	extrinsics_service: Recipient<MsgExtrinsic>,
+    delayed_extrinsics: HashMap<u32, Extrinsic>,
+    spec_name: String,
+    scan_from: u32,
+    data_dir: PathBuf,
 }
 
 impl SubscribeService {
-    /// New redeem service
-    pub async fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> Result<SubscribeService> {
-        let sub = SubscribeService::build_event_subscription(darwinia.clone()).await?;
-        Ok(SubscribeService {
+	/// New subscribe service
+	pub fn new(
+		darwinia: Arc<Darwinia>,
+		ethereum: Ethereum,
+		extrinsics_service: Recipient<MsgExtrinsic>,
+        spec_name: String,
+        scan_from: u32,
+        data_dir: PathBuf,
+	) -> SubscribeService {
+		SubscribeService {
             darwinia,
-            shadow,
-            sub,
-            stop: false
-        })
-    }
+			ethereum,
+			stop: false,
+            extrinsics_service,
+            delayed_extrinsics: HashMap::new(),
+            spec_name,
+            scan_from,
+            data_dir
+		}
+	}
 
     /// start
-    pub async fn start(&mut self) -> Result<SubscribeService> {
+    pub async fn start(&mut self) -> Result<()> {
+        let mut tracker = DarwiniaBlockTracker::new(self.darwinia.clone(), self.scan_from);
         info!("✨ SERVICE STARTED: SUBSCRIBE");
         loop {
-            if let Err(e) = self.process_next_event().await {
-                if e.to_string() == "CodeUpdated" {
-                    self.stop();
-                    return Err(e);
-                } else {
-                    error!("Fail to process next event: {:?}", e);
-                }
+            let header = tracker.next_block().await;
+
+            // debug 
+            // debug!("Darwinia block {}", header.number);
+
+            // handle the 'mmr root sign and send extrinsics' only block height reached
+            if let Err(err) = self.handle_delayed_extrinsics(&header).await {
+                error!("Encounter error when handle delayed extrinsics: {:?}", err);
+                // Prevent too fast refresh errors
+                delay_for(Duration::from_secs(30)).await;
             }
+
+            // handle events of the block
+            let hash = header.hash();
+            let events = self.darwinia.get_raw_events(hash).await;
+            if let Err(err) = self.handle_events(&header, events).await {
+                error!("Encounter error when handle events of block {}: {}", header.number, err);
+            }
+
+            tools::set_cache(self.data_dir.clone(), tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME, header.number as u64).await?;
+
             if self.stop {
                 return Err(BizError::Bridger("Force stop".to_string()).into());
             }
         }
     }
 
-    /// stop
-    pub fn stop(&mut self) {
-        info!("💤 SERVICE STOPPED: SUBSCRIBE");
-        self.stop = true;
-    }
+	/// stop
+	pub fn stop(&mut self) {
+		info!("💤 SERVICE STOPPED: SUBSCRIBE");
+		self.stop = true;
+	}
 
-    /// process_next_event
-    async fn process_next_event(&mut self) -> Result<()> {
-        if let Some(raw) = self.sub.next().await {
-            if let Ok(event) = raw {
-                // Remove the system events temporarily because it`s too verbose.
-                if &event.module == "System" {
-                    if event.variant.as_str() == "CodeUpdated" {
-                        return Err(BizError::Bridger("CodeUpdated".to_string()).into());
-                    }
-                } else {
-                    debug!(">> Event - {}::{}", &event.module, &event.variant);
-                    // Common events to debug
-                    match event.module.as_str() {
-                        ETHEREUM_RELAY => relay::handle(event)?,
-                        ETHEREUM_BACKING => backing::handle(event)?,
-                        _ => {}
-                    };
+    async fn handle_delayed_extrinsics(&mut self, header: &<DarwiniaRuntime as System>::Header) -> Result<()> {
+        let mut to_removes = vec![];
+        for (delayed_to, delayed_ex) in self.delayed_extrinsics.iter() {
+            if header.number >= *delayed_to {
+                if self.darwinia.sender.need_to_sign_mmr_root_of(*delayed_to).await? {
+                    let msg = MsgExtrinsic(delayed_ex.clone());
+                    self.extrinsics_service.send(msg).await?;
                 }
+                to_removes.push(*delayed_to);
             }
+        }
+        for to_remove in to_removes {
+            self.delayed_extrinsics.remove(&to_remove);
         }
         Ok(())
     }
 
-    async fn build_event_subscription(darwinia: Arc<Darwinia>) -> Result<EventSubscription<DarwiniaRuntime>> {
-        let client = &darwinia.client;
-        let scratch = client.subscribe_events().await?;
-        let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());
+    async fn handle_events(&mut self, header: &<DarwiniaRuntime as System>::Header, events: Result<Vec<RawEvent>>) -> Result<()> {
+        for event in events? {
+            let module = event.module.as_str();
+            let variant = event.variant.as_str();
+            let event_data = event.data;
 
-        // Register decoders
-        decoder.with_ethereum_backing();
-        decoder.with_ethereum_relayer_game();
-        decoder.with_ethereum_relay();
-
-        // Build subscriber
-        let sub = EventSubscription::<DarwiniaRuntime>::new(scratch, decoder);
-        Ok(sub)
+            self.handle_event(header, module, variant, event_data).await?;
+        }
+        Ok(())
     }
+
+	async fn handle_event(
+		&mut self,
+        _header: &<DarwiniaRuntime as System>::Header,
+		module: &str,
+		variant: &str,
+		event_data: Vec<u8>,
+	) -> Result<()> {
+		if module != "System" {
+			trace!(">> Event - {}::{}", module, variant);
+		}
+
+		match (module, variant) {
+			("System", "CodeUpdated") => {
+				return Err(BizError::Bridger("CodeUpdated".to_string()).into());
+			}
+
+            // call ethereum_relay_authorities.request_authority and then sudo call
+            // EthereumRelayAuthorities.add_authority will emit the event
+			("EthereumRelayAuthorities", "NewAuthorities") => {
+                if self.darwinia.sender.is_authority().await? {
+                    if let Ok(decoded) = NewAuthorities::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
+                        info!(">> Event - {}::{:#?}", module, decoded);
+                        if self.darwinia.sender.need_to_sign_authorities(decoded.message).await? {
+                            let ex = Extrinsic::SignAndSendAuthorities(decoded.message);
+                            let msg = MsgExtrinsic(ex);
+                            self.extrinsics_service.send(msg).await?;
+                        }
+                    }
+                }
+			}
+
+            // authority set changed will emit this event
+			("EthereumRelayAuthorities", "AuthoritiesSetSigned") => {
+				if let Ok(decoded) =
+					AuthoritiesSetSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
+				{
+                    // TODO: Add better repeating check
+                    info!(">> Event - {}::{:#?}", module, decoded);
+                    let current_term = self.darwinia.get_current_authority_term().await?;
+                    if decoded.term == current_term {
+                        let message = Darwinia::construct_authorities_message(
+                            self.spec_name.clone(),
+                            decoded.term,
+                            decoded.new_authorities
+                        );
+                        let signatures = decoded.signatures
+                            .iter()
+                            .map(|s| s.1.clone()).collect::<Vec<_>>();
+                        self.ethereum.submit_authorities_set(
+                            message,
+                            signatures,
+                        ).await?;
+                        info!("Authorities submitted to ethereum");
+                    }
+				}
+			}
+
+            // call ethereum_backing.lock will emit the event
+			("EthereumRelayAuthorities", "NewMMRRoot") => {
+                if self.darwinia.sender.is_authority().await? {
+                    if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
+                        info!(">> Event - {}::{:#?}", module, decoded);
+                        let ex = Extrinsic::SignAndSendMmrRoot(decoded.block_number);
+                        self.delayed_extrinsics.insert(decoded.block_number, ex);
+                    }
+			    }
+            }
+
+			_ => {}
+		}
+
+		Ok(())
+	}
 }

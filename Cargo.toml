@@ -37,7 +37,7 @@ sp-keyring = "2.0.0"
 structopt = "0.3.18"
 substrate-subxt = "0.13.0"
 toml = "0.5.6"
-web3 = "0.13.0"
+web3 = { version = "0.14.0", git = "https://github.com/tomusdrw/rust-web3.git", features = ["signing"] }
 serde_json = "1.0"
 hex = "0.4.2"
 actix = "0.10"
@@ -45,6 +45,10 @@ actix-rt = "1.1.1"
 async-io = "1.1.10"
 sp-version = "2.0.0"
 thiserror = "1.0"
+anyhow = "1.0.34"
+parity-scale-codec = "1.3.5"
+secp256k1 = { version = "0.19", features = ["recovery"] }
+rust-crypto = "0.2.36"
 
 [dependencies.reqwest]
 version = "0.10"
@@ -69,10 +73,12 @@ features = ["derive"]
 [patch.crates-io]
 # jsonrpsee = { path = "../jsonrpsee", features = ["ws"] }
 # substrate-subxt = { path = "../substrate-subxt" }
-jsonrpsee = { git = "https://github.com/AurevoirXavier/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
-substrate-subxt = { git = "https://github.com/AurevoirXavier/substrate-subxt", branch = "xavier-send-error" }
+jsonrpsee = { git = "https://github.com/darwinia-network/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
+substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt", branch = "xavier-send-error" }
 [patch.'https://github.com/paritytech/jsonrpsee']
 # jsonrpsee = { path = "../jsonrpsee", features = ["ws"] }
 # substrate-subxt = { path = "../substrate-subxt" }
-jsonrpsee = { git = "https://github.com/AurevoirXavier/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
-substrate-subxt = { git = "https://github.com/AurevoirXavier/substrate-subxt", branch = "xavier-send-error" }
+jsonrpsee = { git = "https://github.com/darwinia-network/jsonrpsee", branch = "xavier-send-error", features = ["ws"] }
+substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt", branch = "xavier-send-error" }
+
+

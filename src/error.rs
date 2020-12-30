@@ -6,36 +6,6 @@ use crate::service::redeem::EthereumTransactionHash;
 
 #[derive(ThisError, Debug)]
 pub enum Error {
-    #[error(transparent)]
-    Io(#[from] std::io::Error),
-
-    #[error(transparent)]
-    DeToml(#[from] toml::de::Error),
-
-    #[error(transparent)]
-    SerToml(#[from] toml::ser::Error),
-
-    #[error(transparent)]
-    Web3(#[from] web3::Error),
-
-    #[error(transparent)]
-    Reqwest(#[from] reqwest::Error),
-
-    #[error(transparent)]
-    SerdeJson(#[from] serde_json::Error),
-
-    #[error(transparent)]
-    Subxt(#[from] substrate_subxt::Error),
-
-    #[error(transparent)]
-    Primitives(#[from] primitives::result::Error),
-
-    #[error(transparent)]
-    Etc(#[from] etc::Error),
-
-    #[error(transparent)]
-    BizError(#[from] BizError),
-
     #[error("Failed to connect to darwinia node {url}")]
     FailToConnectDarwinia {
         url: String,
@@ -45,8 +15,11 @@ pub enum Error {
     #[error("The last redeemed block number is not set")]
     LastRedeemedFileNotExists,
 
-    #[error("No ethereum start, run 'bridger set-start --data-dir <data_dir> --block <redeem_scan_start>' to set one")]
+    #[error("No ethereum start, run 'bridger set-start --block <redeem_scan_start> [--data-dir <data_dir>]' to set one")]
     NoEthereumStart,
+
+    #[error("No darwinia scan start, run 'bridger set-darwinia-start --block <scan_start> [--data-dir <data_dir>]' to set one")]
+    NoDarwiniaStart,
 
     #[error("{0}")]
     ShadowInternalServerError(String),
@@ -60,7 +33,7 @@ pub enum BizError {
     #[error("Heartbeat>>> Scanning ethereum too fast from {0}, the latest block number is {1}")]
     ScanningEthereumTooFast(u64, u64),
 
-    #[error("The affirming target block {0} is less than the last_confirmed {0}")]
+    #[error("The affirming target block {0} is less than the last_confirmed {1}")]
     AffirmingBlockLessThanLastConfirmed(u64, u64),
 
     #[error("The affirming target block {0} is in pending")]
@@ -82,4 +55,4 @@ pub enum BizError {
     BlankEthereumMmrRoot(usize),
 }
 
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<T> = anyhow::Result<T>;

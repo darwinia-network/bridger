@@ -12,6 +12,8 @@ mod keys;
 mod run;
 mod show_parcel;
 mod set_start;
+mod ecdsa;
+mod set_darwinia_start;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -67,6 +69,21 @@ enum Opt {
         #[structopt(short, long)]
         block: u64,
     },
+    /// Ecdsa sign and send
+    Ecdsa {
+        /// The new ethereum start
+        #[structopt(short, long)]
+        message: String,
+    },
+    /// Set where to start the darwinia scan
+    SetDarwiniaStart {
+        /// Data dir of bridger
+        #[structopt(short, long)]
+        data_dir: Option<PathBuf>,
+        /// The new ethereum start
+        #[structopt(short, long)]
+        block: u64,
+    },
 }
 
 /// Exec commands
@@ -82,6 +99,8 @@ pub async fn exec() -> Result<()> {
         Opt::Affirmations => affirmations::exec().await?,
         Opt::Guard => guard::exec().await?,
         Opt::SetStart { data_dir, block }  => set_start::exec(data_dir, block).await?,
+        Opt::Ecdsa { message }  => ecdsa::exec(message).await?,
+        Opt::SetDarwiniaStart { data_dir, block }  => set_darwinia_start::exec(data_dir, block).await?,
     }
 
     Ok(())

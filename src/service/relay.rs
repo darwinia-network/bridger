@@ -1,5 +1,5 @@
 //! Relay Service
-use crate::{api::{Darwinia, Shadow}, error::Error, error::Result};
+use crate::{api::{Darwinia, Shadow}, error::Result};
 use std::sync::Arc;
 use primitives::chain::ethereum::EthereumHeader;
 
@@ -8,6 +8,8 @@ use actix::fut::Either;
 use std::time::Duration;
 use crate::service::MsgStop;
 use crate::error::BizError;
+use crate::service::extrinsics::{Extrinsic, MsgExtrinsic};
+use anyhow::Context as AnyhowContext;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
@@ -35,6 +37,8 @@ pub struct RelayService {
     target: u64,
     relayed: u64,
     step: u64,
+
+    extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
 impl Actor for RelayService {
@@ -71,7 +75,12 @@ impl Handler<MsgExecute> for RelayService {
                 .into_actor(self)
                 .then(|_, this, _| {
                     if this.target > this.relayed {
-                        let f = RelayService::affirm(this.darwinia.clone(), this.shadow.clone(), this.target);
+                        let f = RelayService::affirm(
+                            this.darwinia.clone(),
+                            this.shadow.clone(),
+                            this.target,
+                            this.extrinsics_service.clone()
+                        );
                         Either::Left(f.into_actor(this))
                     } else {
                         let f = async {Ok(())};
@@ -81,15 +90,18 @@ impl Handler<MsgExecute> for RelayService {
                 .map(|r, this, _| {
                     match r {
                         Ok(_) => this.relayed = this.target,
-                        Err(err@Error::BizError(BizError::AffirmingBlockLessThanLastConfirmed(..))) => {
-                            this.relayed = this.target; // not try again
-                            trace!("{}", err);
-                        },
-                        Err(err@Error::BizError(..)) => {
-                            trace!("{}", err);
-                        },
                         Err(err) => {
-                            error!("{:?}", err);
+                            if let Some(e) = err.downcast_ref::<BizError>() {
+                                match e {
+                                    BizError::AffirmingBlockLessThanLastConfirmed(..) => {
+                                        this.relayed = this.target; // not try again
+                                        trace!("{}", err);
+                                    },
+                                    _ => trace!("{}", err)
+                                }
+                            } else {
+                                error!("{:#?}", err);
+                            }
                         }
                     }
                 }),
@@ -108,18 +120,19 @@ impl Handler<MsgStop> for RelayService {
 impl RelayService {
 
     /// create new relay service actor
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, last_confirmed: u64, step: u64) -> Self {
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, last_confirmed: u64, step: u64, extrinsics_service: Recipient<MsgExtrinsic>) -> Self {
         RelayService {
             darwinia,
             shadow,
             target: last_confirmed,
             relayed: last_confirmed,
             step,
+            extrinsics_service,
         }
     }
 
     /// affirm target block
-    pub async fn affirm(darwinia: Arc<Darwinia>, shadow: Arc<Shadow>, target: u64) -> Result<()> {
+    pub async fn affirm(darwinia: Arc<Darwinia>, shadow: Arc<Shadow>, target: u64, extrinsics_service: Recipient<MsgExtrinsic>) -> Result<()> {
         // /////////////////////////
         // checking before affirm
         // /////////////////////////
@@ -148,7 +161,7 @@ impl RelayService {
         }
 
         trace!("Prepare to affirm ethereum block: {}", target);
-        let parcel = shadow.parcel(target as usize + 1).await?;
+        let parcel = shadow.parcel(target as usize + 1).await.with_context(|| format!("Fail to get parcel from shadow when affirming ethereum block {}", target))?;
         if parcel.header == EthereumHeader::default()
             || parcel.mmr_root == [0u8;32]
         {
@@ -158,12 +171,10 @@ impl RelayService {
         // /////////////////////////
         // do affirm
         // /////////////////////////
-        match darwinia.affirm(parcel).await {
-            Ok(hash) => {
-                info!("Affirmed ethereum block {} in extrinsic {:?}", target, hash);
-                Ok(())
-            }
-            Err(err) => Err(err),
-        }
+        let ex = Extrinsic::Affirm(parcel);
+        let msg = MsgExtrinsic(ex);
+        extrinsics_service.send(msg).await?;
+
+        Ok(())
     }
 }

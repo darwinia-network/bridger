@@ -56,6 +56,20 @@ pub struct Proxy {
     pub real: String,
 }
 
+/// Darwinia to ethereum config
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct DarwiniaToEthereum {
+    /// relay contract address
+    pub relay_contract_address: String,
+
+	/// ethereum seed
+	pub seed: String,
+
+    /// the darwinia account id who will get the reward
+    /// Do not do submit authorities if None
+    pub benefit: Option<String>,
+}
+
 /// Bridger Config
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -71,6 +85,8 @@ pub struct Config {
     pub step: Step,
     /// Darwinia relayer proxy address
     pub proxy: Option<Proxy>,
+    /// darwinia_to_ethereum
+    pub darwinia_to_ethereum: DarwiniaToEthereum,
 }
 
 impl Default for Config {
@@ -116,6 +132,11 @@ impl Default for Config {
                 guard: 30,
             },
             proxy: None,
+            darwinia_to_ethereum: DarwiniaToEthereum {
+                relay_contract_address: "".to_string(),
+				seed: "".to_string(),
+                benefit: None,
+            }
         }
     }
 }

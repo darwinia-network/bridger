@@ -49,3 +49,19 @@ relay = 60
 redeem = 150
 # guard service polling interval in seconds
 guard = 30
+
+[darwinia_to_ethereum]
+
+# ethereum private key
+# used to 
+#   1. sign ecdsa messages
+#   2. send authorities to ethereum
+seed = '<YOUR_ETHEREUM_SEED>'
+
+# the darwinia account id who will get the reward
+# when send authorities to ethereum
+# Disable by remove or comment
+benefit = "<YOUR_BENEFIT_DARWINIA_ACCOUNT_ID>"
+
+# relay contract address on ethereum
+relay_contract_address = "0xeb931f1a197f3a230d2dfe220ac6674880f827d6"

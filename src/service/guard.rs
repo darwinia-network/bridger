@@ -6,10 +6,10 @@ use actix::prelude::*;
 
 use crate::{
     api::{Darwinia, Shadow},
-    error::Result,
+    error::{Result, BizError},
 };
 use crate::service::MsgStop;
-use crate::error::Error;
+use crate::service::extrinsics::{Extrinsic, MsgExtrinsic};
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -25,6 +25,7 @@ pub struct GuardService {
     pub shadow: Arc<Shadow>,
     /// Dawrinia API
     pub darwinia: Arc<Darwinia>,
+    extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
 impl Actor for GuardService {
@@ -50,12 +51,12 @@ impl Handler<MsgGuard> for GuardService {
             async {}
                 .into_actor(self)
                 .then(|_, this, _| {
-                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone());
+                    let f = GuardService::guard(this.shadow.clone(), this.darwinia.clone(), this.extrinsics_service.clone());
                     f.into_actor(this)
                 })
                 .map(|r, _this, _| {
                     if let Err(err) = r {
-                        if let Error::BizError(..) = err {
+                        if err.downcast_ref::<BizError>().is_some() {
                             trace!("{}", err);
                         } else {
                             error!("{:?}", err);
@@ -76,24 +77,26 @@ impl Handler<MsgStop> for GuardService {
 
 impl GuardService {
     /// New redeem service
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64, is_tech_comm_member: bool) -> Option<GuardService> {
+    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, step: u64, is_tech_comm_member: bool, extrinsics_service: Recipient<MsgExtrinsic>) -> Option<GuardService> {
         if is_tech_comm_member {
             Some(GuardService {
                 darwinia,
                 shadow,
                 step,
+                extrinsics_service,
             })
         } else {
-            warn!("    🙌 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
+            warn!("    🔒 GUARD SERVICE NOT STARTED, YOU ARE NOT TECH COMM MEMBER");
             None
         }
     }
 
-    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>) -> Result<()> {
+    async fn guard(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, extrinsics_service: Recipient<MsgExtrinsic>) -> Result<()> {
         trace!("Checking pending headers...");
 
         let last_confirmed = darwinia.last_confirmed().await.unwrap();
         let pending_headers = darwinia.pending_headers().await?;
+        debug!("pending headers: {:?}", pending_headers.clone().iter().map(|p| p.1.header.number.to_string()).collect::<Vec<_>>().join(", "));
         for pending in pending_headers {
             let pending_parcel = pending.1;
             let voting_state = pending.2;
@@ -102,19 +105,14 @@ impl GuardService {
             // high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
             // and,
             // have not voted
-            if pending_block_number > last_confirmed && !darwinia.account.has_voted(voting_state) {
-                // Delay to wait for possible previous extrinsics
-                tokio::time::delay_for(Duration::from_secs(12)).await;
-
-                // Do vote
+            if pending_block_number > last_confirmed && !darwinia.sender.has_voted(voting_state) {
                 let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
-                if pending_parcel.is_same_as(&parcel_from_shadow) {
-                    let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, true).await?;
-                    info!("Voted to approve: {}, ex hash: {:?}", pending_block_number, ex_hash);
+                let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
+                    Extrinsic::GuardVote(pending_block_number, true)
                 } else {
-                    let ex_hash = darwinia.vote_pending_relay_header_parcel(pending_block_number, false).await?;
-                    info!("Voted to reject: {}, ex hash: {:?}", pending_block_number, ex_hash);
+                    Extrinsic::GuardVote(pending_block_number, false)
                 };
+                extrinsics_service.send(MsgExtrinsic(ex)).await?;
             }
         }
 

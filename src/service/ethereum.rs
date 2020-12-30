@@ -1,16 +1,11 @@
 //! Ethereum transaction service
-use crate::{
-    service::{
-        redeem::{MsgEthereumTransaction, EthereumTransaction, EthereumTransactionHash},
-        relay::MsgBlockNumber,
-        MsgStop
-    },
-    error::{
-        Result as BridgerResult, Error, BizError,
-    },
-    Config,
-    api::Darwinia,
-};
+use crate::{service::{
+    redeem::{MsgEthereumTransaction, EthereumTransaction, EthereumTransactionHash},
+    relay::MsgBlockNumber,
+    MsgStop,
+}, error::{
+    Result as BridgerResult, BizError,
+}, Config, api::Darwinia, tools};
 use primitives::bytes;
 
 use web3::{
@@ -21,7 +16,6 @@ use web3::{
 use actix::prelude::*;
 use std::sync::Arc;
 use std::time::Duration;
-use crate::service::RedeemService;
 use std::path::PathBuf;
 
 #[derive(Clone, Debug)]
@@ -100,8 +94,8 @@ impl Handler<MsgScan> for EthereumService {
                             this.scan_from = latest_block_number
                         },
                         Err(err) => {
-                            if let Error::BizError(..) = err {
-                                trace!("{}", err);
+                            if let Some(e) = err.downcast_ref::<BizError>() {
+                                trace!("{}", e);
                             } else {
                                 error!("{:?}", err);
                             }
@@ -238,7 +232,7 @@ impl EthereumService {
             for tx in &txs {
                 if darwinia.verified(&tx).await? {
                     trace!("    This ethereum tx {:?} has already been redeemed.", tx.enclosed_hash());
-                    RedeemService::set_last_redeemed(data_dir.clone(), tx.block).await?;
+                    tools::set_cache(data_dir.clone(), tools::LAST_REDEEMED_CACHE_FILE_NAME, tx.block).await?;
                 } else {
                     // delay to wait for possible previous extrinsics
                     tokio::time::delay_for(Duration::from_secs(12)).await;

@@ -11,6 +11,7 @@ use crate::{
         proxy::Proxy,
         sudo::Sudo,
         technical_committee::TechnicalCommittee,
+        bridge::relay_authorities::EthereumRelayAuthorities,
     },
 };
 
@@ -26,6 +27,7 @@ use substrate_subxt::{
     system::System,
     Runtime,
 };
+use crate::frame::bridge::relay_authorities::RelayAuthority;
 
 /// Darwinia Runtime
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -74,9 +76,39 @@ impl EthereumRelayerGame for DarwiniaRuntime {
 }
 
 impl EthereumBacking for DarwiniaRuntime {
-    type EthereumTransactionIdex = u64;
+    type EthereumTransactionIndex = u64;
 }
 
 impl Proxy for DarwiniaRuntime {
     type ProxyType = ProxyType;
 }
+
+impl EthereumRelayAuthorities for DarwiniaRuntime {
+    type RelayAuthority = RelayAuthority<
+        <Self as System>::AccountId,
+        Self::RelayAuthoritySigner,
+        <Self as Balances>::Balance,
+        <Self as System>::BlockNumber
+    >;
+    type RelayAuthoritySigner = EcdsaAddress;
+    type RelayAuthoritySignature = EcdsaSignature;
+    type RelayAuthorityMessage = EcdsaMessage;
+}
+
+use codec::{Encode, Decode};
+
+/// EcdsaAddress
+pub type EcdsaAddress = [u8; 20];
+
+/// EcdsaSignature
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
+pub struct EcdsaSignature(pub [u8; 65]);
+
+impl Default for EcdsaSignature {
+    fn default() -> Self {
+        Self([0u8; 65])
+    }
+}
+
+/// EcdsaMessage
+pub type EcdsaMessage = [u8; 32];

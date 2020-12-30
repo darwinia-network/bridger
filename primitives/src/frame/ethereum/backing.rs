@@ -12,11 +12,11 @@ use substrate_subxt_proc_macro::{module, Call, Event, Store};
 #[module]
 pub trait EthereumBacking: System + Balances {
     /// Ethereum transaction index
-    type EthereumTransactionIdex: 'static + Encode + Decode + Send + Default + Clone + Sync;
+    type EthereumTransactionIndex: 'static + Encode + Decode + Send + Default + Clone + Sync;
 }
 
 //////
-/// Call
+// Call
 //////
 
 /// Submit redeem call
@@ -65,6 +65,35 @@ pub struct RedeemDeposit<T: EthereumBacking> {
     pub balance: <T as Balances>::Balance,
     /// Transaction Id
     pub tx_id: u64,
+}
+
+/// Ethereum address
+pub type EcdsaAddress = [u8; 20];
+
+/// Someone lock some *RING*. [account, ecdsa address, asset type, amount]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct LockRing<T: EthereumBacking> {
+    /// Account Id
+    pub account_id: <T as System>::AccountId,
+    /// Ecdsa address
+    pub ecdsa_address: EcdsaAddress,
+    /// Asset type
+    pub asset_type: u8,
+    /// amount
+    pub amount: <T as Balances>::Balance
+}
+
+/// Someone lock some *KTON*. [account, ecdsa address, asset type, amount]
+#[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
+pub struct LockKton<T: EthereumBacking> {
+    /// Account Id
+    pub account_id: <T as System>::AccountId,
+    /// Ecdsa address
+    pub ecdsa_address: EcdsaAddress,
+    /// Asset type
+    pub asset_type: u8,
+    /// amount
+    pub amount: <T as Balances>::Balance
 }
 
 //////

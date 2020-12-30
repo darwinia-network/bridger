@@ -139,3 +139,11 @@ pub struct MMRRootsToSign<T: EthereumRelayAuthorities> {
     /// Runtime marker
     pub _runtime: PhantomData<T>,
 }
+
+/// AuthorityTerm
+#[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
+pub struct MMRRootsToSignKeys<T: EthereumRelayAuthorities> {
+    #[store(returns = Vec<<T as System>::BlockNumber>)]
+    /// Runtime marker
+    pub _runtime: PhantomData<T>,
+}

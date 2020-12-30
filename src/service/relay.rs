@@ -1,22 +1,25 @@
 //! Relay Service
-use crate::{api::{Darwinia, Shadow}, error::Result};
-use std::sync::Arc;
+use crate::{
+	api::{Darwinia, Shadow},
+	error::Result,
+};
 use primitives::chain::ethereum::EthereumHeader;
+use std::sync::Arc;
 
-use actix::prelude::*;
-use actix::fut::Either;
-use std::time::Duration;
-use crate::service::MsgStop;
 use crate::error::BizError;
 use crate::service::extrinsics::{Extrinsic, MsgExtrinsic};
+use crate::service::MsgStop;
+use actix::fut::Either;
+use actix::prelude::*;
 use anyhow::Context as AnyhowContext;
+use std::time::Duration;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
 pub struct MsgBlockNumber(pub u64);
 
 impl Message for MsgBlockNumber {
-    type Result = ();
+	type Result = ();
 }
 
 /// message 'execute'
@@ -24,157 +27,172 @@ impl Message for MsgBlockNumber {
 struct MsgExecute;
 
 impl Message for MsgExecute {
-    type Result = ();
+	type Result = ();
 }
 
 /// Relay Service
 pub struct RelayService {
-    /// Shadow API
-    pub shadow: Arc<Shadow>,
-    /// Dawrinia API
-    pub darwinia: Arc<Darwinia>,
+	/// Shadow API
+	pub shadow: Arc<Shadow>,
+	/// Dawrinia API
+	pub darwinia: Arc<Darwinia>,
 
-    target: u64,
-    relayed: u64,
-    step: u64,
+	target: u64,
+	relayed: u64,
+	step: u64,
 
-    extrinsics_service: Recipient<MsgExtrinsic>,
+	extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
 impl Actor for RelayService {
-    type Context = Context<Self>;
+	type Context = Context<Self>;
 
-    fn started(&mut self, ctx: &mut Self::Context) {
-        info!("    ✨ SERVICE STARTED: RELAY");
-        ctx.run_interval(Duration::from_millis(self.step * 1_000),  |_this, ctx| {
-            ctx.notify(MsgExecute {});
-        });
-    }
+	fn started(&mut self, ctx: &mut Self::Context) {
+		info!("    ✨ SERVICE STARTED: RELAY");
+		ctx.run_interval(Duration::from_millis(self.step * 1_000), |_this, ctx| {
+			ctx.notify(MsgExecute {});
+		});
+	}
 
-    fn stopped(&mut self, _: &mut Self::Context) {
-        info!("    💤 SERVICE STOPPED: RELAY")
-    }
+	fn stopped(&mut self, _: &mut Self::Context) {
+		info!("    💤 SERVICE STOPPED: RELAY")
+	}
 }
 
 impl Handler<MsgBlockNumber> for RelayService {
-    type Result = ();
+	type Result = ();
 
-    fn handle(&mut self, msg: MsgBlockNumber, _: &mut Context<Self>) -> Self::Result {
-        if msg.0> self.relayed && msg.0 > self.target {
-            self.target = msg.0;
-        }
-    }
+	fn handle(&mut self, msg: MsgBlockNumber, _: &mut Context<Self>) -> Self::Result {
+		if msg.0 > self.relayed && msg.0 > self.target {
+			self.target = msg.0;
+		}
+	}
 }
 
 impl Handler<MsgExecute> for RelayService {
-    type Result = AtomicResponse<Self, ()>;
+	type Result = AtomicResponse<Self, ()>;
 
-    fn handle(&mut self, _: MsgExecute, _: &mut Context<Self>) -> Self::Result {
-        AtomicResponse::new(Box::pin(
-            async {}
-                .into_actor(self)
-                .then(|_, this, _| {
-                    if this.target > this.relayed {
-                        let f = RelayService::affirm(
-                            this.darwinia.clone(),
-                            this.shadow.clone(),
-                            this.target,
-                            this.extrinsics_service.clone()
-                        );
-                        Either::Left(f.into_actor(this))
-                    } else {
-                        let f = async {Ok(())};
-                        Either::Right(f.into_actor(this))
-                    }
-                })
-                .map(|r, this, _| {
-                    match r {
-                        Ok(_) => this.relayed = this.target,
-                        Err(err) => {
-                            if let Some(e) = err.downcast_ref::<BizError>() {
-                                match e {
-                                    BizError::AffirmingBlockLessThanLastConfirmed(..) => {
-                                        this.relayed = this.target; // not try again
-                                        trace!("{}", err);
-                                    },
-                                    _ => trace!("{}", err)
-                                }
-                            } else {
-                                error!("{:#?}", err);
-                            }
-                        }
-                    }
-                }),
-        ))
-    }
+	fn handle(&mut self, _: MsgExecute, _: &mut Context<Self>) -> Self::Result {
+		AtomicResponse::new(Box::pin(
+			async {}
+				.into_actor(self)
+				.then(|_, this, _| {
+					if this.target > this.relayed {
+						let f = RelayService::affirm(
+							this.darwinia.clone(),
+							this.shadow.clone(),
+							this.target,
+							this.extrinsics_service.clone(),
+						);
+						Either::Left(f.into_actor(this))
+					} else {
+						let f = async { Ok(()) };
+						Either::Right(f.into_actor(this))
+					}
+				})
+				.map(|r, this, _| {
+					match r {
+						Ok(_) => this.relayed = this.target,
+						Err(err) => {
+							if let Some(e) = err.downcast_ref::<BizError>() {
+								match e {
+									BizError::AffirmingBlockLessThanLastConfirmed(..) => {
+										this.relayed = this.target; // not try again
+										trace!("{}", err);
+									}
+									_ => trace!("{}", err),
+								}
+							} else {
+								error!("{:#?}", err);
+							}
+						}
+					}
+				}),
+		))
+	}
 }
 
 impl Handler<MsgStop> for RelayService {
-    type Result = ();
+	type Result = ();
 
-    fn handle(&mut self, _: MsgStop, ctx: &mut Context<Self>) -> Self::Result {
-        ctx.stop();
-    }
+	fn handle(&mut self, _: MsgStop, ctx: &mut Context<Self>) -> Self::Result {
+		ctx.stop();
+	}
 }
 
 impl RelayService {
+	/// create new relay service actor
+	pub fn new(
+		shadow: Arc<Shadow>,
+		darwinia: Arc<Darwinia>,
+		last_confirmed: u64,
+		step: u64,
+		extrinsics_service: Recipient<MsgExtrinsic>,
+	) -> Self {
+		RelayService {
+			darwinia,
+			shadow,
+			target: last_confirmed,
+			relayed: last_confirmed,
+			step,
+			extrinsics_service,
+		}
+	}
 
-    /// create new relay service actor
-    pub fn new(shadow: Arc<Shadow>, darwinia: Arc<Darwinia>, last_confirmed: u64, step: u64, extrinsics_service: Recipient<MsgExtrinsic>) -> Self {
-        RelayService {
-            darwinia,
-            shadow,
-            target: last_confirmed,
-            relayed: last_confirmed,
-            step,
-            extrinsics_service,
-        }
-    }
+	/// affirm target block
+	pub async fn affirm(
+		darwinia: Arc<Darwinia>,
+		shadow: Arc<Shadow>,
+		target: u64,
+		extrinsics_service: Recipient<MsgExtrinsic>,
+	) -> Result<()> {
+		// /////////////////////////
+		// checking before affirm
+		// /////////////////////////
+		// 1. last confirmed check
+		let last_confirmed = darwinia.last_confirmed().await?;
+		if target <= last_confirmed {
+			return Err(
+				BizError::AffirmingBlockLessThanLastConfirmed(target, last_confirmed).into(),
+			);
+		}
 
-    /// affirm target block
-    pub async fn affirm(darwinia: Arc<Darwinia>, shadow: Arc<Shadow>, target: u64, extrinsics_service: Recipient<MsgExtrinsic>) -> Result<()> {
-        // /////////////////////////
-        // checking before affirm
-        // /////////////////////////
-        // 1. last confirmed check
-        let last_confirmed = darwinia.last_confirmed().await?;
-        if target <= last_confirmed {
-            return Err(BizError::AffirmingBlockLessThanLastConfirmed(target, last_confirmed).into());
-        }
+		// 2. pendings check
+		let pending_headers = darwinia.pending_headers().await?;
+		for pending_header in pending_headers {
+			let pending_block_number = pending_header.1.header.number;
+			if pending_block_number >= target {
+				return Err(BizError::AffirmingBlockInPending(target).into());
+			}
+		}
 
-        // 2. pendings check
-        let pending_headers = darwinia.pending_headers().await?;
-        for pending_header in pending_headers {
-            let pending_block_number = pending_header.1.header.number;
-            if pending_block_number >= target {
-                return Err(BizError::AffirmingBlockInPending(target).into());
-            }
-        }
+		// 3. affirmations check
+		for (_game_id, game) in darwinia.affirmations().await?.iter() {
+			for (_round_id, affirmations) in game.iter() {
+				if Darwinia::contains(&affirmations, target) {
+					return Err(BizError::AffirmingBlockInGame(target).into());
+				}
+			}
+		}
 
-        // 3. affirmations check
-        for (_game_id, game) in darwinia.affirmations().await?.iter() {
-            for (_round_id, affirmations) in game.iter() {
-                if Darwinia::contains(&affirmations, target) {
-                    return Err(BizError::AffirmingBlockInGame(target).into());
-                }
-            }
-        }
+		trace!("Prepare to affirm ethereum block: {}", target);
+		let parcel = shadow.parcel(target as usize + 1).await.with_context(|| {
+			format!(
+				"Fail to get parcel from shadow when affirming ethereum block {}",
+				target
+			)
+		})?;
+		if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
+			return Err(BizError::ParcelFromShadowIsEmpty(target).into());
+		}
 
-        trace!("Prepare to affirm ethereum block: {}", target);
-        let parcel = shadow.parcel(target as usize + 1).await.with_context(|| format!("Fail to get parcel from shadow when affirming ethereum block {}", target))?;
-        if parcel.header == EthereumHeader::default()
-            || parcel.mmr_root == [0u8;32]
-        {
-            return Err(BizError::ParcelFromShadowIsEmpty(target).into());
-        }
+		// /////////////////////////
+		// do affirm
+		// /////////////////////////
+		let ex = Extrinsic::Affirm(parcel);
+		let msg = MsgExtrinsic(ex);
+		extrinsics_service.send(msg).await?;
 
-        // /////////////////////////
-        // do affirm
-        // /////////////////////////
-        let ex = Extrinsic::Affirm(parcel);
-        let msg = MsgExtrinsic(ex);
-        extrinsics_service.send(msg).await?;
-
-        Ok(())
-    }
+		Ok(())
+	}
 }

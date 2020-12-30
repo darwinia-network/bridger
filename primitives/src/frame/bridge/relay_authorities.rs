@@ -12,7 +12,7 @@ pub type AuthoritiesToSignReturn<T> = (
 );
 
 /// AuthoritiesToSignReturn
-pub type MmrRootsToSignReturn<T> = Vec<(<T as System>::AccountId, <T as EthereumRelayAuthorities>::RelayAuthoritySignature)>;
+pub type MmrRootsToSignReturn<T> = Option<Vec<(<T as System>::AccountId, <T as EthereumRelayAuthorities>::RelayAuthoritySignature)>>;
 
 /// Relay Authority
 #[derive(Clone, Encode, Decode, Default, Debug)]

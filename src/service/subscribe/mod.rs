@@ -145,6 +145,7 @@ impl SubscribeService {
 			("EthereumRelayAuthorities", "NewAuthorities") => {
                 if self.darwinia.sender.is_authority().await? {
                     if let Ok(decoded) = NewAuthorities::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
+                        info!(">> Event - {}::{}(message: {:?})", module, variant, decoded.message);
                         if self.darwinia.sender.need_to_sign_authorities(decoded.message).await? {
                             let ex = Extrinsic::SignAndSendAuthorities(decoded.message);
                             let msg = MsgExtrinsic(ex);
@@ -159,6 +160,7 @@ impl SubscribeService {
 				if let Ok(decoded) =
 					AuthoritiesSetSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
 				{
+                    info!(">> Event - {}::{}(term: {}, new_authorities: {:?}, signatures: {:?})", module, variant, decoded.term, decoded.new_authorities, decoded.signatures);
                     let current_term = self.darwinia.get_current_authority_term().await?;
                     if decoded.term == current_term {
                         let message = Darwinia::construct_authorities_message(
@@ -181,9 +183,8 @@ impl SubscribeService {
             // call ethereum_backing.lock will emit the event
 			("EthereumRelayAuthorities", "NewMMRRoot") => {
                 if self.darwinia.sender.is_authority().await? {
-                    if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
-                    {
-                        trace!(">>        NewMMRRoot(block_number: {})", decoded.block_number);
+                    if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
+                        info!(">> Event - {}::{}(block_number: {})", module, variant, decoded.block_number);
                         let ex = Extrinsic::SignAndSendMmrRoot(decoded.block_number);
                         self.delayed_extrinsics.insert(decoded.block_number, ex);
                     }

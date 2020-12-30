@@ -12,7 +12,7 @@ use primitives::{
             AuthoritiesStoreExt,
             AuthoritiesToSignStoreExt,
             AuthoritiesToSignReturn,
-            MMRRootsToSignStoreExt,
+            MmrRootsToSignStoreExt,
         }
     },
     runtime::EcdsaSignature,

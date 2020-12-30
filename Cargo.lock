@@ -4613,7 +4613,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.13.0"
-source = "git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error#94115998c9a1593045fc973c0abfe50503b1891f"
+source = "git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error#1749ac289e475cf44ae63457f396601fd707b296"
 dependencies = [
  "frame-metadata",
  "frame-support",
@@ -4662,7 +4662,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.13.0"
-source = "git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error#94115998c9a1593045fc973c0abfe50503b1891f"
+source = "git+https://github.com/wuminzhe/substrate-subxt?branch=xavier-send-error#1749ac289e475cf44ae63457f396601fd707b296"
 dependencies = [
  "heck",
  "proc-macro-crate",

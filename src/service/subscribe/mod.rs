@@ -65,10 +65,8 @@ impl SubscribeService {
         loop {
             let header = tracker.next_block().await;
 
-            // debug trace
-            if header.number % 50 == 0 {
-                trace!("Darwinia block {}", header.number);
-            }
+            // debug 
+            // debug!("Darwinia block {}", header.number);
 
             // handle the 'mmr root sign and send extrinsics' only block height reached
             if let Err(err) = self.handle_delayed_extrinsics(&header).await {
@@ -134,7 +132,7 @@ impl SubscribeService {
 		event_data: Vec<u8>,
 	) -> Result<()> {
 		if module != "System" {
-			debug!(">> Event - {}::{}", module, variant);
+			trace!(">> Event - {}::{}", module, variant);
 		}
 
 		match (module, variant) {
@@ -187,6 +185,7 @@ impl SubscribeService {
                 if self.darwinia.sender.is_authority().await? {
                     if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
                     {
+                        trace!(">>        NewMMRRoot(block_number: {})", decoded.block_number);
                         let ex = Extrinsic::SignAndSendMmrRoot(decoded.block_number);
                         self.delayed_extrinsics.insert(decoded.block_number, ex);
                     }

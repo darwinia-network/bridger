@@ -256,7 +256,7 @@ impl Darwinia {
 
     /// construct_message
     pub fn construct_authorities_message(first: String, second: u32, third: Vec<EcdsaAddress>) -> Vec<u8> {
-        debug!("{:?}, {:?}, {:?}", first, second, third.iter().map(|a| hex::encode(&a)).collect::<Vec<_>>().join(", "));
+        debug!("Infos to construct eth authorities message: {:?}, {:?}, {:?}", first, second, third.iter().map(|a| hex::encode(&a)).collect::<Vec<_>>().join(", "));
         // scale encode & sign
         let message = _S {
             _1: first,
@@ -278,7 +278,7 @@ impl Darwinia {
             let leaf_index = block_number;
             let mmr_root = self.get_mmr_root(leaf_index).await?;
 
-            debug!("{}, {}, {:?}", spec_name.clone(), block_number, mmr_root);
+            debug!("Infos to construct mmr_root message: {}, {}, {:?}", spec_name.clone(), block_number, mmr_root);
             // scale encode & sign
             let message = _S {
 					_1: spec_name,
@@ -329,7 +329,6 @@ impl Darwinia {
         let header = self.client.header(block_hash).await?;
 
         let mmr_root = if let Some(header) = header {
-            debug!("Header for mmr root: {:?}", header);
             // get digest_item from header
             let log = header
                 .digest()

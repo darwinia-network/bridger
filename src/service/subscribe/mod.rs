@@ -143,15 +143,13 @@ impl SubscribeService {
             // call ethereum_relay_authorities.request_authority and then sudo call
             // EthereumRelayAuthorities.add_authority will emit the event
 			("EthereumRelayAuthorities", "NewAuthorities") => {
-                if self.darwinia.sender.is_authority().await? &&
-                    self.darwinia.sender.need_to_sign_authorities().await?
-                {
-                    if let Ok(decoded) =
-                        NewAuthorities::<DarwiniaRuntime>::decode(&mut &event_data[..])
-                    {
-                        let ex = Extrinsic::SignAndSendAuthorities(decoded.message);
-                        let msg = MsgExtrinsic(ex);
-                        self.extrinsics_service.send(msg).await?;
+                if self.darwinia.sender.is_authority().await? {
+                    if let Ok(decoded) = NewAuthorities::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
+                        if self.darwinia.sender.need_to_sign_authorities(decoded.message).await? {
+                            let ex = Extrinsic::SignAndSendAuthorities(decoded.message);
+                            let msg = MsgExtrinsic(ex);
+                            self.extrinsics_service.send(msg).await?;
+                        }
                     }
                 }
 			}

@@ -117,11 +117,22 @@ impl ExtrinsicsService {
 			}
 
 			Extrinsic::Redeem(redeem_for, proof, ethereum_tx) => {
-				let ex_hash = darwinia.redeem(redeem_for, proof).await?;
-				info!(
-					"Redeemed ethereum tx {:?} with extrinsic {:?}",
-					ethereum_tx.tx_hash, ex_hash
-				);
+				match redeem_for {
+					RedeemFor::SetAuthorities => {
+						let ex_hash = darwinia.sync_authorities_set(proof).await?;
+						info!(
+							"Sent ethereum tx {:?} with extrinsic {:?}",
+							ethereum_tx.tx_hash, ex_hash
+						);
+					}
+					_ => {
+						let ex_hash = darwinia.redeem(redeem_for, proof).await?;
+						info!(
+							"Redeemed ethereum tx {:?} with extrinsic {:?}",
+							ethereum_tx.tx_hash, ex_hash
+						);
+					}
+				}
 
 				// Update cache
 				tools::set_cache(

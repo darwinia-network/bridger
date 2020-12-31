@@ -20,6 +20,8 @@ pub enum EthereumTransactionHash {
 	Deposit(H256),
 	/// Token event
 	Token(H256),
+	/// SetAuthoritiesEvent
+	SetAuthorities(H256),
 }
 
 /// Reedeemable Ethereum transaction
@@ -41,6 +43,7 @@ impl EthereumTransaction {
 		match self.tx_hash {
 			EthereumTransactionHash::Token(h) => h,
 			EthereumTransactionHash::Deposit(h) => h,
+			EthereumTransactionHash::SetAuthorities(h) => h,
 		}
 	}
 }
@@ -181,6 +184,7 @@ impl RedeemService {
 		let redeem_for = match tx.tx_hash {
 			EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
 			EthereumTransactionHash::Token(_) => RedeemFor::Token,
+			EthereumTransactionHash::SetAuthorities(_) => RedeemFor::SetAuthorities,
 		};
 
 		let ex = Extrinsic::Redeem(redeem_for, proof, tx);

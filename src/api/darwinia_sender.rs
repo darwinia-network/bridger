@@ -1,5 +1,5 @@
 use crate::api::darwinia::AccountId;
-use crate::error::Result;
+use crate::error::{Error, Result};
 use primitives::runtime::{DarwiniaRuntime, EcdsaMessage};
 use primitives::{
 	chain::RelayVotingState,
@@ -62,8 +62,8 @@ pub struct DarwiniaSender {
 
 	/// ethereum url
 	pub ethereum_url: String,
-	/// raw ethereum seed
-	pub ethereum_seed: String,
+	/// authority signer raw ethereum seed
+	pub ethereum_seed: Option<String>,
 }
 
 impl DarwiniaSender {
@@ -72,7 +72,7 @@ impl DarwiniaSender {
 		seed: String,
 		real: Option<String>,
 		client: Client<DarwiniaRuntime>,
-		ethereum_seed: String,
+		ethereum_seed: Option<String>,
 		ethereum_url: String,
 	) -> DarwiniaSender {
 		// signer to sign darwinia extrinsic
@@ -159,15 +159,19 @@ impl DarwiniaSender {
 	/// sign
 	pub fn ecdsa_sign(&self, message: &[u8]) -> Result<EcdsaSignature> {
 		let web3 = Web3::new(Http::new(&self.ethereum_url)?);
-		let private_key = hex::decode(&self.ethereum_seed)?;
-		let secret_key = SecretKey::from_slice(&private_key)?;
-		let signature = web3
-			.accounts()
-			.sign(message, SecretKeyRef::new(&secret_key))
-			.signature;
-		let mut buffer = [0u8; 65];
-		buffer.copy_from_slice(signature.0.as_slice());
-		Ok(EcdsaSignature(buffer))
+		if let Some(ethereum_seed) = &self.ethereum_seed {
+			let private_key = hex::decode(&ethereum_seed[2..])?;
+			let secret_key = SecretKey::from_slice(&private_key)?;
+			let signature = web3
+				.accounts()
+				.sign(message, SecretKeyRef::new(&secret_key))
+				.signature;
+			let mut buffer = [0u8; 65];
+			buffer.copy_from_slice(signature.0.as_slice());
+			Ok(EcdsaSignature(buffer))
+		} else {
+			Err(Error::NoAuthoritySignerSeed.into())
+		}
 	}
 
 	/// need_to_sign_authorities

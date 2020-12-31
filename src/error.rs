@@ -18,6 +18,9 @@ pub enum Error {
 	#[error("No darwinia scan start, run 'bridger set-darwinia-start --block <scan_start> [--data-dir <data_dir>]' to set one")]
 	NoDarwiniaStart,
 
+	#[error("No signer seed set for authority, please check your config.toml")]
+	NoAuthoritySignerSeed,
+
 	#[error("{0}")]
 	ShadowInternalServerError(String),
 }

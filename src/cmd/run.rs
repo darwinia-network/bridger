@@ -42,6 +42,9 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
 		} else if let Some(Error::NoDarwiniaStart) = e.downcast_ref() {
 			error!("{:?}", e);
 			break;
+		} else if let Some(Error::NoAuthoritySignerSeed) = e.downcast_ref() {
+			error!("{:?}", e);
+			break;
 		} else {
 			error!("{:?}", e);
 			info!("Bridger will restart in 30 seconds...");
@@ -74,6 +77,11 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 	let shadow = Arc::new(Shadow::new(&config));
 	let darwinia = Arc::new(Darwinia::new(&config).await?);
 	let web3 = Web3::new(Http::new(&config.eth.rpc).unwrap());
+
+	// Stop if darwinia sender is authority but without a signer seed
+	if darwinia.sender.is_authority().await? && darwinia.sender.ethereum_seed.is_none() {
+		return Err(Error::NoAuthoritySignerSeed.into());
+	}
 
 	// --- Network ---
 	let runtime_version: sp_version::RuntimeVersion =
@@ -175,7 +183,7 @@ async fn start_services(
 	)
 	.map(|g| g.start());
 
-	//
+	// darwinia subscribe service
 	let ethereum = Ethereum::new(web3.clone(), &config.clone())?;
 	let mut subscribe = SubscribeService::new(
 		darwinia.clone(),

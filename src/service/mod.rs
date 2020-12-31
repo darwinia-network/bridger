@@ -2,19 +2,15 @@
 pub use crate::error::Result;
 
 pub mod ethereum;
+pub mod extrinsics;
 pub mod guard;
 pub mod redeem;
 pub mod relay;
 pub mod subscribe;
-pub mod extrinsics;
 
 pub use self::{
-    ethereum::EthereumService,
-    redeem::RedeemService,
-    relay::RelayService,
-    guard::GuardService,
-    subscribe::SubscribeService,
-    extrinsics::ExtrinsicsService,
+	ethereum::EthereumService, extrinsics::ExtrinsicsService, guard::GuardService,
+	redeem::RedeemService, relay::RelayService, subscribe::SubscribeService,
 };
 use actix::Message;
 
@@ -23,6 +19,5 @@ use actix::Message;
 pub struct MsgStop;
 
 impl Message for MsgStop {
-    type Result = ();
+	type Result = ();
 }
-

@@ -1,11 +1,7 @@
 //! Briger APIs
 pub mod darwinia;
-mod shadow;
 mod darwinia_sender;
 mod ethereum;
+mod shadow;
 
-pub use self::{
-    darwinia::{Darwinia},
-    shadow::Shadow,
-    ethereum::Ethereum,
-};
+pub use self::{darwinia::Darwinia, ethereum::Ethereum, shadow::Shadow};

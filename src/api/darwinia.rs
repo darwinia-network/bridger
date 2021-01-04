@@ -545,6 +545,7 @@ impl Darwinia {
 		decoder.register_type_size::<EcdsaSignature>("RelayAuthoritySignature");
 		decoder.register_type_size::<u8>("ElectionCompute"); // just a hack
 		decoder.register_type_size::<u32>("Term");
+		decoder.register_type_size::<u64>("EthereumTransactionIndex");
 
 		let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
 		for (_, raw) in raw_events {

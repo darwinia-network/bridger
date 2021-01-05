@@ -15,7 +15,7 @@ pub struct Ethereum {
 	relay_contract_address: Address,
 	/// secret_key to send ethereum tx
 	pub secret_key: Option<SecretKey>,
-	benefit: Option<String>,
+	beneficiary: Option<String>,
 }
 
 impl Ethereum {
@@ -34,7 +34,7 @@ impl Ethereum {
 			web3,
 			relay_contract_address,
 			secret_key,
-			benefit: config.darwinia_to_ethereum.benefit.clone(),
+			beneficiary: config.darwinia_to_ethereum.beneficiary.clone(),
 		})
 	}
 
@@ -44,7 +44,7 @@ impl Ethereum {
 		message: Vec<u8>,
 		signatures: Vec<EcdsaSignature>,
 	) -> Result<()> {
-		if let Some(benefit) = &self.benefit {
+		if let Some(beneficiary) = &self.beneficiary {
 			if let Some(secret_key) = &self.secret_key {
 				let key_ref = SecretKeyRef::new(secret_key);
 
@@ -60,19 +60,19 @@ impl Ethereum {
 					.map(|item| item.0.to_vec())
 					.collect::<Vec<_>>();
 
-				// benefit account id
-				let benefit = hex::decode(&benefit[2..])?;
-				let mut benefit_buffer = [0u8; 32];
-				benefit_buffer.copy_from_slice(&benefit);
+				// beneficiary account id
+				let beneficiary = hex::decode(&beneficiary[2..])?;
+				let mut beneficiary_buffer = [0u8; 32];
+				beneficiary_buffer.copy_from_slice(&beneficiary);
 
 				// debug
 				debug!("message: 0x{}", hex::encode(message.clone()));
 				for signature in signature_list.clone() {
 					debug!("signature: 0x{}", hex::encode(signature));
 				}
-				debug!("benefit: 0x{}", hex::encode(benefit_buffer));
+				debug!("beneficiary: 0x{}", hex::encode(beneficiary_buffer));
 
-				let input = (message, signature_list, benefit_buffer);
+				let input = (message, signature_list, beneficiary_buffer);
 				let receipt = contract
 					.signed_call_with_confirmations(
 						"updateRelayer",

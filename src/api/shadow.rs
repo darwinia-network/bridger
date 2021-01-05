@@ -15,6 +15,7 @@ use primitives::{
 use reqwest::{Client, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
+use std::time::Duration;
 
 #[derive(Serialize)]
 struct Proposal {
@@ -36,7 +37,9 @@ pub struct Shadow {
 impl Shadow {
 	/// Init Shadow API from config
 	pub fn new(config: &Config) -> Shadow {
-		let http = Client::new();
+		let http = reqwest::Client::builder()
+			.timeout(Duration::from_secs(30))
+			.build().unwrap();
 		Shadow {
 			api: config.shadow.clone(),
 			eth: EthereumRPC::new(http.clone(), vec![config.eth.rpc.clone()]),

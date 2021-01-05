@@ -30,6 +30,15 @@ pub struct Redeem<T: EthereumBacking> {
 	pub proof: EthereumReceiptProofThing,
 }
 
+/// Submit SyncAuthoritiesSet call
+#[derive(Clone, Debug, PartialEq, Call, Encode)]
+pub struct SyncAuthoritiesSet<T: EthereumBacking> {
+	/// Runtime marker
+	pub _runtime: PhantomData<T>,
+	/// Ethereum Receipt Proof
+	pub proof: EthereumReceiptProofThing,
+}
+
 //////
 // Events
 //////

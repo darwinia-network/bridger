@@ -38,6 +38,8 @@ pub struct ContractAddress {
 	/// b
 	#[allow(dead_code)]
 	pub bank: H256,
+	/// relay
+	pub relay: H256,
 }
 
 /// Ethereum transaction service
@@ -45,7 +47,7 @@ pub struct ContractAddress {
 /// This service can check and scan darwinia txs in Ethereum
 pub struct EthereumService {
 	contracts: ContractAddress,
-	filters: [FilterBuilder; 2],
+	filters: [FilterBuilder; 3],
 	web3: Web3<Http>,
 	darwinia: Arc<Darwinia>,
 	scan_from: u64,
@@ -144,7 +146,7 @@ impl EthereumService {
 	async fn do_scan(
 		web3: Web3<Http>,
 		contracts: ContractAddress,
-		filters: [FilterBuilder; 2],
+		filters: [FilterBuilder; 3],
 		from: u64,
 		to: u64,
 	) -> BridgerResult<Vec<EthereumTransaction>> {
@@ -184,6 +186,15 @@ impl EthereumService {
 								block,
 								index,
 							}
+						} else if l.topics.contains(&contracts.relay) {
+							EthereumTransaction {
+								tx_hash: EthereumTransactionHash::SetAuthorities(
+									l.transaction_hash.unwrap_or_default(),
+								),
+								block_hash: l.block_hash.unwrap_or_default(),
+								block,
+								index,
+							}
 						} else {
 							EthereumTransaction {
 								tx_hash: EthereumTransactionHash::Deposit(
@@ -206,7 +217,7 @@ impl EthereumService {
 		web3: Web3<Http>,
 		darwinia: Arc<Darwinia>,
 		contracts: ContractAddress,
-		filters: [FilterBuilder; 2],
+		filters: [FilterBuilder; 3],
 		scan_from: u64,
 		relay_service: Recipient<MsgBlockNumber>,
 		redeem_service: Recipient<MsgEthereumTransaction>,
@@ -275,35 +286,39 @@ impl EthereumService {
 	/// Parse contract addresses
 	pub fn parse_contract(config: &Config) -> ContractAddress {
 		let contract = &config.eth.contract;
-		let a = contract.bank.topics[0].as_str();
 		ContractAddress {
-			bank: H256::from_slice(&bytes!(a)),
+			bank: H256::from_slice(&bytes!(contract.bank.topics[0].as_str())),
 			kton: H256::from_slice(&bytes!(contract.kton.topics[0].as_str())),
 			ring: H256::from_slice(&bytes!(contract.ring.topics[0].as_str())),
+			relay: H256::from_slice(&bytes!(contract.relay.topics[0].as_str())),
 		}
 	}
 
 	/// Parse log filter from config
-	pub fn parse_filter(config: &Config) -> [FilterBuilder; 2] {
-		let filters = [&config.eth.contract.bank, &config.eth.contract.issuing]
-			.iter()
-			.map(|c| {
-				FilterBuilder::default()
-					.address(vec![H160::from_slice(&bytes!(c.address.as_str()))])
-					.topics(
-						Some(
-							c.topics
-								.iter()
-								.map(|t| H256::from_slice(&bytes!(t.as_str())))
-								.collect(),
-						),
-						None,
-						None,
-						None,
-					)
-			})
-			.collect::<Vec<FilterBuilder>>();
-		[filters[0].clone(), filters[1].clone()]
+	pub fn parse_filter(config: &Config) -> [FilterBuilder; 3] {
+		let filters = [
+			&config.eth.contract.bank,
+			&config.eth.contract.issuing,
+			&config.eth.contract.relay,
+		]
+		.iter()
+		.map(|c| {
+			FilterBuilder::default()
+				.address(vec![H160::from_slice(&bytes!(c.address.as_str()))])
+				.topics(
+					Some(
+						c.topics
+							.iter()
+							.map(|t| H256::from_slice(&bytes!(t.as_str())))
+							.collect(),
+					),
+					None,
+					None,
+					None,
+				)
+		})
+		.collect::<Vec<FilterBuilder>>();
+		[filters[0].clone(), filters[1].clone(), filters[2].clone()]
 	}
 
 	/// get_latest_block_number

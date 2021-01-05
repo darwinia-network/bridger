@@ -15,8 +15,10 @@ use std::fmt::Debug;
 pub enum RedeemFor {
 	/// Redeem for token
 	Token,
-	/// Redeem for deopsit
+	/// Redeem for deposit
 	Deposit,
+	/// Redeem for set authorities
+	SetAuthorities,
 }
 
 impl Default for RedeemFor {

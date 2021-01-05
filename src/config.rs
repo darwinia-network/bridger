@@ -25,6 +25,8 @@ pub struct EthereumContract {
 	pub bank: EthereumContractTuple,
 	/// Issuing Contract
 	pub issuing: EthereumContractTuple,
+	/// Relay Contract
+	pub relay: EthereumContractTuple,
 }
 
 /// Ethereum Config
@@ -59,11 +61,8 @@ pub struct Proxy {
 /// Darwinia to ethereum config
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DarwiniaToEthereum {
-	/// relay contract address
-	pub relay_contract_address: String,
-
 	/// ethereum seed
-	pub seed: String,
+	pub seed: Option<String>,
 
 	/// the darwinia account id who will get the reward
 	/// Do not do submit authorities if None
@@ -123,6 +122,13 @@ impl Default for Config {
 						address: "0x49262B932E439271d05634c32978294C7Ea15d0C".to_string(),
 						topics: vec![],
 					},
+					relay: EthereumContractTuple {
+						address: "0xc8d6c331030886716f6e323ACB795077eB530E36".to_string(),
+						topics: vec![
+							"0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f"
+								.to_string(),
+						],
+					},
 				},
 			},
 			step: Step {
@@ -133,8 +139,7 @@ impl Default for Config {
 			},
 			proxy: None,
 			darwinia_to_ethereum: DarwiniaToEthereum {
-				relay_contract_address: "".to_string(),
-				seed: "".to_string(),
+				seed: None,
 				benefit: None,
 			},
 		}

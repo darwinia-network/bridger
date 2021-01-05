@@ -19,7 +19,10 @@ use primitives::{
 			SubmitSignedMmrRoot, SubmitSignedMmrRootCallExt,
 		},
 		ethereum::{
-			backing::{Redeem, RedeemCallExt, VerifiedProofStoreExt},
+			backing::{
+				Redeem, RedeemCallExt, SyncAuthoritiesSet, SyncAuthoritiesSetCallExt,
+				VerifiedProofStoreExt,
+			},
 			game::{AffirmationsStoreExt, EthereumRelayerGame},
 			relay::{
 				Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
@@ -71,6 +74,7 @@ impl Darwinia {
 			.build()
 			.await?;
 
+		let signer_seed = config.darwinia_to_ethereum.seed.clone();
 		let sender = DarwiniaSender::new(
 			config.seed.clone(),
 			config
@@ -78,7 +82,7 @@ impl Darwinia {
 				.clone()
 				.map(|proxy| proxy.real[2..].to_string()),
 			client.clone(),
-			config.darwinia_to_ethereum.seed.clone()[2..].to_string(),
+			signer_seed,
 			config.eth.rpc.to_string(),
 		);
 
@@ -258,6 +262,50 @@ impl Darwinia {
 				Ok(self
 					.client
 					.redeem(&self.sender.signer, redeem_for, proof)
+					.await?)
+			}
+		}
+	}
+
+	///
+	pub async fn sync_authorities_set(&self, proof: EthereumReceiptProofThing) -> Result<H256> {
+		let ethereum_tx_hash = proof
+			.header
+			.hash
+			.map(|hash| hex::encode(&hash))
+			.ok_or_else(|| BizError::Bridger("No hash in header".to_string()))?;
+		match &self.sender.real {
+			Some(real) => {
+				trace!(
+					"Proxy sync authorities set(0x{:?}) for real account {:?}",
+					ethereum_tx_hash,
+					real
+				);
+				let call = SyncAuthoritiesSet {
+					_runtime: PhantomData::default(),
+					proof,
+				};
+
+				let ex = self.client.encode(call).unwrap();
+				Ok(self
+					.client
+					.proxy(
+						&self.sender.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
+					.await?)
+			}
+			None => {
+				trace!(
+					"Sync authorities set(0x{:?}) with account {:?}",
+					ethereum_tx_hash,
+					&self.sender.account_id
+				);
+				Ok(self
+					.client
+					.sync_authorities_set(&self.sender.signer, proof)
 					.await?)
 			}
 		}
@@ -497,6 +545,7 @@ impl Darwinia {
 		decoder.register_type_size::<EcdsaSignature>("RelayAuthoritySignature");
 		decoder.register_type_size::<u8>("ElectionCompute"); // just a hack
 		decoder.register_type_size::<u32>("Term");
+		decoder.register_type_size::<u64>("EthereumTransactionIndex");
 
 		let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
 		for (_, raw) in raw_events {

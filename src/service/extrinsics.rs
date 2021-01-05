@@ -119,7 +119,7 @@ impl ExtrinsicsService {
 			Extrinsic::Redeem(redeem_for, proof, ethereum_tx) => {
 				match redeem_for {
 					RedeemFor::SetAuthorities => {
-						let ex_hash = darwinia.sync_authorities_set(proof).await?;
+						let ex_hash = darwinia.sync_authorities_set(proof, &ethereum_tx.tx_hash).await?;
 						info!(
 							"Sent ethereum tx {:?} with extrinsic {:?}",
 							ethereum_tx.tx_hash, ex_hash

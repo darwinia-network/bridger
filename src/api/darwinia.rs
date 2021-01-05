@@ -4,6 +4,7 @@ use crate::error::BizError;
 use crate::{
 	error::{Error, Result},
 	service::redeem::EthereumTransaction,
+	service::redeem::EthereumTransactionHash,
 	Config,
 };
 use core::marker::PhantomData;
@@ -268,16 +269,11 @@ impl Darwinia {
 	}
 
 	///
-	pub async fn sync_authorities_set(&self, proof: EthereumReceiptProofThing) -> Result<H256> {
-		let ethereum_tx_hash = proof
-			.header
-			.hash
-			.map(|hash| hex::encode(&hash))
-			.ok_or_else(|| BizError::Bridger("No hash in header".to_string()))?;
+	pub async fn sync_authorities_set(&self, proof: EthereumReceiptProofThing, ethereum_tx_hash: &EthereumTransactionHash) -> Result<H256> {
 		match &self.sender.real {
 			Some(real) => {
 				trace!(
-					"Proxy sync authorities set(0x{:?}) for real account {:?}",
+					"Proxy sync authorities set(tx: {:?}) for real account {:?}",
 					ethereum_tx_hash,
 					real
 				);
@@ -299,7 +295,7 @@ impl Darwinia {
 			}
 			None => {
 				trace!(
-					"Sync authorities set(0x{:?}) with account {:?}",
+					"Sync authorities set(tx {:?}) with account {:?}",
 					ethereum_tx_hash,
 					&self.sender.account_id
 				);

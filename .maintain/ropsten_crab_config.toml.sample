@@ -68,5 +68,5 @@ seed = '<YOUR_ETHEREUM_SEED>'
 # the darwinia account id who will get the reward
 # when send authorities to ethereum
 # Disable by remove or comment
-benefit = "<YOUR_BENEFIT_DARWINIA_ACCOUNT_ID>"
+beneficiary = "<YOUR_BENEFIT_DARWINIA_ACCOUNT_ID>"
 

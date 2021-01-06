@@ -13,8 +13,8 @@ use primitives::{
 	rpc::{EthereumRPC, RPC},
 };
 use reqwest::{Client, StatusCode};
-use serde::Serialize;
 use serde::Deserialize;
+use serde::Serialize;
 use serde_json::Value;
 use std::time::Duration;
 
@@ -28,8 +28,8 @@ struct Proposal {
 /// Error Json
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 struct ErrorJson {
-    /// MMR leaf string
-    pub error: String,
+	/// MMR leaf string
+	pub error: String,
 }
 
 /// Parent mmr root result
@@ -37,7 +37,7 @@ struct ErrorJson {
 #[serde(untagged)]
 enum ParentMmrRootResult {
 	Result(MMRRootJson),
-	Error { error: String }
+	Error { error: String },
 }
 
 /// Proof result
@@ -45,9 +45,8 @@ enum ParentMmrRootResult {
 #[serde(untagged)]
 enum ProofResult {
 	Result(EthereumRelayProofsJson),
-	Error { error: String }
+	Error { error: String },
 }
-
 
 /// Shadow API
 pub struct Shadow {
@@ -64,7 +63,8 @@ impl Shadow {
 	pub fn new(config: &Config) -> Shadow {
 		let http = reqwest::Client::builder()
 			.timeout(Duration::from_secs(30))
-			.build().unwrap();
+			.build()
+			.unwrap();
 		Shadow {
 			api: config.shadow.clone(),
 			eth: EthereumRPC::new(http.clone(), vec![config.eth.rpc.clone()]),

@@ -6,13 +6,13 @@ use substrate_subxt::system::{System, SystemEventsDecoder};
 use substrate_subxt_proc_macro::{module, Call, Event, Store};
 
 /// AuthoritiesToSignReturn
-pub type AuthoritiesToSignReturn<T> = (
+pub type AuthoritiesToSignReturn<T> = Option<(
 	<T as EthereumRelayAuthorities>::RelayAuthorityMessage,
 	Vec<(
 		<T as System>::AccountId,
 		<T as EthereumRelayAuthorities>::RelayAuthoritySignature,
 	)>,
-);
+)>;
 
 /// AuthoritiesToSignReturn
 pub type MmrRootsToSignReturn<T> = Option<

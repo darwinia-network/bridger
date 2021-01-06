@@ -25,13 +25,6 @@ struct Proposal {
 	pub last_leaf: u64,
 }
 
-/// Error Json
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
-struct ErrorJson {
-	/// MMR leaf string
-	pub error: String,
-}
-
 /// Parent mmr root result
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
@@ -113,12 +106,11 @@ impl Shadow {
 		if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
 			Err(Error::ShadowInternalServerError(resp.text().await?).into())
 		} else {
-			let raw = resp.text().await?;
-			if raw.contains("\"error\"") {
-				let error: ErrorJson = serde_json::from_str(&raw)?;
-				Err(BizError::Bridger(error.error).into())
+			let result: Value = resp.json().await?;
+			if let Some(err) = result.get("error") {
+				Err(BizError::Bridger(err.as_str().unwrap().to_owned()).into())
 			} else {
-				let json: EthereumReceiptProofThingJson = serde_json::from_str(&raw)?;
+				let json: EthereumReceiptProofThingJson = serde_json::from_value(result)?;
 				Ok(json.into())
 			}
 		}

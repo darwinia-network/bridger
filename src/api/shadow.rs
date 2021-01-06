@@ -14,6 +14,7 @@ use primitives::{
 };
 use reqwest::{Client, StatusCode};
 use serde::Serialize;
+use serde::Deserialize;
 use serde_json::Value;
 use std::time::Duration;
 
@@ -23,6 +24,30 @@ struct Proposal {
 	pub target: u64,
 	pub last_leaf: u64,
 }
+
+/// Error Json
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+struct ErrorJson {
+    /// MMR leaf string
+    pub error: String,
+}
+
+/// Parent mmr root result
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+enum ParentMmrRootResult {
+	Result(MMRRootJson),
+	Error { error: String }
+}
+
+/// Proof result
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+enum ProofResult {
+	Result(EthereumRelayProofsJson),
+	Error { error: String }
+}
+
 
 /// Shadow API
 pub struct Shadow {
@@ -54,15 +79,15 @@ impl Shadow {
 		if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
 			Err(Error::ShadowInternalServerError(resp.text().await?).into())
 		} else {
-			let json: MMRRootJson = resp
+			let result: ParentMmrRootResult = resp
 				.json()
 				.await
 				.context(format!("Fail to parse json to MMRRootJson: {}", url))?;
-			let result = json.into();
-			if result == MMRRoot::default() {
-				Err(BizError::BlankEthereumMmrRoot(block_number).into())
-			} else {
-				Ok(result)
+			match result {
+				ParentMmrRootResult::Result(json) => Ok(json.into()),
+				ParentMmrRootResult::Error { error } => {
+					Err(BizError::BlankEthereumMmrRoot(block_number, error).into())
+				}
 			}
 		}
 	}
@@ -88,8 +113,14 @@ impl Shadow {
 		if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
 			Err(Error::ShadowInternalServerError(resp.text().await?).into())
 		} else {
-			let json: EthereumReceiptProofThingJson = resp.json().await?;
-			Ok(json.into())
+			let raw = resp.text().await?;
+			if raw.contains("\"error\"") {
+				let error: ErrorJson = serde_json::from_str(&raw)?;
+				Err(BizError::Bridger(error.error).into())
+			} else {
+				let json: EthereumReceiptProofThingJson = serde_json::from_str(&raw)?;
+				Ok(json.into())
+			}
 		}
 	}
 
@@ -120,8 +151,11 @@ impl Shadow {
 		if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
 			Err(Error::ShadowInternalServerError(resp.text().await?).into())
 		} else {
-			let json: EthereumRelayProofsJson = resp.json().await?;
-			Ok(json.into())
+			let result: ProofResult = resp.json().await?;
+			match result {
+				ProofResult::Result(json) => Ok(json.into()),
+				ProofResult::Error { error } => Err(BizError::Bridger(error).into()),
+			}
 		}
 	}
 }

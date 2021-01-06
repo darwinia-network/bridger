@@ -39,7 +39,7 @@ pub struct EthereumReceiptProof {
 }
 
 /// Ethereum Receipt Proof Json
-#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EthereumReceiptProofJson {
 	/// Proof index
 	pub index: String,
@@ -93,7 +93,7 @@ pub struct EthereumReceiptProofThing {
 }
 
 /// Ethereum ReceiptProofThing Json
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EthereumReceiptProofThingJson {
 	/// Ethereum Header
 	pub header: EthereumHeaderJson,

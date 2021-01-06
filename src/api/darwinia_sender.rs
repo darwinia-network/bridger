@@ -178,11 +178,16 @@ impl DarwiniaSender {
 	pub async fn need_to_sign_authorities(&self, message: EcdsaMessage) -> Result<bool> {
 		let ret: AuthoritiesToSignReturn<DarwiniaRuntime> =
 			self.client.authorities_to_sign(None).await?;
-		if ret.0 == message {
-			let includes = ret.1.iter().any(|a| a.0 == self.account_id);
-			Ok(!includes)
-		} else {
-			Ok(false)
+		match ret {
+			None => Ok(false),
+			Some(r) => {
+				if r.0 == message {
+					let includes = r.1.iter().any(|a| a.0 == self.account_id);
+					Ok(!includes)
+				} else {
+					Ok(false)
+				}
+			}
 		}
 	}
 

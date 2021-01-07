@@ -170,6 +170,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "array-bytes"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43759f68cc29a37659a6b7a48a49674e03a888b6d41f36f4204c36d0d09a51de"
+
+[[package]]
 name = "arrayref"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -824,6 +830,7 @@ dependencies = [
  "actix",
  "actix-rt",
  "anyhow",
+ "array-bytes",
  "async-io",
  "async-macros",
  "async-trait",

@@ -51,8 +51,8 @@ pub enum BizError {
 	#[error("{0:?} has already been redeemed")]
 	TxRedeemed(EthereumTransactionHash),
 
-	#[error("Mmr root for ethereum block {0} is not filled yet")]
-	BlankEthereumMmrRoot(usize),
+	#[error("Mmr root for ethereum block {0} may be not filled yet, the error from shadow: {1}")]
+	BlankEthereumMmrRoot(usize, String),
 }
 
 pub type Result<T> = anyhow::Result<T>;

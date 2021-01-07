@@ -269,7 +269,11 @@ impl Darwinia {
 	}
 
 	///
-	pub async fn sync_authorities_set(&self, proof: EthereumReceiptProofThing, ethereum_tx_hash: &EthereumTransactionHash) -> Result<H256> {
+	pub async fn sync_authorities_set(
+		&self,
+		proof: EthereumReceiptProofThing,
+		ethereum_tx_hash: &EthereumTransactionHash,
+	) -> Result<H256> {
 		match &self.sender.real {
 			Some(real) => {
 				trace!(

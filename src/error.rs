@@ -21,6 +21,9 @@ pub enum Error {
 	#[error("No signer seed set for authority, please check your config.toml")]
 	NoAuthoritySignerSeed,
 
+	#[error("RuntimeUpdated")]
+	RuntimeUpdated,
+
 	#[error("{0}")]
 	ShadowInternalServerError(String),
 }

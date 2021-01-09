@@ -2,7 +2,7 @@
 mod darwinia_tracker;
 
 use crate::api::Ethereum;
-use crate::error::BizError;
+use crate::error::{Error, BizError};
 use crate::service::subscribe::darwinia_tracker::DarwiniaBlockTracker;
 use crate::tools;
 use crate::{
@@ -78,10 +78,14 @@ impl SubscribeService {
 			let hash = header.hash();
 			let events = self.darwinia.get_raw_events(hash).await;
 			if let Err(err) = self.handle_events(&header, events).await {
-				error!(
-					"Encounter error when handle events of block {}: {:?}",
-					header.number, err
-				);
+				if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
+					return Err(err);
+				} else {
+					error!(
+						"An error occurred while processing the events of block {}: {:?}",
+						header.number, err
+					);
+				}
 			}
 
 			tools::set_cache(
@@ -157,7 +161,7 @@ impl SubscribeService {
 
 		match (module, variant) {
 			("System", "CodeUpdated") => {
-				return Err(BizError::Bridger("CodeUpdated".to_string()).into());
+				return Err(Error::RuntimeUpdated.into());
 			}
 
 			// call ethereum_relay_authorities.request_authority and then sudo call

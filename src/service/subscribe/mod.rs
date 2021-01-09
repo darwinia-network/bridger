@@ -2,7 +2,7 @@
 mod darwinia_tracker;
 
 use crate::api::Ethereum;
-use crate::error::{Error, BizError};
+use crate::error::{BizError, Error};
 use crate::service::subscribe::darwinia_tracker::DarwiniaBlockTracker;
 use crate::tools;
 use crate::{
@@ -69,7 +69,10 @@ impl SubscribeService {
 
 			// handle the 'mmr root sign and send extrinsics' only block height reached
 			if let Err(err) = self.handle_delayed_extrinsics(&header).await {
-				error!("An error occurred while processing the delayed extrinsics: {:?}", err);
+				error!(
+					"An error occurred while processing the delayed extrinsics: {:?}",
+					err
+				);
 				// Prevent too fast refresh errors
 				delay_for(Duration::from_secs(30)).await;
 			}
@@ -79,6 +82,12 @@ impl SubscribeService {
 			let events = self.darwinia.get_raw_events(hash).await;
 			if let Err(err) = self.handle_events(&header, events).await {
 				if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
+					tools::set_cache(
+						self.data_dir.clone(),
+						tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME,
+						header.number as u64,
+					)
+					.await?;
 					return Err(err);
 				} else {
 					error!(

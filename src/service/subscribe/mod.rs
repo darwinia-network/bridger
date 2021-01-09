@@ -69,7 +69,7 @@ impl SubscribeService {
 
 			// handle the 'mmr root sign and send extrinsics' only block height reached
 			if let Err(err) = self.handle_delayed_extrinsics(&header).await {
-				error!("Encounter error when handle delayed extrinsics: {:?}", err);
+				error!("An error occurred while processing the delayed extrinsics: {:?}", err);
 				// Prevent too fast refresh errors
 				delay_for(Duration::from_secs(30)).await;
 			}

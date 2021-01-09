@@ -79,7 +79,7 @@ impl SubscribeService {
 			let events = self.darwinia.get_raw_events(hash).await;
 			if let Err(err) = self.handle_events(&header, events).await {
 				error!(
-					"Encounter error when handle events of block {}: {}",
+					"Encounter error when handle events of block {}: {:?}",
 					header.number, err
 				);
 			}

@@ -33,7 +33,10 @@ impl DarwiniaBlockTracker {
 					}
 				}
 				Err(err) => {
-					error!("Encounter error when track next block: {:#?}", err);
+					error!(
+						"An error occurred while tracking next darwinia block: {:#?}",
+						err
+					);
 					delay_for(Duration::from_secs(30)).await;
 				}
 			}

@@ -413,7 +413,6 @@ impl Darwinia {
 					);
 					let submit_signed_mmr_root = SubmitSignedMmrRoot {
 						block_number,
-						mmr_root,
 						signature,
 					};
 
@@ -439,7 +438,6 @@ impl Darwinia {
 						.submit_signed_mmr_root(
 							&self.sender.signer,
 							block_number,
-							mmr_root,
 							signature,
 						)
 						.await?;

@@ -64,8 +64,6 @@ pub struct SubmitSignedAuthorities<T: EthereumRelayAuthorities> {
 pub struct SubmitSignedMmrRoot<T: EthereumRelayAuthorities> {
 	/// block_number
 	pub block_number: <T as System>::BlockNumber,
-	/// mmr_root
-	pub mmr_root: H256,
 	/// signature
 	pub signature: T::RelayAuthoritySignature,
 }

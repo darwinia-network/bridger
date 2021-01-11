@@ -192,13 +192,21 @@ impl DarwiniaSender {
 	}
 
 	/// need_to_mmr_root_of
-	pub async fn need_to_sign_mmr_root_of(&self, block_number: u32) -> Result<bool> {
-		let mmr_roots_to_sign = self.client.mmr_roots_to_sign(block_number, None).await?;
-		match mmr_roots_to_sign {
-			None => Ok(false),
-			Some(items) => {
-				let includes = items.iter().any(|a| a.0 == self.account_id);
-				Ok(!includes)
+	pub async fn need_to_sign_mmr_root_of(&self, block_number: u32) -> bool {
+		match self.client.mmr_roots_to_sign(block_number, None).await {
+			Ok(mmr_roots_to_sign) => match mmr_roots_to_sign {
+				None => false,
+				Some(items) => {
+					let includes = items.iter().any(|a| a.0 == self.account_id);
+					!includes
+				}
+			},
+			Err(err) => {
+				error!(
+					"An error was encountered when trying to get storage MMRRootsToSign: {:?}",
+					err
+				);
+				false
 			}
 		}
 	}

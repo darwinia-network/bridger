@@ -65,7 +65,7 @@ impl SubscribeService {
 			let header = tracker.next_block().await;
 
 			// debug
-			// debug!("Darwinia block {}", header.number);
+			trace!("Darwinia block {}", header.number);
 
 			// handle the 'mmr root sign and send extrinsics' only block height reached
 			if let Err(err) = self.handle_delayed_extrinsics(&header).await {
@@ -127,7 +127,7 @@ impl SubscribeService {
 					.darwinia
 					.sender
 					.need_to_sign_mmr_root_of(*delayed_to)
-					.await?
+					.await
 				{
 					let msg = MsgExtrinsic(delayed_ex.clone());
 					self.extrinsics_service.send(msg).await?;

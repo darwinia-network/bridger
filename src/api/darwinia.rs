@@ -435,11 +435,7 @@ impl Darwinia {
 					);
 					let tx_hash = self
 						.client
-						.submit_signed_mmr_root(
-							&self.sender.signer,
-							block_number,
-							signature,
-						)
+						.submit_signed_mmr_root(&self.sender.signer, block_number, signature)
 						.await?;
 					Ok(tx_hash)
 				}
@@ -544,6 +540,7 @@ impl Darwinia {
 		decoder.register_type_size::<u8>("ElectionCompute"); // just a hack
 		decoder.register_type_size::<u32>("Term");
 		decoder.register_type_size::<u64>("EthereumTransactionIndex");
+		decoder.register_type_size::<(u32, u32)>("TaskAddress<BlockNumber>");
 
 		let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
 		for (_, raw) in raw_events {

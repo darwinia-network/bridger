@@ -435,11 +435,7 @@ impl Darwinia {
 					);
 					let tx_hash = self
 						.client
-						.submit_signed_mmr_root(
-							&self.sender.signer,
-							block_number,
-							signature,
-						)
+						.submit_signed_mmr_root(&self.sender.signer, block_number, signature)
 						.await?;
 					Ok(tx_hash)
 				}

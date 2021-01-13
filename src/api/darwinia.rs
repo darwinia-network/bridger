@@ -256,7 +256,7 @@ impl Darwinia {
 			}
 			None => {
 				trace!(
-					"Redeem ethereum tx 0x{:?} with account {:?}",
+					"Redeem ethereum tx {:?} with account {:?}",
 					ethereum_tx_hash,
 					&self.sender.account_id
 				);

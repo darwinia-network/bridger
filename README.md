@@ -38,7 +38,7 @@ cd ./target/release/
 
 ```
 $ bridger
-darwinia-bridger 0.2.0
+darwinia-bridger 0.2.2
 
 USAGE:
     bridger <SUBCOMMAND>

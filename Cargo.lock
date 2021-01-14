@@ -1741,7 +1741,7 @@ dependencies = [
 [[package]]
 name = "jsonrpsee"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/jsonrpsee?branch=xavier-send-error#d56bd6af5429a9e45a515013d7a76759b1e0ef3a"
+source = "git+https://github.com/darwinia-network/jsonrpsee?branch=xavier-send-error#e081ae4e1081289089c1e547a80ec30d0efc4a21"
 dependencies = [
  "async-std",
  "async-tls",
@@ -1773,7 +1773,7 @@ dependencies = [
 [[package]]
 name = "jsonrpsee-proc-macros"
 version = "1.0.0"
-source = "git+https://github.com/darwinia-network/jsonrpsee?branch=xavier-send-error#d56bd6af5429a9e45a515013d7a76759b1e0ef3a"
+source = "git+https://github.com/darwinia-network/jsonrpsee?branch=xavier-send-error#e081ae4e1081289089c1e547a80ec30d0efc4a21"
 dependencies = [
  "Inflector",
  "proc-macro2",

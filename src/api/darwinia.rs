@@ -21,7 +21,7 @@ use primitives::{
 		},
 		ethereum::{
 			backing::{
-				Redeem, RedeemCallExt, SyncAuthoritiesSet, SyncAuthoritiesSetCallExt,
+				Redeem, RedeemCallExt, SyncAuthoritiesChange, SyncAuthoritiesChangeCallExt,
 				VerifiedProofStoreExt,
 			},
 			game::{AffirmationsStoreExt, EthereumRelayerGame},
@@ -269,7 +269,7 @@ impl Darwinia {
 	}
 
 	///
-	pub async fn sync_authorities_set(
+	pub async fn sync_authorities_change(
 		&self,
 		proof: EthereumReceiptProofThing,
 		ethereum_tx_hash: &EthereumTransactionHash,
@@ -281,7 +281,7 @@ impl Darwinia {
 					ethereum_tx_hash,
 					real
 				);
-				let call = SyncAuthoritiesSet {
+				let call = SyncAuthoritiesChange {
 					_runtime: PhantomData::default(),
 					proof,
 				};
@@ -305,7 +305,7 @@ impl Darwinia {
 				);
 				Ok(self
 					.client
-					.sync_authorities_set(&self.sender.signer, proof)
+					.sync_authorities_change(&self.sender.signer, proof)
 					.await?)
 			}
 		}

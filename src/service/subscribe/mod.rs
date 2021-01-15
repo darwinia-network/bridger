@@ -12,7 +12,9 @@ use crate::{
 };
 use actix::Recipient;
 use primitives::{
-	frame::bridge::relay_authorities::{AuthoritiesSetSigned, NewAuthorities, NewMMRRoot},
+	frame::bridge::relay_authorities::{
+		AuthoritiesChangeSigned, ScheduleAuthoritiesChange, ScheduleMMRRoot,
+	},
 	runtime::DarwiniaRuntime,
 };
 use std::collections::HashMap;
@@ -175,10 +177,10 @@ impl SubscribeService {
 
 			// call ethereum_relay_authorities.request_authority and then sudo call
 			// EthereumRelayAuthorities.add_authority will emit the event
-			("EthereumRelayAuthorities", "NewAuthorities") => {
+			("EthereumRelayAuthorities", "ScheduleAuthoritiesChange") => {
 				if self.darwinia.sender.is_authority().await? {
 					if let Ok(decoded) =
-						NewAuthorities::<DarwiniaRuntime>::decode(&mut &event_data[..])
+						ScheduleAuthoritiesChange::<DarwiniaRuntime>::decode(&mut &event_data[..])
 					{
 						info!(">> Event - {}::{:#?}", module, decoded);
 						if self
@@ -196,9 +198,9 @@ impl SubscribeService {
 			}
 
 			// authority set changed will emit this event
-			("EthereumRelayAuthorities", "AuthoritiesSetSigned") => {
+			("EthereumRelayAuthorities", "AuthoritiesChangeSigned") => {
 				if let Ok(decoded) =
-					AuthoritiesSetSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
+					AuthoritiesChangeSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
 				{
 					// TODO: Add better repeating check
 					info!(">> Event - {}::{:#?}", module, decoded);
@@ -223,9 +225,10 @@ impl SubscribeService {
 			}
 
 			// call ethereum_backing.lock will emit the event
-			("EthereumRelayAuthorities", "NewMMRRoot") => {
+			("EthereumRelayAuthorities", "ScheduleMMRRoot") => {
 				if self.darwinia.sender.is_authority().await? {
-					if let Ok(decoded) = NewMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
+					if let Ok(decoded) =
+						ScheduleMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
 					{
 						info!(">> Event - {}::{:#?}", module, decoded);
 						let ex = Extrinsic::SignAndSendMmrRoot(decoded.block_number);

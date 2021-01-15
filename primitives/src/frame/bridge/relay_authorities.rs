@@ -74,14 +74,14 @@ pub struct SubmitSignedMmrRoot<T: EthereumRelayAuthorities> {
 
 /// A New MMR Root Request to be Signed. [block number]
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
-pub struct NewMMRRoot<T: EthereumRelayAuthorities> {
+pub struct ScheduleMMRRoot<T: EthereumRelayAuthorities> {
 	/// BlockNumber
 	pub block_number: <T as System>::BlockNumber,
 }
 
 /// Authorities Signed. [term, new authorities, signatures]
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
-pub struct AuthoritiesSetSigned<T: EthereumRelayAuthorities> {
+pub struct AuthoritiesChangeSigned<T: EthereumRelayAuthorities> {
 	/// term
 	pub term: u32,
 	/// new authorities
@@ -101,9 +101,9 @@ pub struct MMRRootSigned<T: EthereumRelayAuthorities> {
 	pub signatures: Vec<(<T as System>::AccountId, T::RelayAuthoritySignature)>,
 }
 
-/// NewAuthorities. [message to sign]
+/// ScheduleAuthoritiesChange. [message to sign]
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
-pub struct NewAuthorities<T: EthereumRelayAuthorities> {
+pub struct ScheduleAuthoritiesChange<T: EthereumRelayAuthorities> {
 	/// message
 	pub message: T::RelayAuthorityMessage,
 }

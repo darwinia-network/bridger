@@ -21,7 +21,7 @@ use primitives::{
 		},
 		ethereum::{
 			backing::{
-				Redeem, RedeemCallExt, SyncAuthoritiesSet, SyncAuthoritiesSetCallExt,
+				Redeem, RedeemCallExt, SyncAuthoritiesChange, SyncAuthoritiesChangeCallExt,
 				VerifiedProofStoreExt,
 			},
 			game::{AffirmationsStoreExt, EthereumRelayerGame},
@@ -269,7 +269,7 @@ impl Darwinia {
 	}
 
 	///
-	pub async fn sync_authorities_set(
+	pub async fn sync_authorities_change(
 		&self,
 		proof: EthereumReceiptProofThing,
 		ethereum_tx_hash: &EthereumTransactionHash,
@@ -281,7 +281,7 @@ impl Darwinia {
 					ethereum_tx_hash,
 					real
 				);
-				let call = SyncAuthoritiesSet {
+				let call = SyncAuthoritiesChange {
 					_runtime: PhantomData::default(),
 					proof,
 				};
@@ -305,7 +305,7 @@ impl Darwinia {
 				);
 				Ok(self
 					.client
-					.sync_authorities_set(&self.sender.signer, proof)
+					.sync_authorities_change(&self.sender.signer, proof)
 					.await?)
 			}
 		}
@@ -352,15 +352,17 @@ impl Darwinia {
 
 	/// construct_message
 	pub fn construct_authorities_message(
-		first: String,
-		second: u32,
-		third: Vec<EcdsaAddress>,
+		spec_name: String,
+		term: u32,
+		next_authorities: Vec<EcdsaAddress>,
 	) -> Vec<u8> {
+		let op_code: [u8; 4] = [180, 188, 244, 151];
 		debug!(
-			"Infos to construct eth authorities message: {:?}, {:?}, {:?}",
-			first,
-			second,
-			third
+			"Infos to construct eth authorities message: {}, {}, {}, {:?}",
+			spec_name,
+			hex::encode(&op_code),
+			term,
+			next_authorities
 				.iter()
 				.map(|a| hex::encode(&a))
 				.collect::<Vec<_>>()
@@ -368,9 +370,35 @@ impl Darwinia {
 		);
 		// scale encode & sign
 		let message = _S {
-			_1: first,
-			_2: second,
-			_3: third,
+			_1: spec_name,
+			_2: op_code,
+			_3: term,
+			_4: next_authorities,
+		};
+		let encoded: &[u8] = &message.encode();
+		encoded.to_vec()
+	}
+
+	/// construct mmr root message
+	pub fn construct_mmr_root_message(
+		spec_name: String,
+		block_number: u32,
+		mmr_root: H256,
+	) -> Vec<u8> {
+		let op_code: [u8; 4] = [71, 159, 189, 249];
+		debug!(
+			"Infos to construct mmr_root message: {}, {}, {}, {:?}",
+			spec_name,
+			hex::encode(&op_code),
+			block_number,
+			mmr_root
+		);
+		// scale encode & sign
+		let message = _S {
+			_1: spec_name,
+			_2: op_code,
+			_3: block_number,
+			_4: mmr_root,
 		};
 		let encoded: &[u8] = &message.encode();
 		encoded.to_vec()
@@ -387,20 +415,7 @@ impl Darwinia {
 			let leaf_index = block_number;
 			let mmr_root = self.get_mmr_root(leaf_index).await?;
 
-			debug!(
-				"Infos to construct mmr_root message: {}, {}, {:?}",
-				spec_name.clone(),
-				block_number,
-				mmr_root
-			);
-			// scale encode & sign
-			let message = _S {
-				_1: spec_name,
-				_2: block_number,
-				_3: mmr_root,
-			};
-			let encoded = message.encode();
-
+			let encoded = Darwinia::construct_mmr_root_message(spec_name, block_number, mmr_root);
 			let hash = web3::signing::keccak256(&encoded);
 			let signature = self.sender.ecdsa_sign(&hash)?;
 
@@ -590,27 +605,58 @@ impl Darwinia {
 	}
 }
 #[derive(Encode)]
-struct _S<_1, _2, _3>
+struct _S<_1, _2, _3, _4>
 where
 	_1: Encode,
 	_2: Encode,
 	_3: Encode,
+	_4: Encode,
 {
-	_1: _1,
+	_1: _1, // spec name
+	_2: _2, // op code, mmr root: 0x479fbdf9, next authorities: 0xb4bcf497
 	#[codec(compact)]
-	_2: _2,
-	_3: _3,
+	_3: _3, // block_number or term
+	_4: _4, // mmr_root or next authorities
 }
 
 #[test]
-fn test_encode() {
-	let s = _S {
-		_1: "Pangolin",
-		_2: 50u32,
-		_3: [
-			38u8, 199, 154, 103, 135, 242, 210, 106, 168, 120, 216, 232, 234, 114, 194, 69, 189,
-			238, 196, 220, 4, 5, 74, 15, 181, 223, 155, 200, 224, 204, 189, 1,
+fn mmr_root_encode() {
+	let encoded = Darwinia::construct_mmr_root_message(
+		"DRML".to_owned(),
+		789u32,
+		H256::from_slice(&[
+			0u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0,
+		]),
+	);
+
+	assert_eq!(
+		encoded[..],
+		[
+			16, 68, 82, 77, 76, 71, 159, 189, 249, 85, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+		]
+	);
+}
+
+#[test]
+fn authorities_encode() {
+	let encoded = Darwinia::construct_authorities_message(
+		"DRML".to_owned(),
+		789u32,
+		vec![
+			[7u8, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+			[8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+			[9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
 		],
-	};
-	println!("{:?}", s.encode());
+	);
+
+	assert_eq!(
+		encoded[..],
+		[
+			16, 68, 82, 77, 76, 180, 188, 244, 151, 85, 12, 12, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+			7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9,
+			9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9
+		]
+	);
 }

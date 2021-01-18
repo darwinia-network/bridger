@@ -83,9 +83,11 @@ pub struct ScheduleMMRRoot<T: EthereumRelayAuthorities> {
 impl<T: EthereumRelayAuthorities> std::fmt::Display for ScheduleMMRRoot<T> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		let msg = format!(
-r#">> ScheduleMMRRoot {{
->>    block_number: {},
->> }}"#,
+r#"
+ScheduleMMRRoot {{
+    block_number: {},
+}}
+"#,
 			&self.block_number,
 		);
 		write!(f, "{}", msg)
@@ -106,11 +108,13 @@ pub struct AuthoritiesChangeSigned<T: EthereumRelayAuthorities> {
 impl<T: EthereumRelayAuthorities> std::fmt::Display for AuthoritiesChangeSigned<T> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		let msg = format!(
-r#">> AuthoritiesChangeSigned {{
->>    term: {},
->>    new_authorities: {:?},
->>    signatures: {:?}
->> }}"#,
+r#"
+AuthoritiesChangeSigned {{
+   term: {},
+   new_authorities: {:?},
+   signatures: {:?}
+}}
+"#,
 			&self.term,
 			&self.new_authorities.iter().map(|n| to_hex(&n.encode(), false)).collect::<Vec<_>>(),
 			&self.signatures.iter().map(|s| {
@@ -145,9 +149,11 @@ pub struct ScheduleAuthoritiesChange<T: EthereumRelayAuthorities> {
 impl<T: EthereumRelayAuthorities> std::fmt::Display for ScheduleAuthoritiesChange<T> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		let msg = format!(
-r#">> ScheduleAuthoritiesChange {{
->>    message: {},
->> }}"#,
+r#"
+ScheduleAuthoritiesChange {{
+   message: {},
+}}
+"#,
 			to_hex(&self.message.encode(), false)
 		);
 		write!(f, "{}", msg)
@@ -215,7 +221,6 @@ mod tests {
 				(AccountId32::default(), EcdsaSignature::default())
 			]
 		};
-
 		println!("{}", a);
 	}
 

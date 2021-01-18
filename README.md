@@ -36,7 +36,7 @@ cd target/release/
 
 ## Configuration
 
-`Bridger` depends on a TOML config file, it is located in `~/.bridger/config.toml` as default.
+`Bridger` depends on a TOML config file, it is located in `~/.bridger/config.toml` by default.
 
 Sample config:
 

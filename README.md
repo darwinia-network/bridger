@@ -36,7 +36,7 @@ cd target/release/
 
 ## Configuration
 
-`Bridger` depends on a TOML config file, it is located in `~/.bridger/config.toml` by default.
+Darwinia Bridger depends on a TOML config file, it is located in `~/.bridger/config.toml` by default.
 
 Sample configs:
 
@@ -55,7 +55,7 @@ node = "wss://cc1.darwinia.network"
 
 #### `shadow`
 
-The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS, for example using the official service:
+The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS. For example using the official service:
 
 ```toml
 shadow = "https://shadow.darwinia.network"
@@ -88,6 +88,37 @@ real = "0x0000000000000000000000000000000000000000000000000000000000000000"
 ```
 
 Here is a [tool](https://polkadot.subscan.io/tools/ss58_transform) provided by Subscan that helps convert SS58 addresses to public keys. Comment out this field if you don't want to use proxy account.
+
+#### `darwinia_to_ethereum.seed`
+
+Private key in hex of your **Ethereum** account. It's similar to `seed`, but it's for signing on Ethereum network. For example:
+
+```toml
+[darwinia_to_ethereum]
+seed = "0x0000000000000000000000000000000000000000000000000000000000000000"
+```
+
+**For users who want to relay messages from Darwinia to Ethereum, you must request to become a member of the authority set first**:
+
+1. Open [Extrinsics in apps.darwinia.network](https://apps.darwinia.network/#/extrinsics)
+2. If you're not using a proxy account or you have the permission to sign extrinsics using the "real" account, switch to the "real" account and submit `ethereumRelayAuthorities.requestAuthority(stake_amount, signer)`:
+   - `stake_amount` is the amount of RINGs to stake.
+   - `signer` is the public key of your **Ethereum** account.
+    Otherwise, you must switch to your proxy account and submit `proxy.proxy(real_account, ethereumRelayAuthorities.requestAuthority(stake_amount, signer))`. The `stake_amount` will be deducted from your "real" account.
+3. Notify council members to submit `ethereumRelayAuthorities.addAuthority(your_account)`.
+
+> How it works: Authority is a role of relayer. Authorities sign Darwinia-to-Ethereum messages. Once the number of signatures reaches the threshold and the message is delivered and verified on the Ethereum network, the cross-chain is finished. Updating the authority set involves 2 times of cross-chain: 1) relay the new authority set from Darwinia to Ethereum; 2) relay from Ethereum to Darwinia to send rewards to `darwinia_to_ethereum.beneficiary` (see below).
+
+#### `darwinia_to_ethereum.beneficiary`
+
+Public key in hex of your **Darwinia** account which receives the rewards of relaying new authorities. For example:
+
+```toml
+[darwinia_to_ethereum]
+beneficiary = "0x0000000000000000000000000000000000000000000000000000000000000000"
+```
+
+Comment out if you don't want any reward of relaying.
 
 ## Usage
 

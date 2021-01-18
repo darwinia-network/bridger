@@ -185,7 +185,7 @@ pub struct AuthoritiesToSign<T: EthereumRelayAuthorities> {
 
 /// AuthorityTerm
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct AuthorityTerm<T: EthereumRelayAuthorities> {
+pub struct NextTerm<T: EthereumRelayAuthorities> {
 	#[store(returns = u32)]
 	/// Runtime marker
 	pub _runtime: PhantomData<T>,

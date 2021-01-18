@@ -2,6 +2,7 @@
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use frame_support::sp_runtime::app_crypto::sp_core::H256;
+use substrate_subxt::sp_core::bytes::to_hex;
 use substrate_subxt::system::{System, SystemEventsDecoder};
 use substrate_subxt_proc_macro::{module, Call, Event, Store};
 
@@ -79,6 +80,20 @@ pub struct ScheduleMMRRoot<T: EthereumRelayAuthorities> {
 	pub block_number: <T as System>::BlockNumber,
 }
 
+impl<T: EthereumRelayAuthorities> std::fmt::Display for ScheduleMMRRoot<T> {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let msg = format!(
+			r#"
+ScheduleMMRRoot {{
+    block_number: {},
+}}
+"#,
+			&self.block_number,
+		);
+		write!(f, "{}", msg)
+	}
+}
+
 /// Authorities Signed. [term, new authorities, signatures]
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
 pub struct AuthoritiesChangeSigned<T: EthereumRelayAuthorities> {
@@ -88,6 +103,32 @@ pub struct AuthoritiesChangeSigned<T: EthereumRelayAuthorities> {
 	pub new_authorities: Vec<T::RelayAuthoritySigner>,
 	/// signatures
 	pub signatures: Vec<(<T as System>::AccountId, T::RelayAuthoritySignature)>,
+}
+
+impl<T: EthereumRelayAuthorities> std::fmt::Display for AuthoritiesChangeSigned<T> {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let msg = format!(
+			r#"
+AuthoritiesChangeSigned {{
+   term: {},
+   new_authorities: {:?},
+   signatures: {:?}
+}}
+"#,
+			&self.term,
+			&self
+				.new_authorities
+				.iter()
+				.map(|n| to_hex(&n.encode(), false))
+				.collect::<Vec<_>>(),
+			&self
+				.signatures
+				.iter()
+				.map(|s| { (to_hex(&s.0.encode(), false), to_hex(&s.1.encode(), false)) })
+				.collect::<Vec<_>>()
+		);
+		write!(f, "{}", msg)
+	}
 }
 
 /// MMR Root Signed. [block number, mmr root, message, signatures]
@@ -106,6 +147,20 @@ pub struct MMRRootSigned<T: EthereumRelayAuthorities> {
 pub struct ScheduleAuthoritiesChange<T: EthereumRelayAuthorities> {
 	/// message
 	pub message: T::RelayAuthorityMessage,
+}
+
+impl<T: EthereumRelayAuthorities> std::fmt::Display for ScheduleAuthoritiesChange<T> {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let msg = format!(
+			r#"
+ScheduleAuthoritiesChange {{
+   message: {},
+}}
+"#,
+			to_hex(&self.message.encode(), false)
+		);
+		write!(f, "{}", msg)
+	}
 }
 
 //////
@@ -152,4 +207,37 @@ pub struct MMRRootsToSignKeys<T: EthereumRelayAuthorities> {
 	#[store(returns = Vec<<T as System>::BlockNumber>)]
 	/// Runtime marker
 	pub _runtime: PhantomData<T>,
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use crate::runtime::{DarwiniaRuntime, EcdsaMessage, EcdsaSignature};
+	use substrate_subxt::sp_runtime::AccountId32;
+
+	#[test]
+	pub fn test_format_authorities_change_signed() {
+		let a: AuthoritiesChangeSigned<DarwiniaRuntime> = AuthoritiesChangeSigned {
+			term: 10,
+			new_authorities: vec![[0u8; 20], [1; 20]],
+			signatures: vec![(AccountId32::default(), EcdsaSignature::default())],
+		};
+		println!("{}", a);
+	}
+
+	#[test]
+	pub fn test_format_schedule_mmr_root() {
+		let a: ScheduleMMRRoot<DarwiniaRuntime> = ScheduleMMRRoot { block_number: 10 };
+
+		println!("{}", a);
+	}
+
+	#[test]
+	pub fn test_format_schedule_authorities_change() {
+		let a: ScheduleAuthoritiesChange<DarwiniaRuntime> = ScheduleAuthoritiesChange {
+			message: EcdsaMessage::default(),
+		};
+
+		println!("{}", a);
+	}
 }

@@ -91,6 +91,14 @@ impl SubscribeService {
 					)
 					.await?;
 					return Err(err);
+				} else if let Some(jsonrpsee::client::RequestError::Timeout) = err.downcast_ref() {
+					tools::set_cache(
+						self.data_dir.clone(),
+						tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME,
+						header.number as u64,
+					)
+					.await?;
+					return Err(err);
 				} else {
 					error!(
 						"An error occurred while processing the events of block {}: {:?}",
@@ -182,7 +190,7 @@ impl SubscribeService {
 					if let Ok(decoded) =
 						ScheduleAuthoritiesChange::<DarwiniaRuntime>::decode(&mut &event_data[..])
 					{
-						info!(">> Event - {}::{:#?}", module, decoded);
+						info!("{}", decoded);
 						if self
 							.darwinia
 							.sender
@@ -203,7 +211,7 @@ impl SubscribeService {
 					AuthoritiesChangeSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
 				{
 					// TODO: Add better repeating check
-					info!(">> Event - {}::{:#?}", module, decoded);
+					info!("{}", decoded);
 					let current_term = self.darwinia.get_current_authority_term().await?;
 					if decoded.term == current_term {
 						let message = Darwinia::construct_authorities_message(
@@ -230,7 +238,7 @@ impl SubscribeService {
 					if let Ok(decoded) =
 						ScheduleMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
 					{
-						info!(">> Event - {}::{:#?}", module, decoded);
+						info!("{}", decoded);
 						let ex = Extrinsic::SignAndSendMmrRoot(decoded.block_number);
 						self.delayed_extrinsics.insert(decoded.block_number, ex);
 					}

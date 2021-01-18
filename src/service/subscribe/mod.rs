@@ -97,7 +97,7 @@ impl SubscribeService {
 						tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME,
 						header.number as u64,
 					)
-						.await?;
+					.await?;
 					return Err(err);
 				} else {
 					error!(

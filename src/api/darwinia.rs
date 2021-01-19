@@ -16,7 +16,7 @@ use primitives::{
 	},
 	frame::{
 		bridge::relay_authorities::{
-			AuthorityTermStoreExt, SubmitSignedAuthorities, SubmitSignedAuthoritiesCallExt,
+			NextTermStoreExt, SubmitSignedAuthorities, SubmitSignedAuthoritiesCallExt,
 			SubmitSignedMmrRoot, SubmitSignedMmrRootCallExt,
 		},
 		ethereum::{
@@ -603,7 +603,7 @@ impl Darwinia {
 
 	/// get_current_term
 	pub async fn get_current_authority_term(&self) -> Result<u32> {
-		Ok(self.client.authority_term(None).await?)
+		Ok(self.client.next_term(None).await?)
 	}
 }
 #[derive(Encode)]

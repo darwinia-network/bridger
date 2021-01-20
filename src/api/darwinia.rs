@@ -16,7 +16,7 @@ use primitives::{
 	},
 	frame::{
 		bridge::relay_authorities::{
-			AuthorityTermStoreExt, SubmitSignedAuthorities, SubmitSignedAuthoritiesCallExt,
+			NextTermStoreExt, SubmitSignedAuthorities, SubmitSignedAuthoritiesCallExt,
 			SubmitSignedMmrRoot, SubmitSignedMmrRootCallExt,
 		},
 		ethereum::{
@@ -556,6 +556,8 @@ impl Darwinia {
 		decoder.register_type_size::<u32>("Term");
 		decoder.register_type_size::<u64>("EthereumTransactionIndex");
 		decoder.register_type_size::<(u32, u32)>("TaskAddress<BlockNumber>");
+		decoder.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
+		decoder.register_type_size::<u32>("EraIndex");
 
 		let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
 		for (_, raw) in raw_events {
@@ -601,7 +603,7 @@ impl Darwinia {
 
 	/// get_current_term
 	pub async fn get_current_authority_term(&self) -> Result<u32> {
-		Ok(self.client.authority_term(None).await?)
+		Ok(self.client.next_term(None).await?)
 	}
 }
 #[derive(Encode)]

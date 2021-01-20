@@ -1,4 +1,4 @@
-## Bridger
+## Darwinia Bridger
 
 [![CI](https://github.com/darwinia-network/bridger/workflows/CI/badge.svg)](https://github.com/darwinia-network/bridger/actions)
 [![crate](https://img.shields.io/crates/v/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
@@ -6,7 +6,9 @@
 [![downloads](https://img.shields.io/crates/d/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
 [![LICENSE](https://img.shields.io/crates/l/darwinia-bridger.svg)](https://choosealicense.com/licenses/gpl/)
 
-Darwinia Bridger is the Darwinia relayer client and watchtower written in Rust.
+Relayers (aka. Bridgers) in Darwinia Network are offchain worker clients which help relay the headers and messages between source chains and target chains, they works between two chains and requires RPC access of two chains.
+
+Darwinia Bridger (this repo) is an implementation of relayer client written in Rust.
 
 ## Installation
 
@@ -107,7 +109,9 @@ seed = "0x0000000000000000000000000000000000000000000000000000000000000000"
     Otherwise, you must switch to your proxy account and submit `proxy.proxy(real_account, ethereumRelayAuthorities.requestAuthority(stake_amount, signer))`. The `stake_amount` will be deducted from your "real" account.
 3. Notify council members to submit `ethereumRelayAuthorities.addAuthority(your_account)`.
 
-> How it works: Authority is a role of relayer. Authorities sign Darwinia-to-Ethereum messages. Once the number of signatures reaches the threshold and the message is delivered and verified on the Ethereum network, the cross-chain is finished. Updating the authority set involves 2 times of cross-chain: 1) relay the new authority set from Darwinia to Ethereum; 2) relay from Ethereum to Darwinia to send rewards to `darwinia_to_ethereum.beneficiary` (see below).
+> How it works: authorities are the validators/nodes in the source chain consensus system to resolve Byzantine Generals' Problem and finalize the blocks. Grandpa authorities are BFT alike authorities, our authority concept comes from the similar meaning, is to be used as a replacement for grandpa authorites.
+>
+> Updating the authority set involves 2 times of cross-chain: 1) relay the new authority set from Darwinia to Ethereum; 2) relay from Ethereum to Darwinia to send rewards to `darwinia_to_ethereum.beneficiary` (see below).
 
 #### `darwinia_to_ethereum.beneficiary`
 

@@ -1,7 +1,7 @@
 # Darwinia Bridger
 
 [![CI](https://github.com/darwinia-network/bridger/workflows/CI/badge.svg)](https://github.com/darwinia-network/bridger/actions)
-[![crate](https://img.shields.io/crates/v/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
+[![release](https://img.shields.io/github/v/release/darwinia-network/bridger)](https://github.com/darwinia-network/bridger/releases/latest)
 [![doc](https://img.shields.io/badge/current-docs-brightgreen.svg)](https://docs.rs/darwinia-bridger/)
 [![downloads](https://img.shields.io/crates/d/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
 [![license](https://img.shields.io/github/license/darwinia-network/bridger)](https://choosealicense.com/licenses/gpl/)
@@ -16,12 +16,18 @@ Darwinia Bridger (this repo) is an implementation of relayer client written in R
 
 Download the binary from [latest release](https://github.com/darwinia-network/bridger/releases/latest).
 
+### Pull the Docker image
+
+```bash
+docker pull quay.io/darwinia-network/bridger:<VERSION>
+```
+
 ### ~Install using cargo~
 
 > ⚠️ This method is temporarily unavailable due to #76.
 
-```
-$ cargo install darwinia-bridger
+```bash
+cargo install darwinia-bridger
 ```
 
 ### Build from source
@@ -32,8 +38,6 @@ $ cargo install darwinia-bridger
 git clone https://github.com/darwinia-network/bridger.git
 cd bridger/
 cargo build --release
-cd target/release/
-./bridger run -v
 ```
 
 ## Configuration

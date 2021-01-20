@@ -152,6 +152,4 @@ SUBCOMMANDS:
     show-parcel     Show a parcel from ethereum
 ```
 
-- `bridger run` starts the full-functional bridger. You can also use ```bridger run -v``` to enter verbose mode which prints more trace logs.
-
-- `bridger guard` only starts the standalone guard service.
+Typically, `bridger run` is the only command that you need to know to launch bridger and start all internal services. You can also use `bridger run -v` to enter the verbose mode which prints more trace logs.

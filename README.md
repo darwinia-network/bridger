@@ -4,7 +4,7 @@
 [![crate](https://img.shields.io/crates/v/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
 [![doc](https://img.shields.io/badge/current-docs-brightgreen.svg)](https://docs.rs/darwinia-bridger/)
 [![downloads](https://img.shields.io/crates/d/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
-[![LICENSE](https://img.shields.io/crates/l/darwinia-bridger.svg)](https://choosealicense.com/licenses/gpl/)
+[![license](https://img.shields.io/github/license/darwinia-network/bridger)](https://choosealicense.com/licenses/gpl/)
 
 Relayers (aka. Bridgers) in Darwinia Network are offchain worker clients which help relay the headers and messages between source chains and target chains, they works between two chains and requires RPC access of two chains.
 
@@ -155,7 +155,3 @@ SUBCOMMANDS:
 - `bridger run` starts the full-functional bridger. You can also use ```bridger run -v``` to enter verbose mode which prints more trace logs.
 
 - `bridger guard` only starts the standalone guard service.
-
-## License
-
-GPL-3.0

@@ -1,4 +1,4 @@
-## Darwinia Bridger
+# Darwinia Bridger
 
 [![CI](https://github.com/darwinia-network/bridger/workflows/CI/badge.svg)](https://github.com/darwinia-network/bridger/actions)
 [![crate](https://img.shields.io/crates/v/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)

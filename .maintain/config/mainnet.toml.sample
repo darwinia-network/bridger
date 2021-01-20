@@ -27,8 +27,14 @@ address = '0x649fdf6ee483a96e020b889571e93700fbd82d88'
 topics = ['0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12']
 
 [eth.contract.issuing]
-address = '0xea7938985898af7fd945b03b7bc2e405e744e913'
+address = '0x5f44dd8e59f56aa04fe54e95cc690560ae706b18'
 topics = []
+
+[eth.contract.relay]
+# ethereum relay contract for darwinia to ethereum
+address = '0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49'
+# SetAuthoritiesEvent
+topics = ['0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f']
 
 [step]
 # ethereum service polling interval in seconds
@@ -43,12 +49,14 @@ guard = 30
 [darwinia_to_ethereum]
 
 # ethereum private key
-# used to 
+# used to
 #   1. sign ecdsa messages
 #   2. send authorities to ethereum
-seed = '<YOUR_ETHEREUM_SEED>'
+# Disable by remove or comment
+seed = '<YOUR_ETHEREUM_PRIVATE_KEY>'
 
-# the darwinia account id who will get the reward
+# the darwinia public key who will get the reward
 # when send authorities to ethereum
 # Disable by remove or comment
-beneficiary = "<YOUR_BENEFIT_DARWINIA_ACCOUNT_ID>"
+beneficiary = "<YOUR_BENEFICIARY_DARWINIA_PUBLIC_KEY>"
+

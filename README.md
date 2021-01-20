@@ -1,12 +1,14 @@
-## Bridger
+# Darwinia Bridger
 
 [![CI](https://github.com/darwinia-network/bridger/workflows/CI/badge.svg)](https://github.com/darwinia-network/bridger/actions)
 [![crate](https://img.shields.io/crates/v/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
 [![doc](https://img.shields.io/badge/current-docs-brightgreen.svg)](https://docs.rs/darwinia-bridger/)
 [![downloads](https://img.shields.io/crates/d/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
-[![LICENSE](https://img.shields.io/crates/l/darwinia-bridger.svg)](https://choosealicense.com/licenses/gpl/)
+[![license](https://img.shields.io/github/license/darwinia-network/bridger)](https://choosealicense.com/licenses/gpl/)
 
-Darwinia Bridger is the Darwinia relayer client and watchtower written in Rust.
+Relayers (aka. Bridgers) in Darwinia Network are offchain worker clients which help relay the headers and messages between source chains and target chains, they works between two chains and requires RPC access of two chains.
+
+Darwinia Bridger (this repo) is an implementation of relayer client written in Rust.
 
 ## Installation
 
@@ -36,7 +38,7 @@ cd target/release/
 
 ## Configuration
 
-`Bridger` depends on a TOML config file, it is located in `~/.bridger/config.toml` by default.
+Darwinia Bridger depends on a TOML config file, it is located in `~/.bridger/config.toml` by default.
 
 Sample configs:
 
@@ -55,7 +57,7 @@ node = "wss://cc1.darwinia.network"
 
 #### `shadow`
 
-The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS, for example using the official service:
+The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS. For example using the official service:
 
 ```toml
 shadow = "https://shadow.darwinia.network"
@@ -89,6 +91,39 @@ real = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 Here is a [tool](https://polkadot.subscan.io/tools/ss58_transform) provided by Subscan that helps convert SS58 addresses to public keys. Comment out this field if you don't want to use proxy account.
 
+#### `darwinia_to_ethereum.seed`
+
+Private key in hex of your **Ethereum** account. It's similar to `seed`, but it's for signing on Ethereum network. For example:
+
+```toml
+[darwinia_to_ethereum]
+seed = "0x0000000000000000000000000000000000000000000000000000000000000000"
+```
+
+**For users who want to relay messages from Darwinia to Ethereum, you must request to become a member of the authority set first**:
+
+1. Open [Extrinsics in apps.darwinia.network](https://apps.darwinia.network/#/extrinsics)
+2. If you're not using a proxy account or you have the permission to sign extrinsics using the "real" account, switch to the "real" account and submit `ethereumRelayAuthorities.requestAuthority(stake_amount, signer)`:
+   - `stake_amount` is the amount of RINGs to stake.
+   - `signer` is the public key of your **Ethereum** account.
+    Otherwise, you must switch to your proxy account and submit `proxy.proxy(real_account, ethereumRelayAuthorities.requestAuthority(stake_amount, signer))`. The `stake_amount` will be deducted from your "real" account.
+3. Notify council members to submit `ethereumRelayAuthorities.addAuthority(your_account)`.
+
+> How it works: authorities are the validators/nodes in the source chain consensus system to resolve Byzantine Generals' Problem and finalize the blocks. Grandpa authorities are BFT alike authorities, our authority concept comes from the similar meaning, is to be used as a replacement for grandpa authorites.
+>
+> Updating the authority set involves 2 times of cross-chain: 1) relay the new authority set from Darwinia to Ethereum; 2) relay from Ethereum to Darwinia to send rewards to `darwinia_to_ethereum.beneficiary` (see below).
+
+#### `darwinia_to_ethereum.beneficiary`
+
+Public key in hex of your **Darwinia** account which receives the rewards of relaying new authorities. For example:
+
+```toml
+[darwinia_to_ethereum]
+beneficiary = "0x0000000000000000000000000000000000000000000000000000000000000000"
+```
+
+Comment out if you don't want any reward of relaying.
+
 ## Usage
 
 The latest help texts are also available in `bridger --help`.
@@ -117,10 +152,4 @@ SUBCOMMANDS:
     show-parcel     Show a parcel from ethereum
 ```
 
-- `bridger run` starts the full-functional bridger. You can also use ```bridger run -v``` to enter verbose mode which prints more trace logs.
-
-- `bridger guard` only starts the standalone guard service.
-
-## License
-
-GPL-3.0
+Typically, `bridger run` is the only command that you need to know to launch bridger and start all internal services. You can also use `bridger run -v` to enter the verbose mode which prints more trace logs.

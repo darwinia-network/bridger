@@ -73,22 +73,17 @@ impl Ethereum {
 				debug!("beneficiary: 0x{}", hex::encode(beneficiary_buffer));
 
 				let input = (message, signature_list, beneficiary_buffer);
-				let receipt = contract
-					.signed_call_with_confirmations(
+				let txhash = contract
+					.signed_call(
 						"updateRelayer",
 						input,
 						Options::with(|options| {
 							options.gas = Some(150_000.into());
 						}),
-						12,
 						key_ref,
 					)
 					.await?;
-				trace!(
-					"Submit authorities to eth with tx: {}, status: {:?}",
-					receipt.transaction_hash,
-					receipt.status
-				);
+				trace!("Submit authorities to eth with tx: {}", txhash);
 			}
 		}
 		Ok(())

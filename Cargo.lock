@@ -4652,7 +4652,7 @@ dependencies = [
 [[package]]
 name = "web3"
 version = "0.14.0"
-source = "git+https://github.com/tomusdrw/rust-web3.git#22c21004e06e2bdd1f9594dcdf30f3b1d5a4ea3a"
+source = "git+https://github.com/wuminzhe/rust-web3.git?branch=v0.14.0#e4b90dbdb9f864962378f8fa53f2c5b1e51973e5"
 dependencies = [
  "arrayvec 0.5.2",
  "async-native-tls",

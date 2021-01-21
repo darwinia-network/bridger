@@ -126,7 +126,7 @@ Public key in hex of your **Darwinia** account which receives the rewards of rel
 beneficiary = "0x0000000000000000000000000000000000000000000000000000000000000000"
 ```
 
-Comment out if you don't want any reward of relaying.
+Comment out if you don't want to relay authorities change messages to Ethereum (which sends transactions on Ethereum and consumes gas fee), and of course, you will not get rewards.
 
 ## Usage
 
@@ -157,3 +157,9 @@ SUBCOMMANDS:
 ```
 
 Typically, `bridger run` is the only command that you need to know to launch bridger and start all internal services. You can also use `bridger run -v` to enter the verbose mode which prints more trace logs.
+
+If you hit the error `No darwinia scan start, run 'bridger set-darwinia-start --block <scan_start> [--data-dir <data_dir>]' to set one`, please run the following command, `1671723` is the block number that the Darwinia to Ethereum bridge launched at:
+
+```bash
+bridger set-darwinia-start --block 1671723
+```

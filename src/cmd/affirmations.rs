@@ -1,5 +1,5 @@
 use crate::api::Darwinia;
-use crate::{error::Result, Config};
+use crate::{error::Result, Settings};
 use std::sync::Arc;
 
 /// get all affirmations
@@ -7,7 +7,7 @@ pub async fn exec() -> Result<()> {
 	std::env::set_var("RUST_LOG", "info,darwinia_bridger");
 	env_logger::init();
 
-	let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
+	let config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
 	let darwinia = Arc::new(Darwinia::new(&config).await?);
 	info!("Init API succeed!");
 

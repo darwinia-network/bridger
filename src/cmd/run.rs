@@ -2,7 +2,7 @@ use crate::api::{Darwinia, Shadow};
 use crate::{
 	// listener::Listener,
 	error::{Error, Result},
-	Config,
+	Settings,
 };
 use actix::Actor;
 use async_macros::select;
@@ -61,12 +61,12 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 	);
 
 	// --- Data dir ---
-	let data_dir = data_dir.unwrap_or(Config::default_data_dir()?);
+	let data_dir = data_dir.unwrap_or(Settings::default_data_dir()?);
 	info!("💾 Data dir: {}", data_dir.to_str().unwrap());
 
 	// --- Load config ---
-	let config = Config::new(&data_dir)?;
-	if config.eth.rpc.starts_with("ws") {
+	let config = Settings::new(&data_dir)?;
+	if config.ethereum.rpc.starts_with("ws") {
 		return Err(BizError::Bridger(
 			"Bridger currently doesn't support ethereum websocket transport".to_string(),
 		)
@@ -96,7 +96,7 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 	// --- Init APIs ---
 	let shadow = Arc::new(Shadow::new(&config));
 	let darwinia = Arc::new(Darwinia::new(&config).await?);
-	let web3 = Web3::new(Http::new(&config.eth.rpc).unwrap());
+	let web3 = Web3::new(Http::new(&config.ethereum.rpc).unwrap());
 
 	// Stop if darwinia sender is authority but without a signer seed
 	if darwinia
@@ -114,9 +114,9 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 
 	// --- Print startup info ---
 	info!("🔗 Connect to");
-	info!("   Darwinia {}: {}", &spec_name, config.node);
-	info!("   Shadow: {}", config.shadow);
-	info!("   Ethereum: {}", config.eth.rpc);
+	info!("   Darwinia {}: {}", &spec_name, config.darwinia.rpc);
+	info!("   Shadow: {}", config.shadow.endpoint);
+	info!("   Ethereum: {}", config.ethereum.rpc);
 	let account_id = &darwinia.sender.account_id;
 	let roles = darwinia
 		.sender
@@ -149,7 +149,7 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 }
 
 async fn start_services(
-	config: &Config,
+	config: &Settings,
 	shadow: &Arc<Shadow>,
 	darwinia: &Arc<Darwinia>,
 	web3: &Web3<Http>,
@@ -165,7 +165,7 @@ async fn start_services(
 		shadow.clone(),
 		darwinia.clone(),
 		last_confirmed,
-		config.step.relay,
+		config.services.relay.step,
 		extrinsics_service.clone().recipient(),
 	)
 	.start();
@@ -174,7 +174,7 @@ async fn start_services(
 	let redeem_service = RedeemService::new(
 		shadow.clone(),
 		darwinia.clone(),
-		config.step.redeem,
+		config.services.redeem.step,
 		extrinsics_service.clone().recipient(),
 	)
 	.start();
@@ -199,7 +199,7 @@ async fn start_services(
 	let guard_service = GuardService::new(
 		shadow.clone(),
 		darwinia.clone(),
-		config.step.guard,
+		config.services.guard.step,
 		is_tech_comm_member,
 		extrinsics_service.clone().recipient(),
 	)

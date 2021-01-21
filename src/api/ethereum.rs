@@ -1,5 +1,5 @@
 //! Ethereum API
-use crate::{error::Result, Config};
+use crate::{error::Result, Settings};
 
 use primitives::runtime::EcdsaSignature;
 use secp256k1::SecretKey;
@@ -37,10 +37,10 @@ pub struct Ethereum {
 
 impl Ethereum {
 	/// new
-	pub fn new(web3: Web3<Http>, config: &Config) -> Result<Self> {
-		let relay_contract_address = Ethereum::build_address(&config.eth.contract.relay.address)?;
+	pub fn new(web3: Web3<Http>, config: &Settings) -> Result<Self> {
+		let relay_contract_address = Ethereum::build_address(&config.ethereum.contract.relay.address)?;
 
-		let secret_key = if let Some(seed) = config.darwinia_to_ethereum.seed.clone() {
+		let secret_key = if let Some(seed) = config.ethereum.relayer.clone().map(|r| r.private_key) {
 			let private_key = hex::decode(&seed[2..])?;
 			Some(SecretKey::from_slice(&private_key)?)
 		} else {
@@ -51,7 +51,7 @@ impl Ethereum {
 			web3,
 			relay_contract_address,
 			secret_key,
-			beneficiary: config.darwinia_to_ethereum.beneficiary.clone(),
+			beneficiary: config.ethereum.relayer.clone().map(|r| r.beneficiary_darwinia_account),
 		})
 	}
 

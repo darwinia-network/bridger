@@ -1,4 +1,4 @@
-use crate::{api::Darwinia, error::Result, Config};
+use crate::{api::Darwinia, error::Result, Settings};
 use std::sync::Arc;
 
 /// Ecdsa
@@ -7,7 +7,7 @@ pub async fn exec(message: String) -> Result<()> {
 	env_logger::init();
 
 	// apis
-	let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
+	let config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
 	let darwinia = Arc::new(Darwinia::new(&config).await?);
 
 	info!("Init API succeed!");

@@ -1,4 +1,4 @@
-use crate::{api::Shadow, error::Result, Config};
+use crate::{api::Shadow, error::Result, Settings};
 use std::sync::Arc;
 
 /// Affirm a faked affirmation
@@ -7,7 +7,7 @@ pub async fn exec(block: u64, json: bool) -> Result<()> {
 	env_logger::init();
 
 	// apis
-	let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
+	let config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
 	let shadow = Arc::new(Shadow::new(&config));
 
 	// Get parcel

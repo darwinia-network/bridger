@@ -7,7 +7,7 @@ use crate::{
 		relay::MsgBlockNumber,
 		MsgStop,
 	},
-	tools, Config,
+	tools, Settings,
 };
 use primitives::bytes;
 
@@ -118,7 +118,7 @@ impl Handler<MsgStop> for EthereumService {
 impl EthereumService {
 	/// New Ethereum Service with http
 	pub fn new(
-		config: Config,
+		config: Settings,
 		web3: Web3<Http>,
 		darwinia: Arc<Darwinia>,
 		scan_from: u64,
@@ -126,7 +126,7 @@ impl EthereumService {
 		redeem_service: Recipient<MsgEthereumTransaction>,
 		data_dir: PathBuf,
 	) -> EthereumService {
-		let step = config.step.ethereum;
+		let step = config.services.ethereum.step;
 		let contracts = EthereumService::parse_contract(&config);
 		let filters = EthereumService::parse_filter(&config);
 		EthereumService {
@@ -284,34 +284,41 @@ impl EthereumService {
 	}
 
 	/// Parse contract addresses
-	pub fn parse_contract(config: &Config) -> ContractAddress {
-		let contract = &config.eth.contract;
+	pub fn parse_contract(config: &Settings) -> ContractAddress {
+		let contract = &config.ethereum.contract;
+		let bank_topics = contract.bank.topics.clone().unwrap();
+		let ring_topics = contract.ring.topics.clone().unwrap();
+		let kton_topics = contract.kton.topics.clone().unwrap();
+		let relay_topics = contract.relay.topics.clone().unwrap();
 		ContractAddress {
-			bank: H256::from_slice(&bytes!(contract.bank.topics[0].as_str())),
-			kton: H256::from_slice(&bytes!(contract.kton.topics[0].as_str())),
-			ring: H256::from_slice(&bytes!(contract.ring.topics[0].as_str())),
-			relay: H256::from_slice(&bytes!(contract.relay.topics[0].as_str())),
+			bank: H256::from_slice(&bytes!(bank_topics[0].as_str())),
+			kton: H256::from_slice(&bytes!(kton_topics[0].as_str())),
+			ring: H256::from_slice(&bytes!(ring_topics[0].as_str())),
+			relay: H256::from_slice(&bytes!(relay_topics[0].as_str())),
 		}
 	}
 
 	/// Parse log filter from config
-	pub fn parse_filter(config: &Config) -> [FilterBuilder; 3] {
+	pub fn parse_filter(config: &Settings) -> [FilterBuilder; 3] {
 		let filters = [
-			&config.eth.contract.bank,
-			&config.eth.contract.issuing,
-			&config.eth.contract.relay,
+			&config.ethereum.contract.bank,
+			&config.ethereum.contract.issuing,
+			&config.ethereum.contract.relay,
 		]
 		.iter()
 		.map(|c| {
+			let topics = if let Some(topics) = c.topics.clone() {
+				topics
+					.iter()
+					.map(|t| H256::from_slice(&bytes!(t.as_str())))
+					.collect()
+			} else {
+				vec![]
+			};
 			FilterBuilder::default()
 				.address(vec![H160::from_slice(&bytes!(c.address.as_str()))])
 				.topics(
-					Some(
-						c.topics
-							.iter()
-							.map(|t| H256::from_slice(&bytes!(t.as_str())))
-							.collect(),
-					),
+					Some(topics),
 					None,
 					None,
 					None,

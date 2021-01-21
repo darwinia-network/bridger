@@ -63,10 +63,10 @@ guard = 30
 #   1. sign ecdsa messages
 #   2. send authorities to ethereum
 # Disable by remove or comment
-seed = '<YOUR_ETHEREUM_SEED>'
+seed = '<YOUR_ETHEREUM_PRIVATE_KEY>'
 
 # the darwinia account id who will get the reward
 # when send authorities to ethereum
 # Disable by remove or comment
-beneficiary = "<YOUR_BENEFIT_DARWINIA_ACCOUNT_ID>"
+beneficiary = "<YOUR_BENEFICIARY_DARWINIA_PUBLIC_KEY>"
 

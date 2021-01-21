@@ -78,7 +78,7 @@ impl Ethereum {
 						"updateRelayer",
 						input,
 						Options::with(|options| {
-							options.gas = Some(500_000.into());
+							options.gas = Some(150_000.into());
 						}),
 						12,
 						key_ref,

@@ -73,13 +73,37 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 		.into());
 	}
 
+	// --- Load cached start
+	let last_redeemed = tools::get_cache(
+		data_dir.clone(),
+		tools::LAST_REDEEMED_CACHE_FILE_NAME,
+		Error::NoEthereumStart,
+	)
+	.await?;
+	info!("🌱 Scan ethereum block from: {}", last_redeemed + 1);
+
+	let last_tracked_darwinia_block = tools::get_cache(
+		data_dir.clone(),
+		tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
+		Error::NoDarwiniaStart,
+	)
+	.await? as u32;
+	info!(
+		"🌱 Scan darwinia block from: {}",
+		last_tracked_darwinia_block + 1
+	);
+
 	// --- Init APIs ---
 	let shadow = Arc::new(Shadow::new(&config));
 	let darwinia = Arc::new(Darwinia::new(&config).await?);
 	let web3 = Web3::new(Http::new(&config.eth.rpc).unwrap());
 
 	// Stop if darwinia sender is authority but without a signer seed
-	if darwinia.sender.is_authority().await? && darwinia.sender.ethereum_seed.is_none() {
+	if darwinia
+		.sender
+		.is_authority(Some(last_tracked_darwinia_block + 1))
+		.await? && darwinia.sender.ethereum_seed.is_none()
+	{
 		return Err(Error::NoAuthoritySignerSeed.into());
 	}
 
@@ -94,7 +118,10 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 	info!("   Shadow: {}", config.shadow);
 	info!("   Ethereum: {}", config.eth.rpc);
 	let account_id = &darwinia.sender.account_id;
-	let roles = darwinia.sender.role_names().await?;
+	let roles = darwinia
+		.sender
+		.role_names(Some(last_tracked_darwinia_block + 1))
+		.await?;
 	match &darwinia.sender.real {
 		None => {
 			info!("🧔 Relayer({:?}): 0x{:?}", roles, account_id);
@@ -106,7 +133,19 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 	}
 
 	// --- Start services ---
-	start_services(&config, &shadow, &darwinia, &web3, data_dir, spec_name).await
+	start_services(
+		&config,
+		&shadow,
+		&darwinia,
+		&web3,
+		(
+			data_dir,
+			spec_name,
+			last_redeemed,
+			last_tracked_darwinia_block,
+		),
+	)
+	.await
 }
 
 async fn start_services(
@@ -114,28 +153,8 @@ async fn start_services(
 	shadow: &Arc<Shadow>,
 	darwinia: &Arc<Darwinia>,
 	web3: &Web3<Http>,
-	data_dir: PathBuf,
-	spec_name: String,
+	(data_dir, spec_name, last_redeemed, last_tracked_darwinia_block): (PathBuf, String, u64, u32),
 ) -> Result<()> {
-	let last_redeemed = tools::get_cache(
-		data_dir.clone(),
-		tools::LAST_REDEEMED_CACHE_FILE_NAME,
-		Error::NoEthereumStart,
-	)
-	.await?;
-	info!("🌱 Relay from ethereum block: {}", last_redeemed + 1);
-
-	let last_tracked_ethereum_block = tools::get_cache(
-		data_dir.clone(),
-		tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME,
-		Error::NoDarwiniaStart,
-	)
-	.await?;
-	info!(
-		"🌱 Scan darwinia from block: {}",
-		last_tracked_ethereum_block + 1
-	);
-
 	// extrinsic sender
 	let extrinsics_service =
 		ExtrinsicsService::new(darwinia.clone(), spec_name.clone(), data_dir.clone()).start();
@@ -173,7 +192,10 @@ async fn start_services(
 	.start();
 
 	// guard service
-	let is_tech_comm_member = darwinia.sender.is_tech_comm_member().await?;
+	let is_tech_comm_member = darwinia
+		.sender
+		.is_tech_comm_member(Some(last_tracked_darwinia_block + 1))
+		.await?;
 	let guard_service = GuardService::new(
 		shadow.clone(),
 		darwinia.clone(),
@@ -190,7 +212,7 @@ async fn start_services(
 		ethereum,
 		extrinsics_service.clone().recipient(),
 		spec_name,
-		(last_tracked_ethereum_block as u32) + 1,
+		last_tracked_darwinia_block + 1,
 		data_dir.clone(),
 	);
 	let b = async {

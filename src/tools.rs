@@ -9,7 +9,7 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 pub const LAST_REDEEMED_CACHE_FILE_NAME: &str = "last-redeemed";
 
 /// Last tracked darwinia block file name
-pub const LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME: &str = "last-tracked-darwinia-block";
+pub const LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME: &str = "last-tracked-darwinia-block";
 
 /// Get cache
 pub async fn get_cache(data_dir: PathBuf, filename: &str, err: Error) -> Result<u64> {

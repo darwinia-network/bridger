@@ -134,7 +134,7 @@ The latest help texts are also available in `bridger --help`.
 
 ```
 $ bridger
-darwinia-bridger 0.3.2
+darwinia-bridger 0.3.3
 
 USAGE:
     bridger <SUBCOMMAND>

@@ -36,8 +36,8 @@ address = '0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e'
 topics = ['0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12']
 
 [eth.contract.issuing]
-# erc20 ring and kton Issuing(Burn) contract
-# Note that it is *different* with Issuing(Mint) contract(0x38401F8b484834Da8237fcbf94ee0689b7f4dca5)
+# ERC20 Issuing(Burn) contract, Note that it is *different* with Issuing(Mint) 0x3840...dca5
+# https://github.com/darwinia-network/darwinia-bridge-on-ethereum/issues/2
 address = '0x49262B932E439271d05634c32978294C7Ea15d0C'
 topics = []
 

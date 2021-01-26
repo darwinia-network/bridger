@@ -14,6 +14,7 @@ mod run;
 mod set_darwinia_start;
 mod set_start;
 mod show_parcel;
+mod info_darwinia2ethereum;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -84,6 +85,15 @@ enum Opt {
 		#[structopt(short, long)]
 		block: u64,
 	},
+    /// Get Darwinia to Ethereum proof info
+    InfoD2E {
+        /// tx block number
+        txblock: u64,
+        /// mmr block number
+        mmrblock: u64,
+        /// sign block number
+        signblock: u64,
+    }
 }
 
 /// Exec commands
@@ -102,7 +112,10 @@ pub async fn exec() -> Result<()> {
 		Opt::Ecdsa { message } => ecdsa::exec(message).await?,
 		Opt::SetDarwiniaStart { data_dir, block } => {
 			set_darwinia_start::exec(data_dir, block).await?
-		}
+		},
+        Opt::InfoD2E { txblock, mmrblock, signblock } => {
+            info_darwinia2ethereum::exec( txblock, mmrblock, signblock ).await?
+        },
 	}
 
 	Ok(())

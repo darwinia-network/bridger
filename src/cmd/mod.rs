@@ -14,7 +14,7 @@ mod run;
 mod set_darwinia_start;
 mod set_start;
 mod show_parcel;
-mod info_darwinia2ethereum;
+mod info_d2e;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -87,6 +87,8 @@ enum Opt {
 	},
     /// Get Darwinia to Ethereum proof info
     InfoD2E {
+        /// network name
+        network: String,
         /// tx block number
         txblock: u64,
         /// mmr block number
@@ -113,8 +115,8 @@ pub async fn exec() -> Result<()> {
 		Opt::SetDarwiniaStart { data_dir, block } => {
 			set_darwinia_start::exec(data_dir, block).await?
 		},
-        Opt::InfoD2E { txblock, mmrblock, signblock } => {
-            info_darwinia2ethereum::exec( txblock, mmrblock, signblock ).await?
+        Opt::InfoD2E { network, txblock, mmrblock, signblock } => {
+            info_d2e::exec( network, txblock, mmrblock, signblock ).await?
         },
 	}
 

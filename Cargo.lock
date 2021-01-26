@@ -753,7 +753,7 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridge-primitives"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "async-trait",
  "frame-support",
@@ -772,7 +772,7 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridger"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "actix",
  "actix-rt",

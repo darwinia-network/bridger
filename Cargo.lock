@@ -505,10 +505,13 @@ dependencies = [
  "jsonrpsee",
  "log",
  "parity-scale-codec",
+ "secp256k1",
  "serde",
  "serde_json",
+ "sp-keyring",
  "substrate-subxt",
  "thiserror",
+ "web3",
 ]
 
 [[package]]

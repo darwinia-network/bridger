@@ -15,6 +15,7 @@ mod set_darwinia_start;
 mod set_start;
 mod show_parcel;
 mod info_d2e;
+mod sign_mmr_root;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -95,7 +96,14 @@ enum Opt {
         mmrblock: u64,
         /// sign block number
         signblock: u64,
-    }
+    },
+    /// Sign MMR root
+    SignMMRRoot {
+        /// network name
+        network: String,
+        /// mmr block
+        mmrblock: u64,
+    },
 }
 
 /// Exec commands
@@ -117,6 +125,9 @@ pub async fn exec() -> Result<()> {
 		},
         Opt::InfoD2E { network, txblock, mmrblock, signblock } => {
             info_d2e::exec( network, txblock, mmrblock, signblock ).await?
+        },
+        Opt::SignMMRRoot { network, mmrblock } => {
+            sign_mmr_root::exec(network, mmrblock).await?
         },
 	}
 

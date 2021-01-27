@@ -4,6 +4,7 @@ pub mod events;
 pub mod types;
 pub mod to_ethereum;
 pub mod darwinia;
+pub mod account;
 
 #[macro_use]
 extern crate log;
@@ -21,11 +22,20 @@ pub use events::{
 
 pub use types::{
     EcdsaSignature,
+    EcdsaMessage,
 };
 
-pub use to_ethereum::Darwinia2Ethereum;
+pub use to_ethereum::{
+    Darwinia2Ethereum,
+    Account as ToEthereumAccount,
+};
 
 pub use darwinia::Darwinia;
+
+pub use account::{
+    AccountId,
+    DarwiniaAccount,
+};
 
 pub use error::{
     Error,

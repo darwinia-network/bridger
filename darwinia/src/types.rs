@@ -10,3 +10,8 @@ impl Default for EcdsaSignature {
 	}
 }
 
+/// EcdsaAddress
+pub type EcdsaAddress = [u8; 20];
+
+/// EcdsaMessage
+pub type EcdsaMessage = [u8; 32];

@@ -16,7 +16,13 @@ use crate::{
 
 //TODO move here
 use primitives::{
-    frame::bridge::relay_authorities::{ScheduleMMRRoot, MMRRootSigned, EthereumRelayAuthorities},
+    frame::bridge::relay_authorities::{
+        ScheduleMMRRoot,
+        MMRRootSigned,
+        EthereumRelayAuthorities,
+        ScheduleAuthoritiesChange,
+        AuthoritiesChangeSigned,
+    },
     runtime::DarwiniaRuntime,
 };
 
@@ -24,6 +30,8 @@ use primitives::{
 pub enum EventInfo<T: EthereumRelayAuthorities> {
     MMRRootSignedEvent(MMRRootSigned<T>),
     ScheduleMMRRootEvent(ScheduleMMRRoot<T>),
+    ScheduleAuthoritiesChangeEvent(ScheduleAuthoritiesChange<T>),
+    AuthoritiesChangeSignedEvent(AuthoritiesChangeSigned<T>),
     Invalid(String),
 }
 
@@ -95,9 +103,19 @@ impl DarwiniaEvents {
                     return EventInfo::MMRRootSignedEvent(decoded)
                 }
             },
+			("EthereumRelayAuthorities", "ScheduleAuthoritiesChange") => {
+                if let Ok(decoded) = ScheduleAuthoritiesChange::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
+                    return EventInfo::ScheduleAuthoritiesChangeEvent(decoded)
+                }
+            },
+			("EthereumRelayAuthorities", "AuthoritiesChangeSigned") => {
+				if let Ok(decoded) = AuthoritiesChangeSigned::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
+                    return EventInfo::AuthoritiesChangeSignedEvent(decoded)
+                }
+            },
             _ => {
                 return EventInfo::Invalid(String::from(module)+"::"+variant);
-            }
+            },
         }
         return EventInfo::Invalid(String::from(module)+"::"+variant);
     }

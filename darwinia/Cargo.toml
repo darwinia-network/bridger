@@ -19,7 +19,10 @@ hex = "0.4.2"
 anyhow = "1.0.34"
 log = "0.4.11"
 substrate-subxt = "0.13.0"
+sp-keyring = "2.0.0"
 codec = { package = "parity-scale-codec", version = "1.3.5", default-features = false, features = ["derive", "full"] }
+web3 = { version = "0.14.0", git = "https://github.com/tomusdrw/rust-web3.git", features = ["signing"] }
+secp256k1 = { version = "0.19", features = ["recovery"] }
 
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"

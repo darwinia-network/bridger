@@ -19,6 +19,8 @@ pub enum Error {
     /// Other error.
     #[error("Other error: {0}")]
     Other(String),
+	#[error("No signer seed set for authority, please check your config.toml")]
+	NoAuthoritySignerSeed,
 }
 
 /// Error enum.

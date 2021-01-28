@@ -298,7 +298,8 @@ impl Darwinia2Ethereum {
             None => Ok(false),
             Some(r) => {
                 if r.0 == message {
-                    let includes = r.1.iter().any(|a| a.0 == account.0.account_id);
+                    let account_id = account.0.real.clone().unwrap_or_else(|| account.0.account_id.clone());
+                    let includes = r.1.iter().any(|a| a.0 == account_id);
                     Ok(!includes)
                 } else {
                     Ok(false)
@@ -317,7 +318,8 @@ impl Darwinia2Ethereum {
             Ok(mmr_roots_to_sign) => match mmr_roots_to_sign {
                 None => false,
                 Some(items) => {
-                    let includes = items.iter().any(|a| a.0 == account.0.account_id);
+                    let account_id = account.0.real.clone().unwrap_or_else(|| account.0.account_id.clone());
+                    let includes = items.iter().any(|a| a.0 == account_id);
                     !includes
                 }
             },

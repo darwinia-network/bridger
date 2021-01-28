@@ -20,10 +20,7 @@ pub struct EthereumAccount {
 
 /// Account
 #[derive(Clone)]
-pub struct Account {
-    pub darwinia_account: DarwiniaAccount,
-    pub ethereum_account: EthereumAccount,
-}
+pub struct Account(pub DarwiniaAccount, pub EthereumAccount);
 
 impl Account {
     /// Create a new Account
@@ -32,19 +29,18 @@ impl Account {
         ethereum_seed: Option<String>,
         ethereum_url: String,
     ) -> Account {
-        Account {
-            darwinia_account,
-            ethereum_account: EthereumAccount {
+        Account(darwinia_account,
+            EthereumAccount {
                 ethereum_url,
                 ethereum_seed,
             },
-        }
+        )
     }
 
     /// sign
     pub fn ecdsa_sign(&self, message: &[u8]) -> Result<EcdsaSignature> {
-        let web3 = Web3::new(Http::new(&self.ethereum_account.ethereum_url)?);
-        if let Some(ethereum_seed) = &self.ethereum_account.ethereum_seed {
+        let web3 = Web3::new(Http::new(&self.1.ethereum_url)?);
+        if let Some(ethereum_seed) = &self.1.ethereum_seed {
             let private_key = hex::decode(&ethereum_seed[2..])?;
             let secret_key = SecretKey::from_slice(&private_key)?;
             let signature = web3

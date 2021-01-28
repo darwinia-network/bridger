@@ -1,8 +1,9 @@
 use crate::{
     HeaderMMR,
     Darwinia,
-    ToEthereumAccount,
 };
+
+use super::Account;
 
 use crate::error::{
     Result,
@@ -141,10 +142,10 @@ impl Darwinia2Ethereum {
     /// sync authorities change from ethereum to darwinia
     pub async fn sync_authorities_change(
         &self,
-        account: &ToEthereumAccount,
+        account: &Account,
         proof: EthereumReceiptProofThing,
     ) -> Result<H256> {
-        match &account.darwinia_account.real {
+        match &account.0.real {
             Some(real) => {
                 let call = SyncAuthoritiesChange {
                     _runtime: PhantomData::default(),
@@ -156,7 +157,7 @@ impl Darwinia2Ethereum {
                     .darwinia
                     .subxt
                     .proxy(
-                        &account.darwinia_account.signer,
+                        &account.0.signer,
                         real.clone(),
                         Some(ProxyType::EthereumBridge),
                         &ex,
@@ -167,7 +168,7 @@ impl Darwinia2Ethereum {
                 Ok(self
                     .darwinia
                     .subxt
-                    .sync_authorities_change(&account.darwinia_account.signer, proof)
+                    .sync_authorities_change(&account.0.signer, proof)
                     .await?)
             }
         }
@@ -176,12 +177,12 @@ impl Darwinia2Ethereum {
     /// submit_signed_authorities
     pub async fn ecdsa_sign_and_submit_signed_authorities(
         &self,
-        account: &ToEthereumAccount,
+        account: &Account,
         message: EcdsaMessage,
     ) -> Result<H256> {
         if self.is_authority(&account).await? {
             let signature = account.ecdsa_sign(&message)?;
-            match &account.darwinia_account.real {
+            match &account.0.real {
                 // proxy
                 Some(real) => {
                     trace!("Proxyed ecdsa sign and submit authorities to darwinia");
@@ -192,7 +193,7 @@ impl Darwinia2Ethereum {
                         .darwinia
                         .subxt
                         .proxy(
-                            &account.darwinia_account.signer,
+                            &account.0.signer,
                             real.clone(),
                             Some(ProxyType::EthereumBridge),
                             &ex,
@@ -205,7 +206,7 @@ impl Darwinia2Ethereum {
                     let tx_hash = self
                         .darwinia
                         .subxt
-                        .submit_signed_authorities(&account.darwinia_account.signer, signature)
+                        .submit_signed_authorities(&account.0.signer, signature)
                         .await?;
                     Ok(tx_hash)
                 }
@@ -218,7 +219,7 @@ impl Darwinia2Ethereum {
     /// submit_signed_mmr_root
     pub async fn ecdsa_sign_and_submit_signed_mmr_root(
         &self,
-        account: &ToEthereumAccount,
+        account: &Account,
         spec_name: String,
         block_number: u32,
     ) -> Result<H256> {
@@ -231,7 +232,7 @@ impl Darwinia2Ethereum {
             let hash = web3::signing::keccak256(&encoded);
             let signature = account.ecdsa_sign(&hash)?;
 
-            match &account.darwinia_account.real {
+            match &account.0.real {
                 // proxy
                 Some(real) => {
                     trace!(
@@ -248,7 +249,7 @@ impl Darwinia2Ethereum {
                         .darwinia
                         .subxt
                         .proxy(
-                            &account.darwinia_account.signer,
+                            &account.0.signer,
                             real.clone(),
                             Some(ProxyType::EthereumBridge),
                             &ex,
@@ -264,7 +265,7 @@ impl Darwinia2Ethereum {
                     let tx_hash = self
                         .darwinia
                         .subxt
-                        .submit_signed_mmr_root(&account.darwinia_account.signer, block_number, signature)
+                        .submit_signed_mmr_root(&account.0.signer, block_number, signature)
                         .await?;
                     Ok(tx_hash)
                 }
@@ -275,7 +276,7 @@ impl Darwinia2Ethereum {
     }
 
     /// is authority
-    pub async fn is_authority(&self, account: &ToEthereumAccount) -> Result<bool> {
+    pub async fn is_authority(&self, account: &Account) -> Result<bool> {
         let authorities = self
             .darwinia
             .subxt
@@ -284,11 +285,11 @@ impl Darwinia2Ethereum {
             .iter()
             .map(|a| a.account_id.clone())
             .collect::<Vec<_>>();
-        Ok(authorities.contains(account.darwinia_account.real()))
+        Ok(authorities.contains(account.0.real()))
     }
 
     /// need_to_sign_authorities
-    pub async fn need_to_sign_authorities(&self, account: &ToEthereumAccount, message: EcdsaMessage) -> Result<bool> {
+    pub async fn need_to_sign_authorities(&self, account: &Account, message: EcdsaMessage) -> Result<bool> {
         let ret = self
             .darwinia
             .subxt
@@ -297,7 +298,7 @@ impl Darwinia2Ethereum {
             None => Ok(false),
             Some(r) => {
                 if r.0 == message {
-                    let includes = r.1.iter().any(|a| a.0 == account.darwinia_account.account_id);
+                    let includes = r.1.iter().any(|a| a.0 == account.0.account_id);
                     Ok(!includes)
                 } else {
                     Ok(false)
@@ -307,7 +308,7 @@ impl Darwinia2Ethereum {
     }
 
     /// need_to_mmr_root_of
-    pub async fn need_to_sign_mmr_root_of(&self, account: &ToEthereumAccount, block_number: u32) -> bool {
+    pub async fn need_to_sign_mmr_root_of(&self, account: &Account, block_number: u32) -> bool {
         match self
             .darwinia
             .subxt
@@ -316,7 +317,7 @@ impl Darwinia2Ethereum {
             Ok(mmr_roots_to_sign) => match mmr_roots_to_sign {
                 None => false,
                 Some(items) => {
-                    let includes = items.iter().any(|a| a.0 == account.darwinia_account.account_id);
+                    let includes = items.iter().any(|a| a.0 == account.0.account_id);
                     !includes
                 }
             },
@@ -331,17 +332,18 @@ impl Darwinia2Ethereum {
     }
 
     /// Print Detail
-    pub async fn account_detail(&self, account: &ToEthereumAccount) -> Result<()> {
-        let mut roles = self.darwinia.account_role(&account.darwinia_account).await?;
+    pub async fn account_detail(&self, account: &Account) -> Result<()> {
+        info!("🧔 darwinia => ethereum account");
+        let mut roles = self.darwinia.account_role(&account.0).await?;
         if self.is_authority(&account).await? {
             roles.push("Authority".to_string());
         }
-        match &account.darwinia_account.real {
+        match &account.0.real {
             None => {
-                info!("🧔 Relayer({:?}): 0x{:?}", roles, account.darwinia_account.account_id);
+                info!("🧔 Relayer({:?}): 0x{:?}", roles, account.0.account_id);
             }
             Some(real_account_id) => {
-                info!("🧔 Proxy Relayer: 0x{:?}", account.darwinia_account.account_id);
+                info!("🧔 Proxy Relayer: 0x{:?}", account.0.account_id);
                 info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
             }
         }

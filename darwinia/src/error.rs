@@ -19,14 +19,14 @@ pub enum Error {
     /// Other error.
     #[error("Other error: {0}")]
     Other(String),
-	#[error("No signer seed set for authority, please check your config.toml")]
-	NoAuthoritySignerSeed,
+    #[error("No signer seed set for authority, please check your config.toml")]
+    NoAuthoritySignerSeed,
 }
 
 /// Error enum.
 #[derive(ThisError, Debug)]
 pub enum DarwiniaError {
-	#[error("{0}")]
+    #[error("{0}")]
     Bridger(String),
 }
 

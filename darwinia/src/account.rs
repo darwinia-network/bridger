@@ -5,25 +5,13 @@ use substrate_subxt::{
     system::System,
 };
 
-use primitives::{
-	runtime::{DarwiniaRuntime},
-	frame::{
-		sudo::KeyStoreExt,
-    },
-};
-
-use crate::{
-    error::Result,
-    darwinia::Darwinia,
-};
+use primitives::runtime::DarwiniaRuntime;
 
 /// AccountId
 pub type AccountId = <DarwiniaRuntime as System>::AccountId;
 
 /// Account
 pub struct DarwiniaAccount {
-	/// darwinia client
-	pub darwinia: Darwinia,
 	/// Account Id
 	pub account_id: AccountId,
 	/// signer of the account
@@ -35,7 +23,6 @@ pub struct DarwiniaAccount {
 impl Clone for DarwiniaAccount {
     fn clone(&self) -> Self {
         Self {
-            darwinia: self.darwinia.clone(),
             account_id: self.account_id.clone(),
             signer: self.signer.clone(),
             real: self.real.clone(),
@@ -48,7 +35,6 @@ impl DarwiniaAccount {
 	pub fn new(
 		seed: String,
 		real: Option<String>,
-		darwinia: Darwinia,
 	) -> DarwiniaAccount {
 		// signer to sign darwinia extrinsic
 		let pair = Pair::from_string(&seed, None).unwrap(); // if not a valid seed
@@ -65,14 +51,14 @@ impl DarwiniaAccount {
 		});
 
 		DarwiniaAccount {
-			darwinia,
 			account_id,
 			signer,
 			real,
 		}
 	}
 
-    fn real(&self) -> &AccountId {
+    /// get the real account
+    pub fn real(&self) -> &AccountId {
         if let Some(real_account_id) = &self.real {
             real_account_id
         } else {
@@ -80,19 +66,5 @@ impl DarwiniaAccount {
         }
     }
 
-    /// is_sudo_key
-    pub async fn is_sudo_key(&self) -> Result<bool> {
-        let sudo = self.darwinia.subxt.key(None).await?;
-        Ok(&sudo == self.real())
-    }
-
-    /// role
-    pub async fn role(&self) -> Result<Vec<String>> {
-        let mut roles = vec!["Normal".to_string()];
-        if self.is_sudo_key().await? {
-            roles.push("Sudo".to_string());
-        }
-        Ok(roles)
-    }
 }
 

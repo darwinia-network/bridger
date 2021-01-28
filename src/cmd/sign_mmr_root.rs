@@ -24,7 +24,6 @@ pub async fn exec(network: String, mmrblock: u64) -> Result<()> {
             .proxy
             .clone()
             .map(|proxy| proxy.real[2..].to_string()),
-		darwinia.clone()
     );
     let to_ethereum_account = ToEthereumAccount::new(
         darwinia_account,

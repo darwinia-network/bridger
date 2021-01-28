@@ -32,6 +32,9 @@ use primitives::{
             SubmitSignedAuthoritiesCallExt,
 			SubmitSignedMmrRoot,
             SubmitSignedMmrRootCallExt,
+			AuthoritiesStoreExt,
+            AuthoritiesToSignStoreExt,
+            MmrRootsToSignStoreExt,
         },
         proxy::ProxyCallExt,
     },
@@ -176,7 +179,7 @@ impl Darwinia2Ethereum {
         account: &ToEthereumAccount,
 		message: EcdsaMessage,
 	) -> Result<H256> {
-		if account.is_authority().await? {
+		if self.is_authority(&account).await? {
 			let signature = account.ecdsa_sign(&message)?;
 			match &account.darwinia_account.real {
 				// proxy
@@ -219,7 +222,7 @@ impl Darwinia2Ethereum {
 		spec_name: String,
 		block_number: u32,
 	) -> Result<H256> {
-		if account.is_authority().await? {
+		if self.is_authority(&account).await? {
 			// get mmr root from darwinia
 			let leaf_index = block_number;
 			let mmr_root = self.darwinia.get_mmr_root(leaf_index).await?;
@@ -270,4 +273,78 @@ impl Darwinia2Ethereum {
 			Err(DarwiniaError::Bridger("Not authority".to_string()).into())
 		}
 	}
+
+    /// is authority
+    pub async fn is_authority(&self, account: &ToEthereumAccount) -> Result<bool> {
+        let authorities = self
+			.darwinia
+            .subxt
+			.authorities(None)
+			.await?
+			.iter()
+			.map(|a| a.account_id.clone())
+			.collect::<Vec<_>>();
+        Ok(authorities.contains(account.darwinia_account.real()))
+    }
+
+    /// need_to_sign_authorities
+	pub async fn need_to_sign_authorities(&self, account: &ToEthereumAccount, message: EcdsaMessage) -> Result<bool> {
+		let ret = self
+            .darwinia
+            .subxt
+            .authorities_to_sign(None).await?;
+		match ret {
+			None => Ok(false),
+			Some(r) => {
+				if r.0 == message {
+					let includes = r.1.iter().any(|a| a.0 == account.darwinia_account.account_id);
+					Ok(!includes)
+				} else {
+					Ok(false)
+				}
+			}
+		}
+	}
+
+    /// need_to_mmr_root_of
+	pub async fn need_to_sign_mmr_root_of(&self, account: &ToEthereumAccount, block_number: u32) -> bool {
+		match self
+            .darwinia
+            .subxt
+            .mmr_roots_to_sign(block_number, None)
+            .await {
+			Ok(mmr_roots_to_sign) => match mmr_roots_to_sign {
+				None => false,
+				Some(items) => {
+					let includes = items.iter().any(|a| a.0 == account.darwinia_account.account_id);
+					!includes
+				}
+			},
+			Err(err) => {
+				error!(
+					"An error was encountered when trying to get storage MMRRootsToSign: {:?}",
+					err
+				);
+				false
+			}
+		}
+	}
+
+    /// Print Detail
+    pub async fn account_detail(&self, account: &ToEthereumAccount) -> Result<()> {
+        let mut roles = self.darwinia.account_role(&account.darwinia_account).await?;
+        if self.is_authority(&account).await? {
+            roles.push("Authority".to_string());
+        }
+        match &account.darwinia_account.real {
+            None => {
+                info!("🧔 Relayer({:?}): 0x{:?}", roles, account.darwinia_account.account_id);
+            }
+            Some(real_account_id) => {
+                info!("🧔 Proxy Relayer: 0x{:?}", account.darwinia_account.account_id);
+                info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
+            }
+        }
+        Ok(())
+    }
 }

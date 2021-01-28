@@ -20,12 +20,19 @@ use crate::{
     Rpc,
     DarwiniaEvents,
     EventInfo,
+    account::DarwiniaAccount,
 };
 
 use crate::error::{
     Result,
     DarwiniaError,
     Error,
+};
+
+use primitives::{
+	frame::{
+		sudo::KeyStoreExt,
+    },
 };
 
 pub struct Darwinia {
@@ -201,6 +208,21 @@ impl Darwinia {
             }
             None => Err(Error::Other("get block hash failed".to_string()).into())
         }
+    }
+
+    /// is_sudo_key
+    pub async fn is_sudo_key(&self, account: &DarwiniaAccount) -> Result<bool> {
+        let sudo = self.subxt.key(None).await?;
+        Ok(&sudo == account.real())
+    }
+
+    /// role
+    pub async fn account_role(&self, account: &DarwiniaAccount) -> Result<Vec<String>> {
+        let mut roles = vec!["Normal".to_string()];
+        if self.is_sudo_key(account).await? {
+            roles.push("Sudo".to_string());
+        }
+        Ok(roles)
     }
 }
 

@@ -20,6 +20,7 @@ use web3::signing::SecretKeyRef;
 use web3::transports::Http;
 use web3::Web3;
 
+#[derive(Clone)]
 pub struct EthereumAccount {
 	/// ethereum url
 	pub ethereum_url: String,
@@ -28,6 +29,7 @@ pub struct EthereumAccount {
 }
 
 /// Account
+#[derive(Clone)]
 pub struct Account {
     pub darwinia_account: DarwiniaAccount,
     pub ethereum_account: EthereumAccount,

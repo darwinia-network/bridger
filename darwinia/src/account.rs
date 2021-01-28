@@ -32,6 +32,17 @@ pub struct DarwiniaAccount {
 	pub real: Option<AccountId>,
 }
 
+impl Clone for DarwiniaAccount {
+    fn clone(&self) -> Self {
+        Self {
+            darwinia: self.darwinia.clone(),
+            account_id: self.account_id.clone(),
+            signer: self.signer.clone(),
+            real: self.real.clone(),
+        }
+    }
+}
+
 impl DarwiniaAccount {
 	/// Create a new Account
 	pub fn new(

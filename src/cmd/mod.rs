@@ -16,6 +16,7 @@ mod set_start;
 mod show_parcel;
 mod info_d2e;
 mod sign_mmr_root;
+mod affirm_force;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -89,21 +90,32 @@ enum Opt {
     /// Get Darwinia to Ethereum proof info
     InfoD2E {
         /// network name
+        #[structopt(short, long)]
         network: String,
         /// tx block number
+        #[structopt(short, long)]
         txblock: u64,
         /// mmr block number
+        #[structopt(short, long)]
         mmrblock: u64,
         /// sign block number
+        #[structopt(short, long)]
         signblock: u64,
     },
     /// Sign MMR root
     SignMMRRoot {
         /// network name
+        #[structopt(short, long)]
         network: String,
         /// mmr block
+        #[structopt(short, long)]
         mmrblock: u64,
     },
+    AffirmForce {
+        /// block number
+        #[structopt(short, long)]
+        block: u64,
+    }
 }
 
 /// Exec commands
@@ -129,6 +141,7 @@ pub async fn exec() -> Result<()> {
         Opt::SignMMRRoot { network, mmrblock } => {
             sign_mmr_root::exec(network, mmrblock).await?
         },
+        Opt::AffirmForce { block } => { affirm_force::exec(block).await?; },
 	}
 
 	Ok(())

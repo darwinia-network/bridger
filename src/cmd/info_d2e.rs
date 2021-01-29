@@ -31,16 +31,16 @@ impl fmt::Display for TxProofWithMMRProof {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,
         r#"{{
-            message: {},
-            signatures: [{}],
-            root: {},
-            MMRIndex: {},
-            blockNumber: {},
-            peaks: [{}],
-            siblings: [{}],
-            eventsProofStr: {},
-            signers: {}
-        }}"#, 
+    message: {},
+    signatures: [{}],
+    root: {},
+    MMRIndex: {},
+    blockNumber: {},
+    peaks: [{}],
+    siblings: [{}],
+    eventsProofStr: {},
+    signers: {}
+}}"#, 
             self.message.green(),
             self.signatures.join(",").green(),
             self.root.green(),
@@ -74,7 +74,7 @@ pub async fn exec(network: String,  txblock: u64, mmrblock: u64, signblock: u64)
 
     //let mut result = HashMap::new();
     let mut result: TxProofWithMMRProof = Default::default();
-
+    
     result.message = "0x".to_string() + &hex::encode(&message);
     result.block_header = "0x".to_string() + &hex::encode(header.encode());
     result.events_proof_str = "0x".to_string() + &hex::encode(event_proof.iter().map(|x| &x.0).collect::<Vec<&Vec<u8>>>().encode());

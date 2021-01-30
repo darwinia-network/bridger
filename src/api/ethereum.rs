@@ -6,7 +6,7 @@ use secp256k1::SecretKey;
 use web3::contract::{Contract, Options};
 use web3::signing::SecretKeyRef;
 use web3::transports::Http;
-use web3::types::{Address, H160};
+use web3::types::{Address, H160, H256};
 use web3::Web3;
 
 /// Ethereum
@@ -38,12 +38,41 @@ impl Ethereum {
 		})
 	}
 
+	/// new2
+	pub fn new2(
+		web3: Web3<Http>,
+		relay_contract_address: String,
+		seed: Option<String>,
+		beneficiary: Option<String>,
+	) -> Result<Self> {
+		let relay_contract_address = Ethereum::build_address(&relay_contract_address)?;
+
+		let secret_key = if let Some(seed) = seed {
+			let private_key = hex::decode(&seed[2..])?;
+			Some(SecretKey::from_slice(&private_key)?)
+		} else {
+			None
+		};
+
+		Ok(Ethereum {
+			web3,
+			relay_contract_address,
+			secret_key,
+			beneficiary,
+		})
+	}
+
+	/// is relayer
+	pub fn is_relayer(&self) -> bool {
+		self.beneficiary != None
+	}
+
 	/// submit_authorities_set
 	pub async fn submit_authorities_set(
 		&self,
 		message: Vec<u8>,
 		signatures: Vec<EcdsaSignature>,
-	) -> Result<()> {
+	) -> Result<H256> {
 		if let Some(beneficiary) = &self.beneficiary {
 			if let Some(secret_key) = &self.secret_key {
 				let key_ref = SecretKeyRef::new(secret_key);
@@ -73,25 +102,23 @@ impl Ethereum {
 				debug!("beneficiary: 0x{}", hex::encode(beneficiary_buffer));
 
 				let input = (message, signature_list, beneficiary_buffer);
-				let receipt = contract
-					.signed_call_with_confirmations(
+				let txhash = contract
+					.signed_call(
 						"updateRelayer",
 						input,
 						Options::with(|options| {
 							options.gas = Some(150_000.into());
 						}),
-						12,
 						key_ref,
 					)
 					.await?;
-				trace!(
-					"Submit authorities to eth with tx: {}, status: {:?}",
-					receipt.transaction_hash,
-					receipt.status
-				);
+				Ok(txhash)
+			} else {
+				anyhow::bail!("You have no ethereum private key configured.")
 			}
+		} else {
+			anyhow::bail!("You have no beneficiary configured.")
 		}
-		Ok(())
 	}
 
 	fn build_address(str: &str) -> Result<H160> {
@@ -116,4 +143,26 @@ fn test_load_abi() {
 	)
 	.unwrap();
 	println!("{:?}", contract);
+}
+
+#[actix_rt::test]
+async fn test_submit_authorities_set() {
+	let web3 = Web3::new(
+		Http::new("https://ropsten.infura.io/v3/60703fcc6b4e48079cfc5e385ee7af80").unwrap(),
+	);
+
+	let ethereum = Ethereum::new2(
+		web3,
+		"0xc8d6c331030886716f6e323ACB795077eB530E36".to_string(),
+		Some("0x2f460a73df143256460ebb319b171a4024db8ce2d42bb83a42930814a50d2b71".to_string()),
+		Some("0x129f002b1c0787ea72c31b2dc986e66911fe1b4d6dc16f83a1127f33e5a74c7d".to_string()),
+	)
+	.unwrap();
+
+	let txhash = ethereum
+		.submit_authorities_set(vec![0u8], vec![EcdsaSignature::default()])
+		.await
+		.unwrap();
+
+	println!("{:?}", txhash);
 }

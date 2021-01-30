@@ -207,27 +207,30 @@ impl SubscribeService {
 
 			// authority set changed will emit this event
 			("EthereumRelayAuthorities", "AuthoritiesChangeSigned") => {
-				if let Ok(decoded) =
-					AuthoritiesChangeSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
-				{
-					// TODO: Add better repeating check
-					info!("{}", decoded);
-					let current_term = self.darwinia.get_current_authority_term().await?;
-					if decoded.term == current_term {
-						let message = Darwinia::construct_authorities_message(
-							self.spec_name.clone(),
-							decoded.term,
-							decoded.new_authorities,
-						);
-						let signatures = decoded
-							.signatures
-							.iter()
-							.map(|s| s.1.clone())
-							.collect::<Vec<_>>();
-						self.ethereum
-							.submit_authorities_set(message, signatures)
-							.await?;
-						info!("Authorities submitted to ethereum");
+				if self.ethereum.is_relayer() {
+					if let Ok(decoded) =
+						AuthoritiesChangeSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
+					{
+						// TODO: Add better repeating check
+						info!("{}", decoded);
+						let current_term = self.darwinia.get_current_authority_term().await?;
+						if decoded.term == current_term {
+							let message = Darwinia::construct_authorities_message(
+								self.spec_name.clone(),
+								decoded.term,
+								decoded.new_authorities,
+							);
+							let signatures = decoded
+								.signatures
+								.iter()
+								.map(|s| s.1.clone())
+								.collect::<Vec<_>>();
+							let tx_hash = self
+								.ethereum
+								.submit_authorities_set(message, signatures)
+								.await?;
+							info!("Submit authorities to ethereum with tx: {}", tx_hash);
+						}
 					}
 				}
 			}

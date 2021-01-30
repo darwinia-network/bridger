@@ -15,6 +15,7 @@ use primitives::{
 };
 use secp256k1::SecretKey;
 use sp_keyring::sr25519::sr25519::Pair;
+use substrate_subxt::sp_core::H256;
 use substrate_subxt::{sp_core::Pair as PairTrait, Client, PairSigner};
 use web3::signing::SecretKeyRef;
 use web3::transports::Http;
@@ -99,12 +100,15 @@ impl DarwiniaSender {
 		}
 	}
 
-	async fn roles(&self) -> Result<Vec<Role>> {
-		let sudo = self.client.key(None).await?;
-		let tech_comm_members = self.client.members(None).await?;
+	async fn roles(&self, block_number: Option<u32>) -> Result<Vec<Role>> {
+		let block_number = block_number.map(|n| n.into());
+		let block_hash: Option<H256> = self.client.block_hash(block_number).await?;
+
+		let sudo = self.client.key(block_hash).await?;
+		let tech_comm_members = self.client.members(block_hash).await?;
 		let authorities = self
 			.client
-			.authorities(None)
+			.authorities(block_hash)
 			.await?
 			.iter()
 			.map(|a| a.account_id.clone())
@@ -120,9 +124,9 @@ impl DarwiniaSender {
 	}
 
 	/// role names
-	pub async fn role_names(&self) -> Result<Vec<String>> {
+	pub async fn role_names(&self, block_number: Option<u32>) -> Result<Vec<String>> {
 		let roles = self
-			.roles()
+			.roles(block_number)
 			.await?
 			.iter()
 			.map(|role| format!("{:?}", role))
@@ -131,20 +135,20 @@ impl DarwiniaSender {
 	}
 
 	/// is_sudo_key
-	pub async fn is_sudo_key(&self) -> Result<bool> {
-		let roles = self.roles().await?;
+	pub async fn is_sudo_key(&self, block_number: Option<u32>) -> Result<bool> {
+		let roles = self.roles(block_number).await?;
 		Ok(roles.contains(&Role::Sudo))
 	}
 
 	/// is_tech_comm_member
-	pub async fn is_tech_comm_member(&self) -> Result<bool> {
-		let roles = self.roles().await?;
+	pub async fn is_tech_comm_member(&self, block_number: Option<u32>) -> Result<bool> {
+		let roles = self.roles(block_number).await?;
 		Ok(roles.contains(&Role::TechnicalCommittee))
 	}
 
 	/// is_authority
-	pub async fn is_authority(&self) -> Result<bool> {
-		let roles = self.roles().await?;
+	pub async fn is_authority(&self, block_number: Option<u32>) -> Result<bool> {
+		let roles = self.roles(block_number).await?;
 		Ok(roles.contains(&Role::Authority))
 	}
 
@@ -175,9 +179,16 @@ impl DarwiniaSender {
 	}
 
 	/// need_to_sign_authorities
-	pub async fn need_to_sign_authorities(&self, message: EcdsaMessage) -> Result<bool> {
+	pub async fn need_to_sign_authorities(
+		&self,
+		message: EcdsaMessage,
+		block_number: Option<u32>,
+	) -> Result<bool> {
+		let block_number = block_number.map(|n| n.into());
+		let block_hash: Option<H256> = self.client.block_hash(block_number).await?;
+
 		let ret: AuthoritiesToSignReturn<DarwiniaRuntime> =
-			self.client.authorities_to_sign(None).await?;
+			self.client.authorities_to_sign(block_hash).await?;
 		match ret {
 			None => Ok(false),
 			Some(r) => {
@@ -193,26 +204,29 @@ impl DarwiniaSender {
 	}
 
 	/// need_to_mmr_root_of
-	pub async fn need_to_sign_mmr_root_of(&self, block_number: u32) -> bool {
-		match self.client.mmr_roots_to_sign(block_number, None).await {
-			Ok(mmr_roots_to_sign) => match mmr_roots_to_sign {
-				None => false,
-				Some(items) => {
-					let account_id = self.real.clone().unwrap_or_else(|| self.account_id.clone());
-					let includes = items.iter().any(|a| a.0 == account_id);
-					!includes
-				}
-			},
-			Err(err) => {
-				error!(
-					"An error was encountered when trying to get storage MMRRootsToSign: {:?}",
-					err
-				);
-				false
+	pub async fn need_to_sign_mmr_root_of(
+		&self,
+		block_number: u32,
+		exec_block_number: Option<u32>,
+	) -> Result<bool> {
+		let exec_block_number = exec_block_number.map(|n| n.into());
+		let exec_block_hash: Option<H256> = self.client.block_hash(exec_block_number).await?;
+
+		let mmr_roots_to_sign = self
+			.client
+			.mmr_roots_to_sign(block_number, exec_block_hash)
+			.await?;
+		match mmr_roots_to_sign {
+			None => Ok(false),
+			Some(items) => {
+				let account_id = self.real.clone().unwrap_or_else(|| self.account_id.clone());
+				let includes = items.iter().any(|a| a.0 == account_id);
+				Ok(!includes)
 			}
 		}
 	}
 }
+
 #[test]
 fn test_ecdsa() {
 	let hash =

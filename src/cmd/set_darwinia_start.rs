@@ -12,7 +12,7 @@ pub async fn exec(data_dir: Option<PathBuf>, start: u64) -> Result<()> {
 
 	tools::set_cache(
 		data_dir,
-		tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME,
+		tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
 		start,
 	)
 	.await?;

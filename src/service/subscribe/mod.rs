@@ -86,7 +86,7 @@ impl SubscribeService {
 				if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
 					tools::set_cache(
 						self.data_dir.clone(),
-						tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME,
+						tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
 						header.number as u64,
 					)
 					.await?;
@@ -94,7 +94,7 @@ impl SubscribeService {
 				} else if let Some(jsonrpsee::client::RequestError::Timeout) = err.downcast_ref() {
 					tools::set_cache(
 						self.data_dir.clone(),
-						tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME,
+						tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
 						header.number as u64,
 					)
 					.await?;
@@ -109,7 +109,7 @@ impl SubscribeService {
 
 			tools::set_cache(
 				self.data_dir.clone(),
-				tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME,
+				tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
 				header.number as u64,
 			)
 			.await?;
@@ -130,23 +130,19 @@ impl SubscribeService {
 		&mut self,
 		header: &<DarwiniaRuntime as System>::Header,
 	) -> Result<()> {
-		let mut to_removes = vec![];
-		for (delayed_to, delayed_ex) in self.delayed_extrinsics.iter() {
-			if header.number >= *delayed_to {
-				if self
+		let cloned = self.delayed_extrinsics.clone();
+		for (delayed_to, delayed_ex) in cloned.iter() {
+			if header.number >= *delayed_to
+				&& self
 					.darwinia
 					.sender
-					.need_to_sign_mmr_root_of(*delayed_to)
-					.await
-				{
-					let msg = MsgExtrinsic(delayed_ex.clone());
-					self.extrinsics_service.send(msg).await?;
-				}
-				to_removes.push(*delayed_to);
+					.need_to_sign_mmr_root_of(*delayed_to, Some(header.number))
+					.await?
+			{
+				let msg = MsgExtrinsic(delayed_ex.clone());
+				self.extrinsics_service.send(msg).await?;
+				self.delayed_extrinsics.remove(&delayed_to);
 			}
-		}
-		for to_remove in to_removes {
-			self.delayed_extrinsics.remove(&to_remove);
 		}
 		Ok(())
 	}
@@ -169,7 +165,7 @@ impl SubscribeService {
 
 	async fn handle_event(
 		&mut self,
-		_header: &<DarwiniaRuntime as System>::Header,
+		header: &<DarwiniaRuntime as System>::Header,
 		module: &str,
 		variant: &str,
 		event_data: Vec<u8>,
@@ -177,6 +173,8 @@ impl SubscribeService {
 		if module != "System" {
 			trace!(">> Event - {}::{}", module, variant);
 		}
+
+		let block = Some(header.number);
 
 		match (module, variant) {
 			("System", "CodeUpdated") => {
@@ -186,7 +184,7 @@ impl SubscribeService {
 			// call ethereum_relay_authorities.request_authority and then sudo call
 			// EthereumRelayAuthorities.add_authority will emit the event
 			("EthereumRelayAuthorities", "ScheduleAuthoritiesChange") => {
-				if self.darwinia.sender.is_authority().await? {
+				if self.darwinia.sender.is_authority(block).await? {
 					if let Ok(decoded) =
 						ScheduleAuthoritiesChange::<DarwiniaRuntime>::decode(&mut &event_data[..])
 					{
@@ -194,7 +192,7 @@ impl SubscribeService {
 						if self
 							.darwinia
 							.sender
-							.need_to_sign_authorities(decoded.message)
+							.need_to_sign_authorities(decoded.message, block)
 							.await?
 						{
 							let ex = Extrinsic::SignAndSendAuthorities(decoded.message);
@@ -237,7 +235,7 @@ impl SubscribeService {
 
 			// call ethereum_backing.lock will emit the event
 			("EthereumRelayAuthorities", "ScheduleMMRRoot") => {
-				if self.darwinia.sender.is_authority().await? {
+				if self.darwinia.sender.is_authority(block).await? {
 					if let Ok(decoded) =
 						ScheduleMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
 					{

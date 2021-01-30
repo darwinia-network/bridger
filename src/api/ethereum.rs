@@ -3,11 +3,28 @@ use crate::{error::Result, Config};
 
 use primitives::runtime::EcdsaSignature;
 use secp256k1::SecretKey;
+use serde::{Deserialize, Serialize};
+use std::time::Duration;
 use web3::contract::{Contract, Options};
 use web3::signing::SecretKeyRef;
 use web3::transports::Http;
-use web3::types::{Address, H160, H256};
+use web3::types::{Address, H160, H256, U256};
 use web3::Web3;
+
+#[derive(Debug, Serialize, Deserialize)]
+struct GasPrice {
+	code: i32,
+	data: GasPriceData,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct GasPriceData {
+	rapid: u64,
+	fast: u64,
+	slow: u64,
+	standard: u64,
+	timestamp: u64,
+}
 
 /// Ethereum
 pub struct Ethereum {
@@ -96,10 +113,14 @@ impl Ethereum {
 
 				// debug
 				debug!("message: 0x{}", hex::encode(message.clone()));
-				for signature in signature_list.clone() {
-					debug!("signature: 0x{}", hex::encode(signature));
+				for (i, signature) in signature_list.clone().iter().enumerate() {
+					debug!("signature {}: 0x{}", i + 1, hex::encode(signature));
 				}
 				debug!("beneficiary: 0x{}", hex::encode(beneficiary_buffer));
+
+				// gas price
+				// TODO: do not need to get gas_price if ropsten
+				let gas_price = Ethereum::fast_gas_price().await.ok();
 
 				let input = (message, signature_list, beneficiary_buffer);
 				let txhash = contract
@@ -108,6 +129,7 @@ impl Ethereum {
 						input,
 						Options::with(|options| {
 							options.gas = Some(150_000.into());
+							options.gas_price = gas_price;
 						}),
 						key_ref,
 					)
@@ -126,6 +148,15 @@ impl Ethereum {
 		let mut address_buffer = [0u8; 20];
 		address_buffer.copy_from_slice(&address);
 		Ok(Address::from(address_buffer))
+	}
+
+	async fn fast_gas_price() -> Result<U256> {
+		let gasnow_url = "https://gasnow.sparkpool.com/api/v3/gas/price?utm_source=DarwiniaBridger";
+		let client = reqwest::Client::builder()
+			.timeout(Duration::from_secs(15))
+			.build()?;
+		let gas_price: GasPrice = client.get(gasnow_url).send().await?.json().await?;
+		Ok(gas_price.data.fast.into())
 	}
 }
 
@@ -165,4 +196,9 @@ async fn test_submit_authorities_set() {
 		.unwrap();
 
 	println!("{:?}", txhash);
+}
+
+#[actix_rt::test]
+async fn test_calc_gas_price() {
+	println!("{}", Ethereum::fast_gas_price().await.unwrap());
 }

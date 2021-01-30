@@ -27,7 +27,7 @@ pub async fn exec() -> Result<()> {
 		for (round_id, affirmations) in game.iter() {
 			println!("ROUND {}", round_id);
 			for affirmation in affirmations {
-				println!("affirmation: {:?}", affirmation);
+				println!("affirmation: {}", affirmation);
 			}
 		}
 	}

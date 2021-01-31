@@ -14,6 +14,7 @@ mod run;
 mod set_darwinia_start;
 mod set_start;
 mod show_parcel;
+mod encrypt_key;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -84,6 +85,13 @@ enum Opt {
 		#[structopt(short, long)]
 		block: u64,
 	},
+    ///
+    Crypto {
+        #[structopt(short, long)]
+        private_key: String,
+        #[structopt(short, long)]
+        decrypt: bool,
+    }
 }
 
 /// Exec commands
@@ -102,7 +110,8 @@ pub async fn exec() -> Result<()> {
 		Opt::Ecdsa { message } => ecdsa::exec(message).await?,
 		Opt::SetDarwiniaStart { data_dir, block } => {
 			set_darwinia_start::exec(data_dir, block).await?
-		}
+		},
+		Opt::Crypto{ private_key, decrypt } => encrypt_key::exec(private_key, decrypt).await?
 	}
 
 	Ok(())

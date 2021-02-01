@@ -108,7 +108,7 @@ impl GuardService {
 
 		let last_confirmed = darwinia.last_confirmed().await.unwrap();
 		let pending_headers = darwinia.pending_headers().await?;
-		if pending_headers.len() > 0 {
+		if !pending_headers.is_empty() {
 			trace!(
 				"pending headers: {:?}",
 				pending_headers

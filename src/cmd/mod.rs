@@ -15,6 +15,7 @@ mod set_darwinia_start;
 mod set_start;
 mod show_parcel;
 mod encrypt_key;
+mod encrypt_conf;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -91,6 +92,13 @@ enum Opt {
         private_key: String,
         #[structopt(short, long)]
         decrypt: bool,
+    },
+    ///
+    EncryptConf{
+        #[structopt(short, long)]
+        from_path: String,
+        #[structopt(short, long)]
+        to_path: String,
     }
 }
 
@@ -111,7 +119,8 @@ pub async fn exec() -> Result<()> {
 		Opt::SetDarwiniaStart { data_dir, block } => {
 			set_darwinia_start::exec(data_dir, block).await?
 		},
-		Opt::Crypto{ private_key, decrypt } => encrypt_key::exec(private_key, decrypt).await?
+		Opt::Crypto{ private_key, decrypt } => encrypt_key::exec(private_key, decrypt).await?,
+		Opt::EncryptConf{ from_path, to_path } => encrypt_conf::exec(from_path, to_path).await?
 	}
 
 	Ok(())

@@ -9,6 +9,11 @@ use crate::{
     }
 };
 
+pub trait EncryptPrivateKey {
+    fn encrypt(&mut self, crypto: &Crypto, passwd: &str) -> Result<()>;
+    fn decrypt(&mut self, crypto: &Crypto, passwd: &str) -> Result<()>;
+}
+
 /// crypto for private key
 pub struct Crypto {
     /// salt
@@ -33,8 +38,7 @@ impl Crypto {
             encrypted.extend(write_buffer
                              .take_read_buffer()
                              .take_remaining()
-                             .iter()
-                             .map(|&i| i));
+                             .iter().copied());
 
             match result {
                 Err(_) => return Err(BizError::Bridger("Encryption failed".to_string()).into()),
@@ -59,7 +63,10 @@ impl Crypto {
 
         loop {
             let result = decryptor.decrypt(&mut read_buffer, &mut write_buffer, true);
-            decrypted.extend(write_buffer.take_read_buffer().take_remaining().iter().map(|&i| i));
+            decrypted.extend(write_buffer
+                             .take_read_buffer()
+                             .take_remaining()
+                             .iter().copied());
             match result {
                 Err(_) => return Err(BizError::Bridger("Decryption failed".to_string()).into()),
                 Ok(BufferResult::BufferUnderflow) => break,
@@ -94,6 +101,23 @@ impl Crypto {
         let encrypted_data = base64::decode(&encrypted)?;
         let decrypted_data = self.aes256_cbc_decrypt(&encrypted_data[..], &key, &iv)?;
         Ok(String::from_utf8(decrypted_data)?)
+    }
+}
+
+/// impl Encrypt PrivateKey method encrypt and decrypt
+#[macro_export]
+macro_rules! encrypt_key {
+    ($name: ident) => {
+        impl EncryptPrivateKey for $name {
+            fn encrypt(&mut self, crypto: &Crypto, passwd: &str) -> Result<()> {
+                self.private_key = crypto.encrypt(&passwd, &self.private_key)?;
+                Ok(())
+            }
+            fn decrypt(&mut self, crypto: &Crypto, passwd: &str) -> Result<()> {
+                self.private_key = crypto.decrypt(&passwd, &self.private_key)?;
+                Ok(())
+            }
+        }
     }
 }
 

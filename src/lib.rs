@@ -13,5 +13,5 @@ pub mod error;
 pub mod service;
 pub mod tools;
 
-pub use self::config::Config;
+pub use self::config::Settings;
 pub use self::crypto::Crypto;

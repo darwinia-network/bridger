@@ -22,7 +22,7 @@ ethereum:
         - 0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12
     issuing:
       # erc20 ring and kton issuing contract
-      address: 0x38401F8b484834Da8237fcbf94ee0689b7f4dca5
+      address: 0x49262B932E439271d05634c32978294C7Ea15d0C
     relay:
       # ethereum relay contract for darwinia to ethereum
       address: 0xd374292D512281b56198F0401b149370D680b89F

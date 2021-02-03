@@ -16,7 +16,7 @@ ethereum:
         - 0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10
     bank:
       # gringotts bank contract
-      address: 0x9f284e1337a815fe77d2ff4ae46544645b20c5ff
+      address: 0x649fdf6ee483a96e020b889571e93700fbd82d88
       topics:
         # cross transfer topic
         - 0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12
@@ -46,7 +46,7 @@ ethereum:
 
 darwinia:
   # darwinia node websocket json-rpc endpoint
-  rpc: wss://crab.darwinia.network
+  rpc: wss://cc1.darwinia.network
   # the person who will relay ethereum data to darwinia
   relayer:
     # private key of relayer, or, private key of proxy

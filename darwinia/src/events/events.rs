@@ -1,5 +1,5 @@
 use substrate_subxt::{
-	Client,
+    Client,
     EventsDecoder,
     RawEvent,
     events::Raw,
@@ -32,6 +32,8 @@ pub enum EventInfo<T: EthereumRelayAuthorities> {
     ScheduleMMRRootEvent(ScheduleMMRRoot<T>),
     ScheduleAuthoritiesChangeEvent(ScheduleAuthoritiesChange<T>),
     AuthoritiesChangeSignedEvent(AuthoritiesChangeSigned<T>),
+
+    RuntimeUpdatedEvent(String),
     Invalid(String),
 }
 
@@ -51,21 +53,21 @@ impl Clone for DarwiniaEvents {
 impl DarwiniaEvents {
     pub fn new(client: Client<DarwiniaRuntime>) -> Self {
         let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());
-		decoder.register_type_size::<u128>("Balance");
-		decoder.register_type_size::<u128>("RingBalance");
-		decoder.register_type_size::<u128>("KtonBalance");
-		decoder.register_type_size::<[u8; 20]>("EthereumAddress");
-		decoder.register_type_size::<[u8; 20]>("EcdsaAddress");
-		decoder.register_type_size::<H256>("MMRRoot");
-		decoder.register_type_size::<[u8; 32]>("RelayAuthorityMessage");
-		decoder.register_type_size::<[u8; 20]>("RelayAuthoritySigner");
-		decoder.register_type_size::<EcdsaSignature>("RelayAuthoritySignature");
-		decoder.register_type_size::<u8>("ElectionCompute"); // just a hack
-		decoder.register_type_size::<u32>("Term");
-		decoder.register_type_size::<u64>("EthereumTransactionIndex");
-		decoder.register_type_size::<(u32, u32)>("TaskAddress<BlockNumber>");
-		decoder.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
-		decoder.register_type_size::<u32>("EraIndex");
+        decoder.register_type_size::<u128>("Balance");
+        decoder.register_type_size::<u128>("RingBalance");
+        decoder.register_type_size::<u128>("KtonBalance");
+        decoder.register_type_size::<[u8; 20]>("EthereumAddress");
+        decoder.register_type_size::<[u8; 20]>("EcdsaAddress");
+        decoder.register_type_size::<H256>("MMRRoot");
+        decoder.register_type_size::<[u8; 32]>("RelayAuthorityMessage");
+        decoder.register_type_size::<[u8; 20]>("RelayAuthoritySigner");
+        decoder.register_type_size::<EcdsaSignature>("RelayAuthoritySignature");
+        decoder.register_type_size::<u8>("ElectionCompute"); // just a hack
+        decoder.register_type_size::<u32>("Term");
+        decoder.register_type_size::<u64>("EthereumTransactionIndex");
+        decoder.register_type_size::<(u32, u32)>("TaskAddress<BlockNumber>");
+        decoder.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
+        decoder.register_type_size::<u32>("EraIndex");
         DarwiniaEvents {
             decoder,
             client: client,
@@ -73,43 +75,46 @@ impl DarwiniaEvents {
     }
 
     pub fn decode_events(&self, input: &mut &[u8]) -> Result<Vec<RawEvent>> {
-		let raw_events = self.decoder.decode_events(input)?;
-		let mut events = vec![];
-		for (_, raw) in raw_events {
-			match raw {
-				Raw::Event(event) => {
-					events.push(event);
-				}
-				Raw::Error(err) => {
-					error!("Error found in raw events: {:#?}", err);
-				}
-			}
-		}
+        let raw_events = self.decoder.decode_events(input)?;
+        let mut events = vec![];
+        for (_, raw) in raw_events {
+            match raw {
+                Raw::Event(event) => {
+                    events.push(event);
+                }
+                Raw::Error(err) => {
+                    error!("Error found in raw events: {:#?}", err);
+                }
+            }
+        }
         Ok(events)
     }
 
     /// parse event
     pub fn parse_event(&self, module: &str, variant: &str, event_data: Vec<u8>) -> EventInfo<DarwiniaRuntime> {
         match (module, variant) {
-			("EthereumRelayAuthorities", "ScheduleMMRRoot") => {
+            ("System", "CodeUpdated") => {
+                return EventInfo::RuntimeUpdatedEvent("code updated".to_string());
+            },
+            ("EthereumRelayAuthorities", "ScheduleMMRRoot") => {
                 if let Ok(decoded) = ScheduleMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
                 {
                     return EventInfo::ScheduleMMRRootEvent(decoded);
                 }
             },
-			("EthereumRelayAuthorities", "MMRRootSigned") => {
+            ("EthereumRelayAuthorities", "MMRRootSigned") => {
                 MMRRootSigned::<DarwiniaRuntime>::decode(&mut &event_data[..]).unwrap();
                 if let Ok(decoded) =  MMRRootSigned::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
                     return EventInfo::MMRRootSignedEvent(decoded)
                 }
             },
-			("EthereumRelayAuthorities", "ScheduleAuthoritiesChange") => {
+            ("EthereumRelayAuthorities", "ScheduleAuthoritiesChange") => {
                 if let Ok(decoded) = ScheduleAuthoritiesChange::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
                     return EventInfo::ScheduleAuthoritiesChangeEvent(decoded)
                 }
             },
-			("EthereumRelayAuthorities", "AuthoritiesChangeSigned") => {
-				if let Ok(decoded) = AuthoritiesChangeSigned::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
+            ("EthereumRelayAuthorities", "AuthoritiesChangeSigned") => {
+                if let Ok(decoded) = AuthoritiesChangeSigned::<DarwiniaRuntime>::decode(&mut &event_data[..]) {
                     return EventInfo::AuthoritiesChangeSignedEvent(decoded)
                 }
             },

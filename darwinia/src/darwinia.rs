@@ -110,35 +110,40 @@ impl Darwinia {
     }
 
     /// get events from a special block
+    pub async fn get_events_from_block_hash(&self, hash: H256) -> Result<Vec<EventInfo<DarwiniaRuntime>>> {
+        let storage_data = self
+            .get_storage_data("System", "Events", hash)
+            .await?;
+
+        let raw_events = self.event.decoder.decode_events(&mut &storage_data.0[..])?;
+        let mut result = Vec::new();
+        for (_, raw) in raw_events {
+            match raw {
+                Raw::Event(event) => {
+                    let module = event.module.as_str();
+                    let variant = event.variant.as_str();
+                    let event_data = event.data;
+                    let event = self.event.parse_event(module, variant, event_data);
+                    if let EventInfo::Invalid(info) = event {
+                        info!("cannot decode event {}", info);
+                    } else {
+                        result.push(event);
+                    }
+                }
+                Raw::Error(err) => {
+                    error!("Error found in raw events: {:#?}", err);
+                }
+            }
+        }
+        return Ok(result)
+    }
+
+    /// get events from a special block
     pub async fn get_events_from_block_number(&self, block: u32) -> Result<Vec<EventInfo<DarwiniaRuntime>>> {
         let blockno = BlockNumber::from(block);
         match self.subxt.block_hash(Some(blockno)).await? {
             Some(hash) => {
-                let storage_data = self
-                    .get_storage_data("System", "Events", hash)
-                    .await?;
-
-                let raw_events = self.event.decoder.decode_events(&mut &storage_data.0[..])?;
-                let mut result = Vec::new();
-                for (_, raw) in raw_events {
-                    match raw {
-                        Raw::Event(event) => {
-                            let module = event.module.as_str();
-                            let variant = event.variant.as_str();
-                            let event_data = event.data;
-                            let event = self.event.parse_event(module, variant, event_data);
-                            if let EventInfo::Invalid(info) = event {
-                                info!("cannot decode event {}", info);
-                            } else {
-                                result.push(event);
-                            }
-                        }
-                        Raw::Error(err) => {
-                            error!("Error found in raw events: {:#?}", err);
-                        }
-                    }
-                }
-                return Ok(result)
+                return self.get_events_from_block_hash(hash).await
             },
             None => {
                 info!("error");

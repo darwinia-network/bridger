@@ -224,5 +224,20 @@ impl Darwinia {
         }
         Ok(roles)
     }
+
+    /// finalized_head
+    pub async fn finalized_head(&self) -> Result<H256> {
+        let hash = self.subxt.finalized_head().await?;
+        Ok(hash)
+    }
+
+    /// get block by hash
+    pub async fn get_block_number_by_hash(&self, block_hash: H256) -> Result<Option<u32>> {
+        let block = self.subxt.block(Some(block_hash)).await?;
+        if let Some(block) = block {
+            return Ok(Some(block.block.header.number))
+        }
+        Ok(None)
+    }
 }
 

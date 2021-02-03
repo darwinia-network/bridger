@@ -15,11 +15,12 @@ use primitives::{
     chain::{
         ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
         proxy_type::ProxyType,
+        RelayVotingState,
     },
     frame::{
         ethereum::{
             backing::{
-                Redeem, RedeemCallExt,
+                Redeem, RedeemCallExt, VerifiedProofStoreExt,
             },
             game::{AffirmationsStoreExt, EthereumRelayerGame},
             relay::{
@@ -39,6 +40,7 @@ use core::marker::PhantomData;
 use substrate_subxt::sp_core::H256;
 
 use super::Account;
+use crate::AccountId;
 
 /// Dawrinia API
 pub struct Ethereum2Darwinia {
@@ -266,5 +268,23 @@ impl Ethereum2Darwinia {
                     .await?)
             }
         }
+    }
+
+    /// has_voted
+    pub fn has_voted(&self, account: &Account, voting_state: RelayVotingState<AccountId>) -> bool {
+        match &account.0.real {
+            None => voting_state.contains(&account.0.account_id),
+            Some(real) => voting_state.contains(real),
+        }
+    }
+
+    /// Check if should redeem
+    pub async fn verified(&self, block_hash: H256, tx_index: u64) -> Result<bool> {
+        Ok(self
+            .darwinia
+            .subxt
+            .verified_proof((block_hash.to_fixed_bytes(), tx_index), None)
+            .await?
+            .unwrap_or(false))
     }
 }

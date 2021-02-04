@@ -63,7 +63,10 @@ impl Crypto {
 					.copied(),
 			);
 			match result {
-				Err(_) => return Err(BizError::Bridger("Decryption failed".to_string()).into()),
+				Err(e) => {
+					error!("[{:?}] please check your password", e);
+					return Err(BizError::Bridger("Decryption failed".to_string()).into());
+				}
 				Ok(BufferResult::BufferUnderflow) => break,
 				Ok(BufferResult::BufferOverflow) => {}
 			}

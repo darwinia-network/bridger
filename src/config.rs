@@ -205,13 +205,22 @@ impl Settings {
 	}
 }
 
+impl Default for Settings {
+	fn default() -> Self {
+		let config_file = PathBuf::from(".maintain/config/ropsten_crab.sample.yml");
+		let mut settings = Config::default();
+		settings.merge(File::from(config_file)).unwrap();
+		settings.try_into().unwrap()
+    }
+}
+
 #[cfg(test)]
 mod tests {
 	use super::*;
 
 	#[test]
 	pub fn test_yaml_config() {
-		let settings = Settings::new(&Settings::default_data_dir().unwrap()).unwrap();
+		let settings = Settings::default();
 		println!("{:?}", settings.ethereum);
 	}
 }

@@ -11,7 +11,6 @@ use substrate_subxt::{
 
 use crate::{
     error::Result,
-    types::EcdsaSignature,
 };
 
 //TODO move here
@@ -23,7 +22,7 @@ use primitives::{
         ScheduleAuthoritiesChange,
         AuthoritiesChangeSigned,
     },
-    runtime::DarwiniaRuntime,
+    runtime::{DarwiniaRuntime, EcdsaSignature}
 };
 
 /// Darwinia Event Info
@@ -68,9 +67,10 @@ impl DarwiniaEvents {
         decoder.register_type_size::<(u32, u32)>("TaskAddress<BlockNumber>");
         decoder.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
         decoder.register_type_size::<u32>("EraIndex");
+        decoder.register_type_size::<u64>("EthereumBlockNumber");
         DarwiniaEvents {
             decoder,
-            client: client,
+            client,
         }
     }
 
@@ -122,7 +122,7 @@ impl DarwiniaEvents {
                 return EventInfo::Invalid(String::from(module)+"::"+variant);
             },
         }
-        return EventInfo::Invalid(String::from(module)+"::"+variant);
+        EventInfo::Invalid(String::from(module)+"::"+variant)
     }
 }
 

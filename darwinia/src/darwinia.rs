@@ -14,6 +14,8 @@ use substrate_subxt::{
 
 use primitives::{
     runtime::{DarwiniaRuntime},
+    //todo move to e2d
+    frame::ethereum::backing::VerifiedProofStoreExt,
 };
 
 use crate::{
@@ -109,6 +111,12 @@ impl Darwinia {
         Err(anyhow::anyhow!("StorageData not found"))
     }
 
+    /// get runtime version
+    pub async fn runtime_version(&self) -> Result<String> {
+        let version = self.subxt.rpc.runtime_version(None).await?;
+        Ok(version.spec_name.to_string())
+    }
+
     /// get events from a special block
     pub async fn get_events_from_block_hash(&self, hash: H256) -> Result<Vec<EventInfo<DarwiniaRuntime>>> {
         let storage_data = self
@@ -125,7 +133,9 @@ impl Darwinia {
                     let event_data = event.data;
                     let event = self.event.parse_event(module, variant, event_data);
                     if let EventInfo::Invalid(info) = event {
-                        info!("cannot decode event {}", info);
+                        if module != "System" {
+                            trace!(">> Event - {}", info);
+                        }
                     } else {
                         result.push(event);
                     }
@@ -243,6 +253,15 @@ impl Darwinia {
             return Ok(Some(block.block.header.number))
         }
         Ok(None)
+    }
+
+    /// Check if should redeem
+    pub async fn verified(&self, block_hash: H256, tx_index: u64) -> Result<bool> {
+        Ok(self
+            .subxt
+            .verified_proof((block_hash.to_fixed_bytes(), tx_index), None)
+            .await?
+            .unwrap_or(false))
     }
 }
 

@@ -1,6 +1,6 @@
-mod events;
+mod darwinia_events;
 
-pub use events::{
+pub use darwinia_events::{
     DarwiniaEvents,
     EventInfo,
 };

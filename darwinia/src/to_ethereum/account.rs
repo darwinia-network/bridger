@@ -54,6 +54,11 @@ impl Account {
             Err(Error::NoAuthoritySignerSeed.into())
         }
     }
+
+    /// ethereum seed
+    pub fn has_ethereum_seed(&self) -> bool {
+        self.1.ethereum_seed.is_some()
+    }
 }
 
 #[test]

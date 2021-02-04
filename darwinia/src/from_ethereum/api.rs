@@ -20,7 +20,7 @@ use primitives::{
     frame::{
         ethereum::{
             backing::{
-                Redeem, RedeemCallExt, VerifiedProofStoreExt,
+                Redeem, RedeemCallExt, 
             },
             game::{AffirmationsStoreExt, EthereumRelayerGame},
             relay::{
@@ -43,6 +43,7 @@ use super::Account;
 use crate::AccountId;
 
 /// Dawrinia API
+#[derive(Clone)]
 pub struct Ethereum2Darwinia {
     /// darwinia client
     pub darwinia: Darwinia,
@@ -278,13 +279,4 @@ impl Ethereum2Darwinia {
         }
     }
 
-    /// Check if should redeem
-    pub async fn verified(&self, block_hash: H256, tx_index: u64) -> Result<bool> {
-        Ok(self
-            .darwinia
-            .subxt
-            .verified_proof((block_hash.to_fixed_bytes(), tx_index), None)
-            .await?
-            .unwrap_or(false))
-    }
 }

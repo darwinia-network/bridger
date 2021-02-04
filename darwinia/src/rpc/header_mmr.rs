@@ -52,20 +52,20 @@ impl Into<Option<HeaderMMR>> for HeaderMMRRpc {
             block: 0,
             hash: H256::from_str("0000000000000000000000000000000000000000000000000000000000000000").unwrap(),
             mmr_size: mmr_size.unwrap(),
-            proof: proof,
+            proof,
         })
     }
 }
 
 impl Into<Option<FormatedMMR>> for HeaderMMR {
     fn into(self) -> Option<FormatedMMR> {
-        let (peaks, siblings) = convert(self.mmr_size, self.block, self.hash, &self.proof);
+        let (peaks, siblings) = convert(self.mmr_size, self.block, self.hash, self.proof);
         Some(FormatedMMR {
             block: self.block,
             hash: self.hash,
             mmr_size: self.mmr_size,
-            peaks: peaks,
-            siblings: siblings,
+            peaks,
+            siblings,
         })
     }
 }
@@ -154,7 +154,7 @@ fn get_merkle_root(pos: u64, peak_pos: u64, item: H256, proofs: Vec<H256>) -> H2
             if parent == sibling_pos {
                 parent_item
             } else {
-                proofiter.next().unwrap().clone()
+                *proofiter.next().unwrap()
             }
         };
         let encodable = {
@@ -168,10 +168,10 @@ fn get_merkle_root(pos: u64, peak_pos: u64, item: H256, proofs: Vec<H256>) -> H2
         parent = parent_pos;
         height += 1;
     }
-    return parent_item;
+    parent_item
 }
 
-fn convert(mmr_size: u64, block: u64, block_hash: H256, mmr_proof: &Vec<String>) -> (Vec<String>, Vec<String>) {
+fn convert(mmr_size: u64, block: u64, block_hash: H256, mmr_proof: Vec<String>) -> (Vec<String>, Vec<String>) {
     let mut res_peaks = Vec::new();
     let peaks = get_peaks(mmr_size);
     let peaksize = peaks.len();
@@ -196,7 +196,7 @@ fn convert(mmr_size: u64, block: u64, block_hash: H256, mmr_proof: &Vec<String>)
     if let Some(last_hash) = last {
         res_peaks.push(String::from(last_hash));
     }
-    return (res_peaks, res_siblings);
+    (res_peaks, res_siblings)
 }
 
 #[cfg(test)]

@@ -60,6 +60,7 @@ where
 }
 
 /// Dawrinia API
+#[derive(Clone)]
 pub struct Darwinia2Ethereum {
     /// darwinia client
     pub darwinia: Darwinia,

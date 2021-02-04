@@ -1,4 +1,4 @@
-use crate::api::{Darwinia, Shadow};
+use crate::api::Shadow;
 use crate::{
 	// listener::Listener,
 	error::{Error, Result},
@@ -23,6 +23,15 @@ use crate::service::RedeemService;
 use crate::service::RelayService;
 use crate::service::SubscribeService;
 use crate::tools;
+
+use darwinia::{
+    Darwinia,
+    Ethereum2Darwinia,
+    Darwinia2Ethereum,
+    FromEthereumAccount,
+    DarwiniaAccount,
+    ToEthereumAccount,
+};
 
 /// Run the bridger
 pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
@@ -75,44 +84,62 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 
 	// --- Init APIs ---
 	let shadow = Arc::new(Shadow::new(&config));
-	let darwinia = Arc::new(Darwinia::new(&config).await?);
+	let darwinia = Darwinia::new(&config.node).await?;
+    let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
+    let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
+    let darwinia_account = DarwiniaAccount::new(
+		config.seed.clone(),
+        config.proxy.clone().map(|proxy| proxy.real[2..].to_string()),
+    );
+    let from_ethereum_account = FromEthereumAccount::new(
+        darwinia_account.clone(),
+    );
+    let to_ethereum_account = ToEthereumAccount::new(
+        darwinia_account.clone(),
+		config.darwinia_to_ethereum.seed.clone(),
+        config.eth.rpc.to_string(),
+    );
+
 	let web3 = Web3::new(Http::new(&config.eth.rpc).unwrap());
 
 	// Stop if darwinia sender is authority but without a signer seed
-	if darwinia.sender.is_authority().await? && darwinia.sender.ethereum_seed.is_none() {
+	if darwinia2ethereum.is_authority(&to_ethereum_account).await? && !to_ethereum_account.has_ethereum_seed() {
 		return Err(Error::NoAuthoritySignerSeed.into());
 	}
 
 	// --- Network ---
-	let runtime_version: sp_version::RuntimeVersion =
-		darwinia.client.rpc.runtime_version(None).await?;
-	let spec_name = runtime_version.spec_name.to_string();
+	let spec_name = darwinia.runtime_version().await?;
 
 	// --- Print startup info ---
 	info!("🔗 Connect to");
 	info!("   Darwinia {}: {}", &spec_name, config.node);
 	info!("   Shadow: {}", config.shadow);
 	info!("   Ethereum: {}", config.eth.rpc);
-	let account_id = &darwinia.sender.account_id;
-	let roles = darwinia.sender.role_names().await?;
-	match &darwinia.sender.real {
-		None => {
-			info!("🧔 Relayer({:?}): 0x{:?}", roles, account_id);
-		}
-		Some(real_account_id) => {
-			info!("🧔 Proxy Relayer: 0x{:?}", account_id);
-			info!("👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
-		}
-	}
+    darwinia2ethereum.account_detail(&to_ethereum_account).await?;
+    ethereum2darwinia.account_detail(&from_ethereum_account).await?;
 
 	// --- Start services ---
-	start_services(&config, &shadow, &darwinia, &web3, data_dir, spec_name).await
+	start_services(&config,
+                   &shadow,
+                   &darwinia,
+                   Some(ethereum2darwinia),
+                   Some(darwinia2ethereum),
+                   Some(from_ethereum_account),
+                   Some(to_ethereum_account),
+                   &web3,
+                   data_dir,
+                   spec_name).await
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn start_services(
 	config: &Config,
 	shadow: &Arc<Shadow>,
-	darwinia: &Arc<Darwinia>,
+    darwinia: &Darwinia,
+    ethereum2darwinia: Option<Ethereum2Darwinia>,
+    darwinia2ethereum: Option<Darwinia2Ethereum>, 
+    ethereum2darwinia_relayer: Option<FromEthereumAccount>,
+    darwinia2ethereum_relayer: Option<ToEthereumAccount>,
 	web3: &Web3<Http>,
 	data_dir: PathBuf,
 	spec_name: String,
@@ -138,88 +165,109 @@ async fn start_services(
 
 	// extrinsic sender
 	let extrinsics_service =
-		ExtrinsicsService::new(darwinia.clone(), spec_name.clone(), data_dir.clone()).start();
+		ExtrinsicsService::new(
+            ethereum2darwinia.clone(), 
+            darwinia2ethereum.clone(), 
+            ethereum2darwinia_relayer.clone(),
+            darwinia2ethereum_relayer.clone(),
+            spec_name.clone(), 
+            data_dir.clone()).start();
 
-	// relay service
-	let last_confirmed = darwinia.last_confirmed().await.unwrap();
-	let relay_service = RelayService::new(
-		shadow.clone(),
-		darwinia.clone(),
-		last_confirmed,
-		config.step.relay,
-		extrinsics_service.clone().recipient(),
-	)
-	.start();
+    let (relay_service, redeem_service, ethereum_service, guard_service) = {
+        if let Some(ethereum2darwinia) = &ethereum2darwinia {
+            // relay service
+            let last_confirmed = ethereum2darwinia.last_confirmed().await.unwrap();
+            let relay_service = RelayService::new(
+                shadow.clone(),
+                ethereum2darwinia.clone(),
+                last_confirmed,
+                config.step.relay,
+                extrinsics_service.clone().recipient(),
+            ).start();
 
-	// redeem service
-	let redeem_service = RedeemService::new(
-		shadow.clone(),
-		darwinia.clone(),
-		config.step.redeem,
-		extrinsics_service.clone().recipient(),
-	)
-	.start();
+            // redeem service
+            let redeem_service = RedeemService::new(
+                shadow.clone(),
+                ethereum2darwinia.clone(),
+                config.step.redeem,
+                extrinsics_service.clone().recipient(),
+            ).start();
 
-	// ethereum service
-	let ethereum_service = EthereumService::new(
-		config.clone(),
-		web3.clone(),
-		darwinia.clone(),
-		last_redeemed + 1,
-		relay_service.clone().recipient(),
-		redeem_service.clone().recipient(),
-		data_dir.clone(),
-	)
-	.start();
+            // ethereum service
+            let ethereum_service = EthereumService::new(
+                config.clone(),
+                web3.clone(),
+                darwinia.clone(),
+                last_redeemed + 1,
+                relay_service.clone().recipient(),
+                redeem_service.clone().recipient(),
+                data_dir.clone()).start();
 
-	// guard service
-	let is_tech_comm_member = darwinia.sender.is_tech_comm_member().await?;
-	let guard_service = GuardService::new(
-		shadow.clone(),
-		darwinia.clone(),
-		config.step.guard,
-		is_tech_comm_member,
-		extrinsics_service.clone().recipient(),
-	)
-	.map(|g| g.start());
+            // guard service
+            let guard_service = if let Some(relayer) = &ethereum2darwinia_relayer {
+                let is_tech_comm_member = ethereum2darwinia.is_tech_comm_member(&relayer).await?;
+                GuardService::new(
+                    shadow.clone(),
+                    ethereum2darwinia.clone(),
+                    relayer.clone(),
+                    config.step.guard,
+                    is_tech_comm_member,
+                    extrinsics_service.clone().recipient(),
+                ).map(|g| g.start())
+            } else {
+                None
+            };
+            (Some(relay_service), Some(redeem_service), Some(ethereum_service), guard_service)
+        } else {
+            (None, None, None, None)
+        }
+    };
 
-	// darwinia subscribe service
-	let ethereum = Ethereum::new(web3.clone(), &config.clone())?;
-	let mut subscribe = SubscribeService::new(
-		darwinia.clone(),
-		ethereum,
-		extrinsics_service.clone().recipient(),
-		spec_name,
-		(last_tracked_ethereum_block as u32) + 1,
-		data_dir.clone(),
-	);
-	let b = async {
-		if let Err(e) = subscribe.start().await {
-			return Err(e);
-		}
-		Ok(())
-	};
+    if let Some(darwinia2ethereum) = &darwinia2ethereum {
+        // darwinia subscribe service
+        let ethereum = Ethereum::new(web3.clone(), &config.clone())?;
+        let mut subscribe = SubscribeService::new(
+            darwinia2ethereum.clone(),
+            darwinia2ethereum_relayer.unwrap(),
+            ethereum,
+            extrinsics_service.clone().recipient(),
+            spec_name,
+            (last_tracked_ethereum_block as u32) + 1,
+            data_dir.clone(),
+        );
+        let b = async {
+            if let Err(e) = subscribe.start().await {
+                return Err(e);
+            }
+            Ok(())
+        };
 
-	let killer = darwinia.client.rpc.client.killer.clone();
-	let c = async {
-		loop {
-			if killer.lock().await.next().await.is_some() {
-				return Err(BizError::Bridger("Jsonrpsee's ws connection closed".into()).into());
-			}
-		}
-	};
+        let killer = darwinia.subxt.rpc.client.killer.clone();
+        let c = async {
+            loop {
+                if killer.lock().await.next().await.is_some() {
+                    return Err(BizError::Bridger("Jsonrpsee's ws connection closed".into()).into());
+                }
+            }
+        };
 
-	if let Err(e) = select!(b, c).await {
-		ethereum_service.do_send(MsgStop {});
-		relay_service.do_send(MsgStop {});
-		redeem_service.do_send(MsgStop {});
-		if let Some(guard_service) = guard_service {
-			guard_service.do_send(MsgStop {});
-		}
-		subscribe.stop();
-		extrinsics_service.do_send(MsgStop {});
-		Err(e)
-	} else {
-		Ok(())
-	}
+        if let Err(e) = select!(b, c).await {
+            if let Some(ethereum_service) = &ethereum_service {
+                ethereum_service.do_send(MsgStop {});
+            }
+            if let Some(relay_service) = &relay_service {
+                relay_service.do_send(MsgStop {});
+            }
+            if let Some(redeem_service) = &redeem_service {
+                redeem_service.do_send(MsgStop {});
+            }
+            if let Some(guard_service) = &guard_service {
+                guard_service.do_send(MsgStop {});
+            }
+            subscribe.stop();
+            extrinsics_service.do_send(MsgStop {});
+            return Err(e)
+        }
+    }
+    Ok(())
 }

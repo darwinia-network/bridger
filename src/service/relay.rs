@@ -14,6 +14,10 @@ use actix::prelude::*;
 use anyhow::Context as AnyhowContext;
 use std::time::Duration;
 
+use darwinia::{
+    Ethereum2Darwinia,
+};
+
 /// message 'block_number'
 #[derive(Clone, Debug)]
 pub struct MsgBlockNumber(pub u64);
@@ -35,7 +39,7 @@ pub struct RelayService {
 	/// Shadow API
 	pub shadow: Arc<Shadow>,
 	/// Dawrinia API
-	pub darwinia: Arc<Darwinia>,
+	pub ethereum2darwinia: Ethereum2Darwinia,
 
 	target: u64,
 	relayed: u64,
@@ -79,7 +83,7 @@ impl Handler<MsgExecute> for RelayService {
 				.then(|_, this, _| {
 					if this.target > this.relayed {
 						let f = RelayService::affirm(
-							this.darwinia.clone(),
+                            this.ethereum2darwinia.clone(),
 							this.shadow.clone(),
 							this.target,
 							this.extrinsics_service.clone(),
@@ -124,13 +128,13 @@ impl RelayService {
 	/// create new relay service actor
 	pub fn new(
 		shadow: Arc<Shadow>,
-		darwinia: Arc<Darwinia>,
+		ethereum2darwinia: Ethereum2Darwinia,
 		last_confirmed: u64,
 		step: u64,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> Self {
 		RelayService {
-			darwinia,
+			ethereum2darwinia,
 			shadow,
 			target: last_confirmed,
 			relayed: last_confirmed,
@@ -141,7 +145,7 @@ impl RelayService {
 
 	/// affirm target block
 	pub async fn affirm(
-		darwinia: Arc<Darwinia>,
+		ethereum2darwinia: Ethereum2Darwinia,
 		shadow: Arc<Shadow>,
 		target: u64,
 		extrinsics_service: Recipient<MsgExtrinsic>,
@@ -150,7 +154,7 @@ impl RelayService {
 		// checking before affirm
 		// /////////////////////////
 		// 1. last confirmed check
-		let last_confirmed = darwinia.last_confirmed().await?;
+		let last_confirmed = ethereum2darwinia.last_confirmed().await?;
 		if target <= last_confirmed {
 			return Err(
 				BizError::AffirmingBlockLessThanLastConfirmed(target, last_confirmed).into(),
@@ -158,7 +162,7 @@ impl RelayService {
 		}
 
 		// 2. pendings check
-		let pending_headers = darwinia.pending_headers().await?;
+		let pending_headers = ethereum2darwinia.pending_headers().await?;
 		for pending_header in pending_headers {
 			let pending_block_number = pending_header.1.header.number;
 			if pending_block_number >= target {
@@ -167,7 +171,7 @@ impl RelayService {
 		}
 
 		// 3. affirmations check
-		for (_game_id, game) in darwinia.affirmations().await?.iter() {
+		for (_game_id, game) in ethereum2darwinia.affirmations().await?.iter() {
 			for (_round_id, affirmations) in game.iter() {
 				if Darwinia::contains(&affirmations, target) {
 					return Err(BizError::AffirmingBlockInGame(target).into());

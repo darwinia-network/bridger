@@ -111,6 +111,7 @@ enum Opt {
         #[structopt(short, long)]
         mmrblock: u64,
     },
+    /// Affirm a targe block without any check
     AffirmForce {
         /// block number
         #[structopt(short, long)]

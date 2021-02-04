@@ -5,7 +5,7 @@ use crate::{
 	error::{Error, Result},
 	service::redeem::EthereumTransaction,
 	service::redeem::EthereumTransactionHash,
-	Config,
+	Settings,
 };
 use core::marker::PhantomData;
 use parity_scale_codec::Encode;
@@ -62,12 +62,12 @@ pub struct Darwinia {
 
 impl Darwinia {
 	/// New darwinia API
-	pub async fn new(config: &Config) -> Result<Darwinia> {
+	pub async fn new(config: &Settings) -> Result<Darwinia> {
 		let client =
-			jsonrpsee::ws_client(&config.node)
+			jsonrpsee::ws_client(&config.darwinia.rpc)
 				.await
 				.map_err(|e| Error::FailToConnectDarwinia {
-					url: config.node.clone(),
+					url: config.darwinia.rpc.clone(),
 					source: e,
 				})?;
 		let client = ClientBuilder::<DarwiniaRuntime>::new()
@@ -75,16 +75,13 @@ impl Darwinia {
 			.build()
 			.await?;
 
-		let signer_seed = config.darwinia_to_ethereum.seed.clone();
+		let signer_seed = config.ethereum.authority.clone().map(|a| a.private_key);
 		let sender = DarwiniaSender::new(
-			config.seed.clone(),
-			config
-				.proxy
-				.clone()
-				.map(|proxy| proxy.real[2..].to_string()),
+			config.darwinia.relayer.private_key.clone(),
+			config.darwinia.relayer.real_account.clone().map(|real| real[2..].to_string()),
 			client.clone(),
 			signer_seed,
-			config.eth.rpc.to_string(),
+			config.ethereum.rpc.to_string(),
 		);
 
 		Ok(Darwinia { client, sender })
@@ -554,6 +551,7 @@ impl Darwinia {
 		decoder.register_type_size::<(u32, u32)>("TaskAddress<BlockNumber>");
 		decoder.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
 		decoder.register_type_size::<u32>("EraIndex");
+		decoder.register_type_size::<u64>("EthereumBlockNumber");
 
 		let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
 		for (_, raw) in raw_events {

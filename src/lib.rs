@@ -12,4 +12,4 @@ pub mod error;
 pub mod service;
 pub mod tools;
 
-pub use self::config::Config;
+pub use self::config::Settings;

@@ -1,9 +1,22 @@
-//! Bridger Config
+//! Bridger Settings
 use crate::error::{BizError, Result};
-use etc::{Etc, Meta, Read, Write};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use toml::Serializer;
+use config::{Config, File};
+
+// - Ethereum --------------------------------
+/// Ethereum Settings
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EthereumSettings {
+	/// Ethereum rpc url
+	pub rpc: String,
+	/// Ethereum contracts
+	pub contract: EthereumContract,
+	/// Ethereum Relayer
+	pub relayer: Option<EthereumRelayer>,
+	/// Ethereum Authority
+	pub authority: Option<EthereumAuthority>,
+}
 
 /// Ethereum Contract Tuple
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -11,7 +24,7 @@ pub struct EthereumContractTuple {
 	/// Contract Address
 	pub address: String,
 	/// Contract Topic
-	pub topics: Vec<String>,
+	pub topics: Option<Vec<String>>,
 }
 
 /// Ethereum Contracts
@@ -29,162 +42,117 @@ pub struct EthereumContract {
 	pub relay: EthereumContractTuple,
 }
 
-/// Ethereum Config
+/// Ethereum Relayer
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct EthereumConfig {
-	/// Ethereum rpc url
+pub struct EthereumRelayer {
+	/// Private key
+	pub private_key: String,
+	/// ethereum.relayer's beneficiary account public key
+	pub beneficiary_darwinia_account: String
+}
+
+/// Ethereum Authority 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EthereumAuthority {
+	/// Private key to sign ecdsa signature
+	pub private_key: String,
+}
+
+// - Darwinia --------------------------------
+/// Darwinia Settings
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct DarwiniaSettings {
+	/// Darwinia rpc url
 	pub rpc: String,
-	/// Ethereum contracts
-	pub contract: EthereumContract,
+	/// Darwinia Relayer
+	pub relayer: DarwiniaRelayer,
 }
 
-/// Service step
+/// Darwinia Relayer
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Step {
-	/// Ethereum step
-	pub ethereum: u64,
-	/// Relay Step
-	pub relay: u64,
-	/// Redeem Step
-	pub redeem: u64,
-	/// Guard Step
-	pub guard: u64,
+pub struct DarwiniaRelayer {
+	/// Private key
+	pub private_key: String,
+	/// Real Account public key
+	pub real_account: Option<String>,
 }
 
-/// Proxy config
+// - Shadow --------------------------------
+/// Shadow Settings
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Proxy {
-	/// proxy real
-	pub real: String,
+pub struct ShadowSettings {
+	/// Shadow endpoint
+	pub endpoint: String,
 }
 
-/// Darwinia to ethereum config
+// - Services --------------------------------
+/// Services Settings
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct DarwiniaToEthereum {
-	/// ethereum seed
-	pub seed: Option<String>,
-
-	/// the darwinia account id who will get the reward
-	/// Do not do submit authorities if None
-	pub beneficiary: Option<String>,
+pub struct ServicesSettings {
+	/// Ethereum
+	pub ethereum: ServicesEthereum,
+	/// Relay
+	pub relay: ServicesRelay,
+	/// Redeem
+	pub redeem: ServicesRedeem,
+	/// Guard
+	pub guard: ServicesGuard,
 }
 
-/// Bridger Config
+/// Services ethereum settings
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Config {
-	/// Darwinia node url
-	pub node: String,
-	/// Darwinia account seed
-	pub seed: String,
-	/// Shadow service url
-	pub shadow: String,
-	/// Ethereum Config
-	pub eth: EthereumConfig,
-	/// Service steps
-	pub step: Step,
-	/// Darwinia relayer proxy address
-	pub proxy: Option<Proxy>,
-	/// darwinia_to_ethereum
-	pub darwinia_to_ethereum: DarwiniaToEthereum,
+pub struct ServicesEthereum {
+	/// step
+	pub step: u64,
 }
 
-impl Default for Config {
-	fn default() -> Self {
-		Config {
-			node: "wss://crab.darwinia.network".to_string(),
-			seed: "//Alice".to_string(),
-			shadow: "http://localhost:3000".to_string(),
-			eth: EthereumConfig {
-				rpc: "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016".to_string(),
-				contract: EthereumContract {
-					ring: EthereumContractTuple {
-						address: "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0".to_string(),
-						topics: vec![
-							"0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
-								.to_string(),
-						],
-					},
-					kton: EthereumContractTuple {
-						address: "0x1994100c58753793D52c6f457f189aa3ce9cEe94".to_string(),
-						topics: vec![
-							"0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"
-								.to_string(),
-						],
-					},
-					bank: EthereumContractTuple {
-						address: "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e".to_string(),
-						topics: vec![
-							"0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12"
-								.to_string(),
-						],
-					},
-					issuing: EthereumContractTuple {
-						address: "0x49262B932E439271d05634c32978294C7Ea15d0C".to_string(),
-						topics: vec![],
-					},
-					relay: EthereumContractTuple {
-						address: "0xc8d6c331030886716f6e323ACB795077eB530E36".to_string(),
-						topics: vec![
-							"0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f"
-								.to_string(),
-						],
-					},
-				},
-			},
-			step: Step {
-				ethereum: 30,
-				relay: 60,
-				redeem: 90,
-				guard: 30,
-			},
-			proxy: None,
-			darwinia_to_ethereum: DarwiniaToEthereum {
-				seed: None,
-				beneficiary: None,
-			},
-		}
-	}
+/// Services relay settings
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ServicesRelay {
+	/// step
+	pub step: u64,
 }
 
-impl Config {
-	fn write(c: Etc) -> Result<Config> {
-		let config = Config::default();
-		let mut dst = String::with_capacity(128);
-		config.serialize(Serializer::pretty(&mut dst).pretty_array(true))?;
-		c.write(dst)?;
-		Ok(config)
-	}
+/// Services redeem settings
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ServicesRedeem {
+	/// step
+	pub step: u64,
+}
 
-	/// New config from pathbuf
+/// Services guard settings
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ServicesGuard {
+	/// step
+	pub step: u64,
+}
+
+/// Bridger Settings
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Settings {
+	/// Ethereum Settings
+	pub ethereum: EthereumSettings,
+
+	/// Darwinia Settings
+	pub darwinia: DarwiniaSettings,
+
+	/// Shadow Settings
+	pub shadow: ShadowSettings,
+
+	/// services
+	pub services: ServicesSettings,
+}
+
+impl Settings {
+	/// New settings from pathbuf
 	pub fn new(data_dir: &PathBuf) -> Result<Self> {
 		let mut config_file = data_dir.clone();
-		config_file.push("config.toml");
-		let c = Etc::from(config_file);
+		config_file.push("config.yml");
 
-		// if file exist
-		if c.real_path()?.exists() {
-			// if read fail, do not overwrite the exist one
-			let mut config: Config = toml::from_slice(&c.read()?)?;
+		let mut settings = Config::default();
+		settings.merge(File::from(config_file))?;
 
-			// proxy real's length check
-			if let Some(proxy) = config.clone().proxy {
-				if proxy.real.len() != 64 && proxy.real.len() != 66 {
-					return Err(BizError::Bridger(
-						"Config proxy real's length is wrong".to_string(),
-					)
-					.into());
-				}
-				if proxy.real.len() == 64 {
-					config.proxy = Some(Proxy {
-						real: format!("0x{}", proxy.real),
-					});
-				}
-			}
-
-			Ok(config)
-		} else {
-			Self::write(c)
-		}
+		Ok(settings.try_into()?)
 	}
 
 	/// default_data_dir
@@ -195,4 +163,24 @@ impl Config {
 
 		Ok(dir)
 	}
+}
+
+impl Default for Settings {
+	fn default() -> Self {
+		let config_file = PathBuf::from(".maintain/config/ropsten_crab.sample.yml");
+		let mut settings = Config::default();
+		settings.merge(File::from(config_file)).unwrap();
+		settings.try_into().unwrap()
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	pub fn test_yaml_config() {
+		let settings = Settings::default();
+		println!("{:?}", settings.ethereum);
+	} 
 }

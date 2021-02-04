@@ -3,7 +3,7 @@ use crate::{
 	api::{Darwinia, Shadow},
 	error::Result,
 	service::GuardService,
-	Config,
+	Settings,
 };
 use actix::Actor;
 use std::sync::Arc;
@@ -14,7 +14,7 @@ pub async fn exec() -> Result<()> {
 	env_logger::init();
 
 	// apis
-	let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
+	let config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
 	let shadow = Arc::new(Shadow::new(&config));
 	let darwinia = Arc::new(Darwinia::new(&config).await?);
 
@@ -29,7 +29,7 @@ pub async fn exec() -> Result<()> {
 	let _guard_service = GuardService::new(
 		shadow.clone(),
 		darwinia.clone(),
-		config.step.guard,
+		config.services.guard.step,
 		is_tech_comm_member,
 		extrinsics_service.recipient(),
 	)

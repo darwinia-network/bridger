@@ -1,4 +1,4 @@
-use crate::{error::Result, Config};
+use crate::{error::Result, Settings};
 use primitives::frame::{sudo::KeyStoreExt, technical_committee::MembersStoreExt};
 use primitives::runtime::DarwiniaRuntime;
 use substrate_subxt::ClientBuilder;
@@ -8,10 +8,10 @@ pub async fn exec() -> Result<()> {
 	std::env::set_var("RUST_LOG", "info,darwinia_bridger");
 	env_logger::init();
 
-	let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
+	let config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
 
 	let client = ClientBuilder::<DarwiniaRuntime>::new()
-		.set_url(&config.node)
+		.set_url(&config.darwinia.rpc)
 		.build()
 		.await?;
 	let sudo = client.key(None).await?;

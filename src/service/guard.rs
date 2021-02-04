@@ -108,15 +108,17 @@ impl GuardService {
 
 		let last_confirmed = darwinia.last_confirmed().await.unwrap();
 		let pending_headers = darwinia.pending_headers().await?;
-		debug!(
-			"pending headers: {:?}",
-			pending_headers
-				.clone()
-				.iter()
-				.map(|p| p.1.header.number.to_string())
-				.collect::<Vec<_>>()
-				.join(", ")
-		);
+		if !pending_headers.is_empty() {
+			trace!(
+				"pending headers: {:?}",
+				pending_headers
+					.clone()
+					.iter()
+					.map(|p| p.1.header.number.to_string())
+					.collect::<Vec<_>>()
+					.join(", ")
+			);
+		}
 		for pending in pending_headers {
 			let pending_parcel = pending.1;
 			let voting_state = pending.2;

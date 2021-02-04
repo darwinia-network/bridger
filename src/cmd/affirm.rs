@@ -3,7 +3,7 @@ use crate::{
 	api::{Darwinia, Shadow},
 	error::Result,
 	service::RelayService,
-	Config,
+	Settings,
 };
 use actix::Actor;
 use std::sync::Arc;
@@ -14,7 +14,7 @@ pub async fn exec(block: u64) -> Result<()> {
 	env_logger::init();
 
 	// apis
-	let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
+	let config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
 	let shadow = Arc::new(Shadow::new(&config));
 	let darwinia = Arc::new(Darwinia::new(&config).await?);
 

@@ -278,6 +278,7 @@ impl Darwinia2Ethereum {
 
     /// is authority
     pub async fn is_authority(&self, account: &Account) -> Result<bool> {
+        #![allow(clippy::needless_collect)]
         let authorities = self
             .darwinia
             .subxt

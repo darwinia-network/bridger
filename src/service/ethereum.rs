@@ -19,9 +19,7 @@ use web3::{
 	Web3,
 };
 
-use darwinia::{
-    Darwinia,
-};
+use darwinia::Darwinia;
 
 #[derive(Clone, Debug)]
 struct MsgScan;
@@ -84,7 +82,7 @@ impl Handler<MsgScan> for EthereumService {
 				.into_actor(self)
 				.then(move |_, this, _| {
 					let f = EthereumService::scan(
-                        this.darwinia.clone(),
+						this.darwinia.clone(),
 						this.web3.clone(),
 						this.contracts.clone(),
 						this.filters.clone(),
@@ -216,7 +214,7 @@ impl EthereumService {
 
 	#[allow(clippy::too_many_arguments)]
 	async fn scan(
-        darwinia: Darwinia,
+		darwinia: Darwinia,
 		web3: Web3<Http>,
 		contracts: ContractAddress,
 		filters: [FilterBuilder; 3],

@@ -9,10 +9,7 @@ use crate::{
 	error::{BizError, Result},
 };
 
-use darwinia::{
-    Ethereum2Darwinia,
-    FromEthereumAccount,
-};
+use darwinia::{Ethereum2Darwinia, FromEthereumAccount};
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -28,8 +25,8 @@ pub struct GuardService {
 	pub shadow: Arc<Shadow>,
 	/// Ethereum to Dawrinia API
 	pub ethereum2darwinia: Ethereum2Darwinia,
-    /// Darwinia guard account
-    pub guard_account: FromEthereumAccount,
+	/// Darwinia guard account
+	pub guard_account: FromEthereumAccount,
 	extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
@@ -57,8 +54,8 @@ impl Handler<MsgGuard> for GuardService {
 				.into_actor(self)
 				.then(|_, this, _| {
 					let f = GuardService::guard(
-                        this.ethereum2darwinia.clone(),
-                        this.guard_account.clone(),
+						this.ethereum2darwinia.clone(),
+						this.guard_account.clone(),
 						this.shadow.clone(),
 						this.extrinsics_service.clone(),
 					);
@@ -90,7 +87,7 @@ impl GuardService {
 	pub fn new(
 		shadow: Arc<Shadow>,
 		ethereum2darwinia: Ethereum2Darwinia,
-        guard_account: FromEthereumAccount,
+		guard_account: FromEthereumAccount,
 		step: u64,
 		is_tech_comm_member: bool,
 		extrinsics_service: Recipient<MsgExtrinsic>,
@@ -98,7 +95,7 @@ impl GuardService {
 		if is_tech_comm_member {
 			Some(GuardService {
 				ethereum2darwinia,
-                guard_account,
+				guard_account,
 				shadow,
 				step,
 				extrinsics_service,
@@ -111,7 +108,7 @@ impl GuardService {
 
 	async fn guard(
 		ethereum2darwinia: Ethereum2Darwinia,
-        guard_account: FromEthereumAccount,
+		guard_account: FromEthereumAccount,
 		shadow: Arc<Shadow>,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> Result<()> {
@@ -136,7 +133,9 @@ impl GuardService {
 			// high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
 			// and,
 			// have not voted
-			if pending_block_number > last_confirmed && !ethereum2darwinia.has_voted(&guard_account, voting_state) {
+			if pending_block_number > last_confirmed
+				&& !ethereum2darwinia.has_voted(&guard_account, voting_state)
+			{
 				let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
 				let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
 					Extrinsic::GuardVote(pending_block_number, true)

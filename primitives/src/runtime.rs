@@ -75,13 +75,16 @@ impl EthereumRelayerGame for DarwiniaRuntime {
 	>;
 }
 
-impl std::fmt::Display for RelayAffirmation<
-    EthereumRelayHeaderParcel,
-    <DarwiniaRuntime as System>::AccountId,
-    <DarwiniaRuntime as Balances>::Balance,
-    RelayAffirmationId<u64>> {
-        fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-            let msg = format!(
+impl std::fmt::Display
+	for RelayAffirmation<
+		EthereumRelayHeaderParcel,
+		<DarwiniaRuntime as System>::AccountId,
+		<DarwiniaRuntime as Balances>::Balance,
+		RelayAffirmationId<u64>,
+	>
+{
+	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		let msg = format!(
                 "{{\n  relayer: {}\n  balance: {}\n  relayer_header: [{}\n  ]\n  id: {:?}\n  verified: {}\n}}",
                 self.relayer,
                 self.stake,
@@ -95,8 +98,8 @@ impl std::fmt::Display for RelayAffirmation<
                 self.maybe_extended_relay_affirmation_id,
                 self.verified_on_chain
             );
-            write!(f, "{}", msg)
-        }
+		write!(f, "{}", msg)
+	}
 }
 
 impl EthereumBacking for DarwiniaRuntime {

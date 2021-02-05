@@ -1,14 +1,6 @@
-use crate::{
-	error::{
-        Result,
-    },
-	Config,
-};
+use crate::{error::Result, Config};
 
-use darwinia::{
-    Darwinia,
-    Ethereum2Darwinia,
-};
+use darwinia::{Darwinia, Ethereum2Darwinia};
 
 /// get all affirmations
 pub async fn exec() -> Result<()> {
@@ -18,8 +10,8 @@ pub async fn exec() -> Result<()> {
 	// apis
 	let config = Config::new(&Config::default_data_dir()?)?;
 	let darwinia = Darwinia::new(&config.node).await?;
- 	let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
- 
+	let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
+
 	info!("Init API succeed!");
 
 	for (game_id, game) in ethereum2darwinia.affirmations().await?.iter() {

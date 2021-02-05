@@ -10,24 +10,18 @@ use crate::{
 	service::extrinsics::{Extrinsic, MsgExtrinsic},
 };
 use actix::Recipient;
-use primitives::{
-	runtime::DarwiniaRuntime,
-};
+use primitives::runtime::DarwiniaRuntime;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use substrate_subxt::system::System;
 use tokio::time::{delay_for, Duration};
 
-use darwinia::{
-    Darwinia2Ethereum,
-    ToEthereumAccount,
-    EventInfo,
-};
+use darwinia::{Darwinia2Ethereum, EventInfo, ToEthereumAccount};
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
 	darwinia2ethereum: Darwinia2Ethereum,
-    account: ToEthereumAccount,
+	account: ToEthereumAccount,
 	ethereum: Ethereum,
 	stop: bool,
 	extrinsics_service: Recipient<MsgExtrinsic>,
@@ -41,7 +35,7 @@ impl SubscribeService {
 	/// New subscribe service
 	pub fn new(
 		darwinia2ethereum: Darwinia2Ethereum,
-        account: ToEthereumAccount,
+		account: ToEthereumAccount,
 		ethereum: Ethereum,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 		spec_name: String,
@@ -50,7 +44,7 @@ impl SubscribeService {
 	) -> SubscribeService {
 		SubscribeService {
 			darwinia2ethereum,
-            account,
+			account,
 			ethereum,
 			stop: false,
 			extrinsics_service,
@@ -63,7 +57,8 @@ impl SubscribeService {
 
 	/// start
 	pub async fn start(&mut self) -> Result<()> {
-		let mut tracker = DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), self.scan_from);
+		let mut tracker =
+			DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), self.scan_from);
 		info!("✨ SERVICE STARTED: SUBSCRIBE");
 		loop {
 			let header = tracker.next_block().await;
@@ -83,7 +78,11 @@ impl SubscribeService {
 
 			// handle events of the block
 			let hash = header.hash();
-			let events = self.darwinia2ethereum.darwinia.get_events_from_block_hash(hash).await;
+			let events = self
+				.darwinia2ethereum
+				.darwinia
+				.get_events_from_block_hash(hash)
+				.await;
 			if let Err(err) = self.handle_events(&header, events).await {
 				if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
 					tools::set_cache(
@@ -166,56 +165,60 @@ impl SubscribeService {
 	async fn handle_event(
 		&mut self,
 		_header: &<DarwiniaRuntime as System>::Header,
-        event: EventInfo<DarwiniaRuntime>
+		event: EventInfo<DarwiniaRuntime>,
 	) -> Result<()> {
-        //todo
+		//todo
 		//if module != "System" {
-			//trace!(">> Event - {}::{}", module, variant);
+		//trace!(">> Event - {}::{}", module, variant);
 		//}
-        match event {
-            EventInfo::RuntimeUpdatedEvent(_) => {
-                return Err(Error::RuntimeUpdated.into());
-            }
+		match event {
+			EventInfo::RuntimeUpdatedEvent(_) => {
+				return Err(Error::RuntimeUpdated.into());
+			}
 			// call ethereum_relay_authorities.request_authority and then sudo call
 			// EthereumRelayAuthorities.add_authority will emit the event
-            EventInfo::ScheduleAuthoritiesChangeEvent(event) => {
-                if self.darwinia2ethereum.is_authority(&self.account).await? &&
-                   self.darwinia2ethereum.need_to_sign_authorities(&self.account, event.message).await? {
-                        let ex = Extrinsic::SignAndSendAuthorities(event.message);
-                        let msg = MsgExtrinsic(ex);
-                        self.extrinsics_service.send(msg).await?;
-                }
-            }
+			EventInfo::ScheduleAuthoritiesChangeEvent(event) => {
+				if self.darwinia2ethereum.is_authority(&self.account).await?
+					&& self
+						.darwinia2ethereum
+						.need_to_sign_authorities(&self.account, event.message)
+						.await?
+				{
+					let ex = Extrinsic::SignAndSendAuthorities(event.message);
+					let msg = MsgExtrinsic(ex);
+					self.extrinsics_service.send(msg).await?;
+				}
+			}
 			// authority set changed will emit this event
-            EventInfo::AuthoritiesChangeSignedEvent(event) => {
-                let current_term = self.darwinia2ethereum.get_current_authority_term().await?;
-                if event.term == current_term {
-                    let message = Darwinia2Ethereum::construct_authorities_message(
-                        self.spec_name.clone(),
-                        event.term,
-                        event.new_authorities,
-                    );
-                    let signatures = event
-                        .signatures
-                        .iter()
-                        .map(|s| s.1.clone())
-                        .collect::<Vec<_>>();
-                    self.ethereum
-                        .submit_authorities_set(message, signatures)
-                        .await?;
-                    info!("Authorities submitted to ethereum");
-                }
-            }
-            // call ethereum_backing.lock will emit the event
-            EventInfo::ScheduleMMRRootEvent(event) => {
-                if self.darwinia2ethereum.is_authority(&self.account).await? {
-                    info!("{}", event);
-                    let ex = Extrinsic::SignAndSendMmrRoot(event.block_number);
-                    self.delayed_extrinsics.insert(event.block_number, ex);
-                }
-            }
+			EventInfo::AuthoritiesChangeSignedEvent(event) => {
+				let current_term = self.darwinia2ethereum.get_current_authority_term().await?;
+				if event.term == current_term {
+					let message = Darwinia2Ethereum::construct_authorities_message(
+						self.spec_name.clone(),
+						event.term,
+						event.new_authorities,
+					);
+					let signatures = event
+						.signatures
+						.iter()
+						.map(|s| s.1.clone())
+						.collect::<Vec<_>>();
+					self.ethereum
+						.submit_authorities_set(message, signatures)
+						.await?;
+					info!("Authorities submitted to ethereum");
+				}
+			}
+			// call ethereum_backing.lock will emit the event
+			EventInfo::ScheduleMMRRootEvent(event) => {
+				if self.darwinia2ethereum.is_authority(&self.account).await? {
+					info!("{}", event);
+					let ex = Extrinsic::SignAndSendMmrRoot(event.block_number);
+					self.delayed_extrinsics.insert(event.block_number, ex);
+				}
+			}
 			_ => {}
-        }
+		}
 		Ok(())
 	}
 }

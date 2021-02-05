@@ -14,9 +14,7 @@ use actix::prelude::*;
 use anyhow::Context as AnyhowContext;
 use std::time::Duration;
 
-use darwinia::{
-    Ethereum2Darwinia,
-};
+use darwinia::Ethereum2Darwinia;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
@@ -83,7 +81,7 @@ impl Handler<MsgExecute> for RelayService {
 				.then(|_, this, _| {
 					if this.target > this.relayed {
 						let f = RelayService::affirm(
-                            this.ethereum2darwinia.clone(),
+							this.ethereum2darwinia.clone(),
 							this.shadow.clone(),
 							this.target,
 							this.extrinsics_service.clone(),

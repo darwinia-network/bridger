@@ -1,8 +1,5 @@
 //! Redeem Service
-use crate::{
-	api::Shadow,
-	error::Result,
-};
+use crate::{api::Shadow, error::Result};
 use actix::prelude::*;
 use primitives::chain::ethereum::RedeemFor;
 use std::{sync::Arc, time::Duration};
@@ -13,9 +10,7 @@ use crate::service::MsgStop;
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 
-use darwinia::{
-    Ethereum2Darwinia,
-};
+use darwinia::Ethereum2Darwinia;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -108,7 +103,7 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
 				.into_actor(self)
 				.then(move |_, this, _| {
 					let f = RedeemService::redeem(
-                        this.ethereum2darwinia.clone(),
+						this.ethereum2darwinia.clone(),
 						this.shadow.clone(),
 						msg_clone.tx,
 						this.extrinsics_service.clone(),
@@ -167,7 +162,11 @@ impl RedeemService {
 		trace!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
 
 		// 1. Checking before redeem
-		if ethereum2darwinia.darwinia.verified(tx.block_hash, tx.index).await? {
+		if ethereum2darwinia
+			.darwinia
+			.verified(tx.block_hash, tx.index)
+			.await?
+		{
 			return Err(BizError::TxRedeemed(tx.tx_hash).into());
 		}
 

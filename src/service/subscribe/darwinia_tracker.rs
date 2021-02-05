@@ -1,11 +1,9 @@
 use crate::error::Result;
+use darwinia::Darwinia;
 use std::time::Duration;
 use substrate_subxt::sp_runtime::generic::Header;
 use substrate_subxt::sp_runtime::traits::BlakeTwo256;
 use tokio::time::delay_for;
-use darwinia::{
-    Darwinia,
-};
 
 /// DarwiniaTracker
 pub struct DarwiniaBlockTracker {
@@ -56,8 +54,8 @@ impl DarwiniaBlockTracker {
 					Ok(None)
 				} else {
 					let header = self.darwinia.get_block_by_number(self.next_block).await?;
-                    self.next_block += 1;
-                    Ok(Some(header))
+					self.next_block += 1;
+					Ok(Some(header))
 				}
 			}
 			None => Ok(None),

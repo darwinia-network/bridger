@@ -57,7 +57,7 @@ The WebSocket endpoint of Darwinia official node or any archive node (`darwinia 
 
 ```yaml
 darwinia:
-  rpc: wss://cc1.darwinia.network
+  rpc: wss://mainnet.darwinia.network
 ```
 
 #### `shadow.endpoint`

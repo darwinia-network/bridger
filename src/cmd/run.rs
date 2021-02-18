@@ -7,6 +7,7 @@ use crate::{
 use actix::Actor;
 use async_macros::select;
 use futures::StreamExt;
+use rpassword::prompt_password_stdout;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
@@ -35,7 +36,19 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
 	}
 	env_logger::init();
 
-	while let Err(e) = run(data_dir.clone()).await {
+	// --- Data dir ---
+	let data_dir = data_dir.unwrap_or_else(|| Settings::default_data_dir().unwrap());
+	// --- Load config ---
+	let mut config = Settings::new(&data_dir).unwrap();
+
+	if config.encrypted {
+		let passwd = prompt_password_stdout("Please enter password:").unwrap();
+		if config.decrypt(&passwd).is_err() {
+			return;
+		}
+	}
+
+	while let Err(e) = run(data_dir.clone(), &config).await {
 		if let Some(Error::NoEthereumStart) = e.downcast_ref() {
 			error!("{:?}", e);
 			break;
@@ -53,19 +66,14 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
 	}
 }
 
-async fn run(data_dir: Option<PathBuf>) -> Result<()> {
+async fn run(data_dir: PathBuf, config: &Settings) -> Result<()> {
 	info!(
 		"✌️  {} v{}",
 		env!("CARGO_PKG_NAME"),
 		env!("CARGO_PKG_VERSION")
 	);
 
-	// --- Data dir ---
-	let data_dir = data_dir.unwrap_or(Settings::default_data_dir()?);
 	info!("💾 Data dir: {}", data_dir.to_str().unwrap());
-
-	// --- Load config ---
-	let config = Settings::new(&data_dir)?;
 	if config.ethereum.rpc.starts_with("ws") {
 		return Err(BizError::Bridger(
 			"Bridger currently doesn't support ethereum websocket transport".to_string(),

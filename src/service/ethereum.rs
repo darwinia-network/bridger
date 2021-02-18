@@ -317,12 +317,7 @@ impl EthereumService {
 			};
 			FilterBuilder::default()
 				.address(vec![H160::from_slice(&bytes!(c.address.as_str()))])
-				.topics(
-					Some(topics),
-					None,
-					None,
-					None,
-				)
+				.topics(Some(topics), None, None, None)
 		})
 		.collect::<Vec<FilterBuilder>>();
 		[filters[0].clone(), filters[1].clone(), filters[2].clone()]

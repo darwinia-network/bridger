@@ -63,13 +63,12 @@ pub struct Darwinia {
 impl Darwinia {
 	/// New darwinia API
 	pub async fn new(config: &Settings) -> Result<Darwinia> {
-		let client =
-			jsonrpsee::ws_client(&config.darwinia.rpc)
-				.await
-				.map_err(|e| Error::FailToConnectDarwinia {
-					url: config.darwinia.rpc.clone(),
-					source: e,
-				})?;
+		let client = jsonrpsee::ws_client(&config.darwinia.rpc)
+			.await
+			.map_err(|e| Error::FailToConnectDarwinia {
+				url: config.darwinia.rpc.clone(),
+				source: e,
+			})?;
 		let client = ClientBuilder::<DarwiniaRuntime>::new()
 			.set_client(client)
 			.build()
@@ -78,7 +77,12 @@ impl Darwinia {
 		let signer_seed = config.ethereum.authority.clone().map(|a| a.private_key);
 		let sender = DarwiniaSender::new(
 			config.darwinia.relayer.private_key.clone(),
-			config.darwinia.relayer.real_account.clone().map(|real| real[2..].to_string()),
+			config
+				.darwinia
+				.relayer
+				.real_account
+				.clone()
+				.map(|real| real[2..].to_string()),
 			client.clone(),
 			signer_seed,
 			config.ethereum.rpc.to_string(),

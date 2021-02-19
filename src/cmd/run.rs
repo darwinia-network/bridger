@@ -1,7 +1,4 @@
-use crate::api::{
-    Shadow,
-    darwinia_api,
-};
+use crate::api::{darwinia_api, Shadow};
 use crate::{
 	// listener::Listener,
 	error::{Error, Result},
@@ -29,8 +26,7 @@ use crate::service::SubscribeService;
 use crate::tools;
 
 use darwinia::{
-	Darwinia, Darwinia2Ethereum, Ethereum2Darwinia, FromEthereumAccount,
-	ToEthereumAccount,
+	Darwinia, Darwinia2Ethereum, Ethereum2Darwinia, FromEthereumAccount, ToEthereumAccount,
 };
 
 /// Run the bridger
@@ -116,16 +112,14 @@ async fn run(data_dir: PathBuf, config: &Settings) -> Result<()> {
 	let darwinia2ethereum = darwinia_api::get_d2e_instance(darwinia.clone());
 	let darwinia_account = darwinia_api::get_darwinia_account(&config);
 	let from_ethereum_account = darwinia_api::get_e2d_account(darwinia_account.clone());
-    let to_ethereum_account = darwinia_api::get_d2e_account(
-        darwinia_account.clone(),
-        &config
-    );
+	let to_ethereum_account = darwinia_api::get_d2e_account(darwinia_account.clone(), &config);
 
 	let web3 = Web3::new(Http::new(&config.ethereum.rpc).unwrap());
 
 	// Stop if darwinia sender is authority but without a signer seed
-	if darwinia2ethereum.is_authority(Some(last_tracked_darwinia_block + 1), &to_ethereum_account).await?
-		&& !to_ethereum_account.has_ethereum_seed()
+	if darwinia2ethereum
+		.is_authority(Some(last_tracked_darwinia_block + 1), &to_ethereum_account)
+		.await? && !to_ethereum_account.has_ethereum_seed()
 	{
 		return Err(Error::NoAuthoritySignerSeed.into());
 	}
@@ -142,7 +136,10 @@ async fn run(data_dir: PathBuf, config: &Settings) -> Result<()> {
 		.account_detail(Some(last_tracked_darwinia_block + 1), &to_ethereum_account)
 		.await?;
 	ethereum2darwinia
-		.account_detail(Some(last_tracked_darwinia_block + 1), &from_ethereum_account)
+		.account_detail(
+			Some(last_tracked_darwinia_block + 1),
+			&from_ethereum_account,
+		)
 		.await?;
 
 	// --- Start services ---
@@ -224,7 +221,9 @@ async fn start_services(
 
 			// guard service
 			let guard_service = if let Some(relayer) = &ethereum2darwinia_relayer {
-				let is_tech_comm_member = ethereum2darwinia.is_tech_comm_member(Some(last_tracked_darwinia_block + 1), &relayer).await?;
+				let is_tech_comm_member = ethereum2darwinia
+					.is_tech_comm_member(Some(last_tracked_darwinia_block + 1), &relayer)
+					.await?;
 				GuardService::new(
 					shadow.clone(),
 					ethereum2darwinia.clone(),

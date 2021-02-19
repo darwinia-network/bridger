@@ -175,11 +175,13 @@ impl SubscribeService {
 			// call ethereum_relay_authorities.request_authority and then sudo call
 			// EthereumRelayAuthorities.add_authority will emit the event
 			EventInfo::ScheduleAuthoritiesChangeEvent(event) => {
-				if self.darwinia2ethereum.is_authority(block, &self.account).await?
-					&& self
-						.darwinia2ethereum
-						.need_to_sign_authorities(block, &self.account, event.message)
-						.await?
+				if self
+					.darwinia2ethereum
+					.is_authority(block, &self.account)
+					.await? && self
+					.darwinia2ethereum
+					.need_to_sign_authorities(block, &self.account, event.message)
+					.await?
 				{
 					let ex = Extrinsic::SignAndSendAuthorities(event.message);
 					let msg = MsgExtrinsic(ex);
@@ -201,15 +203,19 @@ impl SubscribeService {
 						.map(|s| s.1.clone())
 						.collect::<Vec<_>>();
 					let tx_hash = self
-                        .ethereum
+						.ethereum
 						.submit_authorities_set(message, signatures)
 						.await?;
-                    info!("Submit authorities to ethereum with tx: {}", tx_hash);
+					info!("Submit authorities to ethereum with tx: {}", tx_hash);
 				}
 			}
 			// call ethereum_backing.lock will emit the event
 			EventInfo::ScheduleMMRRootEvent(event) => {
-				if self.darwinia2ethereum.is_authority(block, &self.account).await? {
+				if self
+					.darwinia2ethereum
+					.is_authority(block, &self.account)
+					.await?
+				{
 					info!("{}", event);
 					let ex = Extrinsic::SignAndSendMmrRoot(event.block_number);
 					self.delayed_extrinsics.insert(event.block_number, ex);

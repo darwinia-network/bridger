@@ -214,15 +214,19 @@ impl Darwinia {
 		}
 	}
 
-    /// block number to hash
-    pub async fn block_number2hash(&self, block_number: Option<u32>) -> Result<Option<H256>> {
-        let block_number = block_number.map(|n| n.into());
-        Ok(self.subxt.block_hash(block_number).await?)
-    }
+	/// block number to hash
+	pub async fn block_number2hash(&self, block_number: Option<u32>) -> Result<Option<H256>> {
+		let block_number = block_number.map(|n| n.into());
+		Ok(self.subxt.block_hash(block_number).await?)
+	}
 
 	/// is_sudo_key
-	pub async fn is_sudo_key(&self, block_number: Option<u32>, account: &DarwiniaAccount) -> Result<bool> {
-        let block_hash = self.block_number2hash(block_number).await?;
+	pub async fn is_sudo_key(
+		&self,
+		block_number: Option<u32>,
+		account: &DarwiniaAccount,
+	) -> Result<bool> {
+		let block_hash = self.block_number2hash(block_number).await?;
 		let sudo = self.subxt.key(block_hash).await?;
 		Ok(&sudo == account.real())
 	}

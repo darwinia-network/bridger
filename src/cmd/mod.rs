@@ -118,7 +118,7 @@ enum Opt {
 		/// block number
 		#[structopt(short, long)]
 		block: u64,
-    },
+	},
 	/// encrypt or decrypt key
 	EncryptKey {
 		#[structopt(short, long)]

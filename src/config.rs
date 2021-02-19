@@ -211,7 +211,7 @@ impl Default for Settings {
 		let mut settings = Config::default();
 		settings.merge(File::from(config_file)).unwrap();
 		settings.try_into().unwrap()
-    }
+	}
 }
 
 #[cfg(test)]

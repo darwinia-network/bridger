@@ -1,8 +1,5 @@
 use crate::{
-	api::{
-        Shadow,
-        darwinia_api,
-    },
+	api::{darwinia_api, Shadow},
 	error::{BizError, Result},
 	Settings,
 };

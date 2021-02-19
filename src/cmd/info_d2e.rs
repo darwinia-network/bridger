@@ -1,15 +1,11 @@
-use crate::{
-    error::Result,
-    Settings,
-	api::darwinia_api,
-};
+use crate::{api::darwinia_api, error::Result, Settings};
 use parity_scale_codec::Encode;
 
 use darwinia::{Darwinia2Ethereum, EventInfo, FormatedMMR};
 
 use colored::*;
-use std::fmt;
 use rpassword::prompt_password_stdout;
+use std::fmt;
 
 #[derive(Default, Debug)]
 struct TxProofWithMMRProof {

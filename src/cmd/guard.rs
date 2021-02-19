@@ -1,9 +1,6 @@
 use crate::service::ExtrinsicsService;
 use crate::{
-	api::{
-        Shadow,
-        darwinia_api,
-    },
+	api::{darwinia_api, Shadow},
 	error::Result,
 	service::GuardService,
 	Settings,
@@ -26,7 +23,8 @@ pub async fn exec() -> Result<()> {
 	let shadow = Arc::new(Shadow::new(&config));
 	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
 	let ethereum2darwinia = darwinia_api::get_e2d_instance(darwinia);
-    let from_ethereum_account = darwinia_api::get_e2d_account(darwinia_api::get_darwinia_account(&config));
+	let from_ethereum_account =
+		darwinia_api::get_e2d_account(darwinia_api::get_darwinia_account(&config));
 	// extrinsic sender
 	let extrinsics_service = ExtrinsicsService::new(
 		Some(ethereum2darwinia.clone()),

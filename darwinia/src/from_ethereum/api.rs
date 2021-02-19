@@ -67,8 +67,12 @@ impl Ethereum2Darwinia {
 	}
 
 	/// is_tech_comm_member
-	pub async fn is_tech_comm_member(&self, block_number: Option<u32>, account: &Account) -> Result<bool> {
-        let block_hash = self.darwinia.block_number2hash(block_number).await?;
+	pub async fn is_tech_comm_member(
+		&self,
+		block_number: Option<u32>,
+		account: &Account,
+	) -> Result<bool> {
+		let block_hash = self.darwinia.block_number2hash(block_number).await?;
 		let tech_comm_members = self.darwinia.subxt.members(block_hash).await?;
 		Ok(tech_comm_members.contains(account.0.real()))
 	}

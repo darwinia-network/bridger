@@ -1,11 +1,13 @@
 use crate::{
-	api::Shadow,
+	api::{
+        Shadow,
+        darwinia_api,
+    },
 	error::{BizError, Result},
-	Config,
+	Settings,
 };
 use primitives::chain::ethereum::EthereumHeader;
-
-use darwinia::{Darwinia, DarwiniaAccount, Ethereum2Darwinia, FromEthereumAccount};
+use rpassword::prompt_password_stdout;
 
 /// Affirm Force
 pub async fn exec(block: u64) -> Result<()> {
@@ -13,18 +15,16 @@ pub async fn exec(block: u64) -> Result<()> {
 	env_logger::init();
 
 	// apis
-	let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
+	let mut config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
+	if config.encrypted {
+		let passwd = prompt_password_stdout("Please enter password:")?;
+		config.decrypt(&passwd)?;
+	}
 	let shadow = Shadow::new(&config);
-	let darwinia = Darwinia::new(&config.node).await?;
-	let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-	let darwinia_account = DarwiniaAccount::new(
-		config.seed.clone(),
-		config
-			.proxy
-			.clone()
-			.map(|proxy| proxy.real[2..].to_string()),
-	);
-	let from_ethereum_account = FromEthereumAccount::new(darwinia_account);
+	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let ethereum2darwinia = darwinia_api::get_e2d_instance(darwinia.clone());
+	let darwinia_account = darwinia_api::get_darwinia_account(&config);
+	let from_ethereum_account = darwinia_api::get_e2d_account(darwinia_account);
 
 	let parcel = shadow.parcel(block as usize + 1).await?;
 	let block_number = parcel.header.number;

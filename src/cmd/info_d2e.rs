@@ -1,10 +1,15 @@
-use crate::{error::Result, Config};
+use crate::{
+    error::Result,
+    Settings,
+	api::darwinia_api,
+};
 use parity_scale_codec::Encode;
 
-use darwinia::{Darwinia, Darwinia2Ethereum, EventInfo, FormatedMMR};
+use darwinia::{Darwinia2Ethereum, EventInfo, FormatedMMR};
 
 use colored::*;
 use std::fmt;
+use rpassword::prompt_password_stdout;
 
 #[derive(Default, Debug)]
 struct TxProofWithMMRProof {
@@ -53,9 +58,13 @@ pub async fn exec(network: String, txblock: u64, mmrblock: u64, signblock: u64) 
 	env_logger::init();
 
 	// apis
-	let config = Config::new(&Config::default_data_dir()?)?;
-	let darwinia = Darwinia::new(&config.node).await?;
-	let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
+	let mut config = Settings::new(&Settings::default_data_dir()?)?;
+	if config.encrypted {
+		let passwd = prompt_password_stdout("Please enter password:")?;
+		config.decrypt(&passwd)?;
+	}
+	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let darwinia2ethereum = darwinia_api::get_d2e_instance(darwinia.clone());
 	// mmr root block
 	let mmr_root = darwinia.get_mmr_root(mmrblock as u32).await?;
 	let message = Darwinia2Ethereum::construct_mmr_root_message(network, mmrblock as u32, mmr_root);

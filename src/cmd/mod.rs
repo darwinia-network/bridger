@@ -9,6 +9,8 @@ mod affirm_raw;
 mod affirmations;
 mod confirm;
 mod ecdsa;
+mod encrypt_conf;
+mod encrypt_key;
 mod guard;
 mod info_d2e;
 mod keys;
@@ -116,6 +118,20 @@ enum Opt {
 		/// block number
 		#[structopt(short, long)]
 		block: u64,
+    },
+	/// encrypt or decrypt key
+	EncryptKey {
+		#[structopt(short, long)]
+		private_key: String,
+		#[structopt(short, long)]
+		decrypt: bool,
+	},
+	/// encrypt or decrypt private_key in config.yml
+	EncryptConf {
+		#[structopt(short, long)]
+		from_path: String,
+		#[structopt(short, long)]
+		to_path: String,
 	},
 }
 
@@ -146,6 +162,11 @@ pub async fn exec() -> Result<()> {
 		Opt::AffirmForce { block } => {
 			affirm_force::exec(block).await?;
 		}
+		Opt::EncryptKey {
+			private_key,
+			decrypt,
+		} => encrypt_key::exec(private_key, decrypt).await?,
+		Opt::EncryptConf { from_path, to_path } => encrypt_conf::exec(from_path, to_path).await?,
 	}
 
 	Ok(())

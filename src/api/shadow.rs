@@ -2,7 +2,7 @@
 use crate::error::Error;
 use crate::{
 	error::{BizError, Result},
-	Config,
+	Settings,
 };
 use anyhow::Context as AnyhowContext;
 use primitives::{
@@ -53,14 +53,14 @@ pub struct Shadow {
 
 impl Shadow {
 	/// Init Shadow API from config
-	pub fn new(config: &Config) -> Shadow {
+	pub fn new(config: &Settings) -> Shadow {
 		let http = reqwest::Client::builder()
 			.timeout(Duration::from_secs(30))
 			.build()
 			.unwrap();
 		Shadow {
-			api: config.shadow.clone(),
-			eth: EthereumRPC::new(http.clone(), vec![config.eth.rpc.clone()]),
+			api: config.shadow.endpoint.clone(),
+			eth: EthereumRPC::new(http.clone(), vec![config.ethereum.rpc.clone()]),
 			http,
 		}
 	}

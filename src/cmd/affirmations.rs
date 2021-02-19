@@ -1,6 +1,8 @@
-use crate::{error::Result, Config};
-
-use darwinia::{Darwinia, Ethereum2Darwinia};
+use crate::{
+    error::Result,
+    Settings,
+    api::darwinia_api,
+};
 
 /// get all affirmations
 pub async fn exec() -> Result<()> {
@@ -8,9 +10,9 @@ pub async fn exec() -> Result<()> {
 	env_logger::init();
 
 	// apis
-	let config = Config::new(&Config::default_data_dir()?)?;
-	let darwinia = Darwinia::new(&config.node).await?;
-	let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
+	let config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
+    let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let ethereum2darwinia = darwinia_api::get_e2d_instance(darwinia);
 
 	info!("Init API succeed!");
 

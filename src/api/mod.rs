@@ -1,5 +1,7 @@
 //! Briger APIs
 pub mod darwinia;
+/// Bridger darwinia apis
+pub mod darwinia_api;
 mod darwinia_sender;
 mod ethereum;
 mod shadow;

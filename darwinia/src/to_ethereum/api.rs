@@ -164,7 +164,7 @@ impl Darwinia2Ethereum {
 		account: &Account,
 		message: EcdsaMessage,
 	) -> Result<H256> {
-		if self.is_authority(&account).await? {
+		if self.is_authority(None, &account).await? {
 			let signature = account.ecdsa_sign(&message)?;
 			match &account.0.real {
 				// proxy
@@ -211,7 +211,7 @@ impl Darwinia2Ethereum {
 		spec_name: String,
 		block_number: u32,
 	) -> Result<H256> {
-		if self.is_authority(&account).await? {
+		if self.is_authority(None, &account).await? {
 			// get mmr root from darwinia
 			let leaf_index = block_number;
 			let mmr_root = self.darwinia.get_mmr_root(leaf_index).await?;
@@ -265,12 +265,13 @@ impl Darwinia2Ethereum {
 	}
 
 	/// is authority
-	pub async fn is_authority(&self, account: &Account) -> Result<bool> {
+	pub async fn is_authority(&self, block_number: Option<u32>, account: &Account) -> Result<bool> {
 		#![allow(clippy::needless_collect)]
+        let block_hash = self.darwinia.block_number2hash(block_number).await?;
 		let authorities = self
 			.darwinia
 			.subxt
-			.authorities(None)
+			.authorities(block_hash)
 			.await?
 			.iter()
 			.map(|a| a.account_id.clone())
@@ -281,10 +282,12 @@ impl Darwinia2Ethereum {
 	/// need_to_sign_authorities
 	pub async fn need_to_sign_authorities(
 		&self,
+        block_number: Option<u32>,
 		account: &Account,
 		message: EcdsaMessage,
 	) -> Result<bool> {
-		let ret = self.darwinia.subxt.authorities_to_sign(None).await?;
+        let block_hash = self.darwinia.block_number2hash(block_number).await?;
+		let ret = self.darwinia.subxt.authorities_to_sign(block_hash).await?;
 		match ret {
 			None => Ok(false),
 			Some(r) => {
@@ -304,40 +307,32 @@ impl Darwinia2Ethereum {
 	}
 
 	/// need_to_mmr_root_of
-	pub async fn need_to_sign_mmr_root_of(&self, account: &Account, block_number: u32) -> bool {
+	pub async fn need_to_sign_mmr_root_of(&self, account: &Account, block_number: u32, exec_block_number: Option<u32>) -> Result<bool> {
+        let exec_block_hash = self.darwinia.block_number2hash(exec_block_number).await?;
 		match self
 			.darwinia
 			.subxt
-			.mmr_roots_to_sign(block_number, None)
-			.await
+			.mmr_roots_to_sign(block_number, exec_block_hash)
+			.await?
 		{
-			Ok(mmr_roots_to_sign) => match mmr_roots_to_sign {
-				None => false,
-				Some(items) => {
-					let account_id = account
-						.0
-						.real
-						.clone()
-						.unwrap_or_else(|| account.0.account_id.clone());
-					let includes = items.iter().any(|a| a.0 == account_id);
-					!includes
-				}
-			},
-			Err(err) => {
-				error!(
-					"An error was encountered when trying to get storage MMRRootsToSign: {:?}",
-					err
-				);
-				false
-			}
+            None => Ok(false),
+            Some(items) => {
+                let account_id = account
+                    .0
+                    .real
+                    .clone()
+                    .unwrap_or_else(|| account.0.account_id.clone());
+                let includes = items.iter().any(|a| a.0 == account_id);
+                Ok(!includes)
+            }
 		}
 	}
 
 	/// Print Detail
-	pub async fn account_detail(&self, account: &Account) -> Result<()> {
+	pub async fn account_detail(&self, block_number: Option<u32>, account: &Account) -> Result<()> {
 		info!("🧔 darwinia => ethereum account");
 		let mut roles = self.darwinia.account_role(&account.0).await?;
-		if self.is_authority(&account).await? {
+		if self.is_authority(block_number, &account).await? {
 			roles.push("Authority".to_string());
 		}
 		match &account.0.real {

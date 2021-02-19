@@ -1,12 +1,16 @@
-use crate::api::Shadow;
+use crate::api::{
+    Shadow,
+    darwinia_api,
+};
 use crate::{
 	// listener::Listener,
 	error::{Error, Result},
-	Config,
+	Settings,
 };
 use actix::Actor;
 use async_macros::select;
 use futures::StreamExt;
+use rpassword::prompt_password_stdout;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
@@ -25,7 +29,7 @@ use crate::service::SubscribeService;
 use crate::tools;
 
 use darwinia::{
-	Darwinia, Darwinia2Ethereum, DarwiniaAccount, Ethereum2Darwinia, FromEthereumAccount,
+	Darwinia, Darwinia2Ethereum, Ethereum2Darwinia, FromEthereumAccount,
 	ToEthereumAccount,
 };
 
@@ -40,7 +44,19 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
 	}
 	env_logger::init();
 
-	while let Err(e) = run(data_dir.clone()).await {
+	// --- Data dir ---
+	let data_dir = data_dir.unwrap_or_else(|| Settings::default_data_dir().unwrap());
+	// --- Load config ---
+	let mut config = Settings::new(&data_dir).unwrap();
+
+	if config.encrypted {
+		let passwd = prompt_password_stdout("Please enter password:").unwrap();
+		if config.decrypt(&passwd).is_err() {
+			return;
+		}
+	}
+
+	while let Err(e) = run(data_dir.clone(), &config).await {
 		if let Some(Error::NoEthereumStart) = e.downcast_ref() {
 			error!("{:?}", e);
 			break;
@@ -58,49 +74,57 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
 	}
 }
 
-async fn run(data_dir: Option<PathBuf>) -> Result<()> {
+async fn run(data_dir: PathBuf, config: &Settings) -> Result<()> {
 	info!(
 		"✌️  {} v{}",
 		env!("CARGO_PKG_NAME"),
 		env!("CARGO_PKG_VERSION")
 	);
 
-	// --- Data dir ---
-	let data_dir = data_dir.unwrap_or(Config::default_data_dir()?);
 	info!("💾 Data dir: {}", data_dir.to_str().unwrap());
-
-	// --- Load config ---
-	let config = Config::new(&data_dir)?;
-	if config.eth.rpc.starts_with("ws") {
+	if config.ethereum.rpc.starts_with("ws") {
 		return Err(BizError::Bridger(
 			"Bridger currently doesn't support ethereum websocket transport".to_string(),
 		)
 		.into());
 	}
 
+	// --- Load cached start
+	let last_redeemed = tools::get_cache(
+		data_dir.clone(),
+		tools::LAST_REDEEMED_CACHE_FILE_NAME,
+		Error::NoEthereumStart,
+	)
+	.await?;
+	info!("🌱 Scan ethereum block from: {}", last_redeemed + 1);
+
+	let last_tracked_darwinia_block = tools::get_cache(
+		data_dir.clone(),
+		tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
+		Error::NoDarwiniaStart,
+	)
+	.await? as u32;
+	info!(
+		"🌱 Scan darwinia block from: {}",
+		last_tracked_darwinia_block + 1
+	);
+
 	// --- Init APIs ---
 	let shadow = Arc::new(Shadow::new(&config));
-	let darwinia = Darwinia::new(&config.node).await?;
-	let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-	let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-	let darwinia_account = DarwiniaAccount::new(
-		config.seed.clone(),
-		config
-			.proxy
-			.clone()
-			.map(|proxy| proxy.real[2..].to_string()),
-	);
-	let from_ethereum_account = FromEthereumAccount::new(darwinia_account.clone());
-	let to_ethereum_account = ToEthereumAccount::new(
-		darwinia_account.clone(),
-		config.darwinia_to_ethereum.seed.clone(),
-		config.eth.rpc.to_string(),
-	);
+	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let ethereum2darwinia = darwinia_api::get_e2d_instance(darwinia.clone());
+	let darwinia2ethereum = darwinia_api::get_d2e_instance(darwinia.clone());
+	let darwinia_account = darwinia_api::get_darwinia_account(&config);
+	let from_ethereum_account = darwinia_api::get_e2d_account(darwinia_account.clone());
+    let to_ethereum_account = darwinia_api::get_d2e_account(
+        darwinia_account.clone(),
+        &config
+    );
 
-	let web3 = Web3::new(Http::new(&config.eth.rpc).unwrap());
+	let web3 = Web3::new(Http::new(&config.ethereum.rpc).unwrap());
 
 	// Stop if darwinia sender is authority but without a signer seed
-	if darwinia2ethereum.is_authority(&to_ethereum_account).await?
+	if darwinia2ethereum.is_authority(Some(last_tracked_darwinia_block + 1), &to_ethereum_account).await?
 		&& !to_ethereum_account.has_ethereum_seed()
 	{
 		return Err(Error::NoAuthoritySignerSeed.into());
@@ -111,14 +135,14 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 
 	// --- Print startup info ---
 	info!("🔗 Connect to");
-	info!("   Darwinia {}: {}", &spec_name, config.node);
-	info!("   Shadow: {}", config.shadow);
-	info!("   Ethereum: {}", config.eth.rpc);
+	info!("   Darwinia {}: {}", &spec_name, config.darwinia.rpc);
+	info!("   Shadow: {}", config.shadow.endpoint);
+	info!("   Ethereum: {}", config.ethereum.rpc);
 	darwinia2ethereum
-		.account_detail(&to_ethereum_account)
+		.account_detail(Some(last_tracked_darwinia_block + 1), &to_ethereum_account)
 		.await?;
 	ethereum2darwinia
-		.account_detail(&from_ethereum_account)
+		.account_detail(Some(last_tracked_darwinia_block + 1), &from_ethereum_account)
 		.await?;
 
 	// --- Start services ---
@@ -131,15 +155,19 @@ async fn run(data_dir: Option<PathBuf>) -> Result<()> {
 		Some(from_ethereum_account),
 		Some(to_ethereum_account),
 		&web3,
-		data_dir,
-		spec_name,
+		(
+			data_dir,
+			spec_name,
+			last_redeemed,
+			last_tracked_darwinia_block,
+		),
 	)
 	.await
 }
 
 #[allow(clippy::too_many_arguments)]
 async fn start_services(
-	config: &Config,
+	config: &Settings,
 	shadow: &Arc<Shadow>,
 	darwinia: &Darwinia,
 	ethereum2darwinia: Option<Ethereum2Darwinia>,
@@ -147,28 +175,8 @@ async fn start_services(
 	ethereum2darwinia_relayer: Option<FromEthereumAccount>,
 	darwinia2ethereum_relayer: Option<ToEthereumAccount>,
 	web3: &Web3<Http>,
-	data_dir: PathBuf,
-	spec_name: String,
+	(data_dir, spec_name, last_redeemed, last_tracked_darwinia_block): (PathBuf, String, u64, u32),
 ) -> Result<()> {
-	let last_redeemed = tools::get_cache(
-		data_dir.clone(),
-		tools::LAST_REDEEMED_CACHE_FILE_NAME,
-		Error::NoEthereumStart,
-	)
-	.await?;
-	info!("🌱 Relay from ethereum block: {}", last_redeemed + 1);
-
-	let last_tracked_ethereum_block = tools::get_cache(
-		data_dir.clone(),
-		tools::LAST_TRACKED_ETHEREUM_BLOCK_FILE_NAME,
-		Error::NoDarwiniaStart,
-	)
-	.await?;
-	info!(
-		"🌱 Scan darwinia from block: {}",
-		last_tracked_ethereum_block + 1
-	);
-
 	// extrinsic sender
 	let extrinsics_service = ExtrinsicsService::new(
 		ethereum2darwinia.clone(),
@@ -188,7 +196,7 @@ async fn start_services(
 				shadow.clone(),
 				ethereum2darwinia.clone(),
 				last_confirmed,
-				config.step.relay,
+				config.services.relay.step,
 				extrinsics_service.clone().recipient(),
 			)
 			.start();
@@ -197,7 +205,7 @@ async fn start_services(
 			let redeem_service = RedeemService::new(
 				shadow.clone(),
 				ethereum2darwinia.clone(),
-				config.step.redeem,
+				config.services.redeem.step,
 				extrinsics_service.clone().recipient(),
 			)
 			.start();
@@ -216,12 +224,12 @@ async fn start_services(
 
 			// guard service
 			let guard_service = if let Some(relayer) = &ethereum2darwinia_relayer {
-				let is_tech_comm_member = ethereum2darwinia.is_tech_comm_member(&relayer).await?;
+				let is_tech_comm_member = ethereum2darwinia.is_tech_comm_member(Some(last_tracked_darwinia_block + 1), &relayer).await?;
 				GuardService::new(
 					shadow.clone(),
 					ethereum2darwinia.clone(),
 					relayer.clone(),
-					config.step.guard,
+					config.services.guard.step,
 					is_tech_comm_member,
 					extrinsics_service.clone().recipient(),
 				)
@@ -249,7 +257,7 @@ async fn start_services(
 			ethereum,
 			extrinsics_service.clone().recipient(),
 			spec_name,
-			(last_tracked_ethereum_block as u32) + 1,
+			(last_tracked_darwinia_block as u32) + 1,
 			data_dir.clone(),
 		);
 		let b = async {

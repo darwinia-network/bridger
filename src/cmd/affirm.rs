@@ -1,9 +1,16 @@
 use crate::service::ExtrinsicsService;
-use crate::{api::Shadow, error::Result, service::RelayService, Config};
+use crate::{
+	api::{
+        Shadow,
+        darwinia_api,
+    },
+	error::Result,
+	service::RelayService,
+	Settings,
+};
 use actix::Actor;
+use rpassword::prompt_password_stdout;
 use std::sync::Arc;
-
-use darwinia::{Darwinia, DarwiniaAccount, Ethereum2Darwinia, FromEthereumAccount};
 
 /// Affirm
 pub async fn exec(block: u64) -> Result<()> {
@@ -11,23 +18,23 @@ pub async fn exec(block: u64) -> Result<()> {
 	env_logger::init();
 
 	// apis
-	let config = Config::new(&Config::default_data_dir()?)?; // TODO: add --data-dir
+	let mut config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
+	if config.encrypted {
+		let passwd = prompt_password_stdout("Please enter password:")?;
+		config.decrypt(&passwd)?;
+	}
 	let shadow = Arc::new(Shadow::new(&config));
-	let darwinia = Darwinia::new(&config.node).await?;
-	let ethereum2darwinia = Ethereum2Darwinia::new(darwinia);
+	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let ethereum2darwinia = darwinia_api::get_e2d_instance(darwinia);
 
-	let from_ethereum_account = FromEthereumAccount::new(DarwiniaAccount::new(
-		config.seed.clone(),
-		config
-			.proxy
-			.clone()
-			.map(|proxy| proxy.real[2..].to_string()),
-	));
-	// extrinsic sender
+    let darwinia_account = darwinia_api::get_darwinia_account(&config);
+	let e2d_account = darwinia_api::get_e2d_account(darwinia_account);
+    
+    // extrinsic sender
 	let extrinsics_service = ExtrinsicsService::new(
 		Some(ethereum2darwinia.clone()),
 		None,
-		Some(from_ethereum_account),
+		Some(e2d_account),
 		None,
 		"".to_string(),
 		dirs::home_dir().unwrap(),

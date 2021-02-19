@@ -1,6 +1,10 @@
-use crate::{error::Result, Config};
+use crate::{
+    error::Result,
+    Settings,
+    api::darwinia_api,
+};
 
-use darwinia::{Darwinia, Darwinia2Ethereum, DarwiniaAccount, ToEthereumAccount};
+use rpassword::prompt_password_stdout;
 
 /// Sign darwinia mmr root, the current block must be larger then mmrblock
 pub async fn exec(network: String, mmrblock: u64) -> Result<()> {
@@ -8,21 +12,18 @@ pub async fn exec(network: String, mmrblock: u64) -> Result<()> {
 	env_logger::init();
 
 	// apis
-	let config = Config::new(&Config::default_data_dir()?)?;
-	let darwinia = Darwinia::new(&config.node).await?;
-	let darwinia_account = DarwiniaAccount::new(
-		config.seed.clone(),
-		config
-			.proxy
-			.clone()
-			.map(|proxy| proxy.real[2..].to_string()),
-	);
-	let to_ethereum_account = ToEthereumAccount::new(
+	let mut config = Settings::new(&Settings::default_data_dir()?)?;
+	if config.encrypted {
+		let passwd = prompt_password_stdout("Please enter password:")?;
+		config.decrypt(&passwd)?;
+	}
+	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let darwinia_account = darwinia_api::get_darwinia_account(&config);
+	let to_ethereum_account = darwinia_api::get_d2e_account(
 		darwinia_account,
-		config.darwinia_to_ethereum.seed.clone(),
-		config.eth.rpc.to_string(),
+        &config
 	);
-	let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
+	let darwinia2ethereum = darwinia_api::get_d2e_instance(darwinia);
 
 	let tx = darwinia2ethereum
 		.ecdsa_sign_and_submit_signed_mmr_root(&to_ethereum_account, network, mmrblock as u32)

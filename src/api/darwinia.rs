@@ -5,7 +5,7 @@ use crate::{
 	error::{Error, Result},
 	service::redeem::EthereumTransaction,
 	service::redeem::EthereumTransactionHash,
-	Config,
+	Settings,
 };
 use core::marker::PhantomData;
 use parity_scale_codec::Encode;
@@ -62,29 +62,30 @@ pub struct Darwinia {
 
 impl Darwinia {
 	/// New darwinia API
-	pub async fn new(config: &Config) -> Result<Darwinia> {
-		let client =
-			jsonrpsee::ws_client(&config.node)
-				.await
-				.map_err(|e| Error::FailToConnectDarwinia {
-					url: config.node.clone(),
-					source: e,
-				})?;
+	pub async fn new(config: &Settings) -> Result<Darwinia> {
+		let client = jsonrpsee::ws_client(&config.darwinia.rpc)
+			.await
+			.map_err(|e| Error::FailToConnectDarwinia {
+				url: config.darwinia.rpc.clone(),
+				source: e,
+			})?;
 		let client = ClientBuilder::<DarwiniaRuntime>::new()
 			.set_client(client)
 			.build()
 			.await?;
 
-		let signer_seed = config.darwinia_to_ethereum.seed.clone();
+		let signer_seed = config.ethereum.authority.clone().map(|a| a.private_key);
 		let sender = DarwiniaSender::new(
-			config.seed.clone(),
+			config.darwinia.relayer.private_key.clone(),
 			config
-				.proxy
+				.darwinia
+				.relayer
+				.real_account
 				.clone()
-				.map(|proxy| proxy.real[2..].to_string()),
+				.map(|real| real[2..].to_string()),
 			client.clone(),
 			signer_seed,
-			config.eth.rpc.to_string(),
+			config.ethereum.rpc.to_string(),
 		);
 
 		Ok(Darwinia { client, sender })
@@ -101,7 +102,7 @@ impl Darwinia {
 
 	/// Vote pending relay header parcel
 	pub async fn vote_pending_relay_header_parcel(&self, pending: u64, aye: bool) -> Result<H256> {
-		if self.sender.is_tech_comm_member().await? {
+		if self.sender.is_tech_comm_member(None).await? {
 			match &self.sender.real {
 				Some(real) => {
 					// proxy
@@ -316,37 +317,37 @@ impl Darwinia {
 		&self,
 		message: EcdsaMessage,
 	) -> Result<H256> {
-		if self.sender.is_authority().await? {
-			let signature = self.sender.ecdsa_sign(&message)?;
-			match &self.sender.real {
-				// proxy
-				Some(real) => {
-					trace!("Proxyed ecdsa sign and submit authorities to darwinia");
-					let submit_signed_authorities = SubmitSignedAuthorities { signature };
+		// TODO: check
+		// 	.sender
+		// 	.need_to_sign_authorities(decoded.message, block)
+		// 	.await?
+		let signature = self.sender.ecdsa_sign(&message)?;
+		match &self.sender.real {
+			// proxy
+			Some(real) => {
+				trace!("Proxyed ecdsa sign and submit authorities to darwinia");
+				let submit_signed_authorities = SubmitSignedAuthorities { signature };
 
-					let ex = self.client.encode(submit_signed_authorities).unwrap();
-					let tx_hash = self
-						.client
-						.proxy(
-							&self.sender.signer,
-							real.clone(),
-							Some(ProxyType::EthereumBridge),
-							&ex,
-						)
-						.await?;
-					Ok(tx_hash)
-				}
-				None => {
-					trace!("Ecdsa sign and submit authorities to darwinia");
-					let tx_hash = self
-						.client
-						.submit_signed_authorities(&self.sender.signer, signature)
-						.await?;
-					Ok(tx_hash)
-				}
+				let ex = self.client.encode(submit_signed_authorities).unwrap();
+				let tx_hash = self
+					.client
+					.proxy(
+						&self.sender.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
+					.await?;
+				Ok(tx_hash)
 			}
-		} else {
-			Err(BizError::Bridger("Not authority".to_string()).into())
+			None => {
+				trace!("Ecdsa sign and submit authorities to darwinia");
+				let tx_hash = self
+					.client
+					.submit_signed_authorities(&self.sender.signer, signature)
+					.await?;
+				Ok(tx_hash)
+			}
 		}
 	}
 
@@ -410,53 +411,49 @@ impl Darwinia {
 		spec_name: String,
 		block_number: u32,
 	) -> Result<H256> {
-		if self.sender.is_authority().await? {
-			// get mmr root from darwinia
-			let leaf_index = block_number;
-			let mmr_root = self.get_mmr_root(leaf_index).await?;
+		// get mmr root from darwinia
+		let leaf_index = block_number;
+		let mmr_root = self.get_mmr_root(leaf_index).await?;
 
-			let encoded = Darwinia::construct_mmr_root_message(spec_name, block_number, mmr_root);
-			let hash = web3::signing::keccak256(&encoded);
-			let signature = self.sender.ecdsa_sign(&hash)?;
+		let encoded = Darwinia::construct_mmr_root_message(spec_name, block_number, mmr_root);
+		let hash = web3::signing::keccak256(&encoded);
+		let signature = self.sender.ecdsa_sign(&hash)?;
 
-			match &self.sender.real {
-				// proxy
-				Some(real) => {
-					trace!(
-						"Proxyed ecdsa sign and submit mmr_root to darwinia, block_number: {}",
-						block_number
-					);
-					let submit_signed_mmr_root = SubmitSignedMmrRoot {
-						block_number,
-						signature,
-					};
+		match &self.sender.real {
+			// proxy
+			Some(real) => {
+				trace!(
+					"Proxyed ecdsa sign and submit mmr_root to darwinia, block_number: {}",
+					block_number
+				);
+				let submit_signed_mmr_root = SubmitSignedMmrRoot {
+					block_number,
+					signature,
+				};
 
-					let ex = self.client.encode(submit_signed_mmr_root).unwrap();
-					let tx_hash = self
-						.client
-						.proxy(
-							&self.sender.signer,
-							real.clone(),
-							Some(ProxyType::EthereumBridge),
-							&ex,
-						)
-						.await?;
-					Ok(tx_hash)
-				}
-				None => {
-					trace!(
-						"Ecdsa sign and submit mmr_root to darwinia, block_number: {}",
-						block_number
-					);
-					let tx_hash = self
-						.client
-						.submit_signed_mmr_root(&self.sender.signer, block_number, signature)
-						.await?;
-					Ok(tx_hash)
-				}
+				let ex = self.client.encode(submit_signed_mmr_root).unwrap();
+				let tx_hash = self
+					.client
+					.proxy(
+						&self.sender.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
+					.await?;
+				Ok(tx_hash)
 			}
-		} else {
-			Err(BizError::Bridger("Not authority".to_string()).into())
+			None => {
+				trace!(
+					"Ecdsa sign and submit mmr_root to darwinia, block_number: {}",
+					block_number
+				);
+				let tx_hash = self
+					.client
+					.submit_signed_mmr_root(&self.sender.signer, block_number, signature)
+					.await?;
+				Ok(tx_hash)
+			}
 		}
 	}
 
@@ -558,6 +555,7 @@ impl Darwinia {
 		decoder.register_type_size::<(u32, u32)>("TaskAddress<BlockNumber>");
 		decoder.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
 		decoder.register_type_size::<u32>("EraIndex");
+		decoder.register_type_size::<u64>("EthereumBlockNumber");
 
 		let raw_events = decoder.decode_events(&mut &storage_data.0[..])?;
 		for (_, raw) in raw_events {

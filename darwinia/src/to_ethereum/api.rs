@@ -2,7 +2,7 @@ use crate::{Darwinia, HeaderMMR};
 
 use super::Account;
 
-use crate::error::{DarwiniaError, Result};
+use crate::error::Result;
 
 use codec::Encode;
 
@@ -164,44 +164,44 @@ impl Darwinia2Ethereum {
 		account: &Account,
 		message: EcdsaMessage,
 	) -> Result<H256> {
-		if self.is_authority(None, &account).await? {
-			let signature = account.ecdsa_sign(&message)?;
-			match &account.0.real {
-				// proxy
-				Some(real) => {
-					trace!("Proxyed ecdsa sign and submit authorities to darwinia");
-					let submit_signed_authorities = SubmitSignedAuthorities { signature };
+        // TODO: check
+        // 	.sender
+        // 	.need_to_sign_authorities(decoded.message, block)
+        // 	.await?
+        let signature = account.ecdsa_sign(&message)?;
+        match &account.0.real {
+            // proxy
+            Some(real) => {
+                trace!("Proxyed ecdsa sign and submit authorities to darwinia");
+                let submit_signed_authorities = SubmitSignedAuthorities { signature };
 
-					let ex = self
-						.darwinia
-						.subxt
-						.encode(submit_signed_authorities)
-						.unwrap();
-					let tx_hash = self
-						.darwinia
-						.subxt
-						.proxy(
-							&account.0.signer,
-							real.clone(),
-							Some(ProxyType::EthereumBridge),
-							&ex,
-						)
-						.await?;
-					Ok(tx_hash)
-				}
-				None => {
-					trace!("Ecdsa sign and submit authorities to darwinia");
-					let tx_hash = self
-						.darwinia
-						.subxt
-						.submit_signed_authorities(&account.0.signer, signature)
-						.await?;
-					Ok(tx_hash)
-				}
-			}
-		} else {
-			Err(DarwiniaError::Bridger("Not authority".to_string()).into())
-		}
+                let ex = self
+                    .darwinia
+                    .subxt
+                    .encode(submit_signed_authorities)
+                    .unwrap();
+                let tx_hash = self
+                    .darwinia
+                    .subxt
+                    .proxy(
+                        &account.0.signer,
+                        real.clone(),
+                        Some(ProxyType::EthereumBridge),
+                        &ex,
+                        )
+                    .await?;
+                Ok(tx_hash)
+            }
+            None => {
+                trace!("Ecdsa sign and submit authorities to darwinia");
+                let tx_hash = self
+                    .darwinia
+                    .subxt
+                    .submit_signed_authorities(&account.0.signer, signature)
+                    .await?;
+                Ok(tx_hash)
+            }
+        }
 	}
 
 	/// submit_signed_mmr_root
@@ -211,57 +211,53 @@ impl Darwinia2Ethereum {
 		spec_name: String,
 		block_number: u32,
 	) -> Result<H256> {
-		if self.is_authority(None, &account).await? {
-			// get mmr root from darwinia
-			let leaf_index = block_number;
-			let mmr_root = self.darwinia.get_mmr_root(leaf_index).await?;
+        // get mmr root from darwinia
+        let leaf_index = block_number;
+        let mmr_root = self.darwinia.get_mmr_root(leaf_index).await?;
 
-			let encoded =
-				Darwinia2Ethereum::construct_mmr_root_message(spec_name, block_number, mmr_root);
-			let hash = web3::signing::keccak256(&encoded);
-			let signature = account.ecdsa_sign(&hash)?;
+        let encoded =
+            Darwinia2Ethereum::construct_mmr_root_message(spec_name, block_number, mmr_root);
+        let hash = web3::signing::keccak256(&encoded);
+        let signature = account.ecdsa_sign(&hash)?;
 
-			match &account.0.real {
-				// proxy
-				Some(real) => {
-					trace!(
-						"Proxyed ecdsa sign and submit mmr_root to darwinia, block_number: {}",
-						block_number
-					);
-					let submit_signed_mmr_root = SubmitSignedMmrRoot {
-						block_number,
-						signature,
-					};
+        match &account.0.real {
+            // proxy
+            Some(real) => {
+                trace!(
+                    "Proxyed ecdsa sign and submit mmr_root to darwinia, block_number: {}",
+                    block_number
+                    );
+                let submit_signed_mmr_root = SubmitSignedMmrRoot {
+                    block_number,
+                    signature,
+                };
 
-					let ex = self.darwinia.subxt.encode(submit_signed_mmr_root).unwrap();
-					let tx_hash = self
-						.darwinia
-						.subxt
-						.proxy(
-							&account.0.signer,
-							real.clone(),
-							Some(ProxyType::EthereumBridge),
-							&ex,
-						)
-						.await?;
-					Ok(tx_hash)
-				}
-				None => {
-					trace!(
-						"Ecdsa sign and submit mmr_root to darwinia, block_number: {}",
-						block_number
-					);
-					let tx_hash = self
-						.darwinia
-						.subxt
-						.submit_signed_mmr_root(&account.0.signer, block_number, signature)
-						.await?;
-					Ok(tx_hash)
-				}
-			}
-		} else {
-			Err(DarwiniaError::Bridger("Not authority".to_string()).into())
-		}
+                let ex = self.darwinia.subxt.encode(submit_signed_mmr_root).unwrap();
+                let tx_hash = self
+                    .darwinia
+                    .subxt
+                    .proxy(
+                        &account.0.signer,
+                        real.clone(),
+                        Some(ProxyType::EthereumBridge),
+                        &ex,
+                        )
+                    .await?;
+                Ok(tx_hash)
+            }
+            None => {
+                trace!(
+                    "Ecdsa sign and submit mmr_root to darwinia, block_number: {}",
+                    block_number
+                    );
+                let tx_hash = self
+                    .darwinia
+                    .subxt
+                    .submit_signed_mmr_root(&account.0.signer, block_number, signature)
+                    .await?;
+                Ok(tx_hash)
+            }
+        }
 	}
 
 	/// is authority

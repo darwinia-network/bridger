@@ -200,10 +200,11 @@ impl SubscribeService {
 						.iter()
 						.map(|s| s.1.clone())
 						.collect::<Vec<_>>();
-					self.ethereum
+					let tx_hash = self
+                        .ethereum
 						.submit_authorities_set(message, signatures)
 						.await?;
-					info!("Authorities submitted to ethereum");
+                    info!("Submit authorities to ethereum with tx: {}", tx_hash);
 				}
 			}
 			// call ethereum_backing.lock will emit the event

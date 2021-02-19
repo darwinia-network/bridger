@@ -257,7 +257,7 @@ async fn start_services(
 			ethereum,
 			extrinsics_service.clone().recipient(),
 			spec_name,
-			(last_tracked_darwinia_block as u32) + 1,
+			last_tracked_darwinia_block + 1,
 			data_dir.clone(),
 		);
 		let b = async {

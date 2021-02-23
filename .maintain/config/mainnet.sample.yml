@@ -43,11 +43,11 @@ ethereum:
   authority:
     # private key to sign ecdsa messages
     # the signature will be submitted to Darwinia by darwinia.relayer
-    private_key: 0x... 
+    private_key: 0x...
 
 darwinia:
   # darwinia node websocket json-rpc endpoint
-  rpc: wss://cc1.darwinia.network
+  rpc: wss://rpc.darwinia.network
   # the person who will relay ethereum data to darwinia
   relayer:
     # private key of relayer, or, private key of proxy

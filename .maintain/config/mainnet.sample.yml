@@ -46,7 +46,7 @@ ethereum:
 
 darwinia:
   # darwinia node websocket json-rpc endpoint
-  rpc: wss://mainnet.darwinia.network
+  rpc: wss://rpc.darwinia.network
   # the person who will relay ethereum data to darwinia
   relayer:
     # private key of relayer, or, private key of proxy

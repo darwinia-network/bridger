@@ -38,9 +38,11 @@ pub struct Ethereum {
 impl Ethereum {
 	/// new
 	pub fn new(web3: Web3<Http>, config: &Settings) -> Result<Self> {
-		let relay_contract_address = Ethereum::build_address(&config.ethereum.contract.relay.address)?;
+		let relay_contract_address =
+			Ethereum::build_address(&config.ethereum.contract.relay.address)?;
 
-		let secret_key = if let Some(seed) = config.ethereum.relayer.clone().map(|r| r.private_key) {
+		let secret_key = if let Some(seed) = config.ethereum.relayer.clone().map(|r| r.private_key)
+		{
 			let private_key = hex::decode(&seed[2..])?;
 			Some(SecretKey::from_slice(&private_key)?)
 		} else {
@@ -51,7 +53,11 @@ impl Ethereum {
 			web3,
 			relay_contract_address,
 			secret_key,
-			beneficiary: config.ethereum.relayer.clone().map(|r| r.beneficiary_darwinia_account),
+			beneficiary: config
+				.ethereum
+				.relayer
+				.clone()
+				.map(|r| r.beneficiary_darwinia_account),
 		})
 	}
 

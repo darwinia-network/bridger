@@ -8,6 +8,8 @@ mod affirm_raw;
 mod affirmations;
 mod confirm;
 mod ecdsa;
+mod encrypt_conf;
+mod encrypt_key;
 mod guard;
 mod keys;
 mod run;
@@ -84,6 +86,20 @@ enum Opt {
 		#[structopt(short, long)]
 		block: u64,
 	},
+	/// encrypt or decrypt key
+	EncryptKey {
+		#[structopt(short, long)]
+		private_key: String,
+		#[structopt(short, long)]
+		decrypt: bool,
+	},
+	/// encrypt or decrypt private_key in config.yml
+	EncryptConf {
+		#[structopt(short, long)]
+		from_path: String,
+		#[structopt(short, long)]
+		to_path: String,
+	},
 }
 
 /// Exec commands
@@ -103,6 +119,11 @@ pub async fn exec() -> Result<()> {
 		Opt::SetDarwiniaStart { data_dir, block } => {
 			set_darwinia_start::exec(data_dir, block).await?
 		}
+		Opt::EncryptKey {
+			private_key,
+			decrypt,
+		} => encrypt_key::exec(private_key, decrypt).await?,
+		Opt::EncryptConf { from_path, to_path } => encrypt_conf::exec(from_path, to_path).await?,
 	}
 
 	Ok(())

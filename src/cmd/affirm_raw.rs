@@ -1,4 +1,5 @@
 use crate::{api::Darwinia, error::Result, Settings};
+use rpassword::prompt_password_stdout;
 use std::sync::Arc;
 
 /// Affirm
@@ -7,7 +8,11 @@ pub async fn exec(json: String) -> Result<()> {
 	env_logger::init();
 
 	// apis
-	let config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
+	let mut config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
+	if config.encrypted {
+		let passwd = prompt_password_stdout("Please enter password:")?;
+		config.decrypt(&passwd)?;
+	}
 	let darwinia = Arc::new(Darwinia::new(&config).await?);
 
 	// build from json string

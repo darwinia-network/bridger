@@ -1,8 +1,11 @@
 //! Bridger Settings
+use crate::encrypt_key;
+
+use super::crypto::{Crypto, EncryptPrivateKey};
 use crate::error::{BizError, Result};
+use config::{Config, File};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use config::{Config, File};
 
 // - Ethereum --------------------------------
 /// Ethereum Settings
@@ -48,15 +51,17 @@ pub struct EthereumRelayer {
 	/// Private key
 	pub private_key: String,
 	/// ethereum.relayer's beneficiary account public key
-	pub beneficiary_darwinia_account: String
+	pub beneficiary_darwinia_account: String,
 }
+encrypt_key!(EthereumRelayer);
 
-/// Ethereum Authority 
+/// Ethereum Authority
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EthereumAuthority {
 	/// Private key to sign ecdsa signature
 	pub private_key: String,
 }
+encrypt_key!(EthereumAuthority);
 
 // - Darwinia --------------------------------
 /// Darwinia Settings
@@ -76,6 +81,7 @@ pub struct DarwiniaRelayer {
 	/// Real Account public key
 	pub real_account: Option<String>,
 }
+encrypt_key!(DarwiniaRelayer);
 
 // - Shadow --------------------------------
 /// Shadow Settings
@@ -130,6 +136,9 @@ pub struct ServicesGuard {
 /// Bridger Settings
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Settings {
+	/// Encrypted
+	pub encrypted: bool,
+
 	/// Ethereum Settings
 	pub ethereum: EthereumSettings,
 
@@ -151,7 +160,6 @@ impl Settings {
 
 		let mut settings = Config::default();
 		settings.merge(File::from(config_file))?;
-
 		Ok(settings.try_into()?)
 	}
 
@@ -163,6 +171,38 @@ impl Settings {
 
 		Ok(dir)
 	}
+
+	/// encrypt configure file
+	pub fn encrypt(&mut self, passwd: &str) -> Result<()> {
+		if !self.encrypted {
+			let crypto = Crypto { salt: [0; 16] };
+			if let Some(relayer) = &mut self.ethereum.relayer {
+				relayer.encrypt(&crypto, &passwd)?;
+			}
+			if let Some(authority) = &mut self.ethereum.authority {
+				authority.encrypt(&crypto, &passwd)?;
+			}
+			self.darwinia.relayer.encrypt(&crypto, &passwd)?;
+			self.encrypted = true;
+		}
+		Ok(())
+	}
+
+	/// decrypt configure file
+	pub fn decrypt(&mut self, passwd: &str) -> Result<()> {
+		if self.encrypted {
+			let crypto = Crypto { salt: [0; 16] };
+			if let Some(relayer) = &mut self.ethereum.relayer {
+				relayer.decrypt(&crypto, &passwd)?;
+			}
+			if let Some(authority) = &mut self.ethereum.authority {
+				authority.decrypt(&crypto, &passwd)?;
+			}
+			self.darwinia.relayer.decrypt(&crypto, &passwd)?;
+			self.encrypted = false;
+		}
+		Ok(())
+	}
 }
 
 impl Default for Settings {
@@ -171,7 +211,7 @@ impl Default for Settings {
 		let mut settings = Config::default();
 		settings.merge(File::from(config_file)).unwrap();
 		settings.try_into().unwrap()
-	}
+    }
 }
 
 #[cfg(test)]
@@ -182,5 +222,5 @@ mod tests {
 	pub fn test_yaml_config() {
 		let settings = Settings::default();
 		println!("{:?}", settings.ethereum);
-	} 
+	}
 }

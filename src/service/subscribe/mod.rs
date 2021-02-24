@@ -6,28 +6,22 @@ use crate::error::{BizError, Error};
 use crate::service::subscribe::darwinia_tracker::DarwiniaBlockTracker;
 use crate::tools;
 use crate::{
-	api::Darwinia,
 	error::Result,
 	service::extrinsics::{Extrinsic, MsgExtrinsic},
 };
 use actix::Recipient;
-use primitives::{
-	frame::bridge::relay_authorities::{
-		AuthoritiesChangeSigned, ScheduleAuthoritiesChange, ScheduleMMRRoot,
-	},
-	runtime::DarwiniaRuntime,
-};
+use primitives::runtime::DarwiniaRuntime;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::Arc;
-use substrate_subxt::sp_core::Decode;
 use substrate_subxt::system::System;
-use substrate_subxt::RawEvent;
 use tokio::time::{delay_for, Duration};
+
+use darwinia::{Darwinia2Ethereum, EventInfo, ToEthereumAccount};
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
-	darwinia: Arc<Darwinia>,
+	darwinia2ethereum: Darwinia2Ethereum,
+	account: ToEthereumAccount,
 	ethereum: Ethereum,
 	stop: bool,
 	extrinsics_service: Recipient<MsgExtrinsic>,
@@ -40,7 +34,8 @@ pub struct SubscribeService {
 impl SubscribeService {
 	/// New subscribe service
 	pub fn new(
-		darwinia: Arc<Darwinia>,
+		darwinia2ethereum: Darwinia2Ethereum,
+		account: ToEthereumAccount,
 		ethereum: Ethereum,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 		spec_name: String,
@@ -48,7 +43,8 @@ impl SubscribeService {
 		data_dir: PathBuf,
 	) -> SubscribeService {
 		SubscribeService {
-			darwinia,
+			darwinia2ethereum,
+			account,
 			ethereum,
 			stop: false,
 			extrinsics_service,
@@ -61,7 +57,8 @@ impl SubscribeService {
 
 	/// start
 	pub async fn start(&mut self) -> Result<()> {
-		let mut tracker = DarwiniaBlockTracker::new(self.darwinia.clone(), self.scan_from);
+		let mut tracker =
+			DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), self.scan_from);
 		info!("✨ SERVICE STARTED: SUBSCRIBE");
 		loop {
 			let header = tracker.next_block().await;
@@ -81,7 +78,11 @@ impl SubscribeService {
 
 			// handle events of the block
 			let hash = header.hash();
-			let events = self.darwinia.get_raw_events(hash).await;
+			let events = self
+				.darwinia2ethereum
+				.darwinia
+				.get_events_from_block_hash(hash)
+				.await;
 			if let Err(err) = self.handle_events(&header, events).await {
 				if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
 					tools::set_cache(
@@ -134,9 +135,8 @@ impl SubscribeService {
 		for (delayed_to, delayed_ex) in cloned.iter() {
 			if header.number >= *delayed_to
 				&& self
-					.darwinia
-					.sender
-					.need_to_sign_mmr_root_of(*delayed_to, Some(header.number))
+					.darwinia2ethereum
+					.need_to_sign_mmr_root_of(&self.account, *delayed_to, Some(header.number))
 					.await?
 			{
 				let msg = MsgExtrinsic(delayed_ex.clone());
@@ -150,15 +150,10 @@ impl SubscribeService {
 	async fn handle_events(
 		&mut self,
 		header: &<DarwiniaRuntime as System>::Header,
-		events: Result<Vec<RawEvent>>,
+		events: Result<Vec<EventInfo<DarwiniaRuntime>>>,
 	) -> Result<()> {
 		for event in events? {
-			let module = event.module.as_str();
-			let variant = event.variant.as_str();
-			let event_data = event.data;
-
-			self.handle_event(header, module, variant, event_data)
-				.await?;
+			self.handle_event(header, event).await?;
 		}
 		Ok(())
 	}
@@ -166,89 +161,68 @@ impl SubscribeService {
 	async fn handle_event(
 		&mut self,
 		header: &<DarwiniaRuntime as System>::Header,
-		module: &str,
-		variant: &str,
-		event_data: Vec<u8>,
+		event: EventInfo<DarwiniaRuntime>,
 	) -> Result<()> {
-		if module != "System" {
-			trace!(">> Event - {}::{}", module, variant);
-		}
-
+		//todo
+		//if module != "System" {
+		//trace!(">> Event - {}::{}", module, variant);
+		//}
 		let block = Some(header.number);
-
-		match (module, variant) {
-			("System", "CodeUpdated") => {
+		match event {
+			EventInfo::RuntimeUpdatedEvent(_) => {
 				return Err(Error::RuntimeUpdated.into());
 			}
-
 			// call ethereum_relay_authorities.request_authority and then sudo call
 			// EthereumRelayAuthorities.add_authority will emit the event
-			("EthereumRelayAuthorities", "ScheduleAuthoritiesChange") => {
-				if self.darwinia.sender.is_authority(block).await? {
-					if let Ok(decoded) =
-						ScheduleAuthoritiesChange::<DarwiniaRuntime>::decode(&mut &event_data[..])
-					{
-						info!("{}", decoded);
-						if self
-							.darwinia
-							.sender
-							.need_to_sign_authorities(decoded.message, block)
-							.await?
-						{
-							let ex = Extrinsic::SignAndSendAuthorities(decoded.message);
-							let msg = MsgExtrinsic(ex);
-							self.extrinsics_service.send(msg).await?;
-						}
-					}
+			EventInfo::ScheduleAuthoritiesChangeEvent(event) => {
+				if self
+					.darwinia2ethereum
+					.is_authority(block, &self.account)
+					.await? && self
+					.darwinia2ethereum
+					.need_to_sign_authorities(block, &self.account, event.message)
+					.await?
+				{
+					let ex = Extrinsic::SignAndSendAuthorities(event.message);
+					let msg = MsgExtrinsic(ex);
+					self.extrinsics_service.send(msg).await?;
 				}
 			}
-
 			// authority set changed will emit this event
-			("EthereumRelayAuthorities", "AuthoritiesChangeSigned") => {
-				if self.ethereum.is_relayer() {
-					if let Ok(decoded) =
-						AuthoritiesChangeSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
-					{
-						// TODO: Add better repeating check
-						info!("{}", decoded);
-						let current_term = self.darwinia.get_current_authority_term().await?;
-						if decoded.term == current_term {
-							let message = Darwinia::construct_authorities_message(
-								self.spec_name.clone(),
-								decoded.term,
-								decoded.new_authorities,
-							);
-							let signatures = decoded
-								.signatures
-								.iter()
-								.map(|s| s.1.clone())
-								.collect::<Vec<_>>();
-							let tx_hash = self
-								.ethereum
-								.submit_authorities_set(message, signatures)
-								.await?;
-							info!("Submit authorities to ethereum with tx: {}", tx_hash);
-						}
-					}
+			EventInfo::AuthoritiesChangeSignedEvent(event) => {
+				let current_term = self.darwinia2ethereum.get_current_authority_term().await?;
+				if event.term == current_term {
+					let message = Darwinia2Ethereum::construct_authorities_message(
+						self.spec_name.clone(),
+						event.term,
+						event.new_authorities,
+					);
+					let signatures = event
+						.signatures
+						.iter()
+						.map(|s| s.1.clone())
+						.collect::<Vec<_>>();
+					let tx_hash = self
+						.ethereum
+						.submit_authorities_set(message, signatures)
+						.await?;
+					info!("Submit authorities to ethereum with tx: {}", tx_hash);
 				}
 			}
-
 			// call ethereum_backing.lock will emit the event
-			("EthereumRelayAuthorities", "ScheduleMMRRoot") => {
-				if self.darwinia.sender.is_authority(block).await? {
-					if let Ok(decoded) =
-						ScheduleMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
-					{
-						info!("{}", decoded);
-						let ex = Extrinsic::SignAndSendMmrRoot(decoded.block_number);
-						self.delayed_extrinsics.insert(decoded.block_number, ex);
-					}
+			EventInfo::ScheduleMMRRootEvent(event) => {
+				if self
+					.darwinia2ethereum
+					.is_authority(block, &self.account)
+					.await?
+				{
+					info!("{}", event);
+					let ex = Extrinsic::SignAndSendMmrRoot(event.block_number);
+					self.delayed_extrinsics.insert(event.block_number, ex);
 				}
 			}
-
 			_ => {}
 		}
-
 		Ok(())
 	}
 }

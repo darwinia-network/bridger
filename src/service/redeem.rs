@@ -1,8 +1,5 @@
 //! Redeem Service
-use crate::{
-	api::{Darwinia, Shadow},
-	error::Result,
-};
+use crate::{api::Shadow, error::Result};
 use actix::prelude::*;
 use primitives::chain::ethereum::RedeemFor;
 use std::{sync::Arc, time::Duration};
@@ -12,6 +9,8 @@ use crate::service::extrinsics::{Extrinsic, MsgExtrinsic};
 use crate::service::MsgStop;
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
+
+use darwinia::Ethereum2Darwinia;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -77,7 +76,7 @@ pub struct RedeemService {
 	/// Shadow API
 	pub shadow: Arc<Shadow>,
 	/// Dawrinia API
-	pub darwinia: Arc<Darwinia>,
+	pub ethereum2darwinia: Ethereum2Darwinia,
 
 	extrinsics_service: Recipient<MsgExtrinsic>,
 }
@@ -104,8 +103,8 @@ impl Handler<MsgEthereumTransaction> for RedeemService {
 				.into_actor(self)
 				.then(move |_, this, _| {
 					let f = RedeemService::redeem(
+						this.ethereum2darwinia.clone(),
 						this.shadow.clone(),
-						this.darwinia.clone(),
 						msg_clone.tx,
 						this.extrinsics_service.clone(),
 					);
@@ -142,12 +141,12 @@ impl RedeemService {
 	/// New redeem service
 	pub fn new(
 		shadow: Arc<Shadow>,
-		darwinia: Arc<Darwinia>,
+		ethereum2darwinia: Ethereum2Darwinia,
 		step: u64,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> RedeemService {
 		RedeemService {
-			darwinia,
+			ethereum2darwinia,
 			shadow,
 			step,
 			extrinsics_service,
@@ -155,19 +154,23 @@ impl RedeemService {
 	}
 
 	async fn redeem(
+		ethereum2darwinia: Ethereum2Darwinia,
 		shadow: Arc<Shadow>,
-		darwinia: Arc<Darwinia>,
 		tx: EthereumTransaction,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> Result<()> {
 		trace!("Try to redeem ethereum tx {:?}...", tx.tx_hash);
 
 		// 1. Checking before redeem
-		if darwinia.verified(&tx).await? {
+		if ethereum2darwinia
+			.darwinia
+			.verified(tx.block_hash, tx.index)
+			.await?
+		{
 			return Err(BizError::TxRedeemed(tx.tx_hash).into());
 		}
 
-		let last_confirmed = darwinia.last_confirmed().await?;
+		let last_confirmed = ethereum2darwinia.last_confirmed().await?;
 		if tx.block >= last_confirmed {
 			return Err(BizError::RedeemingBlockLargeThanLastConfirmed(
 				tx.tx_hash,

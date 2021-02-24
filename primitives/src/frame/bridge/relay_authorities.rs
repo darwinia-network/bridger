@@ -135,7 +135,7 @@ AuthoritiesChangeSigned {{
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]
 pub struct MMRRootSigned<T: EthereumRelayAuthorities> {
 	/// block number
-	pub block_number: u128,
+	pub block_number: <T as System>::BlockNumber,
 	/// mmr root
 	pub mmr_root: H256,
 	/// The redeemed balance

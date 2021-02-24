@@ -5,9 +5,11 @@ use std::{sync::Arc, time::Duration};
 use crate::service::extrinsics::{Extrinsic, MsgExtrinsic};
 use crate::service::MsgStop;
 use crate::{
-	api::{Darwinia, Shadow},
+	api::Shadow,
 	error::{BizError, Result},
 };
+
+use darwinia::{Ethereum2Darwinia, FromEthereumAccount};
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -21,8 +23,10 @@ pub struct GuardService {
 	step: u64,
 	/// Shadow API
 	pub shadow: Arc<Shadow>,
-	/// Dawrinia API
-	pub darwinia: Arc<Darwinia>,
+	/// Ethereum to Dawrinia API
+	pub ethereum2darwinia: Ethereum2Darwinia,
+	/// Darwinia guard account
+	pub guard_account: FromEthereumAccount,
 	extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
@@ -50,8 +54,9 @@ impl Handler<MsgGuard> for GuardService {
 				.into_actor(self)
 				.then(|_, this, _| {
 					let f = GuardService::guard(
+						this.ethereum2darwinia.clone(),
+						this.guard_account.clone(),
 						this.shadow.clone(),
-						this.darwinia.clone(),
 						this.extrinsics_service.clone(),
 					);
 					f.into_actor(this)
@@ -81,14 +86,16 @@ impl GuardService {
 	/// New redeem service
 	pub fn new(
 		shadow: Arc<Shadow>,
-		darwinia: Arc<Darwinia>,
+		ethereum2darwinia: Ethereum2Darwinia,
+		guard_account: FromEthereumAccount,
 		step: u64,
 		is_tech_comm_member: bool,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> Option<GuardService> {
 		if is_tech_comm_member {
 			Some(GuardService {
-				darwinia,
+				ethereum2darwinia,
+				guard_account,
 				shadow,
 				step,
 				extrinsics_service,
@@ -100,14 +107,15 @@ impl GuardService {
 	}
 
 	async fn guard(
+		ethereum2darwinia: Ethereum2Darwinia,
+		guard_account: FromEthereumAccount,
 		shadow: Arc<Shadow>,
-		darwinia: Arc<Darwinia>,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> Result<()> {
 		trace!("Checking pending headers...");
 
-		let last_confirmed = darwinia.last_confirmed().await.unwrap();
-		let pending_headers = darwinia.pending_headers().await?;
+		let last_confirmed = ethereum2darwinia.last_confirmed().await.unwrap();
+		let pending_headers = ethereum2darwinia.pending_headers().await?;
 		if !pending_headers.is_empty() {
 			trace!(
 				"pending headers: {:?}",
@@ -127,7 +135,9 @@ impl GuardService {
 			// high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
 			// and,
 			// have not voted
-			if pending_block_number > last_confirmed && !darwinia.sender.has_voted(voting_state) {
+			if pending_block_number > last_confirmed
+				&& !ethereum2darwinia.has_voted(&guard_account, voting_state)
+			{
 				let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
 				let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
 					Extrinsic::GuardVote(pending_block_number, true)

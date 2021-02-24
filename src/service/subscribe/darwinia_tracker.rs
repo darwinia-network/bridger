@@ -1,20 +1,19 @@
-use crate::{api::Darwinia, error::Result};
-use std::sync::Arc;
+use crate::error::Result;
+use darwinia::Darwinia;
 use std::time::Duration;
 use substrate_subxt::sp_runtime::generic::Header;
 use substrate_subxt::sp_runtime::traits::BlakeTwo256;
-use substrate_subxt::BlockNumber;
 use tokio::time::delay_for;
 
 /// DarwiniaTracker
 pub struct DarwiniaBlockTracker {
-	darwinia: Arc<Darwinia>,
+	darwinia: Darwinia,
 	next_block: u32,
 }
 
 impl DarwiniaBlockTracker {
 	/// new
-	pub fn new(darwinia: Arc<Darwinia>, scan_from: u32) -> Self {
+	pub fn new(darwinia: Darwinia, scan_from: u32) -> Self {
 		Self {
 			darwinia,
 			next_block: scan_from,
@@ -44,32 +43,19 @@ impl DarwiniaBlockTracker {
 	}
 
 	async fn get_next_block(&mut self) -> Result<Option<Header<u32, BlakeTwo256>>> {
-		let finalized_block_hash = self.darwinia.client.finalized_head().await?;
+		let finalized_block_hash = self.darwinia.finalized_head().await?;
 		match self
 			.darwinia
-			.client
-			.block(Some(finalized_block_hash))
+			.get_block_number_by_hash(finalized_block_hash)
 			.await?
 		{
-			Some(finalized_block) => {
-				let finalized_block_number = finalized_block.block.header.number;
+			Some(finalized_block_number) => {
 				if self.next_block > finalized_block_number {
 					Ok(None)
 				} else {
-					let block = BlockNumber::from(self.next_block);
-
-					match self.darwinia.client.block_hash(Some(block)).await? {
-						Some(block_hash) => {
-							match self.darwinia.client.header(Some(block_hash)).await? {
-								Some(header) => {
-									self.next_block += 1;
-									Ok(Some(header))
-								}
-								None => Ok(None),
-							}
-						}
-						None => Ok(None),
-					}
+					let header = self.darwinia.get_block_by_number(self.next_block).await?;
+					self.next_block += 1;
+					Ok(Some(header))
 				}
 			}
 			None => Ok(None),

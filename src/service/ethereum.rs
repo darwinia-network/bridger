@@ -1,6 +1,5 @@
 //! Ethereum transaction service
 use crate::{
-	api::Darwinia,
 	error::{BizError, Result as BridgerResult},
 	service::{
 		redeem::{EthereumTransaction, EthereumTransactionHash, MsgEthereumTransaction},
@@ -13,13 +12,14 @@ use primitives::bytes;
 
 use actix::prelude::*;
 use std::path::PathBuf;
-use std::sync::Arc;
 use std::time::Duration;
 use web3::{
 	transports::http::Http,
 	types::{BlockNumber, FilterBuilder, SyncState, H160, H256, U64},
 	Web3,
 };
+
+use darwinia::Darwinia;
 
 #[derive(Clone, Debug)]
 struct MsgScan;
@@ -49,7 +49,7 @@ pub struct EthereumService {
 	contracts: ContractAddress,
 	filters: [FilterBuilder; 3],
 	web3: Web3<Http>,
-	darwinia: Arc<Darwinia>,
+	darwinia: Darwinia,
 	scan_from: u64,
 	step: u64,
 
@@ -82,8 +82,8 @@ impl Handler<MsgScan> for EthereumService {
 				.into_actor(self)
 				.then(move |_, this, _| {
 					let f = EthereumService::scan(
-						this.web3.clone(),
 						this.darwinia.clone(),
+						this.web3.clone(),
 						this.contracts.clone(),
 						this.filters.clone(),
 						this.scan_from,
@@ -120,7 +120,7 @@ impl EthereumService {
 	pub fn new(
 		config: Settings,
 		web3: Web3<Http>,
-		darwinia: Arc<Darwinia>,
+		darwinia: Darwinia,
 		scan_from: u64,
 		relay_service: Recipient<MsgBlockNumber>,
 		redeem_service: Recipient<MsgEthereumTransaction>,
@@ -214,8 +214,8 @@ impl EthereumService {
 
 	#[allow(clippy::too_many_arguments)]
 	async fn scan(
+		darwinia: Darwinia,
 		web3: Web3<Http>,
-		darwinia: Arc<Darwinia>,
 		contracts: ContractAddress,
 		filters: [FilterBuilder; 3],
 		scan_from: u64,
@@ -256,7 +256,7 @@ impl EthereumService {
 			}
 
 			for tx in &txs {
-				if darwinia.verified(&tx).await? {
+				if darwinia.verified(tx.block_hash, tx.index).await? {
 					trace!(
 						"    This ethereum tx {:?} has already been redeemed.",
 						tx.enclosed_hash()

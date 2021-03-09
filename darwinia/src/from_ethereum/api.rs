@@ -1,6 +1,6 @@
 use crate::Darwinia;
 
-use crate::error::{DarwiniaError, Result};
+use crate::error::{Error, Result};
 use std::collections::HashMap;
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
@@ -132,7 +132,7 @@ impl Ethereum2Darwinia {
 				}
 			}
 		} else {
-			Err(DarwiniaError::Bridger("Not technical committee member".to_string()).into())
+			Err(Error::NotTechnicalCommitteeMember.into())
 		}
 	}
 
@@ -238,7 +238,7 @@ impl Ethereum2Darwinia {
 			.header
 			.hash
 			.map(|hash| hex::encode(&hash))
-			.ok_or_else(|| DarwiniaError::Bridger("No hash in header".to_string()))?;
+			.ok_or_else(|| Error::NoHeaderHashInEthereumReceiptProofOfThing)?;
 		match &account.0.real {
 			Some(real) => {
 				trace!(

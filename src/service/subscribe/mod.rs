@@ -92,28 +92,21 @@ impl SubscribeService {
 					)
 					.await?;
 					return Err(err);
-				} else if let Some(jsonrpsee::client::RequestError::Timeout) = err.downcast_ref() {
-					tools::set_cache(
-						self.data_dir.clone(),
-						tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
-						header.number as u64,
-					)
-					.await?;
-					return Err(err);
 				} else {
 					error!(
 						"An error occurred while processing the events of block {}: {:?}",
 						header.number, err
 					);
+					delay_for(Duration::from_secs(30)).await;
 				}
+			} else {
+				tools::set_cache(
+					self.data_dir.clone(),
+					tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
+					header.number as u64,
+				)
+				.await?;
 			}
-
-			tools::set_cache(
-				self.data_dir.clone(),
-				tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
-				header.number as u64,
-			)
-			.await?;
 
 			if self.stop {
 				return Err(BizError::Bridger("Force stop".to_string()).into());

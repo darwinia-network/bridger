@@ -193,7 +193,7 @@ impl RelayService {
 		// /////////////////////////
 		let ex = Extrinsic::Affirm(parcel);
 		let msg = MsgExtrinsic(ex);
-		extrinsics_service.send(msg).await?;
+		extrinsics_service.send(msg).await??;
 
 		Ok(())
 	}

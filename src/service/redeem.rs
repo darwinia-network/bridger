@@ -192,7 +192,7 @@ impl RedeemService {
 
 		let ex = Extrinsic::Redeem(redeem_for, proof, tx);
 		let msg = MsgExtrinsic(ex);
-		extrinsics_service.send(msg).await?;
+		extrinsics_service.send(msg).await??;
 
 		Ok(())
 	}

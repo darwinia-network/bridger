@@ -4,7 +4,6 @@ use std::time::Duration;
 
 use actix::prelude::*;
 
-use crate::error::BizError;
 use crate::error::Result;
 use crate::service::redeem::EthereumTransaction;
 use crate::service::MsgStop;
@@ -31,7 +30,7 @@ pub enum Extrinsic {
 pub struct MsgExtrinsic(pub Extrinsic);
 
 impl Message for MsgExtrinsic {
-	type Result = ();
+	type Result = Result<()>;
 }
 
 /// Extrinsics Service
@@ -62,34 +61,20 @@ impl Actor for ExtrinsicsService {
 }
 
 impl Handler<MsgExtrinsic> for ExtrinsicsService {
-	type Result = AtomicResponse<Self, ()>;
+	type Result = AtomicResponse<Self, Result<()>>;
 
 	fn handle(&mut self, msg: MsgExtrinsic, _: &mut Context<Self>) -> Self::Result {
-		AtomicResponse::new(Box::pin(
-			async {}
-				.into_actor(self)
-				.then(|_, this, _| {
-					let f = ExtrinsicsService::send_extrinsic(
-						this.ethereum2darwinia.clone(),
-						this.darwinia2ethereum.clone(),
-						this.ethereum2darwinia_relayer.clone(),
-						this.darwinia2ethereum_relayer.clone(),
-						msg.0,
-						this.spec_name.clone(),
-						this.data_dir.clone(),
-					);
-					f.into_actor(this)
-				})
-				.map(|r, _, _| {
-					if let Err(err) = r {
-						if err.downcast_ref::<BizError>().is_some() {
-							trace!("{}", err);
-						} else {
-							error!("{:?}", err);
-						}
-					}
-				}),
-		))
+		let f = ExtrinsicsService::send_extrinsic(
+			self.ethereum2darwinia.clone(),
+			self.darwinia2ethereum.clone(),
+			self.ethereum2darwinia_relayer.clone(),
+			self.darwinia2ethereum_relayer.clone(),
+			msg.0,
+			self.spec_name.clone(),
+			self.data_dir.clone(),
+		).into_actor(self);
+
+		AtomicResponse::new(Box::pin(f))
 	}
 }
 

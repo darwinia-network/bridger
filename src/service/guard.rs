@@ -144,7 +144,7 @@ impl GuardService {
 				} else {
 					Extrinsic::GuardVote(pending_block_number, false)
 				};
-				extrinsics_service.send(MsgExtrinsic(ex)).await?;
+				extrinsics_service.send(MsgExtrinsic(ex)).await??;
 			}
 		}
 

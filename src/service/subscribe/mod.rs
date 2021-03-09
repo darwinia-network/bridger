@@ -133,7 +133,7 @@ impl SubscribeService {
 					.await?
 			{
 				let msg = MsgExtrinsic(delayed_ex.clone());
-				self.extrinsics_service.send(msg).await?;
+				self.extrinsics_service.send(msg).await??;
 				self.delayed_extrinsics.remove(&delayed_to);
 			}
 		}
@@ -178,7 +178,7 @@ impl SubscribeService {
 				{
 					let ex = Extrinsic::SignAndSendAuthorities(event.message);
 					let msg = MsgExtrinsic(ex);
-					self.extrinsics_service.send(msg).await?;
+					self.extrinsics_service.send(msg).await??;
 				}
 			}
 			// authority set changed will emit this event

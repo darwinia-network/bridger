@@ -163,6 +163,19 @@ impl ExtrinsicsService {
 							}
 						}
 					}
+					RedeemFor::RegisterToken => {
+						if let Some(ethereum2darwinia) = &ethereum2darwinia {
+							if let Some(relayer) = &ethereum2darwinia_relayer {
+								let ex_hash = ethereum2darwinia
+									.register_or_issuing_erc20(&relayer, proof)
+									.await?;
+								info!(
+									"register or issuing token tx {:?} with extrinsic {:?}",
+									ethereum_tx.tx_hash, ex_hash
+								);
+							}
+						}
+					}
 					_ => {
 						if let Some(ethereum2darwinia) = &ethereum2darwinia {
 							if let Some(relayer) = &ethereum2darwinia_relayer {

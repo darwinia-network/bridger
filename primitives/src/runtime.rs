@@ -8,7 +8,10 @@ use crate::{
 	},
 	frame::{
 		bridge::relay_authorities::EthereumRelayAuthorities,
-		ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay},
+		ethereum::{
+			backing::EthereumBacking, game::EthereumRelayerGame, issuing::EthereumIssuing,
+			relay::EthereumRelay,
+		},
 		proxy::Proxy,
 		sudo::Sudo,
 		technical_committee::TechnicalCommittee,
@@ -103,6 +106,10 @@ impl std::fmt::Display
 }
 
 impl EthereumBacking for DarwiniaRuntime {
+	type EthereumTransactionIndex = u64;
+}
+
+impl EthereumIssuing for DarwiniaRuntime {
 	type EthereumTransactionIndex = u64;
 }
 

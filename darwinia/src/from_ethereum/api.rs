@@ -16,6 +16,7 @@ use primitives::{
 		ethereum::{
 			backing::{Redeem, RedeemCallExt},
 			game::{AffirmationsStoreExt, EthereumRelayerGame},
+			issuing::{RegisterOrIssuingErc20, RegisterOrIssuingErc20CallExt},
 			relay::{
 				Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
 				PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
@@ -284,6 +285,39 @@ impl Ethereum2Darwinia {
 		match &account.0.real {
 			None => voting_state.contains(&account.0.account_id),
 			Some(real) => voting_state.contains(real),
+		}
+	}
+
+	/// register_or_issuing_erc20
+	pub async fn register_or_issuing_erc20(
+		&self,
+		account: &Account,
+		proof: EthereumReceiptProofThing,
+	) -> Result<H256> {
+		match &account.0.real {
+			Some(real) => {
+				let call = RegisterOrIssuingErc20 {
+					_runtime: PhantomData::default(),
+					proof,
+				};
+
+				let ex = self.darwinia.subxt.encode(call).unwrap();
+				Ok(self
+					.darwinia
+					.subxt
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
+					.await?)
+			}
+			None => Ok(self
+				.darwinia
+				.subxt
+				.register_or_issuing_erc20(&account.0.signer, proof)
+				.await?),
 		}
 	}
 }

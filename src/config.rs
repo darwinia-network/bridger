@@ -43,6 +43,8 @@ pub struct EthereumContract {
 	pub issuing: EthereumContractTuple,
 	/// Relay Contract
 	pub relay: EthereumContractTuple,
+	/// Backing Contract
+	pub backing: EthereumContractTuple,
 }
 
 /// Ethereum Relayer

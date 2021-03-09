@@ -9,7 +9,7 @@ use substrate_subxt::{
 
 use primitives::{
 	//todo move to e2d
-	frame::ethereum::backing::VerifiedProofStoreExt,
+	frame::ethereum::{backing::VerifiedProofStoreExt, issuing::VerifiedIssuingProofStoreExt},
 	runtime::DarwiniaRuntime,
 };
 
@@ -260,6 +260,15 @@ impl Darwinia {
 		Ok(self
 			.subxt
 			.verified_proof((block_hash.to_fixed_bytes(), tx_index), None)
+			.await?
+			.unwrap_or(false))
+	}
+
+	/// Check if should issuing sync
+	pub async fn verified_issuing(&self, block_hash: H256, tx_index: u64) -> Result<bool> {
+		Ok(self
+			.subxt
+			.verified_issuing_proof((block_hash.to_fixed_bytes(), tx_index), None)
 			.await?
 			.unwrap_or(false))
 	}

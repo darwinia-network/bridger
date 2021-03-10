@@ -132,8 +132,7 @@ impl SubscribeService {
 					.need_to_sign_mmr_root_of(&self.account, *delayed_to, Some(header.number))
 					.await?
 			{
-				let msg = MsgExtrinsic(delayed_ex.clone());
-				self.extrinsics_service.send(msg).await??;
+				tools::send_extrinsic(&self.extrinsics_service, delayed_ex.clone()).await;
 				self.delayed_extrinsics.remove(&delayed_to);
 			}
 		}
@@ -177,8 +176,7 @@ impl SubscribeService {
 					.await?
 				{
 					let ex = Extrinsic::SignAndSendAuthorities(event.message);
-					let msg = MsgExtrinsic(ex);
-					self.extrinsics_service.send(msg).await??;
+					tools::send_extrinsic(&self.extrinsics_service, ex).await;
 				}
 			}
 			// authority set changed will emit this event
@@ -218,4 +216,5 @@ impl SubscribeService {
 		}
 		Ok(())
 	}
+
 }

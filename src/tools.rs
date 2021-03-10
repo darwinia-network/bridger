@@ -36,3 +36,29 @@ pub async fn set_cache(data_dir: PathBuf, filename: &str, value: u64) -> Result<
 	file.write_all(value.to_string().as_bytes()).await?;
 	Ok(())
 }
+
+use actix::Recipient;
+use crate::service::extrinsics::{Extrinsic, MsgExtrinsic};
+use tokio::time::{delay_for, Duration};
+
+/// send extrinsic to extrinsics_service
+pub async fn send_extrinsic(extrinsics_service: &Recipient<MsgExtrinsic>, ex: Extrinsic) {
+	let msg = MsgExtrinsic(ex);
+	loop {
+		match extrinsics_service.send(msg.clone()).await {
+			Ok(send_result) => {
+				if let Err(process_err) = send_result {
+					error!("{:?}", process_err);
+					delay_for(Duration::from_secs(30)).await;
+				} else {
+					break;
+				}
+			},
+			Err(send_err) => {
+				error!("{:?}", send_err);
+				delay_for(Duration::from_secs(30)).await;
+			}
+		}
+	}
+}
+

@@ -1,6 +1,5 @@
-use thiserror::Error as ThisError;
-
 use jsonrpsee::client::RequestError;
+use thiserror::Error as ThisError;
 
 /// Error enum.
 #[derive(ThisError, Debug)]
@@ -19,6 +18,10 @@ pub enum Error {
 	Other(String),
 	#[error("No signer seed set for authority, please check your config.toml")]
 	NoAuthoritySignerSeed,
+	#[error("`bytes2hex` - FAILED: {0}")]
+	Bytes2Hex(String),
+	#[error("`hex2bytes` - FAILED: {0}")]
+	Hex2Bytes(String),
 }
 
 /// Error enum.

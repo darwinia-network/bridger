@@ -16,9 +16,9 @@ macro_rules! hex {
 		let mut s = String::new();
 		for i in $bytes {
 			s.push_str(&format!("{:02x}", i));
-			}
-			s
-		}};
+		}
+		s
+	}};
 }
 
 /// Convert hex string to `Vec<u8>` or `[u8; n]`
@@ -29,21 +29,21 @@ macro_rules! bytes {
 		let mut h = $hex;
 		if h.starts_with("0x") {
 			h = &h[2..];
-			}
+		}
 
 		(0..h.len())
 			.step_by(2)
 			.map(|i| u8::from_str_radix(&h[i..i + 2], 16))
 			.collect::<Result<Vec<u8>, _>>()
 			.unwrap_or_default()
-		}};
+	}};
 
 	// Convert hex to [u8; $bits]
 	($hex:expr, $bits:expr) => {{
 		let mut hash = [0_u8; $bits];
 		hash.copy_from_slice(&bytes!($hex));
 		hash
-		}};
+	}};
 }
 
 /// Implement serde for big array

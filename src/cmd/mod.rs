@@ -103,6 +103,9 @@ enum Opt {
 		/// sign block number
 		#[structopt(short, long)]
 		signblock: u64,
+		/// is token or ring/kton
+		#[structopt(short, long)]
+		istoken: bool,
 	},
 	/// Sign MMR root
 	SignMMRRoot {
@@ -157,7 +160,8 @@ pub async fn exec() -> Result<()> {
 			txblock,
 			mmrblock,
 			signblock,
-		} => info_d2e::exec(network, txblock, mmrblock, signblock).await?,
+			istoken,
+		} => info_d2e::exec(network, txblock, mmrblock, signblock, istoken).await?,
 		Opt::SignMMRRoot { network, mmrblock } => sign_mmr_root::exec(network, mmrblock).await?,
 		Opt::AffirmForce { block } => {
 			affirm_force::exec(block).await?;

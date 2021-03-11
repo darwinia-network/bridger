@@ -42,6 +42,8 @@ pub struct ContractAddress {
 	pub relay: H256,
 	/// register
 	pub register: H256,
+	/// lock token on ethereum and redeem from darwinia
+	pub lock: H256,
 }
 
 /// Ethereum transaction service
@@ -197,9 +199,11 @@ impl EthereumService {
 								block,
 								index,
 							}
-						} else if l.topics.contains(&contracts.register) {
+						} else if l.topics.contains(&contracts.register)
+							|| l.topics.contains(&contracts.lock)
+						{
 							EthereumTransaction {
-								tx_hash: EthereumTransactionHash::RegisterToken(
+								tx_hash: EthereumTransactionHash::RegisterOrLockToken(
 									l.transaction_hash.unwrap_or_default(),
 								),
 								block_hash: l.block_hash.unwrap_or_default(),
@@ -310,7 +314,7 @@ impl EthereumService {
 			ring: H256::from_slice(&bytes!(ring_topics[0].as_str())),
 			relay: H256::from_slice(&bytes!(relay_topics[0].as_str())),
 			register: H256::from_slice(&bytes!(backing_topics[0].as_str())),
-			//lock: H256::from_slice(&bytes!(backing_topics[1].as_str())),
+			lock: H256::from_slice(&bytes!(backing_topics[1].as_str())),
 		}
 	}
 

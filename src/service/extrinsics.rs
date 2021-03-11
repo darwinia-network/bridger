@@ -163,7 +163,7 @@ impl ExtrinsicsService {
 							}
 						}
 					}
-					RedeemFor::RegisterToken => {
+					RedeemFor::RegisterOrLockToken => {
 						if let Some(ethereum2darwinia) = &ethereum2darwinia {
 							if let Some(relayer) = &ethereum2darwinia_relayer {
 								let ex_hash = ethereum2darwinia

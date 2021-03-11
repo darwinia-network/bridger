@@ -20,7 +20,7 @@ pub enum RedeemFor {
 	/// Redeem for set authorities
 	SetAuthorities,
 	/// Redeem for register token
-	RegisterToken,
+	RegisterOrLockToken,
 }
 
 impl Default for RedeemFor {

@@ -4088,7 +4088,8 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.13.0"
-source = "git+https://github.com/darwinia-network/substrate-subxt?branch=xavier-send-error#5aee89037814b2deebcab6dda982ee02acf6fa6d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74975f373430ec447afaeb2925f2bac77e113733b08263f4df75e0a0e5998090"
 dependencies = [
  "heck",
  "proc-macro-crate",
@@ -4102,8 +4103,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74975f373430ec447afaeb2925f2bac77e113733b08263f4df75e0a0e5998090"
+source = "git+https://github.com/darwinia-network/substrate-subxt?branch=xavier-send-error#5aee89037814b2deebcab6dda982ee02acf6fa6d"
 dependencies = [
  "heck",
  "proc-macro-crate",

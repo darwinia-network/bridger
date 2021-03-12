@@ -21,9 +21,6 @@ pub enum Error {
 	#[error("Failed to build SecretKey from authority's private key")]
 	FailedToBuildSecretKey(#[from] secp256k1::Error),
 
-	#[error("Failed to decode authority's private key to byte array")]
-	FailedToDecodePriKey(#[from] hex::FromHexError),
-
 	#[error("Failed to connect ethereum rpc http endpoint")]
 	CannotConnectToWeb3(#[from] web3::Error),
 

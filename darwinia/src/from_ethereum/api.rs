@@ -149,7 +149,8 @@ impl Ethereum2Darwinia {
 			// get game id
 			let game_id: &mut [u8] = &mut storage_key.0[32..40];
 			game_id.reverse();
-			let game_id = u64::from_str_radix(hex::encode(game_id).as_str(), 16).unwrap();
+			let game_id =
+				u64::from_str_radix(array_bytes::bytes2hex("", game_id).as_str(), 16).unwrap();
 
 			//
 			if result.get(&game_id).is_none() {
@@ -160,7 +161,8 @@ impl Ethereum2Darwinia {
 			// get round id
 			let round_id: &mut [u8] = &mut storage_key.0[40..44];
 			round_id.reverse();
-			let round_id = u32::from_str_radix(hex::encode(round_id).as_str(), 16).unwrap();
+			let round_id =
+				u32::from_str_radix(array_bytes::bytes2hex("", round_id).as_str(), 16).unwrap();
 
 			game.insert(round_id, affirmations);
 		}
@@ -237,7 +239,7 @@ impl Ethereum2Darwinia {
 		let ethereum_tx_hash = proof
 			.header
 			.hash
-			.map(|hash| hex::encode(&hash))
+			.map(|hash| array_bytes::bytes2hex("", &hash))
 			.ok_or_else(|| DarwiniaError::Bridger("No hash in header".to_string()))?;
 		match &account.0.real {
 			Some(real) => {

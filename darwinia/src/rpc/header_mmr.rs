@@ -1,4 +1,3 @@
-use hex::ToHex;
 use serde::Deserialize;
 use std::str::FromStr;
 use substrate_subxt::{
@@ -218,7 +217,7 @@ fn convert(
 		.map(|hash| H256::from_str(&hash[2..]).unwrap())
 		.collect();
 	let root = get_merkle_root(pos, peak_pos, block_hash, proof);
-	res_peaks.push("0x".to_string() + &root.encode_hex::<String>());
+	res_peaks.push(array_bytes::bytes2hex("0x", root));
 	if let Some(last_hash) = last {
 		res_peaks.push(String::from(last_hash));
 	}

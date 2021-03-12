@@ -83,12 +83,7 @@ impl DarwiniaSender {
 		let account_id = AccountId::from(public);
 
 		// real account, convert to account id
-		let real = real.map(|real| {
-			let real = hex::decode(real).unwrap(); // if decode fail
-			let mut data: [u8; 32] = [0u8; 32];
-			data.copy_from_slice(&real[..]);
-			AccountId::from(data)
-		});
+		let real = real.map(|real| AccountId::from(array_bytes::hex2array_unchecked!(real, 32)));
 
 		DarwiniaSender {
 			client,
@@ -164,7 +159,8 @@ impl DarwiniaSender {
 	pub fn ecdsa_sign(&self, message: &[u8]) -> Result<EcdsaSignature> {
 		let web3 = Web3::new(Http::new(&self.ethereum_url)?);
 		if let Some(ethereum_seed) = &self.ethereum_seed {
-			let private_key = hex::decode(&ethereum_seed[2..])?;
+			let private_key = array_bytes::hex2bytes(&ethereum_seed[2..])
+				.map_err(|_| Error::Hex2Bytes("ethereum_seed[2..]".into()))?;
 			let secret_key = SecretKey::from_slice(&private_key)?;
 			let signature = web3
 				.accounts()
@@ -230,14 +226,16 @@ impl DarwiniaSender {
 #[test]
 fn test_ecdsa() {
 	let hash =
-		hex::decode("71e2f60faf6c7264cca14fb1a01260a787b4d18039cd8cd680aaff1e118c711d").unwrap();
+		array_bytes::hex2bytes("71e2f60faf6c7264cca14fb1a01260a787b4d18039cd8cd680aaff1e118c711d")
+			.unwrap();
 	let hash = hash.as_slice();
 	// let hash = web3::signing::keccak256(message);
 	let web3 = Web3::new(
 		Http::new("https://ropsten.infura.io/v3/60703fcc6b4e48079cfc5e385ee7af80").unwrap(),
 	);
 	let private_key =
-		hex::decode("8bd012fd2433d4fea852f437d6bb22d1e57dee7657cc1e703460ddeaae1a67ca").unwrap();
+		array_bytes::hex2bytes("8bd012fd2433d4fea852f437d6bb22d1e57dee7657cc1e703460ddeaae1a67ca")
+			.unwrap();
 	let secret_key = SecretKey::from_slice(&private_key).unwrap();
 	let signature = web3
 		.accounts()

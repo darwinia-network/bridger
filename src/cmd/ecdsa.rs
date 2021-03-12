@@ -1,4 +1,4 @@
-use crate::{api::Darwinia, error::Result, Settings};
+use crate::{api::Darwinia, error::Error, error::Result, Settings};
 use rpassword::prompt_password_stdout;
 use std::sync::Arc;
 
@@ -17,7 +17,8 @@ pub async fn exec(message: String) -> Result<()> {
 
 	info!("Init API succeed!");
 
-	let message = hex::decode(&message[2..])?;
+	let message = array_bytes::hex2bytes(&message[2..])
+		.map_err(|_| Error::Hex2Bytes("message[2..]".into()))?;
 	let mut buffer = [0u8; 32];
 	buffer.copy_from_slice(&message);
 	darwinia

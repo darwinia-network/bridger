@@ -1,7 +1,7 @@
 #![allow(missing_docs)]
-use thiserror::Error as ThisError;
 
 use jsonrpsee::client::RequestError;
+use thiserror::Error as ThisError;
 
 /// Error enum.
 #[derive(ThisError, Debug)]
@@ -32,6 +32,12 @@ pub enum Error {
 
 	#[error("No signer seed set for authority, please check your config.toml")]
 	NoAuthoritySignerSeed,
+
+	#[error("`bytes2hex` - FAILED: {0}")]
+	Bytes2Hex(String),
+  
+	#[error("`hex2bytes` - FAILED: {0}")]
+	Hex2Bytes(String),
 
 	#[error("Wrong mmr_root({0}) in Darwinia header({1})")]
 	WrongMmrRootInDarwiniaHeader(String, u32),

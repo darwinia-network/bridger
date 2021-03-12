@@ -75,7 +75,7 @@ impl Darwinia2Ethereum {
 		debug!(
 			"Infos to construct mmr_root message: {}, {}, {}, {:?}",
 			spec_name,
-			hex::encode(&op_code),
+			array_bytes::bytes2hex("", &op_code),
 			block_number,
 			mmr_root
 		);
@@ -100,11 +100,11 @@ impl Darwinia2Ethereum {
 		debug!(
 			"Infos to construct eth authorities message: {}, {}, {}, {:?}",
 			spec_name,
-			hex::encode(&op_code),
+			array_bytes::bytes2hex("", &op_code),
 			term,
 			next_authorities
 				.iter()
-				.map(|a| hex::encode(&a))
+				.map(|a| array_bytes::bytes2hex("", &a))
 				.collect::<Vec<_>>()
 				.join(", ")
 		);

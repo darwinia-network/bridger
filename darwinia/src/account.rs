@@ -36,12 +36,7 @@ impl DarwiniaAccount {
 		let account_id = AccountId::from(public);
 
 		// real account, convert to account id
-		let real = real.map(|real| {
-			let real = hex::decode(real).unwrap(); // if decode fail
-			let mut data: [u8; 32] = [0u8; 32];
-			data.copy_from_slice(&real[..]);
-			AccountId::from(data)
-		});
+		let real = real.map(|real| AccountId::from(array_bytes::hex2array_unchecked!(real, 32)));
 
 		DarwiniaAccount {
 			account_id,

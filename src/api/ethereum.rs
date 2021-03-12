@@ -1,5 +1,5 @@
 //! Ethereum API
-use crate::{error::Result, Settings};
+use crate::{error::Error, error::Result, Settings};
 
 use primitives::runtime::EcdsaSignature;
 use secp256k1::SecretKey;
@@ -43,7 +43,8 @@ impl Ethereum {
 
 		let secret_key = if let Some(seed) = config.ethereum.relayer.clone().map(|r| r.private_key)
 		{
-			let private_key = hex::decode(&seed[2..])?;
+			let private_key = array_bytes::hex2bytes(&seed[2..])
+				.map_err(|_| Error::Hex2Bytes("seed[2..]".into()))?;
 			Some(SecretKey::from_slice(&private_key)?)
 		} else {
 			None
@@ -71,7 +72,8 @@ impl Ethereum {
 		let relay_contract_address = Ethereum::build_address(&relay_contract_address)?;
 
 		let secret_key = if let Some(seed) = seed {
-			let private_key = hex::decode(&seed[2..])?;
+			let private_key = array_bytes::hex2bytes(&seed[2..])
+				.map_err(|_| Error::Hex2Bytes("seed[2..]".into()))?;
 			Some(SecretKey::from_slice(&private_key)?)
 		} else {
 			None
@@ -113,16 +115,24 @@ impl Ethereum {
 					.collect::<Vec<_>>();
 
 				// beneficiary account id
-				let beneficiary = hex::decode(&beneficiary[2..])?;
+				let beneficiary = array_bytes::hex2bytes(&beneficiary[2..])
+					.map_err(|_| Error::Hex2Bytes("beneficiary[2..]".into()))?;
 				let mut beneficiary_buffer = [0u8; 32];
 				beneficiary_buffer.copy_from_slice(&beneficiary);
 
 				// debug
-				debug!("message: 0x{}", hex::encode(message.clone()));
+				debug!("message: {}", array_bytes::bytes2hex("0x", message.clone()));
 				for (i, signature) in signature_list.clone().iter().enumerate() {
-					debug!("signature {}: 0x{}", i + 1, hex::encode(signature));
+					debug!(
+						"signature {}: {}",
+						i + 1,
+						array_bytes::bytes2hex("0x", signature)
+					);
 				}
-				debug!("beneficiary: 0x{}", hex::encode(beneficiary_buffer));
+				debug!(
+					"beneficiary: {}",
+					array_bytes::bytes2hex("0x", beneficiary_buffer)
+				);
 
 				// gas price
 				// TODO: do not need to get gas_price if ropsten
@@ -150,7 +160,8 @@ impl Ethereum {
 	}
 
 	fn build_address(str: &str) -> Result<H160> {
-		let address = hex::decode(&str[2..])?;
+		let address =
+			array_bytes::hex2bytes(&str[2..]).map_err(|_| Error::Hex2Bytes("str[2..]".into()))?;
 		let mut address_buffer = [0u8; 20];
 		address_buffer.copy_from_slice(&address);
 		Ok(Address::from(address_buffer))

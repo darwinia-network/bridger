@@ -231,3 +231,100 @@ impl ExtrinsicsService {
 		Ok(())
 	}
 }
+
+#[cfg(test)]
+mod tests {
+	use actix::prelude::*;
+	use crate::error::Result;
+	use std::time::Duration;
+
+	#[derive(Clone, Copy)]
+	struct MyMsg(usize);
+	impl Message for MyMsg {
+		type Result = Result<usize>;
+	}
+
+	struct MyActor;
+
+	impl Actor for MyActor {
+		type Context = Context<Self>;
+	}
+
+	impl Handler<MyMsg> for MyActor {
+		type Result = AtomicResponse<Self, Result<usize>>;
+
+		fn handle(&mut self, msg: MyMsg, _: &mut Self::Context) -> Self::Result {
+			AtomicResponse::new(Box::pin(
+				async {}
+					.into_actor(self)
+					.then(move |_, this, _| {
+						println!("msg {} processing", msg.0);
+						if msg.0 == 888 {
+							println!("sleep 5 seconds for {}", msg.0);
+							tokio::time::delay_for(Duration::from_secs(5))
+								.into_actor(this)
+						} else {
+							println!("passing {}", msg.0);
+							tokio::time::delay_for(Duration::from_millis(1))
+								.into_actor(this)
+						}
+					})
+					.map(move |_, _, _| {
+						println!("at the end of processing {} -----------", msg.0);
+						if msg.0 == 666 {
+							Err(anyhow::anyhow!("error"))
+						} else {
+							Ok(msg.0)
+						}
+					}),
+			))
+		}
+	}
+
+	#[actix_rt::test]
+	async fn test_work() {
+		let my_actor = MyActor.start();
+		if let Ok(r) = my_actor.send(MyMsg(12)).await {
+			if let Ok(r2) = r {
+				assert_eq!(r2, 12);
+			}
+		}
+	}
+
+	#[actix_rt::test]
+	async fn test_error() {
+		let my_actor = MyActor.start();
+		if let Ok(r) = my_actor.send(MyMsg(666)).await {
+			if let Err(e) = r {
+				assert_eq!(e.to_string(), "error".to_string());
+			}
+		}
+	}
+
+	#[actix_rt::test]
+	async fn test_sending_msgs_in_two_different_coroutines() {
+		let my_actor = MyActor.start();
+		let my_actor_clone = my_actor.clone();
+		tokio::spawn(async move {
+			if let Ok(r) = my_actor_clone.send(MyMsg(888)).await {
+				println!("msg {} sent", 888);
+				if let Ok(r2) = r {
+					assert_eq!(r2, 888);
+					println!("msg {} processed", 888);
+				}
+			}
+		});
+		tokio::spawn(async move {
+			if let Ok(r) = my_actor.send(MyMsg(12)).await {
+				println!("msg {} sent", 12);
+				if let Ok(r2) = r {
+					assert_eq!(r2, 12);
+					println!("msg {} processed", 12);
+				}
+			}
+		});
+		tokio::time::delay_for(Duration::from_secs(10)).await;
+		println!("finished")
+	}
+
+}

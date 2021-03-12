@@ -306,20 +306,22 @@ mod tests {
 		let my_actor = MyActor.start();
 		let my_actor_clone = my_actor.clone();
 		tokio::spawn(async move {
-			if let Ok(r) = my_actor_clone.send(MyMsg(888)).await {
-				println!("msg {} sent", 888);
+			let msg_id = 888;
+			if let Ok(r) = my_actor_clone.send(MyMsg(msg_id)).await {
+				println!("msg {} sent", msg_id);
 				if let Ok(r2) = r {
-					assert_eq!(r2, 888);
-					println!("msg {} processed", 888);
+					assert_eq!(r2, msg_id);
+					println!("msg {} processed", msg_id);
 				}
 			}
 		});
 		tokio::spawn(async move {
-			if let Ok(r) = my_actor.send(MyMsg(12)).await {
-				println!("msg {} sent", 12);
+			let msg_id = 12;
+			if let Ok(r) = my_actor.send(MyMsg(msg_id)).await {
+				println!("msg {} sent", msg_id);
 				if let Ok(r2) = r {
-					assert_eq!(r2, 12);
-					println!("msg {} processed", 12);
+					assert_eq!(r2, msg_id);
+					println!("msg {} processed", msg_id);
 				}
 			}
 		});

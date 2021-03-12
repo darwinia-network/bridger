@@ -48,7 +48,7 @@ impl Account {
 			buffer.copy_from_slice(signature.0.as_slice());
 			Ok(EcdsaSignature(buffer))
 		} else {
-			Err(Error::NoAuthoritySignerSeed.into())
+			Err(Error::NoAuthoritySignerSeed)
 		}
 	}
 

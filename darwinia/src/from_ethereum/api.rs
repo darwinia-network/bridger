@@ -132,7 +132,7 @@ impl Ethereum2Darwinia {
 				}
 			}
 		} else {
-			Err(Error::NotTechnicalCommitteeMember.into())
+			Err(Error::NotTechnicalCommitteeMember)
 		}
 	}
 
@@ -238,7 +238,7 @@ impl Ethereum2Darwinia {
 			.header
 			.hash
 			.map(|hash| hex::encode(&hash))
-			.ok_or_else(|| Error::NoHeaderHashInEthereumReceiptProofOfThing)?;
+			.ok_or(Error::NoHeaderHashInEthereumReceiptProofOfThing)?;
 		match &account.0.real {
 			Some(real) => {
 				trace!(

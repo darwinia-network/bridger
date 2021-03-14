@@ -139,7 +139,7 @@ enum Opt {
 pub async fn exec() -> Result<()> {
 	let opt = Opt::from_args();
 	match opt {
-		Opt::Run { data_dir, verbose } => run::exec(data_dir, verbose).await,
+		Opt::Run { data_dir, verbose } => run::exec(data_dir, verbose).await?,
 		Opt::Confirm { block } => confirm::exec(block).await?,
 		Opt::Affirm { block } => affirm::exec(block).await?,
 		Opt::AffirmRaw { json } => affirm_raw::exec(json).await?,

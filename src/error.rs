@@ -24,7 +24,7 @@ pub enum Error {
 	#[error("RuntimeUpdated")]
 	RuntimeUpdated,
 
-	#[error("{0}")]
+	#[error("ShadowInternalServerError: {0}")]
 	ShadowInternalServerError(String),
 
 	#[error("`bytes2hex` - FAILED: {0}")]

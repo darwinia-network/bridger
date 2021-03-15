@@ -24,4 +24,4 @@ pub use darwinia::Darwinia;
 
 pub use account::{AccountId, DarwiniaAccount};
 
-pub use error::{DarwiniaError, Error};
+pub use error::Error;

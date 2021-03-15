@@ -11,6 +11,7 @@ use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 
 use darwinia::Ethereum2Darwinia;
+use crate::tools;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -191,8 +192,7 @@ impl RedeemService {
 		};
 
 		let ex = Extrinsic::Redeem(redeem_for, proof, tx);
-		let msg = MsgExtrinsic(ex);
-		extrinsics_service.send(msg).await?;
+		tools::send_extrinsic(&extrinsics_service, ex).await;
 
 		Ok(())
 	}

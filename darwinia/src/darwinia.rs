@@ -15,7 +15,7 @@ use primitives::{
 
 use crate::{account::DarwiniaAccount, DarwiniaEvents, EventInfo, Rpc};
 
-use crate::error::{DarwiniaError, Error, Result};
+use crate::error::{Error, Result};
 
 use primitives::frame::sudo::KeyStoreExt;
 
@@ -90,7 +90,9 @@ impl Darwinia {
 			}
 		}
 
-		Err(anyhow::anyhow!("StorageData not found"))
+		Err(
+			Error::NoStorageDataFound(module_name.to_string(), storage_name.to_string())
+		)
 	}
 
 	/// get runtime version
@@ -168,23 +170,16 @@ impl Darwinia {
 				let parent_mmr_root = digest_item.as_other().unwrap().to_vec();
 				let parent_mmr_root = &parent_mmr_root[4..];
 				if parent_mmr_root.len() != 32 {
-					return Err(DarwiniaError::Bridger(format!(
-						"Wrong parent_mmr_root len: {}",
-						parent_mmr_root.len()
-					))
-					.into());
+					return Err(Error::WrongMmrRootInDarwiniaHeader(array_bytes::bytes2hex("", &parent_mmr_root), block_number));
 				}
 				let mut mmr_root: [u8; 32] = [0; 32];
 				mmr_root.copy_from_slice(&parent_mmr_root);
 				H256(mmr_root)
 			} else {
-				return Err(DarwiniaError::Bridger(
-					"Wrong header with no parent_mmr_root".to_string(),
-				)
-				.into());
+				return Err(Error::NoMmrRootInDarwiniaHeader(block_number));
 			}
 		} else {
-			return Err(DarwiniaError::Bridger("No header fetched".to_string()).into());
+			return Err(Error::FailedToFetchDarwiniaHeader(block_number));
 		};
 		Ok(mmr_root)
 	}
@@ -208,9 +203,9 @@ impl Darwinia {
 		{
 			Some(block_hash) => match self.subxt.header(Some(block_hash)).await? {
 				Some(header) => Ok(header),
-				None => Err(Error::Other("get header return nil".to_string()).into()),
+				None => Err(Error::Other("get header return nil".to_string())),
 			},
-			None => Err(Error::Other("get block hash failed".to_string()).into()),
+			None => Err(Error::Other("get block hash failed".to_string())),
 		}
 	}
 

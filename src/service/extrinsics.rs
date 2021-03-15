@@ -4,7 +4,6 @@ use std::time::Duration;
 
 use actix::prelude::*;
 
-use crate::error::BizError;
 use crate::error::Result;
 use crate::service::redeem::EthereumTransaction;
 use crate::service::MsgStop;
@@ -31,7 +30,7 @@ pub enum Extrinsic {
 pub struct MsgExtrinsic(pub Extrinsic);
 
 impl Message for MsgExtrinsic {
-	type Result = ();
+	type Result = Result<()>;
 }
 
 /// Extrinsics Service
@@ -62,34 +61,20 @@ impl Actor for ExtrinsicsService {
 }
 
 impl Handler<MsgExtrinsic> for ExtrinsicsService {
-	type Result = AtomicResponse<Self, ()>;
+	type Result = AtomicResponse<Self, Result<()>>;
 
 	fn handle(&mut self, msg: MsgExtrinsic, _: &mut Context<Self>) -> Self::Result {
-		AtomicResponse::new(Box::pin(
-			async {}
-				.into_actor(self)
-				.then(|_, this, _| {
-					let f = ExtrinsicsService::send_extrinsic(
-						this.ethereum2darwinia.clone(),
-						this.darwinia2ethereum.clone(),
-						this.ethereum2darwinia_relayer.clone(),
-						this.darwinia2ethereum_relayer.clone(),
-						msg.0,
-						this.spec_name.clone(),
-						this.data_dir.clone(),
-					);
-					f.into_actor(this)
-				})
-				.map(|r, _, _| {
-					if let Err(err) = r {
-						if err.downcast_ref::<BizError>().is_some() {
-							trace!("{}", err);
-						} else {
-							error!("{:?}", err);
-						}
-					}
-				}),
-		))
+		let f = ExtrinsicsService::send_extrinsic(
+			self.ethereum2darwinia.clone(),
+			self.darwinia2ethereum.clone(),
+			self.ethereum2darwinia_relayer.clone(),
+			self.darwinia2ethereum_relayer.clone(),
+			msg.0,
+			self.spec_name.clone(),
+			self.data_dir.clone(),
+		).into_actor(self);
+
+		AtomicResponse::new(Box::pin(f))
 	}
 }
 
@@ -245,4 +230,103 @@ impl ExtrinsicsService {
 
 		Ok(())
 	}
+}
+
+#[cfg(test)]
+mod tests {
+	use actix::prelude::*;
+	use crate::error::Result;
+	use std::time::Duration;
+
+	#[derive(Clone, Copy)]
+	struct MyMsg(usize);
+	impl Message for MyMsg {
+		type Result = Result<usize>;
+	}
+
+	struct MyActor;
+
+	impl Actor for MyActor {
+		type Context = Context<Self>;
+	}
+
+	impl Handler<MyMsg> for MyActor {
+		type Result = AtomicResponse<Self, Result<usize>>;
+
+		fn handle(&mut self, msg: MyMsg, _: &mut Self::Context) -> Self::Result {
+			AtomicResponse::new(Box::pin(
+				async {}
+					.into_actor(self)
+					.then(move |_, this, _| {
+						println!("msg {} processing", msg.0);
+						if msg.0 == 888 {
+							println!("sleep 5 seconds for {}", msg.0);
+							tokio::time::delay_for(Duration::from_secs(5))
+								.into_actor(this)
+						} else {
+							println!("passing {}", msg.0);
+							tokio::time::delay_for(Duration::from_millis(1))
+								.into_actor(this)
+						}
+					})
+					.map(move |_, _, _| {
+						println!("at the end of processing {} -----------", msg.0);
+						if msg.0 == 666 {
+							Err(anyhow::anyhow!("error"))
+						} else {
+							Ok(msg.0)
+						}
+					}),
+			))
+		}
+	}
+
+	#[actix_rt::test]
+	async fn test_work() {
+		let my_actor = MyActor.start();
+		if let Ok(r) = my_actor.send(MyMsg(12)).await {
+			if let Ok(r2) = r {
+				assert_eq!(r2, 12);
+			}
+		}
+	}
+
+	#[actix_rt::test]
+	async fn test_error() {
+		let my_actor = MyActor.start();
+		if let Ok(r) = my_actor.send(MyMsg(666)).await {
+			if let Err(e) = r {
+				assert_eq!(e.to_string(), "error".to_string());
+			}
+		}
+	}
+
+	#[actix_rt::test]
+	async fn test_sending_msgs_in_two_different_coroutines() {
+		let my_actor = MyActor.start();
+		let my_actor_clone = my_actor.clone();
+		tokio::spawn(async move {
+			let msg_id = 888;
+			if let Ok(r) = my_actor_clone.send(MyMsg(msg_id)).await {
+				println!("msg {} sent", msg_id);
+				if let Ok(r2) = r {
+					assert_eq!(r2, msg_id);
+					println!("msg {} processed", msg_id);
+				}
+			}
+		});
+		tokio::spawn(async move {
+			let msg_id = 12;
+			if let Ok(r) = my_actor.send(MyMsg(msg_id)).await {
+				println!("msg {} sent", msg_id);
+				if let Ok(r2) = r {
+					assert_eq!(r2, msg_id);
+					println!("msg {} processed", msg_id);
+				}
+			}
+		});
+		tokio::time::delay_for(Duration::from_secs(10)).await;
+		println!("finished")
+	}
+
 }

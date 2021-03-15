@@ -10,6 +10,7 @@ use crate::{
 };
 
 use darwinia::{Ethereum2Darwinia, FromEthereumAccount};
+use crate::tools;
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -144,7 +145,7 @@ impl GuardService {
 				} else {
 					Extrinsic::GuardVote(pending_block_number, false)
 				};
-				extrinsics_service.send(MsgExtrinsic(ex)).await?;
+				tools::send_extrinsic(&extrinsics_service, ex).await;
 			}
 		}
 

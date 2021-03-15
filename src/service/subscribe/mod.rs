@@ -82,17 +82,9 @@ impl SubscribeService {
 				.darwinia2ethereum
 				.darwinia
 				.get_events_from_block_hash(hash)
-				.await;
+				.await.map_err(|err| err.into());
 			if let Err(err) = self.handle_events(&header, events).await {
 				if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-					tools::set_cache(
-						self.data_dir.clone(),
-						tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
-						header.number as u64,
-					)
-					.await?;
-					return Err(err);
-				} else if let Some(jsonrpsee::client::RequestError::Timeout) = err.downcast_ref() {
 					tools::set_cache(
 						self.data_dir.clone(),
 						tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
@@ -105,15 +97,16 @@ impl SubscribeService {
 						"An error occurred while processing the events of block {}: {:?}",
 						header.number, err
 					);
+					delay_for(Duration::from_secs(30)).await;
 				}
+			} else {
+				tools::set_cache(
+					self.data_dir.clone(),
+					tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
+					header.number as u64,
+				)
+				.await?;
 			}
-
-			tools::set_cache(
-				self.data_dir.clone(),
-				tools::LAST_TRACKED_DARWINIA_BLOCK_FILE_NAME,
-				header.number as u64,
-			)
-			.await?;
 
 			if self.stop {
 				return Err(BizError::Bridger("Force stop".to_string()).into());
@@ -139,8 +132,7 @@ impl SubscribeService {
 					.need_to_sign_mmr_root_of(&self.account, *delayed_to, Some(header.number))
 					.await?
 			{
-				let msg = MsgExtrinsic(delayed_ex.clone());
-				self.extrinsics_service.send(msg).await?;
+				tools::send_extrinsic(&self.extrinsics_service, delayed_ex.clone()).await;
 				self.delayed_extrinsics.remove(&delayed_to);
 			}
 		}
@@ -184,8 +176,7 @@ impl SubscribeService {
 					.await?
 				{
 					let ex = Extrinsic::SignAndSendAuthorities(event.message);
-					let msg = MsgExtrinsic(ex);
-					self.extrinsics_service.send(msg).await?;
+					tools::send_extrinsic(&self.extrinsics_service, ex).await;
 				}
 			}
 			// authority set changed will emit this event
@@ -225,4 +216,5 @@ impl SubscribeService {
 		}
 		Ok(())
 	}
+
 }

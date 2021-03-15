@@ -15,6 +15,7 @@ use anyhow::Context as AnyhowContext;
 use std::time::Duration;
 
 use darwinia::Ethereum2Darwinia;
+use crate::tools;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
@@ -192,8 +193,7 @@ impl RelayService {
 		// do affirm
 		// /////////////////////////
 		let ex = Extrinsic::Affirm(parcel);
-		let msg = MsgExtrinsic(ex);
-		extrinsics_service.send(msg).await?;
+		tools::send_extrinsic(&extrinsics_service, ex).await;
 
 		Ok(())
 	}

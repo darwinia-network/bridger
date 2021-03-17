@@ -27,7 +27,10 @@ use substrate_subxt::{
 	},
 	system::System,
 	Runtime,
+	EventTypeRegistry,
 };
+
+use sp_core::H256;
 
 /// Darwinia Runtime
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -35,6 +38,25 @@ pub struct DarwiniaRuntime;
 impl Runtime for DarwiniaRuntime {
 	type Signature = MultiSignature;
 	type Extra = DefaultExtra<Self>;
+
+	fn register_type_sizes(registry: &mut EventTypeRegistry<Self>) {
+		registry.register_type_size::<u128>("Balance");
+		registry.register_type_size::<u128>("RingBalance");
+		registry.register_type_size::<u128>("KtonBalance");
+		registry.register_type_size::<[u8; 20]>("EthereumAddress");
+		registry.register_type_size::<[u8; 20]>("EcdsaAddress");
+		registry.register_type_size::<H256>("MMRRoot");
+		registry.register_type_size::<[u8; 32]>("RelayAuthorityMessage");
+		registry.register_type_size::<[u8; 20]>("RelayAuthoritySigner");
+		registry.register_type_size::<EcdsaSignature>("RelayAuthoritySignature");
+		registry.register_type_size::<u8>("ElectionCompute"); // just a hack
+		registry.register_type_size::<u32>("Term");
+		registry.register_type_size::<u64>("EthereumTransactionIndex");
+		registry.register_type_size::<(u32, u32)>("TaskAddress<BlockNumber>");
+		registry.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
+		registry.register_type_size::<u32>("EraIndex");
+		registry.register_type_size::<u64>("EthereumBlockNumber");
+	}
 }
 
 impl Balances for DarwiniaRuntime {

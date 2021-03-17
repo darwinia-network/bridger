@@ -5,20 +5,20 @@ use crate::chain::ethereum::{
 };
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
-use substrate_subxt::system::{System, SystemEventsDecoder};
+use substrate_subxt::system::System;
 use substrate_subxt_proc_macro::{module, Call, Event, Store};
 
 /// Ethereum Relay Pallet
 #[module]
 pub trait EthereumRelay: System {
 	/// RingBalance
-	type RingBalance: 'static + Encode + Decode + Send + Default;
+	type RingBalance: 'static + Encode + Decode + Sync + Send + Default;
 	/// Ethereum BlockNumber
-	type EthereumBlockNumber: 'static + Encode + Decode + Send + Default;
+	type EthereumBlockNumber: 'static + Encode + Sync + Decode + Send + Default;
 	/// Ethereum Pending Header
-	type PendingRelayHeaderParcel: 'static + Encode + Decode + Send + Default;
+	type PendingRelayHeaderParcel: 'static + Encode + Decode + Sync + Send + Default;
 	/// Ethereum Relay Header ID
-	type RelayAffirmationId: 'static + Encode + Decode + Send + Default + Clone + Sync;
+	type RelayAffirmationId: 'static + Encode + Decode + Sync + Send + Default + Clone;
 }
 
 //////

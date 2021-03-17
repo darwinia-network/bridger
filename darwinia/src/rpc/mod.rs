@@ -1,9 +1,8 @@
 mod header_mmr;
 
-use jsonrpsee::{
-	common::{to_value as to_json_value, Params},
-	Client as RpseeClient,
-};
+use jsonrpsee_types::jsonrpc::{to_value as to_json_value, Params};
+
+use jsonrpsee_ws_client::WsClient as RpseeClient;
 
 use substrate_subxt::sp_core::H256;
 

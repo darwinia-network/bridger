@@ -7,6 +7,8 @@ use substrate_subxt::{
 	BlockNumber, Client as Subxt, ClientBuilder,
 };
 
+use jsonrpsee_ws_client::{WsClient, WsConfig};
+
 use primitives::{
 	//todo move to e2d
 	frame::ethereum::backing::VerifiedProofStoreExt,
@@ -40,12 +42,7 @@ impl Clone for Darwinia {
 
 impl Darwinia {
 	pub async fn new(url: &str) -> Result<Darwinia> {
-		let client = jsonrpsee::ws_client(url).await?;
-		let rpc = Rpc::new(client.clone());
-		let client = ClientBuilder::<DarwiniaRuntime>::new()
-			.set_client(client.clone())
-			.build()
-			.await?;
+		let client = WsClient::new(WsConfig::with_url(url)).await?;
 		let event = DarwiniaEvents::new(client.clone());
 		//let signer_seed = config.darwinia_to_ethereum.seed.clone();
 		//let sender = DarwiniaSender::new(

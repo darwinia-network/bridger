@@ -1,14 +1,14 @@
 //! Relayer Game
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
-use substrate_subxt::system::{System, SystemEventsDecoder};
+use substrate_subxt::system::System;
 use substrate_subxt_proc_macro::{module, Store};
 
 /// Ethereum Relay Pallet
 #[module]
 pub trait EthereumRelayerGame: System {
 	/// Ethereum Relay Affirmation
-	type RelayAffirmation: 'static + Encode + Decode + Send + Default;
+	type RelayAffirmation: 'static + Encode + Decode + Sync + Send + Default;
 }
 
 //////

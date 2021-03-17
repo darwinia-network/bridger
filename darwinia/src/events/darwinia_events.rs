@@ -58,6 +58,9 @@ impl DarwiniaEvents {
 		decoder.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
 		decoder.register_type_size::<u32>("EraIndex");
 		decoder.register_type_size::<u64>("EthereumBlockNumber");
+		decoder.register_type_size::<[u8; 20]>("H160");
+		decoder.register_type_size::<[u8; 32]>("H256");
+		decoder.register_type_size::<[u8; 32]>("U256");
 		DarwiniaEvents { decoder, client }
 	}
 

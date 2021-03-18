@@ -1,8 +1,5 @@
 use substrate_subxt::{
-	events::Raw,
-	sp_core::Decode,
-	Client, EventsDecoder, RawEvent,
-	EventTypeRegistry,
+	events::Raw, sp_core::Decode, Client, EventTypeRegistry, EventsDecoder, RawEvent,
 };
 
 use crate::error::Result;
@@ -43,7 +40,8 @@ impl Clone for DarwiniaEvents {
 impl DarwiniaEvents {
 	pub fn new(client: Client<DarwiniaRuntime>) -> Self {
 		let event_type_registry = EventTypeRegistry::<DarwiniaRuntime>::new();
-		let decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone(), event_type_registry);
+		let decoder =
+			EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone(), event_type_registry);
 		DarwiniaEvents { decoder, client }
 	}
 

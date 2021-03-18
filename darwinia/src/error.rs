@@ -16,7 +16,6 @@ pub enum Error {
 
 	// #[error("Failed to connect darwinia rpc ws endpoint")]
 	// CannotConnectToDarwinia(#[from] jsonrpsee_ws_client::),
-
 	#[error("Failed to build SecretKey from authority's private key")]
 	FailedToBuildSecretKey(#[from] secp256k1::Error),
 
@@ -31,7 +30,7 @@ pub enum Error {
 
 	#[error("`bytes2hex` - FAILED: {0}")]
 	Bytes2Hex(String),
-  
+
 	#[error("`hex2bytes` - FAILED: {0}")]
 	Hex2Bytes(String),
 

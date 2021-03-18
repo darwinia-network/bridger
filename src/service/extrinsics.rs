@@ -72,7 +72,8 @@ impl Handler<MsgExtrinsic> for ExtrinsicsService {
 			msg.0,
 			self.spec_name.clone(),
 			self.data_dir.clone(),
-		).into_actor(self);
+		)
+		.into_actor(self);
 
 		AtomicResponse::new(Box::pin(f))
 	}
@@ -234,8 +235,8 @@ impl ExtrinsicsService {
 
 #[cfg(test)]
 mod tests {
-	use actix::prelude::*;
 	use crate::error::Result;
+	use actix::prelude::*;
 	use std::time::Duration;
 
 	#[derive(Clone, Copy)]
@@ -261,12 +262,10 @@ mod tests {
 						println!("msg {} processing", msg.0);
 						if msg.0 == 888 {
 							println!("sleep 5 seconds for {}", msg.0);
-							tokio::time::delay_for(Duration::from_secs(5))
-								.into_actor(this)
+							tokio::time::delay_for(Duration::from_secs(5)).into_actor(this)
 						} else {
 							println!("passing {}", msg.0);
-							tokio::time::delay_for(Duration::from_millis(1))
-								.into_actor(this)
+							tokio::time::delay_for(Duration::from_millis(1)).into_actor(this)
 						}
 					})
 					.map(move |_, _, _| {
@@ -328,5 +327,4 @@ mod tests {
 		tokio::time::delay_for(Duration::from_secs(10)).await;
 		println!("finished")
 	}
-
 }

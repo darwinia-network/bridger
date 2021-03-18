@@ -1,6 +1,5 @@
-use crate::{api::Darwinia, error::Error, error::Result, Settings};
+use crate::{api::darwinia_api, error::Error, error::Result, Settings};
 use rpassword::prompt_password_stdout;
-use std::sync::Arc;
 
 /// Ecdsa
 pub async fn exec(message: String) -> Result<()> {
@@ -13,7 +12,10 @@ pub async fn exec(message: String) -> Result<()> {
 		let passwd = prompt_password_stdout("Please enter password:")?;
 		config.decrypt(&passwd)?;
 	}
-	let darwinia = Arc::new(Darwinia::new(&config).await?);
+	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let darwinia2ethereum = darwinia_api::get_d2e_instance(darwinia.clone());
+	let darwinia_account = darwinia_api::get_darwinia_account(&config);
+	let to_ethereum_account = darwinia_api::get_d2e_account(darwinia_account, &config);
 
 	info!("Init API succeed!");
 
@@ -21,8 +23,8 @@ pub async fn exec(message: String) -> Result<()> {
 		.map_err(|_| Error::Hex2Bytes("message[2..]".into()))?;
 	let mut buffer = [0u8; 32];
 	buffer.copy_from_slice(&message);
-	darwinia
-		.ecdsa_sign_and_submit_signed_authorities(buffer)
+	darwinia2ethereum
+		.ecdsa_sign_and_submit_signed_authorities(&to_ethereum_account, buffer)
 		.await?;
 
 	Ok(())

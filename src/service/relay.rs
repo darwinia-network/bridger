@@ -1,8 +1,5 @@
 //! Relay Service
-use crate::{
-	api::{Darwinia, Shadow},
-	error::Result,
-};
+use crate::{api::Shadow, error::Result};
 use primitives::chain::ethereum::EthereumHeader;
 use std::sync::Arc;
 
@@ -14,8 +11,8 @@ use actix::prelude::*;
 use anyhow::Context as AnyhowContext;
 use std::time::Duration;
 
-use darwinia::Ethereum2Darwinia;
 use crate::tools;
+use darwinia::Ethereum2Darwinia;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
@@ -172,7 +169,7 @@ impl RelayService {
 		// 3. affirmations check
 		for (_game_id, game) in ethereum2darwinia.affirmations().await?.iter() {
 			for (_round_id, affirmations) in game.iter() {
-				if Darwinia::contains(&affirmations, target) {
+				if Ethereum2Darwinia::contains(&affirmations, target) {
 					return Err(BizError::AffirmingBlockInGame(target).into());
 				}
 			}

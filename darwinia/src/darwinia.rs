@@ -18,8 +18,8 @@ use crate::{account::DarwiniaAccount, DarwiniaEvents, EventInfo};
 use crate::error::{Error, Result};
 use jsonrpsee_types::jsonrpc::{to_value as to_json_value, Params};
 
-use primitives::frame::sudo::KeyStoreExt;
 use crate::rpc::*;
+use primitives::frame::sudo::KeyStoreExt;
 
 pub struct Darwinia {
 	/// client
@@ -63,7 +63,12 @@ impl Darwinia {
 			to_json_value(block_number_of_member_leaf)?,
 			to_json_value(block_number_of_last_leaf)?,
 		]);
-		let result: HeaderMMRRpc = self.subxt.rpc.client.request("headerMMR_genProof", params).await?;
+		let result: HeaderMMRRpc = self
+			.subxt
+			.rpc
+			.client
+			.request("headerMMR_genProof", params)
+			.await?;
 		let header_mmr: Option<HeaderMMR> = result.into();
 		if let Some(mut header_proof) = header_mmr {
 			header_proof.block = block_number_of_member_leaf;
@@ -97,9 +102,10 @@ impl Darwinia {
 			}
 		}
 
-		Err(
-			Error::NoStorageDataFound(module_name.to_string(), storage_name.to_string())
-		)
+		Err(Error::NoStorageDataFound(
+			module_name.to_string(),
+			storage_name.to_string(),
+		))
 	}
 
 	/// get runtime version
@@ -177,7 +183,10 @@ impl Darwinia {
 				let parent_mmr_root = digest_item.as_other().unwrap().to_vec();
 				let parent_mmr_root = &parent_mmr_root[4..];
 				if parent_mmr_root.len() != 32 {
-					return Err(Error::WrongMmrRootInDarwiniaHeader(array_bytes::bytes2hex("", &parent_mmr_root), block_number));
+					return Err(Error::WrongMmrRootInDarwiniaHeader(
+						array_bytes::bytes2hex("", &parent_mmr_root),
+						block_number,
+					));
 				}
 				let mut mmr_root: [u8; 32] = [0; 32];
 				mmr_root.copy_from_slice(&parent_mmr_root);

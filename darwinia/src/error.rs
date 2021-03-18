@@ -14,8 +14,8 @@ pub enum Error {
 	#[error("Serde json error: {0}")]
 	Serialization(#[from] serde_json::error::Error),
 
-	#[error("Failed to connect darwinia rpc ws endpoint")]
-	CannotConnectToDarwinia(#[from] jsonrpsee_ws_client::),
+	// #[error("Failed to connect darwinia rpc ws endpoint")]
+	// CannotConnectToDarwinia(#[from] jsonrpsee_ws_client::),
 
 	#[error("Failed to build SecretKey from authority's private key")]
 	FailedToBuildSecretKey(#[from] secp256k1::Error),

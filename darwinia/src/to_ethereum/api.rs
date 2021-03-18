@@ -60,7 +60,6 @@ impl Darwinia2Ethereum {
 	) -> Result<Option<HeaderMMR>> {
 		return self
 			.darwinia
-			.rpc
 			.header_mmr(member_leaf, last_leaf, hash)
 			.await;
 	}

@@ -10,7 +10,7 @@ pub mod types;
 #[macro_use]
 extern crate log;
 
-pub use rpc::{FormatedMMR, HeaderMMR, Rpc};
+pub use rpc::{FormatedMMR, HeaderMMR};
 
 pub use events::{DarwiniaEvents, EventInfo};
 

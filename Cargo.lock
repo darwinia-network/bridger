@@ -517,7 +517,7 @@ dependencies = [
  "serde 1.0.124",
  "serde_json",
  "sp-keyring",
- "substrate-subxt 0.14.0 (git+https://github.com/wuminzhe/substrate-subxt.git?branch=master)",
+ "substrate-subxt",
  "thiserror",
  "web3",
 ]
@@ -817,8 +817,8 @@ dependencies = [
  "rlp",
  "serde 1.0.124",
  "serde_json",
- "substrate-subxt 0.14.0 (git+https://github.com/wuminzhe/substrate-subxt.git?branch=master)",
- "substrate-subxt-proc-macro 0.14.0 (git+https://github.com/wuminzhe/substrate-subxt.git?branch=master)",
+ "substrate-subxt",
+ "substrate-subxt-proc-macro",
  "thiserror",
  "tokio 0.2.25",
  "uint 0.8.5",
@@ -859,7 +859,7 @@ dependencies = [
  "sp-keyring",
  "sp-version",
  "structopt",
- "substrate-subxt 0.14.0 (git+https://github.com/paritytech/substrate-subxt.git?branch=master)",
+ "substrate-subxt",
  "thiserror",
  "tokio 0.2.25",
  "web3",
@@ -4161,38 +4161,6 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.14.0"
-source = "git+https://github.com/paritytech/substrate-subxt.git?branch=master#3b362fb072ec45a870e9aa7cb9f6a2949b59c3ef"
-dependencies = [
- "dyn-clone",
- "frame-metadata",
- "frame-support",
- "funty",
- "futures 0.3.13",
- "hex",
- "jsonrpsee-http-client",
- "jsonrpsee-types",
- "jsonrpsee-ws-client",
- "log",
- "num-traits 0.2.14",
- "pallet-indices",
- "pallet-staking",
- "parity-scale-codec 2.0.1",
- "serde 1.0.124",
- "serde_json",
- "sp-application-crypto",
- "sp-core",
- "sp-rpc",
- "sp-runtime",
- "sp-std",
- "sp-version",
- "substrate-subxt-proc-macro 0.14.0 (git+https://github.com/paritytech/substrate-subxt.git?branch=master)",
- "thiserror",
- "url",
-]
-
-[[package]]
-name = "substrate-subxt"
-version = "0.14.0"
 source = "git+https://github.com/wuminzhe/substrate-subxt.git?branch=master#3400790b0c8755ff03f8cb1b0cc423c53e2de0a2"
 dependencies = [
  "dyn-clone",
@@ -4217,23 +4185,9 @@ dependencies = [
  "sp-runtime",
  "sp-std",
  "sp-version",
- "substrate-subxt-proc-macro 0.14.0 (git+https://github.com/wuminzhe/substrate-subxt.git?branch=master)",
+ "substrate-subxt-proc-macro",
  "thiserror",
  "url",
-]
-
-[[package]]
-name = "substrate-subxt-proc-macro"
-version = "0.14.0"
-source = "git+https://github.com/paritytech/substrate-subxt.git?branch=master#3b362fb072ec45a870e9aa7cb9f6a2949b59c3ef"
-dependencies = [
- "heck",
- "proc-macro-crate",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
- "synstructure",
 ]
 
 [[package]]

@@ -34,10 +34,12 @@ ethereum:
   # Disable by removing or commenting
   relayer:
     # private key of relayer
-    private_key: 0x...
+    # alice
+    private_key: 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a
     # the darwinia account public key who will get the reward
     # when send authorities to ethereum
-    beneficiary_darwinia_account: 0x...
+    # alice
+    beneficiary_darwinia_account: 0xd6c71059dbbe9ad2b0ed3f289738b800836eb425544ce694825285b958ca755e
   # (optional) the person who will ecdsa sign new mmr root or new authority set
   # Disable by removing or commenting
   authority:
@@ -51,7 +53,8 @@ darwinia:
   # the person who will relay ethereum data to darwinia
   relayer:
     # private key of relayer, or, private key of proxy
-    private_key: 0x...
+    # alice
+    private_key: 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a
     # (optional) real account public key
     # allowing `real` account to give permission to `proxy` account to dispatch calls
     # The account (32 bytes) that the proxy will make a call on behalf of

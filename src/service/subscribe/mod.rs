@@ -210,7 +210,7 @@ impl SubscribeService {
 				{
 					info!("{}", event);
 					let ex = Extrinsic::SignAndSendMmrRoot(event.block_number);
-					tools::send_extrinsic(&self.extrinsics_service, ex).await;
+                    self.delayed_extrinsics.insert(event.block_number, ex);
 				}
 			}
 			_ => {}

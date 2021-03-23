@@ -29,7 +29,7 @@ use substrate_subxt::{
 	EventTypeRegistry, Runtime,
 };
 
-use sp_core::{H160, H256};
+use sp_core::{H160, H256, U256};
 
 type SessionIndex = u32;
 
@@ -67,6 +67,10 @@ impl Runtime for DarwiniaRuntime {
 		registry.register_type_size::<Self::AccountId>("AccountId");
 		registry.register_type_size::<SessionIndex>("SessionIndex");
 		registry.register_type_size::<Log>("Log");
+		registry.register_type_size::<U256>("U256");
+		registry.register_type_size::<H256>("H256");
+		registry.register_type_size::<H160>("H160");
+		registry.register_type_size::<ExitReason>("ExitReason");
 		register_default_type_sizes(registry);
 	}
 }
@@ -173,3 +177,49 @@ impl Default for EcdsaSignature {
 
 /// EcdsaMessage
 pub type EcdsaMessage = [u8; 32];
+
+#[derive(Encode, Decode)]
+enum ExitReason {
+	Succeed(ExitSucceed),
+	Error(ExitError),
+	Revert(ExitRevert),
+	Fatal(ExitFatal),
+}
+
+#[derive(Encode, Decode)]
+enum ExitSucceed {
+	Stopped,
+	Returned,
+	Suicided,
+}
+
+#[derive(Encode, Decode)]
+enum ExitError {
+	StackUnderflow,
+	StackOverflow,
+	InvalidJump,
+	InvalidRange,
+	DesignatedInvalid,
+	CallTooDeep,
+	CreateCollision,
+	CreateContractLimit,
+	OutOfOffset,
+	OutOfGas,
+	OutOfFund,
+	PCUnderflow,
+	CreateEmpty,
+	Other(String),
+}
+
+#[derive(Encode, Decode)]
+enum ExitRevert {
+	Reverted,
+}
+
+#[derive(Encode, Decode)]
+enum ExitFatal {
+	NotSupported,
+	UnhandledInterrupt,
+	CallErrorAsFatal(ExitError),
+	Other(String),
+}

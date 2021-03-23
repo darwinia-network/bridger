@@ -65,14 +65,12 @@ impl Runtime for DarwiniaRuntime {
 		registry.register_type_size::<u64>("EthereumBlockNumber");
 		registry.register_type_size::<Self::BlockNumber>("BlockNumber");
 		registry.register_type_size::<Self::AccountId>("AccountId");
-		registry.register_type_size::<[u8; 10]>("DispatchInfo");
 		registry.register_type_size::<SessionIndex>("SessionIndex");
 		registry.register_type_size::<Log>("Log");
 		registry.register_type_size::<U256>("U256");
 		registry.register_type_size::<H256>("H256");
 		registry.register_type_size::<H160>("H160");
 		registry.register_type_size::<ExitReason>("ExitReason");
-		registry.register_type_size::<u32>("u32");
 		register_default_type_sizes(registry);
 	}
 }

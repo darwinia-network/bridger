@@ -1,5 +1,4 @@
 //! Custom byte array
-#![allow(clippy::manual_range_contains)]
 
 use codec::{Decode, Encode};
 use serde::{

@@ -51,8 +51,7 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) -> Result<()> {
 		if let Err(e) = run(data_dir.clone(), &config).await {
 			error!("{:?}", e);
 			match e.downcast_ref() {
-				Some(Error::FailToConnectDarwinia { .. })
-				| Some(Error::NoDarwiniaStart)
+				Some(Error::NoDarwiniaStart)
 				| Some(Error::NoEthereumStart) => {
 					// performing retry
 					info!("Bridger will restart in 30 seconds...");

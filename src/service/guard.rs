@@ -11,7 +11,6 @@ use crate::{
 
 use crate::tools;
 use darwinia::{Ethereum2Darwinia, FromEthereumAccount};
-use crate::tools;
 
 #[derive(Clone, Debug)]
 struct MsgGuard;

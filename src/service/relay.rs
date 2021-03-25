@@ -13,7 +13,6 @@ use std::time::Duration;
 
 use crate::tools;
 use darwinia::Ethereum2Darwinia;
-use crate::tools;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]

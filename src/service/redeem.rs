@@ -12,7 +12,6 @@ use web3::types::H256;
 
 use crate::tools;
 use darwinia::Ethereum2Darwinia;
-use crate::tools;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]

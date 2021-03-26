@@ -3,7 +3,7 @@ use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use frame_support::sp_runtime::app_crypto::sp_core::H256;
 use substrate_subxt::sp_core::bytes::to_hex;
-use substrate_subxt::system::{System, SystemEventsDecoder};
+use substrate_subxt::system::System;
 use substrate_subxt_proc_macro::{module, Call, Event, Store};
 
 /// AuthoritiesToSignReturn
@@ -40,13 +40,13 @@ pub struct RelayAuthority<AccountId, RelayAuthoritySigner, RingBalance, BlockNum
 #[module]
 pub trait EthereumRelayAuthorities: System {
 	/// Relay Authority
-	type RelayAuthority: 'static + Encode + Decode + Send + Default;
+	type RelayAuthority: 'static + Encode + Decode + Send + Sync + Default;
 	/// Relay authority signer
-	type RelayAuthoritySigner: 'static + Encode + Decode + Send + Default;
+	type RelayAuthoritySigner: 'static + Encode + Decode + Sync + Send + Default;
 	/// Relay signature
-	type RelayAuthoritySignature: 'static + Encode + Decode + Send + Sync + Default;
+	type RelayAuthoritySignature: 'static + Encode + Decode + Sync + Send + Sync + Default;
 	/// Relay signature
-	type RelayAuthorityMessage: 'static + Encode + Decode + Send + Default;
+	type RelayAuthorityMessage: 'static + Encode + Decode + Sync + Send + Default;
 }
 
 //////

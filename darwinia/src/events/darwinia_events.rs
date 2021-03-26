@@ -1,7 +1,5 @@
 use substrate_subxt::{
-	events::Raw,
-	sp_core::{Decode, H256},
-	Client, EventsDecoder, RawEvent,
+	events::Raw, sp_core::Decode, Client, EventTypeRegistry, EventsDecoder, RawEvent,
 };
 
 use crate::error::Result;
@@ -12,7 +10,7 @@ use primitives::{
 		AuthoritiesChangeSigned, EthereumRelayAuthorities, MMRRootSigned,
 		ScheduleAuthoritiesChange, ScheduleMMRRoot,
 	},
-	runtime::{DarwiniaRuntime, EcdsaSignature},
+	runtime::DarwiniaRuntime,
 };
 
 /// Darwinia Event Info
@@ -41,23 +39,9 @@ impl Clone for DarwiniaEvents {
 
 impl DarwiniaEvents {
 	pub fn new(client: Client<DarwiniaRuntime>) -> Self {
-		let mut decoder = EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone());
-		decoder.register_type_size::<u128>("Balance");
-		decoder.register_type_size::<u128>("RingBalance");
-		decoder.register_type_size::<u128>("KtonBalance");
-		decoder.register_type_size::<[u8; 20]>("EthereumAddress");
-		decoder.register_type_size::<[u8; 20]>("EcdsaAddress");
-		decoder.register_type_size::<H256>("MMRRoot");
-		decoder.register_type_size::<[u8; 32]>("RelayAuthorityMessage");
-		decoder.register_type_size::<[u8; 20]>("RelayAuthoritySigner");
-		decoder.register_type_size::<EcdsaSignature>("RelayAuthoritySignature");
-		decoder.register_type_size::<u8>("ElectionCompute"); // just a hack
-		decoder.register_type_size::<u32>("Term");
-		decoder.register_type_size::<u64>("EthereumTransactionIndex");
-		decoder.register_type_size::<(u32, u32)>("TaskAddress<BlockNumber>");
-		decoder.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
-		decoder.register_type_size::<u32>("EraIndex");
-		decoder.register_type_size::<u64>("EthereumBlockNumber");
+		let event_type_registry = EventTypeRegistry::<DarwiniaRuntime>::new();
+		let decoder =
+			EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone(), event_type_registry);
 		DarwiniaEvents { decoder, client }
 	}
 

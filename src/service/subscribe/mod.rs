@@ -82,7 +82,8 @@ impl SubscribeService {
 				.darwinia2ethereum
 				.darwinia
 				.get_events_from_block_hash(hash)
-				.await.map_err(|err| err.into());
+				.await
+				.map_err(|err| err.into());
 			if let Err(err) = self.handle_events(&header, events).await {
 				if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
 					tools::set_cache(

@@ -4,7 +4,7 @@ use substrate_subxt::{
 	sp_core::{twox_128, Bytes, H256},
 	sp_runtime::generic::Header,
 	sp_runtime::traits::{BlakeTwo256, Header as TraitHeader},
-	BlockNumber, Client as Subxt, ClientBuilder,
+	BlockNumber, Client, ClientBuilder,
 };
 
 use primitives::{
@@ -13,17 +13,17 @@ use primitives::{
 	runtime::DarwiniaRuntime,
 };
 
-use crate::{account::DarwiniaAccount, DarwiniaEvents, EventInfo, Rpc};
+use crate::{account::DarwiniaAccount, DarwiniaEvents, EventInfo};
 
 use crate::error::{Error, Result};
+use jsonrpsee_types::jsonrpc::{to_value as to_json_value, Params};
 
+use crate::rpc::*;
 use primitives::frame::sudo::KeyStoreExt;
 
 pub struct Darwinia {
-	/// jsonrpc client
-	pub rpc: Rpc,
 	/// client
-	pub subxt: Subxt<DarwiniaRuntime>,
+	pub subxt: Client<DarwiniaRuntime>,
 	/// Event Parser
 	pub event: DarwiniaEvents,
 }
@@ -31,7 +31,6 @@ pub struct Darwinia {
 impl Clone for Darwinia {
 	fn clone(&self) -> Self {
 		Self {
-			rpc: self.rpc.clone(),
 			subxt: self.subxt.clone(),
 			event: self.event.clone(),
 		}
@@ -40,30 +39,43 @@ impl Clone for Darwinia {
 
 impl Darwinia {
 	pub async fn new(url: &str) -> Result<Darwinia> {
-		let client = jsonrpsee::ws_client(url).await?;
-		let rpc = Rpc::new(client.clone());
 		let client = ClientBuilder::<DarwiniaRuntime>::new()
-			.set_client(client.clone())
+			.set_url(url)
+			.skip_type_sizes_check()
 			.build()
 			.await?;
 		let event = DarwiniaEvents::new(client.clone());
-		//let signer_seed = config.darwinia_to_ethereum.seed.clone();
-		//let sender = DarwiniaSender::new(
-		//config.seed.clone(),
-		//config
-		//.proxy
-		//.clone()
-		//.map(|proxy| proxy.real[2..].to_string()),
-		//client.clone(),
-		//signer_seed,
-		//config.eth.rpc.to_string(),
-		//);
 
 		Ok(Self {
-			rpc,
 			subxt: client,
 			event,
 		})
+	}
+
+	/// get mmr root of darwinia
+	pub async fn header_mmr(
+		&self,
+		block_number_of_member_leaf: u64,
+		block_number_of_last_leaf: u64,
+		hash: H256,
+	) -> Result<Option<HeaderMMR>> {
+		let params = Params::Array(vec![
+			to_json_value(block_number_of_member_leaf)?,
+			to_json_value(block_number_of_last_leaf)?,
+		]);
+		let result: HeaderMMRRpc = self
+			.subxt
+			.rpc
+			.client
+			.request("headerMMR_genProof", params)
+			.await?;
+		let header_mmr: Option<HeaderMMR> = result.into();
+		if let Some(mut header_proof) = header_mmr {
+			header_proof.block = block_number_of_member_leaf;
+			header_proof.hash = hash;
+			return Ok(Some(header_proof));
+		}
+		Ok(None)
 	}
 
 	/// get_storage_data
@@ -90,9 +102,10 @@ impl Darwinia {
 			}
 		}
 
-		Err(
-			Error::NoStorageDataFound(module_name.to_string(), storage_name.to_string())
-		)
+		Err(Error::NoStorageDataFound(
+			module_name.to_string(),
+			storage_name.to_string(),
+		))
 	}
 
 	/// get runtime version
@@ -170,7 +183,10 @@ impl Darwinia {
 				let parent_mmr_root = digest_item.as_other().unwrap().to_vec();
 				let parent_mmr_root = &parent_mmr_root[4..];
 				if parent_mmr_root.len() != 32 {
-					return Err(Error::WrongMmrRootInDarwiniaHeader(array_bytes::bytes2hex("", &parent_mmr_root), block_number));
+					return Err(Error::WrongMmrRootInDarwiniaHeader(
+						array_bytes::bytes2hex("", &parent_mmr_root),
+						block_number,
+					));
 				}
 				let mut mmr_root: [u8; 32] = [0; 32];
 				mmr_root.copy_from_slice(&parent_mmr_root);
@@ -251,7 +267,7 @@ impl Darwinia {
 	}
 
 	/// Check if should redeem
-	pub async fn verified(&self, block_hash: H256, tx_index: u64) -> Result<bool> {
+	pub async fn verified(&self, block_hash: web3::types::H256, tx_index: u64) -> Result<bool> {
 		Ok(self
 			.subxt
 			.verified_proof((block_hash.to_fixed_bytes(), tx_index), None)

@@ -58,11 +58,7 @@ impl Darwinia2Ethereum {
 		last_leaf: u64,
 		hash: H256,
 	) -> Result<Option<HeaderMMR>> {
-		return self
-			.darwinia
-			.rpc
-			.header_mmr(member_leaf, last_leaf, hash)
-			.await;
+		return self.darwinia.header_mmr(member_leaf, last_leaf, hash).await;
 	}
 
 	/// construct mmr root message

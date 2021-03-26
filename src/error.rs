@@ -1,14 +1,10 @@
 #![allow(missing_docs)]
 //! Bridger Result
 use crate::service::redeem::EthereumTransactionHash;
-use jsonrpsee::transport::ws::WsNewDnsError;
 use thiserror::Error as ThisError;
 
 #[derive(ThisError, Debug)]
 pub enum Error {
-	#[error("Failed to connect to darwinia node {url}")]
-	FailToConnectDarwinia { url: String, source: WsNewDnsError },
-
 	#[error("The last redeemed block number is not set")]
 	LastRedeemedFileNotExists,
 

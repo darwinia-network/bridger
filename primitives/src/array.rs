@@ -1,4 +1,5 @@
 //! Custom byte array
+
 use codec::{Decode, Encode};
 use serde::{
 	de::{Deserialize, Deserializer, Error, SeqAccess, Visitor},

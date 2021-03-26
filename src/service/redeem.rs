@@ -10,8 +10,8 @@ use crate::service::MsgStop;
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 
-use darwinia::Ethereum2Darwinia;
 use crate::tools;
+use darwinia::Ethereum2Darwinia;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]

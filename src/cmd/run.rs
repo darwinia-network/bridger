@@ -5,8 +5,6 @@ use crate::{
 	Settings,
 };
 use actix::Actor;
-use async_macros::select;
-use futures::StreamExt;
 use rpassword::prompt_password_stdout;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -53,8 +51,7 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) -> Result<()> {
 		if let Err(e) = run(data_dir.clone(), &config).await {
 			error!("{:?}", e);
 			match e.downcast_ref() {
-				Some(Error::FailToConnectDarwinia { .. })
-				| Some(Error::NoDarwiniaStart)
+				Some(Error::NoDarwiniaStart)
 				| Some(Error::NoEthereumStart) => {
 					// performing retry
 					info!("Bridger will restart in 30 seconds...");
@@ -256,23 +253,8 @@ async fn start_services(
 			last_tracked_darwinia_block + 1,
 			data_dir.clone(),
 		);
-		let b = async {
-			if let Err(e) = subscribe.start().await {
-				return Err(e);
-			}
-			Ok(())
-		};
 
-		let killer = darwinia.subxt.rpc.client.killer.clone();
-		let c = async {
-			loop {
-				if killer.lock().await.next().await.is_some() {
-					return Err(BizError::Bridger("Jsonrpsee's ws connection closed".into()).into());
-				}
-			}
-		};
-
-		if let Err(e) = select!(b, c).await {
+		if let Err(_e) = subscribe.start().await {
 			if let Some(ethereum_service) = &ethereum_service {
 				ethereum_service.do_send(MsgStop {});
 			}
@@ -287,7 +269,6 @@ async fn start_services(
 			}
 			subscribe.stop();
 			extrinsics_service.do_send(MsgStop {});
-			return Err(e);
 		}
 	}
 	Ok(())

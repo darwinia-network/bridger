@@ -1,6 +1,5 @@
-use crate::{api::Darwinia, error::Result, Settings};
+use crate::{api::darwinia_api, error::Result, Settings};
 use rpassword::prompt_password_stdout;
-use std::sync::Arc;
 
 /// Affirm
 pub async fn exec(json: String) -> Result<()> {
@@ -13,14 +12,20 @@ pub async fn exec(json: String) -> Result<()> {
 		let passwd = prompt_password_stdout("Please enter password:")?;
 		config.decrypt(&passwd)?;
 	}
-	let darwinia = Arc::new(Darwinia::new(&config).await?);
+	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let ethereum2darwinia = darwinia_api::get_e2d_instance(darwinia);
+	let darwinia_account = darwinia_api::get_darwinia_account(&config);
+	let e2d_account = darwinia_api::get_e2d_account(darwinia_account);
 
 	// build from json string
 	let parcel: primitives::chain::ethereum::EthereumRelayHeaderParcel =
 		serde_json::from_str(&json).unwrap();
 
 	// affirm
-	let hash = darwinia.affirm(parcel).await.unwrap();
+	let hash = ethereum2darwinia
+		.affirm(&e2d_account, parcel)
+		.await
+		.unwrap();
 	println!("Extrinsic hash: {:?}", hash);
 
 	Ok(())

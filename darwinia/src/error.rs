@@ -1,6 +1,5 @@
 #![allow(missing_docs)]
 
-use jsonrpsee::client::RequestError;
 use thiserror::Error as ThisError;
 
 /// Error enum.
@@ -10,13 +9,10 @@ pub enum Error {
 	Io(#[from] std::io::Error),
 
 	#[error("Rpc error: {0}")]
-	Rpc(#[from] RequestError),
+	Rpc(#[from] jsonrpsee_types::error::Error),
 
 	#[error("Serde json error: {0}")]
 	Serialization(#[from] serde_json::error::Error),
-
-	#[error("Failed to connect darwinia rpc ws endpoint")]
-	CannotConnectToDarwinia(#[from] jsonrpsee::transport::ws::WsNewDnsError),
 
 	#[error("Failed to build SecretKey from authority's private key")]
 	FailedToBuildSecretKey(#[from] secp256k1::Error),
@@ -32,7 +28,7 @@ pub enum Error {
 
 	#[error("`bytes2hex` - FAILED: {0}")]
 	Bytes2Hex(String),
-  
+
 	#[error("`hex2bytes` - FAILED: {0}")]
 	Hex2Bytes(String),
 

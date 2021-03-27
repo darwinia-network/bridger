@@ -30,6 +30,11 @@ ethereum:
       topics:
         # set authorities topic
         - 0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f
+    backing:
+      address: "0xd5FC8F2eB94fE6AAdeE91c561818e1fF4ea2C041"
+      topics:
+        - "0x0c403c4583ff520bad94bf49975b3547a573f7157070022cf8c9a023498d4d11"
+        - "0xf70fbddcb43e433da621898f5f2628b0a644a77a4389ac2580c5b1de06382fe2"
   # (optional) the person who will relay darwinia data to ethereum
   # Disable by removing or commenting
   relayer:

@@ -1,11 +1,9 @@
 //! Darwinia Ethereum Issuing
 use crate::chain::ethereum::EthereumReceiptProofThing;
+use crate::frame::ethereum::backing::EcdsaAddress;
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
-use substrate_subxt::{
-	balances::{Balances, BalancesEventsDecoder},
-	system::{System, SystemEventsDecoder},
-};
+use substrate_subxt::{balances::Balances, system::System};
 use substrate_subxt_proc_macro::{module, Call, Store};
 
 /// Ethereum Issuing Pallet
@@ -19,9 +17,11 @@ pub trait EthereumIssuing: System + Balances {
 
 /// Submit register or lock call
 #[derive(Clone, Debug, PartialEq, Call, Encode)]
-pub struct RegisterOrIssuingErc20<T: EthereumIssuing> {
+pub struct RegisterOrRedeemErc20<T: EthereumIssuing> {
 	/// Runtime marker
 	pub _runtime: PhantomData<T>,
+    /// Backing address
+    pub backing: EcdsaAddress,
 	/// Ethereum Receipt Proof
 	pub proof: EthereumReceiptProofThing,
 }

@@ -14,9 +14,9 @@ use primitives::{
 	},
 	frame::{
 		ethereum::{
-			backing::{Redeem, RedeemCallExt},
+			backing::{EcdsaAddress, Redeem, RedeemCallExt},
 			game::{AffirmationsStoreExt, EthereumRelayerGame},
-			issuing::{RegisterOrIssuingErc20, RegisterOrIssuingErc20CallExt},
+			issuing::{RegisterOrRedeemErc20, RegisterOrRedeemErc20CallExt},
 			relay::{
 				Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
 				PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
@@ -312,15 +312,17 @@ impl Ethereum2Darwinia {
 	}
 
 	/// register_or_issuing_erc20
-	pub async fn register_or_issuing_erc20(
+	pub async fn register_or_redeem_erc20(
 		&self,
 		account: &Account,
+        backing: EcdsaAddress,
 		proof: EthereumReceiptProofThing,
 	) -> Result<H256> {
 		match &account.0.real {
 			Some(real) => {
-				let call = RegisterOrIssuingErc20 {
+				let call = RegisterOrRedeemErc20 {
 					_runtime: PhantomData::default(),
+                    backing,
 					proof,
 				};
 
@@ -339,7 +341,7 @@ impl Ethereum2Darwinia {
 			None => Ok(self
 				.darwinia
 				.subxt
-				.register_or_issuing_erc20(&account.0.signer, proof)
+				.register_or_redeem_erc20(&account.0.signer, backing, proof)
 				.await?),
 		}
 	}

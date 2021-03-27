@@ -74,7 +74,7 @@ impl Handler<MsgExtrinsic> for ExtrinsicsService {
 			msg.0,
 			self.spec_name.clone(),
 			self.data_dir.clone(),
-			self.backing.clone(),
+			self.backing,
 		)
 		.into_actor(self);
 
@@ -112,6 +112,7 @@ impl ExtrinsicsService {
 		}
 	}
 
+    #[allow(clippy::too_many_arguments)]
 	async fn send_extrinsic(
 		ethereum2darwinia: Option<Ethereum2Darwinia>,
 		darwinia2ethereum: Option<Darwinia2Ethereum>,

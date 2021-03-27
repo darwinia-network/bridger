@@ -1,6 +1,6 @@
 use crate::Darwinia;
 
-use crate::error::{DarwiniaError, Result};
+use crate::error::{Error, Result};
 use std::collections::HashMap;
 type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
 type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
@@ -133,7 +133,7 @@ impl Ethereum2Darwinia {
 				}
 			}
 		} else {
-			Err(DarwiniaError::Bridger("Not technical committee member".to_string()).into())
+			Err(Error::NotTechnicalCommitteeMember)
 		}
 	}
 
@@ -150,7 +150,8 @@ impl Ethereum2Darwinia {
 			// get game id
 			let game_id: &mut [u8] = &mut storage_key.0[32..40];
 			game_id.reverse();
-			let game_id = u64::from_str_radix(hex::encode(game_id).as_str(), 16).unwrap();
+			let game_id =
+				u64::from_str_radix(array_bytes::bytes2hex("", game_id).as_str(), 16).unwrap();
 
 			//
 			if result.get(&game_id).is_none() {
@@ -161,11 +162,33 @@ impl Ethereum2Darwinia {
 			// get round id
 			let round_id: &mut [u8] = &mut storage_key.0[40..44];
 			round_id.reverse();
-			let round_id = u32::from_str_radix(hex::encode(round_id).as_str(), 16).unwrap();
+			let round_id =
+				u32::from_str_radix(array_bytes::bytes2hex("", round_id).as_str(), 16).unwrap();
 
 			game.insert(round_id, affirmations);
 		}
 		Ok(result)
+	}
+
+	/// affirmations contains block?
+	pub fn contains(affirmations: &[RelayAffirmation], block: u64) -> bool {
+		for affirmation in affirmations {
+			let blocks: &Vec<u64> = &affirmation
+				.relay_header_parcels
+				.iter()
+				.map(|bp| bp.header.number)
+				.collect();
+			if blocks.contains(&block) {
+				return true;
+			}
+		}
+
+		// TODO: Checking the equality of the affirmations
+
+		// TODO: If there is an affirmation with larger block number, then agree and join in the game.
+
+		// TODO: How to play and join the game
+		false
 	}
 
 	/// Get confirmed block numbers
@@ -238,8 +261,8 @@ impl Ethereum2Darwinia {
 		let ethereum_tx_hash = proof
 			.header
 			.hash
-			.map(|hash| hex::encode(&hash))
-			.ok_or_else(|| DarwiniaError::Bridger("No hash in header".to_string()))?;
+			.map(|hash| array_bytes::bytes2hex("", &hash))
+			.ok_or(Error::NoHeaderHashInEthereumReceiptProofOfThing)?;
 		match &account.0.real {
 			Some(real) => {
 				trace!(

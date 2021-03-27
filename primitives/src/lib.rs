@@ -44,3 +44,59 @@ pub mod frame;
 pub mod result;
 pub mod rpc;
 pub mod runtime;
+
+#[cfg(test)]
+mod tests {
+	use super::runtime::DarwiniaRuntime;
+	use substrate_subxt::{
+		ClientBuilder,
+	};
+	// use super::frame::ethereum::relay::PendingRelayHeaderParcelsStoreExt;
+	use super::frame::technical_committee::MembersStoreExt;
+
+	#[tokio::test]
+	async fn test_rpc() {
+		let client = ClientBuilder::<DarwiniaRuntime>::new()
+			.set_url("ws://100.64.200.3:10000")
+			.skip_type_sizes_check()
+			.build()
+			.await.unwrap();
+
+		println!("-----------");
+		let block_number = 1;
+		let block_hash = client.block_hash(Some(block_number.into())).await.unwrap();
+		if let Some(hash) = block_hash {
+			println!("Block hash for block number {}: {}", block_number, hash);
+		} else {
+			println!("Block number {} not found.", block_number);
+		}
+	}
+
+	#[tokio::test]
+	async fn test_storage() {
+		let client = ClientBuilder::<DarwiniaRuntime>::new()
+			.set_url("ws://100.64.200.3:10000")
+			.skip_type_sizes_check()
+			.build()
+			.await.unwrap();
+
+		let members = client.members(None).await.unwrap();
+		for member in members {
+			println!("{:?}", member);
+		}
+	}
+
+	#[tokio::test]
+	async fn test_call() {
+		let client = ClientBuilder::<DarwiniaRuntime>::new()
+			.set_url("wss://pangolin-rpc.darwinia.network")
+			.skip_type_sizes_check()
+			.build()
+			.await.unwrap();
+
+		let members = client.members(None).await.unwrap();
+		for member in members {
+			println!("{:?}", member);
+		}
+	}
+}

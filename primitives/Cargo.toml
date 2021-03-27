@@ -21,13 +21,13 @@ thiserror = "1.0"
 
 ## Optional featrues
 async-trait = { version = "0.1.40", optional = true }
-frame-support = { version = "2.0.0", optional = true }
-pallet-indices = { version = "2.0.0", optional = true }
-pallet-im-online = { version = "2.0.0", optional = true }
+frame-support = { version = "3.0.0", optional = true }
+pallet-indices = { version = "3.0.0", optional = true }
+pallet-im-online = { version = "3.0.0", optional = true }
 reqwest = { version = "0.10", features = ["json"], optional = true }
 serde_json = { version = "1.0", optional = true }
-substrate-subxt = { version = "0.13.0", optional = true }
-substrate-subxt-proc-macro = { version = "0.13.0", optional = true }
+substrate-subxt = { version = "0.15.0", git = "https://github.com/wuminzhe/substrate-subxt.git", branch = "darwinia", optional = true }
+substrate-subxt-proc-macro = { version = "0.15.0", git = "https://github.com/wuminzhe/substrate-subxt.git", branch = "darwinia", optional = true }
 
 [dependencies.rlp]
 package = "rlp"
@@ -40,8 +40,13 @@ features = ["derive"]
 
 [dependencies.codec]
 package = "parity-scale-codec"
-version = "1"
+version = "2"
 features = ["derive"]
+
+[dependencies.tokio]
+package = "tokio"
+version = "0.2.22"
+features = ["full"]
 
 [features]
 rpc = ["async-trait", "reqwest", "serde_json"]

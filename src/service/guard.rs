@@ -9,6 +9,7 @@ use crate::{
 	error::{BizError, Result},
 };
 
+use crate::tools;
 use darwinia::{Ethereum2Darwinia, FromEthereumAccount};
 
 #[derive(Clone, Debug)]
@@ -144,7 +145,7 @@ impl GuardService {
 				} else {
 					Extrinsic::GuardVote(pending_block_number, false)
 				};
-				extrinsics_service.send(MsgExtrinsic(ex)).await?;
+				tools::send_extrinsic(&extrinsics_service, ex).await;
 			}
 		}
 

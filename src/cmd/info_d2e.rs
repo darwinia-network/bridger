@@ -78,7 +78,7 @@ pub async fn exec(
 		.await?;
 	let event_proof = darwinia
 		.get_event_proof(
-			hex::decode(if istoken {
+			array_bytes::hex2bytes(if istoken {
 				"e66f3de22eed97c730152f373193b5a0485b407d88f37d5fd6a2c59e5a696691"
 			} else {
 				"f8860dda3d08046cf2706b92bf7202eaae7a79191c90e76297e0895605b8b457"
@@ -91,17 +91,17 @@ pub async fn exec(
 	//let mut result = HashMap::new();
 	let mut result: TxProofWithMMRProof = Default::default();
 
-	result.message = "0x".to_string() + &hex::encode(&message);
-	result.block_header = "0x".to_string() + &hex::encode(header.encode());
-	result.events_proof_str = "0x".to_string()
-		+ &hex::encode(
-			event_proof
-				.iter()
-				.map(|x| &x.0)
-				.collect::<Vec<&Vec<u8>>>()
-				.encode(),
-		);
-	result.root = "0x".to_string() + &hex::encode(mmr_root);
+	result.message = array_bytes::bytes2hex("0x", &message);
+	result.block_header = array_bytes::bytes2hex("0x", header.encode());
+	result.events_proof_str = array_bytes::bytes2hex(
+		"0x",
+		event_proof
+			.iter()
+			.map(|x| &x.0)
+			.collect::<Vec<&Vec<u8>>>()
+			.encode(),
+	);
+	result.root = array_bytes::bytes2hex("0x", mmr_root);
 	result.mmrindex = mmrblock;
 
 	if let Some(header_proof) = proof {
@@ -122,7 +122,7 @@ pub async fn exec(
 			let mut signatures = vec![];
 			for signature in signed_info.signatures {
 				sign_accounts.push(signature.0.to_string());
-				signatures.push("0x".to_string() + &hex::encode(signature.1.encode()));
+				signatures.push(array_bytes::bytes2hex("0x", signature.1.encode()));
 			}
 			//result.insert("sign-account".to_string(), sign_accounts.join(","));
 			result.signatures = signatures;

@@ -1,5 +1,5 @@
 use crate::{
-	api::{Darwinia, Shadow},
+	api::{darwinia_api, Shadow},
 	error::Result,
 	Settings,
 };
@@ -16,11 +16,16 @@ pub async fn exec(block: u64) -> Result<()> {
 		config.decrypt(&passwd)?;
 	}
 	let shadow = Shadow::new(&config);
-	let darwinia = Darwinia::new(&config).await?;
+	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let ethereum2darwinia = darwinia_api::get_e2d_instance(darwinia);
+	let darwinia_account = darwinia_api::get_darwinia_account(&config);
+	let e2d_account = darwinia_api::get_e2d_account(darwinia_account);
 	info!("Init darwinia API succeed!");
 	let parcel = shadow.parcel(block as usize).await?;
 	info!("Init shadow API succeed!");
-	darwinia.set_confirmed_parcel(parcel).await?;
+	ethereum2darwinia
+		.set_confirmed_parcel(&e2d_account, parcel)
+		.await?;
 	info!("Set confirmed block {} succeed!", block);
 	Ok(())
 }

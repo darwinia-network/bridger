@@ -1,8 +1,5 @@
 //! Relay Service
-use crate::{
-	api::{Darwinia, Shadow},
-	error::Result,
-};
+use crate::{api::Shadow, error::Result};
 use primitives::chain::ethereum::EthereumHeader;
 use std::sync::Arc;
 
@@ -14,6 +11,7 @@ use actix::prelude::*;
 use anyhow::Context as AnyhowContext;
 use std::time::Duration;
 
+use crate::tools;
 use darwinia::Ethereum2Darwinia;
 
 /// message 'block_number'
@@ -171,7 +169,7 @@ impl RelayService {
 		// 3. affirmations check
 		for (_game_id, game) in ethereum2darwinia.affirmations().await?.iter() {
 			for (_round_id, affirmations) in game.iter() {
-				if Darwinia::contains(&affirmations, target) {
+				if Ethereum2Darwinia::contains(&affirmations, target) {
 					return Err(BizError::AffirmingBlockInGame(target).into());
 				}
 			}
@@ -192,8 +190,7 @@ impl RelayService {
 		// do affirm
 		// /////////////////////////
 		let ex = Extrinsic::Affirm(parcel);
-		let msg = MsgExtrinsic(ex);
-		extrinsics_service.send(msg).await?;
+		tools::send_extrinsic(&extrinsics_service, ex).await;
 
 		Ok(())
 	}

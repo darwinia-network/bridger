@@ -1,0 +1,80 @@
+encrypted: false
+ethereum:
+  # ethereum json-rpc endpoint
+  rpc: https://ropsten.infura.io/v3/<YOUR_KEY>
+  contract:
+    ring:
+      # erc20 contract of ring
+      address: 0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0
+      topics:
+        # cross transfer topic
+        - 0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10
+    kton:
+      # erc20 contract of kton
+      address: 0x1994100c58753793D52c6f457f189aa3ce9cEe94
+      topics:
+        # cross transfer topic
+        - 0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10
+    bank:
+      # gringotts bank contract
+      address: 0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e
+      topics:
+        # cross transfer topic
+        - 0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12
+    issuing:
+      # erc20 ring and kton issuing contract
+      address: 0x8f889dDC6AF3BF4C8950fB9b1492C0a949686909
+    relay:
+      # ethereum relay contract for darwinia to ethereum
+      address: 0x524Fa00eBD22DE069553F72d15A1d064e9025713
+      topics:
+        # set authorities topic
+        - 0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f
+  # (optional) the person who will relay darwinia data to ethereum
+  # Disable by removing or commenting
+  relayer:
+    # private key of relayer
+    # alice
+    private_key: 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a
+    # the darwinia account public key who will get the reward
+    # when send authorities to ethereum
+    # alice
+    beneficiary_darwinia_account: 0xd6c71059dbbe9ad2b0ed3f289738b800836eb425544ce694825285b958ca755e
+  # (optional) the person who will ecdsa sign new mmr root or new authority set
+  # Disable by removing or commenting
+  authority:
+    # private key to sign ecdsa messages
+    # the signature will be submitted to Darwinia by darwinia.relayer
+    private_key: 0x8bd012fd2433d4fea852f437d6bb22d1e57dee7657cc1e703460ddeaae1a67ca
+
+darwinia:
+  # darwinia node websocket json-rpc endpoint
+  rpc: wss://pangolin-rpc.darwinia.network
+  # the person who will relay ethereum data to darwinia
+  relayer:
+    # private key of relayer, or, private key of proxy
+    # alice
+    private_key: 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a
+    # (optional) real account public key
+    # allowing `real` account to give permission to `proxy` account to dispatch calls
+    # The account (32 bytes) that the proxy will make a call on behalf of
+    # Disable by removing or commenting
+    # real_account: 0x...
+
+shadow:
+  # shadow http restful endpoint, refer https://github.com/darwinia-network/shadow
+  endpoint: https://ropsten.shadow.darwinia.network
+
+services:
+  ethereum:
+    # ethereum service polling interval in seconds
+    step: 30
+  relay:
+    # relay service polling interval in seconds
+    step: 60
+  redeem:
+    # redeem service polling interval in seconds
+    step: 90
+  guard:
+    # guard service polling interval in seconds
+    step: 30

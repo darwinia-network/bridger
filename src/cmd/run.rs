@@ -5,8 +5,6 @@ use crate::{
 	Settings,
 };
 use actix::Actor;
-use async_macros::select;
-use futures::StreamExt;
 use rpassword::prompt_password_stdout;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -30,7 +28,7 @@ use darwinia::{
 };
 
 /// Run the bridger
-pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
+pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) -> Result<()> {
 	if std::env::var("RUST_LOG").is_err() {
 		if verbose {
 			std::env::set_var("RUST_LOG", "info,darwinia_bridger");
@@ -43,29 +41,25 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) {
 	// --- Data dir ---
 	let data_dir = data_dir.unwrap_or_else(|| Settings::default_data_dir().unwrap());
 	// --- Load config ---
-	let mut config = Settings::new(&data_dir).unwrap();
+	let mut config = Settings::new(&data_dir)?;
 
 	if config.encrypted {
 		let passwd = prompt_password_stdout("Please enter password:").unwrap();
-		if config.decrypt(&passwd).is_err() {
-			return;
-		}
+		config.decrypt(&passwd)?;
 	}
-
-	while let Err(e) = run(data_dir.clone(), &config).await {
-		if let Some(Error::NoEthereumStart) = e.downcast_ref() {
+	loop {
+		if let Err(e) = run(data_dir.clone(), &config).await {
 			error!("{:?}", e);
-			break;
-		} else if let Some(Error::NoDarwiniaStart) = e.downcast_ref() {
-			error!("{:?}", e);
-			break;
-		} else if let Some(Error::NoAuthoritySignerSeed) = e.downcast_ref() {
-			error!("{:?}", e);
-			break;
-		} else {
-			error!("{:?}", e);
-			info!("Bridger will restart in 30 seconds...");
-			time::delay_for(Duration::from_secs(30)).await;
+			match e.downcast_ref() {
+				Some(Error::NoDarwiniaStart)
+				| Some(Error::NoEthereumStart) => {
+					// performing retry
+					info!("Bridger will restart in 30 seconds...");
+					time::delay_for(Duration::from_secs(30)).await;
+				}
+				// break default
+				_ => return Err(e),
+			}
 		}
 	}
 }
@@ -259,23 +253,8 @@ async fn start_services(
 			last_tracked_darwinia_block + 1,
 			data_dir.clone(),
 		);
-		let b = async {
-			if let Err(e) = subscribe.start().await {
-				return Err(e);
-			}
-			Ok(())
-		};
 
-		let killer = darwinia.subxt.rpc.client.killer.clone();
-		let c = async {
-			loop {
-				if killer.lock().await.next().await.is_some() {
-					return Err(BizError::Bridger("Jsonrpsee's ws connection closed".into()).into());
-				}
-			}
-		};
-
-		if let Err(e) = select!(b, c).await {
+		if let Err(_e) = subscribe.start().await {
 			if let Some(ethereum_service) = &ethereum_service {
 				ethereum_service.do_send(MsgStop {});
 			}
@@ -290,7 +269,6 @@ async fn start_services(
 			}
 			subscribe.stop();
 			extrinsics_service.do_send(MsgStop {});
-			return Err(e);
 		}
 	}
 	Ok(())

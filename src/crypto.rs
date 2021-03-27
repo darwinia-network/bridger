@@ -75,7 +75,7 @@ impl Crypto {
 		Ok(decrypted)
 	}
 
-	fn generate_key(&self, passwd: &str) -> Result<[u8; 48]> {
+	fn generate_key(&self, passwd: &str) -> [u8; 48] {
 		//let salt = [0; 16];
 		let mut output = [0; 48];
 		scrypt(
@@ -84,12 +84,12 @@ impl Crypto {
 			&ScryptParams::new(10, 2, 3),
 			&mut output,
 		);
-		Ok(output)
+		output
 	}
 
 	/// encrypt
 	pub fn encrypt(&self, passwd: &str, plain: &str) -> Result<String> {
-		let private_key = self.generate_key(&passwd)?;
+		let private_key = self.generate_key(&passwd);
 		let key = &private_key[..32];
 		let iv = &private_key[32..48];
 		let encrypted = self.aes256_cbc_encrypt(plain.as_bytes(), &key, &iv)?;
@@ -98,7 +98,7 @@ impl Crypto {
 
 	/// decrypt
 	pub fn decrypt(&self, passwd: &str, encrypted: &str) -> Result<String> {
-		let private_key = self.generate_key(&passwd)?;
+		let private_key = self.generate_key(&passwd);
 		let key = &private_key[..32];
 		let iv = &private_key[32..48];
 		let encrypted_data = base64::decode(&encrypted)?;

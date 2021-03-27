@@ -53,8 +53,7 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) -> Result<()> {
 		if let Err(e) = run(data_dir.clone(), &config).await {
 			error!("{:?}", e);
 			match e.downcast_ref() {
-				Some(Error::NoDarwiniaStart)
-				| Some(Error::NoEthereumStart) => {
+				Some(Error::NoDarwiniaStart) | Some(Error::NoEthereumStart) => {
 					// performing retry
 					info!("Bridger will restart in 30 seconds...");
 					time::delay_for(Duration::from_secs(30)).await;
@@ -170,12 +169,12 @@ async fn start_services(
 	web3: &Web3<Http>,
 	(data_dir, spec_name, last_redeemed, last_tracked_darwinia_block): (PathBuf, String, u64, u32),
 ) -> Result<()> {
-    let addr = &config.ethereum.contract.backing.address;
+	let addr = &config.ethereum.contract.backing.address;
 	let backing_address =
-			array_bytes::hex2bytes(&addr[2..]).map_err(|_| Error::Hex2Bytes("str[2..]".into()))?;
-    let mut backing: EcdsaAddress = [0u8; 20];
-    backing.copy_from_slice(&backing_address);
-		
+		array_bytes::hex2bytes(&addr[2..]).map_err(|_| Error::Hex2Bytes("str[2..]".into()))?;
+	let mut backing: EcdsaAddress = [0u8; 20];
+	backing.copy_from_slice(&backing_address);
+
 	// extrinsic sender
 	let extrinsics_service = ExtrinsicsService::new(
 		ethereum2darwinia.clone(),

@@ -20,8 +20,8 @@ pub trait EthereumIssuing: System + Balances {
 pub struct RegisterOrRedeemErc20<T: EthereumIssuing> {
 	/// Runtime marker
 	pub _runtime: PhantomData<T>,
-    /// Backing address
-    pub backing: EcdsaAddress,
+	/// Backing address
+	pub backing: EcdsaAddress,
 	/// Ethereum Receipt Proof
 	pub proof: EthereumReceiptProofThing,
 }

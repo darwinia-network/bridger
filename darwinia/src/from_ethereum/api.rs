@@ -315,14 +315,14 @@ impl Ethereum2Darwinia {
 	pub async fn register_or_redeem_erc20(
 		&self,
 		account: &Account,
-        backing: EcdsaAddress,
+		backing: EcdsaAddress,
 		proof: EthereumReceiptProofThing,
 	) -> Result<H256> {
 		match &account.0.real {
 			Some(real) => {
 				let call = RegisterOrRedeemErc20 {
 					_runtime: PhantomData::default(),
-                    backing,
+					backing,
 					proof,
 				};
 

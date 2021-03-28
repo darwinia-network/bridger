@@ -28,6 +28,9 @@ pub enum Error {
 
 	#[error("`hex2bytes` - FAILED: {0}")]
 	Hex2Bytes(String),
+
+	#[error("New http with URI {0} error: {1}")]
+	NewHttpError(String, String),
 }
 
 #[derive(ThisError, Debug)]

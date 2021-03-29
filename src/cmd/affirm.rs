@@ -35,7 +35,6 @@ pub async fn exec(block: u64) -> Result<()> {
 		None,
 		"".to_string(),
 		dirs::home_dir().unwrap(),
-		None,
 	)
 	.start();
 

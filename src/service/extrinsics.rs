@@ -11,7 +11,6 @@ use crate::tools;
 use primitives::chain::ethereum::{
 	EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor,
 };
-use primitives::frame::ethereum::backing::EcdsaAddress;
 use primitives::runtime::EcdsaMessage;
 use std::path::PathBuf;
 
@@ -47,7 +46,6 @@ pub struct ExtrinsicsService {
 
 	spec_name: String,
 	data_dir: PathBuf,
-	backing: Option<EcdsaAddress>,
 }
 
 impl Actor for ExtrinsicsService {
@@ -74,7 +72,6 @@ impl Handler<MsgExtrinsic> for ExtrinsicsService {
 			msg.0,
 			self.spec_name.clone(),
 			self.data_dir.clone(),
-			self.backing,
 		)
 		.into_actor(self);
 
@@ -99,7 +96,6 @@ impl ExtrinsicsService {
 		darwinia2ethereum_relayer: Option<ToEthereumAccount>,
 		spec_name: String,
 		data_dir: PathBuf,
-		backing: Option<EcdsaAddress>,
 	) -> ExtrinsicsService {
 		ExtrinsicsService {
 			ethereum2darwinia,
@@ -108,7 +104,6 @@ impl ExtrinsicsService {
 			darwinia2ethereum_relayer,
 			spec_name,
 			data_dir,
-			backing,
 		}
 	}
 
@@ -121,7 +116,6 @@ impl ExtrinsicsService {
 		extrinsic: Extrinsic,
 		spec_name: String,
 		data_dir: PathBuf,
-		backing: Option<EcdsaAddress>,
 	) -> Result<()> {
 		match extrinsic {
 			Extrinsic::Affirm(parcel) => {
@@ -160,7 +154,7 @@ impl ExtrinsicsService {
 						if let Some(ethereum2darwinia) = &ethereum2darwinia {
 							if let Some(relayer) = &ethereum2darwinia_relayer {
 								let ex_hash = ethereum2darwinia
-									.register_or_redeem_erc20(&relayer, backing.unwrap(), proof)
+									.register_or_redeem_erc20(&relayer, proof)
 									.await?;
 								info!(
 									"register or redeem token tx {:?} with extrinsic {:?}",

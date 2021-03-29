@@ -109,7 +109,10 @@ async fn run(data_dir: PathBuf, config: &Settings) -> Result<()> {
 	let from_ethereum_account = darwinia_api::get_e2d_account(darwinia_account.clone());
 	let to_ethereum_account = darwinia_api::get_d2e_account(darwinia_account.clone(), &config);
 
-	let web3 = Web3::new(Http::new(&config.ethereum.rpc).unwrap());
+	let web3 = Web3::new(
+		Http::new(&config.ethereum.rpc)
+			.map_err(|e| Error::NewHttpError(config.ethereum.rpc.clone(), e.to_string()))?,
+	);
 
 	// Stop if darwinia sender is authority but without a signer seed
 	if darwinia2ethereum

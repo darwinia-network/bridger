@@ -204,16 +204,16 @@ async fn start_services(
 			.start();
 
 			// ethereum service
-			let ethereum_service = EthereumService::new(
+			let mut ethereum_service = EthereumService::new(
 				config.clone(),
 				web3.clone(),
-				darwinia.clone(),
 				last_redeemed + 1,
+				data_dir.clone(),
+				darwinia.clone(),
 				relay_service.clone().recipient(),
 				redeem_service.clone().recipient(),
-				data_dir.clone(),
-			)
-			.start();
+			);
+			ethereum_service.start().await?;
 
 			// guard service
 			let guard_service = if let Some(relayer) = &ethereum2darwinia_relayer {
@@ -257,9 +257,7 @@ async fn start_services(
 		);
 
 		if let Err(_e) = subscribe.start().await {
-			if let Some(ethereum_service) = &ethereum_service {
-				ethereum_service.do_send(MsgStop {});
-			}
+			ethereum_service.unwrap().stop();
 			if let Some(relay_service) = &relay_service {
 				relay_service.do_send(MsgStop {});
 			}

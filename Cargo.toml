@@ -2,6 +2,7 @@
 members = [
   "primitives",
   "darwinia",
+  "ethereum",
 ]
 
 [package]
@@ -76,6 +77,11 @@ features = ["runtime", "rpc"]
 package = "bridge-client-darwinia"
 version = "0.1.0"
 path = "./darwinia"
+
+[dependencies.ethereum]
+package = "ethereum"
+version = "0.1.0"
+path = "./ethereum"
 
 [dependencies.serde]
 package = "serde"

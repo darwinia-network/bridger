@@ -849,6 +849,7 @@ dependencies = [
  "dirs",
  "env_logger",
  "etc",
+ "ethereum",
  "futures 0.3.13",
  "jsonrpsee-http-client",
  "jsonrpsee-types",
@@ -1054,6 +1055,19 @@ dependencies = [
  "impl-rlp",
  "impl-serde",
  "tiny-keccak 2.0.2",
+]
+
+[[package]]
+name = "ethereum"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "array-bytes",
+ "async-trait",
+ "log",
+ "thiserror",
+ "tokio 0.2.25",
+ "web3",
 ]
 
 [[package]]

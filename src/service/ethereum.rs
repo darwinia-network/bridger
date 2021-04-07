@@ -1,6 +1,6 @@
 //! Ethereum transaction service
 use crate::{
-	error::{BizError, Result},
+	// error::{BizError, Result},
 	service::{
 		redeem::{EthereumTransaction, EthereumTransactionHash, MsgEthereumTransaction},
 		relay::MsgBlockNumber,
@@ -15,22 +15,21 @@ use web3::{
 	types::{Log, H160, H256},
 	Web3,
 };
-use tokio::time::{delay_for, Duration};
+use tokio::time::Duration;
+use async_trait::async_trait;
 
 use darwinia::Darwinia;
-use ethereum::{Chain, Ethereum, EthereumTracker};
+use ethereum::{Ethereum, TopicsList, LogsHandler, EthereumLikeChain, EthereumLikeChainTracker};
 use array_bytes::hex2bytes_unchecked as bytes;
+
 
 /// Ethereum transaction service
 ///
 /// This service can check and scan darwinia txs in Ethereum
-pub struct EthereumService {
-	stop: bool,
-
+pub struct EthereumLogsHandler {
 	// Ethereum
-	contracts: Vec<(H160, Vec<H256>)>,
+	pub contracts: Vec<(H160, Vec<H256>)>,
 	data_dir: PathBuf,
-	tracker: EthereumTracker<ethereum::Ethereum>,
 
 	// Darwinia
 	darwinia: Darwinia,
@@ -40,67 +39,10 @@ pub struct EthereumService {
 	redeem_service: Recipient<MsgEthereumTransaction>,
 }
 
-impl EthereumService {
-	/// New Ethereum Service with http
-	pub fn new(
-		config: Settings,
-		web3: Web3<Http>,
-		scan_from: u64,
-		data_dir: PathBuf,
-		darwinia: Darwinia,
-		relay_service: Recipient<MsgBlockNumber>,
-		redeem_service: Recipient<MsgEthereumTransaction>,
-	) -> EthereumService {
-		let contracts = config.ethereum.contract.clone();
-		let contracts = EthereumService::parse_contracts(&contracts);
-		let tracker =
-			EthereumTracker::new(
-				web3.clone(),
-				contracts.clone(),
-				Ethereum { web3: web3.clone(), from: scan_from },
-			);
-		EthereumService {
-			stop: false,
-			contracts,
-			data_dir,
-			tracker,
-			darwinia,
-			relay_service,
-			redeem_service,
-		}
-	}
-
-	/// start
-	pub async fn start(&mut self) -> Result<()>  {
-		info!("✨ SERVICE STARTED: ETHEREUM");
-
-		loop {
-			match self.tracker.next().await {
-				Err(err) => {
-					error!("{:?}", err);
-					delay_for(Duration::from_secs(30)).await;
-				},
-				Ok(logs) => {
-					if let Err(err2) = self.handle(logs).await {
-						error!("{:?}", err2);
-					}
-				}
-			}
-
-			if self.stop {
-				return Err(BizError::Bridger("Force stop".to_string()).into());
-			}
-		}
-	}
-
-	/// stop
-	pub fn stop(&mut self) {
-		info!("💤 SERVICE STOPPED: ETHEREUM");
-		self.stop = true;
-	}
-
-	async fn handle(&self, logs: Vec<Log>) -> Result<()> {
-		let txs = self.get_transactions(logs).await;
+#[async_trait]
+impl LogsHandler for EthereumLogsHandler {
+    async fn handle(&self, topics_list: Vec<(H160, Vec<H256>)>, logs: Vec<Log>) -> ethereum::Result<()> {
+		let txs = get_transactions(topics_list, logs).await;
 		
 		if !txs.is_empty() {
 			info!(
@@ -115,10 +57,9 @@ impl EthereumService {
 			}
 
 			for tx in &txs {
-				if self.darwinia.verified(tx.block_hash, tx.index).await? {
+				if self.darwinia.verified(tx.block_hash, tx.index).await.unwrap() {
 					trace!(
-						"   {} tx {:?} has already been redeemed.",
-						self.tracker.chain.name(),
+						"   tx {:?} has already been redeemed.",
 						tx.enclosed_hash()
 					);
 					tools::set_cache(
@@ -126,7 +67,7 @@ impl EthereumService {
 						tools::LAST_REDEEMED_CACHE_FILE_NAME,
 						tx.block,
 					)
-					.await?;
+					.await.unwrap();
 				} else {
 					// delay to wait for possible previous extrinsics
 					tokio::time::delay_for(Duration::from_secs(12)).await;
@@ -141,50 +82,28 @@ impl EthereumService {
 		}
 
 		Ok(())
-	}
+    }
+}
 
-	/// Extract transaction from logs
-	async fn get_transactions(&self, logs: Vec<Log>) -> Vec<EthereumTransaction> {
-		let mut txs = vec![];
-		txs.append(
-			&mut logs
-				.iter()
-				.map(|l| {
-					let block = l.block_number.unwrap_or_default().low_u64();
-					let index = l.transaction_index.unwrap_or_default().low_u64();
-					if l.topics.contains(&self.contracts[1].1[0])
-					{
-						EthereumTransaction {
-							tx_hash: EthereumTransactionHash::Token(
-								l.transaction_hash.unwrap_or_default(),
-							),
-							block_hash: l.block_hash.unwrap_or_default(),
-							block,
-							index,
-						}
-					} else if l.topics.contains(&self.contracts[2].1[0]) {
-						EthereumTransaction {
-							tx_hash: EthereumTransactionHash::SetAuthorities(
-								l.transaction_hash.unwrap_or_default(),
-							),
-							block_hash: l.block_hash.unwrap_or_default(),
-							block,
-							index,
-						}
-					} else {
-						EthereumTransaction {
-							tx_hash: EthereumTransactionHash::Deposit(
-								l.transaction_hash.unwrap_or_default(),
-							),
-							block_hash: l.block_hash.unwrap_or_default(),
-							block,
-							index,
-						}
-					}
-				})
-				.collect::<Vec<EthereumTransaction>>(),
-		);
-		txs
+impl EthereumLogsHandler {
+	/// New Ethereum Service with http
+	pub fn new(
+		config: Settings,
+		data_dir: PathBuf,
+		darwinia: Darwinia,
+		relay_service: Recipient<MsgBlockNumber>,
+		redeem_service: Recipient<MsgEthereumTransaction>,
+	) -> EthereumLogsHandler {
+		let contracts = config.ethereum.contract.clone();
+		let contracts = EthereumLogsHandler::parse_contracts(&contracts);
+
+		EthereumLogsHandler {
+			contracts,
+			data_dir,
+			darwinia,
+			relay_service,
+			redeem_service,
+		}
 	}
 
 	/// Parse contract addresses and related topics
@@ -214,4 +133,67 @@ impl EthereumService {
 			(H160::from_slice(&bytes(relay.address)), relay_topics),
 		]
 	}
+
+}
+
+/// Extract transaction from logs
+async fn get_transactions(contracts: Vec<(H160, Vec<H256>)>, logs: Vec<Log>) -> Vec<EthereumTransaction> {
+	let mut txs = vec![];
+	txs.append(
+		&mut logs
+			.iter()
+			.map(|l| {
+				let block = l.block_number.unwrap_or_default().low_u64();
+				let index = l.transaction_index.unwrap_or_default().low_u64();
+				if l.topics.contains(&contracts[1].1[0])
+				{
+					EthereumTransaction {
+						tx_hash: EthereumTransactionHash::Token(
+							l.transaction_hash.unwrap_or_default(),
+						),
+						block_hash: l.block_hash.unwrap_or_default(),
+						block,
+						index,
+					}
+				} else if l.topics.contains(&contracts[2].1[0]) {
+					EthereumTransaction {
+						tx_hash: EthereumTransactionHash::SetAuthorities(
+							l.transaction_hash.unwrap_or_default(),
+						),
+						block_hash: l.block_hash.unwrap_or_default(),
+						block,
+						index,
+					}
+				} else {
+					EthereumTransaction {
+						tx_hash: EthereumTransactionHash::Deposit(
+							l.transaction_hash.unwrap_or_default(),
+						),
+						block_hash: l.block_hash.unwrap_or_default(),
+						block,
+						index,
+					}
+				}
+			})
+			.collect::<Vec<EthereumTransaction>>(),
+	);
+	txs
+}
+
+pub async fn start(web3: &Web3<Http>, start_from: u64, handler: EthereumLogsHandler) {
+	let contracts = handler.contracts.clone();
+
+	let topics_list = TopicsList::new(
+		contracts,
+		handler,
+	);
+
+	let chain = EthereumLikeChain::new("Ethereum".to_owned(), topics_list, Ethereum::new(start_from));
+
+	let mut tracker = EthereumLikeChainTracker::new(
+		web3.clone(), 
+		chain,
+	);
+
+	tracker.start().await;
 }

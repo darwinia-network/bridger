@@ -5,11 +5,11 @@ use web3::{
 	Web3,
 };
 
-pub async fn get_logs(web3: &Web3<Http>, contract_address: H160, topics: Vec<H256>, from: u64, to: u64) -> Result<Vec<Log>> {
+pub async fn get_logs(web3: &Web3<Http>, contract_address: &H160, topics: &Vec<H256>, from: u64, to: u64) -> Result<Vec<Log>> {
 	// build filter
 	let filter_builder = FilterBuilder::default()
-		.address(vec![contract_address])
-		.topics(Some(topics), None, None, None);
+		.address(vec![contract_address.clone()])
+		.topics(Some(topics.clone()), None, None, None);
 
 	let filter = filter_builder.clone()
 		.from_block(BlockNumber::Number(U64::from(from)))

@@ -9,7 +9,7 @@ pub mod relay;
 pub mod subscribe;
 
 pub use self::{
-	ethereum::EthereumService, extrinsics::ExtrinsicsService, guard::GuardService,
+	ethereum::EthereumLogsHandler, extrinsics::ExtrinsicsService, guard::GuardService,
 	redeem::RedeemService, relay::RelayService, subscribe::SubscribeService,
 };
 use actix::Message;

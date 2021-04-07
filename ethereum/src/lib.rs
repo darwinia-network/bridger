@@ -4,8 +4,9 @@ mod ethereum_tracker;
 mod chains;
 
 pub use error::{Error, Result};
-pub use chains::{Chain, Ethereum, Heco, Bsc};
-pub use ethereum_tracker::EthereumTracker;
+pub use chains::{TrackContext, LogsHandler};
+pub use chains::{EthereumLikeChain, DefaultLogsHandler, TopicsList, Ethereum, Heco, Bsc};
+pub use ethereum_tracker::EthereumLikeChainTracker;
 
 #[macro_use]
 extern crate log;

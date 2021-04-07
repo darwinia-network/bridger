@@ -6,6 +6,8 @@ use crate::error::{BizError, Result};
 use config::{Config, File};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use array_bytes::hex2bytes_unchecked as bytes;
+use web3::types::{H160, H256};
 
 // - Ethereum --------------------------------
 /// Ethereum Settings
@@ -202,6 +204,37 @@ impl Settings {
 			self.encrypted = false;
 		}
 		Ok(())
+	}
+
+	/// Get parsed contract addresses and related topics
+	pub fn get_parsed_contracts(&self) -> Vec<(H160, Vec<H256>)> {
+		let contracts = &self.ethereum.contract;
+
+		let bank = contracts.bank.clone();
+		let issuing = contracts.issuing.clone();
+		let relay = contracts.relay.clone();
+
+		let bank_topics = bank.topics.unwrap_or_default()
+			.iter()
+			.map(|t| H256::from_slice(&bytes(t)))
+			.collect();
+
+		let issuing_topics = issuing.topics.unwrap_or_default()
+			.iter()
+			.map(|t| H256::from_slice(&bytes(t)))
+			.collect();
+
+		let relay_topics = relay.topics.unwrap_or_default()
+			.iter()
+			.map(|t| H256::from_slice(&bytes(t)))
+			.collect();
+
+		vec![
+			(H160::from_slice(&bytes(bank.address)), bank_topics),
+			(H160::from_slice(&bytes(issuing.address)), issuing_topics),
+			(H160::from_slice(&bytes(relay.address)), relay_topics),
+		]
+		
 	}
 }
 

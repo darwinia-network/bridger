@@ -1,12 +1,10 @@
 //! Ethereum transaction service
 use crate::{
-	// error::{BizError, Result},
 	service::{
 		redeem::{EthereumTransaction, EthereumTransactionHash, MsgEthereumTransaction},
 		relay::MsgBlockNumber,
 	},
 	tools, Settings,
-	config::EthereumContract,
 };
 use actix::prelude::*;
 use std::path::PathBuf;
@@ -20,7 +18,6 @@ use async_trait::async_trait;
 
 use darwinia::Darwinia;
 use ethereum::{Ethereum, TopicsList, LogsHandler, EthereumLikeChain, EthereumLikeChainTracker};
-use array_bytes::hex2bytes_unchecked as bytes;
 
 
 /// Ethereum transaction service
@@ -95,10 +92,9 @@ impl EthereumService {
 		relay_service: Recipient<MsgBlockNumber>,
 		redeem_service: Recipient<MsgEthereumTransaction>,
 	) -> EthereumLikeChainTracker<Ethereum, Self> {
-		let contracts = config.ethereum.contract.clone();
-		let contracts = EthereumService::parse_contracts(&contracts);
+		let contracts = config.get_parsed_contracts();
 
-		let handler = EthereumService {
+		let logs_handler = EthereumService {
 			data_dir,
 			darwinia,
 			relay_service,
@@ -111,39 +107,11 @@ impl EthereumService {
 				"Ethereum", 
 				TopicsList::new(
 					contracts,
-					handler,
+					logs_handler,
 				), 
 				Ethereum::new(scan_from)
 			)
 		)
-	}
-
-	/// Parse contract addresses and related topics
-	fn parse_contracts(contracts: &EthereumContract) -> Vec<(H160, Vec<H256>)> {
-		let bank = contracts.bank.clone();
-		let issuing = contracts.issuing.clone();
-		let relay = contracts.relay.clone();
-
-		let bank_topics = bank.topics.unwrap_or_default()
-			.iter()
-			.map(|t| H256::from_slice(&bytes(t)))
-			.collect();
-
-		let issuing_topics = issuing.topics.unwrap_or_default()
-			.iter()
-			.map(|t| H256::from_slice(&bytes(t)))
-			.collect();
-
-		let relay_topics = relay.topics.unwrap_or_default()
-			.iter()
-			.map(|t| H256::from_slice(&bytes(t)))
-			.collect();
-
-		vec![
-			(H160::from_slice(&bytes(bank.address)), bank_topics),
-			(H160::from_slice(&bytes(issuing.address)), issuing_topics),
-			(H160::from_slice(&bytes(relay.address)), relay_topics),
-		]
 	}
 
 }

@@ -8,5 +8,5 @@ pub enum Error {
 	Other(String),
 }
 
-pub type Result<T> = anyhow::Result<T, Error>;
+pub type Result<T> = anyhow::Result<T, anyhow::Error>;
 

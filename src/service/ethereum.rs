@@ -57,7 +57,7 @@ impl LogsHandler for EthereumLogsHandler {
 			}
 
 			for tx in &txs {
-				if self.darwinia.verified(tx.block_hash, tx.index).await.unwrap() {
+				if self.darwinia.verified(tx.block_hash, tx.index).await? {
 					trace!(
 						"   tx {:?} has already been redeemed.",
 						tx.enclosed_hash()
@@ -67,7 +67,7 @@ impl LogsHandler for EthereumLogsHandler {
 						tools::LAST_REDEEMED_CACHE_FILE_NAME,
 						tx.block,
 					)
-					.await.unwrap();
+					.await?;
 				} else {
 					// delay to wait for possible previous extrinsics
 					tokio::time::delay_for(Duration::from_secs(12)).await;

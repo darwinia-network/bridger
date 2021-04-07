@@ -13,13 +13,15 @@ use tokio::time::{delay_for, Duration};
 pub struct EthereumLikeChainTracker<C: TrackContext, H: LogsHandler> {
 	web3: Web3<Http>,
 	chain: EthereumLikeChain<C, H>,
+	stop: bool,
 }
 
 impl<C: TrackContext, H: LogsHandler> EthereumLikeChainTracker<C, H> {
 	pub fn new(web3: Web3<Http>, chain: EthereumLikeChain<C, H>) -> Self {
 		EthereumLikeChainTracker {
 			web3,
-			chain
+			chain,
+			stop: false,
 		}
 	}
 
@@ -36,7 +38,15 @@ impl<C: TrackContext, H: LogsHandler> EthereumLikeChainTracker<C, H> {
 					}
 				}
 			}
+
+			if self.stop == true {
+				break;
+			}
 		}
+	}
+
+	pub fn stop(&mut self) {
+		self.stop = true;
 	}
 
 	pub async fn next(&mut self) -> Result<Vec<Log>> {

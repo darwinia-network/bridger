@@ -14,8 +14,7 @@ use web3::{transports::http::Http, Web3};
 
 use crate::api::Ethereum;
 use crate::error::BizError;
-use crate::service;
-use crate::service::EthereumLogsHandler;
+use crate::service::EthereumService;
 use crate::service::ExtrinsicsService;
 use crate::service::GuardService;
 use crate::service::MsgStop;
@@ -182,7 +181,7 @@ async fn start_services(
 	)
 	.start();
 
-	let (relay_service, redeem_service, guard_service) = {
+	let (relay_service, redeem_service, ethereum_service, guard_service) = {
 		if let Some(ethereum2darwinia) = &ethereum2darwinia {
 			// relay service
 			let last_confirmed = ethereum2darwinia.last_confirmed().await.unwrap();
@@ -205,14 +204,16 @@ async fn start_services(
 			.start();
 
 			// ethereum service
-			let ethereum_logs_handler = EthereumLogsHandler::new(
+			let mut ethereum_service = EthereumService::new(
 				config.clone(),
+				web3.clone(),
 				data_dir.clone(),
+				last_redeemed + 1,
 				darwinia.clone(),
 				relay_service.clone().recipient(),
 				redeem_service.clone().recipient(),
 			);
-			service::ethereum::start(&web3, last_redeemed + 1, ethereum_logs_handler).await;
+			ethereum_service.start().await;
 
 			// guard service
 			let guard_service = if let Some(relayer) = &ethereum2darwinia_relayer {
@@ -234,10 +235,11 @@ async fn start_services(
 			(
 				Some(relay_service),
 				Some(redeem_service),
+				Some(ethereum_service),
 				guard_service,
 			)
 		} else {
-			(None, None, None)
+			(None, None, None, None)
 		}
 	};
 
@@ -255,6 +257,7 @@ async fn start_services(
 		);
 
 		if let Err(_e) = subscribe.start().await {
+			ethereum_service.unwrap().stop();
 			if let Some(relay_service) = &relay_service {
 				relay_service.do_send(MsgStop {});
 			}

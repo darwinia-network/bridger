@@ -53,9 +53,9 @@ pub struct EthereumLikeChain<C: TrackContext, H: LogsHandler> {
 }
 
 impl<C: TrackContext, H: LogsHandler> EthereumLikeChain<C, H> {
-	pub fn new(name: String, topics_list: TopicsList<H>, context: C) -> Self {
+	pub fn new(name: &str, topics_list: TopicsList<H>, context: C) -> Self {
 		EthereumLikeChain {
-			name,
+			name: name.to_string(),
 			topics_list,
 			context,
 		}

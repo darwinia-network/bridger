@@ -26,9 +26,8 @@ use array_bytes::hex2bytes_unchecked as bytes;
 /// Ethereum transaction service
 ///
 /// This service can check and scan darwinia txs in Ethereum
-pub struct EthereumLogsHandler {
+pub struct EthereumService {
 	// Ethereum
-	pub contracts: Vec<(H160, Vec<H256>)>,
 	data_dir: PathBuf,
 
 	// Darwinia
@@ -40,7 +39,7 @@ pub struct EthereumLogsHandler {
 }
 
 #[async_trait]
-impl LogsHandler for EthereumLogsHandler {
+impl LogsHandler for EthereumService {
     async fn handle(&self, topics_list: Vec<(H160, Vec<H256>)>, logs: Vec<Log>) -> ethereum::Result<()> {
 		let txs = get_transactions(topics_list, logs).await;
 		
@@ -85,25 +84,38 @@ impl LogsHandler for EthereumLogsHandler {
     }
 }
 
-impl EthereumLogsHandler {
+impl EthereumService {
 	/// New Ethereum Service with http
 	pub fn new(
 		config: Settings,
+		web3: Web3<Http>,
 		data_dir: PathBuf,
+		scan_from: u64,
 		darwinia: Darwinia,
 		relay_service: Recipient<MsgBlockNumber>,
 		redeem_service: Recipient<MsgEthereumTransaction>,
-	) -> EthereumLogsHandler {
+	) -> EthereumLikeChainTracker<Ethereum, Self> {
 		let contracts = config.ethereum.contract.clone();
-		let contracts = EthereumLogsHandler::parse_contracts(&contracts);
+		let contracts = EthereumService::parse_contracts(&contracts);
 
-		EthereumLogsHandler {
-			contracts,
+		let handler = EthereumService {
 			data_dir,
 			darwinia,
 			relay_service,
 			redeem_service,
-		}
+		};
+
+		EthereumLikeChainTracker::new(
+			web3,
+			EthereumLikeChain::new(
+				"Ethereum", 
+				TopicsList::new(
+					contracts,
+					handler,
+				), 
+				Ethereum::new(scan_from)
+			)
+		)
 	}
 
 	/// Parse contract addresses and related topics
@@ -178,22 +190,4 @@ async fn get_transactions(contracts: Vec<(H160, Vec<H256>)>, logs: Vec<Log>) -> 
 			.collect::<Vec<EthereumTransaction>>(),
 	);
 	txs
-}
-
-pub async fn start(web3: &Web3<Http>, start_from: u64, handler: EthereumLogsHandler) {
-	let contracts = handler.contracts.clone();
-
-	let topics_list = TopicsList::new(
-		contracts,
-		handler,
-	);
-
-	let chain = EthereumLikeChain::new("Ethereum".to_owned(), topics_list, Ethereum::new(start_from));
-
-	let mut tracker = EthereumLikeChainTracker::new(
-		web3.clone(), 
-		chain,
-	);
-
-	tracker.start().await;
 }

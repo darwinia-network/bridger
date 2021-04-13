@@ -107,7 +107,7 @@ impl ExtrinsicsService {
 		}
 	}
 
-    #[allow(clippy::too_many_arguments)]
+	#[allow(clippy::too_many_arguments)]
 	async fn send_extrinsic(
 		ethereum2darwinia: Option<Ethereum2Darwinia>,
 		darwinia2ethereum: Option<Darwinia2Ethereum>,
@@ -150,14 +150,25 @@ impl ExtrinsicsService {
 							}
 						}
 					}
-					RedeemFor::RegisterOrLockToken => {
+					RedeemFor::RegisterErc20Token => {
 						if let Some(ethereum2darwinia) = &ethereum2darwinia {
 							if let Some(relayer) = &ethereum2darwinia_relayer {
-								let ex_hash = ethereum2darwinia
-									.register_or_redeem_erc20(&relayer, proof)
-									.await?;
+								let ex_hash =
+									ethereum2darwinia.register_erc20(&relayer, proof).await?;
 								info!(
-									"register or redeem token tx {:?} with extrinsic {:?}",
+									"register erc20 token tx {:?} with extrinsic {:?}",
+									ethereum_tx.tx_hash, ex_hash
+								);
+							}
+						}
+					}
+					RedeemFor::RedeemErc20Token => {
+						if let Some(ethereum2darwinia) = &ethereum2darwinia {
+							if let Some(relayer) = &ethereum2darwinia_relayer {
+								let ex_hash =
+									ethereum2darwinia.redeem_erc20(&relayer, proof).await?;
+								info!(
+									"redeem erc20 token tx {:?} with extrinsic {:?}",
 									ethereum_tx.tx_hash, ex_hash
 								);
 							}

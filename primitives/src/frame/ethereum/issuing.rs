@@ -14,9 +14,18 @@ pub trait EthereumIssuing: System + Balances {
 
 // Call
 
-/// Submit register or lock call
+/// Submit register erc20 token
 #[derive(Clone, Debug, PartialEq, Call, Encode)]
-pub struct RegisterOrRedeemErc20<T: EthereumIssuing> {
+pub struct RegisterErc20<T: EthereumIssuing> {
+	/// Runtime marker
+	pub _runtime: PhantomData<T>,
+	/// Ethereum Receipt Proof
+	pub proof: EthereumReceiptProofThing,
+}
+
+/// Submit redeem erc20 token
+#[derive(Clone, Debug, PartialEq, Call, Encode)]
+pub struct RedeemErc20<T: EthereumIssuing> {
 	/// Runtime marker
 	pub _runtime: PhantomData<T>,
 	/// Ethereum Receipt Proof

@@ -199,11 +199,18 @@ impl EthereumService {
 								block,
 								index,
 							}
-						} else if l.topics.contains(&contracts.register)
-							|| l.topics.contains(&contracts.lock)
-						{
+						} else if l.topics.contains(&contracts.register) {
 							EthereumTransaction {
-								tx_hash: EthereumTransactionHash::RegisterOrLockToken(
+								tx_hash: EthereumTransactionHash::RegisterErc20Token(
+									l.transaction_hash.unwrap_or_default(),
+								),
+								block_hash: l.block_hash.unwrap_or_default(),
+								block,
+								index,
+							}
+						} else if l.topics.contains(&contracts.lock) {
+							EthereumTransaction {
+								tx_hash: EthereumTransactionHash::RedeemErc20Token(
 									l.transaction_hash.unwrap_or_default(),
 								),
 								block_hash: l.block_hash.unwrap_or_default(),

@@ -1,10 +1,7 @@
 //! Frame Proxy
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
-use substrate_subxt::{
-	system::System,
-	Encoded,
-};
+use substrate_subxt::{system::System, Encoded};
 use substrate_subxt_proc_macro::{module, Call};
 
 /// The subset of the `frame_proxy::Trait` that a client must implement.

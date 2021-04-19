@@ -49,7 +49,13 @@ impl fmt::Display for TxProofWithMMRProof {
 }
 
 /// Get Darwinia to Ethereum Info
-pub async fn exec(network: String, txblock: u64, mmrblock: u64, signblock: u64) -> Result<()> {
+pub async fn exec(
+	network: String,
+	txblock: u64,
+	mmrblock: u64,
+	signblock: u64,
+	istoken: bool,
+) -> Result<()> {
 	std::env::set_var("RUST_LOG", "info,darwinia_bridger");
 	env_logger::init();
 
@@ -72,9 +78,11 @@ pub async fn exec(network: String, txblock: u64, mmrblock: u64, signblock: u64) 
 		.await?;
 	let event_proof = darwinia
 		.get_event_proof(
-			array_bytes::hex2bytes(
-				"f8860dda3d08046cf2706b92bf7202eaae7a79191c90e76297e0895605b8b457",
-			)
+			array_bytes::hex2bytes(if istoken {
+				"e66f3de22eed97c730152f373193b5a0485b407d88f37d5fd6a2c59e5a696691"
+			} else {
+				"f8860dda3d08046cf2706b92bf7202eaae7a79191c90e76297e0895605b8b457"
+			})
 			.unwrap(),
 			header.hash(),
 		)

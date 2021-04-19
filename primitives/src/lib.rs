@@ -48,9 +48,7 @@ pub mod runtime;
 #[cfg(test)]
 mod tests {
 	use super::runtime::DarwiniaRuntime;
-	use substrate_subxt::{
-		ClientBuilder,
-	};
+	use substrate_subxt::ClientBuilder;
 	// use super::frame::ethereum::relay::PendingRelayHeaderParcelsStoreExt;
 	use super::frame::technical_committee::MembersStoreExt;
 
@@ -60,7 +58,8 @@ mod tests {
 			.set_url("ws://100.64.200.3:10000")
 			.skip_type_sizes_check()
 			.build()
-			.await.unwrap();
+			.await
+			.unwrap();
 
 		println!("-----------");
 		let block_number = 1;
@@ -78,7 +77,8 @@ mod tests {
 			.set_url("ws://100.64.200.3:10000")
 			.skip_type_sizes_check()
 			.build()
-			.await.unwrap();
+			.await
+			.unwrap();
 
 		let members = client.members(None).await.unwrap();
 		for member in members {
@@ -92,7 +92,8 @@ mod tests {
 			.set_url("wss://pangolin-rpc.darwinia.network")
 			.skip_type_sizes_check()
 			.build()
-			.await.unwrap();
+			.await
+			.unwrap();
 
 		let members = client.members(None).await.unwrap();
 		for member in members {

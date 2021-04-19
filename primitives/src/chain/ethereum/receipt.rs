@@ -19,6 +19,10 @@ pub enum RedeemFor {
 	Deposit,
 	/// Redeem for set authorities
 	SetAuthorities,
+	/// Redeem for register erc20 token
+	RegisterErc20Token,
+	/// Redeem for erc20 token
+	RedeemErc20Token,
 }
 
 impl Default for RedeemFor {

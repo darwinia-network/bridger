@@ -40,6 +40,10 @@ pub struct ContractAddress {
 	pub bank: H256,
 	/// relay
 	pub relay: H256,
+	/// register
+	pub register: H256,
+	/// lock token on ethereum and redeem from darwinia
+	pub lock: H256,
 }
 
 /// Ethereum transaction service
@@ -47,7 +51,7 @@ pub struct ContractAddress {
 /// This service can check and scan darwinia txs in Ethereum
 pub struct EthereumService {
 	contracts: ContractAddress,
-	filters: [FilterBuilder; 3],
+	filters: [FilterBuilder; 4],
 	web3: Web3<Http>,
 	darwinia: Darwinia,
 	scan_from: u64,
@@ -146,7 +150,7 @@ impl EthereumService {
 	async fn do_scan(
 		web3: Web3<Http>,
 		contracts: ContractAddress,
-		filters: [FilterBuilder; 3],
+		filters: [FilterBuilder; 4],
 		from: u64,
 		to: u64,
 	) -> BridgerResult<Vec<EthereumTransaction>> {
@@ -195,6 +199,24 @@ impl EthereumService {
 								block,
 								index,
 							}
+						} else if l.topics.contains(&contracts.register) {
+							EthereumTransaction {
+								tx_hash: EthereumTransactionHash::RegisterErc20Token(
+									l.transaction_hash.unwrap_or_default(),
+								),
+								block_hash: l.block_hash.unwrap_or_default(),
+								block,
+								index,
+							}
+						} else if l.topics.contains(&contracts.lock) {
+							EthereumTransaction {
+								tx_hash: EthereumTransactionHash::RedeemErc20Token(
+									l.transaction_hash.unwrap_or_default(),
+								),
+								block_hash: l.block_hash.unwrap_or_default(),
+								block,
+								index,
+							}
 						} else {
 							EthereumTransaction {
 								tx_hash: EthereumTransactionHash::Deposit(
@@ -217,7 +239,7 @@ impl EthereumService {
 		darwinia: Darwinia,
 		web3: Web3<Http>,
 		contracts: ContractAddress,
-		filters: [FilterBuilder; 3],
+		filters: [FilterBuilder; 4],
 		scan_from: u64,
 		relay_service: Recipient<MsgBlockNumber>,
 		redeem_service: Recipient<MsgEthereumTransaction>,
@@ -256,7 +278,9 @@ impl EthereumService {
 			}
 
 			for tx in &txs {
-				if darwinia.verified(tx.block_hash, tx.index).await? {
+				if darwinia.verified(tx.block_hash, tx.index).await?
+					|| darwinia.verified_issuing(tx.block_hash, tx.index).await?
+				{
 					trace!(
 						"    This ethereum tx {:?} has already been redeemed.",
 						tx.enclosed_hash()
@@ -290,19 +314,23 @@ impl EthereumService {
 		let ring_topics = contract.ring.topics.clone().unwrap();
 		let kton_topics = contract.kton.topics.clone().unwrap();
 		let relay_topics = contract.relay.topics.clone().unwrap();
+		let backing_topics = contract.backing.topics.clone().unwrap();
 		ContractAddress {
 			bank: H256::from_slice(&bytes!(bank_topics[0].as_str())),
 			kton: H256::from_slice(&bytes!(kton_topics[0].as_str())),
 			ring: H256::from_slice(&bytes!(ring_topics[0].as_str())),
 			relay: H256::from_slice(&bytes!(relay_topics[0].as_str())),
+			register: H256::from_slice(&bytes!(backing_topics[0].as_str())),
+			lock: H256::from_slice(&bytes!(backing_topics[1].as_str())),
 		}
 	}
 
 	/// Parse log filter from config
-	pub fn parse_filter(config: &Settings) -> [FilterBuilder; 3] {
+	pub fn parse_filter(config: &Settings) -> [FilterBuilder; 4] {
 		let filters = [
 			&config.ethereum.contract.bank,
 			&config.ethereum.contract.issuing,
+			&config.ethereum.contract.backing,
 			&config.ethereum.contract.relay,
 		]
 		.iter()
@@ -320,7 +348,12 @@ impl EthereumService {
 				.topics(Some(topics), None, None, None)
 		})
 		.collect::<Vec<FilterBuilder>>();
-		[filters[0].clone(), filters[1].clone(), filters[2].clone()]
+		[
+			filters[0].clone(),
+			filters[1].clone(),
+			filters[2].clone(),
+			filters[3].clone(),
+		]
 	}
 
 	/// get_latest_block_number

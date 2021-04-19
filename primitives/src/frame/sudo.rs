@@ -2,10 +2,7 @@
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use frame_support::weights::Weight;
-use substrate_subxt::{
-	system::System,
-	Encoded,
-};
+use substrate_subxt::{system::System, Encoded};
 use substrate_subxt_proc_macro::{module, Call, Store};
 
 /// The subset of the `frame_sudo::Trait` that a client must implement.

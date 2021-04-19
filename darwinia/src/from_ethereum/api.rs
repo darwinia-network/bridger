@@ -16,6 +16,7 @@ use primitives::{
 		ethereum::{
 			backing::{Redeem, RedeemCallExt},
 			game::{AffirmationsStoreExt, EthereumRelayerGame},
+			issuing::{RedeemErc20, RedeemErc20CallExt, RegisterErc20, RegisterErc20CallExt},
 			relay::{
 				Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
 				PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
@@ -307,6 +308,72 @@ impl Ethereum2Darwinia {
 		match &account.0.real {
 			None => voting_state.contains(&account.0.account_id),
 			Some(real) => voting_state.contains(real),
+		}
+	}
+
+	/// register erc20
+	pub async fn register_erc20(
+		&self,
+		account: &Account,
+		proof: EthereumReceiptProofThing,
+	) -> Result<H256> {
+		match &account.0.real {
+			Some(real) => {
+				let call = RegisterErc20 {
+					_runtime: PhantomData::default(),
+					proof,
+				};
+
+				let ex = self.darwinia.subxt.encode(call).unwrap();
+				Ok(self
+					.darwinia
+					.subxt
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
+					.await?)
+			}
+			None => Ok(self
+				.darwinia
+				.subxt
+				.register_erc20(&account.0.signer, proof)
+				.await?),
+		}
+	}
+
+	/// redeem erc20
+	pub async fn redeem_erc20(
+		&self,
+		account: &Account,
+		proof: EthereumReceiptProofThing,
+	) -> Result<H256> {
+		match &account.0.real {
+			Some(real) => {
+				let call = RedeemErc20 {
+					_runtime: PhantomData::default(),
+					proof,
+				};
+
+				let ex = self.darwinia.subxt.encode(call).unwrap();
+				Ok(self
+					.darwinia
+					.subxt
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
+					.await?)
+			}
+			None => Ok(self
+				.darwinia
+				.subxt
+				.redeem_erc20(&account.0.signer, proof)
+				.await?),
 		}
 	}
 }

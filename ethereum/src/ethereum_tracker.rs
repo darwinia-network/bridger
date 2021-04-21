@@ -6,6 +6,8 @@ use crate::client::EthereumLikeChainClient;
 use crate::chains::Chain;
 use web3::types::{H160, H256};
 use std::marker::PhantomData;
+use web3::Web3;
+use web3::transports::Http;
 
 pub struct EthereumLikeChainTracker<C: Chain, H: LogsHandler> {
 	client: EthereumLikeChainClient,
@@ -83,7 +85,6 @@ impl<C: Chain, H: LogsHandler> EthereumLikeChainTracker<C, H> {
 #[tokio::test]
 async fn test_ethereum() {
 	use crate::Ethereum;
-	use crate::TopicsList;
 	use crate::DefaultLogsHandler;
 	use array_bytes::hex2bytes_unchecked as bytes;
 	let web3 = Web3::new(Http::new("https://ropsten.infura.io/v3/60703fcc6b4e48079cfc5e385ee7af80").unwrap());
@@ -91,23 +92,47 @@ async fn test_ethereum() {
 	let contract_address = "0xD35Bb6F1bc1C84b53E0995c1830454AB7C4147f1";
 	let contract_address = H160::from_slice(&bytes(contract_address));
 
-	let topics = &vec!["0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f"];
+	let topics = &vec!["0x96635f5f1b0b05ed7e2265d4e13634378280f038e5a958227d4f383f825c2771"];
 	let topics = topics
 		.iter()
 		.map(|t| H256::from_slice(&bytes(t)))
 		.collect();
 
-	let topics_list = TopicsList::new(
+	let client = EthereumLikeChainClient::new(web3);
+	let mut tracker = EthereumLikeChainTracker::<Ethereum, DefaultLogsHandler>::new(
+		client,
 		vec![(contract_address, topics)],
 		DefaultLogsHandler {},
+		100,
 	);
 
-	let chain = EthereumLikeChain::new("Ethereum", topics_list, Ethereum::new(100));
-
-	let mut tracker = EthereumLikeChainTracker::new(
-		web3.clone(),
-		chain,
-	);
-
-	tracker.start();
+	tracker.start().await;
 }
+
+#[tokio::test]
+async fn test_heco() {
+	use crate::Heco;
+	use crate::DefaultLogsHandler;
+	use array_bytes::hex2bytes_unchecked as bytes;
+	let web3 = Web3::new(Http::new("https://http-mainnet-node.huobichain.com").unwrap());
+
+	let contract_address = "0x0981F3C078856E2491F11A5F86d26274Bb4009d2";
+	let contract_address = H160::from_slice(&bytes(contract_address));
+
+	let topics = &vec!["0x2709918445f306d3e94d280907c62c5d2525ac3192d2e544774c7f181d65af3e"];
+	let topics = topics
+		.iter()
+		.map(|t| H256::from_slice(&bytes(t)))
+		.collect();
+
+	let client = EthereumLikeChainClient::new(web3);
+	let mut tracker = EthereumLikeChainTracker::<Heco, DefaultLogsHandler>::new(
+		client,
+		vec![(contract_address, topics)],
+		DefaultLogsHandler {},
+		4006177,
+	);
+
+	tracker.start().await;
+}
+

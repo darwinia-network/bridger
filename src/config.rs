@@ -165,6 +165,16 @@ impl Settings {
 		Ok(settings.try_into()?)
 	}
 
+	/// New settings from pathbuf
+	pub fn new_heco(data_dir: &PathBuf) -> Result<Self> {
+		let mut config_file = data_dir.clone();
+		config_file.push("config_heco.yml");
+
+		let mut settings = Config::default();
+		settings.merge(File::from(config_file))?;
+		Ok(settings.try_into()?)
+	}
+
 	/// default_data_dir
 	pub fn default_data_dir() -> Result<PathBuf> {
 		let mut dir = dirs::home_dir()
@@ -234,7 +244,7 @@ impl Settings {
 			(H160::from_slice(&bytes(issuing.address)), issuing_topics),
 			(H160::from_slice(&bytes(relay.address)), relay_topics),
 		]
-		
+
 	}
 }
 

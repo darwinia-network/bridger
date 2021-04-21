@@ -7,6 +7,7 @@ pub mod guard;
 pub mod redeem;
 pub mod relay;
 pub mod subscribe;
+pub mod heco;
 
 pub use self::{
 	ethereum::EthereumService, extrinsics::ExtrinsicsService, guard::GuardService,

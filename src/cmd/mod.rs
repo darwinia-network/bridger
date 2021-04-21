@@ -19,6 +19,7 @@ mod set_darwinia_start;
 mod set_start;
 mod show_parcel;
 mod sign_mmr_root;
+mod heco;
 
 #[derive(StructOpt, Debug)]
 #[structopt(setting = AppSettings::InferSubcommands)]
@@ -133,6 +134,16 @@ enum Opt {
 		#[structopt(short, long)]
 		to_path: String,
 	},
+
+	/// heco
+	Heco {
+		/// Data dir of bridger
+		#[structopt(short, long)]
+		data_dir: Option<PathBuf>,
+		/// Run bridger in verbose mode
+		#[structopt(short, long)]
+		verbose: bool,
+	}
 }
 
 /// Exec commands
@@ -167,6 +178,7 @@ pub async fn exec() -> Result<()> {
 			decrypt,
 		} => encrypt_key::exec(private_key, decrypt).await?,
 		Opt::EncryptConf { from_path, to_path } => encrypt_conf::exec(from_path, to_path).await?,
+		Opt::Heco { data_dir, verbose } => heco::exec(data_dir, verbose).await?,
 	}
 
 	Ok(())

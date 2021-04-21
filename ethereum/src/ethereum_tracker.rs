@@ -1,27 +1,30 @@
 use crate::Result;
-use crate::{TrackContext, LogsHandler};
-use crate::EthereumLikeChain;
-use crate::ethereum_api::get_logs;
-
-use web3::{
-	transports::http::Http,
-	types::Log,
-	Web3,
-};
+use crate::LogsHandler;
+use web3::types::Log;
 use tokio::time::{delay_for, Duration};
+use crate::client::EthereumLikeChainClient;
+use crate::chains::Chain;
+use web3::types::{H160, H256};
+use std::marker::PhantomData;
 
-pub struct EthereumLikeChainTracker<C: TrackContext, H: LogsHandler> {
-	web3: Web3<Http>,
-	chain: EthereumLikeChain<C, H>,
+pub struct EthereumLikeChainTracker<C: Chain, H: LogsHandler> {
+	client: EthereumLikeChainClient,
+	topics_list: Vec<(H160, Vec<H256>)>,
+	logs_handler: H,
+	from: u64,
 	stop: bool,
+	phantom: PhantomData<C>,
 }
 
-impl<C: TrackContext, H: LogsHandler> EthereumLikeChainTracker<C, H> {
-	pub fn new(web3: Web3<Http>, chain: EthereumLikeChain<C, H>) -> Self {
+impl<C: Chain, H: LogsHandler> EthereumLikeChainTracker<C, H> {
+	pub fn new(client: EthereumLikeChainClient, topics_list: Vec<(H160, Vec<H256>)>, logs_handler: H, from: u64) -> Self {
 		EthereumLikeChainTracker {
-			web3,
-			chain,
+			client,
+			topics_list,
+			logs_handler,
+			from,
 			stop: false,
+			phantom: PhantomData,
 		}
 	}
 
@@ -33,7 +36,7 @@ impl<C: TrackContext, H: LogsHandler> EthereumLikeChainTracker<C, H> {
 					delay_for(Duration::from_secs(30)).await;
 				},
 				Ok(logs) => {
-					if let Err(err2) = self.chain.handle(logs).await {
+					if let Err(err2) = self.handle(logs).await {
 						error!("{:?}", err2);
 					}
 				}
@@ -51,17 +54,28 @@ impl<C: TrackContext, H: LogsHandler> EthereumLikeChainTracker<C, H> {
 
 	pub async fn next(&mut self) -> Result<Vec<Log>> {
 		let mut result = vec![];
-		let (from, to) = self.chain.next_range(&self.web3).await?;
+		let (from, to) = self.next_range().await?;
 		info!(
 			"Heartbeat>>> Scanning on {} for new cross-chain transactions from {} to {} ...",
-			self.chain.name(),
+			C::NAME,
 			from, to
 		);
-		for topics in &self.chain.get_topics_list() {
-			let logs = get_logs(&self.web3, &topics.0, &topics.1, from, to).await?;
+		for topics in &self.topics_list {
+			let logs = self.client.get_logs(&topics.0, &topics.1, from, to).await?;
 			result.extend_from_slice(&logs);
 		}
 		Ok(result)
+	}
+
+	async fn next_range(&mut self) -> Result<(u64, u64)> {
+		let range = C::next_range(self.from, &self.client).await?;
+		self.from = range.1;
+		Ok(range)
+	}
+
+	async fn handle(&self, logs: Vec<Log>) -> Result<()> {
+		self.logs_handler.handle(&self.client, &self.topics_list, logs).await?;
+		Ok(())
 	}
 
 }
@@ -91,7 +105,7 @@ async fn test_ethereum() {
 	let chain = EthereumLikeChain::new("Ethereum", topics_list, Ethereum::new(100));
 
 	let mut tracker = EthereumLikeChainTracker::new(
-		web3.clone(), 
+		web3.clone(),
 		chain,
 	);
 

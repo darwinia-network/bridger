@@ -17,7 +17,7 @@ use tokio::time::Duration;
 use async_trait::async_trait;
 
 use darwinia::Darwinia;
-use ethereum::{Ethereum, TopicsList, LogsHandler, EthereumLikeChain, EthereumLikeChainTracker};
+use ethereum::{Ethereum, LogsHandler, EthereumLikeChainClient, EthereumLikeChainTracker};
 
 
 /// Ethereum transaction service
@@ -37,9 +37,9 @@ pub struct EthereumService {
 
 #[async_trait]
 impl LogsHandler for EthereumService {
-    async fn handle(&self, topics_list: Vec<(H160, Vec<H256>)>, logs: Vec<Log>) -> ethereum::Result<()> {
+	async fn handle(&self, _client: &EthereumLikeChainClient, topics_list: &Vec<(H160, Vec<H256>)>, logs: Vec<Log>) -> ethereum::Result<()> {
 		let txs = get_transactions(topics_list, logs).await;
-		
+
 		if !txs.is_empty() {
 			info!(
 				"Found {} txs", txs.len(),
@@ -92,6 +92,8 @@ impl EthereumService {
 		relay_service: Recipient<MsgBlockNumber>,
 		redeem_service: Recipient<MsgEthereumTransaction>,
 	) -> EthereumLikeChainTracker<Ethereum, Self> {
+		let client = EthereumLikeChainClient::new(web3);
+
 		let contracts = config.get_parsed_contracts();
 
 		let logs_handler = EthereumService {
@@ -102,22 +104,17 @@ impl EthereumService {
 		};
 
 		EthereumLikeChainTracker::new(
-			web3,
-			EthereumLikeChain::new(
-				"Ethereum", 
-				TopicsList::new(
-					contracts,
-					logs_handler,
-				), 
-				Ethereum::new(scan_from)
-			)
+			client,
+			contracts,
+			logs_handler,
+			scan_from
 		)
 	}
 
 }
 
 /// Extract transaction from logs
-async fn get_transactions(contracts: Vec<(H160, Vec<H256>)>, logs: Vec<Log>) -> Vec<EthereumTransaction> {
+async fn get_transactions(contracts: &Vec<(H160, Vec<H256>)>, logs: Vec<Log>) -> Vec<EthereumTransaction> {
 	let mut txs = vec![];
 	txs.append(
 		&mut logs

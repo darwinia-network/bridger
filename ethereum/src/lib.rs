@@ -1,20 +1,14 @@
 mod error;
-pub mod ethereum_api;
 mod ethereum_tracker;
 mod chains;
+mod client;
+mod logs_handler;
 
 pub use error::{Error, Result};
-pub use chains::{TrackContext, LogsHandler};
-pub use chains::{EthereumLikeChain, DefaultLogsHandler, TopicsList, Ethereum, Heco, Bsc};
+pub use chains::{Chain, Ethereum, Heco};
+pub use logs_handler::{LogsHandler, DefaultLogsHandler};
+pub use client::EthereumLikeChainClient;
 pub use ethereum_tracker::EthereumLikeChainTracker;
 
 #[macro_use]
 extern crate log;
-
-#[cfg(test)]
-mod tests {
-	#[test]
-	fn it_works() {
-		assert_eq!(2 + 2, 4);
-	}
-}

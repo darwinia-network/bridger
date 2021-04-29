@@ -311,69 +311,69 @@ impl Ethereum2Darwinia {
 		}
 	}
 
-	/// register erc20
-	pub async fn register_erc20(
-		&self,
-		account: &Account,
-		proof: EthereumReceiptProofThing,
-	) -> Result<H256> {
-		match &account.0.real {
-			Some(real) => {
-				let call = RegisterErc20 {
-					_runtime: PhantomData::default(),
-					proof,
-				};
+	// /// register erc20
+	// pub async fn register_erc20(
+	// 	&self,
+	// 	account: &Account,
+	// 	proof: EthereumReceiptProofThing,
+	// ) -> Result<H256> {
+	// 	match &account.0.real {
+	// 		Some(real) => {
+	// 			let call = RegisterErc20 {
+	// 				_runtime: PhantomData::default(),
+	// 				proof,
+	// 			};
 
-				let ex = self.darwinia.subxt.encode(call).unwrap();
-				Ok(self
-					.darwinia
-					.subxt
-					.proxy(
-						&account.0.signer,
-						real.clone(),
-						Some(ProxyType::EthereumBridge),
-						&ex,
-					)
-					.await?)
-			}
-			None => Ok(self
-				.darwinia
-				.subxt
-				.register_erc20(&account.0.signer, proof)
-				.await?),
-		}
-	}
+	// 			let ex = self.darwinia.subxt.encode(call).unwrap();
+	// 			Ok(self
+	// 				.darwinia
+	// 				.subxt
+	// 				.proxy(
+	// 					&account.0.signer,
+	// 					real.clone(),
+	// 					Some(ProxyType::EthereumBridge),
+	// 					&ex,
+	// 				)
+	// 				.await?)
+	// 		}
+	// 		None => Ok(self
+	// 			.darwinia
+	// 			.subxt
+	// 			.register_erc20(&account.0.signer, proof)
+	// 			.await?),
+	// 	}
+	// }
 
-	/// redeem erc20
-	pub async fn redeem_erc20(
-		&self,
-		account: &Account,
-		proof: EthereumReceiptProofThing,
-	) -> Result<H256> {
-		match &account.0.real {
-			Some(real) => {
-				let call = RedeemErc20 {
-					_runtime: PhantomData::default(),
-					proof,
-				};
+	// /// redeem erc20
+	// pub async fn redeem_erc20(
+	// 	&self,
+	// 	account: &Account,
+	// 	proof: EthereumReceiptProofThing,
+	// ) -> Result<H256> {
+	// 	match &account.0.real {
+	// 		Some(real) => {
+	// 			let call = RedeemErc20 {
+	// 				_runtime: PhantomData::default(),
+	// 				proof,
+	// 			};
 
-				let ex = self.darwinia.subxt.encode(call).unwrap();
-				Ok(self
-					.darwinia
-					.subxt
-					.proxy(
-						&account.0.signer,
-						real.clone(),
-						Some(ProxyType::EthereumBridge),
-						&ex,
-					)
-					.await?)
-			}
-			None => Ok(self
-				.darwinia
-				.subxt
-				.redeem_erc20(&account.0.signer, proof)
-				.await?),
-		}
-	}
+	// 			let ex = self.darwinia.subxt.encode(call).unwrap();
+	// 			Ok(self
+	// 				.darwinia
+	// 				.subxt
+	// 				.proxy(
+	// 					&account.0.signer,
+	// 					real.clone(),
+	// 					Some(ProxyType::EthereumBridge),
+	// 					&ex,
+	// 				)
+	// 				.await?)
+	// 		}
+	// 		None => Ok(self
+	// 			.darwinia
+	// 			.subxt
+	// 			.redeem_erc20(&account.0.signer, proof)
+	// 			.await?),
+	// 	}
+	// }
 }

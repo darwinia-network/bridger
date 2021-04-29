@@ -147,9 +147,9 @@ impl EthereumBacking for DarwiniaRuntime {
 	type EthereumTransactionIndex = u64;
 }
 
-impl EthereumIssuing for DarwiniaRuntime {
-	type EthereumTransactionIndex = u64;
-}
+// impl EthereumIssuing for DarwiniaRuntime {
+// 	type EthereumTransactionIndex = u64;
+// }
 
 impl Proxy for DarwiniaRuntime {
 	type ProxyType = ProxyType;

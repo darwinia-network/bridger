@@ -279,7 +279,7 @@ impl EthereumService {
 
 			for tx in &txs {
 				if darwinia.verified(tx.block_hash, tx.index).await?
-					|| darwinia.verified_issuing(tx.block_hash, tx.index).await?
+					// || darwinia.verified_issuing(tx.block_hash, tx.index).await?
 				{
 					trace!(
 						"    This ethereum tx {:?} has already been redeemed.",

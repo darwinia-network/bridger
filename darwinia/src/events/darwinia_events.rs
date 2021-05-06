@@ -1,6 +1,4 @@
-use substrate_subxt::{
-	events::Raw, sp_core::Decode, Client, EventTypeRegistry, EventsDecoder, RawEvent,
-};
+use substrate_subxt::{events::Raw, sp_core::Decode, Client, EventTypeRegistry, EventsDecoder, RawEvent, Runtime};
 
 use crate::error::Result;
 
@@ -10,7 +8,6 @@ use primitives::{
 		AuthoritiesChangeSigned, EthereumRelayAuthorities, MMRRootSigned,
 		ScheduleAuthoritiesChange, ScheduleMMRRoot,
 	},
-	runtime::DarwiniaRuntime,
 };
 
 /// Darwinia Event Info
@@ -25,23 +22,23 @@ pub enum EventInfo<T: EthereumRelayAuthorities> {
 }
 
 /// Darwinia Events
-pub struct DarwiniaEvents {
+pub struct DarwiniaEvents<R: Runtime + EthereumRelayAuthorities> {
 	/// event decoder
-	pub decoder: EventsDecoder<DarwiniaRuntime>,
-	client: Client<DarwiniaRuntime>,
+	pub decoder: EventsDecoder<R>,
+	client: Client<R>,
 }
 
-impl Clone for DarwiniaEvents {
+impl<R: Runtime + EthereumRelayAuthorities> Clone for DarwiniaEvents<R> {
 	fn clone(&self) -> Self {
-		DarwiniaEvents::new(self.client.clone())
+		DarwiniaEvents::<R>::new(self.client.clone())
 	}
 }
 
-impl DarwiniaEvents {
-	pub fn new(client: Client<DarwiniaRuntime>) -> Self {
-		let event_type_registry = EventTypeRegistry::<DarwiniaRuntime>::new();
+impl<R: Runtime + EthereumRelayAuthorities> DarwiniaEvents<R> {
+	pub fn new(client: Client<R>) -> Self {
+		let event_type_registry = EventTypeRegistry::<R>::new();
 		let decoder =
-			EventsDecoder::<DarwiniaRuntime>::new(client.metadata().clone(), event_type_registry);
+			EventsDecoder::<R>::new(client.metadata().clone(), event_type_registry);
 		DarwiniaEvents { decoder, client }
 	}
 
@@ -67,35 +64,35 @@ impl DarwiniaEvents {
 		module: &str,
 		variant: &str,
 		event_data: Vec<u8>,
-	) -> EventInfo<DarwiniaRuntime> {
+	) -> EventInfo<R> {
 		match (module, variant) {
 			("System", "CodeUpdated") => {
 				return EventInfo::RuntimeUpdatedEvent("code updated".to_string());
 			}
 			("EthereumRelayAuthorities", "ScheduleMMRRoot") => {
 				if let Ok(decoded) =
-					ScheduleMMRRoot::<DarwiniaRuntime>::decode(&mut &event_data[..])
+					ScheduleMMRRoot::<R>::decode(&mut &event_data[..])
 				{
 					return EventInfo::ScheduleMMRRootEvent(decoded);
 				}
 			}
 			("EthereumRelayAuthorities", "MMRRootSigned") => {
-				MMRRootSigned::<DarwiniaRuntime>::decode(&mut &event_data[..]).unwrap();
-				if let Ok(decoded) = MMRRootSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
+				MMRRootSigned::<R>::decode(&mut &event_data[..]).unwrap();
+				if let Ok(decoded) = MMRRootSigned::<R>::decode(&mut &event_data[..])
 				{
 					return EventInfo::MMRRootSignedEvent(decoded);
 				}
 			}
 			("EthereumRelayAuthorities", "ScheduleAuthoritiesChange") => {
 				if let Ok(decoded) =
-					ScheduleAuthoritiesChange::<DarwiniaRuntime>::decode(&mut &event_data[..])
+					ScheduleAuthoritiesChange::<R>::decode(&mut &event_data[..])
 				{
 					return EventInfo::ScheduleAuthoritiesChangeEvent(decoded);
 				}
 			}
 			("EthereumRelayAuthorities", "AuthoritiesChangeSigned") => {
 				if let Ok(decoded) =
-					AuthoritiesChangeSigned::<DarwiniaRuntime>::decode(&mut &event_data[..])
+					AuthoritiesChangeSigned::<R>::decode(&mut &event_data[..])
 				{
 					return EventInfo::AuthoritiesChangeSignedEvent(decoded);
 				}

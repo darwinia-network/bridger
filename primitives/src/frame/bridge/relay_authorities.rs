@@ -46,7 +46,7 @@ pub trait EthereumRelayAuthorities: System {
 	/// Relay signature
 	type RelayAuthoritySignature: 'static + Encode + Decode + Sync + Send + Sync + Default;
 	/// Relay signature
-	type RelayAuthorityMessage: 'static + Encode + Decode + Sync + Send + Default;
+	type RelayAuthorityMessage: 'static + Encode + Decode + Sync + Send + Default + PartialEq;
 }
 
 //////

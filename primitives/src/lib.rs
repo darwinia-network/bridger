@@ -31,7 +31,7 @@
 //! GPL-3.0
 #![allow(clippy::ptr_offset_with_cast)]
 #![allow(clippy::assign_op_pattern)]
-#![deny(missing_docs)]
+#![allow(missing_docs)]
 #[macro_use]
 extern crate serde;
 
@@ -43,11 +43,11 @@ pub mod chain;
 pub mod frame;
 pub mod result;
 pub mod rpc;
-pub mod runtime;
+pub mod runtimes;
 
 #[cfg(test)]
 mod tests {
-	use super::runtime::DarwiniaRuntime;
+	use super::runtimes::darwinia::DarwiniaRuntime;
 	use substrate_subxt::ClientBuilder;
 	// use super::frame::ethereum::relay::PendingRelayHeaderParcelsStoreExt;
 	use super::frame::technical_committee::MembersStoreExt;

@@ -2,54 +2,58 @@ use crate::Darwinia;
 
 use crate::error::{Error, Result};
 use std::collections::HashMap;
-type PendingRelayHeaderParcel = <DarwiniaRuntime as EthereumRelay>::PendingRelayHeaderParcel;
-type RelayAffirmation = <DarwiniaRuntime as EthereumRelayerGame>::RelayAffirmation;
-type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<RelayAffirmation>>>;
+type PendingRelayHeaderParcel<Relay: EthereumRelay> = <Relay>::PendingRelayHeaderParcel;
+type AffirmationsReturn<Game: EthereumRelayerGame> = HashMap<u64, HashMap<u32, Vec<Game::RelayAffirmation>>>;
 
-use primitives::{
-	chain::{
+use primitives::{chain::{
 		ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
 		proxy_type::ProxyType,
 		RelayVotingState,
-	},
-	frame::{
-		ethereum::{
-			backing::{Redeem, RedeemCallExt},
+	}, frame::{ethereum::{
+			backing::{Redeem, RedeemCallExt, EthereumBacking},
 			game::{AffirmationsStoreExt, EthereumRelayerGame},
-			issuing::{RedeemErc20, RedeemErc20CallExt, RegisterErc20, RegisterErc20CallExt},
+			issuing::{RedeemErc20, RedeemErc20CallExt, RegisterErc20, RegisterErc20CallExt, EthereumIssuing},
 			relay::{
 				Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
 				PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
 				VotePendingRelayHeaderParcel, VotePendingRelayHeaderParcelCallExt,
 			},
 		},
-		proxy::ProxyCallExt,
-		sudo::SudoCallExt,
-		technical_committee::MembersStoreExt,
-	},
-	runtime::DarwiniaRuntime,
-};
+			   proxy::{self, Proxy, ProxyCallExt}, sudo::SudoCallExt, technical_committee::MembersStoreExt,
+			   bridge::relay_authorities::EthereumRelayAuthorities}};
+use primitives::frame::sudo::Sudo;
+use primitives::frame::technical_committee::TechnicalCommittee;
 
 use core::marker::PhantomData;
 use substrate_subxt::sp_core::H256;
 
+
 use super::Account;
-use crate::AccountId;
+use substrate_subxt::{Runtime, SignedExtra, SignedExtension};
+use substrate_subxt::system::System;
+use substrate_subxt::sp_runtime::traits::Verify;
 
 /// Dawrinia API
 #[derive(Clone)]
-pub struct Ethereum2Darwinia {
+pub struct Ethereum2Darwinia<R: Runtime + EthereumRelayAuthorities> {
 	/// darwinia client
-	pub darwinia: Darwinia,
+	pub darwinia: Darwinia<R>,
 }
 
-impl Ethereum2Darwinia {
-	pub fn new(darwinia: Darwinia) -> Self {
+impl<R> Ethereum2Darwinia<R>
+where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumRelayerGame + EthereumBacking + EthereumIssuing + EthereumRelayAuthorities,
+	<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: std::marker::Send,
+	<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Sync,
+	<R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+	  <<R as substrate_subxt::Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>
+{
+	pub fn new(darwinia: Darwinia<R>) -> Self {
 		Self { darwinia }
 	}
 
 	/// Print Detail
-	pub async fn account_detail(&self, block_number: Option<u32>, account: &Account) -> Result<()> {
+	pub async fn account_detail(&self, block_number: Option<u32>, account: &Account<R>) -> Result<()>
+	{
 		info!("🧔 ethereum => darwinia account");
 		let mut roles = self.darwinia.account_role(&account.0).await?;
 		if self.is_tech_comm_member(block_number, &account).await? {
@@ -71,7 +75,7 @@ impl Ethereum2Darwinia {
 	pub async fn is_tech_comm_member(
 		&self,
 		block_number: Option<u32>,
-		account: &Account,
+		account: &Account<R>,
 	) -> Result<bool> {
 		let block_hash = self.darwinia.block_number2hash(block_number).await?;
 		let tech_comm_members = self.darwinia.subxt.members(block_hash).await?;
@@ -81,9 +85,12 @@ impl Ethereum2Darwinia {
 	/// set confirmed with sudo privilege
 	pub async fn set_confirmed_parcel(
 		&self,
-		account: &Account,
+		account: &Account<R>,
 		parcel: EthereumRelayHeaderParcel,
-	) -> Result<H256> {
+	) -> Result<<R as System>::Hash>
+	where <R as System>::Address: From<<R as System>::AccountId>,
+		  R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	{
 		let ex = self.darwinia.subxt.encode(SetConfirmedParcel {
 			ethereum_relay_header_parcel: parcel,
 			_runtime: PhantomData::default(),
@@ -94,10 +101,14 @@ impl Ethereum2Darwinia {
 	/// Vote pending relay header parcel
 	pub async fn vote_pending_relay_header_parcel(
 		&self,
-		account: &Account,
+		account: &Account<R>,
 		pending: u64,
 		aye: bool,
-	) -> Result<H256> {
+		proxy_type: <R as Proxy>::ProxyType,
+	) -> Result<<R as System>::Hash>
+	where <R as System>::Address: From<<R as System>::AccountId>,
+		  R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	{
 		if self.is_tech_comm_member(None, &account).await? {
 			match &account.0.real {
 				Some(real) => {
@@ -116,7 +127,7 @@ impl Ethereum2Darwinia {
 						.proxy(
 							&account.0.signer,
 							real.clone(),
-							Some(ProxyType::EthereumBridge),
+							Some(proxy_type),
 							&ex,
 						)
 						.await?;
@@ -143,7 +154,7 @@ impl Ethereum2Darwinia {
 	///     round_id: [...]
 	///   }
 	/// }
-	pub async fn affirmations(&self) -> Result<AffirmationsReturn> {
+	pub async fn affirmations(&self) -> Result<AffirmationsReturn<R>> {
 		let mut result = HashMap::new();
 		let mut iter = self.darwinia.subxt.affirmations_iter(None).await?;
 		while let Some((mut storage_key, affirmations)) = iter.next().await? {
@@ -155,7 +166,7 @@ impl Ethereum2Darwinia {
 
 			//
 			if result.get(&game_id).is_none() {
-				result.insert(game_id, HashMap::<u32, Vec<RelayAffirmation>>::new());
+				result.insert(game_id, HashMap::<u32, Vec<R::RelayAffirmation>>::new());
 			}
 			let game = result.get_mut(&game_id).unwrap();
 
@@ -170,26 +181,26 @@ impl Ethereum2Darwinia {
 		Ok(result)
 	}
 
-	/// affirmations contains block?
-	pub fn contains(affirmations: &[RelayAffirmation], block: u64) -> bool {
-		for affirmation in affirmations {
-			let blocks: &Vec<u64> = &affirmation
-				.relay_header_parcels
-				.iter()
-				.map(|bp| bp.header.number)
-				.collect();
-			if blocks.contains(&block) {
-				return true;
-			}
-		}
-
-		// TODO: Checking the equality of the affirmations
-
-		// TODO: If there is an affirmation with larger block number, then agree and join in the game.
-
-		// TODO: How to play and join the game
-		false
-	}
+	// /// affirmations contains block?
+	// pub fn contains(affirmations: &[R::RelayAffirmation], block: u64) -> bool {
+	// 	for affirmation in affirmations {
+	// 		let blocks: &Vec<u64> = &affirmation
+	// 			.relay_header_parcels
+	// 			.iter()
+	// 			.map(|bp| bp.header.number)
+	// 			.collect();
+	// 		if blocks.contains(&block) {
+	// 			return true;
+	// 		}
+	// 	}
+	//
+	// 	// TODO: Checking the equality of the affirmations
+	//
+	// 	// TODO: If there is an affirmation with larger block number, then agree and join in the game.
+	//
+	// 	// TODO: How to play and join the game
+	// 	false
+	// }
 
 	/// Get confirmed block numbers
 	pub async fn confirmed_block_numbers(&self) -> Result<Vec<u64>> {
@@ -208,7 +219,7 @@ impl Ethereum2Darwinia {
 	}
 
 	/// Get pending headers
-	pub async fn pending_headers(&self) -> Result<Vec<PendingRelayHeaderParcel>> {
+	pub async fn pending_headers(&self) -> Result<Vec<PendingRelayHeaderParcel<R>>> {
 		Ok(self
 			.darwinia
 			.subxt
@@ -219,9 +230,13 @@ impl Ethereum2Darwinia {
 	/// Submit affirmation
 	pub async fn affirm(
 		&self,
-		account: &Account,
+		account: &Account<R>,
 		parcel: EthereumRelayHeaderParcel,
-	) -> Result<H256> {
+		proxy_type: <R as Proxy>::ProxyType,
+	) -> Result<<R as System>::Hash>
+	where <R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	{
 		match &account.0.real {
 			Some(real) => {
 				trace!("Proxy call `affirm` for {:?}", real);
@@ -238,7 +253,7 @@ impl Ethereum2Darwinia {
 					.proxy(
 						&account.0.signer,
 						real.clone(),
-						Some(ProxyType::EthereumBridge),
+						Some(proxy_type),
 						&ex,
 					)
 					.await?)
@@ -254,10 +269,14 @@ impl Ethereum2Darwinia {
 	/// Redeem
 	pub async fn redeem(
 		&self,
-		account: &Account,
+		account: &Account<R>,
 		redeem_for: RedeemFor,
 		proof: EthereumReceiptProofThing,
-	) -> Result<H256> {
+		proxy_type: <R as Proxy>::ProxyType,
+	) -> Result<<R as System>::Hash>
+	where <R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	{
 		let ethereum_tx_hash = proof
 			.header
 			.hash
@@ -283,7 +302,7 @@ impl Ethereum2Darwinia {
 					.proxy(
 						&account.0.signer,
 						real.clone(),
-						Some(ProxyType::EthereumBridge),
+						Some(proxy_type),
 						&ex,
 					)
 					.await?)
@@ -304,7 +323,10 @@ impl Ethereum2Darwinia {
 	}
 
 	/// has_voted
-	pub fn has_voted(&self, account: &Account, voting_state: RelayVotingState<AccountId>) -> bool {
+	pub fn has_voted(&self, account: &Account<R>, voting_state: RelayVotingState<<R as System>::AccountId>) -> bool
+	where <R as System>::Address: From<<R as System>::AccountId>,
+	R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	{
 		match &account.0.real {
 			None => voting_state.contains(&account.0.account_id),
 			Some(real) => voting_state.contains(real),
@@ -314,9 +336,13 @@ impl Ethereum2Darwinia {
 	/// register erc20
 	pub async fn register_erc20(
 		&self,
-		account: &Account,
+		account: &Account<R>,
 		proof: EthereumReceiptProofThing,
-	) -> Result<H256> {
+		proxy_type: <R as Proxy>::ProxyType,
+	) -> Result<<R as System>::Hash>
+	where <R as System>::Address: From<<R as System>::AccountId>, R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+
+	{
 		match &account.0.real {
 			Some(real) => {
 				let call = RegisterErc20 {
@@ -331,7 +357,7 @@ impl Ethereum2Darwinia {
 					.proxy(
 						&account.0.signer,
 						real.clone(),
-						Some(ProxyType::EthereumBridge),
+						Some(proxy_type),
 						&ex,
 					)
 					.await?)
@@ -347,9 +373,12 @@ impl Ethereum2Darwinia {
 	/// redeem erc20
 	pub async fn redeem_erc20(
 		&self,
-		account: &Account,
+		account: &Account<R>,
 		proof: EthereumReceiptProofThing,
-	) -> Result<H256> {
+		proxy_type: <R as Proxy>::ProxyType,
+	) -> Result<<R as System>::Hash>
+	where <R as System>::Address: From<<R as System>::AccountId>, R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	{
 		match &account.0.real {
 			Some(real) => {
 				let call = RedeemErc20 {
@@ -364,7 +393,7 @@ impl Ethereum2Darwinia {
 					.proxy(
 						&account.0.signer,
 						real.clone(),
-						Some(ProxyType::EthereumBridge),
+						Some(proxy_type),
 						&ex,
 					)
 					.await?)

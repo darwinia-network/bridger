@@ -43,7 +43,7 @@ use substrate_subxt::{Runtime, SignedExtension, SignedExtra};
 
 /// Dawrinia API
 #[derive(Clone)]
-pub struct Ethereum2Darwinia<R: Runtime + EthereumRelayAuthorities> {
+pub struct Ethereum2Darwinia<R: Runtime> {
 	/// darwinia client
 	pub darwinia: Darwinia<R>,
 }

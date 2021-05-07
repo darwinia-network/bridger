@@ -22,19 +22,19 @@ pub enum EventInfo<T: EthereumRelayAuthorities> {
 }
 
 /// Darwinia Events
-pub struct DarwiniaEvents<R: Runtime + EthereumRelayAuthorities> {
+pub struct DarwiniaEvents<R: Runtime> {
 	/// event decoder
 	pub decoder: EventsDecoder<R>,
 	client: Client<R>,
 }
 
-impl<R: Runtime + EthereumRelayAuthorities> Clone for DarwiniaEvents<R> {
+impl<R: Runtime> Clone for DarwiniaEvents<R> {
 	fn clone(&self) -> Self {
 		DarwiniaEvents::<R>::new(self.client.clone())
 	}
 }
 
-impl<R: Runtime + EthereumRelayAuthorities> DarwiniaEvents<R> {
+impl<R: Runtime> DarwiniaEvents<R> {
 	pub fn new(client: Client<R>) -> Self {
 		let event_type_registry = EventTypeRegistry::<R>::new();
 		let decoder = EventsDecoder::<R>::new(client.metadata().clone(), event_type_registry);
@@ -58,7 +58,9 @@ impl<R: Runtime + EthereumRelayAuthorities> DarwiniaEvents<R> {
 	}
 
 	/// parse event
-	pub fn parse_event(&self, module: &str, variant: &str, event_data: Vec<u8>) -> EventInfo<R> {
+	pub fn parse_event(&self, module: &str, variant: &str, event_data: Vec<u8>) -> EventInfo<R>
+	where R: EthereumRelayAuthorities
+	{
 		match (module, variant) {
 			("System", "CodeUpdated") => {
 				return EventInfo::RuntimeUpdatedEvent("code updated".to_string());

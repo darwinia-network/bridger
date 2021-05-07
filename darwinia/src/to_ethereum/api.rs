@@ -14,7 +14,7 @@ use primitives::{
 		bridge::relay_authorities::{
 			AuthoritiesToSignStoreExt, MmrRootsToSignStoreExt, NextTermStoreExt,
 			SubmitSignedAuthorities, SubmitSignedAuthoritiesCallExt, SubmitSignedMmrRoot,
-			SubmitSignedMmrRootCallExt,
+			SubmitSignedMmrRootCallExt, AuthoritiesStoreExt
 		},
 		ethereum::backing::{SyncAuthoritiesChange, SyncAuthoritiesChangeCallExt},
 		proxy::ProxyCallExt,
@@ -49,7 +49,7 @@ where
 
 /// Dawrinia API
 #[derive(Clone)]
-pub struct Darwinia2Ethereum<R: Runtime + EthereumRelayAuthorities> {
+pub struct Darwinia2Ethereum<R: Runtime> {
 	/// darwinia client
 	pub darwinia: Darwinia<R>,
 }
@@ -282,7 +282,7 @@ where
 		// 	.authorities(block_hash)
 		// 	.await?
 		// 	.iter()
-		// 	.map(|a| a.account_id.clone())
+		// 	.map(|a| a)
 		// 	.collect::<Vec<_>>();
 		// Ok(authorities.contains(account.0.real()))
 		Ok(true)

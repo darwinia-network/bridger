@@ -24,7 +24,7 @@ use std::marker::PhantomData;
 use substrate_subxt::sp_runtime::traits::{UniqueSaturatedInto, Verify};
 use substrate_subxt::system::System;
 
-pub struct Darwinia<R: Runtime + EthereumRelayAuthorities> {
+pub struct Darwinia<R: Runtime> {
 	/// client
 	pub subxt: Client<R>,
 	/// Event Parser
@@ -33,7 +33,7 @@ pub struct Darwinia<R: Runtime + EthereumRelayAuthorities> {
 	phantom: PhantomData<<R as System>::AccountId>,
 }
 
-impl<R: Runtime + EthereumRelayAuthorities> Clone for Darwinia<R> {
+impl<R: Runtime> Clone for Darwinia<R> {
 	fn clone(&self) -> Self {
 		Self {
 			subxt: self.subxt.clone(),

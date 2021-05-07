@@ -1,11 +1,11 @@
-use crate::{error::Result, DarwiniaAccount, Error, EcdsaSignature};
+use crate::{error::Result, DarwiniaAccount, EcdsaSignature, Error};
 
 use primitives::frame::bridge::relay_authorities::EthereumRelayAuthorities;
 use secp256k1::SecretKey;
+use substrate_subxt::Runtime;
 use web3::signing::SecretKeyRef;
 use web3::transports::Http;
 use web3::Web3;
-use substrate_subxt::Runtime;
 
 #[derive(Clone)]
 pub struct EthereumAccount {
@@ -20,7 +20,8 @@ pub struct EthereumAccount {
 pub struct Account<R: Runtime>(pub DarwiniaAccount<R>, pub EthereumAccount);
 
 impl<R> Account<R>
-where R: Runtime + EthereumRelayAuthorities
+where
+	R: Runtime + EthereumRelayAuthorities,
 {
 	/// Create a new Account
 	pub fn new(
@@ -38,8 +39,12 @@ where R: Runtime + EthereumRelayAuthorities
 	}
 
 	/// sign
-	pub fn ecdsa_sign(&self, message: &[u8]) -> Result<<R as EthereumRelayAuthorities>::RelayAuthoritySignature>
-	where R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature>
+	pub fn ecdsa_sign(
+		&self,
+		message: &[u8],
+	) -> Result<<R as EthereumRelayAuthorities>::RelayAuthoritySignature>
+	where
+		R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature>,
 	{
 		let web3 = Web3::new(Http::new(&self.1.ethereum_url)?);
 		if let Some(ethereum_seed) = &self.1.ethereum_seed {

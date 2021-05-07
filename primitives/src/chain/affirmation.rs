@@ -1,6 +1,5 @@
 use codec::{Decode, Encode};
 use crate::chain::ethereum::EthereumRelayHeaderParcel;
-use substrate_subxt::Runtime;
 use std::fmt::Display;
 
 /// Game id, round and the index under the round point to a unique affirmation AKA affirmation id

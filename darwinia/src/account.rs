@@ -1,10 +1,12 @@
 use sp_keyring::sr25519::sr25519::Pair;
-use substrate_subxt::{sp_core::Pair as PairTrait, system::System, PairSigner, Runtime, Signer, SignedExtra, SignedExtension};
-use substrate_subxt::sp_runtime::traits::{Verify, IdentifyAccount};
-use substrate_subxt::sp_runtime::MultiSignature;
+use substrate_subxt::sp_runtime::traits::{IdentifyAccount, Verify};
+use substrate_subxt::{
+	sp_core::Pair as PairTrait, system::System, PairSigner, Runtime, SignedExtension, SignedExtra,
+	Signer,
+};
 
 /// AccountId
-pub type AccountId<T: System> = T::AccountId;
+pub type AccountId<T> = <T as System>::AccountId;
 
 /// Account
 pub struct DarwiniaAccount<R: Runtime> {
@@ -27,15 +29,19 @@ impl<R: Runtime + Clone> Clone for DarwiniaAccount<R> {
 }
 
 impl<R> DarwiniaAccount<R>
-where R: Runtime,
-		<R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		<<R as Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
+where
+	R: Runtime,
+	<R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+	<<R as Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
 {
 	/// Create a new Account
 	pub fn new(seed: String, real: Option<String>) -> DarwiniaAccount<R>
-	where <<R as Runtime>::Signature as Verify>::Signer: IdentifyAccount<AccountId = <R as System>::AccountId>,
-		  <R as System>::AccountId: Into<<R as System>::Address>,
-		  <<<R as Runtime>::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: std::marker::Send
+	where
+		<<R as Runtime>::Signature as Verify>::Signer:
+			IdentifyAccount<AccountId = <R as System>::AccountId>,
+		<R as System>::AccountId: Into<<R as System>::Address>,
+		<<<R as Runtime>::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned:
+			std::marker::Send,
 	{
 		// signer to sign darwinia extrinsic
 		let pair = Pair::from_string(&seed, None).unwrap(); // if not a valid seed

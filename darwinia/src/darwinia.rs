@@ -1,8 +1,13 @@
-use substrate_subxt::{events::Raw, sp_core::storage::{StorageData, StorageKey}, sp_core::{twox_128, Bytes, H256}, sp_runtime::generic::Header, sp_runtime::traits::{BlakeTwo256, Header as TraitHeader}, BlockNumber, Client, ClientBuilder, Runtime};
+use substrate_subxt::{
+	events::Raw,
+	sp_core::storage::{StorageData, StorageKey},
+	sp_core::{twox_128, Bytes, H256},
+	sp_runtime::traits::Header as TraitHeader,
+	BlockNumber, Client, ClientBuilder, Runtime,
+};
 
-use primitives::{
-	//todo move to e2d
-	frame::ethereum::{backing::VerifiedProofStoreExt, issuing::VerifiedIssuingProofStoreExt},
+use primitives::frame::ethereum::{
+	backing::VerifiedProofStoreExt, issuing::VerifiedIssuingProofStoreExt,
 };
 
 use crate::{account::DarwiniaAccount, DarwiniaEvents, EventInfo};
@@ -11,19 +16,13 @@ use crate::error::{Error, Result};
 use jsonrpsee_types::jsonrpc::{to_value as to_json_value, Params};
 
 use crate::rpc::*;
-use primitives::frame::sudo::KeyStoreExt;
-use std::marker::PhantomData;
-use substrate_subxt::system::System;
 use primitives::frame::bridge::relay_authorities::EthereumRelayAuthorities;
+use primitives::frame::ethereum::{backing::EthereumBacking, issuing::EthereumIssuing};
+use primitives::frame::sudo::KeyStoreExt;
 use primitives::frame::sudo::Sudo;
-use primitives::frame::ethereum::{
-	backing::EthereumBacking,
-	issuing::EthereumIssuing,
-};
-use std::collections::hash_map::DefaultHasher;
-use std::hash::Hash;
-use std::convert::TryInto;
+use std::marker::PhantomData;
 use substrate_subxt::sp_runtime::traits::{UniqueSaturatedInto, Verify};
+use substrate_subxt::system::System;
 
 pub struct Darwinia<R: Runtime + EthereumRelayAuthorities> {
 	/// client
@@ -31,7 +30,7 @@ pub struct Darwinia<R: Runtime + EthereumRelayAuthorities> {
 	/// Event Parser
 	pub event: DarwiniaEvents<R>,
 
-	phantom: PhantomData<<R as System>::AccountId>
+	phantom: PhantomData<<R as System>::AccountId>,
 }
 
 impl<R: Runtime + EthereumRelayAuthorities> Clone for Darwinia<R> {
@@ -39,7 +38,7 @@ impl<R: Runtime + EthereumRelayAuthorities> Clone for Darwinia<R> {
 		Self {
 			subxt: self.subxt.clone(),
 			event: self.event.clone(),
-			phantom: PhantomData
+			phantom: PhantomData,
 		}
 	}
 }
@@ -56,7 +55,7 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 		Ok(Self {
 			subxt: client,
 			event,
-			phantom: PhantomData
+			phantom: PhantomData,
 		})
 	}
 
@@ -155,10 +154,7 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 	}
 
 	/// get events from a special block
-	pub async fn get_events_from_block_number(
-		&self,
-		block: u32,
-	) -> Result<Vec<EventInfo<R>>> {
+	pub async fn get_events_from_block_number(&self, block: u32) -> Result<Vec<EventInfo<R>>> {
 		let blockno = BlockNumber::from(block);
 		match self.subxt.block_hash(Some(blockno)).await? {
 			Some(hash) => return self.get_events_from_block_hash(hash).await,
@@ -197,8 +193,6 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 						block_number,
 					));
 				}
-				let mut mmr_root: [u8; 32] = [0; 32];
-				mmr_root.copy_from_slice(&parent_mmr_root);
 
 				H256::from_slice(parent_mmr_root)
 			} else {
@@ -236,7 +230,10 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 	}
 
 	/// block number to hash
-	pub async fn block_number2hash(&self, block_number: Option<u32>) -> Result<Option<<R as System>::Hash>> {
+	pub async fn block_number2hash(
+		&self,
+		block_number: Option<u32>,
+	) -> Result<Option<<R as System>::Hash>> {
 		let block_number = block_number.map(|n| n.into());
 		Ok(self.subxt.block_hash(block_number).await?)
 	}
@@ -247,8 +244,9 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 		block_number: Option<u32>,
 		account: &DarwiniaAccount<R>,
 	) -> Result<bool>
-	where <R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-	<<R as Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>
+	where
+		<R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<<R as Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
 	{
 		let block_hash = self.block_number2hash(block_number).await?;
 		let sudo = self.subxt.key(block_hash).await?;
@@ -257,8 +255,9 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 
 	/// role
 	pub async fn account_role(&self, account: &DarwiniaAccount<R>) -> Result<Vec<String>>
-	where <R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		  <<R as Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>
+	where
+		<R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<<R as Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
 	{
 		let mut roles = vec!["Normal".to_string()];
 		if self.is_sudo_key(None, account).await? {
@@ -274,7 +273,10 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 	}
 
 	/// get block by hash
-	pub async fn get_block_number_by_hash(&self, block_hash: <R as System>::Hash) -> Result<Option<<R as System>::BlockNumber>> {
+	pub async fn get_block_number_by_hash(
+		&self,
+		block_hash: <R as System>::Hash,
+	) -> Result<Option<<R as System>::BlockNumber>> {
 		let block = self.subxt.block(Some(block_hash)).await?;
 		if let Some(block) = block {
 			return Ok(Some(*block.block.header.number()));

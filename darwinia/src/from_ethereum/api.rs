@@ -2,36 +2,44 @@ use crate::Darwinia;
 
 use crate::error::{Error, Result};
 use std::collections::HashMap;
-type PendingRelayHeaderParcel<Relay: EthereumRelay> = <Relay>::PendingRelayHeaderParcel;
-type AffirmationsReturn<Game: EthereumRelayerGame> = HashMap<u64, HashMap<u32, Vec<Game::RelayAffirmation>>>;
+type PendingRelayHeaderParcel<Relay> = <Relay as EthereumRelay>::PendingRelayHeaderParcel;
+type AffirmationsReturn<Game> =
+	HashMap<u64, HashMap<u32, Vec<<Game as EthereumRelayerGame>::RelayAffirmation>>>;
 
-use primitives::{chain::{
+use primitives::frame::sudo::Sudo;
+use primitives::frame::technical_committee::TechnicalCommittee;
+use primitives::{
+	chain::{
 		ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
-		proxy_type::ProxyType,
 		RelayVotingState,
-	}, frame::{ethereum::{
-			backing::{Redeem, RedeemCallExt, EthereumBacking},
+	},
+	frame::{
+		bridge::relay_authorities::EthereumRelayAuthorities,
+		ethereum::{
+			backing::{EthereumBacking, Redeem, RedeemCallExt},
 			game::{AffirmationsStoreExt, EthereumRelayerGame},
-			issuing::{RedeemErc20, RedeemErc20CallExt, RegisterErc20, RegisterErc20CallExt, EthereumIssuing},
+			issuing::{
+				EthereumIssuing, RedeemErc20, RedeemErc20CallExt, RegisterErc20,
+				RegisterErc20CallExt,
+			},
 			relay::{
 				Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
 				PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
 				VotePendingRelayHeaderParcel, VotePendingRelayHeaderParcelCallExt,
 			},
 		},
-			   proxy::{self, Proxy, ProxyCallExt}, sudo::SudoCallExt, technical_committee::MembersStoreExt,
-			   bridge::relay_authorities::EthereumRelayAuthorities}};
-use primitives::frame::sudo::Sudo;
-use primitives::frame::technical_committee::TechnicalCommittee;
+		proxy::{Proxy, ProxyCallExt},
+		sudo::SudoCallExt,
+		technical_committee::MembersStoreExt,
+	},
+};
 
 use core::marker::PhantomData;
-use substrate_subxt::sp_core::H256;
-
 
 use super::Account;
-use substrate_subxt::{Runtime, SignedExtra, SignedExtension};
-use substrate_subxt::system::System;
 use substrate_subxt::sp_runtime::traits::Verify;
+use substrate_subxt::system::System;
+use substrate_subxt::{Runtime, SignedExtension, SignedExtra};
 
 /// Dawrinia API
 #[derive(Clone)]
@@ -41,19 +49,32 @@ pub struct Ethereum2Darwinia<R: Runtime + EthereumRelayAuthorities> {
 }
 
 impl<R> Ethereum2Darwinia<R>
-where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumRelayerGame + EthereumBacking + EthereumIssuing + EthereumRelayAuthorities,
+where
+	R: Runtime
+		+ Sudo
+		+ TechnicalCommittee
+		+ EthereumRelay
+		+ Proxy
+		+ EthereumRelayerGame
+		+ EthereumBacking
+		+ EthereumIssuing
+		+ EthereumRelayAuthorities,
 	<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: std::marker::Send,
 	<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Sync,
 	<R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-	  <<R as substrate_subxt::Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>
+	<<R as substrate_subxt::Runtime>::Signature as Verify>::Signer:
+		From<sp_keyring::sr25519::sr25519::Public>,
 {
 	pub fn new(darwinia: Darwinia<R>) -> Self {
 		Self { darwinia }
 	}
 
 	/// Print Detail
-	pub async fn account_detail(&self, block_number: Option<u32>, account: &Account<R>) -> Result<()>
-	{
+	pub async fn account_detail(
+		&self,
+		block_number: Option<u32>,
+		account: &Account<R>,
+	) -> Result<()> {
 		info!("🧔 ethereum => darwinia account");
 		let mut roles = self.darwinia.account_role(&account.0).await?;
 		if self.is_tech_comm_member(block_number, &account).await? {
@@ -88,8 +109,9 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 		account: &Account<R>,
 		parcel: EthereumRelayHeaderParcel,
 	) -> Result<<R as System>::Hash>
-	where <R as System>::Address: From<<R as System>::AccountId>,
-		  R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	where
+		<R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 	{
 		let ex = self.darwinia.subxt.encode(SetConfirmedParcel {
 			ethereum_relay_header_parcel: parcel,
@@ -106,8 +128,9 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 		aye: bool,
 		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
-	where <R as System>::Address: From<<R as System>::AccountId>,
-		  R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	where
+		<R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 	{
 		if self.is_tech_comm_member(None, &account).await? {
 			match &account.0.real {
@@ -124,12 +147,7 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 					let ex_hash = self
 						.darwinia
 						.subxt
-						.proxy(
-							&account.0.signer,
-							real.clone(),
-							Some(proxy_type),
-							&ex,
-						)
+						.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
 						.await?;
 					Ok(ex_hash)
 				}
@@ -234,8 +252,9 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 		parcel: EthereumRelayHeaderParcel,
 		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
-	where <R as System>::Address: From<<R as System>::AccountId>,
-		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	where
+		<R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -250,12 +269,7 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(
-						&account.0.signer,
-						real.clone(),
-						Some(proxy_type),
-						&ex,
-					)
+					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
 					.await?)
 			}
 			None => Ok(self
@@ -274,8 +288,9 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 		proof: EthereumReceiptProofThing,
 		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
-	where <R as System>::Address: From<<R as System>::AccountId>,
-		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	where
+		<R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 	{
 		let ethereum_tx_hash = proof
 			.header
@@ -299,12 +314,7 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(
-						&account.0.signer,
-						real.clone(),
-						Some(proxy_type),
-						&ex,
-					)
+					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
 					.await?)
 			}
 			None => {
@@ -323,9 +333,14 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 	}
 
 	/// has_voted
-	pub fn has_voted(&self, account: &Account<R>, voting_state: RelayVotingState<<R as System>::AccountId>) -> bool
-	where <R as System>::Address: From<<R as System>::AccountId>,
-	R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	pub fn has_voted(
+		&self,
+		account: &Account<R>,
+		voting_state: RelayVotingState<<R as System>::AccountId>,
+	) -> bool
+	where
+		<R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 	{
 		match &account.0.real {
 			None => voting_state.contains(&account.0.account_id),
@@ -340,8 +355,9 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 		proof: EthereumReceiptProofThing,
 		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
-	where <R as System>::Address: From<<R as System>::AccountId>, R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
-
+	where
+		<R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -354,12 +370,7 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(
-						&account.0.signer,
-						real.clone(),
-						Some(proxy_type),
-						&ex,
-					)
+					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
 					.await?)
 			}
 			None => Ok(self
@@ -377,7 +388,9 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 		proof: EthereumReceiptProofThing,
 		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
-	where <R as System>::Address: From<<R as System>::AccountId>, R::Signature: From<sp_keyring::sr25519::sr25519::Signature>
+	where
+		<R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -390,12 +403,7 @@ where R: Runtime + Sudo + TechnicalCommittee + EthereumRelay + Proxy + EthereumR
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(
-						&account.0.signer,
-						real.clone(),
-						Some(proxy_type),
-						&ex,
-					)
+					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
 					.await?)
 			}
 			None => Ok(self

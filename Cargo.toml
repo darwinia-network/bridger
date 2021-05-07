@@ -2,6 +2,7 @@
 members = [
   "primitives",
   "darwinia",
+  "provider/*"
 ]
 
 [package]

@@ -12,6 +12,7 @@ use primitives::{
 	chain::{
 		ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
 		RelayVotingState,
+		proxy_type::ProxyType,
 	},
 	frame::{
 		bridge::relay_authorities::EthereumRelayAuthorities,
@@ -250,11 +251,11 @@ where
 		&self,
 		account: &Account<R>,
 		parcel: EthereumRelayHeaderParcel,
-		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		R: Proxy<ProxyType = ProxyType>
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -269,7 +270,7 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
+					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
 					.await?)
 			}
 			None => Ok(self
@@ -286,11 +287,11 @@ where
 		account: &Account<R>,
 		redeem_for: RedeemFor,
 		proof: EthereumReceiptProofThing,
-		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		R: Proxy<ProxyType = ProxyType>
 	{
 		let ethereum_tx_hash = proof
 			.header
@@ -314,7 +315,7 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
+					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
 					.await?)
 			}
 			None => {
@@ -353,11 +354,11 @@ where
 		&self,
 		account: &Account<R>,
 		proof: EthereumReceiptProofThing,
-		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		R: Proxy<ProxyType = ProxyType>
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -370,7 +371,7 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
+					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
 					.await?)
 			}
 			None => Ok(self
@@ -386,11 +387,11 @@ where
 		&self,
 		account: &Account<R>,
 		proof: EthereumReceiptProofThing,
-		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		R: Proxy<ProxyType = ProxyType>
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -403,7 +404,7 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
+					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
 					.await?)
 			}
 			None => Ok(self

@@ -45,8 +45,8 @@ struct Log {
 
 /// Darwinia Runtime
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct DarwiniaRuntime;
-impl Runtime for DarwiniaRuntime {
+pub struct MainnetRuntime;
+impl Runtime for MainnetRuntime {
 	type Signature = MultiSignature;
 	type Extra = DefaultExtra<Self>;
 
@@ -78,11 +78,11 @@ impl Runtime for DarwiniaRuntime {
 	}
 }
 
-impl Balances for DarwiniaRuntime {
+impl Balances for MainnetRuntime {
 	type Balance = u128;
 }
 
-impl System for DarwiniaRuntime {
+impl System for MainnetRuntime {
 	type Index = u32;
 	type BlockNumber = u32;
 	type Hash = sp_core::H256;
@@ -94,9 +94,9 @@ impl System for DarwiniaRuntime {
 	type AccountData = AccountData<<Self as Balances>::Balance>;
 }
 
-impl TechnicalCommittee for DarwiniaRuntime {}
-impl Sudo for DarwiniaRuntime {}
-impl EthereumRelay for DarwiniaRuntime {
+impl TechnicalCommittee for MainnetRuntime {}
+impl Sudo for MainnetRuntime {}
+impl EthereumRelay for MainnetRuntime {
 	type RingBalance = u128;
 	type EthereumBlockNumber = u64;
 	type PendingRelayHeaderParcel = (
@@ -107,7 +107,7 @@ impl EthereumRelay for DarwiniaRuntime {
 	type RelayAffirmationId = RelayAffirmationId<Self::EthereumBlockNumber>;
 }
 
-impl EthereumRelayerGame for DarwiniaRuntime {
+impl EthereumRelayerGame for MainnetRuntime {
 	type RelayAffirmation = RelayAffirmation<
 		EthereumRelayHeaderParcel,
 		<Self as System>::AccountId,
@@ -116,19 +116,19 @@ impl EthereumRelayerGame for DarwiniaRuntime {
 	>;
 }
 
-impl EthereumBacking for DarwiniaRuntime {
+impl EthereumBacking for MainnetRuntime {
 	type EthereumTransactionIndex = u64;
 }
 
-impl EthereumIssuing for DarwiniaRuntime {
+impl EthereumIssuing for MainnetRuntime {
 	type EthereumTransactionIndex = u64;
 }
 
-impl Proxy for DarwiniaRuntime {
+impl Proxy for MainnetRuntime {
 	type ProxyType = ProxyType;
 }
 
-impl EthereumRelayAuthorities for DarwiniaRuntime {
+impl EthereumRelayAuthorities for MainnetRuntime {
 	type RelayAuthority = RelayAuthority<
 		<Self as System>::AccountId,
 		Self::RelayAuthoritySigner,

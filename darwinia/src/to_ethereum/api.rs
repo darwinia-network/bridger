@@ -12,9 +12,9 @@ use primitives::{
 	chain::ethereum::EthereumReceiptProofThing,
 	frame::{
 		bridge::relay_authorities::{
-			AuthoritiesToSignStoreExt, MmrRootsToSignStoreExt, NextTermStoreExt,
-			SubmitSignedAuthorities, SubmitSignedAuthoritiesCallExt, SubmitSignedMmrRoot,
-			SubmitSignedMmrRootCallExt, AuthoritiesStoreExt
+			AuthoritiesStoreExt, AuthoritiesToSignStoreExt, MmrRootsToSignStoreExt,
+			NextTermStoreExt, RelayAuthority, SubmitSignedAuthorities,
+			SubmitSignedAuthoritiesCallExt, SubmitSignedMmrRoot, SubmitSignedMmrRootCallExt,
 		},
 		ethereum::backing::{SyncAuthoritiesChange, SyncAuthoritiesChangeCallExt},
 		proxy::ProxyCallExt,
@@ -29,6 +29,7 @@ use primitives::frame::{
 	proxy::Proxy,
 	sudo::Sudo,
 };
+use substrate_subxt::balances::Balances;
 use substrate_subxt::sp_runtime::traits::{UniqueSaturatedInto, Verify};
 use substrate_subxt::{system::System, Runtime, SignedExtension, SignedExtra};
 
@@ -273,19 +274,29 @@ where
 		&self,
 		block_number: Option<u32>,
 		account: &Account<R>,
-	) -> Result<bool> {
-		// #![allow(clippy::needless_collect)]
-		// let block_hash = self.darwinia.block_number2hash(block_number).await?;
-		// let authorities = self
-		// 	.darwinia
-		// 	.subxt
-		// 	.authorities(block_hash)
-		// 	.await?
-		// 	.iter()
-		// 	.map(|a| a)
-		// 	.collect::<Vec<_>>();
-		// Ok(authorities.contains(account.0.real()))
-		Ok(true)
+	) -> Result<bool>
+	where
+		R: EthereumRelayAuthorities<
+			RelayAuthority = RelayAuthority<
+				<R as System>::AccountId,
+				EcdsaAddress,
+				<R as Balances>::Balance,
+				<R as System>::BlockNumber,
+			>,
+		>,
+	{
+		#![allow(clippy::needless_collect)]
+		let block_hash = self.darwinia.block_number2hash(block_number).await?;
+		let authorities = self
+			.darwinia
+			.subxt
+			.authorities(block_hash)
+			.await?
+			.iter()
+			.map(|a| a.account_id.clone())
+			.collect::<Vec<_>>();
+		Ok(authorities.contains(account.0.real()))
+		// Ok(true)
 	}
 
 	/// need_to_sign_authorities
@@ -347,7 +358,17 @@ where
 		&self,
 		block_number: Option<u32>,
 		account: &Account<R>,
-	) -> Result<()> {
+	) -> Result<()>
+	where
+		R: EthereumRelayAuthorities<
+			RelayAuthority = RelayAuthority<
+				<R as System>::AccountId,
+				EcdsaAddress,
+				<R as Balances>::Balance,
+				<R as System>::BlockNumber,
+			>,
+		>,
+	{
 		info!("🧔 darwinia => ethereum account");
 		let mut roles = self.darwinia.account_role(&account.0).await?;
 		if self.is_authority(block_number, &account).await? {

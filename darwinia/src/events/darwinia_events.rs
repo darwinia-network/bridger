@@ -59,7 +59,8 @@ impl<R: Runtime> DarwiniaEvents<R> {
 
 	/// parse event
 	pub fn parse_event(&self, module: &str, variant: &str, event_data: Vec<u8>) -> EventInfo<R>
-	where R: EthereumRelayAuthorities
+	where
+		R: EthereumRelayAuthorities,
 	{
 		match (module, variant) {
 			("System", "CodeUpdated") => {

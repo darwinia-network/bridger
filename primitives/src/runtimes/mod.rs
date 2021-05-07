@@ -1,2 +1,2 @@
-pub mod darwinia;
+pub mod mainnet;
 pub mod pangolin;

@@ -20,7 +20,6 @@ use primitives::frame::bridge::relay_authorities::EthereumRelayAuthorities;
 use primitives::frame::ethereum::{backing::EthereumBacking, issuing::EthereumIssuing};
 use primitives::frame::sudo::KeyStoreExt;
 use primitives::frame::sudo::Sudo;
-use std::marker::PhantomData;
 use substrate_subxt::sp_runtime::traits::{UniqueSaturatedInto, Verify};
 use substrate_subxt::system::System;
 
@@ -29,8 +28,6 @@ pub struct Darwinia<R: Runtime> {
 	pub subxt: Client<R>,
 	/// Event Parser
 	pub event: DarwiniaEvents<R>,
-
-	phantom: PhantomData<<R as System>::AccountId>,
 }
 
 impl<R: Runtime> Clone for Darwinia<R> {
@@ -38,7 +35,6 @@ impl<R: Runtime> Clone for Darwinia<R> {
 		Self {
 			subxt: self.subxt.clone(),
 			event: self.event.clone(),
-			phantom: PhantomData,
 		}
 	}
 }
@@ -55,7 +51,6 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 		Ok(Self {
 			subxt: client,
 			event,
-			phantom: PhantomData,
 		})
 	}
 

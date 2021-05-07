@@ -24,7 +24,7 @@ pub type MmrRootsToSignReturn<T> = Option<
 >;
 
 /// Relay Authority
-#[derive(Clone, Encode, Decode, Default, Debug)]
+#[derive(Clone, Encode, Decode, Default, Debug, PartialEq)]
 pub struct RelayAuthority<AccountId, RelayAuthoritySigner, RingBalance, BlockNumber> {
 	/// account_id
 	pub account_id: AccountId,
@@ -40,7 +40,7 @@ pub struct RelayAuthority<AccountId, RelayAuthoritySigner, RingBalance, BlockNum
 #[module]
 pub trait EthereumRelayAuthorities: System {
 	/// Relay Authority
-	type RelayAuthority: 'static + Encode + Decode + Send + Sync + Default;
+	type RelayAuthority: 'static + Encode + Decode + Send + Sync + Default + PartialEq;
 	/// Relay authority signer
 	type RelayAuthoritySigner: 'static + Encode + Decode + Sync + Send + Default;
 	/// Relay signature

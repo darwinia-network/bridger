@@ -9,10 +9,7 @@ use codec::Encode;
 use substrate_subxt::sp_core::H256;
 
 use primitives::{
-	chain::{
-		ethereum::EthereumReceiptProofThing,
-		proxy_type::ProxyType,
-	},
+	chain::{ethereum::EthereumReceiptProofThing, proxy_type::ProxyType},
 	frame::{
 		bridge::relay_authorities::{
 			AuthoritiesStoreExt, AuthoritiesToSignStoreExt, MmrRootsToSignStoreExt,
@@ -58,6 +55,49 @@ pub struct Darwinia2Ethereum<R: Runtime> {
 	pub darwinia: Darwinia<R>,
 }
 
+impl<R: Runtime> Darwinia2Ethereum<R> {
+	pub fn new(darwinia: Darwinia<R>) -> Self {
+		Self { darwinia }
+	}
+}
+
+impl<R> Darwinia2Ethereum<R>
+where
+	R: Runtime + System + Balances,
+	R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+	<R::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
+{
+	/// is authority
+	pub async fn is_authority(
+		&self,
+		block_number: Option<u32>,
+		account: &Account<R>,
+	) -> Result<bool>
+	where
+		R: EthereumRelayAuthorities<
+			RelayAuthority = RelayAuthority<
+				<R as System>::AccountId,
+				EcdsaAddress,
+				<R as Balances>::Balance,
+				<R as System>::BlockNumber,
+			>,
+		>,
+	{
+		#![allow(clippy::needless_collect)]
+		let block_hash = self.darwinia.block_number2hash(block_number).await?;
+		let authorities = self
+			.darwinia
+			.subxt
+			.authorities(block_hash)
+			.await?
+			.iter()
+			.map(|a| a.account_id.clone())
+			.collect::<Vec<_>>();
+		Ok(authorities.contains(account.0.real()))
+		// Ok(true)
+	}
+}
+
 impl<R> Darwinia2Ethereum<R>
 where
 	R: Runtime + Proxy + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthorities,
@@ -68,10 +108,6 @@ where
 	<<R as substrate_subxt::Runtime>::Signature as Verify>::Signer:
 		From<sp_keyring::sr25519::sr25519::Public>,
 {
-	pub fn new(darwinia: Darwinia<R>) -> Self {
-		Self { darwinia }
-	}
-
 	/// header mmr proof
 	pub async fn get_headermmr_genproof(
 		&self,
@@ -149,7 +185,7 @@ where
 		proof: EthereumReceiptProofThing,
 	) -> Result<<R as System>::Hash>
 	where
-		R: Proxy<ProxyType = ProxyType>
+		R: Proxy<ProxyType = ProxyType>,
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -162,7 +198,12 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
 					.await?)
 			}
 			None => Ok(self
@@ -181,7 +222,7 @@ where
 	) -> Result<<R as System>::Hash>
 	where
 		R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature>,
-		R: Proxy<ProxyType = ProxyType>
+		R: Proxy<ProxyType = ProxyType>,
 	{
 		// TODO: check
 		// 	.sender
@@ -202,7 +243,12 @@ where
 				let tx_hash = self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
 					.await?;
 				Ok(tx_hash)
 			}
@@ -228,7 +274,7 @@ where
 	where
 		<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Sync,
 		R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature>,
-		R: Proxy<ProxyType = ProxyType>
+		R: Proxy<ProxyType = ProxyType>,
 	{
 		// get mmr root from darwinia
 		let leaf_index = block_number;
@@ -255,7 +301,12 @@ where
 				let tx_hash = self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
 					.await?;
 				Ok(tx_hash)
 			}
@@ -272,36 +323,6 @@ where
 				Ok(tx_hash)
 			}
 		}
-	}
-
-	/// is authority
-	pub async fn is_authority(
-		&self,
-		block_number: Option<u32>,
-		account: &Account<R>,
-	) -> Result<bool>
-	where
-		R: EthereumRelayAuthorities<
-			RelayAuthority = RelayAuthority<
-				<R as System>::AccountId,
-				EcdsaAddress,
-				<R as Balances>::Balance,
-				<R as System>::BlockNumber,
-			>,
-		>,
-	{
-		#![allow(clippy::needless_collect)]
-		let block_hash = self.darwinia.block_number2hash(block_number).await?;
-		let authorities = self
-			.darwinia
-			.subxt
-			.authorities(block_hash)
-			.await?
-			.iter()
-			.map(|a| a.account_id.clone())
-			.collect::<Vec<_>>();
-		Ok(authorities.contains(account.0.real()))
-		// Ok(true)
 	}
 
 	/// need_to_sign_authorities

@@ -11,8 +11,8 @@ use primitives::frame::technical_committee::TechnicalCommittee;
 use primitives::{
 	chain::{
 		ethereum::{EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor},
-		RelayVotingState,
 		proxy_type::ProxyType,
+		RelayVotingState,
 	},
 	frame::{
 		bridge::relay_authorities::EthereumRelayAuthorities,
@@ -38,6 +38,8 @@ use primitives::{
 use core::marker::PhantomData;
 
 use super::Account;
+use primitives::chain::{RelayAffirmation, RelayAffirmationId};
+use substrate_subxt::balances::Balances;
 use substrate_subxt::sp_runtime::traits::Verify;
 use substrate_subxt::system::System;
 use substrate_subxt::{Runtime, SignedExtension, SignedExtra};
@@ -47,6 +49,28 @@ use substrate_subxt::{Runtime, SignedExtension, SignedExtra};
 pub struct Ethereum2Darwinia<R: Runtime> {
 	/// darwinia client
 	pub darwinia: Darwinia<R>,
+}
+
+impl<R: Runtime + EthereumRelay> Ethereum2Darwinia<R> {
+	pub fn new(darwinia: Darwinia<R>) -> Self {
+		Self { darwinia }
+	}
+
+	/// Get the last confirmed block
+	pub async fn last_confirmed(&self) -> Result<u64> {
+		Ok(
+			if let Some(confirmed) = self.confirmed_block_numbers().await?.iter().max() {
+				*confirmed
+			} else {
+				0
+			},
+		)
+	}
+
+	/// Get confirmed block numbers
+	pub async fn confirmed_block_numbers(&self) -> Result<Vec<u64>> {
+		Ok(self.darwinia.subxt.confirmed_block_numbers(None).await?)
+	}
 }
 
 impl<R> Ethereum2Darwinia<R>
@@ -66,10 +90,6 @@ where
 	<<R as substrate_subxt::Runtime>::Signature as Verify>::Signer:
 		From<sp_keyring::sr25519::sr25519::Public>,
 {
-	pub fn new(darwinia: Darwinia<R>) -> Self {
-		Self { darwinia }
-	}
-
 	/// Print Detail
 	pub async fn account_detail(
 		&self,
@@ -131,7 +151,7 @@ where
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		R: Proxy<ProxyType = ProxyType>
+		R: Proxy<ProxyType = ProxyType>,
 	{
 		if self.is_tech_comm_member(None, &account).await? {
 			match &account.0.real {
@@ -148,7 +168,12 @@ where
 					let ex_hash = self
 						.darwinia
 						.subxt
-						.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
+						.proxy(
+							&account.0.signer,
+							real.clone(),
+							Some(ProxyType::EthereumBridge),
+							&ex,
+						)
 						.await?;
 					Ok(ex_hash)
 				}
@@ -200,41 +225,33 @@ where
 		Ok(result)
 	}
 
-	// /// affirmations contains block?
-	// pub fn contains(affirmations: &[R::RelayAffirmation], block: u64) -> bool {
-	// 	for affirmation in affirmations {
-	// 		let blocks: &Vec<u64> = &affirmation
-	// 			.relay_header_parcels
-	// 			.iter()
-	// 			.map(|bp| bp.header.number)
-	// 			.collect();
-	// 		if blocks.contains(&block) {
-	// 			return true;
-	// 		}
-	// 	}
-	//
-	// 	// TODO: Checking the equality of the affirmations
-	//
-	// 	// TODO: If there is an affirmation with larger block number, then agree and join in the game.
-	//
-	// 	// TODO: How to play and join the game
-	// 	false
-	// }
+	/// affirmations contains block?
+	pub fn contains(
+		affirmations: &[RelayAffirmation<
+			EthereumRelayHeaderParcel,
+			<R as System>::AccountId,
+			<R as Balances>::Balance,
+			RelayAffirmationId<u64>,
+		>],
+		block: u64,
+	) -> bool {
+		for affirmation in affirmations {
+			let blocks: &Vec<u64> = &affirmation
+				.relay_header_parcels
+				.iter()
+				.map(|bp| bp.header.number)
+				.collect();
+			if blocks.contains(&block) {
+				return true;
+			}
+		}
 
-	/// Get confirmed block numbers
-	pub async fn confirmed_block_numbers(&self) -> Result<Vec<u64>> {
-		Ok(self.darwinia.subxt.confirmed_block_numbers(None).await?)
-	}
+		// TODO: Checking the equality of the affirmations
 
-	/// Get the last confirmed block
-	pub async fn last_confirmed(&self) -> Result<u64> {
-		Ok(
-			if let Some(confirmed) = self.confirmed_block_numbers().await?.iter().max() {
-				*confirmed
-			} else {
-				0
-			},
-		)
+		// TODO: If there is an affirmation with larger block number, then agree and join in the game.
+
+		// TODO: How to play and join the game
+		false
 	}
 
 	/// Get pending headers
@@ -255,7 +272,7 @@ where
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		R: Proxy<ProxyType = ProxyType>
+		R: Proxy<ProxyType = ProxyType>,
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -270,7 +287,12 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
 					.await?)
 			}
 			None => Ok(self
@@ -291,7 +313,7 @@ where
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		R: Proxy<ProxyType = ProxyType>
+		R: Proxy<ProxyType = ProxyType>,
 	{
 		let ethereum_tx_hash = proof
 			.header
@@ -315,7 +337,12 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
 					.await?)
 			}
 			None => {
@@ -358,7 +385,7 @@ where
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		R: Proxy<ProxyType = ProxyType>
+		R: Proxy<ProxyType = ProxyType>,
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -371,7 +398,12 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
 					.await?)
 			}
 			None => Ok(self
@@ -391,7 +423,7 @@ where
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		R: Proxy<ProxyType = ProxyType>
+		R: Proxy<ProxyType = ProxyType>,
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -404,7 +436,12 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
+					.proxy(
+						&account.0.signer,
+						real.clone(),
+						Some(ProxyType::EthereumBridge),
+						&ex,
+					)
 					.await?)
 			}
 			None => Ok(self

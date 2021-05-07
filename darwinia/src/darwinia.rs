@@ -39,6 +39,29 @@ impl<R: Runtime> Clone for Darwinia<R> {
 	}
 }
 
+impl<R: Runtime> Darwinia<R> {
+	/// block number to hash
+	pub async fn block_number2hash(
+		&self,
+		block_number: Option<u32>,
+	) -> Result<Option<<R as System>::Hash>> {
+		let block_number = block_number.map(|n| n.into());
+		Ok(self.subxt.block_hash(block_number).await?)
+	}
+
+	/// Check if should redeem
+	pub async fn verified(&self, block_hash: web3::types::H256, tx_index: u64) -> Result<bool>
+	where
+		R: EthereumBacking,
+	{
+		Ok(self
+			.subxt
+			.verified_proof((block_hash.to_fixed_bytes(), tx_index), None)
+			.await?
+			.unwrap_or(false))
+	}
+}
+
 impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthorities> Darwinia<R> {
 	pub async fn new(url: &str) -> Result<Darwinia<R>> {
 		let client = ClientBuilder::<R>::new()
@@ -224,15 +247,6 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 		}
 	}
 
-	/// block number to hash
-	pub async fn block_number2hash(
-		&self,
-		block_number: Option<u32>,
-	) -> Result<Option<<R as System>::Hash>> {
-		let block_number = block_number.map(|n| n.into());
-		Ok(self.subxt.block_hash(block_number).await?)
-	}
-
 	/// is_sudo_key
 	pub async fn is_sudo_key(
 		&self,
@@ -277,15 +291,6 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 			return Ok(Some(*block.block.header.number()));
 		}
 		Ok(None)
-	}
-
-	/// Check if should redeem
-	pub async fn verified(&self, block_hash: web3::types::H256, tx_index: u64) -> Result<bool> {
-		Ok(self
-			.subxt
-			.verified_proof((block_hash.to_fixed_bytes(), tx_index), None)
-			.await?
-			.unwrap_or(false))
 	}
 
 	/// Check if should issuing sync

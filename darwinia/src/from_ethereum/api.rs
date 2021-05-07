@@ -127,11 +127,11 @@ where
 		account: &Account<R>,
 		pending: u64,
 		aye: bool,
-		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		R: Proxy<ProxyType = ProxyType>
 	{
 		if self.is_tech_comm_member(None, &account).await? {
 			match &account.0.real {
@@ -148,7 +148,7 @@ where
 					let ex_hash = self
 						.darwinia
 						.subxt
-						.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
+						.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
 						.await?;
 					Ok(ex_hash)
 				}

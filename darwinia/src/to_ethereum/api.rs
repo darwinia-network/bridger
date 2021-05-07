@@ -9,7 +9,10 @@ use codec::Encode;
 use substrate_subxt::sp_core::H256;
 
 use primitives::{
-	chain::ethereum::EthereumReceiptProofThing,
+	chain::{
+		ethereum::EthereumReceiptProofThing,
+		proxy_type::ProxyType,
+	},
 	frame::{
 		bridge::relay_authorities::{
 			AuthoritiesStoreExt, AuthoritiesToSignStoreExt, MmrRootsToSignStoreExt,
@@ -144,8 +147,10 @@ where
 		&self,
 		account: &Account<R>,
 		proof: EthereumReceiptProofThing,
-		proxy_type: <R as Proxy>::ProxyType,
-	) -> Result<<R as System>::Hash> {
+	) -> Result<<R as System>::Hash>
+	where
+		R: Proxy<ProxyType = ProxyType>
+	{
 		match &account.0.real {
 			Some(real) => {
 				let call = SyncAuthoritiesChange {
@@ -157,7 +162,7 @@ where
 				Ok(self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
+					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
 					.await?)
 			}
 			None => Ok(self
@@ -173,10 +178,10 @@ where
 		&self,
 		account: &Account<R>,
 		message: EcdsaMessage,
-		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
 	where
 		R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature>,
+		R: Proxy<ProxyType = ProxyType>
 	{
 		// TODO: check
 		// 	.sender
@@ -197,7 +202,7 @@ where
 				let tx_hash = self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
+					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
 					.await?;
 				Ok(tx_hash)
 			}
@@ -219,11 +224,11 @@ where
 		account: &Account<R>,
 		spec_name: String,
 		block_number: <R as System>::BlockNumber,
-		proxy_type: <R as Proxy>::ProxyType,
 	) -> Result<<R as System>::Hash>
 	where
 		<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Sync,
 		R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature>,
+		R: Proxy<ProxyType = ProxyType>
 	{
 		// get mmr root from darwinia
 		let leaf_index = block_number;
@@ -250,7 +255,7 @@ where
 				let tx_hash = self
 					.darwinia
 					.subxt
-					.proxy(&account.0.signer, real.clone(), Some(proxy_type), &ex)
+					.proxy(&account.0.signer, real.clone(), Some(ProxyType::EthereumBridge), &ex)
 					.await?;
 				Ok(tx_hash)
 			}

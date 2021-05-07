@@ -1,5 +1,5 @@
 //! Darwinia Ethereum Backing
-use crate::chain::ethereum::{EthereumReceiptProofThing, RedeemFor};
+use crate::chain::ethereum::{EthereumReceiptProofThing, RedeemFor, EcdsaAddress};
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use substrate_subxt::balances::Balances;
@@ -73,9 +73,6 @@ pub struct RedeemDeposit<T: EthereumBacking> {
 	/// Transaction Id
 	pub tx_id: u64,
 }
-
-/// Ethereum address
-pub type EcdsaAddress = [u8; 20];
 
 /// Someone lock some *RING*. [account, ecdsa address, asset type, amount]
 #[derive(Clone, Debug, Eq, PartialEq, Event, Decode)]

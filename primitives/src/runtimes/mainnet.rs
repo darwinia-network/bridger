@@ -33,6 +33,8 @@ use substrate_subxt::{
 };
 
 use sp_core::{H160, H256, U256};
+use codec::{Decode, Encode};
+use crate::chain::ethereum::{EcdsaAddress, EcdsaSignature, EcdsaMessage};
 
 type SessionIndex = u32;
 
@@ -140,23 +142,7 @@ impl EthereumRelayAuthorities for MainnetRuntime {
 	type RelayAuthorityMessage = EcdsaMessage;
 }
 
-use codec::{Decode, Encode};
 
-/// EcdsaAddress
-pub type EcdsaAddress = [u8; 20];
-
-/// EcdsaSignature
-#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
-pub struct EcdsaSignature(pub [u8; 65]);
-
-impl Default for EcdsaSignature {
-	fn default() -> Self {
-		Self([0u8; 65])
-	}
-}
-
-/// EcdsaMessage
-pub type EcdsaMessage = [u8; 32];
 
 #[derive(Encode, Decode)]
 enum ExitReason {

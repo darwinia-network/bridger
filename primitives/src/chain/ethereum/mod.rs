@@ -6,6 +6,7 @@ mod mmr;
 mod parcel;
 mod proof;
 mod receipt;
+mod ecdsa;
 
 pub use self::{
 	block::{EthereumBlockRPC, EthereumHeader, EthereumHeaderJson},
@@ -17,4 +18,7 @@ pub use self::{
 		EthReceiptBody, EthereumReceipt, EthereumReceiptProof, EthereumReceiptProofJson,
 		EthereumReceiptProofThing, EthereumReceiptProofThingJson, RedeemFor,
 	},
+	ecdsa::{
+		EcdsaSignature, EcdsaAddress, EcdsaMessage,
+	}
 };

@@ -1,4 +1,4 @@
-use crate::{error::Result, DarwiniaAccount, EcdsaSignature, Error};
+use crate::{error::Result, DarwiniaAccount, Error};
 
 use primitives::frame::bridge::relay_authorities::EthereumRelayAuthorities;
 use secp256k1::SecretKey;
@@ -6,6 +6,7 @@ use substrate_subxt::Runtime;
 use web3::signing::SecretKeyRef;
 use web3::transports::Http;
 use web3::Web3;
+use primitives::chain::ethereum::EcdsaSignature;
 
 #[derive(Clone)]
 pub struct EthereumAccount {

@@ -5,7 +5,6 @@ pub mod events;
 pub mod from_ethereum;
 pub mod rpc;
 pub mod to_ethereum;
-pub mod types;
 
 #[macro_use]
 extern crate log;
@@ -13,8 +12,6 @@ extern crate log;
 pub use rpc::{FormatedMMR, HeaderMMR};
 
 pub use events::{DarwiniaEvents, EventInfo};
-
-pub use types::{EcdsaMessage, EcdsaSignature};
 
 pub use to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
 

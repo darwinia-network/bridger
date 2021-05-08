@@ -1,4 +1,4 @@
-use crate::{Darwinia, EcdsaMessage, EcdsaSignature, HeaderMMR};
+use crate::{Darwinia, HeaderMMR};
 
 use super::Account;
 
@@ -21,7 +21,6 @@ use primitives::{
 	},
 };
 
-use crate::types::EcdsaAddress;
 use core::marker::PhantomData;
 use primitives::frame::{
 	bridge::relay_authorities::EthereumRelayAuthorities,
@@ -32,6 +31,7 @@ use primitives::frame::{
 use substrate_subxt::balances::Balances;
 use substrate_subxt::sp_runtime::traits::Verify;
 use substrate_subxt::{system::System, Runtime, SignedExtension, SignedExtra};
+use primitives::chain::ethereum::{EcdsaAddress, EcdsaSignature, EcdsaMessage};
 
 #[derive(Encode)]
 struct _S<_1, _2, _3, _4>
@@ -217,7 +217,7 @@ impl<R: Runtime> Darwinia2Ethereum<R> {
 	where
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature>,
+		R: EthereumRelayAuthorities<RelayAuthorityMessage = EcdsaMessage, RelayAuthoritySignature = EcdsaSignature>,
 		<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
 		R: System<Hash = H256> + Proxy<ProxyType = ProxyType>,
 	{

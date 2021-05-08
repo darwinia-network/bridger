@@ -275,7 +275,7 @@ impl<R: Runtime> Darwinia<R> {
 	/// get block header by number
 	pub async fn get_block_by_number(&self, number: u32) -> Result<Header<u32, BlakeTwo256>>
 	where
-		R: System<Header = Header<u32, BlakeTwo256>>,
+		R: System<Header = Header<u32, BlakeTwo256>, Hash = H256, BlockNumber = u32>,
 	{
 		match self
 			.subxt

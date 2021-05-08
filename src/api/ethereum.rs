@@ -1,7 +1,7 @@
 //! Ethereum API
 use crate::{error::Error, error::Result, Settings};
 
-use primitives::runtime::EcdsaSignature;
+use primitives::chain::ethereum::EcdsaSignature;
 use secp256k1::SecretKey;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;

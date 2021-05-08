@@ -11,9 +11,9 @@ use crate::tools;
 use primitives::chain::ethereum::{
 	EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor,
 };
-use primitives::runtime::EcdsaMessage;
+use primitives::chain::ethereum::EcdsaMessage;
 use std::path::PathBuf;
-
+use primitives::runtimes::mainnet::MainnetRuntime;
 use darwinia::{Darwinia2Ethereum, Ethereum2Darwinia, FromEthereumAccount, ToEthereumAccount};
 
 #[derive(Clone, Debug)]
@@ -36,13 +36,13 @@ impl Message for MsgExtrinsic {
 /// Extrinsics Service
 pub struct ExtrinsicsService {
 	/// Ethereum to Darwinia Client
-	pub ethereum2darwinia: Option<Ethereum2Darwinia>,
+	pub ethereum2darwinia: Option<Ethereum2Darwinia<MainnetRuntime>>,
 	/// Dawrinia to Ethereum Client
-	pub darwinia2ethereum: Option<Darwinia2Ethereum>,
+	pub darwinia2ethereum: Option<Darwinia2Ethereum<MainnetRuntime>>,
 	/// ethereum2darwinia relayer
-	pub ethereum2darwinia_relayer: Option<FromEthereumAccount>,
+	pub ethereum2darwinia_relayer: Option<FromEthereumAccount<MainnetRuntime>>,
 	/// darwinia2ethereum relayer
-	pub darwinia2ethereum_relayer: Option<ToEthereumAccount>,
+	pub darwinia2ethereum_relayer: Option<ToEthereumAccount<MainnetRuntime>>,
 
 	spec_name: String,
 	data_dir: PathBuf,
@@ -90,10 +90,10 @@ impl Handler<MsgStop> for ExtrinsicsService {
 impl ExtrinsicsService {
 	/// New sign service
 	pub fn new(
-		ethereum2darwinia: Option<Ethereum2Darwinia>,
-		darwinia2ethereum: Option<Darwinia2Ethereum>,
-		ethereum2darwinia_relayer: Option<FromEthereumAccount>,
-		darwinia2ethereum_relayer: Option<ToEthereumAccount>,
+		ethereum2darwinia: Option<Ethereum2Darwinia<MainnetRuntime>>,
+		darwinia2ethereum: Option<Darwinia2Ethereum<MainnetRuntime>>,
+		ethereum2darwinia_relayer: Option<FromEthereumAccount<MainnetRuntime>>,
+		darwinia2ethereum_relayer: Option<ToEthereumAccount<MainnetRuntime>>,
 		spec_name: String,
 		data_dir: PathBuf,
 	) -> ExtrinsicsService {
@@ -109,10 +109,10 @@ impl ExtrinsicsService {
 
 	#[allow(clippy::too_many_arguments)]
 	async fn send_extrinsic(
-		ethereum2darwinia: Option<Ethereum2Darwinia>,
-		darwinia2ethereum: Option<Darwinia2Ethereum>,
-		ethereum2darwinia_relayer: Option<FromEthereumAccount>,
-		darwinia2ethereum_relayer: Option<ToEthereumAccount>,
+		ethereum2darwinia: Option<Ethereum2Darwinia<MainnetRuntime>>,
+		darwinia2ethereum: Option<Darwinia2Ethereum<MainnetRuntime>>,
+		ethereum2darwinia_relayer: Option<FromEthereumAccount<MainnetRuntime>>,
+		darwinia2ethereum_relayer: Option<ToEthereumAccount<MainnetRuntime>>,
 		extrinsic: Extrinsic,
 		spec_name: String,
 		data_dir: PathBuf,

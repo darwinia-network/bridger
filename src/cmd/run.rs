@@ -26,6 +26,7 @@ use crate::tools;
 use darwinia::{
 	Darwinia, Darwinia2Ethereum, Ethereum2Darwinia, FromEthereumAccount, ToEthereumAccount,
 };
+use primitives::runtimes::mainnet::MainnetRuntime;
 
 /// Run the bridger
 pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) -> Result<()> {
@@ -162,11 +163,11 @@ async fn run(data_dir: PathBuf, config: &Settings) -> Result<()> {
 async fn start_services(
 	config: &Settings,
 	shadow: &Arc<Shadow>,
-	darwinia: &Darwinia,
-	ethereum2darwinia: Option<Ethereum2Darwinia>,
-	darwinia2ethereum: Option<Darwinia2Ethereum>,
-	ethereum2darwinia_relayer: Option<FromEthereumAccount>,
-	darwinia2ethereum_relayer: Option<ToEthereumAccount>,
+	darwinia: &Darwinia<MainnetRuntime>,
+	ethereum2darwinia: Option<Ethereum2Darwinia<MainnetRuntime>>,
+	darwinia2ethereum: Option<Darwinia2Ethereum<MainnetRuntime>>,
+	ethereum2darwinia_relayer: Option<FromEthereumAccount<MainnetRuntime>>,
+	darwinia2ethereum_relayer: Option<ToEthereumAccount<MainnetRuntime>>,
 	web3: &Web3<Http>,
 	(data_dir, spec_name, last_redeemed, last_tracked_darwinia_block): (PathBuf, String, u64, u32),
 ) -> Result<()> {

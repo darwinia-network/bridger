@@ -20,7 +20,8 @@ use primitives::frame::bridge::relay_authorities::EthereumRelayAuthorities;
 use primitives::frame::ethereum::{backing::EthereumBacking, issuing::EthereumIssuing};
 use primitives::frame::sudo::KeyStoreExt;
 use primitives::frame::sudo::Sudo;
-use substrate_subxt::sp_runtime::traits::{UniqueSaturatedInto, Verify};
+use substrate_subxt::sp_runtime::generic::Header;
+use substrate_subxt::sp_runtime::traits::{BlakeTwo256, Verify};
 use substrate_subxt::system::System;
 
 pub struct Darwinia<R: Runtime> {
@@ -40,29 +41,6 @@ impl<R: Runtime> Clone for Darwinia<R> {
 }
 
 impl<R: Runtime> Darwinia<R> {
-	/// block number to hash
-	pub async fn block_number2hash(
-		&self,
-		block_number: Option<u32>,
-	) -> Result<Option<<R as System>::Hash>> {
-		let block_number = block_number.map(|n| n.into());
-		Ok(self.subxt.block_hash(block_number).await?)
-	}
-
-	/// Check if should redeem
-	pub async fn verified(&self, block_hash: web3::types::H256, tx_index: u64) -> Result<bool>
-	where
-		R: EthereumBacking,
-	{
-		Ok(self
-			.subxt
-			.verified_proof((block_hash.to_fixed_bytes(), tx_index), None)
-			.await?
-			.unwrap_or(false))
-	}
-}
-
-impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthorities> Darwinia<R> {
 	pub async fn new(url: &str) -> Result<Darwinia<R>> {
 		let client = ClientBuilder::<R>::new()
 			.set_url(url)
@@ -75,6 +53,57 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 			subxt: client,
 			event,
 		})
+	}
+
+	/// block number to hash
+	pub async fn block_number2hash(&self, block_number: Option<u32>) -> Result<Option<H256>>
+	where
+		R: System<Hash = H256>,
+	{
+		let block_number = block_number.map(|n| n.into());
+		Ok(self.subxt.block_hash(block_number).await?)
+	}
+
+	/// is_sudo_key
+	pub async fn is_sudo_key(
+		&self,
+		block_number: Option<u32>,
+		account: &DarwiniaAccount<R>,
+	) -> Result<bool>
+	where
+		R: System<Hash = H256> + Sudo,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<R::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
+	{
+		let block_hash = self.block_number2hash(block_number).await?;
+		let sudo = self.subxt.key(block_hash).await?;
+		Ok(&sudo == account.real())
+	}
+
+	/// role
+	pub async fn account_role(&self, account: &DarwiniaAccount<R>) -> Result<Vec<String>>
+	where
+		R: System<Hash = H256> + Sudo,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<R::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
+	{
+		let mut roles = vec!["Normal".to_string()];
+		if self.is_sudo_key(None, account).await? {
+			roles.push("Sudo".to_string());
+		}
+		Ok(roles)
+	}
+
+	/// Check if should redeem
+	pub async fn verified(&self, block_hash: web3::types::H256, tx_index: u64) -> Result<bool>
+	where
+		R: EthereumBacking,
+	{
+		Ok(self
+			.subxt
+			.verified_proof((block_hash.to_fixed_bytes(), tx_index), None)
+			.await?
+			.unwrap_or(false))
 	}
 
 	/// get mmr root of darwinia
@@ -108,8 +137,11 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 		&self,
 		module_name: &str,
 		storage_name: &str,
-		header_hash: <R as System>::Hash,
-	) -> Result<StorageData> {
+		header_hash: H256,
+	) -> Result<StorageData>
+	where
+		R: System<Hash = H256>,
+	{
 		let mut storage_key = twox_128(module_name.as_bytes()).to_vec();
 		storage_key.extend(twox_128(storage_name.as_bytes()).to_vec());
 
@@ -140,10 +172,10 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 	}
 
 	/// get events from a special block
-	pub async fn get_events_from_block_hash(
-		&self,
-		hash: <R as System>::Hash,
-	) -> Result<Vec<EventInfo<R>>> {
+	pub async fn get_events_from_block_hash(&self, hash: H256) -> Result<Vec<EventInfo<R>>>
+	where
+		R: EthereumRelayAuthorities + System<Hash = H256>,
+	{
 		let storage_data = self.get_storage_data("System", "Events", hash).await?;
 
 		let raw_events = self.event.decoder.decode_events(&mut &storage_data.0[..])?;
@@ -172,7 +204,10 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 	}
 
 	/// get events from a special block
-	pub async fn get_events_from_block_number(&self, block: u32) -> Result<Vec<EventInfo<R>>> {
+	pub async fn get_events_from_block_number(&self, block: u32) -> Result<Vec<EventInfo<R>>>
+	where
+		R: EthereumRelayAuthorities + System<Hash = H256>,
+	{
 		let blockno = BlockNumber::from(block);
 		match self.subxt.block_hash(Some(blockno)).await? {
 			Some(hash) => return self.get_events_from_block_hash(hash).await,
@@ -184,9 +219,11 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 	}
 
 	/// get mmr root
-	pub async fn get_mmr_root(&self, leaf_index: <R as System>::BlockNumber) -> Result<H256> {
-		let l = UniqueSaturatedInto::<u32>::unique_saturated_into(leaf_index);
-		let block_number = l + 1u32;
+	pub async fn get_mmr_root(&self, leaf_index: u32) -> Result<H256>
+	where
+		R: System<BlockNumber = u32>,
+	{
+		let block_number = leaf_index + 1u32;
 
 		let block_hash = self
 			.subxt
@@ -226,14 +263,20 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 	pub async fn get_event_proof(
 		&self,
 		storage_key: Vec<u8>,
-		block_hash: <R as System>::Hash,
-	) -> Result<Vec<Bytes>> {
+		block_hash: H256,
+	) -> Result<Vec<Bytes>>
+	where
+		R: System<Hash = H256>,
+	{
 		let keys = vec![StorageKey(storage_key)];
 		Ok(self.subxt.read_proof(keys, Some(block_hash)).await?.proof)
 	}
 
 	/// get block header by number
-	pub async fn get_block_by_number(&self, number: u32) -> Result<<R as System>::Header> {
+	pub async fn get_block_by_number(&self, number: u32) -> Result<Header<u32, BlakeTwo256>>
+	where
+		R: System<Header = Header<u32, BlakeTwo256>>,
+	{
 		match self
 			.subxt
 			.block_hash(Some(BlockNumber::from(number)))
@@ -247,36 +290,11 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 		}
 	}
 
-	/// is_sudo_key
-	pub async fn is_sudo_key(
-		&self,
-		block_number: Option<u32>,
-		account: &DarwiniaAccount<R>,
-	) -> Result<bool>
-	where
-		<R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		<<R as Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
-	{
-		let block_hash = self.block_number2hash(block_number).await?;
-		let sudo = self.subxt.key(block_hash).await?;
-		Ok(&sudo == account.real())
-	}
-
-	/// role
-	pub async fn account_role(&self, account: &DarwiniaAccount<R>) -> Result<Vec<String>>
-	where
-		<R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-		<<R as Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
-	{
-		let mut roles = vec!["Normal".to_string()];
-		if self.is_sudo_key(None, account).await? {
-			roles.push("Sudo".to_string());
-		}
-		Ok(roles)
-	}
-
 	/// finalized_head
-	pub async fn finalized_head(&self) -> Result<<R as System>::Hash> {
+	pub async fn finalized_head(&self) -> Result<H256>
+	where
+		R: System<Hash = H256>,
+	{
 		let hash = self.subxt.finalized_head().await?;
 		Ok(hash)
 	}
@@ -284,8 +302,11 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 	/// get block by hash
 	pub async fn get_block_number_by_hash(
 		&self,
-		block_hash: <R as System>::Hash,
-	) -> Result<Option<<R as System>::BlockNumber>> {
+		block_hash: H256,
+	) -> Result<Option<<R as System>::BlockNumber>>
+	where
+		R: System<Hash = H256>,
+	{
 		let block = self.subxt.block(Some(block_hash)).await?;
 		if let Some(block) = block {
 			return Ok(Some(*block.block.header.number()));
@@ -298,7 +319,10 @@ impl<R: Runtime + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthor
 		&self,
 		block_hash: web3::types::H256,
 		tx_index: u64,
-	) -> Result<bool> {
+	) -> Result<bool>
+	where
+		R: EthereumIssuing,
+	{
 		Ok(self
 			.subxt
 			.verified_issuing_proof((block_hash.to_fixed_bytes(), tx_index), None)

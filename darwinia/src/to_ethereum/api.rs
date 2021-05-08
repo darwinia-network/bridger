@@ -25,12 +25,12 @@ use crate::types::EcdsaAddress;
 use core::marker::PhantomData;
 use primitives::frame::{
 	bridge::relay_authorities::EthereumRelayAuthorities,
-	ethereum::{backing::EthereumBacking, issuing::EthereumIssuing},
+	ethereum::backing::EthereumBacking,
 	proxy::Proxy,
 	sudo::Sudo,
 };
 use substrate_subxt::balances::Balances;
-use substrate_subxt::sp_runtime::traits::{UniqueSaturatedInto, Verify};
+use substrate_subxt::sp_runtime::traits::Verify;
 use substrate_subxt::{system::System, Runtime, SignedExtension, SignedExtra};
 
 #[derive(Encode)]
@@ -61,12 +61,7 @@ impl<R: Runtime> Darwinia2Ethereum<R> {
 	}
 }
 
-impl<R> Darwinia2Ethereum<R>
-where
-	R: Runtime + System + Balances,
-	R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-	<R::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
-{
+impl<R: Runtime> Darwinia2Ethereum<R> {
 	/// is authority
 	pub async fn is_authority(
 		&self,
@@ -75,13 +70,17 @@ where
 	) -> Result<bool>
 	where
 		R: EthereumRelayAuthorities<
-			RelayAuthority = RelayAuthority<
-				<R as System>::AccountId,
-				EcdsaAddress,
-				<R as Balances>::Balance,
-				<R as System>::BlockNumber,
-			>,
-		>,
+				RelayAuthority = RelayAuthority<
+					<R as System>::AccountId,
+					EcdsaAddress,
+					<R as Balances>::Balance,
+					<R as System>::BlockNumber,
+				>,
+			> + System<Hash = H256>
+			+ System
+			+ Balances,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<R::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
 	{
 		#![allow(clippy::needless_collect)]
 		let block_hash = self.darwinia.block_number2hash(block_number).await?;
@@ -96,18 +95,7 @@ where
 		Ok(authorities.contains(account.0.real()))
 		// Ok(true)
 	}
-}
 
-impl<R> Darwinia2Ethereum<R>
-where
-	R: Runtime + Proxy + Sudo + EthereumBacking + EthereumIssuing + EthereumRelayAuthorities,
-	<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: std::marker::Send,
-	<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Sync,
-	<R as System>::Address: From<<R as System>::AccountId>,
-	<R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
-	<<R as substrate_subxt::Runtime>::Signature as Verify>::Signer:
-		From<sp_keyring::sr25519::sr25519::Public>,
-{
 	/// header mmr proof
 	pub async fn get_headermmr_genproof(
 		&self,
@@ -173,7 +161,10 @@ where
 	}
 
 	/// get_current_term
-	pub async fn get_current_authority_term(&self) -> Result<u32> {
+	pub async fn get_current_authority_term(&self) -> Result<u32>
+	where
+		R: EthereumRelayAuthorities,
+	{
 		Ok(self.darwinia.subxt.next_term(None).await?)
 	}
 
@@ -183,9 +174,12 @@ where
 		&self,
 		account: &Account<R>,
 		proof: EthereumReceiptProofThing,
-	) -> Result<<R as System>::Hash>
+	) -> Result<H256>
 	where
-		R: Proxy<ProxyType = ProxyType>,
+		R: System<Hash = H256> + Proxy<ProxyType = ProxyType> + EthereumBacking,
+		<R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
 	{
 		match &account.0.real {
 			Some(real) => {
@@ -219,10 +213,13 @@ where
 		&self,
 		account: &Account<R>,
 		message: EcdsaMessage,
-	) -> Result<<R as System>::Hash>
+	) -> Result<H256>
 	where
+		<R as System>::Address: From<<R as System>::AccountId>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 		R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature>,
-		R: Proxy<ProxyType = ProxyType>,
+		<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
+		R: System<Hash = H256> + Proxy<ProxyType = ProxyType>,
 	{
 		// TODO: check
 		// 	.sender
@@ -269,19 +266,20 @@ where
 		&self,
 		account: &Account<R>,
 		spec_name: String,
-		block_number: <R as System>::BlockNumber,
-	) -> Result<<R as System>::Hash>
+		block_number: u32,
+	) -> Result<H256>
 	where
-		<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Sync,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<R as System>::Address: From<<R as System>::AccountId>,
+		<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
 		R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature>,
-		R: Proxy<ProxyType = ProxyType>,
+		R: Proxy<ProxyType = ProxyType> + System<BlockNumber = u32, Hash = H256>,
 	{
 		// get mmr root from darwinia
 		let leaf_index = block_number;
 		let mmr_root = self.darwinia.get_mmr_root(leaf_index).await?;
 
-		let bn = UniqueSaturatedInto::<u32>::unique_saturated_into(block_number);
-		let encoded = Darwinia2Ethereum::<R>::construct_mmr_root_message(spec_name, bn, mmr_root);
+		let encoded = Darwinia2Ethereum::<R>::construct_mmr_root_message(spec_name, block_number, mmr_root);
 		let hash = web3::signing::keccak256(&encoded);
 		let signature = account.ecdsa_sign(&hash)?;
 
@@ -330,8 +328,11 @@ where
 		&self,
 		block_number: Option<u32>,
 		account: &Account<R>,
-		message: <R as EthereumRelayAuthorities>::RelayAuthorityMessage,
-	) -> Result<bool> {
+		message: EcdsaMessage,
+	) -> Result<bool>
+	where
+		R: System<Hash = H256> + EthereumRelayAuthorities<RelayAuthorityMessage = EcdsaMessage>,
+	{
 		let block_hash = self.darwinia.block_number2hash(block_number).await?;
 		let ret = self.darwinia.subxt.authorities_to_sign(block_hash).await?;
 		match ret {
@@ -356,9 +357,12 @@ where
 	pub async fn need_to_sign_mmr_root_of(
 		&self,
 		account: &Account<R>,
-		block_number: <R as System>::BlockNumber,
+		block_number: u32,
 		exec_block_number: Option<u32>,
-	) -> Result<bool> {
+	) -> Result<bool>
+	where
+		R: System<Hash = H256, BlockNumber = u32> + EthereumRelayAuthorities,
+	{
 		let exec_block_hash = self.darwinia.block_number2hash(exec_block_number).await?;
 		match self
 			.darwinia
@@ -387,13 +391,15 @@ where
 	) -> Result<()>
 	where
 		R: EthereumRelayAuthorities<
-			RelayAuthority = RelayAuthority<
-				<R as System>::AccountId,
-				EcdsaAddress,
-				<R as Balances>::Balance,
-				<R as System>::BlockNumber,
-			>,
-		>,
+				RelayAuthority = RelayAuthority<
+					<R as System>::AccountId,
+					EcdsaAddress,
+					<R as Balances>::Balance,
+					<R as System>::BlockNumber,
+				>,
+			> + Balances + System<Hash = H256> + Sudo,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<R::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
 	{
 		info!("🧔 darwinia => ethereum account");
 		let mut roles = self.darwinia.account_role(&account.0).await?;

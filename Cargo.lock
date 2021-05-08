@@ -1823,6 +1823,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "getset"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "24b328c01a4d71d2d8173daa93562a73ab0fe85616876f02500f53d82948c504"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "gimli"
 version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4643,13 +4655,18 @@ dependencies = [
  "actix-web",
  "anyhow",
  "async-trait",
+ "derive_more",
  "env_logger 0.8.3",
+ "getset",
  "log",
  "serde 1.0.125",
+ "serde_derive",
  "serde_json",
  "structopt",
+ "thiserror",
  "tokio 1.4.0",
  "toml",
+ "typed-builder",
 ]
 
 [[package]]
@@ -5214,6 +5231,17 @@ dependencies = [
  "cfg-if 0.1.10",
  "rand 0.7.3",
  "static_assertions",
+]
+
+[[package]]
+name = "typed-builder"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "345426c7406aa355b60c5007c79a2d1f5b605540072795222f17f6443e6a9c6f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

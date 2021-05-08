@@ -17,11 +17,14 @@ pub enum Opt {
 	/// Start substrate relay
 	Start {
 		/// The config file path
+		#[structopt(short, long, parse(from_os_str))]
+		config: Option<PathBuf>,
+		/// Listen host, Default:  127.0.0.1
 		#[structopt(short, long)]
-		config: Option<String>,
-		/// Listen port
-		#[structopt(short, long, default_value = "7890")]
-		port: u32,
+		host: Option<String>,
+		/// Listen port, Default: 7890
+		#[structopt(short, long)]
+		port: Option<u32>,
 	},
 	/// Substrate relay config
 	Config(OptConfig),

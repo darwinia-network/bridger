@@ -5,6 +5,7 @@ use opt::Opt;
 use crate::error::Result;
 
 mod opt;
+mod service;
 
 pub async fn exec() -> Result<()> {
 	let opt = Opt::from_args();
@@ -12,11 +13,8 @@ pub async fn exec() -> Result<()> {
 		Opt::InitBridge { source, target } => {
 			debug!("init: {} -> {}", source, target);
 		}
-		Opt::Start { config, port } => {
-			debug!(
-				"TODO: Start substrate relay, config: {:?}, port: {:?}",
-				config, port
-			)
+		Opt::Start { config, host, port } => {
+			return service::exec(config, host, port).await;
 		}
 		Opt::Config(config) => {
 			debug!("TODO: config file path: {:?}", config);

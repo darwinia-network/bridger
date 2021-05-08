@@ -44,6 +44,13 @@ use substrate_subxt::sp_runtime::traits::Verify;
 use substrate_subxt::system::System;
 use substrate_subxt::{Runtime, SignedExtension, SignedExtra};
 
+type TrueRelayAffirmation<R> = RelayAffirmation<
+	EthereumRelayHeaderParcel,
+	<R as System>::AccountId,
+	<R as Balances>::Balance,
+	RelayAffirmationId<u64>,
+>;
+
 /// Dawrinia API
 #[derive(Clone)]
 pub struct Ethereum2Darwinia<R: Runtime> {
@@ -228,12 +235,7 @@ impl<R: Runtime> Ethereum2Darwinia<R> {
 
 	/// affirmations contains block?
 	pub fn contains(
-		affirmations: &[RelayAffirmation<
-			EthereumRelayHeaderParcel,
-			<R as System>::AccountId,
-			<R as Balances>::Balance,
-			RelayAffirmationId<u64>,
-		>],
+		affirmations: &[TrueRelayAffirmation<R>],
 		block: u64,
 	) -> bool
 	where

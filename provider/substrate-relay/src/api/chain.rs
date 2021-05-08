@@ -1,7 +1,6 @@
-use std::ops::Deref;
 use std::sync::Mutex;
 
-use actix_web::{post, web, HttpRequest, HttpResponse, Responder};
+use actix_web::{post, web, HttpRequest, HttpResponse};
 
 use crate::persist::{Chain, Persist};
 use crate::types::patch::resp::Resp;
@@ -13,7 +12,7 @@ pub async fn chain_add(
 	form: web::Form<Chain>,
 ) -> Result<HttpResponse, crate::error::WebError> {
 	let mut persist = data_persist.lock().unwrap();
-	persist.chain_add(form.0)?;
+	persist.chain_add(form.0).await?;
 	let chains = persist.chains();
 	Ok(HttpResponse::Ok().json(Resp::ok_with_data(chains)))
 }

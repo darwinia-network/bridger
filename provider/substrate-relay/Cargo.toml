@@ -24,6 +24,7 @@ typed-builder = "0.9"
 getset = "0.1"
 thiserror = "1.0"
 derive_more = "0.99"
+async-fs = "1.5"
 
 structopt = "0.3"
 

@@ -17,7 +17,7 @@ fn path_config_file(config: Option<PathBuf>) -> Result<PathBuf> {
 pub async fn exec(config: Option<PathBuf>, host: Option<String>, port: Option<u32>) -> Result<()> {
 	let config_file = path_config_file(config.clone())?;
 	info!("Use config: {}", config_file.display());
-	let mut persist = Persist::load_from_file(config_file)?;
+	let mut persist = Persist::load_from_file(config_file).await?;
 	let generic: &mut Generic = persist.generic_mut();
 
 	if let Some(h) = host {
@@ -26,7 +26,7 @@ pub async fn exec(config: Option<PathBuf>, host: Option<String>, port: Option<u3
 	if let Some(p) = port {
 		generic.set_port(p);
 	}
-	persist.store()?;
+	persist.store().await?;
 	let server = WebServer::builder().persist(persist).build();
 	server.run().await
 }

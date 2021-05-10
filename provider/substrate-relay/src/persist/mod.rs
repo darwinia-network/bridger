@@ -166,7 +166,10 @@ impl Persist {
 
 	pub async fn token_generate(&mut self, remark: Option<String>) -> error::Result<Token> {
 		let token_value = self.new_token();
-		let token = Token::builder().remark(remark).value(token_value).build();
+		let token = Token::builder()
+			.remark(Some(remark.unwrap_or("".to_string())))
+			.value(token_value)
+			.build();
 		self.tokens.push(token.clone());
 		self.store().await?;
 		Ok(token)

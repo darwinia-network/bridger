@@ -2,6 +2,8 @@ use crate::cli::opt::{OptChainCommand, OptConfig, OptConfigSubcommand, OptTokenC
 use crate::client::cli_client::CliClient;
 use crate::error;
 use crate::persist::Chain;
+use crate::types::cond::chain::ChainRemoveCond;
+use crate::types::cond::token::{TokenGenerateCond, TokenRemoveCond};
 
 pub async fn exec(config: OptConfig) -> error::Result<()> {
 	let debug: bool = *(config.debug());
@@ -51,7 +53,10 @@ async fn handle_command_chain(client: &CliClient, command: &OptChainCommand) -> 
 				.build();
 			client.chain_update(&chain).await?
 		}
-		OptChainCommand::Remove { name } => client.chain_remove(name).await?,
+		OptChainCommand::Remove { name } => {
+			let chain_remove = ChainRemoveCond::builder().name(name.clone()).build();
+			client.chain_remove(&chain_remove).await?
+		}
 	}
 	Ok(())
 }
@@ -59,8 +64,14 @@ async fn handle_command_chain(client: &CliClient, command: &OptChainCommand) -> 
 async fn handle_command_token(client: &CliClient, command: &OptTokenCommand) -> error::Result<()> {
 	match command {
 		OptTokenCommand::List => client.token_list().await?,
-		OptTokenCommand::Generate { remark } => client.token_generate(remark).await?,
-		OptTokenCommand::Remove { token } => client.token_remove(token).await?,
+		OptTokenCommand::Generate { remark } => {
+			let token_generate = TokenGenerateCond::builder().remark(remark.clone()).build();
+			client.token_generate(&token_generate).await?
+		}
+		OptTokenCommand::Remove { token } => {
+			let token_remove = TokenRemoveCond::builder().token(token.clone()).build();
+			client.token_remove(&token_remove).await?
+		}
 	}
 	Ok(())
 }

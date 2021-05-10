@@ -52,7 +52,7 @@ where
 	fn call(&mut self, req: ServiceRequest) -> Self::Future {
 		let uri = req.path();
 
-		if !uri.starts_with("/api") {
+		if !uri.starts_with("/api") || uri == "/" {
 			return Either::Left(self.service.call(req));
 		}
 

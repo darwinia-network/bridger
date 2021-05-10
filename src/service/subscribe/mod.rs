@@ -10,7 +10,7 @@ use crate::{
 	service::extrinsics::{Extrinsic, MsgExtrinsic},
 };
 use actix::Recipient;
-use primitives::runtimes::mainnet::MainnetRuntime;
+use primitives::runtimes::darwinia::DarwiniaRuntime;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use substrate_subxt::system::System;
@@ -20,8 +20,8 @@ use darwinia::{Darwinia2Ethereum, EventInfo, ToEthereumAccount};
 
 /// Dawrinia Subscribe
 pub struct SubscribeService {
-	darwinia2ethereum: Darwinia2Ethereum<MainnetRuntime>,
-	account: ToEthereumAccount<MainnetRuntime>,
+	darwinia2ethereum: Darwinia2Ethereum<DarwiniaRuntime>,
+	account: ToEthereumAccount<DarwiniaRuntime>,
 	ethereum: Ethereum,
 	stop: bool,
 	extrinsics_service: Recipient<MsgExtrinsic>,
@@ -34,8 +34,8 @@ pub struct SubscribeService {
 impl SubscribeService {
 	/// New subscribe service
 	pub fn new(
-		darwinia2ethereum: Darwinia2Ethereum<MainnetRuntime>,
-		account: ToEthereumAccount<MainnetRuntime>,
+		darwinia2ethereum: Darwinia2Ethereum<DarwiniaRuntime>,
+		account: ToEthereumAccount<DarwiniaRuntime>,
 		ethereum: Ethereum,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 		spec_name: String,
@@ -123,7 +123,7 @@ impl SubscribeService {
 
 	async fn handle_delayed_extrinsics(
 		&mut self,
-		header: &<MainnetRuntime as System>::Header,
+		header: &<DarwiniaRuntime as System>::Header,
 	) -> Result<()> {
 		let cloned = self.delayed_extrinsics.clone();
 		for (delayed_to, delayed_ex) in cloned.iter() {
@@ -142,8 +142,8 @@ impl SubscribeService {
 
 	async fn handle_events(
 		&mut self,
-		header: &<MainnetRuntime as System>::Header,
-		events: Result<Vec<EventInfo<MainnetRuntime>>>,
+		header: &<DarwiniaRuntime as System>::Header,
+		events: Result<Vec<EventInfo<DarwiniaRuntime>>>,
 	) -> Result<()> {
 		for event in events? {
 			self.handle_event(header, event).await?;
@@ -153,8 +153,8 @@ impl SubscribeService {
 
 	async fn handle_event(
 		&mut self,
-		header: &<MainnetRuntime as System>::Header,
-		event: EventInfo<MainnetRuntime>,
+		header: &<DarwiniaRuntime as System>::Header,
+		event: EventInfo<DarwiniaRuntime>,
 	) -> Result<()> {
 		//todo
 		//if module != "System" {
@@ -184,7 +184,7 @@ impl SubscribeService {
 			EventInfo::AuthoritiesChangeSignedEvent(event) => {
 				let current_term = self.darwinia2ethereum.get_current_authority_term().await?;
 				if event.term == current_term {
-					let message = Darwinia2Ethereum::<MainnetRuntime>::construct_authorities_message(
+					let message = Darwinia2Ethereum::<DarwiniaRuntime>::construct_authorities_message(
 						self.spec_name.clone(),
 						event.term,
 						event.new_authorities,

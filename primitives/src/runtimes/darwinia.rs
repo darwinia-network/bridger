@@ -47,8 +47,8 @@ struct Log {
 
 /// Darwinia Runtime
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct MainnetRuntime;
-impl Runtime for MainnetRuntime {
+pub struct DarwiniaRuntime;
+impl Runtime for DarwiniaRuntime {
 	type Signature = MultiSignature;
 	type Extra = DefaultExtra<Self>;
 
@@ -80,11 +80,11 @@ impl Runtime for MainnetRuntime {
 	}
 }
 
-impl Balances for MainnetRuntime {
+impl Balances for DarwiniaRuntime {
 	type Balance = u128;
 }
 
-impl System for MainnetRuntime {
+impl System for DarwiniaRuntime {
 	type Index = u32;
 	type BlockNumber = u32;
 	type Hash = sp_core::H256;
@@ -96,9 +96,9 @@ impl System for MainnetRuntime {
 	type AccountData = AccountData<<Self as Balances>::Balance>;
 }
 
-impl TechnicalCommittee for MainnetRuntime {}
-impl Sudo for MainnetRuntime {}
-impl EthereumRelay for MainnetRuntime {
+impl TechnicalCommittee for DarwiniaRuntime {}
+impl Sudo for DarwiniaRuntime {}
+impl EthereumRelay for DarwiniaRuntime {
 	type RingBalance = u128;
 	type EthereumBlockNumber = u64;
 	type PendingRelayHeaderParcel = (
@@ -109,7 +109,7 @@ impl EthereumRelay for MainnetRuntime {
 	type RelayAffirmationId = RelayAffirmationId<Self::EthereumBlockNumber>;
 }
 
-impl EthereumRelayerGame for MainnetRuntime {
+impl EthereumRelayerGame for DarwiniaRuntime {
 	type RelayAffirmation = RelayAffirmation<
 		EthereumRelayHeaderParcel,
 		<Self as System>::AccountId,
@@ -118,19 +118,19 @@ impl EthereumRelayerGame for MainnetRuntime {
 	>;
 }
 
-impl EthereumBacking for MainnetRuntime {
+impl EthereumBacking for DarwiniaRuntime {
 	type EthereumTransactionIndex = u64;
 }
 
-impl EthereumIssuing for MainnetRuntime {
+impl EthereumIssuing for DarwiniaRuntime {
 	type EthereumTransactionIndex = u64;
 }
 
-impl Proxy for MainnetRuntime {
+impl Proxy for DarwiniaRuntime {
 	type ProxyType = ProxyType;
 }
 
-impl EthereumRelayAuthorities for MainnetRuntime {
+impl EthereumRelayAuthorities for DarwiniaRuntime {
 	type RelayAuthority = RelayAuthority<
 		<Self as System>::AccountId,
 		Self::RelayAuthoritySigner,

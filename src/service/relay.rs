@@ -13,7 +13,7 @@ use std::time::Duration;
 
 use crate::tools;
 use darwinia::Ethereum2Darwinia;
-use primitives::runtimes::mainnet::MainnetRuntime;
+use primitives::runtimes::darwinia::DarwiniaRuntime;
 
 /// message 'block_number'
 #[derive(Clone, Debug)]
@@ -36,7 +36,7 @@ pub struct RelayService {
 	/// Shadow API
 	pub shadow: Arc<Shadow>,
 	/// Dawrinia API
-	pub ethereum2darwinia: Ethereum2Darwinia<MainnetRuntime>,
+	pub ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
 
 	target: u64,
 	relayed: u64,
@@ -125,7 +125,7 @@ impl RelayService {
 	/// create new relay service actor
 	pub fn new(
 		shadow: Arc<Shadow>,
-		ethereum2darwinia: Ethereum2Darwinia<MainnetRuntime>,
+		ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
 		last_confirmed: u64,
 		step: u64,
 		extrinsics_service: Recipient<MsgExtrinsic>,
@@ -142,7 +142,7 @@ impl RelayService {
 
 	/// affirm target block
 	pub async fn affirm(
-		ethereum2darwinia: Ethereum2Darwinia<MainnetRuntime>,
+		ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
 		shadow: Arc<Shadow>,
 		target: u64,
 		extrinsics_service: Recipient<MsgExtrinsic>,
@@ -170,7 +170,7 @@ impl RelayService {
 		// 3. affirmations check
 		for (_game_id, game) in ethereum2darwinia.affirmations().await?.iter() {
 			for (_round_id, affirmations) in game.iter() {
-				if Ethereum2Darwinia::<MainnetRuntime>::contains(&affirmations, target) {
+				if Ethereum2Darwinia::<DarwiniaRuntime>::contains(&affirmations, target) {
 					return Err(BizError::AffirmingBlockInGame(target).into());
 				}
 			}

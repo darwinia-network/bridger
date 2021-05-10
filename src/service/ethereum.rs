@@ -20,7 +20,7 @@ use web3::{
 };
 
 use darwinia::Darwinia;
-use primitives::runtimes::mainnet::MainnetRuntime;
+use primitives::runtimes::darwinia::DarwiniaRuntime;
 
 #[derive(Clone, Debug)]
 struct MsgScan;
@@ -54,7 +54,7 @@ pub struct EthereumService {
 	contracts: ContractAddress,
 	filters: [FilterBuilder; 4],
 	web3: Web3<Http>,
-	darwinia: Darwinia<MainnetRuntime>,
+	darwinia: Darwinia<DarwiniaRuntime>,
 	scan_from: u64,
 	step: u64,
 
@@ -125,7 +125,7 @@ impl EthereumService {
 	pub fn new(
 		config: Settings,
 		web3: Web3<Http>,
-		darwinia: Darwinia<MainnetRuntime>,
+		darwinia: Darwinia<DarwiniaRuntime>,
 		scan_from: u64,
 		relay_service: Recipient<MsgBlockNumber>,
 		redeem_service: Recipient<MsgEthereumTransaction>,
@@ -237,7 +237,7 @@ impl EthereumService {
 
 	#[allow(clippy::too_many_arguments)]
 	async fn scan(
-		darwinia: Darwinia<MainnetRuntime>,
+		darwinia: Darwinia<DarwiniaRuntime>,
 		web3: Web3<Http>,
 		contracts: ContractAddress,
 		filters: [FilterBuilder; 4],

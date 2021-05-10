@@ -12,7 +12,7 @@ use web3::types::H256;
 
 use crate::tools;
 use darwinia::Ethereum2Darwinia;
-use primitives::runtimes::mainnet::MainnetRuntime;
+use primitives::runtimes::darwinia::DarwiniaRuntime;
 
 /// Ethereum transaction event with hash
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -84,7 +84,7 @@ pub struct RedeemService {
 	/// Shadow API
 	pub shadow: Arc<Shadow>,
 	/// Dawrinia API
-	pub ethereum2darwinia: Ethereum2Darwinia<MainnetRuntime>,
+	pub ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
 
 	extrinsics_service: Recipient<MsgExtrinsic>,
 }
@@ -149,7 +149,7 @@ impl RedeemService {
 	/// New redeem service
 	pub fn new(
 		shadow: Arc<Shadow>,
-		ethereum2darwinia: Ethereum2Darwinia<MainnetRuntime>,
+		ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
 		step: u64,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> RedeemService {
@@ -162,7 +162,7 @@ impl RedeemService {
 	}
 
 	async fn redeem(
-		ethereum2darwinia: Ethereum2Darwinia<MainnetRuntime>,
+		ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
 		shadow: Arc<Shadow>,
 		tx: EthereumTransaction,
 		extrinsics_service: Recipient<MsgExtrinsic>,

@@ -4,17 +4,17 @@ use std::time::Duration;
 use substrate_subxt::sp_runtime::generic::Header;
 use substrate_subxt::sp_runtime::traits::BlakeTwo256;
 use tokio::time::delay_for;
-use primitives::runtimes::mainnet::MainnetRuntime;
+use primitives::runtimes::darwinia::DarwiniaRuntime;
 
 /// DarwiniaTracker
 pub struct DarwiniaBlockTracker {
-	darwinia: Darwinia<MainnetRuntime>,
+	darwinia: Darwinia<DarwiniaRuntime>,
 	next_block: u32,
 }
 
 impl DarwiniaBlockTracker {
 	/// new
-	pub fn new(darwinia: Darwinia<MainnetRuntime>, scan_from: u32) -> Self {
+	pub fn new(darwinia: Darwinia<DarwiniaRuntime>, scan_from: u32) -> Self {
 		Self {
 			darwinia,
 			next_block: scan_from,

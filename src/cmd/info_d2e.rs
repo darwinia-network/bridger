@@ -6,7 +6,7 @@ use darwinia::{Darwinia2Ethereum, EventInfo, FormatedMMR};
 use colored::*;
 use rpassword::prompt_password_stdout;
 use std::fmt;
-use primitives::runtimes::mainnet::MainnetRuntime;
+use primitives::runtimes::darwinia::DarwiniaRuntime;
 
 #[derive(Default, Debug)]
 struct TxProofWithMMRProof {
@@ -70,7 +70,7 @@ pub async fn exec(
 	let darwinia2ethereum = darwinia_api::get_d2e_instance(darwinia.clone());
 	// mmr root block
 	let mmr_root = darwinia.get_mmr_root(mmrblock as u32).await?;
-	let message = Darwinia2Ethereum::<MainnetRuntime>::construct_mmr_root_message(network, mmrblock as u32, mmr_root);
+	let message = Darwinia2Ethereum::<DarwiniaRuntime>::construct_mmr_root_message(network, mmrblock as u32, mmr_root);
 	//let message = web3::signing::keccak256(&encoded);
 
 	let header = darwinia.get_block_by_number(txblock as u32).await?;

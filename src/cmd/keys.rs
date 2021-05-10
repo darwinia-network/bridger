@@ -1,6 +1,6 @@
 use crate::{error::Result, Settings};
 use primitives::frame::{sudo::KeyStoreExt, technical_committee::MembersStoreExt};
-use primitives::runtimes::mainnet::MainnetRuntime;
+use primitives::runtimes::darwinia::DarwiniaRuntime;
 use substrate_subxt::ClientBuilder;
 
 /// technical committee members
@@ -10,7 +10,7 @@ pub async fn exec() -> Result<()> {
 
 	let config = Settings::new(&Settings::default_data_dir()?)?; // TODO: add --data-dir
 
-	let client = ClientBuilder::<MainnetRuntime>::new()
+	let client = ClientBuilder::<DarwiniaRuntime>::new()
 		.set_url(&config.darwinia.rpc)
 		.build()
 		.await?;

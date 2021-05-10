@@ -11,7 +11,7 @@ use crate::{
 
 use crate::tools;
 use darwinia::{Ethereum2Darwinia, FromEthereumAccount};
-use primitives::runtimes::mainnet::MainnetRuntime;
+use primitives::runtimes::darwinia::DarwiniaRuntime;
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -26,9 +26,9 @@ pub struct GuardService {
 	/// Shadow API
 	pub shadow: Arc<Shadow>,
 	/// Ethereum to Dawrinia API
-	pub ethereum2darwinia: Ethereum2Darwinia<MainnetRuntime>,
+	pub ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
 	/// Darwinia guard account
-	pub guard_account: FromEthereumAccount<MainnetRuntime>,
+	pub guard_account: FromEthereumAccount<DarwiniaRuntime>,
 	extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
@@ -88,8 +88,8 @@ impl GuardService {
 	/// New redeem service
 	pub fn new(
 		shadow: Arc<Shadow>,
-		ethereum2darwinia: Ethereum2Darwinia<MainnetRuntime>,
-		guard_account: FromEthereumAccount<MainnetRuntime>,
+		ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
+		guard_account: FromEthereumAccount<DarwiniaRuntime>,
 		step: u64,
 		is_tech_comm_member: bool,
 		extrinsics_service: Recipient<MsgExtrinsic>,
@@ -109,8 +109,8 @@ impl GuardService {
 	}
 
 	async fn guard(
-		ethereum2darwinia: Ethereum2Darwinia<MainnetRuntime>,
-		guard_account: FromEthereumAccount<MainnetRuntime>,
+		ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
+		guard_account: FromEthereumAccount<DarwiniaRuntime>,
 		shadow: Arc<Shadow>,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> Result<()> {

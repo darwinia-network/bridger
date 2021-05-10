@@ -44,10 +44,11 @@ impl WebServer {
 				.wrap(crate::server::middleware::authorization::Authorization)
 				// register simple handler
 				.service(web::resource("/").to(|| async { "Hello!" }))
-				.service(api::token::generate)
+				.service(api::chain::chain_list)
 				.service(api::chain::chain_add)
 				.service(api::chain::chain_update)
 				.service(api::chain::chain_remove)
+				.service(api::token::generate)
 				.service(api::token::list)
 				.service(api::token::remove)
 		})

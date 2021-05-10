@@ -17,6 +17,34 @@ impl<T: Serialize> Resp<T> {
 			serde_json::to_string(&defresp).unwrap()
 		})
 	}
+	pub fn unwrap(self) -> T {
+		if self.err == 1 {
+			let a = &self.msg;
+			panic!("{}", self.msg.unwrap_or("Response error".to_string()));
+		}
+		self.data.unwrap()
+	}
+	pub fn unwrap_or(self, def: T) -> T {
+		if self.err == 1 {
+			return def;
+		}
+		self.data.unwrap_or(def)
+	}
+	pub fn ok_or<E>(self, err: E) -> Result<T, E> {
+		if self.err == 1 {
+			return Err(err);
+		}
+		self.data.ok_or(err)
+	}
+	pub fn ok_or_else<E, F: FnOnce(Option<String>) -> E>(self, err: F) -> Result<T, E> {
+		if self.err == 1 {
+			return Err(err(self.msg));
+		}
+		self.data.ok_or_else(|| err(None))
+	}
+}
+
+impl<T: Serialize> Resp<T> {
 	pub fn ok() -> Resp<T> {
 		Self {
 			err: 0,

@@ -9,6 +9,7 @@ use actix_web::rt::System;
 
 mod api;
 mod cli;
+mod client;
 mod error;
 mod persist;
 mod server;

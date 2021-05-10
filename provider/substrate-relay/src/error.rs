@@ -20,6 +20,10 @@ pub enum CliError {
 	ChainRemoveError,
 	#[error("Not found this token")]
 	TokenNotFound,
+	#[error("Request error: {0}")]
+	RequestError(String),
+	#[error("Api error: [{0}] {1}")]
+	ApiError(String, String),
 }
 
 #[derive(Debug, DeviceMoreDisplay, DeriveMoreError)]

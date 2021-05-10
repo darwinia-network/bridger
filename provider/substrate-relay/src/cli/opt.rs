@@ -43,6 +43,9 @@ pub enum Opt {
 #[derive(Debug, StructOpt, Getters)]
 #[getset(get = "pub")]
 pub struct OptConfig {
+	/// Enable debug model, show more message
+	#[structopt(long, long)]
+	debug: bool,
 	/// The server host by substrate-relay service
 	#[structopt(long, default_value = "http://127.0.0.1:7890")]
 	server: String,

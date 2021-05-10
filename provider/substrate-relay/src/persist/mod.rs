@@ -110,7 +110,13 @@ impl Persist {
 
 		Ok(self)
 	}
+}
 
+// chain
+impl Persist {
+	pub async fn chain_list(&self) -> &Vec<Chain> {
+		&self.chains
+	}
 	pub async fn chain_add(&mut self, chain: Chain) -> error::Result<&Self> {
 		let chains = &mut self.chains;
 		if chains.iter().any(|item| item.name == chain.name) {
@@ -143,7 +149,10 @@ impl Persist {
 		chains.retain(|item| &item.name != chain_name.as_ref());
 		self.store().await
 	}
+}
 
+// token
+impl Persist {
 	fn new_token(&self) -> String {
 		let s: String = rand::thread_rng()
 			.sample_iter(&Alphanumeric)

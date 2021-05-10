@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use actix_web::{post, web, HttpRequest, HttpResponse};
+use actix_web::{post, web, HttpResponse};
 
 use crate::persist::{Chain, Persist};
 use crate::types::cond::chain::ChainRemoveCond;

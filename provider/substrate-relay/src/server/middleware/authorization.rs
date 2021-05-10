@@ -1,4 +1,3 @@
-use std::pin::Pin;
 use std::sync::Mutex;
 use std::task::{Context, Poll};
 

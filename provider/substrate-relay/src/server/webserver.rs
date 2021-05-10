@@ -1,3 +1,5 @@
+use std::sync::Mutex;
+
 use actix_cors::Cors;
 use actix_web::middleware::errhandlers::ErrorHandlers;
 use actix_web::{http, middleware, web, App, HttpServer};
@@ -7,8 +9,6 @@ use typed_builder::TypedBuilder;
 use crate::api;
 use crate::error::Result;
 use crate::persist::{Generic, Persist};
-use actix_web::dev::Service;
-use std::sync::Mutex;
 
 // #[derive(Debug, TypedBuilder, Getters)]
 // #[getset(get = "pub")]
@@ -41,7 +41,7 @@ impl WebServer {
 					ErrorHandlers::new()
 						.handler(http::StatusCode::NOT_FOUND, api::generic::render_error),
 				)
-				.wrap(crate::service::middleware::authorization::Authorization)
+				.wrap(crate::server::middleware::authorization::Authorization)
 				// register simple handler
 				.service(web::resource("/").to(|| async { "Hello!" }))
 				.service(api::token::generate)

@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpResponse};
 
 use crate::persist::Persist;
 use crate::types::cond::token::{TokenGenerateCond, TokenRemoveCond};

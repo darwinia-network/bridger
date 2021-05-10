@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use crate::error::Result;
 use crate::persist::{Generic, Persist};
-use crate::service::webserver::*;
+use crate::server::webserver::*;
 
 fn path_config_file(config: Option<PathBuf>) -> Result<PathBuf> {
 	let mut dir = env::current_exe()?;

@@ -11,7 +11,7 @@ mod api;
 mod cli;
 mod error;
 mod persist;
-mod service;
+mod server;
 mod types;
 
 fn init() {

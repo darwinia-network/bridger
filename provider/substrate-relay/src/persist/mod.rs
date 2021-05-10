@@ -5,7 +5,6 @@ use rand::{distributions::Alphanumeric, Rng};
 use typed_builder::TypedBuilder;
 
 use crate::error;
-use crate::types::cond::chain::ChainRemoveCond;
 
 #[derive(
 	Debug, Clone, Serialize, Deserialize, Default, TypedBuilder, MutGetters, Getters, Setters,

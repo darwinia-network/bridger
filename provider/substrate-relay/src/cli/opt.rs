@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use getset::Getters;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -7,6 +8,12 @@ use structopt::StructOpt;
 pub enum Opt {
 	/// Init substrate to substrate bridge
 	InitBridge {
+		/// The server host by substrate-relay service
+		#[structopt(long, default_value = "http://127.0.0.1:7890")]
+		server: String,
+		/// The token of substrate-relay service
+		#[structopt(short = "k", long)]
+		token: Option<String>,
 		/// The source chain name of s2s bridge by configured
 		#[structopt(short, long)]
 		source: String,
@@ -25,18 +32,22 @@ pub enum Opt {
 		/// Listen port, Default: 7890
 		#[structopt(short, long)]
 		port: Option<u32>,
+		/// Is enable authorization for request this server
+		#[structopt(long)]
+		enable_auth: bool,
 	},
 	/// Substrate relay config
 	Config(OptConfig),
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, StructOpt, Getters)]
+#[getset(get = "pub")]
 pub struct OptConfig {
-	/// The host by substrate-relay service
-	#[structopt(short, long, default_value = "http://127.0.0.1:7890")]
-	host: String,
+	/// The server host by substrate-relay service
+	#[structopt(long, default_value = "http://127.0.0.1:7890")]
+	server: String,
 	/// The token of substrate-relay service
-	#[structopt(short, long)]
+	#[structopt(short = "k", long)]
 	token: Option<String>,
 	/// Config subordinate command
 	#[structopt(subcommand)]
@@ -58,19 +69,34 @@ pub enum OptChainCommand {
 	/// Add a new chain
 	Add {
 		/// Chain name
-		#[structopt(short, long)]
 		name: String,
+		/// Chain rpc host
+		#[structopt(short, long)]
+		host: String,
+		/// Chain rpc port
+		#[structopt(short, long)]
+		port: u32,
+		/// Chain signer
+		#[structopt(short, long)]
+		signer: String,
 	},
 	/// Update an exists chain
 	Update {
 		/// Chain name
-		#[structopt(short, long)]
 		name: String,
+		/// Chain rpc host
+		#[structopt(short, long)]
+		host: String,
+		/// Chain rpc port
+		#[structopt(short, long)]
+		port: u32,
+		/// Chain signer
+		#[structopt(short, long)]
+		signer: String,
 	},
 	/// Remove an exists chain
 	Remove {
 		/// Chain name
-		#[structopt(short, long)]
 		name: String,
 	},
 }

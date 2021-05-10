@@ -1,9 +1,11 @@
 use std::path::PathBuf;
 
 use getset::{Getters, MutGetters, Setters};
+use rand::{distributions::Alphanumeric, Rng};
 use typed_builder::TypedBuilder;
 
 use crate::error;
+use crate::types::cond::chain::ChainRemoveCond;
 
 #[derive(
 	Debug, Clone, Serialize, Deserialize, Default, TypedBuilder, MutGetters, Getters, Setters,
@@ -14,6 +16,8 @@ pub struct Persist {
 	generic: Generic,
 	#[serde(default)]
 	chains: Vec<Chain>,
+	#[serde(default)]
+	tokens: Vec<Token>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TypedBuilder, MutGetters, Getters, Setters)]
@@ -25,6 +29,8 @@ pub struct Generic {
 	host: String,
 	#[serde(default)]
 	port: u32,
+	#[serde(default)]
+	enable_auth: bool,
 }
 
 #[derive(
@@ -42,12 +48,21 @@ pub struct Chain {
 	signer: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Default, TypedBuilder, Getters, Setters)]
+#[getset(get = "pub", set = "pub")]
+pub struct Token {
+	#[serde(default)]
+	value: String,
+	remark: Option<String>,
+}
+
 impl Default for Generic {
 	fn default() -> Self {
 		Self {
 			config_file: Default::default(),
 			host: "127.0.0.1".to_string(),
 			port: 7890,
+			enable_auth: false,
 		}
 	}
 }
@@ -98,11 +113,71 @@ impl Persist {
 	}
 
 	pub async fn chain_add(&mut self, chain: Chain) -> error::Result<&Self> {
-		let mut chains = &mut self.chains;
+		let chains = &mut self.chains;
 		if chains.iter().any(|item| item.name == chain.name) {
 			return Err(error::CliError::ChainNameExists)?;
 		}
 		chains.push(chain);
+		self.store().await
+	}
+
+	pub async fn chain_update(&mut self, chain: Chain) -> error::Result<&Self> {
+		let chains = &mut self.chains;
+		if let Some(saved_chain) = chains.iter_mut().find(|ref item| item.name == chain.name) {
+			saved_chain.host = chain.host;
+			saved_chain.port = chain.port;
+			saved_chain.signer = chain.signer;
+			return self.store().await;
+		}
+		Err(error::CliError::ChainNotFound)?
+	}
+
+	pub fn chain_exists<T: AsRef<str>>(&self, name: T) -> bool {
+		self.chains.iter().any(|item| item.name == name.as_ref())
+	}
+
+	pub async fn chain_remove<T: AsRef<str>>(&mut self, chain_name: T) -> error::Result<&Self> {
+		if !self.chain_exists(&chain_name) {
+			return Err(error::CliError::ChainNotFound)?;
+		}
+		let chains = &mut self.chains;
+		chains.retain(|item| &item.name != chain_name.as_ref());
+		self.store().await
+	}
+
+	fn new_token(&self) -> String {
+		let s: String = rand::thread_rng()
+			.sample_iter(&Alphanumeric)
+			.take(7)
+			.map(char::from)
+			.collect();
+		let mut m = sha1::Sha1::new();
+		m.update(s.as_ref());
+		m.digest().to_string()
+	}
+
+	pub async fn token_generate(&mut self, remark: Option<String>) -> error::Result<Token> {
+		let token_value = self.new_token();
+		let token = Token::builder().remark(remark).value(token_value).build();
+		self.tokens.push(token.clone());
+		self.store().await?;
+		Ok(token)
+	}
+
+	pub async fn token_list(&self) -> Vec<Token> {
+		self.tokens.clone()
+	}
+
+	pub fn token_exists<T: AsRef<str>>(&self, token: T) -> bool {
+		self.tokens.iter().any(|item| item.value == token.as_ref())
+	}
+
+	pub async fn token_remove<T: AsRef<str>>(&mut self, token: T) -> error::Result<&Self> {
+		if !self.token_exists(&token) {
+			return Err(error::CliError::TokenNotFound)?;
+		}
+		let tokens = &mut self.tokens;
+		tokens.retain(|item| &item.value != token.as_ref());
 		self.store().await
 	}
 }

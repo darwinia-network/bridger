@@ -7,6 +7,7 @@ use typed_builder::TypedBuilder;
 use crate::api;
 use crate::error::Result;
 use crate::persist::{Generic, Persist};
+use actix_web::dev::Service;
 use std::sync::Mutex;
 
 // #[derive(Debug, TypedBuilder, Getters)]
@@ -40,10 +41,15 @@ impl WebServer {
 					ErrorHandlers::new()
 						.handler(http::StatusCode::NOT_FOUND, api::generic::render_error),
 				)
+				.wrap(crate::service::middleware::authorization::Authorization)
 				// register simple handler
 				.service(web::resource("/").to(|| async { "Hello!" }))
 				.service(api::token::generate)
 				.service(api::chain::chain_add)
+				.service(api::chain::chain_update)
+				.service(api::chain::chain_remove)
+				.service(api::token::list)
+				.service(api::token::remove)
 		})
 		.bind(addr)?
 		.run()

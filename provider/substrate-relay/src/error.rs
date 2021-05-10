@@ -1,10 +1,10 @@
-use thiserror::Error as ThisError;
-
-pub type Result<T> = anyhow::Result<T>;
-
-use crate::types::patch::resp::Resp;
 use actix_web::{HttpResponse, ResponseError};
 use derive_more::{Display as DeviceMoreDisplay, Error as DeriveMoreError};
+use thiserror::Error as ThisError;
+
+use crate::types::patch::resp::Resp;
+
+pub type Result<T> = anyhow::Result<T>;
 
 #[derive(ThisError, Debug)]
 pub enum CliError {
@@ -14,6 +14,12 @@ pub enum CliError {
 	ConfigPathNotFile,
 	#[error("This chain name is exists")]
 	ChainNameExists,
+	#[error("Not found this chain")]
+	ChainNotFound,
+	#[error("Remove chain error")]
+	ChainRemoveError,
+	#[error("Not found this token")]
+	TokenNotFound,
 }
 
 #[derive(Debug, DeviceMoreDisplay, DeriveMoreError)]

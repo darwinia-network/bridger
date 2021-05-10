@@ -1,1 +1,1 @@
-pub mod handler_auth;
+pub mod authorization;

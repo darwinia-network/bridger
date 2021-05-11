@@ -1,0 +1,33 @@
+[package]
+name = "chain-pangolin"
+version = "0.3.3"
+authors = ["clearloop <udtrokia@gmail.com>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = ["src/**/*", "Cargo.toml", "./README.md"]
+keywords = ["substrate", "darwinia"]
+readme = './README.md'
+edition = "2018"
+
+[dependencies]
+
+paste = "1.0"
+
+relay-chain = { path = "../relay-chain" }
+
+# pangolin
+
+pangolin-runtime = { git = "https://github.com/darwinia-network/darwinia-common", branch = "feature/s2s" }
+relay-pangolin-client = { git = "https://github.com/darwinia-network/darwinia-common", branch = "feature/s2s" }
+
+# Substrate Dependencies
+
+frame-support = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
+sp-core = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
+sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
+sp-runtime = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
+sp-trie = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
+sp-version = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }

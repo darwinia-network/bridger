@@ -1,20 +1,33 @@
 [package]
 name = "relay-chain"
 version = "0.3.3"
-authors = ["clearloop <udtrokia@gmail.com>"]
+authors    = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
 license = "MIT"
 documentation = "https://docs.rs/bridger"
 homepage = "https://github.com/darwinia-network/bridger"
-include = ["src/**/*", "Cargo.toml", "./README.md"]
+include = [
+    "Cargo.toml",
+    "**/*.rs",
+    "README.md",
+    "LICENSE"
+]
 keywords = ["substrate", "darwinia"]
-readme = './README.md'
+readme = 'README.md'
 edition = "2018"
 
 [dependencies]
 
 paste = "1.0"
+
+pangolin-runtime = { git = "https://github.com/darwinia-network/darwinia-common", branch = "feature/s2s", optional = true }
+relay-pangolin-client = { git = "https://github.com/darwinia-network/darwinia-common", branch = "feature/s2s", optional = true }
+
+millau-runtime = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s", optional = true }
+relay-millau-client = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s", optional = true }
+
+# s2s
 
 relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
 
@@ -26,3 +39,8 @@ sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate", b
 sp-runtime = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
 sp-trie = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
 sp-version = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
+
+[features]
+default = []
+millau = ["millau-runtime", "relay-millau-client"]
+pangolin = ["pangolin-runtime", "relay-pangolin-client"]

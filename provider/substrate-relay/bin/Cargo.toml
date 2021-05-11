@@ -47,7 +47,7 @@ toml = "0.5"
 
 
 ## s2s
-relay-group = { path = "../chains/relay-group", features = ["millau", "pangolin"] }
+relay-chain = { path = "../chains/relay-chain", features = ["millau", "pangolin"] }
 
 
 codec = { package = "parity-scale-codec", version = "2.0.0" }

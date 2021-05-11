@@ -1,4 +1,4 @@
-use relay_group::CliChain;
+use relay_chain::CliChain;
 
 use crate::error;
 use crate::persist;

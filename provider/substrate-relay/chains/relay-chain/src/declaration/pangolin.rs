@@ -1,12 +1,12 @@
-pub use pangolin_runtime as runtime;
-pub use relay_pangolin_client as relay_client;
 use sp_version::RuntimeVersion;
 
-use relay_chain::RelayChain;
+use relay_pangolin_client::PangolinRelayChain;
 
-pub struct RelayChainPangolin;
+use crate::*;
 
-impl RelayChain for RelayChainPangolin {
+declare_cli_chain!(PangolinRelayChain, pangolin_runtime);
+
+declare_relay_chain!(pangolin, {
     const CHAIN_NAME: &'static str = "pangolin";
     const RUNTIME_VERSION: RuntimeVersion = pangolin_runtime::VERSION;
     type Runtime = pangolin_runtime::Runtime;
@@ -14,4 +14,4 @@ impl RelayChain for RelayChainPangolin {
     type Chain = relay_pangolin_client::PangolinRelayChain;
     type SigningParams = relay_pangolin_client::SigningParams;
     type SyncHeader = relay_pangolin_client::SyncHeader;
-}
+});

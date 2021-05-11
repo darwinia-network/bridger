@@ -1,12 +1,12 @@
-pub use millau_runtime as runtime;
-pub use relay_millau_client as relay_client;
 use sp_version::RuntimeVersion;
 
-use relay_chain::RelayChain;
+use relay_millau_client::Millau;
 
-pub struct RelayChainMillau;
+use crate::*;
 
-impl RelayChain for RelayChainMillau {
+declare_cli_chain!(Millau, millau_runtime);
+
+declare_relay_chain!(millau, {
     const CHAIN_NAME: &'static str = "millau";
     const RUNTIME_VERSION: RuntimeVersion = millau_runtime::VERSION;
     type Runtime = millau_runtime::Runtime;
@@ -14,4 +14,4 @@ impl RelayChain for RelayChainMillau {
     type Chain = relay_millau_client::Millau;
     type SigningParams = relay_millau_client::SigningParams;
     type SyncHeader = relay_millau_client::SyncHeader;
-}
+});

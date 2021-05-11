@@ -1069,38 +1069,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "chain-millau"
-version = "0.3.3"
-dependencies = [
- "frame-support",
- "millau-runtime",
- "paste",
- "relay-chain",
- "relay-millau-client",
- "sp-core",
- "sp-finality-grandpa",
- "sp-runtime",
- "sp-trie",
- "sp-version",
-]
-
-[[package]]
-name = "chain-pangolin"
-version = "0.3.3"
-dependencies = [
- "frame-support",
- "pangolin-runtime",
- "paste",
- "relay-chain",
- "relay-pangolin-client",
- "sp-core",
- "sp-finality-grandpa",
- "sp-runtime",
- "sp-trie",
- "sp-version",
-]
-
-[[package]]
 name = "chrono"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5153,24 +5121,11 @@ name = "relay-chain"
 version = "0.3.3"
 dependencies = [
  "frame-support",
+ "millau-runtime",
+ "pangolin-runtime",
  "paste",
- "relay-substrate-client",
- "sp-core",
- "sp-finality-grandpa",
- "sp-runtime",
- "sp-trie",
- "sp-version",
-]
-
-[[package]]
-name = "relay-group"
-version = "0.3.3"
-dependencies = [
- "chain-millau",
- "chain-pangolin",
- "frame-support",
- "paste",
- "relay-chain",
+ "relay-millau-client",
+ "relay-pangolin-client",
  "relay-substrate-client",
  "sp-core",
  "sp-finality-grandpa",
@@ -6564,7 +6519,7 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "rand 0.8.3",
- "relay-group",
+ "relay-chain",
  "relay-substrate-client",
  "serde",
  "serde_derive",

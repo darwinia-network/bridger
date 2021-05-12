@@ -47,6 +47,7 @@ pub struct Chain {
     port: u32,
     #[serde(default)]
     signer: String,
+    #[serde(default)]
     secure: bool,
     signer_password: Option<String>,
 }

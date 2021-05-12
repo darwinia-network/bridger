@@ -40,11 +40,14 @@ impl Persist {
         // // | error: values must be emitted before tables
         // // | if not have an change
         // let toml_text = toml::to_string_pretty(&self)?;
-        // std::fs::write(&self.generic.config_file, toml_text)?;
 
-        let json = serde_json::to_string(&self)?;
-        let v: toml::Value = serde_json::from_str(&json)?;
-        let toml_text: String = v.to_string();
+        let toml_text = toml::to_string_pretty(&self.clone())?;
+
+        // let json = serde_json::to_string(&self)?;
+        // let v: toml::Value = serde_json::from_str(&json)?;
+        // debug!("{:?}", v);
+        // let toml_text: String = v.to_string();
+
         async_fs::write(&self.generic.config_file, toml_text).await?;
 
         Ok(self)

@@ -31,6 +31,7 @@ futures = "0.3"
 tokio = { version = "1.0", features = ["full"] }
 colored = "2"
 paste = "1.0"
+once_cell = "1.7"
 
 structopt = "0.3"
 
@@ -55,6 +56,7 @@ num-traits = "0.2"
 
 finality-grandpa = { version = "0.14.0" }
 
+bp-runtime = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
 bp-header-chain = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
 relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
 

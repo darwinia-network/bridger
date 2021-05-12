@@ -33,3 +33,10 @@ pub async fn init_bridge(
     debug!("{:?}", form);
     Ok(HttpResponse::Ok().json(Resp::ok_with_data("")))
 }
+
+#[post("/api/relay/start")]
+pub async fn start(
+    data_persist: web::Data<Mutex<Persist>>,
+) -> Result<HttpResponse, crate::error::WebError> {
+    Ok(HttpResponse::Ok().json(Resp::ok_with_data("")))
+}

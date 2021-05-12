@@ -54,17 +54,17 @@ relay-chain = { path = "../chains/relay-chain", features = ["millau", "pangolin"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
 num-traits = "0.2"
 
+bp-header-chain = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
 finality-grandpa = { version = "0.14.0" }
 
 bp-runtime = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
-bp-header-chain = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
 relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
 
 # Substrate Dependencies
 
-frame-support = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
-sp-core = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
-sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
-sp-runtime = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
-sp-trie = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
-sp-version = { git = "https://github.com/darwinia-network/substrate", branch="s2s" }
+frame-support = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
+sp-core = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
+sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
+sp-runtime = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
+sp-trie = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
+sp-version = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }

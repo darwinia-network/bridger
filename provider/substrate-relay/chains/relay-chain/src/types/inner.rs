@@ -18,6 +18,28 @@ pub trait RelayChain {
     type SyncHeader;
 }
 
+/// Declare chain const type
+pub trait ChainConst {
+    /// Name of the runtime method that returns dispatch weight of outbound messages at the source chain.
+    const OUTBOUND_LANE_MESSAGES_DISPATCH_WEIGHT_METHOD: &'static str;
+    /// Name of the runtime method that returns latest generated nonce at the source chain.
+    const OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD: &'static str;
+    /// Name of the runtime method that returns latest received (confirmed) nonce at the the source chain.
+    const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str;
+
+    /// Name of the runtime method that returns latest received nonce at the target chain.
+    const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str;
+    /// Name of the runtime method that returns latest confirmed (reward-paid) nonce at the target chain.
+    const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str;
+    /// Numebr of the runtime method that returns state of "unrewarded relayers" set at the target chain.
+    const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str;
+
+    /// Name of the runtime method that returns id of best finalized source header at target chain.
+    const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str;
+    /// Name of the runtime method that returns id of best finalized target header at source chain.
+    const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str;
+}
+
 /// Bridge-supported network definition.
 ///
 /// Used to abstract away CLI commands.

@@ -1,5 +1,3 @@
-pub use self::inner::*;
+pub(crate) mod inner;
 
-mod inner;
-
-pub(crate) mod s2s;
+pub mod s2s;

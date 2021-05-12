@@ -2,8 +2,8 @@
 pub use declaration::millau::*;
 #[cfg(feature = "pangolin")]
 pub use declaration::pangolin::*;
-pub use types::*;
+pub use types::inner::*;
 
 mod declaration;
 mod macros;
-mod types;
+pub mod types;

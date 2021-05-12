@@ -8,10 +8,7 @@ use crate::{
 	},
 	frame::{
 		bridge::relay_authorities::EthereumRelayAuthorities,
-		ethereum::{
-			backing::EthereumBacking, game::EthereumRelayerGame, issuing::EthereumIssuing,
-			relay::EthereumRelay,
-		},
+		ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay, issuing::EthereumIssuing},
 		proxy::Proxy,
 		sudo::Sudo,
 		technical_committee::TechnicalCommittee,
@@ -19,6 +16,8 @@ use crate::{
 };
 
 use crate::frame::bridge::relay_authorities::RelayAuthority;
+use crate::frame::ethereum::verifier::{DarwiniaMainnetVerifier, Verifier};
+
 use substrate_subxt::{
 	balances::{AccountData, Balances},
 	extrinsic::DefaultExtra,
@@ -32,9 +31,9 @@ use substrate_subxt::{
 	EventTypeRegistry, Runtime,
 };
 
-use sp_core::{H160, H256, U256};
+use crate::chain::ethereum::{EcdsaAddress, EcdsaMessage, EcdsaSignature};
 use codec::{Decode, Encode};
-use crate::chain::ethereum::{EcdsaAddress, EcdsaSignature, EcdsaMessage};
+use sp_core::{H160, H256, U256};
 
 type SessionIndex = u32;
 
@@ -126,6 +125,10 @@ impl EthereumIssuing for DarwiniaRuntime {
 	type EthereumTransactionIndex = u64;
 }
 
+impl Verifier for DarwiniaRuntime {
+	type VerifierHandler = DarwiniaMainnetVerifier<Self>;
+}
+
 impl Proxy for DarwiniaRuntime {
 	type ProxyType = ProxyType;
 }
@@ -141,8 +144,6 @@ impl EthereumRelayAuthorities for DarwiniaRuntime {
 	type RelayAuthoritySignature = EcdsaSignature;
 	type RelayAuthorityMessage = EcdsaMessage;
 }
-
-
 
 #[derive(Encode, Decode)]
 enum ExitReason {

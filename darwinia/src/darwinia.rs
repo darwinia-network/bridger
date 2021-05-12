@@ -6,10 +6,6 @@ use substrate_subxt::{
 	BlockNumber, Client, ClientBuilder, Runtime,
 };
 
-use primitives::frame::ethereum::{
-	backing::VerifiedProofStoreExt, issuing::VerifiedIssuingProofStoreExt,
-};
-
 use crate::{account::DarwiniaAccount, DarwiniaEvents, EventInfo};
 
 use crate::error::{Error, Result};
@@ -17,7 +13,7 @@ use jsonrpsee_types::jsonrpc::{to_value as to_json_value, Params};
 
 use crate::rpc::*;
 use primitives::frame::bridge::relay_authorities::EthereumRelayAuthorities;
-use primitives::frame::ethereum::{backing::EthereumBacking, issuing::EthereumIssuing};
+use primitives::frame::ethereum::verifier::Verifier;
 use primitives::frame::sudo::KeyStoreExt;
 use primitives::frame::sudo::Sudo;
 use substrate_subxt::sp_runtime::generic::Header;
@@ -97,13 +93,9 @@ impl<R: Runtime> Darwinia<R> {
 	/// Check if should redeem
 	pub async fn verified(&self, block_hash: web3::types::H256, tx_index: u64) -> Result<bool>
 	where
-		R: EthereumBacking,
+		R: Verifier,
 	{
-		Ok(self
-			.subxt
-			.verified_proof((block_hash.to_fixed_bytes(), tx_index), None)
-			.await?
-			.unwrap_or(false))
+		Ok(R::verify(&self.subxt, block_hash.to_fixed_bytes(), tx_index).await?)
 	}
 
 	/// get mmr root of darwinia
@@ -312,21 +304,5 @@ impl<R: Runtime> Darwinia<R> {
 			return Ok(Some(*block.block.header.number()));
 		}
 		Ok(None)
-	}
-
-	/// Check if should issuing sync
-	pub async fn verified_issuing(
-		&self,
-		block_hash: web3::types::H256,
-		tx_index: u64,
-	) -> Result<bool>
-	where
-		R: EthereumIssuing,
-	{
-		Ok(self
-			.subxt
-			.verified_issuing_proof((block_hash.to_fixed_bytes(), tx_index), None)
-			.await?
-			.unwrap_or(false))
 	}
 }

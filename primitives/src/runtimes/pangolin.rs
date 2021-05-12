@@ -32,9 +32,9 @@ use substrate_subxt::{
 	EventTypeRegistry, Runtime,
 };
 
-use sp_core::{H160, H256, U256};
+use crate::chain::ethereum::{EcdsaAddress, EcdsaMessage, EcdsaSignature};
 use codec::{Decode, Encode};
-use crate::chain::ethereum::{EcdsaAddress, EcdsaSignature, EcdsaMessage};
+use sp_core::{H160, H256, U256};
 
 type SessionIndex = u32;
 
@@ -118,8 +118,6 @@ impl EthereumRelayerGame for PangolinRuntime {
 	>;
 }
 
-
-
 impl EthereumBacking for PangolinRuntime {
 	type EthereumTransactionIndex = u64;
 }
@@ -143,7 +141,6 @@ impl EthereumRelayAuthorities for PangolinRuntime {
 	type RelayAuthoritySignature = EcdsaSignature;
 	type RelayAuthorityMessage = EcdsaMessage;
 }
-
 
 #[derive(Encode, Decode)]
 enum ExitReason {

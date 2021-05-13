@@ -1,30 +1,30 @@
 #[macro_export]
 macro_rules! declare_relay_messages {
 	(
-        /// source chain name
-        $source_name:ident,
-        /// target chain name
-        $target_name:ident,
-        /// source relay chain
-        $source_relay_chain:ident,
-        /// target relay chain
-        $target_relay_chain:ident,
+		/// source chain name
+		$source_name:ident,
+		/// target chain name
+		$target_name:ident,
+		/// source relay chain
+		$source_relay_chain:ident,
+		/// target relay chain
+		$target_relay_chain:ident,
 		/// source chain relay client module
 		$source_relay_client:ident,
 		/// target chain relay client module
 		$target_relay_client:ident,
-        /// source chain const
-        $source_const:ident,
+		/// source chain const
+		$source_const:ident,
 		/// target chain const
 		$target_const:ident,
-        /// source chain bridge primitives
-        $source_primitives:ident,
-        /// target chain bridge primitives
-        $target_primitives:ident,
+		/// source chain bridge primitives
+		$source_primitives:ident,
+		/// target chain bridge primitives
+		$target_primitives:ident,
 		/// source chain runtime
 		$source_runtime:ident,
-        /// target chain runtime
-        $target_runtime:ident,
+		/// target chain runtime
+		$target_runtime:ident,
 		/// source chain messages pallet call
 		$source_messages_pallet:ident,
 		/// target chain messages pallet call
@@ -32,7 +32,7 @@ macro_rules! declare_relay_messages {
 		/// source chain extrinsic weight module, (include `max_extrinsic_weight`, `max_extrinsic_size` and more functions, types)
 		$source_extrinsic_weight_module:ident,
 		/// target chain extrinsic weight module, (include `max_extrinsic_weight`, `max_extrinsic_size` and more functions, types)
-        $target_extrinsic_weight_module:ident,
+		$target_extrinsic_weight_module:ident,
 		/// source messages instance in target chain
 		$source_messages_instance_in_target_chain:ident,
 		/// target messages instance in source chain
@@ -41,7 +41,7 @@ macro_rules! declare_relay_messages {
 		$target_source_conversion_rate_in_source_chain:ident,
 		/// target to source conversion rate. default value
 		$target_source_conversion_rate_default_in_source_chain:ident,
-    ) => {
+	) => {
 		paste::item! {
 
 

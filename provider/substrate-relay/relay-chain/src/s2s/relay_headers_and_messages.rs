@@ -20,9 +20,6 @@ macro_rules! select_bridge {
 					pangolin_runtime_params::s2s::SESSION_LENGTH;
 				const MAX_MISSING_RIGHT_HEADERS_AT_LEFT: bp_millau::BlockNumber = bp_millau::SESSION_LENGTH;
 
-				// use crate::MillauMessagesToPangolinRunner::run as right_to_left_messages;
-				// use crate::PangolinMessagesToMillauRunner::run as left_to_right_messages;
-
 				let right_to_left_messages = crate::MillauMessagesToPangolinRunner::run;
 				let left_to_right_messages = crate::PangolinMessagesToMillauRunner::run;
 

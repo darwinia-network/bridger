@@ -6,4 +6,5 @@ pub use types::inner::*;
 
 mod declaration;
 mod macros;
+pub mod s2s;
 pub mod types;

@@ -29,7 +29,7 @@ pub async fn init_bridge(
 		.iter()
 		.find(|&item| item.name() == target_name)
 		.ok_or(error::CliError::ChainNotFound)?;
-	crate::s2s::init_bridge::init(source_chain, target_chain).await?;
+	relay_chain::s2s::init_bridge::init(source_chain.to_chain_info(), target_chain.to_chain_info()).await?;
 	debug!("{:?}", form);
 	Ok(HttpResponse::Ok().json(Resp::ok_with_data("")))
 }

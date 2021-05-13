@@ -15,7 +15,6 @@ mod client;
 mod error;
 mod initialize;
 mod persist;
-mod s2s;
 mod server;
 mod types;
 

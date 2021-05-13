@@ -1,26 +1,15 @@
-use relay_chain::CliChain;
-
-use crate::error;
 use crate::persist;
+use relay_chain::types::transfer::ChainInfo;
 
 impl persist::Chain {
-	/// Convert connection params into Substrate client.
-	pub async fn to_substrate_relay_chain<C: CliChain>(&self) -> error::Result<relay_substrate_client::Client<C>> {
-		Ok(
-			relay_substrate_client::Client::new(relay_substrate_client::ConnectionParams {
-				host: self.host.clone(),
-				port: self.port.clone() as u16,
-				secure: self.secure,
-			})
-			.await?,
-		)
-	}
-
-	/// Parse signing params into chain-specific KeyPair.
-	pub fn to_keypair<C: CliChain>(&self) -> error::Result<C::KeyPair> {
-		use sp_core::crypto::Pair;
-
-		C::KeyPair::from_string(&self.signer, self.signer_password.as_deref())
-			.map_err(|e| anyhow::format_err!("{:?}", e))
+	pub fn to_chain_info(&self) -> ChainInfo {
+		let mut chain_info = ChainInfo::default();
+		chain_info.set_name(self.name.clone());
+		chain_info.set_host(self.host.clone());
+		chain_info.set_port(self.port);
+		chain_info.set_signer(self.signer.clone());
+		chain_info.set_secure(self.secure);
+		chain_info.set_signer_password(self.signer_password.clone());
+		chain_info
 	}
 }

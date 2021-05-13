@@ -48,14 +48,14 @@ toml = "0.5"
 
 # s2s
 
-codec = { package = "parity-scale-codec", version = "2.0.0" }
-num-traits = "0.2"
-
-bp-header-chain = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
-finality-grandpa = { version = "0.14.0" }
-
-bp-runtime = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
+#codec = { package = "parity-scale-codec", version = "2.0.0" }
+#num-traits = "0.2"
+#
+#bp-header-chain = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
+#finality-grandpa = { version = "0.14.0" }
+#
+#bp-runtime = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
+#relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
 
 # Substrate Dependencies
 

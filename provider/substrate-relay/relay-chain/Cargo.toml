@@ -27,6 +27,9 @@ paste = "1.0"
 futures = "0.3"
 getset = "0.1"
 
+serde = "1"
+serde_derive = "1"
+
 codec = { package = "parity-scale-codec", version = "2.0.0" }
 hex = "0.4"
 num-format = "0.4"

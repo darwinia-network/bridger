@@ -29,15 +29,16 @@ macro_rules! select_bridge {
 				anyhow::bail!(
 					"Not support bridge {} -> {}",
 					$bridge.0.to_string(),
-					$bridge.1.to_string()
+					$bridge.1.to_string(),
 				);
 			}
 		}
 	};
 }
 
-pub async fn init(source_chain: ChainInfo, target_chain: ChainInfo) -> anyhow::Result<()> {
+pub async fn run(source_chain: ChainInfo, target_chain: ChainInfo) -> anyhow::Result<()> {
 	let bridge = (&source_chain.name()[..], &target_chain.name()[..]);
+	info!("Init bridge {} -> {}", bridge.0, bridge.1);
 	select_bridge!(bridge, {
 		let source_client = source_chain.to_substrate_relay_chain::<Source>().await?;
 		let target_client = target_chain.to_substrate_relay_chain::<Target>().await?;

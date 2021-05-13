@@ -6,9 +6,9 @@ use actix_web::{http, middleware, web, App, HttpServer};
 use getset::{Getters, Setters};
 use typed_builder::TypedBuilder;
 
-use crate::api;
 use crate::error::Result;
 use crate::persist::{Generic, Persist};
+use crate::server::api;
 
 #[derive(Debug, TypedBuilder, Getters, Setters)]
 #[getset(get = "pub")]

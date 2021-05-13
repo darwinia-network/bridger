@@ -76,7 +76,7 @@ impl Persist {
 			saved_chain.signer = chain.signer;
 			return self.store().await;
 		}
-		Err(error::CliError::ChainNotFound)?
+		Err(error::CliError::ChainNotFound(chain.name().to_string()))?
 	}
 
 	pub fn chain_exists<T: AsRef<str>>(&self, name: T) -> bool {
@@ -85,11 +85,15 @@ impl Persist {
 
 	pub async fn chain_remove<T: AsRef<str>>(&mut self, chain_name: T) -> error::Result<&Self> {
 		if !self.chain_exists(&chain_name) {
-			return Err(error::CliError::ChainNotFound)?;
+			return Err(error::CliError::ChainNotFound(chain_name.as_ref().to_string()))?;
 		}
 		let chains = &mut self.chains;
 		chains.retain(|item| &item.name != chain_name.as_ref());
 		self.store().await
+	}
+
+	pub fn find_chain<S: AsRef<str>>(&self, name: S) -> Option<&Chain> {
+		self.chains.iter().find(|&item| item.name() == name.as_ref())
 	}
 }
 

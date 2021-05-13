@@ -1,16 +1,16 @@
 use actix_web::client::Client;
 use colored::*;
 use getset::{Getters, Setters};
+use std::collections::HashMap;
+use std::time::Duration;
 use typed_builder::TypedBuilder;
 
 use crate::error;
 use crate::persist::{Chain, Token};
 use crate::types::cond::chain::ChainRemoveCond;
-use crate::types::cond::relay::InitBridgeCond;
+use crate::types::cond::relay::{SourceAndTargetCond, StartRelayCond};
 use crate::types::cond::token::{TokenGenerateCond, TokenRemoveCond};
 use crate::types::patch::resp::Resp;
-use std::collections::HashMap;
-use std::time::Duration;
 
 #[derive(Debug, TypedBuilder, Getters, Setters)]
 #[getset(get = "pub")]
@@ -202,7 +202,7 @@ impl CliClient {
 
 // relay
 impl CliClient {
-	pub async fn init_bridge(&self, init_bridge: &InitBridgeCond) -> error::Result<()> {
+	pub async fn init_bridge(&self, init_bridge: &SourceAndTargetCond) -> error::Result<()> {
 		let mut client = self.client();
 		let api = self.api("/api/relay/init-bridge");
 		if self.debug {
@@ -211,6 +211,23 @@ impl CliClient {
 		let mut response = client
 			.post(&api)
 			.send_form(init_bridge)
+			.await
+			.map_err(|e| error::CliError::RequestError(e.to_string()))?;
+		let resp: Resp<String> = response.json().await?;
+		let _ = resp.safe_ok_or_else(|msg| error::CliError::ApiError(api, msg.unwrap_or("unknown".to_string())))?;
+		self.show_success();
+		Ok(())
+	}
+
+	pub async fn start(&self, start_cond: &StartRelayCond) -> error::Result<()> {
+		let mut client = self.client();
+		let api = self.api("/api/relay/start");
+		if self.debug {
+			println!("{} {}", "API:".green().bold(), api);
+		}
+		let mut response = client
+			.post(&api)
+			.send_form(start_cond)
 			.await
 			.map_err(|e| error::CliError::RequestError(e.to_string()))?;
 		let resp: Resp<String> = response.json().await?;

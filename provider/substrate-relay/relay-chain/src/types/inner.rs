@@ -1,4 +1,5 @@
 use bp_messages::MessageNonce;
+use bp_runtime::InstanceId;
 use frame_support::weights::Weight;
 use sp_version::RuntimeVersion;
 use std::time::Duration;
@@ -33,7 +34,7 @@ pub trait ChainConst {
 	const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str;
 	/// Name of the runtime method that returns latest confirmed (reward-paid) nonce at the target chain.
 	const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str;
-	/// Numebr of the runtime method that returns state of "unrewarded relayers" set at the target chain.
+	/// Numeber of the runtime method that returns state of "unrewarded relayers" set at the target chain.
 	const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str;
 
 	/// Name of the runtime method that returns id of best finalized source header at target chain.
@@ -48,6 +49,8 @@ pub trait ChainConst {
 
 	/// AVERAGE_BLOCK_INTERVAL
 	const AVERAGE_BLOCK_INTERVAL: Duration;
+	/// Bridge instance id
+	const BRIDGE_INSTANCE_ID: InstanceId;
 }
 
 /// Bridge-supported network definition.

@@ -6,19 +6,18 @@ use crate::error::Result;
 
 mod config;
 mod initialize;
+mod relay;
 mod server;
 mod types;
 
 pub async fn exec() -> Result<()> {
 	let opt = Opt::from_args();
 	match opt {
-		Opt::InitBridge {
-			server,
-			token,
-			source,
-			target,
-		} => {
-			return initialize::exec(server, token, source, target).await;
+		Opt::InitBridge { bridge_info } => {
+			return initialize::exec(bridge_info).await;
+		}
+		Opt::Relay(opt_relay) => {
+			return relay::exec(opt_relay).await;
 		}
 		Opt::Start {
 			config,

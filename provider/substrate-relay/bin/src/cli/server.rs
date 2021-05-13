@@ -1,6 +1,7 @@
 use std::env;
 use std::path::PathBuf;
 
+use crate::cli::types::PrometheusParams;
 use crate::error::Result;
 use crate::persist::{Generic, Persist};
 use crate::server::webserver::*;
@@ -14,12 +15,7 @@ fn path_config_file(config: Option<PathBuf>) -> Result<PathBuf> {
 	}))
 }
 
-pub async fn exec(
-	config: Option<PathBuf>,
-	host: Option<String>,
-	port: Option<u32>,
-	enable_auth: bool,
-) -> Result<()> {
+pub async fn exec(config: Option<PathBuf>, host: Option<String>, port: Option<u32>, enable_auth: bool) -> Result<()> {
 	let config_file = path_config_file(config.clone())?;
 	info!("Use config: {}", config_file.display());
 	let mut persist = Persist::load_from_file(config_file).await?;

@@ -1,26 +1,22 @@
+use getset::Getters;
+use relay_chain::types::transfer::HexLaneId;
+use structopt::StructOpt;
+
 use std::path::PathBuf;
 
-use getset::Getters;
-use structopt::StructOpt;
+use crate::client::cli_client::CliClient;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "substrate-relay", about = "Substrate relay")]
 pub enum Opt {
 	/// Init substrate to substrate bridge
 	InitBridge {
-		/// The server host by substrate-relay service
-		#[structopt(long, default_value = "http://127.0.0.1:7890")]
-		server: String,
-		/// The token of substrate-relay service
-		#[structopt(short = "k", long)]
-		token: Option<String>,
-		/// The source chain name of s2s bridge by configured
-		#[structopt(short, long)]
-		source: String,
-		/// The target chain name of s2s bridge by configured
-		#[structopt(short, long)]
-		target: String,
+		/// bridge info
+		#[structopt(flatten)]
+		bridge_info: OptBridgeInfo,
 	},
+	/// Relay headers and messages
+	Relay(OptRelay),
 	/// Start substrate relay
 	Start {
 		/// The config file path
@@ -131,4 +127,55 @@ pub enum OptTokenCommand {
 		/// Token value
 		token: String,
 	},
+}
+
+#[derive(Debug, StructOpt)]
+pub struct OptBridgeInfo {
+	/// The server host by substrate-relay service
+	#[structopt(long, default_value = "http://127.0.0.1:7890")]
+	pub server: String,
+	/// The token of substrate-relay service
+	#[structopt(short = "k", long)]
+	pub token: Option<String>,
+	/// The source chain name of s2s bridge by configured
+	#[structopt(short, long)]
+	pub source: String,
+	/// The target chain name of s2s bridge by configured
+	#[structopt(short, long)]
+	pub target: String,
+}
+
+#[derive(Debug, StructOpt)]
+pub enum OptRelay {
+	/// Start relay
+	Start {
+		/// bridge info
+		#[structopt(flatten)]
+		bridge_info: OptBridgeInfo,
+		/// Hex-encoded lane id that should be served by the relay. Defaults to `00000000`.
+		#[structopt(long, default_value = "00000000")]
+		lane: HexLaneId,
+		#[structopt(flatten)]
+		prometheus_params: PrometheusParams,
+	},
+	/// Relay status
+	Status {
+		/// bridge info
+		#[structopt(flatten)]
+		bridge_info: OptBridgeInfo,
+	},
+}
+
+/// Prometheus metrics params.
+#[derive(Debug, StructOpt)]
+pub struct PrometheusParams {
+	/// Do not expose a Prometheus metric endpoint.
+	#[structopt(long)]
+	pub no_prometheus: bool,
+	/// Expose Prometheus endpoint at given interface.
+	#[structopt(long, default_value = "127.0.0.1")]
+	pub prometheus_host: String,
+	/// Expose Prometheus endpoint at given port.
+	#[structopt(long, default_value = "9616")]
+	pub prometheus_port: u16,
 }

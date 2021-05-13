@@ -2,14 +2,11 @@
 
 #[macro_use]
 extern crate serde_derive;
-// #[macro_use]
-// extern crate async_trait;
 #[macro_use]
 extern crate log;
 
 use actix_web::rt::System;
 
-mod api;
 mod cli;
 mod client;
 mod error;

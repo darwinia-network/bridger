@@ -14,8 +14,8 @@ pub enum CliError {
 	ConfigPathNotFile,
 	#[error("This chain name is exists")]
 	ChainNameExists,
-	#[error("Not found this chain")]
-	ChainNotFound,
+	#[error("Not found this chain: [{0}]")]
+	ChainNotFound(String),
 	#[error("Remove chain error")]
 	ChainRemoveError,
 	#[error("Not found this token")]

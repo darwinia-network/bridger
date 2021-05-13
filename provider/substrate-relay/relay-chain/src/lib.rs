@@ -1,3 +1,8 @@
+#[macro_use]
+extern crate serde_derive;
+#[macro_use]
+extern crate log;
+
 #[cfg(feature = "millau")]
 pub use declaration::millau::*;
 #[cfg(feature = "pangolin")]

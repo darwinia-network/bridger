@@ -171,8 +171,6 @@ macro_rules! declare_relay_messages {
 				}
 			}
 
-			// todo:
-
 			/// Source node as messages source.
 			type [<$source_name SourceClient>] = SubstrateMessagesSource<
 				$source_relay_chain,
@@ -265,14 +263,14 @@ Max messages weight in single transaction: {}",
 							source_client.clone(),
 							lane.clone(),
 							lane_id,
-							bp_runtime::MILLAU_BRIDGE_INSTANCE, // todo: need update it
+							$target_const::BRIDGE_INSTANCE_ID,
 							params.target_to_source_headers_relay,
 						),
 						[<$target_name TargetClient>]::new(
 							params.target_client,
 							lane,
 							lane_id,
-							bp_runtime::PANGOLIN_BRIDGE_INSTANCE, // todo: need update it
+							$source_const::BRIDGE_INSTANCE_ID,
 							params.source_to_target_headers_relay,
 						),
 						relay_utils::relay_metrics(

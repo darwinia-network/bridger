@@ -5179,6 +5179,8 @@ dependencies = [
  "relay-pangolin-client",
  "relay-substrate-client",
  "relay-utils",
+ "serde",
+ "serde_derive",
  "sp-core",
  "sp-finality-grandpa",
  "sp-keyring",

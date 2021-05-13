@@ -2,6 +2,7 @@ pub use pangolin_runtime;
 
 use bp_header_chain::justification::GrandpaJustification;
 use bp_messages::MessageNonce;
+use bp_runtime::InstanceId;
 use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use codec::Encode;
 use frame_support::dispatch::GetDispatchInfo;
@@ -57,6 +58,8 @@ impl ChainConst for PangolinChainConst {
 		s2s_params::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
 	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce = s2s_params::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
 	const AVERAGE_BLOCK_INTERVAL: Duration = PangolinRelayChain::AVERAGE_BLOCK_INTERVAL;
+	// todo: the instance id can be create another crate, this way help us simple manage this
+	const BRIDGE_INSTANCE_ID: InstanceId = bp_runtime::PANGOLIN_BRIDGE_INSTANCE;
 }
 
 declare_cli_chain!(PangolinRelayChain, pangolin_runtime);

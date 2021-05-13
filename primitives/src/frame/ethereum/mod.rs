@@ -5,4 +5,4 @@ pub mod backing;
 pub mod game;
 pub mod issuing;
 pub mod relay;
-pub mod verifier;
+pub mod runtime_ext;

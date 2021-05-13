@@ -8,7 +8,7 @@ use crate::{
 	},
 	frame::{
 		bridge::relay_authorities::EthereumRelayAuthorities,
-		ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay, issuing::EthereumIssuing},
+		ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay},
 		proxy::Proxy,
 		sudo::Sudo,
 		technical_committee::TechnicalCommittee,
@@ -16,7 +16,12 @@ use crate::{
 };
 
 use crate::frame::bridge::relay_authorities::RelayAuthority;
-use crate::frame::ethereum::verifier::{DarwiniaMainnetVerifier, Verifier};
+use crate::frame::ethereum::runtime_ext::{
+    DarwiniaMainnetVerifier, 
+    DarwiniaMainnetErc20Redeemer, 
+    DarwiniaMainnetErc20Register,
+    RuntimeExt
+};
 
 use substrate_subxt::{
 	balances::{AccountData, Balances},
@@ -121,12 +126,10 @@ impl EthereumBacking for DarwiniaRuntime {
 	type EthereumTransactionIndex = u64;
 }
 
-impl EthereumIssuing for DarwiniaRuntime {
-	type EthereumTransactionIndex = u64;
-}
-
-impl Verifier for DarwiniaRuntime {
+impl RuntimeExt for DarwiniaRuntime {
 	type VerifierHandler = DarwiniaMainnetVerifier<Self>;
+	type RedeemErc20Handler = DarwiniaMainnetErc20Redeemer<Self>;
+	type RegisterErc20Handler = DarwiniaMainnetErc20Register<Self>;
 }
 
 impl Proxy for DarwiniaRuntime {

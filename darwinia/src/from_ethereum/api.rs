@@ -7,6 +7,7 @@ type AffirmationsReturn<Game> =
 	HashMap<u64, HashMap<u32, Vec<<Game as EthereumRelayerGame>::RelayAffirmation>>>;
 
 use primitives::frame::sudo::Sudo;
+use primitives::frame::ethereum::runtime_ext::RuntimeExt;
 use primitives::frame::technical_committee::TechnicalCommittee;
 use primitives::{
 	chain::{
@@ -18,10 +19,6 @@ use primitives::{
 		ethereum::{
 			backing::{EthereumBacking, Redeem, RedeemCallExt},
 			game::{AffirmationsStoreExt, EthereumRelayerGame},
-			issuing::{
-				EthereumIssuing, RedeemErc20, RedeemErc20CallExt, RegisterErc20,
-				RegisterErc20CallExt,
-			},
 			relay::{
 				Affirm, AffirmCallExt, ConfirmedBlockNumbersStoreExt, EthereumRelay,
 				PendingRelayHeaderParcelsStoreExt, SetConfirmedParcel,
@@ -397,34 +394,14 @@ impl<R: Runtime> Ethereum2Darwinia<R> {
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 		<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
-		R: Proxy<ProxyType = ProxyType> + EthereumIssuing,
+		R: RuntimeExt + Clone,
 	{
-		match &account.0.real {
-			Some(real) => {
-				let call = RegisterErc20 {
-					_runtime: PhantomData::default(),
-					proof,
-				};
-
-				let ex = self.darwinia.subxt.encode(call).unwrap();
-				Ok(self
-					.darwinia
-					.subxt
-					.proxy(
-						&account.0.signer,
-						real.clone(),
-						Some(ProxyType::EthereumBridge),
-						&ex,
-					)
-					.await?)
-			}
-			None => Ok(self
-				.darwinia
-				.subxt
-				.register_erc20(&account.0.signer, proof)
-				.await?),
-		}
-	}
+        Ok(R::register_erc20(
+            &self.darwinia.subxt,
+            account.0.real.clone(),
+            account.0.signer.clone(),
+            proof).await?)
+    }
 
 	/// redeem erc20
 	pub async fn redeem_erc20(
@@ -436,32 +413,12 @@ impl<R: Runtime> Ethereum2Darwinia<R> {
 		<R as System>::Address: From<<R as System>::AccountId>,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 		<<R::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
-		R: Proxy<ProxyType = ProxyType> + EthereumIssuing,
+		R: RuntimeExt + Clone,
 	{
-		match &account.0.real {
-			Some(real) => {
-				let call = RedeemErc20 {
-					_runtime: PhantomData::default(),
-					proof,
-				};
-
-				let ex = self.darwinia.subxt.encode(call).unwrap();
-				Ok(self
-					.darwinia
-					.subxt
-					.proxy(
-						&account.0.signer,
-						real.clone(),
-						Some(ProxyType::EthereumBridge),
-						&ex,
-					)
-					.await?)
-			}
-			None => Ok(self
-				.darwinia
-				.subxt
-				.redeem_erc20(&account.0.signer, proof)
-				.await?),
-		}
+        Ok(R::redeem_erc20(
+            &self.darwinia.subxt,
+            account.0.real.clone(),
+            account.0.signer.clone(),
+            proof).await?)
 	}
 }

@@ -20,6 +20,9 @@ pub enum Error {
 
 	#[error("Fail to get ethereum header of block {1}: {0}")]
 	FailToGetEthereumHeader(String, u64),
+
+    #[error("Do not support {0}")]
+    DonotSupport(String),
 }
 
 /// Sup Result

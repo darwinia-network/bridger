@@ -13,7 +13,7 @@ use jsonrpsee_types::jsonrpc::{to_value as to_json_value, Params};
 
 use crate::rpc::*;
 use primitives::frame::bridge::relay_authorities::EthereumRelayAuthorities;
-use primitives::frame::ethereum::verifier::Verifier;
+use primitives::frame::ethereum::runtime_ext::RuntimeExt;
 use primitives::frame::sudo::KeyStoreExt;
 use primitives::frame::sudo::Sudo;
 use substrate_subxt::sp_runtime::generic::Header;
@@ -93,7 +93,7 @@ impl<R: Runtime> Darwinia<R> {
 	/// Check if should redeem
 	pub async fn verified(&self, block_hash: web3::types::H256, tx_index: u64) -> Result<bool>
 	where
-		R: Verifier,
+		R: RuntimeExt,
 	{
 		Ok(R::verify(&self.subxt, block_hash.to_fixed_bytes(), tx_index).await?)
 	}

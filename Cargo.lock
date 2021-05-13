@@ -823,6 +823,7 @@ dependencies = [
  "rlp",
  "serde 1.0.125",
  "serde_json",
+ "sp-keyring",
  "substrate-subxt",
  "substrate-subxt-proc-macro",
  "thiserror",

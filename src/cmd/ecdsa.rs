@@ -1,5 +1,8 @@
 use crate::{api::darwinia_api, error::Error, error::Result, Settings};
 use rpassword::prompt_password_stdout;
+use primitives::{
+    runtimes::darwinia::DarwiniaRuntime,
+};
 
 /// Ecdsa
 pub async fn exec(message: String) -> Result<()> {
@@ -12,7 +15,7 @@ pub async fn exec(message: String) -> Result<()> {
 		let passwd = prompt_password_stdout("Please enter password:")?;
 		config.decrypt(&passwd)?;
 	}
-	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let darwinia = darwinia_api::get_darwinia_instance::<DarwiniaRuntime>(&config).await?;
 	let darwinia2ethereum = darwinia_api::get_d2e_instance(darwinia.clone());
 	let darwinia_account = darwinia_api::get_darwinia_account(&config);
 	let to_ethereum_account = darwinia_api::get_d2e_account(darwinia_account, &config);

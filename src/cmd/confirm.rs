@@ -3,6 +3,9 @@ use crate::{
 	error::Result,
 	Settings,
 };
+use primitives::{
+    runtimes::darwinia::DarwiniaRuntime,
+};
 use rpassword::prompt_password_stdout;
 
 /// Run the bridger
@@ -16,7 +19,7 @@ pub async fn exec(block: u64) -> Result<()> {
 		config.decrypt(&passwd)?;
 	}
 	let shadow = Shadow::new(&config);
-	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let darwinia = darwinia_api::get_darwinia_instance::<DarwiniaRuntime>(&config).await?;
 	let ethereum2darwinia = darwinia_api::get_e2d_instance(darwinia);
 	let darwinia_account = darwinia_api::get_darwinia_account(&config);
 	let e2d_account = darwinia_api::get_e2d_account(darwinia_account);

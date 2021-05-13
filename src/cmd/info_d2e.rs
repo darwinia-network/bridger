@@ -66,7 +66,7 @@ pub async fn exec(
 		let passwd = prompt_password_stdout("Please enter password:")?;
 		config.decrypt(&passwd)?;
 	}
-	let darwinia = darwinia_api::get_darwinia_instance(&config).await?;
+	let darwinia = darwinia_api::get_darwinia_instance::<DarwiniaRuntime>(&config).await?;
 	let darwinia2ethereum = darwinia_api::get_d2e_instance(darwinia.clone());
 	// mmr root block
 	let mmr_root = darwinia.get_mmr_root(mmrblock as u32).await?;

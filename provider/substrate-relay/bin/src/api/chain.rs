@@ -7,9 +7,7 @@ use crate::types::cond::chain::ChainRemoveCond;
 use crate::types::patch::resp::Resp;
 
 #[get("/api/chain/list")]
-pub async fn chain_list(
-	data_persist: web::Data<Mutex<Persist>>,
-) -> Result<HttpResponse, crate::error::WebError> {
+pub async fn chain_list(data_persist: web::Data<Mutex<Persist>>) -> Result<HttpResponse, crate::error::WebError> {
 	let persist = data_persist.lock().unwrap();
 	let chains = persist.chain_list().await;
 	Ok(HttpResponse::Ok().json(Resp::ok_with_data(chains)))

@@ -48,10 +48,7 @@ impl<T: Serialize> Resp<T> {
 		}
 		Ok(self.data)
 	}
-	pub fn safe_ok_or_else<E, F: FnOnce(Option<String>) -> E>(
-		self,
-		err: F,
-	) -> Result<Option<T>, E> {
+	pub fn safe_ok_or_else<E, F: FnOnce(Option<String>) -> E>(self, err: F) -> Result<Option<T>, E> {
 		if self.err == 1 {
 			return Err(err(self.msg));
 		}

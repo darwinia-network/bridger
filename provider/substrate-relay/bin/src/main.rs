@@ -21,12 +21,12 @@ mod types;
 
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
-    initialize::init()?;
+	initialize::init()?;
 
-    if let Err(err) = cli::exec().await {
-        log::error!("{}", err.to_string());
-        System::current().stop();
-        std::process::exit(1);
-    }
-    Ok(())
+	if let Err(err) = cli::exec().await {
+		log::error!("{}", err.to_string());
+		System::current().stop();
+		std::process::exit(1);
+	}
+	Ok(())
 }

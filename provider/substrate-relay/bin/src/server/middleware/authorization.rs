@@ -1,10 +1,7 @@
 use std::sync::Mutex;
 use std::task::{Context, Poll};
 
-use actix_web::{
-	dev::Service, dev::ServiceRequest, dev::ServiceResponse, dev::Transform, web, Error,
-	HttpResponse,
-};
+use actix_web::{dev::Service, dev::ServiceRequest, dev::ServiceResponse, dev::Transform, web, Error, HttpResponse};
 use futures::future::{ok, Either, Ready};
 
 use crate::persist::{Generic, Persist, Token};
@@ -96,10 +93,7 @@ where
 		};
 
 		// is allow
-		if !allow_tokens
-			.iter()
-			.any(|item| item.value() == &token_request)
-		{
+		if !allow_tokens.iter().any(|item| item.value() == &token_request) {
 			return Either::Right(ok(req.into_response(
 				HttpResponse::Forbidden()
 					.json(Resp::<String>::err_with_msg("Authorization failed"))

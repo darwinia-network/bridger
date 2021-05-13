@@ -17,9 +17,7 @@ pub async fn generate(
 }
 
 #[get("/api/token/list")]
-pub async fn list(
-	data_persist: web::Data<Mutex<Persist>>,
-) -> Result<HttpResponse, crate::error::WebError> {
+pub async fn list(data_persist: web::Data<Mutex<Persist>>) -> Result<HttpResponse, crate::error::WebError> {
 	let persist = data_persist.lock().unwrap();
 	let tokens = persist.token_list().await;
 	Ok(HttpResponse::Ok().json(Resp::ok_with_data(tokens)))

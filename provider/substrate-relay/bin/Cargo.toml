@@ -46,10 +46,7 @@ serde_derive = "1"
 serde_json = "1"
 toml = "0.5"
 
-
-## s2s
-relay-chain = { path = "../chains/relay-chain", features = ["millau", "pangolin"] }
-
+# s2s
 
 codec = { package = "parity-scale-codec", version = "2.0.0" }
 num-traits = "0.2"
@@ -68,3 +65,13 @@ sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate", t
 sp-runtime = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
 sp-trie = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
 sp-version = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
+
+
+## relay chain
+[dependencies.relay-chain]
+path = "../relay-chain"
+features = [
+    "millau",
+    "pangolin"
+]
+

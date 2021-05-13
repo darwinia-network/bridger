@@ -1,18 +1,39 @@
 pub use millau_runtime;
 
 use bp_header_chain::justification::GrandpaJustification;
-use bp_millau;
+use bp_messages::MessageNonce;
+use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use codec::Encode;
-use pangolin_runtime::bridge::s2s::{BridgeGrandpaMillauCall, WithMillauGrandpaInstance};
-use relay_millau_client::{
-	Millau as MillauRelayChain, SigningParams as MillauSigningParams, SyncHeader as MillauSyncHeader,
+use frame_support::dispatch::GetDispatchInfo;
+use frame_support::sp_runtime::FixedU128;
+use messages_relay::message_lane::MessageLane;
+use millau_runtime::{
+	pangolin_messages::{PangolinToMillauConversionRate, INITIAL_PANGOLIN_TO_MILLAU_CONVERSION_RATE},
+	MessagesCall as SourceChainRuntimeMessagesCall, WithPangolinGrandpaInstance, WithPangolinMessagesInstance,
 };
+use pangolin_runtime::bridge::s2s::{
+	BridgeGrandpaMillauCall, MessagesCall as TargetChainRuntimeMessagesCall, WithMillauGrandpaInstance,
+	WithMillauMessagesInstance,
+};
+use pangolin_runtime_params::system as pangolin_params_system;
+use relay_millau_client::Millau as MillauRelayChain;
 use relay_pangolin_client::PangolinRelayChain;
-use relay_substrate_client::{Chain as RelaySubstrateClientChain, TransactionSignScheme};
+use relay_substrate_client::{
+	metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
+	Chain as RelaySubstrateClientChain, TransactionSignScheme,
+};
 use sp_core::{Bytes, Pair};
 use sp_version::RuntimeVersion;
+use std::{ops::RangeInclusive, time::Duration};
 
-use crate::types::s2s::finality_pipeline::{SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate};
+use crate::types::s2s::{
+	finality_pipeline::{SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate},
+	messages_lane::{
+		select_delivery_transaction_limits, MessagesRelayParams, SubstrateMessageLane, SubstrateMessageLaneToSubstrate,
+	},
+	messages_source::SubstrateMessagesSource,
+	messages_target::SubstrateMessagesTarget,
+};
 use crate::*;
 
 pub struct MillauChainConst;
@@ -29,6 +50,10 @@ impl ChainConst for MillauChainConst {
 	const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str = bp_millau::FROM_MILLAU_UNREWARDED_RELAYERS_STATE;
 	const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str = bp_millau::BEST_FINALIZED_MILLAU_HEADER_METHOD;
 	const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str = bp_millau::BEST_FINALIZED_MILLAU_HEADER_METHOD;
+	const MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE: MessageNonce =
+		bp_millau::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
+	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce = bp_millau::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+	const AVERAGE_BLOCK_INTERVAL: Duration = MillauRelayChain::AVERAGE_BLOCK_INTERVAL;
 }
 
 declare_cli_chain!(MillauRelayChain, millau_runtime);
@@ -48,12 +73,34 @@ declare_relay_headers!(
 	Pangolin,
 	MillauRelayChain,
 	PangolinRelayChain,
-	MillauSigningParams,
+	relay_millau_client,
 	MillauChainConst,
 	bp_millau,
 	drml_primitives,
 	pangolin_runtime,
 	BridgeGrandpaMillauCall,
 	WithMillauGrandpaInstance,
-	MillauSyncHeader,
+);
+
+declare_relay_messages!(
+	Millau,
+	Pangolin,
+	MillauRelayChain,
+	PangolinRelayChain,
+	relay_millau_client,
+	relay_pangolin_client,
+	MillauChainConst,
+	PangolinChainConst,
+	bp_millau,
+	drml_primitives,
+	millau_runtime,
+	pangolin_runtime,
+	SourceChainRuntimeMessagesCall,
+	TargetChainRuntimeMessagesCall,
+	bp_millau,
+	pangolin_params_system,
+	WithMillauMessagesInstance,
+	WithPangolinMessagesInstance,
+	PangolinToMillauConversionRate,
+	INITIAL_PANGOLIN_TO_MILLAU_CONVERSION_RATE,
 );

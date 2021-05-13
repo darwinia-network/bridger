@@ -9,8 +9,8 @@ macro_rules! declare_relay_headers {
         $source_relay_chain:ident,
         /// target relay chain
         $target_relay_chain:ident,
-        /// source chain signing params
-        $source_signing_params:ident,
+        /// source relay client module
+        $source_relay_client:ident,
         /// source chain const
         $source_const:ident,
         /// source chain bridge primitives
@@ -23,13 +23,14 @@ macro_rules! declare_relay_headers {
         $source_grandpa_pallet_in_target:ident,
         /// target chain to source chain grandpa instance
         $source_grandpa_instance_in_target:ident,
-        /// source chain sync header (relay_substrate_client::SyncHeader)
-        $source_sync_header:ident,
     ) => {
         paste::item! {
-            /// Pangolin-to-Millau finality sync pipeline.
-            pub(crate) type [<$source_name FinalityTo $target_name>] =
-                SubstrateFinalityToSubstrate<$source_relay_chain, $target_relay_chain, $source_signing_params>;
+            /// Source-to-Target finality sync pipeline.
+            pub(crate) type [<$source_name FinalityTo $target_name>] = SubstrateFinalityToSubstrate<
+                $source_relay_chain,
+                $target_relay_chain,
+                $source_relay_client::SigningParams,
+            >;
 
             impl SubstrateFinalitySyncPipeline for [<$source_name FinalityTo $target_name>] {
                 const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str = $source_const::BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET;
@@ -42,8 +43,8 @@ macro_rules! declare_relay_headers {
 
                 fn make_submit_finality_proof_transaction(
                     &self,
-                    transaction_nonce: <$target_relay_chain as RelaySubstrateClientChain>::Index,
-                    header: $source_sync_header,
+                    transaction_nonce: <$target_relay_chain as relay_substrate_client::Chain>::Index,
+                    header: $source_relay_client::SyncHeader,
                     proof: GrandpaJustification<$source_primitives::Header>,
                 ) -> Bytes {
                     let call = $source_grandpa_pallet_in_target::<

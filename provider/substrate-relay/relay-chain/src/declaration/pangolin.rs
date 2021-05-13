@@ -1,5 +1,3 @@
-pub use pangolin_runtime;
-
 use bp_header_chain::justification::GrandpaJustification;
 use bp_messages::MessageNonce;
 use bp_runtime::InstanceId;

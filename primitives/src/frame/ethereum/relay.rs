@@ -14,7 +14,7 @@ pub trait EthereumRelay: System {
 	/// RingBalance
 	type RingBalance: 'static + Encode + Decode + Sync + Send + Default;
 	/// Ethereum BlockNumber
-	type EthereumBlockNumber: 'static + Encode + Sync + Decode + Send + Default;
+	type EthereumBlockNumber: 'static + Encode + Sync + Decode + Into<u64> + Send + Default;
 	/// Ethereum Pending Header
 	type PendingRelayHeaderParcel: 'static + Encode + Decode + Sync + Send + Default;
 	/// Ethereum Relay Header ID

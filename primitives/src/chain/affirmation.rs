@@ -28,6 +28,27 @@ pub struct RelayAffirmation<RelayHeaderParcel, Relayer, Balance, RelayHeaderId> 
 	pub verified_on_chain: bool,
 }
 
+pub trait RelayAffirmationContainer {
+    fn contains(&self, block: u64) -> bool;
+}
+
+impl<AccountId, Balance> RelayAffirmationContainer 
+for RelayAffirmation<
+    EthereumRelayHeaderParcel, 
+    AccountId, 
+    Balance, 
+    RelayAffirmationId<u64>
+> {
+    fn contains(&self, block: u64) -> bool {
+        return self
+            .relay_header_parcels
+            .iter()
+            .map(|bp| bp.header.number)
+            .collect::<Vec<u64>>()
+            .contains(&block);
+    }
+}
+
 impl<AccountId: Display, Balance: Display> std::fmt::Display
 for RelayAffirmation<
 	EthereumRelayHeaderParcel,

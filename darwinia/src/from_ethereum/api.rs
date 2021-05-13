@@ -6,6 +6,7 @@ type PendingRelayHeaderParcel<Relay> = <Relay as EthereumRelay>::PendingRelayHea
 type AffirmationsReturn<Game> =
 	HashMap<u64, HashMap<u32, Vec<<Game as EthereumRelayerGame>::RelayAffirmation>>>;
 
+use primitives::chain::RelayAffirmationContainer;
 use primitives::frame::sudo::Sudo;
 use primitives::frame::ethereum::runtime_ext::RuntimeExt;
 use primitives::frame::technical_committee::TechnicalCommittee;
@@ -34,19 +35,11 @@ use primitives::{
 use core::marker::PhantomData;
 
 use super::Account;
-use primitives::chain::{RelayAffirmation, RelayAffirmationId};
 use substrate_subxt::balances::Balances;
 use substrate_subxt::sp_core::H256;
 use substrate_subxt::sp_runtime::traits::Verify;
 use substrate_subxt::system::System;
 use substrate_subxt::{Runtime, SignedExtension, SignedExtra};
-
-type TrueRelayAffirmation<R> = RelayAffirmation<
-	EthereumRelayHeaderParcel,
-	<R as System>::AccountId,
-	<R as Balances>::Balance,
-	RelayAffirmationId<u64>,
->;
 
 /// Dawrinia API
 #[derive(Clone)]
@@ -232,21 +225,16 @@ impl<R: Runtime> Ethereum2Darwinia<R> {
 
 	/// affirmations contains block?
 	pub fn contains(
-		affirmations: &[TrueRelayAffirmation<R>],
+		affirmations: &Vec<<R as EthereumRelayerGame>::RelayAffirmation>,
 		block: u64,
 	) -> bool
 	where
-		R: Balances,
+		R: Balances + EthereumRelayerGame,
 	{
 		for affirmation in affirmations {
-			let blocks: &Vec<u64> = &affirmation
-				.relay_header_parcels
-				.iter()
-				.map(|bp| bp.header.number)
-				.collect();
-			if blocks.contains(&block) {
-				return true;
-			}
+            if affirmation.contains(block) {
+                return true;
+            }
 		}
 
 		// TODO: Checking the equality of the affirmations

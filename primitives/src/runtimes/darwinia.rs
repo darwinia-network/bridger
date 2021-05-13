@@ -8,7 +8,12 @@ use crate::{
 	},
 	frame::{
 		bridge::relay_authorities::EthereumRelayAuthorities,
-		ethereum::{backing::EthereumBacking, game::EthereumRelayerGame, relay::EthereumRelay},
+		ethereum::{
+            backing::EthereumBacking, 
+            game::EthereumRelayerGame, 
+            relay::EthereumRelay,
+            relay_helper::EthereumRelayHelper,
+        },
 		proxy::Proxy,
 		sudo::Sudo,
 		technical_committee::TechnicalCommittee,
@@ -111,6 +116,13 @@ impl EthereumRelay for DarwiniaRuntime {
 		RelayVotingState<<Self as System>::AccountId>,
 	);
 	type RelayAffirmationId = RelayAffirmationId<Self::EthereumBlockNumber>;
+}
+
+impl EthereumRelayHelper for DarwiniaRuntime {
+    fn get_pending_relay_header_number(parcel: Self::PendingRelayHeaderParcel)
+        -> Self::EthereumBlockNumber {
+            parcel.1.header.number
+        }
 }
 
 impl EthereumRelayerGame for DarwiniaRuntime {

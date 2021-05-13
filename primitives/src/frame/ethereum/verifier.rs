@@ -62,11 +62,15 @@ pub struct DarwiniaPangolinVerifier<R: Runtime> {
 }
 
 #[async_trait]
-impl<R: Runtime + EthereumIssuing + Verifier> DarwiniaVerifier<R> for DarwiniaPangolinVerifier<R> {
+impl<R: Runtime + EthereumBacking + EthereumIssuing + Verifier> DarwiniaVerifier<R> for DarwiniaPangolinVerifier<R> {
 	/// verify
 	async fn verify(client: &Client<R>, block_hash: [u8; 32], tx_index: u64) -> Result<bool> {
 		Ok(client
 			.verified_issuing_proof((block_hash, tx_index), None)
+			.await?
+			.unwrap_or(false) ||
+			client
+			.verified_proof((block_hash, tx_index), None)
 			.await?
 			.unwrap_or(false))
 	}

@@ -8,13 +8,45 @@ use crate::error::Result;
 use crate::service::redeem::EthereumTransaction;
 use crate::service::MsgStop;
 use crate::tools;
-use primitives::chain::ethereum::{
-	EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor,
+use primitives::{
+    chain::{
+        ethereum::{
+            EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor,
+            EcdsaMessage,
+            EcdsaSignature,
+        },
+        proxy_type::ProxyType,
+    },
+    frame::{
+        ethereum::{
+            backing::EthereumBacking,
+            relay::EthereumRelay,
+            runtime_ext::RuntimeExt,
+        },
+        proxy::{
+            Proxy,
+        },
+        bridge::relay_authorities::EthereumRelayAuthorities,
+        technical_committee::TechnicalCommittee,
+    }
 };
-use primitives::chain::ethereum::EcdsaMessage;
 use std::path::PathBuf;
-use primitives::runtimes::darwinia::DarwiniaRuntime;
 use darwinia::{Darwinia2Ethereum, Ethereum2Darwinia, FromEthereumAccount, ToEthereumAccount};
+
+use substrate_subxt::{
+    Runtime,
+    system::System,
+    SignedExtension,
+    SignedExtra,
+    sp_runtime::traits::Verify,
+    sp_core::{
+        H256,
+        sr25519::{
+            Signature,
+            Public,
+        }
+    }
+};
 
 #[derive(Clone, Debug)]
 pub enum Extrinsic {
@@ -34,21 +66,26 @@ impl Message for MsgExtrinsic {
 }
 
 /// Extrinsics Service
-pub struct ExtrinsicsService {
+pub struct ExtrinsicsService<R: Runtime> {
 	/// Ethereum to Darwinia Client
-	pub ethereum2darwinia: Option<Ethereum2Darwinia<DarwiniaRuntime>>,
+	pub ethereum2darwinia: Option<Ethereum2Darwinia<R>>,
 	/// Dawrinia to Ethereum Client
-	pub darwinia2ethereum: Option<Darwinia2Ethereum<DarwiniaRuntime>>,
+	pub darwinia2ethereum: Option<Darwinia2Ethereum<R>>,
 	/// ethereum2darwinia relayer
-	pub ethereum2darwinia_relayer: Option<FromEthereumAccount<DarwiniaRuntime>>,
+	pub ethereum2darwinia_relayer: Option<FromEthereumAccount<R>>,
 	/// darwinia2ethereum relayer
-	pub darwinia2ethereum_relayer: Option<ToEthereumAccount<DarwiniaRuntime>>,
+	pub darwinia2ethereum_relayer: Option<ToEthereumAccount<R>>,
 
 	spec_name: String,
 	data_dir: PathBuf,
 }
 
-impl Actor for ExtrinsicsService {
+impl<R: Runtime + Unpin> Actor for ExtrinsicsService<R> 
+where <R as System>::AccountId: Unpin,
+      <R as System>::Hash: Unpin,
+      <R as System>::Index: Unpin,
+      <R as Runtime>::Extra: Unpin,
+{
 	type Context = Context<Self>;
 
 	fn started(&mut self, _: &mut Self::Context) {
@@ -60,10 +97,24 @@ impl Actor for ExtrinsicsService {
 	}
 }
 
-impl Handler<MsgExtrinsic> for ExtrinsicsService {
+
+impl<R: Runtime + RuntimeExt + Proxy<ProxyType = ProxyType> + Unpin + Clone> Handler<MsgExtrinsic> for ExtrinsicsService<R> 
+where <R as System>::AccountId: Unpin,
+      <R as System>::Hash: Unpin,
+      <R as System>::Index: Unpin,
+      <R as Runtime>::Extra: Unpin,
+      R: System<Hash = H256, BlockNumber = u32>,
+      R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature, RelayAuthorityMessage = EcdsaMessage>,
+      R: EthereumRelay + TechnicalCommittee + EthereumBacking,
+      <<<R as Runtime>::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Sync + Send,
+      <<R as Runtime>::Signature as Verify>::Signer: From<Public>,
+      <R as Runtime>::Signature: From<Signature>,
+      <R as System>::Address: From<<R as System>::AccountId>,
+{
 	type Result = AtomicResponse<Self, Result<()>>;
 
-	fn handle(&mut self, msg: MsgExtrinsic, _: &mut Context<Self>) -> Self::Result {
+	fn handle(&mut self, msg: MsgExtrinsic, _: &mut Context<Self>) -> Self::Result 
+    {
 		let f = ExtrinsicsService::send_extrinsic(
 			self.ethereum2darwinia.clone(),
 			self.darwinia2ethereum.clone(),
@@ -79,7 +130,12 @@ impl Handler<MsgExtrinsic> for ExtrinsicsService {
 	}
 }
 
-impl Handler<MsgStop> for ExtrinsicsService {
+impl<R: Runtime + Unpin> Handler<MsgStop> for ExtrinsicsService<R> 
+where <R as System>::AccountId: Unpin,
+      <R as System>::Hash: Unpin,
+      <R as System>::Index: Unpin,
+      <R as Runtime>::Extra: Unpin,
+{
 	type Result = ();
 
 	fn handle(&mut self, _: MsgStop, ctx: &mut Context<Self>) -> Self::Result {
@@ -87,16 +143,16 @@ impl Handler<MsgStop> for ExtrinsicsService {
 	}
 }
 
-impl ExtrinsicsService {
+impl<R: Runtime + RuntimeExt + Proxy<ProxyType = ProxyType> + Clone> ExtrinsicsService<R> {
 	/// New sign service
 	pub fn new(
-		ethereum2darwinia: Option<Ethereum2Darwinia<DarwiniaRuntime>>,
-		darwinia2ethereum: Option<Darwinia2Ethereum<DarwiniaRuntime>>,
-		ethereum2darwinia_relayer: Option<FromEthereumAccount<DarwiniaRuntime>>,
-		darwinia2ethereum_relayer: Option<ToEthereumAccount<DarwiniaRuntime>>,
+		ethereum2darwinia: Option<Ethereum2Darwinia<R>>,
+		darwinia2ethereum: Option<Darwinia2Ethereum<R>>,
+		ethereum2darwinia_relayer: Option<FromEthereumAccount<R>>,
+		darwinia2ethereum_relayer: Option<ToEthereumAccount<R>>,
 		spec_name: String,
 		data_dir: PathBuf,
-	) -> ExtrinsicsService {
+	) -> Self {
 		ExtrinsicsService {
 			ethereum2darwinia,
 			darwinia2ethereum,
@@ -109,14 +165,22 @@ impl ExtrinsicsService {
 
 	#[allow(clippy::too_many_arguments)]
 	async fn send_extrinsic(
-		ethereum2darwinia: Option<Ethereum2Darwinia<DarwiniaRuntime>>,
-		darwinia2ethereum: Option<Darwinia2Ethereum<DarwiniaRuntime>>,
-		ethereum2darwinia_relayer: Option<FromEthereumAccount<DarwiniaRuntime>>,
-		darwinia2ethereum_relayer: Option<ToEthereumAccount<DarwiniaRuntime>>,
+		ethereum2darwinia: Option<Ethereum2Darwinia<R>>,
+		darwinia2ethereum: Option<Darwinia2Ethereum<R>>,
+		ethereum2darwinia_relayer: Option<FromEthereumAccount<R>>,
+		darwinia2ethereum_relayer: Option<ToEthereumAccount<R>>,
 		extrinsic: Extrinsic,
 		spec_name: String,
 		data_dir: PathBuf,
-	) -> Result<()> {
+	) -> Result<()> 
+        where <R as System>::Address: From<<R as System>::AccountId>,
+              <R as Runtime>::Signature: From<Signature>,
+              <<<R as Runtime>::Extra as SignedExtra<R>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
+              <<R as Runtime>::Signature as Verify>::Signer: From<Public>,
+              R: EthereumRelay + TechnicalCommittee + EthereumBacking,
+              R: System<Hash = H256, BlockNumber = u32>,
+              R: EthereumRelayAuthorities<RelayAuthoritySignature = EcdsaSignature, RelayAuthorityMessage = EcdsaMessage>,
+    {
 		match extrinsic {
 			Extrinsic::Affirm(parcel) => {
 				let block_number = parcel.header.number;

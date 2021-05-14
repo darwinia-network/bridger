@@ -11,7 +11,19 @@ use crate::{
 
 use crate::tools;
 use darwinia::{Ethereum2Darwinia, FromEthereumAccount};
-use primitives::runtimes::darwinia::DarwiniaRuntime;
+use substrate_subxt::{
+    Runtime,
+    system::System,
+};
+
+use primitives::{
+	chain::{
+		ethereum::EthereumRelayHeaderParcel,
+		RelayVotingState,
+	},
+};
+
+use primitives::frame::ethereum::relay::EthereumRelay;
 
 #[derive(Clone, Debug)]
 struct MsgGuard;
@@ -21,24 +33,33 @@ impl Message for MsgGuard {
 }
 
 /// Redeem Service
-pub struct GuardService {
+pub struct GuardService<R: Runtime> {
 	step: u64,
 	/// Shadow API
 	pub shadow: Arc<Shadow>,
 	/// Ethereum to Dawrinia API
-	pub ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
+	pub ethereum2darwinia: Ethereum2Darwinia<R>,
 	/// Darwinia guard account
-	pub guard_account: FromEthereumAccount<DarwiniaRuntime>,
+	pub guard_account: FromEthereumAccount<R>,
 	extrinsics_service: Recipient<MsgExtrinsic>,
 }
 
-impl Actor for GuardService {
+impl<R: Runtime + Unpin + EthereumRelay + Clone> Actor for GuardService<R> 
+where <R as System>::AccountId: Unpin,
+      <R as System>::Hash: Unpin,
+      <R as System>::Index: Unpin,
+      <R as Runtime>::Extra: Unpin,
+      <R as substrate_subxt::Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+      <R as substrate_subxt::system::System>::Address: From<<R as substrate_subxt::system::System>::AccountId>,
+      R: EthereumRelay<PendingRelayHeaderParcel = (<R as System>::BlockNumber, EthereumRelayHeaderParcel, RelayVotingState<<R as System>::AccountId>)>,
+{
 	type Context = Context<Self>;
 
-	fn started(&mut self, ctx: &mut Self::Context) {
+	fn started(&mut self, ctx: &mut Self::Context) 
+    {
 		info!("    ✨ SERVICE STARTED: GUARD");
 		ctx.run_interval(Duration::from_millis(self.step * 1_000), |_this, ctx| {
-			ctx.notify(MsgGuard {});
+            ctx.notify(MsgGuard {});
 		});
 	}
 
@@ -47,7 +68,15 @@ impl Actor for GuardService {
 	}
 }
 
-impl Handler<MsgGuard> for GuardService {
+impl<R: Runtime + Unpin + EthereumRelay + Clone> Handler<MsgGuard> for GuardService<R> 
+where <R as System>::AccountId: Unpin,
+      <R as System>::Index: Unpin,
+      <R as Runtime>::Extra: Unpin,
+      <R as System>::Hash: Unpin,
+      <R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+      <R as System>::Address: From<<R as System>::AccountId>,
+      R: EthereumRelay<PendingRelayHeaderParcel = (<R as System>::BlockNumber, EthereumRelayHeaderParcel, RelayVotingState<<R as System>::AccountId>)>,
+{
 	type Result = AtomicResponse<Self, ()>;
 
 	fn handle(&mut self, _msg: MsgGuard, _: &mut Context<Self>) -> Self::Result {
@@ -76,7 +105,15 @@ impl Handler<MsgGuard> for GuardService {
 	}
 }
 
-impl Handler<MsgStop> for GuardService {
+impl<R: Runtime + EthereumRelay + Unpin + Clone> Handler<MsgStop> for GuardService<R> 
+where <R as System>::AccountId: Unpin,
+      <R as System>::Hash: Unpin,
+      <R as System>::Index: Unpin,
+      <R as Runtime>::Extra: Unpin,
+      <R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+      <R as System>::Address: From<<R as System>::AccountId>,
+      R: EthereumRelay<PendingRelayHeaderParcel = (<R as System>::BlockNumber, EthereumRelayHeaderParcel, RelayVotingState<<R as System>::AccountId>)>,
+{
 	type Result = ();
 
 	fn handle(&mut self, _: MsgStop, ctx: &mut Context<Self>) -> Self::Result {
@@ -84,16 +121,16 @@ impl Handler<MsgStop> for GuardService {
 	}
 }
 
-impl GuardService {
+impl<R: Runtime + Clone> GuardService<R> {
 	/// New redeem service
 	pub fn new(
 		shadow: Arc<Shadow>,
-		ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
-		guard_account: FromEthereumAccount<DarwiniaRuntime>,
+		ethereum2darwinia: Ethereum2Darwinia<R>,
+		guard_account: FromEthereumAccount<R>,
 		step: u64,
 		is_tech_comm_member: bool,
 		extrinsics_service: Recipient<MsgExtrinsic>,
-	) -> Option<GuardService> {
+	) -> Option<Self> {
 		if is_tech_comm_member {
 			Some(GuardService {
 				ethereum2darwinia,
@@ -109,11 +146,16 @@ impl GuardService {
 	}
 
 	async fn guard(
-		ethereum2darwinia: Ethereum2Darwinia<DarwiniaRuntime>,
-		guard_account: FromEthereumAccount<DarwiniaRuntime>,
+		ethereum2darwinia: Ethereum2Darwinia<R>,
+		guard_account: FromEthereumAccount<R>,
 		shadow: Arc<Shadow>,
 		extrinsics_service: Recipient<MsgExtrinsic>,
-	) -> Result<()> {
+	) -> Result<()> 
+        where R: EthereumRelay,
+              <R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+              R: EthereumRelay<PendingRelayHeaderParcel = (<R as System>::BlockNumber, EthereumRelayHeaderParcel, RelayVotingState<<R as System>::AccountId>)>,
+              <R as System>::Address: From<<R as System>::AccountId>
+    {
 		trace!("Checking pending headers...");
 
 		let last_confirmed = ethereum2darwinia.last_confirmed().await.unwrap();

@@ -44,8 +44,7 @@ for RelayAffirmation<
             .relay_header_parcels
             .iter()
             .map(|bp| bp.header.number)
-            .collect::<Vec<u64>>()
-            .contains(&block);
+            .any(|x| x == block);
     }
 }
 

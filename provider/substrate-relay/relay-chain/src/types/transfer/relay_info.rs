@@ -1,17 +1,14 @@
+use crate::types::transfer::ChainInfo;
 use bp_messages::LaneId;
 use getset::{Getters, MutGetters, Setters};
 
 #[derive(Debug, Clone, Default, MutGetters, Getters, Setters)]
 #[getset(get = "pub", get_mut = "pub", set = "pub")]
 pub struct RelayHeadersAndMessagesInfo {
-	name: String,
-	host: String,
-	port: u32,
-	signer: String,
-	secure: bool,
-	signer_password: Option<String>,
+	source: ChainInfo,
+	target: ChainInfo,
 
-	lane: HexLaneId,
+	lanes: Vec<HexLaneId>,
 	prometheus_params: PrometheusParamsInfo,
 }
 
@@ -43,4 +40,18 @@ pub struct PrometheusParamsInfo {
 	prometheus_host: String,
 	/// Expose Prometheus endpoint at given port.
 	prometheus_port: u16,
+}
+
+impl From<PrometheusParamsInfo> for relay_utils::metrics::MetricsParams {
+	fn from(cli_params: PrometheusParamsInfo) -> relay_utils::metrics::MetricsParams {
+		if !cli_params.no_prometheus {
+			Some(relay_utils::metrics::MetricsAddress {
+				host: cli_params.prometheus_host,
+				port: cli_params.prometheus_port,
+			})
+			.into()
+		} else {
+			None.into()
+		}
+	}
 }

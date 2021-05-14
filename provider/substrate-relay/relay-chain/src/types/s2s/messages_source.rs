@@ -1,3 +1,19 @@
+// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// This file is part of Parity Bridges Common.
+
+// Parity Bridges Common is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Parity Bridges Common is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
+
 //! Substrate client as Substrate messages source. The chain we connect to should have
 //! runtime that implements `<BridgedChainName>HeaderApi` to allow bridging with
 //! <BridgedName> chain.
@@ -7,7 +23,7 @@ use crate::types::s2s::on_demand_headers::OnDemandHeadersRelay;
 
 use async_trait::async_trait;
 use bp_messages::{LaneId, MessageNonce};
-use bp_runtime::InstanceId;
+use bp_runtime::ChainId;
 use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use codec::{Decode, Encode};
 use frame_support::{traits::Instance, weights::Weight};
@@ -34,7 +50,7 @@ pub struct SubstrateMessagesSource<C: Chain, P: SubstrateMessageLane, R, I> {
 	client: Client<C>,
 	lane: P,
 	lane_id: LaneId,
-	instance: InstanceId,
+	instance: ChainId,
 	target_to_source_headers_relay: Option<OnDemandHeadersRelay<P::TargetChain>>,
 	_phantom: PhantomData<(R, I)>,
 }
@@ -45,7 +61,7 @@ impl<C: Chain, P: SubstrateMessageLane, R, I> SubstrateMessagesSource<C, P, R, I
 		client: Client<C>,
 		lane: P,
 		lane_id: LaneId,
-		instance: InstanceId,
+		instance: ChainId,
 		target_to_source_headers_relay: Option<OnDemandHeadersRelay<P::TargetChain>>,
 	) -> Self {
 		SubstrateMessagesSource {

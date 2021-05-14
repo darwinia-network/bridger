@@ -1,3 +1,19 @@
+// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// This file is part of Parity Bridges Common.
+
+// Parity Bridges Common is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Parity Bridges Common is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
+
 //! Substrate-to-Substrate headers sync entrypoint.
 
 use crate::types::s2s::finality_target::SubstrateFinalityTarget;
@@ -29,6 +45,13 @@ pub trait SubstrateFinalitySyncPipeline: FinalitySyncPipeline {
 	fn customize_metrics(params: MetricsParams) -> anyhow::Result<MetricsParams> {
 		Ok(params)
 	}
+
+	/// Start finality relay guards.
+	///
+	/// Different finality bridges may have different set of guards - e.g. on ephemeral chains we
+	/// don't need version guards, on test chains we don't care that much about relayer account
+	/// balance, ... So the implementation is left to the specific bridges.
+	fn start_relay_guards(_target_client: &Client<Self::TargetChain>) {}
 
 	/// Returns id of account that we're using to sign transactions at target chain.
 	fn transactions_author(&self) -> <Self::TargetChain as Chain>::AccountId;

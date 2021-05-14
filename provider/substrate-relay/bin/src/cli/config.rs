@@ -21,40 +21,12 @@ pub async fn exec(config: OptConfig) -> error::Result<()> {
 async fn handle_command_chain(client: &CliClient, command: &OptChainCommand) -> error::Result<()> {
 	match command {
 		OptChainCommand::List => client.chain_list().await?,
-		OptChainCommand::Add {
-			name,
-			host,
-			port,
-			secure,
-			signer,
-			signer_password,
-		} => {
-			let chain = Chain::builder()
-				.name(name.clone())
-				.host(host.clone())
-				.port(*port)
-				.secure(*secure)
-				.signer(signer.clone())
-				.signer_password(signer_password.clone())
-				.build();
+		OptChainCommand::Add { chain_info } => {
+			let chain = chain_info.clone().into();
 			client.chain_add(&chain).await?
 		}
-		OptChainCommand::Update {
-			name,
-			host,
-			port,
-			secure,
-			signer,
-			signer_password,
-		} => {
-			let chain = Chain::builder()
-				.name(name.clone())
-				.host(host.clone())
-				.port(*port)
-				.secure(*secure)
-				.signer(signer.clone())
-				.signer_password(signer_password.clone())
-				.build();
+		OptChainCommand::Update { chain_info } => {
+			let chain = chain_info.clone().into();
 			client.chain_update(&chain).await?
 		}
 		OptChainCommand::Remove { name } => {

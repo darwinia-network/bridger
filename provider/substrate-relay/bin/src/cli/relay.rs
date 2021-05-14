@@ -19,7 +19,7 @@ pub async fn exec(opt_relay: OptRelay) -> error::Result<()> {
 			let data = StartRelayCond::builder()
 				.source(source)
 				.target(target)
-				.lance(lane)
+				.lanes(lane)
 				.no_prometheus(prometheus_params.no_prometheus)
 				.prometheus_host(prometheus_params.prometheus_host)
 				.prometheus_port(prometheus_params.prometheus_port)

@@ -1,5 +1,5 @@
 use getset::{Getters, Setters};
-use relay_chain::types::transfer::HexLaneId;
+use relay_chain::types::transfer::{HexLaneId, PrometheusParamsInfo};
 use typed_builder::TypedBuilder;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, TypedBuilder, Getters, Setters)]
@@ -14,8 +14,18 @@ pub struct SourceAndTargetCond {
 pub struct StartRelayCond {
 	source: String,
 	target: String,
-	lance: HexLaneId,
+	lanes: Vec<HexLaneId>,
 	no_prometheus: bool,
 	prometheus_host: String,
 	prometheus_port: u16,
+}
+
+impl StartRelayCond {
+	pub fn prometheus_info(&self) -> PrometheusParamsInfo {
+		let mut prometheus_info = PrometheusParamsInfo::default();
+		prometheus_info.set_no_prometheus(self.no_prometheus);
+		prometheus_info.set_prometheus_host(self.prometheus_host.clone());
+		prometheus_info.set_prometheus_port(self.prometheus_port);
+		prometheus_info
+	}
 }

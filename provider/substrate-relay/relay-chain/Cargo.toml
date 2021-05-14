@@ -65,15 +65,15 @@ relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bri
 
 # Substrate Dependencies
 
-frame-support = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
-sp-core = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
-sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
-sp-runtime = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
-sp-trie = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
-sp-version = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
+frame-support = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-core = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-runtime = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-trie = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-version = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
 
 [dev-dependencies]
-sp-keyring = { git = "https://github.com/darwinia-network/substrate", tag = "s2s-v1.0" }
+sp-keyring = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
 hex-literal = "0.3"
 
 [features]

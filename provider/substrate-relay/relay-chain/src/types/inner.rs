@@ -1,5 +1,5 @@
 use bp_messages::MessageNonce;
-use bp_runtime::InstanceId;
+use bp_runtime::ChainId;
 use frame_support::weights::Weight;
 use sp_version::RuntimeVersion;
 use std::time::Duration;
@@ -49,8 +49,8 @@ pub trait ChainConst {
 
 	/// AVERAGE_BLOCK_INTERVAL
 	const AVERAGE_BLOCK_INTERVAL: Duration;
-	/// Bridge instance id
-	const BRIDGE_INSTANCE_ID: InstanceId;
+	/// Bridge chain id
+	const BRIDGE_CHAIN_ID: ChainId;
 }
 
 /// Bridge-supported network definition.

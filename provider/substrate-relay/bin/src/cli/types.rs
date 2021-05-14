@@ -67,43 +67,15 @@ pub enum OptChainCommand {
 	List,
 	/// Add a new chain
 	Add {
-		/// Chain name
-		name: String,
-		/// Chain rpc host
-		#[structopt(short, long)]
-		host: String,
-		/// Chain rpc port
-		#[structopt(short, long)]
-		port: u32,
-		/// Chain signer
-		#[structopt(short, long)]
-		signer: String,
-		/// Use secure websocket connection.
-		#[structopt(long)]
-		secure: bool,
-		/// Chain signer password
-		#[structopt(long)]
-		signer_password: Option<String>,
+		/// sub command
+		#[structopt(flatten)]
+		chain_info: OptChainInfo,
 	},
 	/// Update an exists chain
 	Update {
-		/// Chain name
-		name: String,
-		/// Chain rpc host
-		#[structopt(short, long)]
-		host: String,
-		/// Chain rpc port
-		#[structopt(short, long)]
-		port: u32,
-		/// Chain signer
-		#[structopt(short, long)]
-		signer: String,
-		/// Use secure websocket connection.
-		#[structopt(long)]
-		secure: bool,
-		/// Chain signer password
-		#[structopt(long)]
-		signer_password: Option<String>,
+		/// sub command
+		#[structopt(flatten)]
+		chain_info: OptChainInfo,
 	},
 	/// Remove an exists chain
 	Remove {
@@ -129,7 +101,41 @@ pub enum OptTokenCommand {
 	},
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Clone, StructOpt)]
+pub struct OptChainInfo {
+	/// Chain name
+	pub name: String,
+	/// Chain rpc host
+	#[structopt(short, long)]
+	host: String,
+	/// Chain rpc port
+	#[structopt(short, long)]
+	port: u32,
+	/// Chain signer
+	#[structopt(short, long)]
+	signer: String,
+	/// Use secure websocket connection.
+	#[structopt(long)]
+	secure: bool,
+	/// Chain signer password
+	#[structopt(long)]
+	signer_password: Option<String>,
+}
+
+impl From<OptChainInfo> for crate::persist::Chain {
+	fn from(chain_info: OptChainInfo) -> Self {
+		crate::persist::Chain::builder()
+			.name(chain_info.name)
+			.host(chain_info.host)
+			.port(chain_info.port)
+			.secure(chain_info.secure)
+			.signer(chain_info.signer)
+			.signer_password(chain_info.signer_password)
+			.build()
+	}
+}
+
+#[derive(Debug, Clone, StructOpt)]
 pub struct OptBridgeInfo {
 	/// The server host by substrate-relay service
 	#[structopt(long, default_value = "http://127.0.0.1:7890")]
@@ -154,7 +160,7 @@ pub enum OptRelay {
 		bridge_info: OptBridgeInfo,
 		/// Hex-encoded lane id that should be served by the relay. Defaults to `00000000`.
 		#[structopt(long, default_value = "00000000")]
-		lane: HexLaneId,
+		lane: Vec<HexLaneId>,
 		#[structopt(flatten)]
 		prometheus_params: PrometheusParams,
 	},
@@ -167,7 +173,7 @@ pub enum OptRelay {
 }
 
 /// Prometheus metrics params.
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Clone, StructOpt)]
 pub struct PrometheusParams {
 	/// Do not expose a Prometheus metric endpoint.
 	#[structopt(long)]

@@ -225,7 +225,7 @@ impl<R: Runtime> Ethereum2Darwinia<R> {
 
 	/// affirmations contains block?
 	pub fn contains(
-		affirmations: &Vec<<R as EthereumRelayerGame>::RelayAffirmation>,
+		affirmations: &[<R as EthereumRelayerGame>::RelayAffirmation],
 		block: u64,
 	) -> bool
 	where

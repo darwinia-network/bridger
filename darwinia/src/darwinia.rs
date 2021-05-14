@@ -16,8 +16,7 @@ use primitives::frame::bridge::relay_authorities::EthereumRelayAuthorities;
 use primitives::frame::ethereum::runtime_ext::RuntimeExt;
 use primitives::frame::sudo::KeyStoreExt;
 use primitives::frame::sudo::Sudo;
-use substrate_subxt::sp_runtime::generic::Header;
-use substrate_subxt::sp_runtime::traits::{BlakeTwo256, Verify};
+use substrate_subxt::sp_runtime::traits::Verify;
 use substrate_subxt::system::System;
 
 pub struct Darwinia<R: Runtime> {
@@ -52,10 +51,7 @@ impl<R: Runtime> Darwinia<R> {
 	}
 
 	/// block number to hash
-	pub async fn block_number2hash(&self, block_number: Option<u32>) -> Result<Option<H256>>
-	where
-		R: System<Hash = H256>,
-	{
+	pub async fn block_number2hash(&self, block_number: Option<u32>) -> Result<Option<<R as System>::Hash>> {
 		let block_number = block_number.map(|n| n.into());
 		Ok(self.subxt.block_hash(block_number).await?)
 	}
@@ -129,11 +125,8 @@ impl<R: Runtime> Darwinia<R> {
 		&self,
 		module_name: &str,
 		storage_name: &str,
-		header_hash: H256,
-	) -> Result<StorageData>
-	where
-		R: System<Hash = H256>,
-	{
+		header_hash: <R as System>::Hash,
+	) -> Result<StorageData> {
 		let mut storage_key = twox_128(module_name.as_bytes()).to_vec();
 		storage_key.extend(twox_128(storage_name.as_bytes()).to_vec());
 
@@ -164,9 +157,9 @@ impl<R: Runtime> Darwinia<R> {
 	}
 
 	/// get events from a special block
-	pub async fn get_events_from_block_hash(&self, hash: H256) -> Result<Vec<EventInfo<R>>>
+	pub async fn get_events_from_block_hash(&self, hash: <R as System>::Hash) -> Result<Vec<EventInfo<R>>>
 	where
-		R: EthereumRelayAuthorities + System<Hash = H256>,
+		R: EthereumRelayAuthorities,
 	{
 		let storage_data = self.get_storage_data("System", "Events", hash).await?;
 
@@ -265,9 +258,7 @@ impl<R: Runtime> Darwinia<R> {
 	}
 
 	/// get block header by number
-	pub async fn get_block_by_number(&self, number: u32) -> Result<Header<u32, BlakeTwo256>>
-	where
-		R: System<Header = Header<u32, BlakeTwo256>, Hash = H256, BlockNumber = u32>,
+	pub async fn get_block_by_number(&self, number: u32) -> Result<<R as System>::Header>
 	{
 		match self
 			.subxt
@@ -283,9 +274,7 @@ impl<R: Runtime> Darwinia<R> {
 	}
 
 	/// finalized_head
-	pub async fn finalized_head(&self) -> Result<H256>
-	where
-		R: System<Hash = H256>,
+	pub async fn finalized_head(&self) -> Result<<R as System>::Hash>
 	{
 		let hash = self.subxt.finalized_head().await?;
 		Ok(hash)
@@ -294,10 +283,8 @@ impl<R: Runtime> Darwinia<R> {
 	/// get block by hash
 	pub async fn get_block_number_by_hash(
 		&self,
-		block_hash: H256,
+		block_hash: <R as System>::Hash,
 	) -> Result<Option<<R as System>::BlockNumber>>
-	where
-		R: System<Hash = H256>,
 	{
 		let block = self.subxt.block(Some(block_hash)).await?;
 		if let Some(block) = block {

@@ -10,18 +10,45 @@ use crate::{
 	service::extrinsics::{Extrinsic, MsgExtrinsic},
 };
 use actix::Recipient;
-use primitives::runtimes::darwinia::DarwiniaRuntime;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use substrate_subxt::system::System;
 use tokio::time::{delay_for, Duration};
 
 use darwinia::{Darwinia2Ethereum, EventInfo, ToEthereumAccount};
 
+use substrate_subxt::{
+    Runtime,
+    system::System,
+    balances::Balances,
+	sp_runtime::{
+		generic::Header,
+		traits::{
+            BlakeTwo256,
+            Verify,
+        },
+	},
+    sp_core::H256,
+};
+
+use primitives::frame::bridge::relay_authorities::EthereumRelayAuthorities;
+
+use primitives::{
+	chain::{
+        ethereum::{
+            EcdsaAddress,
+            EcdsaSignature,
+            EcdsaMessage,
+        },
+    },
+	frame::bridge::relay_authorities::RelayAuthority,
+};
+
+
+
 /// Dawrinia Subscribe
-pub struct SubscribeService {
-	darwinia2ethereum: Darwinia2Ethereum<DarwiniaRuntime>,
-	account: ToEthereumAccount<DarwiniaRuntime>,
+pub struct SubscribeService<R: Runtime> {
+	darwinia2ethereum: Darwinia2Ethereum<R>,
+	account: ToEthereumAccount<R>,
 	ethereum: Ethereum,
 	stop: bool,
 	extrinsics_service: Recipient<MsgExtrinsic>,
@@ -31,17 +58,17 @@ pub struct SubscribeService {
 	data_dir: PathBuf,
 }
 
-impl SubscribeService {
+impl<R: Runtime + EthereumRelayAuthorities + Balances> SubscribeService<R> {
 	/// New subscribe service
 	pub fn new(
-		darwinia2ethereum: Darwinia2Ethereum<DarwiniaRuntime>,
-		account: ToEthereumAccount<DarwiniaRuntime>,
+		darwinia2ethereum: Darwinia2Ethereum<R>,
+		account: ToEthereumAccount<R>,
 		ethereum: Ethereum,
 		extrinsics_service: Recipient<MsgExtrinsic>,
 		spec_name: String,
 		scan_from: u32,
 		data_dir: PathBuf,
-	) -> SubscribeService {
+	) -> Self {
 		SubscribeService {
 			darwinia2ethereum,
 			account,
@@ -56,7 +83,22 @@ impl SubscribeService {
 	}
 
 	/// start
-	pub async fn start(&mut self) -> Result<()> {
+	pub async fn start(&mut self) -> Result<()> 
+        where R: System<BlockNumber = u32, Header = Header<u32, BlakeTwo256>, Hash = H256>,
+              <R as Runtime>::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+              <<R as Runtime>::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
+              R: EthereumRelayAuthorities<
+                  RelayAuthority = RelayAuthority<
+                  <R as System>::AccountId,
+                  EcdsaAddress,
+                  <R as Balances>::Balance,
+                  <R as System>::BlockNumber,
+                  >,
+                RelayAuthorityMessage = EcdsaMessage,
+                RelayAuthoritySigner = EcdsaAddress,
+                RelayAuthoritySignature = EcdsaSignature,
+              >,
+    {
 		let mut tracker =
 			DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), self.scan_from);
 		info!("✨ SERVICE STARTED: SUBSCRIBE");
@@ -123,8 +165,10 @@ impl SubscribeService {
 
 	async fn handle_delayed_extrinsics(
 		&mut self,
-		header: &<DarwiniaRuntime as System>::Header,
-	) -> Result<()> {
+		header: &Header<u32, BlakeTwo256>,
+	) -> Result<()> 
+        where R: System<BlockNumber = u32>
+    {
 		let cloned = self.delayed_extrinsics.clone();
 		for (delayed_to, delayed_ex) in cloned.iter() {
 			if header.number >= *delayed_to
@@ -142,9 +186,24 @@ impl SubscribeService {
 
 	async fn handle_events(
 		&mut self,
-		header: &<DarwiniaRuntime as System>::Header,
-		events: Result<Vec<EventInfo<DarwiniaRuntime>>>,
-	) -> Result<()> {
+		header: &Header<u32, BlakeTwo256>,
+		events: Result<Vec<EventInfo<R>>>,
+	) -> Result<()> 
+        where R: EthereumRelayAuthorities<
+				RelayAuthority = RelayAuthority<
+					<R as System>::AccountId,
+					EcdsaAddress,
+					<R as Balances>::Balance,
+					<R as System>::BlockNumber,
+				>,
+                RelayAuthorityMessage = EcdsaMessage,
+                RelayAuthoritySigner = EcdsaAddress,
+                RelayAuthoritySignature = EcdsaSignature,
+			>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<R::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
+        R: System<BlockNumber = u32>
+    {
 		for event in events? {
 			self.handle_event(header, event).await?;
 		}
@@ -153,9 +212,24 @@ impl SubscribeService {
 
 	async fn handle_event(
 		&mut self,
-		header: &<DarwiniaRuntime as System>::Header,
-		event: EventInfo<DarwiniaRuntime>,
-	) -> Result<()> {
+		header: &Header<u32, BlakeTwo256>,
+		event: EventInfo<R>,
+	) -> Result<()> 
+        where R: EthereumRelayAuthorities<
+				RelayAuthority = RelayAuthority<
+					<R as System>::AccountId,
+					EcdsaAddress,
+					<R as Balances>::Balance,
+					<R as System>::BlockNumber,
+				>,
+                RelayAuthorityMessage = EcdsaMessage,
+                RelayAuthoritySigner = EcdsaAddress,
+                RelayAuthoritySignature = EcdsaSignature,
+			>,
+		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
+		<R::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
+        R: System<BlockNumber = u32>,
+    {
 		//todo
 		//if module != "System" {
 		//trace!(">> Event - {}::{}", module, variant);
@@ -184,7 +258,7 @@ impl SubscribeService {
 			EventInfo::AuthoritiesChangeSignedEvent(event) => {
 				let current_term = self.darwinia2ethereum.get_current_authority_term().await?;
 				if event.term == current_term {
-					let message = Darwinia2Ethereum::<DarwiniaRuntime>::construct_authorities_message(
+					let message = Darwinia2Ethereum::<R>::construct_authorities_message(
 						self.spec_name.clone(),
 						event.term,
 						event.new_authorities,

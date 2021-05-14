@@ -76,9 +76,7 @@ impl<R: Runtime> Darwinia2Ethereum<R> {
 					<R as Balances>::Balance,
 					<R as System>::BlockNumber,
 				>,
-			> + System<Hash = H256>
-			+ System
-			+ Balances,
+			> + Balances,
 		R::Signature: From<sp_keyring::sr25519::sr25519::Signature>,
 		<R::Signature as Verify>::Signer: From<sp_keyring::sr25519::sr25519::Public>,
 	{
@@ -331,7 +329,7 @@ impl<R: Runtime> Darwinia2Ethereum<R> {
 		message: EcdsaMessage,
 	) -> Result<bool>
 	where
-		R: System<Hash = H256> + EthereumRelayAuthorities<RelayAuthorityMessage = EcdsaMessage>,
+		R: EthereumRelayAuthorities<RelayAuthorityMessage = EcdsaMessage>,
 	{
 		let block_hash = self.darwinia.block_number2hash(block_number).await?;
 		let ret = self.darwinia.subxt.authorities_to_sign(block_hash).await?;
@@ -361,7 +359,7 @@ impl<R: Runtime> Darwinia2Ethereum<R> {
 		exec_block_number: Option<u32>,
 	) -> Result<bool>
 	where
-		R: System<Hash = H256, BlockNumber = u32> + EthereumRelayAuthorities,
+		R: EthereumRelayAuthorities + System<BlockNumber = u32>,
 	{
 		let exec_block_hash = self.darwinia.block_number2hash(exec_block_number).await?;
 		match self

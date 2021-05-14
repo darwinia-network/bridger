@@ -1,20 +1,21 @@
 use crate::error::Result;
 use darwinia::Darwinia;
 use std::time::Duration;
-use substrate_subxt::sp_runtime::generic::Header;
-use substrate_subxt::sp_runtime::traits::BlakeTwo256;
 use tokio::time::delay_for;
-use primitives::runtimes::darwinia::DarwiniaRuntime;
+use substrate_subxt::{
+    Runtime,
+    system::System,
+};
 
 /// DarwiniaTracker
-pub struct DarwiniaBlockTracker {
-	darwinia: Darwinia<DarwiniaRuntime>,
+pub struct DarwiniaBlockTracker<R: Runtime> {
+	darwinia: Darwinia<R>,
 	next_block: u32,
 }
 
-impl DarwiniaBlockTracker {
+impl<R: Runtime> DarwiniaBlockTracker<R> {
 	/// new
-	pub fn new(darwinia: Darwinia<DarwiniaRuntime>, scan_from: u32) -> Self {
+	pub fn new(darwinia: Darwinia<R>, scan_from: u32) -> Self {
 		Self {
 			darwinia,
 			next_block: scan_from,
@@ -22,7 +23,9 @@ impl DarwiniaBlockTracker {
 	}
 
 	/// get next block
-	pub async fn next_block(&mut self) -> Header<u32, BlakeTwo256> {
+	pub async fn next_block(&mut self) -> <R as System>::Header 
+        where R: System<BlockNumber = u32>,
+    {
 		loop {
 			match self.get_next_block().await {
 				Ok(result) => {
@@ -43,7 +46,9 @@ impl DarwiniaBlockTracker {
 		}
 	}
 
-	async fn get_next_block(&mut self) -> Result<Option<Header<u32, BlakeTwo256>>> {
+	async fn get_next_block(&mut self) -> Result<Option<<R as System>::Header>> 
+        where R: System<BlockNumber = u32>,
+    {
 		let finalized_block_hash = self.darwinia.finalized_head().await?;
 		match self
 			.darwinia

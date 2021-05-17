@@ -1,7 +1,6 @@
 use crate::cli::types::{OptChainCommand, OptConfig, OptConfigSubcommand, OptTokenCommand};
 use crate::client::cli_client::CliClient;
 use crate::error;
-use crate::persist::Chain;
 use crate::types::cond::chain::ChainRemoveCond;
 use crate::types::cond::token::{TokenGenerateCond, TokenRemoveCond};
 

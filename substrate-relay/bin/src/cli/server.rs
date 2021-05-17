@@ -1,7 +1,6 @@
 use std::env;
 use std::path::PathBuf;
 
-use crate::cli::types::PrometheusParams;
 use crate::error::Result;
 use crate::persist::{Generic, Persist};
 use crate::server::webserver::*;

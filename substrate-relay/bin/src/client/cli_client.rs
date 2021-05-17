@@ -1,7 +1,6 @@
 use actix_web::client::Client;
 use colored::*;
 use getset::{Getters, Setters};
-use std::collections::HashMap;
 use std::time::Duration;
 use typed_builder::TypedBuilder;
 
@@ -83,7 +82,7 @@ impl CliClient {
 // chain
 impl CliClient {
 	pub async fn chain_list(&self) -> error::Result<()> {
-		let mut client = self.client();
+		let client = self.client();
 		let api = self.api("/api/chain/list");
 		if self.debug {
 			println!("{} {}", "API:".green().bold(), api);
@@ -99,7 +98,7 @@ impl CliClient {
 		Ok(())
 	}
 	pub async fn chain_add(&self, chain: &Chain) -> error::Result<()> {
-		let mut client = self.client();
+		let client = self.client();
 		let api = self.api("/api/chain/add");
 		if self.debug {
 			println!("{} {}", "API:".green().bold(), api);
@@ -115,7 +114,7 @@ impl CliClient {
 		Ok(())
 	}
 	pub async fn chain_update(&self, chain: &Chain) -> error::Result<()> {
-		let mut client = self.client();
+		let client = self.client();
 		let api = self.api("/api/chain/update");
 		if self.debug {
 			println!("{} {}", "API:".green().bold(), api);
@@ -131,7 +130,7 @@ impl CliClient {
 		Ok(())
 	}
 	pub async fn chain_remove(&self, chain_remove: &ChainRemoveCond) -> error::Result<()> {
-		let mut client = self.client();
+		let client = self.client();
 		let api = self.api("/api/chain/remove");
 		if self.debug {
 			println!("{} {}", "API:".green().bold(), api);
@@ -151,7 +150,7 @@ impl CliClient {
 // token
 impl CliClient {
 	pub async fn token_list(&self) -> error::Result<()> {
-		let mut client = self.client();
+		let client = self.client();
 		let api = self.api("/api/token/list");
 		if self.debug {
 			println!("{} {}", "API:".green().bold(), api);
@@ -167,7 +166,7 @@ impl CliClient {
 		Ok(())
 	}
 	pub async fn token_generate(&self, token_generate: &TokenGenerateCond) -> error::Result<()> {
-		let mut client = self.client();
+		let client = self.client();
 		let api = self.api("/api/token/generate");
 		if self.debug {
 			println!("{} {}", "API:".green().bold(), api);
@@ -183,7 +182,7 @@ impl CliClient {
 		Ok(())
 	}
 	pub async fn token_remove(&self, token_remove: &TokenRemoveCond) -> error::Result<()> {
-		let mut client = self.client();
+		let client = self.client();
 		let api = self.api("/api/token/remove");
 		if self.debug {
 			println!("{} {}", "API:".green().bold(), api);
@@ -203,7 +202,7 @@ impl CliClient {
 // relay
 impl CliClient {
 	pub async fn init_bridge(&self, init_bridge: &SourceAndTargetCond) -> error::Result<()> {
-		let mut client = self.client();
+		let client = self.client();
 		let api = self.api("/api/relay/init-bridge");
 		if self.debug {
 			println!("{} {}", "API:".green().bold(), api);
@@ -220,7 +219,7 @@ impl CliClient {
 	}
 
 	pub async fn start(&self, start_cond: &StartRelayCond) -> error::Result<()> {
-		let mut client = self.client();
+		let client = self.client();
 		let api = self.api("/api/relay/start");
 		if self.debug {
 			println!("{} {}", "API:".green().bold(), api);

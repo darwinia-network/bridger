@@ -4,8 +4,6 @@ use structopt::StructOpt;
 
 use std::path::PathBuf;
 
-use crate::client::cli_client::CliClient;
-
 #[derive(Debug, StructOpt)]
 #[structopt(name = "substrate-relay", about = "Substrate relay")]
 pub enum Opt {

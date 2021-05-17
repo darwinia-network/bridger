@@ -31,5 +31,4 @@ pub async fn exec() -> Result<()> {
 			return config::exec(config).await;
 		}
 	}
-	Ok(())
 }

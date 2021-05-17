@@ -3,14 +3,10 @@ use std::sync::Mutex;
 use actix_web::{post, web, HttpResponse};
 
 use crate::error;
-use crate::persist::{Chain, Persist};
+use crate::persist::Persist;
 use crate::types::cond::relay::{SourceAndTargetCond, StartRelayCond};
 use crate::types::patch::resp::Resp;
 use relay_chain::types::transfer::RelayHeadersAndMessagesInfo;
-
-macro_rules! init_bridge {
-	($chain_name:expr, $generic:tt) => {};
-}
 
 #[post("/api/relay/init-bridge")]
 pub async fn init_bridge(

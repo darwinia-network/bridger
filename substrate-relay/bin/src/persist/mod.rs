@@ -3,8 +3,6 @@ use std::path::PathBuf;
 use getset::{Getters, MutGetters, Setters};
 use typed_builder::TypedBuilder;
 
-use crate::error;
-
 mod chain;
 mod persist;
 

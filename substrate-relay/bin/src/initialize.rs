@@ -2,7 +2,7 @@ use crate::error;
 
 pub fn init() -> error::Result<()> {
 	init_log();
-	init_relay_chain();
+	init_relay_chain()?;
 	Ok(())
 }
 

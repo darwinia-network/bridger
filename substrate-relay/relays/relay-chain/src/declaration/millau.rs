@@ -7,8 +7,7 @@ use frame_support::dispatch::GetDispatchInfo;
 use messages_relay::message_lane::MessageLane;
 use millau_runtime::{
 	pangolin_messages::{PangolinToMillauConversionRate, INITIAL_PANGOLIN_TO_MILLAU_CONVERSION_RATE},
-	BridgeMessagesCall as SourceChainRuntimeMessagesCall, WithPangolinGrandpa as WithPangolinGrandpaInstance,
-	WithPangolinMessages as WithPangolinMessagesInstance,
+	BridgeMessagesCall as SourceChainRuntimeMessagesCall, WithPangolinMessages as WithPangolinMessagesInstance,
 };
 use pangolin_runtime::{
 	BridgeGrandpaCall as BridgeGrandpaMillauCall, BridgeMessagesCall as TargetChainRuntimeMessagesCall,

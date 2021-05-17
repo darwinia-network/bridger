@@ -4,18 +4,16 @@ use bp_runtime::ChainId;
 use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use codec::Encode;
 use frame_support::dispatch::GetDispatchInfo;
-use frame_support::sp_runtime::FixedU128;
 use messages_relay::message_lane::MessageLane;
 use millau_runtime::{
-	BridgeGrandpaPangolinCall, MessagesCall as TargetChainRuntimeMessagesCall, WithPangolinGrandpaInstance,
-	WithPangolinMessagesInstance,
+	BridgeGrandpaCall as BridgeGrandpaPangolinCall, BridgeMessagesCall as TargetChainRuntimeMessagesCall,
+	WithPangolinGrandpa as WithPangolinGrandpaInstance, WithPangolinMessages as WithPangolinMessagesInstance,
 };
-use pangolin_runtime::bridge::s2s::{
+use pangolin_runtime::{
 	millau_messages::MillauToPangolinConversionRate, millau_messages::INITIAL_MILLAU_TO_PANGOLIN_CONVERSION_RATE,
-	MessagesCall as SourceChainRuntimeMessagesCall, WithMillauMessagesInstance,
+	BridgeMessagesCall as SourceChainRuntimeMessagesCall, WithMillauMessages as WithMillauMessagesInstance,
 };
-use pangolin_runtime_params::s2s as s2s_params;
-use pangolin_runtime_params::system as pangolin_params_system;
+// use pangolin_runtime_params::system as pangolin_params_system;
 use relay_millau_client::Millau as MillauRelayChain;
 use relay_pangolin_client::PangolinRelayChain;
 use relay_substrate_client::{
@@ -40,21 +38,25 @@ pub struct PangolinChainConst;
 
 impl ChainConst for PangolinChainConst {
 	const OUTBOUND_LANE_MESSAGES_DISPATCH_WEIGHT_METHOD: &'static str =
-		s2s_params::TO_PANGOLIN_MESSAGES_DISPATCH_WEIGHT_METHOD;
+		pangolin_bridge_primitives::TO_PANGOLIN_MESSAGES_DISPATCH_WEIGHT_METHOD;
 	const OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD: &'static str =
-		s2s_params::TO_PANGOLIN_LATEST_GENERATED_NONCE_METHOD;
+		pangolin_bridge_primitives::TO_PANGOLIN_LATEST_GENERATED_NONCE_METHOD;
 	const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-		s2s_params::TO_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
+		pangolin_bridge_primitives::TO_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
 	const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-		s2s_params::FROM_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
+		pangolin_bridge_primitives::FROM_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
 	const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
-		s2s_params::FROM_PANGOLIN_LATEST_CONFIRMED_NONCE_METHOD;
-	const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str = s2s_params::FROM_PANGOLIN_UNREWARDED_RELAYERS_STATE;
-	const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str = s2s_params::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
-	const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str = s2s_params::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
+		pangolin_bridge_primitives::FROM_PANGOLIN_LATEST_CONFIRMED_NONCE_METHOD;
+	const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str =
+		pangolin_bridge_primitives::FROM_PANGOLIN_UNREWARDED_RELAYERS_STATE;
+	const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
+		pangolin_bridge_primitives::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
+	const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str =
+		pangolin_bridge_primitives::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
 	const MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE: MessageNonce =
-		s2s_params::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
-	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce = s2s_params::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+		pangolin_bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
+	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce =
+		pangolin_bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
 	const AVERAGE_BLOCK_INTERVAL: Duration = PangolinRelayChain::AVERAGE_BLOCK_INTERVAL;
 	// todo: the instance id can be create another crate, this way help us simple manage this
 	const BRIDGE_CHAIN_ID: ChainId = bp_runtime::PANGOLIN_CHAIN_ID;
@@ -101,7 +103,7 @@ declare_relay_messages!(
 	millau_runtime,
 	SourceChainRuntimeMessagesCall,
 	TargetChainRuntimeMessagesCall,
-	pangolin_params_system,
+	pangolin_runtime_system_params,
 	bp_millau,
 	WithPangolinMessagesInstance,
 	WithMillauMessagesInstance,

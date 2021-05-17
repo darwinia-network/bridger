@@ -4,17 +4,17 @@ use bp_runtime::ChainId;
 use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use codec::Encode;
 use frame_support::dispatch::GetDispatchInfo;
-use frame_support::sp_runtime::FixedU128;
 use messages_relay::message_lane::MessageLane;
 use millau_runtime::{
 	pangolin_messages::{PangolinToMillauConversionRate, INITIAL_PANGOLIN_TO_MILLAU_CONVERSION_RATE},
-	MessagesCall as SourceChainRuntimeMessagesCall, WithPangolinGrandpaInstance, WithPangolinMessagesInstance,
+	BridgeMessagesCall as SourceChainRuntimeMessagesCall, WithPangolinGrandpa as WithPangolinGrandpaInstance,
+	WithPangolinMessages as WithPangolinMessagesInstance,
 };
-use pangolin_runtime::bridge::s2s::{
-	BridgeGrandpaMillauCall, MessagesCall as TargetChainRuntimeMessagesCall, WithMillauGrandpaInstance,
-	WithMillauMessagesInstance,
+use pangolin_runtime::{
+	BridgeGrandpaCall as BridgeGrandpaMillauCall, BridgeMessagesCall as TargetChainRuntimeMessagesCall,
+	WithMillauGrandpa as WithMillauGrandpaInstance, WithMillauMessages as WithMillauMessagesInstance,
 };
-use pangolin_runtime_params::system as pangolin_params_system;
+// use pangolin_runtime_params::system as pangolin_params_system;
 use relay_millau_client::Millau as MillauRelayChain;
 use relay_pangolin_client::PangolinRelayChain;
 use relay_substrate_client::{
@@ -99,7 +99,7 @@ declare_relay_messages!(
 	SourceChainRuntimeMessagesCall,
 	TargetChainRuntimeMessagesCall,
 	bp_millau,
-	pangolin_params_system,
+	pangolin_runtime_system_params,
 	WithMillauMessagesInstance,
 	WithPangolinMessagesInstance,
 	PangolinToMillauConversionRate,

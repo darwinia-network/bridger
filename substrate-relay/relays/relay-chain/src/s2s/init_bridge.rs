@@ -16,9 +16,9 @@ macro_rules! select_bridge {
 				fn encode_init_bridge(
 					init_data: InitializationData<<Source as ChainBase>::Header>,
 				) -> <Target as RelaySubstrateClientChain>::Call {
-					let initialize_call = millau_runtime::BridgeGrandpaPangolinCall::<
+					let initialize_call = millau_runtime::BridgeGrandpaCall::<
 						millau_runtime::Runtime,
-						millau_runtime::WithPangolinGrandpaInstance,
+						millau_runtime::WithPangolinGrandpa,
 					>::initialize(init_data);
 					millau_runtime::SudoCall::sudo(Box::new(initialize_call.into())).into()
 				}

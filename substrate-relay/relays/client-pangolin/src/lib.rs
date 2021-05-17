@@ -2,28 +2,19 @@ use std::time::Duration;
 
 // -- s2s bridger ---
 use codec::Encode;
-use sp_core::{Pair, storage::StorageKey};
-use sp_runtime::{
-	generic::SignedPayload,
-	traits::IdentifyAccount,
-};
+use sp_core::{storage::StorageKey, Pair};
+use sp_runtime::{generic::SignedPayload, traits::IdentifyAccount};
 
 use relay_substrate_client::{Chain, ChainBase, ChainWithBalances, TransactionSignScheme};
 
-// --- darwinia ---
-use pangolin_runtime::*;
-use frame_support::traits::Len;
-
 /// Pangolin header id.
 pub type HeaderId = relay_utils::HeaderId<drml_primitives::Hash, drml_primitives::BlockNumber>;
-
 
 /// Rialto signing params.
 pub type SigningParams = sp_core::sr25519::Pair;
 
 /// Rialto header type used in headers sync.
 pub type SyncHeader = relay_substrate_client::SyncHeader<drml_primitives::Header>;
-
 
 /// Millau chain definition.
 #[derive(Debug, Clone, Copy)]
@@ -38,7 +29,7 @@ impl ChainBase for PangolinRelayChain {
 
 impl Chain for PangolinRelayChain {
 	const NAME: &'static str = "Pangolin";
-	const AVERAGE_BLOCK_INTERVAL: Duration = Duration::from_secs(5);
+	const AVERAGE_BLOCK_INTERVAL: Duration = Duration::from_secs(6);
 
 	type AccountId = drml_primitives::AccountId;
 	type Index = drml_primitives::Nonce;
@@ -51,12 +42,9 @@ impl ChainWithBalances for PangolinRelayChain {
 
 	fn account_info_storage_key(account_id: &Self::AccountId) -> StorageKey {
 		use frame_support::storage::generator::StorageMap;
-		StorageKey(frame_system::Account::<pangolin_runtime::Runtime>::storage_map_final_key(
-			account_id,
-		))
+		StorageKey(frame_system::Account::<pangolin_runtime::Runtime>::storage_map_final_key(account_id))
 	}
 }
-
 
 impl TransactionSignScheme for PangolinRelayChain {
 	type Chain = PangolinRelayChain;
@@ -104,5 +92,3 @@ impl TransactionSignScheme for PangolinRelayChain {
 		)
 	}
 }
-
-

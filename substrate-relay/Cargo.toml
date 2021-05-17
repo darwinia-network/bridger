@@ -1,7 +1,5 @@
 [workspace]
 members = [
     "bin",
-    "relays/client-millau",
-    "relays/client-pangolin",
-    "relays/relay-chain",
+    "relays/*",
 ]

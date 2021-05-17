@@ -47,7 +47,7 @@ relay-pangolin-client = { path = "../client-pangolin", optional = true }
 
 
 ## millau
-millau-runtime = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s", optional = true }
+millau-runtime = { git = "https://github.com/darwinia-network/darwinia-launch", branch = "main", optional = true }
 bp-millau = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s", optional = true }
 relay-millau-client = { path = "../client-millau", optional = true }
 

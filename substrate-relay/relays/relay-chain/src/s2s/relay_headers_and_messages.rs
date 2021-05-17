@@ -22,7 +22,7 @@ macro_rules! select_bridge {
 
 				// todo: The BlockNumber can be define in ChainConst
 				const MAX_MISSING_LEFT_HEADERS_AT_RIGHT: drml_primitives::BlockNumber =
-					pangolin_runtime_params::s2s::SESSION_LENGTH;
+					pangolin_constants::BLOCKS_PER_SESSION;
 				const MAX_MISSING_RIGHT_HEADERS_AT_LEFT: bp_millau::BlockNumber = bp_millau::SESSION_LENGTH;
 
 				use crate::MillauMessagesToPangolinRunner as right_to_left_messages_runner;

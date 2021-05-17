@@ -48,7 +48,7 @@ toml = "0.5"
 
 ## relay chain
 [dependencies.relay-chain]
-path = "../relay-chain"
+path = "../relays/relay-chain"
 features = [
     "millau",
     "pangolin"

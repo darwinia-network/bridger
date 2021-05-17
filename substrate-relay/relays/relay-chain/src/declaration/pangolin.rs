@@ -15,7 +15,7 @@ use pangolin_runtime::{
 };
 // use pangolin_runtime_params::system as pangolin_params_system;
 use relay_millau_client::Millau as MillauRelayChain;
-use relay_pangolin_client::PangolinRelayChain;
+use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{
 	metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
 	Chain as RelaySubstrateClientChain, TransactionSignScheme,
@@ -57,9 +57,9 @@ impl ChainConst for PangolinChainConst {
 		pangolin_bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
 	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce =
 		pangolin_bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
-	const AVERAGE_BLOCK_INTERVAL: Duration = PangolinRelayChain::AVERAGE_BLOCK_INTERVAL;
+	const AVERAGE_BLOCK_INTERVAL: Duration = PangolinChain::AVERAGE_BLOCK_INTERVAL;
 	// todo: the instance id can be create another crate, this way help us simple manage this
-	const BRIDGE_CHAIN_ID: ChainId = bp_runtime::PANGOLIN_CHAIN_ID;
+	const BRIDGE_CHAIN_ID: ChainId = pangolin_bridge_primitives::PANGOLIN_CHAIN_ID;
 }
 
 declare_cli_chain!(PangolinRelayChain, pangolin_runtime);

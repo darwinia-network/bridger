@@ -16,7 +16,7 @@ use pangolin_runtime::{
 };
 // use pangolin_runtime_params::system as pangolin_params_system;
 use relay_millau_client::Millau as MillauRelayChain;
-use relay_pangolin_client::PangolinRelayChain;
+use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{
 	metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
 	Chain as RelaySubstrateClientChain, TransactionSignScheme,

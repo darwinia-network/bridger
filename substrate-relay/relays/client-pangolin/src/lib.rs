@@ -18,16 +18,16 @@ pub type SyncHeader = relay_substrate_client::SyncHeader<drml_primitives::Header
 
 /// Millau chain definition.
 #[derive(Debug, Clone, Copy)]
-pub struct PangolinRelayChain;
+pub struct PangolinChain;
 
-impl ChainBase for PangolinRelayChain {
+impl ChainBase for PangolinChain {
 	type BlockNumber = drml_primitives::BlockNumber;
 	type Hash = drml_primitives::Hash;
 	type Hasher = drml_primitives::Hashing;
 	type Header = drml_primitives::Header;
 }
 
-impl Chain for PangolinRelayChain {
+impl Chain for PangolinChain {
 	const NAME: &'static str = "Pangolin";
 	const AVERAGE_BLOCK_INTERVAL: Duration = Duration::from_secs(6);
 
@@ -37,7 +37,7 @@ impl Chain for PangolinRelayChain {
 	type Call = pangolin_runtime::Call;
 }
 
-impl ChainWithBalances for PangolinRelayChain {
+impl ChainWithBalances for PangolinChain {
 	type NativeBalance = drml_primitives::Balance;
 
 	fn account_info_storage_key(account_id: &Self::AccountId) -> StorageKey {
@@ -46,8 +46,8 @@ impl ChainWithBalances for PangolinRelayChain {
 	}
 }
 
-impl TransactionSignScheme for PangolinRelayChain {
-	type Chain = PangolinRelayChain;
+impl TransactionSignScheme for PangolinChain {
+	type Chain = PangolinChain;
 	type AccountKeyPair = sp_core::sr25519::Pair;
 	type SignedTransaction = pangolin_runtime::UncheckedExtrinsic;
 

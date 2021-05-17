@@ -14,7 +14,7 @@ use pangolin_runtime::{
 	BridgeMessagesCall as SourceChainRuntimeMessagesCall, WithMillauMessages as WithMillauMessagesInstance,
 };
 // use pangolin_runtime_params::system as pangolin_params_system;
-use relay_millau_client::Millau as MillauRelayChain;
+use relay_millau_client::Millau as MillauChain;
 use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{
 	metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
@@ -62,14 +62,14 @@ impl ChainConst for PangolinChainConst {
 	const BRIDGE_CHAIN_ID: ChainId = pangolin_bridge_primitives::PANGOLIN_CHAIN_ID;
 }
 
-declare_cli_chain!(PangolinRelayChain, pangolin_runtime);
+declare_cli_chain!(PangolinChain, pangolin_runtime);
 
 declare_relay_chain!(Pangolin, {
 	const CHAIN_NAME: &'static str = "pangolin";
 	const RUNTIME_VERSION: RuntimeVersion = pangolin_runtime::VERSION;
 	type Runtime = pangolin_runtime::Runtime;
 	type HeaderId = relay_pangolin_client::HeaderId;
-	type Chain = relay_pangolin_client::PangolinRelayChain;
+	type Chain = relay_pangolin_client::PangolinChain;
 	type SigningParams = relay_pangolin_client::SigningParams;
 	type SyncHeader = relay_pangolin_client::SyncHeader;
 });
@@ -77,8 +77,8 @@ declare_relay_chain!(Pangolin, {
 declare_relay_headers!(
 	Pangolin,
 	Millau,
-	PangolinRelayChain,
-	MillauRelayChain,
+	PangolinChain,
+	MillauChain,
 	relay_pangolin_client,
 	PangolinChainConst,
 	drml_primitives,
@@ -91,8 +91,8 @@ declare_relay_headers!(
 declare_relay_messages!(
 	Pangolin,
 	Millau,
-	PangolinRelayChain,
-	MillauRelayChain,
+	PangolinChain,
+	MillauChain,
 	relay_pangolin_client,
 	relay_millau_client,
 	PangolinChainConst,

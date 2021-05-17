@@ -15,7 +15,7 @@ use pangolin_runtime::{
 	WithMillauGrandpa as WithMillauGrandpaInstance, WithMillauMessages as WithMillauMessagesInstance,
 };
 // use pangolin_runtime_params::system as pangolin_params_system;
-use relay_millau_client::Millau as MillauRelayChain;
+use relay_millau_client::Millau as MillauChain;
 use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{
 	metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
@@ -52,12 +52,12 @@ impl ChainConst for MillauChainConst {
 	const MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE: MessageNonce =
 		bp_millau::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
 	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce = bp_millau::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
-	const AVERAGE_BLOCK_INTERVAL: Duration = MillauRelayChain::AVERAGE_BLOCK_INTERVAL;
+	const AVERAGE_BLOCK_INTERVAL: Duration = MillauChain::AVERAGE_BLOCK_INTERVAL;
 	// todo: the instance id can be create another crate, this way help us simple manage this
 	const BRIDGE_CHAIN_ID: ChainId = bp_runtime::MILLAU_CHAIN_ID;
 }
 
-declare_cli_chain!(MillauRelayChain, millau_runtime);
+declare_cli_chain!(MillauChain, millau_runtime);
 
 declare_relay_chain!(Millau, {
 	const CHAIN_NAME: &'static str = "millau";
@@ -72,8 +72,8 @@ declare_relay_chain!(Millau, {
 declare_relay_headers!(
 	Millau,
 	Pangolin,
-	MillauRelayChain,
-	PangolinRelayChain,
+	MillauChain,
+	PangolinChain,
 	relay_millau_client,
 	MillauChainConst,
 	bp_millau,
@@ -86,8 +86,8 @@ declare_relay_headers!(
 declare_relay_messages!(
 	Millau,
 	Pangolin,
-	MillauRelayChain,
-	PangolinRelayChain,
+	MillauChain,
+	PangolinChain,
 	relay_millau_client,
 	relay_pangolin_client,
 	MillauChainConst,

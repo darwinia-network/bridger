@@ -42,7 +42,9 @@ pangolin-runtime = { git = "https://github.com/darwinia-network/darwinia-common"
 drml-primitives = { git = "https://github.com/darwinia-network/darwinia-common", branch = "s2s", optional = true  }
 pangolin-constants = { git = "https://github.com/darwinia-network/darwinia-common", branch = "s2s", optional = true  }
 pangolin-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia-common", branch = "s2s", optional = true  }
+pangolin-runtime-system-params = { git = "https://github.com/darwinia-network/darwinia-common", branch = "s2s", optional = true }
 relay-pangolin-client = { path = "../client-pangolin", optional = true }
+
 
 ## millau
 millau-runtime = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s", optional = true }
@@ -90,4 +92,5 @@ pangolin = [
     "drml-primitives",
     "pangolin-constants",
     "pangolin-bridge-primitives",
+    "pangolin-runtime-system-params",
 ]

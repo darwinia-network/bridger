@@ -5,7 +5,7 @@ members = [
 #  "provider/*"
 ]
 exclude = [
-  "provider/substrate-relay"
+  "substrate-relay"
 ]
 
 [package]

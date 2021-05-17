@@ -3,4 +3,4 @@
 .idea
 darwinia/target
 primitives/target
-provider/substrate-relay/target
+substrate-relay/target

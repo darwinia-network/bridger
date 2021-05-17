@@ -28,6 +28,8 @@ pub enum CliError {
 	NotSupportChain(String),
 	#[error("Not support bridge {0} -> {1}")]
 	NotSupportBridge(String, String),
+	#[error("The lane id is error")]
+	LaneIdError,
 }
 
 #[derive(Debug, DeviceMoreDisplay, DeriveMoreError)]

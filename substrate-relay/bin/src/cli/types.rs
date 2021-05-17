@@ -158,7 +158,7 @@ pub enum OptRelay {
 		bridge_info: OptBridgeInfo,
 		/// Hex-encoded lane id that should be served by the relay. Defaults to `00000000`.
 		#[structopt(long, default_value = "00000000")]
-		lane: Vec<HexLaneId>,
+		lane: Vec<String>,
 		#[structopt(flatten)]
 		prometheus_params: PrometheusParams,
 	},

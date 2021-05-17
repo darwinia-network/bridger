@@ -14,7 +14,7 @@ pub struct SourceAndTargetCond {
 pub struct StartRelayCond {
 	source: String,
 	target: String,
-	lanes: Vec<HexLaneId>,
+	lanes: String, // fixme: there need support multiple lanes need use Vec<String>
 	no_prometheus: bool,
 	prometheus_host: String,
 	prometheus_port: u16,

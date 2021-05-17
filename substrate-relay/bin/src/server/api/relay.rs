@@ -1,12 +1,13 @@
 use std::sync::Mutex;
 
 use actix_web::{post, web, HttpResponse};
+use relay_chain::types::transfer::{HexLaneId, RelayHeadersAndMessagesInfo};
+use std::str::FromStr;
 
 use crate::error;
 use crate::persist::Persist;
 use crate::types::cond::relay::{SourceAndTargetCond, StartRelayCond};
 use crate::types::patch::resp::Resp;
-use relay_chain::types::transfer::RelayHeadersAndMessagesInfo;
 
 #[post("/api/relay/init-bridge")]
 pub async fn init_bridge(
@@ -48,7 +49,29 @@ pub async fn start(
 	let mut relay_info = RelayHeadersAndMessagesInfo::default();
 	relay_info.set_source(source_chain.to_chain_info());
 	relay_info.set_target(target_chain.to_chain_info());
-	relay_info.set_lanes(cond.lanes().clone());
+
+	// fixme: there need support multiple lanes need use Vec<String>
+	// let lanes_string: Vec<String> = cond.lanes().clone();
+	// let lanes_result = lanes_string
+	// 	.iter()
+	// 	.map(|item| HexLaneId::from_str(&item[..]))
+	// 	.collect::<Vec<Result<HexLaneId, _>>>();
+	// let mut lanes = Vec::with_capacity(lanes_result.len());
+	// for item in lanes_result {
+	// 	let lane = match item {
+	// 		Ok(v) => Ok(v),
+	// 		Err(_) => Err(crate::error::CliError::LaneIdError),
+	// 	}?;
+	// 	lanes.push(lane);
+	// }
+
+	let lane = match HexLaneId::from_str(&cond.lanes()[..]) {
+		Ok(v) => Ok(v),
+		Err(_) => Err(crate::error::CliError::LaneIdError),
+	}?;
+	let lanes = vec![lane];
+
+	relay_info.set_lanes(lanes);
 
 	let prometheus_info = cond.prometheus_info();
 	relay_info.set_prometheus_params(prometheus_info);

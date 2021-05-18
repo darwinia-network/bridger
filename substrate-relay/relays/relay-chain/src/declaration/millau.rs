@@ -56,7 +56,11 @@ impl ChainConst for MillauChainConst {
 	type SigningParams = relay_millau_client::SigningParams;
 }
 
-declare_cli_chain!(MillauChain, millau_runtime);
+impl CliChain for MillauChain {
+	const RUNTIME_VERSION: RuntimeVersion = millau_runtime::VERSION;
+
+	type KeyPair = sp_core::sr25519::Pair;
+}
 
 declare_relay_headers!(
 	Millau,

@@ -62,7 +62,11 @@ impl ChainConst for PangolinChainConst {
 	type SigningParams = drml_primitives::SigningParams;
 }
 
-declare_cli_chain!(PangolinChain, pangolin_runtime);
+impl CliChain for PangolinChain {
+	const RUNTIME_VERSION: RuntimeVersion = pangolin_runtime::VERSION;
+
+	type KeyPair = sp_core::sr25519::Pair;
+}
 
 declare_relay_headers!(
 	Pangolin,

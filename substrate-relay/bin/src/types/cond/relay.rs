@@ -1,5 +1,5 @@
+use chain_relay::types::transfer::{HexLaneId, PrometheusParamsInfo};
 use getset::{Getters, Setters};
-use relay_chain::types::transfer::{HexLaneId, PrometheusParamsInfo};
 use typed_builder::TypedBuilder;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, TypedBuilder, Getters, Setters)]

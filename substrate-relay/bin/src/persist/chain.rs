@@ -1,5 +1,6 @@
+use chain_relay::types::transfer::ChainInfo;
+
 use crate::persist;
-use relay_chain::types::transfer::ChainInfo;
 
 impl persist::Chain {
 	pub fn to_chain_info(&self) -> ChainInfo {

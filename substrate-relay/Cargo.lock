@@ -1062,6 +1062,54 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "chain-relay"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "async-trait",
+ "bp-header-chain",
+ "bp-message-dispatch",
+ "bp-messages",
+ "bp-millau",
+ "bp-runtime",
+ "bridge-runtime-common",
+ "drml-primitives",
+ "finality-grandpa",
+ "finality-relay",
+ "frame-support",
+ "futures 0.3.15",
+ "getset",
+ "headers-relay",
+ "hex",
+ "hex-literal",
+ "log",
+ "messages-relay",
+ "millau-runtime",
+ "num-format",
+ "num-traits",
+ "pallet-bridge-messages",
+ "pangolin-bridge-primitives",
+ "pangolin-bridge-relay-client-definition",
+ "pangolin-constants",
+ "pangolin-runtime",
+ "pangolin-runtime-system-params",
+ "parity-scale-codec",
+ "paste",
+ "relay-millau-client",
+ "relay-substrate-client",
+ "relay-utils",
+ "serde",
+ "serde_derive",
+ "sp-core",
+ "sp-finality-grandpa",
+ "sp-keyring",
+ "sp-runtime",
+ "sp-trie",
+ "sp-version",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5160,54 +5208,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 
 [[package]]
-name = "relay-chain"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "async-std",
- "async-trait",
- "bp-header-chain",
- "bp-message-dispatch",
- "bp-messages",
- "bp-millau",
- "bp-runtime",
- "bridge-runtime-common",
- "drml-primitives",
- "finality-grandpa",
- "finality-relay",
- "frame-support",
- "futures 0.3.15",
- "getset",
- "headers-relay",
- "hex",
- "hex-literal",
- "log",
- "messages-relay",
- "millau-runtime",
- "num-format",
- "num-traits",
- "pallet-bridge-messages",
- "pangolin-bridge-primitives",
- "pangolin-bridge-relay-client-definition",
- "pangolin-constants",
- "pangolin-runtime",
- "pangolin-runtime-system-params",
- "parity-scale-codec",
- "paste",
- "relay-millau-client",
- "relay-substrate-client",
- "relay-utils",
- "serde",
- "serde_derive",
- "sp-core",
- "sp-finality-grandpa",
- "sp-keyring",
- "sp-runtime",
- "sp-trie",
- "sp-version",
-]
-
-[[package]]
 name = "relay-millau-client"
 version = "0.1.0"
 dependencies = [
@@ -6587,6 +6587,7 @@ dependencies = [
  "anyhow",
  "async-fs",
  "async-trait",
+ "chain-relay",
  "colored",
  "derive_more",
  "env_logger 0.8.3",
@@ -6596,7 +6597,6 @@ dependencies = [
  "once_cell",
  "paste",
  "rand 0.8.3",
- "relay-chain",
  "serde",
  "serde_derive",
  "serde_json",

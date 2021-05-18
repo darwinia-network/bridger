@@ -1,5 +1,5 @@
+use chain_relay::types::transfer::HexLaneId;
 use getset::Getters;
-use relay_chain::types::transfer::HexLaneId;
 use structopt::StructOpt;
 
 use std::path::PathBuf;

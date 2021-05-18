@@ -1,11 +1,11 @@
-use std::sync::Mutex;
-
 use actix_web::{get, post, web, HttpResponse};
+use chain_relay::types::transfer::{HexLaneId, RelayHeadersAndMessagesInfo};
 use once_cell::sync::Lazy;
-use relay_chain::types::transfer::{HexLaneId, RelayHeadersAndMessagesInfo};
+
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::mpsc::{self, Sender, TryRecvError};
+use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
 
@@ -39,7 +39,7 @@ pub async fn init_bridge(
 		.find_chain(target_name)
 		.ok_or(error::CliError::ChainNotFound(target_name.to_string()))?;
 
-	relay_chain::s2s::init_bridge::run(source_chain.to_chain_info(), target_chain.to_chain_info()).await?;
+	chain_relay::s2s::init_bridge::run(source_chain.to_chain_info(), target_chain.to_chain_info()).await?;
 	Ok(HttpResponse::Ok().json(Resp::ok_with_data("")))
 }
 
@@ -102,7 +102,7 @@ pub async fn start(
 		// fixme: because futures::executor::block_on will block thread, so mpsc::channel not work in here, can not receive data to park this thread
 		// thread::park();
 		futures::executor::block_on(async {
-			relay_chain::s2s::relay_headers_and_messages::run(relay_info.clone())
+			chain_relay::s2s::relay_headers_and_messages::run(relay_info.clone())
 				.await
 				.unwrap();
 		});

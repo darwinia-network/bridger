@@ -48,9 +48,9 @@ macro_rules! declare_relay_messages {
 			/// Source-to-Target message lane.
 			pub type [<$source_name MessagesTo $target_name>] = SubstrateMessageLaneToSubstrate<
 				$source_relay_chain,
-				$source_relay_client::SigningParams,
+				<$source_const as ChainConst>::SigningParams,
 				$target_relay_chain,
-				$target_relay_client::SigningParams,
+				<$target_const as ChainConst>::SigningParams,
 			>;
 
 			impl SubstrateMessageLane for [<$source_name MessagesTo $target_name>] {
@@ -193,9 +193,9 @@ macro_rules! declare_relay_messages {
 				pub async fn run(
 					params: MessagesRelayParams<
 						$source_relay_chain,
-						$source_relay_client::SigningParams,
+						<$source_const as ChainConst>::SigningParams,
 						$target_relay_chain,
-						$target_relay_client::SigningParams,
+						<$target_const as ChainConst>::SigningParams,
 					>,
 				) -> Result<(), String> {
 					let _source_name = String::from(stringify!($source_name));

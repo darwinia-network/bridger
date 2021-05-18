@@ -10,9 +10,6 @@ use relay_substrate_client::{Chain, ChainBase, ChainWithBalances, TransactionSig
 /// Pangolin header id.
 pub type HeaderId = relay_utils::HeaderId<drml_primitives::Hash, drml_primitives::BlockNumber>;
 
-/// Rialto signing params.
-pub type SigningParams = sp_core::sr25519::Pair;
-
 /// Rialto header type used in headers sync.
 pub type SyncHeader = relay_substrate_client::SyncHeader<drml_primitives::Header>;
 

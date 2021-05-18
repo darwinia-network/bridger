@@ -4392,6 +4392,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangolin-bridge-relay-client-definition"
+version = "2.2.0"
+dependencies = [
+ "darwinia-ethereum-relay",
+ "drml-primitives",
+ "frame-support",
+ "frame-system",
+ "headers-relay",
+ "pallet-transaction-payment",
+ "pangolin-runtime",
+ "parity-scale-codec",
+ "relay-substrate-client",
+ "relay-utils",
+ "sp-core",
+ "sp-keyring",
+ "sp-runtime",
+]
+
+[[package]]
 name = "pangolin-constants"
 version = "2.3.0"
 source = "git+https://github.com/darwinia-network/darwinia-common?branch=s2s#924d151433d87a283573382426788501d49e20c8"
@@ -5169,13 +5188,13 @@ dependencies = [
  "num-traits",
  "pallet-bridge-messages",
  "pangolin-bridge-primitives",
+ "pangolin-bridge-relay-client-definition",
  "pangolin-constants",
  "pangolin-runtime",
  "pangolin-runtime-system-params",
  "parity-scale-codec",
  "paste",
  "relay-millau-client",
- "relay-pangolin-client",
  "relay-substrate-client",
  "relay-utils",
  "serde",
@@ -5197,25 +5216,6 @@ dependencies = [
  "headers-relay",
  "millau-runtime",
  "pallet-transaction-payment",
- "parity-scale-codec",
- "relay-substrate-client",
- "relay-utils",
- "sp-core",
- "sp-keyring",
- "sp-runtime",
-]
-
-[[package]]
-name = "relay-pangolin-client"
-version = "2.2.0"
-dependencies = [
- "darwinia-ethereum-relay",
- "drml-primitives",
- "frame-support",
- "frame-system",
- "headers-relay",
- "pallet-transaction-payment",
- "pangolin-runtime",
  "parity-scale-codec",
  "relay-substrate-client",
  "relay-utils",

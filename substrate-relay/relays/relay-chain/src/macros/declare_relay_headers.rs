@@ -29,7 +29,7 @@ macro_rules! declare_relay_headers {
 			pub(crate) type [<$source_name FinalityTo $target_name>] = SubstrateFinalityToSubstrate<
 				$source_relay_chain,
 				$target_relay_chain,
-				$source_relay_client::SigningParams,
+				<$source_const as ChainConst>::SigningParams,
 			>;
 
 			impl SubstrateFinalitySyncPipeline for [<$source_name FinalityTo $target_name>] {

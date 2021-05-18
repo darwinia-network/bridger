@@ -9,13 +9,12 @@ use millau_runtime::{
 	pangolin_messages::{PangolinToMillauConversionRate, INITIAL_PANGOLIN_TO_MILLAU_CONVERSION_RATE},
 	BridgeMessagesCall as SourceChainRuntimeMessagesCall, WithPangolinMessages as WithPangolinMessagesInstance,
 };
+use pangolin_bridge_relay_client_definition::PangolinChain;
 use pangolin_runtime::{
 	BridgeGrandpaCall as BridgeGrandpaMillauCall, BridgeMessagesCall as TargetChainRuntimeMessagesCall,
 	WithMillauGrandpa as WithMillauGrandpaInstance, WithMillauMessages as WithMillauMessagesInstance,
 };
-// use pangolin_runtime_params::system as pangolin_params_system;
 use relay_millau_client::Millau as MillauChain;
-use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{
 	metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
 	Chain as RelaySubstrateClientChain, TransactionSignScheme,
@@ -54,6 +53,7 @@ impl ChainConst for MillauChainConst {
 	const AVERAGE_BLOCK_INTERVAL: Duration = MillauChain::AVERAGE_BLOCK_INTERVAL;
 	// todo: the instance id can be create another crate, this way help us simple manage this
 	const BRIDGE_CHAIN_ID: ChainId = bp_runtime::MILLAU_CHAIN_ID;
+	type SigningParams = relay_millau_client::SigningParams;
 }
 
 declare_cli_chain!(MillauChain, millau_runtime);
@@ -64,7 +64,7 @@ declare_relay_chain!(Millau, {
 	type Runtime = millau_runtime::Runtime;
 	type HeaderId = relay_millau_client::HeaderId;
 	type Chain = relay_millau_client::Millau;
-	type SigningParams = relay_millau_client::SigningParams;
+	type SigningParams = <MillauChainConst as ChainConst>::SigningParams;
 	type SyncHeader = relay_millau_client::SyncHeader;
 });
 
@@ -88,7 +88,7 @@ declare_relay_messages!(
 	MillauChain,
 	PangolinChain,
 	relay_millau_client,
-	relay_pangolin_client,
+	pangolin_bridge_relay_client_definition,
 	MillauChainConst,
 	PangolinChainConst,
 	bp_millau,

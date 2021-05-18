@@ -51,6 +51,9 @@ pub trait ChainConst {
 	const AVERAGE_BLOCK_INTERVAL: Duration;
 	/// Bridge chain id
 	const BRIDGE_CHAIN_ID: ChainId;
+
+	/// chain signing params
+	type SigningParams;
 }
 
 /// Bridge-supported network definition.

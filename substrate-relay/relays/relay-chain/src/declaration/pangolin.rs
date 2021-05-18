@@ -9,13 +9,12 @@ use millau_runtime::{
 	BridgeGrandpaCall as BridgeGrandpaPangolinCall, BridgeMessagesCall as TargetChainRuntimeMessagesCall,
 	WithPangolinGrandpa as WithPangolinGrandpaInstance, WithPangolinMessages as WithPangolinMessagesInstance,
 };
+use pangolin_bridge_relay_client_definition::PangolinChain;
 use pangolin_runtime::{
 	millau_messages::MillauToPangolinConversionRate, millau_messages::INITIAL_MILLAU_TO_PANGOLIN_CONVERSION_RATE,
 	BridgeMessagesCall as SourceChainRuntimeMessagesCall, WithMillauMessages as WithMillauMessagesInstance,
 };
-// use pangolin_runtime_params::system as pangolin_params_system;
 use relay_millau_client::Millau as MillauChain;
-use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{
 	metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
 	Chain as RelaySubstrateClientChain, TransactionSignScheme,
@@ -60,6 +59,7 @@ impl ChainConst for PangolinChainConst {
 	const AVERAGE_BLOCK_INTERVAL: Duration = PangolinChain::AVERAGE_BLOCK_INTERVAL;
 	// todo: the instance id can be create another crate, this way help us simple manage this
 	const BRIDGE_CHAIN_ID: ChainId = pangolin_bridge_primitives::PANGOLIN_CHAIN_ID;
+	type SigningParams = drml_primitives::SigningParams;
 }
 
 declare_cli_chain!(PangolinChain, pangolin_runtime);
@@ -68,10 +68,10 @@ declare_relay_chain!(Pangolin, {
 	const CHAIN_NAME: &'static str = "pangolin";
 	const RUNTIME_VERSION: RuntimeVersion = pangolin_runtime::VERSION;
 	type Runtime = pangolin_runtime::Runtime;
-	type HeaderId = relay_pangolin_client::HeaderId;
-	type Chain = relay_pangolin_client::PangolinChain;
-	type SigningParams = relay_pangolin_client::SigningParams;
-	type SyncHeader = relay_pangolin_client::SyncHeader;
+	type HeaderId = pangolin_bridge_relay_client_definition::HeaderId;
+	type Chain = pangolin_bridge_relay_client_definition::PangolinChain;
+	type SigningParams = <PangolinChainConst as ChainConst>::SigningParams;
+	type SyncHeader = pangolin_bridge_relay_client_definition::SyncHeader;
 });
 
 declare_relay_headers!(
@@ -79,7 +79,7 @@ declare_relay_headers!(
 	Millau,
 	PangolinChain,
 	MillauChain,
-	relay_pangolin_client,
+	pangolin_bridge_relay_client_definition,
 	PangolinChainConst,
 	drml_primitives,
 	bp_millau,
@@ -93,7 +93,7 @@ declare_relay_messages!(
 	Millau,
 	PangolinChain,
 	MillauChain,
-	relay_pangolin_client,
+	pangolin_bridge_relay_client_definition,
 	relay_millau_client,
 	PangolinChainConst,
 	MillauChainConst,

@@ -1,10 +1,10 @@
 [package]
 authors     = ["Darwinia Network <hello@darwinia.network>"]
-description = "DRML node runtime primitives"
+description = "Pangolin runtime definition for bridge relay client"
 edition     = "2018"
 homepage    = "https://darwinia.network/"
 license     = "GPL-3.0"
-name        = "relay-pangolin-client"
+name        = "pangolin-bridge-relay-client-definition"
 readme      = "README.md"
 repository  = "https://github.com/darwinia-network/darwinia-common/"
 version     = "2.2.0"

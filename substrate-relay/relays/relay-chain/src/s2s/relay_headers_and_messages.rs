@@ -4,15 +4,14 @@ use relay_utils::metrics::MetricsParams;
 use crate::{
 	types::s2s::{messages_lane::MessagesRelayParams, on_demand_headers::OnDemandHeadersRelay},
 	types::transfer::RelayHeadersAndMessagesInfo,
-	RelayChain, RelayChainMillau, RelayChainPangolin,
 };
 
 macro_rules! select_bridge {
 	($bridge: expr, $generic: tt) => {
 		match $bridge {
 			("pangolin", "millau") => {
-				type Left = <RelayChainPangolin as RelayChain>::Chain;
-				type Right = <RelayChainMillau as RelayChain>::Chain;
+				type Left = pangolin_bridge_relay_client_definition::PangolinChain;
+				type Right = relay_millau_client::Millau;
 
 				type LeftToRightFinality = crate::PangolinFinalityToMillau;
 				type RightToLeftFinality = crate::MillauFinalityToPangolin;

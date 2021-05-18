@@ -4,14 +4,14 @@ use codec::Encode;
 use relay_substrate_client::{Chain as RelaySubstrateClientChain, TransactionSignScheme};
 use sp_core::{Bytes, Pair};
 
-use crate::{types::transfer::ChainInfo, RelayChain, RelayChainMillau, RelayChainPangolin};
+use crate::types::transfer::ChainInfo;
 
 macro_rules! select_bridge {
 	($bridge: expr, $generic: tt) => {
 		match $bridge {
 			("pangolin", "millau") => {
-				type Source = <RelayChainPangolin as RelayChain>::Chain;
-				type Target = <RelayChainMillau as RelayChain>::Chain;
+				type Source = pangolin_bridge_relay_client_definition::PangolinChain;
+				type Target = relay_millau_client::Millau;
 
 				fn encode_init_bridge(
 					init_data: InitializationData<<Source as ChainBase>::Header>,

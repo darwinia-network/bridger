@@ -64,16 +64,6 @@ impl ChainConst for PangolinChainConst {
 
 declare_cli_chain!(PangolinChain, pangolin_runtime);
 
-declare_relay_chain!(Pangolin, {
-	const CHAIN_NAME: &'static str = "pangolin";
-	const RUNTIME_VERSION: RuntimeVersion = pangolin_runtime::VERSION;
-	type Runtime = pangolin_runtime::Runtime;
-	type HeaderId = pangolin_bridge_relay_client_definition::HeaderId;
-	type Chain = pangolin_bridge_relay_client_definition::PangolinChain;
-	type SigningParams = <PangolinChainConst as ChainConst>::SigningParams;
-	type SyncHeader = pangolin_bridge_relay_client_definition::SyncHeader;
-});
-
 declare_relay_headers!(
 	Pangolin,
 	Millau,

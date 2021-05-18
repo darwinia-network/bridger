@@ -58,16 +58,6 @@ impl ChainConst for MillauChainConst {
 
 declare_cli_chain!(MillauChain, millau_runtime);
 
-declare_relay_chain!(Millau, {
-	const CHAIN_NAME: &'static str = "millau";
-	const RUNTIME_VERSION: RuntimeVersion = millau_runtime::VERSION;
-	type Runtime = millau_runtime::Runtime;
-	type HeaderId = relay_millau_client::HeaderId;
-	type Chain = relay_millau_client::Millau;
-	type SigningParams = <MillauChainConst as ChainConst>::SigningParams;
-	type SyncHeader = relay_millau_client::SyncHeader;
-});
-
 declare_relay_headers!(
 	Millau,
 	Pangolin,

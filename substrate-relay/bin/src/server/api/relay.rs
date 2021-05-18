@@ -1,13 +1,27 @@
 use std::sync::Mutex;
 
-use actix_web::{post, web, HttpResponse};
+use actix_web::{get, post, web, HttpResponse};
+use once_cell::sync::Lazy;
 use relay_chain::types::transfer::{HexLaneId, RelayHeadersAndMessagesInfo};
+use std::collections::HashMap;
 use std::str::FromStr;
+use std::sync::mpsc::{self, Sender, TryRecvError};
+use std::thread;
+use std::thread::JoinHandle;
 
 use crate::error;
 use crate::persist::Persist;
-use crate::types::cond::relay::{SourceAndTargetCond, StartRelayCond};
+use crate::types::cond::relay::{SourceAndTargetCond, StartRelayCond, StatusRelayCond, StopRelayCond};
 use crate::types::patch::resp::Resp;
+
+static THREAD_CACHE: Lazy<Mutex<HashMap<String, JoinHandle<()>>>> = Lazy::new(|| {
+	let mut m = HashMap::new();
+	Mutex::new(m)
+});
+
+fn bridge_name(source: &String, target: &String) -> String {
+	format!("{}_{}", source, target)
+}
 
 #[post("/api/relay/init-bridge")]
 pub async fn init_bridge(
@@ -76,6 +90,60 @@ pub async fn start(
 	let prometheus_info = cond.prometheus_info();
 	relay_info.set_prometheus_params(prometheus_info);
 
-	relay_chain::s2s::relay_headers_and_messages::run(relay_info).await?;
+	let bridge_name = bridge_name(source_name, target_name);
+
+	let mut tc = THREAD_CACHE.lock().unwrap();
+
+	if tc.contains_key(&bridge_name) {
+		return Err(crate::error::WebError::new("This bridge is already started"));
+	}
+
+	let thread_control: JoinHandle<()> = thread::spawn(move || {
+		// fixme: because futures::executor::block_on will block thread, so mpsc::channel not work in here, can not receive data to park this thread
+		// thread::park();
+		futures::executor::block_on(async {
+			relay_chain::s2s::relay_headers_and_messages::run(relay_info.clone())
+				.await
+				.unwrap();
+		});
+	});
+
+	tc.insert(bridge_name, thread_control);
 	Ok(HttpResponse::Ok().json(Resp::ok_with_data("")))
+}
+
+#[post("/api/relay/stop")]
+pub async fn stop(
+	data_persist: web::Data<Mutex<Persist>>,
+	form: web::Form<StopRelayCond>,
+) -> Result<HttpResponse, crate::error::WebError> {
+	let cond = form.0;
+	let source_name: &String = cond.source();
+	let target_name: &String = cond.target();
+	let bridge_name = bridge_name(source_name, target_name);
+
+	let tc = THREAD_CACHE.lock().unwrap();
+	let _thread_saved = tc
+		.get(&bridge_name)
+		.ok_or(error::WebError::new("This bridge is not start"))?;
+	// thread_saved.thread().unpark();
+	// Ok(HttpResponse::Ok().json(Resp::ok_with_data("Running")))
+	Err(error::WebError::new("Not support now"))
+}
+
+#[get("/api/relay/status")]
+pub async fn status(
+	data_persist: web::Data<Mutex<Persist>>,
+	form: web::Form<StatusRelayCond>,
+) -> Result<HttpResponse, crate::error::WebError> {
+	let cond = form.0;
+	let source_name: &String = cond.source();
+	let target_name: &String = cond.target();
+	let bridge_name = bridge_name(source_name, target_name);
+
+	let tc = THREAD_CACHE.lock().unwrap();
+	match tc.get(&bridge_name) {
+		Some(_) => Ok(HttpResponse::Ok().json(Resp::ok_with_data("Running"))),
+		None => Ok(HttpResponse::Ok().json(Resp::ok_with_data("Stop"))),
+	}
 }

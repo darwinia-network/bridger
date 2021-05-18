@@ -162,6 +162,12 @@ pub enum OptRelay {
 		#[structopt(flatten)]
 		prometheus_params: PrometheusParams,
 	},
+	/// Stop relay
+	Stop {
+		/// bridge info
+		#[structopt(flatten)]
+		bridge_info: OptBridgeInfo,
+	},
 	/// Relay status
 	Status {
 		/// bridge info

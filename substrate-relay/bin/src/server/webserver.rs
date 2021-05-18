@@ -41,6 +41,8 @@ impl WebServer {
 				.service(api::token::remove)
 				.service(api::relay::init_bridge)
 				.service(api::relay::start)
+				.service(api::relay::stop)
+				.service(api::relay::status)
 		})
 		.bind(addr)?
 		.run()

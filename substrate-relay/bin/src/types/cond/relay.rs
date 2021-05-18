@@ -29,3 +29,17 @@ impl StartRelayCond {
 		prometheus_info
 	}
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, TypedBuilder, Getters, Setters)]
+#[getset(get = "pub")]
+pub struct StopRelayCond {
+	source: String,
+	target: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, TypedBuilder, Getters, Setters)]
+#[getset(get = "pub")]
+pub struct StatusRelayCond {
+	source: String,
+	target: String,
+}

@@ -7,7 +7,7 @@ use typed_builder::TypedBuilder;
 use crate::error;
 use crate::persist::{Chain, Token};
 use crate::types::cond::chain::ChainRemoveCond;
-use crate::types::cond::relay::{SourceAndTargetCond, StartRelayCond};
+use crate::types::cond::relay::{SourceAndTargetCond, StartRelayCond, StatusRelayCond, StopRelayCond};
 use crate::types::cond::token::{TokenGenerateCond, TokenRemoveCond};
 use crate::types::patch::resp::Resp;
 
@@ -227,6 +227,41 @@ impl CliClient {
 		let mut response = client
 			.post(&api)
 			.send_form(start_cond)
+			.await
+			.map_err(|e| error::CliError::RequestError(e.to_string()))?;
+		let resp: Resp<String> = response.json().await?;
+		let _ = resp.safe_ok_or_else(|msg| error::CliError::ApiError(api, msg.unwrap_or("unknown".to_string())))?;
+		self.show_success();
+		Ok(())
+	}
+
+	pub async fn stop(&self, cond: &StopRelayCond) -> error::Result<()> {
+		let client = self.client();
+		let api = self.api("/api/relay/stop");
+		if self.debug {
+			println!("{} {}", "API:".green().bold(), api);
+		}
+		let mut response = client
+			.post(&api)
+			.send_form(cond)
+			.await
+			.map_err(|e| error::CliError::RequestError(e.to_string()))?;
+		let resp: Resp<String> = response.json().await?;
+		let _ = resp.safe_ok_or_else(|msg| error::CliError::ApiError(api, msg.unwrap_or("unknown".to_string())))?;
+		self.show_success();
+		Ok(())
+	}
+
+	pub async fn status(&self, cond: &StatusRelayCond) -> error::Result<()> {
+		let client = self.client();
+		let api = self.api("/api/relay/status");
+		if self.debug {
+			println!("{} {}", "API:".green().bold(), api);
+		}
+		let mut response = client
+			.get(&api)
+			.query(cond)?
+			.send()
 			.await
 			.map_err(|e| error::CliError::RequestError(e.to_string()))?;
 		let resp: Resp<String> = response.json().await?;

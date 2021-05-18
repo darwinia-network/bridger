@@ -1,7 +1,7 @@
 use crate::cli::types::OptRelay;
 use crate::client::cli_client::CliClient;
 use crate::error;
-use crate::types::cond::relay::StartRelayCond;
+use crate::types::cond::relay::{StartRelayCond, StatusRelayCond, StopRelayCond};
 
 pub async fn exec(opt_relay: OptRelay) -> error::Result<()> {
 	match opt_relay {
@@ -31,7 +31,23 @@ pub async fn exec(opt_relay: OptRelay) -> error::Result<()> {
 				.build();
 			return client.start(&data).await;
 		}
-		OptRelay::Status { bridge_info } => {}
+		OptRelay::Stop { bridge_info } => {
+			let server = bridge_info.server;
+			let token = bridge_info.token;
+			let source = bridge_info.source;
+			let target = bridge_info.target;
+			let client = CliClient::new(server.clone(), token.clone(), false);
+			let data = StopRelayCond::builder().source(source).target(target).build();
+			return client.stop(&data).await;
+		}
+		OptRelay::Status { bridge_info } => {
+			let server = bridge_info.server;
+			let token = bridge_info.token;
+			let source = bridge_info.source;
+			let target = bridge_info.target;
+			let client = CliClient::new(server.clone(), token.clone(), false);
+			let data = StatusRelayCond::builder().source(source).target(target).build();
+			return client.status(&data).await;
+		}
 	}
-	Ok(())
 }

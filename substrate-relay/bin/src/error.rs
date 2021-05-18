@@ -38,6 +38,14 @@ pub struct WebError {
 	message: String,
 }
 
+impl WebError {
+	pub fn new<S: AsRef<str>>(message: S) -> Self {
+		Self {
+			message: message.as_ref().to_string(),
+		}
+	}
+}
+
 impl From<CliError> for WebError {
 	fn from(error: CliError) -> Self {
 		let message = error.to_string();

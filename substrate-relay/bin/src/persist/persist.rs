@@ -74,6 +74,8 @@ impl Persist {
 			saved_chain.host = chain.host;
 			saved_chain.port = chain.port;
 			saved_chain.signer = chain.signer;
+			saved_chain.secure = chain.secure;
+			saved_chain.signer_password = chain.signer_password;
 			return self.store().await;
 		}
 		Err(error::CliError::ChainNotFound(chain.name().to_string()))?

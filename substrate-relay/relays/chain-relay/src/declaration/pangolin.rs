@@ -57,7 +57,6 @@ impl ChainConst for PangolinChainConst {
 	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce =
 		pangolin_bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
 	const AVERAGE_BLOCK_INTERVAL: Duration = PangolinChain::AVERAGE_BLOCK_INTERVAL;
-	// todo: the instance id can be create another crate, this way help us simple manage this
 	const BRIDGE_CHAIN_ID: ChainId = pangolin_bridge_primitives::PANGOLIN_CHAIN_ID;
 	type SigningParams = drml_primitives::SigningParams;
 }

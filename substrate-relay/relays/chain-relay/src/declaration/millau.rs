@@ -51,7 +51,6 @@ impl ChainConst for MillauChainConst {
 		bp_millau::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
 	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce = bp_millau::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
 	const AVERAGE_BLOCK_INTERVAL: Duration = MillauChain::AVERAGE_BLOCK_INTERVAL;
-	// todo: the instance id can be create another crate, this way help us simple manage this
 	const BRIDGE_CHAIN_ID: ChainId = bp_runtime::MILLAU_CHAIN_ID;
 	type SigningParams = relay_millau_client::SigningParams;
 }

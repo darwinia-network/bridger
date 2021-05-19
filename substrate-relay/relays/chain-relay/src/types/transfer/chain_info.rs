@@ -21,7 +21,7 @@ impl ChainInfo {
 				port: self.port.clone() as u16,
 				secure: self.secure,
 			})
-			.await?,
+			.await,
 		)
 	}
 

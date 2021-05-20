@@ -22,7 +22,7 @@ fn init() {
 		actix_web=info,
 		substrate_relay=debug,
 		relay_chain=debug,
-		bridge=debug,
+		bridge=info,
 		"#,
 	);
 	std::env::set_var("RUST_BACKTRACE", "1");

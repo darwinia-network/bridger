@@ -4,7 +4,7 @@ use codec::Encode;
 use relay_substrate_client::{Chain as RelaySubstrateClientChain, TransactionSignScheme};
 use sp_core::{Bytes, Pair};
 
-use crate::types::transfer::ChainInfo;
+use crate::types::transfer::{BridgeName, ChainInfo};
 
 macro_rules! select_bridge {
 	($bridge: expr, $generic: tt) => {
@@ -36,35 +36,41 @@ macro_rules! select_bridge {
 	};
 }
 
-pub async fn run(source_chain: ChainInfo, target_chain: ChainInfo) -> anyhow::Result<()> {
-	let bridge = (&source_chain.name()[..], &target_chain.name()[..]);
-	info!("Init bridge {} -> {}", bridge.0, bridge.1);
-	debug!("source -> {:?}", source_chain);
-	debug!("target -> {:?}", target_chain);
-	select_bridge!(bridge, {
-		let source_client = source_chain.to_substrate_relay_chain::<Source>().await?;
-		let target_client = target_chain.to_substrate_relay_chain::<Target>().await?;
-		let target_sign = target_chain.to_keypair::<Target>()?;
-		debug!("source client -> {:?}", source_client);
-		debug!("target client -> {:?}", target_client);
+pub struct InitBridge {
+	bridge: BridgeName,
+	source_chain: ChainInfo,
+	target_chain: ChainInfo,
+}
 
-		crate::types::s2s::headers_initialize::initialize(
-			source_client,
-			target_client.clone(),
-			target_sign.public().into(),
-			move |transaction_nonce, initialization_data| {
-				Bytes(
-					Target::sign_transaction(
-						*target_client.genesis_hash(),
-						&target_sign,
-						transaction_nonce,
-						encode_init_bridge(initialization_data),
-					)
-					.encode(),
-				)
-			},
-		)
-		.await;
-	});
+pub async fn run(source_chain: ChainInfo, target_chain: ChainInfo) -> anyhow::Result<()> {
+	// let bridge = (&source_chain.name()[..], &target_chain.name()[..]);
+	// info!("Init bridge {} -> {}", bridge.0, bridge.1);
+	// debug!("source -> {:?}", source_chain);
+	// debug!("target -> {:?}", target_chain);
+	// select_bridge!(bridge, {
+	// 	let source_client = source_chain.to_substrate_relay_chain::<Source>().await?;
+	// 	let target_client = target_chain.to_substrate_relay_chain::<Target>().await?;
+	// 	let target_sign = target_chain.to_keypair::<Target>()?;
+	// 	debug!("source client -> {:?}", source_client);
+	// 	debug!("target client -> {:?}", target_client);
+	//
+	// 	crate::types::s2s::headers_initialize::initialize(
+	// 		source_client,
+	// 		target_client.clone(),
+	// 		target_sign.public().into(),
+	// 		move |transaction_nonce, initialization_data| {
+	// 			Bytes(
+	// 				Target::sign_transaction(
+	// 					*target_client.genesis_hash(),
+	// 					&target_sign,
+	// 					transaction_nonce,
+	// 					encode_init_bridge(initialization_data),
+	// 				)
+	// 				.encode(),
+	// 			)
+	// 		},
+	// 	)
+	// 	.await;
+	// });
 	Ok(())
 }

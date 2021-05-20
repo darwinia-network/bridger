@@ -34,15 +34,11 @@ pub struct Generic {
 #[getset(get = "pub", get_mut = "pub", set = "pub")]
 pub struct Chain {
 	#[serde(default)]
-	name: String,
-	#[serde(default)]
-	host: String,
-	#[serde(default)]
-	port: u32,
+	entrypoint: String,
 	#[serde(default)]
 	signer: String,
-	#[serde(default)]
-	secure: bool,
+	// #[serde(default)]
+	// secure: bool,
 	signer_password: Option<String>,
 }
 

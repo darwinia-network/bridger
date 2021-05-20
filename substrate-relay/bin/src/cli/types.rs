@@ -1,4 +1,4 @@
-use chain_relay::types::transfer::HexLaneId;
+use chain_relay::types::transfer::{BridgeName, ChainInfo, HexLaneId};
 use getset::Getters;
 use structopt::StructOpt;
 
@@ -7,35 +7,42 @@ use std::path::PathBuf;
 #[derive(Debug, StructOpt)]
 #[structopt(name = "substrate-relay", about = "Substrate relay")]
 pub enum Opt {
-	/// Init substrate to substrate bridge
+	// /// Init substrate to substrate bridge
+	// #[deprecated]
+	// InitBridge {
+	// 	/// bridge info
+	// 	#[structopt(flatten)]
+	// 	bridge_info: OptBridgeInfo,
+	// },
 	InitBridge {
 		/// bridge info
 		#[structopt(flatten)]
-		bridge_info: OptBridgeInfo,
+		bridge: RelayBridgeInfo,
 	},
 	/// Relay headers and messages
-	Relay(OptRelay),
-	/// Start substrate relay
-	Start {
-		/// The config file path
-		#[structopt(short, long, parse(from_os_str))]
-		config: Option<PathBuf>,
-		/// Listen host, Default:  127.0.0.1
-		#[structopt(short, long)]
-		host: Option<String>,
-		/// Listen port, Default: 7890
-		#[structopt(short, long)]
-		port: Option<u32>,
-		/// Is enable authorization for request this server
-		#[structopt(long)]
-		enable_auth: bool,
-	},
-	/// Substrate relay config
-	Config(OptConfig),
+	Relay(OptRelayV2),
+	// /// Start substrate relay
+	// Start {
+	// 	/// The config file path
+	// 	#[structopt(short, long, parse(from_os_str))]
+	// 	config: Option<PathBuf>,
+	// 	/// Listen host, Default:  127.0.0.1
+	// 	#[structopt(short, long)]
+	// 	host: Option<String>,
+	// 	/// Listen port, Default: 7890
+	// 	#[structopt(short, long)]
+	// 	port: Option<u32>,
+	// 	/// Is enable authorization for request this server
+	// 	#[structopt(long)]
+	// 	enable_auth: bool,
+	// },
+	// /// Substrate relay config
+	// Config(OptConfig),
 }
 
 #[derive(Debug, StructOpt, Getters)]
 #[getset(get = "pub")]
+#[deprecated]
 pub struct OptConfig {
 	/// Enable debug model, show more message
 	#[structopt(long, long)]
@@ -52,6 +59,7 @@ pub struct OptConfig {
 }
 
 #[derive(Debug, StructOpt)]
+#[deprecated]
 pub enum OptConfigSubcommand {
 	/// Config chain information
 	Chain(OptChainCommand),
@@ -60,6 +68,7 @@ pub enum OptConfigSubcommand {
 }
 
 #[derive(Debug, StructOpt)]
+#[deprecated]
 pub enum OptChainCommand {
 	/// List all chain
 	List,
@@ -83,6 +92,7 @@ pub enum OptChainCommand {
 }
 
 #[derive(Debug, StructOpt)]
+#[deprecated]
 pub enum OptTokenCommand {
 	/// List all token
 	List,
@@ -100,6 +110,7 @@ pub enum OptTokenCommand {
 }
 
 #[derive(Debug, Clone, StructOpt)]
+#[deprecated]
 pub struct OptChainInfo {
 	/// Chain name
 	pub name: String,
@@ -120,20 +131,8 @@ pub struct OptChainInfo {
 	signer_password: Option<String>,
 }
 
-impl From<OptChainInfo> for crate::persist::Chain {
-	fn from(chain_info: OptChainInfo) -> Self {
-		crate::persist::Chain::builder()
-			.name(chain_info.name)
-			.host(chain_info.host)
-			.port(chain_info.port)
-			.secure(chain_info.secure)
-			.signer(chain_info.signer)
-			.signer_password(chain_info.signer_password)
-			.build()
-	}
-}
-
 #[derive(Debug, Clone, StructOpt)]
+#[deprecated]
 pub struct OptBridgeInfo {
 	/// The server host by substrate-relay service
 	#[structopt(long, default_value = "http://127.0.0.1:7890")]
@@ -150,6 +149,7 @@ pub struct OptBridgeInfo {
 }
 
 #[derive(Debug, StructOpt)]
+#[deprecated]
 pub enum OptRelay {
 	/// Start relay
 	Start {
@@ -176,6 +176,22 @@ pub enum OptRelay {
 	},
 }
 
+#[derive(Debug, StructOpt)]
+pub enum OptRelayV2 {}
+
+#[derive(Debug, Clone, StructOpt)]
+pub struct RelayBridgeInfo {
+	bridge: BridgeName,
+	#[structopt(short, long)]
+	source: String,
+	#[structopt(short, long)]
+	target: String,
+	#[structopt(long)]
+	target_signer: String,
+	#[structopt(long)]
+	target_signer_password: Option<String>,
+}
+
 /// Prometheus metrics params.
 #[derive(Debug, Clone, StructOpt)]
 pub struct PrometheusParams {
@@ -188,4 +204,18 @@ pub struct PrometheusParams {
 	/// Expose Prometheus endpoint at given port.
 	#[structopt(long, default_value = "9616")]
 	pub prometheus_port: u16,
+}
+
+impl RelayBridgeInfo {
+	pub fn source_chain_info(&self) -> crate::error::Result<ChainInfo> {
+		Ok(ChainInfo::new(self.source.clone(), None, None)?)
+	}
+
+	pub fn target_chain_info(&self) -> crate::error::Result<ChainInfo> {
+		Ok(ChainInfo::new(
+			self.target.clone(),
+			Some(self.target_signer.clone()),
+			self.target_signer_password.clone(),
+		)?)
+	}
 }

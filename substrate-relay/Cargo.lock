@@ -1074,7 +1074,9 @@ dependencies = [
  "bp-millau",
  "bp-runtime",
  "bridge-runtime-common",
+ "custom_derive",
  "drml-primitives",
+ "enum_derive",
  "finality-grandpa",
  "finality-relay",
  "frame-support",
@@ -1369,6 +1371,12 @@ dependencies = [
  "subtle 2.4.0",
  "zeroize",
 ]
+
+[[package]]
+name = "custom_derive"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef8ae57c4978a2acd8b869ce6b9ca1dfe817bff704c220209fdef2c0b75a01b9"
 
 [[package]]
 name = "darwinia-balances"
@@ -2035,6 +2043,12 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "enum_derive"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "406ac2a8c9eedf8af9ee1489bee9e50029278a6456c740f7454cf8a158abc816"
 
 [[package]]
 name = "enumflags2"

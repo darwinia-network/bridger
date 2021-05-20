@@ -10,6 +10,8 @@ use actix_web::rt::System;
 mod cli;
 mod client;
 mod error;
+#[macro_use]
+mod macros;
 mod persist;
 mod server;
 mod types;
@@ -21,7 +23,7 @@ fn init() {
 		serde=info,
 		actix_web=info,
 		substrate_relay=debug,
-		relay_chain=debug,
+		chain_relay=debug,
 		bridge=info,
 		"#,
 	);

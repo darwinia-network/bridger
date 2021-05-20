@@ -1,6 +1,15 @@
-use crate::types::transfer::ChainInfo;
 use bp_messages::LaneId;
 use getset::{Getters, MutGetters, Setters};
+
+use crate::types::transfer::ChainInfo;
+
+custom_derive! {
+	#[derive(Debug, Clone, EnumFromStr)]
+	/// Bridge to initialize.
+	pub enum BridgeName {
+		PangolinToMillau,
+	}
+}
 
 #[derive(Debug, Clone, Default, MutGetters, Getters, Setters)]
 #[getset(get = "pub", get_mut = "pub", set = "pub")]

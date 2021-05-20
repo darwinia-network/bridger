@@ -54,10 +54,10 @@ impl CliClient {
 		chains.iter().for_each(|chain| {
 			println!(
 				"{}\t\t{}\t\t{}\t\t{}",
-				chain.name(),
-				chain.host(),
-				chain.port(),
-				chain.signer()
+				"chain.name()",   // todo: need remove it
+				"chain.host()",   // todo: need remove it
+				"chain.port()",   // todo: need remove it
+				"chain.signer()"  // todo: need remove it
 			);
 		});
 	}

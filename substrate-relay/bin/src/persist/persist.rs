@@ -54,89 +54,89 @@ impl Persist {
 	}
 }
 
-// chain
-impl Persist {
-	pub async fn chain_list(&self) -> &Vec<Chain> {
-		&self.chains
-	}
-	pub async fn chain_add(&mut self, chain: Chain) -> error::Result<&Self> {
-		let chains = &mut self.chains;
-		if chains.iter().any(|item| item.name == chain.name) {
-			return Err(error::CliError::ChainNameExists)?;
-		}
-		chains.push(chain);
-		self.store().await
-	}
-
-	pub async fn chain_update(&mut self, chain: Chain) -> error::Result<&Self> {
-		let chains = &mut self.chains;
-		if let Some(saved_chain) = chains.iter_mut().find(|ref item| item.name == chain.name) {
-			saved_chain.host = chain.host;
-			saved_chain.port = chain.port;
-			saved_chain.signer = chain.signer;
-			saved_chain.secure = chain.secure;
-			saved_chain.signer_password = chain.signer_password;
-			return self.store().await;
-		}
-		Err(error::CliError::ChainNotFound(chain.name().to_string()))?
-	}
-
-	pub fn chain_exists<T: AsRef<str>>(&self, name: T) -> bool {
-		self.chains.iter().any(|item| item.name == name.as_ref())
-	}
-
-	pub async fn chain_remove<T: AsRef<str>>(&mut self, chain_name: T) -> error::Result<&Self> {
-		if !self.chain_exists(&chain_name) {
-			return Err(error::CliError::ChainNotFound(chain_name.as_ref().to_string()))?;
-		}
-		let chains = &mut self.chains;
-		chains.retain(|item| &item.name != chain_name.as_ref());
-		self.store().await
-	}
-
-	pub fn find_chain<S: AsRef<str>>(&self, name: S) -> Option<&Chain> {
-		self.chains.iter().find(|&item| item.name() == name.as_ref())
-	}
-}
-
-// token
-impl Persist {
-	fn new_token(&self) -> String {
-		let s: String = rand::thread_rng()
-			.sample_iter(&Alphanumeric)
-			.take(7)
-			.map(char::from)
-			.collect();
-		let mut m = sha1::Sha1::new();
-		m.update(s.as_ref());
-		m.digest().to_string()
-	}
-
-	pub async fn token_generate(&mut self, remark: Option<String>) -> error::Result<Token> {
-		let token_value = self.new_token();
-		let token = Token::builder()
-			.remark(Some(remark.unwrap_or("".to_string())))
-			.value(token_value)
-			.build();
-		self.tokens.push(token.clone());
-		self.store().await?;
-		Ok(token)
-	}
-
-	pub async fn token_list(&self) -> Vec<Token> {
-		self.tokens.clone()
-	}
-
-	pub fn token_exists<T: AsRef<str>>(&self, token: T) -> bool {
-		self.tokens.iter().any(|item| item.value == token.as_ref())
-	}
-
-	pub async fn token_remove<T: AsRef<str>>(&mut self, token: T) -> error::Result<&Self> {
-		if !self.token_exists(&token) {
-			return Err(error::CliError::TokenNotFound)?;
-		}
-		let tokens = &mut self.tokens;
-		tokens.retain(|item| &item.value != token.as_ref());
-		self.store().await
-	}
-}
+// // chain
+// impl Persist {
+// 	pub async fn chain_list(&self) -> &Vec<Chain> {
+// 		&self.chains
+// 	}
+// 	pub async fn chain_add(&mut self, chain: Chain) -> error::Result<&Self> {
+// 		let chains = &mut self.chains;
+// 		if chains.iter().any(|item| item.name == chain.name) {
+// 			return Err(error::CliError::ChainNameExists)?;
+// 		}
+// 		chains.push(chain);
+// 		self.store().await
+// 	}
+//
+// 	pub async fn chain_update(&mut self, chain: Chain) -> error::Result<&Self> {
+// 		let chains = &mut self.chains;
+// 		if let Some(saved_chain) = chains.iter_mut().find(|ref item| item.name == chain.name) {
+// 			saved_chain.host = chain.host;
+// 			saved_chain.port = chain.port;
+// 			saved_chain.signer = chain.signer;
+// 			saved_chain.secure = chain.secure;
+// 			saved_chain.signer_password = chain.signer_password;
+// 			return self.store().await;
+// 		}
+// 		Err(error::CliError::ChainNotFound(chain.name().to_string()))?
+// 	}
+//
+// 	pub fn chain_exists<T: AsRef<str>>(&self, name: T) -> bool {
+// 		self.chains.iter().any(|item| item.name == name.as_ref())
+// 	}
+//
+// 	pub async fn chain_remove<T: AsRef<str>>(&mut self, chain_name: T) -> error::Result<&Self> {
+// 		if !self.chain_exists(&chain_name) {
+// 			return Err(error::CliError::ChainNotFound(chain_name.as_ref().to_string()))?;
+// 		}
+// 		let chains = &mut self.chains;
+// 		chains.retain(|item| &item.name != chain_name.as_ref());
+// 		self.store().await
+// 	}
+//
+// 	pub fn find_chain<S: AsRef<str>>(&self, name: S) -> Option<&Chain> {
+// 		self.chains.iter().find(|&item| item.name() == name.as_ref())
+// 	}
+// }
+//
+// // token
+// impl Persist {
+// 	fn new_token(&self) -> String {
+// 		let s: String = rand::thread_rng()
+// 			.sample_iter(&Alphanumeric)
+// 			.take(7)
+// 			.map(char::from)
+// 			.collect();
+// 		let mut m = sha1::Sha1::new();
+// 		m.update(s.as_ref());
+// 		m.digest().to_string()
+// 	}
+//
+// 	pub async fn token_generate(&mut self, remark: Option<String>) -> error::Result<Token> {
+// 		let token_value = self.new_token();
+// 		let token = Token::builder()
+// 			.remark(Some(remark.unwrap_or("".to_string())))
+// 			.value(token_value)
+// 			.build();
+// 		self.tokens.push(token.clone());
+// 		self.store().await?;
+// 		Ok(token)
+// 	}
+//
+// 	pub async fn token_list(&self) -> Vec<Token> {
+// 		self.tokens.clone()
+// 	}
+//
+// 	pub fn token_exists<T: AsRef<str>>(&self, token: T) -> bool {
+// 		self.tokens.iter().any(|item| item.value == token.as_ref())
+// 	}
+//
+// 	pub async fn token_remove<T: AsRef<str>>(&mut self, token: T) -> error::Result<&Self> {
+// 		if !self.token_exists(&token) {
+// 			return Err(error::CliError::TokenNotFound)?;
+// 		}
+// 		let tokens = &mut self.tokens;
+// 		tokens.retain(|item| &item.value != token.as_ref());
+// 		self.store().await
+// 	}
+// }

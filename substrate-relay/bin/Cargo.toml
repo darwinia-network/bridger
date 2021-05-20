@@ -19,8 +19,6 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0"
-typed-builder = "0.9"
-getset = "0.1"
 
 futures = "0.3"
 structopt = "0.3"

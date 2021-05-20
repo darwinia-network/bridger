@@ -11,14 +11,34 @@ custom_derive! {
 	}
 }
 
-#[derive(Debug, Clone, Default, MutGetters, Getters, Setters)]
+#[derive(Debug, Clone, MutGetters, Getters, Setters)]
 #[getset(get = "pub", get_mut = "pub", set = "pub")]
 pub struct RelayHeadersAndMessagesInfo {
+	bridge: BridgeName,
+
 	source: ChainInfo,
 	target: ChainInfo,
 
 	lanes: Vec<HexLaneId>,
 	prometheus_params: PrometheusParamsInfo,
+}
+
+impl RelayHeadersAndMessagesInfo {
+	pub fn new(
+		bridge: BridgeName,
+		source: ChainInfo,
+		target: ChainInfo,
+		lanes: Vec<HexLaneId>,
+		prometheus_params: PrometheusParamsInfo,
+	) -> Self {
+		Self {
+			bridge,
+			source,
+			target,
+			lanes,
+			prometheus_params,
+		}
+	}
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
@@ -61,6 +81,24 @@ impl From<PrometheusParamsInfo> for relay_utils::metrics::MetricsParams {
 			.into()
 		} else {
 			None.into()
+		}
+	}
+}
+
+#[derive(Debug, Clone, MutGetters, Getters, Setters)]
+#[getset(get = "pub", get_mut = "pub", set = "pub")]
+pub struct InitBridge {
+	bridge: BridgeName,
+	source_chain: ChainInfo,
+	target_chain: ChainInfo,
+}
+
+impl InitBridge {
+	pub fn new(bridge: BridgeName, source_chain: ChainInfo, target_chain: ChainInfo) -> Self {
+		Self {
+			bridge,
+			source_chain,
+			target_chain,
 		}
 	}
 }

@@ -4,7 +4,7 @@ use codec::Encode;
 use relay_substrate_client::{Chain as RelaySubstrateClientChain, TransactionSignScheme};
 use sp_core::{Bytes, Pair};
 
-use crate::types::transfer::{BridgeName, ChainInfo};
+use crate::types::transfer::{BridgeName, ChainInfo, InitBridge};
 
 macro_rules! select_bridge {
 	($bridge: expr, $generic: tt) => {
@@ -32,27 +32,10 @@ macro_rules! select_bridge {
 	};
 }
 
-#[derive(Debug, Clone)]
-pub struct InitBridge {
-	bridge: BridgeName,
-	source_chain: ChainInfo,
-	target_chain: ChainInfo,
-}
-
-impl InitBridge {
-	pub fn new(bridge: BridgeName, source_chain: ChainInfo, target_chain: ChainInfo) -> Self {
-		Self {
-			bridge,
-			source_chain,
-			target_chain,
-		}
-	}
-}
-
 pub async fn run(init_bridge: InitBridge) -> anyhow::Result<()> {
-	let source_chain = init_bridge.source_chain;
-	let target_chain = init_bridge.target_chain;
-	let bridge = init_bridge.bridge;
+	let source_chain: &ChainInfo = init_bridge.source_chain();
+	let target_chain: &ChainInfo = init_bridge.target_chain();
+	let bridge: &BridgeName = init_bridge.bridge();
 
 	info!("Init bridge {:?}", bridge);
 	debug!("source -> {:?}", source_chain);

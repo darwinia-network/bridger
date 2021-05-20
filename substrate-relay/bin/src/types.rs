@@ -1,8 +1,5 @@
 use chain_relay::types::transfer::{BridgeName, ChainInfo, HexLaneId, PrometheusParamsInfo};
-use getset::Getters;
 use structopt::StructOpt;
-
-use std::path::PathBuf;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "substrate-relay", about = "Substrate relay")]
@@ -25,23 +22,22 @@ pub enum Opt {
 	},
 }
 
-#[derive(Debug, Clone, StructOpt, Getters)]
-#[getset(get = "pub")]
+#[derive(Debug, Clone, StructOpt)]
 pub struct RelayBridgeInfo {
 	/// The bridge name
-	bridge: BridgeName,
+	pub bridge: BridgeName,
 	#[structopt(short, long)]
-	source: String,
+	pub source: String,
 	#[structopt(short, long)]
-	target: String,
+	pub target: String,
 	#[structopt(long)]
-	source_signer: Option<String>,
+	pub source_signer: Option<String>,
 	#[structopt(long)]
-	source_signer_password: Option<String>,
+	pub source_signer_password: Option<String>,
 	#[structopt(long)]
-	target_signer: Option<String>,
+	pub target_signer: Option<String>,
 	#[structopt(long)]
-	target_signer_password: Option<String>,
+	pub target_signer_password: Option<String>,
 }
 
 /// Prometheus metrics params.

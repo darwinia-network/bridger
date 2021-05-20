@@ -26,7 +26,7 @@ impl ChainInfo {
 		let port = host_port.get(1).unwrap_or_else(|| if secure { &"443" } else { &"80" });
 		Ok(Self {
 			host: host.to_string(),
-			port: port.parse::<u32>()?, //
+			port: port.parse::<u32>()?,
 			signer,
 			secure,
 			signer_password,
@@ -53,7 +53,7 @@ impl ChainInfo {
 
 		let signer = match self.signer.clone() {
 			Some(v) => v,
-			None => anyhow::bail!("This chain not set signer"),
+			None => anyhow::bail!("The chain [{}:{}] not set signer", self.host, self.port),
 		};
 		C::KeyPair::from_string(&signer, self.signer_password.as_deref()).map_err(|e| anyhow::format_err!("{:?}", e))
 	}

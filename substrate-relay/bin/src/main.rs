@@ -1,19 +1,13 @@
 #![feature(async_closure)]
 
 #[macro_use]
-extern crate serde_derive;
-#[macro_use]
 extern crate log;
 
-use actix_web::rt::System;
+use structopt::StructOpt;
 
-mod cli;
-mod client;
-mod error;
-#[macro_use]
-mod macros;
-mod persist;
-mod server;
+use crate::types::Opt;
+
+mod handler;
 mod types;
 
 fn init() {
@@ -31,14 +25,19 @@ fn init() {
 	env_logger::init();
 }
 
-#[actix_web::main]
-async fn main() -> anyhow::Result<()> {
-	init();
+async fn exec() -> anyhow::Result<()> {
+	let opt = Opt::from_args();
+	return match opt {
+		Opt::InitBridge { bridge } => handler::init_bridge(bridge).await,
+		Opt::Relay {
+			bridge,
+			lanes,
+			prometheus,
+		} => handler::on_demand_relay(bridge, lanes, prometheus).await,
+	};
+}
 
-	if let Err(err) = cli::exec().await {
-		log::error!("{}", err.to_string());
-		System::current().stop();
-		std::process::exit(1);
-	}
-	Ok(())
+fn main() -> anyhow::Result<()> {
+	init();
+	futures::executor::block_on(exec())
 }

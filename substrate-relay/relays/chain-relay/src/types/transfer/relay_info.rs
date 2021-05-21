@@ -8,6 +8,7 @@ custom_derive! {
 	/// Bridge to initialize.
 	pub enum BridgeName {
 		PangolinToMillau,
+		MillauToPangolin,
 	}
 }
 

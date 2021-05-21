@@ -25,6 +25,22 @@ macro_rules! select_bridge {
 
 				$generic
 			}
+			BridgeName::MillauToPangolin => {
+				type Source = relay_millau_client::Millau;
+				type Target = pangolin_bridge_relay_client_definition::PangolinChain;
+
+				fn encode_init_bridge(
+					init_data: InitializationData<<Source as ChainBase>::Header>,
+				) -> <Target as RelaySubstrateClientChain>::Call {
+					let initialize_call = pangolin_runtime::BridgeGrandpaCall::<
+						pangolin_runtime::Runtime,
+						pangolin_runtime::WithMillauGrandpa,
+					>::initialize(init_data);
+					pangolin_runtime::SudoCall::sudo(Box::new(initialize_call.into())).into()
+				}
+
+				$generic
+			}
 			_ => {
 				anyhow::bail!("Not support bridge {:?}", $bridge,);
 			}

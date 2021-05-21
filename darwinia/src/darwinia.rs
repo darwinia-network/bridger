@@ -1,3 +1,10 @@
+use jsonrpsee_http_client::to_json_value;
+use primitives::frame::sudo::KeyStoreExt;
+use primitives::{
+	//todo move to e2d
+	frame::ethereum::{backing::VerifiedProofStoreExt, issuing::VerifiedIssuingProofStoreExt},
+	runtime::DarwiniaRuntime,
+};
 use substrate_subxt::{
 	events::Raw,
 	sp_core::storage::{StorageData, StorageKey},
@@ -7,19 +14,9 @@ use substrate_subxt::{
 	BlockNumber, Client, ClientBuilder,
 };
 
-use primitives::{
-	//todo move to e2d
-	frame::ethereum::{backing::VerifiedProofStoreExt, issuing::VerifiedIssuingProofStoreExt},
-	runtime::DarwiniaRuntime,
-};
-
-use crate::{account::DarwiniaAccount, DarwiniaEvents, EventInfo};
-
 use crate::error::{Error, Result};
-use jsonrpsee_types::jsonrpc::{to_value as to_json_value, Params};
-
 use crate::rpc::*;
-use primitives::frame::sudo::KeyStoreExt;
+use crate::{account::DarwiniaAccount, DarwiniaEvents, EventInfo};
 
 pub struct Darwinia {
 	/// client
@@ -59,10 +56,10 @@ impl Darwinia {
 		block_number_of_last_leaf: u64,
 		hash: H256,
 	) -> Result<Option<HeaderMMR>> {
-		let params = Params::Array(vec![
+		let params = &[
 			to_json_value(block_number_of_member_leaf)?,
 			to_json_value(block_number_of_last_leaf)?,
-		]);
+		];
 		let result: HeaderMMRRpc = self
 			.subxt
 			.rpc

@@ -1,9 +1,9 @@
-substrate-relay guide
+substrate-relay 使用指南
 ===
 
-## Compile
+## 编译
 
-Currently `substrate-relay` is independent of `bridge`, need compile in [`substrate-relay`](../) folder.
+目前 `substrate-relay` 是独立于 `bridger` 的一个项目, 需要进入到 [`substrate-relay`](../) 目录下进行编译.
 
 ```bash
 git clone https://github.com/darwinia-network/bridger
@@ -13,15 +13,15 @@ cd substrate-relay
 cargo build --release
 ```
 
-When compiled success, will have `substrate-relay` executable file in `bridger/substrate-relay/target/release` folder.
+编译完成后会在 `bridger/substrate-relay/target/release` 目录下有一个 `substrate-relay` 的可执行程序
 
-## Steps
+## 步骤
 
-Start a Substrate To Substrate bridge, have two steps, the first, init this bridge, this step will record Source Chain best finalized block to Target Chain, the relay step read this value (in target chain), then read source chain from this position and write to Target Chain; The second step is relay headers and message.
+启动一个 Substrate To Substrate 桥, 有两个步骤, 首先初始化桥, 用于在 Target Chain 中记录 Source Chain 当前同步的 finalized block 记录下来, 给 relay 做准备, 从什么位置开始同步. `init-bridge` 工作是一次性的, 后续 relay 的时候会根据同步的状态来更新这个值. 接下来就是第二布开始进行 relay 进行数据同步.
 
-## Bridge
+## 桥
 
-In `substrate-relay`, only pre-defined bridges can be used, currently the `substrate-relay` have these bridges:
+在 `substrate-relay` 中, 可以使用的桥是预先定义好的, 因此我们只能使用已经添加的桥. 目前 `substrate-relay` 支持的桥如下:
 
 - PangolinToMillau
 
@@ -59,7 +59,7 @@ substrate-relay init-bridge PangolinToMillau \
   --target-signer //Alice
 ```
 
-> Attention: the `target-signer` parameters is required for `init-bridge`, the value is account of Target Chain, the purpose is to authorize when writing data, if this account have password use `target-signer-password` to set it.
+> 注意: `init-bridge` 需要提供 `target-signer` 用于在目标链授权写入数据. 如果填写的目标链用户有密码请添加 `target-signer-password` 指定
 
 ### relay
 
@@ -102,5 +102,5 @@ substrate-relay relay PangolinToMillau \
   --target-signer //Alice
 ```
 
-> Attention: the `source-signer` and `target-signer` are required for `relay`, the purpose is to authorize when writing data, if this account have password use `target-signer-password` to set it. if the account have password, use `source-signer-password` and `target-signer-password` to set it.
-
+> 注意: `relay` 需要提供 `source-signer` 以及 `target-signer` 用于在双方链同步数据的认证账户 (relay 是双向的, 前提是两边都有先初始化), 如果有密码分别添加 `source-signer-password` 以及 `target-signer-password`
+ 

@@ -8,7 +8,7 @@ use async_trait::async_trait;
 
 /// RPC trait for bridge primitves
 #[async_trait]
-pub trait RPC {
+pub trait Rpc {
 	/// Block Header
 	type Header;
 	/// Transaction Receipt

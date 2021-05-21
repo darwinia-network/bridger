@@ -4196,7 +4196,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.15.0"
-source = "git+https://github.com/fewensa/substrate-subxt.git?branch=darwinia#1904f3bf4772abecf06be725401276253e8803b0"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=bump-jsonrpsee-alpha6#691f92be1f607d137fe3817e5fcd778fe23074e2"
 dependencies = [
  "async-trait",
  "dyn-clone",
@@ -4228,7 +4228,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.15.0"
-source = "git+https://github.com/fewensa/substrate-subxt.git?branch=darwinia#1904f3bf4772abecf06be725401276253e8803b0"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=bump-jsonrpsee-alpha6#691f92be1f607d137fe3817e5fcd778fe23074e2"
 dependencies = [
  "async-trait",
  "heck",

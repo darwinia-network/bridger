@@ -51,20 +51,20 @@ pub struct EthereumRelayHeaderParcelJson {
 	pub mmr_root: String,
 }
 
-impl Into<EthereumRelayHeaderParcel> for EthereumRelayHeaderParcelJson {
-	fn into(self) -> EthereumRelayHeaderParcel {
+impl From<EthereumRelayHeaderParcelJson> for EthereumRelayHeaderParcel {
+	fn from(that: EthereumRelayHeaderParcelJson) -> Self {
 		EthereumRelayHeaderParcel {
-			header: self.header.into(),
-			mmr_root: bytes!(self.mmr_root.as_str(), 32),
+			header: that.header.into(),
+			mmr_root: bytes!(that.mmr_root.as_str(), 32),
 		}
 	}
 }
 
-impl Into<EthereumRelayHeaderParcelJson> for EthereumRelayHeaderParcel {
-	fn into(self) -> EthereumRelayHeaderParcelJson {
+impl From<EthereumRelayHeaderParcel> for EthereumRelayHeaderParcelJson {
+	fn from(that: EthereumRelayHeaderParcel) -> Self {
 		EthereumRelayHeaderParcelJson {
-			header: self.header.into(),
-			mmr_root: hex!(&self.mmr_root),
+			header: that.header.into(),
+			mmr_root: hex!(&that.mmr_root),
 		}
 	}
 }

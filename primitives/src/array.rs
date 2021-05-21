@@ -24,6 +24,7 @@ pub trait BigArray<'de>: Sized {
 }
 
 // shared
+#[allow(clippy::manual_range_contains)]
 construct_uint! {
 	#[derive(Encode, Decode, Serialize, Deserialize)]
 	pub struct U256(4);

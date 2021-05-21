@@ -33,7 +33,7 @@ substrate-relay-init-bridge 0.3.3
 Init bridge
 
 USAGE:
-    substrate-relay.exe init-bridge [OPTIONS] <bridge> --source <source> --target <target>
+    substrate-relay init-bridge [OPTIONS] <bridge> --source <source> --target <target>
 
 FLAGS:
     -h, --help       Prints help information
@@ -64,12 +64,12 @@ substrate-relay init-bridge PangolinToMillau \
 ### relay
 
 ```bash
-$ substrate-relay.exe relay --help
-substrate-relay.exe-relay 0.3.3
+$ substrate-relay relay --help
+substrate-relay-relay 0.3.3
 Relay headers and messages
 
 USAGE:
-    substrate-relay.exe relay [FLAGS] [OPTIONS] <bridge> --source <source> --target <target>
+    substrate-relay relay [FLAGS] [OPTIONS] <bridge> --source <source> --target <target>
 
 FLAGS:
     -h, --help             Prints help information

@@ -3,6 +3,7 @@ members = [
   "primitives",
   "darwinia",
 ]
+resolver = "2"
 
 [package]
 name = "darwinia-bridger"

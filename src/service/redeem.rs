@@ -153,9 +153,9 @@ impl RedeemService {
 		extrinsics_service: Recipient<MsgExtrinsic>,
 	) -> RedeemService {
 		RedeemService {
-			ethereum2darwinia,
-			shadow,
 			step,
+			shadow,
+			ethereum2darwinia,
 			extrinsics_service,
 		}
 	}

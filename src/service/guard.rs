@@ -95,10 +95,10 @@ impl GuardService {
 	) -> Option<GuardService> {
 		if is_tech_comm_member {
 			Some(GuardService {
+				step,
+				shadow,
 				ethereum2darwinia,
 				guard_account,
-				shadow,
-				step,
 				extrinsics_service,
 			})
 		} else {

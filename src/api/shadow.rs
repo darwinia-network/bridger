@@ -10,7 +10,7 @@ use primitives::{
 		EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
 		EthereumRelayProofs, EthereumRelayProofsJson, MMRRoot, MMRRootJson,
 	},
-	rpc::{EthereumRPC, RPC},
+	rpc::{EthereumRPC, Rpc},
 };
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;

@@ -26,9 +26,9 @@ name = "bridger"
 path = "src/bin/bridger.rs"
 
 [dependencies]
-jsonrpsee-types = "0.2.0-alpha.2"
-jsonrpsee-ws-client = "0.2.0-alpha.3"
-jsonrpsee-http-client = "0.2.0-alpha.2"
+jsonrpsee-types = "0.2.0-alpha.6"
+jsonrpsee-ws-client = "0.2.0-alpha.6"
+jsonrpsee-http-client = "0.2.0-alpha.6"
 async-macros = "2.0.0"
 async-trait = "0.1.40"
 dirs = "3.0.1"
@@ -37,7 +37,7 @@ etc = "0.1.11"
 futures = "0.3.5"
 log = "0.4.11"
 structopt = "0.3.18"
-substrate-subxt = { version = "0.15.0", git = "https://github.com/wuminzhe/substrate-subxt.git", branch = "darwinia" }
+substrate-subxt = { version = "0.15.0", git = "https://github.com/darwinia-network/substrate-subxt.git", branch="bump-jsonrpsee-alpha6" }
 sp-keyring = "3.0.0"
 sp-version = "3.0.0"
 web3 = { version = "0.14.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "v0.14.0", features = ["signing"] }

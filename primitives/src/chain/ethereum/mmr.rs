@@ -15,18 +15,18 @@ pub struct MMRRootJson {
 	pub mmr_root: String,
 }
 
-impl Into<MMRRoot> for MMRRootJson {
-	fn into(self) -> MMRRoot {
+impl From<MMRRootJson> for MMRRoot {
+	fn from(that: MMRRootJson) -> Self {
 		MMRRoot {
-			mmr_root: bytes!(self.mmr_root.as_str(), 32),
+			mmr_root: bytes!(that.mmr_root.as_str(), 32),
 		}
 	}
 }
 
-impl Into<MMRRootJson> for MMRRoot {
-	fn into(self) -> MMRRootJson {
+impl From<MMRRoot> for MMRRootJson {
+	fn from(that: MMRRoot) -> Self {
 		MMRRootJson {
-			mmr_root: hex!(&self.mmr_root),
+			mmr_root: hex!(&that.mmr_root),
 		}
 	}
 }
@@ -53,22 +53,22 @@ pub struct MMRProofJson {
 	pub proof: Vec<String>,
 }
 
-impl Into<MMRProof> for MMRProofJson {
-	fn into(self) -> MMRProof {
+impl From<MMRProofJson> for MMRProof {
+	fn from(that: MMRProofJson) -> Self {
 		MMRProof {
-			member_leaf_index: self.member_leaf_index,
-			last_leaf_index: self.last_leaf_index,
-			proof: self.proof.iter().map(|p| bytes!(p.as_str(), 32)).collect(),
+			member_leaf_index: that.member_leaf_index,
+			last_leaf_index: that.last_leaf_index,
+			proof: that.proof.iter().map(|p| bytes!(p.as_str(), 32)).collect(),
 		}
 	}
 }
 
-impl Into<MMRProofJson> for MMRProof {
-	fn into(self) -> MMRProofJson {
+impl From<MMRProof> for MMRProofJson {
+	fn from(that: MMRProof) -> Self {
 		MMRProofJson {
-			member_leaf_index: self.member_leaf_index,
-			last_leaf_index: self.last_leaf_index,
-			proof: self.proof.iter().map(|p| hex!(p)).collect(),
+			member_leaf_index: that.member_leaf_index,
+			last_leaf_index: that.last_leaf_index,
+			proof: that.proof.iter().map(|p| hex!(p)).collect(),
 		}
 	}
 }

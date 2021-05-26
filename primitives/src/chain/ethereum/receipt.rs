@@ -53,33 +53,33 @@ pub struct EthereumReceiptProofJson {
 	pub header_hash: String,
 }
 
-impl Into<EthereumReceiptProofJson> for EthereumReceiptProof {
-	fn into(self) -> EthereumReceiptProofJson {
+impl From<EthereumReceiptProof> for EthereumReceiptProofJson {
+	fn from(that: EthereumReceiptProof) -> Self {
 		EthereumReceiptProofJson {
-			index: format!("{:x}", self.index),
-			proof: hex!(self.proof),
-			header_hash: hex!(self.header_hash.to_vec()),
+			index: format!("{:x}", that.index),
+			proof: hex!(that.proof),
+			header_hash: hex!(that.header_hash.to_vec()),
 		}
 	}
 }
 
-impl Into<EthereumReceiptProof> for EthereumReceiptProofJson {
-	fn into(self) -> EthereumReceiptProof {
-		let index = if self.index.starts_with("0x") {
-			&self.index[2..]
+impl From<EthereumReceiptProofJson> for EthereumReceiptProof {
+	fn from(that: EthereumReceiptProofJson) -> Self {
+		let index = if that.index.starts_with("0x") {
+			&that.index[2..]
 		} else {
 			"00"
 		};
 
-		let hash = if !self.header_hash.is_empty() {
-			bytes!(self.header_hash.as_str(), 32)
+		let hash = if !that.header_hash.is_empty() {
+			bytes!(that.header_hash.as_str(), 32)
 		} else {
 			[0; 32]
 		};
 
 		EthereumReceiptProof {
 			index: u64::from_str_radix(index, 16).unwrap_or(0),
-			proof: bytes!(self.proof.as_str()),
+			proof: bytes!(that.proof.as_str()),
 			header_hash: hash,
 		}
 	}
@@ -107,12 +107,12 @@ pub struct EthereumReceiptProofThingJson {
 	pub mmr_proof: MMRProofJson,
 }
 
-impl Into<EthereumReceiptProofThing> for EthereumReceiptProofThingJson {
-	fn into(self) -> EthereumReceiptProofThing {
+impl From<EthereumReceiptProofThingJson> for EthereumReceiptProofThing {
+	fn from(that: EthereumReceiptProofThingJson) -> Self {
 		EthereumReceiptProofThing {
-			header: self.header.into(),
-			receipt_proof: self.receipt_proof.into(),
-			mmr_proof: self.mmr_proof.into(),
+			header: that.header.into(),
+			receipt_proof: that.receipt_proof.into(),
+			mmr_proof: that.mmr_proof.into(),
 		}
 	}
 }
@@ -179,13 +179,13 @@ pub struct EthReceiptBody {
 	pub transaction_index: String,
 }
 
-impl Into<EthereumReceipt> for EthReceiptBody {
-	fn into(self) -> EthereumReceipt {
+impl From<EthReceiptBody> for EthereumReceipt {
+	fn from(that: EthReceiptBody) -> Self {
 		EthereumReceipt {
-			gas_used: u64::from_str_radix(&self.cumulative_gas_used.as_str()[2..], 16)
+			gas_used: u64::from_str_radix(&that.cumulative_gas_used.as_str()[2..], 16)
 				.unwrap_or_default(),
-			log_bloom: Bloom(bytes!(self.logs_bloom.as_str(), 256)),
-			logs: self
+			log_bloom: Bloom(bytes!(that.logs_bloom.as_str(), 256)),
+			logs: that
 				.logs
 				.iter()
 				.map(|l| -> LogEntry {
@@ -201,11 +201,11 @@ impl Into<EthereumReceipt> for EthReceiptBody {
 				})
 				.collect(),
 			outcome: {
-				if self.status.len() == 66 {
-					TransactionOutcome::StateRoot(H256(bytes!(self.status.as_str(), 32)))
+				if that.status.len() == 66 {
+					TransactionOutcome::StateRoot(H256(bytes!(that.status.as_str(), 32)))
 				} else {
 					TransactionOutcome::StatusCode(
-						u8::from_str_radix(&self.status.as_str()[2..], 16).unwrap_or(0),
+						u8::from_str_radix(&that.status.as_str()[2..], 16).unwrap_or(0),
 					)
 				}
 			},

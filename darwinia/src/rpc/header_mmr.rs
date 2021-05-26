@@ -40,16 +40,16 @@ pub struct FormatedMMR {
 	pub siblings: Vec<String>,
 }
 
-impl Into<Option<HeaderMMR>> for HeaderMMRRpc {
-	fn into(self) -> Option<HeaderMMR> {
-		let mmr_size = self.mmr_size.parse::<u64>();
+impl From<HeaderMMRRpc> for Option<HeaderMMR> {
+	fn from(that: HeaderMMRRpc) -> Self {
+		let mmr_size = that.mmr_size.parse::<u64>();
 		if let Err(err) = mmr_size {
 			println!("parse mmr size failed {}", err);
 			return None;
 		}
 		//let proof = serde_json::from_str(&self.proof);
 		let trim: &[_] = &['[', ']'];
-		let proof: Vec<String> = self
+		let proof: Vec<String> = that
 			.proof
 			.trim_matches(trim)
 			.split(',')
@@ -67,13 +67,13 @@ impl Into<Option<HeaderMMR>> for HeaderMMRRpc {
 	}
 }
 
-impl Into<Option<FormatedMMR>> for HeaderMMR {
-	fn into(self) -> Option<FormatedMMR> {
-		let (peaks, siblings) = convert(self.mmr_size, self.block, self.hash, self.proof);
+impl From<HeaderMMR> for Option<FormatedMMR> {
+	fn from(that: HeaderMMR) -> Self {
+		let (peaks, siblings) = convert(that.mmr_size, that.block, that.hash, that.proof);
 		Some(FormatedMMR {
-			block: self.block,
-			hash: self.hash,
-			mmr_size: self.mmr_size,
+			block: that.block,
+			hash: that.hash,
+			mmr_size: that.mmr_size,
 			peaks,
 			siblings,
 		})

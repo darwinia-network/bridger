@@ -5,7 +5,7 @@ use super::crypto::{Crypto, EncryptPrivateKey};
 use crate::error::{BizError, Result};
 use config::{Config, File};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 // - Ethereum --------------------------------
 /// Ethereum Settings
@@ -156,8 +156,8 @@ pub struct Settings {
 
 impl Settings {
 	/// New settings from pathbuf
-	pub fn new(data_dir: &PathBuf) -> Result<Self> {
-		let mut config_file = data_dir.clone();
+	pub fn new(data_dir: &Path) -> Result<Self> {
+		let mut config_file = data_dir.to_path_buf();
 		config_file.push("config.yml");
 
 		let mut settings = Config::default();

@@ -21,15 +21,15 @@ pub struct EthereumRelayProofsJson {
 	pub mmr_proof: Vec<String>,
 }
 
-impl Into<EthereumRelayProofs> for EthereumRelayProofsJson {
-	fn into(self) -> EthereumRelayProofs {
+impl From<EthereumRelayProofsJson> for EthereumRelayProofs {
+	fn from(that: EthereumRelayProofsJson) -> Self {
 		EthereumRelayProofs {
-			ethash_proof: self
+			ethash_proof: that
 				.ethash_proof
 				.iter()
 				.map(|p| Into::<EthashProof>::into(p.to_owned()))
 				.collect(),
-			mmr_proof: self
+			mmr_proof: that
 				.mmr_proof
 				.iter()
 				.map(|p| bytes!(p.as_str(), 32))

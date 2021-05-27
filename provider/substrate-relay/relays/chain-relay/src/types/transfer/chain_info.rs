@@ -12,8 +12,14 @@ pub struct ChainInfo {
 }
 
 impl ChainInfo {
-	pub fn new(entrypoint: String, signer: Option<String>, signer_password: Option<String>) -> anyhow::Result<Self> {
-		if entrypoint.find("ws://").unwrap_or(usize::MAX) != 0 && entrypoint.find("wss://").unwrap_or(usize::MAX) != 0 {
+	pub fn new(
+		entrypoint: String,
+		signer: Option<String>,
+		signer_password: Option<String>,
+	) -> anyhow::Result<Self> {
+		if entrypoint.find("ws://").unwrap_or(usize::MAX) != 0
+			&& entrypoint.find("wss://").unwrap_or(usize::MAX) != 0
+		{
 			anyhow::bail!("The entrypoint isn't websocket protocol")
 		}
 		let secure = entrypoint.starts_with("wss://");
@@ -21,9 +27,11 @@ impl ChainInfo {
 			.replace(if secure { "wss://" } else { "ws://" }, "")
 			.replace("/", "")
 			.replace(" ", "");
-		let host_port = entrypoint.split(":").collect::<Vec<&str>>();
+		let host_port = entrypoint.split(':').collect::<Vec<&str>>();
 		let host = host_port.get(0).unwrap_or(&"127.0.0.1");
-		let port = host_port.get(1).unwrap_or_else(|| if secure { &"443" } else { &"80" });
+		let port = host_port
+			.get(1)
+			.unwrap_or_else(|| if secure { &"443" } else { &"80" });
 		Ok(Self {
 			host: host.to_string(),
 			port: port.parse::<u32>()?,
@@ -36,11 +44,13 @@ impl ChainInfo {
 
 impl ChainInfo {
 	/// Convert connection params into Substrate client.
-	pub async fn to_substrate_relay_chain<C: CliChain>(&self) -> anyhow::Result<relay_substrate_client::Client<C>> {
+	pub async fn to_substrate_relay_chain<C: CliChain>(
+		&self,
+	) -> anyhow::Result<relay_substrate_client::Client<C>> {
 		Ok(
 			relay_substrate_client::Client::new(relay_substrate_client::ConnectionParams {
 				host: self.host.clone(),
-				port: self.port.clone() as u16,
+				port: self.port as u16,
 				secure: self.secure,
 			})
 			.await,
@@ -55,6 +65,7 @@ impl ChainInfo {
 			Some(v) => v,
 			None => anyhow::bail!("The chain [{}:{}] not set signer", self.host, self.port),
 		};
-		C::KeyPair::from_string(&signer, self.signer_password.as_deref()).map_err(|e| anyhow::format_err!("{:?}", e))
+		C::KeyPair::from_string(&signer, self.signer_password.as_deref())
+			.map_err(|e| anyhow::format_err!("{:?}", e))
 	}
 }

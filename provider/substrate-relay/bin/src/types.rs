@@ -56,19 +56,19 @@ pub struct PrometheusParams {
 
 impl RelayBridgeInfo {
 	pub fn source_chain_info(&self) -> anyhow::Result<ChainInfo> {
-		Ok(ChainInfo::new(
+		ChainInfo::new(
 			self.source.clone(),
 			self.source_signer.clone(),
 			self.source_signer_password.clone(),
-		)?)
+		)
 	}
 
 	pub fn target_chain_info(&self) -> anyhow::Result<ChainInfo> {
-		Ok(ChainInfo::new(
+		ChainInfo::new(
 			self.target.clone(),
 			self.target_signer.clone(),
 			self.target_signer_password.clone(),
-		)?)
+		)
 	}
 }
 

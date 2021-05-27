@@ -189,6 +189,7 @@ macro_rules! declare_relay_messages {
 
 			pub struct [<$source_name MessagesTo $target_name Runner>];
 
+			#[allow(non_snake_case)]
 			impl [<$source_name MessagesTo $target_name Runner>] {
 				pub async fn run(
 					params: MessagesRelayParams<

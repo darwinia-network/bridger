@@ -5,7 +5,7 @@ mod receipt;
 use crate::{
 	chain::ethereum::{EthReceiptBody, EthereumBlockRPC, EthereumHeader},
 	result::{Error, Result},
-	rpc::RPC,
+	rpc::Rpc,
 };
 use async_trait::async_trait;
 use reqwest::Client;
@@ -61,7 +61,7 @@ impl EthereumRPC {
 /// Verify the result of infura will not response empty header with hash
 /// 0x00000...
 #[async_trait]
-impl RPC for EthereumRPC {
+impl Rpc for EthereumRPC {
 	type Header = EthereumHeader;
 	type Receipt = EthReceiptBody;
 	type Block = EthereumBlockRPC;

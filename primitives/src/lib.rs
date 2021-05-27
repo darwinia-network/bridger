@@ -31,6 +31,7 @@
 //! GPL-3.0
 #![allow(clippy::ptr_offset_with_cast)]
 #![allow(clippy::assign_op_pattern)]
+#![allow(clippy::manual_range_contains)]
 #![deny(missing_docs)]
 #[macro_use]
 extern crate serde;

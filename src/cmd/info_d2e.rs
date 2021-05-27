@@ -89,20 +89,21 @@ pub async fn exec(
 		.await?;
 
 	//let mut result = HashMap::new();
-	let mut result: TxProofWithMMRProof = Default::default();
-
-	result.message = array_bytes::bytes2hex("0x", &message);
-	result.block_header = array_bytes::bytes2hex("0x", header.encode());
-	result.events_proof_str = array_bytes::bytes2hex(
-		"0x",
-		event_proof
-			.iter()
-			.map(|x| &x.0)
-			.collect::<Vec<&Vec<u8>>>()
-			.encode(),
-	);
-	result.root = array_bytes::bytes2hex("0x", mmr_root);
-	result.mmrindex = mmrblock;
+	let mut result: TxProofWithMMRProof = TxProofWithMMRProof {
+		message: array_bytes::bytes2hex("0x", &message),
+		block_header: array_bytes::bytes2hex("0x", header.encode()),
+		events_proof_str: array_bytes::bytes2hex(
+			"0x",
+			event_proof
+				.iter()
+				.map(|x| &x.0)
+				.collect::<Vec<&Vec<u8>>>()
+				.encode(),
+		),
+		root: array_bytes::bytes2hex("0x", mmr_root),
+		mmrindex: mmrblock,
+		..Default::default()
+	};
 
 	if let Some(header_proof) = proof {
 		let proof: Option<FormatedMMR> = header_proof.into();

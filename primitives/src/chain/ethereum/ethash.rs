@@ -38,16 +38,16 @@ pub struct EthashProofJson {
 	proof: Vec<String>,
 }
 
-impl Into<EthashProofJson> for EthashProof {
-	fn into(self) -> EthashProofJson {
+impl From<EthashProof> for EthashProofJson {
+	fn from(that: EthashProof) -> Self {
 		EthashProofJson {
-			dag_nodes: self
+			dag_nodes: that
 				.dag_nodes
 				.as_ref()
 				.iter()
 				.map(|n| format!("0x{}", hex!(n.0.to_vec())))
 				.collect(),
-			proof: self
+			proof: that
 				.proof
 				.iter()
 				.map(|p| format!("0x{}", hex!(p.0.to_vec())))
@@ -56,14 +56,14 @@ impl Into<EthashProofJson> for EthashProof {
 	}
 }
 
-impl Into<EthashProof> for EthashProofJson {
-	fn into(self) -> EthashProof {
+impl From<EthashProofJson> for EthashProof {
+	fn from(that: EthashProofJson) -> Self {
 		EthashProof {
 			dag_nodes: [
-				H512(bytes!(self.dag_nodes[0].as_str(), 64)),
-				H512(bytes!(self.dag_nodes[1].as_str(), 64)),
+				H512(bytes!(that.dag_nodes[0].as_str(), 64)),
+				H512(bytes!(that.dag_nodes[1].as_str(), 64)),
 			],
-			proof: self
+			proof: that
 				.proof
 				.iter()
 				.map(|p| H128(bytes!(p.as_str(), 16)))

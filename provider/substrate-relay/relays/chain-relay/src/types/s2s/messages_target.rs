@@ -1,19 +1,3 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
-// This file is part of Parity Bridges Common.
-
-// Parity Bridges Common is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// Parity Bridges Common is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
-
 //! Substrate client as Substrate messages target. The chain we connect to should have
 //! runtime that implements `<BridgedChainName>HeaderApi` to allow bridging with
 //! <BridgedName> chain.
@@ -146,8 +130,8 @@ where
 				Some(id.1),
 			)
 			.await?;
-		let latest_received_nonce: MessageNonce =
-			Decode::decode(&mut &encoded_response.0[..]).map_err(SubstrateError::ResponseParseFailed)?;
+		let latest_received_nonce: MessageNonce = Decode::decode(&mut &encoded_response.0[..])
+			.map_err(SubstrateError::ResponseParseFailed)?;
 		Ok((id, latest_received_nonce))
 	}
 
@@ -163,8 +147,8 @@ where
 				Some(id.1),
 			)
 			.await?;
-		let latest_received_nonce: MessageNonce =
-			Decode::decode(&mut &encoded_response.0[..]).map_err(SubstrateError::ResponseParseFailed)?;
+		let latest_received_nonce: MessageNonce = Decode::decode(&mut &encoded_response.0[..])
+			.map_err(SubstrateError::ResponseParseFailed)?;
 		Ok((id, latest_received_nonce))
 	}
 
@@ -181,7 +165,8 @@ where
 			)
 			.await?;
 		let unrewarded_relayers_state: UnrewardedRelayersState =
-			Decode::decode(&mut &encoded_response.0[..]).map_err(SubstrateError::ResponseParseFailed)?;
+			Decode::decode(&mut &encoded_response.0[..])
+				.map_err(SubstrateError::ResponseParseFailed)?;
 		Ok((id, unrewarded_relayers_state))
 	}
 
@@ -190,7 +175,8 @@ where
 		id: TargetHeaderIdOf<P>,
 	) -> Result<(TargetHeaderIdOf<P>, P::MessagesReceivingProof), SubstrateError> {
 		let (id, relayers_state) = self.unrewarded_relayers_state(id).await?;
-		let inbound_data_key = pallet_bridge_messages::storage_keys::inbound_lane_data_key::<R, I>(&self.lane_id);
+		let inbound_data_key =
+			pallet_bridge_messages::storage_keys::inbound_lane_data_key::<R, I>(&self.lane_id);
 		let proof = self
 			.client
 			.prove_storage(vec![inbound_data_key], id.1)
@@ -212,14 +198,17 @@ where
 		proof: P::MessagesProof,
 	) -> Result<RangeInclusive<MessageNonce>, SubstrateError> {
 		self.client
-			.submit_signed_extrinsic(self.lane.target_transactions_author(), |transaction_nonce| {
-				self.lane.make_messages_delivery_transaction(
-					transaction_nonce,
-					generated_at_header,
-					nonces.clone(),
-					proof,
-				)
-			})
+			.submit_signed_extrinsic(
+				self.lane.target_transactions_author(),
+				|transaction_nonce| {
+					self.lane.make_messages_delivery_transaction(
+						transaction_nonce,
+						generated_at_header,
+						nonces.clone(),
+						proof,
+					)
+				},
+			)
 			.await?;
 		Ok(nonces)
 	}

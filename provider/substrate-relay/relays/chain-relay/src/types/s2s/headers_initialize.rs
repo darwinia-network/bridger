@@ -1,19 +1,3 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
-// This file is part of Parity Bridges Common.
-
-// Parity Bridges Common is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// Parity Bridges Common is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
-
 //! Initialize Substrate -> Substrate headers bridge.
 //!
 //! Initialization is a transaction that calls `initialize()` function of the
@@ -39,7 +23,10 @@ pub async fn initialize<SourceChain: Chain, TargetChain: Chain>(
 	source_client: Client<SourceChain>,
 	target_client: Client<TargetChain>,
 	target_transactions_signer: TargetChain::AccountId,
-	prepare_initialize_transaction: impl FnOnce(TargetChain::Index, InitializationData<SourceChain::Header>) -> Bytes,
+	prepare_initialize_transaction: impl FnOnce(
+		TargetChain::Index,
+		InitializationData<SourceChain::Header>,
+	) -> Bytes,
 ) {
 	let result = do_initialize(
 		source_client,
@@ -72,7 +59,10 @@ async fn do_initialize<SourceChain: Chain, TargetChain: Chain>(
 	source_client: Client<SourceChain>,
 	target_client: Client<TargetChain>,
 	target_transactions_signer: TargetChain::AccountId,
-	prepare_initialize_transaction: impl FnOnce(TargetChain::Index, InitializationData<SourceChain::Header>) -> Bytes,
+	prepare_initialize_transaction: impl FnOnce(
+		TargetChain::Index,
+		InitializationData<SourceChain::Header>,
+	) -> Bytes,
 ) -> Result<TargetChain::Hash, String> {
 	let initialization_data = prepare_initialization_data(source_client).await?;
 	log::info!(
@@ -88,7 +78,13 @@ async fn do_initialize<SourceChain: Chain, TargetChain: Chain>(
 			prepare_initialize_transaction(transaction_nonce, initialization_data)
 		})
 		.await
-		.map_err(|err| format!("Failed to submit {} transaction: {:?}", TargetChain::NAME, err))?;
+		.map_err(|err| {
+			format!(
+				"Failed to submit {} transaction: {:?}",
+				TargetChain::NAME,
+				err
+			)
+		})?;
 	Ok(initialization_tx_hash)
 }
 
@@ -105,7 +101,13 @@ async fn prepare_initialization_data<SourceChain: Chain>(
 	let mut justifications = source_client
 		.subscribe_justifications()
 		.await
-		.map_err(|err| format!("Failed to subscribe to {} justifications: {:?}", SourceChain::NAME, err))?;
+		.map_err(|err| {
+			format!(
+				"Failed to subscribe to {} justifications: {:?}",
+				SourceChain::NAME,
+				err
+			)
+		})?;
 
 	// Read next justification - the header that it finalizes will be used as initial header.
 	let justification = justifications.next().await.ok_or_else(|| {
@@ -116,11 +118,19 @@ async fn prepare_initialization_data<SourceChain: Chain>(
 	})?;
 
 	// Read initial header.
-	let justification: GrandpaJustification<SourceChain::Header> = Decode::decode(&mut &justification.0[..])
-		.map_err(|err| format!("Failed to decode {} justification: {:?}", SourceChain::NAME, err))?;
+	let justification: GrandpaJustification<SourceChain::Header> =
+		Decode::decode(&mut &justification.0[..]).map_err(|err| {
+			format!(
+				"Failed to decode {} justification: {:?}",
+				SourceChain::NAME,
+				err
+			)
+		})?;
 
-	let (initial_header_hash, initial_header_number) =
-		(justification.commit.target_hash, justification.commit.target_number);
+	let (initial_header_hash, initial_header_number) = (
+		justification.commit.target_hash,
+		justification.commit.target_number,
+	);
 
 	let initial_header = source_header(&source_client, initial_header_hash).await?;
 	log::trace!(target: "bridge", "Selected {} initial header: {}/{}",
@@ -130,7 +140,8 @@ async fn prepare_initialization_data<SourceChain: Chain>(
 	);
 
 	// Read GRANDPA authorities set at initial header.
-	let initial_authorities_set = source_authorities_set(&source_client, initial_header_hash).await?;
+	let initial_authorities_set =
+		source_authorities_set(&source_client, initial_header_hash).await?;
 	log::trace!(target: "bridge", "Selected {} initial authorities set: {:?}",
 		SourceChain::NAME,
 		initial_authorities_set,
@@ -141,7 +152,10 @@ async fn prepare_initialization_data<SourceChain: Chain>(
 	let mut authorities_for_verification = initial_authorities_set.clone();
 	let scheduled_change = find_grandpa_authorities_scheduled_change(&initial_header);
 	assert!(
-		scheduled_change.as_ref().map(|c| c.delay.is_zero()).unwrap_or(true),
+		scheduled_change
+			.as_ref()
+			.map(|c| c.delay.is_zero())
+			.unwrap_or(true),
 		"GRANDPA authorities change at {} scheduled to happen in {:?} blocks. We expect\
 		regular hange to have zero delay",
 		initial_header_hash,
@@ -149,7 +163,8 @@ async fn prepare_initialization_data<SourceChain: Chain>(
 	);
 	let schedules_change = scheduled_change.is_some();
 	if schedules_change {
-		authorities_for_verification = source_authorities_set(&source_client, *initial_header.parent_hash()).await?;
+		authorities_for_verification =
+			source_authorities_set(&source_client, *initial_header.parent_hash()).await?;
 		log::trace!(
 			target: "bridge",
 			"Selected {} header is scheduling GRANDPA authorities set changes. Using previous set: {:?}",
@@ -161,13 +176,14 @@ async fn prepare_initialization_data<SourceChain: Chain>(
 	// Now let's try to guess authorities set id by verifying justification.
 	let mut initial_authorities_set_id = 0;
 	let mut min_possible_block_number = SourceChain::BlockNumber::zero();
-	let authorities_for_verification = VoterSet::new(authorities_for_verification.clone()).ok_or_else(|| {
-		format!(
-			"Read invalid {} authorities set: {:?}",
-			SourceChain::NAME,
-			authorities_for_verification,
-		)
-	})?;
+	let authorities_for_verification = VoterSet::new(authorities_for_verification.clone())
+		.ok_or_else(|| {
+			format!(
+				"Read invalid {} authorities set: {:?}",
+				SourceChain::NAME,
+				authorities_for_verification,
+			)
+		})?;
 	loop {
 		log::trace!(
 			target: "bridge", "Trying {} GRANDPA authorities set id: {}",
@@ -219,14 +235,17 @@ async fn source_header<SourceChain: Chain>(
 	source_client: &Client<SourceChain>,
 	header_hash: SourceChain::Hash,
 ) -> Result<SourceChain::Header, String> {
-	source_client.header_by_hash(header_hash).await.map_err(|err| {
-		format!(
-			"Failed to retrive {} header with hash {}: {:?}",
-			SourceChain::NAME,
-			header_hash,
-			err,
-		)
-	})
+	source_client
+		.header_by_hash(header_hash)
+		.await
+		.map_err(|err| {
+			format!(
+				"Failed to retrive {} header with hash {}: {:?}",
+				SourceChain::NAME,
+				header_hash,
+				err,
+			)
+		})
 }
 
 /// Read GRANDPA authorities set at given header.

@@ -1,19 +1,3 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
-// This file is part of Parity Bridges Common.
-
-// Parity Bridges Common is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// Parity Bridges Common is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
-
 //! Types used to connect to the Millau-Substrate chain.
 
 use codec::Encode;
@@ -51,9 +35,9 @@ impl ChainWithBalances for Millau {
 
 	fn account_info_storage_key(account_id: &Self::AccountId) -> StorageKey {
 		use frame_support::storage::generator::StorageMap;
-		StorageKey(frame_system::Account::<millau_runtime::Runtime>::storage_map_final_key(
-			account_id,
-		))
+		StorageKey(
+			frame_system::Account::<millau_runtime::Runtime>::storage_map_final_key(account_id),
+		)
 	}
 }
 
@@ -93,7 +77,12 @@ impl TransactionSignScheme for Millau {
 		let signer: sp_runtime::MultiSigner = signer.public().into();
 		let (call, extra, _) = raw_payload.deconstruct();
 
-		millau_runtime::UncheckedExtrinsic::new_signed(call, signer.into_account(), signature.into(), extra)
+		millau_runtime::UncheckedExtrinsic::new_signed(
+			call,
+			signer.into_account(),
+			signature.into(),
+			extra,
+		)
 	}
 }
 

@@ -1,19 +1,3 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
-// This file is part of Parity Bridges Common.
-
-// Parity Bridges Common is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// Parity Bridges Common is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
-
 //! Substrate client as Substrate finality proof target. The chain we connect to should have
 //! runtime that implements `<BridgedChainName>FinalityApi` to allow bridging with
 //! <BridgedName> chain.
@@ -81,12 +65,22 @@ where
 		)
 	}
 
-	async fn submit_finality_proof(&self, header: P::Header, proof: P::FinalityProof) -> Result<(), SubstrateError> {
+	async fn submit_finality_proof(
+		&self,
+		header: P::Header,
+		proof: P::FinalityProof,
+	) -> Result<(), SubstrateError> {
 		self.client
-			.submit_signed_extrinsic(self.pipeline.transactions_author(), move |transaction_nonce| {
-				self.pipeline
-					.make_submit_finality_proof_transaction(transaction_nonce, header, proof)
-			})
+			.submit_signed_extrinsic(
+				self.pipeline.transactions_author(),
+				move |transaction_nonce| {
+					self.pipeline.make_submit_finality_proof_transaction(
+						transaction_nonce,
+						header,
+						proof,
+					)
+				},
+			)
 			.await
 			.map(drop)
 	}

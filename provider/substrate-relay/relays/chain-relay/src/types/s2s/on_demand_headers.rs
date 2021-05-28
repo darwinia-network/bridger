@@ -1,27 +1,14 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
-// This file is part of Parity Bridges Common.
-
-// Parity Bridges Common is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// Parity Bridges Common is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
-
 //! On-demand Substrate -> Substrate headers relay.
 
-use crate::types::s2s::finality_pipeline::{SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate};
+use crate::types::s2s::finality_pipeline::{
+	SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate,
+};
 use crate::types::s2s::finality_target::SubstrateFinalityTarget;
 
 use bp_header_chain::justification::GrandpaJustification;
 use finality_relay::{
-	FinalitySyncPipeline, SourceClient as FinalitySourceClient, TargetClient as FinalityTargetClient,
+	FinalitySyncPipeline, SourceClient as FinalitySourceClient,
+	TargetClient as FinalityTargetClient,
 };
 use futures::{
 	channel::{mpsc, oneshot},
@@ -29,12 +16,12 @@ use futures::{
 };
 use num_traits::{CheckedSub, Zero};
 use relay_substrate_client::{
-	finality_source::FinalitySource as SubstrateFinalitySource, BlockNumberOf, Chain, Client, HashOf, HeaderIdOf,
-	SyncHeader,
+	finality_source::FinalitySource as SubstrateFinalitySource, BlockNumberOf, Chain, Client,
+	HashOf, HeaderIdOf, SyncHeader,
 };
 use relay_utils::{
-	metrics::MetricsParams, relay_loop::Client as RelayClient, BlockNumberBase, FailedClient, HeaderId,
-	MaybeConnectionError,
+	metrics::MetricsParams, relay_loop::Client as RelayClient, BlockNumberBase, FailedClient,
+	HeaderId, MaybeConnectionError,
 };
 use std::fmt::Debug;
 
@@ -65,15 +52,18 @@ impl<SourceChain: Chain> OnDemandHeadersRelay<SourceChain> {
 		TargetChain: Chain + Debug,
 		TargetChain::BlockNumber: BlockNumberBase,
 		TargetSign: Clone + Send + Sync + 'static,
-		SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>: SubstrateFinalitySyncPipeline<
-			Hash = HashOf<SourceChain>,
-			Number = BlockNumberOf<SourceChain>,
-			Header = SyncHeader<SourceChain::Header>,
-			FinalityProof = GrandpaJustification<SourceChain::Header>,
-			TargetChain = TargetChain,
-		>,
-		SubstrateFinalityTarget<TargetChain, SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>>:
-			FinalityTargetClient<SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>>,
+		SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>:
+			SubstrateFinalitySyncPipeline<
+				Hash = HashOf<SourceChain>,
+				Number = BlockNumberOf<SourceChain>,
+				Header = SyncHeader<SourceChain::Header>,
+				FinalityProof = GrandpaJustification<SourceChain::Header>,
+				TargetChain = TargetChain,
+			>,
+		SubstrateFinalityTarget<
+			TargetChain,
+			SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>,
+		>: FinalityTargetClient<SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>>,
 	{
 		let (required_header_tx, required_header_rx) = mpsc::channel(1);
 		async_std::task::spawn(async move {
@@ -124,15 +114,18 @@ async fn background_task<SourceChain, TargetChain, TargetSign>(
 	TargetChain: Chain + Debug,
 	TargetChain::BlockNumber: BlockNumberBase,
 	TargetSign: Clone + Send + Sync + 'static,
-	SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>: SubstrateFinalitySyncPipeline<
-		Hash = HashOf<SourceChain>,
-		Number = BlockNumberOf<SourceChain>,
-		Header = SyncHeader<SourceChain::Header>,
-		FinalityProof = GrandpaJustification<SourceChain::Header>,
-		TargetChain = TargetChain,
-	>,
-	SubstrateFinalityTarget<TargetChain, SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>>:
-		FinalityTargetClient<SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>>,
+	SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>:
+		SubstrateFinalitySyncPipeline<
+			Hash = HashOf<SourceChain>,
+			Number = BlockNumberOf<SourceChain>,
+			Header = SyncHeader<SourceChain::Header>,
+			FinalityProof = GrandpaJustification<SourceChain::Header>,
+			TargetChain = TargetChain,
+		>,
+	SubstrateFinalityTarget<
+		TargetChain,
+		SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>,
+	>: FinalityTargetClient<SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>>,
 {
 	let relay_task_name = on_demand_headers_relay_name::<SourceChain, TargetChain>();
 	let mut finality_source = SubstrateFinalitySource::<
@@ -186,8 +179,12 @@ async fn background_task<SourceChain, TargetChain, TargetSign>(
 		}
 
 		// read best finalized source header number from target
-		let best_finalized_source_header_at_target =
-			best_finalized_source_header_at_target::<SourceChain, _, _>(&finality_target, &relay_task_name).await;
+		let best_finalized_source_header_at_target = best_finalized_source_header_at_target::<
+			SourceChain,
+			_,
+			_,
+		>(&finality_target, &relay_task_name)
+		.await;
 		if matches!(best_finalized_source_header_at_target, Err(ref e) if e.is_connection_error()) {
 			relay_utils::relay_loop::reconnect_failed_client(
 				FailedClient::Target,
@@ -241,16 +238,19 @@ where
 	SubstrateFinalitySource<SourceChain, P>: FinalitySourceClient<P>,
 	P: FinalitySyncPipeline<Number = SourceChain::BlockNumber>,
 {
-	finality_source.best_finalized_block_number().await.map_err(|error| {
-		log::error!(
-			target: "bridge",
-			"Failed to read best finalized source header from source in {} relay: {:?}",
-			relay_task_name,
-			error,
-		);
+	finality_source
+		.best_finalized_block_number()
+		.await
+		.map_err(|error| {
+			log::error!(
+				target: "bridge",
+				"Failed to read best finalized source header from source in {} relay: {:?}",
+				relay_task_name,
+				error,
+			);
 
-		error
-	})
+			error
+		})
 }
 
 /// Read best finalized source block number from target client.
@@ -335,7 +335,8 @@ fn select_on_demand_relay_action<C: Chain>(
 	}
 
 	// now let's select what to do with relay
-	let needs_to_be_active = required_source_header_at_target > best_finalized_source_header_at_target;
+	let needs_to_be_active =
+		required_source_header_at_target > best_finalized_source_header_at_target;
 	match (needs_to_be_active, is_active) {
 		(true, false) => OnDemandRelayAction::Start,
 		(false, true) => OnDemandRelayAction::Stop,
@@ -358,13 +359,14 @@ fn start_on_demand_headers_relay<SourceChain: Chain, TargetChain: Chain, TargetS
 ) -> Option<async_std::task::JoinHandle<()>>
 where
 	SourceChain::BlockNumber: BlockNumberBase,
-	SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>: SubstrateFinalitySyncPipeline<
-		Hash = HashOf<SourceChain>,
-		Number = BlockNumberOf<SourceChain>,
-		Header = SyncHeader<SourceChain::Header>,
-		FinalityProof = GrandpaJustification<SourceChain::Header>,
-		TargetChain = TargetChain,
-	>,
+	SubstrateFinalityToSubstrate<SourceChain, TargetChain, TargetSign>:
+		SubstrateFinalitySyncPipeline<
+			Hash = HashOf<SourceChain>,
+			Number = BlockNumberOf<SourceChain>,
+			Header = SyncHeader<SourceChain::Header>,
+			FinalityProof = GrandpaJustification<SourceChain::Header>,
+			TargetChain = TargetChain,
+		>,
 	TargetSign: 'static,
 {
 	let headers_relay_future = crate::types::s2s::finality_pipeline::run(
@@ -446,12 +448,26 @@ mod tests {
 	#[test]
 	fn stops_relay_if_required_header_is_synced() {
 		assert_eq!(
-			select_on_demand_relay_action::<TestChain>(AT_SOURCE, AT_TARGET, AT_TARGET.unwrap(), 100, "test", true),
+			select_on_demand_relay_action::<TestChain>(
+				AT_SOURCE,
+				AT_TARGET,
+				AT_TARGET.unwrap(),
+				100,
+				"test",
+				true
+			),
 			OnDemandRelayAction::Stop,
 		);
 
 		assert_eq!(
-			select_on_demand_relay_action::<TestChain>(AT_SOURCE, AT_TARGET, AT_TARGET.unwrap(), 100, "test", false),
+			select_on_demand_relay_action::<TestChain>(
+				AT_SOURCE,
+				AT_TARGET,
+				AT_TARGET.unwrap(),
+				100,
+				"test",
+				false
+			),
 			OnDemandRelayAction::None,
 		);
 	}

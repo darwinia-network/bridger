@@ -30,7 +30,8 @@ use frame_support::{traits::Instance, weights::Weight};
 use messages_relay::{
 	message_lane::{SourceHeaderIdOf, TargetHeaderIdOf},
 	message_lane_loop::{
-		ClientState, MessageProofParameters, MessageWeights, MessageWeightsMap, SourceClient, SourceClientState,
+		ClientState, MessageProofParameters, MessageWeights, MessageWeightsMap, SourceClient,
+		SourceClientState,
 	},
 };
 use pallet_bridge_messages::Config as MessagesConfig;
@@ -146,8 +147,8 @@ where
 				Some(id.1),
 			)
 			.await?;
-		let latest_generated_nonce: MessageNonce =
-			Decode::decode(&mut &encoded_response.0[..]).map_err(SubstrateError::ResponseParseFailed)?;
+		let latest_generated_nonce: MessageNonce = Decode::decode(&mut &encoded_response.0[..])
+			.map_err(SubstrateError::ResponseParseFailed)?;
 		Ok((id, latest_generated_nonce))
 	}
 
@@ -163,8 +164,8 @@ where
 				Some(id.1),
 			)
 			.await?;
-		let latest_received_nonce: MessageNonce =
-			Decode::decode(&mut &encoded_response.0[..]).map_err(SubstrateError::ResponseParseFailed)?;
+		let latest_received_nonce: MessageNonce = Decode::decode(&mut &encoded_response.0[..])
+			.map_err(SubstrateError::ResponseParseFailed)?;
 		Ok((id, latest_received_nonce))
 	}
 
@@ -183,7 +184,8 @@ where
 			.await?;
 
 		make_message_weights_map::<C>(
-			Decode::decode(&mut &encoded_response.0[..]).map_err(SubstrateError::ResponseParseFailed)?,
+			Decode::decode(&mut &encoded_response.0[..])
+				.map_err(SubstrateError::ResponseParseFailed)?,
 			nonces,
 		)
 	}
@@ -193,18 +195,29 @@ where
 		id: SourceHeaderIdOf<P>,
 		nonces: RangeInclusive<MessageNonce>,
 		proof_parameters: MessageProofParameters,
-	) -> Result<(SourceHeaderIdOf<P>, RangeInclusive<MessageNonce>, P::MessagesProof), SubstrateError> {
-		let mut storage_keys = Vec::with_capacity(nonces.end().saturating_sub(*nonces.start()) as usize + 1);
+	) -> Result<
+		(
+			SourceHeaderIdOf<P>,
+			RangeInclusive<MessageNonce>,
+			P::MessagesProof,
+		),
+		SubstrateError,
+	> {
+		let mut storage_keys =
+			Vec::with_capacity(nonces.end().saturating_sub(*nonces.start()) as usize + 1);
 		let mut message_nonce = *nonces.start();
 		while message_nonce <= *nonces.end() {
-			let message_key = pallet_bridge_messages::storage_keys::message_key::<R, I>(&self.lane_id, message_nonce);
+			let message_key = pallet_bridge_messages::storage_keys::message_key::<R, I>(
+				&self.lane_id,
+				message_nonce,
+			);
 			storage_keys.push(message_key);
 			message_nonce += 1;
 		}
 		if proof_parameters.outbound_state_proof_required {
-			storage_keys.push(pallet_bridge_messages::storage_keys::outbound_lane_data_key::<I>(
-				&self.lane_id,
-			));
+			storage_keys.push(
+				pallet_bridge_messages::storage_keys::outbound_lane_data_key::<I>(&self.lane_id),
+			);
 		}
 
 		let proof = self
@@ -229,10 +242,16 @@ where
 		proof: P::MessagesReceivingProof,
 	) -> Result<(), SubstrateError> {
 		self.client
-			.submit_signed_extrinsic(self.lane.source_transactions_author(), move |transaction_nonce| {
-				self.lane
-					.make_messages_receiving_proof_transaction(transaction_nonce, generated_at_block, proof)
-			})
+			.submit_signed_extrinsic(
+				self.lane.source_transactions_author(),
+				move |transaction_nonce| {
+					self.lane.make_messages_receiving_proof_transaction(
+						transaction_nonce,
+						generated_at_block,
+						proof,
+					)
+				},
+			)
 			.await?;
 		Ok(())
 	}
@@ -247,7 +266,10 @@ where
 pub async fn read_client_state<SelfChain, BridgedHeaderHash, BridgedHeaderNumber>(
 	self_client: &Client<SelfChain>,
 	best_finalized_header_id_method_name: &str,
-) -> Result<ClientState<HeaderIdOf<SelfChain>, HeaderId<BridgedHeaderHash, BridgedHeaderNumber>>, SubstrateError>
+) -> Result<
+	ClientState<HeaderIdOf<SelfChain>, HeaderId<BridgedHeaderHash, BridgedHeaderNumber>>,
+	SubstrateError,
+>
 where
 	SelfChain: Chain,
 	SelfChain::Header: DeserializeOwned,
@@ -257,8 +279,13 @@ where
 {
 	// let's read our state first: we need best finalized header hash on **this** chain
 	let self_best_finalized_header_hash = self_client.best_finalized_header_hash().await?;
-	let self_best_finalized_header = self_client.header_by_hash(self_best_finalized_header_hash).await?;
-	let self_best_finalized_id = HeaderId(*self_best_finalized_header.number(), self_best_finalized_header_hash);
+	let self_best_finalized_header = self_client
+		.header_by_hash(self_best_finalized_header_hash)
+		.await?;
+	let self_best_finalized_id = HeaderId(
+		*self_best_finalized_header.number(),
+		self_best_finalized_header_hash,
+	);
 
 	// now let's read our best header on **this** chain
 	let self_best_header = self_client.best_header().await?;
@@ -274,7 +301,8 @@ where
 		)
 		.await?;
 	let decoded_best_finalized_peer_on_self: (BridgedHeaderNumber, BridgedHeaderHash) =
-		Decode::decode(&mut &encoded_best_finalized_peer_on_self.0[..]).map_err(SubstrateError::ResponseParseFailed)?;
+		Decode::decode(&mut &encoded_best_finalized_peer_on_self.0[..])
+			.map_err(SubstrateError::ResponseParseFailed)?;
 	let peer_on_self_best_finalized_id = HeaderId(
 		decoded_best_finalized_peer_on_self.0,
 		decoded_best_finalized_peer_on_self.1,
@@ -360,8 +388,11 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_succeeds_if_no_messages_are_missing() {
 		assert_eq!(
-			make_message_weights_map::<relay_rialto_client::Rialto>(vec![(1, 0, 0), (2, 0, 0), (3, 0, 0)], 1..=3,)
-				.unwrap(),
+			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
+				vec![(1, 0, 0), (2, 0, 0), (3, 0, 0)],
+				1..=3,
+			)
+			.unwrap(),
 			vec![
 				(1, MessageWeights { weight: 0, size: 0 }),
 				(2, MessageWeights { weight: 0, size: 0 }),
@@ -375,7 +406,11 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_succeeds_if_head_messages_are_missing() {
 		assert_eq!(
-			make_message_weights_map::<relay_rialto_client::Rialto>(vec![(2, 0, 0), (3, 0, 0)], 1..=3,).unwrap(),
+			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
+				vec![(2, 0, 0), (3, 0, 0)],
+				1..=3,
+			)
+			.unwrap(),
 			vec![
 				(2, MessageWeights { weight: 0, size: 0 }),
 				(3, MessageWeights { weight: 0, size: 0 }),
@@ -388,7 +423,10 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_fails_if_mid_messages_are_missing() {
 		assert!(matches!(
-			make_message_weights_map::<relay_rialto_client::Rialto>(vec![(1, 0, 0), (3, 0, 0)], 1..=3,),
+			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
+				vec![(1, 0, 0), (3, 0, 0)],
+				1..=3,
+			),
 			Err(SubstrateError::Custom(_))
 		));
 	}
@@ -396,7 +434,10 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_fails_if_tail_messages_are_missing() {
 		assert!(matches!(
-			make_message_weights_map::<relay_rialto_client::Rialto>(vec![(1, 0, 0), (2, 0, 0)], 1..=3,),
+			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
+				vec![(1, 0, 0), (2, 0, 0)],
+				1..=3,
+			),
 			Err(SubstrateError::Custom(_))
 		));
 	}
@@ -404,7 +445,10 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_fails_if_all_messages_are_missing() {
 		assert!(matches!(
-			make_message_weights_map::<relay_rialto_client::Rialto>(vec![], 1..=3),
+			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
+				vec![],
+				1..=3
+			),
 			Err(SubstrateError::Custom(_))
 		));
 	}

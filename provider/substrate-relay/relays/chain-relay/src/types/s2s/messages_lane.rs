@@ -98,7 +98,12 @@ pub trait SubstrateMessageLane: MessageLane {
 
 /// Substrate-to-Substrate message lane.
 #[derive(Debug)]
-pub struct SubstrateMessageLaneToSubstrate<Source: Chain, SourceSignParams, Target: Chain, TargetSignParams> {
+pub struct SubstrateMessageLaneToSubstrate<
+	Source: Chain,
+	SourceSignParams,
+	Target: Chain,
+	TargetSignParams,
+> {
 	/// Client for the source Substrate chain.
 	pub(crate) source_client: Client<Source>,
 	/// Parameters required to sign transactions for source chain.
@@ -164,8 +169,8 @@ pub fn select_delivery_transaction_limits<W: pallet_bridge_messages::WeightInfoE
 	let weight_for_delivery_tx = max_extrinsic_weight / 3;
 	let weight_for_messages_dispatch = max_extrinsic_weight - weight_for_delivery_tx;
 
-	let delivery_tx_base_weight =
-		W::receive_messages_proof_overhead() + W::receive_messages_proof_outbound_lane_state_overhead();
+	let delivery_tx_base_weight = W::receive_messages_proof_overhead()
+		+ W::receive_messages_proof_outbound_lane_state_overhead();
 	let delivery_tx_weight_rest = weight_for_delivery_tx - delivery_tx_base_weight;
 	let max_number_of_messages = std::cmp::min(
 		delivery_tx_weight_rest / W::receive_messages_proof_messages_overhead(1),
@@ -188,14 +193,16 @@ pub fn select_delivery_transaction_limits<W: pallet_bridge_messages::WeightInfoE
 mod tests {
 	use super::*;
 
-	type RialtoToMillauMessagesWeights = pallet_bridge_messages::weights::RialtoWeight<rialto_runtime::Runtime>;
+	type PangolinToMillauMessagesWeights =
+		pallet_bridge_messages::weights::RialtoWeight<pangolin_runtime::Runtime>;
 
 	#[test]
 	fn select_delivery_transaction_limits_works() {
-		let (max_count, max_weight) = select_delivery_transaction_limits::<RialtoToMillauMessagesWeights>(
-			bp_millau::max_extrinsic_weight(),
-			bp_millau::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
-		);
+		let (max_count, max_weight) =
+			select_delivery_transaction_limits::<PangolinToMillauMessagesWeights>(
+				pangolin_runtime_system_params::max_extrinsic_weight(),
+				bp_millau::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
+			);
 		assert_eq!(
 			(max_count, max_weight),
 			// We don't actually care about these values, so feel free to update them whenever test
@@ -203,7 +210,7 @@ mod tests {
 			// reserved for messages dispatch allows dispatch of non-trivial messages.
 			//
 			// Any significant change in this values should attract additional attention.
-			(1013, 216_583_333_334),
+			(1024, 666583333334),
 		);
 	}
 }

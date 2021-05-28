@@ -1152,9 +1152,9 @@ dependencies = [
 
 [[package]]
 name = "curl"
-version = "0.4.37"
+version = "0.4.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adba2012502267c1fdde381e0e3acc44bf8be96b2f7d455089dcc2c8ad2f67bd"
+checksum = "003cb79c1c6d1c93344c7e1201bb51c2148f24ec2bd9c253709d6b2efb796515"
 dependencies = [
  "curl-sys",
  "libc",
@@ -1167,9 +1167,9 @@ dependencies = [
 
 [[package]]
 name = "curl-sys"
-version = "0.4.43+curl-7.76.0"
+version = "0.4.44+curl-7.77.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a802c7a9828b7d139efaed1bc92471ab6681ed86d19a105605f5eadcb0837d11"
+checksum = "4b6d85e9322b193f117c966e79c2d6929ec08c02f339f950044aba12e20bbaf1"
 dependencies = [
  "cc",
  "libc",
@@ -3866,9 +3866,9 @@ checksum = "b16bd47d9e329435e309c58469fe0791c2d0d1ba96ec0954152a5ae2b04387dc"
 
 [[package]]
 name = "memoffset"
-version = "0.6.3"
+version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f83fb6581e8ed1f85fd45c116db8405483899489e38406156c25eb743554361d"
+checksum = "59accc507f1338036a0477ef61afdae33cde60840f4dfe481319ce3ad116ddf9"
 dependencies = [
  "autocfg",
 ]
@@ -7808,7 +7808,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.15.0"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=bump-jsonrpsee-alpha6#0846293a44e0588627243a8f3b5faed5056f9c55"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.15.0#6cdcd6aeb38c72e1e504a5d30d5092fbfe840892"
 dependencies = [
  "async-trait",
  "dyn-clone",
@@ -7840,7 +7840,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.15.0"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=bump-jsonrpsee-alpha6#0846293a44e0588627243a8f3b5faed5056f9c55"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.15.0#6cdcd6aeb38c72e1e504a5d30d5092fbfe840892"
 dependencies = [
  "async-trait",
  "heck",

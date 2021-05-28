@@ -56,7 +56,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_rpc() {
 		let client = ClientBuilder::<DarwiniaRuntime>::new()
-			.set_url("ws://100.64.200.3:10000")
+			.set_url("wss://pangolin-rpc.darwinia.network")
 			.skip_type_sizes_check()
 			.build()
 			.await
@@ -75,7 +75,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_storage() {
 		let client = ClientBuilder::<DarwiniaRuntime>::new()
-			.set_url("ws://100.64.200.3:10000")
+			.set_url("wss://pangolin-rpc.darwinia.network")
 			.skip_type_sizes_check()
 			.build()
 			.await

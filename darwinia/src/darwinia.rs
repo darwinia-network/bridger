@@ -185,7 +185,7 @@ impl<R: Runtime> Darwinia<R> {
 				}
 			}
 		}
-		return Ok(result);
+		Ok(result)
 	}
 
 	/// get events from a special block

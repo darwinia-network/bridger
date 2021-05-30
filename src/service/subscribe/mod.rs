@@ -103,7 +103,7 @@ impl<R: Runtime + EthereumRelayAuthorities + Balances> SubscribeService<R> {
 			DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), self.scan_from);
 		info!("✨ SERVICE STARTED: SUBSCRIBE");
 		loop {
-			let header = tracker.next_block().await;
+			let header = tracker.next_block().await?;
 
 			// debug
 			trace!("Darwinia block {}", header.number);

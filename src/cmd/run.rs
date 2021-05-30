@@ -51,13 +51,15 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) -> Result<()> {
 		if let Err(e) = run(data_dir.clone(), &config).await {
 			error!("{:?}", e);
 			match e.downcast_ref() {
+				// break
 				Some(Error::NoDarwiniaStart) | Some(Error::NoEthereumStart) => {
-					// performing retry
+					return Err(e);
+				}
+				// retry
+				_ => {
 					info!("Bridger will restart in 30 seconds...");
 					time::delay_for(Duration::from_secs(30)).await;
 				}
-				// break default
-				_ => return Err(e),
 			}
 		}
 	}
@@ -257,6 +259,7 @@ async fn start_services(
 		);
 
 		if let Err(_e) = subscribe.start().await {
+			subscribe.stop();
 			if let Some(ethereum_service) = &ethereum_service {
 				ethereum_service.do_send(MsgStop {});
 			}
@@ -269,8 +272,8 @@ async fn start_services(
 			if let Some(guard_service) = &guard_service {
 				guard_service.do_send(MsgStop {});
 			}
-			subscribe.stop();
 			extrinsics_service.do_send(MsgStop {});
+			anyhow::bail!("DarwiniaTracker broken!");
 		}
 	}
 	Ok(())

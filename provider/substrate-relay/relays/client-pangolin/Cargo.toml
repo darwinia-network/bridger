@@ -1,0 +1,32 @@
+[package]
+authors     = ["Darwinia Network <hello@darwinia.network>"]
+description = "Pangolin runtime definition for bridge relay client"
+edition     = "2018"
+homepage    = "https://darwinia.network/"
+license     = "GPL-3.0"
+name        = "pangolin-bridge-relay-client-definition"
+readme      = "README.md"
+repository  = "https://github.com/darwinia-network/darwinia-common/"
+version     = "2.2.0"
+
+[dependencies]
+codec                  = { package = "parity-scale-codec", version = "2.0.0" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common", branch = "s2s" }
+
+# Bridge dependencies
+
+drml-primitives         = { default-features = false, git = "https://github.com/darwinia-network/darwinia-common", branch = "s2s" }
+pangolin-runtime        = { git = "https://github.com/darwinia-network/darwinia-common", branch = "s2s" }
+darwinia-ethereum-relay = { default-features = false, git = "https://github.com/darwinia-network/darwinia-common", branch = "s2s" }
+
+
+# Substrate Dependencies
+
+frame-system               = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+frame-support              = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }

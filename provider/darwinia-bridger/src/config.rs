@@ -209,7 +209,7 @@ impl Settings {
 
 impl Default for Settings {
 	fn default() -> Self {
-		let config_file = PathBuf::from(".maintain/config/ropsten_pangolin.sample.yml");
+		let config_file = PathBuf::from("../../.maintain/config/ropsten_pangolin.sample.yml");
 		let mut settings = Config::default();
 		settings.merge(File::from(config_file)).unwrap();
 		settings.try_into().unwrap()

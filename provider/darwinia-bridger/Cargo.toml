@@ -1,0 +1,79 @@
+
+[package]
+name = "darwinia-bridger"
+version = "0.3.3"
+authors = ["clearloop <udtrokia@gmail.com>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = ["src/**/*", "Cargo.toml", "./README.md"]
+keywords = ["substrate", "darwinia"]
+readme = './README.md'
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "bridger"
+path = "src/bin/bridger.rs"
+
+[dependencies]
+jsonrpsee-types = "=0.2.0-alpha.6"
+jsonrpsee-ws-client = "=0.2.0-alpha.6"
+jsonrpsee-http-client = "=0.2.0-alpha.6"
+async-macros = "2.0.0"
+async-trait = "0.1.40"
+dirs = "3.0.1"
+env_logger = "0.7.1"
+etc = "0.1.11"
+futures = "0.3.5"
+log = "0.4.11"
+structopt = "0.3.18"
+substrate-subxt = { version = "0.15.0", git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.0" }
+sp-keyring = "3.0.0"
+sp-version = "3.0.0"
+web3 = { version = "0.14.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "v0.14.0", features = ["signing"] }
+config = "0.10"
+serde_json = "1.0"
+array-bytes = "1.1.0"
+actix = "0.10"
+actix-rt = "1.1.1"
+async-io = "1.1.10"
+thiserror = "1.0"
+anyhow = "1.0.34"
+parity-scale-codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive", "full"] }
+secp256k1 = { version = "0.19", features = ["recovery"] }
+rust-crypto = "0.2.36"
+colored = "2.0.0"
+base64 = "0.13.0"
+rpassword = "5.0.1"
+serde_yaml = "0.8.15"
+
+[dependencies.reqwest]
+version = "0.10"
+features = ["json"]
+
+[dependencies.tokio]
+package = "tokio"
+version = "0.2.22"
+features = ["full"]
+
+[dependencies.primitives]
+package = "darwinia-bridge-primitives"
+version = "0.3.3"
+path = "../../primitives"
+features = ["runtime", "rpc"]
+
+[dependencies.darwinia]
+package = "bridge-client-darwinia"
+version = "0.1.0"
+path = "../../darwinia"
+
+[dependencies.serde]
+package = "serde"
+version = "1"
+features = ["derive"]
+

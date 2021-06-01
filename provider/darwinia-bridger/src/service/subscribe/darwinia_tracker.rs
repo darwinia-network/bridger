@@ -32,26 +32,11 @@ impl DarwiniaBlockTracker {
 					}
 				}
 				Err(err) => {
-					if let Some(e) = err.downcast_ref::<substrate_subxt::Error>() {
-						match e {
-							substrate_subxt::Error::Rpc(
-								jsonrpsee_types::error::Error::RestartNeeded(_),
-							) => {
-								return Err(crate::error::Error::RestartFromJsonrpsee.into());
-							}
-							_ => {
-								error!(
-									"An error occurred while tracking next darwinia block: {:#?}",
-									e
-								);
-								delay_for(Duration::from_secs(30)).await;
-							}
-						}
+					error!("An error occurred while tracking next darwinia block: {:#?}", err);
+					let err_msg = format!("{:?}", err);
+					if err_msg.contains("restart") {
+						return Err(crate::error::Error::RestartFromJsonrpsee.into());
 					} else {
-						error!(
-							"An error occurred while tracking next darwinia block: {:#?}",
-							err
-						);
 						delay_for(Duration::from_secs(30)).await;
 					}
 				}

@@ -20,7 +20,7 @@ thiserror = "1.0.20"
 array-bytes = "1.1.0"
 anyhow = "1.0.34"
 log = "0.4.11"
-substrate-subxt = { version = "0.15.0", git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.0" }
+substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.1" }
 sp-keyring = "3.0.0"
 codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive", "full"] }
 web3 = { version = "0.14.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "v0.14.0", features = ["signing"] }

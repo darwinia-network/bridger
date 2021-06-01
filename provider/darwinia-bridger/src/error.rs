@@ -31,6 +31,9 @@ pub enum Error {
 
 	#[error("New http with URI {0} error: {1}")]
 	NewHttpError(String, String),
+
+	#[error("Restart from jsonrpsee")]
+	RestartFromJsonrpsee,
 }
 
 #[derive(ThisError, Debug)]

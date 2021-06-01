@@ -62,7 +62,7 @@ impl Runtime for DarwiniaRuntime {
 		registry.register_type_size::<EcdsaSignature>("RelayAuthoritySignature");
 		registry.register_type_size::<u8>("ElectionCompute"); // just a hack
 		registry.register_type_size::<u32>("Term");
-		registry.register_type_size::<u64>("EthereumTransactionIndex");
+		registry.register_type_size::<(H256, u64)>("EthereumTransactionIndex");
 		registry.register_type_size::<(u64, u32, u32)>("RelayAffirmationId");
 		registry.register_type_size::<u32>("EraIndex");
 		registry.register_type_size::<u64>("EthereumBlockNumber");
@@ -144,11 +144,11 @@ impl std::fmt::Display
 }
 
 impl EthereumBacking for DarwiniaRuntime {
-	type EthereumTransactionIndex = u64;
+	type EthereumTransactionIndex = (H256, u64);
 }
 
 impl EthereumIssuing for DarwiniaRuntime {
-	type EthereumTransactionIndex = u64;
+	type EthereumTransactionIndex = (H256, u64);
 }
 
 impl Proxy for DarwiniaRuntime {

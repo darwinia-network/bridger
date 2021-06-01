@@ -21,22 +21,24 @@ impl DarwiniaBlockTracker {
 	}
 
 	/// get next block
-	pub async fn next_block(&mut self) -> Header<u32, BlakeTwo256> {
+	pub async fn next_block(&mut self) -> Result<Header<u32, BlakeTwo256>> {
 		loop {
 			match self.get_next_block().await {
 				Ok(result) => {
 					if let Some(header) = result {
-						return header;
+						return Ok(header);
 					} else {
 						delay_for(Duration::from_secs(6)).await;
 					}
 				}
 				Err(err) => {
-					error!(
-						"An error occurred while tracking next darwinia block: {:#?}",
-						err
-					);
-					delay_for(Duration::from_secs(30)).await;
+					error!("An error occurred while tracking next darwinia block: {:#?}", err);
+					let err_msg = format!("{:?}", err);
+					if err_msg.contains("restart") {
+						return Err(crate::error::Error::RestartFromJsonrpsee.into());
+					} else {
+						delay_for(Duration::from_secs(30)).await;
+					}
 				}
 			}
 		}

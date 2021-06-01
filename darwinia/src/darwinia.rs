@@ -140,7 +140,7 @@ impl Darwinia {
 				}
 			}
 		}
-		return Ok(result);
+		Ok(result)
 	}
 
 	/// get events from a special block

@@ -5,4 +5,6 @@ members = [
   "provider/darwinia-bridger",
   "provider/substrate-relay/bin",
   "provider/substrate-relay/relays/*",
+
+  "bridger/*"
 ]

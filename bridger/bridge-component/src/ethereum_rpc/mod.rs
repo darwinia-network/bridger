@@ -19,6 +19,7 @@ pub struct EthereumRpcConfig {
 
 impl BridgeConfig for EthereumRpcConfig {}
 
+#[derive(Clone, Debug, Default)]
 pub struct EthereumRpcComponent {
     config: EthereumRpcConfig,
     http_client_component: HttpClientComponent,

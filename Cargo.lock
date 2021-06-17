@@ -736,10 +736,32 @@ name = "bridge-component"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "async-trait",
+ "bridge-primitives",
  "bridge-standard",
  "env_logger 0.8.3",
  "log",
  "reqwest 0.11.3",
+ "serde 1.0.126",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "bridge-primitives"
+version = "0.3.3"
+dependencies = [
+ "async-trait",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "pallet-im-online 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "parity-scale-codec 2.1.1",
+ "reqwest 0.11.3",
+ "rlp 0.4.6",
+ "serde 1.0.126",
+ "serde_json",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "uint 0.8.5",
 ]
 
 [[package]]
@@ -1327,7 +1349,7 @@ dependencies = [
  "async-trait",
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-im-online 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-indices",
+ "pallet-indices 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 2.1.1",
  "reqwest 0.10.10",
  "rlp 0.4.6",
@@ -4887,6 +4909,24 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "3.0.0"
+source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
+dependencies = [
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "log",
+ "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "parity-scale-codec 2.1.1",
+ "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+]
+
+[[package]]
+name = "pallet-im-online"
+version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=s2s#3f110196163b5ec03bac5ee188d60bedf3ebd91d"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
@@ -4919,6 +4959,21 @@ dependencies = [
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-staking 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "pallet-indices"
+version = "3.0.0"
+source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
+dependencies = [
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "parity-scale-codec 2.1.1",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
 ]
 
 [[package]]
@@ -6295,6 +6350,7 @@ dependencies = [
  "percent-encoding 2.1.0",
  "pin-project-lite 0.2.6",
  "serde 1.0.126",
+ "serde_json",
  "serde_urlencoded",
  "tokio 1.6.0",
  "tokio-native-tls",
@@ -7712,6 +7768,17 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "3.0.0"
+source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
+dependencies = [
+ "lazy_static",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "strum",
+]
+
+[[package]]
+name = "sp-keyring"
+version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=s2s#3f110196163b5ec03bac5ee188d60bedf3ebd91d"
 dependencies = [
  "lazy_static",
@@ -8771,7 +8838,7 @@ dependencies = [
  "jsonrpsee-ws-client",
  "log",
  "num-traits 0.2.14",
- "pallet-indices",
+ "pallet-indices 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-staking 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 2.1.1",
  "serde 1.0.126",

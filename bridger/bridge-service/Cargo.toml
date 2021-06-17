@@ -1,5 +1,5 @@
 [package]
-name = "client-darwinia"
+name = "bridge-service"
 version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -8,19 +8,19 @@ license = "MIT"
 documentation = "https://docs.rs/bridger"
 homepage = "https://github.com/darwinia-network/bridger"
 include = [
-    "Cargo.toml",
-    "**/*.rs",
-    "README.md",
-    "LICENSE"
+	"Cargo.toml",
+	"**/*.rs",
+	"README.md",
+	"LICENSE"
 ]
 keywords = ["substrate", "darwinia"]
 readme = 'README.md'
 edition = "2018"
 
 [dependencies]
+
+log = "0.4"
+
+[dev-dependencies]
 anyhow = "1.0"
-
-bridge-standard = { path = "../bridge-standard" }
-
-substrate-api-client = { git = "https://github.com/darwinia-network/substrate-api-client.git", branch = "darwinia" }
-
+env_logger = "0.8"

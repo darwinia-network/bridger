@@ -753,6 +753,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bridge-service"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "env_logger 0.8.3",
+ "log",
+]
+
+[[package]]
 name = "bridge-standard"
 version = "0.3.3"
 dependencies = [
@@ -1010,6 +1019,7 @@ name = "client-darwinia"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "bridge-standard",
  "substrate-api-client",
 ]
 

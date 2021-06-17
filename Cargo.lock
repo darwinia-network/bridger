@@ -732,6 +732,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "bridge-component"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bridge-standard",
+ "env_logger 0.8.3",
+ "log",
+ "reqwest 0.11.3",
+]
+
+[[package]]
 name = "bridge-runtime-common"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/parity-bridges-common?branch=s2s#6fe18756a3122b743a054c489003e3636b3f1815"
@@ -753,22 +764,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridge-service"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "env_logger 0.8.3",
- "log",
-]
-
-[[package]]
 name = "bridge-standard"
 version = "0.3.3"
 dependencies = [
  "anyhow",
  "env_logger 0.8.3",
- "futures 0.3.15",
  "log",
+ "thiserror",
 ]
 
 [[package]]
@@ -1327,7 +1329,7 @@ dependencies = [
  "pallet-im-online 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-indices",
  "parity-scale-codec 2.1.1",
- "reqwest",
+ "reqwest 0.10.10",
  "rlp 0.4.6",
  "serde 1.0.126",
  "serde_json",
@@ -1363,7 +1365,7 @@ dependencies = [
  "jsonrpsee-ws-client",
  "log",
  "parity-scale-codec 2.1.1",
- "reqwest",
+ "reqwest 0.10.10",
  "rpassword",
  "rust-crypto",
  "secp256k1",
@@ -3379,7 +3381,7 @@ dependencies = [
  "futures 0.3.15",
  "http",
  "hyper 0.13.10",
- "hyper-tls",
+ "hyper-tls 0.4.3",
  "native-tls",
  "tokio 0.2.25",
  "tokio-tls",
@@ -3415,6 +3417,19 @@ dependencies = [
  "native-tls",
  "tokio 0.2.25",
  "tokio-tls",
+]
+
+[[package]]
+name = "hyper-tls"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d6183ddfa99b85da61a140bea0efc93fdf56ceaa041b37d553518030827f9905"
+dependencies = [
+ "bytes 1.0.1",
+ "hyper 0.14.8",
+ "native-tls",
+ "tokio 1.6.0",
+ "tokio-native-tls",
 ]
 
 [[package]]
@@ -6234,7 +6249,7 @@ dependencies = [
  "http",
  "http-body 0.3.1",
  "hyper 0.13.10",
- "hyper-tls",
+ "hyper-tls 0.4.3",
  "ipnet",
  "js-sys",
  "lazy_static",
@@ -6249,6 +6264,40 @@ dependencies = [
  "serde_urlencoded",
  "tokio 0.2.25",
  "tokio-tls",
+ "url 2.2.2",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "winreg 0.7.0",
+]
+
+[[package]]
+name = "reqwest"
+version = "0.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2296f2fac53979e8ccbc4a1136b25dcefd37be9ed7e4a1f6b05a6029c84ff124"
+dependencies = [
+ "base64 0.13.0",
+ "bytes 1.0.1",
+ "encoding_rs",
+ "futures-core",
+ "futures-util",
+ "http",
+ "http-body 0.4.2",
+ "hyper 0.14.8",
+ "hyper-tls 0.5.0",
+ "ipnet",
+ "js-sys",
+ "lazy_static",
+ "log",
+ "mime",
+ "native-tls",
+ "percent-encoding 2.1.0",
+ "pin-project-lite 0.2.6",
+ "serde 1.0.126",
+ "serde_urlencoded",
+ "tokio 1.6.0",
+ "tokio-native-tls",
  "url 2.2.2",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -9072,6 +9121,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-native-tls"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7d995660bd2b7f8c1568414c1126076c13fbb725c40112dc0120b78eb9b717b"
+dependencies = [
+ "native-tls",
+ "tokio 1.6.0",
+]
+
+[[package]]
 name = "tokio-rustls"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9321,7 +9380,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.3.23",
+ "rand 0.7.3",
  "static_assertions",
 ]
 
@@ -9676,7 +9735,7 @@ dependencies = [
  "hex",
  "hyper 0.13.10",
  "hyper-proxy",
- "hyper-tls",
+ "hyper-tls 0.4.3",
  "jsonrpc-core",
  "log",
  "native-tls",

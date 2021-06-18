@@ -40,7 +40,7 @@ impl BridgeComponent<ShadowConfig, Shadow> for ShadowComponent {
     fn component(&self) -> anyhow::Result<Shadow> {
         let http_client = self.http_client_component.component()?;
         let ethereum_rpc = self.ethereum_rpc_component.component()?;
-        todo!()
+        Ok(Shadow::new(self.config.clone(), http_client, ethereum_rpc))
     }
 
     fn config(&self) -> &ShadowConfig {

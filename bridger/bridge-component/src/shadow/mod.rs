@@ -4,9 +4,9 @@ use bridge_standard::config::BridgeConfig;
 use crate::ethereum_rpc::EthereumRpcComponent;
 use crate::http_client::HttpClientComponent;
 
-pub use self::shadow::*;
+pub use self::shadow_raw::*;
 
-mod shadow;
+mod shadow_raw;
 
 #[derive(Clone, Debug, Default)]
 pub struct ShadowConfig {

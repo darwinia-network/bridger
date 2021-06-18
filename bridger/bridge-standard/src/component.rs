@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use crate::config::BridgeConfig;
 
 pub trait BridgeComponent<C: BridgeConfig, R> {

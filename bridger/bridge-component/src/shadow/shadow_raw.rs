@@ -9,7 +9,6 @@ use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
-use std::time::Duration;
 
 use crate::error::{BizError, ComponentResult};
 use crate::ethereum_rpc::EthereumRpc;

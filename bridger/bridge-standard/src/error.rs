@@ -18,4 +18,25 @@ pub enum StandardError {
 
     #[error("Custom error: {0}")]
     Custom(Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("The last redeemed block number is not set")]
+    LastRedeemedFileNotExists,
+
+    #[error("No signer seed set for authority, please check your config.toml")]
+    NoAuthoritySignerSeed,
+
+    #[error("RuntimeUpdated")]
+    RuntimeUpdated,
+
+    #[error("ShadowInternalServerError: {0}")]
+    ShadowInternalServerError(String),
+
+    #[error("`bytes2hex` - FAILED: {0}")]
+    Bytes2Hex(String),
+
+    #[error("`hex2bytes` - FAILED: {0}")]
+    Hex2Bytes(String),
+
+    #[error("New http with URI {0} error: {1}")]
+    NewHttpError(String, String),
 }

@@ -4,11 +4,16 @@ use bridge_primitives::chain::ethereum::{
     EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
     EthereumRelayProofs, EthereumRelayProofsJson, MMRRoot, MMRRootJson,
 };
+use bridge_standard::error::StandardError;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
 use std::time::Duration;
+
+use crate::error::{BizError, ComponentResult};
+use crate::ethereum_rpc::EthereumRpc;
+use crate::shadow::ShadowConfig;
 
 #[derive(Serialize)]
 struct Proposal {
@@ -35,34 +40,33 @@ enum ProofResult {
 
 /// Shadow API
 pub struct Shadow {
-    /// Shadow API
-    pub api: String,
+    /// shadow config
+    pub config: ShadowConfig,
     /// Ethereum RPC
-    pub eth: EthereumRPC,
+    pub eth: EthereumRpc,
     /// HTTP Client
     pub http: Client,
 }
 
 impl Shadow {
     /// Init Shadow API from config
-    pub fn new(config: &Settings) -> Shadow {
-        let http = reqwest::Client::builder()
-            .timeout(Duration::from_secs(30))
-            .build()
-            .unwrap();
+    pub fn new(config: ShadowConfig, http_client: Client, eth: EthereumRpc) -> Shadow {
         Shadow {
-            api: config.shadow.endpoint.clone(),
-            eth: EthereumRPC::new(http.clone(), vec![config.ethereum.rpc.clone()]),
-            http,
+            config,
+            eth,
+            http: http_client,
         }
     }
 
     /// Get mmr
-    pub async fn get_parent_mmr_root(&self, block_number: usize) -> Result<MMRRoot> {
-        let url = &format!("{}/ethereum/parent_mmr_root/{}", &self.api, block_number);
+    pub async fn get_parent_mmr_root(&self, block_number: usize) -> ComponentResult<MMRRoot> {
+        let url = &format!(
+            "{}/ethereum/parent_mmr_root/{}",
+            &self.config.endpoint, block_number
+        );
         let resp = self.http.get(url).send().await?;
         if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
-            Err(Error::ShadowInternalServerError(resp.text().await?).into())
+            Err(StandardError::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let result: ParentMmrRootResult = resp
                 .json()
@@ -78,7 +82,7 @@ impl Shadow {
     }
 
     /// Get HeaderParcel
-    pub async fn parcel(&self, number: usize) -> Result<EthereumRelayHeaderParcel> {
+    pub async fn parcel(&self, number: usize) -> ComponentResult<EthereumRelayHeaderParcel> {
         let mmr_root = self.get_parent_mmr_root(number).await?;
         let header = self.eth.get_header_by_number(number as u64).await?;
 
@@ -89,14 +93,17 @@ impl Shadow {
     }
 
     /// Get Receipt
-    pub async fn receipt(&self, tx: &str, last: u64) -> Result<EthereumReceiptProofThing> {
+    pub async fn receipt(&self, tx: &str, last: u64) -> ComponentResult<EthereumReceiptProofThing> {
         let resp = self
             .http
-            .get(&format!("{}/ethereum/receipt/{}/{}", &self.api, tx, last))
+            .get(&format!(
+                "{}/ethereum/receipt/{}/{}",
+                &self.config.endpoint, tx, last
+            ))
             .send()
             .await?;
         if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
-            Err(Error::ShadowInternalServerError(resp.text().await?).into())
+            Err(StandardError::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let result: Value = resp.json().await?;
             if let Some(err) = result.get("error") {
@@ -114,7 +121,7 @@ impl Shadow {
         member: u64,
         target: u64,
         last_leaf: u64,
-    ) -> Result<EthereumRelayProofs> {
+    ) -> ComponentResult<EthereumRelayProofs> {
         info!(
             "Requesting proposal - member: {}, target: {}, last_leaf: {}",
             member, target, last_leaf
@@ -127,13 +134,13 @@ impl Shadow {
 
         let resp = self
             .http
-            .post(&format!("{}/ethereum/proof", self.api))
+            .post(&format!("{}/ethereum/proof", self.config.endpoint))
             .json(&map)
             .send()
             .await?;
 
         if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
-            Err(Error::ShadowInternalServerError(resp.text().await?).into())
+            Err(StandardError::ShadowInternalServerError(resp.text().await?).into())
         } else {
             let result: ProofResult = resp.json().await?;
             match result {

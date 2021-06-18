@@ -1,6 +1,7 @@
 use bridge_component::ethereum_rpc::{EthereumRpcComponent, EthereumRpcConfig};
 use bridge_component::http_client::{HttpClientComponent, HttpClientConfig};
 use bridge_component::shadow::{ShadowComponent, ShadowConfig};
+use bridge_component::web3::{Web3Component, Web3Config};
 
 pub fn config_http_client() -> HttpClientConfig {
     HttpClientConfig { timeout: 30 }
@@ -16,6 +17,12 @@ pub fn config_ethereum_rpc<S: AsRef<str>>(api_key: S) -> EthereumRpcConfig {
 pub fn config_shadow() -> ShadowConfig {
     ShadowConfig {
         endpoint: "https://shadow.darwinia.network".to_string(),
+    }
+}
+
+pub fn config_web3<S: AsRef<str>>(api_key: S) -> Web3Config {
+    Web3Config {
+        endpoint: format!("https://mainnet.infura.io/v3/{}", api_key.as_ref()),
     }
 }
 
@@ -61,4 +68,12 @@ pub fn component_shadow_default<S: AsRef<str>>(ethereum_rpc_key: S) -> ShadowCom
         self::config_ethereum_rpc(ethereum_rpc_key),
         self::config_http_client(),
     )
+}
+
+pub fn component_web3(config_web3: Web3Config) -> Web3Component {
+    Web3Component::new(config_web3).expect("Failed to create web3 component")
+}
+
+pub fn component_web3_default<S: AsRef<str>>(ethereum_rpc_key: S) -> Web3Component {
+    self::component_web3(self::config_web3(ethereum_rpc_key))
 }

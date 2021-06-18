@@ -30,5 +30,7 @@ serde_json = { version = "1.0" }
 bridge-standard = { path = "../bridge-standard" }
 bridge-primitives = { path = "../primitives", features = ["runtime", "rpc"] }
 
+web3 = { version = "0.14.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "v0.14.0", features = ["signing"] }
+
 [dev-dependencies]
 env_logger = "0.8"

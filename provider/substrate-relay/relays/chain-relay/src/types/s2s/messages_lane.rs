@@ -177,14 +177,14 @@ pub fn select_delivery_transaction_limits<W: pallet_bridge_messages::WeightInfoE
 mod tests {
 	use super::*;
 
-	type PangolinToMillauMessagesWeights =
-		pallet_bridge_messages::weights::RialtoWeight<pangolin_runtime::Runtime>;
+	type RialtoToMillauMessagesWeights =
+		pallet_bridge_messages::weights::RialtoWeight<rialto_runtime::Runtime>;
 
 	#[test]
 	fn select_delivery_transaction_limits_works() {
 		let (max_count, max_weight) =
-			select_delivery_transaction_limits::<PangolinToMillauMessagesWeights>(
-				pangolin_runtime_system_params::max_extrinsic_weight(),
+			select_delivery_transaction_limits::<RialtoToMillauMessagesWeights>(
+				bp_millau::max_extrinsic_weight(),
 				bp_millau::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
 			);
 		assert_eq!(
@@ -194,7 +194,7 @@ mod tests {
 			// reserved for messages dispatch allows dispatch of non-trivial messages.
 			//
 			// Any significant change in this values should attract additional attention.
-			(1024, 666583333334),
+			(1024, 216_583_333_334),
 		);
 	}
 }

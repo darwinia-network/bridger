@@ -6,13 +6,18 @@ use codec::Encode;
 use frame_support::dispatch::GetDispatchInfo;
 use messages_relay::message_lane::MessageLane;
 use millau_runtime::{
-	pangolin_messages::{PangolinToMillauConversionRate, INITIAL_PANGOLIN_TO_MILLAU_CONVERSION_RATE},
-	BridgeMessagesCall as SourceChainRuntimeMessagesCall, WithPangolinMessages as WithPangolinMessagesInstance,
+	pangolin_messages::{
+		PangolinToMillauConversionRate, INITIAL_PANGOLIN_TO_MILLAU_CONVERSION_RATE,
+	},
+	BridgeMessagesCall as SourceChainRuntimeMessagesCall,
+	WithPangolinMessages as WithPangolinMessagesInstance,
 };
 use pangolin_bridge_relay_client_definition::PangolinChain;
 use pangolin_runtime::{
-	BridgeGrandpaCall as BridgeGrandpaMillauCall, BridgeMessagesCall as TargetChainRuntimeMessagesCall,
-	WithMillauGrandpa as WithMillauGrandpaInstance, WithMillauMessages as WithMillauMessagesInstance,
+	BridgeGrandpaCall as BridgeGrandpaMillauCall,
+	BridgeMessagesCall as TargetChainRuntimeMessagesCall,
+	WithMillauGrandpa as WithMillauGrandpaInstance,
+	WithMillauMessages as WithMillauMessagesInstance,
 };
 use relay_millau_client::Millau as MillauChain;
 use relay_substrate_client::{
@@ -26,7 +31,8 @@ use std::{ops::RangeInclusive, time::Duration};
 use crate::types::s2s::{
 	finality_pipeline::{SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate},
 	messages_lane::{
-		select_delivery_transaction_limits, MessagesRelayParams, SubstrateMessageLane, SubstrateMessageLaneToSubstrate,
+		select_delivery_transaction_limits, MessagesRelayParams, SubstrateMessageLane,
+		SubstrateMessageLaneToSubstrate,
 	},
 	messages_source::SubstrateMessagesSource,
 	messages_target::SubstrateMessagesTarget,
@@ -37,19 +43,25 @@ pub struct MillauChainConst;
 
 impl ChainConst for MillauChainConst {
 	const OUTBOUND_LANE_MESSAGES_DISPATCH_WEIGHT_METHOD: &'static str =
-		bp_millau::TO_MILLAU_MESSAGES_DISPATCH_WEIGHT_METHOD;
+		millau_primitives::TO_MILLAU_MESSAGES_DISPATCH_WEIGHT_METHOD;
 	const OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD: &'static str =
-		bp_millau::TO_MILLAU_LATEST_GENERATED_NONCE_METHOD;
-	const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str = bp_millau::TO_MILLAU_LATEST_RECEIVED_NONCE_METHOD;
-	const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str = bp_millau::FROM_MILLAU_LATEST_RECEIVED_NONCE_METHOD;
+		millau_primitives::TO_MILLAU_LATEST_GENERATED_NONCE_METHOD;
+	const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
+		millau_primitives::TO_MILLAU_LATEST_RECEIVED_NONCE_METHOD;
+	const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
+		millau_primitives::FROM_MILLAU_LATEST_RECEIVED_NONCE_METHOD;
 	const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
-		bp_millau::FROM_MILLAU_LATEST_CONFIRMED_NONCE_METHOD;
-	const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str = bp_millau::FROM_MILLAU_UNREWARDED_RELAYERS_STATE;
-	const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str = bp_millau::BEST_FINALIZED_MILLAU_HEADER_METHOD;
-	const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str = bp_millau::BEST_FINALIZED_MILLAU_HEADER_METHOD;
+		millau_primitives::FROM_MILLAU_LATEST_CONFIRMED_NONCE_METHOD;
+	const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str =
+		millau_primitives::FROM_MILLAU_UNREWARDED_RELAYERS_STATE;
+	const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
+		millau_primitives::BEST_FINALIZED_MILLAU_HEADER_METHOD;
+	const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str =
+		millau_primitives::BEST_FINALIZED_MILLAU_HEADER_METHOD;
 	const MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE: MessageNonce =
-		bp_millau::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
-	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce = bp_millau::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+		millau_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
+	const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce =
+		millau_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
 	const AVERAGE_BLOCK_INTERVAL: Duration = MillauChain::AVERAGE_BLOCK_INTERVAL;
 	const BRIDGE_CHAIN_ID: ChainId = bp_runtime::MILLAU_CHAIN_ID;
 	type SigningParams = relay_millau_client::SigningParams;
@@ -68,7 +80,7 @@ declare_relay_headers!(
 	PangolinChain,
 	relay_millau_client,
 	MillauChainConst,
-	bp_millau,
+	millau_primitives,
 	drml_primitives,
 	pangolin_runtime,
 	BridgeGrandpaMillauCall,
@@ -84,13 +96,13 @@ declare_relay_messages!(
 	pangolin_bridge_relay_client_definition,
 	MillauChainConst,
 	PangolinChainConst,
-	bp_millau,
+	millau_primitives,
 	drml_primitives,
 	millau_runtime,
 	pangolin_runtime,
 	SourceChainRuntimeMessagesCall,
 	TargetChainRuntimeMessagesCall,
-	bp_millau,
+	millau_primitives,
 	pangolin_runtime_system_params,
 	WithMillauMessagesInstance,
 	WithPangolinMessagesInstance,

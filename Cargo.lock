@@ -217,6 +217,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d6e24d2cce90c53b948c46271bfb053e4bdc2db9b5d3f65e20f8cf28a1b7fc3"
 
 [[package]]
+name = "async-attributes"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3203e79f4dd9bdda415ed03cf14dae5a2bf775c683a00f94e9cd1faf0f596e5"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "async-channel"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -340,12 +350,13 @@ version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d9f06685bad74e0570f5213741bea82158279a4103d988e57bfada11ad230341"
 dependencies = [
+ "async-attributes",
  "async-channel",
  "async-global-executor",
  "async-io",
  "async-lock",
  "async-process",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
  "futures-channel",
  "futures-core",
  "futures-io",
@@ -736,7 +747,10 @@ name = "bridge-component"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "async-std",
  "async-trait",
+ "bee-client",
+ "bridge-config",
  "bridge-primitives",
  "bridge-standard",
  "env_logger 0.8.3",
@@ -744,8 +758,20 @@ dependencies = [
  "reqwest 0.11.3",
  "serde 1.0.126",
  "serde_json",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "thiserror",
  "web3",
+]
+
+[[package]]
+name = "bridge-config"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bridge-standard",
+ "env_logger 0.8.3",
+ "log",
 ]
 
 [[package]]
@@ -787,10 +813,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "bridge-service"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bee-client",
+ "bridge-component",
+ "bridge-config",
+ "bridge-standard",
+ "env_logger 0.8.3",
+ "lifeline",
+ "log",
+ "parity-scale-codec 2.1.1",
+ "postage",
+ "thiserror",
+]
+
+[[package]]
 name = "bridge-standard"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "async-trait",
+ "bee-client",
  "env_logger 0.8.3",
  "log",
  "thiserror",
@@ -801,9 +846,11 @@ name = "bridger-entrypoint"
 version = "0.3.3"
 dependencies = [
  "anyhow",
- "bee-client",
+ "bridge-config",
+ "bridge-service",
+ "bridge-standard",
+ "chain-darwinia",
  "env_logger 0.8.3",
- "futures 0.3.15",
  "log",
  "structopt",
 ]
@@ -954,6 +1001,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "chain-darwinia"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bridge-standard",
+ "substrate-api-client",
+]
+
+[[package]]
 name = "chain-relay"
 version = "0.3.3"
 dependencies = [
@@ -1037,15 +1093,6 @@ dependencies = [
  "textwrap",
  "unicode-width",
  "vec_map",
-]
-
-[[package]]
-name = "client-darwinia"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "bridge-standard",
- "substrate-api-client",
 ]
 
 [[package]]
@@ -1159,7 +1206,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06ed27e177f16d65f0f0c22a213e17c696ace5dd64b14258b52f9417ccb52db4"
 dependencies = [
  "cfg-if 1.0.0",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
 ]
 
 [[package]]
@@ -1170,7 +1217,7 @@ checksum = "94af6efb46fef72616855b036a624cf27ba656ffc9be1b9a3c931cfc7749a9a9"
 dependencies = [
  "cfg-if 1.0.0",
  "crossbeam-epoch",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
 ]
 
 [[package]]
@@ -1180,10 +1227,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "52fb27eab85b17fbb9f6fd667089e07d6a2eb8743d02639ee7f6a7a7729c9c94"
 dependencies = [
  "cfg-if 1.0.0",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
  "lazy_static",
  "memoffset",
  "scopeguard",
+]
+
+[[package]]
+name = "crossbeam-queue"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b10ddc024425c88c2ad148c1b0fd53f4c6d38db9697c9f1588381212fa657c9"
+dependencies = [
+ "cfg-if 1.0.0",
+ "crossbeam-utils 0.8.5",
 ]
 
 [[package]]
@@ -1199,11 +1256,10 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-utils"
-version = "0.8.4"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4feb231f0d4d6af81aed15928e58ecf5816aa62a2393e2c82f46973e92a9a278"
+checksum = "d82cfc11ce7f2c3faef78d8a684447b40d503d9681acebed6cb728d45940c4db"
 dependencies = [
- "autocfg",
  "cfg-if 1.0.0",
  "lazy_static",
 ]
@@ -3595,7 +3651,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81c01404730bb4574bbacb59ca0855f969f8eabd688ca22866f2cc333f1a4f69"
 dependencies = [
  "async-channel",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
  "curl",
  "curl-sys",
  "encoding_rs",
@@ -4002,6 +4058,23 @@ dependencies = [
  "libc",
  "pkg-config",
  "vcpkg",
+]
+
+[[package]]
+name = "lifeline"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b49b836e2676e5f6d926c09dc1a13b52c3315b459554df4514d76756bfa72a0e"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "futures-util",
+ "log",
+ "pin-project 0.4.28",
+ "postage",
+ "regex",
+ "thiserror",
+ "tokio 1.6.0",
 ]
 
 [[package]]
@@ -5763,6 +5836,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "pollster"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb20dcc30536a1508e75d47dd0e399bb2fe7354dcf35cda9127f2bf1ed92e30e"
+
+[[package]]
+name = "postage"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a63d25391d04a097954b76aba742b6b5b74f213dfe3dbaeeb36e8ddc1c657f0b"
+dependencies = [
+ "atomic",
+ "crossbeam-queue",
+ "log",
+ "pin-project 1.0.7",
+ "pollster",
+ "static_assertions",
+ "thiserror",
+]
+
+[[package]]
 name = "ppv-lite86"
 version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6125,7 +6219,7 @@ checksum = "d78120e2c850279833f1dd3582f730c4ab53ed95aeaaaa862a2a5c71b1656d8e"
 dependencies = [
  "crossbeam-channel 0.5.1",
  "crossbeam-deque",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
  "lazy_static",
  "num_cpus",
 ]

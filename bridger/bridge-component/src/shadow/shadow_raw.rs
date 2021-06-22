@@ -1,5 +1,6 @@
 //! Darwinia shadow API
 use anyhow::Context as AnyhowContext;
+use bridge_config::component::ShadowConfig;
 use bridge_primitives::chain::ethereum::{
     EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
     EthereumRelayProofs, EthereumRelayProofsJson, MMRRoot, MMRRootJson,
@@ -12,7 +13,6 @@ use serde_json::Value;
 
 use crate::error::{BizError, ComponentResult};
 use crate::ethereum_rpc::EthereumRpc;
-use crate::shadow::ShadowConfig;
 
 #[derive(Serialize)]
 struct Proposal {

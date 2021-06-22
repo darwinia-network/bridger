@@ -1,5 +1,5 @@
-use bridge_standard::component::BridgeComponent;
-use bridge_standard::config::BridgeConfig;
+use bridge_config::component::ShadowConfig;
+use bridge_standard::bridge::component::BridgeComponent;
 
 use crate::ethereum_rpc::EthereumRpcComponent;
 use crate::http_client::HttpClientComponent;
@@ -7,13 +7,6 @@ use crate::http_client::HttpClientComponent;
 pub use self::shadow_raw::*;
 
 mod shadow_raw;
-
-#[derive(Clone, Debug, Default)]
-pub struct ShadowConfig {
-    pub endpoint: String,
-}
-
-impl BridgeConfig for ShadowConfig {}
 
 #[derive(Clone, Debug, Default)]
 pub struct ShadowComponent {
@@ -36,10 +29,11 @@ impl ShadowComponent {
     }
 }
 
+#[async_trait]
 impl BridgeComponent<ShadowConfig, Shadow> for ShadowComponent {
-    fn component(&self) -> anyhow::Result<Shadow> {
-        let http_client = self.http_client_component.component()?;
-        let ethereum_rpc = self.ethereum_rpc_component.component()?;
+    async fn component(&self) -> anyhow::Result<Shadow> {
+        let http_client = self.http_client_component.component().await?;
+        let ethereum_rpc = self.ethereum_rpc_component.component().await?;
         Ok(Shadow::new(self.config.clone(), http_client, ethereum_rpc))
     }
 

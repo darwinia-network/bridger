@@ -1,4 +1,4 @@
-use bridge_standard::chain::BridgeChain;
+use bridge_standard::bridge::chain::BridgeChain;
 
 pub struct DarwiniaChain {}
 

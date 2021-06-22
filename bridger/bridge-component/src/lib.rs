@@ -5,6 +5,7 @@ extern crate async_trait;
 #[macro_use]
 extern crate log;
 
+pub mod bee;
 pub mod error;
 pub mod ethereum_rpc;
 pub mod http_client;

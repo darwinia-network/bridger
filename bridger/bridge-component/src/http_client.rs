@@ -1,13 +1,6 @@
-use bridge_standard::component::BridgeComponent;
-use bridge_standard::config::BridgeConfig;
+use bridge_config::component::HttpClientConfig;
+use bridge_standard::bridge::component::BridgeComponent;
 use std::time::Duration;
-
-#[derive(Clone, Debug, Default)]
-pub struct HttpClientConfig {
-    pub timeout: u64,
-}
-
-impl BridgeConfig for HttpClientConfig {}
 
 #[derive(Clone, Debug, Default)]
 pub struct HttpClientComponent {
@@ -20,8 +13,9 @@ impl HttpClientComponent {
     }
 }
 
+#[async_trait]
 impl BridgeComponent<HttpClientConfig, reqwest::Client> for HttpClientComponent {
-    fn component(&self) -> anyhow::Result<reqwest::Client> {
+    async fn component(&self) -> anyhow::Result<reqwest::Client> {
         let client = reqwest::Client::builder()
             .timeout(Duration::from_secs(self.config.timeout))
             .build()?;

@@ -20,7 +20,10 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0"
 thiserror = "1.0"
+async-trait = "0.1"
 log = "0.4"
+
+bee-client = { git = "https://github.com/darwinia-network/substrate-api-client", branch = "darwinia" }
 
 [dev-dependencies]
 env_logger = "0.8"

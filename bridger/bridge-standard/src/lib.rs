@@ -1,6 +1,7 @@
-pub mod chain;
-pub mod component;
-pub mod config;
+#[macro_use]
+extern crate async_trait;
+
+pub mod bridge;
 pub mod error;
-pub mod service;
+pub mod external;
 pub mod types;

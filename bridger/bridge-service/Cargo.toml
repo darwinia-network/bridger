@@ -1,5 +1,5 @@
 [package]
-name = "client-darwinia"
+name = "bridge-service"
 version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -19,8 +19,20 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
 
+lifeline = "0.6"
+postage = "0.4"
+
+bee-client = { git = "https://github.com/darwinia-network/substrate-api-client", branch = "darwinia" }
 bridge-standard = { path = "../bridge-standard" }
+bridge-config = { path = "../bridge-config" }
+bridge-component = { path = "../bridge-component" }
 
-substrate-api-client = { git = "https://github.com/darwinia-network/substrate-api-client.git", branch = "darwinia" }
 
+## todo: may don't dependency to there
+codec = { package = "parity-scale-codec", version = "2.1", features = ["derive", "full"] }
+
+[dev-dependencies]
+env_logger = "0.8"

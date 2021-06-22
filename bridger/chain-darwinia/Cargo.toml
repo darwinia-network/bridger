@@ -1,5 +1,5 @@
 [package]
-name = "bridger-entrypoint"
+name = "chain-darwinia"
 version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -17,24 +17,10 @@ keywords = ["substrate", "darwinia"]
 readme = 'README.md'
 edition = "2018"
 
-
-[[bin]]
-name = "darwinia-bridger"
-path = "src/main.rs"
-
 [dependencies]
 anyhow = "1.0"
 
-structopt = "0.3"
-
-log = "0.4"
-env_logger = "0.8"
-
 bridge-standard = { path = "../bridge-standard" }
-bridge-config = { path = "../bridge-config" }
-bridge-service = { path = "../bridge-service" }
 
-chain-darwinia = { path = "../chain-darwinia" }
-
-
+substrate-api-client = { git = "https://github.com/darwinia-network/substrate-api-client.git", branch = "darwinia" }
 

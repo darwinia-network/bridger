@@ -1,5 +1,5 @@
-use bridge_standard::component::BridgeComponent;
-use bridge_standard::config::BridgeConfig;
+use bridge_config::component::EthereumRpcConfig;
+use bridge_standard::bridge::component::BridgeComponent;
 
 use crate::http_client::HttpClientComponent;
 
@@ -8,16 +8,6 @@ pub use self::rpc::*;
 mod block;
 mod receipt;
 mod rpc;
-
-#[derive(Clone, Debug, Default)]
-pub struct EthereumRpcConfig {
-    /// Rpc host
-    pub rpc: Vec<String>,
-    /// Counter
-    pub atom: usize,
-}
-
-impl BridgeConfig for EthereumRpcConfig {}
 
 #[derive(Clone, Debug, Default)]
 pub struct EthereumRpcComponent {
@@ -37,9 +27,10 @@ impl EthereumRpcComponent {
     }
 }
 
+#[async_trait]
 impl BridgeComponent<EthereumRpcConfig, EthereumRpc> for EthereumRpcComponent {
-    fn component(&self) -> anyhow::Result<EthereumRpc> {
-        let client = self.http_client_component.component()?;
+    async fn component(&self) -> anyhow::Result<EthereumRpc> {
+        let client = self.http_client_component.component().await?;
         Ok(EthereumRpc::new(client, self.config.clone()))
     }
 

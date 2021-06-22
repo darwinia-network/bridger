@@ -1,11 +1,7 @@
-use bee_client::api::{Api, Event};
-use bee_client::types::client::ChainTypes;
 use bee_client::types::substrate::system::System;
-use bridge_component::bee::BeeComponent;
-use bridge_standard::bridge::chain::BridgeChain;
 use bridge_standard::bridge::task::BridgeTask;
 use codec::{Decode, Encode};
-use lifeline::{Bus, Lifeline, Service, Task};
+use lifeline::{Lifeline, Service, Task};
 use std::marker::PhantomData;
 
 pub trait EthereumRelay: System {
@@ -54,6 +50,7 @@ impl<T: BridgeTask> Service for RelayService<T> {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // let mut rx = bus.rx::<BridgerMessage>()?;
+        println!("entry service. bus: {:?}", bus);
         let _greet = Self::try_task("service-ethereum-confirmed", async move {
             // while let Some(recv) = rx.recv().await {
             // 	println!(">>------------------- {:?}", recv);

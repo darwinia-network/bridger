@@ -2,10 +2,7 @@ use bee_client::types::client::ChainTypes;
 use bee_client::ws::BeeWebsocket;
 use bridge_config::component::BeeConfig;
 use bridge_standard::bridge::component::BridgeComponent;
-use bridge_standard::error::StandardError;
 use std::marker::PhantomData;
-use web3::transports::Http;
-use web3::Web3;
 
 pub struct BeeComponent<T: ChainTypes> {
     config: BeeConfig,

@@ -1,12 +1,12 @@
-use bridge_standard::bridge::chain::BridgeChain;
 use bridge_standard::bridge::task::BridgeTask;
 use chain_darwinia::chain::DarwiniaChain;
 use chain_ethereum::chain::EthereumChain;
-use std::fmt::Debug;
 
 use crate::bus::DarwiniaEthereumBus;
 
-pub struct TaskDarwiniaEthereum {}
+pub struct TaskDarwiniaEthereum {
+    bus: <Self as BridgeTask>::Bus,
+}
 
 impl BridgeTask for TaskDarwiniaEthereum {
     const NAME: &'static str = "task-darwinia-ethereum";
@@ -16,9 +16,18 @@ impl BridgeTask for TaskDarwiniaEthereum {
 }
 
 impl TaskDarwiniaEthereum {
+    pub fn new() -> Self {
+        Self {
+            bus: <Self as BridgeTask>::Bus::default(),
+        }
+    }
+    pub fn bus(&self) -> &<Self as BridgeTask>::Bus {
+        &self.bus
+    }
+
     pub fn spawn_service<S: lifeline::Service<Bus = <Self as BridgeTask>::Bus>>(
-        bus: &<Self as BridgeTask>::Bus,
+        &self,
     ) -> S::Lifeline {
-        S::spawn(bus)
+        S::spawn(&self.bus)
     }
 }

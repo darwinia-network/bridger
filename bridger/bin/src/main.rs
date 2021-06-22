@@ -1,19 +1,12 @@
 use bridge_service::service::relay::RelayService;
-use bridge_service::BridgeService;
-use bridge_standard::bridge::task::BridgeTask;
-use bridge_task::bus::DarwiniaEthereumBus;
 use bridge_task::TaskDarwiniaEthereum;
-use chain_darwinia::chain::DarwiniaChain;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let bus_darwinia_ethereum = DarwiniaEthereumBus::default();
+    let task = TaskDarwiniaEthereum::new();
+    task.spawn_service::<RelayService<TaskDarwiniaEthereum>>()?;
 
-    TaskDarwiniaEthereum::spawn_service::<RelayService<TaskDarwiniaEthereum>>(
-        &bus_darwinia_ethereum,
-    )?;
-
-    drop(bus_darwinia_ethereum);
+    drop(task);
     Ok(())
 }
 

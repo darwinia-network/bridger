@@ -24,8 +24,11 @@ anyhow = "1.0"
 log = "0.4"
 env_logger = "0.8"
 
+lifeline = "0.6"
+
 bridge-standard = { path = "../bridge-standard" }
 bridge-config = { path = "../bridge-config" }
 bridge-service = { path = "../bridge-service" }
 
 chain-darwinia = { path = "../chain-darwinia" }
+

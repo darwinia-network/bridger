@@ -19,16 +19,6 @@ pub trait EthereumRelay: System {
     type RelayAffirmationId: 'static + Encode + Decode + Sync + Send + Default + Clone;
 }
 
-// pub struct RelayService<T: ChainTypes> {
-//     bee_component: BeeComponent<T>,
-// }
-//
-// impl<T: ChainTypes> RelayService<T> {
-//     pub fn new(bee_component: BeeComponent<T>) -> Self {
-//         Self { bee_component }
-//     }
-// }
-
 /*
 // fake code
 

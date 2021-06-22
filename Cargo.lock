@@ -851,9 +851,11 @@ dependencies = [
  "bridge-service",
  "bridge-standard",
  "chain-darwinia",
+ "chain-ethereum",
  "env_logger 0.8.3",
  "lifeline",
  "log",
+ "postage",
 ]
 
 [[package]]

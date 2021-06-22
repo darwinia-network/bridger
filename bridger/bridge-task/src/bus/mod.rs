@@ -4,4 +4,4 @@ pub use self::messages::*;
 
 mod messages;
 
-lifeline_bus!(pub struct DarwiniaEthereumBus<T>);
+lifeline_bus!(pub struct DarwiniaEthereumBus);

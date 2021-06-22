@@ -2,10 +2,11 @@ use bee_client::api::{Api, Event};
 use bee_client::types::client::ChainTypes;
 use bee_client::types::substrate::system::System;
 use bridge_component::bee::BeeComponent;
+use bridge_standard::bridge::chain::BridgeChain;
+use bridge_standard::bridge::task::BridgeTask;
 use codec::{Decode, Encode};
 use lifeline::{Bus, Lifeline, Service, Task};
-
-use crate::bus::BridgeBus;
+use std::marker::PhantomData;
 
 pub trait EthereumRelay: System {
     /// RingBalance
@@ -18,15 +19,15 @@ pub trait EthereumRelay: System {
     type RelayAffirmationId: 'static + Encode + Decode + Sync + Send + Default + Clone;
 }
 
-pub struct RelayService<T: ChainTypes> {
-    bee_component: BeeComponent<T>,
-}
-
-impl<T: ChainTypes> RelayService<T> {
-    pub fn new(bee_component: BeeComponent<T>) -> Self {
-        Self { bee_component }
-    }
-}
+// pub struct RelayService<T: ChainTypes> {
+//     bee_component: BeeComponent<T>,
+// }
+//
+// impl<T: ChainTypes> RelayService<T> {
+//     pub fn new(bee_component: BeeComponent<T>) -> Self {
+//         Self { bee_component }
+//     }
+// }
 
 /*
 // fake code
@@ -52,12 +53,13 @@ impl<T: ChainTypes> Service for RelayService<T> {
 
 */
 
-pub struct EthereumConfirmedService {
+pub struct RelayService<T: BridgeTask> {
     _greet: Lifeline,
+    _marker: PhantomData<T>,
 }
 
-impl Service for EthereumConfirmedService {
-    type Bus = BridgeBus;
+impl<T: BridgeTask> Service for RelayService<T> {
+    type Bus = T::Bus;
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
@@ -68,6 +70,9 @@ impl Service for EthereumConfirmedService {
             // }
             Ok(())
         });
-        Ok(Self { _greet })
+        Ok(Self {
+            _greet,
+            _marker: Default::default(),
+        })
     }
 }

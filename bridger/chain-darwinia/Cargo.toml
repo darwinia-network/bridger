@@ -22,5 +22,9 @@ anyhow = "1.0"
 
 bridge-standard = { path = "../bridge-standard" }
 
-substrate-api-client = { git = "https://github.com/darwinia-network/substrate-api-client.git", branch = "darwinia" }
+bee-client = { git = "https://github.com/darwinia-network/substrate-api-client.git", branch = "darwinia" }
+
+
+sp-core = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.0" }
+sp-runtime = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.0" }
 

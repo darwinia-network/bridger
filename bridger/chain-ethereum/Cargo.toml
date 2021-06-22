@@ -1,5 +1,5 @@
 [package]
-name = "bridge-standard"
+name = "chain-ethereum"
 version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -8,10 +8,10 @@ license = "MIT"
 documentation = "https://docs.rs/bridger"
 homepage = "https://github.com/darwinia-network/bridger"
 include = [
-	"Cargo.toml",
-	"**/*.rs",
-	"README.md",
-	"LICENSE"
+    "Cargo.toml",
+    "**/*.rs",
+    "README.md",
+    "LICENSE"
 ]
 keywords = ["substrate", "darwinia"]
 readme = 'README.md'
@@ -19,13 +19,5 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0"
-thiserror = "1.0"
-async-trait = "0.1"
-log = "0.4"
 
-bee-client = { git = "https://github.com/darwinia-network/substrate-api-client", branch = "darwinia" }
-
-lifeline = "0.6"
-
-[dev-dependencies]
-env_logger = "0.8"
+bridge-standard = { path = "../bridge-standard" }

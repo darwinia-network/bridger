@@ -1,5 +1,10 @@
-fn main() {
-    println!("Hello, world!");
+use bridge_service::service::relay::RelayService;
+
+fn main() -> anyhow::Result<()> {
+    // let bus = BridgeBus::default();
+    // let service = Service::with(bus);
+    // service.spawn_service::<RelayService>()?;
+    Ok(())
 }
 
 /*

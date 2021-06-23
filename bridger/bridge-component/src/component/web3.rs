@@ -4,6 +4,7 @@ use bridge_standard::error::StandardError;
 use web3::transports::Http;
 use web3::Web3;
 
+#[derive(Debug)]
 pub struct Web3Component {
     config: Web3Config,
 }

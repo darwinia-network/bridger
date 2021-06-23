@@ -56,7 +56,6 @@ where
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // let mut rx = bus.rx::<BridgerMessage>()?;
-        println!("entry service. bus: {:?}", bus);
         let component_bee = Component::bee::<T, T::Source>()?;
         let _greet = Self::try_task("service-ethereum-confirmed", async move {
             // while let Some(recv) = rx.recv().await {

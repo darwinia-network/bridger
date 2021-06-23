@@ -12,10 +12,11 @@ fn config() -> DarwiniaEthereumConfig {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    // darwinia ethereum bridge
     let task = DarwiniaEthereumTask::with(self::config())?;
     task.spawn_service::<SubstrateToEthereumRelayService<DarwiniaEthereumTask>>()?;
+    task.start();
 
-    drop(task);
     loop {
         tokio::time::sleep(tokio::time::Duration::from_millis(5000)).await;
     }

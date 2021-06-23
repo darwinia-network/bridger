@@ -35,6 +35,10 @@ impl DarwiniaEthereumTask {
 }
 
 impl DarwiniaEthereumTask {
+    pub fn start(self) {
+        drop(self)
+    }
+
     pub fn bus(&self) -> &<Self as BridgeTask>::Bus {
         &self.bus
     }

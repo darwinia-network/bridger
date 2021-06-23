@@ -10,11 +10,11 @@ pub struct BeeComponent<T: ChainTypes> {
 }
 
 impl<T: ChainTypes> BeeComponent<T> {
-    pub fn new(config: BeeConfig) -> anyhow::Result<Self> {
-        Ok(Self {
+    pub fn new(config: BeeConfig) -> Self {
+        Self {
             config,
             _marker: Default::default(),
-        })
+        }
     }
 }
 

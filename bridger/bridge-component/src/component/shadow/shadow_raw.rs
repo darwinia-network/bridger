@@ -11,8 +11,8 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
 
+use crate::component::ethereum_rpc::EthereumRpc;
 use crate::error::{BizError, ComponentResult};
-use crate::ethereum_rpc::EthereumRpc;
 
 #[derive(Serialize)]
 struct Proposal {

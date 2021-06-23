@@ -1,7 +1,7 @@
 use bridge_config::component::EthereumRpcConfig;
 use bridge_standard::bridge::component::BridgeComponent;
 
-use crate::http_client::HttpClientComponent;
+use crate::component::http_client::HttpClientComponent;
 
 pub use self::rpc::*;
 
@@ -16,14 +16,11 @@ pub struct EthereumRpcComponent {
 }
 
 impl EthereumRpcComponent {
-    pub fn new(
-        config: EthereumRpcConfig,
-        http_client_component: HttpClientComponent,
-    ) -> anyhow::Result<Self> {
-        Ok(Self {
+    pub fn new(config: EthereumRpcConfig, http_client_component: HttpClientComponent) -> Self {
+        Self {
             config,
             http_client_component,
-        })
+        }
     }
 }
 

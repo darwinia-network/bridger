@@ -8,8 +8,8 @@ pub struct HttpClientComponent {
 }
 
 impl HttpClientComponent {
-    pub fn new(config: HttpClientConfig) -> anyhow::Result<Self> {
-        Ok(Self { config })
+    pub fn new(config: HttpClientConfig) -> Self {
+        Self { config }
     }
 }
 

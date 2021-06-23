@@ -1,8 +1,8 @@
 use bridge_config::component::ShadowConfig;
 use bridge_standard::bridge::component::BridgeComponent;
 
-use crate::ethereum_rpc::EthereumRpcComponent;
-use crate::http_client::HttpClientComponent;
+use crate::component::ethereum_rpc::EthereumRpcComponent;
+use crate::component::http_client::HttpClientComponent;
 
 pub use self::shadow_raw::*;
 
@@ -20,12 +20,12 @@ impl ShadowComponent {
         config: ShadowConfig,
         http_client_component: HttpClientComponent,
         ethereum_rpc_component: EthereumRpcComponent,
-    ) -> anyhow::Result<Self> {
-        Ok(Self {
+    ) -> Self {
+        Self {
             config,
             http_client_component,
             ethereum_rpc_component,
-        })
+        }
     }
 }
 

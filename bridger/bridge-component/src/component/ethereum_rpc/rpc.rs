@@ -3,9 +3,9 @@ use bridge_primitives::chain::ethereum::{EthReceiptBody, EthereumBlockRPC, Ether
 use reqwest::Client;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+use crate::component::ethereum_rpc::block::EthBlockRPCResp;
+use crate::component::ethereum_rpc::receipt::EthReceiptRPCResp;
 use crate::error::{ComponentError, ComponentResult};
-use crate::ethereum_rpc::block::EthBlockRPCResp;
-use crate::ethereum_rpc::receipt::EthReceiptRPCResp;
 
 /// Ethereum rpc set
 pub struct EthereumRpc {

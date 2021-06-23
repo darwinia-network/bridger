@@ -9,8 +9,8 @@ pub struct Web3Component {
 }
 
 impl Web3Component {
-    pub fn new(config: Web3Config) -> anyhow::Result<Self> {
-        Ok(Self { config })
+    pub fn new(config: Web3Config) -> Self {
+        Self { config }
     }
 }
 

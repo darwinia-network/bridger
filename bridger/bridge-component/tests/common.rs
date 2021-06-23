@@ -6,11 +6,11 @@ use bee_client::types::substrate::extra::{DefaultExtra, SignedExtra};
 use bee_client::types::substrate::session::Session;
 use bee_client::types::substrate::sudo::Sudo;
 use bee_client::types::substrate::system::System;
-use bridge_component::bee::{BeeComponent, BeeConfig};
-use bridge_component::ethereum_rpc::{EthereumRpcComponent, EthereumRpcConfig};
-use bridge_component::http_client::{HttpClientComponent, HttpClientConfig};
-use bridge_component::shadow::{ShadowComponent, ShadowConfig};
-use bridge_component::web3::{Web3Component, Web3Config};
+use bridge_component::component::bee::{BeeComponent, BeeConfig};
+use bridge_component::component::ethereum_rpc::{EthereumRpcComponent, EthereumRpcConfig};
+use bridge_component::component::http_client::{HttpClientComponent, HttpClientConfig};
+use bridge_component::component::shadow::{ShadowComponent, ShadowConfig};
+use bridge_component::component::web3::{Web3Component, Web3Config};
 use sp_runtime::generic::Header;
 use sp_runtime::traits::{BlakeTwo256, IdentifyAccount, Verify};
 use sp_runtime::{MultiAddress, MultiSignature, OpaqueExtrinsic};
@@ -46,7 +46,7 @@ pub fn config_bee() -> BeeConfig {
 }
 
 pub fn component_http_client(config: HttpClientConfig) -> HttpClientComponent {
-    HttpClientComponent::new(config).expect("Failed to create http client component")
+    HttpClientComponent::new(config)
 }
 
 pub fn component_http_client_default() -> HttpClientComponent {
@@ -59,7 +59,6 @@ pub fn component_ethereum_rpc(
 ) -> EthereumRpcComponent {
     let component_http_client = self::component_http_client(config_http_client);
     EthereumRpcComponent::new(config_ethereum_rpc, component_http_client)
-        .expect("Failed to create ethereum rpc component")
 }
 
 pub fn component_ethereum_rpc_default<S: AsRef<str>>(api_key: S) -> EthereumRpcComponent {
@@ -78,7 +77,6 @@ pub fn component_shadow(
     let component_ethereum_rpc =
         self::component_ethereum_rpc(config_ethereum_rpc, config_http_client);
     ShadowComponent::new(config_shadow, component_http_client, component_ethereum_rpc)
-        .expect("Failed to create shadow component")
 }
 
 pub fn component_shadow_default<S: AsRef<str>>(ethereum_rpc_key: S) -> ShadowComponent {
@@ -90,7 +88,7 @@ pub fn component_shadow_default<S: AsRef<str>>(ethereum_rpc_key: S) -> ShadowCom
 }
 
 pub fn component_web3(config_web3: Web3Config) -> Web3Component {
-    Web3Component::new(config_web3).expect("Failed to create web3 component")
+    Web3Component::new(config_web3)
 }
 
 pub fn component_web3_default<S: AsRef<str>>(ethereum_rpc_key: S) -> Web3Component {
@@ -98,7 +96,7 @@ pub fn component_web3_default<S: AsRef<str>>(ethereum_rpc_key: S) -> Web3Compone
 }
 
 pub fn component_bee<T: ChainTypes>() -> BeeComponent<T> {
-    BeeComponent::<T>::new(self::config_bee()).expect("Failed to create bee component")
+    BeeComponent::<T>::new(self::config_bee())
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

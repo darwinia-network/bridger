@@ -1,4 +1,4 @@
-use bridge_config::component::ShadowConfig;
+use bridge_config::config::component::ShadowConfig;
 use bridge_standard::bridge::component::BridgeComponent;
 
 use crate::component::ethereum_rpc::EthereumRpcComponent;

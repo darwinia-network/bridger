@@ -1,6 +1,6 @@
 //! Darwinia shadow API
 use anyhow::Context as AnyhowContext;
-use bridge_config::component::ShadowConfig;
+use bridge_config::config::component::ShadowConfig;
 use bridge_primitives::chain::ethereum::{
     EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
     EthereumRelayProofs, EthereumRelayProofsJson, MMRRoot, MMRRootJson,

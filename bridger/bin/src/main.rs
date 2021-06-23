@@ -1,4 +1,4 @@
-use bridge_service::service::relay::RelayService;
+use bridge_service::service::relay::SubstrateToEthereumRelayService;
 use bridge_task::task::darwinia_ethereum::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
 
 fn config() -> DarwiniaEthereumConfig {
@@ -13,7 +13,7 @@ fn config() -> DarwiniaEthereumConfig {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let task = DarwiniaEthereumTask::with(self::config())?;
-    task.spawn_service::<RelayService<DarwiniaEthereumTask>>()?;
+    task.spawn_service::<SubstrateToEthereumRelayService<DarwiniaEthereumTask>>()?;
 
     drop(task);
     loop {

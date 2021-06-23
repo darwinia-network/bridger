@@ -1,4 +1,4 @@
-use bridge_config::component::HttpClientConfig;
+use bridge_config::config::component::HttpClientConfig;
 use bridge_standard::bridge::component::BridgeComponent;
 use std::time::Duration;
 

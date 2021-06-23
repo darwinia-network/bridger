@@ -1,4 +1,6 @@
 use bee_client::types::substrate::system::System;
+use bridge_component::Component;
+use bridge_standard::bridge::chain::{LikeEthereumChain, SubstrateChain};
 use bridge_standard::bridge::task::BridgeTask;
 use codec::{Decode, Encode};
 use lifeline::{Lifeline, Service, Task};
@@ -39,18 +41,23 @@ impl<T: ChainTypes> Service for RelayService<T> {
 
 */
 
-pub struct RelayService<T: BridgeTask> {
+pub struct SubstrateToEthereumRelayService<T: BridgeTask> {
     _greet: Lifeline,
     _marker: PhantomData<T>,
 }
 
-impl<T: BridgeTask> Service for RelayService<T> {
+impl<T: BridgeTask> Service for SubstrateToEthereumRelayService<T>
+where
+    T::Source: SubstrateChain,
+    T::Target: LikeEthereumChain,
+{
     type Bus = T::Bus;
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // let mut rx = bus.rx::<BridgerMessage>()?;
         println!("entry service. bus: {:?}", bus);
+        let component_bee = Component::bee::<T, T::Source>()?;
         let _greet = Self::try_task("service-ethereum-confirmed", async move {
             // while let Some(recv) = rx.recv().await {
             // 	println!(">>------------------- {:?}", recv);

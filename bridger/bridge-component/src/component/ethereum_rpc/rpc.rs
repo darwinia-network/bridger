@@ -1,4 +1,4 @@
-use bridge_config::component::EthereumRpcConfig;
+use bridge_config::config::component::EthereumRpcConfig;
 use bridge_primitives::chain::ethereum::{EthReceiptBody, EthereumBlockRPC, EthereumHeader};
 use reqwest::Client;
 use std::sync::atomic::{AtomicUsize, Ordering};

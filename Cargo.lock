@@ -755,7 +755,6 @@ dependencies = [
  "bridge-standard",
  "env_logger 0.8.3",
  "log",
- "once_cell",
  "reqwest 0.11.3",
  "serde 1.0.126",
  "serde_json",
@@ -773,6 +772,9 @@ dependencies = [
  "bridge-standard",
  "env_logger 0.8.3",
  "log",
+ "once_cell",
+ "serde 1.0.126",
+ "serde_json",
 ]
 
 [[package]]

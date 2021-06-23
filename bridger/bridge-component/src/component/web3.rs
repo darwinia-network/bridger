@@ -1,4 +1,4 @@
-use bridge_config::component::Web3Config;
+use bridge_config::config::component::Web3Config;
 use bridge_standard::bridge::component::BridgeComponent;
 use bridge_standard::error::StandardError;
 use web3::transports::Http;

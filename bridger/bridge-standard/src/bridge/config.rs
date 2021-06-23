@@ -1,1 +1,3 @@
-pub trait BridgeConfig {}
+pub trait BridgeConfig {
+    fn marker() -> &'static str;
+}

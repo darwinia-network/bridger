@@ -4,10 +4,11 @@ pub trait BridgeChain {
     const CHAIN_CATEGORY: ChainCategory;
 }
 
-// todo: maybe change name to LikeDarwiniaChain ?
 pub trait SubstrateChain: BridgeChain {
     type ChainTypes: ChainTypes;
 }
+
+pub trait LikeDarwiniaChain: SubstrateChain {}
 
 pub trait LikeEthereumChain: BridgeChain {}
 

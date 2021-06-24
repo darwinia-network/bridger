@@ -6,7 +6,9 @@ use bee_client::types::substrate::extra::DefaultExtra;
 use bee_client::types::substrate::session::Session;
 use bee_client::types::substrate::sudo::Sudo;
 use bee_client::types::substrate::system::System;
-use bridge_standard::bridge::chain::{BridgeChain, ChainCategory, SubstrateChain};
+use bridge_standard::bridge::chain::{
+    BridgeChain, ChainCategory, LikeDarwiniaChain, SubstrateChain,
+};
 use sp_runtime::generic::Header;
 use sp_runtime::traits::{BlakeTwo256, IdentifyAccount, Verify};
 use sp_runtime::{MultiAddress, MultiSignature, OpaqueExtrinsic};
@@ -20,6 +22,8 @@ impl BridgeChain for DarwiniaChain {
 impl SubstrateChain for DarwiniaChain {
     type ChainTypes = DarwiniaChainTypes;
 }
+
+impl LikeDarwiniaChain for DarwiniaChain {}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct DarwiniaChainTypes;

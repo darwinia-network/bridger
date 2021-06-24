@@ -1,7 +1,7 @@
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_service::message::s2e::EthereumScanMessage;
-use bridge_service::service::ethereum::SubstrateToEthereumEthereumScanService;
-use bridge_service::service::relay::SubstrateToEthereumRelayService;
+use bridge_service::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
+use bridge_service::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 use bridge_standard::bridge::task::BridgeTask;
 use bridge_task::bus::DarwiniaEthereumBus;
 use bridge_task::task::darwinia_ethereum::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
@@ -40,9 +40,10 @@ async fn main() -> anyhow::Result<()> {
 
     // darwinia ethereum bridge
     let task = DarwiniaEthereumTask::with(self::config())?;
-    let _s0 = task.spawn_service::<SubstrateToEthereumRelayService<DarwiniaEthereumTask>>()?;
-    let _s1 =
-        task.spawn_service::<SubstrateToEthereumEthereumScanService<DarwiniaEthereumTask>>()?;
+    let _s0 =
+        task.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService<DarwiniaEthereumTask>>()?;
+    let _s1 = task
+        .spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService<DarwiniaEthereumTask>>()?;
     task.start().await?;
 
     loop {

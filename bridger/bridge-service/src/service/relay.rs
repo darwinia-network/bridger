@@ -5,7 +5,7 @@ use codec::{Decode, Encode};
 use lifeline::{Lifeline, Service, Task};
 
 use bridge_component::Component;
-use bridge_standard::bridge::chain::{LikeEthereumChain, SubstrateChain};
+use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain, SubstrateChain};
 use bridge_standard::bridge::task::BridgeTask;
 
 pub trait EthereumRelay: System {
@@ -43,14 +43,14 @@ impl<T: ChainTypes> Service for RelayService<T> {
 
 */
 
-pub struct SubstrateToEthereumRelayService<T: BridgeTask + 'static> {
+pub struct LikeDarwiniaWithLikeEthereumRelayService<T: BridgeTask + 'static> {
     _greet: Lifeline,
     _marker: PhantomData<T>,
 }
 
-impl<T: BridgeTask + 'static> Service for SubstrateToEthereumRelayService<T>
+impl<T: BridgeTask + 'static> Service for LikeDarwiniaWithLikeEthereumRelayService<T>
 where
-    T::Source: SubstrateChain,
+    T::Source: LikeDarwiniaChain,
     T::Target: LikeEthereumChain,
 {
     type Bus = T::Bus;

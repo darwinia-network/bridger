@@ -13,6 +13,8 @@ use sp_runtime::generic::Header;
 use sp_runtime::traits::{BlakeTwo256, IdentifyAccount, Verify};
 use sp_runtime::{MultiAddress, MultiSignature, OpaqueExtrinsic};
 
+mod types;
+
 pub struct DarwiniaChain {}
 
 impl BridgeChain for DarwiniaChain {

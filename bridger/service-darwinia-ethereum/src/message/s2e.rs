@@ -16,8 +16,3 @@ pub enum EthereumScanMessage<T: BridgeTask + Clone + 'static> {
 impl<T: BridgeTask + Clone + 'static> Message<T::Bus> for EthereumScanMessage<T> {
     type Channel = broadcast::Sender<Self>;
 }
-
-#[derive(Debug, Clone)]
-pub enum TestMessage {
-    Test,
-}

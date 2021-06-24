@@ -1012,6 +1012,7 @@ dependencies = [
  "anyhow",
  "bee-client",
  "bridge-standard",
+ "parity-scale-codec 2.1.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
 ]
@@ -6891,7 +6892,6 @@ dependencies = [
  "env_logger 0.8.3",
  "lifeline",
  "log",
- "parity-scale-codec 2.1.1",
  "postage",
  "thiserror",
 ]

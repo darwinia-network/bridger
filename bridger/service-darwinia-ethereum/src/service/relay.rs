@@ -1,23 +1,10 @@
 use std::marker::PhantomData;
 
-use bee_client::types::substrate::system::System;
-use codec::{Decode, Encode};
 use lifeline::{Lifeline, Service, Task};
 
 use bridge_component::Component;
 use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain, SubstrateChain};
 use bridge_standard::bridge::task::BridgeTask;
-
-pub trait EthereumRelay: System {
-    /// RingBalance
-    type RingBalance: 'static + Encode + Decode + Sync + Send + Default;
-    /// Ethereum BlockNumber
-    type EthereumBlockNumber: 'static + Encode + Decode + Sync + Send + Default;
-    /// Ethereum Pending Header
-    type PendingRelayHeaderParcel: 'static + Encode + Decode + Sync + Send + Default;
-    /// Ethereum Relay Header ID
-    type RelayAffirmationId: 'static + Encode + Decode + Sync + Send + Default + Clone;
-}
 
 /*
 // fake code

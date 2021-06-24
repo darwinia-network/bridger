@@ -4,6 +4,7 @@ use bridge_config::config::component::BeeConfig;
 use bridge_standard::bridge::component::BridgeComponent;
 use std::marker::PhantomData;
 
+#[derive(Clone)]
 pub struct BeeComponent<T: ChainTypes> {
     config: BeeConfig,
     _marker: PhantomData<T>,

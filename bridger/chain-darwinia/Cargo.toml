@@ -20,6 +20,8 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0"
 
+codec = { package = "parity-scale-codec", version = "2.1", features = ["derive", "full"] }
+
 bridge-standard = { path = "../bridge-standard" }
 
 bee-client = { git = "https://github.com/darwinia-network/substrate-api-client.git", branch = "darwinia" }

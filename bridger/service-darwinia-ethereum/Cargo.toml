@@ -31,8 +31,5 @@ bridge-config = { path = "../bridge-config" }
 bridge-component = { path = "../bridge-component" }
 
 
-## todo: may don't dependency to there
-codec = { package = "parity-scale-codec", version = "2.1", features = ["derive", "full"] }
-
 [dev-dependencies]
 env_logger = "0.8"

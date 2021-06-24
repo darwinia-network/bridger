@@ -10,6 +10,7 @@ use chain_ethereum::EthereumChain;
 use service_darwinia_ethereum::message::s2e::EthereumScanMessage;
 
 use crate::bus::DarwiniaEthereumBus;
+use bridge_standard::bridge::service::BridgeService;
 
 #[derive(Debug, Clone)]
 pub struct DarwiniaEthereumTask {}
@@ -26,6 +27,7 @@ impl DarwiniaEthereumTask {
         config.store(Self::NAME)?;
         Ok(DarwiniaEthereumTaskBoot {
             bus: Default::default(),
+            services: vec![],
         })
     }
 }
@@ -33,6 +35,7 @@ impl DarwiniaEthereumTask {
 #[derive(Debug)]
 pub struct DarwiniaEthereumTaskBoot {
     bus: DarwiniaEthereumBus,
+    services: Vec<Box<dyn BridgeService<DarwiniaEthereumTask>>>,
 }
 
 impl DarwiniaEthereumTaskBoot {
@@ -58,8 +61,16 @@ impl DarwiniaEthereumTaskBoot {
         &self.bus
     }
 
-    pub fn spawn_service<S: lifeline::Service<Bus = DarwiniaEthereumBus>>(&self) -> S::Lifeline {
-        S::spawn(&self.bus)
+    pub fn spawn_service<
+        S: lifeline::Service<Bus = DarwiniaEthereumBus, Lifeline = anyhow::Result<S>>
+            + BridgeService<DarwiniaEthereumTask>
+            + 'static,
+    >(
+        &mut self,
+    ) -> anyhow::Result<&mut Self> {
+        let service = S::spawn(&self.bus)?;
+        self.services.push(Box::new(service));
+        Ok(self)
     }
 }
 

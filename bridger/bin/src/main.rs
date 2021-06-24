@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_standard::bridge::task::BridgeTask;
 use bridge_task::bus::DarwiniaEthereumBus;
@@ -12,7 +15,7 @@ fn init() {
         r#"
 		serde=info,
 		lifeline=debug,
-		bridge=info,
+		darwinia_bridge=debug,
 		"#,
     );
     std::env::set_var("RUST_BACKTRACE", "1");
@@ -39,17 +42,29 @@ async fn main() -> anyhow::Result<()> {
     self::init();
 
     // darwinia ethereum bridge
-    let task = DarwiniaEthereumTask::with(self::config())?;
-    let _s0 =
-        task.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService<DarwiniaEthereumTask>>()?;
-    let _s1 = task
-        .spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService<DarwiniaEthereumTask>>()?;
+    let mut task = DarwiniaEthereumTask::with(self::config())?;
+
+    task.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService<DarwiniaEthereumTask>>()?;
+    task.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService<DarwiniaEthereumTask>>()?;
     task.start().await?;
 
+    let mut times = 0;
     loop {
-        tokio::time::sleep(tokio::time::Duration::from_millis(5000)).await;
+        tokio::time::sleep(tokio::time::Duration::from_millis(1000)).await;
         task.send_scan().await?;
+        times += 1;
+        if times == 5 {
+            drop(task);
+            debug!("The task is stopped");
+            break;
+        }
     }
+    loop {
+        debug!("No task run");
+        tokio::time::sleep(tokio::time::Duration::from_millis(10000)).await;
+        break;
+    }
+    Ok(())
 }
 
 /*

@@ -10,10 +10,17 @@ use bridge_standard::bridge::component::BridgeComponent;
 use bridge_standard::bridge::task::BridgeTask;
 
 use crate::message::s2e::EthereumScanMessage;
+use bridge_standard::bridge::service::BridgeService;
 
+#[derive(Debug)]
 pub struct LikeDarwiniaWithLikeEthereumEthereumScanService<T: BridgeTask + 'static> {
     _greet: Lifeline,
     _marker: PhantomData<T>,
+}
+
+impl<T: BridgeTask + 'static> BridgeService<T>
+    for LikeDarwiniaWithLikeEthereumEthereumScanService<T>
+{
 }
 
 impl<T: BridgeTask + 'static> Service for LikeDarwiniaWithLikeEthereumEthereumScanService<T>

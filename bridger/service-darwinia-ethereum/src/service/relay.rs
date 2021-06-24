@@ -4,6 +4,7 @@ use lifeline::{Lifeline, Service, Task};
 
 use bridge_component::Component;
 use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain, SubstrateChain};
+use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeTask;
 
 /*
@@ -30,10 +31,13 @@ impl<T: ChainTypes> Service for RelayService<T> {
 
 */
 
+#[derive(Debug)]
 pub struct LikeDarwiniaWithLikeEthereumRelayService<T: BridgeTask + 'static> {
     _greet: Lifeline,
     _marker: PhantomData<T>,
 }
+
+impl<T: BridgeTask + 'static> BridgeService<T> for LikeDarwiniaWithLikeEthereumRelayService<T> {}
 
 impl<T: BridgeTask + 'static> Service for LikeDarwiniaWithLikeEthereumRelayService<T>
 where

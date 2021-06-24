@@ -1,7 +1,9 @@
 use lifeline::{Bus, Sender};
 
 use bridge_component::Component;
-use bridge_config::config::component::{BeeConfig, EthereumRpcConfig, ShadowConfig, Web3Config};
+use bridge_config::config::component::{
+    BeeConfig, EthereumRpcConfig, MicrokvConfig, ShadowConfig, Web3Config,
+};
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_config::Config;
 use bridge_standard::bridge::task::BridgeTask;
@@ -43,7 +45,7 @@ impl DarwiniaEthereumTaskBoot {
         let mut tx_scan = self.bus.tx::<EthereumScanMessage<DarwiniaEthereumTask>>()?;
         // drop(self.bus);
         tx_scan
-            .send(EthereumScanMessage::<DarwiniaEthereumTask>::Scan)
+            .send(EthereumScanMessage::<DarwiniaEthereumTask>::Start)
             .await?;
         Ok(())
     }
@@ -52,7 +54,7 @@ impl DarwiniaEthereumTaskBoot {
     pub async fn send_scan(&self) -> anyhow::Result<()> {
         let mut tx_scan = self.bus.tx::<EthereumScanMessage<DarwiniaEthereumTask>>()?;
         tx_scan
-            .send(EthereumScanMessage::<DarwiniaEthereumTask>::Scan)
+            .send(EthereumScanMessage::<DarwiniaEthereumTask>::Start)
             .await?;
         Ok(())
     }
@@ -80,6 +82,7 @@ pub struct DarwiniaEthereumConfig {
     pub web3: Web3Config,
     pub ethereum_rpc: EthereumRpcConfig,
     pub shadow: ShadowConfig,
+    pub microkv: MicrokvConfig,
     pub service: SubstrateEthereumConfig,
 }
 
@@ -91,6 +94,7 @@ impl DarwiniaEthereumConfig {
         Config::store(name, self.ethereum_rpc.clone())?;
         Config::store(name, self.shadow.clone())?;
         Config::store(name, self.service.clone())?;
+        Config::store(name, self.microkv.clone())?;
         Ok(())
     }
 }

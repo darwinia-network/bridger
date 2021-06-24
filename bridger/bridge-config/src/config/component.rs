@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use bridge_standard::bridge::config::BridgeConfig;
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -56,5 +58,17 @@ pub struct Web3Config {
 impl BridgeConfig for Web3Config {
     fn marker() -> &'static str {
         "component-web3"
+    }
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct MicrokvConfig {
+    pub base_path: PathBuf,
+    pub db_name: Option<String>,
+}
+
+impl BridgeConfig for MicrokvConfig {
+    fn marker() -> &'static str {
+        "component-microkv"
     }
 }

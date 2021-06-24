@@ -525,6 +525,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6736e2428df2ca2848d846c43e88745121a6654696e349ce0054a420815a7409"
 
 [[package]]
+name = "bincode"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
+dependencies = [
+ "serde 1.0.126",
+]
+
+[[package]]
 name = "bitflags"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -755,6 +764,7 @@ dependencies = [
  "bridge-standard",
  "env_logger 0.8.3",
  "log",
+ "microkv",
  "reqwest 0.11.3",
  "serde 1.0.126",
  "serde_json",
@@ -3601,6 +3611,7 @@ checksum = "824845a0bf897a9042383849b02c1bc219c2383772efcd5c6f9766fa4b81aef3"
 dependencies = [
  "autocfg",
  "hashbrown",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -4053,6 +4064,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "libsodium-sys"
+version = "0.2.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b779387cd56adfbc02ea4a668e704f729be8d6a6abd2c27ca5ee537849a92fd"
+dependencies = [
+ "cc",
+ "libc",
+ "pkg-config",
+ "walkdir",
+]
+
+[[package]]
 name = "libz-sys"
 version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4267,6 +4290,18 @@ dependencies = [
  "log",
  "parking_lot 0.11.1",
  "relay-utils",
+]
+
+[[package]]
+name = "microkv"
+version = "0.2.6"
+source = "git+https://github.com/fewensa/microkv?branch=master#0745f6b706f8c963a0bee97a560d2d5e2b1a8c18"
+dependencies = [
+ "bincode",
+ "indexmap",
+ "secstr",
+ "serde 1.0.126",
+ "sodiumoxide",
 ]
 
 [[package]]
@@ -6731,6 +6766,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "secstr"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cce2c726741c320e5b8f1edd9a21b3c2c292ae94514afd001d41d81ba143dafc"
+dependencies = [
+ "libc",
+ "serde 1.0.126",
+]
+
+[[package]]
 name = "security-framework"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6894,6 +6939,7 @@ dependencies = [
  "log",
  "postage",
  "thiserror",
+ "tokio 1.6.0",
 ]
 
 [[package]]
@@ -7074,6 +7120,18 @@ checksum = "9e3dfc207c526015c632472a77be09cf1b6e46866581aecae5cc38fb4235dea2"
 dependencies = [
  "libc",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "sodiumoxide"
+version = "0.2.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e26be3acb6c2d9a7aac28482586a7856436af4cfe7100031d219de2d2ecb0028"
+dependencies = [
+ "ed25519",
+ "libc",
+ "libsodium-sys",
+ "serde 1.0.126",
 ]
 
 [[package]]

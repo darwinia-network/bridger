@@ -8,7 +8,8 @@ use postage::{broadcast, mpsc};
 
 #[derive(Debug, Clone)]
 pub enum EthereumScanMessage<T: BridgeTask + Clone + 'static> {
-    Scan,
+    Start,
+    Pause,
     #[doc(hidden)]
     _Marker(PhantomData<fn() -> T>),
 }

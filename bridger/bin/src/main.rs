@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate log;
 
+use bridge_config::config::component::{
+    BeeConfig, EthereumRpcConfig, MicrokvConfig, ShadowConfig, Web3Config,
+};
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_standard::bridge::task::BridgeTask;
 use bridge_task::bus::DarwiniaEthereumBus;
@@ -16,6 +19,8 @@ fn init() {
 		serde=info,
 		lifeline=debug,
 		darwinia_bridge=debug,
+		service_darwinia_ethereum=debug,
+        task-darwinia-ethereum=debug,
 		"#,
     );
     std::env::set_var("RUST_BACKTRACE", "1");
@@ -23,11 +28,29 @@ fn init() {
 }
 
 fn config() -> DarwiniaEthereumConfig {
+    let ethereum_endpoint = format!("https://mainnet.infura.io/v3/{}", env!("ETHEREUM_KEY"));
+    let mut microkv_path = std::env::temp_dir();
+    microkv_path.push("microkv/bridger");
+
     DarwiniaEthereumConfig {
-        bee: Default::default(),
-        web3: Default::default(),
-        ethereum_rpc: Default::default(),
-        shadow: Default::default(),
+        bee: BeeConfig {
+            endpoint: "wss://rpc.darwinia.network".to_string(),
+            strict: false,
+        },
+        web3: Web3Config {
+            endpoint: ethereum_endpoint.clone(),
+        },
+        ethereum_rpc: EthereumRpcConfig {
+            rpc: vec![ethereum_endpoint.clone()],
+            atom: 0,
+        },
+        shadow: ShadowConfig {
+            endpoint: "https://shadow.darwinia.network".to_string(),
+        },
+        microkv: MicrokvConfig {
+            base_path: microkv_path,
+            db_name: Some(DarwiniaEthereumTask::NAME.to_string()),
+        },
         service: SubstrateEthereumConfig {
             interval_ethereum: 120,
             interval_relay: 60,
@@ -50,10 +73,10 @@ async fn main() -> anyhow::Result<()> {
 
     let mut times = 0;
     loop {
-        tokio::time::sleep(tokio::time::Duration::from_millis(1000)).await;
+        tokio::time::sleep(tokio::time::Duration::from_millis(5000)).await;
         task.send_scan().await?;
         times += 1;
-        if times == 5 {
+        if times == u64::MAX {
             drop(task);
             debug!("The task is stopped");
             break;

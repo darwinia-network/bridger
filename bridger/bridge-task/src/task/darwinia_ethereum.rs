@@ -4,10 +4,10 @@ use bridge_component::Component;
 use bridge_config::config::component::{BeeConfig, EthereumRpcConfig, ShadowConfig, Web3Config};
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_config::Config;
-use bridge_service::message::s2e::EthereumScanMessage;
 use bridge_standard::bridge::task::BridgeTask;
 use chain_darwinia::chain::DarwiniaChain;
 use chain_ethereum::chain::EthereumChain;
+use service_darwinia_ethereum::message::s2e::EthereumScanMessage;
 
 use crate::bus::DarwiniaEthereumBus;
 

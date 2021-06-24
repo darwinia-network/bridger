@@ -1,10 +1,10 @@
 use bridge_config::config::service::SubstrateEthereumConfig;
-use bridge_service::message::s2e::EthereumScanMessage;
-use bridge_service::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
-use bridge_service::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 use bridge_standard::bridge::task::BridgeTask;
 use bridge_task::bus::DarwiniaEthereumBus;
 use bridge_task::task::darwinia_ethereum::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
+use service_darwinia_ethereum::message::s2e::EthereumScanMessage;
+use service_darwinia_ethereum::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
+use service_darwinia_ethereum::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 fn init() {
     std::env::set_var(

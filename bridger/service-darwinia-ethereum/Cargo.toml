@@ -1,5 +1,5 @@
 [package]
-name = "bridge-service"
+name = "service-darwinia-ethereum"
 version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"

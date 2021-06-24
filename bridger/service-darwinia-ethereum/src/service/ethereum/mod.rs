@@ -54,6 +54,13 @@ where
                                 break;
                             }
                             debug!(target: T::NAME, "ethereum scan ----->");
+                            let block_number: u64 = 12345;
+                            microkv.put("last_synced", &block_number)?;
+                            let las_synced: Option<u64> = microkv.get_option("last_synced")?;
+                            debug!(
+                                target: T::NAME,
+                                "Last synced block number is: {:?}", las_synced,
+                            );
                             tokio::time::sleep(tokio::time::Duration::from_millis(
                                 config.interval_ethereum * 1_000,
                             ))

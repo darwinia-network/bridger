@@ -50,6 +50,7 @@ fn config() -> DarwiniaEthereumConfig {
         microkv: MicrokvConfig {
             base_path: microkv_path,
             db_name: Some(DarwiniaEthereumTask::NAME.to_string()),
+            auto_commit: true,
         },
         service: SubstrateEthereumConfig {
             interval_ethereum: 120,

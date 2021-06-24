@@ -65,6 +65,7 @@ impl BridgeConfig for Web3Config {
 pub struct MicrokvConfig {
     pub base_path: PathBuf,
     pub db_name: Option<String>,
+    pub auto_commit: bool,
 }
 
 impl BridgeConfig for MicrokvConfig {

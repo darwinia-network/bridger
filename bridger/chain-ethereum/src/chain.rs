@@ -1,5 +1,6 @@
 use bridge_standard::bridge::chain::{BridgeChain, ChainCategory, LikeEthereumChain};
 
+#[derive(Clone, Debug)]
 pub struct EthereumChain {}
 
 impl BridgeChain for EthereumChain {

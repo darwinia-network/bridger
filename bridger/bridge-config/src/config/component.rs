@@ -10,7 +10,7 @@ pub struct EthereumRpcConfig {
 
 impl BridgeConfig for EthereumRpcConfig {
     fn marker() -> &'static str {
-        "ethereum_rpc"
+        "component-ethereum_rpc"
     }
 }
 
@@ -21,7 +21,7 @@ pub struct ShadowConfig {
 
 impl BridgeConfig for ShadowConfig {
     fn marker() -> &'static str {
-        "shadow"
+        "component-shadow"
     }
 }
 
@@ -33,7 +33,7 @@ pub struct BeeConfig {
 
 impl BridgeConfig for BeeConfig {
     fn marker() -> &'static str {
-        "bee"
+        "component-bee"
     }
 }
 
@@ -44,7 +44,7 @@ pub struct HttpClientConfig {
 
 impl BridgeConfig for HttpClientConfig {
     fn marker() -> &'static str {
-        "http_client"
+        "component-http_client"
     }
 }
 
@@ -55,6 +55,6 @@ pub struct Web3Config {
 
 impl BridgeConfig for Web3Config {
     fn marker() -> &'static str {
-        "web3"
+        "component-web3"
     }
 }

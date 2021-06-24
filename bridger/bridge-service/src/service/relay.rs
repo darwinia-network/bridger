@@ -1,10 +1,12 @@
+use std::marker::PhantomData;
+
 use bee_client::types::substrate::system::System;
+use codec::{Decode, Encode};
+use lifeline::{Lifeline, Service, Task};
+
 use bridge_component::Component;
 use bridge_standard::bridge::chain::{LikeEthereumChain, SubstrateChain};
 use bridge_standard::bridge::task::BridgeTask;
-use codec::{Decode, Encode};
-use lifeline::{Lifeline, Service, Task};
-use std::marker::PhantomData;
 
 pub trait EthereumRelay: System {
     /// RingBalance
@@ -41,12 +43,12 @@ impl<T: ChainTypes> Service for RelayService<T> {
 
 */
 
-pub struct SubstrateToEthereumRelayService<T: BridgeTask> {
+pub struct SubstrateToEthereumRelayService<T: BridgeTask + 'static> {
     _greet: Lifeline,
     _marker: PhantomData<T>,
 }
 
-impl<T: BridgeTask> Service for SubstrateToEthereumRelayService<T>
+impl<T: BridgeTask + 'static> Service for SubstrateToEthereumRelayService<T>
 where
     T::Source: SubstrateChain,
     T::Target: LikeEthereumChain,
@@ -57,12 +59,20 @@ where
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // let mut rx = bus.rx::<BridgerMessage>()?;
         let component_bee = Component::bee::<T, T::Source>()?;
-        let _greet = Self::try_task("service-ethereum-confirmed", async move {
+        let _greet = Self::try_task(&format!("{}-service-relay", T::NAME), async move {
+            println!("hello relay");
+
             // while let Some(recv) = rx.recv().await {
             // 	println!(">>------------------- {:?}", recv);
             // }
+
+            // loop {
+            //     println!("hello");
+            // }
+
             Ok(())
         });
+        println!("{:?}", _greet);
         Ok(Self {
             _greet,
             _marker: Default::default(),

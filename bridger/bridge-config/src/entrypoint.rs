@@ -13,7 +13,7 @@ use std::sync::Arc;
 
 static INSTANCE: Lazy<Mutex<HashMap<String, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
-pub struct Config {}
+pub struct Config;
 
 impl Config {
     pub fn store<S: AsRef<str>, B: BridgeConfig + Serialize>(

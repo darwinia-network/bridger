@@ -193,7 +193,7 @@ pub struct NextTerm<T: EthereumRelayAuthorities> {
 
 /// AuthorityTerm
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct MMRRootsToSign<T: EthereumRelayAuthorities> {
+pub struct MmrRootsToSign<T: EthereumRelayAuthorities> {
 	#[store(returns = MmrRootsToSignReturn<T>)]
 	/// Block number
 	pub block_number: <T as System>::BlockNumber,
@@ -203,7 +203,7 @@ pub struct MMRRootsToSign<T: EthereumRelayAuthorities> {
 
 /// AuthorityTerm
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
-pub struct MMRRootsToSignKeys<T: EthereumRelayAuthorities> {
+pub struct MmrRootsToSignKeys<T: EthereumRelayAuthorities> {
 	#[store(returns = Vec<<T as System>::BlockNumber>)]
 	/// Runtime marker
 	pub _runtime: PhantomData<T>,

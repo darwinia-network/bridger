@@ -36,7 +36,6 @@ bridge-standard = { path = "../bridge-standard" }
 bridge-config = { path = "../bridge-config" }
 bridge-task = { path = "../bridge-task" }
 
-service-darwinia-ethereum = { path = "../service-darwinia-ethereum" }
 
 
 

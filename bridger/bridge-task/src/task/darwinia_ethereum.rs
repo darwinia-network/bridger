@@ -6,13 +6,15 @@ use bridge_config::config::component::{
 };
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_config::Config;
+use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeTask;
 use chain_darwinia::DarwiniaChain;
 use chain_ethereum::EthereumChain;
 use service_darwinia_ethereum::message::s2e::EthereumScanMessage;
+use service_darwinia_ethereum::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
+use service_darwinia_ethereum::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 use crate::bus::DarwiniaEthereumBus;
-use bridge_standard::bridge::service::BridgeService;
 
 #[derive(Debug, Clone)]
 pub struct DarwiniaEthereumTask {}
@@ -28,7 +30,7 @@ impl DarwiniaEthereumTask {
     pub fn with(config: DarwiniaEthereumConfig) -> anyhow::Result<DarwiniaEthereumTaskBoot> {
         config.store(Self::NAME)?;
         Ok(DarwiniaEthereumTaskBoot {
-            bus: Default::default(),
+            bus: Self::bus(),
             services: vec![],
         })
     }
@@ -41,7 +43,10 @@ pub struct DarwiniaEthereumTaskBoot {
 }
 
 impl DarwiniaEthereumTaskBoot {
-    pub async fn start(&self) -> anyhow::Result<()> {
+    pub async fn start(&mut self) -> anyhow::Result<()> {
+        self.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService<DarwiniaEthereumTask>>()?;
+        self.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService<DarwiniaEthereumTask>>()?;
+
         let mut tx_scan = self.bus.tx::<EthereumScanMessage<DarwiniaEthereumTask>>()?;
         // drop(self.bus);
         tx_scan

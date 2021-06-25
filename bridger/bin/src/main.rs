@@ -8,9 +8,6 @@ use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_standard::bridge::task::BridgeTask;
 use bridge_task::bus::DarwiniaEthereumBus;
 use bridge_task::task::darwinia_ethereum::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
-use service_darwinia_ethereum::message::s2e::EthereumScanMessage;
-use service_darwinia_ethereum::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
-use service_darwinia_ethereum::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 fn init() {
     std::env::set_var(
@@ -67,9 +64,6 @@ async fn main() -> anyhow::Result<()> {
 
     // darwinia ethereum bridge
     let mut task = DarwiniaEthereumTask::with(self::config())?;
-
-    task.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService<DarwiniaEthereumTask>>()?;
-    task.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService<DarwiniaEthereumTask>>()?;
     task.start().await?;
 
     let mut times = 0;

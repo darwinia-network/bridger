@@ -4178,7 +4178,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.15.0"
-source = "git+https://github.com/wuminzhe/substrate-subxt.git?branch=darwinia#c9163befd3bdf3062bdb4912c50933083ff69eba"
+source = "git+https://github.com/wuminzhe/substrate-subxt.git?branch=for_v0.3.3-2#fa73ffe10897a0ccb764de72bbe3485e4b1fe703"
 dependencies = [
  "dyn-clone",
  "frame-metadata",
@@ -4210,7 +4210,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.15.0"
-source = "git+https://github.com/wuminzhe/substrate-subxt.git?branch=darwinia#c9163befd3bdf3062bdb4912c50933083ff69eba"
+source = "git+https://github.com/wuminzhe/substrate-subxt.git?branch=for_v0.3.3-2#fa73ffe10897a0ccb764de72bbe3485e4b1fe703"
 dependencies = [
  "heck",
  "proc-macro-crate",

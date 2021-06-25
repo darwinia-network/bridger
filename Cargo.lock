@@ -826,6 +826,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "bridge-shared"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bridge-standard",
+ "lifeline",
+ "log",
+ "postage",
+]
+
+[[package]]
 name = "bridge-standard"
 version = "0.3.3"
 dependencies = [
@@ -861,6 +872,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bridge-config",
+ "bridge-shared",
  "bridge-standard",
  "bridge-task",
  "env_logger 0.8.3",
@@ -6932,6 +6944,7 @@ dependencies = [
  "bee-client",
  "bridge-component",
  "bridge-config",
+ "bridge-shared",
  "bridge-standard",
  "env_logger 0.8.3",
  "lifeline",

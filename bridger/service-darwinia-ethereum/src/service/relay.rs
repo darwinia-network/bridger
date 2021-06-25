@@ -5,6 +5,7 @@ use lifeline::{Lifeline, Service, Task};
 use bridge_component::Component;
 use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain, SubstrateChain};
 use bridge_standard::bridge::service::BridgeService;
+use bridge_standard::bridge::shared_service::SharedService;
 use bridge_standard::bridge::task::BridgeTask;
 
 /*
@@ -35,9 +36,16 @@ impl<T: ChainTypes> Service for RelayService<T> {
 pub struct LikeDarwiniaWithLikeEthereumRelayService<T: BridgeTask + 'static> {
     _greet: Lifeline,
     _marker: PhantomData<T>,
+    // shared_channel: Option<S>,
 }
 
 impl<T: BridgeTask + 'static> BridgeService<T> for LikeDarwiniaWithLikeEthereumRelayService<T> {}
+
+impl<T: BridgeTask + 'static> SharedService<T> for LikeDarwiniaWithLikeEthereumRelayService<T> {
+    fn spawn_with_shared(bus: &T::Bus) -> anyhow::Result<Self> {
+        todo!()
+    }
+}
 
 impl<T: BridgeTask + 'static> Service for LikeDarwiniaWithLikeEthereumRelayService<T>
 where
@@ -67,6 +75,7 @@ where
         Ok(Self {
             _greet,
             _marker: Default::default(),
+            // shared_service: None,
         })
     }
 }

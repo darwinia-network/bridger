@@ -842,9 +842,8 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-trait",
- "env_logger 0.8.3",
+ "bee-client",
  "lifeline",
- "log",
  "thiserror",
 ]
 

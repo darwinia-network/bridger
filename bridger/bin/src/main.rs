@@ -13,12 +13,12 @@ fn init() {
     std::env::set_var(
         "RUST_LOG",
         r#"
-		serde=info,
-		lifeline=debug,
-		darwinia_bridge=debug,
-		service_darwinia_ethereum=debug,
+        serde=info,
+        lifeline=debug,
+        darwinia_bridge=debug,
+        service_darwinia_ethereum=debug,
         task-darwinia-ethereum=debug,
-		"#,
+        "#,
     );
     std::env::set_var("RUST_BACKTRACE", "1");
     env_logger::init();

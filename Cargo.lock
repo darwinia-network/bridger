@@ -4304,7 +4304,7 @@ dependencies = [
 [[package]]
 name = "microkv"
 version = "0.2.6"
-source = "git+https://github.com/fewensa/microkv.git?branch=master#03746e1316d278406830cd571ffe2684e72f433e"
+source = "git+https://github.com/fewensa/microkv.git?branch=master#2f4bb0c8a8323a4587de8806f0cf2b558f4be3fd"
 dependencies = [
  "bincode",
  "indexmap",

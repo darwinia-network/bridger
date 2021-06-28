@@ -834,9 +834,11 @@ dependencies = [
  "bridge-config",
  "bridge-standard",
  "chain-darwinia",
+ "dyn-clone",
  "lifeline",
  "log",
  "postage",
+ "tokio 1.6.0",
 ]
 
 [[package]]

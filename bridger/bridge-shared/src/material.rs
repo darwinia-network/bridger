@@ -3,12 +3,10 @@ use bridge_standard::bridge::sand::BridgeSand;
 use chain_darwinia::DarwiniaChain;
 
 use crate::bus::SharedBus;
-use crate::traits::{SharedKeep, SharedMaterial};
+use crate::traits::SharedMaterial;
 
 #[derive(Clone, Debug)]
 pub struct MaterialDarwinia {}
-
-impl SharedKeep for MaterialDarwinia {}
 
 impl BridgeSand for MaterialDarwinia {
     const NAME: &'static str = "shared-darwinia";

@@ -6,6 +6,7 @@ use bridge_config::config::component::{
 };
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_shared::config::{DarwiniaServiceConfig, SharedConfig};
+use bridge_shared::messages::{DarwiniaMessage, SharedMessage};
 use bridge_shared::shared::BridgeShared;
 use bridge_standard::bridge::sand::BridgeSand;
 use bridge_standard::bridge::task::BridgeTask;
@@ -19,6 +20,8 @@ fn init() {
         serde=info,
         lifeline=debug,
         darwinia_bridge=debug,
+        bridge_shared=debug,
+        shared-darwinia=debug,
         service_darwinia_ethereum=debug,
         task-darwinia-ethereum=debug,
         "#,
@@ -77,8 +80,13 @@ async fn main() -> anyhow::Result<()> {
     self::init();
 
     // init bridge shared
-    let mut shared = BridgeShared::new(self::config_shared())?;
-    shared.start();
+    let mut shared = BridgeShared::new(self::config_shared());
+    shared.start()?;
+    let mut channel = shared.channel()?;
+
+    channel
+        .send_darwinia(DarwiniaMessage::SendExtrinsic)
+        .await?;
 
     // darwinia ethereum bridge
     let mut task = DarwiniaEthereumTask::with(self::config_task())?;

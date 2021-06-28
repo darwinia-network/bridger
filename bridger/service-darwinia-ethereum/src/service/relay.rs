@@ -59,7 +59,7 @@ where
         // let mut rx = bus.rx::<BridgerMessage>()?;
         let component_bee = Component::bee::<T, T::Source>()?;
         let _greet = Self::try_task(&format!("{}-service-relay", T::NAME), async move {
-            println!("hello relay");
+            debug!(target: T::NAME, "hello relay");
 
             // while let Some(recv) = rx.recv().await {
             // 	println!(">>------------------- {:?}", recv);
@@ -71,7 +71,6 @@ where
 
             Ok(())
         });
-        println!("{:?}", _greet);
         Ok(Self {
             _greet,
             _marker: Default::default(),

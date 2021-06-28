@@ -5,6 +5,9 @@ use bridge_config::config::component::{
     BeeConfig, EthereumRpcConfig, MicrokvConfig, ShadowConfig, Web3Config,
 };
 use bridge_config::config::service::SubstrateEthereumConfig;
+use bridge_shared::config::{DarwiniaServiceConfig, SharedConfig};
+use bridge_shared::shared::BridgeShared;
+use bridge_standard::bridge::sand::BridgeSand;
 use bridge_standard::bridge::task::BridgeTask;
 use bridge_task::bus::DarwiniaEthereumBus;
 use bridge_task::task::darwinia_ethereum::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
@@ -24,7 +27,7 @@ fn init() {
     env_logger::init();
 }
 
-fn config() -> DarwiniaEthereumConfig {
+fn config_task() -> DarwiniaEthereumConfig {
     let ethereum_endpoint = format!("https://mainnet.infura.io/v3/{}", env!("ETHEREUM_KEY"));
     let mut microkv_path = std::env::temp_dir();
     microkv_path.push("microkv/bridger");
@@ -58,12 +61,27 @@ fn config() -> DarwiniaEthereumConfig {
     }
 }
 
+fn config_shared() -> SharedConfig {
+    SharedConfig {
+        service_darwinia: DarwiniaServiceConfig {
+            bee: BeeConfig {
+                endpoint: "wss://rpc.darwinia.network".to_string(),
+                strict: false,
+            },
+        },
+    }
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     self::init();
 
+    // init bridge shared
+    let mut shared = BridgeShared::new(self::config_shared())?;
+    shared.start();
+
     // darwinia ethereum bridge
-    let mut task = DarwiniaEthereumTask::with(self::config())?;
+    let mut task = DarwiniaEthereumTask::with(self::config_task())?;
     task.start().await?;
 
     let mut times = 0;

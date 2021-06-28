@@ -830,7 +830,10 @@ name = "bridge-shared"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "bridge-component",
+ "bridge-config",
  "bridge-standard",
+ "chain-darwinia",
  "lifeline",
  "log",
  "postage",

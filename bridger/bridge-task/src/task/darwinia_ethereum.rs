@@ -6,6 +6,7 @@ use bridge_config::config::component::{
 };
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_config::Config;
+use bridge_standard::bridge::sand::BridgeSand;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeTask;
 use chain_darwinia::DarwiniaChain;
@@ -19,8 +20,11 @@ use crate::bus::DarwiniaEthereumBus;
 #[derive(Debug, Clone)]
 pub struct DarwiniaEthereumTask {}
 
-impl BridgeTask for DarwiniaEthereumTask {
+impl BridgeSand for DarwiniaEthereumTask {
     const NAME: &'static str = "task-darwinia-ethereum";
+}
+
+impl BridgeTask for DarwiniaEthereumTask {
     type Source = DarwiniaChain;
     type Target = EthereumChain;
     type Bus = DarwiniaEthereumBus;
@@ -92,8 +96,8 @@ pub struct DarwiniaEthereumConfig {
 }
 
 impl DarwiniaEthereumConfig {
-    pub fn store<S: AsRef<str>>(&self, task_name: S) -> anyhow::Result<()> {
-        let name = task_name.as_ref();
+    pub fn store<S: AsRef<str>>(&self, cell_name: S) -> anyhow::Result<()> {
+        let name = cell_name.as_ref();
         Config::store(name, self.bee.clone())?;
         Config::store(name, self.web3.clone())?;
         Config::store(name, self.ethereum_rpc.clone())?;

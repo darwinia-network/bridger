@@ -17,11 +17,11 @@ pub struct Config;
 
 impl Config {
     pub fn store<S: AsRef<str>, B: BridgeConfig + Serialize>(
-        task_name: S,
+        sand_name: S,
         config: B,
     ) -> BridgeResult<()> {
         let config_marker = B::marker();
-        let key = format!("{}:{}", task_name.as_ref(), config_marker);
+        let key = format!("{}:{}", sand_name.as_ref(), config_marker);
 
         let json = serde_json::to_string(&config).map_err(|e| {
             StandardError::Other(format!(
@@ -34,10 +34,10 @@ impl Config {
     }
 
     pub fn restore<S: AsRef<str>, B: BridgeConfig + DeserializeOwned>(
-        task_name: S,
+        sand_name: S,
     ) -> BridgeResult<B> {
         let config_marker = B::marker();
-        let key = format!("{}:{}", task_name.as_ref(), config_marker);
+        let key = format!("{}:{}", sand_name.as_ref(), config_marker);
         match INSTANCE.lock().unwrap().get(&key) {
             Some(v) => serde_json::from_str(v).map_err(|e| {
                 StandardError::Other(format!(

@@ -1,18 +1,10 @@
-use std::marker::PhantomData;
-
-use lifeline::{Bus, Lifeline, Receiver, Service, Task};
+use lifeline::{Bus, Lifeline, Receiver, Task};
 
 use bridge_component::Component;
-use bridge_config::config::component::BeeConfig;
-use bridge_config::Config;
-use bridge_standard::bridge::chain::LikeDarwiniaChain;
-use bridge_standard::bridge::component::BridgeComponent;
-use bridge_standard::bridge::config::BridgeConfig;
 use bridge_standard::bridge::sand::BridgeSand;
 
-use crate::bus::SharedBus;
 use crate::material::darwinia::MaterialDarwinia;
-use crate::messages::{DarwiniaMessage, SharedMessage};
+use crate::messages::SharedMessage;
 use crate::traits::{SharedChainMaterial, SharedKeepService, SharedMaterial};
 
 #[derive(Debug)]
@@ -28,7 +20,7 @@ impl lifeline::Service for DarwiniaSharedService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let mut rx = bus.rx::<SharedMessage>()?;
-        let component_bee =
+        let _component_bee =
             Component::bee::<MaterialDarwinia, <MaterialDarwinia as SharedChainMaterial>::Chain>()?;
 
         let _lifeline_extrinsic = Self::try_task(
@@ -36,11 +28,13 @@ impl lifeline::Service for DarwiniaSharedService {
             async move {
                 // let bee = component_bee.component().await?; //
                 while let Some(shared_message) = rx.recv().await {
-                    if let SharedMessage::Darwinia(message) = shared_message {
-                        debug!(
-                            target: MaterialDarwinia::NAME,
-                            "recv message: {:?}", message
-                        );
+                    match shared_message {
+                        SharedMessage::Darwinia(message) => {
+                            debug!(
+                                target: MaterialDarwinia::NAME,
+                                "recv message: {:?}", message
+                            );
+                        }
                     }
                 }
                 Ok(())

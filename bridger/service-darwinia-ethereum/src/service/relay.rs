@@ -3,9 +3,7 @@ use std::marker::PhantomData;
 use lifeline::{Lifeline, Service, Task};
 
 use bridge_component::Component;
-use bridge_shared::channel::SharedChannel;
-use bridge_shared::traits::SharedService;
-use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain, SubstrateChain};
+use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain};
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeTask;
 
@@ -50,9 +48,9 @@ where
     type Bus = T::Bus;
     type Lifeline = anyhow::Result<Self>;
 
-    fn spawn(bus: &Self::Bus) -> Self::Lifeline {
+    fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         // let mut rx = bus.rx::<BridgerMessage>()?;
-        let component_bee = Component::bee::<T, T::Source>()?;
+        let _component_bee = Component::bee::<T, T::Source>()?;
         let _greet = Self::try_task(&format!("{}-service-relay", T::NAME), async move {
             debug!(target: T::NAME, "hello relay");
 

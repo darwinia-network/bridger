@@ -1,13 +1,11 @@
-use lifeline::{Bus, Service};
-
-use bridge_standard::bridge::sand::BridgeSand;
+use lifeline::Bus;
 
 use crate::bus::SharedBus;
 use crate::channel::SharedChannel;
-use crate::config::{DarwiniaServiceConfig, SharedConfig};
+use crate::config::SharedConfig;
 use crate::messages::SharedMessage;
 use crate::service::darwinia::DarwiniaSharedService;
-use crate::traits::{SharedKeepService, SharedMaterial};
+use crate::traits::SharedKeepService;
 
 #[derive(Debug)]
 pub struct BridgeShared {

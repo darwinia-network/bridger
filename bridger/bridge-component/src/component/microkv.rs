@@ -21,7 +21,7 @@ impl BridgeComponent<MicrokvConfig, MicroKV> for MicrokvComponent {
             .config
             .db_name
             .clone()
-            .unwrap_or(MicrokvConfig::marker().to_string());
+            .unwrap_or_else(|| MicrokvConfig::marker().to_string());
         let kv = MicroKV::open_with_base_path(dbname, self.config.base_path.clone())?
             .set_auto_commit(self.config.auto_commit);
         Ok(kv)

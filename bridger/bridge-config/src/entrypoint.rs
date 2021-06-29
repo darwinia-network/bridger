@@ -1,15 +1,12 @@
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-use once_cell::sync::{Lazy, OnceCell};
+use once_cell::sync::Lazy;
 
 use bridge_standard::bridge::config::BridgeConfig;
 use bridge_standard::error::{BridgeResult, StandardError};
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
-use std::borrow::BorrowMut;
-use std::ops::Deref;
-use std::sync::Arc;
+use serde::Serialize;
 
 static INSTANCE: Lazy<Mutex<HashMap<String, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 

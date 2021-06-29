@@ -1,4 +1,3 @@
-use bridge_standard::bridge::chain::BridgeChain;
 use bridge_standard::bridge::sand::BridgeSand;
 use chain_darwinia::DarwiniaChain;
 

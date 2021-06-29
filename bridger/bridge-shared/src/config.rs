@@ -1,6 +1,5 @@
 use bridge_config::config::component::BeeConfig;
 use bridge_config::Config;
-use bridge_standard::bridge::config::BridgeConfig;
 use bridge_standard::bridge::sand::BridgeSand;
 
 use crate::material::darwinia::MaterialDarwinia;

@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use lifeline::{Bus, Lifeline, Receiver, Service, Task};
+use lifeline::{Bus, Lifeline, Receiver, Task};
 
 use bridge_component::Component;
 use bridge_config::config::service::SubstrateEthereumConfig;
@@ -8,13 +8,12 @@ use bridge_config::Config;
 use bridge_shared::channel::SharedChannel;
 use bridge_shared::messages::DarwiniaMessage;
 use bridge_shared::traits::SharedService;
-use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain, SubstrateChain};
+use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain};
 use bridge_standard::bridge::component::BridgeComponent;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeTask;
 
 use crate::message::s2e::EthereumScanMessage;
-use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 mod scan;
 
@@ -40,7 +39,7 @@ where
         let component_microkv = Component::microkv::<T>()?;
         let _greet = Self::try_task(&format!("{}-service-ethereum-scan", T::NAME), async move {
             let config: SubstrateEthereumConfig = Config::restore(T::NAME)?;
-            let web3 = component_web3.component().await?;
+            let _web3 = component_web3.component().await?;
             let microkv = component_microkv.component().await?;
             let mut running = false;
             while let Some(recv) = rx_scan.recv().await {

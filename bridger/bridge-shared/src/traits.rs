@@ -6,7 +6,6 @@ use lifeline::{Bus, Task};
 use bridge_standard::bridge::chain::BridgeChain;
 use bridge_standard::bridge::sand::BridgeSand;
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::BridgeTask;
 
 use crate::channel::SharedChannel;
 

@@ -1,1 +1,1 @@
-pub struct EthereumScan {}
+// pub struct EthereumScan {}

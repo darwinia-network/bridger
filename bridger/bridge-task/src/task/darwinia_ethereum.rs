@@ -1,6 +1,5 @@
 use lifeline::{Bus, Sender};
 
-use bridge_component::Component;
 use bridge_config::config::component::{
     BeeConfig, EthereumRpcConfig, MicrokvConfig, ShadowConfig, Web3Config,
 };
@@ -33,7 +32,7 @@ impl BridgeTask for DarwiniaEthereumTask {
 }
 
 impl DarwiniaEthereumTask {
-    pub fn new(
+    pub fn create(
         config: DarwiniaEthereumConfig,
         channel: SharedChannel,
     ) -> anyhow::Result<DarwiniaEthereumTaskBoot> {

@@ -34,5 +34,6 @@ async fn main() -> anyhow::Result<()> {
             handler::handle_task_command(command)?;
         }
     };
+    debug!("Bridge started!");
     Ok(())
 }

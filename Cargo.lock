@@ -818,24 +818,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridge-task"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "bridge-component",
- "bridge-config",
- "bridge-shared",
- "bridge-standard",
- "chain-darwinia",
- "chain-ethereum",
- "env_logger 0.8.4",
- "lifeline",
- "log",
- "postage",
- "service-darwinia-ethereum",
-]
-
-[[package]]
 name = "bridger-entrypoint"
 version = "0.3.3"
 dependencies = [
@@ -843,10 +825,10 @@ dependencies = [
  "bridge-config",
  "bridge-shared",
  "bridge-standard",
- "bridge-task",
  "env_logger 0.8.4",
  "log",
  "structopt",
+ "task-darwinia-ethereum",
  "tokio 1.7.1",
 ]
 
@@ -6907,24 +6889,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "service-darwinia-ethereum"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "bee-client",
- "bridge-component",
- "bridge-config",
- "bridge-shared",
- "bridge-standard",
- "env_logger 0.8.4",
- "lifeline",
- "log",
- "postage",
- "thiserror",
- "tokio 1.7.1",
-]
-
-[[package]]
 name = "sha-1"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8963,6 +8927,26 @@ name = "tap"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
+
+[[package]]
+name = "task-darwinia-ethereum"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bee-client",
+ "bridge-component",
+ "bridge-config",
+ "bridge-shared",
+ "bridge-standard",
+ "chain-darwinia",
+ "chain-ethereum",
+ "env_logger 0.8.4",
+ "lifeline",
+ "log",
+ "postage",
+ "thiserror",
+ "tokio 1.7.1",
+]
 
 [[package]]
 name = "tempfile"

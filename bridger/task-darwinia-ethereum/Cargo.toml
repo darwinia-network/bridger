@@ -1,5 +1,5 @@
 [package]
-name = "service-darwinia-ethereum"
+name = "task-darwinia-ethereum"
 version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -22,8 +22,6 @@ anyhow = "1.0"
 thiserror = "1.0"
 log = "0.4"
 
-tokio = { version = "1", features = ["full"] }
-
 lifeline = "0.6"
 postage = "0.4"
 
@@ -33,6 +31,11 @@ bridge-config = { path = "../bridge-config" }
 bridge-component = { path = "../bridge-component" }
 bridge-shared = { path = "../bridge-shared" }
 
+chain-darwinia = { path = "../chain-darwinia" }
+chain-ethereum = { path = "../chain-ethereum" }
+
+# todo: Add on-demand
+tokio = { version = "1", features = ["full"] }
 
 [dev-dependencies]
 env_logger = "0.8"

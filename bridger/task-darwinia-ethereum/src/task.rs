@@ -12,11 +12,11 @@ use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeTask;
 use chain_darwinia::DarwiniaChain;
 use chain_ethereum::EthereumChain;
-use service_darwinia_ethereum::message::s2e::EthereumScanMessage;
-use service_darwinia_ethereum::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
-use service_darwinia_ethereum::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 use crate::bus::DarwiniaEthereumBus;
+use crate::message::s2e::EthereumScanMessage;
+use crate::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
+use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 #[derive(Debug, Clone)]
 pub struct DarwiniaEthereumTask {}

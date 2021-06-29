@@ -7,21 +7,19 @@ use substrate_subxt::system::System;
 use substrate_subxt_proc_macro::{module, Call, Event, Store};
 
 /// AuthoritiesToSignReturn
-pub type AuthoritiesToSignReturn<T> = Option<(
+pub type AuthoritiesToSignReturn<T> = (
 	<T as EthereumRelayAuthorities>::RelayAuthorityMessage,
 	Vec<(
 		<T as System>::AccountId,
 		<T as EthereumRelayAuthorities>::RelayAuthoritySignature,
 	)>,
-)>;
+);
 
-/// AuthoritiesToSignReturn
-pub type MmrRootsToSignReturn<T> = Option<
-	Vec<(
-		<T as System>::AccountId,
-		<T as EthereumRelayAuthorities>::RelayAuthoritySignature,
-	)>,
->;
+/// MmrRootsToSignReturn
+pub type MmrRootsToSignReturn<T> = Vec<(
+    <T as System>::AccountId,
+    <T as EthereumRelayAuthorities>::RelayAuthoritySignature,
+)>;
 
 /// Relay Authority
 #[derive(Clone, Encode, Decode, Default, Debug)]
@@ -178,7 +176,7 @@ pub struct Authorities<T: EthereumRelayAuthorities> {
 /// AuthoritiesToSign
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
 pub struct AuthoritiesToSign<T: EthereumRelayAuthorities> {
-	#[store(returns = AuthoritiesToSignReturn<T>)]
+	#[store(returns = Option<AuthoritiesToSignReturn<T>>)]
 	/// Runtime marker
 	pub _runtime: PhantomData<T>,
 }
@@ -194,7 +192,7 @@ pub struct NextTerm<T: EthereumRelayAuthorities> {
 /// AuthorityTerm
 #[derive(Clone, Debug, Eq, PartialEq, Store, Encode)]
 pub struct MMRRootsToSign<T: EthereumRelayAuthorities> {
-	#[store(returns = MmrRootsToSignReturn<T>)]
+	#[store(returns = Option<MmrRootsToSignReturn<T>>)]
 	/// Block number
 	pub block_number: <T as System>::BlockNumber,
 	/// Runtime marker

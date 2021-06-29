@@ -7,31 +7,31 @@ use sp_runtime::{generic::SignedPayload, traits::IdentifyAccount};
 use std::time::Duration;
 
 /// Millau header id.
-pub type HeaderId = relay_utils::HeaderId<millau_runtime::Hash, millau_runtime::BlockNumber>;
+pub type HeaderId = relay_utils::HeaderId<millau_primitives::Hash, millau_primitives::BlockNumber>;
 
 /// Millau chain definition.
 #[derive(Debug, Clone, Copy)]
 pub struct Millau;
 
 impl ChainBase for Millau {
-	type BlockNumber = millau_runtime::BlockNumber;
-	type Hash = millau_runtime::Hash;
-	type Hasher = millau_runtime::Hashing;
-	type Header = millau_runtime::Header;
+	type BlockNumber = millau_primitives::BlockNumber;
+	type Hash = millau_primitives::Hash;
+	type Hasher = millau_primitives::Hashing;
+	type Header = millau_primitives::Header;
 }
 
 impl Chain for Millau {
 	const NAME: &'static str = "Millau";
 	const AVERAGE_BLOCK_INTERVAL: Duration = Duration::from_secs(5);
 
-	type AccountId = millau_runtime::AccountId;
-	type Index = millau_runtime::Index;
+	type AccountId = millau_primitives::AccountId;
+	type Index = millau_primitives::Nonce;
 	type SignedBlock = millau_runtime::SignedBlock;
 	type Call = millau_runtime::Call;
 }
 
 impl ChainWithBalances for Millau {
-	type NativeBalance = millau_runtime::Balance;
+	type NativeBalance = millau_primitives::Balance;
 
 	fn account_info_storage_key(account_id: &Self::AccountId) -> StorageKey {
 		use frame_support::storage::generator::StorageMap;

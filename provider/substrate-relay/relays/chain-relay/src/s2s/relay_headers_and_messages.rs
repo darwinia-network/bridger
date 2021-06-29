@@ -23,7 +23,8 @@ macro_rules! select_bridge {
 				// todo: The BlockNumber can be define in ChainConst
 				const MAX_MISSING_LEFT_HEADERS_AT_RIGHT: drml_primitives::BlockNumber =
 					pangolin_constants::BLOCKS_PER_SESSION;
-				const MAX_MISSING_RIGHT_HEADERS_AT_LEFT: bp_millau::BlockNumber = bp_millau::SESSION_LENGTH;
+				const MAX_MISSING_RIGHT_HEADERS_AT_LEFT: millau_primitives::BlockNumber =
+					millau_primitives::SESSION_LENGTH;
 
 				use crate::MillauMessagesToPangolinRunner as right_to_left_messages_runner;
 				use crate::PangolinMessagesToMillauRunner as left_to_right_messages_runner;
@@ -82,10 +83,9 @@ pub async fn run(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result<()> 
 				source_to_target_headers_relay: Some(left_to_right_on_demand_headers.clone()),
 				target_to_source_headers_relay: Some(right_to_left_on_demand_headers.clone()),
 				lane_id: lane,
-				metrics_params: metrics_params
-					.clone()
-					.disable()
-					.metrics_prefix(messages_relay::message_lane_loop::metrics_prefix::<LeftToRightMessages>(&lane)),
+				metrics_params: metrics_params.clone().disable().metrics_prefix(
+					messages_relay::message_lane_loop::metrics_prefix::<LeftToRightMessages>(&lane),
+				),
 			})
 			.map_err(|e| anyhow::format_err!("{}", e))
 			.boxed();
@@ -98,10 +98,9 @@ pub async fn run(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result<()> 
 				source_to_target_headers_relay: Some(right_to_left_on_demand_headers.clone()),
 				target_to_source_headers_relay: Some(left_to_right_on_demand_headers.clone()),
 				lane_id: lane,
-				metrics_params: metrics_params
-					.clone()
-					.disable()
-					.metrics_prefix(messages_relay::message_lane_loop::metrics_prefix::<RightToLeftMessages>(&lane)),
+				metrics_params: metrics_params.clone().disable().metrics_prefix(
+					messages_relay::message_lane_loop::metrics_prefix::<RightToLeftMessages>(&lane),
+				),
 			})
 			.map_err(|e| anyhow::format_err!("{}", e))
 			.boxed();

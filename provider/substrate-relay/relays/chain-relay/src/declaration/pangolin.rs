@@ -6,13 +6,17 @@ use codec::Encode;
 use frame_support::dispatch::GetDispatchInfo;
 use messages_relay::message_lane::MessageLane;
 use millau_runtime::{
-	BridgeGrandpaCall as BridgeGrandpaPangolinCall, BridgeMessagesCall as TargetChainRuntimeMessagesCall,
-	WithPangolinGrandpa as WithPangolinGrandpaInstance, WithPangolinMessages as WithPangolinMessagesInstance,
+	BridgeGrandpaCall as BridgeGrandpaPangolinCall,
+	BridgeMessagesCall as TargetChainRuntimeMessagesCall,
+	WithPangolinGrandpa as WithPangolinGrandpaInstance,
+	WithPangolinMessages as WithPangolinMessagesInstance,
 };
 use pangolin_bridge_relay_client_definition::PangolinChain;
 use pangolin_runtime::{
-	millau_messages::MillauToPangolinConversionRate, millau_messages::INITIAL_MILLAU_TO_PANGOLIN_CONVERSION_RATE,
-	BridgeMessagesCall as SourceChainRuntimeMessagesCall, WithMillauMessages as WithMillauMessagesInstance,
+	millau_messages::MillauToPangolinConversionRate,
+	millau_messages::INITIAL_MILLAU_TO_PANGOLIN_CONVERSION_RATE,
+	BridgeMessagesCall as SourceChainRuntimeMessagesCall,
+	WithMillauMessages as WithMillauMessagesInstance,
 };
 use relay_millau_client::Millau as MillauChain;
 use relay_substrate_client::{
@@ -26,7 +30,8 @@ use std::{ops::RangeInclusive, time::Duration};
 use crate::types::s2s::{
 	finality_pipeline::{SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate},
 	messages_lane::{
-		select_delivery_transaction_limits, MessagesRelayParams, SubstrateMessageLane, SubstrateMessageLaneToSubstrate,
+		select_delivery_transaction_limits, MessagesRelayParams, SubstrateMessageLane,
+		SubstrateMessageLaneToSubstrate,
 	},
 	messages_source::SubstrateMessagesSource,
 	messages_target::SubstrateMessagesTarget,
@@ -75,7 +80,7 @@ declare_relay_headers!(
 	pangolin_bridge_relay_client_definition,
 	PangolinChainConst,
 	drml_primitives,
-	bp_millau,
+	millau_primitives,
 	millau_runtime,
 	BridgeGrandpaPangolinCall,
 	WithPangolinGrandpaInstance,
@@ -91,13 +96,13 @@ declare_relay_messages!(
 	PangolinChainConst,
 	MillauChainConst,
 	drml_primitives,
-	bp_millau,
+	millau_primitives,
 	pangolin_runtime,
 	millau_runtime,
 	SourceChainRuntimeMessagesCall,
 	TargetChainRuntimeMessagesCall,
 	pangolin_runtime_system_params,
-	bp_millau,
+	millau_primitives,
 	WithPangolinMessagesInstance,
 	WithMillauMessagesInstance,
 	MillauToPangolinConversionRate,

@@ -242,7 +242,9 @@ where
 
 	async fn require_target_header_on_source(&self, id: TargetHeaderIdOf<P>) {
 		if let Some(ref target_to_source_headers_relay) = self.target_to_source_headers_relay {
-			target_to_source_headers_relay.require_finalized_header(id);
+			target_to_source_headers_relay
+				.require_finalized_header(id)
+				.await;
 		}
 	}
 }
@@ -372,7 +374,7 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_succeeds_if_no_messages_are_missing() {
 		assert_eq!(
-			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
+			make_message_weights_map::<relay_rialto_client::Rialto>(
 				vec![(1, 0, 0), (2, 0, 0), (3, 0, 0)],
 				1..=3,
 			)
@@ -390,7 +392,7 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_succeeds_if_head_messages_are_missing() {
 		assert_eq!(
-			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
+			make_message_weights_map::<relay_rialto_client::Rialto>(
 				vec![(2, 0, 0), (3, 0, 0)],
 				1..=3,
 			)
@@ -407,7 +409,7 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_fails_if_mid_messages_are_missing() {
 		assert!(matches!(
-			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
+			make_message_weights_map::<relay_rialto_client::Rialto>(
 				vec![(1, 0, 0), (3, 0, 0)],
 				1..=3,
 			),
@@ -418,7 +420,7 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_fails_if_tail_messages_are_missing() {
 		assert!(matches!(
-			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
+			make_message_weights_map::<relay_rialto_client::Rialto>(
 				vec![(1, 0, 0), (2, 0, 0)],
 				1..=3,
 			),
@@ -429,10 +431,7 @@ mod tests {
 	#[test]
 	fn make_message_weights_map_fails_if_all_messages_are_missing() {
 		assert!(matches!(
-			make_message_weights_map::<pangolin_bridge_relay_client_definition::PangolinChain>(
-				vec![],
-				1..=3
-			),
+			make_message_weights_map::<relay_rialto_client::Rialto>(vec![], 1..=3),
 			Err(SubstrateError::Custom(_))
 		));
 	}

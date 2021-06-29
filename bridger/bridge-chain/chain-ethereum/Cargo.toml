@@ -20,4 +20,4 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0"
 
-bridge-standard = { path = "../bridge-standard" }
+bridge-standard = { path = "../../bridge-standard" }

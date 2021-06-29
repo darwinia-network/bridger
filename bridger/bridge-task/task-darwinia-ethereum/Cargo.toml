@@ -26,13 +26,13 @@ lifeline = "0.6"
 postage = "0.4"
 
 bee-client = { git = "https://github.com/darwinia-network/substrate-api-client", branch = "darwinia" }
-bridge-standard = { path = "../bridge-standard" }
-bridge-config = { path = "../bridge-config" }
-bridge-component = { path = "../bridge-component" }
-bridge-shared = { path = "../bridge-shared" }
+bridge-standard = { path = "../../bridge-standard" }
+bridge-config = { path = "../../bridge-config" }
+bridge-component = { path = "../../bridge-component" }
+bridge-shared = { path = "../../bridge-shared" }
 
-chain-darwinia = { path = "../chain-darwinia" }
-chain-ethereum = { path = "../chain-ethereum" }
+chain-darwinia = { path = "../../bridge-chain/chain-darwinia" }
+chain-ethereum = { path = "../../bridge-chain/chain-ethereum" }
 
 # todo: Add on-demand
 tokio = { version = "1", features = ["full"] }

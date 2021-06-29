@@ -30,4 +30,4 @@ bridge-standard = { path = "../bridge-standard" }
 bridge-component = { path = "../bridge-component" }
 bridge-config = { path = "../bridge-config" }
 
-chain-darwinia = { path = "../chain-darwinia" }
+chain-darwinia = { path = "../bridge-chain/chain-darwinia" }

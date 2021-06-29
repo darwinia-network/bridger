@@ -34,7 +34,7 @@ tokio = { version = "1", features = ["full"] }
 
 bridge-standard = { path = "../bridge-standard" }
 bridge-config = { path = "../bridge-config" }
-task-darwinia-ethereum = { path = "../task-darwinia-ethereum" }
+task-darwinia-ethereum = { path = "../bridge-task/task-darwinia-ethereum" }
 bridge-shared = { path = "../bridge-shared" }
 
 

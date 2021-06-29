@@ -1,10 +1,17 @@
 [workspace]
 members = [
-  "primitives",
-  "darwinia",
-  "provider/darwinia-bridger",
-  "provider/substrate-relay/bin",
-  "provider/substrate-relay/relays/*",
+	"primitives",
+	"darwinia",
+	"provider/darwinia-bridger",
+	"provider/substrate-relay/bin",
+	"provider/substrate-relay/relays/*",
 
-  "bridger/*"
+	"bridger/bin",
+	"bridger/bridge-chain/*",
+	"bridger/bridge-component",
+	"bridger/bridge-config",
+	"bridger/bridge-shared",
+	"bridger/bridge-standard",
+	"bridger/bridge-task/*",
+	"bridger/primitives",
 ]

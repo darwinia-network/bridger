@@ -178,14 +178,14 @@ mod tests {
 	use super::*;
 
 	type RialtoToMillauMessagesWeights =
-		pallet_bridge_messages::weights::RialtoWeight<rialto_runtime::Runtime>;
+		pallet_bridge_messages::weights::RialtoWeight<pangolin_runtime::Runtime>;
 
 	#[test]
 	fn select_delivery_transaction_limits_works() {
 		let (max_count, max_weight) =
 			select_delivery_transaction_limits::<RialtoToMillauMessagesWeights>(
-				bp_millau::max_extrinsic_weight(),
-				bp_millau::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
+				millau_primitives::max_extrinsic_weight(),
+				millau_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
 			);
 		assert_eq!(
 			(max_count, max_weight),

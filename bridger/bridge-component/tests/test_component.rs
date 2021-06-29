@@ -1,5 +1,3 @@
-use bridge_component::ethereum_rpc::{EthereumRpcComponent, EthereumRpcConfig};
-use bridge_component::http_client::{HttpClientComponent, HttpClientConfig};
 use bridge_standard::bridge::component::BridgeComponent;
 use std::sync::atomic::AtomicUsize;
 

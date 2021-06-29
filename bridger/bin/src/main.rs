@@ -30,7 +30,8 @@ fn init() {
 }
 
 fn config_task() -> DarwiniaEthereumConfig {
-    let ethereum_endpoint = format!("https://mainnet.infura.io/v3/{}", env!("ETHEREUM_KEY"));
+    let ethereum_key = option_env!("ETHEREUM_KEY").unwrap_or("hello");
+    let ethereum_endpoint = format!("https://mainnet.infura.io/v3/{}", ethereum_key);
     let mut microkv_path = std::env::temp_dir();
     microkv_path.push("microkv/bridger");
 

@@ -325,8 +325,8 @@ mod tests {
 
 	type TestChain = relay_millau_client::Millau;
 
-	const AT_SOURCE: Option<bp_millau::BlockNumber> = Some(10);
-	const AT_TARGET: Option<bp_millau::BlockNumber> = Some(1);
+	const AT_SOURCE: Option<millau_primitives::BlockNumber> = Some(10);
+	const AT_TARGET: Option<millau_primitives::BlockNumber> = Some(1);
 
 	#[async_std::test]
 	async fn updates_required_header_when_too_many_headers_missing() {

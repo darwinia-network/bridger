@@ -6,10 +6,9 @@ use bridge_config::config::component::{
 };
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_shared::config::{DarwiniaServiceConfig, SharedConfig};
-use bridge_shared::messages::{DarwiniaMessage, SharedMessage};
+use bridge_shared::messages::DarwiniaMessage;
 use bridge_shared::shared::BridgeShared;
 use bridge_standard::bridge::sand::BridgeSand;
-use bridge_standard::bridge::task::BridgeTask;
 use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
 
 fn init() {
@@ -29,6 +28,7 @@ fn init() {
     env_logger::init();
 }
 
+#[allow(clippy::redundant_clone)]
 fn config_task() -> DarwiniaEthereumConfig {
     let ethereum_key = option_env!("ETHEREUM_KEY").unwrap_or("hello");
     let ethereum_endpoint = format!("https://mainnet.infura.io/v3/{}", ethereum_key);
@@ -75,6 +75,7 @@ fn config_shared() -> SharedConfig {
     }
 }
 
+#[allow(clippy::never_loop)]
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     self::init();

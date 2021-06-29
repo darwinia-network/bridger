@@ -5,6 +5,7 @@ use bridge_standard::bridge::task::BridgeTask;
 use lifeline::Message;
 use postage::broadcast;
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum EthereumScanMessage<T: BridgeTask + Clone + 'static> {
     Start,

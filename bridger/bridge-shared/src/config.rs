@@ -3,7 +3,7 @@ use bridge_config::Config;
 use bridge_standard::bridge::config::BridgeConfig;
 use bridge_standard::bridge::sand::BridgeSand;
 
-use crate::material::MaterialDarwinia;
+use crate::material::darwinia::MaterialDarwinia;
 
 #[derive(Clone, Debug)]
 pub struct SharedConfig {

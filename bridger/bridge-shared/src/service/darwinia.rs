@@ -11,9 +11,9 @@ use bridge_standard::bridge::config::BridgeConfig;
 use bridge_standard::bridge::sand::BridgeSand;
 
 use crate::bus::SharedBus;
-use crate::material::MaterialDarwinia;
+use crate::material::darwinia::MaterialDarwinia;
 use crate::messages::{DarwiniaMessage, SharedMessage};
-use crate::traits::{SharedKeepService, SharedMaterial};
+use crate::traits::{SharedChainMaterial, SharedKeepService, SharedMaterial};
 
 #[derive(Debug)]
 pub struct DarwiniaSharedService {
@@ -29,7 +29,7 @@ impl lifeline::Service for DarwiniaSharedService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let mut rx = bus.rx::<SharedMessage>()?;
         let component_bee =
-            Component::bee::<MaterialDarwinia, <MaterialDarwinia as SharedMaterial>::Chain>()?;
+            Component::bee::<MaterialDarwinia, <MaterialDarwinia as SharedChainMaterial>::Chain>()?;
 
         let _lifeline_extrinsic = Self::try_task(
             &format!("{}-extrinsic", MaterialDarwinia::NAME),

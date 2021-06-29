@@ -3,7 +3,7 @@ use bridge_standard::bridge::sand::BridgeSand;
 use chain_darwinia::DarwiniaChain;
 
 use crate::bus::SharedBus;
-use crate::traits::SharedMaterial;
+use crate::traits::{SharedChainMaterial, SharedMaterial};
 
 #[derive(Clone, Debug)]
 pub struct MaterialDarwinia {}
@@ -13,6 +13,9 @@ impl BridgeSand for MaterialDarwinia {
 }
 
 impl SharedMaterial for MaterialDarwinia {
-    type Chain = DarwiniaChain;
     type Bus = SharedBus;
+}
+
+impl SharedChainMaterial for MaterialDarwinia {
+    type Chain = DarwiniaChain;
 }

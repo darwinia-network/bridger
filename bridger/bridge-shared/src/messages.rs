@@ -4,7 +4,7 @@ use lifeline::Message;
 use postage::broadcast;
 
 use crate::bus::SharedBus;
-use crate::material::MaterialDarwinia;
+use crate::material::darwinia::MaterialDarwinia;
 use crate::traits::SharedMaterial;
 
 #[derive(Debug, Clone)]

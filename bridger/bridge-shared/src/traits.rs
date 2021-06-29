@@ -13,12 +13,15 @@ use crate::channel::SharedChannel;
 pub trait SharedKeepService: Debug {}
 
 pub trait SharedMaterial: BridgeSand + Clone + Debug {
-    type Chain: BridgeChain;
     type Bus: DynBus + Default;
 
     fn bus() -> Self::Bus {
         Self::Bus::default()
     }
+}
+
+pub trait SharedChainMaterial: SharedMaterial {
+    type Chain: BridgeChain;
 }
 
 pub trait SharedService: Task + BridgeService + Debug {

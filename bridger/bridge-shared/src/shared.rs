@@ -5,7 +5,6 @@ use bridge_standard::bridge::sand::BridgeSand;
 use crate::bus::SharedBus;
 use crate::channel::SharedChannel;
 use crate::config::{DarwiniaServiceConfig, SharedConfig};
-use crate::material::MaterialDarwinia;
 use crate::messages::SharedMessage;
 use crate::service::darwinia::DarwiniaSharedService;
 use crate::traits::{SharedKeepService, SharedMaterial};

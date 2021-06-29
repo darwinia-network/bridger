@@ -3,9 +3,10 @@ use std::marker::PhantomData;
 use lifeline::{Lifeline, Service, Task};
 
 use bridge_component::Component;
+use bridge_shared::channel::SharedChannel;
+use bridge_shared::traits::SharedService;
 use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain, SubstrateChain};
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::shared_service::SharedService;
 use bridge_standard::bridge::task::BridgeTask;
 
 /*
@@ -39,13 +40,7 @@ pub struct LikeDarwiniaWithLikeEthereumRelayService<T: BridgeTask + 'static> {
     // shared_channel: Option<S>,
 }
 
-impl<T: BridgeTask + 'static> BridgeService<T> for LikeDarwiniaWithLikeEthereumRelayService<T> {}
-
-impl<T: BridgeTask + 'static> SharedService<T> for LikeDarwiniaWithLikeEthereumRelayService<T> {
-    fn spawn_with_shared(bus: &T::Bus) -> anyhow::Result<Self> {
-        todo!()
-    }
-}
+impl<T: BridgeTask + 'static> BridgeService for LikeDarwiniaWithLikeEthereumRelayService<T> {}
 
 impl<T: BridgeTask + 'static> Service for LikeDarwiniaWithLikeEthereumRelayService<T>
 where

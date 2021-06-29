@@ -28,11 +28,21 @@ impl BridgeShared {
 }
 
 impl BridgeShared {
-    pub fn start(&mut self) -> anyhow::Result<()> {
-        self.config.store_darwinia::<MaterialDarwinia>()?;
+    fn spawn_service<
+        S: lifeline::Service<Bus = SharedBus, Lifeline = anyhow::Result<S>>
+            + SharedKeepService
+            + 'static,
+    >(
+        &mut self,
+    ) -> anyhow::Result<&mut Self> {
+        let service = S::spawn(&self.bus)?;
+        self.services.push(Box::new(service));
+        Ok(self)
+    }
 
-        let service_darwinia = DarwiniaSharedService::spawn(&self.bus)?;
-        self.services.push(Box::new(service_darwinia));
+    pub fn start(&mut self) -> anyhow::Result<()> {
+        self.config.store()?;
+        self.spawn_service::<DarwiniaSharedService>()?;
         Ok(())
     }
 

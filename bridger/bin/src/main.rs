@@ -89,7 +89,7 @@ async fn main() -> anyhow::Result<()> {
         .await?;
 
     // darwinia ethereum bridge
-    let mut task = DarwiniaEthereumTask::with(self::config_task())?;
+    let mut task = DarwiniaEthereumTask::new(self::config_task(), channel.clone())?;
     task.start().await?;
 
     let mut times = 0;

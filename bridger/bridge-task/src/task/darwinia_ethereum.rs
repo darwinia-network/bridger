@@ -6,6 +6,8 @@ use bridge_config::config::component::{
 };
 use bridge_config::config::service::SubstrateEthereumConfig;
 use bridge_config::Config;
+use bridge_shared::channel::SharedChannel;
+use bridge_shared::traits::SharedService;
 use bridge_standard::bridge::sand::BridgeSand;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeTask;
@@ -31,11 +33,15 @@ impl BridgeTask for DarwiniaEthereumTask {
 }
 
 impl DarwiniaEthereumTask {
-    pub fn with(config: DarwiniaEthereumConfig) -> anyhow::Result<DarwiniaEthereumTaskBoot> {
+    pub fn new(
+        config: DarwiniaEthereumConfig,
+        channel: SharedChannel,
+    ) -> anyhow::Result<DarwiniaEthereumTaskBoot> {
         config.store(Self::NAME)?;
         Ok(DarwiniaEthereumTaskBoot {
             bus: Self::bus(),
             services: vec![],
+            channel,
         })
     }
 }
@@ -43,13 +49,14 @@ impl DarwiniaEthereumTask {
 #[derive(Debug)]
 pub struct DarwiniaEthereumTaskBoot {
     bus: DarwiniaEthereumBus,
-    services: Vec<Box<dyn BridgeService<DarwiniaEthereumTask>>>,
+    services: Vec<Box<dyn BridgeService>>,
+    channel: SharedChannel,
 }
 
 impl DarwiniaEthereumTaskBoot {
     pub async fn start(&mut self) -> anyhow::Result<()> {
         self.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService<DarwiniaEthereumTask>>()?;
-        self.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService<DarwiniaEthereumTask>>()?;
+        self.spawn_shared_service::<LikeDarwiniaWithLikeEthereumEthereumScanService<DarwiniaEthereumTask>>()?;
 
         let mut tx_scan = self.bus.tx::<EthereumScanMessage<DarwiniaEthereumTask>>()?;
         // drop(self.bus);
@@ -72,14 +79,26 @@ impl DarwiniaEthereumTaskBoot {
         &self.bus
     }
 
-    pub fn spawn_service<
+    fn spawn_service<
         S: lifeline::Service<Bus = DarwiniaEthereumBus, Lifeline = anyhow::Result<S>>
-            + BridgeService<DarwiniaEthereumTask>
+            + BridgeService
             + 'static,
     >(
         &mut self,
     ) -> anyhow::Result<&mut Self> {
         let service = S::spawn(&self.bus)?;
+        self.services.push(Box::new(service));
+        Ok(self)
+    }
+
+    fn spawn_shared_service<
+        S: BridgeService
+            + SharedService<Bus = DarwiniaEthereumBus, Lifeline = anyhow::Result<S>>
+            + 'static,
+    >(
+        &mut self,
+    ) -> anyhow::Result<&mut Self> {
+        let service = S::spawn(&self.bus, self.channel.clone())?;
         self.services.push(Box::new(service));
         Ok(self)
     }

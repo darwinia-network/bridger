@@ -20,14 +20,11 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0"
-dyn-clone = "1"
 
 log = "0.4"
 
 lifeline = "0.6"
 postage = "0.4"
-
-tokio = { version = "1", features = ["full"] }
 
 bridge-standard = { path = "../bridge-standard" }
 bridge-component = { path = "../bridge-component" }

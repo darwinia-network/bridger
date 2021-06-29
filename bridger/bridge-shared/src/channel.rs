@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Formatter, Write};
 
 use lifeline::Sender;
 
@@ -8,6 +8,13 @@ use crate::messages::{DarwiniaMessage, SharedMessage};
 #[derive(Clone)]
 pub struct SharedChannel {
     sender: postage::broadcast::Sender<SharedMessage>,
+}
+
+impl Debug for SharedChannel {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error> {
+        f.write_str("SharedChannel { sender: <...> }");
+        Ok(())
+    }
 }
 
 impl SharedChannel {

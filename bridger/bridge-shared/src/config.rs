@@ -3,6 +3,8 @@ use bridge_config::Config;
 use bridge_standard::bridge::config::BridgeConfig;
 use bridge_standard::bridge::sand::BridgeSand;
 
+use crate::material::MaterialDarwinia;
+
 #[derive(Clone, Debug)]
 pub struct SharedConfig {
     pub service_darwinia: DarwiniaServiceConfig,
@@ -21,7 +23,8 @@ impl DarwiniaServiceConfig {
 }
 
 impl SharedConfig {
-    pub fn store_darwinia<S: BridgeSand>(&self) -> anyhow::Result<()> {
-        self.service_darwinia.store(S::NAME)
+    pub fn store(&self) -> anyhow::Result<()> {
+        self.service_darwinia.store(MaterialDarwinia::NAME)?;
+        Ok(())
     }
 }

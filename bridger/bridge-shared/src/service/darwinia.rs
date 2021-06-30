@@ -2,20 +2,12 @@ use lifeline::{Bus, Lifeline, Receiver, Task};
 
 use bridge_component::Component;
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
+use bridge_standard::bridge::task::BridgeSand;
 use chain_darwinia::DarwiniaChain;
 
 use crate::bus::SharedBus;
 use crate::messages::SharedMessage;
-
-#[derive(Clone, Debug)]
-pub struct SharedTask {}
-
-impl BridgeTask for SharedTask {}
-
-impl BridgeSand for SharedTask {
-    const NAME: &'static str = "shared-darwinia";
-}
+use crate::shared::SharedTask;
 
 #[derive(Debug)]
 pub struct DarwiniaSharedService {

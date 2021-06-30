@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate log;
-
 use structopt::StructOpt;
 
 use crate::types::command::Opt;
@@ -24,8 +21,6 @@ fn init() -> anyhow::Result<()> {
     );
     std::env::set_var("RUST_BACKTRACE", "1");
     env_logger::init();
-
-    dc::init()?;
     Ok(())
 }
 
@@ -34,10 +29,15 @@ async fn main() -> anyhow::Result<()> {
     self::init()?;
     let opt = Opt::from_args();
     match opt {
+        Opt::Server { options } => {
+            handler::handle_server(options).await?;
+        }
         Opt::Task(command) => {
-            handler::handle_task_command(command)?;
+            handler::handle_task(command).await?;
+        }
+        Opt::Shared(command) => {
+            handler::handle_shared(command).await?;
         }
     };
-    debug!("Bridge started!");
     Ok(())
 }

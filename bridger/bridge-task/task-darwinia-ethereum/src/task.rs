@@ -9,6 +9,7 @@ use bridge_config::Config;
 use bridge_shared::shared::SharedChannel;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
+use serde::{Deserialize, Serialize};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::message::s2e::EthereumScanMessage;
@@ -17,7 +18,7 @@ use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 #[derive(Debug)]
 pub struct DarwiniaEthereumTask {
-    services: Vec<Box<dyn BridgeService>>,
+    services: Vec<Box<dyn BridgeService + Send + Sync>>,
 }
 
 impl BridgeTask for DarwiniaEthereumTask {}
@@ -52,15 +53,17 @@ impl DarwiniaEthereumTask {
     fn spawn_service<
         S: lifeline::Service<Bus = DarwiniaEthereumBus, Lifeline = anyhow::Result<S>>
             + BridgeService
+            + Send
+            + Sync
             + 'static,
     >(
         bus: &DarwiniaEthereumBus,
-    ) -> anyhow::Result<Box<dyn BridgeService>> {
+    ) -> anyhow::Result<Box<dyn BridgeService + Send + Sync>> {
         Ok(Box::new(S::spawn(bus)?))
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DarwiniaEthereumConfig {
     pub bee: BeeConfig,
     pub web3: Web3Config,

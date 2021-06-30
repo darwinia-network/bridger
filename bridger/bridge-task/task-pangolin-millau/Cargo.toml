@@ -20,6 +20,7 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0"
 log = "0.4"
+serde = { version = "1", features = ["derive"] }
 
 lifeline = "0.6"
 postage = "0.4"

@@ -2,6 +2,7 @@ use lifeline::dyn_bus::DynBus;
 
 use bridge_shared::shared::SharedChannel;
 use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
+use serde::{Deserialize, Serialize};
 
 use crate::bus::PangolinMillauBus;
 
@@ -27,7 +28,7 @@ impl PangolinMillauTask {
 
 // -- config --
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinMillauConfig {}
 
 impl PangolinMillauConfig {

@@ -1,50 +1,107 @@
-use lifeline::Bus;
+use std::fmt::{Debug, Formatter};
+
+use lifeline::{Bus, Sender};
+
+use bridge_config::config::component::BeeConfig;
+use bridge_config::Config;
+use bridge_standard::bridge::service::BridgeService;
+use bridge_standard::bridge::task::BridgeSand;
 
 use crate::bus::SharedBus;
-use crate::channel::SharedChannel;
-use crate::config::SharedConfig;
-use crate::messages::SharedMessage;
-use crate::service::darwinia::DarwiniaSharedService;
-use crate::traits::SharedKeepService;
+use crate::messages::{DarwiniaMessage, SharedMessage};
+use crate::service::darwinia::{DarwiniaSharedService, SharedTask};
 
 #[derive(Debug)]
 pub struct BridgeShared {
-    config: SharedConfig,
-    bus: SharedBus,
-    services: Vec<Box<dyn SharedKeepService>>,
+    services: Vec<Box<dyn BridgeService>>,
+    channel: SharedChannel,
 }
 
 impl BridgeShared {
-    pub fn new(config: SharedConfig) -> Self {
-        BridgeShared {
-            config,
-            bus: SharedBus::default(),
-            services: vec![],
-        }
+    pub fn new(config: SharedConfig) -> anyhow::Result<Self> {
+        config.store()?;
+        let bus = SharedBus::default();
+
+        let services = vec![Self::spawn_service::<DarwiniaSharedService>(&bus)?];
+
+        let sender = bus.tx::<SharedMessage>()?;
+        Ok(Self {
+            services,
+            channel: SharedChannel::new(sender),
+        })
     }
 }
 
 impl BridgeShared {
     fn spawn_service<
-        S: lifeline::Service<Bus = SharedBus, Lifeline = anyhow::Result<S>>
-            + SharedKeepService
-            + 'static,
+        S: lifeline::Service<Bus = SharedBus, Lifeline = anyhow::Result<S>> + BridgeService + 'static,
     >(
-        &mut self,
-    ) -> anyhow::Result<&mut Self> {
-        let service = S::spawn(&self.bus)?;
-        self.services.push(Box::new(service));
-        Ok(self)
+        bus: &SharedBus,
+    ) -> anyhow::Result<Box<dyn BridgeService>> {
+        Ok(Box::new(S::spawn(bus)?))
     }
+}
 
-    pub fn start(&mut self) -> anyhow::Result<()> {
-        self.config.store()?;
-        self.spawn_service::<DarwiniaSharedService>()?;
+impl BridgeShared {
+    pub fn channel(&self) -> SharedChannel {
+        self.channel.clone()
+    }
+}
+
+// -- config --
+
+#[derive(Clone, Debug)]
+pub struct SharedConfig {
+    pub service_darwinia: DarwiniaServiceConfig,
+}
+
+#[derive(Clone, Debug)]
+pub struct DarwiniaServiceConfig {
+    pub bee: BeeConfig,
+}
+
+impl DarwiniaServiceConfig {
+    pub fn store<S: AsRef<str>>(&self, cell_name: S) -> anyhow::Result<()> {
+        Config::store(cell_name.as_ref(), self.bee.clone())?;
         Ok(())
     }
+}
 
-    pub fn channel(&self) -> anyhow::Result<SharedChannel> {
-        let sender = self.bus.tx::<SharedMessage>()?;
-        Ok(SharedChannel::new(sender))
+impl SharedConfig {
+    pub fn store(&self) -> anyhow::Result<()> {
+        self.service_darwinia.store(SharedTask::NAME)?;
+        Ok(())
+    }
+}
+
+// -- channel --
+
+#[derive(Clone)]
+pub struct SharedChannel {
+    sender: postage::broadcast::Sender<SharedMessage>,
+}
+
+lifeline::impl_storage_clone!(SharedChannel);
+
+impl Debug for SharedChannel {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error> {
+        f.write_str("SharedChannel { sender: <...> }")?;
+        Ok(())
+    }
+}
+
+impl SharedChannel {
+    pub fn new(sender: postage::broadcast::Sender<SharedMessage>) -> Self {
+        Self { sender }
+    }
+}
+
+impl SharedChannel {
+    pub async fn send(&mut self, message: SharedMessage) -> anyhow::Result<()> {
+        self.sender.send(message).await?;
+        Ok(())
+    }
+    pub async fn send_darwinia(&mut self, message: DarwiniaMessage) -> anyhow::Result<()> {
+        self.send(SharedMessage::Darwinia(message)).await
     }
 }

@@ -1,15 +1,14 @@
 use lifeline::Message;
 use postage::broadcast;
 
-use crate::material::darwinia::MaterialDarwinia;
-use crate::traits::SharedMaterial;
+use crate::bus::SharedBus;
 
 #[derive(Debug, Clone)]
 pub enum SharedMessage {
     Darwinia(DarwiniaMessage),
 }
 
-impl Message<<MaterialDarwinia as SharedMaterial>::Bus> for SharedMessage {
+impl Message<SharedBus> for SharedMessage {
     type Channel = broadcast::Sender<Self>;
 }
 

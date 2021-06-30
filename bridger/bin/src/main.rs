@@ -5,10 +5,9 @@ use bridge_config::config::component::{
     BeeConfig, EthereumRpcConfig, MicrokvConfig, ShadowConfig, Web3Config,
 };
 use bridge_config::config::service::SubstrateEthereumConfig;
-use bridge_shared::config::{DarwiniaServiceConfig, SharedConfig};
-use bridge_shared::messages::DarwiniaMessage;
 use bridge_shared::shared::BridgeShared;
-use bridge_standard::bridge::sand::BridgeSand;
+use bridge_shared::shared::{DarwiniaServiceConfig, SharedConfig};
+use bridge_standard::bridge::task::BridgeSand;
 use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
 
 fn init() {
@@ -81,22 +80,15 @@ async fn main() -> anyhow::Result<()> {
     self::init();
 
     // init bridge shared
-    let mut shared = BridgeShared::new(self::config_shared());
-    shared.start()?;
-    let mut channel = shared.channel()?;
-
-    channel
-        .send_darwinia(DarwiniaMessage::SendExtrinsic)
-        .await?;
+    let shared = BridgeShared::new(self::config_shared())?;
+    let channel = shared.channel();
 
     // darwinia ethereum bridge
-    let mut task = DarwiniaEthereumTask::create(self::config_task(), channel.clone())?;
-    task.start().await?;
+    let task = DarwiniaEthereumTask::new(self::config_task(), channel.clone()).await?;
 
     let mut times = 0;
     loop {
         tokio::time::sleep(tokio::time::Duration::from_millis(5000)).await;
-        task.send_scan().await?;
         times += 1;
         if times == u64::MAX {
             drop(task);

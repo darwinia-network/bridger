@@ -1,11 +1,12 @@
-use std::marker::PhantomData;
-
 use lifeline::{Lifeline, Service, Task};
 
 use bridge_component::Component;
-use bridge_standard::bridge::chain::{LikeDarwiniaChain, LikeEthereumChain};
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::BridgeTask;
+use bridge_standard::bridge::task::BridgeSand;
+use chain_darwinia::DarwiniaChain;
+
+use crate::bus::DarwiniaEthereumBus;
+use crate::task::DarwiniaEthereumTask;
 
 /*
 // fake code
@@ -32,42 +33,35 @@ impl<T: ChainTypes> Service for RelayService<T> {
 */
 
 #[derive(Debug)]
-pub struct LikeDarwiniaWithLikeEthereumRelayService<T: BridgeTask + 'static> {
+pub struct LikeDarwiniaWithLikeEthereumRelayService {
     _greet: Lifeline,
-    _marker: PhantomData<T>,
-    // shared_channel: Option<S>,
 }
 
-impl<T: BridgeTask + 'static> BridgeService for LikeDarwiniaWithLikeEthereumRelayService<T> {}
+impl BridgeService for LikeDarwiniaWithLikeEthereumRelayService {}
 
-impl<T: BridgeTask + 'static> Service for LikeDarwiniaWithLikeEthereumRelayService<T>
-where
-    T::Source: LikeDarwiniaChain,
-    T::Target: LikeEthereumChain,
-{
-    type Bus = T::Bus;
+impl Service for LikeDarwiniaWithLikeEthereumRelayService {
+    type Bus = DarwiniaEthereumBus;
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         // let mut rx = bus.rx::<BridgerMessage>()?;
-        let _component_bee = Component::bee::<T, T::Source>()?;
-        let _greet = Self::try_task(&format!("{}-service-relay", T::NAME), async move {
-            debug!(target: T::NAME, "hello relay");
+        let _component_bee = Component::bee::<DarwiniaEthereumTask, DarwiniaChain>()?;
+        let _greet = Self::try_task(
+            &format!("{}-service-relay", DarwiniaEthereumTask::NAME),
+            async move {
+                debug!(target: DarwiniaEthereumTask::NAME, "hello relay");
 
-            // while let Some(recv) = rx.recv().await {
-            // 	println!(">>------------------- {:?}", recv);
-            // }
+                // while let Some(recv) = rx.recv().await {
+                // 	println!(">>------------------- {:?}", recv);
+                // }
 
-            // loop {
-            //     println!("hello");
-            // }
+                // loop {
+                //     println!("hello");
+                // }
 
-            Ok(())
-        });
-        Ok(Self {
-            _greet,
-            _marker: Default::default(),
-            // shared_service: None,
-        })
+                Ok(())
+            },
+        );
+        Ok(Self { _greet })
     }
 }

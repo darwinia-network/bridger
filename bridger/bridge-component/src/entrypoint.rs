@@ -3,7 +3,7 @@ use bridge_config::config::component::{
 };
 use bridge_config::Config;
 use bridge_standard::bridge::chain::SubstrateChain;
-use bridge_standard::bridge::sand::BridgeSand;
+use bridge_standard::bridge::task::BridgeSand;
 
 use crate::component::bee::BeeComponent;
 use crate::component::ethereum_rpc::EthereumRpcComponent;

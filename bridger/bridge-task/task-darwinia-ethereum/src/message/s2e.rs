@@ -1,19 +1,17 @@
 use std::fmt::Debug;
-use std::marker::PhantomData;
 
-use bridge_standard::bridge::task::BridgeTask;
 use lifeline::Message;
 use postage::broadcast;
 
+use crate::bus::DarwiniaEthereumBus;
+
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
-pub enum EthereumScanMessage<T: BridgeTask + Clone + 'static> {
+pub enum EthereumScanMessage {
     Start,
     Pause,
-    #[doc(hidden)]
-    _Marker(PhantomData<fn() -> T>),
 }
 
-impl<T: BridgeTask + Clone + 'static> Message<T::Bus> for EthereumScanMessage<T> {
+impl Message<DarwiniaEthereumBus> for EthereumScanMessage {
     type Channel = broadcast::Sender<Self>;
 }

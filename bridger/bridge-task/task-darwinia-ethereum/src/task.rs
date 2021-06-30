@@ -33,7 +33,7 @@ impl DarwiniaEthereumTask {
     ) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
         let bus = DarwiniaEthereumBus::default();
-        bus.store_resource::<SharedChannel>(channel.clone());
+        bus.store_resource::<SharedChannel>(channel);
 
         let services = vec![
             Self::spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?,

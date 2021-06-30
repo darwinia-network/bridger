@@ -822,13 +822,14 @@ name = "bridger-entrypoint"
 version = "0.3.3"
 dependencies = [
  "anyhow",
- "bridge-config",
  "bridge-shared",
  "bridge-standard",
  "env_logger 0.8.4",
  "log",
+ "once_cell",
  "structopt",
  "task-darwinia-ethereum",
+ "task-pangolin-millau",
  "tokio 1.7.1",
 ]
 
@@ -8946,6 +8947,20 @@ dependencies = [
  "postage",
  "thiserror",
  "tokio 1.7.1",
+]
+
+[[package]]
+name = "task-pangolin-millau"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bridge-component",
+ "bridge-config",
+ "bridge-shared",
+ "bridge-standard",
+ "lifeline",
+ "log",
+ "postage",
 ]
 
 [[package]]

@@ -1,5 +1,5 @@
 [package]
-name = "bridger-entrypoint"
+name = "task-pangolin-millau"
 version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -17,25 +17,16 @@ keywords = ["substrate", "darwinia"]
 readme = 'README.md'
 edition = "2018"
 
-
-[[bin]]
-name = "darwinia-bridger"
-path = "src/main.rs"
-
 [dependencies]
 anyhow = "1.0"
-once_cell = "1"
-
-structopt = "0.3"
-
 log = "0.4"
-env_logger = "0.8"
 
-tokio = { version = "1", features = ["full"] }
+lifeline = "0.6"
+postage = "0.4"
 
-bridge-standard = { path = "../bridge-standard" }
-bridge-shared = { path = "../bridge-shared" }
+bridge-standard = { path = "../../bridge-standard" }
+bridge-config = { path = "../../bridge-config" }
+bridge-component = { path = "../../bridge-component" }
+bridge-shared = { path = "../../bridge-shared" }
 
-task-darwinia-ethereum = { path = "../bridge-task/task-darwinia-ethereum" }
-task-pangolin-millau = { path = "../bridge-task/task-pangolin-millau" }
-
+[dev-dependencies]

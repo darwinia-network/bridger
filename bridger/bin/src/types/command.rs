@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -41,10 +42,15 @@ pub enum SharedCommand {
     },
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Clone, Debug, StructOpt)]
 pub struct ServerOptions {
+    /// Bridger service listen host
     #[structopt(short, long, default_value = "127.0.0.1")]
     pub host: String,
+    /// Bridger service listen port
     #[structopt(short, long, default_value = "1098")]
     pub port: u32,
+    /// The bridger config or data base path.
+    #[structopt(short, long, parse(from_os_str))]
+    pub base_path: Option<PathBuf>,
 }

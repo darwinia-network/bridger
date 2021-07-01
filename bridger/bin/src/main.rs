@@ -11,6 +11,7 @@ fn init() -> anyhow::Result<()> {
         "RUST_LOG",
         r#"
         serde=info,
+        tide=debug,
         lifeline=debug,
         darwinia_bridge=debug,
         bridge_shared=debug,

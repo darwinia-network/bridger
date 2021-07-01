@@ -1,3 +1,3 @@
 pub mod command;
-pub mod tide;
+pub mod server;
 pub mod transfer;

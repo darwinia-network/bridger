@@ -959,14 +959,17 @@ dependencies = [
  "bridge-standard",
  "config 0.11.0",
  "env_logger 0.8.4",
+ "hyper 0.14.9",
  "log",
  "once_cell",
  "reqwest 0.11.4",
+ "routerify",
  "serde 1.0.126",
  "serde_json",
  "structopt",
  "task-darwinia-ethereum",
  "task-pangolin-millau",
+ "thiserror",
  "tide",
  "tokio 1.7.1",
 ]
@@ -6829,6 +6832,19 @@ name = "route-recognizer"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56770675ebc04927ded3e60633437841581c285dc6236109ea25fbf3beb7b59e"
+
+[[package]]
+name = "routerify"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e33e46aa5a1e4d60c193d6f734534fa0b3f8d74ae3b579fe7e1c3242ac23e94"
+dependencies = [
+ "http",
+ "hyper 0.14.9",
+ "lazy_static",
+ "percent-encoding 2.1.0",
+ "regex",
+]
 
 [[package]]
 name = "rpassword"

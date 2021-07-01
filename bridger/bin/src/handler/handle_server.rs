@@ -1,46 +1,48 @@
 use std::sync::Arc;
+use std::{convert::Infallible, net::SocketAddr};
 
-use tide::prelude::*;
-use tide::{Body, Request, Response, StatusCode};
+use hyper::{Body, Request, Response, Server, StatusCode};
+use routerify::prelude::*;
+use routerify::{Middleware, RequestInfo, Router, RouterService};
 
-use bridge_shared::shared::SharedTask;
+use bridge_shared::shared::{BridgeShared, SharedConfig, SharedTask};
 use bridge_standard::bridge::task::BridgeSand;
+use bridge_standard::error::StandardError;
 
 use crate::dc;
 use crate::types::command::ServerOptions;
-use crate::types::tide::{BridgeState, Resp};
-use tide::utils::After;
+use crate::types::server::{BridgeState, Resp};
+use crate::types::transfer::SharedStartParam;
 
 pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
-    let state = app_state(options.clone())?;
+    let router = router(options.clone());
 
-    let mut app = tide::with_state(state);
+    let service = RouterService::new(router).unwrap();
 
-    app.with(After(|mut res: Response| async {
-        if let Some(err) = res.error() {
-            let err_msg = format!("{:?}", err);
-            let mut split = err_msg.split("\n");
-            let msgs: Vec<&str> = split.collect();
-            let mut iter = msgs.into_iter();
-            let msg = iter.nth(0).unwrap_or_else(|| "Unknown error");
-            let trace = iter.collect::<Vec<&str>>().join("\n");
-            log::error!("{} \n{}", msg, trace);
-            res.set_status(StatusCode::InternalServerError);
+    let host_port = format!("{}:{}", options.host, options.port);
+    let addr: SocketAddr = host_port.parse()?;
 
-            let resp = Resp::<String>::err_with_trace(msg, trace, None);
-            res.set_body(Body::from_json(&resp)?);
-        }
-        Ok(res)
-    }));
+    let server = Server::bind(&addr).serve(service);
 
-    app.at("/").get(hello);
-    app.at("/shared/start").post(start_shared);
-    app.at("/task/list").get(task_list);
+    log::info!("darwinia-bridger is running on: {}", addr);
+    if let Err(err) = server.await {
+        log::error!("Server error: {}", err);
+    }
 
-    let addr = format!("{}:{}", options.host, options.port);
-    println!("Server listening on http://{}", addr);
-    app.listen(&addr).await?;
     Ok(())
+}
+
+fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
+    let state = app_state(options).expect("Failed to build app state");
+    Router::builder()
+        .data(state)
+        .middleware(Middleware::pre(logger))
+        .get("/", hello)
+        .post("/shared/start", start_shared)
+        .get("/task/list", task_list)
+        .err_handler_with_info(error_handler)
+        .build()
+        .unwrap()
 }
 
 fn app_state(options: ServerOptions) -> anyhow::Result<BridgeState> {
@@ -57,18 +59,45 @@ fn app_state(options: ServerOptions) -> anyhow::Result<BridgeState> {
     })
 }
 
-async fn hello(_req: Request<BridgeState>) -> tide::Result {
+async fn logger(req: Request<Body>) -> anyhow::Result<Request<Body>> {
+    log::debug!(
+        "{} {} {}",
+        req.remote_addr(),
+        req.method(),
+        req.uri().path()
+    );
+    Ok(req)
+}
+
+async fn error_handler(err: routerify::RouteError, _: RequestInfo) -> Response<Body> {
+    let msg = format!("Something went wrong: {}", err);
+    Resp::<String>::err_with_trace(msg, "", None)
+        .response_json()
+        .expect("Failed to build response")
+}
+
+async fn hello(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
     Ok(Resp::ok("hello".to_string()).response_json()?)
 }
 
-async fn start_shared(mut req: Request<BridgeState>) -> tide::Result {
-    let state = req.state();
+async fn start_shared(req: Request<Body>) -> anyhow::Result<Response<Body>> {
+    let saved_shared = dc::get_shared();
+    if saved_shared.is_some() {
+        return Ok(Resp::ok("Shared already started".to_string()).response_json()?);
+    }
+
+    let state = req.data::<BridgeState>().unwrap();
     let file_name = format!("{}.toml", SharedTask::NAME);
     let path_config = state.base_path.join(file_name);
-    let is_upload = req.param("is_upload")?;
-    if is_upload == "true" || is_upload == "1" {
-        let config_raw = req.param("config")?;
-        tokio::fs::write(&path_config, config_raw).await?;
+    let is_upload = req
+        .param("is_upload")
+        .map(|item| item == "true" || item == "1")
+        .unwrap_or(false);
+    if is_upload {
+        let config_raw = req
+            .param("config")
+            .ok_or_else(|| StandardError::Api("The config content is required".to_string()))?;
+        tokio::fs::write(&path_config, config_raw).await?
     }
     if !path_config.exists() {
         return Ok(Resp::<String>::err(
@@ -77,12 +106,19 @@ async fn start_shared(mut req: Request<BridgeState>) -> tide::Result {
         )
         .response_json()?);
     }
-    let config = tokio::fs::read_to_string(&path_config).await?;
 
-    Ok(Resp::ok(config).response_json()?)
+    let mut c = config::Config::default();
+    c.merge(config::File::from(path_config))?;
+    let shared_config = c
+        .try_into::<SharedConfig>()
+        .map_err(|e| StandardError::Api(format!("Failed to load shared config: {:?}", e)))?;
+    let shared = BridgeShared::new(shared_config)?;
+    dc::set_shared(shared)?;
+
+    Ok(Resp::ok("success".to_string()).response_json()?)
 }
 
-async fn task_list(_req: Request<BridgeState>) -> tide::Result {
+async fn task_list(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let tasks = dc::available_tasks()?;
     Ok(Resp::ok(tasks).response_json()?)
 }

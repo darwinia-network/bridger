@@ -1,18 +1,18 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Serialize)]
-pub struct Resp<T: Serialize> {
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(bound = "T: Serialize, for<'a> T: Deserialize<'a>")]
+pub struct Resp<T: Serialize + for<'a> Deserialize<'a>> {
     err: u8,
     msg: String,
     trace: Option<String>,
     data: Option<T>,
 }
 
-impl<T: Serialize + DeserializeOwned> Resp<T> {
+impl<T: Serialize + for<'a> Deserialize<'a>> Resp<T> {
     pub fn ok(data: T) -> Self {
         Self {
             err: 0,
@@ -39,18 +39,31 @@ impl<T: Serialize + DeserializeOwned> Resp<T> {
     }
 }
 
-impl<T: Serialize + DeserializeOwned> Resp<T> {
-    pub fn response_json(&self) -> anyhow::Result<tide::Response> {
-        let code = if self.err == 1 {
-            tide::StatusCode::Ok
+impl<T: Serialize + for<'a> Deserialize<'a>> Resp<T> {
+    pub fn msg(&self) -> &String {
+        &self.msg
+    }
+    pub fn data(&self) -> Option<&T> {
+        self.data.as_ref()
+    }
+    pub fn trace(&self) -> Option<&String> {
+        self.trace.as_ref()
+    }
+    pub fn is_ok(&self) -> bool {
+        self.err == 0
+    }
+    pub fn response_json(&self) -> anyhow::Result<hyper::Response<hyper::Body>> {
+        let code = if self.err == 0 {
+            hyper::StatusCode::OK
         } else {
-            tide::StatusCode::BadRequest
+            hyper::StatusCode::BAD_REQUEST
         };
-        let value = serde_json::to_value(self)?;
-        Ok(tide::Response::builder(code)
+        let value = serde_json::to_string(self)?;
+        let response = hyper::Response::builder()
+            .status(code)
             .header("Content-Type", "application/json")
-            .body(value)
-            .build())
+            .body(hyper::Body::from(value))?;
+        Ok(response)
     }
 }
 

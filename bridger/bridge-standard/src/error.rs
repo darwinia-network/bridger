@@ -40,6 +40,9 @@ pub enum StandardError {
     #[error("New http with URI {0} error: {1}")]
     NewHttpError(String, String),
 
+    #[error("Api error: {0}")]
+    Api(String),
+
     #[error("Cli error: {0}")]
     Cli(String),
 }

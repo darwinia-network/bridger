@@ -37,7 +37,6 @@ structopt = "0.3"
 log = "0.4"
 env_logger = "0.8"
 reqwest = { version = "0.11", features = ["json"] }
-thiserror = "1.0"
 
 bridge-standard = { path = "../bridge-standard" }
 bridge-shared = { path = "../bridge-shared" }

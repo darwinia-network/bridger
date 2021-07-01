@@ -969,7 +969,6 @@ dependencies = [
  "structopt",
  "task-darwinia-ethereum",
  "task-pangolin-millau",
- "thiserror",
  "tide",
  "tokio 1.7.1",
 ]

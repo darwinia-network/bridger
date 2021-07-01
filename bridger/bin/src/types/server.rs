@@ -35,20 +35,28 @@ impl<T: Serialize + for<'a> Deserialize<'a>> Resp<T> {
             data: Some(data),
         }
     }
-    pub fn err<M: AsRef<str>>(msg: M, data: Option<T>) -> Self {
+    pub fn err_with_msg<M: AsRef<str>>(msg: M) -> Self {
         Self {
             err: 1,
             msg: msg.as_ref().to_string(),
             trace: None,
-            data,
+            data: None,
         }
     }
-    pub fn err_with_trace<M: AsRef<str>, R: AsRef<str>>(msg: M, trace: R, data: Option<T>) -> Self {
+    pub fn err_with_msg_and_data<M: AsRef<str>>(msg: M, data: T) -> Self {
+        Self {
+            err: 1,
+            msg: msg.as_ref().to_string(),
+            trace: None,
+            data: Some(data),
+        }
+    }
+    pub fn err_with_trace<M: AsRef<str>, R: AsRef<str>>(msg: M, trace: R) -> Self {
         Self {
             err: 1,
             msg: msg.as_ref().to_string(),
             trace: Some(trace.as_ref().to_string()),
-            data,
+            data: None,
         }
     }
 }

@@ -1,7 +1,7 @@
+use std::net::SocketAddr;
 use std::sync::Arc;
-use std::{convert::Infallible, net::SocketAddr};
 
-use hyper::{Body, Request, Response, Server, StatusCode};
+use hyper::{Body, Request, Response, Server};
 use routerify::prelude::*;
 use routerify::{Middleware, RequestInfo, Router, RouterService};
 
@@ -9,10 +9,10 @@ use bridge_shared::shared::{BridgeShared, SharedConfig, SharedTask};
 use bridge_standard::bridge::task::BridgeSand;
 use bridge_standard::error::StandardError;
 
-use crate::dc;
 use crate::types::command::ServerOptions;
 use crate::types::server::{BridgeState, Resp};
 use crate::types::transfer::SharedStartParam;
+use crate::{dc, patch};
 
 pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
     let router = router(options.clone());
@@ -70,34 +70,29 @@ async fn logger(req: Request<Body>) -> anyhow::Result<Request<Body>> {
 }
 
 async fn error_handler(err: routerify::RouteError, _: RequestInfo) -> Response<Body> {
-    let msg = format!("Something went wrong: {}", err);
+    log::error!("{:?}", err);
+    let msg = format!("{}", err);
     Resp::<String>::err_with_trace(msg, "", None)
         .response_json()
         .expect("Failed to build response")
 }
 
 async fn hello(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
-    Ok(Resp::ok("hello".to_string()).response_json()?)
+    Ok(Resp::<String>::ok().response_json()?)
 }
 
-async fn start_shared(req: Request<Body>) -> anyhow::Result<Response<Body>> {
+async fn start_shared(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let saved_shared = dc::get_shared();
     if saved_shared.is_some() {
-        return Ok(Resp::ok("Shared already started".to_string()).response_json()?);
+        return Resp::<String>::ok_with_msg("Shared already started").response_json();
     }
 
+    let param: SharedStartParam = patch::hyper::deserialize_body(&mut req).await?;
     let state = req.data::<BridgeState>().unwrap();
-    let file_name = format!("{}.toml", SharedTask::NAME);
-    let path_config = state.base_path.join(file_name);
-    let is_upload = req
-        .param("is_upload")
-        .map(|item| item == "true" || item == "1")
-        .unwrap_or(false);
-    if is_upload {
-        let config_raw = req
-            .param("config")
-            .ok_or_else(|| StandardError::Api("The config content is required".to_string()))?;
-        tokio::fs::write(&path_config, config_raw).await?
+
+    let path_config = state.base_path.join(format!("{}.toml", SharedTask::NAME));
+    if let Some(config_raw) = param.config {
+        tokio::fs::write(&path_config, &config_raw).await?
     }
     if !path_config.exists() {
         return Ok(Resp::<String>::err(
@@ -115,10 +110,10 @@ async fn start_shared(req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let shared = BridgeShared::new(shared_config)?;
     dc::set_shared(shared)?;
 
-    Ok(Resp::ok("success".to_string()).response_json()?)
+    Resp::<String>::ok().response_json()
 }
 
 async fn task_list(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let tasks = dc::available_tasks()?;
-    Ok(Resp::ok(tasks).response_json()?)
+    Resp::ok_with_data(tasks).response_json()
 }

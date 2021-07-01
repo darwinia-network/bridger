@@ -4,6 +4,7 @@ use crate::types::command::Opt;
 
 mod dc;
 mod handler;
+mod patch;
 mod types;
 
 fn init() -> anyhow::Result<()> {

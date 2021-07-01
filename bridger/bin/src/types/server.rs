@@ -13,10 +13,24 @@ pub struct Resp<T: Serialize + for<'a> Deserialize<'a>> {
 }
 
 impl<T: Serialize + for<'a> Deserialize<'a>> Resp<T> {
-    pub fn ok(data: T) -> Self {
+    pub fn ok() -> Self {
+        Self::ok_with_msg("success")
+    }
+    pub fn ok_with_msg<M: AsRef<str>>(msg: M) -> Self {
         Self {
             err: 0,
-            msg: "success".to_string(),
+            msg: msg.as_ref().to_string(),
+            trace: None,
+            data: None,
+        }
+    }
+    pub fn ok_with_data(data: T) -> Self {
+        Self::ok_with_msg_and_data("success", data)
+    }
+    pub fn ok_with_msg_and_data<M: AsRef<str>>(msg: M, data: T) -> Self {
+        Self {
+            err: 0,
+            msg: msg.as_ref().to_string(),
             trace: None,
             data: Some(data),
         }

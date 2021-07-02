@@ -39,25 +39,17 @@ impl PangolinMillauTask {
     pub async fn new(config: PangolinMillauConfig, channel: SharedChannel) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
         let bus = PangolinMillauBus::default();
-        bus.store_resource::<SharedChannel>(channel);
 
         let services = vec![
             Self::spawn_service::<InitBridgeService>(&bus)?,
             Self::spawn_service::<RelayService>(&bus)?,
         ];
 
-        Ok(Self { services })
-    }
-}
-
-// -- config --
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct PangolinMillauConfig {}
-
-impl PangolinMillauConfig {
-    pub fn store<S: AsRef<str>>(&self, cell_name: S) -> anyhow::Result<()> {
-        let _name = cell_name.as_ref();
-        Ok(())
+        let carries = vec![];
+        Ok(Self {
+            bus,
+            services,
+            carries,
+        })
     }
 }

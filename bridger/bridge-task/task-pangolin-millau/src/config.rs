@@ -1,5 +1,4 @@
-use bridge_config::Config;
-use bridge_standard::bridge::config::BridgeConfig;
+use bridge_standard::bridge::config::{BridgeConfig, Config};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinMillauConfig {
@@ -9,8 +8,9 @@ pub struct PangolinMillauConfig {
 
 impl PangolinMillauConfig {
     pub fn store<S: AsRef<str>>(&self, sand_name: S) -> anyhow::Result<()> {
-        let _name = sand_name.as_ref();
-        Config::store(sand_name, self.pangolin.clone())?;
+        let name = sand_name.as_ref();
+        Config::store_with_namespace(name, self.pangolin.clone(), "pangolin")?;
+        Config::store_with_namespace(name, self.millau.clone(), "millau")?;
         Ok(())
     }
 }

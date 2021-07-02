@@ -15,13 +15,28 @@ static INSTANCE: Lazy<Mutex<HashMap<String, String>>> = Lazy::new(|| Mutex::new(
 
 pub struct Config;
 
+const DEFAULT_NAMESPACE: &'static str = "default";
+
 impl Config {
     pub fn store<S: AsRef<str>, B: BridgeConfig + Serialize>(
         sand_name: S,
         config: B,
     ) -> BridgeResult<()> {
+        Self::store_with_namespace(sand_name, config, DEFAULT_NAMESPACE)
+    }
+
+    pub fn store_with_namespace<S: AsRef<str>, B: BridgeConfig + Serialize, N: AsRef<str>>(
+        sand_name: S,
+        config: B,
+        namespace: N,
+    ) -> BridgeResult<()> {
         let config_marker = B::marker();
-        let key = format!("{}:{}", sand_name.as_ref(), config_marker);
+        let key = format!(
+            "{}:{}@{}",
+            sand_name.as_ref(),
+            config_marker,
+            namespace.as_ref()
+        );
 
         let json = serde_json::to_string(&config).map_err(|e| {
             StandardError::Other(format!(
@@ -36,8 +51,24 @@ impl Config {
     pub fn restore<S: AsRef<str>, B: BridgeConfig + DeserializeOwned>(
         sand_name: S,
     ) -> BridgeResult<B> {
+        Self::restore_with_namespace(sand_name, DEFAULT_NAMESPACE)
+    }
+
+    pub fn restore_with_namespace<
+        S: AsRef<str>,
+        B: BridgeConfig + DeserializeOwned,
+        N: AsRef<str>,
+    >(
+        sand_name: S,
+        namespace: N,
+    ) -> BridgeResult<B> {
         let config_marker = B::marker();
-        let key = format!("{}:{}", sand_name.as_ref(), config_marker);
+        let key = format!(
+            "{}:{}@{}",
+            sand_name.as_ref(),
+            config_marker,
+            namespace.as_ref()
+        );
         match INSTANCE.lock().unwrap().get(&key) {
             Some(v) => serde_json::from_str(v).map_err(|e| {
                 StandardError::Other(format!(

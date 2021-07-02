@@ -6,7 +6,7 @@ use std::sync::Mutex;
 
 use once_cell::sync::Lazy;
 
-use bridge_standard::bridge::task::{BridgeSand, BridgeTaskManage};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTaskKeep};
 use bridge_standard::error::StandardError;
 use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::DarwiniaEthereumTask;
@@ -20,7 +20,7 @@ static AVAILABLE_TASKS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| {
     ])
 });
 
-static RUNNING_TASKS: Lazy<Mutex<HashMap<String, Box<dyn BridgeTaskManage + Send>>>> =
+static RUNNING_TASKS: Lazy<Mutex<HashMap<String, Box<dyn BridgeTaskKeep + Send>>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
 
 pub fn available_tasks() -> anyhow::Result<Vec<String>> {
@@ -32,7 +32,7 @@ pub fn available_tasks() -> anyhow::Result<Vec<String>> {
 
 pub fn keep_task<N: AsRef<str>>(
     name: N,
-    task: Box<dyn BridgeTaskManage + Send>,
+    task: Box<dyn BridgeTaskKeep + Send>,
 ) -> anyhow::Result<()> {
     let mut running = RUNNING_TASKS
         .lock()

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskManage};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 
 use crate::bus::PangolinMillauBus;
 
@@ -16,7 +16,7 @@ impl BridgeSand for PangolinMillauTask {
     const NAME: &'static str = "task-pangolin-millau";
 }
 
-impl BridgeTaskManage for PangolinMillauTask {}
+impl BridgeTaskKeep for PangolinMillauTask {}
 
 impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
     fn bus(&self) -> &PangolinMillauBus {

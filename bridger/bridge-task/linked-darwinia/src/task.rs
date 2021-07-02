@@ -1,5 +1,5 @@
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskManage};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 
 use crate::bus::DarwiniaLinkedBus;
 use crate::config::DarwiniaLinkedConfig;
@@ -16,7 +16,7 @@ impl BridgeSand for DarwiniaLinked {
     const NAME: &'static str = "linked-darwinia";
 }
 
-impl BridgeTaskManage for DarwiniaLinked {}
+impl BridgeTaskKeep for DarwiniaLinked {}
 
 impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
     fn bus(&self) -> &DarwiniaLinkedBus {

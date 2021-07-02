@@ -1,5 +1,5 @@
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskManage};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 
 use crate::bus::TemplateLinkedBus;
 use crate::config::TemplateLinkedConfig;
@@ -16,7 +16,7 @@ impl BridgeSand for TemplateLinked {
     const NAME: &'static str = "linked-template";
 }
 
-impl BridgeTaskManage for TemplateLinked {}
+impl BridgeTaskKeep for TemplateLinked {}
 
 impl BridgeTask<TemplateLinkedBus> for TemplateLinked {
     fn bus(&self) -> &TemplateLinkedBus {

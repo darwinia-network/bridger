@@ -6,7 +6,7 @@ pub trait BridgeSand {
     const NAME: &'static str;
 }
 
-pub trait BridgeTask<B: lifeline::Bus>: BridgeSand + BridgeTaskManage {
+pub trait BridgeTask<B: lifeline::Bus>: BridgeSand + BridgeTaskKeep {
     fn spawn_service<
         S: lifeline::Service<Bus = B, Lifeline = anyhow::Result<S>>
             + BridgeService
@@ -23,4 +23,4 @@ pub trait BridgeTask<B: lifeline::Bus>: BridgeSand + BridgeTaskManage {
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline);
 }
 
-pub trait BridgeTaskManage: Debug {}
+pub trait BridgeTaskKeep: Debug {}

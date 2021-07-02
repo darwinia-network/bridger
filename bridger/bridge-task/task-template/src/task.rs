@@ -1,5 +1,5 @@
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskManage};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 
 use crate::bus::TemplateTaskBus;
 use crate::config::TemplateTaskConfig;
@@ -26,7 +26,7 @@ impl BridgeTask<TemplateTaskBus> for TemplateTask {
     }
 }
 
-impl BridgeTaskManage for TemplateTask {}
+impl BridgeTaskKeep for TemplateTask {}
 
 impl TemplateTask {
     pub fn new(config: TemplateTaskConfig) -> anyhow::Result<Self> {

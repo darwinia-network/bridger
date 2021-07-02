@@ -5,7 +5,7 @@ use bridge_component::config::{
 };
 use bridge_standard::bridge::config::Config;
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskManage};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 use serde::{Deserialize, Serialize};
 
 use crate::bus::DarwiniaEthereumBus;
@@ -25,7 +25,7 @@ impl BridgeSand for DarwiniaEthereumTask {
     const NAME: &'static str = "task-darwinia-ethereum";
 }
 
-impl BridgeTaskManage for DarwiniaEthereumTask {}
+impl BridgeTaskKeep for DarwiniaEthereumTask {}
 
 impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
     fn bus(&self) -> &DarwiniaEthereumBus {

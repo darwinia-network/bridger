@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::fmt::Debug;
 
 use crate::bridge::service::BridgeService;
@@ -23,4 +24,7 @@ pub trait BridgeTask<B: lifeline::Bus>: BridgeSand + BridgeTaskKeep {
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline);
 }
 
-pub trait BridgeTaskKeep: Debug {}
+pub trait BridgeTaskKeep: Debug {
+    // fn box_bus(&self) -> Box<&dyn lifeline::Bus>;
+    fn as_any(&self) -> &dyn Any;
+}

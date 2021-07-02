@@ -29,7 +29,8 @@ impl Service for ExtrinsicService {
                 while let Some(message) = rx.recv().await {
                     log::debug!(
                         target: DarwiniaLinked::NAME,
-                        "recv a new extrinsic message: {:?}",
+                        "[{}] recv a new extrinsic message: {:?}",
+                        DarwiniaLinked::NAME,
                         message
                     );
                 }

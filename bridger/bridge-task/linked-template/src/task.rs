@@ -16,7 +16,11 @@ impl BridgeSand for TemplateLinked {
     const NAME: &'static str = "linked-template";
 }
 
-impl BridgeTaskKeep for TemplateLinked {}
+impl BridgeTaskKeep for TemplateLinked {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
 
 impl BridgeTask<TemplateLinkedBus> for TemplateLinked {
     fn bus(&self) -> &TemplateLinkedBus {

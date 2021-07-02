@@ -25,7 +25,11 @@ impl BridgeSand for DarwiniaEthereumTask {
     const NAME: &'static str = "task-darwinia-ethereum";
 }
 
-impl BridgeTaskKeep for DarwiniaEthereumTask {}
+impl BridgeTaskKeep for DarwiniaEthereumTask {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
 
 impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
     fn bus(&self) -> &DarwiniaEthereumBus {

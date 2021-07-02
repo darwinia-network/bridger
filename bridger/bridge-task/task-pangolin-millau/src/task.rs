@@ -16,7 +16,11 @@ impl BridgeSand for PangolinMillauTask {
     const NAME: &'static str = "task-pangolin-millau";
 }
 
-impl BridgeTaskKeep for PangolinMillauTask {}
+impl BridgeTaskKeep for PangolinMillauTask {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
 
 impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
     fn bus(&self) -> &PangolinMillauBus {

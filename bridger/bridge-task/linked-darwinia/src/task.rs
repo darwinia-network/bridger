@@ -16,7 +16,11 @@ impl BridgeSand for DarwiniaLinked {
     const NAME: &'static str = "linked-darwinia";
 }
 
-impl BridgeTaskKeep for DarwiniaLinked {}
+impl BridgeTaskKeep for DarwiniaLinked {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
 
 impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
     fn bus(&self) -> &DarwiniaLinkedBus {

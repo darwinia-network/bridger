@@ -26,7 +26,11 @@ impl BridgeTask<TemplateTaskBus> for TemplateTask {
     }
 }
 
-impl BridgeTaskKeep for TemplateTask {}
+impl BridgeTaskKeep for TemplateTask {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
 
 impl TemplateTask {
     pub fn new(config: TemplateTaskConfig) -> anyhow::Result<Self> {

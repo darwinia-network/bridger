@@ -18,3 +18,14 @@ pub struct TaskStartParam {
     pub name: String,
     pub config: Option<String>,
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct TaskStopParam {
+    pub name: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct TaskListResponse {
+    pub name: String,
+    pub running: bool,
+}

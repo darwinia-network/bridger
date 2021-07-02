@@ -1,12 +1,12 @@
 use std::fmt::{Debug, Formatter};
 
 use lifeline::{Bus, Sender};
+use serde::{Deserialize, Serialize};
 
 use bridge_config::config::component::BeeConfig;
 use bridge_config::Config;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
-use serde::{Deserialize, Serialize};
 
 use crate::bus::SharedBus;
 use crate::messages::{DarwiniaMessage, SharedMessage};
@@ -26,9 +26,10 @@ impl BridgeShared {
         let services = vec![Self::spawn_service::<DarwiniaSharedService>(&bus)?];
 
         let sender = bus.tx::<SharedMessage>()?;
+        let receiver = bus.rx::<SharedMessage>()?;
         Ok(Self {
             services,
-            channel: SharedChannel::new(sender),
+            channel: SharedChannel::new(sender, receiver),
         })
     }
 }
@@ -92,9 +93,15 @@ impl SharedConfig {
 
 // -- channel --
 
+type SharedChannelTx =
+    <<SharedMessage as lifeline::Message<SharedBus>>::Channel as lifeline::Channel>::Tx;
+type SharedChannelRx =
+    <<SharedMessage as lifeline::Message<SharedBus>>::Channel as lifeline::Channel>::Rx;
+
 #[derive(Clone)]
 pub struct SharedChannel {
-    sender: postage::broadcast::Sender<SharedMessage>,
+    sender: SharedChannelTx,
+    receiver: SharedChannelRx,
 }
 
 lifeline::impl_storage_clone!(SharedChannel);
@@ -107,12 +114,18 @@ impl Debug for SharedChannel {
 }
 
 impl SharedChannel {
-    pub fn new(sender: postage::broadcast::Sender<SharedMessage>) -> Self {
-        Self { sender }
+    pub fn new(sender: SharedChannelTx, receiver: SharedChannelRx) -> Self {
+        Self { sender, receiver }
     }
 }
 
 impl SharedChannel {
+    pub fn sender(&self) -> SharedChannelTx {
+        self.sender.clone()
+    }
+    pub fn receiver(&self) -> SharedChannelRx {
+        self.receiver.clone()
+    }
     pub async fn send(&mut self, message: SharedMessage) -> anyhow::Result<()> {
         self.sender.send(message).await?;
         Ok(())

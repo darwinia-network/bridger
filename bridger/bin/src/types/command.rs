@@ -5,9 +5,21 @@ use structopt::StructOpt;
 #[structopt(name = "darwinia-bridger", about = "Darwinia bridger")]
 pub enum Opt {
     /// Task manager
-    Task(TaskCommand),
+    Task {
+        /// The server host by darwinia-bridger service
+        #[structopt(long, default_value = "http://127.0.0.1:1098")]
+        server: String,
+        #[structopt(flatten)]
+        command: TaskCommand,
+    },
     /// Bridge shared service
-    Shared(SharedCommand),
+    Shared {
+        /// The server host by darwinia-bridger service
+        #[structopt(long, default_value = "http://127.0.0.1:1098")]
+        server: String,
+        #[structopt(flatten)]
+        command: SharedCommand,
+    },
     /// Start bridger server
     Server {
         #[structopt(flatten)]
@@ -21,13 +33,19 @@ pub enum TaskCommand {
     List,
     /// Start a task
     Start {
+        /// The task name
         #[structopt(short, long)]
         name: String,
+        /// The config format, supports [toml|json|yml]
+        #[structopt(long, default_value = "toml")]
+        format: String,
+        /// The config file path, When first run this is required, but the server already have this task config, can be skip this parameter
         #[structopt(short, long)]
-        config: String,
+        config: Option<PathBuf>,
     },
     /// Stop a running task
     Stop {
+        /// The task name
         #[structopt(short, long)]
         name: String,
     },
@@ -37,8 +55,11 @@ pub enum TaskCommand {
 pub enum SharedCommand {
     /// Start shared service
     Start {
-        #[structopt(short, long)]
-        config: String,
+        /// The config format, supports [toml|json|yml]
+        #[structopt(long, default_value = "toml")]
+        format: String,
+        #[structopt(short, long, parse(from_os_str))]
+        config: Option<PathBuf>,
     },
 }
 
@@ -51,6 +72,6 @@ pub struct ServerOptions {
     #[structopt(short, long, default_value = "1098")]
     pub port: u32,
     /// The bridger config or data base path.
-    #[structopt(short, long, parse(from_os_str))]
+    #[structopt(long, parse(from_os_str))]
     pub base_path: Option<PathBuf>,
 }

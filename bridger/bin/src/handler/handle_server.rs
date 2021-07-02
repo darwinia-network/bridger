@@ -8,16 +8,21 @@ use routerify::{Middleware, RequestInfo, Router, RouterService};
 use bridge_shared::shared::{BridgeShared, SharedConfig, SharedTask};
 use bridge_standard::bridge::task::BridgeSand;
 use bridge_standard::error::StandardError;
-
-use crate::types::command::ServerOptions;
-use crate::types::server::{BridgeState, Resp};
-use crate::types::transfer::{SharedStartParam, TaskStartParam};
-use crate::{dc, patch};
 use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
 use task_pangolin_millau::task::{PangolinMillauConfig, PangolinMillauTask};
 
+use crate::types::command::ServerOptions;
+use crate::types::server::{BridgeState, Resp};
+use crate::types::transfer::{SharedStartParam, TaskListResponse, TaskStartParam, TaskStopParam};
+use crate::{dc, patch};
+
 /// Handler bridger server
 pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
+    start_webserver(options).await?;
+    Ok(())
+}
+
+async fn start_webserver(options: ServerOptions) -> anyhow::Result<()> {
     let router = router(options.clone());
 
     let service = RouterService::new(router).unwrap();
@@ -31,7 +36,6 @@ pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
     if let Err(err) = server.await {
         log::error!("Server error: {}", err);
     }
-
     Ok(())
 }
 
@@ -45,6 +49,7 @@ fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
         .post("/shared/start", start_shared)
         .get("/task/list", task_list)
         .post("/task/start", task_start)
+        .post("/task/stop", task_stop)
         .err_handler_with_info(error_handler)
         .build()
         .unwrap()
@@ -52,14 +57,7 @@ fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
 
 /// Routerify app state, include bridger common config
 fn app_state(options: ServerOptions) -> anyhow::Result<BridgeState> {
-    let base_path = options.base_path.unwrap_or_else(|| {
-        let mut path = std::env::temp_dir();
-        path.push("darwinia-bridger");
-        path
-    });
-    if !base_path.exists() {
-        std::fs::create_dir_all(&base_path)?;
-    }
+    let base_path = patch::bridger::base_path(options.base_path)?;
     Ok(BridgeState {
         base_path: Arc::new(base_path),
     })
@@ -107,11 +105,11 @@ async fn start_shared(mut req: Request<Body>) -> anyhow::Result<Response<Body>> 
         tokio::fs::write(&path_config, &config_raw).await?
     }
     if !path_config.exists() {
-        return Ok(Resp::<String>::err_with_msg(format!(
+        return Resp::<String>::err_with_msg(format!(
             "The config file not found: {:?}",
             path_config
         ))
-        .response_json()?);
+        .response_json();
     }
 
     let mut c = config::Config::default();
@@ -128,38 +126,52 @@ async fn start_shared(mut req: Request<Body>) -> anyhow::Result<Response<Body>> 
 /// Get task list
 async fn task_list(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let tasks = dc::available_tasks()?;
-    Resp::ok_with_data(tasks).response_json()
+    let data = tasks
+        .iter()
+        .map(|item| {
+            let running = dc::task_is_running(item).unwrap_or(false);
+            TaskListResponse {
+                name: item.clone(),
+                running,
+            }
+        })
+        .collect::<Vec<TaskListResponse>>();
+    Resp::ok_with_data(data).response_json()
 }
 
 /// Start a task
 async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let param: TaskStartParam = patch::hyper::deserialize_body(&mut req).await?;
+    if dc::task_is_running(&param.name)? {
+        return Resp::<String>::ok_with_msg(format!("The task [{}] is running", &param.name))
+            .response_json();
+    }
+
     let state = req.data::<BridgeState>().unwrap();
-    let path_config = state
-        .base_path
-        .join(format!("{}.{}", SharedTask::NAME, param.format));
-    if let Some(config_raw) = param.config {
-        tokio::fs::write(&path_config, &config_raw).await?
-    }
 
-    if !path_config.exists() {
-        return Ok(Resp::<String>::err_with_msg(format!(
-            "The config file not found: {:?}",
-            path_config
-        ))
-        .response_json()?);
-    }
-
-    let shared = dc::get_shared().ok_or(StandardError::Api(
-        "The shared service isn't start, please start it first.".to_string(),
-    ))?;
+    let shared = dc::get_shared().ok_or_else(|| {
+        StandardError::Api("The shared service isn't started, please start it first.".to_string())
+    })?;
     let channel = shared.channel();
-
-    let mut c = config::Config::default();
-    c.merge(config::File::from(path_config))?;
 
     match &param.name[..] {
         DarwiniaEthereumTask::NAME => {
+            let path_config =
+                state
+                    .base_path
+                    .join(format!("{}.{}", DarwiniaEthereumTask::NAME, param.format));
+            if let Some(config_raw) = param.config {
+                tokio::fs::write(&path_config, &config_raw).await?
+            }
+            if !path_config.exists() {
+                return Resp::<String>::err_with_msg(format!(
+                    "The config file not found: {:?}",
+                    path_config
+                ))
+                .response_json();
+            }
+            let mut c = config::Config::default();
+            c.merge(config::File::from(path_config))?;
             let task_config = c
                 .try_into::<DarwiniaEthereumConfig>()
                 .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
@@ -167,6 +179,22 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
             dc::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
         }
         PangolinMillauTask::NAME => {
+            let path_config =
+                state
+                    .base_path
+                    .join(format!("{}.{}", PangolinMillauTask::NAME, param.format));
+            if let Some(config_raw) = param.config {
+                tokio::fs::write(&path_config, &config_raw).await?
+            }
+            if !path_config.exists() {
+                return Resp::<String>::err_with_msg(format!(
+                    "The config file not found: {:?}",
+                    path_config
+                ))
+                .response_json();
+            }
+            let mut c = config::Config::default();
+            c.merge(config::File::from(path_config))?;
             let task_config = c
                 .try_into::<PangolinMillauConfig>()
                 .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
@@ -179,5 +207,15 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
         }
     }
 
+    Resp::<String>::ok().response_json()
+}
+
+/// Start a task
+async fn task_stop(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
+    let param: TaskStopParam = patch::hyper::deserialize_body(&mut req).await?;
+    log::debug!("{:?}", param);
+    let task_name = param.name;
+    dc::stop_task(&task_name)?;
+    log::warn!("The task {} is stopped", task_name);
     Resp::<String>::ok().response_json()
 }

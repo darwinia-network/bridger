@@ -12,13 +12,13 @@ fn init() -> anyhow::Result<()> {
         "RUST_LOG",
         r#"
         serde=info,
-        tide=debug,
         lifeline=debug,
         darwinia_bridge=debug,
         bridge_shared=debug,
         shared-darwinia=debug,
         service_darwinia_ethereum=debug,
         task-darwinia-ethereum=debug,
+        task-shared=debug,
         "#,
     );
     std::env::set_var("RUST_BACKTRACE", "1");
@@ -34,11 +34,11 @@ async fn main() -> anyhow::Result<()> {
         Opt::Server { options } => {
             handler::handle_server(options).await?;
         }
-        Opt::Task(command) => {
-            handler::handle_task(command).await?;
+        Opt::Task { server, command } => {
+            handler::handle_task(server, command).await?;
         }
-        Opt::Shared(command) => {
-            handler::handle_shared(command).await?;
+        Opt::Shared { server, command } => {
+            handler::handle_shared(server, command).await?;
         }
     };
     Ok(())

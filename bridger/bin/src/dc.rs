@@ -1,4 +1,5 @@
-#![warn(dead_code)]
+#![allow(dead_code)]
+
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Mutex;
@@ -43,11 +44,20 @@ pub fn stop_task<N: AsRef<str>>(name: N) -> anyhow::Result<()> {
         .lock()
         .map_err(|_e| StandardError::Other("failed to get running task".to_string()))?;
     let name = name.as_ref();
-    running.remove(name).ok_or(StandardError::Other(format!(
-        "not found this task: {}",
-        name
-    )))?;
+    running.remove(name).ok_or_else(|| {
+        StandardError::Other(format!(
+            "not found this task: [{}]. maybe this task not started yet",
+            name
+        ))
+    })?;
     Ok(())
+}
+
+pub fn task_is_running<N: AsRef<str>>(name: N) -> anyhow::Result<bool> {
+    let running = RUNNING_TASKS
+        .lock()
+        .map_err(|_e| StandardError::Other("failed to get running task".to_string()))?;
+    Ok(running.contains_key(name.as_ref()))
 }
 
 pub fn set_shared(shared: BridgeShared) -> anyhow::Result<()> {

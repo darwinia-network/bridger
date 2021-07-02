@@ -1,41 +1,37 @@
-use std::path::Path;
-
-use bridge_shared::shared::{BridgeShared, SharedConfig};
-use bridge_standard::error::StandardError;
-
-use crate::dc;
+use crate::patch;
 use crate::types::command::SharedCommand;
+use crate::types::server::Resp;
+use crate::types::transfer::SharedStartParam;
 
-pub async fn handle_shared(command: SharedCommand) -> anyhow::Result<()> {
+pub async fn handle_shared(server: String, command: SharedCommand) -> anyhow::Result<()> {
     match command {
-        SharedCommand::Start { config } => {
-            let saved_shared = dc::get_shared();
-            if saved_shared.is_some() {
+        SharedCommand::Start { format, config } => {
+            if !patch::bridger::is_allow_config_format(&format) {
+                eprintln!("Not support this format. {}", format);
                 return Ok(());
             }
+            let content = match config {
+                Some(path) => Some(tokio::fs::read_to_string(&path).await?),
+                None => None,
+            };
+            let param = SharedStartParam {
+                format,
+                config: content,
+            };
+            let resp = reqwest::Client::builder()
+                .build()?
+                .post(format!("{}/shared/start", server))
+                .json(&param)
+                .send()
+                .await?
+                .json::<Resp<String>>()
+                .await?;
 
-            let path = Path::new(&config);
-            if !path.exists() {
-                return Err(StandardError::Cli(format!(
-                    "The shared config not found: [{}]",
-                    config
-                )))?;
+            if resp.is_err() {
+                eprintln!("{}", resp.msg());
+                return Ok(());
             }
-            if !path.is_file() {
-                return Err(StandardError::Cli(format!(
-                    "The config path is not file: [{}]",
-                    config
-                )))?;
-            }
-
-            let mut c = config::Config::default();
-            c.merge(config::File::from(path))?;
-            let shared_config = c.try_into::<SharedConfig>().map_err(|e| {
-                StandardError::Cli(format!("Failed to load shared config: {:?}", e))
-            })?;
-            let shared = BridgeShared::new(shared_config)?;
-            dc::set_shared(shared)?;
-            println!("Start shared success");
+            println!("{}", resp.msg());
         }
     }
     Ok(())

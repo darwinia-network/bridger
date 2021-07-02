@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -73,6 +75,9 @@ impl<T: Serialize + for<'a> Deserialize<'a>> Resp<T> {
     }
     pub fn is_ok(&self) -> bool {
         self.err == 0
+    }
+    pub fn is_err(&self) -> bool {
+        self.err == 1
     }
     pub fn response_json(&self) -> anyhow::Result<hyper::Response<hyper::Body>> {
         let code = if self.err == 0 {

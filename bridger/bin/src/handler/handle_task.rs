@@ -1,56 +1,78 @@
-use std::path::Path;
-
-use bridge_standard::bridge::task::BridgeSand;
 use bridge_standard::error::StandardError;
-use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
-use task_pangolin_millau::task::PangolinMillauTask;
 
-use crate::dc;
+use crate::patch;
 use crate::types::command::TaskCommand;
+use crate::types::server::Resp;
+use crate::types::transfer::{TaskListResponse, TaskStartParam, TaskStopParam};
 
-pub async fn handle_task(command: TaskCommand) -> anyhow::Result<()> {
+pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result<()> {
     match command {
         TaskCommand::List => {
-            let tasks = dc::available_tasks()?;
-            tasks.iter().for_each(|item| println!("{}", item));
+            let resp = reqwest::get(format!("{}/task/list", server))
+                .await?
+                .json::<Resp<Vec<TaskListResponse>>>()
+                .await?;
+            if resp.is_err() {
+                return Err(StandardError::Cli(resp.msg().to_string()).into());
+            }
+            if let Some(tasks) = resp.data() {
+                tasks.iter().for_each(|task| {
+                    if task.running {
+                        println!("RUNNING {}", task.name);
+                    } else {
+                        println!("STOPPED {}", task.name);
+                    }
+                });
+            }
         }
-        TaskCommand::Start { name, config } => {
-            let path = Path::new(&config);
-            let shared = dc::get_shared().ok_or(StandardError::Cli(
-                "The shared service isn't start, please start it first.".to_string(),
-            ))?;
-            let channel = shared.channel();
-            match &name[..] {
-                DarwiniaEthereumTask::NAME => {
-                    let mut c = config::Config::default();
-                    c.merge(config::File::from(path))?;
-                    let shared_config = c.try_into::<DarwiniaEthereumConfig>().map_err(|e| {
-                        StandardError::Cli(format!(
-                            "Failed to load darwina-ethereum config: {:?}",
-                            e
-                        ))
-                    })?;
-                    let task = DarwiniaEthereumTask::new(shared_config, channel).await?;
-                    dc::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
-                    println!("Start {} success", DarwiniaEthereumTask::NAME);
-                }
-                PangolinMillauTask::NAME => {
-                    println!("start PangolinMillauTask");
-                }
-                _ => anyhow::bail!("Not support this task: [{}]", name),
+        TaskCommand::Start {
+            name,
+            format,
+            config,
+        } => {
+            if !patch::bridger::is_allow_config_format(&format) {
+                eprintln!("Not support this format. {}", format);
+                return Ok(());
+            }
+            let content = match config {
+                Some(path) => Some(tokio::fs::read_to_string(&path).await?),
+                None => None,
             };
+            let param = TaskStartParam {
+                format,
+                name,
+                config: content,
+            };
+            let resp = reqwest::Client::builder()
+                .build()?
+                .post(format!("{}/task/start", server))
+                .json(&param)
+                .send()
+                .await?
+                .json::<Resp<String>>()
+                .await?;
+            if resp.is_err() {
+                eprintln!("{}", resp.msg());
+                return Ok(());
+            }
+            println!("{}", resp.msg());
         }
         TaskCommand::Stop { name } => {
-            println!("stop task: {}", name)
+            let param = TaskStopParam { name };
+            let resp = reqwest::Client::builder()
+                .build()?
+                .post(format!("{}/task/stop", server))
+                .json(&param)
+                .send()
+                .await?
+                .json::<Resp<String>>()
+                .await?;
+            if resp.is_err() {
+                eprintln!("{}", resp.msg());
+                return Ok(());
+            }
+            println!("{}", resp.msg());
         }
     };
-    Ok(())
-}
-
-#[warn(dead_code)]
-async fn start_shared() -> anyhow::Result<()> {
-    // let shared = BridgeShared::new(self::config_shared())?;
-    // let channel = shared.channel();
-    // Ok(channel)
     Ok(())
 }

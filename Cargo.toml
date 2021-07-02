@@ -1,8 +1,12 @@
 [workspace]
 members = [
-  "primitives",
-  "darwinia",
-  "provider/darwinia-bridger",
-  "provider/substrate-relay/bin",
-  "provider/substrate-relay/relays/*",
+	"primitives",
+	"darwinia",
+	"provider/darwinia-bridger",
+	"provider/substrate-relay/bin",
+	"provider/substrate-relay/relays/*",
 ]
+
+# Development
+# [patch.'https://github.com/darwinia-network/darwinia-common']
+# bsc-primitives = { path = "../common/primitives/chain-bsc" }

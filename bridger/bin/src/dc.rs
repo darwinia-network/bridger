@@ -9,6 +9,7 @@ use once_cell::sync::{Lazy, OnceCell};
 use bridge_shared::shared::BridgeShared;
 use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
 use bridge_standard::error::StandardError;
+use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::DarwiniaEthereumTask;
 use task_pangolin_millau::task::PangolinMillauTask;
 
@@ -16,6 +17,7 @@ static AVAILABLE_TASKS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| {
     Mutex::new(vec![
         DarwiniaEthereumTask::NAME.to_string(),
         PangolinMillauTask::NAME.to_string(),
+        DarwiniaLinked::NAME.to_string(),
     ])
 });
 

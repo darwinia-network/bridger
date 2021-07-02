@@ -15,6 +15,8 @@ use crate::types::command::ServerOptions;
 use crate::types::server::{BridgeState, Resp};
 use crate::types::transfer::{SharedStartParam, TaskListResponse, TaskStartParam, TaskStopParam};
 use crate::{dc, patch};
+use linked_darwinia::config::DarwiniaLinkedConfig;
+use linked_darwinia::task::DarwiniaLinked;
 
 /// Handler bridger server
 pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
@@ -200,6 +202,29 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
                 .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
             let task = PangolinMillauTask::new(task_config, channel.clone()).await?;
             dc::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
+        }
+        DarwiniaLinked::NAME => {
+            let path_config =
+                state
+                    .base_path
+                    .join(format!("{}.{}", DarwiniaLinked::NAME, param.format));
+            if let Some(config_raw) = param.config {
+                tokio::fs::write(&path_config, &config_raw).await?
+            }
+            if !path_config.exists() {
+                return Resp::<String>::err_with_msg(format!(
+                    "The config file not found: {:?}",
+                    path_config
+                ))
+                .response_json();
+            }
+            let mut c = config::Config::default();
+            c.merge(config::File::from(path_config))?;
+            let task_config = c
+                .try_into::<DarwiniaLinkedConfig>()
+                .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
+            let task = DarwiniaLinked::new(task_config).await?;
+            dc::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
         }
         _ => {
             return Resp::<String>::err_with_msg(format!("Not support this task [{}]", &param.name))

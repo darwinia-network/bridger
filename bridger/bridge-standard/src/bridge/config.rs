@@ -18,6 +18,10 @@ pub struct Config;
 const DEFAULT_NAMESPACE: &'static str = "default";
 
 impl Config {
+    pub fn default_namespace() -> &'static str {
+        DEFAULT_NAMESPACE
+    }
+
     pub fn store<S: AsRef<str>, B: BridgeConfig + Serialize>(
         sand_name: S,
         config: B,

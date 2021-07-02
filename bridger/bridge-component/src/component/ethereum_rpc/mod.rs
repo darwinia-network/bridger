@@ -1,7 +1,7 @@
-use bridge_config::config::component::EthereumRpcConfig;
 use bridge_standard::bridge::component::BridgeComponent;
 
 use crate::component::http_client::HttpClientComponent;
+use crate::config::EthereumRpcConfig;
 
 pub use self::rpc::*;
 

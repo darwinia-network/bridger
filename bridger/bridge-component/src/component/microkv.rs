@@ -1,7 +1,9 @@
-use bridge_config::config::component::MicrokvConfig;
+use microkv::MicroKV;
+
 use bridge_standard::bridge::component::BridgeComponent;
 use bridge_standard::bridge::config::BridgeConfig;
-use microkv::MicroKV;
+
+use crate::config::MicrokvConfig;
 
 #[derive(Clone, Debug, Default)]
 pub struct MicrokvComponent {

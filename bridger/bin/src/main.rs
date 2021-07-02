@@ -2,8 +2,8 @@ use structopt::StructOpt;
 
 use crate::types::command::Opt;
 
-mod dc;
 mod handler;
+mod keep;
 mod patch;
 mod types;
 
@@ -19,6 +19,7 @@ fn init() -> anyhow::Result<()> {
         service_darwinia_ethereum=debug,
         task-darwinia-ethereum=debug,
         task-shared=debug,
+        linked-darwinia=debug,
         "#,
     );
     std::env::set_var("RUST_BACKTRACE", "1");
@@ -36,9 +37,6 @@ async fn main() -> anyhow::Result<()> {
         }
         Opt::Task { server, command } => {
             handler::handle_task(server, command).await?;
-        }
-        Opt::Shared { server, command } => {
-            handler::handle_shared(server, command).await?;
         }
     };
     Ok(())

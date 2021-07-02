@@ -1,6 +1,8 @@
-use bridge_config::config::component::HttpClientConfig;
-use bridge_standard::bridge::component::BridgeComponent;
 use std::time::Duration;
+
+use bridge_standard::bridge::component::BridgeComponent;
+
+use crate::config::HttpClientConfig;
 
 #[derive(Clone, Debug, Default)]
 pub struct HttpClientComponent {

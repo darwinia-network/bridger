@@ -1,3 +1,6 @@
+use async_recursion::async_recursion;
+use colored::Colorize;
+
 use bridge_standard::error::StandardError;
 
 use crate::patch;
@@ -5,6 +8,7 @@ use crate::types::command::TaskCommand;
 use crate::types::server::Resp;
 use crate::types::transfer::{TaskListResponse, TaskStartParam, TaskStopParam};
 
+#[async_recursion]
 pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result<()> {
     match command {
         TaskCommand::List => {
@@ -18,18 +22,17 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
             if let Some(tasks) = resp.data() {
                 tasks.iter().for_each(|task| {
                     if task.running {
-                        println!("RUNNING {}", task.name);
+                        println!("{} {}", "RUNNING".green(), task.name);
                     } else {
-                        println!("STOPPED {}", task.name);
+                        println!("{} {}", "STOPPED".red(), task.name);
                     }
                 });
             }
         }
-        TaskCommand::Start {
-            name,
-            format,
-            config,
-        } => {
+        TaskCommand::Start { options } => {
+            let format = options.format;
+            let name = options.name;
+            let config = options.config;
             if !patch::bridger::is_allow_config_format(&format) {
                 eprintln!("Not support this format. {}", format);
                 return Ok(());
@@ -56,6 +59,17 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
                 return Ok(());
             }
             println!("{}", resp.msg());
+        }
+        TaskCommand::Restart { options } => {
+            handle_task(
+                server.clone(),
+                TaskCommand::Stop {
+                    name: options.name.clone(),
+                },
+            )
+            .await?;
+            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+            handle_task(server, TaskCommand::Start { options }).await?
         }
         TaskCommand::Stop { name } => {
             let param = TaskStopParam { name };

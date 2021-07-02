@@ -28,9 +28,7 @@ lifeline = "0.6"
 postage = "0.4"
 
 bridge-standard = { path = "../../bridge-standard" }
-bridge-config = { path = "../../bridge-config" }
 bridge-component = { path = "../../bridge-component" }
-bridge-shared = { path = "../../bridge-shared" }
 
 external-s2s = { path = "../../bridge-external/external-s2s", features = [ "millau", "pangolin" ] }
 chain-pangolin = { path = "../../bridge-chain/chain-pangolin" }

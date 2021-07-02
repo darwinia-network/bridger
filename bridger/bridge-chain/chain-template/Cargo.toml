@@ -1,5 +1,5 @@
 [package]
-name = "bridge-shared"
+name = "chain-template"
 version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -17,18 +17,7 @@ keywords = ["substrate", "darwinia"]
 readme = 'README.md'
 edition = "2018"
 
-
 [dependencies]
 anyhow = "1.0"
-serde = { version = "1", features = ["derive"] }
 
-log = "0.4"
-
-lifeline = "0.6"
-postage = "0.4"
-
-bridge-standard = { path = "../bridge-standard" }
-bridge-component = { path = "../bridge-component" }
-bridge-config = { path = "../bridge-config" }
-
-chain-darwinia = { path = "../bridge-chain/chain-darwinia" }
+bridge-standard = { path = "../../bridge-standard" }

@@ -1,9 +1,7 @@
-use lifeline::dyn_bus::DynBus;
 use serde::{Deserialize, Serialize};
 
-use bridge_shared::shared::SharedChannel;
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 
 use crate::bus::PangolinMillauBus;
 use crate::config::PangolinMillauConfig;
@@ -12,13 +10,29 @@ use crate::service::relay::RelayService;
 
 #[derive(Debug)]
 pub struct PangolinMillauTask {
+    bus: PangolinMillauBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
+    carries: Vec<lifeline::Lifeline>,
 }
-
-impl BridgeTask for PangolinMillauTask {}
 
 impl BridgeSand for PangolinMillauTask {
     const NAME: &'static str = "task-pangolin-millau";
+}
+
+impl BridgeTaskKeep for PangolinMillauTask {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
+    fn bus(&self) -> &PangolinMillauBus {
+        &self.bus
+    }
+
+    fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {
+        self.carries.push(other_bus);
+    }
 }
 
 impl PangolinMillauTask {
@@ -36,16 +50,14 @@ impl PangolinMillauTask {
     }
 }
 
-impl PangolinMillauTask {
-    fn spawn_service<
-        S: lifeline::Service<Bus = PangolinMillauBus, Lifeline = anyhow::Result<S>>
-            + BridgeService
-            + Send
-            + Sync
-            + 'static,
-    >(
-        bus: &PangolinMillauBus,
-    ) -> anyhow::Result<Box<dyn BridgeService + Send + Sync>> {
-        Ok(Box::new(S::spawn(bus)?))
+// -- config --
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PangolinMillauConfig {}
+
+impl PangolinMillauConfig {
+    pub fn store<S: AsRef<str>>(&self, cell_name: S) -> anyhow::Result<()> {
+        let _name = cell_name.as_ref();
+        Ok(())
     }
 }

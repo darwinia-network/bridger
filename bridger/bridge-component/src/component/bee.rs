@@ -1,8 +1,11 @@
+use std::marker::PhantomData;
+
 use bee_client::types::client::ChainTypes;
 use bee_client::ws::BeeWebsocket;
-use bridge_config::config::component::BeeConfig;
+
 use bridge_standard::bridge::component::BridgeComponent;
-use std::marker::PhantomData;
+
+use crate::config::BeeConfig;
 
 #[derive(Clone)]
 pub struct BeeComponent<T: ChainTypes> {

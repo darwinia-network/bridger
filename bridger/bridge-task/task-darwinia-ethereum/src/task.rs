@@ -1,51 +1,65 @@
-use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Sender};
+use lifeline::{Bus, Lifeline, Sender};
 
-use bridge_config::config::component::{
+use bridge_component::config::{
     BeeConfig, EthereumRpcConfig, MicrokvConfig, ShadowConfig, Web3Config,
 };
-use bridge_config::config::service::SubstrateEthereumConfig;
-use bridge_config::Config;
-use bridge_shared::shared::SharedChannel;
+use bridge_standard::bridge::config::Config;
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 use serde::{Deserialize, Serialize};
 
 use crate::bus::DarwiniaEthereumBus;
+use crate::config::SubstrateEthereumConfig;
 use crate::message::s2e::EthereumScanMessage;
 use crate::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
 use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 #[derive(Debug)]
 pub struct DarwiniaEthereumTask {
+    bus: DarwiniaEthereumBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
+    carries: Vec<lifeline::Lifeline>,
 }
-
-impl BridgeTask for DarwiniaEthereumTask {}
 
 impl BridgeSand for DarwiniaEthereumTask {
     const NAME: &'static str = "task-darwinia-ethereum";
 }
 
+impl BridgeTaskKeep for DarwiniaEthereumTask {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
+    fn bus(&self) -> &DarwiniaEthereumBus {
+        &self.bus
+    }
+
+    fn keep_carry(&mut self, other_bus: Lifeline) {
+        self.carries.push(other_bus);
+    }
+}
+
 impl DarwiniaEthereumTask {
-    pub async fn new(
-        config: DarwiniaEthereumConfig,
-        channel: SharedChannel,
-    ) -> anyhow::Result<Self> {
+    pub async fn new(config: DarwiniaEthereumConfig) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
         let bus = DarwiniaEthereumBus::default();
-        bus.store_resource::<SharedChannel>(channel);
 
         let services = vec![
             Self::spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?,
             Self::spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?,
         ];
 
-        // todo: only test code
         let mut tx_scan = bus.tx::<EthereumScanMessage>()?;
         tx_scan.send(EthereumScanMessage::Start).await?;
 
-        Ok(Self { services })
+        let carries = vec![];
+        Ok(Self {
+            bus,
+            services,
+            carries,
+        })
     }
 }
 

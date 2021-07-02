@@ -26,21 +26,23 @@ path = "src/main.rs"
 anyhow = "1.0"
 once_cell = "1"
 config = "0.11"
-tide = "0.16"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }
-#async-std = { version = "1", features = ["attributes"] }
 routerify = "2"
 hyper = "0.14"
 structopt = "0.3"
 log = "0.4"
 env_logger = "0.8"
 reqwest = { version = "0.11", features = ["json"] }
+lifeline = "0.6"
+colored = "2"
+async-recursion = "0.3"
 
 bridge-standard = { path = "../bridge-standard" }
-bridge-shared = { path = "../bridge-shared" }
 
 task-darwinia-ethereum = { path = "../bridge-task/task-darwinia-ethereum" }
 task-pangolin-millau = { path = "../bridge-task/task-pangolin-millau" }
+
+linked-darwinia = { path = "../bridge-task/linked-darwinia" }
 

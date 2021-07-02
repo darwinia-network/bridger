@@ -1,17 +1,18 @@
 //! Darwinia shadow API
 use anyhow::Context as AnyhowContext;
-use bridge_config::config::component::ShadowConfig;
-use bridge_primitives::chain::ethereum::{
-    EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
-    EthereumRelayProofs, EthereumRelayProofsJson, MMRRoot, MMRRootJson,
-};
-use bridge_standard::error::StandardError;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
 
+use bridge_primitives::chain::ethereum::{
+    EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
+    EthereumRelayProofs, EthereumRelayProofsJson, MMRRoot, MMRRootJson,
+};
+use bridge_standard::error::StandardError;
+
 use crate::component::ethereum_rpc::EthereumRpc;
+use crate::config::ShadowConfig;
 use crate::error::{BizError, ComponentResult};
 
 #[derive(Serialize)]

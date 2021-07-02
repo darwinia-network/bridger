@@ -29,7 +29,7 @@ postage = "0.4"
 bridge-standard = { path = "../../bridge-standard" }
 bridge-component = { path = "../../bridge-component" }
 
-linked-template = { path = "../../bridge-linked/linked-template" }
+linked-template = { path = "../linked-template" }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

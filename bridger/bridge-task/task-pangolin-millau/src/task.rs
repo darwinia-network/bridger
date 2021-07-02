@@ -1,28 +1,47 @@
 use lifeline::dyn_bus::DynBus;
-
-use bridge_shared::shared::SharedChannel;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
 use serde::{Deserialize, Serialize};
+
+use bridge_standard::bridge::service::BridgeService;
+use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskManage};
 
 use crate::bus::PangolinMillauBus;
 
 #[derive(Debug)]
-pub struct PangolinMillauTask {}
-
-impl BridgeTask for PangolinMillauTask {}
+pub struct PangolinMillauTask {
+    bus: PangolinMillauBus,
+    services: Vec<Box<dyn BridgeService + Send + Sync>>,
+    carries: Vec<lifeline::Lifeline>,
+}
 
 impl BridgeSand for PangolinMillauTask {
     const NAME: &'static str = "task-pangolin-millau";
 }
 
+impl BridgeTaskManage for PangolinMillauTask {}
+
+impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
+    fn bus(&self) -> &PangolinMillauBus {
+        &self.bus
+    }
+
+    fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {
+        self.carries.push(other_bus);
+    }
+}
+
 impl PangolinMillauTask {
-    pub async fn new(config: PangolinMillauConfig, channel: SharedChannel) -> anyhow::Result<Self> {
+    pub async fn new(config: PangolinMillauConfig) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
         let bus = PangolinMillauBus::default();
-        bus.store_resource::<SharedChannel>(channel);
-        // todo: millau <-> pangolin start
-        debug!("create task-pangolin-millau");
-        Ok(Self {})
+
+        let services = vec![];
+
+        let carries = vec![];
+        Ok(Self {
+            bus,
+            services,
+            carries,
+        })
     }
 }
 

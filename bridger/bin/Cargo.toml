@@ -39,7 +39,6 @@ env_logger = "0.8"
 reqwest = { version = "0.11", features = ["json"] }
 
 bridge-standard = { path = "../bridge-standard" }
-bridge-shared = { path = "../bridge-shared" }
 
 task-darwinia-ethereum = { path = "../bridge-task/task-darwinia-ethereum" }
 task-pangolin-millau = { path = "../bridge-task/task-pangolin-millau" }

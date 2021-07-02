@@ -27,6 +27,5 @@ postage = "0.4"
 
 bridge-standard = { path = "../../bridge-standard" }
 bridge-component = { path = "../../bridge-component" }
-bridge-shared = { path = "../../bridge-shared" }
 
 [dev-dependencies]

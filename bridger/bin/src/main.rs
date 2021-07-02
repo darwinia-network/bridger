@@ -36,10 +36,9 @@ async fn main() -> anyhow::Result<()> {
         }
         Opt::Task { server, command } => {
             handler::handle_task(server, command).await?;
-        }
-        Opt::Shared { server, command } => {
-            handler::handle_shared(server, command).await?;
-        }
+        } // Opt::Shared { server, command } => {
+          //     handler::handle_shared(server, command).await?;
+          // }
     };
     Ok(())
 }

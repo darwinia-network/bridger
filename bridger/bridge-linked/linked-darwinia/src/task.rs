@@ -1,5 +1,5 @@
 use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskManage};
 
 use crate::bus::DarwiniaLinkedBus;
 use crate::config::DarwiniaLinkedConfig;
@@ -7,14 +7,26 @@ use crate::service::extrinsic::ExtrinsicService;
 
 #[derive(Debug)]
 pub struct DarwiniaLinked {
+    bus: DarwiniaLinkedBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
+    carries: Vec<lifeline::Lifeline>,
 }
 
 impl BridgeSand for DarwiniaLinked {
     const NAME: &'static str = "linked-darwinia";
 }
 
-impl BridgeTask for DarwiniaLinked {}
+impl BridgeTaskManage for DarwiniaLinked {}
+
+impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
+    fn bus(&self) -> &DarwiniaLinkedBus {
+        &self.bus
+    }
+
+    fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {
+        self.carries.push(other_bus);
+    }
+}
 
 impl DarwiniaLinked {
     pub async fn new(config: DarwiniaLinkedConfig) -> anyhow::Result<Self> {
@@ -23,20 +35,11 @@ impl DarwiniaLinked {
 
         let services = vec![Self::spawn_service::<ExtrinsicService>(&bus)?];
 
-        Ok(Self { services })
-    }
-}
-
-impl DarwiniaLinked {
-    fn spawn_service<
-        S: lifeline::Service<Bus = DarwiniaLinkedBus, Lifeline = anyhow::Result<S>>
-            + BridgeService
-            + Send
-            + Sync
-            + 'static,
-    >(
-        bus: &DarwiniaLinkedBus,
-    ) -> anyhow::Result<Box<dyn BridgeService + Send + Sync>> {
-        Ok(Box::new(S::spawn(bus)?))
+        let carries = vec![];
+        Ok(Self {
+            bus,
+            services,
+            carries,
+        })
     }
 }

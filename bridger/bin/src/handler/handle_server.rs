@@ -5,9 +5,10 @@ use hyper::{Body, Request, Response, Server};
 use routerify::prelude::*;
 use routerify::{Middleware, RequestInfo, Router, RouterService};
 
-use bridge_shared::shared::{BridgeShared, SharedConfig, SharedTask};
 use bridge_standard::bridge::task::BridgeSand;
 use bridge_standard::error::StandardError;
+use linked_darwinia::config::DarwiniaLinkedConfig;
+use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
 use task_pangolin_millau::task::{PangolinMillauConfig, PangolinMillauTask};
 
@@ -15,8 +16,6 @@ use crate::types::command::ServerOptions;
 use crate::types::server::{BridgeState, Resp};
 use crate::types::transfer::{SharedStartParam, TaskListResponse, TaskStartParam, TaskStopParam};
 use crate::{dc, patch};
-use linked_darwinia::config::DarwiniaLinkedConfig;
-use linked_darwinia::task::DarwiniaLinked;
 
 /// Handler bridger server
 pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
@@ -48,7 +47,6 @@ fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
         .data(state)
         .middleware(Middleware::pre(logger))
         .get("/", hello)
-        .post("/shared/start", start_shared)
         .get("/task/list", task_list)
         .post("/task/start", task_start)
         .post("/task/stop", task_stop)
@@ -90,41 +88,6 @@ async fn hello(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
     Ok(Resp::<String>::ok().response_json()?)
 }
 
-/// Start shared service
-async fn start_shared(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
-    let saved_shared = dc::get_shared();
-    if saved_shared.is_some() {
-        return Resp::<String>::ok_with_msg("Shared already started").response_json();
-    }
-
-    let param: SharedStartParam = patch::hyper::deserialize_body(&mut req).await?;
-    let state = req.data::<BridgeState>().unwrap();
-
-    let path_config = state
-        .base_path
-        .join(format!("{}.{}", SharedTask::NAME, param.format));
-    if let Some(config_raw) = param.config {
-        tokio::fs::write(&path_config, &config_raw).await?
-    }
-    if !path_config.exists() {
-        return Resp::<String>::err_with_msg(format!(
-            "The config file not found: {:?}",
-            path_config
-        ))
-        .response_json();
-    }
-
-    let mut c = config::Config::default();
-    c.merge(config::File::from(path_config))?;
-    let shared_config = c
-        .try_into::<SharedConfig>()
-        .map_err(|e| StandardError::Api(format!("Failed to load shared config: {:?}", e)))?;
-    let shared = BridgeShared::new(shared_config)?;
-    dc::set_shared(shared)?;
-
-    Resp::<String>::ok().response_json()
-}
-
 /// Get task list
 async fn task_list(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let tasks = dc::available_tasks()?;
@@ -151,11 +114,6 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
 
     let state = req.data::<BridgeState>().unwrap();
 
-    let shared = dc::get_shared().ok_or_else(|| {
-        StandardError::Api("The shared service isn't started, please start it first.".to_string())
-    })?;
-    let channel = shared.channel();
-
     match &param.name[..] {
         DarwiniaEthereumTask::NAME => {
             let path_config =
@@ -177,7 +135,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
             let task_config = c
                 .try_into::<DarwiniaEthereumConfig>()
                 .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
-            let task = DarwiniaEthereumTask::new(task_config, channel.clone()).await?;
+            let task = DarwiniaEthereumTask::new(task_config).await?;
             dc::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
         }
         PangolinMillauTask::NAME => {
@@ -200,7 +158,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
             let task_config = c
                 .try_into::<PangolinMillauConfig>()
                 .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
-            let task = PangolinMillauTask::new(task_config, channel.clone()).await?;
+            let task = PangolinMillauTask::new(task_config).await?;
             dc::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
         }
         DarwiniaLinked::NAME => {

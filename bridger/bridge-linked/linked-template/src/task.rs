@@ -16,9 +16,9 @@ impl BridgeSand for TemplateLinked {
     const NAME: &'static str = "linked-template";
 }
 
-impl BridgeTask<TemplateLinkedBus> for TemplateLinked {}
+impl BridgeTaskManage for TemplateLinked {}
 
-impl BridgeTaskManage<TemplateLinkedBus> for TemplateLinked {
+impl BridgeTask<TemplateLinkedBus> for TemplateLinked {
     fn bus(&self) -> &TemplateLinkedBus {
         &self.bus
     }

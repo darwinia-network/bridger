@@ -911,20 +911,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridge-shared"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "bridge-component",
- "bridge-standard",
- "chain-darwinia",
- "lifeline",
- "log",
- "postage",
- "serde 1.0.126",
-]
-
-[[package]]
 name = "bridge-standard"
 version = "0.3.3"
 dependencies = [
@@ -943,7 +929,6 @@ name = "bridger-entrypoint"
 version = "0.3.3"
 dependencies = [
  "anyhow",
- "bridge-shared",
  "bridge-standard",
  "config 0.11.0",
  "env_logger 0.8.4",
@@ -1185,6 +1170,14 @@ dependencies = [
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
  "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
  "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+]
+
+[[package]]
+name = "chain-template"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bridge-standard",
 ]
 
 [[package]]
@@ -4367,6 +4360,21 @@ name = "linked-hash-map"
 version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
+
+[[package]]
+name = "linked-template"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bridge-component",
+ "bridge-standard",
+ "lifeline",
+ "log",
+ "postage",
+ "serde 1.0.126",
+ "tokio 1.7.1",
+]
 
 [[package]]
 name = "linregress"
@@ -9317,7 +9325,6 @@ dependencies = [
  "anyhow",
  "bee-client",
  "bridge-component",
- "bridge-shared",
  "bridge-standard",
  "chain-darwinia",
  "chain-ethereum",
@@ -9336,12 +9343,28 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bridge-component",
- "bridge-shared",
  "bridge-standard",
  "lifeline",
  "log",
  "postage",
  "serde 1.0.126",
+]
+
+[[package]]
+name = "task-template"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bridge-component",
+ "bridge-standard",
+ "env_logger 0.8.4",
+ "lifeline",
+ "linked-template",
+ "log",
+ "postage",
+ "serde 1.0.126",
+ "tokio 1.7.1",
 ]
 
 [[package]]

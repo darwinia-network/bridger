@@ -10,7 +10,6 @@ members = [
 	"bridger/bridge-chain/*",
 	"bridger/bridge-component",
 	"bridger/bridge-linked/*",
-	"bridger/bridge-shared",
 	"bridger/bridge-standard",
 	"bridger/bridge-task/*",
 	"bridger/primitives",

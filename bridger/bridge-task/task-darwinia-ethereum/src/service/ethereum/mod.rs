@@ -2,8 +2,6 @@ use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Task};
 
 use bridge_component::Component;
-use bridge_shared::messages::DarwiniaMessage;
-use bridge_shared::shared::SharedChannel;
 use bridge_standard::bridge::component::BridgeComponent;
 use bridge_standard::bridge::config::Config;
 use bridge_standard::bridge::service::BridgeService;
@@ -31,7 +29,6 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         let mut rx_scan = bus.rx::<EthereumScanMessage>()?;
         let component_web3 = Component::web3::<DarwiniaEthereumTask>()?;
         let component_microkv = Component::microkv::<DarwiniaEthereumTask>()?;
-        let mut channel = bus.storage().clone_resource::<SharedChannel>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
@@ -59,9 +56,6 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                                     target: DarwiniaEthereumTask::NAME,
                                     "Last synced block number is: {:?}", las_synced,
                                 );
-                                channel
-                                    .send_darwinia(DarwiniaMessage::SendExtrinsic)
-                                    .await?;
                                 tokio::time::sleep(tokio::time::Duration::from_millis(
                                     config.interval_ethereum * 1_000,
                                 ))

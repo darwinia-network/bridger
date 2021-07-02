@@ -1,4 +1,3 @@
-use crate::config::{BeeConfig, EthereumRpcConfig, HttpClientConfig, ShadowConfig, Web3Config};
 use bee_client::types::client::BasicSessionKeys;
 use bee_client::types::client::ChainTypes;
 use bee_client::types::substrate::balances::{AccountData, Balances};
@@ -7,14 +6,18 @@ use bee_client::types::substrate::extra::DefaultExtra;
 use bee_client::types::substrate::session::Session;
 use bee_client::types::substrate::sudo::Sudo;
 use bee_client::types::substrate::system::System;
+use sp_runtime::generic::Header;
+use sp_runtime::traits::{BlakeTwo256, IdentifyAccount, Verify};
+use sp_runtime::{MultiAddress, MultiSignature, OpaqueExtrinsic};
+
 use bridge_component::component::bee::BeeComponent;
 use bridge_component::component::ethereum_rpc::EthereumRpcComponent;
 use bridge_component::component::http_client::HttpClientComponent;
 use bridge_component::component::shadow::ShadowComponent;
 use bridge_component::component::web3::Web3Component;
-use sp_runtime::generic::Header;
-use sp_runtime::traits::{BlakeTwo256, IdentifyAccount, Verify};
-use sp_runtime::{MultiAddress, MultiSignature, OpaqueExtrinsic};
+use bridge_component::config::{
+    BeeConfig, EthereumRpcConfig, HttpClientConfig, ShadowConfig, Web3Config,
+};
 
 pub fn config_http_client() -> HttpClientConfig {
     HttpClientConfig { timeout: 30 }

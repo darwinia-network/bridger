@@ -6,8 +6,7 @@ use std::sync::Mutex;
 
 use once_cell::sync::{Lazy, OnceCell};
 
-use bridge_shared::shared::BridgeShared;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
+use bridge_standard::bridge::task::{BridgeSand, BridgeTaskManage};
 use bridge_standard::error::StandardError;
 use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::DarwiniaEthereumTask;
@@ -21,10 +20,8 @@ static AVAILABLE_TASKS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| {
     ])
 });
 
-static RUNNING_TASKS: Lazy<Mutex<HashMap<String, Box<dyn BridgeTask + Send>>>> =
+static RUNNING_TASKS: Lazy<Mutex<HashMap<String, Box<dyn BridgeTaskManage + Send>>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
-
-static RUNNING_SHARED: OnceCell<BridgeShared> = OnceCell::new();
 
 pub fn available_tasks() -> anyhow::Result<Vec<String>> {
     let tasks = AVAILABLE_TASKS
@@ -33,7 +30,10 @@ pub fn available_tasks() -> anyhow::Result<Vec<String>> {
     Ok(tasks.deref().clone())
 }
 
-pub fn keep_task<N: AsRef<str>>(name: N, task: Box<dyn BridgeTask + Send>) -> anyhow::Result<()> {
+pub fn keep_task<N: AsRef<str>>(
+    name: N,
+    task: Box<dyn BridgeTaskManage + Send>,
+) -> anyhow::Result<()> {
     let mut running = RUNNING_TASKS
         .lock()
         .map_err(|_e| StandardError::Other("failed to get running task".to_string()))?;
@@ -60,15 +60,4 @@ pub fn task_is_running<N: AsRef<str>>(name: N) -> anyhow::Result<bool> {
         .lock()
         .map_err(|_e| StandardError::Other("failed to get running task".to_string()))?;
     Ok(running.contains_key(name.as_ref()))
-}
-
-pub fn set_shared(shared: BridgeShared) -> anyhow::Result<()> {
-    RUNNING_SHARED
-        .set(shared)
-        .map_err(|_e| StandardError::Other("failed to save shared".to_string()))?;
-    Ok(())
-}
-
-pub fn get_shared() -> Option<&'static BridgeShared> {
-    RUNNING_SHARED.get()
 }

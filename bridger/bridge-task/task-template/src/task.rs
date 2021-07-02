@@ -16,9 +16,7 @@ impl BridgeSand for TemplateTask {
     const NAME: &'static str = "task-template";
 }
 
-impl BridgeTask<TemplateTaskBus> for TemplateTask {}
-
-impl BridgeTaskManage<TemplateTaskBus> for TemplateTask {
+impl BridgeTask<TemplateTaskBus> for TemplateTask {
     fn bus(&self) -> &TemplateTaskBus {
         &self.bus
     }
@@ -27,6 +25,8 @@ impl BridgeTaskManage<TemplateTaskBus> for TemplateTask {
         self.carries.push(other_bus);
     }
 }
+
+impl BridgeTaskManage for TemplateTask {}
 
 impl TemplateTask {
     pub fn new(config: TemplateTaskConfig) -> anyhow::Result<Self> {

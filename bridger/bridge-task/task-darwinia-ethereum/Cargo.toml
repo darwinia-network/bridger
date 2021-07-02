@@ -29,7 +29,6 @@ postage = "0.4"
 bee-client = { git = "https://github.com/darwinia-network/substrate-api-client", branch = "darwinia" }
 bridge-standard = { path = "../../bridge-standard" }
 bridge-component = { path = "../../bridge-component" }
-bridge-shared = { path = "../../bridge-shared" }
 
 chain-darwinia = { path = "../../bridge-chain/chain-darwinia" }
 chain-ethereum = { path = "../../bridge-chain/chain-ethereum" }

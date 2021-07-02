@@ -1,4 +1,3 @@
-use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
 
 use bridge_component::Component;

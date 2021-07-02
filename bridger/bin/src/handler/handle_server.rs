@@ -14,7 +14,7 @@ use task_pangolin_millau::task::{PangolinMillauConfig, PangolinMillauTask};
 
 use crate::types::command::ServerOptions;
 use crate::types::server::{BridgeState, Resp};
-use crate::types::transfer::{SharedStartParam, TaskListResponse, TaskStartParam, TaskStopParam};
+use crate::types::transfer::{TaskListResponse, TaskStartParam, TaskStopParam};
 use crate::{keep, patch};
 
 /// Handler bridger server

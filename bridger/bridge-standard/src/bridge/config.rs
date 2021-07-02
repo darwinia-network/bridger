@@ -15,7 +15,7 @@ static INSTANCE: Lazy<Mutex<HashMap<String, String>>> = Lazy::new(|| Mutex::new(
 
 pub struct Config;
 
-const DEFAULT_NAMESPACE: &'static str = "default";
+const DEFAULT_NAMESPACE: &str = "default";
 
 impl Config {
     pub fn default_namespace() -> &'static str {

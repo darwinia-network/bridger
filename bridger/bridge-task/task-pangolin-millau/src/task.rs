@@ -1,4 +1,3 @@
-use lifeline::dyn_bus::DynBus;
 use serde::{Deserialize, Serialize};
 
 use bridge_standard::bridge::service::BridgeService;

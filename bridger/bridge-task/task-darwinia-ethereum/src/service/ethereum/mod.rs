@@ -1,5 +1,5 @@
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Task};
+use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
 
 use bridge_component::Component;
 use bridge_standard::bridge::component::BridgeComponent;
@@ -9,10 +9,9 @@ use bridge_standard::bridge::task::BridgeSand;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
+use crate::message::darwinia::ToDarwiniaLinkedMessage;
 use crate::message::s2e::EthereumScanMessage;
 use crate::task::DarwiniaEthereumTask;
-
-mod scan;
 
 #[derive(Debug)]
 pub struct LikeDarwiniaWithLikeEthereumEthereumScanService {
@@ -26,6 +25,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
+        let mut tx_darwinia = bus.tx::<ToDarwiniaLinkedMessage>()?;
         let mut rx_scan = bus.rx::<EthereumScanMessage>()?;
         let component_web3 = Component::web3::<DarwiniaEthereumTask>()?;
         let component_microkv = Component::microkv::<DarwiniaEthereumTask>()?;
@@ -56,6 +56,9 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                                     target: DarwiniaEthereumTask::NAME,
                                     "Last synced block number is: {:?}", las_synced,
                                 );
+                                tx_darwinia
+                                    .send(ToDarwiniaLinkedMessage::SendExtrinsic)
+                                    .await?;
                                 tokio::time::sleep(tokio::time::Duration::from_millis(
                                     config.interval_ethereum * 1_000,
                                 ))

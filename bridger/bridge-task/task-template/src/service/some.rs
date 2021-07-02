@@ -5,7 +5,7 @@ use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeSand;
 
 use crate::bus::TemplateTaskBus;
-use crate::message::{TemplateTaskMessage, ToTemplateLinkMessage};
+use crate::message::{TemplateTaskMessage, ToTemplateLinkedMessage};
 use crate::task::TemplateTask;
 
 #[derive(Debug)]
@@ -27,7 +27,7 @@ impl Service for SomeService {
             &format!("{}-service-some", TemplateTask::NAME),
             async move {
                 while let Some(message) = rx.recv().await {
-                    tx.send(ToTemplateLinkMessage::SomeEvent).await?;
+                    tx.send(ToTemplateLinkedMessage::SomeEvent).await?;
                     log::debug!(
                         target: TemplateTask::NAME,
                         "[{}] recv a new some message: {:?}",

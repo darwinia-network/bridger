@@ -13,10 +13,10 @@ impl Message<TemplateTaskBus> for TemplateTaskMessage {
 }
 
 #[derive(Debug, Clone)]
-pub enum ToTemplateLinkMessage {
+pub enum ToTemplateLinkedMessage {
     SomeEvent,
 }
 
-impl Message<TemplateTaskBus> for ToTemplateLinkMessage {
+impl Message<TemplateTaskBus> for ToTemplateLinkedMessage {
     type Channel = broadcast::Sender<Self>;
 }

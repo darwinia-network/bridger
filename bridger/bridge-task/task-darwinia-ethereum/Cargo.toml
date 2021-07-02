@@ -33,6 +33,8 @@ bridge-component = { path = "../../bridge-component" }
 chain-darwinia = { path = "../../bridge-chain/chain-darwinia" }
 chain-ethereum = { path = "../../bridge-chain/chain-ethereum" }
 
+linked-darwinia = { path = "../linked-darwinia" }
+
 # todo: Add on-demand
 tokio = { version = "1", features = ["full"] }
 

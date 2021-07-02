@@ -115,6 +115,29 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let state = req.data::<BridgeState>().unwrap();
 
     match &param.name[..] {
+        DarwiniaLinked::NAME => {
+            let path_config =
+                state
+                    .base_path
+                    .join(format!("{}.{}", DarwiniaLinked::NAME, param.format));
+            if let Some(config_raw) = param.config {
+                tokio::fs::write(&path_config, &config_raw).await?
+            }
+            if !path_config.exists() {
+                return Resp::<String>::err_with_msg(format!(
+                    "The config file not found: {:?}",
+                    path_config
+                ))
+                .response_json();
+            }
+            let mut c = config::Config::default();
+            c.merge(config::File::from(path_config))?;
+            let task_config = c
+                .try_into::<DarwiniaLinkedConfig>()
+                .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
+            let task = DarwiniaLinked::new(task_config).await?;
+            dc::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
+        }
         DarwiniaEthereumTask::NAME => {
             let path_config =
                 state
@@ -160,29 +183,6 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
                 .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
             let task = PangolinMillauTask::new(task_config).await?;
             dc::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
-        }
-        DarwiniaLinked::NAME => {
-            let path_config =
-                state
-                    .base_path
-                    .join(format!("{}.{}", DarwiniaLinked::NAME, param.format));
-            if let Some(config_raw) = param.config {
-                tokio::fs::write(&path_config, &config_raw).await?
-            }
-            if !path_config.exists() {
-                return Resp::<String>::err_with_msg(format!(
-                    "The config file not found: {:?}",
-                    path_config
-                ))
-                .response_json();
-            }
-            let mut c = config::Config::default();
-            c.merge(config::File::from(path_config))?;
-            let task_config = c
-                .try_into::<DarwiniaLinkedConfig>()
-                .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
-            let task = DarwiniaLinked::new(task_config).await?;
-            dc::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
         }
         _ => {
             return Resp::<String>::err_with_msg(format!("Not support this task [{}]", &param.name))

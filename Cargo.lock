@@ -8988,6 +8988,7 @@ dependencies = [
  "chain-ethereum",
  "env_logger 0.8.4",
  "lifeline",
+ "linked-darwinia",
  "log",
  "postage",
  "serde 1.0.126",

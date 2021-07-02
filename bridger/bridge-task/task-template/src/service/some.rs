@@ -21,7 +21,7 @@ impl Service for SomeService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let mut rx = bus.rx::<TemplateTaskMessage>()?;
-        let mut tx = bus.tx::<ToTemplateLinkMessage>()?;
+        let mut tx = bus.tx::<ToTemplateLinkedMessage>()?;
         let _component_http_client = Component::http_client::<TemplateTask>()?;
         let _greet = Self::try_task(
             &format!("{}-service-some", TemplateTask::NAME),

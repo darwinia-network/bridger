@@ -7,7 +7,5 @@ async fn test_linked() {
     let config = TemplateLinkedConfig {
         http_client: HttpClientConfig { timeout: 1000 },
     };
-    let _linked = TemplateLinked::new(config)
-        .await
-        .expect("failed to create linked");
+    let _linked = TemplateLinked::new(config).expect("failed to create linked");
 }

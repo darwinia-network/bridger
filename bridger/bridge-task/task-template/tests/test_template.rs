@@ -1,7 +1,7 @@
 use lifeline::{Bus, CarryFrom, Sender};
 
 use bridge_component::config::HttpClientConfig;
-use bridge_standard::bridge::task::BridgeTaskManage;
+use bridge_standard::bridge::task::{BridgeTask, BridgeTaskManage};
 use linked_template::config::TemplateLinkedConfig;
 use linked_template::task::TemplateLinked;
 use task_template::config::TemplateTaskConfig;

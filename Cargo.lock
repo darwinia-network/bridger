@@ -1149,6 +1149,45 @@ dependencies = [
 ]
 
 [[package]]
+name = "chain-millau"
+version = "0.3.3"
+dependencies = [
+ "bridge-standard",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "headers-relay",
+ "millau-primitives",
+ "millau-runtime",
+ "pallet-transaction-payment",
+ "parity-scale-codec 2.1.3",
+ "relay-substrate-client",
+ "relay-utils",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+]
+
+[[package]]
+name = "chain-pangolin"
+version = "0.3.3"
+dependencies = [
+ "bridge-standard",
+ "darwinia-ethereum-relay",
+ "drml-primitives",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "headers-relay",
+ "pallet-transaction-payment",
+ "pangolin-runtime",
+ "parity-scale-codec 2.1.3",
+ "relay-substrate-client",
+ "relay-utils",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+]
+
+[[package]]
 name = "chain-relay"
 version = "0.3.3"
 dependencies = [
@@ -2610,6 +2649,37 @@ dependencies = [
  "evm-core",
  "primitive-types 0.9.0",
  "sha3 0.8.2",
+]
+
+[[package]]
+name = "external-s2s"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "async-trait",
+ "bp-header-chain",
+ "bp-message-dispatch",
+ "bp-messages",
+ "bp-runtime",
+ "bridge-runtime-common",
+ "finality-grandpa",
+ "finality-relay",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "futures 0.3.15",
+ "headers-relay",
+ "log",
+ "messages-relay",
+ "num-traits 0.2.14",
+ "pallet-bridge-messages",
+ "parity-scale-codec 2.1.3",
+ "relay-substrate-client",
+ "relay-utils",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-finality-grandpa",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
 ]
 
 [[package]]
@@ -9333,14 +9403,42 @@ name = "task-pangolin-millau"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "bp-header-chain",
+ "bp-message-dispatch",
+ "bp-messages",
+ "bp-runtime",
  "bridge-component",
  "bridge-config",
+ "bridge-runtime-common",
  "bridge-shared",
  "bridge-standard",
+ "chain-millau",
+ "chain-pangolin",
+ "drml-primitives",
+ "external-s2s",
+ "finality-grandpa",
+ "finality-relay",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "headers-relay",
  "lifeline",
  "log",
+ "messages-relay",
+ "millau-primitives",
+ "millau-runtime",
+ "pallet-bridge-messages",
+ "pangolin-bridge-primitives",
+ "pangolin-constants",
+ "pangolin-runtime",
+ "pangolin-runtime-system-params",
  "postage",
+ "relay-substrate-client",
+ "relay-utils",
  "serde 1.0.126",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-finality-grandpa",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
+ "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.2)",
 ]
 
 [[package]]

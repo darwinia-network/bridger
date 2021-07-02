@@ -1,5 +1,5 @@
 [package]
-name = "task-pangolin-millau"
+name = "external-s2s"
 version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -18,34 +18,14 @@ readme = 'README.md'
 edition = "2018"
 
 [dependencies]
+
 anyhow = "1.0"
 log = "0.4"
-serde = { version = "1", features = ["derive"] }
-
-lifeline = "0.6"
-postage = "0.4"
-
-bridge-standard = { path = "../../bridge-standard" }
-bridge-config = { path = "../../bridge-config" }
-bridge-component = { path = "../../bridge-component" }
-bridge-shared = { path = "../../bridge-shared" }
-
-external-s2s = { path = "../../bridge-external/external-s2s" }
-
-## pangolin
-pangolin-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-drml-primitives                 = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-pangolin-constants              = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-pangolin-bridge-primitives      = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-pangolin-runtime-system-params  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-chain-pangolin                  = { path = "../../bridge-chain/chain-pangolin" }
-
-## millau
-millau-runtime      = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
-millau-primitives   = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
-chain-millau        = { path = "../../bridge-chain/chain-millau" }
-
-
+codec = { package = "parity-scale-codec", version = "2.0.0" }
+async-trait = "0.1"
+num-traits = "0.2"
+futures = "0.3"
+async-std = "1.9"
 
 # Bridge dependencies
 
@@ -72,4 +52,3 @@ sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git
 sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
 sp-version          = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
 
-[dev-dependencies]

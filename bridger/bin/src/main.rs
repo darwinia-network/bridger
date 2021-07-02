@@ -2,8 +2,8 @@ use structopt::StructOpt;
 
 use crate::types::command::Opt;
 
-mod dc;
 mod handler;
+mod keep;
 mod patch;
 mod types;
 

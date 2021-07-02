@@ -15,7 +15,7 @@ use task_pangolin_millau::task::{PangolinMillauConfig, PangolinMillauTask};
 use crate::types::command::ServerOptions;
 use crate::types::server::{BridgeState, Resp};
 use crate::types::transfer::{SharedStartParam, TaskListResponse, TaskStartParam, TaskStopParam};
-use crate::{dc, patch};
+use crate::{keep, patch};
 
 /// Handler bridger server
 pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
@@ -90,11 +90,11 @@ async fn hello(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
 
 /// Get task list
 async fn task_list(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
-    let tasks = dc::available_tasks()?;
+    let tasks = keep::available_tasks()?;
     let data = tasks
         .iter()
         .map(|item| {
-            let running = dc::task_is_running(item).unwrap_or(false);
+            let running = keep::task_is_running(item).unwrap_or(false);
             TaskListResponse {
                 name: item.clone(),
                 running,
@@ -107,7 +107,7 @@ async fn task_list(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
 /// Start a task
 async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let param: TaskStartParam = patch::hyper::deserialize_body(&mut req).await?;
-    if dc::task_is_running(&param.name)? {
+    if keep::task_is_running(&param.name)? {
         return Resp::<String>::ok_with_msg(format!("The task [{}] is running", &param.name))
             .response_json();
     }
@@ -136,7 +136,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
                 .try_into::<DarwiniaLinkedConfig>()
                 .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
             let task = DarwiniaLinked::new(task_config).await?;
-            dc::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
+            keep::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
         }
         DarwiniaEthereumTask::NAME => {
             let path_config =
@@ -159,7 +159,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
                 .try_into::<DarwiniaEthereumConfig>()
                 .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
             let task = DarwiniaEthereumTask::new(task_config).await?;
-            dc::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
+            keep::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
         }
         PangolinMillauTask::NAME => {
             let path_config =
@@ -182,7 +182,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
                 .try_into::<PangolinMillauConfig>()
                 .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
             let task = PangolinMillauTask::new(task_config).await?;
-            dc::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
+            keep::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
         }
         _ => {
             return Resp::<String>::err_with_msg(format!("Not support this task [{}]", &param.name))
@@ -198,7 +198,7 @@ async fn task_stop(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let param: TaskStopParam = patch::hyper::deserialize_body(&mut req).await?;
     log::debug!("{:?}", param);
     let task_name = param.name;
-    dc::stop_task(&task_name)?;
+    keep::stop_task(&task_name)?;
     log::warn!("The task {} is stopped", task_name);
     Resp::<String>::ok().response_json()
 }

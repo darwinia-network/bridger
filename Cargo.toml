@@ -9,7 +9,6 @@ members = [
 	"bridger/bin",
 	"bridger/bridge-chain/*",
 	"bridger/bridge-component",
-	"bridger/bridge-config",
 	"bridger/bridge-shared",
 	"bridger/bridge-standard",
 	"bridger/bridge-task/*",

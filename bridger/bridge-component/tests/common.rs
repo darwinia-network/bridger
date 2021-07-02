@@ -1,3 +1,4 @@
+use crate::config::{BeeConfig, EthereumRpcConfig, HttpClientConfig, ShadowConfig, Web3Config};
 use bee_client::types::client::BasicSessionKeys;
 use bee_client::types::client::ChainTypes;
 use bee_client::types::substrate::balances::{AccountData, Balances};
@@ -11,9 +12,6 @@ use bridge_component::component::ethereum_rpc::EthereumRpcComponent;
 use bridge_component::component::http_client::HttpClientComponent;
 use bridge_component::component::shadow::ShadowComponent;
 use bridge_component::component::web3::Web3Component;
-use bridge_config::config::component::{
-    BeeConfig, EthereumRpcConfig, HttpClientConfig, ShadowConfig, Web3Config,
-};
 use sp_runtime::generic::Header;
 use sp_runtime::traits::{BlakeTwo256, IdentifyAccount, Verify};
 use sp_runtime::{MultiAddress, MultiSignature, OpaqueExtrinsic};

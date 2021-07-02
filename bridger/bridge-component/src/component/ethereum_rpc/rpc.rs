@@ -1,10 +1,12 @@
-use bridge_config::config::component::EthereumRpcConfig;
-use bridge_primitives::chain::ethereum::{EthReceiptBody, EthereumBlockRPC, EthereumHeader};
-use reqwest::Client;
 use std::sync::atomic::{AtomicUsize, Ordering};
+
+use reqwest::Client;
+
+use bridge_primitives::chain::ethereum::{EthReceiptBody, EthereumBlockRPC, EthereumHeader};
 
 use crate::component::ethereum_rpc::block::EthBlockRPCResp;
 use crate::component::ethereum_rpc::receipt::EthReceiptRPCResp;
+use crate::config::EthereumRpcConfig;
 use crate::error::{ComponentError, ComponentResult};
 
 /// Ethereum rpc set

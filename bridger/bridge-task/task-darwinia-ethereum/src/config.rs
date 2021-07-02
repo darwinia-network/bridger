@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use bridge_standard::bridge::config::BridgeConfig;
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

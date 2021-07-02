@@ -858,7 +858,6 @@ dependencies = [
  "async-std",
  "async-trait",
  "bee-client",
- "bridge-config",
  "bridge-primitives",
  "bridge-standard",
  "env_logger 0.8.4",
@@ -871,19 +870,6 @@ dependencies = [
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "thiserror",
  "web3",
-]
-
-[[package]]
-name = "bridge-config"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "bridge-standard",
- "env_logger 0.8.4",
- "log",
- "once_cell",
- "serde 1.0.126",
- "serde_json",
 ]
 
 [[package]]
@@ -930,7 +916,6 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bridge-component",
- "bridge-config",
  "bridge-standard",
  "chain-darwinia",
  "lifeline",
@@ -947,6 +932,9 @@ dependencies = [
  "async-trait",
  "bee-client",
  "lifeline",
+ "once_cell",
+ "serde 1.0.126",
+ "serde_json",
  "thiserror",
 ]
 
@@ -9314,7 +9302,6 @@ dependencies = [
  "anyhow",
  "bee-client",
  "bridge-component",
- "bridge-config",
  "bridge-shared",
  "bridge-standard",
  "chain-darwinia",
@@ -9334,7 +9321,6 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bridge-component",
- "bridge-config",
  "bridge-shared",
  "bridge-standard",
  "lifeline",

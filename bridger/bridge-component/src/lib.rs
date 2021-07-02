@@ -8,6 +8,7 @@ extern crate log;
 pub use self::entrypoint::*;
 
 pub mod component;
+pub mod config;
 pub mod error;
 
 mod entrypoint;

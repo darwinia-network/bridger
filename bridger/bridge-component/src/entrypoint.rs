@@ -1,8 +1,8 @@
-use bridge_config::config::component::{
+use crate::config::{
     BeeConfig, EthereumRpcConfig, HttpClientConfig, MicrokvConfig, ShadowConfig, Web3Config,
 };
-use bridge_config::Config;
 use bridge_standard::bridge::chain::SubstrateChain;
+use bridge_standard::bridge::config::Config;
 use bridge_standard::bridge::task::BridgeSand;
 
 use crate::component::bee::BeeComponent;

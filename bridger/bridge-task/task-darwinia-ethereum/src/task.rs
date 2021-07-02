@@ -1,17 +1,17 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Sender};
 
-use bridge_config::config::component::{
+use bridge_component::config::{
     BeeConfig, EthereumRpcConfig, MicrokvConfig, ShadowConfig, Web3Config,
 };
-use bridge_config::config::service::SubstrateEthereumConfig;
-use bridge_config::Config;
 use bridge_shared::shared::SharedChannel;
+use bridge_standard::bridge::config::Config;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
 use serde::{Deserialize, Serialize};
 
 use crate::bus::DarwiniaEthereumBus;
+use crate::config::SubstrateEthereumConfig;
 use crate::message::s2e::EthereumScanMessage;
 use crate::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
 use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;

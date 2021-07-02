@@ -3,8 +3,8 @@ use std::fmt::{Debug, Formatter};
 use lifeline::{Bus, Sender};
 use serde::{Deserialize, Serialize};
 
-use bridge_config::config::component::BeeConfig;
-use bridge_config::Config;
+use bridge_component::config::BeeConfig;
+use bridge_standard::bridge::config::Config;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
 

@@ -2,15 +2,15 @@ use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Task};
 
 use bridge_component::Component;
-use bridge_config::config::service::SubstrateEthereumConfig;
-use bridge_config::Config;
 use bridge_shared::messages::DarwiniaMessage;
 use bridge_shared::shared::SharedChannel;
 use bridge_standard::bridge::component::BridgeComponent;
+use bridge_standard::bridge::config::Config;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeSand;
 
 use crate::bus::DarwiniaEthereumBus;
+use crate::config::SubstrateEthereumConfig;
 use crate::message::s2e::EthereumScanMessage;
 use crate::task::DarwiniaEthereumTask;
 

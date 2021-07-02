@@ -1,8 +1,10 @@
-use bridge_config::config::component::Web3Config;
-use bridge_standard::bridge::component::BridgeComponent;
-use bridge_standard::error::StandardError;
 use web3::transports::Http;
 use web3::Web3;
+
+use bridge_standard::bridge::component::BridgeComponent;
+use bridge_standard::error::StandardError;
+
+use crate::config::Web3Config;
 
 #[derive(Debug)]
 pub struct Web3Component {

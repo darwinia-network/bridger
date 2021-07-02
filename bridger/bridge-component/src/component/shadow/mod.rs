@@ -1,8 +1,8 @@
-use bridge_config::config::component::ShadowConfig;
 use bridge_standard::bridge::component::BridgeComponent;
 
 use crate::component::ethereum_rpc::EthereumRpcComponent;
 use crate::component::http_client::HttpClientComponent;
+use crate::config::ShadowConfig;
 
 pub use self::shadow_raw::*;
 

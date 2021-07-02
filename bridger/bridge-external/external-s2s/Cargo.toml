@@ -26,6 +26,8 @@ async-trait = "0.1"
 num-traits = "0.2"
 futures = "0.3"
 async-std = "1.9"
+paste = "1.0"
+
 
 # Bridge dependencies
 
@@ -52,3 +54,34 @@ sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git
 sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
 sp-version          = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
 
+
+
+## pangolin
+pangolin-runtime                = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
+drml-primitives                 = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
+pangolin-constants              = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
+pangolin-bridge-primitives      = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
+pangolin-runtime-system-params  = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
+chain-pangolin                  = { optional = true, path = "../../bridge-chain/chain-pangolin" }
+
+## millau
+millau-runtime      = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
+millau-primitives   = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
+chain-millau        = { optional = true, path = "../../bridge-chain/chain-millau" }
+
+
+[features]
+default = []
+millau = [
+    "millau-runtime",
+    "chain-millau",
+    "millau-primitives",
+]
+pangolin = [
+    "pangolin-runtime",
+    "chain-pangolin",
+    "drml-primitives",
+    "pangolin-constants",
+    "pangolin-bridge-primitives",
+    "pangolin-runtime-system-params",
+]

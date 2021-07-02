@@ -1,5 +1,12 @@
 use std::{ops::RangeInclusive, time::Duration};
 
+use bp_header_chain::justification::GrandpaJustification;
+use bp_messages::MessageNonce;
+use bp_runtime::ChainId;
+use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
+use codec::Encode;
+use frame_support::dispatch::GetDispatchInfo;
+use messages_relay::message_lane::MessageLane;
 use millau_runtime::{
     pangolin_messages::{
         PangolinToMillauConversionRate, INITIAL_PANGOLIN_TO_MILLAU_CONVERSION_RATE,
@@ -13,20 +20,18 @@ use pangolin_runtime::{
     WithMillauGrandpa as WithMillauGrandpaInstance,
     WithMillauMessages as WithMillauMessagesInstance,
 };
-
-use bp_messages::MessageNonce;
-use bp_runtime::ChainId;
-use chain_millau::MillauChain;
-use codec::Encode;
-use frame_support::dispatch::GetDispatchInfo;
-use messages_relay::message_lane::MessageLane;
-use pangolin_bridge_relay_client_definition::PangolinChain;
-use relay_millau_client::Millau as MillauChain;
 use relay_substrate_client::{
     metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
     Chain as RelaySubstrateClientChain, TransactionSignScheme,
 };
+use sp_core::{Bytes, Pair};
 use sp_version::RuntimeVersion;
+
+use chain_millau::MillauChain;
+use chain_pangolin::PangolinChain;
+
+use crate::declaration::pangolin::PangolinChainConst;
+use crate::traits::{ChainConst, CliChain};
 
 pub struct MillauChainConst;
 
@@ -53,7 +58,7 @@ impl ChainConst for MillauChainConst {
         millau_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
     const AVERAGE_BLOCK_INTERVAL: Duration = MillauChain::AVERAGE_BLOCK_INTERVAL;
     const BRIDGE_CHAIN_ID: ChainId = bp_runtime::MILLAU_CHAIN_ID;
-    type SigningParams = relay_millau_client::SigningParams;
+    type SigningParams = chain_millau::SigningParams;
 }
 
 impl CliChain for MillauChain {
@@ -62,12 +67,12 @@ impl CliChain for MillauChain {
     type KeyPair = sp_core::sr25519::Pair;
 }
 
-external_s2s::declare_relay_headers!(
+crate::declare_relay_headers!(
     Millau,
     Pangolin,
     MillauChain,
     PangolinChain,
-    relay_millau_client,
+    chain_millau,
     MillauChainConst,
     millau_primitives,
     drml_primitives,
@@ -76,13 +81,13 @@ external_s2s::declare_relay_headers!(
     WithMillauGrandpaInstance,
 );
 
-external_s2s::declare_relay_messages!(
+crate::declare_relay_messages!(
     Millau,
     Pangolin,
     MillauChain,
     PangolinChain,
-    relay_millau_client,
-    pangolin_bridge_relay_client_definition,
+    chain_millau,
+    chain_pangolin,
     MillauChainConst,
     PangolinChainConst,
     millau_primitives,

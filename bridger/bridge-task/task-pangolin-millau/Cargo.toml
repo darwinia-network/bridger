@@ -20,7 +20,9 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0"
 log = "0.4"
-serde = { version = "1", features = ["derive"] }
+custom_derive = "0.1"
+enum_derive = "0.1"
+codec = { package = "parity-scale-codec", version = "2.0.0" }
 
 lifeline = "0.6"
 postage = "0.4"
@@ -30,46 +32,18 @@ bridge-config = { path = "../../bridge-config" }
 bridge-component = { path = "../../bridge-component" }
 bridge-shared = { path = "../../bridge-shared" }
 
-external-s2s = { path = "../../bridge-external/external-s2s" }
-
-## pangolin
-pangolin-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-drml-primitives                 = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-pangolin-constants              = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-pangolin-bridge-primitives      = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-pangolin-runtime-system-params  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
-chain-pangolin                  = { path = "../../bridge-chain/chain-pangolin" }
-
-## millau
-millau-runtime      = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
-millau-primitives   = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
-chain-millau        = { path = "../../bridge-chain/chain-millau" }
-
-
+external-s2s = { path = "../../bridge-external/external-s2s", features = [ "millau", "pangolin" ] }
+chain-pangolin = { path = "../../bridge-chain/chain-pangolin" }
+chain-millau = { path = "../../bridge-chain/chain-millau" }
 
 # Bridge dependencies
 
-bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-bp-message-dispatch    = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-finality-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
 relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-finality-grandpa       = { version = "0.14.0" }
-
+bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
 
 # Substrate Dependencies
 
-frame-support       = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
 sp-core             = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
-sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
-sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
-sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
-sp-version          = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
 
 [dev-dependencies]

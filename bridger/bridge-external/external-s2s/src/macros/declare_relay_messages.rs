@@ -44,12 +44,6 @@ macro_rules! declare_relay_messages {
     ) => {
         paste::item! {
 
-            // use bp_messages::MessageNonce;
-            // use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
-            // use messages_relay::message_lane::MessageLane;
-            // use sp_core::{Bytes, Pair};
-
-
             /// Source-to-Target message lane.
             pub type [<$source_name MessagesTo $target_name>] = $crate::relay::messages_lane::SubstrateMessageLaneToSubstrate<
                 $source_relay_chain,

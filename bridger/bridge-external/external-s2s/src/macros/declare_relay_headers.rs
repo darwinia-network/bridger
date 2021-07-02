@@ -26,17 +26,14 @@ macro_rules! declare_relay_headers {
     ) => {
         paste::item! {
 
-            // use bp_header_chain::justification::GrandpaJustification;
-            // use sp_core::{Bytes, Pair};
-
             /// Source-to-Target finality sync pipeline.
-            pub(crate) type [<$source_name FinalityTo $target_name>] = $crate::relay::SubstrateFinalityToSubstrate<
+            pub(crate) type [<$source_name FinalityTo $target_name>] = $crate::relay::finality_pipeline::SubstrateFinalityToSubstrate<
                 $source_relay_chain,
                 $target_relay_chain,
                 <$source_const as ChainConst>::SigningParams,
             >;
 
-            impl $crate::relay::SubstrateFinalitySyncPipeline for [<$source_name FinalityTo $target_name>] {
+            impl $crate::relay::finality_pipeline::SubstrateFinalitySyncPipeline for [<$source_name FinalityTo $target_name>] {
                 const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str = $source_const::BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET;
 
                 type TargetChain = $target_relay_chain;

@@ -1,5 +1,12 @@
 use std::{ops::RangeInclusive, time::Duration};
 
+use bp_header_chain::justification::GrandpaJustification;
+use bp_messages::MessageNonce;
+use bp_runtime::ChainId;
+use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
+use codec::Encode;
+use frame_support::dispatch::GetDispatchInfo;
+use messages_relay::message_lane::MessageLane;
 use millau_runtime::{
     BridgeGrandpaCall as BridgeGrandpaPangolinCall,
     BridgeMessagesCall as TargetChainRuntimeMessagesCall,
@@ -12,22 +19,18 @@ use pangolin_runtime::{
     BridgeMessagesCall as SourceChainRuntimeMessagesCall,
     WithMillauMessages as WithMillauMessagesInstance,
 };
-
-use bp_header_chain::justification::GrandpaJustification;
-use bp_messages::MessageNonce;
-use bp_runtime::ChainId;
-use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
-use codec::Encode;
-use frame_support::dispatch::GetDispatchInfo;
-use messages_relay::message_lane::MessageLane;
-use pangolin_bridge_relay_client_definition::PangolinChain;
-use relay_millau_client::Millau as MillauChain;
 use relay_substrate_client::{
     metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
     Chain as RelaySubstrateClientChain, TransactionSignScheme,
 };
 use sp_core::{Bytes, Pair};
 use sp_version::RuntimeVersion;
+
+use chain_millau::MillauChain;
+use chain_pangolin::PangolinChain;
+
+use crate::declaration::millau::MillauChainConst;
+use crate::traits::{ChainConst, CliChain};
 
 pub struct PangolinChainConst;
 
@@ -63,12 +66,12 @@ impl CliChain for PangolinChain {
     type KeyPair = sp_core::sr25519::Pair;
 }
 
-external_s2s::declare_relay_headers!(
+crate::declare_relay_headers!(
     Pangolin,
     Millau,
     PangolinChain,
     MillauChain,
-    pangolin_bridge_relay_client_definition,
+    chain_pangolin,
     PangolinChainConst,
     drml_primitives,
     millau_primitives,
@@ -77,13 +80,13 @@ external_s2s::declare_relay_headers!(
     WithPangolinGrandpaInstance,
 );
 
-external_s2s::declare_relay_messages!(
+crate::declare_relay_messages!(
     Pangolin,
     Millau,
     PangolinChain,
     MillauChain,
-    pangolin_bridge_relay_client_definition,
-    relay_millau_client,
+    chain_pangolin,
+    chain_millau,
     PangolinChainConst,
     MillauChainConst,
     drml_primitives,

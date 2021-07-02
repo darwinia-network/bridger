@@ -1,0 +1,36 @@
+[package]
+name = "task-template"
+version = "0.3.3"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+    "Cargo.toml",
+    "**/*.rs",
+    "README.md",
+    "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2018"
+
+[dependencies]
+anyhow = "1.0"
+log = "0.4"
+async-trait = "0.1"
+serde = { version = "1", features = ["derive"] }
+
+lifeline = "0.6"
+postage = "0.4"
+
+bridge-standard = { path = "../../bridge-standard" }
+bridge-component = { path = "../../bridge-component" }
+
+linked-template = { path = "../../bridge-linked/linked-template" }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+env_logger = "0.8"

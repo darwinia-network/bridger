@@ -44,8 +44,8 @@ impl Config {
 
         let json = serde_json::to_string(&config).map_err(|e| {
             StandardError::Other(format!(
-                "Te config cannot be serialize, lease check it. {:?}",
-                e
+                "Te config cannot be serialize, lease check it. [{}] {:?}",
+                key, e
             ))
         })?;
         let _mutex = INSTANCE.lock().unwrap().insert(key, json);
@@ -76,13 +76,14 @@ impl Config {
         match INSTANCE.lock().unwrap().get(&key) {
             Some(v) => serde_json::from_str(v).map_err(|e| {
                 StandardError::Other(format!(
-                    "The config cannot be deserialize, please check it. {:?}",
-                    e
+                    "The config cannot be deserialize, please check it. [{}] {:?}",
+                    key, e
                 ))
             }),
-            None => Err(StandardError::NotSupport(
-                "Not support this config, please init this config after create task".to_string(),
-            )),
+            None => Err(StandardError::NotSupport(format!(
+                "Not support this config, please init this config after create task -> [{}]",
+                key
+            ))),
         }
     }
 }

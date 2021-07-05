@@ -1,15 +1,10 @@
-use codec::Encode;
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 
-use bp_header_chain::InitializationData;
-use bp_runtime::Chain as ChainBase;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeSand;
-use relay_substrate_client::{Chain as RelaySubstrateClientChain, TransactionSignScheme};
-use sp_core::{Bytes, Pair};
 
 use crate::bus::PangolinMillauBus;
-use crate::message::{BridgeName, PangolinMillauMessage};
+use crate::message::PangolinMillauMessage;
 use crate::task::PangolinMillauTask;
 
 #[derive(Debug)]

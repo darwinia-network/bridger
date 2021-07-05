@@ -23,6 +23,7 @@ log = "0.4"
 custom_derive = "0.1"
 enum_derive = "0.1"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
+serde = { version = "1", features = ["derive"] }
 
 lifeline = "0.6"
 postage = "0.4"
@@ -36,12 +37,12 @@ chain-millau = { path = "../../bridge-chain/chain-millau" }
 
 # Bridge dependencies
 
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
+bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
 
 # Substrate Dependencies
 
-sp-core             = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
+sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
 
 [dev-dependencies]

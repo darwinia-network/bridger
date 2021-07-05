@@ -22,9 +22,9 @@ edition = "2018"
 bridge-standard = { path = "../../bridge-standard" }
 
 codec                  = { package = "parity-scale-codec", version = "2.0.0" }
-headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.2" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
 
 # Bridge dependencies
 
@@ -35,9 +35,9 @@ darwinia-ethereum-relay = { git = "https://github.com/darwinia-network/darwinia-
 
 # Substrate Dependencies
 
-frame-system               = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
-frame-support              = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
-pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
-sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
-sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
-sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.2" }
+frame-system               = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+frame-support              = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }

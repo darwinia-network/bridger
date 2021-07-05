@@ -12,7 +12,8 @@ impl Message<PangolinMillauBus> for PangolinMillauMessage {
     type Channel = broadcast::Sender<Self>;
 }
 
-#[derive(Debug, Clone, EnumFromStr)]
+// EnumFromStr
+#[derive(Debug, Clone)]
 pub enum BridgeName {
     PangolinToMillau,
     MillauToPangolin,

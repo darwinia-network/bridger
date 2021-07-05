@@ -12,7 +12,8 @@ use bridge_standard::error::StandardError;
 use linked_darwinia::config::DarwiniaLinkedConfig;
 use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
-use task_pangolin_millau::task::{PangolinMillauConfig, PangolinMillauTask};
+use task_pangolin_millau::config::PangolinMillauConfig;
+use task_pangolin_millau::task::PangolinMillauTask;
 
 use crate::types::command::ServerOptions;
 use crate::types::server::{BridgeState, Resp};

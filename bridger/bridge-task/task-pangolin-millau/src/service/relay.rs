@@ -3,6 +3,7 @@ use lifeline::{Lifeline, Service, Task};
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::BridgeSand;
 
+use crate::bus::PangolinMillauBus;
 use crate::task::PangolinMillauTask;
 
 #[derive(Debug)]
@@ -13,7 +14,7 @@ pub struct RelayService {
 impl BridgeService for RelayService {}
 
 impl Service for RelayService {
-    type Bus = DarwiniaEthereumBus;
+    type Bus = PangolinMillauBus;
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {

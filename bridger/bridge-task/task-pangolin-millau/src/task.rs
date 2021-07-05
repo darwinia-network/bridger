@@ -36,7 +36,7 @@ impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
 }
 
 impl PangolinMillauTask {
-    pub async fn new(config: PangolinMillauConfig, channel: SharedChannel) -> anyhow::Result<Self> {
+    pub async fn new(config: PangolinMillauConfig) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
         let bus = PangolinMillauBus::default();
 

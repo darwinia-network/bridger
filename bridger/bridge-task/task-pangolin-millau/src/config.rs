@@ -1,4 +1,5 @@
 use bridge_standard::bridge::config::{BridgeConfig, Config};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinMillauConfig {

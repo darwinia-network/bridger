@@ -2482,6 +2482,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
  "futures 0.3.15",
  "headers-relay",
+ "hex",
  "log",
  "messages-relay",
  "millau-primitives",
@@ -2496,6 +2497,7 @@ dependencies = [
  "paste",
  "relay-substrate-client",
  "relay-utils",
+ "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
  "sp-finality-grandpa",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
@@ -9087,24 +9089,14 @@ name = "task-pangolin-millau"
 version = "0.3.3"
 dependencies = [
  "anyhow",
- "bp-header-chain",
- "bp-runtime",
  "bridge-component",
  "bridge-standard",
- "chain-millau",
- "chain-pangolin",
- "custom_derive",
- "enum_derive",
  "external-s2s",
  "lifeline",
  "log",
- "millau-runtime",
- "pangolin-runtime",
  "parity-scale-codec 2.2.0",
  "postage",
- "relay-substrate-client",
  "serde 1.0.126",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
 ]
 
 [[package]]

@@ -20,8 +20,8 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0"
 log = "0.4"
-custom_derive = "0.1"
-enum_derive = "0.1"
+#custom_derive = "0.1"
+#enum_derive = "0.1"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
 serde = { version = "1", features = ["derive"] }
 
@@ -32,19 +32,6 @@ bridge-standard  = { path = "../../bridge-standard" }
 bridge-component = { path = "../../bridge-component" }
 
 external-s2s        = { path = "../../bridge-external/external-s2s", features = [ "millau", "pangolin" ] }
-chain-pangolin      = { path = "../../bridge-chain/chain-pangolin" }
-chain-millau        = { path = "../../bridge-chain/chain-millau" }
-millau-runtime      = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
-pangolin-runtime    = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
 
-# Bridge dependencies
-
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-
-# Substrate Dependencies
-
-sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
 
 [dev-dependencies]

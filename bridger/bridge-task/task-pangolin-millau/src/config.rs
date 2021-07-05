@@ -1,12 +1,15 @@
+use std::convert::TryFrom;
+
 use serde::{Deserialize, Serialize};
 
 use bridge_standard::bridge::config::{BridgeConfig, Config};
-use external_s2s::traits::CliChain;
+use external_s2s::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinMillauConfig {
     pangolin: ChainInfoConfig,
     millau: ChainInfoConfig,
+    relay: RelayConfig,
 }
 
 impl PangolinMillauConfig {
@@ -16,11 +19,24 @@ impl PangolinMillauConfig {
         let name = sand_name.as_ref();
         Config::store_with_namespace(name, self.pangolin.clone(), "pangolin")?;
         Config::store_with_namespace(name, self.millau.clone(), "millau")?;
+        Config::store(name, self.relay.clone())?;
         Ok(())
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RelayConfig {
+    pub lanes: Vec<HexLaneId>,
+    pub prometheus_params: PrometheusParamsInfo,
+}
+
+impl BridgeConfig for RelayConfig {
+    fn marker() -> &'static str {
+        "config-relay"
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ChainInfoConfig {
     pub endpoint: String,
     pub signer: Option<String>,
@@ -67,34 +83,19 @@ impl ChainInfoConfig {
     pub fn port(&self) -> anyhow::Result<u16> {
         Ok(self.host_port()?.1)
     }
+}
 
-    /// Convert connection params into Substrate client.
-    pub async fn to_substrate_relay_chain<C: CliChain>(
-        &self,
-    ) -> anyhow::Result<relay_substrate_client::Client<C>> {
-        Ok(
-            relay_substrate_client::Client::new(relay_substrate_client::ConnectionParams {
-                host: self.host()?,
-                port: self.port()?,
-                secure: self.secure,
-            })
-            .await,
-        )
-    }
+impl TryFrom<ChainInfoConfig> for ChainInfo {
+    type Error = anyhow::Error;
 
-    /// Parse signing params into chain-specific KeyPair.
-    pub fn to_keypair<C: CliChain>(&self) -> anyhow::Result<C::KeyPair> {
-        use sp_core::crypto::Pair;
-
-        let signer = match self.signer.clone() {
-            Some(v) => v,
-            None => anyhow::bail!(
-                "The chain [{}:{}] not set signer",
-                self.host()?,
-                self.port()?
-            ),
-        };
-        C::KeyPair::from_string(&signer, self.signer_password.as_deref())
-            .map_err(|e| anyhow::format_err!("{:?}", e))
+    fn try_from(from: ChainInfoConfig) -> Result<Self, Self::Error> {
+        let host_port = from.host_port()?;
+        Ok(Self {
+            host: host_port.0,
+            port: host_port.1,
+            signer: from.signer,
+            secure: from.secure,
+            signer_password: from.signer_password,
+        })
     }
 }

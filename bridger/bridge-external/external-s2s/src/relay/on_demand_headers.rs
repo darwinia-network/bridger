@@ -326,7 +326,7 @@ fn on_demand_headers_relay_name<SourceChain: Chain, TargetChain: Chain>() -> Str
 mod tests {
     use super::*;
 
-    type TestChain = relay_millau_client::Millau;
+    type TestChain = chain_millau::MillauChain;
 
     const AT_SOURCE: Option<millau_primitives::BlockNumber> = Some(10);
     const AT_TARGET: Option<millau_primitives::BlockNumber> = Some(1);

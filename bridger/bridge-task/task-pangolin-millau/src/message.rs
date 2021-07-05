@@ -1,11 +1,13 @@
 use lifeline::Message;
 use postage::broadcast;
+use serde::{Deserialize, Serialize};
 
 use crate::bus::PangolinMillauBus;
+use crate::config::ChainInfoConfig;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum PangolinMillauMessage {
-    InitBridge(BridgeName),
+    InitBridge(BridgeInfo),
 }
 
 impl Message<PangolinMillauBus> for PangolinMillauMessage {
@@ -13,8 +15,15 @@ impl Message<PangolinMillauBus> for PangolinMillauMessage {
 }
 
 // EnumFromStr
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum BridgeName {
     PangolinToMillau,
     MillauToPangolin,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct BridgeInfo {
+    pub bridge: BridgeName,
+    pub source_chain: ChainInfoConfig,
+    pub target_chain: ChainInfoConfig,
 }

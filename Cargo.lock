@@ -9098,6 +9098,8 @@ dependencies = [
  "external-s2s",
  "lifeline",
  "log",
+ "millau-runtime",
+ "pangolin-runtime",
  "parity-scale-codec 2.2.0",
  "postage",
  "relay-substrate-client",

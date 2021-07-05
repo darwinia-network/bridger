@@ -1,5 +1,3 @@
-use serde::{Deserialize, Serialize};
-
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 

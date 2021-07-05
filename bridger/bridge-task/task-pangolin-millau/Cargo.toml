@@ -28,12 +28,14 @@ serde = { version = "1", features = ["derive"] }
 lifeline = "0.6"
 postage = "0.4"
 
-bridge-standard = { path = "../../bridge-standard" }
+bridge-standard  = { path = "../../bridge-standard" }
 bridge-component = { path = "../../bridge-component" }
 
-external-s2s = { path = "../../bridge-external/external-s2s", features = [ "millau", "pangolin" ] }
-chain-pangolin = { path = "../../bridge-chain/chain-pangolin" }
-chain-millau = { path = "../../bridge-chain/chain-millau" }
+external-s2s        = { path = "../../bridge-external/external-s2s", features = [ "millau", "pangolin" ] }
+chain-pangolin      = { path = "../../bridge-chain/chain-pangolin" }
+chain-millau        = { path = "../../bridge-chain/chain-millau" }
+millau-runtime      = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
+pangolin-runtime    = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s"}
 
 # Bridge dependencies
 

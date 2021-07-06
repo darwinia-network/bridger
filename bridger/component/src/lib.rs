@@ -10,5 +10,6 @@ pub use self::entrypoint::*;
 pub mod component;
 pub mod config;
 pub mod error;
+pub mod state;
 
 mod entrypoint;

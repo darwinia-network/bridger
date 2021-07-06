@@ -4292,7 +4292,7 @@ dependencies = [
 [[package]]
 name = "microkv"
 version = "0.2.6"
-source = "git+https://github.com/fewensa/microkv.git?branch=master#2f4bb0c8a8323a4587de8806f0cf2b558f4be3fd"
+source = "git+https://github.com/fewensa/microkv.git?branch=master#4ca7591da7ffbff34bb719da9f8b7bacccced2b7"
 dependencies = [
  "bincode",
  "indexmap",

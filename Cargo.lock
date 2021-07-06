@@ -742,7 +742,7 @@ dependencies = [
  "async-trait",
  "bee-client",
  "bridge-primitives",
- "bridge-standard",
+ "bridge-traits",
  "env_logger 0.8.4",
  "log",
  "microkv",
@@ -794,7 +794,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridge-standard"
+name = "bridge-traits"
 version = "0.3.3"
 dependencies = [
  "anyhow",
@@ -813,7 +813,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-recursion",
- "bridge-standard",
+ "bridge-traits",
  "colored",
  "config 0.11.0",
  "env_logger 0.8.4",
@@ -1002,7 +1002,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bee-client",
- "bridge-standard",
+ "bridge-traits",
  "parity-scale-codec 2.2.0",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -1013,7 +1013,7 @@ name = "chain-ethereum"
 version = "0.3.3"
 dependencies = [
  "anyhow",
- "bridge-standard",
+ "bridge-traits",
 ]
 
 [[package]]
@@ -1071,7 +1071,7 @@ name = "chain-template"
 version = "0.3.3"
 dependencies = [
  "anyhow",
- "bridge-standard",
+ "bridge-traits",
 ]
 
 [[package]]
@@ -4088,7 +4088,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bridge-component",
- "bridge-standard",
+ "bridge-traits",
  "chain-darwinia",
  "lifeline",
  "log",
@@ -4119,7 +4119,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bridge-component",
- "bridge-standard",
+ "bridge-traits",
  "lifeline",
  "log",
  "postage",
@@ -8989,7 +8989,7 @@ dependencies = [
  "anyhow",
  "bee-client",
  "bridge-component",
- "bridge-standard",
+ "bridge-traits",
  "chain-darwinia",
  "chain-ethereum",
  "env_logger 0.8.4",
@@ -9008,7 +9008,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bridge-component",
- "bridge-standard",
+ "bridge-traits",
  "lifeline",
  "log",
  "postage",
@@ -9022,7 +9022,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bridge-component",
- "bridge-standard",
+ "bridge-traits",
  "env_logger 0.8.4",
  "lifeline",
  "linked-template",

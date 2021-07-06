@@ -3,7 +3,7 @@ use std::convert::TryFrom;
 use serde::{Deserialize, Serialize};
 
 use bridge_traits::bridge::config::{BridgeConfig, Config};
-use external_s2s::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
+use support_s2s::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinMillauConfig {

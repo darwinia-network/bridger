@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::bus::PangolinMillauBus;
 
-pub type BridgeName = external_s2s::types::BridgeName;
+pub type BridgeName = support_s2s::types::BridgeName;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum PangolinMillauMessage {

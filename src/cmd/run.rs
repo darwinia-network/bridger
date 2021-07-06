@@ -49,15 +49,17 @@ pub async fn exec(data_dir: Option<PathBuf>, verbose: bool) -> Result<()> {
 	}
 	loop {
 		if let Err(e) = run(data_dir.clone(), &config).await {
-			error!("{:?}", e);
+            error!("{:?}", e);
 			match e.downcast_ref() {
+				// break
 				Some(Error::NoDarwiniaStart) | Some(Error::NoEthereumStart) => {
-					// performing retry
+					return Err(e);
+				}
+				// retry
+				_ => {
 					info!("Bridger will restart in 30 seconds...");
 					time::delay_for(Duration::from_secs(30)).await;
 				}
-				// break default
-				_ => return Err(e),
 			}
 		}
 	}

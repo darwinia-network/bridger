@@ -27,6 +27,7 @@ impl PangolinMillauConfig {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RelayConfig {
     pub lanes: Vec<HexLaneId>,
+    #[serde(default)]
     pub prometheus_params: PrometheusParamsInfo,
 }
 
@@ -40,6 +41,7 @@ impl BridgeConfig for RelayConfig {
 pub struct ChainInfoConfig {
     pub endpoint: String,
     pub signer: Option<String>,
+    #[serde(skip)]
     pub secure: bool,
     pub signer_password: Option<String>,
 }
@@ -56,7 +58,7 @@ impl ChainInfoConfig {
         Ok(())
     }
 
-    fn host_port(&self) -> anyhow::Result<(String, u16)> {
+    fn host_port(&self) -> anyhow::Result<(bool, String, u16)> {
         if self.endpoint.find("ws://").unwrap_or(usize::MAX) != 0
             && self.endpoint.find("wss://").unwrap_or(usize::MAX) != 0
         {
@@ -73,15 +75,19 @@ impl ChainInfoConfig {
         let port = host_port
             .get(1)
             .unwrap_or_else(|| if secure { &"443" } else { &"80" });
-        Ok((host.to_string(), port.parse::<u16>()?))
+        Ok((secure, host.to_string(), port.parse::<u16>()?))
     }
 
-    pub fn host(&self) -> anyhow::Result<String> {
+    pub fn secure(&self) -> anyhow::Result<bool> {
         Ok(self.host_port()?.0)
     }
 
-    pub fn port(&self) -> anyhow::Result<u16> {
+    pub fn host(&self) -> anyhow::Result<String> {
         Ok(self.host_port()?.1)
+    }
+
+    pub fn port(&self) -> anyhow::Result<u16> {
+        Ok(self.host_port()?.2)
     }
 }
 
@@ -91,10 +97,10 @@ impl TryFrom<ChainInfoConfig> for ChainInfo {
     fn try_from(from: ChainInfoConfig) -> Result<Self, Self::Error> {
         let host_port = from.host_port()?;
         Ok(Self {
-            host: host_port.0,
-            port: host_port.1,
+            secure: host_port.0,
+            host: host_port.1,
+            port: host_port.2,
             signer: from.signer,
-            secure: from.secure,
             signer_password: from.signer_password,
         })
     }

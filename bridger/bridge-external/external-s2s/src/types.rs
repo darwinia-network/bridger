@@ -1,9 +1,11 @@
+use std::fmt::{Display, Formatter};
+use std::str::FromStr;
+
 use bp_messages::LaneId;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::traits::CliChain;
 
-// EnumFromStr
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub enum BridgeName {
     PangolinToMillau,
@@ -54,7 +56,7 @@ pub struct InitBridge {
     pub target: ChainInfo,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct HexLaneId(pub LaneId);
 
 impl From<HexLaneId> for LaneId {
@@ -70,6 +72,14 @@ impl std::str::FromStr for HexLaneId {
         let mut lane_id = LaneId::default();
         hex::decode_to_slice(s, &mut lane_id)?;
         Ok(HexLaneId(lane_id))
+    }
+}
+
+impl Display for HexLaneId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        let lane_id = self.0;
+        let hex_text = hex::encode(lane_id);
+        f.write_str(&hex_text[..])
     }
 }
 
@@ -106,4 +116,25 @@ pub struct RelayHeadersAndMessagesInfo {
 
     pub lanes: Vec<HexLaneId>,
     pub prometheus_params: PrometheusParamsInfo,
+}
+
+impl<'de> Deserialize<'de> for HexLaneId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let hex_text: String = Deserialize::deserialize(deserializer)?;
+        let lane = HexLaneId::from_str(&hex_text[..]).map_err(serde::de::Error::custom)?;
+        Ok(lane)
+    }
+}
+
+impl Serialize for HexLaneId {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        let hex_text = self.to_string();
+        serializer.serialize_str(&hex_text[..])
+    }
 }

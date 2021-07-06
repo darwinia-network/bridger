@@ -7,8 +7,8 @@ use lifeline::CarryFrom;
 use routerify::prelude::*;
 use routerify::{Middleware, RequestInfo, Router, RouterService};
 
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask};
-use bridge_standard::error::StandardError;
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
+use bridge_traits::error::StandardError;
 use linked_darwinia::config::DarwiniaLinkedConfig;
 use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};

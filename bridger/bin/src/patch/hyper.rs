@@ -1,4 +1,4 @@
-use bridge_standard::error::StandardError;
+use bridge_traits::error::StandardError;
 use hyper::{Body, Request};
 
 pub async fn deserialize_body<T: serde::de::DeserializeOwned>(

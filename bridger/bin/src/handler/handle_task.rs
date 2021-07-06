@@ -1,7 +1,7 @@
 use async_recursion::async_recursion;
 use colored::Colorize;
 
-use bridge_standard::error::StandardError;
+use bridge_traits::error::StandardError;
 
 use crate::patch;
 use crate::types::command::TaskCommand;

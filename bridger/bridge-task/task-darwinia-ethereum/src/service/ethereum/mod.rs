@@ -8,8 +8,8 @@ use bridge_standard::bridge::task::BridgeSand;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
-use crate::message::darwinia::ToDarwiniaLinkedMessage;
 use crate::message::s2e::EthereumScanMessage;
+use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage};
 use crate::task::DarwiniaEthereumTask;
 
 #[derive(Debug)]
@@ -24,8 +24,8 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let mut tx_darwinia = bus.tx::<ToDarwiniaLinkedMessage>()?;
-        let mut rx_scan = bus.rx::<EthereumScanMessage>()?;
+        let mut tx = bus.tx::<DarwiniaEthereumMessage>()?;
+        let mut rx = bus.rx::<DarwiniaEthereumMessage>()?;
         let component_web3 = Component::web3::<DarwiniaEthereumTask>()?;
         let component_microkv = Component::microkv::<DarwiniaEthereumTask>()?;
 
@@ -36,36 +36,42 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                 let _web3 = component_web3.component().await?;
                 let microkv = component_microkv.component().await?;
                 let mut running = false;
-                while let Some(recv) = rx_scan.recv().await {
-                    match recv {
-                        EthereumScanMessage::Start => {
-                            if running {
-                                continue;
-                            }
-                            running = true;
-                            loop {
-                                if !running {
-                                    break;
+                while let Some(recv) = rx.recv().await {
+                    if let DarwiniaEthereumMessage::Scan(message_scan) = recv {
+                        match message_scan {
+                            EthereumScanMessage::Start => {
+                                if running {
+                                    continue;
                                 }
-                                debug!(target: DarwiniaEthereumTask::NAME, "ethereum scan ----->");
-                                let block_number: u64 = 12345;
-                                microkv.put("last_synced", &block_number)?;
-                                let las_synced: Option<u64> = microkv.get("last_synced")?;
-                                debug!(
-                                    target: DarwiniaEthereumTask::NAME,
-                                    "Last synced block number is: {:?}", las_synced,
-                                );
-                                tx_darwinia
-                                    .send(ToDarwiniaLinkedMessage::SendExtrinsic)
+                                running = true;
+                                loop {
+                                    if !running {
+                                        break;
+                                    }
+                                    debug!(
+                                        target: DarwiniaEthereumTask::NAME,
+                                        "ethereum scan ----->"
+                                    );
+                                    let block_number: u64 = 12345;
+                                    microkv.put("last_synced", &block_number)?;
+                                    let las_synced: Option<u64> = microkv.get("last_synced")?;
+                                    debug!(
+                                        target: DarwiniaEthereumTask::NAME,
+                                        "Last synced block number is: {:?}", las_synced,
+                                    );
+                                    tx.send(DarwiniaEthereumMessage::ToDarwinia(
+                                        ToDarwiniaLinkedMessage::SendExtrinsic,
+                                    ))
                                     .await?;
-                                tokio::time::sleep(tokio::time::Duration::from_millis(
-                                    config.interval_ethereum * 1_000,
-                                ))
-                                .await;
+                                    tokio::time::sleep(tokio::time::Duration::from_millis(
+                                        config.interval_ethereum * 1_000,
+                                    ))
+                                    .await;
+                                }
                             }
-                        }
-                        EthereumScanMessage::Pause => {
-                            running = false;
+                            EthereumScanMessage::Pause => {
+                                running = false;
+                            }
                         }
                     }
                 }

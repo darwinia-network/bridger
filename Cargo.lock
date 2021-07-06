@@ -829,7 +829,7 @@ dependencies = [
  "structopt",
  "task-darwinia-ethereum",
  "task-pangolin-millau",
- "tokio 1.7.1",
+ "tokio 1.8.0",
 ]
 
 [[package]]
@@ -848,7 +848,7 @@ dependencies = [
  "hash-db",
  "parity-scale-codec 2.2.0",
  "plain_hasher",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "rlp 0.5.0",
  "serde 1.0.126",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
@@ -1014,6 +1014,45 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bridge-traits",
+]
+
+[[package]]
+name = "chain-millau"
+version = "0.3.3"
+dependencies = [
+ "bridge-traits",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "headers-relay",
+ "millau-primitives",
+ "millau-runtime",
+ "pallet-transaction-payment",
+ "parity-scale-codec 2.2.0",
+ "relay-substrate-client",
+ "relay-utils",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+]
+
+[[package]]
+name = "chain-pangolin"
+version = "0.3.3"
+dependencies = [
+ "bridge-traits",
+ "darwinia-ethereum-relay",
+ "drml-primitives",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "headers-relay",
+ "pallet-transaction-payment",
+ "pangolin-runtime",
+ "parity-scale-codec 2.2.0",
+ "relay-substrate-client",
+ "relay-utils",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
 ]
 
 [[package]]
@@ -1671,7 +1710,7 @@ dependencies = [
  "log",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
  "parity-scale-codec 2.2.0",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "rlp 0.5.0",
  "serde 1.0.126",
  "sha3 0.8.2",
@@ -2262,7 +2301,7 @@ source = "git+https://github.com/darwinia-network/rust-ethash#9014d7649c19800f3b
 dependencies = [
  "byteorder",
  "ethereum-types 0.11.0",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "rlp 0.5.0",
  "sha3 0.9.1",
 ]
@@ -2327,7 +2366,7 @@ dependencies = [
  "keccak-hash",
  "merkle-patricia-trie",
  "parity-scale-codec 2.2.0",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "rlp 0.5.0",
  "rlp-derive",
  "serde 1.0.126",
@@ -2361,7 +2400,7 @@ dependencies = [
  "impl-codec 0.5.1",
  "impl-rlp 0.3.0",
  "impl-serde",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "uint 0.9.1",
 ]
 
@@ -2383,7 +2422,7 @@ dependencies = [
  "evm-runtime",
  "log",
  "parity-scale-codec 2.2.0",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "rlp 0.5.0",
  "serde 1.0.126",
  "sha3 0.8.2",
@@ -2397,7 +2436,7 @@ checksum = "e1e6640dd44ba663316c7121e0c6fee38000d8249127fd9221bfdc331f75cbfe"
 dependencies = [
  "funty",
  "parity-scale-codec 2.2.0",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "serde 1.0.126",
 ]
 
@@ -2409,7 +2448,7 @@ checksum = "0a8f04dcc8b0296652eabfa443a08ebed6071a1178e0f42a7f7b63a612bddf0b"
 dependencies = [
  "evm-core",
  "evm-runtime",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
 ]
 
 [[package]]
@@ -2419,8 +2458,51 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "54c302f29ca8bba82a382aa52d427869964179e4f24eae57bde70958ce9b7607"
 dependencies = [
  "evm-core",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "sha3 0.8.2",
+]
+
+[[package]]
+name = "external-s2s"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "async-trait",
+ "bp-header-chain",
+ "bp-message-dispatch",
+ "bp-messages",
+ "bp-runtime",
+ "bridge-runtime-common",
+ "chain-millau",
+ "chain-pangolin",
+ "drml-primitives",
+ "finality-grandpa",
+ "finality-relay",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "futures 0.3.15",
+ "headers-relay",
+ "hex",
+ "log",
+ "messages-relay",
+ "millau-primitives",
+ "millau-runtime",
+ "num-traits 0.2.14",
+ "pallet-bridge-messages",
+ "pangolin-bridge-primitives",
+ "pangolin-constants",
+ "pangolin-runtime",
+ "pangolin-runtime-system-params",
+ "parity-scale-codec 2.2.0",
+ "paste",
+ "relay-substrate-client",
+ "relay-utils",
+ "serde 1.0.126",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "sp-finality-grandpa",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
 ]
 
 [[package]]
@@ -2462,9 +2544,9 @@ dependencies = [
 
 [[package]]
 name = "finality-grandpa"
-version = "0.14.2"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c29b0f7ece4ac0afa32edd8ab1c1c8fec9f0ea1d8c92107e829150ae156854e"
+checksum = "74a1bfdcc776e63e49f741c7ce6116fa1b887e8ac2e3ccb14dd4aa113e54feb9"
 dependencies = [
  "either",
  "futures 0.3.15",
@@ -3203,7 +3285,7 @@ dependencies = [
  "http",
  "indexmap",
  "slab",
- "tokio 1.7.1",
+ "tokio 1.8.0",
  "tokio-util 0.6.7",
  "tracing",
 ]
@@ -3436,7 +3518,7 @@ dependencies = [
  "itoa",
  "pin-project-lite 0.2.7",
  "socket2 0.4.0",
- "tokio 1.7.1",
+ "tokio 1.8.0",
  "tower-service",
  "tracing",
  "want",
@@ -3472,7 +3554,7 @@ dependencies = [
  "log",
  "rustls",
  "rustls-native-certs",
- "tokio 1.7.1",
+ "tokio 1.8.0",
  "tokio-rustls",
  "webpki 0.21.4",
 ]
@@ -3499,7 +3581,7 @@ dependencies = [
  "bytes 1.0.1",
  "hyper 0.14.9",
  "native-tls",
- "tokio 1.7.1",
+ "tokio 1.8.0",
  "tokio-native-tls",
 ]
 
@@ -3865,7 +3947,7 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae0386ec98c26dd721aaa3412bf3a817156ff3ee7cb6959503f8d1095f4ccc51"
 dependencies = [
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "tiny-keccak 2.0.2",
 ]
 
@@ -4079,7 +4161,7 @@ dependencies = [
  "postage",
  "regex",
  "thiserror",
- "tokio 1.7.1",
+ "tokio 1.8.0",
 ]
 
 [[package]]
@@ -4124,7 +4206,7 @@ dependencies = [
  "log",
  "postage",
  "serde 1.0.126",
- "tokio 1.7.1",
+ "tokio 1.8.0",
 ]
 
 [[package]]
@@ -5648,7 +5730,7 @@ dependencies = [
  "impl-trait-for-tuples",
  "parity-util-mem-derive",
  "parking_lot 0.11.1",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "winapi 0.3.9",
 ]
 
@@ -5917,9 +5999,9 @@ dependencies = [
 
 [[package]]
 name = "primitive-types"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2415937401cb030a2a0a4d922483f945fa068f52a7dbb22ce0fe5f2b6f6adace"
+checksum = "06345ee39fbccfb06ab45f3a1a5798d9dafa04cb8921a76d227040003a234b0e"
 dependencies = [
  "fixed-hash 0.7.0",
  "impl-codec 0.5.1",
@@ -6477,7 +6559,7 @@ dependencies = [
  "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
- "tokio 1.7.1",
+ "tokio 1.8.0",
  "tokio-native-tls",
  "url 2.2.2",
  "wasm-bindgen",
@@ -7526,7 +7608,7 @@ dependencies = [
  "parity-scale-codec 2.2.0",
  "parity-util-mem",
  "parking_lot 0.11.1",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "rand 0.7.3",
  "regex",
  "schnorrkel",
@@ -7570,7 +7652,7 @@ dependencies = [
  "parity-scale-codec 2.2.0",
  "parity-util-mem",
  "parking_lot 0.11.1",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "rand 0.7.3",
  "regex",
  "schnorrkel",
@@ -7614,7 +7696,7 @@ dependencies = [
  "parity-scale-codec 2.2.0",
  "parity-util-mem",
  "parking_lot 0.11.1",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "rand 0.7.3",
  "regex",
  "schnorrkel",
@@ -8142,7 +8224,7 @@ checksum = "b2e5c88b4bc8d607e4e2ff767a85db58cf7101f3dd6064f06929342ea67fe8fb"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec 2.2.0",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime-interface-proc-macro 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8159,7 +8241,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec 2.2.0",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime-interface-proc-macro 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -8176,7 +8258,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=s2s#1d7f6
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec 2.2.0",
- "primitive-types 0.9.0",
+ "primitive-types 0.9.1",
  "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
  "sp-runtime-interface-proc-macro 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
@@ -8754,9 +8836,9 @@ checksum = "8ea5119cdb4c55b55d432abb513a0429384878c15dde60cc77b1c99de1a95a6a"
 
 [[package]]
 name = "structopt"
-version = "0.3.21"
+version = "0.3.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5277acd7ee46e63e5168a80734c9f6ee81b1367a7d8772a2d765df2a3705d28c"
+checksum = "69b041cdcb67226aca307e6e7be44c8806423d83e018bd662360a93dabce4d71"
 dependencies = [
  "clap",
  "lazy_static",
@@ -8765,9 +8847,9 @@ dependencies = [
 
 [[package]]
 name = "structopt-derive"
-version = "0.4.14"
+version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ba9cdfda491b814720b6b06e0cac513d922fc407582032e8706e9f137976f90"
+checksum = "7813934aecf5f51a54775e00068c237de98489463968231a51746bbbc03f9c10"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -8999,7 +9081,7 @@ dependencies = [
  "postage",
  "serde 1.0.126",
  "thiserror",
- "tokio 1.7.1",
+ "tokio 1.8.0",
 ]
 
 [[package]]
@@ -9009,8 +9091,10 @@ dependencies = [
  "anyhow",
  "bridge-component",
  "bridge-traits",
+ "external-s2s",
  "lifeline",
  "log",
+ "parity-scale-codec 2.2.0",
  "postage",
  "serde 1.0.126",
 ]
@@ -9029,7 +9113,7 @@ dependencies = [
  "log",
  "postage",
  "serde 1.0.126",
- "tokio 1.7.1",
+ "tokio 1.8.0",
 ]
 
 [[package]]
@@ -9066,18 +9150,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.25"
+version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa6f76457f59514c7eeb4e59d891395fab0b2fd1d40723ae737d64153392e9c6"
+checksum = "93119e4feac1cbe6c798c34d3a53ea0026b0b1de6a120deef895137c0529bfe2"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.25"
+version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a36768c0fbf1bb15eca10defa29526bda730a2376c2ab4393ccfa16fb1a318d"
+checksum = "060d69a0afe7796bf42e9e2ff91f5ee691fb15c53d38b4b62a9a53eb23164745"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -9237,9 +9321,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.7.1"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fb2ed024293bb19f7a5dc54fe83bf86532a44c12a2bb8ba40d64a4509395ca2"
+checksum = "570c2eb13b3ab38208130eccd41be92520388791207fde783bda7c1e8ace28d4"
 dependencies = [
  "autocfg",
  "bytes 1.0.1",
@@ -9284,7 +9368,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7d995660bd2b7f8c1568414c1126076c13fbb725c40112dc0120b78eb9b717b"
 dependencies = [
  "native-tls",
- "tokio 1.7.1",
+ "tokio 1.8.0",
 ]
 
 [[package]]
@@ -9294,7 +9378,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc6844de72e57df1980054b38be3a9f4702aba4858be64dd700181a8a6d0e1b6"
 dependencies = [
  "rustls",
- "tokio 1.7.1",
+ "tokio 1.8.0",
  "webpki 0.21.4",
 ]
 
@@ -9349,7 +9433,7 @@ dependencies = [
  "futures-sink",
  "log",
  "pin-project-lite 0.2.7",
- "tokio 1.7.1",
+ "tokio 1.8.0",
 ]
 
 [[package]]

@@ -63,12 +63,12 @@ drml-primitives                 = { optional = true, git = "https://github.com/d
 pangolin-constants              = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
 pangolin-bridge-primitives      = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
 pangolin-runtime-system-params  = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-chain-pangolin                  = { optional = true, path = "../../bridge-chain/chain-pangolin" }
+chain-pangolin                  = { optional = true, path = "../../chains/chain-pangolin" }
 
 ## millau
 millau-runtime      = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
 millau-primitives   = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
-chain-millau        = { optional = true, path = "../../bridge-chain/chain-millau" }
+chain-millau        = { optional = true, path = "../../chains/chain-millau" }
 
 
 [features]

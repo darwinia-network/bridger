@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 
 use serde::{Deserialize, Serialize};
 
-use bridge_standard::bridge::config::{BridgeConfig, Config};
+use bridge_traits::bridge::config::{BridgeConfig, Config};
 use external_s2s::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

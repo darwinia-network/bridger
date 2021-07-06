@@ -19,7 +19,7 @@ edition = "2018"
 
 [dependencies]
 
-bridge-standard = { path = "../../bridge-standard" }
+bridge-traits = { path = "../../traits" }
 
 codec                  = { package = "parity-scale-codec", version = "2.0.0" }
 headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }

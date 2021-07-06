@@ -28,8 +28,8 @@ serde = { version = "1", features = ["derive"] }
 lifeline = "0.6"
 postage = "0.4"
 
-bridge-standard  = { path = "../../bridge-standard" }
-bridge-component = { path = "../../bridge-component" }
+bridge-traits    = { path = "../../traits" }
+bridge-component = { path = "../../component" }
 
 external-s2s        = { path = "../../bridge-external/external-s2s", features = [ "millau", "pangolin" ] }
 

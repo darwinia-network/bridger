@@ -2,9 +2,9 @@ use std::convert::TryFrom;
 
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 
-use bridge_standard::bridge::config::Config;
-use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::BridgeSand;
+use bridge_traits::bridge::config::Config;
+use bridge_traits::bridge::service::BridgeService;
+use bridge_traits::bridge::task::BridgeSand;
 use external_s2s::runner::pangolin_millau;
 use external_s2s::types::{ChainInfo, InitBridge};
 

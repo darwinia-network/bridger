@@ -1,6 +1,6 @@
 //! Types used to connect to the Millau-Substrate chain.
 
-use bridge_standard::bridge::chain::{BridgeChain, ChainCategory};
+use bridge_traits::bridge::chain::{BridgeChain, ChainCategory};
 use codec::Encode;
 use relay_substrate_client::{Chain, ChainBase, ChainWithBalances, TransactionSignScheme};
 use sp_core::{storage::StorageKey, Pair};

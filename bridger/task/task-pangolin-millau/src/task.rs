@@ -1,5 +1,5 @@
-use bridge_standard::bridge::service::BridgeService;
-use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
+use bridge_traits::bridge::service::BridgeService;
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 
 use crate::bus::PangolinMillauBus;
 use crate::config::PangolinMillauConfig;

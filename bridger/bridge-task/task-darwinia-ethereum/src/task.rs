@@ -1,4 +1,5 @@
 use lifeline::{Bus, Lifeline, Sender};
+use serde::{Deserialize, Serialize};
 
 use bridge_component::config::{
     BeeConfig, EthereumRpcConfig, MicrokvConfig, ShadowConfig, Web3Config,
@@ -6,11 +7,10 @@ use bridge_component::config::{
 use bridge_standard::bridge::config::Config;
 use bridge_standard::bridge::service::BridgeService;
 use bridge_standard::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
-use serde::{Deserialize, Serialize};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
-use crate::message::s2e::EthereumScanMessage;
+use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
 use crate::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
 use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
@@ -51,8 +51,10 @@ impl DarwiniaEthereumTask {
             Self::spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?,
         ];
 
-        let mut tx_scan = bus.tx::<EthereumScanMessage>()?;
-        tx_scan.send(EthereumScanMessage::Start).await?;
+        let mut tx_scan = bus.tx::<DarwiniaEthereumMessage>()?;
+        tx_scan
+            .send(DarwiniaEthereumMessage::Scan(EthereumScanMessage::Start))
+            .await?;
 
         let carries = vec![];
         Ok(Self {

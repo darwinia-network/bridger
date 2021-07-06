@@ -39,10 +39,10 @@ lifeline = "0.6"
 colored = "2"
 async-recursion = "0.3"
 
-bridge-standard = { path = "../bridge-standard" }
+bridge-traits = { path = "../traits" }
 
-task-darwinia-ethereum = { path = "../bridge-task/task-darwinia-ethereum" }
-task-pangolin-millau = { path = "../bridge-task/task-pangolin-millau" }
+task-darwinia-ethereum = { path = "../task/task-darwinia-ethereum" }
+task-pangolin-millau = { path = "../task/task-pangolin-millau" }
 
-linked-darwinia = { path = "../bridge-task/linked-darwinia" }
+linked-darwinia = { path = "../task/linked-darwinia" }
 

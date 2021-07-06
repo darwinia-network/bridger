@@ -1,0 +1,42 @@
+[package]
+name = "task-darwinia-ethereum"
+version = "0.3.3"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+    "Cargo.toml",
+    "**/*.rs",
+    "README.md",
+    "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2018"
+
+[dependencies]
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+
+lifeline = "0.6"
+postage = "0.4"
+
+bee-client = { git = "https://github.com/darwinia-network/substrate-api-client", branch = "darwinia" }
+bridge-traits = { path = "../../traits" }
+bridge-component = { path = "../../component" }
+
+chain-darwinia = { path = "../../chains/darwinia" }
+chain-ethereum = { path = "../../chains/ethereum" }
+
+linked-darwinia = { path = "../linked-darwinia" }
+
+# todo: Add on-demand
+tokio = { version = "1", features = ["full"] }
+
+[dev-dependencies]
+env_logger = "0.8"

@@ -742,7 +742,7 @@ dependencies = [
  "async-trait",
  "bee-client",
  "bridge-primitives",
- "bridge-standard",
+ "bridge-traits",
  "env_logger 0.8.4",
  "log",
  "microkv",
@@ -794,7 +794,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridge-standard"
+name = "bridge-traits"
 version = "0.3.3"
 dependencies = [
  "anyhow",
@@ -813,7 +813,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-recursion",
- "bridge-standard",
+ "bridge-traits",
  "colored",
  "config 0.11.0",
  "env_logger 0.8.4",
@@ -829,7 +829,7 @@ dependencies = [
  "structopt",
  "task-darwinia-ethereum",
  "task-pangolin-millau",
- "tokio 1.8.0",
+ "tokio 1.7.1",
 ]
 
 [[package]]
@@ -1002,7 +1002,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bee-client",
- "bridge-standard",
+ "bridge-traits",
  "parity-scale-codec 2.2.0",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -1013,46 +1013,7 @@ name = "chain-ethereum"
 version = "0.3.3"
 dependencies = [
  "anyhow",
- "bridge-standard",
-]
-
-[[package]]
-name = "chain-millau"
-version = "0.3.3"
-dependencies = [
- "bridge-standard",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "headers-relay",
- "millau-primitives",
- "millau-runtime",
- "pallet-transaction-payment",
- "parity-scale-codec 2.2.0",
- "relay-substrate-client",
- "relay-utils",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
-]
-
-[[package]]
-name = "chain-pangolin"
-version = "0.3.3"
-dependencies = [
- "bridge-standard",
- "darwinia-ethereum-relay",
- "drml-primitives",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "headers-relay",
- "pallet-transaction-payment",
- "pangolin-runtime",
- "parity-scale-codec 2.2.0",
- "relay-substrate-client",
- "relay-utils",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
+ "bridge-traits",
 ]
 
 [[package]]
@@ -1110,7 +1071,7 @@ name = "chain-template"
 version = "0.3.3"
 dependencies = [
  "anyhow",
- "bridge-standard",
+ "bridge-traits",
 ]
 
 [[package]]
@@ -2463,49 +2424,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "external-s2s"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "async-std",
- "async-trait",
- "bp-header-chain",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
- "chain-millau",
- "chain-pangolin",
- "drml-primitives",
- "finality-grandpa",
- "finality-relay",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "futures 0.3.15",
- "headers-relay",
- "hex",
- "log",
- "messages-relay",
- "millau-primitives",
- "millau-runtime",
- "num-traits 0.2.14",
- "pallet-bridge-messages",
- "pangolin-bridge-primitives",
- "pangolin-constants",
- "pangolin-runtime",
- "pangolin-runtime-system-params",
- "parity-scale-codec 2.2.0",
- "paste",
- "relay-substrate-client",
- "relay-utils",
- "serde 1.0.126",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "sp-finality-grandpa",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=s2s)",
-]
-
-[[package]]
 name = "failure"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3285,7 +3203,7 @@ dependencies = [
  "http",
  "indexmap",
  "slab",
- "tokio 1.8.0",
+ "tokio 1.7.1",
  "tokio-util 0.6.7",
  "tracing",
 ]
@@ -3518,7 +3436,7 @@ dependencies = [
  "itoa",
  "pin-project-lite 0.2.7",
  "socket2 0.4.0",
- "tokio 1.8.0",
+ "tokio 1.7.1",
  "tower-service",
  "tracing",
  "want",
@@ -3554,7 +3472,7 @@ dependencies = [
  "log",
  "rustls",
  "rustls-native-certs",
- "tokio 1.8.0",
+ "tokio 1.7.1",
  "tokio-rustls",
  "webpki 0.21.4",
 ]
@@ -3581,7 +3499,7 @@ dependencies = [
  "bytes 1.0.1",
  "hyper 0.14.9",
  "native-tls",
- "tokio 1.8.0",
+ "tokio 1.7.1",
  "tokio-native-tls",
 ]
 
@@ -4161,7 +4079,7 @@ dependencies = [
  "postage",
  "regex",
  "thiserror",
- "tokio 1.8.0",
+ "tokio 1.7.1",
 ]
 
 [[package]]
@@ -4170,7 +4088,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bridge-component",
- "bridge-standard",
+ "bridge-traits",
  "chain-darwinia",
  "lifeline",
  "log",
@@ -4201,12 +4119,12 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bridge-component",
- "bridge-standard",
+ "bridge-traits",
  "lifeline",
  "log",
  "postage",
  "serde 1.0.126",
- "tokio 1.8.0",
+ "tokio 1.7.1",
 ]
 
 [[package]]
@@ -6559,7 +6477,7 @@ dependencies = [
  "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
- "tokio 1.8.0",
+ "tokio 1.7.1",
  "tokio-native-tls",
  "url 2.2.2",
  "wasm-bindgen",
@@ -9071,7 +8989,7 @@ dependencies = [
  "anyhow",
  "bee-client",
  "bridge-component",
- "bridge-standard",
+ "bridge-traits",
  "chain-darwinia",
  "chain-ethereum",
  "env_logger 0.8.4",
@@ -9081,7 +8999,7 @@ dependencies = [
  "postage",
  "serde 1.0.126",
  "thiserror",
- "tokio 1.8.0",
+ "tokio 1.7.1",
 ]
 
 [[package]]
@@ -9090,11 +9008,9 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "bridge-component",
- "bridge-standard",
- "external-s2s",
+ "bridge-traits",
  "lifeline",
  "log",
- "parity-scale-codec 2.2.0",
  "postage",
  "serde 1.0.126",
 ]
@@ -9106,14 +9022,14 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bridge-component",
- "bridge-standard",
+ "bridge-traits",
  "env_logger 0.8.4",
  "lifeline",
  "linked-template",
  "log",
  "postage",
  "serde 1.0.126",
- "tokio 1.8.0",
+ "tokio 1.7.1",
 ]
 
 [[package]]
@@ -9150,18 +9066,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.26"
+version = "1.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93119e4feac1cbe6c798c34d3a53ea0026b0b1de6a120deef895137c0529bfe2"
+checksum = "fa6f76457f59514c7eeb4e59d891395fab0b2fd1d40723ae737d64153392e9c6"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.26"
+version = "1.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "060d69a0afe7796bf42e9e2ff91f5ee691fb15c53d38b4b62a9a53eb23164745"
+checksum = "8a36768c0fbf1bb15eca10defa29526bda730a2376c2ab4393ccfa16fb1a318d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -9321,9 +9237,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.8.0"
+version = "1.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "570c2eb13b3ab38208130eccd41be92520388791207fde783bda7c1e8ace28d4"
+checksum = "5fb2ed024293bb19f7a5dc54fe83bf86532a44c12a2bb8ba40d64a4509395ca2"
 dependencies = [
  "autocfg",
  "bytes 1.0.1",
@@ -9368,7 +9284,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7d995660bd2b7f8c1568414c1126076c13fbb725c40112dc0120b78eb9b717b"
 dependencies = [
  "native-tls",
- "tokio 1.8.0",
+ "tokio 1.7.1",
 ]
 
 [[package]]
@@ -9378,7 +9294,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc6844de72e57df1980054b38be3a9f4702aba4858be64dd700181a8a6d0e1b6"
 dependencies = [
  "rustls",
- "tokio 1.8.0",
+ "tokio 1.7.1",
  "webpki 0.21.4",
 ]
 
@@ -9433,7 +9349,7 @@ dependencies = [
  "futures-sink",
  "log",
  "pin-project-lite 0.2.7",
- "tokio 1.8.0",
+ "tokio 1.7.1",
 ]
 
 [[package]]

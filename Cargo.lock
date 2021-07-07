@@ -744,6 +744,7 @@ dependencies = [
  "bridge-primitives",
  "bridge-traits",
  "env_logger 0.8.4",
+ "lifeline",
  "log",
  "microkv",
  "reqwest 0.11.4",
@@ -813,6 +814,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-recursion",
+ "bridge-component",
  "bridge-traits",
  "colored",
  "config 0.11.0",

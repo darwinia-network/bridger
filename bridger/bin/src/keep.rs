@@ -4,8 +4,9 @@ use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Mutex;
 
-use once_cell::sync::Lazy;
+use once_cell::sync::{Lazy, OnceCell};
 
+use bridge_component::state::BridgeState;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTaskKeep};
 use bridge_traits::error::StandardError;
 use linked_darwinia::task::DarwiniaLinked;
@@ -22,6 +23,8 @@ static AVAILABLE_TASKS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| {
 
 static RUNNING_TASKS: Lazy<Mutex<HashMap<String, Box<dyn BridgeTaskKeep + Send>>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
+
+static BRIDGE_STATE: OnceCell<BridgeState> = OnceCell::new();
 
 pub fn available_tasks() -> anyhow::Result<Vec<String>> {
     let tasks = AVAILABLE_TASKS
@@ -84,4 +87,14 @@ where
         };
     }
     Err(StandardError::Api(format!("the task [{}] isn't started", name)).into())
+}
+
+pub fn set_state(state: BridgeState) -> anyhow::Result<()> {
+    BRIDGE_STATE
+        .set(state)
+        .map_err(|_e| StandardError::Api("Failed to keep bridge state".to_string()).into())
+}
+
+pub fn get_state() -> Option<BridgeState> {
+    BRIDGE_STATE.get().cloned()
 }

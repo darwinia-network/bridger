@@ -1,7 +1,8 @@
 use lifeline::{Bus, CarryFrom, Sender};
 
 use bridge_component::config::HttpClientConfig;
-use bridge_traits::bridge::task::{BridgeTask, BridgeTaskKeep};
+use bridge_component::state::BridgeState;
+use bridge_traits::bridge::task::BridgeTask;
 use linked_template::config::TemplateLinkedConfig;
 use linked_template::task::TemplateLinked;
 use task_template::config::TemplateTaskConfig;
@@ -21,15 +22,21 @@ async fn test_task() {
     std::env::set_var("RUST_BACKTRACE", "1");
     env_logger::init();
 
+    let config_state = Default::default();
+    let state = BridgeState::new(config_state)
+        .await
+        .expect("failed to create bridge state");
+
     let config_linked = TemplateLinkedConfig {
         http_client: HttpClientConfig { timeout: 1000 },
     };
-    let linked = TemplateLinked::new(config_linked).expect("failed to create linked");
+    let linked =
+        TemplateLinked::new(config_linked, state.clone()).expect("failed to create linked");
 
     let config_task = TemplateTaskConfig {
         http_client: HttpClientConfig { timeout: 1000 },
     };
-    let mut task = TemplateTask::new(config_task).expect("failed to create task");
+    let mut task = TemplateTask::new(config_task, state.clone()).expect("failed to create task");
 
     task.keep_carry(
         linked

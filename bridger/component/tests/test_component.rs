@@ -1,5 +1,4 @@
 use bridge_traits::bridge::component::BridgeComponent;
-use std::sync::atomic::AtomicUsize;
 
 mod common;
 

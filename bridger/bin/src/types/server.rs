@@ -97,6 +97,6 @@ impl<T: Serialize + for<'a> Deserialize<'a>> Resp<T> {
 // -- bridge state
 
 #[derive(Clone)]
-pub struct BridgeState {
+pub struct WebserverState {
     pub base_path: Arc<PathBuf>,
 }

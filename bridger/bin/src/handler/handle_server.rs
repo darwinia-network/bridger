@@ -7,6 +7,8 @@ use lifeline::CarryFrom;
 use routerify::prelude::*;
 use routerify::{Middleware, RequestInfo, Router, RouterService};
 
+use bridge_component::config::{MicrokvConfig, StateConfig};
+use bridge_component::state::BridgeState;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
 use bridge_traits::error::StandardError;
 use linked_darwinia::config::DarwiniaLinkedConfig;
@@ -16,7 +18,7 @@ use task_pangolin_millau::config::PangolinMillauConfig;
 use task_pangolin_millau::task::PangolinMillauTask;
 
 use crate::types::command::ServerOptions;
-use crate::types::server::{BridgeState, Resp};
+use crate::types::server::{Resp, WebserverState};
 use crate::types::transfer::{TaskListResponse, TaskStartParam, TaskStopParam};
 use crate::{keep, patch};
 
@@ -27,7 +29,7 @@ pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
 }
 
 async fn start_webserver(options: ServerOptions) -> anyhow::Result<()> {
-    let router = router(options.clone());
+    let router = router(options.clone()).await;
 
     let service = RouterService::new(router).unwrap();
 
@@ -44,8 +46,8 @@ async fn start_webserver(options: ServerOptions) -> anyhow::Result<()> {
 }
 
 /// Define routerify router
-fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
-    let state = app_state(options).expect("Failed to build app state");
+async fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
+    let state = app_state(options).await.expect("Failed to build app state");
     Router::builder()
         .data(state)
         .middleware(Middleware::pre(logger))
@@ -59,9 +61,20 @@ fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
 }
 
 /// Routerify app state, include bridger common config
-fn app_state(options: ServerOptions) -> anyhow::Result<BridgeState> {
+async fn app_state(options: ServerOptions) -> anyhow::Result<WebserverState> {
     let base_path = patch::bridger::base_path(options.base_path)?;
-    Ok(BridgeState {
+
+    let config_state = StateConfig {
+        microkv: MicrokvConfig {
+            base_path: base_path.clone(),
+            db_name: Some("database".to_string()),
+            auto_commit: true,
+        },
+    };
+    let bridge_state = BridgeState::new(config_state).await?;
+    keep::set_state(bridge_state)?;
+
+    Ok(WebserverState {
         base_path: Arc::new(base_path),
     })
 }
@@ -126,7 +139,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
             .response_json();
     }
 
-    let state = req.data::<BridgeState>().unwrap();
+    let state_webserver = req.data::<WebserverState>().unwrap();
 
     let config_format = &param.format;
     let option_config = &param.config;
@@ -135,7 +148,9 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
         return Resp::<String>::err_with_msg(format!("Not support this task [{}]", &param.name))
             .response_json();
     }
-    let path_config = state.base_path.join(format!("{}.{}", name, config_format));
+    let path_config = state_webserver
+        .base_path
+        .join(format!("{}.{}", name, config_format));
     if let Some(config_raw) = option_config {
         tokio::fs::write(&path_config, &config_raw).await?
     }
@@ -146,6 +161,9 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
         ))
         .response_json();
     }
+
+    let state_bridge = keep::get_state()
+        .ok_or_else(|| StandardError::Api("Please set bridge state first.".to_string()))?;
 
     match name {
         DarwiniaLinked::NAME => {
@@ -162,7 +180,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
                 .response_json();
             }
             let task_config = task_config::<DarwiniaEthereumConfig>(path_config)?;
-            let mut task = DarwiniaEthereumTask::new(task_config).await?;
+            let mut task = DarwiniaEthereumTask::new(task_config, state_bridge.clone()).await?;
 
             keep::run_with_running_task(
                 DarwiniaLinked::NAME,

@@ -73,3 +73,8 @@ impl BridgeConfig for MicrokvConfig {
         "component-microkv"
     }
 }
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct StateConfig {
+    pub microkv: MicrokvConfig,
+}

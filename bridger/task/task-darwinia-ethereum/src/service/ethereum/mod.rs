@@ -1,5 +1,7 @@
+use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
 
+use bridge_component::state::BridgeState;
 use bridge_component::Component;
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
@@ -26,14 +28,14 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         let mut tx = bus.tx::<DarwiniaEthereumMessage>()?;
         let mut rx = bus.rx::<DarwiniaEthereumMessage>()?;
         let component_web3 = Component::web3::<DarwiniaEthereumTask>()?;
-        let component_microkv = Component::microkv::<DarwiniaEthereumTask>()?;
+        let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
                 let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
                 let _web3 = component_web3.component().await?;
-                let microkv = component_microkv.component().await?;
+                let microkv = state.microkv();
                 let mut running = false;
                 while let Some(recv) = rx.recv().await {
                     if let DarwiniaEthereumMessage::Scan(message_scan) = recv {

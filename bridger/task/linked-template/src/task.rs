@@ -1,9 +1,11 @@
+use bridge_component::state::BridgeState;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 
 use crate::bus::TemplateLinkedBus;
 use crate::config::TemplateLinkedConfig;
 use crate::service::some::SomeService;
+use lifeline::dyn_bus::DynBus;
 
 #[derive(Debug)]
 pub struct TemplateLinked {
@@ -33,9 +35,10 @@ impl BridgeTask<TemplateLinkedBus> for TemplateLinked {
 }
 
 impl TemplateLinked {
-    pub fn new(config: TemplateLinkedConfig) -> anyhow::Result<Self> {
+    pub fn new(config: TemplateLinkedConfig, state: BridgeState) -> anyhow::Result<Self> {
         config.store(TemplateLinked::NAME)?;
         let bus = TemplateLinkedBus::default();
+        bus.store_resource::<BridgeState>(state);
 
         let services = vec![Self::spawn_service::<SomeService>(&bus)?];
 

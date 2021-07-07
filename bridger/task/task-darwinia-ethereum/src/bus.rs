@@ -1,6 +1,7 @@
 use lifeline::prelude::*;
 use lifeline::{Receiver, Sender};
 
+use bridge_component::state::BridgeState;
 use bridge_traits::bridge::task::BridgeSand;
 use linked_darwinia::bus::DarwiniaLinkedBus;
 use linked_darwinia::message::DarwiniaLinkedMessage;
@@ -10,6 +11,8 @@ use crate::message::{DarwiniaEthereumMessage, ToDarwiniaLinkedMessage};
 use crate::task::DarwiniaEthereumTask;
 
 lifeline_bus!(pub struct DarwiniaEthereumBus);
+
+impl Resource<DarwiniaEthereumBus> for BridgeState {}
 
 impl CarryFrom<DarwiniaEthereumBus> for DarwiniaLinkedBus {
     type Lifeline = anyhow::Result<lifeline::Lifeline>;

@@ -4,6 +4,8 @@ use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 use crate::bus::TemplateTaskBus;
 use crate::config::TemplateTaskConfig;
 use crate::service::some::SomeService;
+use bridge_component::state::BridgeState;
+use lifeline::dyn_bus::DynBus;
 
 #[derive(Debug)]
 pub struct TemplateTask {
@@ -33,9 +35,10 @@ impl BridgeTaskKeep for TemplateTask {
 }
 
 impl TemplateTask {
-    pub fn new(config: TemplateTaskConfig) -> anyhow::Result<Self> {
+    pub fn new(config: TemplateTaskConfig, state: BridgeState) -> anyhow::Result<Self> {
         config.store(TemplateTask::NAME)?;
         let bus = TemplateTaskBus::default();
+        bus.store_resource::<BridgeState>(state);
 
         let services = vec![Self::spawn_service::<SomeService>(&bus)?];
 

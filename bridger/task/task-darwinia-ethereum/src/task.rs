@@ -1,9 +1,9 @@
+use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Sender};
 use serde::{Deserialize, Serialize};
 
-use bridge_component::config::{
-    BeeConfig, EthereumRpcConfig, MicrokvConfig, ShadowConfig, Web3Config,
-};
+use bridge_component::config::{BeeConfig, EthereumRpcConfig, ShadowConfig, Web3Config};
+use bridge_component::state::BridgeState;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
@@ -42,9 +42,10 @@ impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
 }
 
 impl DarwiniaEthereumTask {
-    pub async fn new(config: DarwiniaEthereumConfig) -> anyhow::Result<Self> {
+    pub async fn new(config: DarwiniaEthereumConfig, state: BridgeState) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
         let bus = DarwiniaEthereumBus::default();
+        bus.store_resource::<BridgeState>(state);
 
         let services = vec![
             Self::spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?,
@@ -85,7 +86,6 @@ pub struct DarwiniaEthereumConfig {
     pub web3: Web3Config,
     pub ethereum_rpc: EthereumRpcConfig,
     pub shadow: ShadowConfig,
-    pub microkv: MicrokvConfig,
     pub service: SubstrateEthereumConfig,
 }
 
@@ -97,7 +97,6 @@ impl DarwiniaEthereumConfig {
         Config::store(name, self.ethereum_rpc.clone())?;
         Config::store(name, self.shadow.clone())?;
         Config::store(name, self.service.clone())?;
-        Config::store(name, self.microkv.clone())?;
         Ok(())
     }
 }

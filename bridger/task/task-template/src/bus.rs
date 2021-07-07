@@ -1,6 +1,7 @@
 use lifeline::prelude::*;
 use lifeline::{Receiver, Sender};
 
+use bridge_component::state::BridgeState;
 use bridge_traits::bridge::task::BridgeSand;
 use linked_template::bus::TemplateLinkedBus;
 use linked_template::message::TemplateLinkedMessage;
@@ -10,6 +11,8 @@ use crate::message::ToTemplateLinkedMessage;
 use crate::task::TemplateTask;
 
 lifeline_bus!(pub struct TemplateTaskBus);
+
+impl Resource<TemplateTaskBus> for BridgeState {}
 
 impl CarryFrom<TemplateTaskBus> for TemplateLinkedBus {
     type Lifeline = anyhow::Result<lifeline::Lifeline>;

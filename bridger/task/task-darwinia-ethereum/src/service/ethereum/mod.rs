@@ -34,7 +34,7 @@ fn create_tracker(web3: Web3<Http>, topics_list: Vec<(H160, Vec<H256>)>, scan_fr
     )
 }
 
-async fn get_topics_list() -> Vec<(H160, Vec<H256>)> {
+fn get_topics_list() -> Vec<(H160, Vec<H256>)> {
     let contract_address = "0xD35Bb6F1bc1C84b53E0995c1830454AB7C4147f1";
     let contract_address = H160::from_slice(&bytes(contract_address));
 
@@ -67,22 +67,19 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                 let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
                 let web3 = component_web3.component().await?;
                 let microkv = state.microkv();
-                let mut running = false;
+
+                let topics_list = get_topics_list();
+                let scan_from: u64 = 12345;
+                let mut tracker = create_tracker(web3.clone(), topics_list, scan_from, config.interval_ethereum);
+
                 while let Some(recv) = rx.recv().await {
                     if let DarwiniaEthereumMessage::Scan(message_scan) = recv {
                         match message_scan {
                             EthereumScanMessage::Start => {
-                                if running {
-                                    continue;
-                                }
-                                running = true;
-                                let topics_list = get_topics_list().await;
-                                let scan_from: u64 = 12345;
-                                let mut tracker = create_tracker(web3.clone(), topics_list, scan_from, config.interval_ethereum);
                                 tracker.start().await;
                             }
                             EthereumScanMessage::Pause => {
-                                running = false;
+                                tracker.stop();
                             }
                         }
                     }

@@ -38,8 +38,7 @@ impl BridgeComponent<ShadowConfig, Shadow> for ShadowComponent {
         let config: ShadowConfig = Config::restore_with_namespace(T::NAME, &namespace)?;
         let component_http_client =
             HttpClientComponent::restore_with_namespace::<T>(namespace.clone())?;
-        let component_ethereum_rpc =
-            EthereumRpcComponent::restore_with_namespace::<T>(namespace.clone())?;
+        let component_ethereum_rpc = EthereumRpcComponent::restore_with_namespace::<T>(namespace)?;
         Ok(Self::new(
             config,
             component_http_client,

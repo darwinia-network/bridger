@@ -11,8 +11,8 @@ macro_rules! select_bridge {
     ($bridge: expr, $generic: tt) => {
         match $bridge {
             BridgeName::PangolinToMillau => {
-                type Source = chain_pangolin::PangolinChain;
-                type Target = chain_millau::MillauChain;
+                type Source = component_pangolin::PangolinChain;
+                type Target = component_millau::MillauChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
@@ -27,8 +27,8 @@ macro_rules! select_bridge {
                 $generic
             }
             BridgeName::MillauToPangolin => {
-                type Source = chain_millau::MillauChain;
-                type Target = chain_pangolin::PangolinChain;
+                type Source = component_millau::MillauChain;
+                type Target = component_pangolin::PangolinChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,

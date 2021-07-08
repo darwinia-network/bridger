@@ -376,7 +376,7 @@ mod tests {
     #[test]
     fn make_message_weights_map_succeeds_if_no_messages_are_missing() {
         assert_eq!(
-            make_message_weights_map::<chain_pangolin::PangolinChain>(
+            make_message_weights_map::<component_pangolin::PangolinChain>(
                 vec![(1, 0, 0), (2, 0, 0), (3, 0, 0)],
                 1..=3,
             )
@@ -394,7 +394,7 @@ mod tests {
     #[test]
     fn make_message_weights_map_succeeds_if_head_messages_are_missing() {
         assert_eq!(
-            make_message_weights_map::<chain_pangolin::PangolinChain>(
+            make_message_weights_map::<component_pangolin::PangolinChain>(
                 vec![(2, 0, 0), (3, 0, 0)],
                 1..=3,
             )
@@ -411,7 +411,7 @@ mod tests {
     #[test]
     fn make_message_weights_map_fails_if_mid_messages_are_missing() {
         assert!(matches!(
-            make_message_weights_map::<chain_pangolin::PangolinChain>(
+            make_message_weights_map::<component_pangolin::PangolinChain>(
                 vec![(1, 0, 0), (3, 0, 0)],
                 1..=3,
             ),
@@ -422,7 +422,7 @@ mod tests {
     #[test]
     fn make_message_weights_map_fails_if_tail_messages_are_missing() {
         assert!(matches!(
-            make_message_weights_map::<chain_pangolin::PangolinChain>(
+            make_message_weights_map::<component_pangolin::PangolinChain>(
                 vec![(1, 0, 0), (2, 0, 0)],
                 1..=3,
             ),
@@ -433,7 +433,7 @@ mod tests {
     #[test]
     fn make_message_weights_map_fails_if_all_messages_are_missing() {
         assert!(matches!(
-            make_message_weights_map::<chain_pangolin::PangolinChain>(vec![], 1..=3),
+            make_message_weights_map::<component_pangolin::PangolinChain>(vec![], 1..=3),
             Err(SubstrateError::Custom(_))
         ));
     }

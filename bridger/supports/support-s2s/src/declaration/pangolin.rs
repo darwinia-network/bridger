@@ -26,8 +26,8 @@ use relay_substrate_client::{
 use sp_core::{Bytes, Pair};
 use sp_version::RuntimeVersion;
 
-use chain_millau::MillauChain;
-use chain_pangolin::PangolinChain;
+use component_millau::MillauChain;
+use component_pangolin::PangolinChain;
 
 use crate::declaration::millau::MillauChainConst;
 use crate::traits::{ChainConst, CliChain};
@@ -71,7 +71,7 @@ crate::declare_relay_headers!(
     Millau,
     PangolinChain,
     MillauChain,
-    chain_pangolin,
+    component_pangolin,
     PangolinChainConst,
     drml_primitives,
     millau_primitives,
@@ -85,8 +85,8 @@ crate::declare_relay_messages!(
     Millau,
     PangolinChain,
     MillauChain,
-    chain_pangolin,
-    chain_millau,
+    component_pangolin,
+    component_millau,
     PangolinChainConst,
     MillauChainConst,
     drml_primitives,

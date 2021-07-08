@@ -27,8 +27,8 @@ use relay_substrate_client::{
 use sp_core::{Bytes, Pair};
 use sp_version::RuntimeVersion;
 
-use chain_millau::MillauChain;
-use chain_pangolin::PangolinChain;
+use component_millau::MillauChain;
+use component_pangolin::PangolinChain;
 
 use crate::declaration::pangolin::PangolinChainConst;
 use crate::traits::{ChainConst, CliChain};
@@ -58,7 +58,7 @@ impl ChainConst for MillauChainConst {
         millau_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
     const AVERAGE_BLOCK_INTERVAL: Duration = MillauChain::AVERAGE_BLOCK_INTERVAL;
     const BRIDGE_CHAIN_ID: ChainId = bp_runtime::MILLAU_CHAIN_ID;
-    type SigningParams = chain_millau::SigningParams;
+    type SigningParams = component_millau::SigningParams;
 }
 
 impl CliChain for MillauChain {
@@ -72,7 +72,7 @@ crate::declare_relay_headers!(
     Pangolin,
     MillauChain,
     PangolinChain,
-    chain_millau,
+    component_millau,
     MillauChainConst,
     millau_primitives,
     drml_primitives,
@@ -86,8 +86,8 @@ crate::declare_relay_messages!(
     Pangolin,
     MillauChain,
     PangolinChain,
-    chain_millau,
-    chain_pangolin,
+    component_millau,
+    component_pangolin,
     MillauChainConst,
     PangolinChainConst,
     millau_primitives,

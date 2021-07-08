@@ -10,8 +10,8 @@ macro_rules! select_bridge {
     ($bridge: expr, $generic: tt) => {
         match $bridge {
             BridgeName::PangolinToMillau => {
-                type Left = chain_pangolin::PangolinChain;
-                type Right = chain_millau::MillauChain;
+                type Left = component_pangolin::PangolinChain;
+                type Right = component_millau::MillauChain;
 
                 type LeftToRightFinality = crate::declaration::pangolin::PangolinFinalityToMillau;
                 type RightToLeftFinality = crate::declaration::millau::MillauFinalityToPangolin;

@@ -32,28 +32,28 @@ serde = { version = "1", features = ["derive"] }
 
 # Bridge dependencies
 
-bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-bp-message-dispatch    = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-finality-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "s2s" }
+bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+bp-message-dispatch    = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+finality-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
 finality-grandpa       = { version = "0.14.0" }
 
 
 # Substrate Dependencies
 
-frame-support       = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
-sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
-sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
-sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
-sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
-sp-version          = { git = "https://github.com/darwinia-network/substrate.git", branch = "s2s" }
+frame-support       = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-version          = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
 
 
 
@@ -63,24 +63,24 @@ drml-primitives                 = { optional = true, git = "https://github.com/d
 pangolin-constants              = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
 pangolin-bridge-primitives      = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
 pangolin-runtime-system-params  = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-chain-pangolin                  = { optional = true, path = "../../chains/pangolin" }
+component-pangolin              = { optional = true, path = "../../components/client-pangolin" }
 
 ## millau
 millau-runtime      = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
 millau-primitives   = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
-chain-millau        = { optional = true, path = "../../chains/millau" }
+component-millau    = { optional = true, path = "../../components/client-millau" }
 
 
 [features]
 default = []
 millau = [
     "millau-runtime",
-    "chain-millau",
+    "component-millau",
     "millau-primitives",
 ]
 pangolin = [
     "pangolin-runtime",
-    "chain-pangolin",
+    "component-pangolin",
     "drml-primitives",
     "pangolin-constants",
     "pangolin-bridge-primitives",

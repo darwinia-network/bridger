@@ -1,8 +1,9 @@
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 
-use bridge_component::Component;
+use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
+use component_http_client::HttpClientComponent;
 
 use crate::bus::TemplateLinkedBus;
 use crate::message::TemplateLinkedMessage;
@@ -21,7 +22,7 @@ impl Service for SomeService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let mut rx = bus.rx::<TemplateLinkedMessage>()?;
-        let _component_http_client = Component::http_client::<TemplateLinked>()?;
+        let _component_http_client = HttpClientComponent::restore::<TemplateLinked>()?;
         let _greet = Self::try_task(
             &format!("{}-service-some", TemplateLinked::NAME),
             async move {

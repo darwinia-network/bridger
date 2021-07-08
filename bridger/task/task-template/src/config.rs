@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-use bridge_component::config::HttpClientConfig;
 use bridge_traits::bridge::config::Config;
+use component_http_client::HttpClientConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TemplateTaskConfig {

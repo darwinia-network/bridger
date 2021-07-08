@@ -1,9 +1,9 @@
 use lifeline::{Lifeline, Service, Task};
 
-use bridge_component::Component;
+use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use chain_darwinia::DarwiniaChain;
+use component_darwinia::component::DarwiniaComponent;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::task::DarwiniaEthereumTask;
@@ -20,7 +20,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _component_bee = Component::bee::<DarwiniaEthereumTask, DarwiniaChain>()?;
+        let _component_darwinia = DarwiniaComponent::restore::<DarwiniaEthereumTask>()?;
         let _greet = Self::try_task(
             &format!("{}-service-relay", DarwiniaEthereumTask::NAME),
             async move {

@@ -1,8 +1,8 @@
 use lifeline::prelude::*;
 use lifeline::{Receiver, Sender};
 
-use bridge_component::state::BridgeState;
 use bridge_traits::bridge::task::BridgeSand;
+use component_state::state::BridgeState;
 use linked_darwinia::bus::DarwiniaLinkedBus;
 use linked_darwinia::message::DarwiniaLinkedMessage;
 use linked_darwinia::task::DarwiniaLinked;

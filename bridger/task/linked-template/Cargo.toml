@@ -27,7 +27,8 @@ lifeline = "0.6"
 postage = "0.4"
 
 bridge-traits = { path = "../../traits" }
-bridge-component = { path = "../../component" }
+component-http-client = { path = "../../components/http-client" }
+component-state = { path = "../../components/state" }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

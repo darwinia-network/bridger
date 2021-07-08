@@ -7,8 +7,7 @@ members = [
 	"provider/substrate-relay/relays/*",
 
 	"bridger/bin",
-    "bridger/chains/*",
-	"bridger/component",
+	"bridger/components/*",
 	"bridger/traits",
 	"bridger/task/*",
 	"bridger/primitives",

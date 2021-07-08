@@ -1,8 +1,8 @@
 use lifeline::prelude::*;
 use lifeline::{Receiver, Sender};
 
-use bridge_component::state::BridgeState;
 use bridge_traits::bridge::task::BridgeSand;
+use component_state::state::BridgeState;
 use linked_template::bus::TemplateLinkedBus;
 use linked_template::message::TemplateLinkedMessage;
 use linked_template::task::TemplateLinked;

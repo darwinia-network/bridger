@@ -6,7 +6,7 @@ use std::sync::Mutex;
 
 use once_cell::sync::{Lazy, OnceCell};
 
-use bridge_traits::bridge::task::{BridgeSand, BridgeTaskKeep};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTaskKeep, TaskRouterAsyncFn};
 use bridge_traits::error::StandardError;
 use component_state::state::BridgeState;
 use linked_darwinia::task::DarwiniaLinked;
@@ -25,6 +25,9 @@ static RUNNING_TASKS: Lazy<Mutex<HashMap<String, Box<dyn BridgeTaskKeep + Send>>
     Lazy::new(|| Mutex::new(HashMap::new()));
 
 static BRIDGE_STATE: OnceCell<BridgeState> = OnceCell::new();
+
+static CUSTOM_TASK_ROUTER: Lazy<Mutex<HashMap<String, TaskRouterAsyncFn>>> =
+    Lazy::new(|| Mutex::new(HashMap::new()));
 
 pub fn available_tasks() -> anyhow::Result<Vec<String>> {
     let tasks = AVAILABLE_TASKS
@@ -97,4 +100,28 @@ pub fn set_state(state: BridgeState) -> anyhow::Result<()> {
 
 pub fn get_state() -> Option<BridgeState> {
     BRIDGE_STATE.get().cloned()
+}
+
+pub fn merge_route(router_new: HashMap<String, TaskRouterAsyncFn>) -> anyhow::Result<()> {
+    let mut router_keep = CUSTOM_TASK_ROUTER
+        .lock()
+        .map_err(|_e| StandardError::Api("failed to get custom task router".to_string()))?;
+    for (key, value) in router_new.into_iter() {
+        router_keep.insert(key, value);
+    }
+    Ok(())
+}
+
+pub async fn run_route<U: AsRef<str>>(uri: U) -> anyhow::Result<serde_json::Value> {
+    let uri = uri.as_ref();
+    let v = futures::executor::block_on(async {
+        let router_keep = CUSTOM_TASK_ROUTER
+            .lock()
+            .map_err(|_e| StandardError::Api("failed to get custom task router".to_string()))?;
+        if let Some(route) = router_keep.get(uri) {
+            return (route)("".to_string()).await;
+        }
+        Err(StandardError::Api(format!("Not found this task router: [{}]", uri)).into())
+    });
+    v
 }

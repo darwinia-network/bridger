@@ -1,5 +1,5 @@
 use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskRouter};
 
 use crate::bus::DarwiniaLinkedBus;
 use crate::config::DarwiniaLinkedConfig;
@@ -30,6 +30,14 @@ impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {
         self.carries.push(other_bus);
     }
+
+    fn register_route(&self, router: &mut TaskRouter) {
+        router.register::<DarwiniaLinked>("test", Box::new(move |x| Box::pin(test_route(x))));
+    }
+}
+
+async fn test_route(arg: String) -> anyhow::Result<serde_json::Value> {
+    Ok(serde_json::Value::String("Hello task route".to_string()))
 }
 
 impl DarwiniaLinked {

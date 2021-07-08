@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskRouter};
 use component_darwinia::config::DarwiniaConfig;
 use component_ethereum::config::{EthereumRpcConfig, Web3Config};
 use component_shadow::ShadowConfig;
@@ -41,6 +41,8 @@ impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
     fn keep_carry(&mut self, other_bus: Lifeline) {
         self.carries.push(other_bus);
     }
+
+    fn register_route(&self, router: &mut TaskRouter) {}
 }
 
 impl DarwiniaEthereumTask {

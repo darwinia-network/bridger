@@ -1,7 +1,7 @@
 use lifeline::dyn_bus::DynBus;
 
 use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskRouter};
 use component_state::state::BridgeState;
 
 use crate::bus::TemplateLinkedBus;
@@ -33,6 +33,8 @@ impl BridgeTask<TemplateLinkedBus> for TemplateLinked {
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {
         self.carries.push(other_bus);
     }
+
+    fn register_route(&self, router: &mut TaskRouter) {}
 }
 
 impl TemplateLinked {

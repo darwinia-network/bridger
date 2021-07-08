@@ -8,7 +8,7 @@ use routerify::prelude::*;
 use routerify::{Middleware, RequestInfo, Router, RouterService};
 
 use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask, TaskRouter};
 use bridge_traits::error::StandardError;
 use component_state::config::{BridgeStateConfig, MicrokvConfig};
 use component_state::state::BridgeStateComponent;
@@ -55,6 +55,7 @@ async fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
         .get("/task/list", task_list)
         .post("/task/start", task_start)
         .post("/task/stop", task_stop)
+        .get("/task/:task_name/:task_route", task_route)
         .err_handler_with_info(error_handler)
         .build()
         .unwrap()
@@ -166,10 +167,12 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let state_bridge = keep::get_state()
         .ok_or_else(|| StandardError::Api("Please set bridge state first.".to_string()))?;
 
+    let mut task_router = TaskRouter::new();
     match name {
         DarwiniaLinked::NAME => {
             let task_config = task_config::<DarwiniaLinkedConfig>(path_config)?;
             let task = DarwiniaLinked::new(task_config).await?;
+            task.register_route(&mut task_router);
             keep::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
         }
         DarwiniaEthereumTask::NAME => {
@@ -190,15 +193,20 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
                     Ok(())
                 },
             )?;
+            task.register_route(&mut task_router);
             keep::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
         }
         PangolinMillauTask::NAME => {
             let task_config = task_config::<PangolinMillauConfig>(path_config)?;
             let task = PangolinMillauTask::new(task_config).await?;
+            task.register_route(&mut task_router);
             keep::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
         }
         _ => unreachable!(),
-    }
+    };
+
+    let custom_router = task_router.router();
+    keep::merge_route(custom_router)?;
 
     Resp::<String>::ok().response_json()
 }
@@ -211,4 +219,17 @@ async fn task_stop(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     keep::stop_task(&task_name)?;
     log::warn!("The task {} is stopped", task_name);
     Resp::<String>::ok().response_json()
+}
+
+async fn task_route(req: Request<Body>) -> anyhow::Result<Response<Body>> {
+    let task_name = req
+        .param("task_name")
+        .ok_or_else(|| StandardError::Api("The task name is required".to_string()))?;
+    let task_route = req
+        .param("task_route")
+        .ok_or_else(|| StandardError::Api("The task route is required".to_string()))?;
+    let uri = format!("{}-{}", task_name, task_route);
+
+    let value = keep::run_route(uri).await?;
+    Resp::ok_with_data(value).response_json()
 }

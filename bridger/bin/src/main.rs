@@ -1,3 +1,5 @@
+#![feature(async_closure)]
+
 use structopt::StructOpt;
 
 use crate::types::command::Opt;

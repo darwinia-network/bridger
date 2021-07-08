@@ -6,9 +6,9 @@ use std::sync::Mutex;
 
 use once_cell::sync::{Lazy, OnceCell};
 
-use bridge_component::state::BridgeState;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTaskKeep};
 use bridge_traits::error::StandardError;
+use component_state::state::BridgeState;
 use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::DarwiniaEthereumTask;
 use task_pangolin_millau::task::PangolinMillauTask;

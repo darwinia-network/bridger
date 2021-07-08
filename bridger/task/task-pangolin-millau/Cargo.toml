@@ -20,18 +20,14 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0"
 log = "0.4"
-#custom_derive = "0.1"
-#enum_derive = "0.1"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
 serde = { version = "1", features = ["derive"] }
 
 lifeline = "0.6"
 postage = "0.4"
 
-bridge-traits    = { path = "../../traits" }
-bridge-component = { path = "../../component" }
+bridge-traits = { path = "../../traits" }
 
 support-s2s        = { path = "../../supports/support-s2s", features = [ "millau", "pangolin" ] }
-
 
 [dev-dependencies]

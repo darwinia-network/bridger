@@ -7,10 +7,11 @@ use lifeline::CarryFrom;
 use routerify::prelude::*;
 use routerify::{Middleware, RequestInfo, Router, RouterService};
 
-use bridge_component::config::{MicrokvConfig, StateConfig};
-use bridge_component::state::BridgeState;
+use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
 use bridge_traits::error::StandardError;
+use component_state::config::{BridgeStateConfig, MicrokvConfig};
+use component_state::state::BridgeStateComponent;
 use linked_darwinia::config::DarwiniaLinkedConfig;
 use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
@@ -64,14 +65,15 @@ async fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
 async fn app_state(options: ServerOptions) -> anyhow::Result<WebserverState> {
     let base_path = patch::bridger::base_path(options.base_path)?;
 
-    let config_state = StateConfig {
+    let config_state = BridgeStateConfig {
         microkv: MicrokvConfig {
             base_path: base_path.clone(),
             db_name: Some("database".to_string()),
             auto_commit: true,
         },
     };
-    let bridge_state = BridgeState::new(config_state).await?;
+    let component_state = BridgeStateComponent::new(config_state);
+    let bridge_state = component_state.component().await?;
     keep::set_state(bridge_state)?;
 
     Ok(WebserverState {

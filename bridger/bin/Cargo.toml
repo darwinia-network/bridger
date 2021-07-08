@@ -40,7 +40,8 @@ colored = "2"
 async-recursion = "0.3"
 
 bridge-traits = { path = "../traits" }
-bridge-component = { path = "../component" }
+
+component-state = { path = "../components/state" }
 
 task-darwinia-ethereum = { path = "../task/task-darwinia-ethereum" }
 task-pangolin-millau = { path = "../task/task-pangolin-millau" }

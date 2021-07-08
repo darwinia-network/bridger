@@ -7,6 +7,7 @@ use crate::types::command::TaskCommand;
 use crate::types::server::Resp;
 use crate::types::transfer::{TaskListResponse, TaskStartParam, TaskStopParam};
 
+#[allow(clippy::manual_map)]
 #[async_recursion::async_recursion]
 pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result<()> {
     match command {

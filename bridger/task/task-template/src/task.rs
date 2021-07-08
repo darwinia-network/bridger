@@ -1,11 +1,12 @@
+use lifeline::dyn_bus::DynBus;
+
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
+use component_state::state::BridgeState;
 
 use crate::bus::TemplateTaskBus;
 use crate::config::TemplateTaskConfig;
 use crate::service::some::SomeService;
-use bridge_component::state::BridgeState;
-use lifeline::dyn_bus::DynBus;
 
 #[derive(Debug)]
 pub struct TemplateTask {

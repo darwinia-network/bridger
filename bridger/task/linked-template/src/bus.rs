@@ -1,6 +1,6 @@
 use lifeline::prelude::*;
 
-use bridge_component::state::BridgeState;
+use component_state::state::BridgeState;
 
 lifeline_bus!(pub struct TemplateLinkedBus);
 

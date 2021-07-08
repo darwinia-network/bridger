@@ -1,12 +1,12 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
 
-use bridge_component::state::BridgeState;
-use bridge_component::Component;
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
+use component_ethereum::web3::Web3Component;
+use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
@@ -27,7 +27,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let mut tx = bus.tx::<DarwiniaEthereumMessage>()?;
         let mut rx = bus.rx::<DarwiniaEthereumMessage>()?;
-        let component_web3 = Component::web3::<DarwiniaEthereumTask>()?;
+        let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(

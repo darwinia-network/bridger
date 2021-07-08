@@ -2,11 +2,13 @@ use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Sender};
 use serde::{Deserialize, Serialize};
 
-use bridge_component::config::{BeeConfig, EthereumRpcConfig, ShadowConfig, Web3Config};
-use bridge_component::state::BridgeState;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
+use component_darwinia::config::DarwiniaConfig;
+use component_ethereum::config::{EthereumRpcConfig, Web3Config};
+use component_shadow::ShadowConfig;
+use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
@@ -82,7 +84,7 @@ impl DarwiniaEthereumTask {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DarwiniaEthereumConfig {
-    pub bee: BeeConfig,
+    pub darwinia: DarwiniaConfig,
     pub web3: Web3Config,
     pub ethereum_rpc: EthereumRpcConfig,
     pub shadow: ShadowConfig,
@@ -92,7 +94,7 @@ pub struct DarwiniaEthereumConfig {
 impl DarwiniaEthereumConfig {
     pub fn store<S: AsRef<str>>(&self, cell_name: S) -> anyhow::Result<()> {
         let name = cell_name.as_ref();
-        Config::store(name, self.bee.clone())?;
+        Config::store(name, self.darwinia.clone())?;
         Config::store(name, self.web3.clone())?;
         Config::store(name, self.ethereum_rpc.clone())?;
         Config::store(name, self.shadow.clone())?;

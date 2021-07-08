@@ -30,6 +30,7 @@ bridge-traits = { path = "../../traits" }
 bridge-primitives = { path = "../../primitives", features = ["runtime", "rpc"] }
 
 web3 = { version = "0.14.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "v0.14.0", features = ["signing"] }
+
 reqwest = { version = "0.11", features = ["json"] }
 
 component-http-client = { path = "../http-client" }

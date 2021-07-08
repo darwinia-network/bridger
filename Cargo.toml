@@ -11,4 +11,5 @@ members = [
 	"bridger/traits",
 	"bridger/task/*",
 	"bridger/primitives",
+	"bridger/supports/*",
 ]

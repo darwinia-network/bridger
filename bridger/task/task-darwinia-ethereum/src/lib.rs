@@ -7,3 +7,6 @@ pub mod task;
 mod bus;
 mod message;
 mod service;
+
+#[macro_use]
+extern crate async_trait;

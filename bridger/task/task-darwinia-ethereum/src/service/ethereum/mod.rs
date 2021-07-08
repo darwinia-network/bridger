@@ -13,9 +13,40 @@ use crate::config::SubstrateEthereumConfig;
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage};
 use crate::task::DarwiniaEthereumTask;
 
+mod ethereum_logs_handler;
+use ethereum_logs_handler::EthereumLogsHandler;
+use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker, Result};
+use array_bytes::hex2bytes_unchecked as bytes;
+use web3::{
+    Web3, 
+    transports::http::Http,
+    types::{Log, H160, H256}
+};
+
+fn create_tracker(web3: Web3<Http>, topics_list: Vec<(H160, Vec<H256>)>, scan_from: u64, step: u64) -> EvmLogTracker<Ethereum, EthereumLogsHandler> {
+    let client = EvmClient::new(web3);
+    EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
+        client,
+        topics_list,
+        EthereumLogsHandler {},
+        100,
+        10,
+    )
+}
+
+async fn get_topics_list() -> Vec<(H160, Vec<H256>)> {
+    let contract_address = "0xD35Bb6F1bc1C84b53E0995c1830454AB7C4147f1";
+    let contract_address = H160::from_slice(&bytes(contract_address));
+
+    let topics = &vec!["0x96635f5f1b0b05ed7e2265d4e13634378280f038e5a958227d4f383f825c2771"];
+    let topics = topics.iter().map(|t| H256::from_slice(&bytes(t))).collect();
+    vec![(contract_address, topics)]
+}
+
 #[derive(Debug)]
 pub struct LikeDarwiniaWithLikeEthereumEthereumScanService {
     _greet: Lifeline,
+    tracker: Option<EvmLogTracker<Ethereum, EthereumLogsHandler>>,
 }
 
 impl BridgeService for LikeDarwiniaWithLikeEthereumEthereumScanService {}
@@ -34,7 +65,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
                 let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-                let _web3 = component_web3.component().await?;
+                let web3 = component_web3.component().await?;
                 let microkv = state.microkv();
                 let mut running = false;
                 while let Some(recv) = rx.recv().await {
@@ -45,30 +76,10 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                                     continue;
                                 }
                                 running = true;
-                                loop {
-                                    if !running {
-                                        break;
-                                    }
-                                    debug!(
-                                        target: DarwiniaEthereumTask::NAME,
-                                        "ethereum scan ----->"
-                                    );
-                                    let block_number: u64 = 12345;
-                                    microkv.put("last_synced", &block_number)?;
-                                    let las_synced: Option<u64> = microkv.get("last_synced")?;
-                                    debug!(
-                                        target: DarwiniaEthereumTask::NAME,
-                                        "Last synced block number is: {:?}", las_synced,
-                                    );
-                                    tx.send(DarwiniaEthereumMessage::ToDarwinia(
-                                        ToDarwiniaLinkedMessage::SendExtrinsic,
-                                    ))
-                                    .await?;
-                                    tokio::time::sleep(tokio::time::Duration::from_millis(
-                                        config.interval_ethereum * 1_000,
-                                    ))
-                                    .await;
-                                }
+                                let topics_list = get_topics_list().await;
+                                let scan_from: u64 = 12345;
+                                let mut tracker = create_tracker(web3.clone(), topics_list, scan_from, config.interval_ethereum);
+                                tracker.start().await;
                             }
                             EthereumScanMessage::Pause => {
                                 running = false;
@@ -79,6 +90,6 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                 Ok(())
             },
         );
-        Ok(Self { _greet })
+        Ok(Self { _greet, tracker: None })
     }
 }

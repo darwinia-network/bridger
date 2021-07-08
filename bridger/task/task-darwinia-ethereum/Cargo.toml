@@ -25,6 +25,10 @@ serde = { version = "1", features = ["derive"] }
 
 lifeline = "0.6"
 postage = "0.4"
+async-trait = "0.1.48"
+
+web3 = { version = "0.14.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "v0.14.0", features = ["signing"] }
+array-bytes = "1.1.0"
 
 bridge-traits = { path = "../../traits" }
 
@@ -34,6 +38,7 @@ component-state = { path = "../../components/state" }
 component-darwinia = { path = "../../components/client-darwinia" }
 component-ethereum = { path = "../../components/ethereum" }
 component-shadow = { path = "../../components/shadow" }
+evm-log-tracker = { path = "../../supports/evm-log-tracker" }
 
 # todo: Add on-demand
 tokio = { version = "1", features = ["full"] }

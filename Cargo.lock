@@ -2587,6 +2587,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "evm-log-tracker"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "array-bytes",
+ "async-trait",
+ "log",
+ "thiserror",
+ "tokio 1.8.1",
+ "web3",
+]
+
+[[package]]
 name = "evm-runtime"
 version = "0.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9189,12 +9202,15 @@ name = "task-darwinia-ethereum"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "array-bytes",
+ "async-trait",
  "bridge-traits",
  "component-darwinia",
  "component-ethereum",
  "component-shadow",
  "component-state",
  "env_logger 0.8.4",
+ "evm-log-tracker",
  "lifeline",
  "linked-darwinia",
  "log",
@@ -9202,6 +9218,7 @@ dependencies = [
  "serde 1.0.126",
  "thiserror",
  "tokio 1.8.1",
+ "web3",
 ]
 
 [[package]]

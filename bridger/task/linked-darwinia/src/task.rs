@@ -38,6 +38,8 @@ impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
 
 impl DarwiniaLinked {
     async fn test_route(arg: String) -> anyhow::Result<serde_json::Value> {
+        let task: &DarwiniaLinked = support_keep::task::running_task(DarwiniaLinked::NAME)?;
+
         Ok(serde_json::Value::String("Hello task route".to_string()))
     }
 }

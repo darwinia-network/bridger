@@ -29,6 +29,7 @@ lifeline = "0.6"
 postage = "0.4"
 
 bridge-traits = { path = "../../traits" }
+support-keep = { path = "../../supports/support-keep" }
 
 component-http-client = { path = "../../components/http-client" }
 component-darwinia = { path = "../../components/client-darwinia" }

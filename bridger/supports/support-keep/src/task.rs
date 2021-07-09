@@ -9,10 +9,15 @@ use once_cell::sync::{Lazy, OnceCell};
 use bridge_traits::bridge::task::BridgeTaskKeep;
 use bridge_traits::error::StandardError;
 
-static AVAILABLE_TASKS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| Mutex::new(vec![]));
+static AVAILABLE_TASKS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| {
+    Mutex::new(vec![
+        "linked-darwinia".to_string(),
+        "task-darwinia-ethereum".to_string(),
+    ])
+});
 
-static RUNNING_TASKS: Lazy<Mutex<HashMap<String, Box<dyn BridgeTaskKeep + Send>>>> =
-    Lazy::new(|| Mutex::new(HashMap::new()));
+static mut RUNNING_TASKS: OnceCell<HashMap<String, Box<dyn BridgeTaskKeep + Send>>> =
+    OnceCell::new();
 
 pub fn available_tasks() -> anyhow::Result<Vec<String>> {
     let tasks = AVAILABLE_TASKS
@@ -32,47 +37,60 @@ pub fn keep_task<N: AsRef<str>>(
     name: N,
     task: Box<dyn BridgeTaskKeep + Send>,
 ) -> anyhow::Result<()> {
-    let mut running = RUNNING_TASKS
-        .lock()
-        .map_err(|_e| StandardError::Api("failed to get running task".to_string()))?;
-    running.insert(name.as_ref().to_string(), task);
-    Ok(())
+    unsafe {
+        if let Some(running) = RUNNING_TASKS.get_mut() {
+            running.insert(name.as_ref().to_string(), task);
+            Ok(())
+        } else {
+            let mut map = HashMap::new();
+            map.insert(name.as_ref().to_string(), task);
+            RUNNING_TASKS
+                .set(map)
+                .map_err(|_m| StandardError::Api("failed to init running task".to_string()))?;
+            Ok(())
+        }
+    }
 }
 
 pub fn stop_task<N: AsRef<str>>(name: N) -> anyhow::Result<()> {
-    let mut running = RUNNING_TASKS
-        .lock()
-        .map_err(|_e| StandardError::Api("failed to get running task".to_string()))?;
     let name = name.as_ref();
-    running.remove(name).ok_or_else(|| {
-        StandardError::Api(format!(
-            "not found this task: [{}]. maybe this task not started yet",
-            name
-        ))
-    })?;
-    Ok(())
+    unsafe {
+        if let Some(runing) = RUNNING_TASKS.get_mut() {
+            runing.remove(name).ok_or_else(|| {
+                StandardError::Api(format!(
+                    "not found this task: [{}]. maybe this task not started yet",
+                    name
+                ))
+            })?;
+        }
+        Ok(())
+    }
 }
 
 pub fn task_is_running<N: AsRef<str>>(name: N) -> bool {
-    match RUNNING_TASKS.lock() {
-        Ok(running) => running.contains_key(name.as_ref()),
-        Err(_) => false,
+    unsafe {
+        RUNNING_TASKS
+            .get()
+            .map(|running| running.contains_key(name.as_ref()))
+            .unwrap_or(false)
     }
 }
 
-pub fn run_with_running_task<T, F>(name: &str, fnc: F) -> anyhow::Result<()>
-where
-    T: 'static + BridgeTaskKeep,
-    F: FnOnce(&T) -> anyhow::Result<()>,
-{
-    let running = RUNNING_TASKS
-        .lock()
-        .map_err(|_e| StandardError::Api("failed to get running task".to_string()))?;
-    if let Some(tk) = running.get(&name.to_string()) {
-        return match tk.as_any().downcast_ref::<T>() {
-            Some(b) => fnc(b),
-            None => Err(StandardError::Api(format!("can't downcast task [{}]", name)).into()),
-        };
+pub fn running_task<T: 'static + BridgeTaskKeep>(
+    name: impl AsRef<str>,
+) -> anyhow::Result<&'static T> {
+    let name = name.as_ref();
+    unsafe {
+        if let Some(running) = RUNNING_TASKS.get() {
+            if let Some(tk) = running.get(&name.to_string()) {
+                return match tk.as_any().downcast_ref::<T>() {
+                    Some(b) => Ok(b),
+                    None => {
+                        Err(StandardError::Api(format!("can't downcast task [{}]", name)).into())
+                    }
+                };
+            }
+        }
+        Err(StandardError::Api(format!("the task [{}] isn't started", name)).into())
     }
-    Err(StandardError::Api(format!("the task [{}] isn't started", name)).into())
 }

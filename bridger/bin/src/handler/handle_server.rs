@@ -186,13 +186,10 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
             let task_config = task_config::<DarwiniaEthereumConfig>(path_config)?;
             let mut task = DarwiniaEthereumTask::new(task_config, state_bridge.clone()).await?;
 
-            support_keep::task::run_with_running_task(
-                DarwiniaLinked::NAME,
-                |linked_darwinia: &DarwiniaLinked| {
-                    task.keep_carry(linked_darwinia.bus().carry_from(task.bus())?);
-                    Ok(())
-                },
-            )?;
+            let linked_darwinia: &DarwiniaLinked =
+                support_keep::task::running_task(DarwiniaLinked::NAME)?;
+            task.keep_carry(linked_darwinia.bus().carry_from(task.bus())?);
+
             task.register_route(&mut task_router);
             support_keep::task::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
         }

@@ -4270,6 +4270,7 @@ dependencies = [
  "postage",
  "serde 1.0.126",
  "serde_json",
+ "support-keep",
 ]
 
 [[package]]
@@ -9152,6 +9153,7 @@ dependencies = [
  "once_cell",
  "serde 1.0.126",
  "serde_json",
+ "tokio 1.8.1",
 ]
 
 [[package]]

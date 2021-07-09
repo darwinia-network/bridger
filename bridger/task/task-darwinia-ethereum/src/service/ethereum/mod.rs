@@ -23,43 +23,71 @@ use web3::{
     types::{Log, H160, H256}
 };
 
+use std::time::Duration;
+use tokio::time::sleep;
+
 fn create_tracker(web3: Web3<Http>, topics_list: Vec<(H160, Vec<H256>)>, scan_from: u64, step: u64) -> EvmLogTracker<Ethereum, EthereumLogsHandler> {
     let client = EvmClient::new(web3);
     EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
         client,
-        topics_list,
-        EthereumLogsHandler {},
+        topics_list.clone(),
+        EthereumLogsHandler::new(topics_list),
         100,
         step,
     )
 }
 
+
+// struct Topic {
+//     name: String,
+//     address: H160,
+//     topic: H256,
+//     handle: FnMut(Log) -> Result<()>,
+// }
+
+// impl Topic {
+//     pub fn new(name: String, address: H160, topic: H256, handle: FnMut(Log) -> Result<()>) -> Topic {
+//         Topic {
+//             name, address, topic, handle
+//         }
+//     }
+
+//     pub fn belongs_to(&self, log: Log) -> bool {
+
+//     }
+// }
+
 fn get_topics_list() -> Vec<(H160, Vec<H256>)> {
     let topics_setting = vec![
+        // ring
         (
             "0x9469d013805bffb7d3debe5e7839237e535ec483",
             vec![
                 "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10",
             ]
         ),
+        // kton
         (
             "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff",
             vec![
                 "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10",
             ]
         ),
+        // bank
         (
             "0x649fdf6ee483a96e020b889571e93700fbd82d88",
             vec![
                 "0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12",
             ]
         ),
+        // relay
         (
             "0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49",
             vec![
                 "0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f",
             ]
         ),
+        // backing
         (
             "0xd5FC8F2eB94fE6AAdeE91c561818e1fF4ea2C041",
             vec![

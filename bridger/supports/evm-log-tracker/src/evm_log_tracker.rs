@@ -85,7 +85,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
         Ok(range)
     }
 
-    async fn handle(&self, logs: Vec<Log>) -> Result<()> {
+    async fn handle(&mut self, logs: Vec<Log>) -> Result<()> {
         self.logs_handler
             .handle(&self.client, &self.topics_list, logs)
             .await?;

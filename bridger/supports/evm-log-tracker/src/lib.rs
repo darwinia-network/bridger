@@ -11,7 +11,7 @@ mod evm_log_tracker;
 mod traits;
 
 pub use error::Error;
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<T> = anyhow::Result<T>;
 
 pub use chains::{Bsc, Ethereum, Heco};
 pub use default_logs_handler::DefaultLogsHandler;

@@ -1,13 +1,13 @@
 use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskRouter};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 
 use crate::bus::DarwiniaLinkedBus;
 use crate::config::DarwiniaLinkedConfig;
+use crate::route;
 use crate::service::extrinsic::ExtrinsicService;
 
 #[derive(Debug)]
 pub struct DarwiniaLinked {
-    bus: DarwiniaLinkedBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
     carries: Vec<lifeline::Lifeline>,
 }
@@ -16,46 +16,40 @@ impl BridgeSand for DarwiniaLinked {
     const NAME: &'static str = "linked-darwinia";
 }
 
+#[async_trait::async_trait]
 impl BridgeTaskKeep for DarwiniaLinked {
     fn as_any(&self) -> &dyn std::any::Any {
         self
+    }
+    async fn route(
+        &self,
+        uri: String,
+        param: serde_json::Value,
+    ) -> anyhow::Result<serde_json::Value> {
+        let ret = (uri, param);
+        let value: serde_json::Value = serde_json::to_value(ret)?;
+        Ok(value)
     }
 }
 
 impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
     fn bus(&self) -> &DarwiniaLinkedBus {
-        &self.bus
+        crate::bus::bus()
     }
 
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {
         self.carries.push(other_bus);
-    }
-
-    fn register_route(&self, router: &mut TaskRouter) {
-        router.register::<DarwiniaLinked>("test", Box::new(move |x| Box::pin(Self::test_route(x))));
-    }
-}
-
-impl DarwiniaLinked {
-    async fn test_route(arg: String) -> anyhow::Result<serde_json::Value> {
-        let task: &DarwiniaLinked = support_keep::task::running_task(DarwiniaLinked::NAME)?;
-
-        Ok(serde_json::Value::String("Hello task route".to_string()))
     }
 }
 
 impl DarwiniaLinked {
     pub async fn new(config: DarwiniaLinkedConfig) -> anyhow::Result<Self> {
         config.store(DarwiniaLinked::NAME)?;
-        let bus = DarwiniaLinkedBus::default();
+        let bus = crate::bus::bus();
 
         let services = vec![Self::spawn_service::<ExtrinsicService>(&bus)?];
 
         let carries = vec![];
-        Ok(Self {
-            bus,
-            services,
-            carries,
-        })
+        Ok(Self { services, carries })
     }
 }

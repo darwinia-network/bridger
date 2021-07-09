@@ -8,7 +8,7 @@ use routerify::prelude::*;
 use routerify::{Middleware, RequestInfo, Router, RouterService};
 
 use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask, TaskRouter};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
 use bridge_traits::error::StandardError;
 use component_state::config::{BridgeStateConfig, MicrokvConfig};
 use component_state::state::BridgeStateComponent;
@@ -55,7 +55,7 @@ async fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
         .get("/task/list", task_list)
         .post("/task/start", task_start)
         .post("/task/stop", task_stop)
-        .get("/task/:task_name/:task_route", task_route)
+        .post("/task/:task_name/:task_route", task_route)
         .err_handler_with_info(error_handler)
         .build()
         .unwrap()
@@ -167,12 +167,12 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let state_bridge = support_keep::state::get_state()
         .ok_or_else(|| StandardError::Api("Please set bridge state first.".to_string()))?;
 
-    let mut task_router = TaskRouter::new();
+    // let mut task_router = TaskRouter::new();
     match name {
         DarwiniaLinked::NAME => {
             let task_config = task_config::<DarwiniaLinkedConfig>(path_config)?;
             let task = DarwiniaLinked::new(task_config).await?;
-            task.register_route(&mut task_router);
+            // task.register_route(&mut task_router);
             support_keep::task::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
         }
         DarwiniaEthereumTask::NAME => {
@@ -187,23 +187,23 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
             let mut task = DarwiniaEthereumTask::new(task_config, state_bridge.clone()).await?;
 
             let linked_darwinia: &DarwiniaLinked =
-                support_keep::task::running_task(DarwiniaLinked::NAME)?;
+                support_keep::task::running_task_cast(DarwiniaLinked::NAME)?;
             task.keep_carry(linked_darwinia.bus().carry_from(task.bus())?);
 
-            task.register_route(&mut task_router);
+            // task.register_route(&mut task_router);
             support_keep::task::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
         }
         PangolinMillauTask::NAME => {
             let task_config = task_config::<PangolinMillauConfig>(path_config)?;
             let task = PangolinMillauTask::new(task_config).await?;
-            task.register_route(&mut task_router);
+            // task.register_route(&mut task_router);
             support_keep::task::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
         }
         _ => unreachable!(),
     };
 
-    let custom_router = task_router.router();
-    support_keep::route::merge_route(custom_router)?;
+    // let custom_router = task_router.router();
+    // support_keep::route::merge_route(custom_router)?;
 
     Resp::<String>::ok().response_json()
 }
@@ -218,7 +218,22 @@ async fn task_stop(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     Resp::<String>::ok().response_json()
 }
 
-async fn task_route(req: Request<Body>) -> anyhow::Result<Response<Body>> {
+async fn task_route(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
+    // let task_name = req
+    //     .param("task_name")
+    //     .ok_or_else(|| StandardError::Api("The task name is required".to_string()))?;
+    // let task_route = req
+    //     .param("task_route")
+    //     .ok_or_else(|| StandardError::Api("The task route is required".to_string()))?;
+    //
+    // let uri = format!("{}-{}", task_name, task_route);
+    // let param: serde_json::Value = patch::hyper::deserialize_body(&mut req)
+    //     .await
+    //     .unwrap_or(serde_json::Value::Null);
+    //
+    // let value = support_keep::route::run_route(uri, param).await?;
+    // Resp::ok_with_data(value).response_json()
+
     let task_name = req
         .param("task_name")
         .ok_or_else(|| StandardError::Api("The task name is required".to_string()))?;
@@ -226,7 +241,15 @@ async fn task_route(req: Request<Body>) -> anyhow::Result<Response<Body>> {
         .param("task_route")
         .ok_or_else(|| StandardError::Api("The task route is required".to_string()))?;
     let uri = format!("{}-{}", task_name, task_route);
+    let param: serde_json::Value = patch::hyper::deserialize_body(&mut req)
+        .await
+        .unwrap_or(serde_json::Value::Null);
 
-    let value = support_keep::route::run_route(uri).await?;
-    Resp::ok_with_data(value).response_json()
+    // let task = support_keep::task::running_task(task_name)
+    //     .ok_or_else(|| StandardError::Api("The task isn't started".to_string()))?;
+    // let value = task.route(uri, param).await?;
+    //
+    // Resp::ok_with_data(value).response_json()
+
+    Resp::<String>::ok().response_json()
 }

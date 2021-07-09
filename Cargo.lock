@@ -4243,8 +4243,7 @@ dependencies = [
 [[package]]
 name = "lifeline"
 version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b49b836e2676e5f6d926c09dc1a13b52c3315b459554df4514d76756bfa72a0e"
+source = "git+https://github.com/fewensa/lifeline-rs.git?branch=threads-safely#6e45414f81e9905d8e018e6627cf3146184aa152"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4262,11 +4261,13 @@ name = "linked-darwinia"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bridge-traits",
  "component-darwinia",
  "component-http-client",
  "lifeline",
  "log",
+ "once_cell",
  "postage",
  "serde 1.0.126",
  "serde_json",
@@ -4300,8 +4301,10 @@ dependencies = [
  "component-state",
  "lifeline",
  "log",
+ "once_cell",
  "postage",
  "serde 1.0.126",
+ "serde_json",
  "tokio 1.8.1",
 ]
 
@@ -9153,7 +9156,6 @@ dependencies = [
  "once_cell",
  "serde 1.0.126",
  "serde_json",
- "tokio 1.8.1",
 ]
 
 [[package]]
@@ -9207,6 +9209,7 @@ name = "task-darwinia-ethereum"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bridge-traits",
  "component-darwinia",
  "component-ethereum",
@@ -9216,9 +9219,10 @@ dependencies = [
  "lifeline",
  "linked-darwinia",
  "log",
+ "once_cell",
  "postage",
  "serde 1.0.126",
- "thiserror",
+ "serde_json",
  "tokio 1.8.1",
 ]
 
@@ -9227,12 +9231,15 @@ name = "task-pangolin-millau"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bridge-traits",
  "component-pangolin",
  "lifeline",
  "log",
+ "once_cell",
  "postage",
  "serde 1.0.126",
+ "serde_json",
 ]
 
 [[package]]
@@ -9248,8 +9255,10 @@ dependencies = [
  "lifeline",
  "linked-template",
  "log",
+ "once_cell",
  "postage",
  "serde 1.0.126",
+ "serde_json",
  "tokio 1.8.1",
 ]
 

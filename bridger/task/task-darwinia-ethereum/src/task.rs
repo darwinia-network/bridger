@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskRouter};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 use component_darwinia::config::DarwiniaConfig;
 use component_ethereum::config::{EthereumRpcConfig, Web3Config};
 use component_shadow::ShadowConfig;
@@ -18,7 +18,6 @@ use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 #[derive(Debug)]
 pub struct DarwiniaEthereumTask {
-    bus: DarwiniaEthereumBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
     carries: Vec<lifeline::Lifeline>,
 }
@@ -27,28 +26,34 @@ impl BridgeSand for DarwiniaEthereumTask {
     const NAME: &'static str = "task-darwinia-ethereum";
 }
 
+#[async_trait::async_trait]
 impl BridgeTaskKeep for DarwiniaEthereumTask {
     fn as_any(&self) -> &dyn std::any::Any {
         self
+    }
+    async fn route(
+        &self,
+        uri: String,
+        param: serde_json::Value,
+    ) -> anyhow::Result<serde_json::Value> {
+        todo!()
     }
 }
 
 impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
     fn bus(&self) -> &DarwiniaEthereumBus {
-        &self.bus
+        crate::bus::bus()
     }
 
     fn keep_carry(&mut self, other_bus: Lifeline) {
         self.carries.push(other_bus);
     }
-
-    fn register_route(&self, router: &mut TaskRouter) {}
 }
 
 impl DarwiniaEthereumTask {
     pub async fn new(config: DarwiniaEthereumConfig, state: BridgeState) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
-        let bus = DarwiniaEthereumBus::default();
+        let bus = crate::bus::bus();
         bus.store_resource::<BridgeState>(state);
 
         let services = vec![
@@ -62,11 +67,7 @@ impl DarwiniaEthereumTask {
             .await?;
 
         let carries = vec![];
-        Ok(Self {
-            bus,
-            services,
-            carries,
-        })
+        Ok(Self { services, carries })
     }
 }
 

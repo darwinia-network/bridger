@@ -1,5 +1,8 @@
+use std::ops::Deref;
+
 use lifeline::prelude::*;
 use lifeline::{Receiver, Sender};
+use once_cell::sync::OnceCell;
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_state::state::BridgeState;
@@ -9,6 +12,12 @@ use linked_template::task::TemplateLinked;
 
 use crate::message::ToTemplateLinkedMessage;
 use crate::task::TemplateTask;
+
+static BUS: OnceCell<TemplateTaskBus> = OnceCell::new();
+
+pub(crate) fn bus() -> &'static TemplateTaskBus {
+    BUS.get_or_init(|| Default::default())
+}
 
 lifeline_bus!(pub struct TemplateTaskBus);
 

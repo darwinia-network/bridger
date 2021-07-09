@@ -76,7 +76,18 @@ pub fn task_is_running<N: AsRef<str>>(name: N) -> bool {
     }
 }
 
-pub fn running_task<T: 'static + BridgeTaskKeep>(
+pub fn running_task(name: impl AsRef<str>) -> Option<&'static Box<dyn BridgeTaskKeep + Send>> {
+    let name = name.as_ref();
+    unsafe {
+        if let Some(running) = RUNNING_TASKS.get() {
+            running.get(&name.to_string())
+        } else {
+            None
+        }
+    }
+}
+
+pub fn running_task_cast<T: 'static + BridgeTaskKeep>(
     name: impl AsRef<str>,
 ) -> anyhow::Result<&'static T> {
     let name = name.as_ref();

@@ -19,14 +19,17 @@ pub fn merge_route(router_new: HashMap<String, TaskRouterAsyncFn>) -> anyhow::Re
     Ok(())
 }
 
-pub async fn run_route<U: AsRef<str>>(uri: U) -> anyhow::Result<serde_json::Value> {
+pub async fn run_route<U: AsRef<str>>(
+    uri: U,
+    param: serde_json::Value,
+) -> anyhow::Result<serde_json::Value> {
     let uri = uri.as_ref();
     let v = futures::executor::block_on(async {
         let router_keep = CUSTOM_TASK_ROUTER
             .lock()
             .map_err(|_e| StandardError::Api("failed to get custom task router".to_string()))?;
         if let Some(route) = router_keep.get(uri) {
-            return (route)("".to_string()).await;
+            return (route)(param).await;
         }
         Err(StandardError::Api(format!("Not found this task router: [{}]", uri)).into())
     });

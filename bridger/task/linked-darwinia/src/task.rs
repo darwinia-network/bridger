@@ -32,12 +32,14 @@ impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
     }
 
     fn register_route(&self, router: &mut TaskRouter) {
-        router.register::<DarwiniaLinked>("test", Box::new(move |x| Box::pin(test_route(x))));
+        router.register::<DarwiniaLinked>("test", Box::new(move |x| Box::pin(Self::test_route(x))));
     }
 }
 
-async fn test_route(arg: String) -> anyhow::Result<serde_json::Value> {
-    Ok(serde_json::Value::String("Hello task route".to_string()))
+impl DarwiniaLinked {
+    async fn test_route(arg: String) -> anyhow::Result<serde_json::Value> {
+        Ok(serde_json::Value::String("Hello task route".to_string()))
+    }
 }
 
 impl DarwiniaLinked {

@@ -17,10 +17,10 @@ use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
 use task_pangolin_millau::task::{PangolinMillauConfig, PangolinMillauTask};
 
+use crate::patch;
 use crate::types::command::ServerOptions;
 use crate::types::server::{Resp, WebserverState};
 use crate::types::transfer::{TaskListResponse, TaskStartParam, TaskStopParam};
-use crate::{keep, patch};
 
 /// Handler bridger server
 pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
@@ -74,7 +74,7 @@ async fn app_state(options: ServerOptions) -> anyhow::Result<WebserverState> {
     };
     let component_state = BridgeStateComponent::new(config_state);
     let bridge_state = component_state.component().await?;
-    keep::set_state(bridge_state)?;
+    support_keep::state::set_state(bridge_state)?;
 
     Ok(WebserverState {
         base_path: Arc::new(base_path),
@@ -108,11 +108,11 @@ async fn hello(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
 
 /// Get task list
 async fn task_list(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
-    let tasks = keep::available_tasks()?;
+    let tasks = support_keep::task::available_tasks()?;
     let data = tasks
         .iter()
         .map(|item| {
-            let running = keep::task_is_running(item);
+            let running = support_keep::task::task_is_running(item);
             TaskListResponse {
                 name: item.clone(),
                 running,
@@ -136,7 +136,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let param: TaskStartParam = patch::hyper::deserialize_body(&mut req).await?;
 
     let name = &param.name[..];
-    if keep::task_is_running(name) {
+    if support_keep::task::task_is_running(name) {
         return Resp::<String>::ok_with_msg(format!("The task [{}] is running", &param.name))
             .response_json();
     }
@@ -146,7 +146,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let config_format = &param.format;
     let option_config = &param.config;
 
-    if !keep::is_available_task(name) {
+    if !support_keep::task::is_available_task(name) {
         return Resp::<String>::err_with_msg(format!("Not support this task [{}]", &param.name))
             .response_json();
     }
@@ -164,7 +164,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
         .response_json();
     }
 
-    let state_bridge = keep::get_state()
+    let state_bridge = support_keep::state::get_state()
         .ok_or_else(|| StandardError::Api("Please set bridge state first.".to_string()))?;
 
     let mut task_router = TaskRouter::new();
@@ -173,10 +173,10 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
             let task_config = task_config::<DarwiniaLinkedConfig>(path_config)?;
             let task = DarwiniaLinked::new(task_config).await?;
             task.register_route(&mut task_router);
-            keep::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
+            support_keep::task::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
         }
         DarwiniaEthereumTask::NAME => {
-            if !keep::task_is_running(DarwiniaLinked::NAME) {
+            if !support_keep::task::task_is_running(DarwiniaLinked::NAME) {
                 return Resp::<String>::err_with_msg(format!(
                     "Please start [{}] first",
                     DarwiniaLinked::NAME
@@ -186,7 +186,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
             let task_config = task_config::<DarwiniaEthereumConfig>(path_config)?;
             let mut task = DarwiniaEthereumTask::new(task_config, state_bridge.clone()).await?;
 
-            keep::run_with_running_task(
+            support_keep::task::run_with_running_task(
                 DarwiniaLinked::NAME,
                 |linked_darwinia: &DarwiniaLinked| {
                     task.keep_carry(linked_darwinia.bus().carry_from(task.bus())?);
@@ -194,19 +194,19 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
                 },
             )?;
             task.register_route(&mut task_router);
-            keep::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
+            support_keep::task::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
         }
         PangolinMillauTask::NAME => {
             let task_config = task_config::<PangolinMillauConfig>(path_config)?;
             let task = PangolinMillauTask::new(task_config).await?;
             task.register_route(&mut task_router);
-            keep::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
+            support_keep::task::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
         }
         _ => unreachable!(),
     };
 
     let custom_router = task_router.router();
-    keep::merge_route(custom_router)?;
+    support_keep::route::merge_route(custom_router)?;
 
     Resp::<String>::ok().response_json()
 }
@@ -216,7 +216,7 @@ async fn task_stop(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let param: TaskStopParam = patch::hyper::deserialize_body(&mut req).await?;
     log::debug!("{:?}", param);
     let task_name = param.name;
-    keep::stop_task(&task_name)?;
+    support_keep::task::stop_task(&task_name)?;
     log::warn!("The task {} is stopped", task_name);
     Resp::<String>::ok().response_json()
 }
@@ -230,6 +230,6 @@ async fn task_route(req: Request<Body>) -> anyhow::Result<Response<Body>> {
         .ok_or_else(|| StandardError::Api("The task route is required".to_string()))?;
     let uri = format!("{}-{}", task_name, task_route);
 
-    let value = keep::run_route(uri).await?;
+    let value = support_keep::route::run_route(uri).await?;
     Resp::ok_with_data(value).response_json()
 }

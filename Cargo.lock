@@ -824,17 +824,16 @@ dependencies = [
  "component-state",
  "config 0.11.0",
  "env_logger 0.8.4",
- "futures 0.3.15",
  "hyper 0.14.10",
  "lifeline",
  "linked-darwinia",
  "log",
- "once_cell",
  "reqwest 0.11.4",
  "routerify",
  "serde 1.0.126",
  "serde_json",
  "structopt",
+ "support-keep",
  "task-darwinia-ethereum",
  "task-pangolin-millau",
  "tokio 1.8.1",
@@ -9140,6 +9139,20 @@ name = "subtle"
 version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
+
+[[package]]
+name = "support-keep"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bridge-traits",
+ "component-state",
+ "futures 0.3.15",
+ "log",
+ "once_cell",
+ "serde 1.0.126",
+ "serde_json",
+]
 
 [[package]]
 name = "syn"

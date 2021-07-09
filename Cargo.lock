@@ -309,18 +309,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async-native-tls"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e9e7a929bd34c68a82d58a4de7f86fffdaf97fb2af850162a7bb19dd7269b33"
-dependencies = [
- "native-tls",
- "thiserror",
- "tokio 0.2.25",
- "url 2.2.2",
-]
-
-[[package]]
 name = "async-process"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -478,12 +466,6 @@ checksum = "5024ee8015f02155eee35c711107ddd9a9bf3cb689cf2a9089c97e79b6e1ae83"
 
 [[package]]
 name = "base64"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b41b7ea54a0c9d92199de89e20e58d49f02f8e699814ef3fdf266f6f748d15c7"
-
-[[package]]
-name = "base64"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3441f0f7b02788e948e47f457ca01f1d7e6d92c693bc132c22b087d3141c03ff"
@@ -509,7 +491,7 @@ dependencies = [
  "hex",
  "log",
  "pallet-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "serde_json",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -537,7 +519,7 @@ dependencies = [
  "hex",
  "log",
  "pallet-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "serde_json",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -573,22 +555,12 @@ checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
 name = "bitvec"
-version = "0.17.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41262f11d771fd4a61aa3ce019fca363b4b6c282fca9da2a31186d3965a47a5c"
-dependencies = [
- "either",
- "radium 0.3.0",
-]
-
-[[package]]
-name = "bitvec"
 version = "0.20.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7774144344a4faa177370406a7ff5f1da24303817368584c6206c8303eb07848"
 dependencies = [
  "funty",
- "radium 0.6.2",
+ "radium",
  "tap",
  "wyz",
 ]
@@ -661,7 +633,7 @@ source = "git+https://github.com/darwinia-network/parity-bridges-common.git?bran
 dependencies = [
  "finality-grandpa",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-finality-grandpa",
@@ -676,7 +648,7 @@ source = "git+https://github.com/darwinia-network/parity-bridges-common.git?bran
 dependencies = [
  "bp-runtime",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
@@ -688,7 +660,7 @@ dependencies = [
  "bp-runtime",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -716,7 +688,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "hash-db",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -733,7 +705,7 @@ dependencies = [
  "bp-header-chain",
  "ed25519-dalek",
  "finality-grandpa",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-finality-grandpa",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -751,7 +723,7 @@ dependencies = [
  "jsonrpsee-types",
  "jsonrpsee-ws-client",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "secp256k1",
  "serde 1.0.126",
  "serde_json",
@@ -769,7 +741,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-im-online 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "reqwest 0.11.4",
  "rlp 0.4.6",
  "serde 1.0.126",
@@ -791,7 +763,7 @@ dependencies = [
  "pallet-bridge-dispatch",
  "pallet-bridge-grandpa",
  "pallet-bridge-messages",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-state-machine 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -850,11 +822,11 @@ version = "2.5.0"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s#72bf634a74b7c3885514128f5d5dcc9e6ee104a0"
 dependencies = [
  "array-bytes",
- "ethbloom 0.11.0",
+ "ethbloom",
  "hash-db",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "plain_hasher",
- "primitive-types 0.9.1",
+ "primitive-types",
  "rlp 0.5.0",
  "serde 1.0.126",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -877,12 +849,6 @@ name = "bumpalo"
 version = "3.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c59e7af012c713f529e7a3ee57ce9b31ddd858d4b512923602f74608b009631"
-
-[[package]]
-name = "byte-slice-cast"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0a5e3906bcbf133e33c1d4d95afc664ad37fbdb9f6568d8043e7ea8c27d93d3"
 
 [[package]]
 name = "byte-slice-cast"
@@ -917,12 +883,6 @@ name = "bytes"
 version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0e4cec68f03f32e44924783795810fa50a7035d8c8ebe78580ad7e6c703fba38"
-
-[[package]]
-name = "bytes"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0dcbc35f504eb6fc275a6d20e4ebcda18cf50d40ba6fabff8c711fa16cb3b16"
 
 [[package]]
 name = "bytes"
@@ -1037,7 +997,7 @@ dependencies = [
  "pangolin-constants",
  "pangolin-runtime",
  "pangolin-runtime-system-params",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "paste",
  "relay-millau-client",
  "relay-substrate-client",
@@ -1061,7 +1021,6 @@ dependencies = [
  "libc",
  "num-integer",
  "num-traits 0.2.14",
- "time 0.1.43",
  "winapi 0.3.9",
 ]
 
@@ -1117,7 +1076,7 @@ dependencies = [
  "bee-client 0.6.0 (git+https://github.com/darwinia-network/substrate-api-client.git?branch=bee-v12)",
  "bridge-traits",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -1161,7 +1120,7 @@ dependencies = [
  "bee-client 0.6.0 (git+https://github.com/darwinia-network/substrate-api-client.git?branch=bee-v13)",
  "bridge-traits",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1479,7 +1438,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -1490,7 +1449,7 @@ version = "2.5.0"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s#72bf634a74b7c3885514128f5d5dcc9e6ee104a0"
 dependencies = [
  "darwinia-support",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1504,7 +1463,7 @@ dependencies = [
  "bsc-primitives",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1519,7 +1478,7 @@ dependencies = [
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-im-online 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-indices 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "reqwest 0.10.10",
  "rlp 0.4.6",
  "serde 1.0.126",
@@ -1555,7 +1514,7 @@ dependencies = [
  "jsonrpsee-types",
  "jsonrpsee-ws-client",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "reqwest 0.10.10",
  "rpassword",
  "rust-crypto",
@@ -1582,7 +1541,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "serde_json",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1597,7 +1556,7 @@ source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
@@ -1608,7 +1567,7 @@ source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -1621,7 +1580,7 @@ dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1637,7 +1596,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-npos-elections 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1658,7 +1617,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "serde_json",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1678,11 +1637,11 @@ dependencies = [
  "dp-evm",
  "dvm-ethereum",
  "ethereum-primitives",
- "ethereum-types 0.11.0",
+ "ethereum-types",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "serde_json",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1695,7 +1654,7 @@ version = "2.5.0"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s#72bf634a74b7c3885514128f5d5dcc9e6ee104a0"
 dependencies = [
  "ethabi 13.0.0",
- "ethereum-types 0.11.0",
+ "ethereum-types",
 ]
 
 [[package]]
@@ -1710,10 +1669,10 @@ dependencies = [
  "darwinia-relayer-game",
  "darwinia-support",
  "ethereum-primitives",
- "ethereum-types 0.11.0",
+ "ethereum-types",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "rlp 0.5.0",
  "serde 1.0.126",
  "serde_json",
@@ -1736,8 +1695,8 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
- "primitive-types 0.9.1",
+ "parity-scale-codec",
+ "primitive-types",
  "rlp 0.5.0",
  "serde 1.0.126",
  "sha3 0.9.1",
@@ -1756,7 +1715,7 @@ dependencies = [
  "dp-evm",
  "evm",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -1773,7 +1732,7 @@ dependencies = [
  "evm",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sha3 0.9.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1811,13 +1770,13 @@ dependencies = [
  "darwinia-support",
  "dp-evm",
  "ethabi 13.0.0",
- "ethereum-types 0.11.0",
+ "ethereum-types",
  "evm",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "ripemd160",
  "sha3 0.9.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1838,7 +1797,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1852,7 +1811,7 @@ version = "2.5.0"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s#72bf634a74b7c3885514128f5d5dcc9e6ee104a0"
 dependencies = [
  "darwinia-support",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1869,7 +1828,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -1880,7 +1839,7 @@ version = "2.5.0"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s#72bf634a74b7c3885514128f5d5dcc9e6ee104a0"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -1895,7 +1854,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -1911,11 +1870,11 @@ dependencies = [
  "dp-asset",
  "dp-contract",
  "ethereum-primitives",
- "ethereum-types 0.11.0",
+ "ethereum-types",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "serde_json",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1936,11 +1895,11 @@ dependencies = [
  "dp-evm",
  "dvm-ethereum",
  "ethereum-primitives",
- "ethereum-types 0.11.0",
+ "ethereum-types",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "serde_json",
  "sha3 0.9.1",
@@ -1962,7 +1921,7 @@ dependencies = [
  "log",
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1980,7 +1939,7 @@ version = "2.5.0"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s#72bf634a74b7c3885514128f5d5dcc9e6ee104a0"
 dependencies = [
  "darwinia-support",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1999,7 +1958,7 @@ dependencies = [
  "hex",
  "impl-trait-for-tuples",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2013,7 +1972,7 @@ dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2026,7 +1985,7 @@ source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
@@ -2038,7 +1997,7 @@ dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -2118,7 +2077,7 @@ version = "2.5.0"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s#72bf634a74b7c3885514128f5d5dcc9e6ee104a0"
 dependencies = [
  "ethereum-primitives",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sha3 0.9.1",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -2129,7 +2088,7 @@ version = "2.5.0"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s#72bf634a74b7c3885514128f5d5dcc9e6ee104a0"
 dependencies = [
  "ethabi 13.0.0",
- "ethereum-types 0.11.0",
+ "ethereum-types",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
@@ -2140,7 +2099,7 @@ source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s
 dependencies = [
  "evm",
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2157,7 +2116,7 @@ version = "2.5.0"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s#72bf634a74b7c3885514128f5d5dcc9e6ee104a0"
 dependencies = [
  "ethereum",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "rlp 0.5.0",
  "sha3 0.9.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2189,7 +2148,7 @@ dependencies = [
  "darwinia-evm",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2207,13 +2166,13 @@ dependencies = [
  "dp_consensus",
  "dvm-rpc-runtime-api",
  "ethereum",
- "ethereum-types 0.11.0",
+ "ethereum-types",
  "evm",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "libsecp256k1",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "rlp 0.5.0",
  "serde 1.0.126",
  "sha3 0.9.1",
@@ -2232,8 +2191,8 @@ dependencies = [
  "darwinia-support",
  "dp-evm",
  "ethereum",
- "ethereum-types 0.11.0",
- "parity-scale-codec 2.2.0",
+ "ethereum-types",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2402,25 +2361,27 @@ checksum = "4f7935cc590ee512e8073c4fe82b85e056216324e65aed24459204e3f6d9f72e"
 
 [[package]]
 name = "ethabi"
-version = "12.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "052a565e3de82944527d6d10a465697e6bb92476b772ca7141080c901f6a63c6"
-dependencies = [
- "ethereum-types 0.9.2",
- "rustc-hex",
- "serde 1.0.126",
- "serde_json",
- "tiny-keccak 1.5.0",
- "uint 0.8.5",
-]
-
-[[package]]
-name = "ethabi"
 version = "13.0.0"
 source = "git+https://github.com/darwinia-network/ethabi.git?branch=xavier-no-std#baacf174d5c2f12122c4ee3fe31506fb52069983"
 dependencies = [
  "anyhow",
- "ethereum-types 0.11.0",
+ "ethereum-types",
+ "hex",
+ "serde 1.0.126",
+ "serde_json",
+ "sha3 0.9.1",
+ "thiserror",
+ "uint 0.9.1",
+]
+
+[[package]]
+name = "ethabi"
+version = "14.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a01317735d563b3bad2d5f90d2e1799f414165408251abb762510f40e790e69a"
+dependencies = [
+ "anyhow",
+ "ethereum-types",
  "hex",
  "serde 1.0.126",
  "serde_json",
@@ -2435,23 +2396,10 @@ version = "0.4.0"
 source = "git+https://github.com/darwinia-network/rust-ethash#9014d7649c19800f3b37944a23dd499d207cf881"
 dependencies = [
  "byteorder",
- "ethereum-types 0.11.0",
- "primitive-types 0.9.1",
+ "ethereum-types",
+ "primitive-types",
  "rlp 0.5.0",
  "sha3 0.9.1",
-]
-
-[[package]]
-name = "ethbloom"
-version = "0.9.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71a6567e6fd35589fea0c63b94b4cf2e55573e413901bdbe60ab15cf0e25e5df"
-dependencies = [
- "crunchy",
- "fixed-hash 0.6.1",
- "impl-rlp 0.2.1",
- "impl-serde",
- "tiny-keccak 2.0.2",
 ]
 
 [[package]]
@@ -2461,11 +2409,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "779864b9c7f7ead1f092972c3257496c6a84b46dba2ce131dd8a282cb2cc5972"
 dependencies = [
  "crunchy",
- "fixed-hash 0.7.0",
- "impl-codec 0.5.1",
- "impl-rlp 0.3.0",
+ "fixed-hash",
+ "impl-codec",
+ "impl-rlp",
  "impl-serde",
- "tiny-keccak 2.0.2",
+ "tiny-keccak",
 ]
 
 [[package]]
@@ -2474,11 +2422,11 @@ version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "567ce064a8232c16e2b2c2173a936b91fbe35c2f2c5278871f5a1a31688b42e9"
 dependencies = [
- "ethereum-types 0.11.0",
+ "ethereum-types",
  "funty",
  "hash-db",
  "hash256-std-hasher",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "rlp 0.5.0",
  "rlp-derive",
  "serde 1.0.126",
@@ -2493,15 +2441,15 @@ source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=s2s
 dependencies = [
  "array-bytes",
  "ethash",
- "ethbloom 0.11.0",
- "ethereum-types 0.11.0",
- "fixed-hash 0.7.0",
- "impl-codec 0.5.1",
- "impl-rlp 0.3.0",
+ "ethbloom",
+ "ethereum-types",
+ "fixed-hash",
+ "impl-codec",
+ "impl-rlp",
  "keccak-hash",
  "merkle-patricia-trie",
- "parity-scale-codec 2.2.0",
- "primitive-types 0.9.1",
+ "parity-scale-codec",
+ "primitive-types",
  "rlp 0.5.0",
  "rlp-derive",
  "serde 1.0.126",
@@ -2512,30 +2460,16 @@ dependencies = [
 
 [[package]]
 name = "ethereum-types"
-version = "0.9.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "473aecff686bd8e7b9db0165cbbb53562376b39bf35b427f0c60446a9e1634b0"
-dependencies = [
- "ethbloom 0.9.2",
- "fixed-hash 0.6.1",
- "impl-rlp 0.2.1",
- "impl-serde",
- "primitive-types 0.7.3",
- "uint 0.8.5",
-]
-
-[[package]]
-name = "ethereum-types"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f64b5df66a228d85e4b17e5d6c6aa43b0310898ffe8a85988c4c032357aaabfd"
 dependencies = [
- "ethbloom 0.11.0",
- "fixed-hash 0.7.0",
- "impl-codec 0.5.1",
- "impl-rlp 0.3.0",
+ "ethbloom",
+ "fixed-hash",
+ "impl-codec",
+ "impl-rlp",
  "impl-serde",
- "primitive-types 0.9.1",
+ "primitive-types",
  "uint 0.9.1",
 ]
 
@@ -2556,8 +2490,8 @@ dependencies = [
  "evm-gasometer",
  "evm-runtime",
  "log",
- "parity-scale-codec 2.2.0",
- "primitive-types 0.9.1",
+ "parity-scale-codec",
+ "primitive-types",
  "rlp 0.5.0",
  "serde 1.0.126",
  "sha3 0.8.2",
@@ -2570,8 +2504,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e1e6640dd44ba663316c7121e0c6fee38000d8249127fd9221bfdc331f75cbfe"
 dependencies = [
  "funty",
- "parity-scale-codec 2.2.0",
- "primitive-types 0.9.1",
+ "parity-scale-codec",
+ "primitive-types",
  "serde 1.0.126",
 ]
 
@@ -2583,7 +2517,7 @@ checksum = "0a8f04dcc8b0296652eabfa443a08ebed6071a1178e0f42a7f7b63a612bddf0b"
 dependencies = [
  "evm-core",
  "evm-runtime",
- "primitive-types 0.9.1",
+ "primitive-types",
 ]
 
 [[package]]
@@ -2606,7 +2540,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "54c302f29ca8bba82a382aa52d427869964179e4f24eae57bde70958ce9b7607"
 dependencies = [
  "evm-core",
- "primitive-types 0.9.1",
+ "primitive-types",
  "sha3 0.8.2",
 ]
 
@@ -2658,7 +2592,7 @@ dependencies = [
  "futures-timer",
  "log",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
 ]
 
@@ -2676,18 +2610,6 @@ dependencies = [
  "log",
  "num-traits 0.2.14",
  "relay-utils",
-]
-
-[[package]]
-name = "fixed-hash"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11498d382790b7a8f2fd211780bec78619bba81cdad3a283997c0c41f836759c"
-dependencies = [
- "byteorder",
- "rand 0.7.3",
- "rustc-hex",
- "static_assertions",
 ]
 
 [[package]]
@@ -2748,7 +2670,7 @@ dependencies = [
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "linregress",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "paste",
  "sp-api 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2767,7 +2689,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "linregress",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "paste",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -2786,7 +2708,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "linregress",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "paste",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2803,7 +2725,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-npos-elections 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -2816,7 +2738,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-npos-elections 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2829,7 +2751,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2843,7 +2765,7 @@ version = "13.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "073f7bef18421362441a1708f8528e442234954611f95bdc554b313fb321948e"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2854,7 +2776,7 @@ name = "frame-metadata"
 version = "13.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -2865,7 +2787,7 @@ name = "frame-metadata"
 version = "13.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2883,7 +2805,7 @@ dependencies = [
  "impl-trait-for-tuples",
  "log",
  "once_cell",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "paste",
  "serde 1.0.126",
  "smallvec",
@@ -2909,7 +2831,7 @@ dependencies = [
  "impl-trait-for-tuples",
  "log",
  "once_cell",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "paste",
  "serde 1.0.126",
  "smallvec",
@@ -2935,7 +2857,7 @@ dependencies = [
  "impl-trait-for-tuples",
  "log",
  "once_cell",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "paste",
  "serde 1.0.126",
  "smallvec",
@@ -3063,7 +2985,7 @@ checksum = "f5fedbff05d665c00bf4e089b4377fcb15b8bd37ebc3e5fc06665474cf6e25d7"
 dependencies = [
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3080,7 +3002,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "impl-trait-for-tuples",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -3097,7 +3019,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "impl-trait-for-tuples",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -3111,7 +3033,7 @@ name = "frame-system-rpc-runtime-api"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
@@ -3121,7 +3043,7 @@ version = "0.9.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -3429,6 +3351,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "headers"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f0b7591fb62902706ae8e7aaff416b1b0fa2c0fd0878b46dc13baa3712d8a855"
+dependencies = [
+ "base64 0.13.0",
+ "bitflags",
+ "bytes 1.0.1",
+ "headers-core",
+ "http",
+ "mime",
+ "sha-1 0.9.6",
+ "time 0.1.43",
+]
+
+[[package]]
+name = "headers-core"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7f66481bfee273957b1f20485a4ff3362987f85b2c236580d81b4eb7a326429"
+dependencies = [
+ "http",
+]
+
+[[package]]
 name = "headers-relay"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
@@ -3630,24 +3577,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hyper-proxy"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f93ec5be69758dfc06b9b29efa9d6e9306e387c85eb362c603912eead2ad98c7"
-dependencies = [
- "bytes 0.5.6",
- "futures 0.3.15",
- "http",
- "hyper 0.13.10",
- "hyper-tls 0.4.3",
- "native-tls",
- "tokio 0.2.25",
- "tokio-tls",
- "tower-service",
- "typed-headers",
-]
-
-[[package]]
 name = "hyper-rustls"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3714,29 +3643,11 @@ dependencies = [
 
 [[package]]
 name = "impl-codec"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1be51a921b067b0eaca2fad532d9400041561aa922221cc65f95a85641c6bf53"
-dependencies = [
- "parity-scale-codec 1.3.7",
-]
-
-[[package]]
-name = "impl-codec"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "161ebdfec3c8e3b52bf61c4f3550a1eea4f9579d10dc1b936f3171ebdcd6c443"
 dependencies = [
- "parity-scale-codec 2.2.0",
-]
-
-[[package]]
-name = "impl-rlp"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f7a72f11830b52333f36e3b09a288333888bf54380fd0ac0790a3c31ab0f3c5"
-dependencies = [
- "rlp 0.4.6",
+ "parity-scale-codec",
 ]
 
 [[package]]
@@ -3904,7 +3815,7 @@ checksum = "489b9c612e60c766f751ab40fcb43cbb55a1e10bb44a9b4307ed510ca598cbd7"
 dependencies = [
  "failure",
  "futures 0.1.31",
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "jsonrpc-pubsub",
  "log",
  "serde 1.0.126",
@@ -3919,6 +3830,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0745a6379e3edc893c84ec203589790774e4247420033e71a76d3ab4687991fa"
 dependencies = [
  "futures 0.1.31",
+ "log",
+ "serde 1.0.126",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
+name = "jsonrpc-core"
+version = "17.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4467ab6dfa369b69e52bd0692e480c4d117410538526a57a304a0f2250fd95e"
+dependencies = [
+ "futures 0.3.15",
+ "futures-executor",
+ "futures-util",
  "log",
  "serde 1.0.126",
  "serde_derive",
@@ -3952,7 +3878,7 @@ version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "639558e0604013be9787ae52f798506ae42bf4220fe587bdc5625871cc8b9c77"
 dependencies = [
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "log",
  "parking_lot 0.10.2",
  "rand 0.7.3",
@@ -4034,7 +3960,7 @@ dependencies = [
  "pin-project 1.0.7",
  "serde 1.0.126",
  "serde_json",
- "soketto",
+ "soketto 0.4.2",
  "thiserror",
  "url 2.2.2",
  "webpki 0.22.0",
@@ -4052,8 +3978,8 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae0386ec98c26dd721aaa3412bf3a817156ff3ee7cb6959503f8d1095f4ccc51"
 dependencies = [
- "primitive-types 0.9.1",
- "tiny-keccak 2.0.2",
+ "primitive-types",
+ "tiny-keccak",
 ]
 
 [[package]]
@@ -4555,7 +4481,7 @@ dependencies = [
  "pangolin-bridge-primitives",
  "pangolin-constants",
  "pangolin-runtime-system-params",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-block-builder",
@@ -4982,7 +4908,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-consensus-aura",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4997,7 +4923,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-authority-discovery",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5013,7 +4939,7 @@ dependencies = [
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-authorship 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -5028,7 +4954,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -5043,7 +4969,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5061,7 +4987,7 @@ dependencies = [
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-consensus-babe",
  "sp-consensus-vrf",
@@ -5081,7 +5007,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -5096,7 +5022,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5115,7 +5041,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-finality-grandpa",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5135,7 +5061,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5150,7 +5076,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5166,7 +5092,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5187,7 +5113,7 @@ dependencies = [
  "log",
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-finality-grandpa",
@@ -5206,7 +5132,7 @@ dependencies = [
  "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5221,7 +5147,7 @@ dependencies = [
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-authorship 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-application-crypto 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -5240,7 +5166,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5257,7 +5183,7 @@ checksum = "c080576a1fbb1187b7da9f4cba739076bbb197f44964892b2d392755920bbf63"
 dependencies = [
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -5273,7 +5199,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5290,7 +5216,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5303,7 +5229,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5319,7 +5245,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
  "pallet-balances",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5333,7 +5259,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5347,7 +5273,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "safe-mix",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5361,7 +5287,7 @@ dependencies = [
  "enumflags2",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5376,7 +5302,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5392,7 +5318,7 @@ dependencies = [
  "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "impl-trait-for-tuples",
  "pallet-timestamp 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -5412,7 +5338,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "impl-trait-for-tuples",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -5431,7 +5357,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "impl-trait-for-tuples",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5449,7 +5375,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -5461,7 +5387,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "rand_chacha 0.2.2",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5477,7 +5403,7 @@ dependencies = [
  "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-authorship 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-session 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-application-crypto 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -5499,7 +5425,7 @@ dependencies = [
  "log",
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "paste",
  "serde 1.0.126",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -5521,7 +5447,7 @@ dependencies = [
  "log",
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "paste",
  "serde 1.0.126",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5539,7 +5465,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5555,7 +5481,7 @@ dependencies = [
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -5573,7 +5499,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "impl-trait-for-tuples",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -5590,7 +5516,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "impl-trait-for-tuples",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5604,7 +5530,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "smallvec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5619,7 +5545,7 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "pallet-transaction-payment",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -5631,7 +5557,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5664,7 +5590,7 @@ dependencies = [
  "headers-relay",
  "pallet-transaction-payment",
  "pangolin-runtime",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "relay-substrate-client",
  "relay-utils",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5764,7 +5690,7 @@ dependencies = [
  "pangolin-bridge-primitives",
  "pangolin-constants",
  "pangolin-runtime-system-params",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "smallvec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5818,25 +5744,13 @@ dependencies = [
 
 [[package]]
 name = "parity-scale-codec"
-version = "1.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4b26b16c7687c3075982af47719e481815df30bc544f7a6690763a25ca16e9d"
-dependencies = [
- "arrayvec 0.5.2",
- "bitvec 0.17.4",
- "byte-slice-cast 0.3.5",
- "serde 1.0.126",
-]
-
-[[package]]
-name = "parity-scale-codec"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8975095a2a03bbbdc70a74ab11a4f76a6d0b84680d87c68d722531b0ac28e8a9"
 dependencies = [
  "arrayvec 0.7.1",
- "bitvec 0.20.4",
- "byte-slice-cast 1.0.0",
+ "bitvec",
+ "byte-slice-cast",
  "impl-trait-for-tuples",
  "parity-scale-codec-derive",
  "serde 1.0.126",
@@ -5865,7 +5779,7 @@ dependencies = [
  "impl-trait-for-tuples",
  "parity-util-mem-derive",
  "parking_lot 0.11.1",
- "primitive-types 0.9.1",
+ "primitive-types",
  "winapi 0.3.9",
 ]
 
@@ -6121,26 +6035,13 @@ checksum = "ac74c624d6b2d21f425f752262f42188365d7b8ff1aff74c82e45136510a4857"
 
 [[package]]
 name = "primitive-types"
-version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7dd39dcacf71411ba488570da7bbc89b717225e46478b30ba99b92db6b149809"
-dependencies = [
- "fixed-hash 0.6.1",
- "impl-codec 0.4.2",
- "impl-rlp 0.2.1",
- "impl-serde",
- "uint 0.8.5",
-]
-
-[[package]]
-name = "primitive-types"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06345ee39fbccfb06ab45f3a1a5798d9dafa04cb8921a76d227040003a234b0e"
 dependencies = [
- "fixed-hash 0.7.0",
- "impl-codec 0.5.1",
- "impl-rlp 0.3.0",
+ "fixed-hash",
+ "impl-codec",
+ "impl-rlp",
  "impl-serde",
  "uint 0.9.1",
 ]
@@ -6288,12 +6189,6 @@ checksum = "c3d0b9745dc2debf507c8422de05d7226cc1f0644216dfdfead988f9b1ab32a7"
 dependencies = [
  "proc-macro2",
 ]
-
-[[package]]
-name = "radium"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "def50a86306165861203e7f84ecffbbdfdea79f0e51039b33de1e952358c47ac"
 
 [[package]]
 name = "radium"
@@ -6561,7 +6456,7 @@ dependencies = [
  "millau-primitives 0.1.0 (git+https://github.com/darwinia-network/darwinia-launch.git?branch=s2s)",
  "millau-runtime",
  "pallet-transaction-payment",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "relay-substrate-client",
  "relay-utils",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -6589,7 +6484,7 @@ dependencies = [
  "log",
  "num-traits 0.2.14",
  "pallet-balances",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "rand 0.7.3",
  "relay-utils",
  "sc-rpc-api",
@@ -6930,12 +6825,12 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "derive_more",
  "futures 0.3.15",
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "jsonrpc-pubsub",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "serde 1.0.126",
  "serde_json",
@@ -6995,18 +6890,18 @@ dependencies = [
 
 [[package]]
 name = "secp256k1"
-version = "0.19.0"
+version = "0.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6179428c22c73ac0fbb7b5579a56353ce78ba29759b3b8575183336ea74cdfb"
+checksum = "97d03ceae636d0fed5bae6a7f4f664354c5f4fcedf6eef053fef17e49f837d0a"
 dependencies = [
  "secp256k1-sys",
 ]
 
 [[package]]
 name = "secp256k1-sys"
-version = "0.3.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11553d210db090930f4432bea123b31f70bbf693ace14504ea2a35e796c28dd2"
+checksum = "827cb7cce42533829c792fc51b82fbf18b125b45a702ef2c8be77fce65463a7b"
 dependencies = [
  "cc",
 ]
@@ -7388,13 +7283,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "soketto"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4919971d141dbadaa0e82b5d369e2d7666c98e4625046140615ca363e50d4daa"
+dependencies = [
+ "base64 0.13.0",
+ "bytes 1.0.1",
+ "futures 0.3.15",
+ "httparse",
+ "log",
+ "rand 0.8.4",
+ "sha-1 0.9.6",
+]
+
+[[package]]
 name = "sp-api"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e63c3460d5daecf67df542c34c2bbd636214a5a200d4bddcfa2ffb9e72c346af"
 dependencies = [
  "hash-db",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api-proc-macro 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -7411,7 +7321,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.
 dependencies = [
  "hash-db",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api-proc-macro 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -7428,7 +7338,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "hash-db",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api-proc-macro 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7481,7 +7391,7 @@ version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c52e2e6d43036b97c4fce1ed87c5262c1ffdc78c655ada4d3024a3f8094bdd2c"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -7493,7 +7403,7 @@ name = "sp-application-crypto"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -7505,7 +7415,7 @@ name = "sp-application-crypto"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7520,7 +7430,7 @@ checksum = "d0f1c69966c192d1dee8521f0b29ece2b14db07b9b44d801a94e295234761645"
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-debug-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -7533,7 +7443,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-debug-derive 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -7547,7 +7457,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-debug-derive 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7559,7 +7469,7 @@ name = "sp-authority-discovery"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7572,7 +7482,7 @@ version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ec68fb8e5a37548b06c14ee91a9c574cc330324c86d37810ec29dd4f8bc68d7"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -7583,7 +7493,7 @@ name = "sp-authorship"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -7595,7 +7505,7 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "async-trait",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7606,7 +7516,7 @@ name = "sp-block-builder"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7621,7 +7531,7 @@ dependencies = [
  "futures 0.3.15",
  "log",
  "lru",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-consensus",
@@ -7650,7 +7560,7 @@ dependencies = [
  "futures-timer",
  "libp2p",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "serde 1.0.126",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7673,7 +7583,7 @@ version = "0.9.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "async-trait",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-consensus",
@@ -7691,7 +7601,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "async-trait",
  "merlin",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7711,7 +7621,7 @@ name = "sp-consensus-slots"
 version = "0.9.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -7721,7 +7631,7 @@ name = "sp-consensus-vrf"
 version = "0.9.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "schnorrkel",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7749,10 +7659,10 @@ dependencies = [
  "log",
  "merlin",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parity-util-mem",
  "parking_lot 0.11.1",
- "primitive-types 0.9.1",
+ "primitive-types",
  "rand 0.7.3",
  "regex",
  "schnorrkel",
@@ -7767,7 +7677,7 @@ dependencies = [
  "substrate-bip39",
  "thiserror",
  "tiny-bip39",
- "tiny-keccak 2.0.2",
+ "tiny-keccak",
  "twox-hash",
  "wasmi",
  "zeroize",
@@ -7793,10 +7703,10 @@ dependencies = [
  "log",
  "merlin",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parity-util-mem",
  "parking_lot 0.11.1",
- "primitive-types 0.9.1",
+ "primitive-types",
  "rand 0.7.3",
  "regex",
  "schnorrkel",
@@ -7811,7 +7721,7 @@ dependencies = [
  "substrate-bip39",
  "thiserror",
  "tiny-bip39",
- "tiny-keccak 2.0.2",
+ "tiny-keccak",
  "twox-hash",
  "wasmi",
  "zeroize",
@@ -7837,10 +7747,10 @@ dependencies = [
  "log",
  "merlin",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parity-util-mem",
  "parking_lot 0.11.1",
- "primitive-types 0.9.1",
+ "primitive-types",
  "rand 0.7.3",
  "regex",
  "schnorrkel",
@@ -7855,7 +7765,7 @@ dependencies = [
  "substrate-bip39",
  "thiserror",
  "tiny-bip39",
- "tiny-keccak 2.0.2",
+ "tiny-keccak",
  "twox-hash",
  "wasmi",
  "zeroize",
@@ -7908,7 +7818,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2fdc625f8c7b13b9a136d334888b21b5743d2081cb666cb03efca1dc9b8f74d1"
 dependencies = [
  "environmental",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-storage 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -7919,7 +7829,7 @@ version = "0.9.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
  "environmental",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-storage 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
 ]
@@ -7930,7 +7840,7 @@ version = "0.9.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "environmental",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-storage 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -7942,7 +7852,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "finality-grandpa",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7958,7 +7868,7 @@ version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2542380b535c6941502a0a3069a657eb5abb70fd67b11afa164d4a4b038ba73a"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -7970,7 +7880,7 @@ name = "sp-inherents"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -7984,7 +7894,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "async-trait",
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -8001,7 +7911,7 @@ dependencies = [
  "hash-db",
  "libsecp256k1",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8025,7 +7935,7 @@ dependencies = [
  "hash-db",
  "libsecp256k1",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -8049,7 +7959,7 @@ dependencies = [
  "hash-db",
  "libsecp256k1",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -8098,7 +8008,7 @@ dependencies = [
  "derive_more",
  "futures 0.3.15",
  "merlin",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "schnorrkel",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8114,7 +8024,7 @@ dependencies = [
  "derive_more",
  "futures 0.3.15",
  "merlin",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "schnorrkel",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -8130,7 +8040,7 @@ dependencies = [
  "derive_more",
  "futures 0.3.15",
  "merlin",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "schnorrkel",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -8152,7 +8062,7 @@ version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "54e6e8b84ee0dc7bb65b55beba55ffbc17803222ab7c746a74f72fc5869c7320"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-arithmetic 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8165,7 +8075,7 @@ name = "sp-npos-elections"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -8178,7 +8088,7 @@ name = "sp-npos-elections"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -8295,7 +8205,7 @@ dependencies = [
  "hash256-std-hasher",
  "impl-trait-for-tuples",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parity-util-mem",
  "paste",
  "rand 0.7.3",
@@ -8316,7 +8226,7 @@ dependencies = [
  "hash256-std-hasher",
  "impl-trait-for-tuples",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parity-util-mem",
  "paste",
  "rand 0.7.3",
@@ -8337,7 +8247,7 @@ dependencies = [
  "hash256-std-hasher",
  "impl-trait-for-tuples",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parity-util-mem",
  "paste",
  "rand 0.7.3",
@@ -8356,8 +8266,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b2e5c88b4bc8d607e4e2ff767a85db58cf7101f3dd6064f06929342ea67fe8fb"
 dependencies = [
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
- "primitive-types 0.9.1",
+ "parity-scale-codec",
+ "primitive-types",
  "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime-interface-proc-macro 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8373,8 +8283,8 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
- "primitive-types 0.9.1",
+ "parity-scale-codec",
+ "primitive-types",
  "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime-interface-proc-macro 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -8390,8 +8300,8 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
- "primitive-types 0.9.1",
+ "parity-scale-codec",
+ "primitive-types",
  "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime-interface-proc-macro 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -8444,7 +8354,7 @@ version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2c7cf161533725a78083b04f3269effe4c3b4b6ce5f655019b3eec3e729ba4d4"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8457,7 +8367,7 @@ name = "sp-session"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -8470,7 +8380,7 @@ name = "sp-session"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -8484,7 +8394,7 @@ version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc729eb10f8809c61a1fe439ac118a4413de004aaf863003ee8752ac0b596e73"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -8494,7 +8404,7 @@ name = "sp-staking"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
 ]
@@ -8504,7 +8414,7 @@ name = "sp-staking"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
@@ -8518,7 +8428,7 @@ dependencies = [
  "hash-db",
  "log",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "rand 0.7.3",
  "smallvec",
@@ -8540,7 +8450,7 @@ dependencies = [
  "hash-db",
  "log",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "rand 0.7.3",
  "smallvec",
@@ -8562,7 +8472,7 @@ dependencies = [
  "hash-db",
  "log",
  "num-traits 0.2.14",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.11.1",
  "rand 0.7.3",
  "smallvec",
@@ -8600,7 +8510,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86af458d4a0251c490cdde9dcaaccb88d398f3b97ac6694cdd49ed9337e6b961"
 dependencies = [
  "impl-serde",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "ref-cast",
  "serde 1.0.126",
  "sp-debug-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8613,7 +8523,7 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
  "impl-serde",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "ref-cast",
  "serde 1.0.126",
  "sp-debug-derive 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -8626,7 +8536,7 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "impl-serde",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "ref-cast",
  "serde 1.0.126",
  "sp-debug-derive 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -8640,7 +8550,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27387c541197b9f47f3d9ddcab5649a3ecdca582d2f2ea2b511af24a3d3cbf83"
 dependencies = [
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8653,7 +8563,7 @@ name = "sp-timestamp"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -8669,7 +8579,7 @@ dependencies = [
  "async-trait",
  "futures-timer",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -8685,7 +8595,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "567382d8d4e14fb572752863b5cd57a78f9e9a6583332b590b726f061f3ea957"
 dependencies = [
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing",
  "tracing-core",
@@ -8698,7 +8608,7 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "tracing",
  "tracing-core",
@@ -8712,7 +8622,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "erased-serde",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "parking_lot 0.10.2",
  "serde 1.0.126",
  "serde_json",
@@ -8731,7 +8641,7 @@ dependencies = [
  "derive_more",
  "futures 0.3.15",
  "log",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-blockchain",
@@ -8747,7 +8657,7 @@ checksum = "b85b7f745da41ef825c6f7b93f1fdc897b03df94a4884adfbb70fbcd0aed1298"
 dependencies = [
  "hash-db",
  "memory-db",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "trie-db",
@@ -8761,7 +8671,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.
 dependencies = [
  "hash-db",
  "memory-db",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "trie-db",
@@ -8775,7 +8685,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f
 dependencies = [
  "hash-db",
  "memory-db",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "trie-db",
@@ -8801,7 +8711,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dbeffa538a13d715d30e01d57a2636ba32845b737a29a3ea32403576588222e7"
 dependencies = [
  "impl-serde",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8813,7 +8723,7 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
  "impl-serde",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -8825,7 +8735,7 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "impl-serde",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -8837,7 +8747,7 @@ name = "sp-version-proc-macro"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "proc-macro-crate 1.0.0",
  "proc-macro2",
  "quote",
@@ -8851,7 +8761,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b214e125666a6416cf30a70cc6a5dacd34a4e5197f8a3d479f714af7e1dc7a47"
 dependencies = [
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasmi",
 ]
@@ -8862,7 +8772,7 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "wasmi",
 ]
@@ -8873,7 +8783,7 @@ version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "impl-trait-for-tuples",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "wasmi",
 ]
@@ -9030,7 +8940,7 @@ name = "substrate-fixed"
 version = "0.5.6"
 source = "git+https://github.com/encointer/substrate-fixed?branch=master#b33d186888c60f38adafcfc0ec3a21aab263aef1"
 dependencies = [
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "typenum",
 ]
 
@@ -9078,7 +8988,7 @@ dependencies = [
  "num-traits 0.2.14",
  "pallet-indices 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-staking 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-scale-codec 2.2.0",
+ "parity-scale-codec",
  "serde 1.0.126",
  "serde_json",
  "sp-application-crypto 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -9390,15 +9300,6 @@ dependencies = [
 
 [[package]]
 name = "tiny-keccak"
-version = "1.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d8a021c69bb74a44ccedb824a046447e2c84a01df9e5c20779750acb38e11b2"
-dependencies = [
- "crunchy",
-]
-
-[[package]]
-name = "tiny-keccak"
 version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2c9d3793400a45f954c52e73d068316d76b6f4e36977e3fcebb13a2721e80237"
@@ -9443,16 +9344,6 @@ dependencies = [
  "slab",
  "tokio-macros 0.2.6",
  "winapi 0.3.9",
-]
-
-[[package]]
-name = "tokio"
-version = "0.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46409491c9375a693ce7032101970a54f8a2010efb77e13f70788f0d84489e39"
-dependencies = [
- "autocfg",
- "pin-project-lite 0.2.7",
 ]
 
 [[package]]
@@ -9519,6 +9410,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-stream"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b2f3f698253f03119ac0102beaa64f67a67e08074d03a22d18784104543727f"
+dependencies = [
+ "futures-core",
+ "pin-project-lite 0.2.7",
+ "tokio 1.8.1",
+]
+
+[[package]]
 name = "tokio-tls"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9545,27 +9447,13 @@ dependencies = [
 
 [[package]]
 name = "tokio-util"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3137de2b078e95274b696cc522e87f22c9a753fe3ef3344116ffb94f104f10a3"
-dependencies = [
- "bytes 0.6.0",
- "futures-core",
- "futures-io",
- "futures-sink",
- "log",
- "pin-project-lite 0.2.7",
- "tokio 0.3.7",
-]
-
-[[package]]
-name = "tokio-util"
 version = "0.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1caa0b0c8d94a049db56b5acf8cba99dc0623aab1b26d5b5f5e2d945846b3592"
 dependencies = [
  "bytes 1.0.1",
  "futures-core",
+ "futures-io",
  "futures-sink",
  "log",
  "pin-project-lite 0.2.7",
@@ -9759,19 +9647,6 @@ dependencies = [
  "cfg-if 0.1.10",
  "rand 0.7.3",
  "static_assertions",
-]
-
-[[package]]
-name = "typed-headers"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3179a61e9eccceead5f1574fd173cf2e162ac42638b9bf214c6ad0baf7efa24a"
-dependencies = [
- "base64 0.11.0",
- "bytes 0.5.6",
- "chrono",
- "http",
- "mime",
 ]
 
 [[package]]
@@ -10098,35 +9973,46 @@ dependencies = [
 
 [[package]]
 name = "web3"
-version = "0.14.0"
-source = "git+https://github.com/wuminzhe/rust-web3.git?branch=v0.14.0#e4b90dbdb9f864962378f8fa53f2c5b1e51973e5"
+version = "0.16.0"
+source = "git+https://github.com/wuminzhe/rust-web3.git?branch=master#ef643118ab5de677f5455b1f08ca379586daf51c"
 dependencies = [
  "arrayvec 0.5.2",
- "async-native-tls",
  "base64 0.13.0",
+ "bytes 1.0.1",
  "derive_more",
- "ethabi 12.0.0",
- "ethereum-types 0.9.2",
+ "ethabi 14.1.0",
+ "ethereum-types",
  "futures 0.3.15",
  "futures-timer",
+ "headers",
  "hex",
- "hyper 0.13.10",
- "hyper-proxy",
- "hyper-tls 0.4.3",
- "jsonrpc-core",
+ "jsonrpc-core 17.1.0",
  "log",
- "native-tls",
  "parking_lot 0.11.1",
  "pin-project 1.0.7",
- "rlp 0.4.6",
+ "reqwest 0.11.4",
+ "rlp 0.5.0",
  "secp256k1",
  "serde 1.0.126",
  "serde_json",
- "soketto",
- "tiny-keccak 2.0.2",
- "tokio 0.2.25",
- "tokio-util 0.5.1",
- "typed-headers",
+ "soketto 0.5.0",
+ "tiny-keccak",
+ "tokio 1.8.1",
+ "tokio-stream",
+ "tokio-util 0.6.7",
+ "url 2.2.2",
+ "web3-async-native-tls",
+]
+
+[[package]]
+name = "web3-async-native-tls"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f6d8d1636b2627fe63518d5a9b38a569405d9c9bc665c43c9c341de57227ebb"
+dependencies = [
+ "native-tls",
+ "thiserror",
+ "tokio 1.8.1",
  "url 2.2.2",
 ]
 

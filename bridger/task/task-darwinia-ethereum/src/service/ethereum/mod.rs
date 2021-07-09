@@ -138,7 +138,9 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                     if let DarwiniaEthereumMessage::Scan(message_scan) = recv {
                         match message_scan {
                             EthereumScanMessage::Start => {
-                                tracker.start().await;
+                                if tracker.running == false {
+                                    tracker.start().await;
+                                }
                             }
                             EthereumScanMessage::Pause => {
                                 tracker.stop();

@@ -11,7 +11,7 @@ pub struct EvmLogTracker<C: EvmChain, H: LogsHandler> {
     logs_handler: H,
     from: u64,
     step_in_secs: u64,
-    stop: bool,
+    pub running: bool,
     phantom: PhantomData<C>,
 }
 
@@ -29,12 +29,13 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
             logs_handler,
             from,
             step_in_secs,
-            stop: false,
+            running: false,
             phantom: PhantomData,
         }
     }
 
     pub async fn start(&mut self) {
+        self.running = true;
         loop {
             match self.next().await {
                 Err(err) => {
@@ -50,7 +51,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
                 }
             }
 
-            if self.stop == true {
+            if self.running == false {
                 break;
             }
 
@@ -59,7 +60,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
     }
 
     pub fn stop(&mut self) {
-        self.stop = true;
+        self.running = false;
     }
 
     pub async fn next(&mut self) -> Result<Vec<Log>> {

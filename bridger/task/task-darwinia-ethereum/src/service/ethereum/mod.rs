@@ -30,23 +30,57 @@ fn create_tracker(web3: Web3<Http>, topics_list: Vec<(H160, Vec<H256>)>, scan_fr
         topics_list,
         EthereumLogsHandler {},
         100,
-        10,
+        step,
     )
 }
 
 fn get_topics_list() -> Vec<(H160, Vec<H256>)> {
-    let contract_address = "0xD35Bb6F1bc1C84b53E0995c1830454AB7C4147f1";
-    let contract_address = H160::from_slice(&bytes(contract_address));
+    let topics_setting = vec![
+        (
+            "0x9469d013805bffb7d3debe5e7839237e535ec483",
+            vec![
+                "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10",
+            ]
+        ),
+        (
+            "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff",
+            vec![
+                "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10",
+            ]
+        ),
+        (
+            "0x649fdf6ee483a96e020b889571e93700fbd82d88",
+            vec![
+                "0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12",
+            ]
+        ),
+        (
+            "0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49",
+            vec![
+                "0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f",
+            ]
+        ),
+        (
+            "0xd5FC8F2eB94fE6AAdeE91c561818e1fF4ea2C041",
+            vec![
+                "0x0c403c4583ff520bad94bf49975b3547a573f7157070022cf8c9a023498d4d11",
+                "0xf70fbddcb43e433da621898f5f2628b0a644a77a4389ac2580c5b1de06382fe2",
+            ]
+        ),
+    ];
 
-    let topics = &vec!["0x96635f5f1b0b05ed7e2265d4e13634378280f038e5a958227d4f383f825c2771"];
-    let topics = topics.iter().map(|t| H256::from_slice(&bytes(t))).collect();
-    vec![(contract_address, topics)]
+    topics_setting.iter().map(|item| {
+        let contract_address = item.0;
+        let contract_address = H160::from_slice(&bytes(contract_address));
+
+        let topics = item.1.iter().map(|t| H256::from_slice(&bytes(t))).collect();
+        (contract_address, topics)
+    }).collect()
 }
 
 #[derive(Debug)]
 pub struct LikeDarwiniaWithLikeEthereumEthereumScanService {
     _greet: Lifeline,
-    tracker: Option<EvmLogTracker<Ethereum, EthereumLogsHandler>>,
 }
 
 impl BridgeService for LikeDarwiniaWithLikeEthereumEthereumScanService {}
@@ -69,7 +103,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                 let microkv = state.microkv();
 
                 let topics_list = get_topics_list();
-                let scan_from: u64 = 12345;
+                let scan_from: u64 = microkv.get("last_synced")?.unwrap_or(0);
                 let mut tracker = create_tracker(web3.clone(), topics_list, scan_from, config.interval_ethereum);
 
                 while let Some(recv) = rx.recv().await {
@@ -87,6 +121,6 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                 Ok(())
             },
         );
-        Ok(Self { _greet, tracker: None })
+        Ok(Self { _greet })
     }
 }

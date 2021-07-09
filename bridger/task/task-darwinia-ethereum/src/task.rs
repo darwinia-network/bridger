@@ -18,6 +18,7 @@ use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 #[derive(Debug)]
 pub struct DarwiniaEthereumTask {
+    bus: DarwiniaEthereumBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
     carries: Vec<lifeline::Lifeline>,
 }
@@ -42,7 +43,7 @@ impl BridgeTaskKeep for DarwiniaEthereumTask {
 
 impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
     fn bus(&self) -> &DarwiniaEthereumBus {
-        crate::bus::bus()
+        &self.bus
     }
 
     fn keep_carry(&mut self, other_bus: Lifeline) {
@@ -53,7 +54,7 @@ impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
 impl DarwiniaEthereumTask {
     pub async fn new(config: DarwiniaEthereumConfig, state: BridgeState) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
-        let bus = crate::bus::bus();
+        let bus = DarwiniaEthereumBus::default();
         bus.store_resource::<BridgeState>(state);
 
         let services = vec![
@@ -67,7 +68,11 @@ impl DarwiniaEthereumTask {
             .await?;
 
         let carries = vec![];
-        Ok(Self { services, carries })
+        Ok(Self {
+            bus,
+            services,
+            carries,
+        })
     }
 }
 

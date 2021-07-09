@@ -7,6 +7,7 @@ use crate::bus::PangolinMillauBus;
 
 #[derive(Debug)]
 pub struct PangolinMillauTask {
+    bus: PangolinMillauBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
     carries: Vec<lifeline::Lifeline>,
 }
@@ -31,7 +32,7 @@ impl BridgeTaskKeep for PangolinMillauTask {
 
 impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
     fn bus(&self) -> &PangolinMillauBus {
-        crate::bus::bus()
+        &self.bus
     }
 
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {
@@ -43,10 +44,16 @@ impl PangolinMillauTask {
     pub async fn new(config: PangolinMillauConfig) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
 
+        let bus = PangolinMillauBus::default();
+
         let services = vec![];
 
         let carries = vec![];
-        Ok(Self { services, carries })
+        Ok(Self {
+            bus,
+            services,
+            carries,
+        })
     }
 }
 

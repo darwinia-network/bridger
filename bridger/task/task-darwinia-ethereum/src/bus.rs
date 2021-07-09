@@ -2,7 +2,6 @@ use std::ops::Deref;
 
 use lifeline::prelude::*;
 use lifeline::{Receiver, Sender};
-use once_cell::sync::OnceCell;
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_state::state::BridgeState;
@@ -12,12 +11,6 @@ use linked_darwinia::task::DarwiniaLinked;
 
 use crate::message::{DarwiniaEthereumMessage, ToDarwiniaLinkedMessage};
 use crate::task::DarwiniaEthereumTask;
-
-static BUS: OnceCell<DarwiniaEthereumBus> = OnceCell::new();
-
-pub(crate) fn bus() -> &'static DarwiniaEthereumBus {
-    BUS.get_or_init(|| Default::default())
-}
 
 lifeline_bus!(pub struct DarwiniaEthereumBus);
 

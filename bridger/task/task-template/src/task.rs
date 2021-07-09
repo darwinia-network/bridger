@@ -10,6 +10,7 @@ use crate::service::some::SomeService;
 
 #[derive(Debug)]
 pub struct TemplateTask {
+    bus: TemplateTaskBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
     carries: Vec<lifeline::Lifeline>,
 }
@@ -45,12 +46,16 @@ impl BridgeTaskKeep for TemplateTask {
 impl TemplateTask {
     pub fn new(config: TemplateTaskConfig, state: BridgeState) -> anyhow::Result<Self> {
         config.store(TemplateTask::NAME)?;
-        let bus = crate::bus::bus();
+        let bus = TemplateTaskBus::default();
         bus.store_resource::<BridgeState>(state);
 
         let services = vec![Self::spawn_service::<SomeService>(&bus)?];
 
         let carries = vec![];
-        Ok(Self { services, carries })
+        Ok(Self {
+            bus,
+            services,
+            carries,
+        })
     }
 }

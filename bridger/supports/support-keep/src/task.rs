@@ -16,7 +16,7 @@ static AVAILABLE_TASKS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| {
     ])
 });
 
-static mut RUNNING_TASKS: OnceCell<HashMap<String, Box<dyn BridgeTaskKeep + Send>>> =
+static mut RUNNING_TASKS: OnceCell<HashMap<String, Box<dyn BridgeTaskKeep + Send + Sync>>> =
     OnceCell::new();
 
 pub fn available_tasks() -> anyhow::Result<Vec<String>> {
@@ -35,7 +35,7 @@ pub fn is_available_task<S: AsRef<str>>(name: S) -> bool {
 
 pub fn keep_task<N: AsRef<str>>(
     name: N,
-    task: Box<dyn BridgeTaskKeep + Send>,
+    task: Box<dyn BridgeTaskKeep + Send + Sync>,
 ) -> anyhow::Result<()> {
     unsafe {
         if let Some(running) = RUNNING_TASKS.get_mut() {
@@ -76,7 +76,9 @@ pub fn task_is_running<N: AsRef<str>>(name: N) -> bool {
     }
 }
 
-pub fn running_task(name: impl AsRef<str>) -> Option<&'static Box<dyn BridgeTaskKeep + Send>> {
+pub fn running_task(
+    name: impl AsRef<str>,
+) -> Option<&'static Box<dyn BridgeTaskKeep + Send + Sync>> {
     let name = name.as_ref();
     unsafe {
         if let Some(running) = RUNNING_TASKS.get() {

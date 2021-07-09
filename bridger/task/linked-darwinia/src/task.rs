@@ -8,6 +8,7 @@ use crate::service::extrinsic::ExtrinsicService;
 
 #[derive(Debug)]
 pub struct DarwiniaLinked {
+    bus: DarwiniaLinkedBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
     carries: Vec<lifeline::Lifeline>,
 }
@@ -34,7 +35,7 @@ impl BridgeTaskKeep for DarwiniaLinked {
 
 impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
     fn bus(&self) -> &DarwiniaLinkedBus {
-        crate::bus::bus()
+        &self.bus
     }
 
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {
@@ -45,11 +46,15 @@ impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
 impl DarwiniaLinked {
     pub async fn new(config: DarwiniaLinkedConfig) -> anyhow::Result<Self> {
         config.store(DarwiniaLinked::NAME)?;
-        let bus = crate::bus::bus();
+        let bus = DarwiniaLinkedBus::default();
 
         let services = vec![Self::spawn_service::<ExtrinsicService>(&bus)?];
 
         let carries = vec![];
-        Ok(Self { services, carries })
+        Ok(Self {
+            bus,
+            services,
+            carries,
+        })
     }
 }

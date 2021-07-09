@@ -10,6 +10,7 @@ use crate::service::some::SomeService;
 
 #[derive(Debug)]
 pub struct TemplateLinked {
+    bus: TemplateLinkedBus,
     services: Vec<Box<dyn BridgeService + Send + Sync>>,
     carries: Vec<lifeline::Lifeline>,
 }
@@ -45,12 +46,16 @@ impl BridgeTask<TemplateLinkedBus> for TemplateLinked {
 impl TemplateLinked {
     pub fn new(config: TemplateLinkedConfig, state: BridgeState) -> anyhow::Result<Self> {
         config.store(TemplateLinked::NAME)?;
-        let bus = crate::bus::bus();
+        let bus = TemplateLinkedBus::default();
         bus.store_resource::<BridgeState>(state);
 
         let services = vec![Self::spawn_service::<SomeService>(&bus)?];
 
         let carries = vec![];
-        Ok(Self { services, carries })
+        Ok(Self {
+            bus,
+            services,
+            carries,
+        })
     }
 }

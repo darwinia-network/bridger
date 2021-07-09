@@ -219,20 +219,9 @@ async fn task_stop(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
 }
 
 async fn task_route(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
-    // let task_name = req
-    //     .param("task_name")
-    //     .ok_or_else(|| StandardError::Api("The task name is required".to_string()))?;
-    // let task_route = req
-    //     .param("task_route")
-    //     .ok_or_else(|| StandardError::Api("The task route is required".to_string()))?;
-    //
-    // let uri = format!("{}-{}", task_name, task_route);
-    // let param: serde_json::Value = patch::hyper::deserialize_body(&mut req)
-    //     .await
-    //     .unwrap_or(serde_json::Value::Null);
-    //
-    // let value = support_keep::route::run_route(uri, param).await?;
-    // Resp::ok_with_data(value).response_json()
+    let param: serde_json::Value = patch::hyper::deserialize_body(&mut req)
+        .await
+        .unwrap_or(serde_json::Value::Null);
 
     let task_name = req
         .param("task_name")
@@ -241,15 +230,10 @@ async fn task_route(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
         .param("task_route")
         .ok_or_else(|| StandardError::Api("The task route is required".to_string()))?;
     let uri = format!("{}-{}", task_name, task_route);
-    let param: serde_json::Value = patch::hyper::deserialize_body(&mut req)
-        .await
-        .unwrap_or(serde_json::Value::Null);
 
-    // let task = support_keep::task::running_task(task_name)
-    //     .ok_or_else(|| StandardError::Api("The task isn't started".to_string()))?;
-    // let value = task.route(uri, param).await?;
-    //
-    // Resp::ok_with_data(value).response_json()
+    let task = support_keep::task::running_task(task_name)
+        .ok_or_else(|| StandardError::Api("The task isn't started".to_string()))?;
+    let value = task.route(uri, param).await?;
 
-    Resp::<String>::ok().response_json()
+    Resp::ok_with_data(value).response_json()
 }

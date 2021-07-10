@@ -3,7 +3,6 @@ use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
 
 use crate::bus::DarwiniaLinkedBus;
 use crate::config::DarwiniaLinkedConfig;
-use crate::route;
 use crate::service::extrinsic::ExtrinsicService;
 
 #[derive(Debug)]
@@ -27,9 +26,7 @@ impl BridgeTaskKeep for DarwiniaLinked {
         uri: String,
         param: serde_json::Value,
     ) -> anyhow::Result<serde_json::Value> {
-        let ret = (uri, param);
-        let value: serde_json::Value = serde_json::to_value(ret)?;
-        Ok(value)
+        crate::route::dispatch_route(uri, param).await
     }
 }
 

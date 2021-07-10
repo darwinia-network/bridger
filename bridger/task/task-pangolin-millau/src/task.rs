@@ -26,7 +26,7 @@ impl BridgeTaskKeep for PangolinMillauTask {
         uri: String,
         param: serde_json::Value,
     ) -> anyhow::Result<serde_json::Value> {
-        todo!()
+        crate::route::dispatch_route(uri, param).await
     }
 }
 

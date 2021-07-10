@@ -231,8 +231,12 @@ async fn task_route(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
         .ok_or_else(|| StandardError::Api("The task route is required".to_string()))?;
     let uri = format!("{}-{}", task_name, task_route);
 
-    let task = support_keep::task::running_task(task_name)
-        .ok_or_else(|| StandardError::Api("The task isn't started".to_string()))?;
+    let task = support_keep::task::running_task(task_name).ok_or_else(|| {
+        StandardError::Api(format!(
+            "The task [{}] not found or isn't started",
+            task_name
+        ))
+    })?;
     let value = task.route(uri, param).await?;
 
     Resp::ok_with_data(value).response_json()

@@ -1,9 +1,8 @@
-use serde::{Deserialize, Serialize};
-
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskTerminal};
 
 use crate::bus::PangolinMillauBus;
+use crate::config::PangolinMillauConfig;
 
 #[derive(Debug)]
 pub struct PangolinMillauTask {
@@ -27,6 +26,9 @@ impl BridgeTaskKeep for PangolinMillauTask {
 }
 
 impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
+    fn config_template() -> anyhow::Result<serde_json::Value> {
+        Ok(serde_json::to_value(PangolinMillauConfig::template())?)
+    }
     fn bus(&self) -> &PangolinMillauBus {
         &self.bus
     }
@@ -50,17 +52,5 @@ impl PangolinMillauTask {
             services,
             carries,
         })
-    }
-}
-
-// -- config --
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct PangolinMillauConfig {}
-
-impl PangolinMillauConfig {
-    pub fn store<S: AsRef<str>>(&self, cell_name: S) -> anyhow::Result<()> {
-        let _name = cell_name.as_ref();
-        Ok(())
     }
 }

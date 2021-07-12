@@ -47,6 +47,15 @@ pub enum TaskCommand {
         #[structopt(flatten)]
         options: TaskExecuteOptions,
     },
+    /// Show config template
+    ConfigTemplate {
+        /// The task name
+        #[structopt(short, long)]
+        name: String,
+        /// The config format, supports [toml|json|yml]
+        #[structopt(long, default_value = "toml")]
+        format: String,
+    },
 }
 
 #[derive(Clone, Debug, StructOpt)]

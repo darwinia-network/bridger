@@ -20,6 +20,9 @@ impl BridgeSand for TemplateTask {
 }
 
 impl BridgeTask<TemplateTaskBus> for TemplateTask {
+    fn config_template() -> anyhow::Result<serde_json::Value> {
+        Ok(serde_json::to_value(TemplateTaskConfig::template())?)
+    }
     fn bus(&self) -> &TemplateTaskBus {
         &self.bus
     }

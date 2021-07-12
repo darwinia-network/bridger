@@ -7,10 +7,12 @@ use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
 use bridge_traits::error::StandardError;
 use linked_darwinia::config::DarwiniaLinkedConfig;
 use linked_darwinia::task::DarwiniaLinked;
-use task_darwinia_ethereum::task::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
-use task_pangolin_millau::task::{PangolinMillauConfig, PangolinMillauTask};
+use task_darwinia_ethereum::config::DarwiniaEthereumConfig;
+use task_darwinia_ethereum::task::DarwiniaEthereumTask;
+use task_pangolin_millau::config::PangolinMillauConfig;
+use task_pangolin_millau::task::PangolinMillauTask;
 
-use crate::types::transfer::TaskStartParam;
+use crate::types::transfer::{TaskConfigTemplateParam, TaskStartParam};
 
 fn task_config<T: serde::de::DeserializeOwned>(path_config: PathBuf) -> anyhow::Result<T> {
     let mut c = config::Config::default();
@@ -143,4 +145,35 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
     };
 
     Ok(())
+}
+
+pub fn task_config_template(param: TaskConfigTemplateParam) -> anyhow::Result<String> {
+    let task_name = param.name;
+    let format = param.format;
+    if !support_keep::task::is_available_task(&task_name) {
+        return Err(StandardError::Api(format!("Not support this task [{}]", &task_name)).into());
+    }
+    let value = match &task_name[..] {
+        DarwiniaLinked::NAME => DarwiniaLinked::config_template(),
+        DarwiniaEthereumTask::NAME => DarwiniaEthereumTask::config_template(),
+        PangolinMillauTask::NAME => PangolinMillauTask::config_template(),
+        _ => {
+            return Err(StandardError::Api(format!(
+                "Unsupported to show default config template: [{}]",
+                task_name
+            ))
+            .into())
+        }
+    }?;
+    let template = match &format[..] {
+        "toml" => toml::to_string(&value)?,
+        "json" => serde_json::to_string_pretty(&value)?,
+        "yml" => serde_yaml::to_string(&value)?,
+        _ => {
+            return Err(
+                StandardError::Api(format!("Unsupported this config format: [{}]", format)).into(),
+            )
+        }
+    };
+    Ok(template)
 }

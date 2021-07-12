@@ -30,6 +30,9 @@ impl BridgeTaskKeep for TemplateLinked {
 }
 
 impl BridgeTask<TemplateLinkedBus> for TemplateLinked {
+    fn config_template() -> anyhow::Result<serde_json::Value> {
+        Ok(serde_json::to_value(TemplateLinkedConfig::template())?)
+    }
     fn bus(&self) -> &TemplateLinkedBus {
         &self.bus
     }

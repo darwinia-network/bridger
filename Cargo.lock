@@ -832,11 +832,13 @@ dependencies = [
  "routerify",
  "serde 1.0.126",
  "serde_json",
+ "serde_yaml",
  "structopt",
  "support-keep",
  "task-darwinia-ethereum",
  "task-pangolin-millau",
  "tokio 1.8.1",
+ "toml",
 ]
 
 [[package]]

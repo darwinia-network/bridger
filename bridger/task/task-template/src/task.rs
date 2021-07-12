@@ -21,7 +21,7 @@ impl BridgeSand for TemplateTask {
 
 impl BridgeTask<TemplateTaskBus> for TemplateTask {
     fn bus(&self) -> &TemplateTaskBus {
-        crate::bus::bus()
+        &self.bus
     }
 
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {

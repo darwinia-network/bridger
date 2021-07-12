@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use lifeline::prelude::*;
 use lifeline::{Receiver, Sender};
 

@@ -85,12 +85,10 @@ impl<T: Serialize + for<'a> Deserialize<'a>> Resp<T> {
     ) -> anyhow::Result<hyper::Response<hyper::Body>> {
         let xcode = if let Some(code) = code {
             code
+        } else if self.err == 0 {
+            hyper::StatusCode::OK
         } else {
-            if self.err == 0 {
-                hyper::StatusCode::OK
-            } else {
-                hyper::StatusCode::BAD_REQUEST
-            }
+            hyper::StatusCode::BAD_REQUEST
         };
         let value = serde_json::to_string(self)?;
         let response = hyper::Response::builder()

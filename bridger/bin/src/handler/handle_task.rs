@@ -97,7 +97,7 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
                 if param.is_empty() {
                     continue;
                 }
-                let pvs = param.split("=").collect::<Vec<&str>>();
+                let pvs = param.split('=').collect::<Vec<&str>>();
                 if pvs.len() != 2 {
                     return Err(StandardError::Api("The params length is wrong".to_string()).into());
                 }

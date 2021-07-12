@@ -86,6 +86,7 @@ pub fn task_is_running<N: AsRef<str>>(name: N) -> bool {
     }
 }
 
+#[allow(clippy::borrowed_box)]
 pub fn running_task(
     name: impl AsRef<str>,
 ) -> Option<&'static Box<dyn BridgeTaskKeep + Send + Sync>> {

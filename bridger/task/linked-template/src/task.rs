@@ -31,7 +31,7 @@ impl BridgeTaskKeep for TemplateLinked {
 
 impl BridgeTask<TemplateLinkedBus> for TemplateLinked {
     fn bus(&self) -> &TemplateLinkedBus {
-        crate::bus::bus()
+        &self.bus
     }
 
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {

@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use lifeline::prelude::*;
 
 use component_state::state::BridgeState;

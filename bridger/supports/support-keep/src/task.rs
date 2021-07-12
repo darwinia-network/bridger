@@ -9,15 +9,25 @@ use once_cell::sync::{Lazy, OnceCell};
 use bridge_traits::bridge::task::BridgeTaskKeep;
 use bridge_traits::error::StandardError;
 
-static AVAILABLE_TASKS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| {
-    Mutex::new(vec![
-        "linked-darwinia".to_string(),
-        "task-darwinia-ethereum".to_string(),
-    ])
-});
+static AVAILABLE_TASKS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| Mutex::new(vec![]));
 
 static mut RUNNING_TASKS: OnceCell<HashMap<String, Box<dyn BridgeTaskKeep + Send + Sync>>> =
     OnceCell::new();
+
+pub fn add_available_tasks(names: Vec<impl AsRef<str>>) -> anyhow::Result<()> {
+    for item in names {
+        add_available_task(item)?;
+    }
+    Ok(())
+}
+
+pub fn add_available_task(name: impl AsRef<str>) -> anyhow::Result<()> {
+    let mut tasks = AVAILABLE_TASKS
+        .lock()
+        .map_err(|_e| StandardError::Api("failed to get available task".to_string()))?;
+    tasks.push(name.as_ref().to_string());
+    Ok(())
+}
 
 pub fn available_tasks() -> anyhow::Result<Vec<String>> {
     let tasks = AVAILABLE_TASKS

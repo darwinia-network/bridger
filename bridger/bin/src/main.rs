@@ -3,27 +3,13 @@ use structopt::StructOpt;
 use crate::types::command::Opt;
 
 mod handler;
+mod initialize;
 mod patch;
 mod types;
 
-fn init() -> anyhow::Result<()> {
-    std::env::set_var(
-        "RUST_LOG",
-        r#"
-        serde=info,
-        lifeline=debug,
-        darwinia_bridge=debug,
-        task-darwinia-ethereum=debug,
-        "#,
-    );
-    std::env::set_var("RUST_BACKTRACE", "1");
-    env_logger::init();
-    Ok(())
-}
-
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    self::init()?;
+    initialize::init()?;
     let opt = Opt::from_args();
     match opt {
         Opt::Server { options } => {

@@ -1,5 +1,5 @@
 use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskTerminal};
 
 use crate::bus::PangolinMillauBus;
 use crate::config::PangolinMillauConfig;
@@ -17,9 +17,13 @@ impl BridgeSand for PangolinMillauTask {
     const NAME: &'static str = "task-pangolin-millau";
 }
 
+#[async_trait::async_trait]
 impl BridgeTaskKeep for PangolinMillauTask {
     fn as_any(&self) -> &dyn std::any::Any {
         self
+    }
+    async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
+        crate::route::dispatch_route(&self.bus, uri, param).await
     }
 }
 
@@ -36,6 +40,7 @@ impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
 impl PangolinMillauTask {
     pub async fn new(config: PangolinMillauConfig) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
+
         let bus = PangolinMillauBus::default();
 
         let services = vec![

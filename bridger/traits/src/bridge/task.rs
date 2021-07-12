@@ -1,6 +1,8 @@
 use std::any::Any;
 use std::fmt::Debug;
 
+use serde::{Deserialize, Serialize};
+
 use crate::bridge::service::BridgeService;
 
 pub trait BridgeSand {
@@ -24,7 +26,25 @@ pub trait BridgeTask<B: lifeline::Bus>: BridgeSand + BridgeTaskKeep {
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline);
 }
 
+#[async_trait::async_trait]
 pub trait BridgeTaskKeep: Debug {
-    // fn box_bus(&self) -> Box<&dyn lifeline::Bus>;
     fn as_any(&self) -> &dyn Any;
+    async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal>;
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct TaskTerminal {
+    view: String,
+}
+
+impl TaskTerminal {
+    pub fn new(view: impl AsRef<str>) -> Self {
+        Self {
+            view: view.as_ref().to_string(),
+        }
+    }
+
+    pub fn view(&self) -> &String {
+        &self.view
+    }
 }

@@ -523,6 +523,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "bee-client"
+version = "0.6.0"
+source = "git+https://github.com/darwinia-network/substrate-api-client.git?branch=bee-v13#3542de0287c822746a02d843ec61a661461f9876"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "dyn-clone",
+ "ellipse",
+ "frame-metadata 13.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "futures 0.3.15",
+ "hex",
+ "log",
+ "pallet-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "parity-scale-codec 2.2.0",
+ "serde 1.0.126",
+ "serde_json",
+ "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-rpc 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "thiserror",
+ "ws",
+]
+
+[[package]]
 name = "beef"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -777,6 +805,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-trait",
+ "futures 0.3.15",
  "lifeline",
  "once_cell",
  "serde 1.0.126",
@@ -799,12 +828,12 @@ dependencies = [
  "lifeline",
  "linked-darwinia",
  "log",
- "once_cell",
  "reqwest 0.11.4",
  "routerify",
  "serde 1.0.126",
  "serde_json",
  "structopt",
+ "support-keep",
  "task-darwinia-ethereum",
  "task-pangolin-millau",
  "tokio 1.8.1",
@@ -1086,7 +1115,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-trait",
- "bee-client",
+ "bee-client 0.6.0 (git+https://github.com/darwinia-network/substrate-api-client.git?branch=bee-v12)",
  "bridge-traits",
  "log",
  "parity-scale-codec 2.2.0",
@@ -1125,41 +1154,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "component-millau"
-version = "0.3.3"
-dependencies = [
- "bridge-traits",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "headers-relay",
- "millau-primitives 0.1.0 (git+https://github.com/darwinia-network/darwinia-launch.git?branch=s2s)",
- "millau-runtime",
- "pallet-transaction-payment",
- "parity-scale-codec 2.2.0",
- "relay-substrate-client",
- "relay-utils",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "component-pangolin"
 version = "0.3.3"
 dependencies = [
+ "anyhow",
+ "async-trait",
+ "bee-client 0.6.0 (git+https://github.com/darwinia-network/substrate-api-client.git?branch=bee-v13)",
  "bridge-traits",
- "darwinia-ethereum-relay",
- "drml-primitives",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "headers-relay",
- "pallet-transaction-payment",
- "pangolin-runtime",
+ "log",
  "parity-scale-codec 2.2.0",
- "relay-substrate-client",
- "relay-utils",
+ "serde 1.0.126",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
@@ -4238,8 +4243,7 @@ dependencies = [
 [[package]]
 name = "lifeline"
 version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b49b836e2676e5f6d926c09dc1a13b52c3315b459554df4514d76756bfa72a0e"
+source = "git+https://github.com/fewensa/lifeline-rs.git?branch=threads-safely#6e45414f81e9905d8e018e6627cf3146184aa152"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4257,6 +4261,7 @@ name = "linked-darwinia"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bridge-traits",
  "component-darwinia",
  "component-http-client",
@@ -4264,6 +4269,7 @@ dependencies = [
  "log",
  "postage",
  "serde 1.0.126",
+ "serde_json",
 ]
 
 [[package]]
@@ -4295,6 +4301,7 @@ dependencies = [
  "log",
  "postage",
  "serde 1.0.126",
+ "serde_json",
  "tokio 1.8.1",
 ]
 
@@ -4463,7 +4470,7 @@ dependencies = [
 [[package]]
 name = "microkv"
 version = "0.2.6"
-source = "git+https://github.com/fewensa/microkv.git?branch=master#4ca7591da7ffbff34bb719da9f8b7bacccced2b7"
+source = "git+https://github.com/ex0dus-0x/microkv.git?branch=master#b73053184787dceec3a2d33990e56a79dc2b6295"
 dependencies = [
  "bincode",
  "indexmap",
@@ -5490,6 +5497,28 @@ dependencies = [
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
+ "static_assertions",
+]
+
+[[package]]
+name = "pallet-staking"
+version = "3.0.0"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+dependencies = [
+ "frame-election-provider-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "log",
+ "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "parity-scale-codec 2.2.0",
+ "paste",
+ "serde 1.0.126",
+ "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "static_assertions",
 ]
 
@@ -9113,46 +9142,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
-name = "support-s2s"
+name = "support-keep"
 version = "0.3.3"
 dependencies = [
  "anyhow",
- "async-std",
- "async-trait",
- "bp-header-chain",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
- "component-millau",
- "component-pangolin",
- "drml-primitives",
- "finality-grandpa",
- "finality-relay",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "bridge-traits",
+ "component-state",
  "futures 0.3.15",
- "headers-relay",
- "hex",
  "log",
- "messages-relay",
- "millau-primitives 0.1.0 (git+https://github.com/darwinia-network/darwinia-launch.git?branch=s2s)",
- "millau-runtime",
- "num-traits 0.2.14",
- "pallet-bridge-messages",
- "pangolin-bridge-primitives",
- "pangolin-constants",
- "pangolin-runtime",
- "pangolin-runtime-system-params",
- "parity-scale-codec 2.2.0",
- "paste",
- "relay-substrate-client",
- "relay-utils",
+ "once_cell",
  "serde 1.0.126",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-finality-grandpa",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "serde_json",
 ]
 
 [[package]]
@@ -9206,6 +9206,7 @@ name = "task-darwinia-ethereum"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bridge-traits",
  "component-darwinia",
  "component-ethereum",
@@ -9217,7 +9218,7 @@ dependencies = [
  "log",
  "postage",
  "serde 1.0.126",
- "thiserror",
+ "serde_json",
  "tokio 1.8.1",
 ]
 
@@ -9226,13 +9227,14 @@ name = "task-pangolin-millau"
 version = "0.3.3"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bridge-traits",
+ "component-pangolin",
  "lifeline",
  "log",
- "parity-scale-codec 2.2.0",
  "postage",
  "serde 1.0.126",
- "support-s2s",
+ "serde_json",
 ]
 
 [[package]]
@@ -9250,6 +9252,7 @@ dependencies = [
  "log",
  "postage",
  "serde 1.0.126",
+ "serde_json",
  "tokio 1.8.1",
 ]
 

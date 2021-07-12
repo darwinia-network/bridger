@@ -79,18 +79,32 @@ impl<T: Serialize + for<'a> Deserialize<'a>> Resp<T> {
     pub fn is_err(&self) -> bool {
         self.err == 1
     }
-    pub fn response_json(&self) -> anyhow::Result<hyper::Response<hyper::Body>> {
-        let code = if self.err == 0 {
+    fn _response_json_with_code(
+        &self,
+        code: Option<hyper::StatusCode>,
+    ) -> anyhow::Result<hyper::Response<hyper::Body>> {
+        let xcode = if let Some(code) = code {
+            code
+        } else if self.err == 0 {
             hyper::StatusCode::OK
         } else {
             hyper::StatusCode::BAD_REQUEST
         };
         let value = serde_json::to_string(self)?;
         let response = hyper::Response::builder()
-            .status(code)
+            .status(xcode)
             .header("Content-Type", "application/json")
             .body(hyper::Body::from(value))?;
         Ok(response)
+    }
+    pub fn response_json_with_code(
+        &self,
+        code: hyper::StatusCode,
+    ) -> anyhow::Result<hyper::Response<hyper::Body>> {
+        self._response_json_with_code(Some(code))
+    }
+    pub fn response_json(&self) -> anyhow::Result<hyper::Response<hyper::Body>> {
+        self._response_json_with_code(None)
     }
 }
 

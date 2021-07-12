@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use colored::Colorize;
 
 use bridge_traits::error::StandardError;
@@ -5,8 +7,12 @@ use bridge_traits::error::StandardError;
 use crate::patch;
 use crate::types::command::TaskCommand;
 use crate::types::server::Resp;
-use crate::types::transfer::{TaskListResponse, TaskStartParam, TaskStopParam};
+use crate::types::transfer::{
+    TaskConfigTemplateParam, TaskListResponse, TaskStartParam, TaskStopParam,
+};
+use bridge_traits::bridge::task::TaskTerminal;
 
+#[allow(clippy::manual_map)]
 #[async_recursion::async_recursion]
 pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result<()> {
     match command {
@@ -85,6 +91,62 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
                 return Ok(());
             }
             println!("{}", resp.msg());
+        }
+        TaskCommand::Exec { options } => {
+            let params = options.param;
+            let mut req_body = HashMap::new();
+            for param in params {
+                if param.is_empty() {
+                    continue;
+                }
+                let pvs = param.split('=').collect::<Vec<&str>>();
+                if pvs.len() != 2 {
+                    return Err(StandardError::Api("The params length is wrong".to_string()).into());
+                }
+                let param_name = pvs
+                    .get(0)
+                    .ok_or_else(|| StandardError::Api("The param name is required".to_string()))?;
+                let param_value = pvs
+                    .get(1)
+                    .ok_or_else(|| StandardError::Api("The param value is required".to_string()))?;
+                req_body.insert(param_name.to_string(), param_value.to_string());
+            }
+            let url = format!("{}/task/{}/{}", server, options.name, options.api);
+            let resp = reqwest::Client::builder()
+                .build()?
+                .post(url)
+                .json(&req_body)
+                .send()
+                .await?
+                .json::<Resp<TaskTerminal>>()
+                .await?;
+            if resp.is_err() {
+                eprintln!("{}", resp.msg());
+                return Ok(());
+            }
+            match resp.data() {
+                Some(tt) => println!("{}", tt.view()),
+                None => println!(),
+            }
+        }
+        TaskCommand::ConfigTemplate { name, format } => {
+            let param = TaskConfigTemplateParam { name, format };
+            let resp = reqwest::Client::builder()
+                .build()?
+                .post(format!("{}/task/config-template", server))
+                .json(&param)
+                .send()
+                .await?
+                .json::<Resp<String>>()
+                .await?;
+            if resp.is_err() {
+                eprintln!("{}", resp.msg());
+                return Ok(());
+            }
+            match resp.data() {
+                Some(v) => println!("{}", v),
+                None => println!("Not have default template"),
+            }
         }
     };
     Ok(())

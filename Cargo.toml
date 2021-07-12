@@ -8,8 +8,8 @@ members = [
 
 	"bridger/bin",
 	"bridger/components/*",
-	"bridger/traits",
-	"bridger/task/*",
 	"bridger/primitives",
 	"bridger/supports/*",
+	"bridger/task/*",
+	"bridger/traits",
 ]

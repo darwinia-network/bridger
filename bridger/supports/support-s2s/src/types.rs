@@ -83,6 +83,27 @@ impl Display for HexLaneId {
     }
 }
 
+impl<'de> Deserialize<'de> for HexLaneId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let hex_text: String = Deserialize::deserialize(deserializer)?;
+        let lane = HexLaneId::from_str(&hex_text[..]).map_err(serde::de::Error::custom)?;
+        Ok(lane)
+    }
+}
+
+impl Serialize for HexLaneId {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        let hex_text = self.to_string();
+        serializer.serialize_str(&hex_text[..])
+    }
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct PrometheusParamsInfo {
     /// Do not expose a Prometheus metric endpoint.
@@ -116,25 +137,4 @@ pub struct RelayHeadersAndMessagesInfo {
 
     pub lanes: Vec<HexLaneId>,
     pub prometheus_params: PrometheusParamsInfo,
-}
-
-impl<'de> Deserialize<'de> for HexLaneId {
-    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let hex_text: String = Deserialize::deserialize(deserializer)?;
-        let lane = HexLaneId::from_str(&hex_text[..]).map_err(serde::de::Error::custom)?;
-        Ok(lane)
-    }
-}
-
-impl Serialize for HexLaneId {
-    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-    where
-        S: Serializer,
-    {
-        let hex_text = self.to_string();
-        serializer.serialize_str(&hex_text[..])
-    }
 }

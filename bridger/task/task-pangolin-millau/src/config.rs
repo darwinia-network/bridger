@@ -1,4 +1,5 @@
 use std::convert::TryFrom;
+use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
@@ -42,6 +43,13 @@ impl BridgeConfig for RelayConfig {
     fn marker() -> &'static str {
         "config-relay"
     }
+
+    fn template() -> Self {
+        Self {
+            lanes: vec![HexLaneId::from_str("00000000").unwrap()],
+            prometheus_params: Default::default(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -56,6 +64,15 @@ pub struct ChainInfoConfig {
 impl BridgeConfig for ChainInfoConfig {
     fn marker() -> &'static str {
         "s2s-chain-info"
+    }
+
+    fn template() -> Self {
+        Self {
+            endpoint: "ws://127.0.0.1:9544".to_string(),
+            signer: Some("//Alice".to_string()),
+            secure: false,
+            signer_password: Some("".to_string()),
+        }
     }
 }
 

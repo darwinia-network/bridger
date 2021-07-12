@@ -6,11 +6,12 @@ use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_ethereum::web3::Web3Component;
+use component_darwinia::component::DarwiniaComponent;
 use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
-use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage};
+use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage, ToRelayMessage, ToRedeemMessage};
 use crate::task::DarwiniaEthereumTask;
 
 mod ethereum_logs_handler;
@@ -23,15 +24,32 @@ use web3::{
     types::{Log, H160, H256}
 };
 
+use postage::broadcast;
+use microkv::MicroKV;
+
 use std::time::Duration;
 use tokio::time::sleep;
 
-fn create_tracker(web3: Web3<Http>, topics_list: Vec<(H160, Vec<H256>)>, scan_from: u64, step: u64) -> EvmLogTracker<Ethereum, EthereumLogsHandler> {
+use darwinia::{
+	Darwinia,
+};
+
+fn create_tracker(
+    darwinia_client: Darwinia, 
+    microkv: MicroKV, 
+    sender_to_relay: broadcast::Sender<ToRelayMessage>,
+    sender_to_redeem: broadcast::Sender<ToRedeemMessage>, 
+    web3: Web3<Http>, 
+    topics_list: Vec<(H160, Vec<H256>)>, 
+    scan_from: u64, 
+    step: u64
+) -> EvmLogTracker<Ethereum, EthereumLogsHandler> {
     let client = EvmClient::new(web3);
+    let logs_handler = EthereumLogsHandler::new(topics_list.clone(), sender_to_relay, sender_to_redeem, microkv, darwinia_client);
     EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
         client,
-        topics_list.clone(),
-        EthereumLogsHandler::new(topics_list),
+        topics_list,
+        logs_handler,
         100,
         step,
     )
@@ -119,20 +137,33 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let mut tx = bus.tx::<DarwiniaEthereumMessage>()?;
+        let mut sender_to_relay = bus.tx::<ToRelayMessage>()?;
+        let mut sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
         let mut rx = bus.rx::<DarwiniaEthereumMessage>()?;
         let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
+        
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
                 let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+                let darwinia_client = Darwinia::new("wss://rpc.darwinia.network").await?;
                 let web3 = component_web3.component().await?;
                 let microkv = state.microkv();
 
                 let topics_list = get_topics_list();
                 let scan_from: u64 = microkv.get("last_synced")?.unwrap_or(0);
-                let mut tracker = create_tracker(web3.clone(), topics_list, scan_from, config.interval_ethereum);
+                let mut tracker = create_tracker(
+                    darwinia_client,
+                    microkv.clone(), 
+                    sender_to_relay, 
+                    sender_to_redeem,
+                    web3.clone(), 
+                    topics_list, 
+                    scan_from, 
+                    config.interval_ethereum
+                );
 
                 while let Some(recv) = rx.recv().await {
                     if let DarwiniaEthereumMessage::Scan(message_scan) = recv {

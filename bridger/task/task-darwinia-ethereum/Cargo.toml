@@ -28,6 +28,7 @@ postage = "0.4"
 async-trait = "0.1.48"
 
 web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 array-bytes = "1.1.0"
 
 bridge-traits = { path = "../../traits" }
@@ -43,5 +44,9 @@ evm-log-tracker = { path = "../../supports/evm-log-tracker" }
 # todo: Add on-demand
 tokio = { version = "1", features = ["full"] }
 
-[dev-dependencies]
 env_logger = "0.8"
+
+[dependencies.darwinia]
+package = "bridge-client-darwinia"
+version = "0.1.0"
+path = "../../../darwinia"

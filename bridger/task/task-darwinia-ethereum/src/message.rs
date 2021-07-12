@@ -7,6 +7,8 @@ use postage::broadcast;
 
 use crate::bus::DarwiniaEthereumBus;
 
+use crate::service::EthereumTransaction;
+
 #[derive(Debug, Clone)]
 pub enum DarwiniaEthereumMessage {
     Scan(EthereumScanMessage),
@@ -26,4 +28,24 @@ pub enum EthereumScanMessage {
 #[derive(Debug, Clone)]
 pub enum ToDarwiniaLinkedMessage {
     SendExtrinsic,
+}
+
+// *** ToRelayMessage ***
+#[derive(Clone, Debug)]
+pub enum ToRelayMessage {
+	EthereumBlockNumber(u64),
+}
+
+impl Message<DarwiniaEthereumBus> for ToRelayMessage {
+    type Channel = broadcast::Sender<Self>;
+}
+
+// *** ToRedeemMessage **
+#[derive(Clone, Debug)]
+pub enum ToRedeemMessage {
+	EthereumTransaction(EthereumTransaction),
+}
+
+impl Message<DarwiniaEthereumBus> for ToRedeemMessage {
+    type Channel = broadcast::Sender<Self>;
 }

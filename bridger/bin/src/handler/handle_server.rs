@@ -10,10 +10,13 @@ use bridge_traits::error::StandardError;
 use component_state::config::{BridgeStateConfig, MicrokvConfig};
 use component_state::state::BridgeStateComponent;
 
+use crate::handler::task_manager;
 use crate::patch;
 use crate::types::command::ServerOptions;
 use crate::types::server::{Resp, WebserverState};
-use crate::types::transfer::{TaskListResponse, TaskStartParam, TaskStopParam};
+use crate::types::transfer::{
+    TaskConfigTemplateParam, TaskListResponse, TaskStartParam, TaskStopParam,
+};
 
 /// Handler bridger server
 pub async fn handle_server(options: ServerOptions) -> anyhow::Result<()> {
@@ -70,6 +73,7 @@ async fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
         .get("/task/list", task_list)
         .post("/task/start", task_start)
         .post("/task/stop", task_stop)
+        .post("/task/config-template", task_config_template)
         .post("/task/:task_name/:task_route", task_route)
         .any(handler_404)
         .err_handler_with_info(error_handler)
@@ -139,7 +143,7 @@ async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
 
     let state_webserver = req.data::<WebserverState>().unwrap();
     let base_path = &state_webserver.base_path.as_ref();
-    if let Err(e) = crate::handler::task_manager::start_task_single(base_path.into(), param).await {
+    if let Err(e) = task_manager::start_task_single(base_path.into(), param).await {
         return Resp::<String>::err_with_msg(format!("{}", e)).response_json();
     }
     Resp::<String>::ok().response_json()
@@ -176,4 +180,10 @@ async fn task_route(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let value = task.route(task_route.clone(), param).await?;
 
     Resp::ok_with_data(value).response_json()
+}
+
+async fn task_config_template(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
+    let param: TaskConfigTemplateParam = patch::hyper::deserialize_body(&mut req).await?;
+    let config_template = task_manager::task_config_template(param)?;
+    Resp::ok_with_data(config_template).response_json()
 }

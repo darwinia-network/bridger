@@ -1,17 +1,12 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Sender};
-use serde::{Deserialize, Serialize};
 
-use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskTerminal};
-use component_darwinia::config::DarwiniaConfig;
-use component_ethereum::config::{EthereumRpcConfig, Web3Config};
-use component_shadow::ShadowConfig;
 use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::DarwiniaEthereumConfig;
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
 use crate::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
 use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
@@ -38,6 +33,9 @@ impl BridgeTaskKeep for DarwiniaEthereumTask {
 }
 
 impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
+    fn config_template() -> anyhow::Result<serde_json::Value> {
+        Ok(serde_json::to_value(DarwiniaEthereumConfig::template())?)
+    }
     fn bus(&self) -> &DarwiniaEthereumBus {
         &self.bus
     }
@@ -69,40 +67,5 @@ impl DarwiniaEthereumTask {
             services,
             carries,
         })
-    }
-}
-
-impl DarwiniaEthereumTask {
-    fn spawn_service<
-        S: lifeline::Service<Bus = DarwiniaEthereumBus, Lifeline = anyhow::Result<S>>
-            + BridgeService
-            + Send
-            + Sync
-            + 'static,
-    >(
-        bus: &DarwiniaEthereumBus,
-    ) -> anyhow::Result<Box<dyn BridgeService + Send + Sync>> {
-        Ok(Box::new(S::spawn(bus)?))
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct DarwiniaEthereumConfig {
-    pub darwinia: DarwiniaConfig,
-    pub web3: Web3Config,
-    pub ethereum_rpc: EthereumRpcConfig,
-    pub shadow: ShadowConfig,
-    pub service: SubstrateEthereumConfig,
-}
-
-impl DarwiniaEthereumConfig {
-    pub fn store<S: AsRef<str>>(&self, cell_name: S) -> anyhow::Result<()> {
-        let name = cell_name.as_ref();
-        Config::store(name, self.darwinia.clone())?;
-        Config::store(name, self.web3.clone())?;
-        Config::store(name, self.ethereum_rpc.clone())?;
-        Config::store(name, self.shadow.clone())?;
-        Config::store(name, self.service.clone())?;
-        Ok(())
     }
 }

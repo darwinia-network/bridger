@@ -22,6 +22,13 @@ impl PangolinMillauConfig {
         Config::store(name, self.relay.clone())?;
         Ok(())
     }
+    pub fn template() -> Self {
+        Self {
+            pangolin: ChainInfoConfig::template(),
+            millau: ChainInfoConfig::template(),
+            relay: RelayConfig::template(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

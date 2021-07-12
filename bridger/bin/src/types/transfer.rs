@@ -29,3 +29,10 @@ pub struct TaskListResponse {
     pub name: String,
     pub running: bool,
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct TaskConfigTemplateParam {
+    pub name: String,
+    #[serde(default = "default_config_format")]
+    pub format: String,
+}

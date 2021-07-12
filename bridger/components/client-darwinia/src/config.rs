@@ -11,4 +11,11 @@ impl BridgeConfig for DarwiniaConfig {
     fn marker() -> &'static str {
         "component-darwinia"
     }
+
+    fn template() -> Self {
+        Self {
+            endpoint: "wss://rpc.darwinia.network".to_string(),
+            strict: false,
+        }
+    }
 }

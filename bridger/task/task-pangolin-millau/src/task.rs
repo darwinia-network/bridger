@@ -28,6 +28,9 @@ impl BridgeTaskKeep for PangolinMillauTask {
 }
 
 impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
+    fn config_template() -> anyhow::Result<serde_json::Value> {
+        Ok(serde_json::to_value(PangolinMillauConfig::template())?)
+    }
     fn bus(&self) -> &PangolinMillauBus {
         &self.bus
     }

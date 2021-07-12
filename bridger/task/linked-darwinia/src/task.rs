@@ -27,6 +27,10 @@ impl BridgeTaskKeep for DarwiniaLinked {
 }
 
 impl BridgeTask<DarwiniaLinkedBus> for DarwiniaLinked {
+    fn config_template() -> anyhow::Result<serde_json::Value> {
+        Ok(serde_json::to_value(DarwiniaLinkedConfig::template())?)
+    }
+
     fn bus(&self) -> &DarwiniaLinkedBus {
         &self.bus
     }

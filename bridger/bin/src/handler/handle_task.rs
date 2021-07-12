@@ -7,7 +7,9 @@ use bridge_traits::error::StandardError;
 use crate::patch;
 use crate::types::command::TaskCommand;
 use crate::types::server::Resp;
-use crate::types::transfer::{TaskListResponse, TaskStartParam, TaskStopParam};
+use crate::types::transfer::{
+    TaskConfigTemplateParam, TaskListResponse, TaskStartParam, TaskStopParam,
+};
 use bridge_traits::bridge::task::TaskTerminal;
 
 #[allow(clippy::manual_map)]
@@ -125,6 +127,25 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
             match resp.data() {
                 Some(tt) => println!("{}", tt.view()),
                 None => println!(),
+            }
+        }
+        TaskCommand::ConfigTemplate { name, format } => {
+            let param = TaskConfigTemplateParam { name, format };
+            let resp = reqwest::Client::builder()
+                .build()?
+                .post(format!("{}/task/config-template", server))
+                .json(&param)
+                .send()
+                .await?
+                .json::<Resp<String>>()
+                .await?;
+            if resp.is_err() {
+                eprintln!("{}", resp.msg());
+                return Ok(());
+            }
+            match resp.data() {
+                Some(v) => println!("{}", v),
+                None => println!("Not have default template"),
             }
         }
     };

@@ -25,8 +25,6 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1.0"
 config = "0.11"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
 tokio = { version = "1", features = ["full"] }
 routerify = "2"
 hyper = "0.14"
@@ -37,6 +35,11 @@ reqwest = { version = "0.11", features = ["json"] }
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 colored = "2"
 async-recursion = "0.3"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.5"
+serde_yaml = "0.8"
 
 bridge-traits = { path = "../traits" }
 

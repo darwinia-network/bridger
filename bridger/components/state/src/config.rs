@@ -13,6 +13,12 @@ impl BridgeConfig for BridgeStateConfig {
     fn marker() -> &'static str {
         "component-bridge-state"
     }
+
+    fn template() -> Self {
+        Self {
+            microkv: MicrokvConfig::template(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -25,5 +31,13 @@ pub struct MicrokvConfig {
 impl BridgeConfig for MicrokvConfig {
     fn marker() -> &'static str {
         "component-microkv"
+    }
+
+    fn template() -> Self {
+        Self {
+            base_path: "/tmp/microkv".into(),
+            db_name: Some("microkv".to_string()),
+            auto_commit: true,
+        }
     }
 }

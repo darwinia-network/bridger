@@ -21,6 +21,7 @@ pub trait BridgeTask<B: lifeline::Bus>: BridgeSand + BridgeTaskKeep {
     ) -> anyhow::Result<Box<dyn BridgeService + Send + Sync>> {
         Ok(Box::new(S::spawn(bus)?))
     }
+    fn config_template() -> anyhow::Result<serde_json::Value>;
 
     fn bus(&self) -> &B;
     fn keep_carry(&mut self, other_bus: lifeline::Lifeline);

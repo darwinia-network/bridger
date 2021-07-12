@@ -46,4 +46,8 @@ impl BridgeConfig for HttpClientConfig {
     fn marker() -> &'static str {
         "component-http_client"
     }
+
+    fn template() -> Self {
+        Self { timeout: 3000 }
+    }
 }

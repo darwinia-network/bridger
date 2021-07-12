@@ -9,6 +9,7 @@ use crate::error::{BridgeResult, StandardError};
 
 pub trait BridgeConfig {
     fn marker() -> &'static str;
+    fn template() -> Self;
 }
 
 static INSTANCE: Lazy<Mutex<HashMap<String, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));

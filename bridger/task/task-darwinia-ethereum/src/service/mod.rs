@@ -1,5 +1,6 @@
 pub mod ethereum;
 pub mod relay;
+pub mod redeem;
 
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;

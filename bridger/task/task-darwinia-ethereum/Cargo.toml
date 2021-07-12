@@ -32,8 +32,10 @@ microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 array-bytes = "1.1.0"
 
 bridge-traits = { path = "../../traits" }
+bridge-primitives = { path = "../../primitives", features = ["runtime", "rpc"] }
 
 linked-darwinia = { path = "../linked-darwinia" }
+
 
 component-state = { path = "../../components/state" }
 component-darwinia = { path = "../../components/client-darwinia" }

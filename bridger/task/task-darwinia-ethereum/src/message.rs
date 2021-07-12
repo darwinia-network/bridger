@@ -34,6 +34,7 @@ pub enum ToDarwiniaLinkedMessage {
 #[derive(Clone, Debug)]
 pub enum ToRelayMessage {
 	EthereumBlockNumber(u64),
+    StartRelay,
 }
 
 impl Message<DarwiniaEthereumBus> for ToRelayMessage {
@@ -47,5 +48,29 @@ pub enum ToRedeemMessage {
 }
 
 impl Message<DarwiniaEthereumBus> for ToRedeemMessage {
+    type Channel = broadcast::Sender<Self>;
+}
+
+// *** ToExtrinsicsMessage **
+#[derive(Clone, Debug)]
+pub enum ToExtrinsicsMessage {
+	Extrinsic(Extrinsic),
+}
+
+use bridge_primitives::chain::ethereum::{
+    EthereumReceiptProofThing, EthereumRelayHeaderParcel, RedeemFor,
+};
+
+pub type EcdsaMessage = [u8; 32];
+#[derive(Clone, Debug)]
+pub enum Extrinsic {
+	Affirm(EthereumRelayHeaderParcel),
+	Redeem(RedeemFor, EthereumReceiptProofThing, EthereumTransaction),
+	GuardVote(u64, bool),
+	SignAndSendMmrRoot(u32),
+	SignAndSendAuthorities(EcdsaMessage),
+}
+
+impl Message<DarwiniaEthereumBus> for ToExtrinsicsMessage {
     type Channel = broadcast::Sender<Self>;
 }

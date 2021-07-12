@@ -4406,7 +4406,7 @@ dependencies = [
 [[package]]
 name = "microkv"
 version = "0.2.6"
-source = "git+https://github.com/fewensa/microkv.git?branch=master#4ca7591da7ffbff34bb719da9f8b7bacccced2b7"
+source = "git+https://github.com/fewensa/microkv.git?branch=master#b73053184787dceec3a2d33990e56a79dc2b6295"
 dependencies = [
  "bincode",
  "indexmap",
@@ -9115,6 +9115,7 @@ dependencies = [
  "array-bytes",
  "async-trait",
  "bridge-client-darwinia",
+ "bridge-primitives",
  "bridge-traits",
  "component-darwinia",
  "component-ethereum",

@@ -34,6 +34,7 @@ use darwinia::{
 	Darwinia,
 };
 
+
 fn create_tracker(
     darwinia_client: Darwinia, 
     microkv: MicroKV, 
@@ -148,7 +149,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
                 let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-                let darwinia_client = Darwinia::new("wss://rpc.darwinia.network").await?;
+                let darwinia_client = Darwinia::new("wss://rpc.darwinia.network").await?; // TODO: from config
                 let web3 = component_web3.component().await?;
                 let microkv = state.microkv();
 
@@ -170,6 +171,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                         match message_scan {
                             EthereumScanMessage::Start => {
                                 if tracker.running == false {
+                                    // TODO: spawn
                                     tracker.start().await;
                                 }
                             }

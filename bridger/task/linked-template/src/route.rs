@@ -1,4 +1,7 @@
+use crate::bus::TemplateLinkedBus;
+
 pub async fn dispatch_route(
+    bus: &TemplateLinkedBus,
     uri: String,
     param: serde_json::Value,
 ) -> anyhow::Result<serde_json::Value> {

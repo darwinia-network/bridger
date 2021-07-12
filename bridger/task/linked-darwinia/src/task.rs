@@ -26,7 +26,7 @@ impl BridgeTaskKeep for DarwiniaLinked {
         uri: String,
         param: serde_json::Value,
     ) -> anyhow::Result<serde_json::Value> {
-        crate::route::dispatch_route(uri, param).await
+        crate::route::dispatch_route(&self.bus, uri, param).await
     }
 }
 

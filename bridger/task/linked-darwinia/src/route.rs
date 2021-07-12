@@ -1,6 +1,9 @@
 use bridge_traits::error::StandardError;
 
+use crate::bus::DarwiniaLinkedBus;
+
 pub async fn dispatch_route(
+    bus: &DarwiniaLinkedBus,
     uri: String,
     param: serde_json::Value,
 ) -> anyhow::Result<serde_json::Value> {

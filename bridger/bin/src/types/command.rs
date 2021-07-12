@@ -41,6 +41,25 @@ pub enum TaskCommand {
         #[structopt(short, long)]
         name: String,
     },
+    /// Execute task command
+    Exec {
+        /// Options of task execute
+        #[structopt(flatten)]
+        options: TaskExecuteOptions,
+    },
+}
+
+#[derive(Clone, Debug, StructOpt)]
+pub struct TaskExecuteOptions {
+    /// The task name
+    #[structopt(short, long)]
+    pub name: String,
+    /// The api of task
+    #[structopt(short, long)]
+    pub api: String,
+    /// The parameters of this api
+    #[structopt(short, long, default_value = "")]
+    pub param: Vec<String>,
 }
 
 #[derive(Clone, Debug, StructOpt)]

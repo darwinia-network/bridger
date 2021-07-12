@@ -1,7 +1,7 @@
 use lifeline::dyn_bus::DynBus;
 
 use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep};
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskTerminal};
 use component_state::state::BridgeState;
 
 use crate::bus::TemplateLinkedBus;
@@ -24,11 +24,7 @@ impl BridgeTaskKeep for TemplateLinked {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    async fn route(
-        &self,
-        uri: String,
-        param: serde_json::Value,
-    ) -> anyhow::Result<serde_json::Value> {
+    async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
         crate::route::dispatch_route(&self.bus, uri, param).await
     }
 }

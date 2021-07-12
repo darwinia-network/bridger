@@ -4270,7 +4270,6 @@ dependencies = [
  "postage",
  "serde 1.0.126",
  "serde_json",
- "support-keep",
 ]
 
 [[package]]
@@ -4471,7 +4470,7 @@ dependencies = [
 [[package]]
 name = "microkv"
 version = "0.2.6"
-source = "git+https://github.com/fewensa/microkv.git?branch=master#4ca7591da7ffbff34bb719da9f8b7bacccced2b7"
+source = "git+https://github.com/ex0dus-0x/microkv.git?branch=master#b73053184787dceec3a2d33990e56a79dc2b6295"
 dependencies = [
  "bincode",
  "indexmap",

@@ -56,6 +56,7 @@ async fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
         .post("/task/start", task_start)
         .post("/task/stop", task_stop)
         .post("/task/:task_name/:task_route", task_route)
+        .any(handler_404)
         .err_handler_with_info(error_handler)
         .build()
         .unwrap()
@@ -99,6 +100,12 @@ async fn error_handler(err: routerify::RouteError, _: RequestInfo) -> Response<B
     Resp::<String>::err_with_msg(msg)
         .response_json()
         .expect("Failed to build response")
+}
+
+async fn handler_404(req: Request<Body>) -> anyhow::Result<Response<Body>> {
+    let uri = req.uri();
+    Resp::<String>::err_with_msg(format!("Not found this api: {}", uri))
+        .response_json_with_code(hyper::StatusCode::NOT_FOUND)
 }
 
 /// Index
@@ -229,7 +236,6 @@ async fn task_route(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let task_route = req
         .param("task_route")
         .ok_or_else(|| StandardError::Api("The task route is required".to_string()))?;
-    let uri = format!("{}-{}", task_name, task_route);
 
     let task = support_keep::task::running_task(task_name).ok_or_else(|| {
         StandardError::Api(format!(
@@ -237,7 +243,7 @@ async fn task_route(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
             task_name
         ))
     })?;
-    let value = task.route(uri, param).await?;
+    let value = task.route(task_route.clone(), param).await?;
 
     Resp::ok_with_data(value).response_json()
 }

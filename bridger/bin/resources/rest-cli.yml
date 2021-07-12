@@ -1,0 +1,44 @@
+
+tasks:
+  - name: linked-darwinia
+    commands:
+      - name: test
+        path: test
+        headers:
+          - x-some-key: some value
+        bodies:
+          - name: key
+            short: k
+            long: key
+            types: Optin<String>
+            description: The test key
+
+  - name: task-darwinia-ethereum
+    commands:
+      - name: affirm
+        path: affirm
+        bodies:
+          - name: blocknumber
+            short: b
+            default: 0
+            types: u32
+            description: The ethereum block number
+            derives:
+              - "#[derive(Debug)]"
+      - name: confirm
+        path: confirm
+        bodies:
+          - name: blockhash
+            short: h
+            types: String
+            description: The block hash
+
+          - name: timestamp
+            types: u64
+            description: Current unix timestamp
+
+
+
+
+
+

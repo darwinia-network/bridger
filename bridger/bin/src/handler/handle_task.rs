@@ -87,6 +87,7 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
             }
             println!("{}", resp.msg());
         }
+        _ => println!("not support now"),
     };
     Ok(())
 }

@@ -41,6 +41,30 @@ pub enum TaskCommand {
         #[structopt(short, long)]
         name: String,
     },
+    Exec {
+        #[structopt(flatten)]
+        sub_command: TaskSubcommand,
+    },
+}
+
+#[derive(Clone, Debug, StructOpt)]
+pub enum TaskSubcommand {
+    LinkedDarwinia(LinkedDarwiniaCommand),
+    TaskDarwiniaEthereum,
+}
+
+#[derive(Clone, Debug, StructOpt)]
+pub enum LinkedDarwiniaCommand {
+    Test {
+        #[structopt(flatten)]
+        options: LinkedDarwiniaCommandTest,
+    },
+}
+
+#[derive(Clone, Debug, StructOpt)]
+pub struct LinkedDarwiniaCommandTest {
+    #[structopt(long)]
+    key: String,
 }
 
 #[derive(Clone, Debug, StructOpt)]

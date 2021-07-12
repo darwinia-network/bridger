@@ -93,17 +93,11 @@ pub fn running_task_cast<T: 'static + BridgeTaskKeep>(
     name: impl AsRef<str>,
 ) -> anyhow::Result<&'static T> {
     let name = name.as_ref();
-    unsafe {
-        if let Some(running) = RUNNING_TASKS.get() {
-            if let Some(tk) = running.get(&name.to_string()) {
-                return match tk.as_any().downcast_ref::<T>() {
-                    Some(b) => Ok(b),
-                    None => {
-                        Err(StandardError::Api(format!("can't downcast task [{}]", name)).into())
-                    }
-                };
-            }
-        }
-        Err(StandardError::Api(format!("the task [{}] isn't started", name)).into())
+    if let Some(tk) = running_task(name) {
+        return match tk.as_any().downcast_ref::<T>() {
+            Some(b) => Ok(b),
+            None => Err(StandardError::Api(format!("can't downcast task [{}]", name)).into()),
+        };
     }
+    Err(StandardError::Api(format!("the task [{}] isn't started", name)).into())
 }

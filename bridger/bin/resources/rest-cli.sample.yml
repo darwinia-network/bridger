@@ -1,0 +1,48 @@
+
+tasks:
+  # the task name, e.g. darwinia-bridge task linked-darwinia
+  - name: linked-darwinia
+    commands:
+      # the task support command, e.g. darwinia-bridge task linked-darwinia test
+      - name: test
+        path: test
+        headers:
+          - x-some-key: some value
+        bodies:
+          # the command params e.g. darwinia-bridge task linked-darwinia test --key 123456
+          - name: key
+            short: k
+            long: key
+            types: Optin<String>
+            derives:
+              - "#[derive(Clone)]"
+            description: The test key
+
+  - name: task-darwinia-ethereum
+    commands:
+      - name: affirm
+        path: affirm
+        bodies:
+          - name: blocknumber
+            short: b
+            default: 0
+            types: u32
+            description: The ethereum block number
+      - name:
+          name: confirm
+          path: confirm
+          bodies:
+            - name: blockhash
+              short: h
+              types: String
+              description: The block hash
+
+            - name: timestamp
+              types: u64
+              description: Current unix timestamp
+
+
+
+
+
+

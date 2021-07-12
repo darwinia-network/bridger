@@ -832,6 +832,7 @@ dependencies = [
  "routerify",
  "serde 1.0.126",
  "serde_json",
+ "serde_yaml",
  "structopt",
  "support-keep",
  "task-darwinia-ethereum",

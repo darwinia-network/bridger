@@ -57,15 +57,13 @@ impl Service for ExtrinsicsService {
                 let darwinia2ethereum_relayer = ToEthereumAccount::new(account.clone(), None, "".to_string());
                 let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
 
-                let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
-                let shadow = Arc::new(component_shadow.component().await?);
-
                 let spec_name = darwinia.runtime_version().await?;
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToExtrinsicsMessage::Extrinsic(ex) => {
                             ExtrinsicsService::send_extrinsic(
+                                microkv,
                                 Some(ethereum2darwinia.clone()),
                                 Some(darwinia2ethereum.clone()),
                                 Some(ethereum2darwinia_relayer.clone()),

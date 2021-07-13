@@ -72,3 +72,13 @@ pub enum Extrinsic {
 impl Message<DarwiniaEthereumBus> for ToExtrinsicsMessage {
     type Channel = broadcast::Sender<Self>;
 }
+
+// *** ToGuardMessage **
+#[derive(Clone, Debug)]
+pub enum ToGuardMessage {
+    StartGuard,
+}
+
+impl Message<DarwiniaEthereumBus> for ToGuardMessage {
+    type Channel = broadcast::Sender<Self>;
+}

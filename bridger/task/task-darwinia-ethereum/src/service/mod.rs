@@ -2,6 +2,7 @@ pub mod ethereum;
 pub mod relay;
 pub mod redeem;
 pub mod extrinsics;
+pub mod guard;
 
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;

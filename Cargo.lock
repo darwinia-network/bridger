@@ -978,56 +978,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "chain-relay"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "async-std",
- "async-trait",
- "bp-header-chain",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
- "custom_derive",
- "drml-primitives",
- "enum_derive",
- "finality-grandpa",
- "finality-relay",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "futures 0.3.15",
- "getset",
- "headers-relay",
- "hex",
- "hex-literal",
- "log",
- "messages-relay",
- "millau-primitives 0.1.0 (git+https://github.com/darwinia-network/darwinia-launch.git?branch=s2s)",
- "millau-runtime",
- "num-format",
- "num-traits 0.2.14",
- "pallet-bridge-messages",
- "pangolin-bridge-primitives",
- "pangolin-bridge-relay-client-definition",
- "pangolin-constants",
- "pangolin-runtime",
- "pangolin-runtime-system-params",
- "parity-scale-codec 2.2.0",
- "paste",
- "relay-millau-client",
- "relay-substrate-client",
- "relay-utils",
- "serde 1.0.126",
- "serde_derive",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-finality-grandpa",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "chrono"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1461,12 +1411,6 @@ dependencies = [
  "subtle 2.4.0",
  "zeroize",
 ]
-
-[[package]]
-name = "custom_derive"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef8ae57c4978a2acd8b869ce6b9ca1dfe817bff704c220209fdef2c0b75a01b9"
 
 [[package]]
 name = "darwinia-balances"
@@ -2325,12 +2269,6 @@ dependencies = [
  "quote",
  "syn",
 ]
-
-[[package]]
-name = "enum_derive"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "406ac2a8c9eedf8af9ee1489bee9e50029278a6456c740f7454cf8a158abc816"
 
 [[package]]
 name = "enumflags2"
@@ -3312,18 +3250,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "getset"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24b328c01a4d71d2d8173daa93562a73ab0fe85616876f02500f53d82948c504"
-dependencies = [
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "gimli"
 version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3453,12 +3379,6 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
-
-[[package]]
-name = "hex-literal"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76505e26b6ca3bbdbbb360b68472abbb80998c5fa5dc43672eca34f28258e138"
 
 [[package]]
 name = "hmac"
@@ -4827,16 +4747,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num-format"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bafe4179722c2894288ee77a9f044f02811c86af699344c498b0840c698a2465"
-dependencies = [
- "arrayvec 0.4.12",
- "itoa",
-]
-
-[[package]]
 name = "num-integer"
 version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5617,25 +5527,6 @@ dependencies = [
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "pangolin-bridge-relay-client-definition"
-version = "2.2.0"
-dependencies = [
- "darwinia-ethereum-relay",
- "drml-primitives",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "headers-relay",
- "pallet-transaction-payment",
- "pangolin-runtime",
- "parity-scale-codec 2.2.0",
- "relay-substrate-client",
- "relay-utils",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
@@ -6516,24 +6407,6 @@ name = "regex-syntax"
 version = "0.6.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
-
-[[package]]
-name = "relay-millau-client"
-version = "0.1.0"
-dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "headers-relay",
- "millau-primitives 0.1.0 (git+https://github.com/darwinia-network/darwinia-launch.git?branch=s2s)",
- "millau-runtime",
- "pallet-transaction-payment",
- "parity-scale-codec 2.2.0",
- "relay-substrate-client",
- "relay-utils",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
 
 [[package]]
 name = "relay-substrate-client"
@@ -9012,18 +8885,6 @@ dependencies = [
  "log",
  "prometheus",
  "tokio 0.2.25",
-]
-
-[[package]]
-name = "substrate-relay"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "chain-relay",
- "env_logger 0.8.4",
- "futures 0.3.15",
- "log",
- "structopt",
 ]
 
 [[package]]

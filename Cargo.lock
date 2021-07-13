@@ -9194,6 +9194,7 @@ dependencies = [
  "serde 1.0.126",
  "serde_json",
  "support-ethereum",
+ "thiserror",
  "tokio 1.8.1",
  "web3",
 ]

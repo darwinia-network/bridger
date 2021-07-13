@@ -11,6 +11,7 @@ use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
 use crate::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
 use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 use crate::service::redeem::RedeemService;
+use crate::service::extrinsics::ExtrinsicsService;
 
 #[derive(Debug)]
 pub struct DarwiniaEthereumTask {
@@ -56,6 +57,7 @@ impl DarwiniaEthereumTask {
             Self::spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?,
             Self::spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?,
             Self::spawn_service::<RedeemService>(&bus)?,
+            Self::spawn_service::<ExtrinsicsService>(&bus)?,
         ];
 
         let mut tx_scan = bus.tx::<DarwiniaEthereumMessage>()?;

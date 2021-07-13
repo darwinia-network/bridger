@@ -3,7 +3,8 @@ use lifeline::{Bus, Lifeline, Service, Receiver, Sender, Task};
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia::component::DarwiniaComponent;
+use component_darwinia_subxt::component::DarwiniaSubxtComponent;
+use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
 
 use crate::bus::DarwiniaEthereumBus;
@@ -15,11 +16,10 @@ use crate::message::{ToRedeemMessage, ToExtrinsicsMessage, Extrinsic};
 use std::time::Duration;
 use tokio::time::sleep;
 
-use darwinia::{Darwinia, Ethereum2Darwinia};
 use std::sync::Arc;
 use postage::broadcast;
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
-use bridge_primitives::chain::ethereum::RedeemFor;
+use support_ethereum::receipt::RedeemFor;
 
 #[derive(Debug)]
 pub struct RedeemService {
@@ -33,7 +33,7 @@ impl Service for RedeemService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let _component_darwinia = DarwiniaComponent::restore::<DarwiniaEthereumTask>()?;
+        let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
         let mut rx = bus.rx::<ToRedeemMessage>()?;
         let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
         let _greet = Self::try_task(
@@ -42,7 +42,7 @@ impl Service for RedeemService {
                 debug!(target: DarwiniaEthereumTask::NAME, "hello redeem");
 
                 // let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-                let darwinia = Darwinia::new("wss://rpc.darwinia.network").await?; // TODO: from config
+                let darwinia = component_darwinia.component().await?;
                 let darwinia_client = Ethereum2Darwinia::new(darwinia);
 
                 let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;

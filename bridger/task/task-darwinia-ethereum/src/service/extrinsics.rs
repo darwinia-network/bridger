@@ -27,6 +27,7 @@ use std::sync::Arc;
 use postage::broadcast;
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use support_ethereum::receipt::RedeemFor;
+use component_darwinia_subxt::account::DarwiniaAccount;
 
 #[derive(Debug)]
 pub struct ExtrinsicsService {
@@ -45,19 +46,33 @@ impl Service for ExtrinsicsService {
         let _greet = Self::try_task(
             &format!("{}-service-extrinsics", DarwiniaEthereumTask::NAME),
             async move {
-                debug!(target: DarwiniaEthereumTask::NAME, "hello redeem");
+                debug!(target: DarwiniaEthereumTask::NAME, "hello extrinsics");
 
                 // let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
                 let darwinia = component_darwinia.component().await?;
-                let darwinia_client = Ethereum2Darwinia::new(darwinia);
+                let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
+                let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
+
+                let account = DarwiniaAccount::new("".to_string(), None); // TODO: config
+                let darwinia2ethereum_relayer = ToEthereumAccount::new(account.clone(), None, "".to_string());
+                let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
 
                 let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
                 let shadow = Arc::new(component_shadow.component().await?);
 
+                let spec_name = darwinia.runtime_version().await?;
+
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToExtrinsicsMessage::Extrinsic(ex) => {
-
+                            ExtrinsicsService::send_extrinsic(
+                                Some(ethereum2darwinia.clone()),
+                                Some(darwinia2ethereum.clone()),
+                                Some(ethereum2darwinia_relayer.clone()),
+                                Some(darwinia2ethereum_relayer.clone()),
+                                ex,
+                                spec_name.clone()
+                            ).await?;
                         },
                     }
                 }

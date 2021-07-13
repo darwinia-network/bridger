@@ -28,6 +28,9 @@ use postage::broadcast;
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use support_ethereum::receipt::RedeemFor;
 use component_darwinia_subxt::account::DarwiniaAccount;
+use lifeline::dyn_bus::DynBus;
+use component_state::state::BridgeState;
+use microkv::MicroKV;
 
 #[derive(Debug)]
 pub struct ExtrinsicsService {
@@ -43,10 +46,13 @@ impl Service for ExtrinsicsService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
         let mut rx = bus.rx::<ToExtrinsicsMessage>()?;
+        let state = bus.storage().clone_resource::<BridgeState>()?;
         let _greet = Self::try_task(
             &format!("{}-service-extrinsics", DarwiniaEthereumTask::NAME),
             async move {
                 debug!(target: DarwiniaEthereumTask::NAME, "hello extrinsics");
+
+                let microkv = state.microkv();
 
                 // let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
                 let darwinia = component_darwinia.component().await?;
@@ -85,6 +91,7 @@ impl Service for ExtrinsicsService {
 impl ExtrinsicsService {
 	#[allow(clippy::too_many_arguments)]
 	async fn send_extrinsic(
+        microkv: &MicroKV,
 		ethereum2darwinia: Option<Ethereum2Darwinia>,
 		darwinia2ethereum: Option<Darwinia2Ethereum>,
 		ethereum2darwinia_relayer: Option<FromEthereumAccount>,
@@ -165,13 +172,7 @@ impl ExtrinsicsService {
 				}
 
 				// Update cache
-                // TODO: use kv database
-				// tools::set_cache(
-				// 	data_dir,
-				// 	tools::LAST_REDEEMED_CACHE_FILE_NAME,
-				// 	ethereum_tx.block,
-				// )
-				// .await?;
+                microkv.put("last-redeemed", &ethereum_tx.block)?;
 			}
 
 			Extrinsic::GuardVote(pending_block_number, aye) => {

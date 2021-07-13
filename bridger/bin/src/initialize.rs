@@ -17,6 +17,8 @@ fn init_log() {
         lifeline=debug,
         darwinia_bridge=debug,
         task-darwinia-ethereum=debug,
+		support_s2s=debug,
+		bridge=info,
         "#,
     );
     std::env::set_var("RUST_BACKTRACE", "1");

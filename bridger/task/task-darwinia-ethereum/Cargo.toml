@@ -32,15 +32,20 @@ microkv = { git = "https://github.com/ex0dus-0x/microkv.git", branch = "master" 
 array-bytes = "1.1.0"
 
 bridge-traits = { path = "../../traits" }
-bridge-primitives = { path = "../../primitives", features = ["runtime", "rpc"] }
 
 linked-darwinia = { path = "../linked-darwinia" }
 
 
 component-state = { path = "../../components/state" }
-component-darwinia = { path = "../../components/client-darwinia" }
 component-ethereum = { path = "../../components/ethereum" }
 component-shadow = { path = "../../components/shadow" }
+component-http-client = { path = "../../components/http-client" }
+
+#component-darwinia = { path = "../../components/client-darwinia" }
+component-darwinia-subxt = { path = "../../components/client-darwinia-subxt" }
+
+support-ethereum = { path = "../../supports/support-ethereum" }
+
 evm-log-tracker = { path = "../../supports/evm-log-tracker" }
 
 # todo: Add on-demand
@@ -48,7 +53,3 @@ tokio = { version = "1", features = ["full"] }
 
 env_logger = "0.8"
 
-[dependencies.darwinia]
-package = "bridge-client-darwinia"
-version = "0.1.0"
-path = "../../../darwinia"

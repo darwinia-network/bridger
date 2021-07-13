@@ -1,16 +1,13 @@
 //! Ethereum EthereumRelayHeaderParcel
-use crate::{
-    bytes,
-    chain::ethereum::{EthereumHeader, EthereumHeaderJson},
-    hex,
-};
+use std::fmt::Formatter;
+
 use codec::{Decode, Encode};
-
-#[cfg(feature = "runtime")]
-use uint::static_assertions::_core::fmt::Formatter;
-
-#[cfg(feature = "runtime")]
+use serde::{Deserialize, Serialize};
 use sp_core::bytes::to_hex;
+
+use bridge_primitives::{bytes, hex};
+
+use crate::block::{EthereumHeader, EthereumHeaderJson};
 
 /// Ethereum EthereumRelayHeaderParcel
 #[derive(Encode, Decode, Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize)]
@@ -28,7 +25,6 @@ impl EthereumRelayHeaderParcel {
     }
 }
 
-#[cfg(feature = "runtime")]
 impl std::fmt::Display for EthereumRelayHeaderParcel {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let header = &self.header.to_string();

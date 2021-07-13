@@ -737,16 +737,9 @@ dependencies = [
 name = "bridge-primitives"
 version = "0.3.3"
 dependencies = [
- "async-trait",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-im-online 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "parity-scale-codec",
- "reqwest 0.11.4",
  "rlp 0.4.6",
  "serde 1.0.126",
- "serde_json",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "uint 0.8.5",
 ]
 
@@ -1086,18 +1079,45 @@ dependencies = [
 ]
 
 [[package]]
+name = "component-darwinia-subxt"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "array-bytes",
+ "async-trait",
+ "bridge-traits",
+ "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "jsonrpsee-http-client",
+ "jsonrpsee-types",
+ "jsonrpsee-ws-client",
+ "log",
+ "pallet-im-online 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-indices",
+ "parity-scale-codec",
+ "secp256k1",
+ "serde 1.0.126",
+ "serde_json",
+ "sp-keyring 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "substrate-subxt",
+ "substrate-subxt-proc-macro",
+ "support-ethereum",
+ "thiserror",
+ "web3",
+]
+
+[[package]]
 name = "component-ethereum"
 version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-trait",
- "bridge-primitives",
  "bridge-traits",
  "component-http-client",
  "log",
  "reqwest 0.11.4",
  "serde 1.0.126",
  "serde_json",
+ "support-ethereum",
  "thiserror",
  "web3",
 ]
@@ -1135,7 +1155,6 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-trait",
- "bridge-primitives",
  "bridge-traits",
  "component-ethereum",
  "component-http-client",
@@ -1143,6 +1162,7 @@ dependencies = [
  "reqwest 0.11.4",
  "serde 1.0.126",
  "serde_json",
+ "support-ethereum",
 ]
 
 [[package]]
@@ -1480,7 +1500,7 @@ dependencies = [
  "async-trait",
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-im-online 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-indices 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-indices",
  "parity-scale-codec",
  "reqwest 0.10.10",
  "rlp 0.4.6",
@@ -2537,7 +2557,7 @@ dependencies = [
 
 [[package]]
 name = "evm-log-tracker"
-version = "0.1.0"
+version = "0.3.3"
 dependencies = [
  "anyhow",
  "array-bytes",
@@ -4216,7 +4236,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bridge-traits",
- "component-darwinia",
+ "component-darwinia-subxt",
  "component-http-client",
  "lifeline",
  "log",
@@ -5207,21 +5227,6 @@ dependencies = [
  "sp-keyring 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "pallet-indices"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
-dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
@@ -9015,7 +9020,7 @@ dependencies = [
  "jsonrpsee-ws-client",
  "log",
  "num-traits 0.2.14",
- "pallet-indices 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-indices",
  "pallet-staking 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec",
  "serde 1.0.126",
@@ -9091,6 +9096,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
+name = "support-ethereum"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "bridge-primitives",
+ "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log",
+ "pallet-im-online 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-indices",
+ "parity-scale-codec",
+ "rlp 0.4.6",
+ "serde 1.0.126",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "support-keep"
 version = "0.3.3"
 dependencies = [
@@ -9157,11 +9178,10 @@ dependencies = [
  "anyhow",
  "array-bytes",
  "async-trait",
- "bridge-client-darwinia",
- "bridge-primitives",
  "bridge-traits",
- "component-darwinia",
+ "component-darwinia-subxt",
  "component-ethereum",
+ "component-http-client",
  "component-shadow",
  "component-state",
  "env_logger 0.8.4",
@@ -9173,6 +9193,7 @@ dependencies = [
  "postage",
  "serde 1.0.126",
  "serde_json",
+ "support-ethereum",
  "tokio 1.8.1",
  "web3",
 ]
@@ -10023,7 +10044,7 @@ dependencies = [
 [[package]]
 name = "web3"
 version = "0.16.0"
-source = "git+https://github.com/wuminzhe/rust-web3.git?branch=master#ef643118ab5de677f5455b1f08ca379586daf51c"
+source = "git+https://github.com/wuminzhe/rust-web3.git?branch=master#b03cf9d1cd5c15705f1caf716f44fbc48ab4d707"
 dependencies = [
  "arrayvec 0.5.2",
  "base64 0.13.0",

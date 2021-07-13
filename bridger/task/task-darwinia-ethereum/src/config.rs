@@ -1,17 +1,19 @@
 use serde::{Deserialize, Serialize};
 
 use bridge_traits::bridge::config::{BridgeConfig, Config};
-use component_darwinia::config::DarwiniaConfig;
+use component_darwinia_subxt::config::DarwiniaSubxtConfig;
 use component_ethereum::config::{EthereumRpcConfig, Web3Config};
+use component_http_client::HttpClientConfig;
 use component_shadow::ShadowConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DarwiniaEthereumConfig {
-    pub darwinia: DarwiniaConfig,
+    pub darwinia: DarwiniaSubxtConfig,
     pub web3: Web3Config,
     pub ethereum_rpc: EthereumRpcConfig,
     pub shadow: ShadowConfig,
     pub service: SubstrateEthereumConfig,
+    pub http_client: HttpClientConfig,
 }
 
 impl DarwiniaEthereumConfig {
@@ -22,15 +24,17 @@ impl DarwiniaEthereumConfig {
         Config::store(name, self.ethereum_rpc.clone())?;
         Config::store(name, self.shadow.clone())?;
         Config::store(name, self.service.clone())?;
+        Config::store(name, self.http_client.clone())?;
         Ok(())
     }
     pub fn template() -> Self {
         Self {
-            darwinia: DarwiniaConfig::template(),
+            darwinia: DarwiniaSubxtConfig::template(),
             web3: Web3Config::template(),
             ethereum_rpc: EthereumRpcConfig::template(),
             shadow: ShadowConfig::template(),
             service: SubstrateEthereumConfig::template(),
+            http_client: HttpClientConfig::template(),
         }
     }
 }

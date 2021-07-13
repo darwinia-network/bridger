@@ -1,52 +1,56 @@
+use std::time::Duration;
+
+use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
+use microkv::MicroKV;
+use postage::broadcast;
+use tokio::time::sleep;
+use web3::{
+    transports::http::Http,
+    types::{Log, H160, H256},
+    Web3,
+};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
+use component_darwinia_subxt::component::DarwiniaSubxtComponent;
+use component_darwinia_subxt::darwinia::client::Darwinia;
 use component_ethereum::web3::Web3Component;
-use component_darwinia::component::DarwiniaComponent;
 use component_state::state::BridgeState;
+use ethereum_logs_handler::EthereumLogsHandler;
+use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker, Result};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
-use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage, ToRelayMessage, ToRedeemMessage};
+use crate::message::{
+    DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage, ToRedeemMessage,
+    ToRelayMessage,
+};
 use crate::task::DarwiniaEthereumTask;
 
 mod ethereum_logs_handler;
-use ethereum_logs_handler::EthereumLogsHandler;
-use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker, Result};
-use array_bytes::hex2bytes_unchecked as bytes;
-use web3::{
-    Web3, 
-    transports::http::Http,
-    types::{Log, H160, H256}
-};
-
-use postage::broadcast;
-use microkv::MicroKV;
-
-use std::time::Duration;
-use tokio::time::sleep;
-
-use darwinia::{
-	Darwinia,
-};
-
 
 fn create_tracker(
-    darwinia_client: Darwinia, 
-    microkv: MicroKV, 
+    darwinia_client: Darwinia,
+    microkv: MicroKV,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
-    sender_to_redeem: broadcast::Sender<ToRedeemMessage>, 
-    web3: Web3<Http>, 
-    topics_list: Vec<(H160, Vec<H256>)>, 
-    scan_from: u64, 
-    step: u64
+    sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
+    web3: Web3<Http>,
+    topics_list: Vec<(H160, Vec<H256>)>,
+    scan_from: u64,
+    step: u64,
 ) -> EvmLogTracker<Ethereum, EthereumLogsHandler> {
     let client = EvmClient::new(web3);
-    let logs_handler = EthereumLogsHandler::new(topics_list.clone(), sender_to_relay, sender_to_redeem, microkv, darwinia_client);
+    let logs_handler = EthereumLogsHandler::new(
+        topics_list.clone(),
+        sender_to_relay,
+        sender_to_redeem,
+        microkv,
+        darwinia_client,
+    );
     EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
         client,
         topics_list,
@@ -55,7 +59,6 @@ fn create_tracker(
         step,
     )
 }
-
 
 // struct Topic {
 //     name: String,
@@ -81,30 +84,22 @@ fn get_topics_list() -> Vec<(H160, Vec<H256>)> {
         // ring
         (
             "0x9469d013805bffb7d3debe5e7839237e535ec483",
-            vec![
-                "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10",
-            ]
+            vec!["0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"],
         ),
         // kton
         (
             "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff",
-            vec![
-                "0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10",
-            ]
+            vec!["0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"],
         ),
         // bank
         (
             "0x649fdf6ee483a96e020b889571e93700fbd82d88",
-            vec![
-                "0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12",
-            ]
+            vec!["0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12"],
         ),
         // relay
         (
             "0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49",
-            vec![
-                "0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f",
-            ]
+            vec!["0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f"],
         ),
         // backing
         (
@@ -112,17 +107,20 @@ fn get_topics_list() -> Vec<(H160, Vec<H256>)> {
             vec![
                 "0x0c403c4583ff520bad94bf49975b3547a573f7157070022cf8c9a023498d4d11",
                 "0xf70fbddcb43e433da621898f5f2628b0a644a77a4389ac2580c5b1de06382fe2",
-            ]
+            ],
         ),
     ];
 
-    topics_setting.iter().map(|item| {
-        let contract_address = item.0;
-        let contract_address = H160::from_slice(&bytes(contract_address));
+    topics_setting
+        .iter()
+        .map(|item| {
+            let contract_address = item.0;
+            let contract_address = H160::from_slice(&bytes(contract_address));
 
-        let topics = item.1.iter().map(|t| H256::from_slice(&bytes(t))).collect();
-        (contract_address, topics)
-    }).collect()
+            let topics = item.1.iter().map(|t| H256::from_slice(&bytes(t))).collect();
+            (contract_address, topics)
+        })
+        .collect()
 }
 
 #[derive(Debug)]
@@ -142,14 +140,15 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         let mut sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
         let mut rx = bus.rx::<DarwiniaEthereumMessage>()?;
         let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
-        
+        let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
                 let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-                let darwinia_client = Darwinia::new("wss://rpc.darwinia.network").await?; // TODO: from config
+                let darwinia_client = component_darwinia_subxt.component().await?;
                 let web3 = component_web3.component().await?;
                 let microkv = state.microkv();
 
@@ -157,13 +156,13 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                 let scan_from: u64 = microkv.get("last_synced")?.unwrap_or(0);
                 let mut tracker = create_tracker(
                     darwinia_client,
-                    microkv.clone(), 
-                    sender_to_relay, 
+                    microkv.clone(),
+                    sender_to_relay,
                     sender_to_redeem,
-                    web3.clone(), 
-                    topics_list, 
-                    scan_from, 
-                    config.interval_ethereum
+                    web3.clone(),
+                    topics_list,
+                    scan_from,
+                    config.interval_ethereum,
                 );
 
                 while let Some(recv) = rx.recv().await {

@@ -31,4 +31,5 @@ postage = "0.4"
 bridge-traits = { path = "../../traits" }
 
 component-http-client = { path = "../../components/http-client" }
-component-darwinia = { path = "../../components/client-darwinia" }
+#component-darwinia = { path = "../../components/client-darwinia" }
+component-darwinia-subxt = { path = "../../components/client-darwinia-subxt" }

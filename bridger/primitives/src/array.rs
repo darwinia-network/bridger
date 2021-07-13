@@ -1,13 +1,14 @@
 //! Custom byte array
 
+use std::{
+    fmt::{self, Debug, Display, Formatter, Result as FmtResult},
+    marker::PhantomData,
+};
+
 use codec::{Decode, Encode};
 use serde::{
     de::{Deserialize, Deserializer, Error, SeqAccess, Visitor},
     ser::{Serialize, SerializeTuple, Serializer},
-};
-use std::{
-    fmt::{self, Debug, Display, Formatter, Result as FmtResult},
-    marker::PhantomData,
 };
 use uint::construct_uint;
 
@@ -29,36 +30,36 @@ construct_uint! {
     pub struct U256(4);
 }
 
-construct_hash_bytes! {
+crate::construct_hash_bytes! {
     #[derive(Clone)]
     pub struct H128(16);
 }
 
-construct_hash_bytes! {
+crate::construct_hash_bytes! {
     #[derive(Clone)]
     pub struct H160(20);
 }
 
-construct_hash_bytes! {
+crate::construct_hash_bytes! {
     #[derive(Clone)]
     pub struct H256(32);
 }
 
-construct_hash_bytes! {
+crate::construct_hash_bytes! {
     #[derive(Clone)]
     pub struct H512(64);
 }
 
-construct_hash_bytes! {
+crate::construct_hash_bytes! {
     #[derive(Clone)]
     pub struct H1024(128);
 }
 
-construct_hash_bytes! {
+crate::construct_hash_bytes! {
     #[derive(Clone)]
     pub struct Bloom(256);
 }
 
-impl_hash_rlp!(Bloom, 256);
-impl_hash_rlp!(H256, 32);
-impl_hash_rlp!(H160, 20);
+crate::impl_hash_rlp!(Bloom, 256);
+crate::impl_hash_rlp!(H256, 32);
+crate::impl_hash_rlp!(H160, 20);

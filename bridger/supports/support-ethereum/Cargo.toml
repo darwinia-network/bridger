@@ -1,0 +1,34 @@
+[package]
+name = "support-ethereum"
+version = "0.3.3"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+    "Cargo.toml",
+    "**/*.rs",
+    "README.md",
+    "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2018"
+
+[dependencies]
+anyhow = "1.0"
+log = "0.4"
+rlp = "0.4.4"
+
+serde = { version = "1", features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "2.1", features = ["derive", "full"] }
+
+frame-support = "3.0.0"
+pallet-indices = "3.0.0"
+pallet-im-online = "3.0.0"
+sp-core = "3.0.0"
+
+bridge-primitives = { path = "../../primitives" }
+

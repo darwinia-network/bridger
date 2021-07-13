@@ -1,16 +1,16 @@
-use evm_log_tracker::{EvmClient, LogsHandler, Result};
+use std::time::Duration;
+
 use lifeline::Sender;
+use microkv::MicroKV;
+use postage::broadcast;
+use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
 
+use component_darwinia_subxt::darwinia::client::Darwinia;
+use evm_log_tracker::{EvmClient, LogsHandler, Result};
+
+use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
-use crate::message::{ToRelayMessage, ToRedeemMessage};
-
-use postage::broadcast;
-use microkv::MicroKV;
-use darwinia::Darwinia;
-
-use std::time::Duration;
-use tokio::time::sleep;
 
 pub(crate) struct EthereumLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
@@ -22,14 +22,18 @@ pub(crate) struct EthereumLogsHandler {
 
 impl EthereumLogsHandler {
     pub fn new(
-        topics_list: Vec<(H160, Vec<H256>)>, 
+        topics_list: Vec<(H160, Vec<H256>)>,
         sender_to_relay: broadcast::Sender<ToRelayMessage>,
-        sender_to_redeem: broadcast::Sender<ToRedeemMessage>, 
-        microkv: MicroKV, 
-        darwinia_client: Darwinia
+        sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
+        microkv: MicroKV,
+        darwinia_client: Darwinia,
     ) -> Self {
         EthereumLogsHandler {
-            topics_list, sender_to_relay, sender_to_redeem, microkv, darwinia_client
+            topics_list,
+            sender_to_relay,
+            sender_to_redeem,
+            microkv,
+            darwinia_client,
         }
     }
 }
@@ -56,30 +60,48 @@ impl LogsHandler for EthereumLogsHandler {
             // Send block number to `Relay Service`
             for tx in &txs {
                 trace!("    {:?}", &tx.tx_hash);
-                self.sender_to_relay.send(ToRelayMessage::EthereumBlockNumber(tx.block)).await?;
+                self.sender_to_relay
+                    .send(ToRelayMessage::EthereumBlockNumber(tx.block))
+                    .await?;
             }
 
             // Send tx to `Redeem Service`
             for tx in &txs {
-                if self.darwinia_client.verified(tx.block_hash, tx.index).await? 
-                    || self.darwinia_client.verified_issuing(tx.block_hash, tx.index).await? {
-					trace!(
-						"    This ethereum tx {:?} has already been redeemed.",
-						tx.enclosed_hash()
-					);
+                if self
+                    .darwinia_client
+                    .verified(tx.block_hash, tx.index)
+                    .await?
+                    || self
+                        .darwinia_client
+                        .verified_issuing(tx.block_hash, tx.index)
+                        .await?
+                {
+                    trace!(
+                        "    This ethereum tx {:?} has already been redeemed.",
+                        tx.enclosed_hash()
+                    );
                 } else {
-					// delay to wait for possible previous extrinsics
+                    // delay to wait for possible previous extrinsics
                     sleep(Duration::from_secs(12)).await;
-                    self.sender_to_redeem.send(ToRedeemMessage::EthereumTransaction(tx.clone())).await?;
+                    self.sender_to_redeem
+                        .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
+                        .await?;
                 }
             }
         }
-       
+
         Ok(())
     }
 }
 
-fn build_txs(logs: Vec<Log>, ring: H256, kton: H256, relay: H256, register: H256, lock: H256) -> Vec<EthereumTransaction> {
+fn build_txs(
+    logs: Vec<Log>,
+    ring: H256,
+    kton: H256,
+    relay: H256,
+    register: H256,
+    lock: H256,
+) -> Vec<EthereumTransaction> {
     let mut txs = vec![];
     txs.append(
         &mut logs
@@ -133,7 +155,8 @@ fn build_txs(logs: Vec<Log>, ring: H256, kton: H256, relay: H256, register: H256
                         index,
                     }
                 }
-            }).collect::<Vec<EthereumTransaction>>()
+            })
+            .collect::<Vec<EthereumTransaction>>(),
     );
     txs
 }

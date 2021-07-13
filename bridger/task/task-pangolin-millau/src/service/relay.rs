@@ -10,7 +10,7 @@ use support_s2s::types::{ChainInfo, RelayHeadersAndMessagesInfo};
 
 use crate::bus::PangolinMillauBus;
 use crate::config::{ChainInfoConfig, RelayConfig};
-use crate::message::{BridgeName, PangolinMillauMessage};
+use crate::message::{BridgeName, PangolinMillauMessageSend};
 use crate::task::PangolinMillauTask;
 
 #[derive(Debug)]
@@ -25,7 +25,7 @@ impl Service for RelayService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let mut rx = bus.rx::<PangolinMillauMessage>()?;
+        let mut rx = bus.rx::<PangolinMillauMessageSend>()?;
         let config_pangolin: ChainInfoConfig =
             Config::restore_with_namespace(PangolinMillauTask::NAME, "pangolin")?;
         let config_millau: ChainInfoConfig =
@@ -35,16 +35,14 @@ impl Service for RelayService {
         let _greet = Self::try_task(&format!("{}-relay", PangolinMillauTask::NAME), async move {
             while let Some(message) = rx.recv().await {
                 match message {
-                    PangolinMillauMessage::Relay(bridge) => {
-                        let source_chain = if bridge == BridgeName::PangolinToMillau {
-                            config_pangolin.clone()
-                        } else {
-                            config_millau.clone()
-                        };
-                        let target_chain = if bridge == BridgeName::MillauToPangolin {
-                            config_millau.clone()
-                        } else {
-                            config_pangolin.clone()
+                    PangolinMillauMessageSend::Relay(bridge) => {
+                        let (source_chain, target_chain) = match bridge {
+                            BridgeName::PangolinToMillau => {
+                                (config_pangolin.clone(), config_millau.clone())
+                            }
+                            BridgeName::MillauToPangolin => {
+                                (config_millau.clone(), config_pangolin.clone())
+                            }
                         };
                         let relay_info = RelayHeadersAndMessagesInfo {
                             bridge,

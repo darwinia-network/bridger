@@ -47,7 +47,11 @@ impl BridgeConfig for RelayConfig {
     fn template() -> Self {
         Self {
             lanes: vec![HexLaneId::from_str("00000000").unwrap()],
-            prometheus_params: Default::default(),
+            prometheus_params: PrometheusParamsInfo {
+                no_prometheus: false,
+                prometheus_host: "127.0.0.1".to_string(),
+                prometheus_port: 9616,
+            },
         }
     }
 }
@@ -55,9 +59,11 @@ impl BridgeConfig for RelayConfig {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ChainInfoConfig {
     pub endpoint: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub signer: Option<String>,
     #[serde(skip)]
     pub secure: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub signer_password: Option<String>,
 }
 
@@ -71,7 +77,7 @@ impl BridgeConfig for ChainInfoConfig {
             endpoint: "ws://127.0.0.1:9544".to_string(),
             signer: Some("//Alice".to_string()),
             secure: false,
-            signer_password: Some("".to_string()),
+            signer_password: None,
         }
     }
 }

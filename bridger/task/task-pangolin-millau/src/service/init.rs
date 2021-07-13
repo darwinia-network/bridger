@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-use lifeline::{Bus, Lifeline, Receiver, Service, Task};
+use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
@@ -10,7 +10,7 @@ use support_s2s::types::{ChainInfo, InitBridge};
 
 use crate::bus::PangolinMillauBus;
 use crate::config::ChainInfoConfig;
-use crate::message::{BridgeName, PangolinMillauMessage};
+use crate::message::{BridgeName, PangolinMillauMessageReceive, PangolinMillauMessageSend};
 use crate::task::PangolinMillauTask;
 
 #[derive(Debug)]
@@ -25,7 +25,8 @@ impl Service for InitBridgeService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let mut rx = bus.rx::<PangolinMillauMessage>()?;
+        let mut rx = bus.rx::<PangolinMillauMessageSend>()?;
+        let mut tx = bus.tx::<PangolinMillauMessageReceive>()?;
         let config_pangolin: ChainInfoConfig =
             Config::restore_with_namespace(PangolinMillauTask::NAME, "pangolin")?;
         let config_millau: ChainInfoConfig =
@@ -36,16 +37,14 @@ impl Service for InitBridgeService {
             async move {
                 while let Some(message) = rx.recv().await {
                     match message {
-                        PangolinMillauMessage::InitBridge(bridge) => {
-                            let source_chain = if bridge == BridgeName::PangolinToMillau {
-                                config_pangolin.clone()
-                            } else {
-                                config_millau.clone()
-                            };
-                            let target_chain = if bridge == BridgeName::MillauToPangolin {
-                                config_millau.clone()
-                            } else {
-                                config_pangolin.clone()
+                        PangolinMillauMessageSend::InitBridge(bridge) => {
+                            let (source_chain, target_chain) = match bridge {
+                                BridgeName::PangolinToMillau => {
+                                    (config_pangolin.clone(), config_millau.clone())
+                                }
+                                BridgeName::MillauToPangolin => {
+                                    (config_millau.clone(), config_pangolin.clone())
+                                }
                             };
                             let init_bridge = InitBridge {
                                 bridge,
@@ -53,6 +52,8 @@ impl Service for InitBridgeService {
                                 target: ChainInfo::try_from(target_chain)?,
                             };
                             pangolin_millau::init_bridge(init_bridge).await?;
+                            tx.send(PangolinMillauMessageReceive::FinishedInitBridge)
+                                .await?;
                         }
                         _ => continue,
                     }

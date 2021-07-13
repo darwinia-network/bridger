@@ -109,6 +109,8 @@ pub struct PrometheusParamsInfo {
     /// Do not expose a Prometheus metric endpoint.
     pub no_prometheus: bool,
     /// Expose Prometheus endpoint at given interface.
+    #[serde(skip_serializing_if = "String::is_empty")]
+    #[serde(default)]
     pub prometheus_host: String,
     /// Expose Prometheus endpoint at given port.
     pub prometheus_port: u16,

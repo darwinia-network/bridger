@@ -3,8 +3,11 @@ use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskTe
 
 use crate::bus::PangolinMillauBus;
 use crate::config::PangolinMillauConfig;
+use crate::message::{PangolinMillauMessageReceive, PangolinMillauMessageSend};
 use crate::service::init::InitBridgeService;
 use crate::service::relay::RelayService;
+use lifeline::{Bus, Receiver, Sender};
+use support_s2s::types::BridgeName;
 
 #[derive(Debug)]
 pub struct PangolinMillauTask {
@@ -50,6 +53,34 @@ impl PangolinMillauTask {
             Self::spawn_service::<InitBridgeService>(&bus)?,
             Self::spawn_service::<RelayService>(&bus)?,
         ];
+
+        let mut sender = bus.tx::<PangolinMillauMessageSend>()?;
+        let mut receiver = bus.rx::<PangolinMillauMessageReceive>()?;
+        sender
+            .send(PangolinMillauMessageSend::InitBridge(
+                BridgeName::MillauToPangolin,
+            ))
+            .await?;
+        while let Some(recv) = receiver.recv().await {
+            match recv {
+                PangolinMillauMessageReceive::FinishedInitBridge => break,
+            }
+        }
+        sender
+            .send(PangolinMillauMessageSend::InitBridge(
+                BridgeName::PangolinToMillau,
+            ))
+            .await?;
+        while let Some(recv) = receiver.recv().await {
+            match recv {
+                PangolinMillauMessageReceive::FinishedInitBridge => break,
+            }
+        }
+        sender
+            .send(PangolinMillauMessageSend::Relay(
+                BridgeName::PangolinToMillau,
+            ))
+            .await?;
 
         let carries = vec![];
         Ok(Self {

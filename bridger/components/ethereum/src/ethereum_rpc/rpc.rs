@@ -2,7 +2,8 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 use reqwest::Client;
 
-use bridge_primitives::chain::ethereum::{EthReceiptBody, EthereumBlockRPC, EthereumHeader};
+use support_ethereum::block::{EthereumBlockRPC, EthereumHeader};
+use support_ethereum::receipt::EthReceiptBody;
 
 use crate::config::EthereumRpcConfig;
 use crate::error::{ComponentEthereumError, ComponentEthereumResult};

@@ -3,7 +3,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use bridge_primitives::chain::ethereum::EthReceiptBody;
+use support_ethereum::receipt::EthReceiptBody;
 
 use crate::error::ComponentEthereumResult;
 

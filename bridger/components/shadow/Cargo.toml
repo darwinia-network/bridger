@@ -26,7 +26,7 @@ serde_json = { version = "1.0" }
 
 bridge-traits = { path = "../../traits" }
 
-bridge-primitives = { path = "../../primitives", features = ["runtime", "rpc"] }
+support-ethereum = { path = "../../supports/support-ethereum" }
 component-http-client = { path = "../http-client" }
 component-ethereum = { path = "../ethereum" }
 

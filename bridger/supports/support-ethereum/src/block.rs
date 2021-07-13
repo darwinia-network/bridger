@@ -1,13 +1,14 @@
-use crate::{
+use core::fmt::Formatter;
+use std::{fmt::Debug, str::FromStr};
+
+use codec::{Decode, Encode};
+use serde::{Deserialize, Serialize};
+use sp_core::bytes::to_hex;
+
+use bridge_primitives::{
     array::{Bloom, U256},
     hex,
 };
-use codec::{Decode, Encode};
-#[cfg(feature = "runtime")]
-use sp_core::bytes::to_hex;
-use std::{fmt::Debug, str::FromStr};
-#[cfg(feature = "runtime")]
-use uint::static_assertions::_core::fmt::Formatter;
 
 /// Raw EthereumBlock from Ethereum rpc
 #[derive(Serialize, Deserialize, Debug)]
@@ -89,7 +90,6 @@ pub struct EthereumHeader {
     pub hash: Option<[u8; 32]>,
 }
 
-#[cfg(feature = "runtime")]
 impl std::fmt::Display for EthereumHeader {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut msgs = vec![];

@@ -3,7 +3,7 @@ use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia::component::DarwiniaComponent;
+use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 
 use crate::bus::DarwiniaLinkedBus;
 use crate::message::DarwiniaLinkedMessage;
@@ -22,7 +22,7 @@ impl Service for ExtrinsicService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let mut rx = bus.rx::<DarwiniaLinkedMessage>()?;
-        let _component_darwinia = DarwiniaComponent::restore::<DarwiniaLinked>()?;
+        let _component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaLinked>()?;
         let _greet = Self::try_task(
             &format!("{}-service-extrinsic", DarwiniaLinked::NAME),
             async move {

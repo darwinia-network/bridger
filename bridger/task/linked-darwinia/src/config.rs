@@ -1,17 +1,17 @@
 use serde::{Deserialize, Serialize};
 
 use bridge_traits::bridge::config::{BridgeConfig, Config};
-use component_darwinia::config::DarwiniaConfig;
+use component_darwinia_subxt::config::DarwiniaSubxtConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DarwiniaLinkedConfig {
-    pub darwinia: DarwiniaConfig,
+    pub darwinia: DarwiniaSubxtConfig,
 }
 
 impl DarwiniaLinkedConfig {
     pub fn template() -> Self {
         Self {
-            darwinia: DarwiniaConfig::template(),
+            darwinia: DarwiniaSubxtConfig::template(),
         }
     }
 }

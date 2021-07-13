@@ -1,14 +1,17 @@
 //! Ethereum receipt
-use crate::{
-    array::{Bloom, H160, H256},
-    bytes,
-    chain::ethereum::{EthereumHeader, EthereumHeaderJson, MMRProof, MMRProofJson},
-    hex,
-};
+use std::fmt::Debug;
+
 use codec::{Decode, Encode};
 use rlp::{Encodable, RlpStream};
-use serde::Deserialize;
-use std::fmt::Debug;
+use serde::{Deserialize, Serialize};
+
+use bridge_primitives::{
+    array::{Bloom, H160, H256},
+    bytes, hex,
+};
+
+use crate::block::{EthereumHeader, EthereumHeaderJson};
+use crate::mmr::{MMRProof, MMRProofJson};
 
 /// Redeem for
 #[derive(Clone, Debug, Encode, PartialEq, Eq)]

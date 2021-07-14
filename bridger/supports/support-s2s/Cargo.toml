@@ -66,8 +66,8 @@ pangolin-runtime-system-params  = { optional = true, git = "https://github.com/d
 component-pangolin              = { optional = true, path = "../../components/client-pangolin" }
 
 ## millau
-millau-runtime      = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
-millau-primitives   = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
+millau-runtime      = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "pangolin-bridge" }
+millau-primitives   = { optional = true, git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "pangolin-bridge" }
 component-millau    = { optional = true, path = "../../components/client-millau" }
 
 

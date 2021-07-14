@@ -24,4 +24,3 @@ rustup target add wasm32-unknown-unknown
 
 cargo doc --all --no-deps --release
 
-

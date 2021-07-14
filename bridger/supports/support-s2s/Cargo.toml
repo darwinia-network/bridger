@@ -58,11 +58,11 @@ sp-version          = { git = "https://github.com/darwinia-network/substrate.git
 
 
 ## pangolin
-pangolin-runtime                = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-drml-primitives                 = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-pangolin-constants              = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-pangolin-bridge-primitives      = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-pangolin-runtime-system-params  = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
+pangolin-runtime                = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+drml-primitives                 = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangolin-constants              = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangolin-bridge-primitives      = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangolin-runtime-system-params  = { optional = true, git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
 component-pangolin              = { optional = true, path = "../../components/client-pangolin" }
 
 ## millau

@@ -1,4 +1,5 @@
 pub mod ethereum;
+pub mod darwinia;
 pub mod relay;
 pub mod redeem;
 pub mod extrinsics;

@@ -82,3 +82,13 @@ pub enum ToGuardMessage {
 impl Message<DarwiniaEthereumBus> for ToGuardMessage {
     type Channel = broadcast::Sender<Self>;
 }
+
+// *** ToDarwiniaMessage **
+#[derive(Clone, Debug)]
+pub enum ToDarwiniaMessage {
+    Start,
+}
+
+impl Message<DarwiniaEthereumBus> for ToDarwiniaMessage {
+    type Channel = broadcast::Sender<Self>;
+}

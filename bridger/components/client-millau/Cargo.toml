@@ -28,8 +28,8 @@ relay-utils            = { git = "https://github.com/darwinia-network/parity-bri
 
 # Supported Chains
 
-millau-runtime      = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
-millau-primitives   = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "s2s" }
+millau-runtime      = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "pangolin-bridge" }
+millau-primitives   = { git = "https://github.com/darwinia-network/darwinia-launch.git", branch = "pangolin-bridge" }
 
 # Substrate Dependencies
 

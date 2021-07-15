@@ -28,9 +28,9 @@ relay-utils            = { git = "https://github.com/darwinia-network/parity-bri
 
 # Bridge dependencies
 
-drml-primitives         = { git = "https://github.com/darwinia-network/darwinia-common", branch = "master" }
-pangolin-runtime        = { git = "https://github.com/darwinia-network/darwinia-common", branch = "master" }
-darwinia-ethereum-relay = { git = "https://github.com/darwinia-network/darwinia-common", branch = "master" }
+drml-primitives         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangolin-runtime        = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+darwinia-ethereum-relay = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
 
 
 # Substrate Dependencies

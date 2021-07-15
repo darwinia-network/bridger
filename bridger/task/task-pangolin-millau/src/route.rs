@@ -4,9 +4,9 @@ use crate::bus::PangolinMillauBus;
 
 pub async fn dispatch_route(
     _bus: &PangolinMillauBus,
-    uri: String,
-    param: serde_json::Value,
+    _uri: String,
+    _param: serde_json::Value,
 ) -> anyhow::Result<TaskTerminal> {
-    let value = TaskTerminal::new(format!("{} -> {:?}", uri, param));
+    let value = TaskTerminal::new("Not have any command");
     Ok(value)
 }

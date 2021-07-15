@@ -21,6 +21,7 @@ edition = "2018"
 anyhow = "1.0"
 async-trait = "0.1"
 log = "0.4"
+codec = { package = "parity-scale-codec", version = "2.0.0" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
@@ -28,6 +29,7 @@ lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threa
 postage = "0.4"
 
 bridge-traits = { path = "../../traits" }
-component-pangolin = { path = "../../components/client-pangolin" }
+
+support-s2s        = { path = "../../supports/support-s2s", features = [ "millau", "pangolin" ] }
 
 [dev-dependencies]

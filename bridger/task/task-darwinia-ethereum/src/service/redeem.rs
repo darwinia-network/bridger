@@ -33,26 +33,31 @@ impl Service for RedeemService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+        // Receiver & Sender
         let mut rx = bus.rx::<ToRedeemMessage>()?;
         let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+
+        // Components
+        let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+        let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
+
         let _greet = Self::try_task(
             &format!("{}-service-redeem", DarwiniaEthereumTask::NAME),
             async move {
                 debug!(target: DarwiniaEthereumTask::NAME, "hello redeem");
 
-                // let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-                let darwinia = component_darwinia.component().await?;
-                let darwinia_client = Ethereum2Darwinia::new(darwinia);
+                // Darwinia client
+                let darwinia = component_darwinia_subxt.component().await?;
+                let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
 
-                let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
+                // Shadow client
                 let shadow = Arc::new(component_shadow.component().await?);
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToRedeemMessage::EthereumTransaction(tx) => {
                             RedeemService::redeem(
-                                darwinia_client.clone(),
+                                ethereum2darwinia.clone(),
                                 shadow.clone(),
                                 tx,
                                 sender_to_extrinsics.clone(),

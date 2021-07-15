@@ -30,6 +30,7 @@ use crate::message::{
     ToRelayMessage,
 };
 use crate::task::DarwiniaEthereumTask;
+use component_ethereum::config::EthereumConfig;
 
 mod ethereum_logs_handler;
 
@@ -79,42 +80,40 @@ fn create_tracker(
 //     }
 // }
 
-fn get_topics_list() -> Vec<(H160, Vec<H256>)> {
+fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
+
     let topics_setting = vec![
         // ring
         (
-            "0x9469d013805bffb7d3debe5e7839237e535ec483",
-            vec!["0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"],
+            ethereum_config.subscribe_ring_address,
+            ethereum_config.subscribe_ring_topics,
         ),
         // kton
         (
-            "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff",
-            vec!["0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"],
+            ethereum_config.subscribe_kton_address,
+            ethereum_config.subscribe_kton_topics,
         ),
         // bank
         (
-            "0x649fdf6ee483a96e020b889571e93700fbd82d88",
-            vec!["0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12"],
+            ethereum_config.subscribe_bank_address,
+            ethereum_config.subscribe_bank_topics,
         ),
         // relay
         (
-            "0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49",
-            vec!["0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f"],
+            ethereum_config.subscribe_relay_address,
+            ethereum_config.subscribe_relay_topics,
         ),
         // backing
         (
-            "0xd5FC8F2eB94fE6AAdeE91c561818e1fF4ea2C041",
-            vec![
-                "0x0c403c4583ff520bad94bf49975b3547a573f7157070022cf8c9a023498d4d11",
-                "0xf70fbddcb43e433da621898f5f2628b0a644a77a4389ac2580c5b1de06382fe2",
-            ],
+            ethereum_config.subscribe_backing_address,
+            ethereum_config.subscribe_backing_topics,
         ),
     ];
 
     topics_setting
         .iter()
         .map(|item| {
-            let contract_address = item.0;
+            let contract_address = &item.0;
             let contract_address = H160::from_slice(&bytes(contract_address));
 
             let topics = item.1.iter().map(|t| H256::from_slice(&bytes(t))).collect();
@@ -135,34 +134,47 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let mut tx = bus.tx::<DarwiniaEthereumMessage>()?;
+        // Receiver & Sender
+        let mut rx = bus.rx::<DarwiniaEthereumMessage>()?;
         let mut sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let mut sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
-        let mut rx = bus.rx::<DarwiniaEthereumMessage>()?;
+
+        // Components
         let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
         let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
 
+        // Config
+        let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let ethereum_config: EthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+
+        // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
-                let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-                let darwinia_client = component_darwinia_subxt.component().await?;
-                let web3 = component_web3.component().await?;
+                debug!(target: DarwiniaEthereumTask::NAME, "hello ethereum-scan");
+
                 let microkv = state.microkv();
 
-                let topics_list = get_topics_list();
+                // Web3 client
+                let web3 = component_web3.component().await?;
+
+                // Darwinia client
+                let darwinia = component_darwinia_subxt.component().await?;
+
+                let topics_list = get_topics_list(ethereum_config);
                 let scan_from: u64 = microkv.get("last_synced")?.unwrap_or(0);
+
                 let mut tracker = create_tracker(
-                    darwinia_client,
+                    darwinia,
                     microkv.clone(),
                     sender_to_relay,
                     sender_to_redeem,
                     web3.clone(),
                     topics_list,
                     scan_from,
-                    config.interval_ethereum,
+                    servce_config.interval_ethereum,
                 );
 
                 while let Some(recv) = rx.recv().await {

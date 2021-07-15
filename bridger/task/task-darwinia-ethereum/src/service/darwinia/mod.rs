@@ -24,7 +24,7 @@ use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::{SubstrateEthereumConfig, DarwiniaEthereumConfig};
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage, ToRedeemMessage, ToRelayMessage, ToDarwiniaMessage, Extrinsic, ToExtrinsicsMessage};
 use crate::task::DarwiniaEthereumTask;
 use component_darwinia_subxt::darwinia::runtime::DarwiniaRuntime;
@@ -40,6 +40,8 @@ use component_darwinia_subxt::
         Darwinia2Ethereum, Account as ToEthereumAccount
     }
 ;
+use component_darwinia_subxt::config::DarwiniaSubxtConfig;
+use component_ethereum::config::{Web3Config, EthereumConfig};
 
 #[derive(Debug)]
 pub struct DarwiniaService {
@@ -53,35 +55,45 @@ impl lifeline::Service for DarwiniaService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+        // Receiver & Sender
         let mut rx = bus.rx::<ToDarwiniaMessage>()?;
-        let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
-        let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
         let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
+        // Components
+        let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
+        let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+
+        // Config
+        let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let config_ethereum: EthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let config_web3: Web3Config = Config::restore(DarwiniaEthereumTask::NAME)?;
+
+        // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(
-            &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
+            &format!("{}-service-darwinia-scan", DarwiniaEthereumTask::NAME),
             async move {
+                debug!(target: DarwiniaEthereumTask::NAME, "hello darwinia-scan");
                 let mut delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
-                let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-                let darwinia_client = component_darwinia_subxt.component().await?;
-                let web3 = component_web3.component().await?;
                 let microkv = state.microkv();
 
-                // let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-                let darwinia = component_darwinia.component().await?;
+                // Darwinia client & account
+                let darwinia = component_darwinia_subxt.component().await?;
                 let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-                let account = DarwiniaAccount::new("".to_string(), None); // TODO: config
-                let account = ToEthereumAccount::new(account.clone(), None, "".to_string());
-                let ethereum = Ethereum::new(web3, "".to_string(), None, None)?; // TODO: config
+                let account = DarwiniaAccount::new(config_darwinia.endpoint, config_darwinia.relayer_real_account);
+                let account = ToEthereumAccount::new(account.clone(), config_darwinia.ecdsa_authority_private_key, config_web3.endpoint);
+
+                // Ethereum client
+                let web3 = component_web3.component().await?;
+                let ethereum = Ethereum::new(web3, config_ethereum.relayer_relay_contract_address, config_ethereum.relayer_private_key, config_ethereum.relayer_beneficiary_darwinia_account)?;
+
                 let spec_name = darwinia.runtime_version().await?;
-                let scan_from = 0u32; // TODO: config
+                let scan_from = microkv.get("darwinia_scan_from")?.unwrap_or(032);
 
                 let mut runner = DarwiniaServiceRunner {
-                    darwinia2ethereum, 
+                    darwinia2ethereum,
                     account,
                     ethereum,
                     sender_to_extrinsics,

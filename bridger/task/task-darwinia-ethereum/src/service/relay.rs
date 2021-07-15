@@ -17,6 +17,8 @@ use support_ethereum::block::EthereumHeader;
 use crate::bus::DarwiniaEthereumBus;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRelayMessage};
 use crate::task::DarwiniaEthereumTask;
+use crate::config::SubstrateEthereumConfig;
+use bridge_traits::bridge::config::Config;
 
 #[derive(Debug)]
 pub struct LikeDarwiniaWithLikeEthereumRelayService {
@@ -30,11 +32,17 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
+        // Receiver & Sender
+        let mut rx = bus.rx::<ToRelayMessage>()?;
+        let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+
+        // Components
         let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
         let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
 
-        let mut rx = bus.rx::<ToRelayMessage>()?;
-        let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+        // Config
+        let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+
         let _greet = Self::try_task(
             &format!("{}-service-relay", DarwiniaEthereumTask::NAME),
             async move {
@@ -42,11 +50,14 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                 let mut target: u64 = 0;
                 let mut relayed: u64 = 0;
 
-                // let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+                // Darwinia client
                 let darwinia = component_darwinia.component().await?;
-                let darwinia_client = Ethereum2Darwinia::new(darwinia);
-                let shadow_raw = component_shadow.component().await?;
-                let shadow = Arc::new(shadow_raw);
+                let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
+
+                // Shadow client
+                let shadow = Arc::new(component_shadow.component().await?);
+
+                let interval_relay = servce_config.interval_relay;
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
@@ -54,7 +65,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                             target = block_number;
                         }
                         ToRelayMessage::StartRelay => {
-                            let dc = darwinia_client.clone();
+                            let dc = ethereum2darwinia.clone();
                             let sh = shadow.clone();
                             let ste = sender_to_extrinsics.clone();
                             tokio::spawn(async move {
@@ -77,8 +88,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                                         }
                                     }
 
-                                    // TODO: read iterval from config
-                                    sleep(Duration::from_secs(30)).await;
+                                    sleep(Duration::from_secs(interval_relay)).await;
                                 }
                             });
                         }

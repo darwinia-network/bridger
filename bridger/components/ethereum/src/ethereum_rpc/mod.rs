@@ -4,7 +4,7 @@ use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::error::BridgeResult;
 use component_http_client::HttpClientComponent;
 
-use crate::config::EthereumRpcConfig;
+use crate::config::EthereumConfig;
 
 pub use self::rpc::*;
 
@@ -14,12 +14,12 @@ mod rpc;
 
 #[derive(Clone, Debug, Default)]
 pub struct EthereumRpcComponent {
-    config: EthereumRpcConfig,
+    config: EthereumConfig,
     http_client_component: HttpClientComponent,
 }
 
 impl EthereumRpcComponent {
-    pub fn new(config: EthereumRpcConfig, http_client_component: HttpClientComponent) -> Self {
+    pub fn new(config: EthereumConfig, http_client_component: HttpClientComponent) -> Self {
         Self {
             config,
             http_client_component,
@@ -28,9 +28,9 @@ impl EthereumRpcComponent {
 }
 
 #[async_trait::async_trait]
-impl BridgeComponent<EthereumRpcConfig, EthereumRpc> for EthereumRpcComponent {
+impl BridgeComponent<EthereumConfig, EthereumRpc> for EthereumRpcComponent {
     fn restore_with_namespace<T: BridgeSand>(namespace: String) -> BridgeResult<Self> {
-        let config: EthereumRpcConfig = Config::restore_with_namespace(T::NAME, &namespace)?;
+        let config: EthereumConfig = Config::restore_with_namespace(T::NAME, &namespace)?;
         let http_client_component = HttpClientComponent::restore_with_namespace::<T>(namespace)?;
         Ok(Self::new(config, http_client_component))
     }
@@ -40,7 +40,7 @@ impl BridgeComponent<EthereumRpcConfig, EthereumRpc> for EthereumRpcComponent {
         Ok(EthereumRpc::new(client, self.config.clone()))
     }
 
-    fn config(&self) -> &EthereumRpcConfig {
+    fn config(&self) -> &EthereumConfig {
         &self.config
     }
 }

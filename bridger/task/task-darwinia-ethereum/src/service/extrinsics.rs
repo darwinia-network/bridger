@@ -31,6 +31,9 @@ use component_darwinia_subxt::account::DarwiniaAccount;
 use lifeline::dyn_bus::DynBus;
 use component_state::state::BridgeState;
 use microkv::MicroKV;
+use component_darwinia_subxt::config::DarwiniaSubxtConfig;
+use bridge_traits::bridge::config::Config;
+use component_ethereum::config::Web3Config;
 
 #[derive(Debug)]
 pub struct ExtrinsicsService {
@@ -44,9 +47,19 @@ impl Service for ExtrinsicsService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+        // Receiver & Sender
         let mut rx = bus.rx::<ToExtrinsicsMessage>()?;
+
+        // Components
+        let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+
+        // Config
+        let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let config_web3: Web3Config = Config::restore(DarwiniaEthereumTask::NAME)?;
+
+        // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
+
         let _greet = Self::try_task(
             &format!("{}-service-extrinsics", DarwiniaEthereumTask::NAME),
             async move {
@@ -54,13 +67,12 @@ impl Service for ExtrinsicsService {
 
                 let microkv = state.microkv();
 
-                // let config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-                let darwinia = component_darwinia.component().await?;
+                // Darwinia client & accounts
+                let darwinia = component_darwinia_subxt.component().await?;
                 let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
                 let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-
-                let account = DarwiniaAccount::new("".to_string(), None); // TODO: config
-                let darwinia2ethereum_relayer = ToEthereumAccount::new(account.clone(), None, "".to_string());
+                let account = DarwiniaAccount::new(config_darwinia.relayer_private_key, config_darwinia.relayer_real_account);
+                let darwinia2ethereum_relayer = ToEthereumAccount::new(account.clone(), config_darwinia.ecdsa_authority_private_key, config_web3.endpoint);
                 let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
 
                 let spec_name = darwinia.runtime_version().await?;

@@ -13,6 +13,7 @@ use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 use crate::service::redeem::RedeemService;
 use crate::service::extrinsics::ExtrinsicsService;
 use crate::service::guard::GuardService;
+use crate::service::darwinia::DarwiniaService;
 
 #[derive(Debug)]
 pub struct DarwiniaEthereumTask {
@@ -55,11 +56,12 @@ impl DarwiniaEthereumTask {
         bus.store_resource::<BridgeState>(state);
 
         let services = vec![
-            Self::spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?,
-            Self::spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?,
-            Self::spawn_service::<RedeemService>(&bus)?,
-            Self::spawn_service::<ExtrinsicsService>(&bus)?,
-            Self::spawn_service::<GuardService>(&bus)?,
+            // Self::spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?,
+            // Self::spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?,
+            // Self::spawn_service::<RedeemService>(&bus)?,
+            // Self::spawn_service::<ExtrinsicsService>(&bus)?,
+            // Self::spawn_service::<GuardService>(&bus)?,
+            Self::spawn_service::<DarwiniaService>(&bus)?,
         ];
 
         let mut tx_scan = bus.tx::<DarwiniaEthereumMessage>()?;

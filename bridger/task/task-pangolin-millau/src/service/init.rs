@@ -39,17 +39,19 @@ impl Service for InitBridgeService {
                     match message {
                         PangolinMillauMessageSend::InitBridge(bridge) => {
                             let (source_chain, target_chain) = match bridge {
-                                BridgeName::PangolinToMillau => {
-                                    (config_pangolin.clone(), config_millau.clone())
-                                }
-                                BridgeName::MillauToPangolin => {
-                                    (config_millau.clone(), config_pangolin.clone())
-                                }
+                                BridgeName::PangolinToMillau => (
+                                    config_pangolin.to_chain_info()?,
+                                    config_millau.to_chain_info()?,
+                                ),
+                                BridgeName::MillauToPangolin => (
+                                    config_millau.to_chain_info()?,
+                                    config_pangolin.to_chain_info()?,
+                                ),
                             };
                             let init_bridge = InitBridge {
                                 bridge,
-                                source: ChainInfo::try_from(source_chain)?,
-                                target: ChainInfo::try_from(target_chain)?,
+                                source: source_chain,
+                                target: target_chain,
                             };
                             pangolin_millau::init_bridge(init_bridge).await?;
                             tx.send(PangolinMillauMessageReceive::FinishedInitBridge)

@@ -35,6 +35,10 @@ impl PangolinMillauConfig {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RelayConfig {
     pub lanes: Vec<HexLaneId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signer_pangolin: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signer_millau: Option<String>,
     #[serde(default)]
     pub prometheus_params: PrometheusParamsInfo,
 }
@@ -47,6 +51,8 @@ impl BridgeConfig for RelayConfig {
     fn template() -> Self {
         Self {
             lanes: vec![HexLaneId::from_str("00000000").unwrap()],
+            signer_pangolin: Some("//Alice".to_string()),
+            signer_millau: Some("//Alice".to_string()),
             prometheus_params: PrometheusParamsInfo {
                 no_prometheus: false,
                 prometheus_host: "127.0.0.1".to_string(),
@@ -119,19 +125,22 @@ impl ChainInfoConfig {
     pub fn port(&self) -> anyhow::Result<u16> {
         Ok(self.host_port()?.2)
     }
-}
 
-impl TryFrom<ChainInfoConfig> for ChainInfo {
-    type Error = anyhow::Error;
+    pub fn to_chain_info(&self) -> anyhow::Result<ChainInfo> {
+        self.to_chain_info_with_expect_signer(None)
+    }
 
-    fn try_from(from: ChainInfoConfig) -> Result<Self, Self::Error> {
-        let host_port = from.host_port()?;
-        Ok(Self {
+    pub fn to_chain_info_with_expect_signer(
+        &self,
+        except_signer: Option<String>,
+    ) -> anyhow::Result<ChainInfo> {
+        let host_port = self.host_port()?;
+        Ok(ChainInfo {
             secure: host_port.0,
             host: host_port.1,
             port: host_port.2,
-            signer: from.signer,
-            signer_password: from.signer_password,
+            signer: except_signer.or_else(|| self.signer.clone()),
+            signer_password: self.signer_password.clone(),
         })
     }
 }

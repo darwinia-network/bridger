@@ -17,9 +17,12 @@ use crate::types::transfer::{TaskConfigTemplateParam, TaskStartParam};
 fn task_config<T: serde::de::DeserializeOwned>(path_config: PathBuf) -> anyhow::Result<T> {
     let mut c = config::Config::default();
     c.merge(config::File::from(path_config))?;
-    let tc = c
-        .try_into::<T>()
-        .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
+    let tc = c.try_into::<T>().map_err(|e| {
+        StandardError::Api(format!(
+            "Failed to load task config: {:?} of path: {:?}",
+            e, path_config
+        ))
+    })?;
     Ok(tc)
 }
 

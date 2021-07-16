@@ -77,7 +77,7 @@ impl lifeline::Service for DarwiniaService {
                 debug!(target: DarwiniaEthereumTask::NAME, "hello darwinia-scan");
                 let mut delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
-                let microkv = state.microkv();
+                let microkv1 = state.microkv();
 
                 // Darwinia client & account
                 let darwinia = component_darwinia_subxt.component().await?;
@@ -90,7 +90,7 @@ impl lifeline::Service for DarwiniaService {
                 let ethereum = Ethereum::new(web3, config_ethereum.relayer_relay_contract_address, config_ethereum.relayer_private_key, config_ethereum.relayer_beneficiary_darwinia_account)?;
 
                 let spec_name = darwinia.runtime_version().await?;
-                let scan_from = microkv.get("darwinia_scan_from")?.unwrap_or(032);
+                let scan_from = microkv1.get("darwinia_scan_from")?.unwrap_or(032);
 
                 let mut runner = DarwiniaServiceRunner {
                     darwinia2ethereum,
@@ -101,6 +101,13 @@ impl lifeline::Service for DarwiniaService {
                     spec_name,
                     scan_from,
                 };
+                tokio::spawn(async move {
+                    let microkv = state.microkv();
+                    if let Err(err) = runner.start(microkv).await {
+                        // TODO: reconnect to darwinia
+                        error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
+                    }
+                });
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToDarwiniaMessage::Stop => {
@@ -136,7 +143,6 @@ impl DarwiniaServiceRunner {
     ) -> Result<()> {
         let mut tracker =
             DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), self.scan_from);
-        info!("✨ SERVICE STARTED: SUBSCRIBE");
         loop {
             let header = tracker.next_block().await?;
 

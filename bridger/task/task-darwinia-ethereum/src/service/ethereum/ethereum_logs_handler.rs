@@ -12,6 +12,9 @@ use evm_log_tracker::{EvmClient, LogsHandler, Result};
 use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 
+use crate::task::DarwiniaEthereumTask;
+use bridge_traits::bridge::task::BridgeSand;
+
 pub(crate) struct EthereumLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
@@ -46,12 +49,13 @@ impl LogsHandler for EthereumLogsHandler {
         _topics_list: &Vec<(H160, Vec<H256>)>,
         logs: Vec<Log>,
     ) -> Result<()> {
+        // TODO: check the address
         let ring = self.topics_list[0].1[0];
         let kton = self.topics_list[1].1[0];
         let bank = self.topics_list[2].1[0];
         let relay = self.topics_list[3].1[0];
         let register = self.topics_list[4].1[0];
-        let lock = self.topics_list[4].1[1];
+        let lock = self.topics_list[4].1[0];
 
         // Build all transactions from logs
         let txs = build_txs(logs, ring, kton, relay, register, lock);
@@ -59,7 +63,7 @@ impl LogsHandler for EthereumLogsHandler {
         if !txs.is_empty() {
             // Send block number to `Relay Service`
             for tx in &txs {
-                trace!("    {:?}", &tx.tx_hash);
+                trace!(target: DarwiniaEthereumTask::NAME, "{:?}", &tx.tx_hash);
                 self.sender_to_relay
                     .send(ToRelayMessage::EthereumBlockNumber(tx.block))
                     .await?;
@@ -77,7 +81,8 @@ impl LogsHandler for EthereumLogsHandler {
                         .await?
                 {
                     trace!(
-                        "    This ethereum tx {:?} has already been redeemed.",
+                        target: DarwiniaEthereumTask::NAME,
+                        "This ethereum tx {:?} has already been redeemed.",
                         tx.enclosed_hash()
                     );
                 } else {

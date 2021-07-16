@@ -61,27 +61,7 @@ fn create_tracker(
     )
 }
 
-// struct Topic {
-//     name: String,
-//     address: H160,
-//     topic: H256,
-//     handle: FnMut(Log) -> Result<()>,
-// }
-
-// impl Topic {
-//     pub fn new(name: String, address: H160, topic: H256, handle: FnMut(Log) -> Result<()>) -> Topic {
-//         Topic {
-//             name, address, topic, handle
-//         }
-//     }
-
-//     pub fn belongs_to(&self, log: Log) -> bool {
-
-//     }
-// }
-
 fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
-
     let topics_setting = vec![
         // ring
         (
@@ -153,7 +133,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
-                debug!(target: DarwiniaEthereumTask::NAME, "hello ethereum-scan");
+                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM");
 
                 let microkv = state.microkv();
 
@@ -177,18 +157,17 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                     servce_config.interval_ethereum,
                 );
 
+                tokio::spawn(async move {
+                    tracker.start().await
+                });
+
                 while let Some(recv) = rx.recv().await {
                     if let DarwiniaEthereumMessage::Scan(message_scan) = recv {
                         match message_scan {
-                            EthereumScanMessage::Start => {
-                                if tracker.running == false {
-                                    // TODO: spawn
-                                    tracker.start().await;
-                                }
+                            EthereumScanMessage::Stop => {
+                                // TODO: stop the tracker
                             }
-                            EthereumScanMessage::Pause => {
-                                tracker.stop();
-                            }
+                            _ => {}
                         }
                     }
                 }

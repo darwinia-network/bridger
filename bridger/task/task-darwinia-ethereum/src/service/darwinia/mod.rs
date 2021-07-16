@@ -74,7 +74,7 @@ impl lifeline::Service for DarwiniaService {
         let _greet = Self::try_task(
             &format!("{}-service-darwinia-scan", DarwiniaEthereumTask::NAME),
             async move {
-                debug!(target: DarwiniaEthereumTask::NAME, "hello darwinia-scan");
+                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: DARWINIA");
                 let mut delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
                 let microkv1 = state.microkv();

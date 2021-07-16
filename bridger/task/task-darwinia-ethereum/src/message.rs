@@ -24,7 +24,7 @@ impl Message<DarwiniaEthereumBus> for DarwiniaEthereumMessage {
 #[derive(Debug, Clone)]
 pub enum EthereumScanMessage {
     Start,
-    Pause,
+    Stop,
 }
 
 #[derive(Debug, Clone)]

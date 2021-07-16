@@ -16,7 +16,7 @@ fn init_log() {
         serde=info,
         lifeline=debug,
         darwinia_bridge=debug,
-        task-darwinia-ethereum=debug,
+        task-darwinia-ethereum=trace,
 		support_s2s=debug,
 		bridge=info,
         "#,

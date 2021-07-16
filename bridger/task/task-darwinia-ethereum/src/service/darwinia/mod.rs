@@ -141,11 +141,12 @@ impl DarwiniaServiceRunner {
             let header = tracker.next_block().await?;
 
             // debug
-            trace!("Darwinia block {}", header.number);
+            trace!(target: DarwiniaEthereumTask::NAME, "Darwinia block {}", header.number);
 
             // handle the 'mmr root sign and send extrinsics' only block height reached
             if let Err(err) = self.handle_delayed_extrinsics(&header).await {
                 error!(
+                    target: DarwiniaEthereumTask::NAME,
 					"An error occurred while processing the delayed extrinsics: {:?}",
 					err
 				);
@@ -167,6 +168,7 @@ impl DarwiniaServiceRunner {
                     return Err(err);
                 } else {
                     error!(
+                        target: DarwiniaEthereumTask::NAME,
 						"An error occurred while processing the events of block {}: {:?}",
 						header.number, err
 					);

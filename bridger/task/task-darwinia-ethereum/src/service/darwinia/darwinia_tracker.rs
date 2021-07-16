@@ -4,6 +4,8 @@ use substrate_subxt::sp_runtime::generic::Header;
 use substrate_subxt::sp_runtime::traits::BlakeTwo256;
 use std::time::Duration;
 use tokio::time::sleep;
+use crate::task::DarwiniaEthereumTask;
+use bridge_traits::bridge::task::BridgeSand;
 
 /// DarwiniaTracker
 pub struct DarwiniaBlockTracker {
@@ -32,8 +34,7 @@ impl DarwiniaBlockTracker {
                     }
                 }
                 Err(err) => {
-                    error!("An error occurred while tracking next darwinia block: {:#?}", err);
-                    let err_msg = format!("{:?}", err);
+                    error!(target: DarwiniaEthereumTask::NAME, "An error occurred while tracking next darwinia block: {:#?}", err);
                     if err_msg.contains("restart") {
                         return Err(crate::error::Error::RestartFromJsonrpsee.into());
                     } else {

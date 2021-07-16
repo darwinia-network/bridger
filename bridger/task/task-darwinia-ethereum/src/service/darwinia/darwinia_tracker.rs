@@ -35,6 +35,7 @@ impl DarwiniaBlockTracker {
                 }
                 Err(err) => {
                     error!(target: DarwiniaEthereumTask::NAME, "An error occurred while tracking next darwinia block: {:#?}", err);
+                    let err_msg = format!("{:?}", err).to_lowercase();
                     if err_msg.contains("restart") {
                         return Err(crate::error::Error::RestartFromJsonrpsee.into());
                     } else {

@@ -1,12 +1,10 @@
-use std::convert::TryFrom;
-
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use support_s2s::runner::pangolin_millau;
-use support_s2s::types::{ChainInfo, RelayHeadersAndMessagesInfo};
+use support_s2s::types::RelayHeadersAndMessagesInfo;
 
 use crate::bus::PangolinMillauBus;
 use crate::config::{ChainInfoConfig, RelayConfig};

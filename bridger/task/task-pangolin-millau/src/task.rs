@@ -1,13 +1,15 @@
+use lifeline::{Bus, Sender};
+
+use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskTerminal};
+use support_s2s::types::BridgeName;
 
 use crate::bus::PangolinMillauBus;
-use crate::config::PangolinMillauConfig;
-use crate::message::{PangolinMillauMessageReceive, PangolinMillauMessageSend};
+use crate::config::{PangolinMillauConfig, RelayConfig};
+use crate::message::PangolinMillauMessageSend;
 use crate::service::init::InitBridgeService;
 use crate::service::relay::RelayService;
-use lifeline::{Bus, Receiver, Sender};
-use support_s2s::types::BridgeName;
 
 #[derive(Debug)]
 pub struct PangolinMillauTask {
@@ -56,32 +58,14 @@ impl PangolinMillauTask {
         ];
 
         let mut sender = bus.tx::<PangolinMillauMessageSend>()?;
-        let mut receiver = bus.rx::<PangolinMillauMessageReceive>()?;
-        sender
-            .send(PangolinMillauMessageSend::InitBridge(
-                BridgeName::MillauToPangolin,
-            ))
-            .await?;
-        while let Some(recv) = receiver.recv().await {
-            match recv {
-                PangolinMillauMessageReceive::FinishedInitBridge => break,
-            }
+        let relay_config: RelayConfig = Config::restore(Self::NAME)?;
+        if relay_config.auto_start {
+            sender
+                .send(PangolinMillauMessageSend::Relay(
+                    BridgeName::PangolinToMillau,
+                ))
+                .await?;
         }
-        sender
-            .send(PangolinMillauMessageSend::InitBridge(
-                BridgeName::PangolinToMillau,
-            ))
-            .await?;
-        while let Some(recv) = receiver.recv().await {
-            match recv {
-                PangolinMillauMessageReceive::FinishedInitBridge => break,
-            }
-        }
-        sender
-            .send(PangolinMillauMessageSend::Relay(
-                BridgeName::PangolinToMillau,
-            ))
-            .await?;
 
         let carries = vec![];
         Ok(Self {

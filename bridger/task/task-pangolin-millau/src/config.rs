@@ -1,4 +1,3 @@
-use std::convert::TryFrom;
 use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
@@ -35,6 +34,7 @@ impl PangolinMillauConfig {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RelayConfig {
     pub lanes: Vec<HexLaneId>,
+    pub auto_start: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signer_pangolin: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,6 +51,7 @@ impl BridgeConfig for RelayConfig {
     fn template() -> Self {
         Self {
             lanes: vec![HexLaneId::from_str("00000000").unwrap()],
+            auto_start: false,
             signer_pangolin: Some("//Alice".to_string()),
             signer_millau: Some("//Alice".to_string()),
             prometheus_params: PrometheusParamsInfo {

@@ -87,6 +87,7 @@ impl Message<DarwiniaEthereumBus> for ToGuardMessage {
 #[derive(Clone, Debug)]
 pub enum ToDarwiniaMessage {
     Start,
+    Stop,
 }
 
 impl Message<DarwiniaEthereumBus> for ToDarwiniaMessage {

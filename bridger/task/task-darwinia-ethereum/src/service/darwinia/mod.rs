@@ -103,9 +103,11 @@ impl lifeline::Service for DarwiniaService {
                 };
                 while let Some(recv) = rx.recv().await {
                     match recv {
-                        ToDarwiniaMessage::Start => {
-                            runner.start(microkv).await?;
+                        ToDarwiniaMessage::Stop => {
+                            // TODO: how to stop the runner?
+                            // maybe add a channel to it
                         }
+                        _ => {}
                     }
                 }
                 Ok(())

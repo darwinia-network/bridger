@@ -59,7 +59,7 @@ impl Service for GuardService {
                 // Darwinia client & account
                 let darwinia = component_darwinia_subxt.component().await?;
                 let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-                let account = DarwiniaAccount::new(config_darwinia.endpoint, config_darwinia.relayer_real_account);
+                let account = DarwiniaAccount::new(config_darwinia.relayer_private_key, config_darwinia.relayer_real_account);
                 let guard_account = FromEthereumAccount::new(account);
 
                 // Shadow client

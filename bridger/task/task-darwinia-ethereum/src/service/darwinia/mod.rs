@@ -82,7 +82,7 @@ impl lifeline::Service for DarwiniaService {
                 // Darwinia client & account
                 let darwinia = component_darwinia_subxt.component().await?;
                 let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-                let account = DarwiniaAccount::new(config_darwinia.endpoint, config_darwinia.relayer_real_account);
+                let account = DarwiniaAccount::new(config_darwinia.relayer_private_key, config_darwinia.relayer_real_account);
                 let account = ToEthereumAccount::new(account.clone(), config_darwinia.ecdsa_authority_private_key, config_web3.endpoint);
 
                 // Ethereum client

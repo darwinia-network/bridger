@@ -36,7 +36,7 @@ pub enum ToDarwiniaLinkedMessage {
 #[derive(Clone, Debug)]
 pub enum ToRelayMessage {
     EthereumBlockNumber(u64),
-    StartRelay,
+    Relay,
 }
 
 impl Message<DarwiniaEthereumBus> for ToRelayMessage {

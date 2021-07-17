@@ -56,11 +56,11 @@ impl DarwiniaEthereumTask {
         bus.store_resource::<BridgeState>(state);
 
         let services = vec![
-            // Self::spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?,
+            Self::spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?,
             // Self::spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?,
             // Self::spawn_service::<RedeemService>(&bus)?,
             // Self::spawn_service::<ExtrinsicsService>(&bus)?,
-            Self::spawn_service::<GuardService>(&bus)?,
+            // Self::spawn_service::<GuardService>(&bus)?,
             // Self::spawn_service::<DarwiniaService>(&bus)?,
         ];
 

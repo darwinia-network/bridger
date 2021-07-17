@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 use postage::broadcast;
@@ -34,6 +34,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToRelayMessage>()?;
+        let mut sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         // Components
@@ -46,7 +47,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
         let _greet = Self::try_task(
             &format!("{}-service-relay", DarwiniaEthereumTask::NAME),
             async move {
-                debug!(target: DarwiniaEthereumTask::NAME, "hello relay");
+                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM > DARWINIA RELAY");
                 let mut target: u64 = 0;
                 let mut relayed: u64 = 0;
 
@@ -59,39 +60,40 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
 
                 let interval_relay = servce_config.interval_relay;
 
+                tokio::spawn(async move {
+                    loop {
+                        if let Err(err) = sender_to_relay.send(ToRelayMessage::Relay).await {
+                            error!("{:#?}", err);
+                        }
+                        sleep(Duration::from_secs(interval_relay)).await;
+                    }
+                });
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToRelayMessage::EthereumBlockNumber(block_number) => {
                             target = block_number;
-                        }
-                        ToRelayMessage::StartRelay => {
-                            let dc = ethereum2darwinia.clone();
-                            let sh = shadow.clone();
-                            let ste = sender_to_extrinsics.clone();
-                            tokio::spawn(async move {
-                                loop {
-                                    if target > relayed {
-                                        match LikeDarwiniaWithLikeEthereumRelayService::affirm(
-                                            dc.clone(),
-                                            sh.clone(),
-                                            target,
-                                            ste.clone(),
-                                        )
-                                        .await
-                                        {
-                                            Ok(()) => {
-                                                relayed = target;
-                                            }
-                                            Err(err) => {
-                                                error!("{:#?}", err);
-                                            }
+                        },
+                        ToRelayMessage::Relay => {
+                            if target > relayed {
+                                match LikeDarwiniaWithLikeEthereumRelayService::affirm(
+                                    ethereum2darwinia.clone(),
+                                    shadow.clone(),
+                                    target,
+                                    sender_to_extrinsics.clone(),
+                                    )
+                                    .await
+                                    {
+                                        Ok(()) => {
+                                            relayed = target;
+                                        }
+                                        Err(err) => {
+                                            error!("{:#?}", err);
                                         }
                                     }
+                            }
 
-                                    sleep(Duration::from_secs(interval_relay)).await;
-                                }
-                            });
-                        }
+                        },
+                        _ => {}
                     }
                 }
 
@@ -138,7 +140,7 @@ impl LikeDarwiniaWithLikeEthereumRelayService {
             }
         }
 
-        trace!("Prepare to affirm ethereum block: {}", target);
+        trace!(target: DarwiniaEthereumTask::NAME, "Prepare to affirm ethereum block: {}", target);
         let parcel = shadow.parcel(target as usize + 1).await?;
         if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
             return Err(BizError::ParcelFromShadowIsEmpty(target).into());

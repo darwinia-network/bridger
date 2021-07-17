@@ -4,11 +4,9 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::{
-    from_ethereum::{
+use component_darwinia_subxt::from_ethereum::{
         Ethereum2Darwinia, Account as FromEthereumAccount
-    },
-};
+    };
 use component_shadow::{Shadow, ShadowComponent};
 
 use crate::bus::DarwiniaEthereumBus;
@@ -54,7 +52,7 @@ impl Service for GuardService {
         let _greet = Self::try_task(
             &format!("{}-service-guard", DarwiniaEthereumTask::NAME),
             async move {
-                debug!(target: DarwiniaEthereumTask::NAME, "hello guard");
+                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: GUARD");
 
                 // Darwinia client & account
                 let darwinia = component_darwinia_subxt.component().await?;
@@ -65,17 +63,29 @@ impl Service for GuardService {
                 // Shadow client
                 let shadow = Arc::new(component_shadow.component().await?);
 
+                //
+                tokio::spawn(async move {
+                    loop {
+                        let ethereum2darwinia_clone = ethereum2darwinia.clone();
+                        let guard_account_clone = guard_account.clone();
+                        let shadow_clone = shadow.clone();
+                        let sender_to_extrinsics_clone = sender_to_extrinsics.clone();
+                        if let Err(err) = GuardService::guard(
+                                ethereum2darwinia_clone,
+                                guard_account_clone,
+                                shadow_clone,
+                                sender_to_extrinsics_clone
+                            ).await {
+                            error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
+                        }
+                        
+                        sleep(Duration::from_secs(1)).await;
+                    }
+                });
+
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToGuardMessage::StartGuard => {
-                            loop {
-                                GuardService::guard(
-                                    ethereum2darwinia.clone(),
-                                    guard_account.clone(),
-                                    shadow.clone(),
-                                    sender_to_extrinsics.clone(),
-                                ).await?;
-                            }
 
                         },
                     }
@@ -96,12 +106,13 @@ impl GuardService {
         shadow: Arc<Shadow>,
         mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
     ) -> anyhow::Result<()> {
-        trace!("Checking pending headers...");
+        trace!(target: DarwiniaEthereumTask::NAME, "Checking pending headers...");
 
         let last_confirmed = ethereum2darwinia.last_confirmed().await.unwrap();
         let pending_headers = ethereum2darwinia.pending_headers().await?;
         if !pending_headers.is_empty() {
             trace!(
+                target: DarwiniaEthereumTask::NAME, 
 				"pending headers: {:?}",
 				pending_headers
 					.clone()

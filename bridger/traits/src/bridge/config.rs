@@ -121,7 +121,10 @@ impl Config {
         format: ConfigFormat,
     ) -> anyhow::Result<()> {
         let content = Self::raw_config(config, format)?;
-        Ok(std::fs::write(path_config.as_ref(), content)?)
+        let path = path_config.as_ref();
+        std::fs::write(path, content)?;
+        log::info!("The config [{:?}] persisted", path);
+        Ok(())
     }
 
     pub fn load<T>(path_config: impl AsRef<Path>) -> anyhow::Result<T>

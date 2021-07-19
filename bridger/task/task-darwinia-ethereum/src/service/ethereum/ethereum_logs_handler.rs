@@ -85,6 +85,7 @@ impl LogsHandler for EthereumLogsHandler {
                         "This ethereum tx {:?} has already been redeemed.",
                         tx.enclosed_hash()
                     );
+                    self.microkv.put("last-redeemed", &tx.block);
                 } else {
                     // delay to wait for possible previous extrinsics
                     sleep(Duration::from_secs(12)).await;

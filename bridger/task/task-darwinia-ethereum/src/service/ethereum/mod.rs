@@ -144,7 +144,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                 let darwinia = component_darwinia_subxt.component().await?;
 
                 let topics_list = get_topics_list(ethereum_config);
-                let scan_from: u64 = microkv.get("last_synced")?.unwrap_or(0);
+                let scan_from: u64 = microkv.get("last-redeemed")?.unwrap_or(0) + 1;
 
                 let mut tracker = create_tracker(
                     darwinia,

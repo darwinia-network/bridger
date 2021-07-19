@@ -26,6 +26,7 @@ use component_darwinia_subxt::account::DarwiniaAccount;
 use bridge_traits::bridge::config::Config;
 use component_darwinia_subxt::config::DarwiniaSubxtConfig;
 use async_recursion::async_recursion;
+use crate::config::SubstrateEthereumConfig;
 
 #[derive(Debug)]
 pub struct GuardService {
@@ -71,12 +72,14 @@ impl Service for GuardService {
 #[async_recursion]
 async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
     info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD");
+
     // Components
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
     let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
 
     // Config
     let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
     // Darwinia client & account
     let darwinia = component_darwinia_subxt.component().await?;

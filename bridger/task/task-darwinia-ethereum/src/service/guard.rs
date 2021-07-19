@@ -46,7 +46,7 @@ impl Service for GuardService {
         let _greet = Self::try_task(
             &format!("{}-service-guard", DarwiniaEthereumTask::NAME),
             async move {
-                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD");
+
 
                 //
                 tokio::spawn(async move {
@@ -70,6 +70,7 @@ impl Service for GuardService {
 
 #[async_recursion]
 async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
+    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD");
     // Components
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
     let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;

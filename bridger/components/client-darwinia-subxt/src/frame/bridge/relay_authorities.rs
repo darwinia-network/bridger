@@ -17,10 +17,13 @@ pub type AuthoritiesToSignReturn<T> = (
 );
 
 /// MmrRootsToSignReturn
-pub type MmrRootsToSignReturn<T> = Vec<(
-    <T as System>::AccountId,
-    <T as EthereumRelayAuthorities>::RelayAuthoritySignature,
-)>;
+pub type MmrRootsToSignReturn<T> = (
+    H256,
+    Vec<(
+        <T as System>::AccountId,
+        <T as EthereumRelayAuthorities>::RelayAuthoritySignature,
+    )>
+);
 
 /// Relay Authority
 #[derive(Clone, Encode, Decode, Default, Debug)]

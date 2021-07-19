@@ -70,6 +70,7 @@ impl Service for GuardService {
                         let guard_account_clone = guard_account.clone();
                         let shadow_clone = shadow.clone();
                         let sender_to_extrinsics_clone = sender_to_extrinsics.clone();
+                        // TODO: reconnect when low-level err encountered
                         if let Err(err) = GuardService::guard(
                                 ethereum2darwinia_clone,
                                 guard_account_clone,
@@ -108,7 +109,7 @@ impl GuardService {
     ) -> anyhow::Result<()> {
         trace!(target: DarwiniaEthereumTask::NAME, "Checking pending headers...");
 
-        let last_confirmed = ethereum2darwinia.last_confirmed().await.unwrap();
+        let last_confirmed = ethereum2darwinia.last_confirmed().await?;
         let pending_headers = ethereum2darwinia.pending_headers().await?;
         if !pending_headers.is_empty() {
             trace!(

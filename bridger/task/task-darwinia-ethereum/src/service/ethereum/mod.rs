@@ -133,7 +133,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
-                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM");
+                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA ETHEREUM SUBSCRIBE");
 
                 let microkv = state.microkv();
 

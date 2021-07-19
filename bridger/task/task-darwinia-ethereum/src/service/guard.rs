@@ -52,7 +52,7 @@ impl Service for GuardService {
         let _greet = Self::try_task(
             &format!("{}-service-guard", DarwiniaEthereumTask::NAME),
             async move {
-                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: GUARD");
+                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD");
 
                 // Darwinia client & account
                 let darwinia = component_darwinia_subxt.component().await?;

@@ -63,7 +63,7 @@ impl Service for ExtrinsicsService {
         let _greet = Self::try_task(
             &format!("{}-service-extrinsics", DarwiniaEthereumTask::NAME),
             async move {
-                debug!(target: DarwiniaEthereumTask::NAME, "hello extrinsics");
+                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS");
 
                 let microkv = state.microkv();
 

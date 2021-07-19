@@ -47,7 +47,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
         let _greet = Self::try_task(
             &format!("{}-service-relay", DarwiniaEthereumTask::NAME),
             async move {
-                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM > DARWINIA RELAY");
+                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY");
 
                 // Darwinia client
                 let darwinia = component_darwinia.component().await?;

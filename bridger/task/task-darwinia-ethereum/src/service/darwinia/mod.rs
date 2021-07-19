@@ -86,7 +86,7 @@ impl lifeline::Service for DarwiniaService {
 
 #[async_recursion]
 async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
-    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: DARWINIA SUBSCRIBE");
+    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA DARWINIA SUBSCRIBE");
 
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 

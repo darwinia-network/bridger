@@ -73,7 +73,9 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToRelayMessage::EthereumBlockNumber(block_number) => {
-                            target = block_number;
+                            if block_number > target {
+                                target = block_number;
+                            }
                         },
                         ToRelayMessage::Relay => {
                             if target > relayed {

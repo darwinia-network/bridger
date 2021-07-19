@@ -777,12 +777,17 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-trait",
+ "config 0.11.0",
  "futures 0.3.15",
  "lifeline",
  "once_cell",
  "serde 1.0.126",
  "serde_json",
+ "serde_yaml",
+ "strum 0.21.0",
+ "strum_macros 0.21.1",
  "thiserror",
+ "toml",
 ]
 
 [[package]]
@@ -794,7 +799,6 @@ dependencies = [
  "bridge-traits",
  "colored",
  "component-state",
- "config 0.11.0",
  "env_logger 0.8.4",
  "hyper 0.14.10",
  "lifeline",
@@ -804,13 +808,11 @@ dependencies = [
  "routerify",
  "serde 1.0.126",
  "serde_json",
- "serde_yaml",
  "structopt",
  "support-keep",
  "task-darwinia-ethereum",
  "task-pangolin-millau",
  "tokio 1.8.1",
- "toml",
 ]
 
 [[package]]
@@ -9121,6 +9123,7 @@ dependencies = [
  "postage",
  "serde 1.0.126",
  "serde_json",
+ "support-keep",
  "support-s2s",
 ]
 

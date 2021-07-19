@@ -1,27 +1,19 @@
 use std::ffi::OsStr;
 use std::path::PathBuf;
+use std::str::FromStr;
 
 use lifeline::CarryFrom;
 
+use bridge_traits::bridge::config::Config;
+use bridge_traits::bridge::config::ConfigFormat;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
 use bridge_traits::error::StandardError;
-use linked_darwinia::config::DarwiniaLinkedConfig;
 use linked_darwinia::task::DarwiniaLinked;
-use task_darwinia_ethereum::config::DarwiniaEthereumConfig;
+use support_keep::types::TaskState;
 use task_darwinia_ethereum::task::DarwiniaEthereumTask;
-use task_pangolin_millau::config::PangolinMillauConfig;
 use task_pangolin_millau::task::PangolinMillauTask;
 
 use crate::types::transfer::{TaskConfigTemplateParam, TaskStartParam};
-
-fn task_config<T: serde::de::DeserializeOwned>(path_config: PathBuf) -> anyhow::Result<T> {
-    let mut c = config::Config::default();
-    c.merge(config::File::from(path_config))?;
-    let tc = c
-        .try_into::<T>()
-        .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
-    Ok(tc)
-}
 
 /// Auto start all configured task
 pub async fn auto_start_task(base_path: PathBuf) -> anyhow::Result<()> {
@@ -55,7 +47,9 @@ pub async fn auto_start_task(base_path: PathBuf) -> anyhow::Result<()> {
                     StandardError::Api(format!("Failed to extra config format for [{}]", task))
                 })?;
             let param = TaskStartParam {
-                format: format.to_string(),
+                format: ConfigFormat::from_str(format).map_err(|_e| {
+                    StandardError::Api(format!("Failed to extra config format for [{}]", task))
+                })?,
                 name: task.clone(),
                 config: None,
             };
@@ -77,7 +71,9 @@ pub async fn auto_start_task(base_path: PathBuf) -> anyhow::Result<()> {
                     StandardError::Api(format!("Failed to extra config format for [{}]", task))
                 })?;
             let param = TaskStartParam {
-                format: format.to_string(),
+                format: ConfigFormat::from_str(format).map_err(|_e| {
+                    StandardError::Api(format!("Failed to extra config format for [{}]", task))
+                })?,
                 name: task.clone(),
                 config: None,
             };
@@ -94,15 +90,15 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
         return Err(StandardError::Api(format!("The task [{}] is running", &param.name)).into());
     }
 
-    let config_format = &param.format;
+    let config_format = param.format;
     let option_config = &param.config;
 
     if !support_keep::task::is_available_task(name) {
         return Err(StandardError::Api(format!("Not support this task [{}]", &param.name)).into());
     }
-    let path_config = base_path.join(format!("{}.{}", name, config_format));
+    let path_config = base_path.join(format!("{}.{}", name, config_format.file_extension()));
     if let Some(config_raw) = option_config {
-        tokio::fs::write(&path_config, &config_raw).await?
+        Config::persist(&path_config, &config_raw, config_format.clone())?;
     }
     if !path_config.exists() {
         return Err(
@@ -110,12 +106,11 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
         );
     }
 
-    let state_bridge = support_keep::state::get_state()
-        .ok_or_else(|| StandardError::Api("Please set bridge state first.".to_string()))?;
+    let state_bridge = support_keep::state::get_state_bridge_ok()?;
 
     match name {
         DarwiniaLinked::NAME => {
-            let task_config = task_config::<DarwiniaLinkedConfig>(path_config)?;
+            let task_config = Config::load(&path_config)?;
             let task = DarwiniaLinked::new(task_config).await?;
             support_keep::task::keep_task(DarwiniaLinked::NAME, Box::new(task))?;
         }
@@ -127,7 +122,7 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
                 ))
                 .into());
             }
-            let task_config = task_config::<DarwiniaEthereumConfig>(path_config)?;
+            let task_config = Config::load(&path_config)?;
             let mut task = DarwiniaEthereumTask::new(task_config, state_bridge.clone()).await?;
 
             let linked_darwinia: &DarwiniaLinked =
@@ -137,12 +132,19 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
             support_keep::task::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
         }
         PangolinMillauTask::NAME => {
-            let task_config = task_config::<PangolinMillauConfig>(path_config)?;
+            let task_config = Config::load(&path_config)?;
             let task = PangolinMillauTask::new(task_config).await?;
             support_keep::task::keep_task(PangolinMillauTask::NAME, Box::new(task))?;
         }
         _ => return Err(StandardError::Api(format!("Unsupported task: [{}]", name)).into()),
     };
+
+    // keep task state
+    let state_task = TaskState {
+        config_path: path_config.clone(),
+        config_format: config_format.clone(),
+    };
+    support_keep::state::set_state_task(name, state_task)?;
 
     Ok(())
 }
@@ -162,18 +164,9 @@ pub fn task_config_template(param: TaskConfigTemplateParam) -> anyhow::Result<St
                 "Unsupported to show default config template: [{}]",
                 task_name
             ))
-            .into())
+            .into());
         }
     }?;
-    let template = match &format[..] {
-        "toml" => toml::to_string(&value)?,
-        "json" => serde_json::to_string_pretty(&value)?,
-        "yml" => serde_yaml::to_string(&value)?,
-        _ => {
-            return Err(
-                StandardError::Api(format!("Unsupported this config format: [{}]", format)).into(),
-            )
-        }
-    };
+    let template = Config::raw_config(value, format)?;
     Ok(template)
 }

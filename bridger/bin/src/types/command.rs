@@ -1,5 +1,8 @@
 use std::path::PathBuf;
+
 use structopt::StructOpt;
+
+use bridge_traits::bridge::config::ConfigFormat;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "darwinia-bridger", about = "Darwinia bridger")]
@@ -54,7 +57,7 @@ pub enum TaskCommand {
         name: String,
         /// The config format, supports [toml|json|yml]
         #[structopt(long, default_value = "toml")]
-        format: String,
+        format: ConfigFormat,
     },
 }
 
@@ -78,7 +81,7 @@ pub struct TaskControlOptions {
     pub name: String,
     /// The config format, supports [toml|json|yml]
     #[structopt(long, default_value = "toml")]
-    pub format: String,
+    pub format: ConfigFormat,
     /// The config file path, When first run this is required, but the server already have this task config, can be skip this parameter
     #[structopt(short, long)]
     pub config: Option<PathBuf>,

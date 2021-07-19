@@ -1,9 +1,11 @@
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::Mutex;
 
 use once_cell::sync::Lazy;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use strum::AsStaticRef;
 
 use crate::error::{BridgeResult, StandardError};
 
@@ -13,6 +15,22 @@ pub trait BridgeConfig {
 }
 
 static INSTANCE: Lazy<Mutex<HashMap<String, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+
+#[derive(Clone, Debug, Deserialize, Serialize, strum::EnumString, strum::AsStaticStr)]
+pub enum ConfigFormat {
+    #[strum(serialize = "yml")]
+    Yml,
+    #[strum(serialize = "json")]
+    Json,
+    #[strum(serialize = "toml")]
+    Toml,
+}
+
+impl ConfigFormat {
+    pub fn file_extension(&self) -> &'static str {
+        self.as_static()
+    }
+}
 
 pub struct Config;
 
@@ -86,5 +104,35 @@ impl Config {
                 key
             ))),
         }
+    }
+
+    pub fn raw_config(config: impl Serialize, format: ConfigFormat) -> anyhow::Result<String> {
+        let content = match format {
+            ConfigFormat::Yml => serde_yaml::to_string(&config)?,
+            ConfigFormat::Json => serde_json::to_string_pretty(&config)?,
+            ConfigFormat::Toml => toml::to_string(&config)?,
+        };
+        Ok(content)
+    }
+
+    pub fn persist(
+        path_config: impl AsRef<Path>,
+        config: impl Serialize,
+        format: ConfigFormat,
+    ) -> anyhow::Result<()> {
+        let content = Self::raw_config(config, format)?;
+        Ok(std::fs::write(path_config.as_ref(), content)?)
+    }
+
+    pub fn load<T>(path_config: impl AsRef<Path>) -> anyhow::Result<T>
+    where
+        T: serde::de::DeserializeOwned,
+    {
+        let mut c = config::Config::default();
+        c.merge(config::File::from(path_config.as_ref()))?;
+        let tc = c
+            .try_into::<T>()
+            .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
+        Ok(tc)
     }
 }

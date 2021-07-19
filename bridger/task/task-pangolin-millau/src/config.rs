@@ -7,9 +7,9 @@ use support_s2s::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinMillauConfig {
-    pangolin: ChainInfoConfig,
-    millau: ChainInfoConfig,
-    relay: RelayConfig,
+    pub pangolin: ChainInfoConfig,
+    pub millau: ChainInfoConfig,
+    pub relay: RelayConfig,
 }
 
 impl PangolinMillauConfig {

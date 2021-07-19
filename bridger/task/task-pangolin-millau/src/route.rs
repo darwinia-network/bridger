@@ -2,12 +2,15 @@ use std::str::FromStr;
 
 use lifeline::{Bus, Receiver, Sender};
 
-use bridge_traits::bridge::task::TaskTerminal;
+use bridge_traits::bridge::task::{BridgeSand, TaskTerminal};
 use bridge_traits::error::StandardError;
 use support_s2s::types::BridgeName;
 
 use crate::bus::PangolinMillauBus;
+use crate::config::PangolinMillauConfig;
 use crate::message::{PangolinMillauMessageReceive, PangolinMillauMessageSend};
+use crate::task::PangolinMillauTask;
+use bridge_traits::bridge::config::Config;
 
 pub async fn dispatch_route(
     bus: &PangolinMillauBus,
@@ -16,7 +19,7 @@ pub async fn dispatch_route(
 ) -> anyhow::Result<TaskTerminal> {
     match &uri[..] {
         "init-bridge" => init_bridge(bus, param).await,
-        "start-relay" => relay(bus, param).await,
+        "start-relay" => start_relay(bus, param).await,
         _ => Ok(TaskTerminal::new("Unsupported command")),
     }
 }
@@ -58,13 +61,28 @@ async fn init_bridge(
     )))
 }
 
-async fn relay(bus: &PangolinMillauBus, _param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
+async fn start_relay(
+    bus: &PangolinMillauBus,
+    _param: serde_json::Value,
+) -> anyhow::Result<TaskTerminal> {
     let mut sender = bus.tx::<PangolinMillauMessageSend>()?;
     sender
         .send(PangolinMillauMessageSend::Relay(
             BridgeName::PangolinToMillau,
         ))
         .await?;
+
+    let state_task = support_keep::state::get_state_task_unwrap(PangolinMillauTask::NAME)?;
+    let mut config_task: PangolinMillauConfig = Config::load(state_task.config_path.clone())?;
+    let mut config_relay = config_task.relay;
+    config_relay.auto_start = true;
+    config_task.relay = config_relay;
+    Config::persist(
+        &state_task.config_path,
+        config_task,
+        state_task.config_format.clone(),
+    )?;
+
     // todo: there can be upgrade config to set `auto_start=true`
     Ok(TaskTerminal::new("success"))
 }

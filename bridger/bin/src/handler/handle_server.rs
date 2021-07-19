@@ -9,11 +9,12 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::error::StandardError;
 use component_state::config::{BridgeStateConfig, MicrokvConfig};
 use component_state::state::BridgeStateComponent;
+use support_keep::types::WebserverState;
 
 use crate::handler::task_manager;
 use crate::patch;
 use crate::types::command::ServerOptions;
-use crate::types::server::{Resp, WebserverState};
+use crate::types::server::Resp;
 use crate::types::transfer::{
     TaskConfigTemplateParam, TaskListResponse, TaskStartParam, TaskStopParam,
 };
@@ -37,7 +38,7 @@ async fn init(options: ServerOptions) -> anyhow::Result<()> {
     };
     let component_state = BridgeStateComponent::new(config_state);
     let bridge_state = component_state.component().await?;
-    support_keep::state::set_state(bridge_state)?;
+    support_keep::state::set_state_bridge(bridge_state)?;
     Ok(())
 }
 
@@ -141,8 +142,8 @@ async fn task_list(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
 async fn task_start(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let param: TaskStartParam = patch::hyper::deserialize_body(&mut req).await?;
 
-    let state_webserver = req.data::<WebserverState>().unwrap();
-    let base_path = &state_webserver.base_path.as_ref();
+    let state = req.data::<WebserverState>().unwrap();
+    let base_path = &state.base_path.as_ref();
     if let Err(e) = task_manager::start_task_single(base_path.into(), param).await {
         return Resp::<String>::err_with_msg(format!("{}", e)).response_json();
     }

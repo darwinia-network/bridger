@@ -48,8 +48,6 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
             &format!("{}-service-relay", DarwiniaEthereumTask::NAME),
             async move {
                 info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM > DARWINIA RELAY");
-                let mut target: u64 = 0;
-                let mut relayed: u64 = 0;
 
                 // Darwinia client
                 let darwinia = component_darwinia.component().await?;
@@ -59,6 +57,10 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                 let shadow = Arc::new(component_shadow.component().await?);
 
                 let interval_relay = servce_config.interval_relay;
+
+                let last_confirmed = ethereum2darwinia.last_confirmed().await?;
+                let mut target: u64 = last_confirmed;
+                let mut relayed: u64 = last_confirmed;
 
                 tokio::spawn(async move {
                     loop {

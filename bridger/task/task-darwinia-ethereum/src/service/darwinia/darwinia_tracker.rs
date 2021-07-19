@@ -6,19 +6,20 @@ use std::time::Duration;
 use tokio::time::sleep;
 use crate::task::DarwiniaEthereumTask;
 use bridge_traits::bridge::task::BridgeSand;
+use component_state::state::BridgeState;
 
 /// DarwiniaTracker
 pub struct DarwiniaBlockTracker {
     darwinia: Darwinia,
-    next_block: u32,
+    state: BridgeState,
 }
 
 impl DarwiniaBlockTracker {
     /// new
-    pub fn new(darwinia: Darwinia, scan_from: u32) -> Self {
+    pub fn new(darwinia: Darwinia, state: BridgeState) -> Self {
         Self {
             darwinia,
-            next_block: scan_from,
+            state,
         }
     }
 
@@ -47,6 +48,8 @@ impl DarwiniaBlockTracker {
     }
 
     async fn get_next_block(&mut self) -> Result<Option<Header<u32, BlakeTwo256>>> {
+        let kv = self.state.microkv();
+        let next_block = kv.get("last-tracked-darwinia-block")?.unwrap_or(0u32) + 1;
         let finalized_block_hash = self.darwinia.finalized_head().await?;
         match self
             .darwinia
@@ -54,11 +57,11 @@ impl DarwiniaBlockTracker {
             .await?
         {
             Some(finalized_block_number) => {
-                if self.next_block > finalized_block_number {
+                if next_block > finalized_block_number {
                     Ok(None)
                 } else {
-                    let header = self.darwinia.get_block_by_number(self.next_block).await?;
-                    self.next_block += 1;
+                    let header = self.darwinia.get_block_by_number(next_block).await?;
+                    // kv.put("last-tracked-darwinia-block", &next_block);
                     Ok(Some(header))
                 }
             }

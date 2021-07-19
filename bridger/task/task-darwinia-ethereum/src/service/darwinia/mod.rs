@@ -65,14 +65,15 @@ impl lifeline::Service for DarwiniaService {
         let _greet = Self::try_task(
             &format!("{}-service-darwinia-scan", DarwiniaEthereumTask::NAME),
             async move {
+                let cloned_state = state.clone();
                 tokio::spawn(async move {
-                    run(state, sender_to_extrinsics).await
+                    run(cloned_state, sender_to_extrinsics).await
                 });
                 while let Some(recv) = rx.recv().await {
                     match recv {
-                        ToDarwiniaMessage::Stop => {
-                            // TODO: how to stop the runner?
-                            // maybe add a channel to it
+                        ToDarwiniaMessage::LastTrackedDarwiniaBlock(block_number) => {
+                            let microkv = state.microkv();
+                            microkv.put("last-tracked-darwinia-block", &block_number);
                         }
                         _ => {}
                     }
@@ -94,10 +95,6 @@ async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sende
     let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
     let config_ethereum: EthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
     let config_web3: Web3Config = Config::restore(DarwiniaEthereumTask::NAME)?;
-
-    // Datastore
-    let microkv = state.microkv();
-    let scan_from = microkv.get("last-tracked-darwinia-block")?.unwrap_or(0u32) + 1;
 
     // Components
     let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
@@ -122,9 +119,8 @@ async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sende
         sender_to_extrinsics: sender_to_extrinsics.clone(),
         delayed_extrinsics,
         spec_name,
-        scan_from,
     };
-    if let Err(err) = runner.start(microkv).await {
+    if let Err(err) = runner.start(state.clone()).await {
         sleep(Duration::from_secs(30)).await;
         run(state, sender_to_extrinsics).await
     } else {
@@ -139,7 +135,6 @@ struct DarwiniaServiceRunner {
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     delayed_extrinsics: HashMap<u32, Extrinsic>,
     spec_name: String,
-    scan_from: u32,
 }
 
 impl DarwiniaServiceRunner {
@@ -147,10 +142,11 @@ impl DarwiniaServiceRunner {
     /// start
     pub async fn start(
         &mut self,
-        microkv: &MicroKV,
+        state: BridgeState,
     ) -> Result<()> {
         let mut tracker =
-            DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), self.scan_from);
+            DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), state.clone());
+        let microkv = state.microkv();
         loop {
             let header = tracker.next_block().await?;
 
@@ -192,6 +188,8 @@ impl DarwiniaServiceRunner {
                 microkv.put("last-tracked-darwinia-block", &(header.number));
             }
 
+            sleep(Duration::from_millis(500)).await;
+
         }
     }
 
@@ -230,10 +228,6 @@ impl DarwiniaServiceRunner {
         header: &<DarwiniaRuntime as System>::Header,
         event: EventInfo<DarwiniaRuntime>,
     ) -> Result<()> {
-        //todo
-        //if module != "System" {
-        //trace!(">> Event - {}::{}", module, variant);
-        //}
         let block = Some(header.number);
         match event {
             EventInfo::RuntimeUpdatedEvent(_) => {
@@ -272,7 +266,7 @@ impl DarwiniaServiceRunner {
                         .ethereum
                         .submit_authorities_set(message, signatures)
                         .await?;
-                    info!("Submit authorities to ethereum with tx: {}", tx_hash);
+                    info!(target: DarwiniaEthereumTask::NAME, "Submit authorities to ethereum with tx: {}", tx_hash);
                 }
             }
             // call ethereum_backing.lock will emit the event
@@ -282,7 +276,7 @@ impl DarwiniaServiceRunner {
                     .is_authority(block, &self.account)
                     .await?
                 {
-                    info!("{}", event);
+                    info!(target: DarwiniaEthereumTask::NAME, "{}", event);
                     let ex = Extrinsic::SignAndSendMmrRoot(event.block_number);
                     self.delayed_extrinsics.insert(event.block_number, ex);
                 }

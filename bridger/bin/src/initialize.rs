@@ -19,6 +19,7 @@ fn init_log() {
         task-darwinia-ethereum=trace,
 		support_s2s=debug,
 		bridge=info,
+        evm_log_tracker=info,
         "#,
     );
     std::env::set_var("RUST_BACKTRACE", "1");

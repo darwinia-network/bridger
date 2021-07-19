@@ -105,9 +105,10 @@ async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessag
             }
         }
 
-        sleep(Duration::from_secs(5)).await;
+        sleep(Duration::from_secs(servce_config.interval_guard)).await;
     }
 
+    sleep(Duration::from_secs(30)).await;
     run(sender_to_extrinsics).await
 }
 

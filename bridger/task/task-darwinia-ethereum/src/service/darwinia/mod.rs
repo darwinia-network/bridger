@@ -125,6 +125,7 @@ async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sende
         scan_from,
     };
     if let Err(err) = runner.start(microkv).await {
+        sleep(Duration::from_secs(30)).await;
         run(state, sender_to_extrinsics).await
     } else {
         Ok(())

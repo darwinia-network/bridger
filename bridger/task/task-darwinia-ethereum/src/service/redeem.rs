@@ -44,7 +44,7 @@ impl Service for RedeemService {
         let _greet = Self::try_task(
             &format!("{}-service-redeem", DarwiniaEthereumTask::NAME),
             async move {
-                debug!(target: DarwiniaEthereumTask::NAME, "hello redeem");
+                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM > DARWINIA REDEEM");
 
                 // Darwinia client
                 let darwinia = component_darwinia_subxt.component().await?;

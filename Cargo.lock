@@ -9031,6 +9031,7 @@ version = "0.3.3"
 dependencies = [
  "anyhow",
  "array-bytes",
+ "async-recursion",
  "async-trait",
  "bridge-traits",
  "component-darwinia-subxt",

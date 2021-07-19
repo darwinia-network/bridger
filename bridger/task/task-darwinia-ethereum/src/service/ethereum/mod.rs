@@ -56,7 +56,7 @@ fn create_tracker(
         client,
         topics_list,
         logs_handler,
-        100,
+        scan_from,
         step,
     )
 }

@@ -805,6 +805,7 @@ dependencies = [
  "lifeline",
  "linked-darwinia",
  "log",
+ "microkv",
  "reqwest 0.11.4",
  "routerify",
  "serde 1.0.126",

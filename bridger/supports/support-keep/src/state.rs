@@ -15,11 +15,11 @@ pub fn set_state_bridge(state: BridgeState) -> anyhow::Result<()> {
         .map_err(|_e| StandardError::Api("Failed to keep bridge state".to_string()).into())
 }
 
-pub fn get_state_bridge() -> Option<BridgeState> {
-    STATE_BRIDGE.get().cloned()
+pub fn get_state_bridge() -> Option<&'static BridgeState> {
+    STATE_BRIDGE.get()
 }
 
-pub fn get_state_bridge_ok() -> anyhow::Result<BridgeState> {
+pub fn get_state_bridge_ok() -> anyhow::Result<&'static BridgeState> {
     get_state_bridge()
         .ok_or_else(|| StandardError::Api("Please set bridge state first.".to_string()).into())
 }

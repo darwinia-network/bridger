@@ -15,10 +15,49 @@ pub enum Opt {
         #[structopt(flatten)]
         command: TaskCommand,
     },
+    /// The bridge kv db storage operation
+    Kv {
+        /// The server host by darwinia-bridger service
+        #[structopt(long, default_value = "http://127.0.0.1:1098")]
+        server: String,
+        /// The namespace of storage
+        #[structopt(long, short)]
+        namespace: Option<String>,
+        #[structopt(flatten)]
+        command: KvCommand,
+    },
     /// Start bridger server
     Server {
         #[structopt(flatten)]
         options: ServerOptions,
+    },
+}
+
+#[derive(Debug, StructOpt)]
+pub enum KvCommand {
+    /// Put Key-Value to bridger database
+    Put {
+        /// keys and values one by one
+        #[structopt()]
+        kvs: Vec<String>,
+    },
+    /// Get Key-Value from bridger
+    Get {
+        /// Get a value by key
+        #[structopt()]
+        keys: Vec<String>,
+    },
+    /// List bridger database
+    List {
+        /// List by sorted
+        #[structopt(short, long)]
+        sorted: bool,
+    },
+    /// Remove a Key-Value from bridger
+    Remove {
+        /// Remove a value by key
+        #[structopt()]
+        keys: Vec<String>,
     },
 }
 

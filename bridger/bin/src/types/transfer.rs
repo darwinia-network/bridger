@@ -38,3 +38,16 @@ pub struct TaskConfigTemplateParam {
     #[serde(default = "default_config_format")]
     pub format: ConfigFormat,
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct KvOperationParam {
+    pub namespace: Option<String>,
+    pub keys: Vec<String>,
+    pub values: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct KvListParam {
+    pub namespace: Option<String>,
+    pub sorted: bool,
+}

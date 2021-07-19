@@ -46,7 +46,6 @@ impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
 }
 
 impl PangolinMillauTask {
-    #[allow(clippy::never_loop)]
     pub async fn new(config: PangolinMillauConfig) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
 

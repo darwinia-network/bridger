@@ -93,3 +93,15 @@ pub enum ToDarwiniaMessage {
 impl Message<DarwiniaEthereumBus> for ToDarwiniaMessage {
     type Channel = broadcast::Sender<Self>;
 }
+
+// *** ToEthereumMessage **
+#[derive(Clone, Debug)]
+pub enum ToEthereumMessage {
+    Start,
+    Stop,
+}
+
+impl Message<DarwiniaEthereumBus> for ToEthereumMessage {
+    type Channel = broadcast::Sender<Self>;
+}
+

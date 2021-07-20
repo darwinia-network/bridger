@@ -25,10 +25,7 @@ use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
-use crate::message::{
-    DarwiniaEthereumMessage, EthereumScanMessage, ToRedeemMessage,
-    ToRelayMessage,
-};
+use crate::message::{ToRedeemMessage, ToRelayMessage, ToDarwiniaMessage, ToEthereumMessage};
 use crate::task::DarwiniaEthereumTask;
 use component_ethereum::config::EthereumConfig;
 
@@ -116,29 +113,33 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
-        let mut rx = bus.rx::<DarwiniaEthereumMessage>()?;
+        let mut rx = bus.rx::<ToEthereumMessage>()?;
         let sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
 
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
+        let mut running = false;
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
-                let cloned_state = state.clone();
-                tokio::spawn(async move {
-                    run(cloned_state, sender_to_relay, sender_to_redeem).await
-                });
 
                 while let Some(recv) = rx.recv().await {
-                    if let DarwiniaEthereumMessage::Scan(message_scan) = recv {
-                        match message_scan {
-                            EthereumScanMessage::Stop => {
-                                // TODO: stop the tracker
+                    match recv {
+                        ToEthereumMessage::Start => {
+                            if !running {
+                                running = true;
+
+                                let cloned_state = state.clone();
+                                let cloned_sender_to_relay = sender_to_relay.clone();
+                                let cloned_sender_to_redeem = sender_to_redeem.clone();
+                                tokio::spawn(async move {
+                                    run(cloned_state, cloned_sender_to_relay, cloned_sender_to_redeem).await
+                                });
                             }
-                            _ => {}
                         }
+                        _ => {}
                     }
                 }
                 Ok(())

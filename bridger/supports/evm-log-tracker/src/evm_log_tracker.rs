@@ -34,7 +34,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
         }
     }
 
-    pub async fn start(&mut self) {
+    pub async fn start(&mut self) -> anyhow::Result<()> {
         self.running = true;
         loop {
             match self.next().await {
@@ -45,9 +45,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
                     sleep(Duration::from_secs(30)).await;
                 }
                 Ok(logs) => {
-                    if let Err(err2) = self.handle(logs).await {
-                        error!("{:?}", err2);
-                    }
+                    self.handle(logs).await?;
                 }
             }
 
@@ -57,6 +55,8 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
 
             sleep(Duration::from_secs(self.step_in_secs)).await;
         }
+
+        Ok(())
     }
 
     pub fn stop(&mut self) {

@@ -15,15 +15,6 @@ use task_pangolin_millau::task::PangolinMillauTask;
 
 use crate::types::transfer::{TaskConfigTemplateParam, TaskStartParam};
 
-fn task_config<T: serde::de::DeserializeOwned>(path_config: PathBuf) -> anyhow::Result<T> {
-    let mut c = config::Config::default();
-    c.merge(config::File::from(path_config))?;
-    let tc = c
-        .try_into::<T>()
-        .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
-    Ok(tc)
-}
-
 /// Auto start all configured task
 pub async fn auto_start_task(base_path: PathBuf) -> anyhow::Result<()> {
     let available_tasks = support_keep::task::available_tasks()?;

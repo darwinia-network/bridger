@@ -57,7 +57,7 @@ pub fn get_state_task(task: impl AsRef<str>) -> anyhow::Result<Option<TaskState>
     let state_task = STATE_TASK
         .lock()
         .map_err(|_e| StandardError::Api("failed to get task state".to_string()))?;
-    Ok(state_task.get(task.as_ref()).map(|v| v.clone()))
+    Ok(state_task.get(task.as_ref()).cloned())
 }
 
 pub fn get_state_task_unwrap(task: impl AsRef<str>) -> anyhow::Result<TaskState> {

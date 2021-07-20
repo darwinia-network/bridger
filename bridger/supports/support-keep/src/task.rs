@@ -100,7 +100,7 @@ pub fn running_task(
     }
 }
 
-pub fn running_task_cast<T: 'static + BridgeTaskKeep>(
+pub fn running_task_cast_ref<T: 'static + BridgeTaskKeep>(
     name: impl AsRef<str>,
 ) -> anyhow::Result<&'static T> {
     let name = name.as_ref();
@@ -108,6 +108,25 @@ pub fn running_task_cast<T: 'static + BridgeTaskKeep>(
         if let Some(running) = RUNNING_TASKS.get() {
             if let Some(tk) = running.get(&name.to_string()) {
                 return match tk.as_any().downcast_ref::<T>() {
+                    Some(b) => Ok(b),
+                    None => {
+                        Err(StandardError::Api(format!("can't downcast task [{}]", name)).into())
+                    }
+                };
+            }
+        }
+        Err(StandardError::Api(format!("the task [{}] isn't started", name)).into())
+    }
+}
+
+pub fn running_task_cast_mut<T: 'static + BridgeTaskKeep>(
+    name: impl AsRef<str>,
+) -> anyhow::Result<&'static mut T> {
+    let name = name.as_ref();
+    unsafe {
+        if let Some(running) = RUNNING_TASKS.get_mut() {
+            if let Some(tk) = running.get_mut(&name.to_string()) {
+                return match tk.as_any_mut().downcast_mut::<T>() {
                     Some(b) => Ok(b),
                     None => {
                         Err(StandardError::Api(format!("can't downcast task [{}]", name)).into())

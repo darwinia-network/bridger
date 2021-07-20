@@ -785,6 +785,7 @@ dependencies = [
  "serde 1.0.126",
  "serde_json",
  "serde_yaml",
+ "sha1",
  "strum 0.21.0",
  "strum_macros 0.21.1",
  "thiserror",
@@ -9145,6 +9146,7 @@ dependencies = [
  "postage",
  "serde 1.0.126",
  "serde_json",
+ "support-keep",
  "tokio 1.8.1",
 ]
 

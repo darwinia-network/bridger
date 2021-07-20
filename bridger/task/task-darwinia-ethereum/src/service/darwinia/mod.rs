@@ -171,6 +171,8 @@ impl DarwiniaServiceRunner {
                 .get_events_from_block_hash(hash)
                 .await
                 .map_err(|err| err.into());
+
+            // process events
             if let Err(err) = self.handle_events(&header, events).await {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
                     microkv.put("last-tracked-darwinia-block", &(header.number))?;
@@ -181,7 +183,13 @@ impl DarwiniaServiceRunner {
 						"An error occurred while processing the events of block {}: {:?}",
 						header.number, err
 					);
-                    sleep(Duration::from_secs(30)).await;
+
+                    let err_msg = format!("{:?}", err).to_lowercase();
+                    if err_msg.contains("type size unavailable") {
+                        microkv.put("last-tracked-darwinia-block", &(header.number))?;
+                    } else {
+                        sleep(Duration::from_secs(30)).await;
+                    }
                 }
             } else {
                 microkv.put("last-tracked-darwinia-block", &(header.number))?;

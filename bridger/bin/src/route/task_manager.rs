@@ -151,6 +151,7 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
     Ok(())
 }
 
+/// Generate task config template
 pub fn task_config_template(param: TaskConfigTemplateParam) -> anyhow::Result<String> {
     let task_name = param.name;
     let format = param.format;

@@ -42,7 +42,7 @@ impl Service for SomeService {
                         }
                         TemplateTaskMessage::StopSomeService => {
                             let stack = task.stack();
-                            stack.stop_service::<SomeService>()?;
+                            stack.stop_service::<SomeService>().unwrap();
                         }
                     }
                 }

@@ -1,5 +1,8 @@
 use std::path::PathBuf;
+
 use structopt::StructOpt;
+
+use bridge_traits::bridge::config::ConfigFormat;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "darwinia-bridger", about = "Darwinia bridger")]
@@ -12,10 +15,49 @@ pub enum Opt {
         #[structopt(flatten)]
         command: TaskCommand,
     },
+    /// The bridge kv db storage operation
+    Kv {
+        /// The server host by darwinia-bridger service
+        #[structopt(long, default_value = "http://127.0.0.1:1098")]
+        server: String,
+        /// The namespace of storage
+        #[structopt(long, short)]
+        namespace: Option<String>,
+        #[structopt(flatten)]
+        command: KvCommand,
+    },
     /// Start bridger server
     Server {
         #[structopt(flatten)]
         options: ServerOptions,
+    },
+}
+
+#[derive(Debug, StructOpt)]
+pub enum KvCommand {
+    /// Put Key-Value to bridger database
+    Put {
+        /// keys and values one by one
+        #[structopt()]
+        kvs: Vec<String>,
+    },
+    /// Get Key-Value from bridger
+    Get {
+        /// Get a value by key
+        #[structopt()]
+        keys: Vec<String>,
+    },
+    /// List bridger database
+    List {
+        /// List by sorted
+        #[structopt(short, long)]
+        sorted: bool,
+    },
+    /// Remove a Key-Value from bridger
+    Remove {
+        /// Remove a value by key
+        #[structopt()]
+        keys: Vec<String>,
     },
 }
 
@@ -54,7 +96,7 @@ pub enum TaskCommand {
         name: String,
         /// The config format, supports [toml|json|yml]
         #[structopt(long, default_value = "toml")]
-        format: String,
+        format: ConfigFormat,
     },
 }
 
@@ -78,7 +120,7 @@ pub struct TaskControlOptions {
     pub name: String,
     /// The config format, supports [toml|json|yml]
     #[structopt(long, default_value = "toml")]
-    pub format: String,
+    pub format: ConfigFormat,
     /// The config file path, When first run this is required, but the server already have this task config, can be skip this parameter
     #[structopt(short, long)]
     pub config: Option<PathBuf>,

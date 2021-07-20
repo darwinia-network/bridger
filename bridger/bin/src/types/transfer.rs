@@ -1,20 +1,22 @@
 use serde::{Deserialize, Serialize};
 
-fn default_config_format() -> String {
-    "toml".to_string()
+use bridge_traits::bridge::config::ConfigFormat;
+
+fn default_config_format() -> ConfigFormat {
+    ConfigFormat::Toml
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SharedStartParam {
     #[serde(default = "default_config_format")]
-    pub format: String,
+    pub format: ConfigFormat,
     pub config: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct TaskStartParam {
     #[serde(default = "default_config_format")]
-    pub format: String,
+    pub format: ConfigFormat,
     pub name: String,
     pub config: Option<String>,
 }
@@ -34,5 +36,18 @@ pub struct TaskListResponse {
 pub struct TaskConfigTemplateParam {
     pub name: String,
     #[serde(default = "default_config_format")]
-    pub format: String,
+    pub format: ConfigFormat,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct KvOperationParam {
+    pub namespace: Option<String>,
+    pub keys: Vec<String>,
+    pub values: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct KvListParam {
+    pub namespace: Option<String>,
+    pub sorted: bool,
 }

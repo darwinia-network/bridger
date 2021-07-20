@@ -2,7 +2,7 @@ use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::BridgeSand;
+use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
 use component_http_client::HttpClientComponent;
 
 use crate::bus::TemplateTaskBus;
@@ -27,14 +27,24 @@ impl Service for SomeService {
         let _greet = Self::try_task(
             &format!("{}-service-some", TemplateTask::NAME),
             async move {
+                let task: &mut TemplateTask =
+                    support_keep::task::running_task_cast_mut(TemplateTask::NAME)?;
                 while let Some(message) = rx.recv().await {
-                    tx.send(ToTemplateLinkedMessage::SomeEvent).await?;
-                    log::debug!(
-                        target: TemplateTask::NAME,
-                        "[{}] recv a new some message: {:?}",
-                        TemplateTask::NAME,
-                        message
-                    );
+                    match message {
+                        TemplateTaskMessage::SomeEvent => {
+                            tx.send(ToTemplateLinkedMessage::SomeEvent).await?;
+                            log::debug!(
+                                target: TemplateTask::NAME,
+                                "[{}] recv a new some message: {:?}",
+                                TemplateTask::NAME,
+                                message
+                            );
+                        }
+                        TemplateTaskMessage::StopSomeService => {
+                            let stack = task.stack();
+                            stack.stop_service::<SomeService>()?;
+                        }
+                    }
                 }
                 Ok(())
             },

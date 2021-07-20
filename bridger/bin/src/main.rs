@@ -5,6 +5,7 @@ use crate::types::command::Opt;
 mod handler;
 mod initialize;
 mod patch;
+mod route;
 mod types;
 
 #[tokio::main]
@@ -18,6 +19,11 @@ async fn main() -> anyhow::Result<()> {
         Opt::Task { server, command } => {
             handler::handle_task(server, command).await?;
         }
+        Opt::Kv {
+            server,
+            namespace,
+            command,
+        } => handler::handle_kv(server, namespace, command).await?,
     };
     Ok(())
 }

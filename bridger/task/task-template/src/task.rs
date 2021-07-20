@@ -1,7 +1,8 @@
 use lifeline::dyn_bus::DynBus;
 
-use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::{BridgeSand, BridgeTask, BridgeTaskKeep, TaskTerminal};
+use bridge_traits::bridge::task::{
+    BridgeSand, BridgeTask, BridgeTaskKeep, TaskStack, TaskTerminal,
+};
 use component_state::state::BridgeState;
 
 use crate::bus::TemplateTaskBus;
@@ -11,8 +12,7 @@ use crate::service::some::SomeService;
 #[derive(Debug)]
 pub struct TemplateTask {
     bus: TemplateTaskBus,
-    services: Vec<Box<dyn BridgeService + Send + Sync>>,
-    carries: Vec<lifeline::Lifeline>,
+    stack: TaskStack<TemplateTaskBus>,
 }
 
 impl BridgeSand for TemplateTask {
@@ -27,14 +27,17 @@ impl BridgeTask<TemplateTaskBus> for TemplateTask {
         &self.bus
     }
 
-    fn keep_carry(&mut self, other_bus: lifeline::Lifeline) {
-        self.carries.push(other_bus);
+    fn stack(&mut self) -> &mut TaskStack<TemplateTaskBus> {
+        &mut self.stack
     }
 }
 
 #[async_trait::async_trait]
 impl BridgeTaskKeep for TemplateTask {
     fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
     }
     async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
@@ -47,14 +50,8 @@ impl TemplateTask {
         config.store(TemplateTask::NAME)?;
         let bus = TemplateTaskBus::default();
         bus.store_resource::<BridgeState>(state);
-
-        let services = vec![Self::spawn_service::<SomeService>(&bus)?];
-
-        let carries = vec![];
-        Ok(Self {
-            bus,
-            services,
-            carries,
-        })
+        let mut stack = TaskStack::new();
+        stack.spawn_service::<SomeService>(&bus)?;
+        Ok(Self { bus, stack })
     }
 }

@@ -6,9 +6,11 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::traits::CliChain;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, strum::EnumString)]
 pub enum BridgeName {
+    #[strum(serialize = "pangolin-to-millau")]
     PangolinToMillau,
+    #[strum(serialize = "millau-to-pangolin")]
     MillauToPangolin,
 }
 

@@ -1,8 +1,5 @@
 #![allow(dead_code)]
 
-use std::path::PathBuf;
-use std::sync::Arc;
-
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -106,11 +103,4 @@ impl<T: Serialize + for<'a> Deserialize<'a>> Resp<T> {
     pub fn response_json(&self) -> anyhow::Result<hyper::Response<hyper::Body>> {
         self._response_json_with_code(None)
     }
-}
-
-// -- bridge state
-
-#[derive(Clone)]
-pub struct WebserverState {
-    pub base_path: Arc<PathBuf>,
 }

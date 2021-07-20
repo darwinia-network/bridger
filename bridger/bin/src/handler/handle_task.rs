@@ -2,15 +2,14 @@ use std::collections::HashMap;
 
 use colored::Colorize;
 
+use bridge_traits::bridge::task::TaskTerminal;
 use bridge_traits::error::StandardError;
 
-use crate::patch;
 use crate::types::command::TaskCommand;
 use crate::types::server::Resp;
 use crate::types::transfer::{
     TaskConfigTemplateParam, TaskListResponse, TaskStartParam, TaskStopParam,
 };
-use bridge_traits::bridge::task::TaskTerminal;
 
 #[allow(clippy::manual_map)]
 #[async_recursion::async_recursion]
@@ -38,10 +37,6 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
             let format = options.format;
             let name = options.name;
             let config = options.config;
-            if !patch::bridger::is_allow_config_format(&format) {
-                eprintln!("Not support this format. {}", format);
-                return Ok(());
-            }
             let content = match config {
                 Some(path) => Some(tokio::fs::read_to_string(&path).await?),
                 None => None,

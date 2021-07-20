@@ -83,7 +83,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
 #[async_recursion]
 async fn update_target(state: BridgeState, block_number: u64) {
     if let Err(err) = LikeDarwiniaWithLikeEthereumRelayService::update_target(state.clone(), block_number).await {
-        error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
+        error!(target: DarwiniaEthereumTask::NAME, "update target err: {:#?}", err);
         sleep(Duration::from_secs(30)).await;
         update_target(state, block_number).await;
     }
@@ -92,7 +92,7 @@ async fn update_target(state: BridgeState, block_number: u64) {
 #[async_recursion]
 async fn affirm(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
     if let Err(err) = LikeDarwiniaWithLikeEthereumRelayService::affirm(state.clone(), sender_to_extrinsics.clone()).await {
-        error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
+        error!(target: DarwiniaEthereumTask::NAME, "affirm err: {:#?}", err);
         sleep(Duration::from_secs(30)).await;
         affirm(state, sender_to_extrinsics).await;
     }

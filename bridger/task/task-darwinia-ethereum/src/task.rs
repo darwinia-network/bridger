@@ -9,12 +9,12 @@ use component_state::state::BridgeState;
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::DarwiniaEthereumConfig;
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
+use crate::service::darwinia::DarwiniaService;
 use crate::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
-use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
-use crate::service::redeem::RedeemService;
 use crate::service::extrinsics::ExtrinsicsService;
 use crate::service::guard::GuardService;
-use crate::service::darwinia::DarwiniaService;
+use crate::service::redeem::RedeemService;
+use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 #[derive(Debug)]
 pub struct DarwiniaEthereumTask {
@@ -59,8 +59,8 @@ impl DarwiniaEthereumTask {
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new();
-        stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?;
         stack.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?;
+        stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?;
         stack.spawn_service::<RedeemService>(&bus)?;
         stack.spawn_service::<GuardService>(&bus)?;
         stack.spawn_service::<DarwiniaService>(&bus)?;

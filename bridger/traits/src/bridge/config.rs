@@ -131,11 +131,15 @@ impl Config {
     where
         T: serde::de::DeserializeOwned,
     {
+        let path = path_config.as_ref();
         let mut c = config::Config::default();
-        c.merge(config::File::from(path_config.as_ref()))?;
-        let tc = c
-            .try_into::<T>()
-            .map_err(|e| StandardError::Api(format!("Failed to load task config: {:?}", e)))?;
+        c.merge(config::File::from(path))?;
+        let tc = c.try_into::<T>().map_err(|e| {
+            StandardError::Api(format!(
+                "Failed to load task config: {:?} path: {:?}",
+                e, path
+            ))
+        })?;
         Ok(tc)
     }
 }

@@ -1,4 +1,4 @@
-use lifeline::{Bus, Lifeline, Service, Receiver, Sender, Task};
+use lifeline::{Bus, Lifeline, Service, Receiver, Task};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
@@ -12,20 +12,15 @@ use component_darwinia_subxt::{
         Darwinia2Ethereum, Account as ToEthereumAccount
     }
 };
-use component_shadow::{Shadow, ShadowComponent};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::task::DarwiniaEthereumTask;
-use crate::error::BizError;
 
-use crate::message::{ToRedeemMessage, ToExtrinsicsMessage, Extrinsic};
+use crate::message::{ToExtrinsicsMessage, Extrinsic};
 
 use std::time::Duration;
 use tokio::time::sleep;
 
-use std::sync::Arc;
-use postage::broadcast;
-use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use support_ethereum::receipt::RedeemFor;
 use component_darwinia_subxt::account::DarwiniaAccount;
 use lifeline::dyn_bus::DynBus;

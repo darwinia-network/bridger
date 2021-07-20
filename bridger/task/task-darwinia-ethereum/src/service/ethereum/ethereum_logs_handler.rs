@@ -52,7 +52,7 @@ impl LogsHandler for EthereumLogsHandler {
         // TODO: check the address
         let ring = self.topics_list[0].1[0];
         let kton = self.topics_list[1].1[0];
-        let bank = self.topics_list[2].1[0];
+        let _bank = self.topics_list[2].1[0];
         let relay = self.topics_list[3].1[0];
         let register = self.topics_list[4].1[0];
         let lock = self.topics_list[4].1[0];
@@ -62,7 +62,6 @@ impl LogsHandler for EthereumLogsHandler {
 
         if !txs.is_empty() {
             // Send block number to `Relay Service`
-            println!("size: {}", txs.len());
             for tx in &txs {
                 trace!(target: DarwiniaEthereumTask::NAME, "{:?} in ethereum block {}", &tx.tx_hash, &tx.block);
                 self.sender_to_relay
@@ -164,7 +163,7 @@ impl EthereumLogsHandler {
                 "This ethereum tx {:?} has already been redeemed.",
                 tx.enclosed_hash()
             );
-            self.microkv.put("last-redeemed", &tx.block);
+            self.microkv.put("last-redeemed", &tx.block)?;
         } else {
             // delay to wait for possible previous extrinsics
             sleep(Duration::from_secs(12)).await;

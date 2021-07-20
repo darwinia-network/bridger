@@ -311,7 +311,7 @@ impl Darwinia2Ethereum {
             .await?
         {
             None => Ok(false),
-            Some((mmr_root, items)) => {
+            Some((_mmr_root, items)) => {
                 let account_id = account
                     .0
                     .real

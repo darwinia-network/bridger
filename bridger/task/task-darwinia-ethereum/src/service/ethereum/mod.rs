@@ -2,13 +2,13 @@ use std::time::Duration;
 
 use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
+use lifeline::{Bus, Lifeline, Receiver, Task};
 use microkv::MicroKV;
 use postage::broadcast;
 use tokio::time::sleep;
 use web3::{
     transports::http::Http,
-    types::{Log, H160, H256},
+    types::{H160, H256},
     Web3,
 };
 
@@ -21,12 +21,12 @@ use component_darwinia_subxt::darwinia::client::Darwinia;
 use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
 use ethereum_logs_handler::EthereumLogsHandler;
-use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker, Result};
+use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
 use crate::message::{
-    DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage, ToRedeemMessage,
+    DarwiniaEthereumMessage, EthereumScanMessage, ToRedeemMessage,
     ToRelayMessage,
 };
 use crate::task::DarwiniaEthereumTask;
@@ -117,8 +117,8 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<DarwiniaEthereumMessage>()?;
-        let mut sender_to_relay = bus.tx::<ToRelayMessage>()?;
-        let mut sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
+        let sender_to_relay = bus.tx::<ToRelayMessage>()?;
+        let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
 
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;

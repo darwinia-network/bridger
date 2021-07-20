@@ -3,34 +3,25 @@ pub use darwinia_tracker::DarwiniaBlockTracker;
 use std::time::Duration;
 use tokio::time::sleep;
 
-use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
-use microkv::MicroKV;
 use postage::broadcast;
-use web3::{
-    transports::http::Http,
-    types::{Log, H160, H256},
-    Web3,
-};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::darwinia::client::Darwinia;
 use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::{SubstrateEthereumConfig, DarwiniaEthereumConfig};
-use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage, ToRedeemMessage, ToRelayMessage, ToDarwiniaMessage, Extrinsic, ToExtrinsicsMessage};
+use crate::message::{ToDarwiniaMessage, Extrinsic, ToExtrinsicsMessage};
 use crate::task::DarwiniaEthereumTask;
 use component_darwinia_subxt::darwinia::runtime::DarwiniaRuntime;
 use substrate_subxt::system::System;
 
-use crate::error::{Result, Error, BizError};
+use crate::error::{Result, Error};
 use component_darwinia_subxt::events::EventInfo;
 use std::collections::HashMap;
 use crate::ethereum::Ethereum;
@@ -58,7 +49,7 @@ impl lifeline::Service for DarwiniaService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToDarwiniaMessage>()?;
-        let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+        let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
@@ -73,7 +64,7 @@ impl lifeline::Service for DarwiniaService {
                     match recv {
                         ToDarwiniaMessage::LastTrackedDarwiniaBlock(block_number) => {
                             let microkv = state.microkv();
-                            microkv.put("last-tracked-darwinia-block", &block_number);
+                            microkv.put("last-tracked-darwinia-block", &block_number)?;
                         }
                         _ => {}
                     }
@@ -177,7 +168,7 @@ impl DarwiniaServiceRunner {
                 .map_err(|err| err.into());
             if let Err(err) = self.handle_events(&header, events).await {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-                    microkv.put("last-tracked-darwinia-block", &(header.number));
+                    microkv.put("last-tracked-darwinia-block", &(header.number))?;
                     return Err(err);
                 } else {
                     error!(
@@ -188,10 +179,8 @@ impl DarwiniaServiceRunner {
                     sleep(Duration::from_secs(30)).await;
                 }
             } else {
-                microkv.put("last-tracked-darwinia-block", &(header.number));
+                microkv.put("last-tracked-darwinia-block", &(header.number))?;
             }
-
-            sleep(Duration::from_millis(500)).await;
 
         }
     }

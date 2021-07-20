@@ -1,6 +1,6 @@
 use bridge_traits::bridge::task::TaskTerminal;
-use lifeline::{Bus, Receiver, Sender};
-use crate::message::{ToRelayMessage, ToDarwiniaMessage};
+use lifeline::{Bus, Sender};
+use crate::message::ToRelayMessage;
 use bridge_traits::error::StandardError;
 
 use crate::bus::DarwiniaEthereumBus;
@@ -42,7 +42,7 @@ async fn set_darwinia_start(bus: &DarwiniaEthereumBus, param: serde_json::Value)
         .ok_or_else(|| StandardError::Api("The block_number is required".to_string()))?;
     let block_number = block_number.as_str().unwrap();
 
-    microkv.put("last-tracked-darwinia-block", &block_number.parse::<u32>().unwrap());
+    microkv.put("last-tracked-darwinia-block", &block_number.parse::<u32>().unwrap())?;
     Ok(TaskTerminal::new("success"))
 }
 

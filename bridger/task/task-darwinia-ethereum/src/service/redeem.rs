@@ -36,7 +36,7 @@ impl Service for RedeemService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToRedeemMessage>()?;
-        let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+        let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-redeem", DarwiniaEthereumTask::NAME),

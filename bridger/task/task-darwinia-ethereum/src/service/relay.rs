@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use std::time::{Duration, SystemTime};
+use std::time::Duration;
 
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 use postage::broadcast;
@@ -39,7 +39,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
         // Receiver & Sender
         let mut rx = bus.rx::<ToRelayMessage>()?;
         let mut sender_to_relay = bus.tx::<ToRelayMessage>()?;
-        let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+        let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         // Config
         let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
@@ -70,7 +70,6 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                         ToRelayMessage::Relay => {
                             affirm(state.clone(), sender_to_extrinsics.clone()).await
                         },
-                        _ => {}
                     }
                 }
 
@@ -106,7 +105,7 @@ impl LikeDarwiniaWithLikeEthereumRelayService {
         let target = microkv.get("target")?.unwrap_or(0);
 
         if block_number > target {
-            microkv.put("target", &block_number);
+            microkv.put("target", &block_number)?;
         }
 
         Ok(())
@@ -133,7 +132,7 @@ impl LikeDarwiniaWithLikeEthereumRelayService {
         trace!(target: DarwiniaEthereumTask::NAME, "Your block to affirm is {}, last confirmed ethereum block is {}", target, last_confirmed);
 
         if last_confirmed > relayed {
-            microkv.put("relayed", &last_confirmed);
+            microkv.put("relayed", &last_confirmed)?;
             relayed = last_confirmed;
         }
 
@@ -147,7 +146,7 @@ impl LikeDarwiniaWithLikeEthereumRelayService {
                 .await
             {
                 Ok(()) => {
-                    microkv.put("relayed", &target);
+                    microkv.put("relayed", &target)?;
                 }
                 Err(err) => {
                     return Err(err)?;

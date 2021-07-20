@@ -53,18 +53,23 @@ impl lifeline::Service for DarwiniaService {
 
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
+        let mut running = false;
         let _greet = Self::try_task(
             &format!("{}-service-darwinia-scan", DarwiniaEthereumTask::NAME),
             async move {
-                let cloned_state = state.clone();
-                tokio::spawn(async move {
-                    run(cloned_state, sender_to_extrinsics).await
-                });
+
                 while let Some(recv) = rx.recv().await {
                     match recv {
-                        ToDarwiniaMessage::LastTrackedDarwiniaBlock(block_number) => {
-                            let microkv = state.microkv();
-                            microkv.put("last-tracked-darwinia-block", &block_number)?;
+                        ToDarwiniaMessage::Start => {
+                            if !running {
+                                running = true;
+
+                                let cloned_state = state.clone();
+                                let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
+                                tokio::spawn(async move {
+                                    run(cloned_state, cloned_sender_to_extrinsics).await
+                                });
+                            }
                         }
                         _ => {}
                     }

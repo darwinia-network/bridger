@@ -62,8 +62,9 @@ impl LogsHandler for EthereumLogsHandler {
 
         if !txs.is_empty() {
             // Send block number to `Relay Service`
+            println!("size: {}", txs.len());
             for tx in &txs {
-                trace!(target: DarwiniaEthereumTask::NAME, "{:?}", &tx.tx_hash);
+                trace!(target: DarwiniaEthereumTask::NAME, "{:?} in ethereum block {}", &tx.tx_hash, &tx.block);
                 self.sender_to_relay
                     .send(ToRelayMessage::EthereumBlockNumber(tx.block))
                     .await?;
@@ -71,34 +72,14 @@ impl LogsHandler for EthereumLogsHandler {
 
             // Send tx to `Redeem Service`
             for tx in &txs {
-                if self
-                    .darwinia_client
-                    .verified(tx.block_hash, tx.index)
-                    .await?
-                    || self
-                        .darwinia_client
-                        .verified_issuing(tx.block_hash, tx.index)
-                        .await?
-                {
-                    trace!(
-                        target: DarwiniaEthereumTask::NAME,
-                        "This ethereum tx {:?} has already been redeemed.",
-                        tx.enclosed_hash()
-                    );
-                    self.microkv.put("last-redeemed", &tx.block);
-                } else {
-                    // delay to wait for possible previous extrinsics
-                    sleep(Duration::from_secs(12)).await;
-                    self.sender_to_redeem
-                        .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
-                        .await?;
-                }
+                self.redeem(tx).await?;
             }
         }
 
         Ok(())
     }
 }
+
 
 fn build_txs(
     logs: Vec<Log>,
@@ -165,4 +146,34 @@ fn build_txs(
             .collect::<Vec<EthereumTransaction>>(),
     );
     txs
+}
+
+impl EthereumLogsHandler {
+    async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
+        if self
+            .darwinia_client
+            .verified(tx.block_hash, tx.index)
+            .await?
+            || self
+            .darwinia_client
+            .verified_issuing(tx.block_hash, tx.index)
+            .await?
+        {
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "This ethereum tx {:?} has already been redeemed.",
+                tx.enclosed_hash()
+            );
+            self.microkv.put("last-redeemed", &tx.block);
+        } else {
+            // delay to wait for possible previous extrinsics
+            sleep(Duration::from_secs(12)).await;
+            trace!(target: DarwiniaEthereumTask::NAME, "send to redeem service: {:?}", &tx.tx_hash);
+            self.sender_to_redeem
+                .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
+                .await?;
+        }
+
+        Ok(())
+    }
 }

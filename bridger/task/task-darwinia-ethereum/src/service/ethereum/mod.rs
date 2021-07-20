@@ -33,6 +33,7 @@ use crate::task::DarwiniaEthereumTask;
 use component_ethereum::config::EthereumConfig;
 
 mod ethereum_logs_handler;
+use async_recursion::async_recursion;
 
 fn create_tracker(
     darwinia_client: Darwinia,
@@ -119,46 +120,15 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         let mut sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let mut sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
 
-        // Components
-        let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
-        let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
-
-        // Config
-        let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-        let ethereum_config: EthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
-                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA ETHEREUM SUBSCRIBE");
-
-                let microkv = state.microkv();
-
-                // Web3 client
-                let web3 = component_web3.component().await?;
-
-                // Darwinia client
-                let darwinia = component_darwinia_subxt.component().await?;
-
-                let topics_list = get_topics_list(ethereum_config);
-                let scan_from: u64 = microkv.get("last-redeemed")?.unwrap_or(0) + 1;
-
-                let mut tracker = create_tracker(
-                    darwinia,
-                    microkv.clone(),
-                    sender_to_relay,
-                    sender_to_redeem,
-                    web3.clone(),
-                    topics_list,
-                    scan_from,
-                    servce_config.interval_ethereum,
-                );
-
+                let cloned_state = state.clone();
                 tokio::spawn(async move {
-                    tracker.start().await
+                    run(cloned_state, sender_to_relay, sender_to_redeem).await
                 });
 
                 while let Some(recv) = rx.recv().await {
@@ -176,4 +146,59 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         );
         Ok(Self { _greet })
     }
+}
+
+#[async_recursion]
+async fn run(
+    state: BridgeState,
+    sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
+    sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>
+) {
+    if let Err(err) = start(state.clone(), sender_to_relay.clone(), sender_to_redeem.clone()).await {
+        error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
+        sleep(Duration::from_secs(30)).await;
+        run(state, sender_to_relay, sender_to_redeem).await;
+    }
+}
+
+async fn start(
+    state: BridgeState,
+    sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
+    sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>
+) -> anyhow::Result<()> {
+    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA ETHEREUM SUBSCRIBE");
+
+    // Components
+    let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
+    let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+
+    // Config
+    let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let ethereum_config: EthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+
+    let microkv = state.microkv();
+
+    // Web3 client
+    let web3 = component_web3.component().await?;
+
+    // Darwinia client
+    let darwinia = component_darwinia_subxt.component().await?;
+
+    let topics_list = get_topics_list(ethereum_config);
+    let scan_from: u64 = microkv.get("last-redeemed")?.unwrap_or(0) + 1;
+
+    let mut tracker = create_tracker(
+        darwinia,
+        microkv.clone(),
+        sender_to_relay,
+        sender_to_redeem,
+        web3.clone(),
+        topics_list,
+        scan_from,
+        servce_config.interval_ethereum,
+    );
+
+    tracker.start().await?;
+
+    Ok(())
 }

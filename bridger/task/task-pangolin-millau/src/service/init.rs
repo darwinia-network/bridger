@@ -1,12 +1,10 @@
-use std::convert::TryFrom;
-
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use support_s2s::runner::pangolin_millau;
-use support_s2s::types::{ChainInfo, InitBridge};
+use support_s2s::types::InitBridge;
 
 use crate::bus::PangolinMillauBus;
 use crate::config::ChainInfoConfig;
@@ -39,17 +37,19 @@ impl Service for InitBridgeService {
                     match message {
                         PangolinMillauMessageSend::InitBridge(bridge) => {
                             let (source_chain, target_chain) = match bridge {
-                                BridgeName::PangolinToMillau => {
-                                    (config_pangolin.clone(), config_millau.clone())
-                                }
-                                BridgeName::MillauToPangolin => {
-                                    (config_millau.clone(), config_pangolin.clone())
-                                }
+                                BridgeName::PangolinToMillau => (
+                                    config_pangolin.to_chain_info()?,
+                                    config_millau.to_chain_info()?,
+                                ),
+                                BridgeName::MillauToPangolin => (
+                                    config_millau.to_chain_info()?,
+                                    config_pangolin.to_chain_info()?,
+                                ),
                             };
                             let init_bridge = InitBridge {
                                 bridge,
-                                source: ChainInfo::try_from(source_chain)?,
-                                target: ChainInfo::try_from(target_chain)?,
+                                source: source_chain,
+                                target: target_chain,
                             };
                             pangolin_millau::init_bridge(init_bridge).await?;
                             tx.send(PangolinMillauMessageReceive::FinishedInitBridge)

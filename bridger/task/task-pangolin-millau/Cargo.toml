@@ -30,6 +30,7 @@ postage = "0.4"
 
 bridge-traits = { path = "../../traits" }
 
-support-s2s        = { path = "../../supports/support-s2s", features = [ "millau", "pangolin" ] }
+support-s2s   = { path = "../../supports/support-s2s", features = [ "millau", "pangolin" ] }
+support-keep  = { path = "../../supports/support-keep" }
 
 [dev-dependencies]

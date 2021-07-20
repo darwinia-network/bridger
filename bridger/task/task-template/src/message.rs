@@ -6,6 +6,7 @@ use crate::bus::TemplateTaskBus;
 #[derive(Debug, Clone)]
 pub enum TemplateTaskMessage {
     SomeEvent,
+    StopSomeService,
 }
 
 impl Message<TemplateTaskBus> for TemplateTaskMessage {

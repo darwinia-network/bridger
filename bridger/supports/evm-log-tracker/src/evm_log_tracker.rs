@@ -39,10 +39,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
         loop {
             match self.next().await {
                 Err(err) => {
-                    error!("{:?}", err);
-                    // 遇到异常，额外多等待 30 秒
-                    // TODO: 判断具体异常，考虑是否需要重启
-                    sleep(Duration::from_secs(30)).await;
+                    return Err(err);
                 }
                 Ok(logs) => {
                     self.handle(logs).await?;
@@ -65,7 +62,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
 
     pub async fn next(&mut self) -> Result<Vec<Log>> {
         let mut result = vec![];
-        let (from, to) = self.next_range().await?;
+        let (from, to) = C::next_range(self.from, &self.client).await?;
         info!(
             "Heartbeat>>> Scanning on {} for new cross-chain transactions from {} to {} ...",
             C::NAME,
@@ -76,13 +73,8 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
             let logs = self.client.get_logs(&topics.0, &topics.1, from, to).await?;
             result.extend_from_slice(&logs);
         }
+        self.from = to;
         Ok(result)
-    }
-
-    async fn next_range(&mut self) -> Result<(u64, u64)> {
-        let range = C::next_range(self.from, &self.client).await?;
-        self.from = range.1;
-        Ok(range)
     }
 
     async fn handle(&mut self, logs: Vec<Log>) -> Result<()> {

@@ -69,29 +69,35 @@ impl Service for GuardService {
 async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
     info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD");
 
+    println!("1------------");
     // Components
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
     let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
 
+    println!("2------------");
     // Config
     let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
     let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
+    println!("3------------");
     // Darwinia client & account
     let darwinia = component_darwinia_subxt.component().await?;
     let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
     let account = DarwiniaAccount::new(config_darwinia.relayer_private_key, config_darwinia.relayer_real_account);
     let guard_account = FromEthereumAccount::new(account);
 
+    println!("4------------");
     // Shadow client
     let shadow = Arc::new(component_shadow.component().await?);
 
+    println!("6------------");
     loop {
         let ethereum2darwinia_clone = ethereum2darwinia.clone();
         let guard_account_clone = guard_account.clone();
         let shadow_clone = shadow.clone();
         let sender_to_extrinsics_clone = sender_to_extrinsics.clone();
 
+        println!("7------------");
         if let Err(err) = GuardService::guard(
             ethereum2darwinia_clone,
             guard_account_clone,

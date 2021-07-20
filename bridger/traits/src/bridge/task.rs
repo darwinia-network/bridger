@@ -90,10 +90,9 @@ impl<B: lifeline::Bus> TaskStack<B> {
         S: lifeline::Service<Bus = B, Lifeline = anyhow::Result<S>> + BridgeService,
     >(
         &mut self,
-    ) -> anyhow::Result<()> {
+    ) -> Option<Box<dyn BridgeService + Send + Sync>> {
         let type_name = std::any::type_name::<S>();
-        self.services.remove(type_name);
-        Ok(())
+        self.services.remove(type_name)
     }
 
     pub fn respawn_service<
@@ -106,7 +105,8 @@ impl<B: lifeline::Bus> TaskStack<B> {
         &mut self,
         bus: &B,
     ) -> anyhow::Result<()> {
-        self.stop_service::<S>()?;
+        // keep it until leave this block
+        let _ = self.stop_service::<S>();
         self.spawn_service::<S>(bus)
     }
 

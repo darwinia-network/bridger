@@ -1,6 +1,5 @@
 use lifeline::dyn_bus::DynBus;
 
-use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::{
     BridgeSand, BridgeTask, BridgeTaskKeep, TaskStack, TaskTerminal,
 };
@@ -53,7 +52,7 @@ impl TemplateLinked {
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new();
-        stack.spawn_service(SomeService)?;
+        stack.spawn_service::<SomeService>(&bus)?;
         Ok(Self { bus, stack })
     }
 }

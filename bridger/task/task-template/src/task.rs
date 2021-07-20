@@ -1,6 +1,5 @@
 use lifeline::dyn_bus::DynBus;
 
-use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::{
     BridgeSand, BridgeTask, BridgeTaskKeep, TaskStack, TaskTerminal,
 };

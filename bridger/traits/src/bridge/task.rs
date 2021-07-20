@@ -96,6 +96,20 @@ impl<B: lifeline::Bus> TaskStack<B> {
         Ok(())
     }
 
+    pub fn respawn_service<
+        S: lifeline::Service<Bus = B, Lifeline = anyhow::Result<S>>
+            + BridgeService
+            + Send
+            + Sync
+            + 'static,
+    >(
+        &mut self,
+        bus: &B,
+    ) -> anyhow::Result<()> {
+        self.stop_service::<S>()?;
+        self.spawn_service::<S>(bus)
+    }
+
     pub fn carry(&mut self, lifeline: lifeline::Lifeline) -> anyhow::Result<()> {
         self.carries.push(lifeline);
         Ok(())

@@ -86,7 +86,15 @@ impl lifeline::Service for DarwiniaService {
 }
 
 #[async_recursion]
-async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
+async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
+    if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
+        error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
+        sleep(Duration::from_secs(30)).await;
+        run(state, sender_to_extrinsics).await;
+    }
+}
+
+async fn start(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
     info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA DARWINIA SUBSCRIBE");
 
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
@@ -120,12 +128,7 @@ async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sende
         delayed_extrinsics,
         spec_name,
     };
-    if let Err(err) = runner.start(state.clone()).await {
-        sleep(Duration::from_secs(30)).await;
-        run(state, sender_to_extrinsics).await
-    } else {
-        Ok(())
-    }
+    runner.start(state.clone()).await
 }
 
 struct DarwiniaServiceRunner {

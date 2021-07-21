@@ -15,7 +15,7 @@ cargo build --release
 `pangolin-millau` 作为 bridger 其中的一个桥, 首先需要启动 `darwinia-bridger`.
 
 ```bash
-darwinia-bridger serve --base-path /path/to/bridge-config
+darwinia-bridger server --base-path /path/to/bridge-config
 ```
 
 接下来准备一个 `pangoli-millau` 桥的配置文件, 可以透过

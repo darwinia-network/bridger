@@ -12,24 +12,10 @@ pub trait BridgeSand {
 }
 
 pub trait BridgeTask<B: lifeline::Bus>: BridgeSand + BridgeTaskKeep {
-    // fn spawn_service<
-    //     S: lifeline::Service<Bus = B, Lifeline = anyhow::Result<S>>
-    //         + BridgeService
-    //         + Send
-    //         + Sync
-    //         + 'static,
-    // >(
-    //     bus: &B,
-    // ) -> anyhow::Result<Box<dyn BridgeService + Send + Sync>> {
-    //     let type_name = std::any::type_name::<S>();
-    //     println!("start service name: {}", type_name);
-    //     Ok(Box::new(S::spawn(bus)?))
-    // }
     fn config_template() -> anyhow::Result<serde_json::Value>;
 
     fn bus(&self) -> &B;
     fn stack(&mut self) -> &mut TaskStack<B>;
-    // fn keep_carry(&mut self, other_bus: lifeline::Lifeline);
 }
 
 #[async_trait::async_trait]

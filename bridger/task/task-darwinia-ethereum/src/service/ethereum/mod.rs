@@ -25,7 +25,7 @@ use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::SubstrateEthereumConfig;
-use crate::message::{ToRedeemMessage, ToRelayMessage, ToDarwiniaMessage, ToEthereumMessage};
+use crate::message::{ToRedeemMessage, ToRelayMessage, ToEthereumMessage};
 use crate::task::DarwiniaEthereumTask;
 use component_ethereum::config::EthereumConfig;
 

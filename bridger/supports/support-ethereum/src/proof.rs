@@ -1,7 +1,8 @@
 //! Ethereum Relay Proof
-use crate::chain::ethereum::{EthashProof, EthashProofJson};
 use codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
+
+use crate::ethash::{EthashProof, EthashProofJson};
 
 /// Darwinia eth relay header thing
 #[derive(Clone, Debug, Decode, Encode, Default, PartialEq, Eq)]
@@ -32,7 +33,7 @@ impl From<EthereumRelayProofsJson> for EthereumRelayProofs {
             mmr_proof: that
                 .mmr_proof
                 .iter()
-                .map(|p| bytes!(p.as_str(), 32))
+                .map(|p| bridge_primitives::bytes!(p.as_str(), 32))
                 .collect(),
         }
     }

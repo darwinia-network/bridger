@@ -23,8 +23,8 @@ log = "0.4.11"
 substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.2" }
 sp-keyring = "3.0.0"
 codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive", "full"] }
-web3 = { version = "0.14.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "v0.14.0", features = ["signing"] }
-secp256k1 = { version = "0.19", features = ["recovery"] }
+web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+secp256k1 = { version = "0.20", features = ["recovery"] }
 
 [dependencies.primitives]
 package = "darwinia-bridge-primitives"

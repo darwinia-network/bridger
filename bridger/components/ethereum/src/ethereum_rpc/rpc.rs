@@ -2,9 +2,10 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 use reqwest::Client;
 
-use bridge_primitives::chain::ethereum::{EthReceiptBody, EthereumBlockRPC, EthereumHeader};
+use support_ethereum::block::{EthereumBlockRPC, EthereumHeader};
+use support_ethereum::receipt::EthReceiptBody;
 
-use crate::config::EthereumRpcConfig;
+use crate::config::EthereumConfig;
 use crate::error::{ComponentEthereumError, ComponentEthereumResult};
 use crate::ethereum_rpc::block::EthBlockRPCResp;
 use crate::ethereum_rpc::receipt::EthReceiptRPCResp;
@@ -14,13 +15,13 @@ pub struct EthereumRpc {
     /// Reqwest client
     client: Client,
     /// config
-    config: EthereumRpcConfig,
+    config: EthereumConfig,
     /// atom
     atom: AtomicUsize,
 }
 
 impl EthereumRpc {
-    pub fn new(client: Client, config: EthereumRpcConfig) -> Self {
+    pub fn new(client: Client, config: EthereumConfig) -> Self {
         let atom = AtomicUsize::new(config.atom);
         Self {
             client,
@@ -30,9 +31,9 @@ impl EthereumRpc {
     }
     /// Generate random RPC
     pub fn rpc(&self) -> &str {
-        let next = (self.atom.load(Ordering::SeqCst) + 1) % self.config.rpc.len();
+        let next = (self.atom.load(Ordering::SeqCst) + 1) % self.config.endpoint.len();
         self.atom.store(next, Ordering::SeqCst);
-        &self.config.rpc[next]
+        &self.config.endpoint[next]
     }
 }
 

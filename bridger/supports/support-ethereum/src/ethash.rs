@@ -1,10 +1,13 @@
 #![allow(dead_code)]
-use crate::{
+
+use serde::{Deserialize, Serialize};
+
+use codec::{Decode, Encode};
+
+use bridge_primitives::{
     array::{H128, H512},
     hex,
 };
-use codec::{Decode, Encode};
-use serde::{Deserialize, Serialize};
 
 /// Ethash proof
 #[derive(Clone, Encode, Decode, Debug, PartialEq, Eq, Deserialize, Serialize, Default)]
@@ -20,12 +23,12 @@ impl EthashProof {
     pub fn from_tuple(dag_nodes: [&str; 2], proof: [&str; 23]) -> EthashProof {
         EthashProof {
             dag_nodes: [
-                H512(bytes!(dag_nodes[0], 64)),
-                H512(bytes!(dag_nodes[1], 64)),
+                H512(bridge_primitives::bytes!(dag_nodes[0], 64)),
+                H512(bridge_primitives::bytes!(dag_nodes[1], 64)),
             ],
             proof: proof
                 .iter()
-                .map(|s| H128(bytes!(*s, 16)))
+                .map(|s| H128(bridge_primitives::bytes!(*s, 16)))
                 .collect::<Vec<H128>>(),
         }
     }
@@ -60,13 +63,13 @@ impl From<EthashProofJson> for EthashProof {
     fn from(that: EthashProofJson) -> Self {
         EthashProof {
             dag_nodes: [
-                H512(bytes!(that.dag_nodes[0].as_str(), 64)),
-                H512(bytes!(that.dag_nodes[1].as_str(), 64)),
+                H512(bridge_primitives::bytes!(that.dag_nodes[0].as_str(), 64)),
+                H512(bridge_primitives::bytes!(that.dag_nodes[1].as_str(), 64)),
             ],
             proof: that
                 .proof
                 .iter()
-                .map(|p| H128(bytes!(p.as_str(), 16)))
+                .map(|p| H128(bridge_primitives::bytes!(p.as_str(), 16)))
                 .collect(),
         }
     }

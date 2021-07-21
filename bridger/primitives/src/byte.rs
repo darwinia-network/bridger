@@ -110,9 +110,9 @@ macro_rules! serde_array {
 #[macro_export]
 macro_rules! construct_hash_bytes {
     ( $(#[$attr:meta])* $visibility:vis struct $name:ident ( $len:tt ); ) => {
-        serde_array!($len);
+        crate::serde_array!($len);
 
-        doc_comment!{
+        crate::doc_comment!{
             concat!("The ", stringify!($len), "-bit hash type."),
             $(#[$attr])*
             #[derive(Decode, Encode, Serialize, Deserialize)]
@@ -124,7 +124,7 @@ macro_rules! construct_hash_bytes {
 
         impl Display for $name {
             fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-                f.write_str(&hex!(self.0.as_ref()))
+                f.write_str(&crate::hex!(self.0.as_ref()))
             }
         }
 

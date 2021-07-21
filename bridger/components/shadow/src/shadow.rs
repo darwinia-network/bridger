@@ -5,13 +5,13 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
 
-use bridge_primitives::chain::ethereum::{
-    EthereumReceiptProofThing, EthereumReceiptProofThingJson, EthereumRelayHeaderParcel,
-    EthereumRelayProofs, EthereumRelayProofsJson, MMRRoot, MMRRootJson,
-};
 use bridge_traits::error::StandardError;
 use component_ethereum::error::{BizError, ComponentEthereumResult};
 use component_ethereum::ethereum_rpc::EthereumRpc;
+use support_ethereum::mmr::{MMRRoot, MMRRootJson};
+use support_ethereum::parcel::EthereumRelayHeaderParcel;
+use support_ethereum::proof::{EthereumRelayProofs, EthereumRelayProofsJson};
+use support_ethereum::receipt::{EthereumReceiptProofThing, EthereumReceiptProofThingJson};
 
 use crate::config::ShadowConfig;
 

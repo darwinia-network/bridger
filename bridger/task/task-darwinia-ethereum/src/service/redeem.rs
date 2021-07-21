@@ -79,7 +79,7 @@ impl RedeemHelper {
         match RedeemHelper::build(sender_to_extrinsics.clone()).await {
             Ok(helper) => helper,
             Err(err) => {
-                error!(target: DarwiniaEthereumTask::NAME, "redeem helper err: {:#?}", err);
+                error!(target: DarwiniaEthereumTask::NAME, "redeem init err: {:#?}", err);
                 sleep(Duration::from_secs(10)).await;
                 RedeemHelper::new(sender_to_extrinsics).await
             }

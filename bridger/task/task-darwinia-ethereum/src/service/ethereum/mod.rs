@@ -156,8 +156,8 @@ async fn run(
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>
 ) {
     if let Err(err) = start(state.clone(), sender_to_relay.clone(), sender_to_redeem.clone()).await {
-        error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
-        sleep(Duration::from_secs(30)).await;
+        error!(target: DarwiniaEthereumTask::NAME, "ethereum init err {:#?}", err);
+        sleep(Duration::from_secs(10)).await;
         run(state, sender_to_relay, sender_to_redeem).await;
     }
 }

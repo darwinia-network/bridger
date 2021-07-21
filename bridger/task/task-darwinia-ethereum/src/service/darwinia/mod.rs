@@ -84,8 +84,8 @@ impl lifeline::Service for DarwiniaService {
 #[async_recursion]
 async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
     if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
-        error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
-        sleep(Duration::from_secs(30)).await;
+        error!(target: DarwiniaEthereumTask::NAME, "darwinia init err {:#?}", err);
+        sleep(Duration::from_secs(10)).await;
         run(state, sender_to_extrinsics).await;
     }
 }

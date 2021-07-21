@@ -101,7 +101,7 @@ impl RelayHelper {
         match RelayHelper::build(state.clone(), sender_to_extrinsics.clone()).await {
             Ok(helper) => helper,
             Err(err) => {
-                error!(target: DarwiniaEthereumTask::NAME, "relay helper err: {:#?}", err);
+                error!(target: DarwiniaEthereumTask::NAME, "relay init err: {:#?}", err);
                 sleep(Duration::from_secs(10)).await;
                 RelayHelper::new(state, sender_to_extrinsics).await
             }

@@ -96,7 +96,7 @@ impl ExtrinsicsHelper {
         match ExtrinsicsHelper::build(state.clone()).await {
             Ok(helper) => helper,
             Err(err) => {
-                error!(target: DarwiniaEthereumTask::NAME, "extrinsics helper err: {:#?}", err);
+                error!(target: DarwiniaEthereumTask::NAME, "extrinsics init err: {:#?}", err);
                 sleep(Duration::from_secs(10)).await;
                 ExtrinsicsHelper::new(state).await
             }

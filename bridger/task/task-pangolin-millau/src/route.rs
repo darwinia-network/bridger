@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use lifeline::{Bus, Receiver, Sender};
 
+use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::task::{BridgeSand, TaskTerminal};
 use bridge_traits::error::StandardError;
 use support_s2s::types::BridgeName;
@@ -10,7 +11,6 @@ use crate::bus::PangolinMillauBus;
 use crate::config::PangolinMillauConfig;
 use crate::message::{PangolinMillauMessageReceive, PangolinMillauMessageSend};
 use crate::task::PangolinMillauTask;
-use bridge_traits::bridge::config::Config;
 
 pub async fn dispatch_route(
     bus: &PangolinMillauBus,
@@ -83,6 +83,5 @@ async fn start_relay(
         state_task.config_format.clone(),
     )?;
 
-    // todo: there can be upgrade config to set `auto_start=true`
     Ok(TaskTerminal::new("success"))
 }

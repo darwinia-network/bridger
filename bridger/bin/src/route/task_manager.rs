@@ -98,7 +98,7 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
     }
     let path_config = base_path.join(format!("{}.{}", name, config_format.file_extension()));
     if let Some(config_raw) = option_config {
-        Config::persist(&path_config, &config_raw, config_format.clone())?;
+        Config::persist_raw(&path_config, &config_raw)?;
     }
     if !path_config.exists() {
         return Err(
@@ -151,6 +151,7 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
     Ok(())
 }
 
+/// Generate task config template
 pub fn task_config_template(param: TaskConfigTemplateParam) -> anyhow::Result<String> {
     let task_name = param.name;
     let format = param.format;

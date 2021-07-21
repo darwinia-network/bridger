@@ -20,6 +20,7 @@ use std::sync::Arc;
 use postage::broadcast;
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use support_ethereum::receipt::RedeemFor;
+use async_recursion::async_recursion;
 
 #[derive(Debug)]
 pub struct RedeemService {
@@ -42,7 +43,7 @@ impl Service for RedeemService {
             async move {
                 info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA REDEEM");
 
-                let mut helper = RedeemHelper::new(sender_to_extrinsics.clone()).await?;
+                let mut helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
@@ -52,7 +53,7 @@ impl Service for RedeemService {
                                 // TODO: Consider the errors more carefully
                                 // Maybe a websocket err, so wait 10 secs to reconnect.
                                 sleep(Duration::from_secs(10)).await;
-                                helper = RedeemHelper::new(sender_to_extrinsics.clone()).await?;
+                                helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
                                 // TODO: Maybe need retry
                             }
                         }
@@ -73,8 +74,19 @@ struct RedeemHelper {
 }
 
 impl RedeemHelper {
+    #[async_recursion]
+    pub async fn new(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> Self {
+        match RedeemHelper::build(sender_to_extrinsics.clone()).await {
+            Ok(helper) => helper,
+            Err(err) => {
+                error!(target: DarwiniaEthereumTask::NAME, "redeem helper err: {:#?}", err);
+                sleep(Duration::from_secs(10)).await;
+                RedeemHelper::new(sender_to_extrinsics).await
+            }
+        }
+    }
 
-    pub async fn new(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<Self> {
+    async fn build(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<Self> {
         // Components
         let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
         let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;

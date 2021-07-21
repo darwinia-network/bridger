@@ -22,6 +22,7 @@ use bridge_traits::bridge::config::Config;
 
 use component_state::state::BridgeState;
 use lifeline::dyn_bus::DynBus;
+use async_recursion::async_recursion;
 
 #[derive(Debug)]
 pub struct LikeDarwiniaWithLikeEthereumRelayService {
@@ -50,7 +51,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
             &format!("{}-service-relay", DarwiniaEthereumTask::NAME),
             async move {
 
-                let mut helper = RelayHelper::new(state.clone(), sender_to_extrinsics.clone()).await?;
+                let mut helper = RelayHelper::new(state.clone(), sender_to_extrinsics.clone()).await;
 
                 let interval_relay = servce_config.interval_relay;
 
@@ -75,7 +76,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                                 // TODO: Consider the errors more carefully
                                 // Maybe a websocket err, so wait 10 secs to reconnect.
                                 sleep(Duration::from_secs(10)).await;
-                                helper = RelayHelper::new(state.clone(), sender_to_extrinsics.clone()).await?;
+                                helper = RelayHelper::new(state.clone(), sender_to_extrinsics.clone()).await;
                             }
                         },
                     }
@@ -96,7 +97,19 @@ struct RelayHelper {
 }
 
 impl RelayHelper {
-    pub async fn new(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<Self> {
+    #[async_recursion]
+    pub async fn new(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> Self {
+        match RelayHelper::build(state.clone(), sender_to_extrinsics.clone()).await {
+            Ok(helper) => helper,
+            Err(err) => {
+                error!(target: DarwiniaEthereumTask::NAME, "relay helper err: {:#?}", err);
+                sleep(Duration::from_secs(10)).await;
+                RelayHelper::new(state, sender_to_extrinsics).await
+            }
+        }
+    }
+
+    async fn build(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<Self> {
         // Components
         let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
         let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;

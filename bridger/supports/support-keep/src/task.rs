@@ -100,7 +100,7 @@ pub fn running_task(
     }
 }
 
-pub fn running_task_cast_ref<T: 'static + BridgeTaskKeep>(
+pub fn running_task_downcast_ref<T: 'static + BridgeTaskKeep>(
     name: impl AsRef<str>,
 ) -> anyhow::Result<&'static T> {
     let name = name.as_ref();
@@ -119,7 +119,7 @@ pub fn running_task_cast_ref<T: 'static + BridgeTaskKeep>(
     }
 }
 
-pub fn running_task_cast_mut<T: 'static + BridgeTaskKeep>(
+pub fn running_task_downcast_mut<T: 'static + BridgeTaskKeep>(
     name: impl AsRef<str>,
 ) -> anyhow::Result<&'static mut T> {
     let name = name.as_ref();

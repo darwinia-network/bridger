@@ -126,7 +126,7 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
             let mut task = DarwiniaEthereumTask::new(task_config, state_bridge.clone()).await?;
 
             let linked_darwinia: &DarwiniaLinked =
-                support_keep::task::running_task_cast_ref(DarwiniaLinked::NAME)?;
+                support_keep::task::running_task_downcast_ref(DarwiniaLinked::NAME)?;
             let carry = linked_darwinia.bus().carry_from(task.bus())?;
             let stack = task.stack();
             stack.carry(carry)?;

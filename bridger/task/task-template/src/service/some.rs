@@ -28,7 +28,7 @@ impl Service for SomeService {
             &format!("{}-service-some", TemplateTask::NAME),
             async move {
                 let task: &mut TemplateTask =
-                    support_keep::task::running_task_cast_mut(TemplateTask::NAME)?;
+                    support_keep::task::running_task_downcast_mut(TemplateTask::NAME)?;
                 while let Some(message) = rx.recv().await {
                     match message {
                         TemplateTaskMessage::SomeEvent => {

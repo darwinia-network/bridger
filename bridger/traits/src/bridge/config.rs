@@ -118,7 +118,6 @@ impl Config {
     pub fn persist_raw(
         path_config: impl AsRef<Path>,
         config: impl AsRef<str>,
-        format: ConfigFormat,
     ) -> anyhow::Result<()> {
         let path = path_config.as_ref();
         std::fs::write(path, config.as_ref())?;
@@ -131,8 +130,8 @@ impl Config {
         config: impl Serialize,
         format: ConfigFormat,
     ) -> anyhow::Result<()> {
-        let content = Self::raw_config(config, format.clone())?;
-        Self::persist_raw(path_config, content, format)
+        let content = Self::raw_config(config, format)?;
+        Self::persist_raw(path_config, content)
     }
 
     pub fn load<T>(path_config: impl AsRef<Path>) -> anyhow::Result<T>

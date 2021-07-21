@@ -20,7 +20,6 @@ use crate::task::DarwiniaEthereumTask;
 use crate::config::SubstrateEthereumConfig;
 use bridge_traits::bridge::config::Config;
 
-use async_recursion::async_recursion;
 use component_state::state::BridgeState;
 use lifeline::dyn_bus::DynBus;
 
@@ -44,11 +43,14 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
         // Config
         let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
+        // State
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-relay", DarwiniaEthereumTask::NAME),
             async move {
+
+                let mut helper = RelayHelper::new(state.clone(), sender_to_extrinsics.clone()).await?;
 
                 let interval_relay = servce_config.interval_relay;
 
@@ -65,10 +67,16 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                     match recv {
                         ToRelayMessage::EthereumBlockNumber(block_number) => {
                             trace!(target: DarwiniaEthereumTask::NAME, "Received new ethereum block number to affirm: {}", block_number);
-                            update_target(state.clone(), block_number).await
+                            helper.update_target(block_number).await?;
                         },
                         ToRelayMessage::Relay => {
-                            affirm(state.clone(), sender_to_extrinsics.clone()).await
+                            if let Err(err) = helper.affirm().await {
+                                error!(target: DarwiniaEthereumTask::NAME, "affirm err: {:#?}", err);
+                                // TODO: Consider the errors more carefully
+                                // Maybe a websocket err, so wait 10 secs to reconnect.
+                                sleep(Duration::from_secs(10)).await;
+                                helper = RelayHelper::new(state.clone(), sender_to_extrinsics.clone()).await?;
+                            }
                         },
                     }
                 }
@@ -80,52 +88,38 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
     }
 }
 
-#[async_recursion]
-async fn update_target(state: BridgeState, block_number: u64) {
-    if let Err(err) = LikeDarwiniaWithLikeEthereumRelayService::update_target(state.clone(), block_number).await {
-        error!(target: DarwiniaEthereumTask::NAME, "update target err: {:#?}", err);
-        sleep(Duration::from_secs(30)).await;
-        update_target(state, block_number).await;
-    }
+struct RelayHelper {
+    state: BridgeState,
+    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    darwinia: Ethereum2Darwinia,
+    shadow: Arc<Shadow>,
 }
 
-#[async_recursion]
-async fn affirm(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
-    if let Err(err) = LikeDarwiniaWithLikeEthereumRelayService::affirm(state.clone(), sender_to_extrinsics.clone()).await {
-        error!(target: DarwiniaEthereumTask::NAME, "affirm err: {:#?}", err);
-        sleep(Duration::from_secs(30)).await;
-        affirm(state, sender_to_extrinsics).await;
-    }
-}
-
-impl LikeDarwiniaWithLikeEthereumRelayService {
-    pub async fn update_target(state: BridgeState, block_number: u64) -> anyhow::Result<()> {
-        let microkv = state.microkv();
-
-        let target = microkv.get("target")?.unwrap_or(0);
-
-        if block_number > target {
-            microkv.put("target", &block_number)?;
-        }
-
-        Ok(())
-    }
-
-    pub async fn affirm(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
-        let microkv = state.microkv();
-
+impl RelayHelper {
+    pub async fn new(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<Self> {
         // Components
         let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
         let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
 
         // Darwinia client
         let darwinia = component_darwinia.component().await?;
-        let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
+        let darwinia = Ethereum2Darwinia::new(darwinia.clone());
 
         // Shadow client
         let shadow = Arc::new(component_shadow.component().await?);
 
-        let last_confirmed = ethereum2darwinia.last_confirmed().await?;
+        Ok(RelayHelper {
+            state,
+            sender_to_extrinsics,
+            darwinia,
+            shadow
+        })
+    }
+
+    pub async fn affirm(&self) -> anyhow::Result<()> {
+        let microkv = self.state.microkv();
+
+        let last_confirmed = self.darwinia.last_confirmed().await?;
         let mut relayed= microkv.get("relayed")?.unwrap_or(0);
         let target = microkv.get("target")?.unwrap_or(0);
 
@@ -137,11 +131,11 @@ impl LikeDarwiniaWithLikeEthereumRelayService {
         }
 
         if target > relayed {
-            match LikeDarwiniaWithLikeEthereumRelayService::do_affirm(
-                ethereum2darwinia,
-                shadow,
+            match do_affirm(
+                self.darwinia.clone(),
+                self.shadow.clone(),
                 target,
-                sender_to_extrinsics,
+                self.sender_to_extrinsics.clone(),
             )
                 .await
             {
@@ -155,50 +149,61 @@ impl LikeDarwiniaWithLikeEthereumRelayService {
         }
 
         Ok(())
-
     }
 
-    pub async fn do_affirm(
-        ethereum2darwinia: Ethereum2Darwinia,
-        shadow: Arc<Shadow>,
-        target: u64,
-        mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-    ) -> anyhow::Result<()> {
-        // /////////////////////////
-        // checking before affirm
-        // /////////////////////////
-        // 1. pendings check
-        let pending_headers = ethereum2darwinia.pending_headers().await?;
-        for pending_header in pending_headers {
-            let pending_block_number = pending_header.1.header.number;
-            if pending_block_number >= target {
-                return Err(BizError::AffirmingBlockInPending(target).into());
-            }
-        }
+    pub async fn update_target(&self, block_number: u64) -> anyhow::Result<()> {
+        let microkv = self.state.microkv();
 
-        // 1. affirmations check
-        for (_game_id, game) in ethereum2darwinia.affirmations().await?.iter() {
-            for (_round_id, affirmations) in game.iter() {
-                if Ethereum2Darwinia::contains(&affirmations, target) {
-                    return Err(BizError::AffirmingBlockInGame(target).into());
-                }
-            }
-        }
+        let target = microkv.get("target")?.unwrap_or(0);
 
-        trace!(target: DarwiniaEthereumTask::NAME, "Prepare to affirm ethereum block: {}", target);
-        let parcel = shadow.parcel(target as usize + 1).await?;
-        if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
-            return Err(BizError::ParcelFromShadowIsEmpty(target).into());
+        if block_number > target {
+            microkv.put("target", &block_number)?;
         }
-
-        // /////////////////////////
-        // do affirm
-        // /////////////////////////
-        let ex = Extrinsic::Affirm(parcel);
-        sender_to_extrinsics
-            .send(ToExtrinsicsMessage::Extrinsic(ex))
-            .await?;
 
         Ok(())
     }
+}
+
+pub async fn do_affirm(
+    ethereum2darwinia: Ethereum2Darwinia,
+    shadow: Arc<Shadow>,
+    target: u64,
+    mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+) -> anyhow::Result<()> {
+    // /////////////////////////
+    // checking before affirm
+    // /////////////////////////
+    // 1. pendings check
+    let pending_headers = ethereum2darwinia.pending_headers().await?;
+    for pending_header in pending_headers {
+        let pending_block_number = pending_header.1.header.number;
+        if pending_block_number >= target {
+            return Err(BizError::AffirmingBlockInPending(target).into());
+        }
+    }
+
+    // 1. affirmations check
+    for (_game_id, game) in ethereum2darwinia.affirmations().await?.iter() {
+        for (_round_id, affirmations) in game.iter() {
+            if Ethereum2Darwinia::contains(&affirmations, target) {
+                return Err(BizError::AffirmingBlockInGame(target).into());
+            }
+        }
+    }
+
+    trace!(target: DarwiniaEthereumTask::NAME, "Prepare to affirm ethereum block: {}", target);
+    let parcel = shadow.parcel(target as usize + 1).await?;
+    if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
+        return Err(BizError::ParcelFromShadowIsEmpty(target).into());
+    }
+
+    // /////////////////////////
+    // do affirm
+    // /////////////////////////
+    let ex = Extrinsic::Affirm(parcel);
+    sender_to_extrinsics
+        .send(ToExtrinsicsMessage::Extrinsic(ex))
+        .await?;
+
+    Ok(())
 }

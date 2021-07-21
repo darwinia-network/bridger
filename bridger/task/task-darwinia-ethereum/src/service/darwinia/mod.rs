@@ -3,34 +3,25 @@ pub use darwinia_tracker::DarwiniaBlockTracker;
 use std::time::Duration;
 use tokio::time::sleep;
 
-use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
-use microkv::MicroKV;
 use postage::broadcast;
-use web3::{
-    transports::http::Http,
-    types::{Log, H160, H256},
-    Web3,
-};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::darwinia::client::Darwinia;
 use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::{SubstrateEthereumConfig, DarwiniaEthereumConfig};
-use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage, ToDarwiniaLinkedMessage, ToRedeemMessage, ToRelayMessage, ToDarwiniaMessage, Extrinsic, ToExtrinsicsMessage};
+use crate::message::{ToDarwiniaMessage, Extrinsic, ToExtrinsicsMessage};
 use crate::task::DarwiniaEthereumTask;
 use component_darwinia_subxt::darwinia::runtime::DarwiniaRuntime;
 use substrate_subxt::system::System;
 
-use crate::error::{Result, Error, BizError};
+use crate::error::{Result, Error};
 use component_darwinia_subxt::events::EventInfo;
 use std::collections::HashMap;
 use crate::ethereum::Ethereum;
@@ -58,22 +49,27 @@ impl lifeline::Service for DarwiniaService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToDarwiniaMessage>()?;
-        let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+        let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
+        let mut running = false;
         let _greet = Self::try_task(
             &format!("{}-service-darwinia-scan", DarwiniaEthereumTask::NAME),
             async move {
-                let cloned_state = state.clone();
-                tokio::spawn(async move {
-                    run(cloned_state, sender_to_extrinsics).await
-                });
+
                 while let Some(recv) = rx.recv().await {
                     match recv {
-                        ToDarwiniaMessage::LastTrackedDarwiniaBlock(block_number) => {
-                            let microkv = state.microkv();
-                            microkv.put("last-tracked-darwinia-block", &block_number);
+                        ToDarwiniaMessage::Start => {
+                            if !running {
+                                running = true;
+
+                                let cloned_state = state.clone();
+                                let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
+                                tokio::spawn(async move {
+                                    run(cloned_state, cloned_sender_to_extrinsics).await
+                                });
+                            }
                         }
                         _ => {}
                     }
@@ -88,14 +84,14 @@ impl lifeline::Service for DarwiniaService {
 #[async_recursion]
 async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
     if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
-        error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
-        sleep(Duration::from_secs(30)).await;
+        error!(target: DarwiniaEthereumTask::NAME, "darwinia err {:#?}", err);
+        sleep(Duration::from_secs(10)).await;
         run(state, sender_to_extrinsics).await;
     }
 }
 
 async fn start(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
-    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA DARWINIA SUBSCRIBE");
+    info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
 
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
@@ -116,9 +112,11 @@ async fn start(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sen
 
     // Ethereum client
     let web3 = component_web3.component().await?;
-    let ethereum = Ethereum::new(web3, config_ethereum.relayer_relay_contract_address, config_ethereum.relayer_private_key, config_ethereum.relayer_beneficiary_darwinia_account)?;
+    let ethereum = Ethereum::new(web3, config_ethereum.subscribe_relay_address, config_ethereum.relayer_private_key, config_ethereum.relayer_beneficiary_darwinia_account)?;
 
     let spec_name = darwinia.runtime_version().await?;
+
+    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA DARWINIA SUBSCRIBE");
 
     let mut runner = DarwiniaServiceRunner {
         darwinia2ethereum,
@@ -175,9 +173,11 @@ impl DarwiniaServiceRunner {
                 .get_events_from_block_hash(hash)
                 .await
                 .map_err(|err| err.into());
+
+            // process events
             if let Err(err) = self.handle_events(&header, events).await {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-                    microkv.put("last-tracked-darwinia-block", &(header.number));
+                    microkv.put("last-tracked-darwinia-block", &(header.number))?;
                     return Err(err);
                 } else {
                     error!(
@@ -185,13 +185,17 @@ impl DarwiniaServiceRunner {
 						"An error occurred while processing the events of block {}: {:?}",
 						header.number, err
 					);
-                    sleep(Duration::from_secs(30)).await;
+
+                    let err_msg = format!("{:?}", err).to_lowercase();
+                    if err_msg.contains("type size unavailable") {
+                        microkv.put("last-tracked-darwinia-block", &(header.number))?;
+                    } else {
+                        sleep(Duration::from_secs(30)).await;
+                    }
                 }
             } else {
-                microkv.put("last-tracked-darwinia-block", &(header.number));
+                microkv.put("last-tracked-darwinia-block", &(header.number))?;
             }
-
-            sleep(Duration::from_millis(500)).await;
 
         }
     }

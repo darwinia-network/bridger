@@ -11,7 +11,6 @@ use component_shadow::{Shadow, ShadowComponent};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::task::DarwiniaEthereumTask;
-use crate::error::BizError;
 
 use crate::message::{ToGuardMessage, ToExtrinsicsMessage, Extrinsic};
 
@@ -20,8 +19,6 @@ use tokio::time::sleep;
 
 use std::sync::Arc;
 use postage::broadcast;
-use crate::service::{EthereumTransaction, EthereumTransactionHash};
-use support_ethereum::receipt::RedeemFor;
 use component_darwinia_subxt::account::DarwiniaAccount;
 use bridge_traits::bridge::config::Config;
 use component_darwinia_subxt::config::DarwiniaSubxtConfig;
@@ -42,12 +39,11 @@ impl Service for GuardService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToGuardMessage>()?;
-        let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+        let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-guard", DarwiniaEthereumTask::NAME),
             async move {
-
 
                 //
                 tokio::spawn(async move {
@@ -70,8 +66,16 @@ impl Service for GuardService {
 }
 
 #[async_recursion]
-async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
-    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD");
+async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
+    if let Err(err) = start(sender_to_extrinsics.clone()).await {
+        error!(target: DarwiniaEthereumTask::NAME, "guard init err {:#?}", err);
+        sleep(Duration::from_secs(10)).await;
+        run(sender_to_extrinsics).await;
+    }
+}
+
+async fn start(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
+    info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
 
     // Components
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
@@ -89,6 +93,8 @@ async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessag
 
     // Shadow client
     let shadow = Arc::new(component_shadow.component().await?);
+
+    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD");
 
     loop {
         let ethereum2darwinia_clone = ethereum2darwinia.clone();
@@ -112,8 +118,7 @@ async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessag
         sleep(Duration::from_secs(servce_config.interval_guard)).await;
     }
 
-    sleep(Duration::from_secs(30)).await;
-    run(sender_to_extrinsics).await
+    Ok(())
 }
 
 impl GuardService {

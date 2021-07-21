@@ -50,19 +50,15 @@ impl LogsHandler for EthereumLogsHandler {
         logs: Vec<Log>,
     ) -> Result<()> {
         // TODO: check the address
-        let ring = self.topics_list[0].1[0];
-        let kton = self.topics_list[1].1[0];
-        let bank = self.topics_list[2].1[0];
-        let relay = self.topics_list[3].1[0];
-        let register = self.topics_list[4].1[0];
-        let lock = self.topics_list[4].1[0];
+        let bank_topic = self.topics_list[0].1[0];
+        let issuing_topic = self.topics_list[1].1[0];
+        let relay_topic = self.topics_list[2].1[0];
 
         // Build all transactions from logs
-        let txs = build_txs(logs, ring, kton, relay, register, lock);
+        let txs = build_txs(logs, bank_topic, issuing_topic, relay_topic);
 
         if !txs.is_empty() {
             // Send block number to `Relay Service`
-            println!("size: {}", txs.len());
             for tx in &txs {
                 trace!(target: DarwiniaEthereumTask::NAME, "{:?} in ethereum block {}", &tx.tx_hash, &tx.block);
                 self.sender_to_relay
@@ -83,68 +79,49 @@ impl LogsHandler for EthereumLogsHandler {
 
 fn build_txs(
     logs: Vec<Log>,
-    ring: H256,
-    kton: H256,
-    relay: H256,
-    register: H256,
-    lock: H256,
+    bank_topic: H256,
+    issuing_topic: H256,
+    relay_topic: H256,
 ) -> Vec<EthereumTransaction> {
     let mut txs = vec![];
-    txs.append(
-        &mut logs
-            .iter()
-            .map(|l| {
-                let block = l.block_number.unwrap_or_default().low_u64();
-                let index = l.transaction_index.unwrap_or_default().low_u64();
-                if l.topics.contains(&ring) || l.topics.contains(&kton) {
-                    EthereumTransaction {
-                        tx_hash: EthereumTransactionHash::Token(
-                            l.transaction_hash.unwrap_or_default(),
-                        ),
-                        block_hash: l.block_hash.unwrap_or_default(),
-                        block,
-                        index,
-                    }
-                } else if l.topics.contains(&relay) {
-                    EthereumTransaction {
-                        tx_hash: EthereumTransactionHash::SetAuthorities(
-                            l.transaction_hash.unwrap_or_default(),
-                        ),
-                        block_hash: l.block_hash.unwrap_or_default(),
-                        block,
-                        index,
-                    }
-                } else if l.topics.contains(&register) {
-                    EthereumTransaction {
-                        tx_hash: EthereumTransactionHash::RegisterErc20Token(
-                            l.transaction_hash.unwrap_or_default(),
-                        ),
-                        block_hash: l.block_hash.unwrap_or_default(),
-                        block,
-                        index,
-                    }
-                } else if l.topics.contains(&lock) {
-                    EthereumTransaction {
-                        tx_hash: EthereumTransactionHash::RedeemErc20Token(
-                            l.transaction_hash.unwrap_or_default(),
-                        ),
-                        block_hash: l.block_hash.unwrap_or_default(),
-                        block,
-                        index,
-                    }
-                } else {
-                    EthereumTransaction {
-                        tx_hash: EthereumTransactionHash::Deposit(
-                            l.transaction_hash.unwrap_or_default(),
-                        ),
-                        block_hash: l.block_hash.unwrap_or_default(),
-                        block,
-                        index,
-                    }
-                }
-            })
-            .collect::<Vec<EthereumTransaction>>(),
-    );
+    for l in &logs {
+        let block = l.block_number.unwrap_or_default().low_u64();
+        let index = l.transaction_index.unwrap_or_default().low_u64();
+        let tx = if l.topics.contains(&issuing_topic) {
+            EthereumTransaction {
+                tx_hash: EthereumTransactionHash::Token(
+                    l.transaction_hash.unwrap_or_default(),
+                ),
+                block_hash: l.block_hash.unwrap_or_default(),
+                block,
+                index,
+            }
+        } else if l.topics.contains(&relay_topic) {
+            EthereumTransaction {
+                tx_hash: EthereumTransactionHash::SetAuthorities(
+                    l.transaction_hash.unwrap_or_default(),
+                ),
+                block_hash: l.block_hash.unwrap_or_default(),
+                block,
+                index,
+            }
+        } else if l.topics.contains(&bank_topic) {
+            EthereumTransaction {
+                tx_hash: EthereumTransactionHash::Deposit(
+                    l.transaction_hash.unwrap_or_default(),
+                ),
+                block_hash: l.block_hash.unwrap_or_default(),
+                block,
+                index,
+            }
+        } else {
+            error!(target: DarwiniaEthereumTask::NAME, "Can not find any useful topics in the log: {:?}", l.topics);
+            continue;
+        };
+
+        txs.push(tx);
+
+    }
     txs
 }
 
@@ -164,7 +141,7 @@ impl EthereumLogsHandler {
                 "This ethereum tx {:?} has already been redeemed.",
                 tx.enclosed_hash()
             );
-            self.microkv.put("last-redeemed", &tx.block);
+            self.microkv.put("last-redeemed", &tx.block)?;
         } else {
             // delay to wait for possible previous extrinsics
             sleep(Duration::from_secs(12)).await;

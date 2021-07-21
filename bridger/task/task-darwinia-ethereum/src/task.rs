@@ -59,7 +59,6 @@ impl DarwiniaEthereumTask {
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new();
-
         stack.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?;
         stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?;
         stack.spawn_service::<RedeemService>(&bus)?;

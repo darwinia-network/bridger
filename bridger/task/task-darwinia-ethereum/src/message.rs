@@ -88,9 +88,20 @@ impl Message<DarwiniaEthereumBus> for ToGuardMessage {
 pub enum ToDarwiniaMessage {
     Start,
     Stop,
-    LastTrackedDarwiniaBlock(u32)
 }
 
 impl Message<DarwiniaEthereumBus> for ToDarwiniaMessage {
     type Channel = broadcast::Sender<Self>;
 }
+
+// *** ToEthereumMessage **
+#[derive(Clone, Debug)]
+pub enum ToEthereumMessage {
+    Start,
+    Stop,
+}
+
+impl Message<DarwiniaEthereumBus> for ToEthereumMessage {
+    type Channel = broadcast::Sender<Self>;
+}
+

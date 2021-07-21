@@ -36,17 +36,26 @@ impl Service for RedeemService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToRedeemMessage>()?;
-        let mut sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+        let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-redeem", DarwiniaEthereumTask::NAME),
             async move {
-                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA REDEEM");
+
+
+                let mut helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToRedeemMessage::EthereumTransaction(tx) => {
-                            redeem(tx, sender_to_extrinsics.clone()).await
+                            if let Err(err) = helper.redeem(tx).await {
+                                error!(target: DarwiniaEthereumTask::NAME, "redeem err: {:#?}", err);
+                                // TODO: Consider the errors more carefully
+                                // Maybe a websocket err, so wait 10 secs to reconnect.
+                                sleep(Duration::from_secs(10)).await;
+                                helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
+                                // TODO: Maybe need retry
+                            }
                         }
                     }
                 }
@@ -58,34 +67,53 @@ impl Service for RedeemService {
     }
 }
 
-#[async_recursion]
-async fn redeem(tx: EthereumTransaction, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
-    if let Err(err) = RedeemService::redeem(tx.clone(), sender_to_extrinsics.clone()).await {
-        error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
-        sleep(Duration::from_secs(30)).await;
-        redeem(tx, sender_to_extrinsics).await;
-    }
+struct RedeemHelper {
+    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    darwinia: Ethereum2Darwinia,
+    shadow: Arc<Shadow>,
 }
 
-impl RedeemService {
+impl RedeemHelper {
+    #[async_recursion]
+    pub async fn new(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> Self {
+        match RedeemHelper::build(sender_to_extrinsics.clone()).await {
+            Ok(helper) => helper,
+            Err(err) => {
+                error!(target: DarwiniaEthereumTask::NAME, "redeem init err: {:#?}", err);
+                sleep(Duration::from_secs(10)).await;
+                RedeemHelper::new(sender_to_extrinsics).await
+            }
+        }
+    }
 
-    async fn redeem(tx: EthereumTransaction, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
+    async fn build(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<Self> {
+        info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
+
         // Components
-        let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+        let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
         let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
 
         // Darwinia client
-        let darwinia = component_darwinia_subxt.component().await?;
-        let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
+        let darwinia = component_darwinia.component().await?;
+        let darwinia = Ethereum2Darwinia::new(darwinia.clone());
 
         // Shadow client
         let shadow = Arc::new(component_shadow.component().await?);
 
-        RedeemService::do_redeem(
-            ethereum2darwinia,
-            shadow,
-            tx,
+        info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA REDEEM");
+        Ok(RedeemHelper {
             sender_to_extrinsics,
+            darwinia,
+            shadow
+        })
+    }
+
+    pub async fn redeem(&self, tx: EthereumTransaction) -> anyhow::Result<()> {
+        RedeemHelper::do_redeem(
+            self.darwinia.clone(),
+            self.shadow.clone(),
+            tx,
+            self.sender_to_extrinsics.clone(),
         ).await?;
 
         Ok(())

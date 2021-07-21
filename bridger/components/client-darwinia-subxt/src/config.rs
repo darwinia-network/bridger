@@ -22,9 +22,9 @@ impl BridgeConfig for DarwiniaSubxtConfig {
     fn template() -> Self {
         Self {
             endpoint: "wss://rpc.darwinia.network".to_string(),
-            relayer_private_key: "".to_string(),
-            relayer_real_account: None,
-            ecdsa_authority_private_key: None
+            relayer_private_key: "0x...".to_string(),
+            relayer_real_account: Some("0x...".to_string()),
+            ecdsa_authority_private_key: Some("0x...".to_string()),
         }
     }
 }

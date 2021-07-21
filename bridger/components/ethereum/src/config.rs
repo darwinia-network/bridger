@@ -34,16 +34,16 @@ impl BridgeConfig for EthereumConfig {
     fn template() -> Self {
         Self {
             endpoint: vec!["https://mainnet.infura.io/v3/<api_key>".to_string()],
-            relayer_private_key: None,
-            relayer_beneficiary_darwinia_account: None,
-            subscribe_ring_address: "".to_string(),
-            subscribe_kton_address: "".to_string(),
-            subscribe_bank_address: "".to_string(),
-            subscribe_bank_topics: vec![],
-            subscribe_relay_address: "".to_string(),
-            subscribe_relay_topics: vec![],
-            subscribe_issuing_address: "".to_string(),
-            subscribe_issuing_topics: vec![],
+            relayer_private_key: Some("0x...".to_string()),
+            relayer_beneficiary_darwinia_account: Some("0x...".to_string()),
+            subscribe_ring_address: "0x...".to_string(),
+            subscribe_kton_address: "0x...".to_string(),
+            subscribe_bank_address: "0x...".to_string(),
+            subscribe_bank_topics: vec!["0x...".to_string()],
+            subscribe_relay_address: "0x...".to_string(),
+            subscribe_relay_topics: vec!["0x...".to_string()],
+            subscribe_issuing_address: "0x...".to_string(),
+            subscribe_issuing_topics: vec!["0x...".to_string()],
             atom: 0,
         }
     }

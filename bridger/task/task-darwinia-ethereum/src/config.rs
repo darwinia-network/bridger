@@ -58,9 +58,9 @@ impl BridgeConfig for SubstrateEthereumConfig {
 
     fn template() -> Self {
         Self {
-            interval_ethereum: 5,
+            interval_ethereum: 120,
             interval_relay: 60,
-            interval_redeem: 150,
+            interval_redeem: 90,
             interval_guard: 30,
         }
     }

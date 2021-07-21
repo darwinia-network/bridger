@@ -136,7 +136,7 @@ impl RelayHelper {
         let mut relayed= microkv.get("relayed")?.unwrap_or(0);
         let target = microkv.get("target")?.unwrap_or(0);
 
-        trace!(target: DarwiniaEthereumTask::NAME, "Your block to affirm is {}, last confirmed ethereum block is {}", target, last_confirmed);
+        trace!(target: DarwiniaEthereumTask::NAME, "The last confirmed ethereum block is {}", last_confirmed);
 
         if last_confirmed > relayed {
             microkv.put("relayed", &last_confirmed)?;
@@ -144,6 +144,7 @@ impl RelayHelper {
         }
 
         if target > relayed {
+            trace!(target: DarwiniaEthereumTask::NAME, "Your are affirming ethereum block {}", target);
             match do_affirm(
                 self.darwinia.clone(),
                 self.shadow.clone(),
@@ -159,6 +160,8 @@ impl RelayHelper {
                     return Err(err)?;
                 }
             }
+        } else {
+            trace!(target: DarwiniaEthereumTask::NAME, "You do not need to affirm ethereum block {}", target);
         }
 
         Ok(())

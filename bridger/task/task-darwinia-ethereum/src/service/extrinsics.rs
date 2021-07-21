@@ -29,6 +29,7 @@ use microkv::MicroKV;
 use component_darwinia_subxt::config::DarwiniaSubxtConfig;
 use bridge_traits::bridge::config::Config;
 use component_ethereum::config::Web3Config;
+use async_recursion::async_recursion;
 
 #[derive(Debug)]
 pub struct ExtrinsicsService {
@@ -53,7 +54,7 @@ impl Service for ExtrinsicsService {
             async move {
                 info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS");
 
-                let mut helper = ExtrinsicsHelper::new(state.clone()).await?;
+                let mut helper = ExtrinsicsHelper::new(state.clone()).await;
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
@@ -67,7 +68,7 @@ impl Service for ExtrinsicsService {
                                 // Maybe a websocket err, so wait 10 secs to reconnect.
                                 sleep(Duration::from_secs(10)).await;
 
-                                helper = ExtrinsicsHelper::new(state.clone()).await?;
+                                helper = ExtrinsicsHelper::new(state.clone()).await;
                             }
                         },
                     }
@@ -90,7 +91,19 @@ struct ExtrinsicsHelper {
 }
 
 impl ExtrinsicsHelper {
-    pub async fn new(state: BridgeState) -> anyhow::Result<Self> {
+    #[async_recursion]
+    pub async fn new(state: BridgeState) -> Self {
+        match ExtrinsicsHelper::build(state.clone()).await {
+            Ok(helper) => helper,
+            Err(err) => {
+                error!(target: DarwiniaEthereumTask::NAME, "extrinsics helper err: {:#?}", err);
+                sleep(Duration::from_secs(10)).await;
+                ExtrinsicsHelper::new(state).await
+            }
+        }
+    }
+
+    async fn build(state: BridgeState) -> anyhow::Result<Self> {
         // Components
         let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
 

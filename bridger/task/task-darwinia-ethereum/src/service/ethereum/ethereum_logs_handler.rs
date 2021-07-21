@@ -6,14 +6,13 @@ use postage::broadcast;
 use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
 
+use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::darwinia::client::Darwinia;
 use evm_log_tracker::{EvmClient, LogsHandler, Result};
 
 use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
-
 use crate::task::DarwiniaEthereumTask;
-use bridge_traits::bridge::task::BridgeSand;
 
 pub(crate) struct EthereumLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
@@ -60,7 +59,12 @@ impl LogsHandler for EthereumLogsHandler {
         if !txs.is_empty() {
             // Send block number to `Relay Service`
             for tx in &txs {
-                trace!(target: DarwiniaEthereumTask::NAME, "{:?} in ethereum block {}", &tx.tx_hash, &tx.block);
+                trace!(
+                    target: DarwiniaEthereumTask::NAME,
+                    "{:?} in ethereum block {}",
+                    &tx.tx_hash,
+                    &tx.block
+                );
                 self.sender_to_relay
                     .send(ToRelayMessage::EthereumBlockNumber(tx.block))
                     .await?;
@@ -76,7 +80,6 @@ impl LogsHandler for EthereumLogsHandler {
     }
 }
 
-
 fn build_txs(
     logs: Vec<Log>,
     bank_topic: H256,
@@ -89,9 +92,7 @@ fn build_txs(
         let index = l.transaction_index.unwrap_or_default().low_u64();
         let tx = if l.topics.contains(&issuing_topic) {
             EthereumTransaction {
-                tx_hash: EthereumTransactionHash::Token(
-                    l.transaction_hash.unwrap_or_default(),
-                ),
+                tx_hash: EthereumTransactionHash::Token(l.transaction_hash.unwrap_or_default()),
                 block_hash: l.block_hash.unwrap_or_default(),
                 block,
                 index,
@@ -107,20 +108,20 @@ fn build_txs(
             }
         } else if l.topics.contains(&bank_topic) {
             EthereumTransaction {
-                tx_hash: EthereumTransactionHash::Deposit(
-                    l.transaction_hash.unwrap_or_default(),
-                ),
+                tx_hash: EthereumTransactionHash::Deposit(l.transaction_hash.unwrap_or_default()),
                 block_hash: l.block_hash.unwrap_or_default(),
                 block,
                 index,
             }
         } else {
-            error!(target: DarwiniaEthereumTask::NAME, "Can not find any useful topics in the log: {:?}", l.topics);
+            error!(
+                target: DarwiniaEthereumTask::NAME,
+                "Can not find any useful topics in the log: {:?}", l.topics
+            );
             continue;
         };
 
         txs.push(tx);
-
     }
     txs
 }
@@ -132,9 +133,9 @@ impl EthereumLogsHandler {
             .verified(tx.block_hash, tx.index)
             .await?
             || self
-            .darwinia_client
-            .verified_issuing(tx.block_hash, tx.index)
-            .await?
+                .darwinia_client
+                .verified_issuing(tx.block_hash, tx.index)
+                .await?
         {
             trace!(
                 target: DarwiniaEthereumTask::NAME,
@@ -145,7 +146,11 @@ impl EthereumLogsHandler {
         } else {
             // delay to wait for possible previous extrinsics
             sleep(Duration::from_secs(12)).await;
-            trace!(target: DarwiniaEthereumTask::NAME, "send to redeem service: {:?}", &tx.tx_hash);
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "send to redeem service: {:?}",
+                &tx.tx_hash
+            );
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;

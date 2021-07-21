@@ -1,28 +1,27 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use async_recursion::async_recursion;
+use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 use postage::broadcast;
 use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
 use component_ethereum::error::BizError;
 use component_shadow::{Shadow, ShadowComponent};
+use component_state::state::BridgeState;
 use support_ethereum::block::EthereumHeader;
 
 use crate::bus::DarwiniaEthereumBus;
+use crate::config::SubstrateEthereumConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRelayMessage};
 use crate::task::DarwiniaEthereumTask;
-use crate::config::SubstrateEthereumConfig;
-use bridge_traits::bridge::config::Config;
-
-use component_state::state::BridgeState;
-use lifeline::dyn_bus::DynBus;
-use async_recursion::async_recursion;
 
 #[derive(Debug)]
 pub struct LikeDarwiniaWithLikeEthereumRelayService {
@@ -50,8 +49,8 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
         let _greet = Self::try_task(
             &format!("{}-service-relay", DarwiniaEthereumTask::NAME),
             async move {
-
-                let mut helper = RelayHelper::new(state.clone(), sender_to_extrinsics.clone()).await;
+                let mut helper =
+                    RelayHelper::new(state.clone(), sender_to_extrinsics.clone()).await;
 
                 let interval_relay = servce_config.interval_relay;
 
@@ -66,18 +65,27 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToRelayMessage::EthereumBlockNumber(block_number) => {
-                            trace!(target: DarwiniaEthereumTask::NAME, "Received new ethereum block number to affirm: {}", block_number);
+                            trace!(
+                                target: DarwiniaEthereumTask::NAME,
+                                "Received new ethereum block number to affirm: {}",
+                                block_number
+                            );
                             helper.update_target(block_number).await?;
-                        },
+                        }
                         ToRelayMessage::Relay => {
                             if let Err(err) = helper.affirm().await {
-                                error!(target: DarwiniaEthereumTask::NAME, "affirm err: {:#?}", err);
+                                error!(
+                                    target: DarwiniaEthereumTask::NAME,
+                                    "affirm err: {:#?}", err
+                                );
                                 // TODO: Consider the errors more carefully
                                 // Maybe a websocket err, so wait 10 secs to reconnect.
                                 sleep(Duration::from_secs(10)).await;
-                                helper = RelayHelper::new(state.clone(), sender_to_extrinsics.clone()).await;
+                                helper =
+                                    RelayHelper::new(state.clone(), sender_to_extrinsics.clone())
+                                        .await;
                             }
-                        },
+                        }
                     }
                 }
 
@@ -97,18 +105,27 @@ struct RelayHelper {
 
 impl RelayHelper {
     #[async_recursion]
-    pub async fn new(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> Self {
+    pub async fn new(
+        state: BridgeState,
+        sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    ) -> Self {
         match RelayHelper::build(state.clone(), sender_to_extrinsics.clone()).await {
             Ok(helper) => helper,
             Err(err) => {
-                error!(target: DarwiniaEthereumTask::NAME, "relay init err: {:#?}", err);
+                error!(
+                    target: DarwiniaEthereumTask::NAME,
+                    "relay init err: {:#?}", err
+                );
                 sleep(Duration::from_secs(10)).await;
                 RelayHelper::new(state, sender_to_extrinsics).await
             }
         }
     }
 
-    async fn build(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<Self> {
+    async fn build(
+        state: BridgeState,
+        sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    ) -> anyhow::Result<Self> {
         info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
 
         // Components
@@ -122,12 +139,15 @@ impl RelayHelper {
         // Shadow client
         let shadow = Arc::new(component_shadow.component().await?);
 
-        info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY");
+        info!(
+            target: DarwiniaEthereumTask::NAME,
+            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY"
+        );
         Ok(RelayHelper {
             state,
             sender_to_extrinsics,
             darwinia,
-            shadow
+            shadow,
         })
     }
 
@@ -135,10 +155,14 @@ impl RelayHelper {
         let microkv = self.state.microkv();
 
         let last_confirmed = self.darwinia.last_confirmed().await?;
-        let mut relayed= microkv.get("relayed")?.unwrap_or(0);
+        let mut relayed = microkv.get("relayed")?.unwrap_or(0);
         let target = microkv.get("target")?.unwrap_or(0);
 
-        trace!(target: DarwiniaEthereumTask::NAME, "The last confirmed ethereum block is {}", last_confirmed);
+        trace!(
+            target: DarwiniaEthereumTask::NAME,
+            "The last confirmed ethereum block is {}",
+            last_confirmed
+        );
 
         if last_confirmed > relayed {
             microkv.put("relayed", &last_confirmed)?;
@@ -146,24 +170,32 @@ impl RelayHelper {
         }
 
         if target > relayed {
-            trace!(target: DarwiniaEthereumTask::NAME, "Your are affirming ethereum block {}", target);
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "Your are affirming ethereum block {}",
+                target
+            );
             match do_affirm(
                 self.darwinia.clone(),
                 self.shadow.clone(),
                 target,
                 self.sender_to_extrinsics.clone(),
             )
-                .await
+            .await
             {
                 Ok(()) => {
                     microkv.put("relayed", &target)?;
                 }
                 Err(err) => {
-                    return Err(err)?;
+                    return Err(err);
                 }
             }
         } else {
-            trace!(target: DarwiniaEthereumTask::NAME, "You do not need to affirm ethereum block {}", target);
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "You do not need to affirm ethereum block {}",
+                target
+            );
         }
 
         Ok(())
@@ -209,7 +241,11 @@ pub async fn do_affirm(
         }
     }
 
-    trace!(target: DarwiniaEthereumTask::NAME, "Prepare to affirm ethereum block: {}", target);
+    trace!(
+        target: DarwiniaEthereumTask::NAME,
+        "Prepare to affirm ethereum block: {}",
+        target
+    );
     let parcel = shadow.parcel(target as usize + 1).await?;
     if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
         return Err(BizError::ParcelFromShadowIsEmpty(target).into());

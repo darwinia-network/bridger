@@ -49,7 +49,6 @@ support-ethereum = { path = "../../supports/support-ethereum" }
 
 evm-log-tracker = { path = "../../supports/evm-log-tracker" }
 
-# todo: Add on-demand
 tokio = { version = "1", features = ["full"] }
 
 env_logger = "0.8"

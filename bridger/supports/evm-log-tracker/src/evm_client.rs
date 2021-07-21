@@ -1,9 +1,10 @@
-use crate::Result;
 use web3::{
     transports::http::Http,
     types::{BlockNumber, FilterBuilder, Log, SyncState, H160, H256, U64},
     Web3,
 };
+
+use crate::Result;
 
 #[derive(Debug)]
 pub struct EvmClient {
@@ -17,6 +18,7 @@ impl EvmClient {
 }
 
 impl EvmClient {
+    #[allow(clippy::clone_on_copy)]
     pub async fn get_logs(
         &self,
         contract_address: &H160,

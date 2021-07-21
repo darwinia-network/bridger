@@ -1,8 +1,10 @@
-use crate::{EvmChain, EvmClient, LogsHandler, Result};
 use std::marker::PhantomData;
 use std::time::Duration;
+
 use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
+
+use crate::{EvmChain, EvmClient, LogsHandler, Result};
 
 #[derive(Debug)]
 pub struct EvmLogTracker<C: EvmChain, H: LogsHandler> {
@@ -46,7 +48,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
                 }
             }
 
-            if self.running == false {
+            if !self.running {
                 break;
             }
 

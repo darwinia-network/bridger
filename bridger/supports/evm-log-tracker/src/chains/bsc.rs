@@ -1,7 +1,9 @@
-use crate::{EvmChain, EvmClient, Result};
-use async_trait::async_trait;
 use std::time::Duration;
+
+use async_trait::async_trait;
 use tokio::time::sleep;
+
+use crate::{EvmChain, EvmClient, Result};
 
 /// Binance Smart Chain
 #[derive(Debug)]

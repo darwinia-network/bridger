@@ -1,29 +1,25 @@
-use lifeline::{Bus, Lifeline, Service, Receiver, Sender, Task};
+use std::sync::Arc;
+use std::time::Duration;
+
+use async_recursion::async_recursion;
+use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
+use postage::broadcast;
+use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
+use component_darwinia_subxt::account::DarwiniaAccount;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::from_ethereum::{
-        Ethereum2Darwinia, Account as FromEthereumAccount
-    };
+use component_darwinia_subxt::config::DarwiniaSubxtConfig;
+use component_darwinia_subxt::from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia};
 use component_shadow::{Shadow, ShadowComponent};
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::task::DarwiniaEthereumTask;
-
-use crate::message::{ToGuardMessage, ToExtrinsicsMessage, Extrinsic};
-
-use std::time::Duration;
-use tokio::time::sleep;
-
-use std::sync::Arc;
-use postage::broadcast;
-use component_darwinia_subxt::account::DarwiniaAccount;
-use bridge_traits::bridge::config::Config;
-use component_darwinia_subxt::config::DarwiniaSubxtConfig;
-use async_recursion::async_recursion;
 use crate::config::SubstrateEthereumConfig;
+use crate::message::{Extrinsic, ToExtrinsicsMessage, ToGuardMessage};
+use crate::task::DarwiniaEthereumTask;
 
 #[derive(Debug)]
 pub struct GuardService {
@@ -44,17 +40,12 @@ impl Service for GuardService {
         let _greet = Self::try_task(
             &format!("{}-service-guard", DarwiniaEthereumTask::NAME),
             async move {
-
                 //
-                tokio::spawn(async move {
-                    run(sender_to_extrinsics).await
-                });
+                tokio::spawn(async move { run(sender_to_extrinsics).await });
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
-                        ToGuardMessage::StartGuard => {
-
-                        },
+                        ToGuardMessage::StartGuard => {}
                     }
                 }
 
@@ -68,13 +59,18 @@ impl Service for GuardService {
 #[async_recursion]
 async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
     if let Err(err) = start(sender_to_extrinsics.clone()).await {
-        error!(target: DarwiniaEthereumTask::NAME, "guard init err {:#?}", err);
+        error!(
+            target: DarwiniaEthereumTask::NAME,
+            "guard init err {:#?}", err
+        );
         sleep(Duration::from_secs(10)).await;
         run(sender_to_extrinsics).await;
     }
 }
 
-async fn start(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
+async fn start(
+    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+) -> anyhow::Result<()> {
     info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
 
     // Components
@@ -88,13 +84,19 @@ async fn start(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMess
     // Darwinia client & account
     let darwinia = component_darwinia_subxt.component().await?;
     let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-    let account = DarwiniaAccount::new(config_darwinia.relayer_private_key, config_darwinia.relayer_real_account);
+    let account = DarwiniaAccount::new(
+        config_darwinia.relayer_private_key,
+        config_darwinia.relayer_real_account,
+    );
     let guard_account = FromEthereumAccount::new(account);
 
     // Shadow client
     let shadow = Arc::new(component_shadow.component().await?);
 
-    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD");
+    info!(
+        target: DarwiniaEthereumTask::NAME,
+        "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
+    );
 
     loop {
         let ethereum2darwinia_clone = ethereum2darwinia.clone();
@@ -106,8 +108,10 @@ async fn start(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMess
             ethereum2darwinia_clone,
             guard_account_clone,
             shadow_clone,
-            sender_to_extrinsics_clone
-        ).await {
+            sender_to_extrinsics_clone,
+        )
+        .await
+        {
             error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
             let err_msg = format!("{:?}", err).to_lowercase();
             if err_msg.contains("restart") {
@@ -122,28 +126,30 @@ async fn start(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMess
 }
 
 impl GuardService {
-
     async fn guard(
         ethereum2darwinia: Ethereum2Darwinia,
         guard_account: FromEthereumAccount,
         shadow: Arc<Shadow>,
-        mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
+        mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> anyhow::Result<()> {
-        trace!(target: DarwiniaEthereumTask::NAME, "Checking pending headers...");
+        trace!(
+            target: DarwiniaEthereumTask::NAME,
+            "Checking pending headers..."
+        );
 
         let last_confirmed = ethereum2darwinia.last_confirmed().await?;
         let pending_headers = ethereum2darwinia.pending_headers().await?;
         if !pending_headers.is_empty() {
             trace!(
                 target: DarwiniaEthereumTask::NAME,
-				"pending headers: {:?}",
-				pending_headers
-					.clone()
-					.iter()
-					.map(|p| p.1.header.number.to_string())
-					.collect::<Vec<_>>()
-					.join(", ")
-			);
+                "pending headers: {:?}",
+                pending_headers
+                    .clone()
+                    .iter()
+                    .map(|p| p.1.header.number.to_string())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
         }
         for pending in pending_headers {
             let pending_parcel = pending.1;
@@ -162,7 +168,9 @@ impl GuardService {
                 } else {
                     Extrinsic::GuardVote(pending_block_number, false)
                 };
-                sender_to_extrinsics.send(ToExtrinsicsMessage::Extrinsic(ex)).await?;
+                sender_to_extrinsics
+                    .send(ToExtrinsicsMessage::Extrinsic(ex))
+                    .await?;
             }
         }
 

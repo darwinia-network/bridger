@@ -1,35 +1,29 @@
-use lifeline::{Bus, Lifeline, Service, Receiver, Task};
-
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::{
-    from_ethereum::{
-        Ethereum2Darwinia, Account as FromEthereumAccount
-    },
-    to_ethereum::{
-        Darwinia2Ethereum, Account as ToEthereumAccount
-    }
-};
-
-use crate::bus::DarwiniaEthereumBus;
-use crate::task::DarwiniaEthereumTask;
-
-use crate::message::{ToExtrinsicsMessage, Extrinsic};
-
 use std::time::Duration;
+
+use async_recursion::async_recursion;
+use lifeline::dyn_bus::DynBus;
+use lifeline::{Bus, Lifeline, Receiver, Service, Task};
+use microkv::MicroKV;
 use tokio::time::sleep;
 
-use support_ethereum::receipt::RedeemFor;
-use component_darwinia_subxt::account::DarwiniaAccount;
-use lifeline::dyn_bus::DynBus;
-use component_state::state::BridgeState;
-use microkv::MicroKV;
-use component_darwinia_subxt::config::DarwiniaSubxtConfig;
+use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
+use bridge_traits::bridge::service::BridgeService;
+use bridge_traits::bridge::task::BridgeSand;
+use component_darwinia_subxt::account::DarwiniaAccount;
+use component_darwinia_subxt::component::DarwiniaSubxtComponent;
+use component_darwinia_subxt::config::DarwiniaSubxtConfig;
+use component_darwinia_subxt::{
+    from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia},
+    to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum},
+};
 use component_ethereum::config::Web3Config;
-use async_recursion::async_recursion;
+use component_state::state::BridgeState;
+use support_ethereum::receipt::RedeemFor;
+
+use crate::bus::DarwiniaEthereumBus;
+use crate::message::{Extrinsic, ToExtrinsicsMessage};
+use crate::task::DarwiniaEthereumTask;
 
 #[derive(Debug)]
 pub struct ExtrinsicsService {
@@ -52,15 +46,16 @@ impl Service for ExtrinsicsService {
         let _greet = Self::try_task(
             &format!("{}-service-extrinsics", DarwiniaEthereumTask::NAME),
             async move {
-
-
                 let mut helper = ExtrinsicsHelper::new(state.clone()).await;
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToExtrinsicsMessage::Extrinsic(ex) => {
                             if let Err(err) = helper.send_extrinsic(ex).await {
-                                error!(target: DarwiniaEthereumTask::NAME, "extrinsics err: {:#?}", err);
+                                error!(
+                                    target: DarwiniaEthereumTask::NAME,
+                                    "extrinsics err: {:#?}", err
+                                );
 
                                 // TODO: Consider the errors more carefully
                                 // TODO: Maybe need retry
@@ -70,7 +65,7 @@ impl Service for ExtrinsicsService {
 
                                 helper = ExtrinsicsHelper::new(state.clone()).await;
                             }
-                        },
+                        }
                     }
                 }
 
@@ -96,7 +91,10 @@ impl ExtrinsicsHelper {
         match ExtrinsicsHelper::build(state.clone()).await {
             Ok(helper) => helper,
             Err(err) => {
-                error!(target: DarwiniaEthereumTask::NAME, "extrinsics init err: {:#?}", err);
+                error!(
+                    target: DarwiniaEthereumTask::NAME,
+                    "extrinsics init err: {:#?}", err
+                );
                 sleep(Duration::from_secs(10)).await;
                 ExtrinsicsHelper::new(state).await
             }
@@ -117,13 +115,23 @@ impl ExtrinsicsHelper {
         let darwinia = component_darwinia.component().await?;
         let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
         let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-        let account = DarwiniaAccount::new(config_darwinia.relayer_private_key, config_darwinia.relayer_real_account);
-        let darwinia2ethereum_relayer = ToEthereumAccount::new(account.clone(), config_darwinia.ecdsa_authority_private_key, config_web3.endpoint);
+        let account = DarwiniaAccount::new(
+            config_darwinia.relayer_private_key,
+            config_darwinia.relayer_real_account,
+        );
+        let darwinia2ethereum_relayer = ToEthereumAccount::new(
+            account.clone(),
+            config_darwinia.ecdsa_authority_private_key,
+            config_web3.endpoint,
+        );
         let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
 
         let spec_name = darwinia.runtime_version().await?;
 
-        info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS");
+        info!(
+            target: DarwiniaEthereumTask::NAME,
+            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS"
+        );
 
         Ok(ExtrinsicsHelper {
             state,
@@ -131,7 +139,7 @@ impl ExtrinsicsHelper {
             darwinia2ethereum,
             darwinia2ethereum_relayer,
             ethereum2darwinia_relayer,
-            spec_name
+            spec_name,
         })
     }
 
@@ -144,8 +152,9 @@ impl ExtrinsicsHelper {
             Some(self.ethereum2darwinia_relayer.clone()),
             Some(self.darwinia2ethereum_relayer.clone()),
             ex,
-            self.spec_name.clone()
-        ).await
+            self.spec_name.clone(),
+        )
+        .await
     }
 }
 
@@ -167,11 +176,13 @@ async fn do_send_extrinsic(
                     let ex_hash = ethereum2darwinia.affirm(&relayer, parcel).await?;
                     info!(
                         target: DarwiniaEthereumTask::NAME,
-                        "Affirmed ethereum block {} in extrinsic {:?}",
-                        block_number, ex_hash
+                        "Affirmed ethereum block {} in extrinsic {:?}", block_number, ex_hash
                     );
                 } else {
-                    info!(target: DarwiniaEthereumTask::NAME, "cannot affirm without relayer account");
+                    info!(
+                        target: DarwiniaEthereumTask::NAME,
+                        "cannot affirm without relayer account"
+                    );
                 }
             }
         }
@@ -187,10 +198,14 @@ async fn do_send_extrinsic(
                             info!(
                                 target: DarwiniaEthereumTask::NAME,
                                 "Sent ethereum tx {:?} with extrinsic {:?}",
-                                ethereum_tx.tx_hash, ex_hash
+                                ethereum_tx.tx_hash,
+                                ex_hash
                             );
                         } else {
-                            info!(target: DarwiniaEthereumTask::NAME, "cannot sync authorities changed without relayer account");
+                            info!(
+                                target: DarwiniaEthereumTask::NAME,
+                                "cannot sync authorities changed without relayer account"
+                            );
                         }
                     }
                 }
@@ -227,7 +242,8 @@ async fn do_send_extrinsic(
                             info!(
                                 target: DarwiniaEthereumTask::NAME,
                                 "Redeemed ethereum tx {:?} with extrinsic {:?}",
-                                ethereum_tx.tx_hash, ex_hash
+                                ethereum_tx.tx_hash,
+                                ex_hash
                             );
                         }
                     }
@@ -247,14 +263,12 @@ async fn do_send_extrinsic(
                     if aye {
                         info!(
                             target: DarwiniaEthereumTask::NAME,
-                            "Voted to approve: {}, ex hash: {:?}",
-                            pending_block_number, ex_hash
+                            "Voted to approve: {}, ex hash: {:?}", pending_block_number, ex_hash
                         );
                     } else {
                         info!(
                             target: DarwiniaEthereumTask::NAME,
-                            "Voted to reject: {}, ex hash: {:?}",
-                            pending_block_number, ex_hash
+                            "Voted to reject: {}, ex hash: {:?}", pending_block_number, ex_hash
                         );
                     }
                 }
@@ -263,32 +277,38 @@ async fn do_send_extrinsic(
 
         Extrinsic::SignAndSendMmrRoot(block_number) => {
             if let Some(darwinia2ethereum) = &darwinia2ethereum {
-                trace!(target: DarwiniaEthereumTask::NAME, "Start sign and send mmr_root...");
+                trace!(
+                    target: DarwiniaEthereumTask::NAME,
+                    "Start sign and send mmr_root..."
+                );
                 if let Some(relayer) = &darwinia2ethereum_relayer {
                     let ex_hash = darwinia2ethereum
-                        .ecdsa_sign_and_submit_signed_mmr_root(
-                            &relayer,
-                            spec_name,
-                            block_number,
-                        )
+                        .ecdsa_sign_and_submit_signed_mmr_root(&relayer, spec_name, block_number)
                         .await?;
                     info!(
                         target: DarwiniaEthereumTask::NAME,
                         "Sign and send mmr root of block {} in extrinsic {:?}",
-                        block_number, ex_hash
+                        block_number,
+                        ex_hash
                     );
                 }
             }
         }
 
         Extrinsic::SignAndSendAuthorities(message) => {
-            trace!(target: DarwiniaEthereumTask::NAME, "Start sign and send authorities...");
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "Start sign and send authorities..."
+            );
             if let Some(darwinia2ethereum) = &darwinia2ethereum {
                 if let Some(relayer) = &darwinia2ethereum_relayer {
                     let ex_hash = darwinia2ethereum
                         .ecdsa_sign_and_submit_signed_authorities(&relayer, message)
                         .await?;
-                    info!(target: DarwiniaEthereumTask::NAME, "Sign and send authorities in extrinsic {:?}", ex_hash);
+                    info!(
+                        target: DarwiniaEthereumTask::NAME,
+                        "Sign and send authorities in extrinsic {:?}", ex_hash
+                    );
                 }
             }
         }

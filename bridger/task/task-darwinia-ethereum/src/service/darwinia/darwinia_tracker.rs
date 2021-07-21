@@ -1,12 +1,15 @@
-use crate::error::Result;
-use component_darwinia_subxt::darwinia::client::Darwinia;
+use std::time::Duration;
+
 use substrate_subxt::sp_runtime::generic::Header;
 use substrate_subxt::sp_runtime::traits::BlakeTwo256;
-use std::time::Duration;
 use tokio::time::sleep;
-use crate::task::DarwiniaEthereumTask;
+
 use bridge_traits::bridge::task::BridgeSand;
+use component_darwinia_subxt::darwinia::client::Darwinia;
 use component_state::state::BridgeState;
+
+use crate::error::Result;
+use crate::task::DarwiniaEthereumTask;
 
 /// DarwiniaTracker
 pub struct DarwiniaBlockTracker {
@@ -17,10 +20,7 @@ pub struct DarwiniaBlockTracker {
 impl DarwiniaBlockTracker {
     /// new
     pub fn new(darwinia: Darwinia, state: BridgeState) -> Self {
-        Self {
-            darwinia,
-            state,
-        }
+        Self { darwinia, state }
     }
 
     /// get next block
@@ -35,7 +35,10 @@ impl DarwiniaBlockTracker {
                     }
                 }
                 Err(err) => {
-                    error!(target: DarwiniaEthereumTask::NAME, "An error occurred while tracking next darwinia block: {:#?}", err);
+                    error!(
+                        target: DarwiniaEthereumTask::NAME,
+                        "An error occurred while tracking next darwinia block: {:#?}", err
+                    );
                     let err_msg = format!("{:?}", err).to_lowercase();
                     if err_msg.contains("restart") {
                         return Err(crate::error::Error::RestartFromJsonrpsee.into());

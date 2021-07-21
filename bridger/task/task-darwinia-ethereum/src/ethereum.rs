@@ -1,15 +1,17 @@
 //! Ethereum API
-use crate::{error::Error, error::Result};
+use std::time::Duration;
 
-use component_darwinia_subxt::types::EcdsaSignature;
 use secp256k1::SecretKey;
 use serde::{Deserialize, Serialize};
-use std::time::Duration;
 use web3::contract::{Contract, Options};
 use web3::signing::SecretKeyRef;
 use web3::transports::Http;
 use web3::types::{Address, H160, H256, U256};
 use web3::Web3;
+
+use component_darwinia_subxt::types::EcdsaSignature;
+
+use crate::{error::Error, error::Result};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct GasPrice {
@@ -37,10 +39,14 @@ pub struct Ethereum {
 
 impl Ethereum {
     /// new
-    pub fn new(web3: Web3<Http>, relay_contract: String, relayer_private_key: Option<String>, beneficiary_darwinia_account: Option<String>) -> Result<Self> {
+    pub fn new(
+        web3: Web3<Http>,
+        relay_contract: String,
+        relayer_private_key: Option<String>,
+        beneficiary_darwinia_account: Option<String>,
+    ) -> Result<Self> {
         let relay_contract_address = Ethereum::build_address(&relay_contract)?;
-        let secret_key = if let Some(seed) = relayer_private_key
-        {
+        let secret_key = if let Some(seed) = relayer_private_key {
             let private_key = array_bytes::hex2bytes(&seed[2..])
                 .map_err(|_| Error::Hex2Bytes("seed[2..]".into()))?;
             Some(SecretKey::from_slice(&private_key)?)
@@ -88,15 +94,15 @@ impl Ethereum {
                 debug!("message: {}", array_bytes::bytes2hex("0x", message.clone()));
                 for (i, signature) in signature_list.clone().iter().enumerate() {
                     debug!(
-						"signature {}: {}",
-						i + 1,
-						array_bytes::bytes2hex("0x", signature)
-					);
+                        "signature {}: {}",
+                        i + 1,
+                        array_bytes::bytes2hex("0x", signature)
+                    );
                 }
                 debug!(
-					"beneficiary: {}",
-					array_bytes::bytes2hex("0x", beneficiary_buffer)
-				);
+                    "beneficiary: {}",
+                    array_bytes::bytes2hex("0x", beneficiary_buffer)
+                );
 
                 // gas price
                 // TODO: do not need to get gas_price if ropsten

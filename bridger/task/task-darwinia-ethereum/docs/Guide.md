@@ -28,3 +28,5 @@
     ```
     ./target/release/darwinia-bridger task exec --name task-darwinia-ethereum --api start-ethereum --param block_number=12856303
     ```
+   
+Note: Darwinia web socket node connected requires enabling [offchain-indexing](https://github.com/darwinia-network/bridger/issues/196#issuecomment-884056708).

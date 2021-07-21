@@ -110,7 +110,7 @@ async fn start(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sen
 
     // Ethereum client
     let web3 = component_web3.component().await?;
-    let ethereum = Ethereum::new(web3, config_ethereum.relayer_relay_contract_address, config_ethereum.relayer_private_key, config_ethereum.relayer_beneficiary_darwinia_account)?;
+    let ethereum = Ethereum::new(web3, config_ethereum.subscribe_relay_address, config_ethereum.relayer_private_key, config_ethereum.relayer_beneficiary_darwinia_account)?;
 
     let spec_name = darwinia.runtime_version().await?;
 

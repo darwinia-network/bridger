@@ -29,7 +29,7 @@ struct GasPriceData {
 /// Ethereum
 pub struct Ethereum {
     web3: Web3<Http>,
-    relay_contract_address: Option<Address>,
+    relay_contract_address: Address,
     /// secret_key to send ethereum tx
     pub secret_key: Option<SecretKey>,
     beneficiary: Option<String>,
@@ -37,10 +37,8 @@ pub struct Ethereum {
 
 impl Ethereum {
     /// new
-    pub fn new(web3: Web3<Http>, relay_contract: Option<String>, relayer_private_key: Option<String>, beneficiary_darwinia_account: Option<String>) -> Result<Self> {
-        let relay_contract_address =
-            relay_contract.map(|relay_contract| Ethereum::build_address(&relay_contract).unwrap());
-
+    pub fn new(web3: Web3<Http>, relay_contract: String, relayer_private_key: Option<String>, beneficiary_darwinia_account: Option<String>) -> Result<Self> {
+        let relay_contract_address = Ethereum::build_address(&relay_contract)?;
         let secret_key = if let Some(seed) = relayer_private_key
         {
             let private_key = array_bytes::hex2bytes(&seed[2..])
@@ -70,7 +68,7 @@ impl Ethereum {
 
                 let contract = Contract::from_json(
                     self.web3.eth(),
-                    self.relay_contract_address.unwrap(),
+                    self.relay_contract_address,
                     include_bytes!("Relay.json"),
                 )?;
 

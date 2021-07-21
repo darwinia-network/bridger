@@ -61,30 +61,20 @@ fn create_tracker(
 
 fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
     let topics_setting = vec![
-        // ring
-        (
-            ethereum_config.subscribe_ring_address,
-            ethereum_config.subscribe_ring_topics,
-        ),
-        // kton
-        (
-            ethereum_config.subscribe_kton_address,
-            ethereum_config.subscribe_kton_topics,
-        ),
         // bank
         (
             ethereum_config.subscribe_bank_address,
             ethereum_config.subscribe_bank_topics,
         ),
+        // issuing
+        (
+            ethereum_config.subscribe_issuing_address,
+            ethereum_config.subscribe_issuing_topics,
+        ),
         // relay
         (
             ethereum_config.subscribe_relay_address,
             ethereum_config.subscribe_relay_topics,
-        ),
-        // backing
-        (
-            ethereum_config.subscribe_backing_address,
-            ethereum_config.subscribe_backing_topics,
         ),
     ];
 

@@ -41,7 +41,7 @@ impl Service for RedeemService {
         let _greet = Self::try_task(
             &format!("{}-service-redeem", DarwiniaEthereumTask::NAME),
             async move {
-                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA REDEEM");
+
 
                 let mut helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
 
@@ -98,6 +98,7 @@ impl RedeemHelper {
         // Shadow client
         let shadow = Arc::new(component_shadow.component().await?);
 
+        info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA REDEEM");
         Ok(RedeemHelper {
             sender_to_extrinsics,
             darwinia,

@@ -52,7 +52,7 @@ impl Service for ExtrinsicsService {
         let _greet = Self::try_task(
             &format!("{}-service-extrinsics", DarwiniaEthereumTask::NAME),
             async move {
-                info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS");
+
 
                 let mut helper = ExtrinsicsHelper::new(state.clone()).await;
 
@@ -120,6 +120,8 @@ impl ExtrinsicsHelper {
         let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
 
         let spec_name = darwinia.runtime_version().await?;
+
+        info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS");
 
         Ok(ExtrinsicsHelper {
             state,

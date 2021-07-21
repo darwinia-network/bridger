@@ -56,7 +56,6 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                 let interval_relay = servce_config.interval_relay;
 
                 tokio::spawn(async move {
-                    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY");
                     loop {
                         if let Err(err) = sender_to_relay.send(ToRelayMessage::Relay).await {
                             error!("{:#?}", err);
@@ -121,6 +120,7 @@ impl RelayHelper {
         // Shadow client
         let shadow = Arc::new(component_shadow.component().await?);
 
+        info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY");
         Ok(RelayHelper {
             state,
             sender_to_extrinsics,

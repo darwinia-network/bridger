@@ -104,6 +104,8 @@ impl ExtrinsicsHelper {
     }
 
     async fn build(state: BridgeState) -> anyhow::Result<Self> {
+        info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
+
         // Components
         let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
 

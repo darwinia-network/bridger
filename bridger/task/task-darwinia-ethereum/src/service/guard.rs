@@ -75,6 +75,8 @@ async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessag
 }
 
 async fn start(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
+    info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
+
     // Components
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
     let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;

@@ -109,6 +109,8 @@ impl RelayHelper {
     }
 
     async fn build(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<Self> {
+        info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
+
         // Components
         let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
         let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;

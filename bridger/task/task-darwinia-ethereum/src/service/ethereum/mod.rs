@@ -146,7 +146,7 @@ async fn run(
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>
 ) {
     if let Err(err) = start(state.clone(), sender_to_relay.clone(), sender_to_redeem.clone()).await {
-        error!(target: DarwiniaEthereumTask::NAME, "ethereum init err {:#?}", err);
+        error!(target: DarwiniaEthereumTask::NAME, "ethereum err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
         run(state, sender_to_relay, sender_to_redeem).await;
     }
@@ -157,6 +157,8 @@ async fn start(
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>
 ) -> anyhow::Result<()> {
+    info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
+
     // Components
     let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;

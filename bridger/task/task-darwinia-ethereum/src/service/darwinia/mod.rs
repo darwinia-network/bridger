@@ -91,8 +91,6 @@ async fn run(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sende
 }
 
 async fn start(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
-    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA DARWINIA SUBSCRIBE");
-
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
     // Config
@@ -115,6 +113,8 @@ async fn start(state: BridgeState, sender_to_extrinsics: postage::broadcast::Sen
     let ethereum = Ethereum::new(web3, config_ethereum.relayer_relay_contract_address, config_ethereum.relayer_private_key, config_ethereum.relayer_beneficiary_darwinia_account)?;
 
     let spec_name = darwinia.runtime_version().await?;
+
+    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA DARWINIA SUBSCRIBE");
 
     let mut runner = DarwiniaServiceRunner {
         darwinia2ethereum,

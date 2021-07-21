@@ -167,8 +167,6 @@ async fn start(
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>
 ) -> anyhow::Result<()> {
-    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA ETHEREUM SUBSCRIBE");
-
     // Components
     let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
@@ -187,6 +185,8 @@ async fn start(
 
     let topics_list = get_topics_list(ethereum_config);
     let scan_from: u64 = microkv.get("last-redeemed")?.unwrap_or(0) + 1;
+
+    info!(target: DarwiniaEthereumTask::NAME, "✨ SERVICE STARTED: ETHEREUM <> DARWINIA ETHEREUM SUBSCRIBE");
 
     let mut tracker = create_tracker(
         darwinia,

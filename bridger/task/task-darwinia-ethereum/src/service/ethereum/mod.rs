@@ -124,7 +124,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                             tokio::spawn(async move {
                                 run(cloned_state, cloned_sender_to_relay, cloned_sender_to_redeem, cloned_sender_to_ethereum).await
                             });
-                    }
+                        }
                         _ => {}
                     }
                 }

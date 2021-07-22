@@ -6,6 +6,8 @@
 [![downloads](https://img.shields.io/crates/d/darwinia-bridger.svg)](https://crates.io/crates/darwinia-bridger)
 [![license](https://img.shields.io/github/license/darwinia-network/bridger)](https://choosealicense.com/licenses/gpl/)
 
+> WARNING: THE DOCUMENT IS OUTDATED
+
 Relayers (aka. Bridgers) in Darwinia Network are offchain worker clients which help relay the headers and messages between source chains and target chains, they works between two chains and requires RPC access of two chains.
 
 Darwinia Bridger (this repo) is an implementation of relayer client written in Rust.

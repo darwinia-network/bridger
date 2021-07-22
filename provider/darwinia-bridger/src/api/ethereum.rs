@@ -193,29 +193,29 @@ fn test_load_abi() {
 	println!("{:?}", contract);
 }
 
-#[actix_rt::test]
-async fn test_submit_authorities_set() {
-	let web3 = Web3::new(
-		Http::new("https://ropsten.infura.io/v3/60703fcc6b4e48079cfc5e385ee7af80").unwrap(),
-	);
-
-	let ethereum = Ethereum::new2(
-		web3,
-		"0xc8d6c331030886716f6e323ACB795077eB530E36".to_string(),
-		Some("0x2f460a73df143256460ebb319b171a4024db8ce2d42bb83a42930814a50d2b71".to_string()),
-		Some("0x129f002b1c0787ea72c31b2dc986e66911fe1b4d6dc16f83a1127f33e5a74c7d".to_string()),
-	)
-	.unwrap();
-
-	let txhash = ethereum
-		.submit_authorities_set(vec![0u8], vec![EcdsaSignature::default()])
-		.await
-		.unwrap();
-
-	println!("{:?}", txhash);
-}
-
-#[actix_rt::test]
-async fn test_calc_gas_price() {
-	println!("{}", Ethereum::fast_gas_price().await.unwrap());
-}
+// #[actix_rt::test]
+// async fn test_submit_authorities_set() {
+// 	let web3 = Web3::new(
+// 		Http::new("https://ropsten.infura.io/v3/60703fcc6b4e48079cfc5e385ee7af80").unwrap(),
+// 	);
+//
+// 	let ethereum = Ethereum::new2(
+// 		web3,
+// 		"0xc8d6c331030886716f6e323ACB795077eB530E36".to_string(),
+// 		Some("0x2f460a73df143256460ebb319b171a4024db8ce2d42bb83a42930814a50d2b71".to_string()),
+// 		Some("0x129f002b1c0787ea72c31b2dc986e66911fe1b4d6dc16f83a1127f33e5a74c7d".to_string()),
+// 	)
+// 	.unwrap();
+//
+// 	let txhash = ethereum
+// 		.submit_authorities_set(vec![0u8], vec![EcdsaSignature::default()])
+// 		.await
+// 		.unwrap();
+//
+// 	println!("{:?}", txhash);
+// }
+//
+// #[actix_rt::test]
+// async fn test_calc_gas_price() {
+// 	println!("{}", Ethereum::fast_gas_price().await.unwrap());
+// }

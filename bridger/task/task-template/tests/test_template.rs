@@ -41,17 +41,20 @@ async fn test_task() {
     };
     let mut task = TemplateTask::new(config_task, state.clone()).expect("failed to create task");
 
-    task.keep_carry(
-        linked
-            .bus()
-            .carry_from(task.bus())
-            .expect("failed to carry from template task"),
-    );
+    let bus_template = task.bus();
 
-    let mut tx = task
-        .bus()
+    let mut tx = bus_template
         .tx::<TemplateTaskMessage>()
         .expect("failed to get sender");
+
+    let carry = linked
+        .bus()
+        .carry_from(bus_template)
+        .expect("failed to carry from template task");
+    task.stack()
+        .carry(carry)
+        .expect("failed to linked carry template");
+
     tx.send(TemplateTaskMessage::SomeEvent)
         .await
         .expect("failed to send message");

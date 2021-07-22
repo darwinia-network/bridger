@@ -22,7 +22,7 @@ pub type MmrRootsToSignReturn<T> = (
     Vec<(
         <T as System>::AccountId,
         <T as EthereumRelayAuthorities>::RelayAuthoritySignature,
-    )>
+    )>,
 );
 
 /// Relay Authority
@@ -215,7 +215,9 @@ pub struct MMRRootsToSignKeys<T: EthereumRelayAuthorities> {
 mod tests {
     use substrate_subxt::sp_runtime::AccountId32;
 
-    use crate::runtime::{DarwiniaRuntime, EcdsaMessage, EcdsaSignature};
+    use crate::darwinia::runtime::DarwiniaRuntime;
+    use crate::types::EcdsaMessage;
+    use crate::types::EcdsaSignature;
 
     use super::*;
 

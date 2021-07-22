@@ -27,8 +27,6 @@ impl Service for SomeService {
         let _greet = Self::try_task(
             &format!("{}-service-some", TemplateTask::NAME),
             async move {
-                let task: &mut TemplateTask =
-                    support_keep::task::running_task_downcast_mut(TemplateTask::NAME)?;
                 while let Some(message) = rx.recv().await {
                     match message {
                         TemplateTaskMessage::SomeEvent => {
@@ -41,6 +39,8 @@ impl Service for SomeService {
                             );
                         }
                         TemplateTaskMessage::StopSomeService => {
+                            let task: &mut TemplateTask =
+                                support_keep::task::running_task_downcast_mut(TemplateTask::NAME)?;
                             let stack = task.stack();
                             stack.stop_service::<SomeService>().expect("unreachable");
                         }

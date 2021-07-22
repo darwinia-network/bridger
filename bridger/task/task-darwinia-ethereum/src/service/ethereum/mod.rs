@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Task};
+use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
 use microkv::MicroKV;
 use postage::broadcast;
 use tokio::time::sleep;
@@ -30,7 +30,6 @@ use crate::task::DarwiniaEthereumTask;
 use component_ethereum::config::EthereumConfig;
 
 mod ethereum_logs_handler;
-use async_recursion::async_recursion;
 
 fn create_tracker(
     darwinia_client: Darwinia,
@@ -106,11 +105,11 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         let mut rx = bus.rx::<ToEthereumMessage>()?;
         let sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
+        let sender_to_ethereum = bus.tx::<ToEthereumMessage>()?;
 
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
-        let mut running = false;
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
             async move {
@@ -118,17 +117,14 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToEthereumMessage::Start => {
-                            if !running {
-                                running = true;
-
-                                let cloned_state = state.clone();
-                                let cloned_sender_to_relay = sender_to_relay.clone();
-                                let cloned_sender_to_redeem = sender_to_redeem.clone();
-                                tokio::spawn(async move {
-                                    run(cloned_state, cloned_sender_to_relay, cloned_sender_to_redeem).await
-                                });
-                            }
-                        }
+                            let cloned_state = state.clone();
+                            let cloned_sender_to_relay = sender_to_relay.clone();
+                            let cloned_sender_to_redeem = sender_to_redeem.clone();
+                            let cloned_sender_to_ethereum = sender_to_ethereum.clone();
+                            tokio::spawn(async move {
+                                run(cloned_state, cloned_sender_to_relay, cloned_sender_to_redeem, cloned_sender_to_ethereum).await
+                            });
+                    }
                         _ => {}
                     }
                 }
@@ -139,16 +135,18 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
     }
 }
 
-#[async_recursion]
 async fn run(
     state: BridgeState,
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
-    sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>
+    sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+    mut sender_to_ethereum: postage::broadcast::Sender<ToEthereumMessage>
 ) {
     if let Err(err) = start(state.clone(), sender_to_relay.clone(), sender_to_redeem.clone()).await {
         error!(target: DarwiniaEthereumTask::NAME, "ethereum err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
-        run(state, sender_to_relay, sender_to_redeem).await;
+        sender_to_ethereum
+            .send(ToEthereumMessage::Start)
+            .await.unwrap();
     }
 }
 

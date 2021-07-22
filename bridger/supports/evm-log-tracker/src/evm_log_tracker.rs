@@ -2,6 +2,7 @@ use std::marker::PhantomData;
 use std::time::Duration;
 
 use tokio::time::sleep;
+
 use web3::types::{Log, H160, H256};
 
 use crate::{EvmChain, EvmClient, LogsHandler, Result};
@@ -92,6 +93,8 @@ async fn test_ethereum() {
     use crate::DefaultLogsHandler;
     use crate::Ethereum;
     use array_bytes::hex2bytes_unchecked as bytes;
+    use web3::transports::Http;
+    use web3::Web3;
     let web3 = Web3::new(
         Http::new("https://ropsten.infura.io/v3/60703fcc6b4e48079cfc5e385ee7af80").unwrap(),
     );
@@ -108,9 +111,11 @@ async fn test_ethereum() {
         vec![(contract_address, topics)],
         DefaultLogsHandler {},
         100,
+        1,
     );
 
-    tracker.start().await;
+    let res = tracker.next().await;
+    assert!(res.unwrap().len() > 0);
 }
 
 #[tokio::test]
@@ -118,6 +123,8 @@ async fn test_heco() {
     use crate::DefaultLogsHandler;
     use crate::Heco;
     use array_bytes::hex2bytes_unchecked as bytes;
+    use web3::transports::Http;
+    use web3::Web3;
     let web3 = Web3::new(Http::new("https://http-mainnet-node.huobichain.com").unwrap());
 
     let contract_address = "0x0981F3C078856E2491F11A5F86d26274Bb4009d2";
@@ -132,7 +139,9 @@ async fn test_heco() {
         vec![(contract_address, topics)],
         DefaultLogsHandler {},
         4006177,
+        1,
     );
 
-    tracker.start().await;
+    let res = tracker.next().await;
+    assert!(res.unwrap().len() > 0);
 }

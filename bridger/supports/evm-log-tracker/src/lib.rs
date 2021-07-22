@@ -5,11 +5,11 @@ extern crate async_trait;
 #[macro_use]
 extern crate log;
 
+pub use self::evm_log_tracker::EvmLogTracker;
 pub use chains::{Bsc, Ethereum, Heco};
 pub use default_logs_handler::DefaultLogsHandler;
 pub use error::Error;
 pub use evm_client::EvmClient;
-pub use evm_log_tracker::EvmLogTracker;
 pub use traits::{EvmChain, LogsHandler};
 
 mod chains;

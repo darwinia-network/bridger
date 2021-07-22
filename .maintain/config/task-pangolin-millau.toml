@@ -1,0 +1,14 @@
+[pangolin]
+endpoint = "ws://127.0.0.1:23044"
+signer = "//Alice"
+
+[millau]
+endpoint = "ws://127.0.0.1:13044"
+signer = "//Alice"
+
+[relay]
+lanes = [ "00000000" ]
+auto_start = false
+signer_pangolin = "//Alice"
+signer_millau = "//Millau"
+prometheus_params = { no_prometheus = false, prometheus_host = "127.0.0.1", prometheus_port = 9616 }

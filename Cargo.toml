@@ -1,13 +1,11 @@
 [workspace]
 members = [
 	"primitives",
-	"darwinia",
-	"provider/darwinia-bridger",
 
-	"bridger/bin",
-	"bridger/components/*",
-	"bridger/primitives",
-	"bridger/supports/*",
-	"bridger/task/*",
-	"bridger/traits",
+	"bin",
+	"components/*",
+	"primitives",
+	"supports/*",
+	"task/*",
+	"traits",
 ]

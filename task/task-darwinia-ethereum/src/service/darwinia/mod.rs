@@ -226,7 +226,7 @@ impl DarwiniaServiceRunner {
                 self.sender_to_extrinsics
                     .send(ToExtrinsicsMessage::Extrinsic(delayed_ex.clone()))
                     .await?;
-                self.delayed_extrinsics.remove(&delayed_to);
+                self.delayed_extrinsics.remove(delayed_to);
             }
         }
         Ok(())

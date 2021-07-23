@@ -52,7 +52,7 @@ impl EthereumRpc {
         block: &str,
     ) -> ComponentEthereumResult<EthereumBlockRPC> {
         Ok(
-            EthBlockRPCResp::get_by_hash(&self.client, &self.rpc(), block)
+            EthBlockRPCResp::get_by_hash(&self.client, self.rpc(), block)
                 .await?
                 .result,
         )
@@ -62,7 +62,7 @@ impl EthereumRpc {
         &self,
         block: u64,
     ) -> ComponentEthereumResult<EthereumBlockRPC> {
-        let result = EthBlockRPCResp::get(&self.client, &self.rpc(), block).await;
+        let result = EthBlockRPCResp::get(&self.client, self.rpc(), block).await;
         result.map(|resp| resp.result).map_err(|err| {
             ComponentEthereumError::FailToGetEthereumHeader(format!("{:?}", err), block)
         })
@@ -80,18 +80,18 @@ impl EthereumRpc {
     }
 
     pub async fn get_receipt(&self, txhash: &str) -> ComponentEthereumResult<EthReceiptBody> {
-        Ok(EthReceiptRPCResp::get(&self.client, &self.rpc(), txhash)
+        Ok(EthReceiptRPCResp::get(&self.client, self.rpc(), txhash)
             .await?
             .result)
     }
 
     pub async fn block_number(&self) -> ComponentEthereumResult<u64> {
-        let v: serde_json::Value = EthBlockRPCResp::syncing(&self.client, &self.rpc())
+        let v: serde_json::Value = EthBlockRPCResp::syncing(&self.client, self.rpc())
             .await?
             .result;
         match v {
             serde_json::Value::Bool(false) => {
-                let header: EthereumHeader = EthBlockRPCResp::latest(&self.client, &self.rpc())
+                let header: EthereumHeader = EthBlockRPCResp::latest(&self.client, self.rpc())
                     .await?
                     .result
                     .into();
@@ -107,7 +107,7 @@ impl EthereumRpc {
             )
             .unwrap_or(0)),
             _ => {
-                let header: EthereumHeader = EthBlockRPCResp::latest(&self.client, &self.rpc())
+                let header: EthereumHeader = EthBlockRPCResp::latest(&self.client, self.rpc())
                     .await?
                     .result
                     .into();

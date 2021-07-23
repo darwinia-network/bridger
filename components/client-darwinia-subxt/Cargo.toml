@@ -45,3 +45,4 @@ pallet-im-online = "3.0.0"
 
 bridge-traits = { path = "../../traits" }
 support-ethereum = { path = "../../supports/support-ethereum" }
+bridge-primitives = { path = "../../primitives" }

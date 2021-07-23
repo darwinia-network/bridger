@@ -26,10 +26,26 @@ pub enum Opt {
         #[structopt(flatten)]
         command: KvCommand,
     },
+    /// Crypto help command
+    Crypto(CryptoCommand),
     /// Start bridger server
     Server {
         #[structopt(flatten)]
         options: ServerOptions,
+    },
+}
+
+#[derive(Debug, StructOpt)]
+pub enum CryptoCommand {
+    /// encrypt a value
+    Encrypt {
+        #[structopt(flatten)]
+        options: CryptoOptions,
+    },
+    /// decrypt a value
+    Decrypt {
+        #[structopt(flatten)]
+        options: CryptoOptions,
     },
 }
 
@@ -137,4 +153,11 @@ pub struct ServerOptions {
     /// The bridger config or data base path.
     #[structopt(long, parse(from_os_str))]
     pub base_path: Option<PathBuf>,
+}
+
+#[derive(Clone, Debug, StructOpt)]
+pub struct CryptoOptions {
+    /// The value your want encrypt or decrypt
+    #[structopt(short, long)]
+    pub value: String,
 }

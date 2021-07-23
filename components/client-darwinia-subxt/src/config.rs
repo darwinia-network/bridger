@@ -1,11 +1,12 @@
 use bridge_traits::bridge::config::BridgeConfig;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, bridge_traits::BridgeCrypto)]
 pub struct DarwiniaSubxtConfig {
     pub endpoint: String,
 
     /// relayer's private key
+    #[crypto(decrypt)]
     pub relayer_private_key: String,
     /// the real account behind the relayer
     pub relayer_real_account: Option<String>,

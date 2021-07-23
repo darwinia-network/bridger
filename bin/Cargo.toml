@@ -35,6 +35,7 @@ lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threa
 colored = "2"
 async-recursion = "0.3"
 dirs = "3"
+rpassword = "5.0"
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -44,6 +45,8 @@ bridge-traits = { path = "../traits" }
 component-state = { path = "../components/state" }
 support-keep = { path = "../supports/support-keep" }
 microkv = { git = "https://github.com/ex0dus-0x/microkv.git", branch = "master" }
+
+bridge-primitives = { path = "../primitives" }
 
 task-darwinia-ethereum = { path = "../task/task-darwinia-ethereum" }
 task-pangolin-millau = { path = "../task/task-pangolin-millau" }

@@ -1,60 +1,26 @@
 [package]
-name = "darwinia-bridge-primitives"
+name = "bridge-primitives"
 version = "0.3.3"
-authors = ["clearloop <udtrokia@gmail.com>"]
-description = "Darwinia bridge primitives"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
-license = "GPL-3.0"
-documentation = "https://docs.rs/darwinia-bridge-primitives"
-homepage = "https://github.com/darwinia-network/bridger/tree/master/primitives"
-include = ["src/**/*", "Cargo.toml", "./README.md"]
-keywords = ["blockchain"]
-readme = './README.md'
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+	"Cargo.toml",
+	"**/*.rs",
+	"README.md",
+	"LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
 edition = "2018"
 
-[package.metadata.docs.rs]
-all-features = true
-
 [dependencies]
+
 uint = "0.8.5"
-thiserror = "1.0"
+rlp = "0.4.4"
 
-## Optional featrues
-async-trait = { version = "0.1.40", optional = true }
-frame-support = { version = "3.0.0", optional = true }
-pallet-indices = { version = "3.0.0", optional = true }
-pallet-im-online = { version = "3.0.0", optional = true }
-reqwest = { version = "0.10", features = ["json"], optional = true }
-serde_json = { version = "1.0", optional = true }
-substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.2", optional = true }
-substrate-subxt-proc-macro = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.2", optional = true }
-
-[dependencies.rlp]
-package = "rlp"
-version = "0.4.4"
-
-[dependencies.serde]
-package = "serde"
-version = "1"
-features = ["derive"]
-
-[dependencies.codec]
-package = "parity-scale-codec"
-version = "2"
-features = ["derive"]
-
-[dependencies.tokio]
-package = "tokio"
-version = "0.2.22"
-features = ["full"]
-
-[features]
-rpc = ["async-trait", "reqwest", "serde_json"]
-runtime = [
-  "substrate-subxt",
-  "substrate-subxt-proc-macro",
-  "frame-support",
-  "pallet-indices",
-  "pallet-im-online",
-]
-default = []
+serde = { version = "1", features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "2.1", features = ["derive", "full"] }

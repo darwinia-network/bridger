@@ -1,8 +1,11 @@
 [workspace]
 members = [
-  "primitives",
-  "darwinia",
-  "provider/darwinia-bridger",
-  "provider/substrate-relay/bin",
-  "provider/substrate-relay/relays/*",
+	"primitives",
+
+	"bin",
+	"components/*",
+	"primitives",
+	"supports/*",
+	"task/*",
+	"traits",
 ]

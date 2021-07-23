@@ -1,0 +1,62 @@
+[package]
+name = "task-darwinia-ethereum"
+version = "0.3.3"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+    "Cargo.toml",
+    "**/*.rs",
+    "README.md",
+    "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2018"
+
+[dependencies]
+thiserror = "1.0"
+anyhow = "1.0"
+async-trait = "0.1"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
+postage = "0.4"
+
+web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+microkv = { git = "https://github.com/ex0dus-0x/microkv.git", branch = "master" }
+array-bytes = "1.1.0"
+
+bridge-traits = { path = "../../traits" }
+
+linked-darwinia = { path = "../linked-darwinia" }
+
+
+component-state = { path = "../../components/state" }
+component-ethereum = { path = "../../components/ethereum" }
+component-shadow = { path = "../../components/shadow" }
+component-http-client = { path = "../../components/http-client" }
+
+#component-darwinia = { path = "../../components/client-darwinia" }
+component-darwinia-subxt = { package = "component-darwinia-subxt", path = "../../components/client-darwinia-subxt" }
+
+support-ethereum = { path = "../../supports/support-ethereum" }
+
+evm-log-tracker = { path = "../../supports/evm-log-tracker" }
+
+tokio = { version = "1", features = ["full"] }
+
+env_logger = "0.8"
+substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.2" }
+secp256k1 = { version = "0.20", features = ["recovery"] }
+async-recursion = "0.3.2"
+
+[dependencies.reqwest]
+version = "0.10"
+features = ["json"]
+

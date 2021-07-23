@@ -1,0 +1,39 @@
+[package]
+name = "bridge-traits"
+version = "0.3.3"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+	"Cargo.toml",
+	"**/*.rs",
+	"README.md",
+	"LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2018"
+
+[dependencies]
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+async-trait = "0.1"
+once_cell = "1"
+futures = "0.3"
+
+strum = { version = "0.21", features = ["derive"] }
+strum_macros = "0.21"
+
+config = "0.11"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.5"
+serde_yaml = "0.8"
+
+lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
+
+[dev-dependencies]

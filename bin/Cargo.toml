@@ -1,0 +1,52 @@
+[package]
+name = "bridger-entrypoint"
+version = "0.3.3"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+    "Cargo.toml",
+    "**/*.rs",
+    "README.md",
+    "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2018"
+
+
+[[bin]]
+name = "darwinia-bridger"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0"
+tokio = { version = "1", features = ["full"] }
+routerify = "2"
+hyper = "0.14"
+structopt = "0.3"
+log = "0.4"
+env_logger = "0.8"
+reqwest = { version = "0.11", features = ["json"] }
+lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
+colored = "2"
+async-recursion = "0.3"
+dirs = "3"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+bridge-traits = { path = "../traits" }
+
+component-state = { path = "../components/state" }
+support-keep = { path = "../supports/support-keep" }
+microkv = { git = "https://github.com/ex0dus-0x/microkv.git", branch = "master" }
+
+task-darwinia-ethereum = { path = "../task/task-darwinia-ethereum" }
+task-pangolin-millau = { path = "../task/task-pangolin-millau" }
+
+linked-darwinia = { path = "../task/linked-darwinia" }
+

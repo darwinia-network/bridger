@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::time::Duration;
 
-use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
 use postage::broadcast;
@@ -46,23 +45,25 @@ impl lifeline::Service for DarwiniaService {
         // Receiver & Sender
         let mut rx = bus.rx::<ToDarwiniaMessage>()?;
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
+        let sender_to_darwinia = bus.tx::<ToDarwiniaMessage>()?;
 
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
-        let mut running = false;
         let _greet = Self::try_task(
             &format!("{}-service-darwinia-scan", DarwiniaEthereumTask::NAME),
             async move {
                 while let Some(ToDarwiniaMessage::Start) = rx.recv().await {
-                    if !running {
-                        running = true;
-
-                        let cloned_state = state.clone();
-                        let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
-                        tokio::spawn(async move {
-                            run(cloned_state, cloned_sender_to_extrinsics).await
-                        });
-                    }
+                    let cloned_state = state.clone();
+                    let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
+                    let cloned_sender_to_darwinia = sender_to_darwinia.clone();
+                    tokio::spawn(async move {
+                        run(
+                            cloned_state,
+                            cloned_sender_to_extrinsics,
+                            cloned_sender_to_darwinia,
+                        )
+                        .await
+                    });
                 }
                 Ok(())
             },
@@ -71,10 +72,10 @@ impl lifeline::Service for DarwiniaService {
     }
 }
 
-#[async_recursion]
 async fn run(
     state: BridgeState,
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    mut sender_to_darwinia: postage::broadcast::Sender<ToDarwiniaMessage>,
 ) {
     if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
         error!(
@@ -82,7 +83,10 @@ async fn run(
             "darwinia err {:#?}", err
         );
         sleep(Duration::from_secs(10)).await;
-        run(state, sender_to_extrinsics).await;
+        sender_to_darwinia
+            .send(ToDarwiniaMessage::Start)
+            .await
+            .unwrap();
     }
 }
 

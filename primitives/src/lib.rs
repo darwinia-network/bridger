@@ -7,5 +7,3 @@ extern crate serde;
 
 pub mod array;
 pub mod byte;
-pub mod crypto;
-pub mod error;

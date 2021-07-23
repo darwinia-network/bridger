@@ -19,9 +19,6 @@ edition = "2018"
 
 [dependencies]
 
-log = "0.4"
-thiserror = "1.0"
-
 uint = "0.8.5"
 rlp = "0.4.4"
 

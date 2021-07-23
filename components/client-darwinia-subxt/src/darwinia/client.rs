@@ -185,7 +185,7 @@ impl Darwinia {
                     ));
                 }
                 let mut mmr_root: [u8; 32] = [0; 32];
-                mmr_root.copy_from_slice(&parent_mmr_root);
+                mmr_root.copy_from_slice(parent_mmr_root);
                 H256(mmr_root)
             } else {
                 return Err(Error::NoMmrRootInDarwiniaHeader(block_number));

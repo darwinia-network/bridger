@@ -235,7 +235,7 @@ impl From<EthereumHeaderJson> for EthereumHeader {
             difficulty: U256::from(that.difficulty),
             seal: that.seal.iter().map(|s| bytes!(s.as_str())).collect(),
             hash: Some(bytes!(that.hash.as_str(), 32)),
-            base_fee_per_gas: that.base_fee_per_gas.map(|v| U256::from(v)),
+            base_fee_per_gas: that.base_fee_per_gas.map(U256::from),
         }
     }
 }

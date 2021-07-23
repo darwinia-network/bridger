@@ -131,10 +131,10 @@ impl EthereumLogsHandler {
             .darwinia_client
             .verified(tx.block_hash, tx.index)
             .await?
-            || self
-            .darwinia_client
-            .verified_issuing(tx.block_hash, tx.index)
-            .await?
+            // || self
+            // .darwinia_client
+            // .verified_issuing(tx.block_hash, tx.index)
+            // .await?
         {
             trace!(
                 target: DarwiniaEthereumTask::NAME,

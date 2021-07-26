@@ -40,6 +40,13 @@ pub struct TaskConfigTemplateParam {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct TaskSetPasswordParam {
+    pub name: String,
+    pub password: String,
+    pub store: bool,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct KvOperationParam {
     pub namespace: Option<String>,
     pub keys: Vec<String>,

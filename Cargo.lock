@@ -1027,6 +1027,7 @@ dependencies = [
  "lifeline",
  "log",
  "microkv",
+ "once_cell",
  "serde 1.0.126",
 ]
 

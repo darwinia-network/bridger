@@ -1,13 +1,14 @@
+use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 
 use microkv::MicroKV;
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::BridgeConfig;
-
-use crate::config::{BridgeStateConfig, MicrokvConfig};
 use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::error::BridgeResult;
+
+use crate::config::{BridgeStateConfig, MicrokvConfig};
 
 #[derive(Clone)]
 pub struct BridgeStateComponent {
@@ -52,6 +53,26 @@ lifeline::impl_storage_clone!(BridgeState);
 impl BridgeState {
     pub fn microkv(&self) -> &MicroKV {
         &self.microkv
+    }
+    pub fn put_task_password(
+        &self,
+        task: impl AsRef<str>,
+        password: impl AsRef<str>,
+        store: bool,
+    ) -> anyhow::Result<()> {
+        crate::keep::put_task_password(task, password)?;
+        if store {
+            let key = format!("{}@password", param.name);
+            self.microkv().put(key, password.as_ref())?;
+        }
+        Ok(())
+    }
+    pub fn get_task_password(&self, task: impl AsRef<str>) -> anyhow::Result<Option<String>> {
+        let task = task.as_ref();
+        Ok(self
+            .microkv()
+            .get(task)?
+            .unwrap_or_else(|| crate::keep::get_task_password(task)?))
     }
 }
 

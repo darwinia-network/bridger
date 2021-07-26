@@ -114,6 +114,14 @@ pub enum TaskCommand {
         #[structopt(long, default_value = "toml")]
         format: ConfigFormat,
     },
+    /// Set password for this task to decrypt task config.
+    SetPassword {
+        /// The task name
+        #[structopt(short, long)]
+        name: String,
+        /// Is store password to database. if store it, the next time will load this.
+        store: bool,
+    },
 }
 
 #[derive(Clone, Debug, StructOpt)]
@@ -127,6 +135,9 @@ pub struct TaskExecuteOptions {
     /// The parameters of this api
     #[structopt(short, long, default_value = "")]
     pub param: Vec<String>,
+    /// The password to decrypt config if necessary
+    #[structopt(short, long)]
+    pub password: bool,
 }
 
 #[derive(Clone, Debug, StructOpt)]

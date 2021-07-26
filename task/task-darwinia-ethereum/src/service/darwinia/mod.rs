@@ -95,7 +95,6 @@ async fn start(
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
 ) -> anyhow::Result<()> {
     info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
-    let decrypt_password = state.get_task_config_password(DarwiniaEthereumTask::NAME)?;
 
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 

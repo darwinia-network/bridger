@@ -3,6 +3,8 @@ use bridge_traits::bridge::task::TaskTerminal;
 use crate::bus::DarwiniaEthereumBus;
 
 mod affirm;
+mod confirm;
+mod ecdsa;
 mod parcel;
 mod relay;
 mod starter;
@@ -18,6 +20,11 @@ pub async fn dispatch_route(
         "start-ethereum" => starter::start_ethereum(bus, param).await,
         "show-parcel" => parcel::show(bus, param).await,
         "affirm" => affirm::affirm(bus, param).await,
+        "affirm-force" => affirm::affirm_force(bus, param).await,
+        "affirm-raw" => affirm::affirm_raw(bus, param).await,
+        "affirmations" => affirm::affirmations(bus, param).await,
+        "confirm" => confirm::confirm(bus, param).await,
+        "ecdsa" => ecdsa::ecdsa(bus, param).await,
         _ => Ok(TaskTerminal::new("Unsupported command")),
     }
 }

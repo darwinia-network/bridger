@@ -4,7 +4,6 @@ use std::time::Duration;
 use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
-use postage::broadcast;
 use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -214,12 +213,15 @@ impl RelayHelper {
     }
 }
 
-pub async fn do_affirm(
+pub async fn do_affirm<S>(
     ethereum2darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
     target: u64,
-    mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-) -> anyhow::Result<()> {
+    mut sender_to_extrinsics: S,
+) -> anyhow::Result<()>
+where
+    S: lifeline::Sender<ToExtrinsicsMessage>,
+{
     // /////////////////////////
     // checking before affirm
     // /////////////////////////

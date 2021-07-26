@@ -5,6 +5,10 @@ use crate::bus::DarwiniaEthereumBus;
 mod affirm;
 mod confirm;
 mod ecdsa;
+mod guard;
+mod info;
+mod keys;
+mod mmr;
 mod parcel;
 mod relay;
 mod starter;
@@ -25,6 +29,9 @@ pub async fn dispatch_route(
         "affirmations" => affirm::affirmations(bus, param).await,
         "confirm" => confirm::confirm(bus, param).await,
         "ecdsa" => ecdsa::ecdsa(bus, param).await,
+        "info-d2e" => info::d2e(bus, param).await,
+        "keys" => keys::keys(bus, param).await,
+        "sign-mmr-root" => mmr::sign_mmr_root(bus, param).await,
         _ => Ok(TaskTerminal::new("Unsupported command")),
     }
 }

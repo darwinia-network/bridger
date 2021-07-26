@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 
 use microkv::MicroKV;
@@ -60,10 +59,12 @@ impl BridgeState {
         password: impl AsRef<str>,
         store: bool,
     ) -> anyhow::Result<()> {
+        let task = task.as_ref();
+        let password = password.as_ref();
         crate::keep::put_task_config_password(task, password)?;
         if store {
-            let key = format!("{}@password", param.name);
-            self.microkv().put(key, password.as_ref())?;
+            let key = format!("{}@password", task);
+            self.microkv().put(key, &password.to_string())?;
         }
         Ok(())
     }
@@ -72,10 +73,11 @@ impl BridgeState {
         task: impl AsRef<str>,
     ) -> anyhow::Result<Option<String>> {
         let task = task.as_ref();
-        Ok(self
-            .microkv()
-            .get(task)?
-            .unwrap_or_else(|| crate::keep::get_task_config_password(task)?))
+        let key = format!("{}@password", task);
+        match self.microkv().get(key)? {
+            Some(v) => Ok(Some(v)),
+            None => crate::keep::get_task_config_password(task),
+        }
     }
     pub fn get_task_config_password_unwrap_or_default(
         &self,

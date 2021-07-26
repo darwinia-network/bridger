@@ -82,7 +82,7 @@ pub async fn set_password(mut req: Request<Body>) -> anyhow::Result<Response<Bod
     let param: TaskSetPasswordParam = patch::hyper::deserialize_body(&mut req).await?;
     let task_name = param.name;
     if !support_keep::task::is_available_task(&task_name) {
-        return Err(StandardError::Api(format!("Not support this task [{}]", &param.name)).into());
+        return Err(StandardError::Api(format!("Not support this task [{}]", task_name)).into());
     }
     let state = support_keep::state::get_state_bridge_ok()?;
     state.put_task_config_password(task_name, param.password, param.store)?;

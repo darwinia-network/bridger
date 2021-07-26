@@ -19,7 +19,7 @@ use component_shadow::{Shadow, ShadowComponent};
 use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::D2ETaskConfig;
+use crate::config::TaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToGuardMessage};
 use crate::task::DarwiniaEthereumTask;
 
@@ -88,7 +88,7 @@ async fn start(
 
     // Config
     let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-    let servce_config: D2ETaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let servce_config: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
     // Darwinia client & account
     let darwinia = component_darwinia_subxt.component().await?;
@@ -96,7 +96,7 @@ async fn start(
     let account = DarwiniaAccount::new(
         config_darwinia.relayer_private_key_decrypt(
             state.get_task_config_password_unwrap_or_default(DarwiniaEthereumTask::NAME)?,
-        ),
+        )?,
         config_darwinia.relayer_real_account,
     );
     let guard_account = FromEthereumAccount::new(account);

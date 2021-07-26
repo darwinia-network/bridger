@@ -156,7 +156,7 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
         TaskCommand::SetPassword { name, store } => {
             let password = rpassword::prompt_password_stdout("Please enter password:")?;
             let param = TaskSetPasswordParam {
-                name,
+                name: name.clone(),
                 password,
                 store,
             };

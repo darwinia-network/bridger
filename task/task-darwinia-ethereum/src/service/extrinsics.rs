@@ -118,7 +118,7 @@ impl ExtrinsicsHelper {
         let account = DarwiniaAccount::new(
             config_darwinia.relayer_private_key_decrypt(
                 state.get_task_config_password_unwrap_or_default(DarwiniaEthereumTask::NAME)?,
-            ),
+            )?,
             config_darwinia.relayer_real_account,
         );
         let darwinia2ethereum_relayer = ToEthereumAccount::new(

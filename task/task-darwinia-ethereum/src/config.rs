@@ -12,7 +12,7 @@ pub struct DarwiniaEthereumConfig {
     pub web3: Web3Config,
     pub ethereum: EthereumConfig,
     pub shadow: ShadowConfig,
-    pub task: D2ETaskConfig,
+    pub task: TaskConfig,
     pub http_client: HttpClientConfig,
 }
 
@@ -33,14 +33,14 @@ impl DarwiniaEthereumConfig {
             web3: Web3Config::template(),
             ethereum: EthereumConfig::template(),
             shadow: ShadowConfig::template(),
-            task: D2ETaskConfig::template(),
+            task: TaskConfig::template(),
             http_client: HttpClientConfig::template(),
         }
     }
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, bridge_traits::BridgeCrypto)]
-pub struct D2ETaskConfig {
+pub struct TaskConfig {
     /// the config is enable crypto
     #[crypto(is_enable)]
     is_enable_crypto: bool,
@@ -54,14 +54,14 @@ pub struct D2ETaskConfig {
     pub interval_guard: u64,
 }
 
-impl BridgeConfig for D2ETaskConfig {
+impl BridgeConfig for TaskConfig {
     fn marker() -> &'static str {
         "service-substrate-ethereum"
     }
 
     fn template() -> Self {
         Self {
-            is_enable_crypto: bool,
+            is_enable_crypto: false,
             interval_ethereum: 120,
             interval_relay: 60,
             interval_redeem: 90,

@@ -13,7 +13,7 @@ pub async fn affirm(
     let block = param["block"]
         .as_u64()
         .ok_or_else(|| StandardError::Api("The `block` parameter is required".to_string()))?;
-    let password = param["password"].as_str().unwrap_or_else("");
+    let password = param["password"].as_str().unwrap_or_else(|| "");
 
     let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
     Ok(TaskTerminal::new("success"))

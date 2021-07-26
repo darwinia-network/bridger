@@ -2,8 +2,6 @@ use std::ffi::OsStr;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use lifeline::CarryFrom;
-
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::config::ConfigFormat;
 use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
@@ -133,11 +131,14 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
             let task_config = Config::load(&path_config)?;
             let mut task = DarwiniaEthereumTask::new(task_config, state_bridge.clone()).await?;
 
-            let linked_darwinia: &DarwiniaLinked =
-                support_keep::task::running_task_downcast_ref(DarwiniaLinked::NAME)?;
-            let carry = linked_darwinia.bus().carry_from(task.bus())?;
-            let stack = task.stack();
-            stack.carry(carry)?;
+            let linked_darwinia: &mut DarwiniaLinked =
+                support_keep::task::running_task_downcast_mut(DarwiniaLinked::NAME)?;
+
+            // let carry = linked_darwinia.bus().carry_from(task.bus())?;
+            // let stack = task.stack();
+            // stack.carry(carry)?;
+
+            linked_darwinia.stack().carry_from(task.stack())?;
 
             support_keep::task::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
         }

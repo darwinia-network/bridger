@@ -11,7 +11,6 @@ use crate::service::some::SomeService;
 
 #[derive(Debug)]
 pub struct TemplateLinked {
-    bus: TemplateLinkedBus,
     stack: TaskStack<TemplateLinkedBus>,
 }
 
@@ -28,16 +27,13 @@ impl BridgeTaskKeep for TemplateLinked {
         self
     }
     async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
-        crate::route::dispatch_route(&self.bus, uri, param).await
+        crate::route::dispatch_route(self.stack.bus(), uri, param).await
     }
 }
 
 impl BridgeTask<TemplateLinkedBus> for TemplateLinked {
     fn config_template() -> anyhow::Result<serde_json::Value> {
         Ok(serde_json::to_value(TemplateLinkedConfig::template())?)
-    }
-    fn bus(&self) -> &TemplateLinkedBus {
-        &self.bus
     }
 
     fn stack(&mut self) -> &mut TaskStack<TemplateLinkedBus> {
@@ -51,8 +47,8 @@ impl TemplateLinked {
         let bus = TemplateLinkedBus::default();
         bus.store_resource::<BridgeState>(state);
 
-        let mut stack = TaskStack::new();
-        stack.spawn_service::<SomeService>(&bus)?;
-        Ok(Self { bus, stack })
+        let mut stack = TaskStack::new(bus);
+        stack.spawn_service::<SomeService>()?;
+        Ok(Self { stack })
     }
 }

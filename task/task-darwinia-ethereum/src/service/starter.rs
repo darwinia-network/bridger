@@ -7,7 +7,7 @@ use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
 use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::D2ETaskConfig;
+use crate::config::TaskConfig;
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
 use crate::service::darwinia::DarwiniaService;
 use crate::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
@@ -30,7 +30,7 @@ impl Service for StarterService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // task config
-        let config_task: D2ETaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let config_task: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
         // State
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let mut tx_scan = bus.tx::<DarwiniaEthereumMessage>()?;
@@ -39,7 +39,7 @@ impl Service for StarterService {
             &format!("{}-service-starter", DarwiniaEthereumTask::NAME),
             async move {
                 if !config_task.is_enable_crypto() {
-                    return start_services(&mut tx_scan);
+                    return start_services(&mut tx_scan).await;
                 }
 
                 loop {
@@ -55,7 +55,7 @@ impl Service for StarterService {
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(timeout_secs)).await;
                 }
-                start_services(&mut tx_scan)
+                start_services(&mut tx_scan).await
             },
         );
         Ok(Self { _greet })
@@ -70,12 +70,12 @@ where
         support_keep::task::running_task_downcast_mut(DarwiniaEthereumTask::NAME)?;
     let stack = task.stack();
 
-    stack.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?;
-    stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?;
-    stack.spawn_service::<RedeemService>(&bus)?;
-    stack.spawn_service::<GuardService>(&bus)?;
-    stack.spawn_service::<DarwiniaService>(&bus)?;
-    stack.spawn_service::<ExtrinsicsService>(&bus)?;
+    stack.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>()?;
+    stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>()?;
+    stack.spawn_service::<RedeemService>()?;
+    stack.spawn_service::<GuardService>()?;
+    stack.spawn_service::<DarwiniaService>()?;
+    stack.spawn_service::<ExtrinsicsService>()?;
 
     tx_scan
         .send(DarwiniaEthereumMessage::Scan(EthereumScanMessage::Start))

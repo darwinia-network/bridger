@@ -120,6 +120,7 @@ pub enum TaskCommand {
         #[structopt(short, long)]
         name: String,
         /// Is store password to database. if store it, the next time will load this.
+        #[structopt(short, long)]
         store: bool,
     },
 }
@@ -136,7 +137,7 @@ pub struct TaskExecuteOptions {
     #[structopt(short, long, default_value = "")]
     pub param: Vec<String>,
     /// The password to decrypt config if necessary
-    #[structopt(short, long)]
+    #[structopt(short = "P", long)]
     pub password: bool,
 }
 

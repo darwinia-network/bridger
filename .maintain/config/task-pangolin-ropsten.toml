@@ -1,0 +1,55 @@
+[darwinia]
+# a offchain-indexing opening pangolin node
+endpoint = "wss://pangolin-rpc.darwinia.network"
+
+# private key of relayer, or, private key of proxy
+relayer_private_key = "0x..."
+# (optional) real account public key
+relayer_real_account = "0x..."
+
+# private key to sign ecdsa messages
+ecdsa_authority_private_key = "0x..."
+
+strict = false
+
+[web3]
+endpoint = "https://ropsten.infura.io/v3/<YOUR_KEY>"
+
+[ethereum]
+endpoint = [ "https://ropsten.infura.io/v3/<YOUR_KEY>" ]
+
+# below two need to be all setted if you want to do the relay job
+# (optional) the person who will relay darwinia data to ethereum
+relayer_private_key = "0x..."
+# (optional) the darwinia account public key who will get the reward
+relayer_beneficiary_darwinia_account = "0x..."
+
+# useless for now
+subscribe_ring_address = "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0"
+subscribe_kton_address = "0x1994100c58753793D52c6f457f189aa3ce9cEe94"
+
+# listen to gringotts bank cross-chain transfer
+subscribe_bank_address = "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e"
+subscribe_bank_topics = ["0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12"]
+
+# listen to ring/kton cross-chain transfer
+subscribe_issuing_address = "0x49262B932E439271d05634c32978294C7Ea15d0C"
+subscribe_issuing_topics = ["0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"]
+
+# listen to set authorities
+subscribe_relay_address = "0xd374292D512281b56198F0401b149370D680b89F"
+subscribe_relay_topics = ["0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f"]
+
+atom = 0
+
+[shadow]
+endpoint = "https://ropsten.shadow.darwinia.network"
+
+[service]
+interval_ethereum = 120
+interval_relay = 60
+interval_redeem = 90
+interval_guard = 30
+
+[http_client]
+timeout = 3000

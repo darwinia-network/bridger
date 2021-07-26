@@ -95,6 +95,7 @@ async fn start(
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
 ) -> anyhow::Result<()> {
     info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
+    let decrypt_password = state.get_task_config_password(DarwiniaEthereumTask::NAME)?;
 
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
@@ -111,7 +112,9 @@ async fn start(
     let darwinia = component_darwinia_subxt.component().await?;
     let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
     let account = DarwiniaAccount::new(
-        config_darwinia.relayer_private_key,
+        config_darwinia.relayer_private_key_decrypt(
+            state.get_task_config_password_unwrap_or_default(DarwiniaEthereumTask::NAME)?,
+        ),
         config_darwinia.relayer_real_account,
     );
     let account = ToEthereumAccount::new(

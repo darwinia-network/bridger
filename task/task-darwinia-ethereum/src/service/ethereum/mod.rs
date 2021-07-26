@@ -25,7 +25,7 @@ use ethereum_logs_handler::EthereumLogsHandler;
 use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::D2ETaskConfig;
 use crate::message::{ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
 use crate::task::DarwiniaEthereumTask;
 
@@ -173,7 +173,7 @@ async fn start(
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
 
     // Config
-    let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let servce_config: D2ETaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
     let ethereum_config: EthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
     let microkv = state.microkv();

@@ -1,0 +1,13 @@
+[darwinia]
+# a offchain-indexing opening darwinia node
+endpoint = "ws://127.0.0.1:9944"
+
+# private key of relayer, or, private key of proxy
+relayer_private_key = "0x..."
+# (optional) real account public key
+relayer_real_account = "0x..."
+
+# private key to sign ecdsa messages
+ecdsa_authority_private_key = "0x..."
+
+strict = false

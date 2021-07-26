@@ -41,10 +41,16 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
                 Some(path) => Some(tokio::fs::read_to_string(&path).await?),
                 None => None,
             };
+            let mut password = None;
+            if options.password {
+                password = Some(rpassword::prompt_password_stdout("Please enter password:")?);
+            }
             let param = TaskStartParam {
                 format,
                 name,
                 config: content,
+                password,
+                store_password: options.store_password,
             };
             let resp = reqwest::Client::builder()
                 .build()?

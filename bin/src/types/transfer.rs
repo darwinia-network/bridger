@@ -19,6 +19,8 @@ pub struct TaskStartParam {
     pub format: ConfigFormat,
     pub name: String,
     pub config: Option<String>,
+    pub password: Option<String>,
+    pub store_password: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

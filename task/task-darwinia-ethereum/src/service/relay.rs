@@ -19,7 +19,7 @@ use component_state::state::BridgeState;
 use support_ethereum::block::EthereumHeader;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::D2ETaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRelayMessage};
 use crate::task::DarwiniaEthereumTask;
 
@@ -41,7 +41,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         // Config
-        let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let servce_config: D2ETaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
         // State
         let state = bus.storage().clone_resource::<BridgeState>()?;

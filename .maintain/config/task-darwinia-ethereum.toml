@@ -45,7 +45,8 @@ atom = 0
 [shadow]
 endpoint = "https://shadow.darwinia.network"
 
-[service]
+[task]
+is_crypto_enable = false
 interval_ethereum = 120
 interval_relay = 60
 interval_redeem = 90

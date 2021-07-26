@@ -66,7 +66,7 @@ pub fn crypto(input: TokenStream) -> TokenStream {
         Some(ief) => {
             let ident_field_is_enable = ief.ident.clone().unwrap();
             quote! {
-                pub fn is_crypto_enable(&self) -> bool {
+                pub fn is_enable_crypto(&self) -> bool {
                     self.#ident_field_is_enable
                 }
             }

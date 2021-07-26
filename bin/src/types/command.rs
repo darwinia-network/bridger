@@ -151,6 +151,12 @@ pub struct TaskControlOptions {
     /// The config file path, When first run this is required, but the server already have this task config, can be skip this parameter
     #[structopt(short, long)]
     pub config: Option<PathBuf>,
+    /// The password to decrypt config if necessary
+    #[structopt(short, long)]
+    pub password: bool,
+    /// Store password to database.
+    #[structopt(long)]
+    pub store_password: bool,
 }
 
 #[derive(Clone, Debug, StructOpt)]

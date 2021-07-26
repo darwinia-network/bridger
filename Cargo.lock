@@ -8846,6 +8846,7 @@ dependencies = [
  "serde_json",
  "substrate-subxt",
  "support-ethereum",
+ "support-keep",
  "thiserror",
  "tokio 1.9.0",
  "web3",

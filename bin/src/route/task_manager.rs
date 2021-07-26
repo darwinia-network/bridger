@@ -52,6 +52,8 @@ pub async fn auto_start_task(base_path: PathBuf) -> anyhow::Result<()> {
                 })?,
                 name: task.clone(),
                 config: None,
+                password: None,
+                store_password: false,
             };
             start_task_single(base_path.clone(), param).await?;
         }
@@ -76,6 +78,8 @@ pub async fn auto_start_task(base_path: PathBuf) -> anyhow::Result<()> {
                 })?,
                 name: task.clone(),
                 config: None,
+                password: None,
+                store_password: false,
             };
             start_task_single(base_path.clone(), param).await?;
         }
@@ -108,6 +112,10 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
 
     let state_bridge = support_keep::state::get_state_bridge_ok()?;
 
+    // put task password
+    if let Some(password) = param.password {
+        state_bridge.put_task_config_password(name, password, param.store_password)?;
+    }
     match name {
         DarwiniaLinked::NAME => {
             let task_config = Config::load(&path_config)?;

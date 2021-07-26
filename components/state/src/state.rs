@@ -54,25 +54,34 @@ impl BridgeState {
     pub fn microkv(&self) -> &MicroKV {
         &self.microkv
     }
-    pub fn put_task_password(
+    pub fn put_task_config_password(
         &self,
         task: impl AsRef<str>,
         password: impl AsRef<str>,
         store: bool,
     ) -> anyhow::Result<()> {
-        crate::keep::put_task_password(task, password)?;
+        crate::keep::put_task_config_password(task, password)?;
         if store {
             let key = format!("{}@password", param.name);
             self.microkv().put(key, password.as_ref())?;
         }
         Ok(())
     }
-    pub fn get_task_password(&self, task: impl AsRef<str>) -> anyhow::Result<Option<String>> {
+    pub fn get_task_config_password(
+        &self,
+        task: impl AsRef<str>,
+    ) -> anyhow::Result<Option<String>> {
         let task = task.as_ref();
         Ok(self
             .microkv()
             .get(task)?
-            .unwrap_or_else(|| crate::keep::get_task_password(task)?))
+            .unwrap_or_else(|| crate::keep::get_task_config_password(task)?))
+    }
+    pub fn get_task_config_password_unwrap_or_default(
+        &self,
+        task: impl AsRef<str>,
+    ) -> anyhow::Result<String> {
+        Ok(self.get_task_config_password(task)?.unwrap_or_default())
     }
 }
 

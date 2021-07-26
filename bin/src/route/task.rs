@@ -85,6 +85,6 @@ pub async fn set_password(mut req: Request<Body>) -> anyhow::Result<Response<Bod
         return Err(StandardError::Api(format!("Not support this task [{}]", &param.name)).into());
     }
     let state = support_keep::state::get_state_bridge_ok()?;
-    state.put_task_password(task_name, param.password, param.store)?;
+    state.put_task_config_password(task_name, param.password, param.store)?;
     Resp::<String>::ok().response_json()
 }

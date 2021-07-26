@@ -46,8 +46,8 @@ component-http-client = { path = "../../components/http-client" }
 component-darwinia-subxt = { package = "component-darwinia-subxt", path = "../../components/client-darwinia-subxt" }
 
 support-ethereum = { path = "../../supports/support-ethereum" }
-
 evm-log-tracker = { path = "../../supports/evm-log-tracker" }
+support-keep = { path = "../../supports/support-keep" }
 
 tokio = { version = "1", features = ["full"] }
 

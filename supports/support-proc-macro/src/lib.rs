@@ -28,14 +28,10 @@ mod crypto;
 /// ```
 /// This will be expand to
 /// ```rust
-/// use support_proc_macro::BridgeCrypto;
-///
 /// pub struct Foo {
-///     // #[crypto(is_enable)]
 ///     enable: bool,
-///     // #[crypto(decrypt)]
+
 ///     name: String,
-///     // #[crypto(decrypt)]
 ///     country: String,
 ///     power_level: u64,
 /// }
@@ -77,9 +73,7 @@ mod crypto;
 /// use support_proc_macro::BridgeCrypto;
 ///
 /// pub struct Foo {
-///     // #[crypto(decrypt)]
 ///     name: String,
-///     // #[crypto(decrypt)]
 ///     country: String,
 ///     power_level: u64,
 /// }

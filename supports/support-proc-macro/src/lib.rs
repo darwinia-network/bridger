@@ -12,6 +12,8 @@ mod crypto;
 ///
 /// Example.
 /// ```rust
+/// use support_proc_macro::BridgeCrypto;
+///
 /// #[derive(BridgeCrypto)]
 /// pub struct Foo {
 ///     #[crypto(is_enable)]
@@ -26,14 +28,15 @@ mod crypto;
 /// ```
 /// This will be expand to
 /// ```rust
+/// use support_proc_macro::BridgeCrypto;
+///
 /// pub struct Foo {
-///     #[crypto(is_enable)]
+///     // #[crypto(is_enable)]
 ///     enable: bool,
-///     #[crypto(decrypt)]
+///     // #[crypto(decrypt)]
 ///     name: String,
-///     #[crypto(decrypt)]
+///     // #[crypto(decrypt)]
 ///     country: String,
-///     #[crypto(decrypt)]
 ///     power_level: u64,
 /// }
 /// impl Foo {
@@ -43,14 +46,14 @@ mod crypto;
 ///             return Ok(self.name.clone());
 ///         }
 ///         let crypto = bridge_primitives::crypto::Crypto::new();
-///         crypto.decrypt(password.as_ref(), &self.name)
+///         Ok(crypto.decrypt(password.as_ref(), &self.name)?)
 ///     }
 ///     pub fn country_decrypt(&self, password: impl AsRef<str>) -> anyhow::Result<String> {
 ///         if !self.enable {
 ///             return Ok(self.country.clone());
 ///         }
 ///         let crypto = bridge_primitives::crypto::Crypto::new();
-///         crypto.decrypt(password.as_ref(), &self.country)
+///         Ok(crypto.decrypt(password.as_ref(), &self.country)?)
 ///     }
 /// }
 /// ```
@@ -58,6 +61,8 @@ mod crypto;
 /// or without crypto is_enable
 ///
 /// ```rust
+/// use support_proc_macro::BridgeCrypto;
+///
 /// #[derive(BridgeCrypto)]
 /// pub struct Foo {
 ///     #[crypto(decrypt)]
@@ -69,23 +74,24 @@ mod crypto;
 /// ```
 /// This will be expand to
 /// ```rust
+/// use support_proc_macro::BridgeCrypto;
+///
 /// pub struct Foo {
-///     #[crypto(decrypt)]
+///     // #[crypto(decrypt)]
 ///     name: String,
-///     #[crypto(decrypt)]
+///     // #[crypto(decrypt)]
 ///     country: String,
-///     #[crypto(decrypt)]
 ///     power_level: u64,
 /// }
 /// impl Foo {
 ///     pub fn is_enable_crypto(&self) -> bool { true }
 ///     pub fn name_decrypt(&self, password: impl AsRef<str>) -> anyhow::Result<String> {
 ///         let crypto = bridge_primitives::crypto::Crypto::new();
-///         crypto.decrypt(password.as_ref(), &self.name)
+///         Ok(crypto.decrypt(password.as_ref(), &self.name)?)
 ///     }
 ///     pub fn country_decrypt(&self, password: impl AsRef<str>) -> anyhow::Result<String> {
 ///         let crypto = bridge_primitives::crypto::Crypto::new();
-///         crypto.decrypt(password.as_ref(), &self.country)
+///         Ok(crypto.decrypt(password.as_ref(), &self.country)?)
 ///     }
 /// }
 /// ```

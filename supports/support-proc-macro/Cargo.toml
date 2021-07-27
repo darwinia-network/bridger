@@ -27,3 +27,6 @@ proc-macro2 = "1"
 proc_macro_roids = "0.7.0"
 
 bridge-primitives = { path = "../../primitives" }
+
+[dev-dependencies]
+anyhow = "1"

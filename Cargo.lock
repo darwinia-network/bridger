@@ -8732,6 +8732,7 @@ dependencies = [
 name = "support-proc-macro"
 version = "0.3.3"
 dependencies = [
+ "anyhow",
  "bridge-primitives",
  "proc-macro2",
  "proc_macro_roids",

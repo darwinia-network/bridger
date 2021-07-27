@@ -1,4 +1,4 @@
-use lifeline::{Bus, CarryFrom, Sender};
+use lifeline::{Bus, Sender};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::BridgeTask;

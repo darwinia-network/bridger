@@ -32,6 +32,7 @@ pub async fn dispatch_route(
         "info-d2e" => info::d2e(bus, param).await,
         "keys" => keys::keys(bus, param).await,
         "sign-mmr-root" => mmr::sign_mmr_root(bus, param).await,
+        "guard" => guard::guard(bus, param).await,
         _ => Ok(TaskTerminal::new("Unsupported command")),
     }
 }

@@ -12,7 +12,7 @@ pub struct DarwiniaEthereumConfig {
     pub web3: Web3Config,
     pub ethereum: EthereumConfig,
     pub shadow: ShadowConfig,
-    pub service: SubstrateEthereumConfig,
+    pub task: TaskConfig,
     pub http_client: HttpClientConfig,
 }
 
@@ -23,7 +23,7 @@ impl DarwiniaEthereumConfig {
         Config::store(name, self.web3.clone())?;
         Config::store(name, self.ethereum.clone())?;
         Config::store(name, self.shadow.clone())?;
-        Config::store(name, self.service.clone())?;
+        Config::store(name, self.task.clone())?;
         Config::store(name, self.http_client.clone())?;
         Ok(())
     }
@@ -33,14 +33,17 @@ impl DarwiniaEthereumConfig {
             web3: Web3Config::template(),
             ethereum: EthereumConfig::template(),
             shadow: ShadowConfig::template(),
-            service: SubstrateEthereumConfig::template(),
+            task: TaskConfig::template(),
             http_client: HttpClientConfig::template(),
         }
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub struct SubstrateEthereumConfig {
+#[derive(Clone, Debug, Default, Serialize, Deserialize, bridge_traits::BridgeCrypto)]
+pub struct TaskConfig {
+    /// the config is enable crypto
+    #[crypto(is_enable)]
+    is_enable_crypto: bool,
     /// ethereum scan service polling interval in seconds
     pub interval_ethereum: u64,
     /// relay service polling interval in seconds
@@ -51,13 +54,14 @@ pub struct SubstrateEthereumConfig {
     pub interval_guard: u64,
 }
 
-impl BridgeConfig for SubstrateEthereumConfig {
+impl BridgeConfig for TaskConfig {
     fn marker() -> &'static str {
         "service-substrate-ethereum"
     }
 
     fn template() -> Self {
         Self {
+            is_enable_crypto: false,
             interval_ethereum: 120,
             interval_relay: 60,
             interval_redeem: 90,

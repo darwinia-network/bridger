@@ -4,7 +4,6 @@ use std::time::Duration;
 use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
-use postage::broadcast;
 use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -19,7 +18,7 @@ use component_state::state::BridgeState;
 use support_ethereum::block::EthereumHeader;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::TaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRelayMessage};
 use crate::task::DarwiniaEthereumTask;
 
@@ -41,7 +40,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         // Config
-        let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let servce_config: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
         // State
         let state = bus.storage().clone_resource::<BridgeState>()?;
@@ -214,12 +213,15 @@ impl RelayHelper {
     }
 }
 
-pub async fn do_affirm(
+pub async fn do_affirm<S>(
     ethereum2darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
     target: u64,
-    mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-) -> anyhow::Result<()> {
+    mut sender_to_extrinsics: S,
+) -> anyhow::Result<()>
+where
+    S: lifeline::Sender<ToExtrinsicsMessage>,
+{
     // /////////////////////////
     // checking before affirm
     // /////////////////////////

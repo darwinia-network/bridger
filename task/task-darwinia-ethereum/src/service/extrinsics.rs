@@ -116,7 +116,9 @@ impl ExtrinsicsHelper {
         let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
         let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
         let account = DarwiniaAccount::new(
-            config_darwinia.relayer_private_key,
+            config_darwinia.relayer_private_key_decrypt(
+                state.get_task_config_password_unwrap_or_default(DarwiniaEthereumTask::NAME)?,
+            )?,
             config_darwinia.relayer_real_account,
         );
         let darwinia2ethereum_relayer = ToEthereumAccount::new(

@@ -53,7 +53,8 @@ atom = 0
 # The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS. For example using the official service:
 endpoint = "https://shadow.darwinia.network"
 
-[service]
+[task]
+is_enable_crypto = false
 interval_ethereum = 120
 interval_relay = 60
 interval_redeem = 90

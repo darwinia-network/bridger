@@ -4,10 +4,10 @@ use microkv::MicroKV;
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::BridgeConfig;
-
-use crate::config::{BridgeStateConfig, MicrokvConfig};
 use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::error::BridgeResult;
+
+use crate::config::{BridgeStateConfig, MicrokvConfig};
 
 #[derive(Clone)]
 pub struct BridgeStateComponent {
@@ -52,6 +52,38 @@ lifeline::impl_storage_clone!(BridgeState);
 impl BridgeState {
     pub fn microkv(&self) -> &MicroKV {
         &self.microkv
+    }
+    pub fn put_task_config_password(
+        &self,
+        task: impl AsRef<str>,
+        password: impl AsRef<str>,
+        store: bool,
+    ) -> anyhow::Result<()> {
+        let task = task.as_ref();
+        let password = password.as_ref();
+        crate::keep::put_task_config_password(task, password)?;
+        if store {
+            let key = format!("{}@password", task);
+            self.microkv().put(key, &password.to_string())?;
+        }
+        Ok(())
+    }
+    pub fn get_task_config_password(
+        &self,
+        task: impl AsRef<str>,
+    ) -> anyhow::Result<Option<String>> {
+        let task = task.as_ref();
+        let key = format!("{}@password", task);
+        match self.microkv().get(key)? {
+            Some(v) => Ok(Some(v)),
+            None => crate::keep::get_task_config_password(task),
+        }
+    }
+    pub fn get_task_config_password_unwrap_or_default(
+        &self,
+        task: impl AsRef<str>,
+    ) -> anyhow::Result<String> {
+        Ok(self.get_task_config_password(task)?.unwrap_or_default())
     }
 }
 

@@ -8,7 +8,7 @@ use crate::patch;
 use crate::route::task_manager;
 use crate::types::server::Resp;
 use crate::types::transfer::{
-    TaskConfigTemplateParam, TaskListResponse, TaskStartParam, TaskStopParam,
+    TaskConfigTemplateParam, TaskListResponse, TaskSetPasswordParam, TaskStartParam, TaskStopParam,
 };
 
 /// Get task list
@@ -76,4 +76,15 @@ pub async fn task_config_template(mut req: Request<Body>) -> anyhow::Result<Resp
     let param: TaskConfigTemplateParam = patch::hyper::deserialize_body(&mut req).await?;
     let config_template = crate::route::task_manager::task_config_template(param)?;
     Resp::ok_with_data(config_template).response_json()
+}
+
+pub async fn set_password(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
+    let param: TaskSetPasswordParam = patch::hyper::deserialize_body(&mut req).await?;
+    let task_name = param.name;
+    if !support_keep::task::is_available_task(&task_name) {
+        return Err(StandardError::Api(format!("Not support this task [{}]", task_name)).into());
+    }
+    let state = support_keep::state::get_state_bridge_ok()?;
+    state.put_task_config_password(task_name, param.password, param.store)?;
+    Resp::<String>::ok().response_json()
 }

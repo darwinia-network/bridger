@@ -57,7 +57,12 @@ impl lifeline::Service for DarwiniaService {
                     let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
                     let cloned_sender_to_darwinia = sender_to_darwinia.clone();
                     tokio::spawn(async move {
-                        run(cloned_state, cloned_sender_to_extrinsics, cloned_sender_to_darwinia).await
+                        run(
+                            cloned_state,
+                            cloned_sender_to_extrinsics,
+                            cloned_sender_to_darwinia,
+                        )
+                        .await
                     });
                 }
                 Ok(())
@@ -70,7 +75,7 @@ impl lifeline::Service for DarwiniaService {
 async fn run(
     state: BridgeState,
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
-    mut sender_to_darwinia: postage::broadcast::Sender<ToDarwiniaMessage>
+    mut sender_to_darwinia: postage::broadcast::Sender<ToDarwiniaMessage>,
 ) {
     if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
         error!(
@@ -80,7 +85,8 @@ async fn run(
         sleep(Duration::from_secs(10)).await;
         sender_to_darwinia
             .send(ToDarwiniaMessage::Start)
-            .await.unwrap();
+            .await
+            .unwrap();
     }
 }
 
@@ -105,7 +111,9 @@ async fn start(
     let darwinia = component_darwinia_subxt.component().await?;
     let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
     let account = DarwiniaAccount::new(
-        config_darwinia.relayer_private_key,
+        config_darwinia.relayer_private_key_decrypt(
+            state.get_task_config_password_unwrap_or_default(DarwiniaEthereumTask::NAME)?,
+        )?,
         config_darwinia.relayer_real_account,
     );
     let account = ToEthereumAccount::new(

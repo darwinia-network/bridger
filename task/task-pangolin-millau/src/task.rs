@@ -14,7 +14,6 @@ use crate::service::relay::RelayService;
 
 #[derive(Debug)]
 pub struct PangolinMillauTask {
-    bus: PangolinMillauBus,
     stack: TaskStack<PangolinMillauBus>,
 }
 
@@ -31,16 +30,13 @@ impl BridgeTaskKeep for PangolinMillauTask {
         self
     }
     async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
-        crate::route::dispatch_route(&self.bus, uri, param).await
+        crate::route::dispatch_route(self.stack.bus(), uri, param).await
     }
 }
 
 impl BridgeTask<PangolinMillauBus> for PangolinMillauTask {
     fn config_template() -> anyhow::Result<serde_json::Value> {
         Ok(serde_json::to_value(PangolinMillauConfig::template())?)
-    }
-    fn bus(&self) -> &PangolinMillauBus {
-        &self.bus
     }
 
     fn stack(&mut self) -> &mut TaskStack<PangolinMillauBus> {
@@ -54,11 +50,11 @@ impl PangolinMillauTask {
 
         let bus = PangolinMillauBus::default();
 
-        let mut stack = TaskStack::new();
-        stack.spawn_service::<InitBridgeService>(&bus)?;
-        stack.spawn_service::<RelayService>(&bus)?;
+        let mut stack = TaskStack::new(bus);
+        stack.spawn_service::<InitBridgeService>()?;
+        stack.spawn_service::<RelayService>()?;
 
-        let mut sender = bus.tx::<PangolinMillauMessageSend>()?;
+        let mut sender = stack.bus().tx::<PangolinMillauMessageSend>()?;
         let relay_config: RelayConfig = Config::restore(Self::NAME)?;
         if relay_config.auto_start {
             sender
@@ -68,6 +64,6 @@ impl PangolinMillauTask {
                 .await?;
         }
 
-        Ok(Self { bus, stack })
+        Ok(Self { stack })
     }
 }

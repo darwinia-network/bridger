@@ -4,6 +4,7 @@ pub mod extrinsics;
 pub mod guard;
 pub mod redeem;
 pub mod relay;
+pub mod starter;
 
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;

@@ -1,4 +1,5 @@
 [darwinia]
+enable_crypto = false
 # a offchain-indexing opening darwinia node
 endpoint = "ws://127.0.0.1:9944"
 

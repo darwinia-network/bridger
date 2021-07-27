@@ -1,4 +1,5 @@
 [darwinia]
+enable_crypto = false
 # The WebSocket endpoint of any archive node (`darwinia --pruning=archive`) and enabling offchain-indexing, supports `ws://` and `wss://`.
 endpoint = "ws://127.0.0.1:9944"
 
@@ -54,7 +55,7 @@ atom = 0
 endpoint = "https://shadow.darwinia.network"
 
 [task]
-is_enable_crypto = false
+enable_crypto = false
 interval_ethereum = 120
 interval_relay = 60
 interval_redeem = 90

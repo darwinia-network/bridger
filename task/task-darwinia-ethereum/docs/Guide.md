@@ -47,11 +47,12 @@ When you got it. then update your config. change follow this.
 
 ```toml
 [darwinia]
+enable_crypto = true
 # private key of relayer, or, private key of proxy
 relayer_private_key = "<YOUR CRYPTED DATA>"
 # ...
 [task]
-is_enable_crypto = true
+enable_crypto = true
 interval_ethereum = 120
 interval_relay = 60
 # ...

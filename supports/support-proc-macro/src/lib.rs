@@ -30,7 +30,6 @@ mod crypto;
 /// ```rust
 /// pub struct Foo {
 ///     enable: bool,
-
 ///     name: String,
 ///     country: String,
 ///     power_level: u64,

@@ -919,8 +919,8 @@ dependencies = [
  "serde 1.0.126",
  "serde_json",
  "sp-keyring 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-subxt 0.15.2 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.15.2)",
- "substrate-subxt-proc-macro 0.15.2 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.15.2)",
+ "substrate-subxt 0.15.2",
+ "substrate-subxt-proc-macro 0.15.2",
  "support-ethereum",
  "thiserror",
  "web3",
@@ -1014,8 +1014,8 @@ dependencies = [
  "serde 1.0.126",
  "serde_json",
  "sp-keyring 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-subxt 0.15.2 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=metadata)",
- "substrate-subxt-proc-macro 0.15.2 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=metadata)",
+ "substrate-subxt 0.15.3",
+ "substrate-subxt-proc-macro 0.15.3",
  "support-ethereum",
  "thiserror",
  "web3",
@@ -8581,15 +8581,15 @@ dependencies = [
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-version 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-subxt-proc-macro 0.15.2 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.15.2)",
+ "substrate-subxt-proc-macro 0.15.2",
  "thiserror",
  "url 2.2.2",
 ]
 
 [[package]]
 name = "substrate-subxt"
-version = "0.15.2"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=metadata#23687fffc09c3649b8440202269d15b8d12134ca"
+version = "0.15.3"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=metadata#f744898db66733693b3772fe3f39edcb565a6155"
 dependencies = [
  "async-trait",
  "dyn-clone",
@@ -8613,7 +8613,7 @@ dependencies = [
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "substrate-subxt-proc-macro 0.15.2 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=metadata)",
+ "substrate-subxt-proc-macro 0.15.3",
  "thiserror",
  "url 2.2.2",
 ]
@@ -8635,8 +8635,8 @@ dependencies = [
 
 [[package]]
 name = "substrate-subxt-proc-macro"
-version = "0.15.2"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=metadata#23687fffc09c3649b8440202269d15b8d12134ca"
+version = "0.15.3"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=metadata#f744898db66733693b3772fe3f39edcb565a6155"
 dependencies = [
  "async-trait",
  "heck",
@@ -8837,7 +8837,7 @@ dependencies = [
  "secp256k1",
  "serde 1.0.126",
  "serde_json",
- "substrate-subxt 0.15.2 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.15.2)",
+ "substrate-subxt 0.15.2",
  "support-ethereum",
  "thiserror",
  "tokio 1.8.2",
@@ -8886,7 +8886,7 @@ dependencies = [
  "secp256k1",
  "serde 1.0.126",
  "serde_json",
- "substrate-subxt 0.15.2 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.15.2)",
+ "substrate-subxt 0.15.3",
  "support-ethereum",
  "thiserror",
  "tokio 1.8.2",

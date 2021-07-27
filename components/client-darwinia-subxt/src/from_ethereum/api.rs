@@ -50,7 +50,7 @@ impl Ethereum2Darwinia {
     pub async fn account_detail(&self, block_number: Option<u32>, account: &Account) -> Result<()> {
         log::info!("🧔 ethereum => darwinia account");
         let mut roles = self.darwinia.account_role(&account.0).await?;
-        if self.is_tech_comm_member(block_number, &account).await? {
+        if self.is_tech_comm_member(block_number, account).await? {
             roles.push("TechnicalCommittee".to_string());
         }
         match &account.0.real {
@@ -96,7 +96,7 @@ impl Ethereum2Darwinia {
         pending: u64,
         aye: bool,
     ) -> Result<H256> {
-        if self.is_tech_comm_member(None, &account).await? {
+        if self.is_tech_comm_member(None, account).await? {
             match &account.0.real {
                 Some(real) => {
                     // proxy

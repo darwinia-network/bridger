@@ -19,7 +19,7 @@ edition = "2018"
 
 
 [[bin]]
-name = "darwinia-bridger"
+name = "bridger"
 path = "src/main.rs"
 
 [dependencies]

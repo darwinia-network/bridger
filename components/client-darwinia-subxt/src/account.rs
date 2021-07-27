@@ -1,5 +1,8 @@
-use sp_keyring::sr25519::sr25519::Pair;
-use substrate_subxt::{sp_core::Pair as PairTrait, system::System, PairSigner};
+use substrate_subxt::{
+    sp_core::{sr25519::Pair, Pair as PairTrait},
+    system::System,
+    PairSigner,
+};
 
 use crate::darwinia::runtime::DarwiniaRuntime;
 

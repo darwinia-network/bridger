@@ -31,7 +31,6 @@ jsonrpsee-types = "=0.2.0-alpha.6"
 jsonrpsee-ws-client = "=0.2.0-alpha.6"
 jsonrpsee-http-client = "=0.2.0-alpha.6"
 
-sp-keyring = "3.0.0"
 codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive", "full"] }
 web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 secp256k1 = { version = "0.20", features = ["recovery"] }

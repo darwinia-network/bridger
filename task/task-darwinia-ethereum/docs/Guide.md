@@ -92,6 +92,8 @@ or without password to start. then run `set-password` command.
 
 ```bash
 ./target/release/bridger task exec --name task-darwinia-darwinia --api start-darwinia
+
+# If you hit the error `No darwinia scan start`, the block number is the start point Darwinia to Ethereum bridge launched at:
 ./target/release/bridger task exec --name task-darwinia-darwinia --api start-darwinia --param block_number=4230622
 ```
 
@@ -275,3 +277,17 @@ or without password to start. then run `set-password` command.
   --param block_number=2354684
 ```
 
+**For users who want to relay messages from Darwinia to Ethereum, you must request to become a member of the authority set first**:
+
+1. Open [Extrinsics in apps.darwinia.network](https://apps.darwinia.network/#/extrinsics)
+2. If you're not using a proxy account or you have the permission to sign extrinsics using the "real" account, switch to the "real" account and submit `ethereumRelayAuthorities.requestAuthority(stake_amount, signer)`:
+   - `stake_amount` is the amount of RINGs to stake.
+   - `signer` is the public key of your **Ethereum** account.
+     Otherwise, you must switch to your proxy account and submit `proxy.proxy(real_account, ethereumRelayAuthorities.requestAuthority(stake_amount, signer))`. The `stake_amount` will be deducted from your "real" account.
+3. Notify council members to submit `ethereumRelayAuthorities.addAuthority(your_account)`.
+
+> How it works: authorities are the validators/nodes in the source chain consensus system to resolve Byzantine Generals' Problem and finalize the blocks. Grandpa authorities are BFT alike authorities, our authority concept comes from the similar meaning, is to be used as a replacement for grandpa authorites.
+>
+> Updating the authority set involves 2 times of cross-chain: 1) relay the new authority set from Darwinia to Ethereum; 2) relay from Ethereum to Darwinia to send rewards to `ethereum.relayer_beneficiary_darwinia_account` (see below).
+
+Comment out if you don't want to relay authorities change messages to Ethereum (which sends transactions on Ethereum and consumes gas fee), and of course, you will not get rewards.

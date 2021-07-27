@@ -13,7 +13,7 @@ pub async fn show(
     let output = param["output"]
         .as_str()
         .map(|item| item.to_lowercase())
-        .unwrap_or("raw".to_string());
+        .unwrap_or_else(|| "raw".to_string());
     let block = param["block"]
         .as_u64()
         .ok_or_else(|| StandardError::Api("The `block` parameter is required".to_string()))?;

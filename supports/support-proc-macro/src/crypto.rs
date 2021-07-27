@@ -5,7 +5,8 @@ use proc_macro_roids::{DeriveInputStructExt, FieldExt}; // IdentExt
 use quote::quote;
 use syn::{parse_macro_input, parse_quote, DeriveInput, Ident};
 
-// #[proc_macro_derive(BridgeCrypto, attributes(crypto))]
+// #[proc_macro_derive(BridgeCrypto, attributes(crypto))] // develop test only
+#[allow(clippy::cmp_owned)]
 pub fn crypto(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let struct_name = ast.ident.clone();

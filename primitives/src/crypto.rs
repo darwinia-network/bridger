@@ -10,6 +10,12 @@ pub struct Crypto {
     salt: [u8; 16],
 }
 
+impl Default for Crypto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Crypto {
     pub fn new() -> Self {
         Self::new_with_salt([0; 16])
@@ -46,9 +52,7 @@ impl Crypto {
             );
 
             match result {
-                Err(_) => {
-                    return Err(BridgeBasicError::Crypto("Encryption failed".to_string()).into())
-                }
+                Err(_) => return Err(BridgeBasicError::Crypto("Encryption failed".to_string())),
                 Ok(BufferResult::BufferUnderflow) => break,
                 Ok(BufferResult::BufferOverflow) => {}
             }
@@ -82,7 +86,7 @@ impl Crypto {
             match result {
                 Err(e) => {
                     log::error!("[{:?}] please check your password", e);
-                    return Err(BridgeBasicError::Crypto("Decryption failed".to_string()).into());
+                    return Err(BridgeBasicError::Crypto("Decryption failed".to_string()));
                 }
                 Ok(BufferResult::BufferUnderflow) => break,
                 Ok(BufferResult::BufferOverflow) => {}

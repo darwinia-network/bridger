@@ -37,7 +37,7 @@ mod crypto;
 ///     power_level: u64,
 /// }
 /// impl Foo {
-///     pub fn is_crypto_enable(&self) -> bool { self.enable }
+///     pub fn is_enable_crypto(&self) -> bool { self.enable }
 ///     pub fn name_decrypt(&self, password: impl AsRef<str>) -> anyhow::Result<String> {
 ///         if !self.enable {
 ///             return Ok(self.name.clone());
@@ -78,7 +78,7 @@ mod crypto;
 ///     power_level: u64,
 /// }
 /// impl Foo {
-///     pub fn is_crypto_enable(&self) -> bool { true }
+///     pub fn is_enable_crypto(&self) -> bool { true }
 ///     pub fn name_decrypt(&self, password: impl AsRef<str>) -> anyhow::Result<String> {
 ///         let crypto = bridge_primitives::crypto::Crypto::new();
 ///         crypto.decrypt(password.as_ref(), &self.name)

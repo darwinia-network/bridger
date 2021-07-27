@@ -72,7 +72,7 @@ pub fn crypto(input: TokenStream) -> TokenStream {
             }
         }
         None => quote! {
-            pub fn is_crypto_enable(&self) -> bool { true }
+            pub fn is_enable_crypto(&self) -> bool { true }
         },
     };
 

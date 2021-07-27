@@ -291,3 +291,12 @@ or without password to start. then run `set-password` command.
 > Updating the authority set involves 2 times of cross-chain: 1) relay the new authority set from Darwinia to Ethereum; 2) relay from Ethereum to Darwinia to send rewards to `ethereum.relayer_beneficiary_darwinia_account` (see below).
 
 Comment out if you don't want to relay authorities change messages to Ethereum (which sends transactions on Ethereum and consumes gas fee), and of course, you will not get rewards.
+
+
+### guard
+
+**examples**
+
+```bash
+./target/release/bridger task exec --name task-darwinia-ethereum --api guard
+```

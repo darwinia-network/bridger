@@ -650,33 +650,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridger-entrypoint"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "async-recursion",
- "bridge-traits",
- "colored",
- "component-state",
- "dirs",
- "env_logger 0.8.4",
- "hyper 0.14.10",
- "lifeline",
- "linked-darwinia",
- "log",
- "microkv",
- "reqwest 0.11.4",
- "routerify",
- "serde 1.0.126",
- "serde_json",
- "structopt",
- "support-keep",
- "task-darwinia-ethereum",
- "task-pangolin-millau",
- "tokio 1.8.2",
-]
-
-[[package]]
 name = "bs58"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1286,6 +1259,33 @@ dependencies = [
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+]
+
+[[package]]
+name = "darwinia-bridger"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "async-recursion",
+ "bridge-traits",
+ "colored",
+ "component-state",
+ "dirs",
+ "env_logger 0.8.4",
+ "hyper 0.14.10",
+ "lifeline",
+ "linked-darwinia",
+ "log",
+ "microkv",
+ "reqwest 0.11.4",
+ "routerify",
+ "serde 1.0.126",
+ "serde_json",
+ "structopt",
+ "support-keep",
+ "task-darwinia-ethereum",
+ "task-pangolin-millau",
+ "tokio 1.8.2",
 ]
 
 [[package]]

@@ -1,10 +1,15 @@
 [darwinia]
-# a offchain-indexing opening darwinia node
+# The WebSocket endpoint of any archive node (`darwinia --pruning=archive`) and enabling offchain-indexing, supports `ws://` and `wss://`.
 endpoint = "ws://127.0.0.1:9944"
 
+# Private key in hex of your account or proxy account to sign relay extrinsics. It is highly recommended to use a proxy account to prevent exposing your main account's private key.
+# Proxy account is an account that can "perform" on behalf of your "real" account.
+# To allow an account proxying extrinsics, you need to open [Extrinsics in apps.darwinia.network](https://apps.darwinia.network/#/extrinsics), switch to your "real" account, and submit the `proxy.addProxy(proxy_account, ProxyType.EthereumBridge, 0)` extrinsic to delegate it.
 # private key of relayer, or, private key of proxy
+# Here is a [tool](https://polkadot.subscan.io/tools/ss58_transform) provided by Subscan that helps convert SS58 addresses to public keys.
 relayer_private_key = "0x..."
 # (optional) real account public key
+# If you set `seed` to the private key of your proxy account, you have to set this to the public key of your "real" account as well.
 relayer_real_account = "0x..."
 
 # private key to sign ecdsa messages
@@ -16,6 +21,8 @@ strict = false
 endpoint = "https://mainnet.infura.io/v3/<YOUR_KEY>"
 
 [ethereum]
+# The endpoint of Ethereum RPC. You can use the public geth hosted by Darwinia, your self-hosted node, or any third-party Ethereum RPC service, such as Infura and Alchemy. For example:
+# https://mainnet.geth.darwinia.network
 endpoint = [ "https://mainnet.infura.io/v3/<YOUR_KEY>" ]
 
 # below two need to be all setted if you want to do the relay job
@@ -43,6 +50,7 @@ subscribe_relay_topics = ["0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b2
 atom = 0
 
 [shadow]
+# The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS. For example using the official service:
 endpoint = "https://shadow.darwinia.network"
 
 [service]

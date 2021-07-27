@@ -1,6 +1,6 @@
 [package]
-name = "bridger-entrypoint"
-version = "0.3.3"
+name = "darwinia-bridger"
+version = "0.4.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -19,7 +19,7 @@ edition = "2018"
 
 
 [[bin]]
-name = "darwinia-bridger"
+name = "bridger"
 path = "src/main.rs"
 
 [dependencies]

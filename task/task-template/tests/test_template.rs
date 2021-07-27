@@ -1,4 +1,4 @@
-use lifeline::{Bus, CarryFrom, Sender};
+use lifeline::{Bus, Sender};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::BridgeTask;
@@ -33,26 +33,32 @@ async fn test_task() {
     let config_linked = TemplateLinkedConfig {
         http_client: HttpClientConfig { timeout: 1000 },
     };
-    let linked =
+    let mut linked =
         TemplateLinked::new(config_linked, state.clone()).expect("failed to create linked");
 
     let config_task = TemplateTaskConfig {
         http_client: HttpClientConfig { timeout: 1000 },
     };
     let mut task = TemplateTask::new(config_task, state.clone()).expect("failed to create task");
-
-    let bus_template = task.bus();
+    let stack_task = task.stack();
+    let bus_template = stack_task.bus();
 
     let mut tx = bus_template
         .tx::<TemplateTaskMessage>()
         .expect("failed to get sender");
 
-    let carry = linked
-        .bus()
-        .carry_from(bus_template)
-        .expect("failed to carry from template task");
-    task.stack()
-        .carry(carry)
+    // linked.stack().bus().carry_from()
+    // let carry = linked
+    //     .bus()
+    //     .carry_from(bus_template)
+    //     .expect("failed to carry from template task");
+    // task.stack()
+    //     .carry(carry)
+    //     .expect("failed to linked carry template");
+
+    linked
+        .stack()
+        .carry_from(stack_task)
         .expect("failed to linked carry template");
 
     tx.send(TemplateTaskMessage::SomeEvent)

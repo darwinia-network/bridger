@@ -1,6 +1,6 @@
 [package]
 name = "bridge-traits"
-version = "0.3.3"
+version = "0.4.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -33,6 +33,8 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 toml = "0.5"
 serde_yaml = "0.8"
+
+support-proc-macro = { path = "../supports/support-proc-macro" }
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 

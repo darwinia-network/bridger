@@ -1,6 +1,6 @@
 [package]
 name = "bridge-primitives"
-version = "0.3.3"
+version = "0.4.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -18,9 +18,13 @@ readme = 'README.md'
 edition = "2018"
 
 [dependencies]
-
+log = "0.4"
+thiserror = "1.0"
 uint = "0.8.5"
 rlp = "0.4.4"
 
 serde = { version = "1", features = ["derive"] }
 codec = { package = "parity-scale-codec", version = "2.1", features = ["derive", "full"] }
+
+rust-crypto = "0.2"
+base64 = "0.13"

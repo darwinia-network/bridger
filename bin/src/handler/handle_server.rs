@@ -54,7 +54,7 @@ async fn start_webserver(options: ServerOptions) -> anyhow::Result<()> {
 
     let server = Server::bind(&addr).serve(service);
 
-    log::info!("darwinia-bridger is running on: {}", addr);
+    log::info!("bridger is running on: {}", addr);
     if let Err(err) = server.await {
         log::error!("Server error: {}", err);
     }
@@ -73,6 +73,7 @@ async fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
         .post("/task/stop", route::task::task_stop)
         .post("/task/config-template", route::task::task_config_template)
         .post("/task/:task_name/:task_route", route::task::task_route)
+        .post("/task/set-password", route::task::set_password)
         .post("/kv/put", route::kv::put)
         .post("/kv/get", route::kv::get)
         .post("/kv/list", route::kv::list)

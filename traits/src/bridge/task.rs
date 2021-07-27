@@ -1,7 +1,6 @@
 use std::any::Any;
 use std::collections::HashMap;
 use std::fmt::Debug;
-use std::marker::PhantomData;
 
 use serde::{Deserialize, Serialize};
 
@@ -13,8 +12,6 @@ pub trait BridgeSand {
 
 pub trait BridgeTask<B: lifeline::Bus>: BridgeSand + BridgeTaskKeep {
     fn config_template() -> anyhow::Result<serde_json::Value>;
-
-    fn bus(&self) -> &B;
     fn stack(&mut self) -> &mut TaskStack<B>;
 }
 
@@ -46,16 +43,23 @@ impl TaskTerminal {
 pub struct TaskStack<B: lifeline::Bus> {
     services: HashMap<String, Box<dyn BridgeService + Send + Sync>>,
     carries: Vec<lifeline::Lifeline>,
-    _marker: PhantomData<fn() -> B>,
+    bus: B,
 }
 
 impl<B: lifeline::Bus> TaskStack<B> {
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(bus: B) -> Self {
+        Self {
+            services: Default::default(),
+            carries: Default::default(),
+            bus,
+        }
     }
 }
 
 impl<B: lifeline::Bus> TaskStack<B> {
+    pub fn bus(&self) -> &B {
+        &self.bus
+    }
     pub fn spawn_service<
         S: lifeline::Service<Bus = B, Lifeline = anyhow::Result<S>>
             + BridgeService
@@ -64,10 +68,9 @@ impl<B: lifeline::Bus> TaskStack<B> {
             + 'static,
     >(
         &mut self,
-        bus: &B,
     ) -> anyhow::Result<()> {
         let type_name = std::any::type_name::<S>();
-        let service = Box::new(S::spawn(bus)?);
+        let service = Box::new(S::spawn(&self.bus)?);
         self.services.insert(type_name.to_string(), service);
         Ok(())
     }
@@ -89,15 +92,24 @@ impl<B: lifeline::Bus> TaskStack<B> {
             + 'static,
     >(
         &mut self,
-        bus: &B,
     ) -> anyhow::Result<()> {
         // keep it until leave this block
         let _ = self.stop_service::<S>();
-        self.spawn_service::<S>(bus)
+        self.spawn_service::<S>()
     }
 
-    pub fn carry(&mut self, lifeline: lifeline::Lifeline) -> anyhow::Result<()> {
+    pub fn carry_from<CY: lifeline::Bus>(&mut self, other: &TaskStack<CY>) -> anyhow::Result<()>
+    where
+        B: lifeline::Bus
+            + lifeline::prelude::CarryFrom<CY, Lifeline = anyhow::Result<lifeline::Lifeline>>,
+    {
+        let lifeline = self.bus.carry_from(&other.bus)?;
         self.carries.push(lifeline);
         Ok(())
     }
+
+    // pub fn carry(&mut self, lifeline: lifeline::Lifeline) -> anyhow::Result<()> {
+    //     self.carries.push(lifeline);
+    //     Ok(())
+    // }
 }

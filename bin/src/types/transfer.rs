@@ -19,6 +19,8 @@ pub struct TaskStartParam {
     pub format: ConfigFormat,
     pub name: String,
     pub config: Option<String>,
+    pub password: Option<String>,
+    pub store_password: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -37,6 +39,13 @@ pub struct TaskConfigTemplateParam {
     pub name: String,
     #[serde(default = "default_config_format")]
     pub format: ConfigFormat,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct TaskSetPasswordParam {
+    pub name: String,
+    pub password: String,
+    pub store: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

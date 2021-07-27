@@ -1,6 +1,6 @@
 [package]
 name = "component-darwinia-subxt"
-version = "0.3.3"
+version = "0.4.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -44,3 +44,4 @@ pallet-im-online = "3.0.0"
 
 bridge-traits = { path = "../../traits" }
 support-ethereum = { path = "../../supports/support-ethereum" }
+bridge-primitives = { path = "../../primitives" }

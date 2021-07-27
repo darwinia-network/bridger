@@ -8,7 +8,7 @@ use bridge_traits::error::StandardError;
 use crate::types::command::TaskCommand;
 use crate::types::server::Resp;
 use crate::types::transfer::{
-    TaskConfigTemplateParam, TaskListResponse, TaskStartParam, TaskStopParam,
+    TaskConfigTemplateParam, TaskListResponse, TaskSetPasswordParam, TaskStartParam, TaskStopParam,
 };
 
 #[allow(clippy::manual_map)]
@@ -41,10 +41,16 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
                 Some(path) => Some(tokio::fs::read_to_string(&path).await?),
                 None => None,
             };
+            let mut password = None;
+            if options.password {
+                password = Some(rpassword::prompt_password_stdout("Please enter password:")?);
+            }
             let param = TaskStartParam {
                 format,
                 name,
                 config: content,
+                password,
+                store_password: options.store_password,
             };
             let resp = reqwest::Client::builder()
                 .build()?
@@ -106,6 +112,10 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
                     .ok_or_else(|| StandardError::Api("The param value is required".to_string()))?;
                 req_body.insert(param_name.to_string(), param_value.to_string());
             }
+            if options.password {
+                let password = rpassword::prompt_password_stdout("Please enter password:")?;
+                req_body.insert("password".to_string(), password);
+            }
             let url = format!("{}/task/{}/{}", server, options.name, options.api);
             let resp = reqwest::Client::builder()
                 .build()?
@@ -141,6 +151,30 @@ pub async fn handle_task(server: String, command: TaskCommand) -> anyhow::Result
             match resp.data() {
                 Some(v) => println!("{}", v),
                 None => println!("Not have default template"),
+            }
+        }
+        TaskCommand::SetPassword { name, store } => {
+            let password = rpassword::prompt_password_stdout("Please enter password:")?;
+            let param = TaskSetPasswordParam {
+                name: name.clone(),
+                password,
+                store,
+            };
+            let resp = reqwest::Client::builder()
+                .build()?
+                .post(format!("{}/task/set-password", server))
+                .json(&param)
+                .send()
+                .await?
+                .json::<Resp<String>>()
+                .await?;
+            if resp.is_err() {
+                eprintln!("{}", resp.msg());
+                return Ok(());
+            }
+            match resp.data() {
+                Some(v) => println!("{}", v),
+                None => println!("Failed to set password for task {}", name),
             }
         }
     };

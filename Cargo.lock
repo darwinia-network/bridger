@@ -600,11 +600,15 @@ dependencies = [
 
 [[package]]
 name = "bridge-primitives"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
+ "base64 0.13.0",
+ "log",
  "parity-scale-codec",
  "rlp 0.4.6",
+ "rust-crypto",
  "serde 1.0.126",
+ "thiserror",
  "uint 0.8.5",
 ]
 
@@ -631,7 +635,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-traits"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -645,36 +649,9 @@ dependencies = [
  "serde_yaml",
  "strum 0.21.0",
  "strum_macros 0.21.1",
+ "support-proc-macro",
  "thiserror",
  "toml",
-]
-
-[[package]]
-name = "bridger-entrypoint"
-version = "0.3.3"
-dependencies = [
- "anyhow",
- "async-recursion",
- "bridge-traits",
- "colored",
- "component-state",
- "dirs",
- "env_logger 0.8.4",
- "hyper 0.14.11",
- "lifeline",
- "linked-darwinia",
- "log",
- "microkv",
- "reqwest 0.11.4",
- "routerify",
- "serde 1.0.126",
- "serde_json",
- "structopt",
- "support-keep",
- "task-darwinia-ethereum",
- "task-pangolin-millau",
- "task-pangolin-ropsten",
- "tokio 1.9.0",
 ]
 
 [[package]]
@@ -886,7 +863,7 @@ dependencies = [
 
 [[package]]
 name = "component-darwinia"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -901,11 +878,12 @@ dependencies = [
 
 [[package]]
 name = "component-darwinia-subxt"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "array-bytes",
  "async-trait",
+ "bridge-primitives",
  "bridge-traits",
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "jsonrpsee-http-client",
@@ -927,7 +905,7 @@ dependencies = [
 
 [[package]]
 name = "component-ethereum"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -944,7 +922,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -956,7 +934,7 @@ dependencies = [
 
 [[package]]
 name = "component-millau"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "bridge-traits",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -975,7 +953,7 @@ dependencies = [
 
 [[package]]
 name = "component-pangolin"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "bridge-traits",
  "darwinia-ethereum-relay",
@@ -1021,7 +999,7 @@ dependencies = [
 
 [[package]]
 name = "component-shadow"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1037,7 +1015,7 @@ dependencies = [
 
 [[package]]
 name = "component-state"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1045,6 +1023,7 @@ dependencies = [
  "lifeline",
  "log",
  "microkv",
+ "once_cell",
  "serde 1.0.126",
 ]
 
@@ -1312,6 +1291,36 @@ dependencies = [
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+]
+
+[[package]]
+name = "darwinia-bridger"
+version = "0.4.0"
+dependencies = [
+ "anyhow",
+ "async-recursion",
+ "bridge-primitives",
+ "bridge-traits",
+ "colored",
+ "component-state",
+ "dirs",
+ "env_logger 0.8.4",
+ "hyper 0.14.11",
+ "lifeline",
+ "linked-darwinia",
+ "log",
+ "microkv",
+ "reqwest 0.11.4",
+ "routerify",
+ "rpassword",
+ "serde 1.0.126",
+ "serde_json",
+ "structopt",
+ "support-keep",
+ "task-darwinia-ethereum",
+ "task-pangolin-millau",
+ "task-pangolin-ropsten",
+ "tokio 1.9.0",
 ]
 
 [[package]]
@@ -2280,7 +2289,7 @@ dependencies = [
 
 [[package]]
 name = "evm-log-tracker"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "array-bytes",
@@ -2823,6 +2832,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fuchsia-cprng"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
+
+[[package]]
 name = "fuchsia-zircon"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2966,6 +2981,12 @@ dependencies = [
  "proc-macro-nested",
  "slab",
 ]
+
+[[package]]
+name = "gcc"
+version = "0.3.55"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f5f3913fa0bfe7ee1fd8248b6b9f42a5af4b9d65ec2dd2c3c26132b950ecfc2"
 
 [[package]]
 name = "generic-array"
@@ -3975,7 +3996,7 @@ dependencies = [
 
 [[package]]
 name = "linked-darwinia"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -3997,7 +4018,7 @@ checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
 
 [[package]]
 name = "linked-template"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -5795,6 +5816,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "proc_macro_roids"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06675fa2c577f52bcf77fbb511123927547d154faa08097cc012c66ec3c9611a"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "prometheus"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5882,6 +5914,29 @@ checksum = "643f8f41a8ebc4c5dc4515c82bb8abd397b527fc20fd681b7c011c2aee5d44fb"
 
 [[package]]
 name = "rand"
+version = "0.3.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64ac302d8f83c0c1974bf758f6b041c6c8ada916fbb44a609158ca8b064cc76c"
+dependencies = [
+ "libc",
+ "rand 0.4.6",
+]
+
+[[package]]
+name = "rand"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "552840b97013b1a26992c11eac34bdd778e464601a4c2054b5f0bff7c6761293"
+dependencies = [
+ "fuchsia-cprng",
+ "libc",
+ "rand_core 0.3.1",
+ "rdrand",
+ "winapi 0.3.9",
+]
+
+[[package]]
+name = "rand"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a6b1679d49b24bbfe0c803429aa1874472f50d9b363131f0e89fc356b544d03"
@@ -5925,6 +5980,21 @@ dependencies = [
  "ppv-lite86",
  "rand_core 0.6.3",
 ]
+
+[[package]]
+name = "rand_core"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a6fdeb83b075e8266dcc8762c22776f6877a63111121f5f8c7411e5be7eed4b"
+dependencies = [
+ "rand_core 0.4.2",
+]
+
+[[package]]
+name = "rand_core"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c33a3c44ca05fa6f1807d8e6743f3824e8509beca625669633be0acbdf509dc"
 
 [[package]]
 name = "rand_core"
@@ -6010,6 +6080,15 @@ dependencies = [
  "crossbeam-utils",
  "lazy_static",
  "num_cpus",
+]
+
+[[package]]
+name = "rdrand"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "678054eb77286b51581ba43620cc911abf02758c91f93f479767aed0f90458b2"
+dependencies = [
+ "rand_core 0.3.1",
 ]
 
 [[package]]
@@ -6287,6 +6366,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "rpassword"
+version = "5.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ffc936cf8a7ea60c58f030fd36a612a48f440610214dc54bc36431f9ea0c3efb"
+dependencies = [
+ "libc",
+ "winapi 0.3.9",
+]
+
+[[package]]
+name = "rust-crypto"
+version = "0.2.36"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f76d05d3993fd5f4af9434e8e436db163a12a9d40e1a58a726f27a01dfd12a2a"
+dependencies = [
+ "gcc",
+ "libc",
+ "rand 0.3.23",
+ "rustc-serialize",
+ "time 0.1.43",
+]
+
+[[package]]
 name = "rust-ini"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6309,6 +6411,12 @@ name = "rustc-hex"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3e75f6a532d0fd9f7f13144f392b6ad56a32696bfcd9c78f797f16bbb6f072d6"
+
+[[package]]
+name = "rustc-serialize"
+version = "0.3.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 
 [[package]]
 name = "rustc_version"
@@ -8702,7 +8810,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "support-ethereum"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "bridge-primitives",
@@ -8718,7 +8826,7 @@ dependencies = [
 
 [[package]]
 name = "support-keep"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "bridge-traits",
@@ -8731,8 +8839,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "support-proc-macro"
+version = "0.4.0"
+dependencies = [
+ "anyhow",
+ "bridge-primitives",
+ "proc-macro2",
+ "proc_macro_roids",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "support-s2s"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-std",
@@ -8822,13 +8942,14 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "task-darwinia-ethereum"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "array-bytes",
  "async-recursion",
  "async-trait",
  "bridge-traits",
+ "colored",
  "component-darwinia-subxt",
  "component-ethereum",
  "component-http-client",
@@ -8840,6 +8961,7 @@ dependencies = [
  "linked-darwinia",
  "log",
  "microkv",
+ "parity-scale-codec",
  "postage",
  "reqwest 0.10.10",
  "secp256k1",
@@ -8847,6 +8969,7 @@ dependencies = [
  "serde_json",
  "substrate-subxt 0.15.2",
  "support-ethereum",
+ "support-keep",
  "thiserror",
  "tokio 1.9.0",
  "web3",
@@ -8854,7 +8977,7 @@ dependencies = [
 
 [[package]]
 name = "task-pangolin-millau"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8903,7 +9026,7 @@ dependencies = [
 
 [[package]]
 name = "task-template"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",

@@ -25,7 +25,7 @@ use ethereum_logs_handler::EthereumLogsHandler;
 use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::TaskConfig;
 use crate::message::{ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
 use crate::task::DarwiniaEthereumTask;
 
@@ -120,7 +120,13 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                     let cloned_sender_to_redeem = sender_to_redeem.clone();
                     let cloned_sender_to_ethereum = sender_to_ethereum.clone();
                     tokio::spawn(async move {
-                        run(cloned_state, cloned_sender_to_relay, cloned_sender_to_redeem, cloned_sender_to_ethereum).await
+                        run(
+                            cloned_state,
+                            cloned_sender_to_relay,
+                            cloned_sender_to_redeem,
+                            cloned_sender_to_ethereum,
+                        )
+                        .await
                     });
                 }
                 Ok(())
@@ -134,7 +140,7 @@ async fn run(
     state: BridgeState,
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
-    mut sender_to_ethereum: postage::broadcast::Sender<ToEthereumMessage>
+    mut sender_to_ethereum: postage::broadcast::Sender<ToEthereumMessage>,
 ) {
     if let Err(err) = start(
         state.clone(),
@@ -150,7 +156,8 @@ async fn run(
         sleep(Duration::from_secs(10)).await;
         sender_to_ethereum
             .send(ToEthereumMessage::Start)
-            .await.unwrap();
+            .await
+            .unwrap();
     }
 }
 
@@ -166,7 +173,7 @@ async fn start(
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
 
     // Config
-    let servce_config: SubstrateEthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let servce_config: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
     let ethereum_config: EthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
     let microkv = state.microkv();

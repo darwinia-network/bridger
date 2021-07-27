@@ -18,7 +18,6 @@ use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 
 #[derive(Debug)]
 pub struct PangolinRopstenTask {
-    bus: PangolinRopstenBus,
     stack: TaskStack<PangolinRopstenBus>,
 }
 
@@ -35,16 +34,13 @@ impl BridgeTaskKeep for PangolinRopstenTask {
         self
     }
     async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
-        crate::route::dispatch_route(&self.bus, uri, param).await
+        crate::route::dispatch_route(&self.stack.bus(), uri, param).await
     }
 }
 
 impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
     fn config_template() -> anyhow::Result<serde_json::Value> {
         Ok(serde_json::to_value(DarwiniaEthereumConfig::template())?)
-    }
-    fn bus(&self) -> &PangolinRopstenBus {
-        &self.bus
     }
 
     fn stack(&mut self) -> &mut TaskStack<PangolinRopstenBus> {
@@ -58,19 +54,19 @@ impl PangolinRopstenTask {
         let bus = PangolinRopstenBus::default();
         bus.store_resource::<BridgeState>(state);
 
-        let mut stack = TaskStack::new();
-        stack.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>(&bus)?;
-        stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>(&bus)?;
-        stack.spawn_service::<RedeemService>(&bus)?;
-        stack.spawn_service::<GuardService>(&bus)?;
-        stack.spawn_service::<DarwiniaService>(&bus)?;
-        stack.spawn_service::<ExtrinsicsService>(&bus)?;
+        let mut stack = TaskStack::new(bus);
+        stack.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>()?;
+        stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>()?;
+        stack.spawn_service::<RedeemService>()?;
+        stack.spawn_service::<GuardService>()?;
+        stack.spawn_service::<DarwiniaService>()?;
+        stack.spawn_service::<ExtrinsicsService>()?;
 
-        let mut tx_scan = bus.tx::<DarwiniaEthereumMessage>()?;
+        let mut tx_scan = stack.bus().tx::<DarwiniaEthereumMessage>()?;
         tx_scan
             .send(DarwiniaEthereumMessage::Scan(EthereumScanMessage::Start))
             .await?;
 
-        Ok(Self { bus, stack })
+        Ok(Self { stack })
     }
 }

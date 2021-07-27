@@ -9,3 +9,11 @@ members = [
 	"task/*",
 	"traits",
 ]
+
+# development
+# [patch."https://github.com/darwinia-network/darwinia-common"]
+# darwinia-ethereum-relay   = { path = "../common/frame/bridge/ethereum/relay" }
+# darwinia-relay-primitives = { path = "../common/primitives/relay" }
+# darwinia-relayer-game     = { path = "../common/frame/bridge/relayer-game" }
+# darwinia-support          = { path = "../common/frame/support" }
+# ethereum-primitives       = { path = "../common/primitives/ethereum" }

@@ -4,7 +4,7 @@
 
 FROM rust:1 as builder
 
-ARG RUST_TOOLCHAIN=nightly-2021-03-01
+ARG RUST_TOOLCHAIN=nightly-2021-04-15
 ENV CARGO_TERM_COLOR=always
 
 RUN rustup update \

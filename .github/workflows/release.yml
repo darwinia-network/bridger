@@ -30,8 +30,3 @@ jobs:
           docker_registry: quay.io
           docker_build_options: -f .maintain/Dockerfile
           skip_deploy: true
-
-      - uses: ./.github/actions/dingtalk-notify
-        if: failure() && (github.event_name == 'pull_request' && github.event.pull_request.draft == false || github.event_name != 'pull_request')
-        with:
-          dingtalk_bot_token: ${{ secrets.DINGTALK_BOT_TOKEN }}

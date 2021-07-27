@@ -5,11 +5,11 @@ use structopt::StructOpt;
 use bridge_traits::bridge::config::ConfigFormat;
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "darwinia-bridger", about = "Darwinia bridger")]
+#[structopt(name = "bridger", about = "Darwinia bridger")]
 pub enum Opt {
     /// Task manager
     Task {
-        /// The server host by darwinia-bridger service
+        /// The server host by bridger service
         #[structopt(long, default_value = "http://127.0.0.1:1098")]
         server: String,
         #[structopt(flatten)]
@@ -17,7 +17,7 @@ pub enum Opt {
     },
     /// The bridge kv db storage operation
     Kv {
-        /// The server host by darwinia-bridger service
+        /// The server host by bridger service
         #[structopt(long, default_value = "http://127.0.0.1:1098")]
         server: String,
         /// The namespace of storage

@@ -54,7 +54,7 @@ async fn start_webserver(options: ServerOptions) -> anyhow::Result<()> {
 
     let server = Server::bind(&addr).serve(service);
 
-    log::info!("darwinia-bridger is running on: {}", addr);
+    log::info!("bridger is running on: {}", addr);
     if let Err(err) = server.await {
         log::error!("Server error: {}", err);
     }

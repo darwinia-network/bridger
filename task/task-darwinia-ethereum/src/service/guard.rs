@@ -3,8 +3,7 @@ use std::time::Duration;
 
 use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
-use postage::broadcast;
+use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -137,12 +136,15 @@ async fn start(
 }
 
 impl GuardService {
-    async fn guard(
+    pub async fn guard<S>(
         ethereum2darwinia: Ethereum2Darwinia,
         guard_account: FromEthereumAccount,
         shadow: Arc<Shadow>,
-        mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-    ) -> anyhow::Result<()> {
+        mut sender_to_extrinsics: S,
+    ) -> anyhow::Result<()>
+    where
+        S: lifeline::Sender<ToExtrinsicsMessage>,
+    {
         trace!(
             target: DarwiniaEthereumTask::NAME,
             "Checking pending headers..."

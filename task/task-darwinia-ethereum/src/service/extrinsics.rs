@@ -173,7 +173,7 @@ async fn do_send_extrinsic(
             let block_number = parcel.header.number;
             if let Some(ethereum2darwinia) = &ethereum2darwinia {
                 if let Some(relayer) = &ethereum2darwinia_relayer {
-                    let ex_hash = ethereum2darwinia.affirm(&relayer, parcel).await?;
+                    let ex_hash = ethereum2darwinia.affirm(relayer, parcel).await?;
                     info!(
                         target: DarwiniaEthereumTask::NAME,
                         "Affirmed ethereum block {} in extrinsic {:?}", block_number, ex_hash
@@ -193,7 +193,7 @@ async fn do_send_extrinsic(
                     if let Some(darwinia2ethereum) = &darwinia2ethereum {
                         if let Some(relayer) = &darwinia2ethereum_relayer {
                             let ex_hash = darwinia2ethereum
-                                .sync_authorities_change(&relayer, proof)
+                                .sync_authorities_change(relayer, proof)
                                 .await?;
                             info!(
                                 target: DarwiniaEthereumTask::NAME,
@@ -237,7 +237,7 @@ async fn do_send_extrinsic(
                     if let Some(ethereum2darwinia) = &ethereum2darwinia {
                         if let Some(relayer) = &ethereum2darwinia_relayer {
                             let ex_hash = ethereum2darwinia
-                                .redeem(&relayer, redeem_for, proof)
+                                .redeem(relayer, redeem_for, proof)
                                 .await?;
                             info!(
                                 target: DarwiniaEthereumTask::NAME,
@@ -258,7 +258,7 @@ async fn do_send_extrinsic(
             if let Some(ethereum2darwinia) = &ethereum2darwinia {
                 if let Some(guard) = &ethereum2darwinia_relayer {
                     let ex_hash = ethereum2darwinia
-                        .vote_pending_relay_header_parcel(&guard, pending_block_number, aye)
+                        .vote_pending_relay_header_parcel(guard, pending_block_number, aye)
                         .await?;
                     if aye {
                         info!(
@@ -283,7 +283,7 @@ async fn do_send_extrinsic(
                 );
                 if let Some(relayer) = &darwinia2ethereum_relayer {
                     let ex_hash = darwinia2ethereum
-                        .ecdsa_sign_and_submit_signed_mmr_root(&relayer, spec_name, block_number)
+                        .ecdsa_sign_and_submit_signed_mmr_root(relayer, spec_name, block_number)
                         .await?;
                     info!(
                         target: DarwiniaEthereumTask::NAME,
@@ -303,7 +303,7 @@ async fn do_send_extrinsic(
             if let Some(darwinia2ethereum) = &darwinia2ethereum {
                 if let Some(relayer) = &darwinia2ethereum_relayer {
                     let ex_hash = darwinia2ethereum
-                        .ecdsa_sign_and_submit_signed_authorities(&relayer, message)
+                        .ecdsa_sign_and_submit_signed_authorities(relayer, message)
                         .await?;
                     info!(
                         target: DarwiniaEthereumTask::NAME,

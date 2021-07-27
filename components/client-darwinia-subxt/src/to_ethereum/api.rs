@@ -327,7 +327,7 @@ impl Darwinia2Ethereum {
     pub async fn account_detail(&self, block_number: Option<u32>, account: &Account) -> Result<()> {
         log::info!("🧔 darwinia => ethereum account");
         let mut roles = self.darwinia.account_role(&account.0).await?;
-        if self.is_authority(block_number, &account).await? {
+        if self.is_authority(block_number, account).await? {
             roles.push("Authority".to_string());
         }
         match &account.0.real {

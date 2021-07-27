@@ -235,7 +235,7 @@ pub async fn do_affirm(
     // 1. affirmations check
     for (_game_id, game) in ethereum2darwinia.affirmations().await?.iter() {
         for (_round_id, affirmations) in game.iter() {
-            if Ethereum2Darwinia::contains(&affirmations, target) {
+            if Ethereum2Darwinia::contains(affirmations, target) {
                 return Err(BizError::AffirmingBlockInGame(target).into());
             }
         }

@@ -3,6 +3,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize, bridge_traits::BridgeCrypto)]
 pub struct DarwiniaSubxtConfig {
+    /// is enable crypto private key
+    #[crypto(is_enable)]
+    enable_crypto: bool,
     pub endpoint: String,
 
     /// relayer's private key
@@ -22,6 +25,7 @@ impl BridgeConfig for DarwiniaSubxtConfig {
 
     fn template() -> Self {
         Self {
+            enable_crypto: false,
             endpoint: "wss://rpc.darwinia.network".to_string(),
             relayer_private_key: "0x...".to_string(),
             relayer_real_account: Some("0x...".to_string()),

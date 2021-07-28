@@ -178,6 +178,7 @@ async fn do_send_extrinsic(
                         target: PangolinRopstenTask::NAME,
                         "Affirmed ethereum block {} in extrinsic {:?}", block_number, ex_hash
                     );
+                    microkv.put("relayed", &block_number)?;
                 } else {
                     info!(
                         target: PangolinRopstenTask::NAME,

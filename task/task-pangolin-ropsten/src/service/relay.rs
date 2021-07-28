@@ -181,20 +181,14 @@ impl RelayHelper {
                 "Your are affirming ethereum block {}",
                 target
             );
-            match do_affirm(
+            if let Err(err) = do_affirm(
                 self.darwinia.clone(),
                 self.shadow.clone(),
                 target,
                 self.sender_to_extrinsics.clone(),
             )
-            .await
-            {
-                Ok(()) => {
-                    microkv.put("relayed", &target)?;
-                }
-                Err(err) => {
+            .await {
                     return Err(err);
-                }
             }
         } else {
             trace!(

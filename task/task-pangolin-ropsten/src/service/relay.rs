@@ -167,6 +167,12 @@ impl RelayHelper {
         if last_confirmed > relayed {
             microkv.put("relayed", &last_confirmed)?;
             relayed = last_confirmed;
+        } else {
+            trace!(
+            target: PangolinRopstenTask::NAME,
+            "The last relayed ethereum block is {}",
+            relayed
+        );
         }
 
         if target > relayed {

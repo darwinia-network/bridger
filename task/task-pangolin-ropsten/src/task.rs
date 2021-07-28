@@ -43,6 +43,10 @@ impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
         Ok(serde_json::to_value(DarwiniaEthereumConfig::template())?)
     }
 
+    fn bus(&self) -> &PangolinRopstenBus {
+        &self.bus
+    }
+
     fn stack(&mut self) -> &mut TaskStack<PangolinRopstenBus> {
         &mut self.stack
     }

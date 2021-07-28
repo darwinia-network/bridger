@@ -1,6 +1,6 @@
 [package]
-name = "component-darwinia-subxt"
-version = "0.4.0"
+name = "component-pangolin-subxt"
+version = "0.3.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -35,13 +35,12 @@ codec = { package = "parity-scale-codec", version = "2.0.0", default-features = 
 web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 secp256k1 = { version = "0.20", features = ["recovery"] }
 
-substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.2" }
-substrate-subxt-proc-macro = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.2" }
+substrate-subxt = { version = "0.15.3", git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "metadata" }
+substrate-subxt-proc-macro = { version = "0.15.3", git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "metadata" }
 
-frame-support = "3.0.0"
-pallet-indices = "3.0.0"
-pallet-im-online = "3.0.0"
+frame-support = { package = "frame-support", version = "3.0.0", git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+pallet-indices = { package = "pallet-indices", version = "3.0.0", git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+pallet-im-online = { package = "pallet-im-online", version = "3.0.0", git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
 
 bridge-traits = { path = "../../traits" }
 support-ethereum = { path = "../../supports/support-ethereum" }
-bridge-primitives = { path = "../../primitives" }

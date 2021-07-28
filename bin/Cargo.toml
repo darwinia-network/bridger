@@ -50,6 +50,7 @@ bridge-primitives = { path = "../primitives" }
 
 task-darwinia-ethereum = { path = "../task/task-darwinia-ethereum" }
 task-pangolin-millau = { path = "../task/task-pangolin-millau" }
+task-pangolin-ropsten = { path = "../task/task-pangolin-ropsten" }
 
 linked-darwinia = { path = "../task/linked-darwinia" }
 

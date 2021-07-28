@@ -2,6 +2,7 @@ use bridge_traits::bridge::task::BridgeSand;
 use linked_darwinia::task::DarwiniaLinked;
 use task_darwinia_ethereum::task::DarwiniaEthereumTask;
 use task_pangolin_millau::task::PangolinMillauTask;
+use task_pangolin_ropsten::task::PangolinRopstenTask;
 
 pub fn init() -> anyhow::Result<()> {
     init_log();
@@ -17,6 +18,7 @@ fn init_log() {
         lifeline=debug,
         darwinia_bridge=debug,
         task-darwinia-ethereum=trace,
+        task-pangolin-ropsten=trace,
 		support_s2s=debug,
 		bridge=info,
         evm_log_tracker=info,
@@ -31,5 +33,6 @@ fn init_keep() -> anyhow::Result<()> {
         DarwiniaLinked::NAME,
         DarwiniaEthereumTask::NAME,
         PangolinMillauTask::NAME,
+        PangolinRopstenTask::NAME,
     ])
 }

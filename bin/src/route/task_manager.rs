@@ -9,6 +9,7 @@ use bridge_traits::error::StandardError;
 use linked_darwinia::task::DarwiniaLinked;
 use support_keep::types::TaskState;
 use task_darwinia_ethereum::task::DarwiniaEthereumTask;
+use task_pangolin_ropsten::task::PangolinRopstenTask;
 use task_pangolin_millau::task::PangolinMillauTask;
 
 use crate::types::transfer::{TaskConfigTemplateParam, TaskStartParam};
@@ -141,6 +142,25 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
             linked_darwinia.stack().carry_from(task.stack())?;
 
             support_keep::task::keep_task(DarwiniaEthereumTask::NAME, Box::new(task))?;
+        }
+        PangolinRopstenTask::NAME => {
+            // if !support_keep::task::task_is_running(DarwiniaLinked::NAME) {
+            //     return Err(StandardError::Api(format!(
+            //         "Please start [{}] first",
+            //         DarwiniaLinked::NAME
+            //     ))
+            //         .into());
+            // }
+            let task_config = Config::load(&path_config)?;
+            let task = PangolinRopstenTask::new(task_config, state_bridge.clone()).await?;
+
+            // let linked_darwinia: &DarwiniaLinked =
+            //     support_keep::task::running_task_downcast_ref(DarwiniaLinked::NAME)?;
+            // let carry = linked_darwinia.bus().carry_from(task.bus())?;
+            // let stack = task.stack();
+            // stack.carry(carry)?;
+
+            support_keep::task::keep_task(PangolinRopstenTask::NAME, Box::new(task))?;
         }
         PangolinMillauTask::NAME => {
             let task_config = Config::load(&path_config)?;

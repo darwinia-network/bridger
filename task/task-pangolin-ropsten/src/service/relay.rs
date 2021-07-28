@@ -246,7 +246,7 @@ pub async fn do_affirm(
         "Prepare to affirm ethereum block: {}",
         target
     );
-    let parcel = shadow.parcel(target as usize + 1).await?;
+    let parcel = shadow.parcel(target as usize).await?;
     if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
         return Err(BizError::ParcelFromShadowIsEmpty(target).into());
     }

@@ -85,7 +85,7 @@ async fn redeem(
         anyhow::bail!("err")
     };
     let eth_tx = EthereumTransaction {
-        tx_hash: tx_hash,
+        tx_hash,
         block_hash: tx.block_hash.unwrap(),
         block: tx.block_number.unwrap().as_u64(),
         index: tx.transaction_index.unwrap().as_u64()

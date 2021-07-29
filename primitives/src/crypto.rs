@@ -100,7 +100,7 @@ impl Crypto {
         //let salt = [0; 16];
         let mut output = [0; 48];
         scrypt(
-            &passwd.as_bytes(),
+            passwd.as_bytes(),
             &self.salt,
             &ScryptParams::new(10, 2, 3),
             &mut output,
@@ -110,22 +110,22 @@ impl Crypto {
 
     /// encrypt
     pub fn encrypt(&self, passwd: &str, plain: &str) -> BridgeBasicResult<String> {
-        let private_key = self.generate_key(&passwd);
+        let private_key = self.generate_key(passwd);
         let key = &private_key[..32];
         let iv = &private_key[32..48];
-        let encrypted = self.aes256_cbc_encrypt(plain.as_bytes(), &key, &iv)?;
+        let encrypted = self.aes256_cbc_encrypt(plain.as_bytes(), key, iv)?;
         Ok(base64::encode(encrypted.as_slice()))
     }
 
     /// decrypt
     pub fn decrypt(&self, passwd: &str, encrypted: &str) -> BridgeBasicResult<String> {
-        let private_key = self.generate_key(&passwd);
+        let private_key = self.generate_key(passwd);
         let key = &private_key[..32];
         let iv = &private_key[32..48];
         let encrypted_data = base64::decode(&encrypted).map_err(|e| {
             BridgeBasicError::Crypto(format!("failed to decrypt, base64 decode error: {:?}", e))
         })?;
-        let decrypted_data = self.aes256_cbc_decrypt(&encrypted_data[..], &key, &iv)?;
+        let decrypted_data = self.aes256_cbc_decrypt(&encrypted_data[..], key, iv)?;
         String::from_utf8(decrypted_data).map_err(|e| {
             BridgeBasicError::Crypto(format!("failed to decrypt data to string: {:?}", e))
         })

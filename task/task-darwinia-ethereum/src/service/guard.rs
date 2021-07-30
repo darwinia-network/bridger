@@ -22,6 +22,9 @@ use crate::config::TaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToGuardMessage};
 use crate::task::DarwiniaEthereumTask;
 
+use component_ethereum::error::BizError;
+use component_ethereum::error::ComponentEthereumError;
+
 #[derive(Debug)]
 pub struct GuardService {
     _greet: Lifeline,
@@ -170,15 +173,30 @@ impl GuardService {
             if pending_block_number > last_confirmed
                 && !ethereum2darwinia.has_voted(&guard_account, voting_state)
             {
-                let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
-                let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
-                    Extrinsic::GuardVote(pending_block_number, true)
-                } else {
-                    Extrinsic::GuardVote(pending_block_number, false)
-                };
-                sender_to_extrinsics
-                    .send(ToExtrinsicsMessage::Extrinsic(ex))
-                    .await?;
+                match shadow.parcel(pending_block_number as usize).await {
+                    Ok(parcel_from_shadow) => {
+                        let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
+                            Extrinsic::GuardVote(pending_block_number, true)
+                        } else {
+                            Extrinsic::GuardVote(pending_block_number, false)
+                        };
+                        sender_to_extrinsics
+                            .send(ToExtrinsicsMessage::Extrinsic(ex))
+                            .await?;
+                    },
+                    Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(block, msg))) => {
+                        trace!(
+                            target: DarwiniaEthereumTask::NAME,
+                            "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                            block,
+                            msg
+                        );
+                    },
+                    Err(err) => {
+                        return Err(err.into());
+                    }
+
+                }
             }
         }
 

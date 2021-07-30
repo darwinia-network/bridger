@@ -51,17 +51,15 @@ impl Service for ExtrinsicsService {
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToExtrinsicsMessage::Extrinsic(ex) => {
-                            if let Err(err) = helper.send_extrinsic(ex).await {
+                            while let Err(err) = helper.send_extrinsic(ex.clone()).await {
                                 error!(
                                     target: PangolinRopstenTask::NAME,
                                     "extrinsics err: {:#?}", err
                                 );
 
                                 // TODO: Consider the errors more carefully
-                                // TODO: Maybe need retry
 
-                                // Maybe a websocket err, so wait 10 secs to reconnect.
-                                sleep(Duration::from_secs(10)).await;
+                                sleep(Duration::from_secs(5)).await;
 
                                 helper = ExtrinsicsHelper::new(state.clone()).await;
                             }
@@ -178,6 +176,7 @@ async fn do_send_extrinsic(
                         target: PangolinRopstenTask::NAME,
                         "Affirmed ethereum block {} in extrinsic {:?}", block_number, ex_hash
                     );
+                    microkv.put("relayed", &block_number)?;
                 } else {
                     info!(
                         target: PangolinRopstenTask::NAME,

@@ -90,9 +90,9 @@ pub struct EthereumHeader {
     gas_limit: U256,
     difficulty: U256,
     seal: Vec<Vec<u8>>,
+    base_fee_per_gas: Option<U256>,
     /// Ethereum header hash
     pub hash: Option<[u8; 32]>,
-    base_fee_per_gas: Option<U256>,
 }
 
 impl std::fmt::Display for EthereumHeader {
@@ -154,9 +154,6 @@ impl std::fmt::Display for EthereumHeader {
                 msgs.push(format!("{:>19}{}", "", to_hex(item, false)));
             }
         }
-        if let Some(hash) = &self.hash {
-            msgs.push(format!("{:>19}{}", "hash: ", to_hex(hash, false)));
-        }
         if let Some(base_fee_per_gas) = &self.base_fee_per_gas {
             msgs.push(format!(
                 "{:>19}{}",
@@ -164,6 +161,10 @@ impl std::fmt::Display for EthereumHeader {
                 &base_fee_per_gas.as_u128()
             ))
         }
+        if let Some(hash) = &self.hash {
+            msgs.push(format!("{:>19}{}", "hash: ", to_hex(hash, false)));
+        }
+
         write!(f, "{}", msgs.join("\n"))
     }
 }
@@ -186,8 +187,8 @@ pub struct EthereumHeaderJson {
     gas_limit: u128,
     difficulty: u128,
     seal: Vec<String>,
-    hash: String,
     pub base_fee_per_gas: Option<u128>,
+    hash: String,
 }
 
 impl From<EthereumHeader> for EthereumHeaderJson {
@@ -211,8 +212,8 @@ impl From<EthereumHeader> for EthereumHeaderJson {
                 .iter()
                 .map(|s| format!("0x{}", hex!(s.to_vec())))
                 .collect(),
-            hash: format!("0x{}", hex!(that.hash.unwrap_or_default().to_vec())),
             base_fee_per_gas: that.base_fee_per_gas.map(|v| v.as_u128()),
+            hash: format!("0x{}", hex!(that.hash.unwrap_or_default().to_vec())),
         }
     }
 }
@@ -234,8 +235,8 @@ impl From<EthereumHeaderJson> for EthereumHeader {
             gas_limit: U256::from(that.gas_limit),
             difficulty: U256::from(that.difficulty),
             seal: that.seal.iter().map(|s| bytes!(s.as_str())).collect(),
-            hash: Some(bytes!(that.hash.as_str(), 32)),
             base_fee_per_gas: that.base_fee_per_gas.map(U256::from),
+            hash: Some(bytes!(that.hash.as_str(), 32)),
         }
     }
 }

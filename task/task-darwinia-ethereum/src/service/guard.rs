@@ -68,7 +68,7 @@ async fn run(
     if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
         error!(
             target: DarwiniaEthereumTask::NAME,
-            "guard init err {:#?}", err
+            "guard err {:#?}", err
         );
         sleep(Duration::from_secs(10)).await;
         run(state, sender_to_extrinsics).await;
@@ -99,37 +99,32 @@ async fn start(
         config_darwinia.relayer_real_account,
     );
     let guard_account = FromEthereumAccount::new(account);
+    let is_tech_comm_member = ethereum2darwinia.is_tech_comm_member(None, &guard_account).await?;
 
-    // Shadow client
-    let shadow = Arc::new(component_shadow.component().await?);
+    if is_tech_comm_member {
+        // Shadow client
+        let shadow = Arc::new(component_shadow.component().await?);
 
-    info!(
-        target: DarwiniaEthereumTask::NAME,
-        "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
-    );
+        info!(
+            target: DarwiniaEthereumTask::NAME,
+            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
+        );
 
-    loop {
-        let ethereum2darwinia_clone = ethereum2darwinia.clone();
-        let guard_account_clone = guard_account.clone();
-        let shadow_clone = shadow.clone();
-        let sender_to_extrinsics_clone = sender_to_extrinsics.clone();
+        loop {
+            let ethereum2darwinia_clone = ethereum2darwinia.clone();
+            let guard_account_clone = guard_account.clone();
+            let shadow_clone = shadow.clone();
+            let sender_to_extrinsics_clone = sender_to_extrinsics.clone();
 
-        if let Err(err) = GuardService::guard(
-            ethereum2darwinia_clone,
-            guard_account_clone,
-            shadow_clone,
-            sender_to_extrinsics_clone,
-        )
-        .await
-        {
-            error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
-            let err_msg = format!("{:?}", err).to_lowercase();
-            if err_msg.contains("restart") {
-                break;
-            }
+            GuardService::guard(
+                ethereum2darwinia_clone,
+                guard_account_clone,
+                shadow_clone,
+                sender_to_extrinsics_clone,
+            ).await?;
+
+            sleep(Duration::from_secs(servce_config.interval_guard)).await;
         }
-
-        sleep(Duration::from_secs(servce_config.interval_guard)).await;
     }
 
     Ok(())

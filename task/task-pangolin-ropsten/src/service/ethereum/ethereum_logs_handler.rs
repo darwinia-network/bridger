@@ -66,7 +66,7 @@ impl LogsHandler for EthereumLogsHandler {
                     &tx.block
                 );
                 self.sender_to_relay
-                    .send(ToRelayMessage::EthereumBlockNumber(tx.block))
+                    .send(ToRelayMessage::EthereumBlockNumber(tx.block + 1))
                     .await?;
             }
 

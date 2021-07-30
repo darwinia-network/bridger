@@ -180,6 +180,7 @@ async fn do_send_extrinsic(
                         target: DarwiniaEthereumTask::NAME,
                         "Affirmed ethereum block {} in extrinsic {:?}", block_number, ex_hash
                     );
+                    microkv.put("relayed", &block_number)?;
                 } else {
                     info!(
                         target: DarwiniaEthereumTask::NAME,

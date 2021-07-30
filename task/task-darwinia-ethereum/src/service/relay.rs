@@ -166,6 +166,12 @@ impl RelayHelper {
         if last_confirmed > relayed {
             microkv.put("relayed", &last_confirmed)?;
             relayed = last_confirmed;
+        } else {
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "The last relayed ethereum block is {}",
+                relayed
+            );
         }
 
         if target > relayed {
@@ -174,20 +180,13 @@ impl RelayHelper {
                 "Your are affirming ethereum block {}",
                 target
             );
-            match do_affirm(
+            if let Err(err) = do_affirm(
                 self.darwinia.clone(),
                 self.shadow.clone(),
                 target,
                 self.sender_to_extrinsics.clone(),
-            )
-            .await
-            {
-                Ok(()) => {
-                    microkv.put("relayed", &target)?;
-                }
-                Err(err) => {
-                    return Err(err);
-                }
+            ).await {
+                return Err(err);
             }
         } else {
             trace!(
@@ -248,7 +247,7 @@ where
         "Prepare to affirm ethereum block: {}",
         target
     );
-    let parcel = shadow.parcel(target as usize + 1).await?;
+    let parcel = shadow.parcel(target as usize).await?;
     if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
         return Err(BizError::ParcelFromShadowIsEmpty(target).into());
     }

@@ -51,23 +51,18 @@ impl Service for ExtrinsicsService {
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToExtrinsicsMessage::Extrinsic(ex) => {
-                            loop {
-                                if let Err(err) = helper.send_extrinsic(ex.clone()).await {
-                                    error!(
-                                        target: PangolinRopstenTask::NAME,
-                                        "extrinsics err: {:#?}", err
-                                    );
+                            while let Err(err) = helper.send_extrinsic(ex.clone()).await {
+                                error!(
+                                    target: PangolinRopstenTask::NAME,
+                                    "extrinsics err: {:#?}", err
+                                );
 
-                                    // TODO: Consider the errors more carefully
+                                // TODO: Consider the errors more carefully
 
-                                    sleep(Duration::from_secs(5)).await;
+                                sleep(Duration::from_secs(5)).await;
 
-                                    helper = ExtrinsicsHelper::new(state.clone()).await;
-                                } else {
-                                    break;
-                                }
+                                helper = ExtrinsicsHelper::new(state.clone()).await;
                             }
-
                         }
                     }
                 }

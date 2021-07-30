@@ -51,19 +51,21 @@ impl Service for ExtrinsicsService {
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToExtrinsicsMessage::Extrinsic(ex) => {
-                            if let Err(err) = helper.send_extrinsic(ex).await {
-                                error!(
-                                    target: DarwiniaEthereumTask::NAME,
-                                    "extrinsics err: {:#?}", err
-                                );
+                            loop {
+                                if let Err(err) = helper.send_extrinsic(ex.clone()).await {
+                                    error!(
+                                        target: DarwiniaEthereumTask::NAME,
+                                        "extrinsics err: {:#?}", err
+                                    );
 
-                                // TODO: Consider the errors more carefully
-                                // TODO: Maybe need retry
+                                    // TODO: Consider the errors more carefully
 
-                                // Maybe a websocket err, so wait 10 secs to reconnect.
-                                sleep(Duration::from_secs(10)).await;
+                                    sleep(Duration::from_secs(5)).await;
 
-                                helper = ExtrinsicsHelper::new(state.clone()).await;
+                                    helper = ExtrinsicsHelper::new(state.clone()).await;
+                                } else {
+                                    break;
+                                }
                             }
                         }
                     }

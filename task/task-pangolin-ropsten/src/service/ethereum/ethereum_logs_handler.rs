@@ -126,14 +126,18 @@ fn build_txs(
             }
         } else if l.topics.contains(&erc20_register_topic) {
             EthereumTransaction {
-                tx_hash: EthereumTransactionHash::RegisterErc20Token(l.transaction_hash.unwrap_or_default()),
+                tx_hash: EthereumTransactionHash::RegisterErc20Token(
+                    l.transaction_hash.unwrap_or_default(),
+                ),
                 block_hash: l.block_hash.unwrap_or_default(),
                 block,
                 index,
             }
         } else if l.topics.contains(&erc20_lock_topic) {
             EthereumTransaction {
-                tx_hash: EthereumTransactionHash::RedeemErc20Token(l.transaction_hash.unwrap_or_default()),
+                tx_hash: EthereumTransactionHash::RedeemErc20Token(
+                    l.transaction_hash.unwrap_or_default(),
+                ),
                 block_hash: l.block_hash.unwrap_or_default(),
                 block,
                 index,
@@ -156,11 +160,11 @@ impl EthereumLogsHandler {
         if self
             .darwinia_client
             .verified(tx.block_hash, tx.index)
-            .await? ||
-            self.
-            darwinia_client.
-            verified_issuing(tx.block_hash, tx.index)
             .await?
+            || self
+                .darwinia_client
+                .verified_issuing(tx.block_hash, tx.index)
+                .await?
         {
             trace!(
                 target: PangolinRopstenTask::NAME,

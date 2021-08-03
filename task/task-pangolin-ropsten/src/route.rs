@@ -7,14 +7,14 @@ use component_state::state::BridgeState;
 
 use crate::bus::PangolinRopstenBus;
 
-use crate::message::{ToDarwiniaMessage, ToEthereumMessage, ToRelayMessage, ToRedeemMessage};
+use crate::message::{ToDarwiniaMessage, ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
-use component_ethereum::web3::Web3Component;
 use crate::task::PangolinRopstenTask;
-use bridge_traits::bridge::component::BridgeComponent;
-use web3::types::{TransactionId, H256};
 use array_bytes::hex2bytes_unchecked as bytes;
+use bridge_traits::bridge::component::BridgeComponent;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
+use component_ethereum::web3::Web3Component;
+use web3::types::{TransactionId, H256};
 
 use bridge_traits::bridge::task::BridgeSand;
 
@@ -32,10 +32,7 @@ pub async fn dispatch_route(
     }
 }
 
-async fn relay(
-    bus: &PangolinRopstenBus,
-    param: serde_json::Value,
-) -> anyhow::Result<TaskTerminal> {
+async fn relay(bus: &PangolinRopstenBus, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
     let mut sender = bus.tx::<ToRelayMessage>()?;
     let block_number = param
         .get("block_number")
@@ -88,31 +85,25 @@ async fn redeem(
         tx_hash,
         block_hash: tx.block_hash.unwrap(),
         block: tx.block_number.unwrap().as_u64(),
-        index: tx.transaction_index.unwrap().as_u64()
+        index: tx.transaction_index.unwrap().as_u64(),
     };
 
-
-    if darwinia
-        .verified(eth_tx.block_hash, eth_tx.index)
-        .await?
-    {
+    if darwinia.verified(eth_tx.block_hash, eth_tx.index).await? {
         trace!(
-                target: PangolinRopstenTask::NAME,
-                "This ethereum tx {:?} has already been redeemed.",
-                eth_tx.enclosed_hash()
-            );
+            target: PangolinRopstenTask::NAME,
+            "This ethereum tx {:?} has already been redeemed.",
+            eth_tx.enclosed_hash()
+        );
     } else {
         trace!(
-                target: PangolinRopstenTask::NAME,
-                "send to redeem service: {:?}",
-                &eth_tx.tx_hash
-            );
+            target: PangolinRopstenTask::NAME,
+            "send to redeem service: {:?}",
+            &eth_tx.tx_hash
+        );
         sender
             .send(ToRedeemMessage::EthereumTransaction(eth_tx))
             .await?
-    }
-
-    ;
+    };
 
     Ok(TaskTerminal::new("success"))
 }

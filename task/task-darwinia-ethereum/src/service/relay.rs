@@ -13,6 +13,7 @@ use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
 use component_ethereum::error::BizError;
+use component_ethereum::error::ComponentEthereumError;
 use component_shadow::{Shadow, ShadowComponent};
 use component_state::state::BridgeState;
 use support_ethereum::block::EthereumHeader;
@@ -166,6 +167,12 @@ impl RelayHelper {
         if last_confirmed > relayed {
             microkv.put("relayed", &last_confirmed)?;
             relayed = last_confirmed;
+        } else {
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "The last relayed ethereum block is {}",
+                relayed
+            );
         }
 
         if target > relayed {
@@ -174,20 +181,13 @@ impl RelayHelper {
                 "Your are affirming ethereum block {}",
                 target
             );
-            match do_affirm(
+            if let Err(err) = do_affirm(
                 self.darwinia.clone(),
                 self.shadow.clone(),
                 target,
                 self.sender_to_extrinsics.clone(),
-            )
-            .await
-            {
-                Ok(()) => {
-                    microkv.put("relayed", &target)?;
-                }
-                Err(err) => {
-                    return Err(err);
-                }
+            ).await {
+                return Err(err);
             }
         } else {
             trace!(
@@ -230,7 +230,12 @@ where
     for pending_header in pending_headers {
         let pending_block_number = pending_header.1.header.number;
         if pending_block_number >= target {
-            return Err(BizError::AffirmingBlockInPending(target).into());
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "The affirming target block {} is in pending",
+                target
+            );
+            return Ok(());
         }
     }
 
@@ -238,7 +243,12 @@ where
     for (_game_id, game) in ethereum2darwinia.affirmations().await?.iter() {
         for (_round_id, affirmations) in game.iter() {
             if Ethereum2Darwinia::contains(affirmations, target) {
-                return Err(BizError::AffirmingBlockInGame(target).into());
+                trace!(
+                    target: DarwiniaEthereumTask::NAME,
+                    "The affirming target block {} is in the relayer game",
+                    target
+                );
+                return Ok(());
             }
         }
     }
@@ -248,18 +258,38 @@ where
         "Prepare to affirm ethereum block: {}",
         target
     );
-    let parcel = shadow.parcel(target as usize + 1).await?;
-    if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
-        return Err(BizError::ParcelFromShadowIsEmpty(target).into());
-    }
 
-    // /////////////////////////
-    // do affirm
-    // /////////////////////////
-    let ex = Extrinsic::Affirm(parcel);
-    sender_to_extrinsics
-        .send(ToExtrinsicsMessage::Extrinsic(ex))
-        .await?;
+    match shadow.parcel(target as usize).await {
+        Ok(parcel) => {
+            if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
+                trace!(
+                    target: DarwiniaEthereumTask::NAME,
+                    "Shadow service failed to provide parcel for block {}",
+                    target
+                );
+                return Ok(());
+            }
+
+            // /////////////////////////
+            // do affirm
+            // /////////////////////////
+            let ex = Extrinsic::Affirm(parcel);
+            sender_to_extrinsics
+                .send(ToExtrinsicsMessage::Extrinsic(ex))
+                .await?
+        },
+        Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(block, msg))) => {
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                block,
+                msg
+            );
+        },
+        Err(err) => {
+            return Err(err.into());
+        }
+    }
 
     Ok(())
 }

@@ -34,7 +34,7 @@ impl BridgeTaskKeep for PangolinRopstenTask {
         self
     }
     async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
-        crate::route::dispatch_route(&self.stack.bus(), uri, param).await
+        crate::route::dispatch_route(self.stack.bus(), uri, param).await
     }
 }
 

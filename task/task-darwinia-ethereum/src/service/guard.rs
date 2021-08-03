@@ -22,6 +22,9 @@ use crate::config::TaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToGuardMessage};
 use crate::task::DarwiniaEthereumTask;
 
+use component_ethereum::error::BizError;
+use component_ethereum::error::ComponentEthereumError;
+
 #[derive(Debug)]
 pub struct GuardService {
     _greet: Lifeline,
@@ -68,7 +71,7 @@ async fn run(
     if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
         error!(
             target: DarwiniaEthereumTask::NAME,
-            "guard init err {:#?}", err
+            "guard err {:#?}", err
         );
         sleep(Duration::from_secs(10)).await;
         run(state, sender_to_extrinsics).await;
@@ -99,37 +102,32 @@ async fn start(
         config_darwinia.relayer_real_account,
     );
     let guard_account = FromEthereumAccount::new(account);
+    let is_tech_comm_member = ethereum2darwinia.is_tech_comm_member(None, &guard_account).await?;
 
-    // Shadow client
-    let shadow = Arc::new(component_shadow.component().await?);
+    if is_tech_comm_member {
+        // Shadow client
+        let shadow = Arc::new(component_shadow.component().await?);
 
-    info!(
-        target: DarwiniaEthereumTask::NAME,
-        "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
-    );
+        info!(
+            target: DarwiniaEthereumTask::NAME,
+            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
+        );
 
-    loop {
-        let ethereum2darwinia_clone = ethereum2darwinia.clone();
-        let guard_account_clone = guard_account.clone();
-        let shadow_clone = shadow.clone();
-        let sender_to_extrinsics_clone = sender_to_extrinsics.clone();
+        loop {
+            let ethereum2darwinia_clone = ethereum2darwinia.clone();
+            let guard_account_clone = guard_account.clone();
+            let shadow_clone = shadow.clone();
+            let sender_to_extrinsics_clone = sender_to_extrinsics.clone();
 
-        if let Err(err) = GuardService::guard(
-            ethereum2darwinia_clone,
-            guard_account_clone,
-            shadow_clone,
-            sender_to_extrinsics_clone,
-        )
-        .await
-        {
-            error!(target: DarwiniaEthereumTask::NAME, "{:#?}", err);
-            let err_msg = format!("{:?}", err).to_lowercase();
-            if err_msg.contains("restart") {
-                break;
-            }
+            GuardService::guard(
+                ethereum2darwinia_clone,
+                guard_account_clone,
+                shadow_clone,
+                sender_to_extrinsics_clone,
+            ).await?;
+
+            sleep(Duration::from_secs(servce_config.interval_guard)).await;
         }
-
-        sleep(Duration::from_secs(servce_config.interval_guard)).await;
     }
 
     Ok(())
@@ -175,15 +173,30 @@ impl GuardService {
             if pending_block_number > last_confirmed
                 && !ethereum2darwinia.has_voted(&guard_account, voting_state)
             {
-                let parcel_from_shadow = shadow.parcel(pending_block_number as usize).await?;
-                let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
-                    Extrinsic::GuardVote(pending_block_number, true)
-                } else {
-                    Extrinsic::GuardVote(pending_block_number, false)
-                };
-                sender_to_extrinsics
-                    .send(ToExtrinsicsMessage::Extrinsic(ex))
-                    .await?;
+                match shadow.parcel(pending_block_number as usize).await {
+                    Ok(parcel_from_shadow) => {
+                        let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
+                            Extrinsic::GuardVote(pending_block_number, true)
+                        } else {
+                            Extrinsic::GuardVote(pending_block_number, false)
+                        };
+                        sender_to_extrinsics
+                            .send(ToExtrinsicsMessage::Extrinsic(ex))
+                            .await?;
+                    },
+                    Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(block, msg))) => {
+                        trace!(
+                            target: DarwiniaEthereumTask::NAME,
+                            "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                            block,
+                            msg
+                        );
+                    },
+                    Err(err) => {
+                        return Err(err.into());
+                    }
+
+                }
             }
         }
 

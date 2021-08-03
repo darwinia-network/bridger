@@ -15,7 +15,6 @@ use component_shadow::{Shadow, ShadowComponent};
 use support_ethereum::receipt::RedeemFor;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::error::BizError;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::DarwiniaEthereumTask;
@@ -147,17 +146,22 @@ impl RedeemHelper {
             .verified(tx.block_hash, tx.index)
             .await?
         {
-            return Err(BizError::TxRedeemed(tx.tx_hash).into());
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "Ethereum tx {:?} redeemed",
+                tx.tx_hash
+            );
+            return Ok(());
         }
 
         let last_confirmed = ethereum2darwinia.last_confirmed().await?;
         if tx.block >= last_confirmed {
-            return Err(BizError::RedeemingBlockLargeThanLastConfirmed(
-                tx.tx_hash,
-                tx.block,
-                last_confirmed,
-            )
-            .into());
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "Ethereum tx {:?}'s block {} is large than last confirmed block {}",
+                tx.tx_hash, tx.block, last_confirmed,
+            );
+            return Ok(());
         }
 
         // 2. Do redeem

@@ -96,3 +96,22 @@ OPTIONS:
 
 - `--base-path` all of bridger data, like task config, database will store in here, the default path is `$HOME/.bridger`
 - `--host` `--port` the bridger server host and port.
+
+## You need to know
+
+The darwinia bridger is a server/client architecture software, all bridge are running in bridger server.
+This means you can run bridger on any computer you can access. you can set server bind host and port.
+
+Server
+
+```bash
+bridger server --host 127.0.0.1 --port 2021
+```
+
+> However, please do not open the port if it is not necessary, because it's too dangerous, everyone may connect to your bridger service
+
+Client
+
+```bash
+bridger task --server http://127.0.0.1:2021 list
+```

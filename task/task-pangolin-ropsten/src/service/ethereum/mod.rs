@@ -76,6 +76,11 @@ fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
             ethereum_config.subscribe_relay_address,
             ethereum_config.subscribe_relay_topics,
         ),
+        // backing
+        (
+            ethereum_config.subscribe_backing_address,
+            ethereum_config.subscribe_backing_topics,
+        ),
     ];
 
     topics_setting

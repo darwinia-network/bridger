@@ -145,6 +145,10 @@ impl RedeemHelper {
             .darwinia
             .verified(tx.block_hash, tx.index)
             .await?
+			|| ethereum2darwinia.
+            darwinia.
+            verified_issuing(tx.block_hash, tx.index)
+            .await?
         {
             trace!(
                 target: PangolinRopstenTask::NAME,

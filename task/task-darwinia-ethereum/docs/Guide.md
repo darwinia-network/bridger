@@ -43,8 +43,6 @@ darwinia-ethereum
       --param block_number=12856303
     ```
 
-> NOTE: Darwinia web socket node connected requires enabling [offchain-indexing](https://github.com/darwinia-network/bridger/issues/196#issuecomment-884056708).
-
 Query the block being synchronized:
 
 ```bash
@@ -55,7 +53,7 @@ Query the block being synchronized:
 
 ### Migrate 0.3.x to 0.4.x
 
-In order to keep the progress, bridger(0.3.x) will save two files.
+To keep the progress, bridger(0.3.x) will save two files.
 
 - ~/.bridger/last-redeemed
 - ~/.bridger/last-tracked-darwinia-block
@@ -87,7 +85,7 @@ Bridger(0.4.x) does not need these two files, so if you want to continue from th
 
 ## Security config
 
-if you want to encrypt your private key in config file. the first you can use `crypto encrypt` command to get your encrypted value.
+if you want to encrypt your private key in a config file. first, you can use `crypto encrypt` command to get your encrypted value.
 
 ```bash
 ./target/release/bridger crypto encrypt --value abcdefg
@@ -112,17 +110,17 @@ Now we support these filed to encrypt and decrypt
 
 - darwinia.relayer_private_key
 
-> NOTE: please use same password to encrypt your keys.
+> NOTE: please use the same password to encrypt your keys.
 
 when the configuration is encrypted, the task will not start until you provide the password.
 
-your can start with password
+your can start with `--password`
 
 ```bash
 ./target/release/bridger start -n task-darwinia-ethereum --password
 ```
 
-or without password to start. then run `set-password` command.
+or without `--password` to start. then run the `set-password` command.
 
 ```bash
 ./target/release/bridger task start -n task-darwinia-ethereum

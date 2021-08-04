@@ -52,9 +52,18 @@ impl LogsHandler for EthereumLogsHandler {
         let bank_topic = self.topics_list[0].1[0];
         let issuing_topic = self.topics_list[1].1[0];
         let relay_topic = self.topics_list[2].1[0];
+        let erc20_register_topic = self.topics_list[3].1[0];
+        let erc20_lock_topic = self.topics_list[3].1[1];
 
         // Build all transactions from logs
-        let txs = build_txs(logs, bank_topic, issuing_topic, relay_topic);
+        let txs = build_txs(
+            logs,
+            bank_topic,
+            issuing_topic,
+            relay_topic,
+            erc20_register_topic,
+            erc20_lock_topic,
+        );
 
         if !txs.is_empty() {
             // Send block number to `Relay Service`
@@ -85,6 +94,8 @@ fn build_txs(
     bank_topic: H256,
     issuing_topic: H256,
     relay_topic: H256,
+    erc20_register_topic: H256,
+    erc20_lock_topic: H256,
 ) -> Vec<EthereumTransaction> {
     let mut txs = vec![];
     for l in &logs {
@@ -113,6 +124,24 @@ fn build_txs(
                 block,
                 index,
             }
+        } else if l.topics.contains(&erc20_register_topic) {
+            EthereumTransaction {
+                tx_hash: EthereumTransactionHash::RegisterErc20Token(
+                    l.transaction_hash.unwrap_or_default(),
+                ),
+                block_hash: l.block_hash.unwrap_or_default(),
+                block,
+                index,
+            }
+        } else if l.topics.contains(&erc20_lock_topic) {
+            EthereumTransaction {
+                tx_hash: EthereumTransactionHash::RedeemErc20Token(
+                    l.transaction_hash.unwrap_or_default(),
+                ),
+                block_hash: l.block_hash.unwrap_or_default(),
+                block,
+                index,
+            }
         } else {
             error!(
                 target: PangolinRopstenTask::NAME,
@@ -132,6 +161,10 @@ impl EthereumLogsHandler {
             .darwinia_client
             .verified(tx.block_hash, tx.index)
             .await?
+            || self
+                .darwinia_client
+                .verified_issuing(tx.block_hash, tx.index)
+                .await?
         {
             trace!(
                 target: PangolinRopstenTask::NAME,

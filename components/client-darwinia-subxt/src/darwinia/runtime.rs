@@ -71,7 +71,9 @@ impl Runtime for DarwiniaRuntime {
         registry.register_type_size::<H160>("H160");
         registry.register_type_size::<ExitReason>("ExitReason");
         registry.register_type_size::<Self::Hash>("Hash");
+        println!("{:?}", registry);
         register_default_type_sizes(registry);
+        println!("{:?}", registry);
     }
 }
 

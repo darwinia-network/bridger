@@ -3,21 +3,14 @@ use std::time::Duration;
 use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
-use microkv::MicroKV;
-use postage::broadcast;
 use tokio::time::sleep;
-use web3::{
-    transports::http::Http,
-    types::{H160, H256},
-    Web3,
-};
+use web3::types::{H160, H256};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::darwinia::client::Darwinia;
 use component_ethereum::config::EthereumConfig;
 use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;

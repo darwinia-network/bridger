@@ -209,35 +209,32 @@ async fn do_send_extrinsic(
                     }
                 }
                 RedeemFor::RegisterErc20Token => {
-                    // if let Some(ethereum2darwinia) = &ethereum2darwinia {
-                    // 	if let Some(relayer) = &ethereum2darwinia_relayer {
-                    // 		let ex_hash =
-                    // 			ethereum2darwinia.register_erc20(&relayer, proof).await?;
-                    // 		info!(
-                    // 			"register erc20 token tx {:?} with extrinsic {:?}",
-                    // 			ethereum_tx.tx_hash, ex_hash
-                    // 		);
-                    // 	}
-                    // }
+                    if let Some(ethereum2darwinia) = &ethereum2darwinia {
+                        if let Some(relayer) = &ethereum2darwinia_relayer {
+                            let ex_hash = ethereum2darwinia.register_erc20(&relayer, proof).await?;
+                            info!(
+                                "register erc20 token tx {:?} with extrinsic {:?}",
+                                ethereum_tx.tx_hash, ex_hash
+                            );
+                        }
+                    }
                 }
                 RedeemFor::RedeemErc20Token => {
-                    // if let Some(ethereum2darwinia) = &ethereum2darwinia {
-                    // 	if let Some(relayer) = &ethereum2darwinia_relayer {
-                    // 		let ex_hash =
-                    // 			ethereum2darwinia.redeem_erc20(&relayer, proof).await?;
-                    // 		info!(
-                    // 			"redeem erc20 token tx {:?} with extrinsic {:?}",
-                    // 			ethereum_tx.tx_hash, ex_hash
-                    // 		);
-                    // 	}
-                    // }
+                    if let Some(ethereum2darwinia) = &ethereum2darwinia {
+                        if let Some(relayer) = &ethereum2darwinia_relayer {
+                            let ex_hash = ethereum2darwinia.redeem_erc20(&relayer, proof).await?;
+                            info!(
+                                "redeem erc20 token tx {:?} with extrinsic {:?}",
+                                ethereum_tx.tx_hash, ex_hash
+                            );
+                        }
+                    }
                 }
                 _ => {
                     if let Some(ethereum2darwinia) = &ethereum2darwinia {
                         if let Some(relayer) = &ethereum2darwinia_relayer {
-                            let ex_hash = ethereum2darwinia
-                                .redeem(relayer, redeem_for, proof)
-                                .await?;
+                            let ex_hash =
+                                ethereum2darwinia.redeem(relayer, redeem_for, proof).await?;
                             info!(
                                 target: PangolinRopstenTask::NAME,
                                 "Redeemed ethereum tx {:?} with extrinsic {:?}",

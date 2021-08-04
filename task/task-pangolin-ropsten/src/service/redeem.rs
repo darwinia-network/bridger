@@ -44,10 +44,7 @@ impl Service for RedeemService {
                     match recv {
                         ToRedeemMessage::EthereumTransaction(tx) => {
                             if let Err(err) = helper.redeem(tx).await {
-                                error!(
-                                    target: PangolinRopstenTask::NAME,
-                                    "redeem err: {:#?}", err
-                                );
+                                error!(target: PangolinRopstenTask::NAME, "redeem err: {:#?}", err);
                                 // TODO: Consider the errors more carefully
                                 // Maybe a websocket err, so wait 10 secs to reconnect.
                                 sleep(Duration::from_secs(10)).await;
@@ -145,6 +142,10 @@ impl RedeemHelper {
             .darwinia
             .verified(tx.block_hash, tx.index)
             .await?
+            || ethereum2darwinia
+                .darwinia
+                .verified_issuing(tx.block_hash, tx.index)
+                .await?
         {
             trace!(
                 target: PangolinRopstenTask::NAME,
@@ -159,7 +160,9 @@ impl RedeemHelper {
             trace!(
                 target: PangolinRopstenTask::NAME,
                 "Ethereum tx {:?}'s block {} is large than last confirmed block {}",
-                tx.tx_hash, tx.block, last_confirmed,
+                tx.tx_hash,
+                tx.block,
+                last_confirmed,
             );
             return Ok(());
         }

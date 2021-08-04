@@ -76,6 +76,11 @@ fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
             ethereum_config.subscribe_relay_address,
             ethereum_config.subscribe_relay_topics,
         ),
+        // backing
+        (
+            ethereum_config.subscribe_backing_address,
+            ethereum_config.subscribe_backing_topics,
+        ),
     ];
 
     topics_setting
@@ -120,7 +125,13 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                     let cloned_sender_to_redeem = sender_to_redeem.clone();
                     let cloned_sender_to_ethereum = sender_to_ethereum.clone();
                     tokio::spawn(async move {
-                        run(cloned_state, cloned_sender_to_relay, cloned_sender_to_redeem, cloned_sender_to_ethereum).await
+                        run(
+                            cloned_state,
+                            cloned_sender_to_relay,
+                            cloned_sender_to_redeem,
+                            cloned_sender_to_ethereum,
+                        )
+                        .await
                     });
                 }
                 Ok(())
@@ -134,7 +145,7 @@ async fn run(
     state: BridgeState,
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
-    mut sender_to_ethereum: postage::broadcast::Sender<ToEthereumMessage>
+    mut sender_to_ethereum: postage::broadcast::Sender<ToEthereumMessage>,
 ) {
     if let Err(err) = start(
         state.clone(),
@@ -143,14 +154,12 @@ async fn run(
     )
     .await
     {
-        error!(
-            target: PangolinRopstenTask::NAME,
-            "ethereum err {:#?}", err
-        );
+        error!(target: PangolinRopstenTask::NAME, "ethereum err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
         sender_to_ethereum
             .send(ToEthereumMessage::Start)
-            .await.unwrap();
+            .await
+            .unwrap();
     }
 }
 

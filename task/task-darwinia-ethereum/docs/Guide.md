@@ -3,47 +3,95 @@ darwinia-ethereum
 
 ## Prepare
 
-1. `cp .maintain/config/task-darwinia-ethereum.toml ~/.bridger`
+1. `cargo build --release`
+2. `cp .maintain/config/task-darwinia-ethereum.toml ~/.bridger`
    The dir can be any path you like, and fill the content.
-2. `cp ~/.bridger/linked-darwinia.toml ~/.bridger`
-3. `cargo build --release`
+3. `cp .maintain/config/linked-darwinia.toml ~/.bridger` or `cp .maintain/config/task-darwinia-ethereum.toml ~/.bridger/linked-darwinia.toml`
 
 ## Run
 
-4. `./target/release/bridger server`
+1. `./target/release/bridger server`
    it may take a while to run all services if the network is not good. this will run all services except the darwinia and ethereum subscribe services. These two services should be started manually.
 
-5. Open another shell
+2. Open another shell
 
-6. Start the darwinia subscribe service
+3. Start the darwinia subscribe service
     ```bash
-    ./target/release/bridger task exec --name task-darwinia-ethereum --api start-darwinia
+    ./target/release/bridger task exec \
+      --name task-darwinia-ethereum \
+      --api start-darwinia
     ```
    or start it with a block_number
     ```bash
-    ./target/release/bridger task exec --name task-darwinia-ethereum --api start-darwinia --param block_number=4230622
+    ./target/release/bridger task exec \
+      --name task-darwinia-ethereum \
+      --api start-darwinia \
+      --param block_number=4230622
     ```
 
-7. Start the ethereum subscribe service
+4. Start the ethereum subscribe service
     ```bash
-    ./target/release/bridger task exec --name task-darwinia-ethereum --api start-ethereum
+    ./target/release/bridger task exec \
+      --name task-darwinia-ethereum \
+      --api start-ethereum
     ```
    or start it with a block_number
     ```bash
-    ./target/release/bridger task exec --name task-darwinia-ethereum --api start-ethereum --param block_number=12856303
+    ./target/release/bridger task exec \
+      --name task-darwinia-ethereum \
+      --api start-ethereum \
+      --param block_number=12856303
     ```
 
-Note: Darwinia web socket node connected requires enabling [offchain-indexing](https://github.com/darwinia-network/bridger/issues/196#issuecomment-884056708).
+Query the block being synchronized:
+
+```bash
+./target/release/bridger kv get last-tracked-darwinia-block last-redeemed
+```
+
+## Migrate
+
+### Migrate 0.3.x to 0.4.x
+
+To keep the progress, bridger(0.3.x) will save two files.
+
+- ~/.bridger/last-redeemed
+- ~/.bridger/last-tracked-darwinia-block
+
+Bridger(0.4.x) does not need these two files, so if you want to continue from the previous progress after the upgrade, you need to migrate these two values.
+
+1. [Prepare](#Prepare)
+2. Run bridger server (0.4.x)
+   ```bash
+   ./target/release/bridger server
+   ```
+4. Start the darwinia subscribe service
+   ```bash
+    ./target/release/bridger task exec \
+      --name task-darwinia-ethereum \
+      --api start-darwinia \
+      --param block_number=$(cat ~/.bridger/last-redeemed)
+   ```
+4. Start the ethereum subscribe service
+   ```bash
+   ./target/release/bridger task exec \
+     --name task-darwinia-ethereum \
+     --api start-ethereum \
+     --param block_number=$(cat ~/.bridger/last-tracked-darwinia-block)
+   ```
+
+> IMPORTANT: Please don't start with `block_number` every time, because bridger(0.4.x) will remember the currently synchronized block as before, as long as it carries `block_number`, it will start from the specified block.
+
 
 ## Security config
 
-If you want to encrypt your private key in config file. the first you can use `crypto encrypt` command to get your encrypted value.
+if you want to encrypt your private key in a config file. first, you can use `crypto encrypt` command to get your encrypted value.
 
 ```bash
 ./target/release/bridger crypto encrypt --value abcdefg
 ```
 
-When you got it. then update your config. change follow this.
+when you got it. then update your config. change follow this.
 
 ```toml
 [darwinia]
@@ -58,21 +106,21 @@ interval_relay = 60
 # ...
 ```
 
-Not we support these filed to encrypt and decrypt
+Now we support these filed to encrypt and decrypt
 
 - darwinia.relayer_private_key
 
-> NOTE: please use same password to encrypt your keys.
+> NOTE: please use the same password to encrypt your keys.
 
-When the configuration is encrypted, the task will not start until you provide the password.
+when the configuration is encrypted, the task will not start until you provide the password.
 
-your can start with password
+your can start with `--password`
 
 ```bash
 ./target/release/bridger start -n task-darwinia-ethereum --password
 ```
 
-or without password to start. then run `set-password` command.
+or without `--password` to start. then run the `set-password` command.
 
 ```bash
 ./target/release/bridger task start -n task-darwinia-ethereum

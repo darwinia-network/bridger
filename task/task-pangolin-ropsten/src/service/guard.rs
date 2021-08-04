@@ -62,10 +62,7 @@ impl Service for GuardService {
 #[async_recursion]
 async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
     if let Err(err) = start(sender_to_extrinsics.clone()).await {
-        error!(
-            target: PangolinRopstenTask::NAME,
-            "guard err {:#?}", err
-        );
+        error!(target: PangolinRopstenTask::NAME, "guard err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
         run(sender_to_extrinsics).await;
     }
@@ -92,7 +89,9 @@ async fn start(
         config_darwinia.relayer_real_account,
     );
     let guard_account = FromEthereumAccount::new(account);
-    let is_tech_comm_member = ethereum2darwinia.is_tech_comm_member(None, &guard_account).await?;
+    let is_tech_comm_member = ethereum2darwinia
+        .is_tech_comm_member(None, &guard_account)
+        .await?;
 
     if is_tech_comm_member {
         // Shadow client
@@ -114,7 +113,8 @@ async fn start(
                 guard_account_clone,
                 shadow_clone,
                 sender_to_extrinsics_clone,
-            ).await?;
+            )
+            .await?;
 
             sleep(Duration::from_secs(servce_config.interval_guard)).await;
         }
@@ -170,21 +170,22 @@ impl GuardService {
                         sender_to_extrinsics
                             .send(ToExtrinsicsMessage::Extrinsic(ex))
                             .await?;
-                    },
-                    Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(block, msg))) => {
+                    }
+                    Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(
+                        block,
+                        msg,
+                    ))) => {
                         trace!(
                             target: PangolinRopstenTask::NAME,
                             "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
                             block,
                             msg
                         );
-                    },
+                    }
                     Err(err) => {
                         return Err(err.into());
                     }
-
                 }
-
             }
         }
 

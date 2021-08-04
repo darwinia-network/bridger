@@ -75,10 +75,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
                         }
                         ToRelayMessage::Relay => {
                             if let Err(err) = helper.affirm().await {
-                                error!(
-                                    target: PangolinRopstenTask::NAME,
-                                    "affirm err: {:#?}", err
-                                );
+                                error!(target: PangolinRopstenTask::NAME, "affirm err: {:#?}", err);
                                 // TODO: Consider the errors more carefully
                                 // Maybe a websocket err, so wait 10 secs to reconnect.
                                 sleep(Duration::from_secs(10)).await;
@@ -170,10 +167,10 @@ impl RelayHelper {
             relayed = last_confirmed;
         } else {
             trace!(
-            target: PangolinRopstenTask::NAME,
-            "The last relayed ethereum block is {}",
-            relayed
-        );
+                target: PangolinRopstenTask::NAME,
+                "The last relayed ethereum block is {}",
+                relayed
+            );
         }
 
         if target > relayed {
@@ -188,8 +185,9 @@ impl RelayHelper {
                 target,
                 self.sender_to_extrinsics.clone(),
             )
-            .await {
-                    return Err(err);
+            .await
+            {
+                return Err(err);
             }
         } else {
             trace!(
@@ -276,7 +274,7 @@ pub async fn do_affirm(
             sender_to_extrinsics
                 .send(ToExtrinsicsMessage::Extrinsic(ex))
                 .await?
-        },
+        }
         Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(block, msg))) => {
             trace!(
                 target: PangolinRopstenTask::NAME,
@@ -284,7 +282,7 @@ pub async fn do_affirm(
                 block,
                 msg
             );
-        },
+        }
         Err(err) => {
             return Err(err.into());
         }

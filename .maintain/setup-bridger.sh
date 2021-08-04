@@ -30,7 +30,18 @@ cross build \
 
 cd ${WORK_PATH}/deploy/bin/
 
-cp ${WORK_PATH}/target/x86_64-unknown-linux-gnu/release/darwinia ${WORK_PATH}/deploy/bin/
-chmod +x darwinia
-tar cjSf darwinia-x86_64-linux-gnu.tar.bz2 darwinia
-mv ${WORK_PATH}/deploy/bin/darwinia ${WORK_PATH}/deploy/
+cp ${WORK_PATH}/target/x86_64-unknown-linux-gnu/release/bridger ${WORK_PATH}/deploy/bin/
+chmod +x bridger
+tar cjSf bridger-x86_64-linux-gnu.tar.bz2 bridger
+mv ${WORK_PATH}/deploy/bin/bridger ${WORK_PATH}/deploy/
+
+
+echo -e '\e[1;32m🔑 Generating File(s) Hash\e[0m'
+
+md5sum * > ../md5sums.txt
+sha256sum * > ../sha256sums.txt
+
+mv ../md5sums.txt .
+mv ../sha256sums.txt .
+
+ls

@@ -11,17 +11,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build darwinia
+      - name: Build bridger
         env:
           RUST_TOOLCHAIN: nightly-2021-04-15
         run: |
           .maintain/setup-bridger.sh
 
-#      - name: Upload deploy
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: darwinia-artifact
-#          path: deploy
+      - name: Publish github release
+        uses: docker://antonyurchenko/git-release:latest
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRAFT_RELEASE: "false"
+          PRE_RELEASE: "false"
+          CHANGELOG_FILE: "CHANGELOG.md"
+          ALLOW_EMPTY_CHANGELOG: "false"
+        with:
+          args: |
+            deploy/bin/*
 
   build-publish-docker-image:
     name: Build Docker image

@@ -57,7 +57,12 @@ impl lifeline::Service for DarwiniaService {
                     let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
                     let cloned_sender_to_darwinia = sender_to_darwinia.clone();
                     tokio::spawn(async move {
-                        run(cloned_state, cloned_sender_to_extrinsics, cloned_sender_to_darwinia).await
+                        run(
+                            cloned_state,
+                            cloned_sender_to_extrinsics,
+                            cloned_sender_to_darwinia,
+                        )
+                        .await
                     });
                 }
                 Ok(())
@@ -70,17 +75,15 @@ impl lifeline::Service for DarwiniaService {
 async fn run(
     state: BridgeState,
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
-    mut sender_to_darwinia: postage::broadcast::Sender<ToDarwiniaMessage>
+    mut sender_to_darwinia: postage::broadcast::Sender<ToDarwiniaMessage>,
 ) {
     if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
-        error!(
-            target: PangolinRopstenTask::NAME,
-            "darwinia err {:#?}", err
-        );
+        error!(target: PangolinRopstenTask::NAME, "darwinia err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
         sender_to_darwinia
             .send(ToDarwiniaMessage::Start)
-            .await.unwrap();
+            .await
+            .unwrap();
     }
 }
 

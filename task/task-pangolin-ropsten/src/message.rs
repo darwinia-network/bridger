@@ -104,4 +104,3 @@ pub enum ToEthereumMessage {
 impl Message<PangolinRopstenBus> for ToEthereumMessage {
     type Channel = broadcast::Sender<Self>;
 }
-

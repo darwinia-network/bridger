@@ -13,7 +13,7 @@ RUN rustup update \
     && rustup target add wasm32-unknown-unknown --toolchain ${RUST_TOOLCHAIN}
 
 WORKDIR /src
-COPY .. .
+COPY . .
 
 RUN cargo build --release
 

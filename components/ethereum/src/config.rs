@@ -21,6 +21,8 @@ pub struct EthereumConfig {
     pub subscribe_relay_topics: Vec<String>,
     pub subscribe_issuing_address: String,
     pub subscribe_issuing_topics: Vec<String>,
+    pub subscribe_backing_address: String,
+    pub subscribe_backing_topics: Vec<String>,
 
     /// Counter
     pub atom: usize,
@@ -44,6 +46,8 @@ impl BridgeConfig for EthereumConfig {
             subscribe_relay_topics: vec!["0x...".to_string()],
             subscribe_issuing_address: "0x...".to_string(),
             subscribe_issuing_topics: vec!["0x...".to_string()],
+            subscribe_backing_address: "0x...".to_string(),
+            subscribe_backing_topics: vec!["0x...".to_string()],
             atom: 0,
         }
     }

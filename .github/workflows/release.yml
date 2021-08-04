@@ -1,12 +1,36 @@
 name: Release
-
 on:
   push:
-    tags: ["*"]
-    branches: ["feature/docker-image"]
+    tags:
+      - 'v*'
 
 jobs:
-  build-docker-image:
+  build-publish-github-release:
+    name: Build binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build bridger
+        env:
+          RUST_TOOLCHAIN: nightly-2021-04-15
+        run: |
+          .maintain/setup-bridger.sh
+
+      - name: Publish github release
+        uses: docker://antonyurchenko/git-release:latest
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRAFT_RELEASE: "false"
+          PRE_RELEASE: "false"
+          CHANGELOG_FILE: "CHANGELOG.md"
+          ALLOW_EMPTY_CHANGELOG: "false"
+        with:
+          args: |
+            deploy/bin/*
+
+  build-publish-docker-image:
     name: Build Docker image
     runs-on: ubuntu-latest
     steps:
@@ -28,5 +52,5 @@ jobs:
       - uses: ./.github/actions/docker-build-deploy
         with:
           docker_registry: quay.io
-          docker_build_options: -f .maintain/Dockerfile
+          docker_build_options: -f .maintain/docker/Dockerfile.publish-docker-image
           skip_deploy: true

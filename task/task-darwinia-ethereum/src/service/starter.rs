@@ -39,6 +39,7 @@ impl Service for StarterService {
             &format!("{}-service-starter", DarwiniaEthereumTask::NAME),
             async move {
                 if !config_task.is_enable_crypto() {
+                    tokio::time::sleep(std::time::Duration::from_secs(3)).await;
                     return start_services(&mut tx_scan).await;
                 }
 

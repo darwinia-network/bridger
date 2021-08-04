@@ -31,34 +31,6 @@ use crate::task::PangolinRopstenTask;
 
 mod ethereum_logs_handler;
 
-#[allow(clippy::too_many_arguments)]
-fn create_tracker(
-    darwinia_client: Darwinia,
-    microkv: MicroKV,
-    sender_to_relay: broadcast::Sender<ToRelayMessage>,
-    sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-    web3: Web3<Http>,
-    topics_list: Vec<(H160, Vec<H256>)>,
-    scan_from: u64,
-    step: u64,
-) -> EvmLogTracker<Ethereum, EthereumLogsHandler> {
-    let client = EvmClient::new(web3);
-    let logs_handler = EthereumLogsHandler::new(
-        topics_list.clone(),
-        sender_to_relay,
-        sender_to_redeem,
-        microkv,
-        darwinia_client,
-    );
-    EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
-        client,
-        topics_list,
-        logs_handler,
-        scan_from,
-        step,
-    )
-}
-
 fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
     let topics_setting = vec![
         // bank
@@ -187,21 +159,26 @@ async fn start(
     let darwinia = component_darwinia_subxt.component().await?;
 
     let topics_list = get_topics_list(ethereum_config);
-    let scan_from: u64 = microkv.get("last-redeemed-ropsten")?.unwrap_or(0) + 1;
 
     info!(
         target: PangolinRopstenTask::NAME,
         "✨ SERVICE STARTED: ETHEREUM <> DARWINIA ETHEREUM SUBSCRIBE"
     );
 
-    let mut tracker = create_tracker(
-        darwinia,
-        microkv.clone(),
+    let client = EvmClient::new(web3);
+    let logs_handler = EthereumLogsHandler::new(
+        topics_list.clone(),
         sender_to_relay,
         sender_to_redeem,
-        web3.clone(),
+        microkv.clone(),
+        darwinia,
+    );
+    let mut tracker = EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
+        client,
         topics_list,
-        scan_from,
+        logs_handler,
+        state.clone(),
+        "last-redeemed-ropsten".to_string(),
         servce_config.interval_ethereum,
     );
 

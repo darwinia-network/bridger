@@ -1,12 +1,29 @@
 name: Release
-
 on:
   push:
-    tags: ["*"]
-    branches: ["feature/docker-image"]
+    tags:
+      - 'v*'
 
 jobs:
-  build-docker-image:
+  build-publish-github-release:
+    name: Build binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build darwinia
+        env:
+          RUST_TOOLCHAIN: nightly-2021-04-15
+        run: |
+          .maintain/setup-bridger.sh
+
+#      - name: Upload deploy
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: darwinia-artifact
+#          path: deploy
+
+  build-publish-docker-image:
     name: Build Docker image
     runs-on: ubuntu-latest
     steps:
@@ -28,5 +45,5 @@ jobs:
       - uses: ./.github/actions/docker-build-deploy
         with:
           docker_registry: quay.io
-          docker_build_options: -f .maintain/Dockerfile
+          docker_build_options: -f .maintain/docker/Dockerfile.publish-docker-image
           skip_deploy: true

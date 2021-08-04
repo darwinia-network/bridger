@@ -6,9 +6,9 @@
 [![downloads](https://img.shields.io/crates/d/darwinia-bridger.svg)](https://github.com/darwinia-network/bridger/releases/)
 [![license](https://img.shields.io/github/license/darwinia-network/bridger)](https://choosealicense.com/licenses/gpl/)
 
-Relayers (aka. Bridgers) in Darwinia Network are offchain worker clients which help relay the headers and messages between source chains and target chains, they works between two chains and requires RPC access of two chains.
+Relayers (aka. Bridgers) in Darwinia Network are offchain worker clients which help relay the headers and messages between source chains and target chains, they work between two chains and require RPC access of two chains.
 
-Darwinia Bridger (this repo) is an implementation of relayer client written in Rust.
+Darwinia Bridger (this repo) is an implementation of a relayer client written in Rust.
 
 ## Installation
 
@@ -26,7 +26,7 @@ docker pull quay.io/darwinia-network/bridger:<VERSION>
 
 > ⚠️ Because of [#76](https://github.com/darwinia-network/bridger/issues/76) we don't publish darwinia-bridger to crates.io, the [darwinia-bridger](https://crates.io/crates/darwinia-bridger) currently in crates is outdated.
 
-If you want to install use cargo, you can run this command, the first you need found last version in [latest release](https://github.com/darwinia-network/bridger/releases/latest).
+If you want to install use cargo, you can run this command, the first you need found the last version in [latest release](https://github.com/darwinia-network/bridger/releases/latest).
 
 ```bash
 cargo install darwinia-bridger --git https://github.com/darwinia-network/bridger --tag <VERSION>
@@ -34,7 +34,7 @@ cargo install darwinia-bridger --git https://github.com/darwinia-network/bridger
 
 ### Build from source
 
-> Notice: please use last `nightly` toolchain. You might want to change the default toolchain using `rustup default nightly`, some bridger need wasm support, you can run `rustup target add wasm32-unknown-unknown`.
+> Notice: please use the last `nightly` toolchain. You might want to change the default toolchain using `rustup default nightly`, some bridge need wasm support, you can run `rustup target add wasm32-unknown-unknown`.
 
 ```bash
 git clone https://github.com/darwinia-network/bridger.git
@@ -44,7 +44,7 @@ cargo build --release
 
 ## Configuration
 
-The currently darwinia-bridger supports these bridge, the config you can click docs link
+The currently darwinia-bridger supports these bridges, the config you can click docs link
 
 | type                | bridge            | doc                                                  |
 | ------------------- | ----------------- | ---------------------------------------------------- |
@@ -74,7 +74,7 @@ SUBCOMMANDS:
     task      Task manager
 ```
 
-No matter what bridge you wish to start, the first, you must run `bridger server` to start bridger server.
+No matter what bridge you wish to start, first, you must run `bridger server` to start the bridger server.
 
 ```text
 $ bridger server --help
@@ -96,3 +96,22 @@ OPTIONS:
 
 - `--base-path` all of bridger data, like task config, database will store in here, the default path is `$HOME/.bridger`
 - `--host` `--port` the bridger server host and port.
+
+## You need to know
+
+The darwinia bridger is a server/client architecture software, all bridges are running in the bridger server.
+This means you can run bridger on any computer you can access. you can set server bind host and port.
+
+Server
+
+```bash
+bridger server --host 127.0.0.1 --port 2021
+```
+
+> However, please do not open the port if it is not necessary, because it's too dangerous, everyone may connect to your bridger service
+
+Client
+
+```bash
+bridger task --server http://127.0.0.1:2021 list
+```

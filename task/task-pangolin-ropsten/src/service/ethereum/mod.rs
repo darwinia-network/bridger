@@ -117,12 +117,12 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let service_name = format!("{}-service-ethereum-scan", PangolinRopstenTask::NAME);
-        let _greet = Self::try_task(&service_name, async move {
+        let _greet = Self::try_task(&service_name.clone(), async move {
             let mut is_started = false;
             while let Some(ToEthereumMessage::Start) = rx.recv().await {
                 if is_started {
                     log::warn!("The service {} has been started", service_name.clone());
-                    return;
+                    return Ok(());
                 }
 
                 let cloned_state = state.clone();

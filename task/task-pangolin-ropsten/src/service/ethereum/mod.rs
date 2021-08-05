@@ -116,27 +116,32 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
-        let _greet = Self::try_task(
-            &format!("{}-service-ethereum-scan", PangolinRopstenTask::NAME),
-            async move {
-                while let Some(ToEthereumMessage::Start) = rx.recv().await {
-                    let cloned_state = state.clone();
-                    let cloned_sender_to_relay = sender_to_relay.clone();
-                    let cloned_sender_to_redeem = sender_to_redeem.clone();
-                    let cloned_sender_to_ethereum = sender_to_ethereum.clone();
-                    tokio::spawn(async move {
-                        run(
-                            cloned_state,
-                            cloned_sender_to_relay,
-                            cloned_sender_to_redeem,
-                            cloned_sender_to_ethereum,
-                        )
-                        .await
-                    });
+        let service_name = format!("{}-service-ethereum-scan", PangolinRopstenTask::NAME);
+        let _greet = Self::try_task(&service_name.clone(), async move {
+            let mut is_started = false;
+            while let Some(ToEthereumMessage::Start) = rx.recv().await {
+                if is_started {
+                    log::warn!("The service {} has been started", service_name.clone());
+                    return Ok(());
                 }
-                Ok(())
-            },
-        );
+
+                let cloned_state = state.clone();
+                let cloned_sender_to_relay = sender_to_relay.clone();
+                let cloned_sender_to_redeem = sender_to_redeem.clone();
+                let cloned_sender_to_ethereum = sender_to_ethereum.clone();
+                tokio::spawn(async move {
+                    run(
+                        cloned_state,
+                        cloned_sender_to_relay,
+                        cloned_sender_to_redeem,
+                        cloned_sender_to_ethereum,
+                    )
+                    .await
+                });
+                is_started = true;
+            }
+            Ok(())
+        });
         Ok(Self { _greet })
     }
 }

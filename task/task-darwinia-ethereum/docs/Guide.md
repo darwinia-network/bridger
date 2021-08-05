@@ -6,7 +6,7 @@ darwinia-ethereum
 1. `cargo build --release`
 2. `cp .maintain/config/task-darwinia-ethereum.toml ~/.bridger`
    The dir can be any path you like, and fill the content.
-3. `cp .maintain/config/linked-darwinia.toml ~/.bridger` or `cp .maintain/config/task-darwinia-ethereum.toml ~/.bridger/linked-darwinia.toml`
+3. `cp .maintain/config/linked-darwinia.toml ~/.bridger`
 
 ## Run
 

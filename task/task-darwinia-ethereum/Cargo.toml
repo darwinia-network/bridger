@@ -55,7 +55,7 @@ support-keep = { path = "../../supports/support-keep" }
 tokio = { version = "1", features = ["full"] }
 
 env_logger = "0.8"
-substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.15.2" }
+substrate-subxt = { version = "0.15.3", git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "metadata" }
 secp256k1 = { version = "0.20", features = ["recovery"] }
 async-recursion = "0.3.2"
 

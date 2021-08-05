@@ -66,6 +66,9 @@ async fn start_services<S>(tx_scan: &mut S) -> anyhow::Result<()>
 where
     S: lifeline::Sender<DarwiniaEthereumMessage>,
 {
+    // wait task has be keep
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+
     let task: &mut DarwiniaEthereumTask =
         support_keep::task::running_task_downcast_mut(DarwiniaEthereumTask::NAME)?;
     let stack = task.stack();

@@ -3,21 +3,14 @@ use std::time::Duration;
 use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
-use microkv::MicroKV;
-use postage::broadcast;
 use tokio::time::sleep;
-use web3::{
-    transports::http::Http,
-    types::{H160, H256},
-    Web3,
-};
+use web3::types::{H160, H256};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::darwinia::client::Darwinia;
 use component_ethereum::config::EthereumConfig;
 use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
@@ -30,34 +23,6 @@ use crate::message::{ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
 use crate::task::DarwiniaEthereumTask;
 
 mod ethereum_logs_handler;
-
-#[allow(clippy::too_many_arguments)]
-fn create_tracker(
-    darwinia_client: Darwinia,
-    microkv: MicroKV,
-    sender_to_relay: broadcast::Sender<ToRelayMessage>,
-    sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-    web3: Web3<Http>,
-    topics_list: Vec<(H160, Vec<H256>)>,
-    scan_from: u64,
-    step: u64,
-) -> EvmLogTracker<Ethereum, EthereumLogsHandler> {
-    let client = EvmClient::new(web3);
-    let logs_handler = EthereumLogsHandler::new(
-        topics_list.clone(),
-        sender_to_relay,
-        sender_to_redeem,
-        microkv,
-        darwinia_client,
-    );
-    EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
-        client,
-        topics_list,
-        logs_handler,
-        scan_from,
-        step,
-    )
-}
 
 fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
     let topics_setting = vec![
@@ -190,21 +155,26 @@ async fn start(
     let darwinia = component_darwinia_subxt.component().await?;
 
     let topics_list = get_topics_list(ethereum_config);
-    let scan_from: u64 = microkv.get("last-redeemed")?.unwrap_or(0) + 1;
 
     info!(
         target: DarwiniaEthereumTask::NAME,
         "✨ SERVICE STARTED: ETHEREUM <> DARWINIA ETHEREUM SUBSCRIBE"
     );
 
-    let mut tracker = create_tracker(
-        darwinia,
-        microkv.clone(),
+    let client = EvmClient::new(web3);
+    let logs_handler = EthereumLogsHandler::new(
+        topics_list.clone(),
         sender_to_relay,
         sender_to_redeem,
-        web3.clone(),
+        microkv.clone(),
+        darwinia,
+    );
+    let mut tracker = EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
+        client,
         topics_list,
-        scan_from,
+        logs_handler,
+        state.clone(),
+        "last-redeemed".to_string(),
         servce_config.interval_ethereum,
     );
 

@@ -1,3 +1,7 @@
+// this router command is use to get storage event proof with signatures.
+// For example, the storage updated in transaction at block 205, the mmr to sign block is 210 and
+// the sign block is 216, then the command is as follows
+// bridger task exec --name task-pangolin-ropsten --api info-d2e --param network=Pangolin --param txblock=205 --param mmrblock=210 --param signblock=216
 use codec::Encode;
 use colored::*;
 

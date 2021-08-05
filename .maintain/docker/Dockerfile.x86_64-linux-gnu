@@ -22,7 +22,9 @@ FROM ubuntu:16.04
 
 # change mirrorlist
 RUN apt update && apt install -y \
-	# tool
-	git make \
-	# compiler
-	gcc g++ clang-4.0
+    # lib
+    libssl-dev \
+    # tool
+    git make pkg-config \
+    # compiler
+    gcc g++ clang-4.0

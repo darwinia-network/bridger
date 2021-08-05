@@ -57,7 +57,7 @@ The latest help texts are also available in `bridger --help`.
 
 ```
 $ bridger
-bridger 0.4.2
+bridger 0.4.3
 Darwinia bridger
 
 USAGE:
@@ -78,7 +78,7 @@ No matter what bridge you wish to start, first, you must run `bridger server` to
 
 ```text
 $ bridger server --help
-bridger-server 0.4.2
+bridger-server 0.4.3
 Start bridger server
 
 USAGE:

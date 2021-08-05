@@ -22,14 +22,9 @@ FROM ubuntu:16.04
 
 # change mirrorlist
 RUN apt update && apt install -y \
-<<<<<<< HEAD
     # lib
     libssl-dev \
-	# tool
-	git make pkg-config \
-=======
-	# tool
-	git make \
->>>>>>> 8e17730165001cbf90539ec9b75c2864fa8818d6
-	# compiler
-	gcc g++ clang-4.0
+    # tool
+    git make pkg-config \
+    # compiler
+    gcc g++ clang-4.0

@@ -1,3 +1,12 @@
+## [0.4.2] - 2021-08-05
+
+### Fixed
+- [Register type size](https://github.com/darwinia-network/bridger/pull/222)
+- [Fix redeem retry problem](https://github.com/darwinia-network/bridger/pull/223)
+
+### Added
+- Docs
+
 ## [0.4.1] - 2021-08-05
 
 ### Fixed

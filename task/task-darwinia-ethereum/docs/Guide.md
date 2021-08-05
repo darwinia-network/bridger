@@ -12,6 +12,9 @@ darwinia-ethereum
 
 1. `./target/release/bridger server`
    it may take a while to run all services if the network is not good. this will run all services except the darwinia and ethereum subscribe services. These two services should be started manually.
+   
+
+Note: There are 6 sub services for now. Only 4 of them are automatically started, other 2 sub services require to set start `block_number` params. Due to [KV db enhancement issue](https://github.com/darwinia-network/bridger/pull/214), this has to be done using following cli.
 
 2. Open another shell
 

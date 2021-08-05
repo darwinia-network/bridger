@@ -600,7 +600,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-primitives"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "base64 0.13.0",
  "log",
@@ -635,7 +635,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-traits"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -863,7 +863,7 @@ dependencies = [
 
 [[package]]
 name = "component-darwinia"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -878,7 +878,7 @@ dependencies = [
 
 [[package]]
 name = "component-darwinia-subxt"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "array-bytes",
@@ -905,7 +905,7 @@ dependencies = [
 
 [[package]]
 name = "component-ethereum"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -922,7 +922,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -934,7 +934,7 @@ dependencies = [
 
 [[package]]
 name = "component-millau"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "bridge-traits",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -953,7 +953,7 @@ dependencies = [
 
 [[package]]
 name = "component-pangolin"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "bridge-traits",
  "darwinia-ethereum-relay",
@@ -999,7 +999,7 @@ dependencies = [
 
 [[package]]
 name = "component-shadow"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1015,7 +1015,7 @@ dependencies = [
 
 [[package]]
 name = "component-state"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1295,7 +1295,7 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridger"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-recursion",
@@ -2289,7 +2289,7 @@ dependencies = [
 
 [[package]]
 name = "evm-log-tracker"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "array-bytes",
@@ -3996,7 +3996,7 @@ dependencies = [
 
 [[package]]
 name = "linked-darwinia"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4018,7 +4018,7 @@ checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
 
 [[package]]
 name = "linked-template"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8810,7 +8810,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "support-ethereum"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "bridge-primitives",
@@ -8826,7 +8826,7 @@ dependencies = [
 
 [[package]]
 name = "support-keep"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "bridge-traits",
@@ -8840,7 +8840,7 @@ dependencies = [
 
 [[package]]
 name = "support-proc-macro"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "bridge-primitives",
@@ -8852,7 +8852,7 @@ dependencies = [
 
 [[package]]
 name = "support-s2s"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-std",
@@ -8942,7 +8942,7 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "task-darwinia-ethereum"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "array-bytes",
@@ -8977,7 +8977,7 @@ dependencies = [
 
 [[package]]
 name = "task-pangolin-millau"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -9026,7 +9026,7 @@ dependencies = [
 
 [[package]]
 name = "task-template"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",

@@ -16,20 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Darwinia. If not, see <https://www.gnu.org/licenses/>.
 
-FROM ubuntu:16.04
+FROM rustembedded/cross:aarch64-unknown-linux-gnu
 
-# for gernal linux
+# only for aarch64
 
 # change mirrorlist
 RUN apt update && apt install -y \
-<<<<<<< HEAD
-    # lib
-    libssl-dev \
-	# tool
-	git make pkg-config \
-=======
-	# tool
-	git make \
->>>>>>> 8e17730165001cbf90539ec9b75c2864fa8818d6
+	# lib
+	libc6-dev-i386 \
 	# compiler
-	gcc g++ clang-4.0
+	gcc-aarch64-linux-gnu gcc-5-aarch64-linux-gnu g++-aarch64-linux-gnu g++-5-aarch64-linux-gnu \
+	clang llvm libclang-dev

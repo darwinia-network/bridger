@@ -1,3 +1,8 @@
+## [0.4.3] - 2021-08-05
+
+### Fixed
+- [Upgrade subxt for Darwinia](https://github.com/darwinia-network/bridger/pull/229)
+
 ## [0.4.2] - 2021-08-05
 
 ### Fixed

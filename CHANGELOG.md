@@ -1,3 +1,9 @@
+## [0.4.4] - 2021-08-05
+
+### Fixed
+- [fix channel closed error](https://github.com/darwinia-network/bridger/pull/231)
+
+
 ## [0.4.3] - 2021-08-05
 
 ### Fixed
@@ -17,7 +23,7 @@
 ### Fixed
 - [Start to early](https://github.com/darwinia-network/bridger/pull/226)
 - [CI/CD refactor](https://github.com/darwinia-network/bridger/pull/225)
-  
+
 ### Added
 - Pangolin-Ropsten specific feature(for testing)
 - Docs

@@ -33,12 +33,13 @@ impl Service for RedeemService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToRedeemMessage>()?;
+        let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-redeem", PangolinRopstenTask::NAME),
             async move {
-                let mut helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
+                let mut helper = RedeemHelper::new(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await;
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
@@ -48,7 +49,7 @@ impl Service for RedeemService {
                                 // TODO: Consider the errors more carefully
                                 // Maybe a websocket err, so wait 10 secs to reconnect.
                                 sleep(Duration::from_secs(10)).await;
-                                helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
+                                helper = RedeemHelper::new(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await;
                                 // TODO: Maybe need retry
                             }
                         }
@@ -64,6 +65,7 @@ impl Service for RedeemService {
 
 struct RedeemHelper {
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
     darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
 }
@@ -72,8 +74,9 @@ impl RedeemHelper {
     #[async_recursion]
     pub async fn new(
         sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+        sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
     ) -> Self {
-        match RedeemHelper::build(sender_to_extrinsics.clone()).await {
+        match RedeemHelper::build(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await {
             Ok(helper) => helper,
             Err(err) => {
                 error!(
@@ -81,13 +84,14 @@ impl RedeemHelper {
                     "redeem init err: {:#?}", err
                 );
                 sleep(Duration::from_secs(10)).await;
-                RedeemHelper::new(sender_to_extrinsics).await
+                RedeemHelper::new(sender_to_extrinsics, sender_to_redeem).await
             }
         }
     }
 
     async fn build(
         sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+        sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
     ) -> anyhow::Result<Self> {
         info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 
@@ -108,6 +112,7 @@ impl RedeemHelper {
         );
         Ok(RedeemHelper {
             sender_to_extrinsics,
+            sender_to_redeem,
             darwinia,
             shadow,
         })
@@ -119,6 +124,7 @@ impl RedeemHelper {
             self.shadow.clone(),
             tx,
             self.sender_to_extrinsics.clone(),
+            self.sender_to_redeem.clone(),
         )
         .await?;
 
@@ -130,6 +136,7 @@ impl RedeemHelper {
         shadow: Arc<Shadow>,
         tx: EthereumTransaction,
         mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+        mut sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>
     ) -> anyhow::Result<()> {
         trace!(
             target: PangolinRopstenTask::NAME,
@@ -164,6 +171,8 @@ impl RedeemHelper {
                 tx.block,
                 last_confirmed,
             );
+            sleep(Duration::from_secs(30)).await;
+            sender_to_redeem.send(ToRedeemMessage::EthereumTransaction(tx)).await?;
             return Ok(());
         }
 

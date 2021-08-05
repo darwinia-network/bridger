@@ -55,7 +55,7 @@ impl lifeline::Service for DarwiniaService {
             while let Some(ToDarwiniaMessage::Start) = rx.recv().await {
                 if is_started {
                     log::warn!("The service {} has been started", service_name.clone());
-                    return Ok(());
+                    continue;
                 }
 
                 let cloned_state = state.clone();

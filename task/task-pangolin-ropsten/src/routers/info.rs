@@ -73,8 +73,6 @@ pub async fn d2e(
         .ok_or_else(|| StandardError::Api("The `signblock` parameter is required".to_string()))?
         .parse()?;
 
-    println!("------------ {:?} {:?} {:?} {:?} -------------", network, txblock, mmrblock, signblock);
-
     // Darwinia client
     let component_darwinia = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
     let darwinia = component_darwinia.component().await?;
@@ -89,7 +87,6 @@ pub async fn d2e(
     );
 
     let header = darwinia.get_block_by_number(txblock as u32).await?;
-    println!("========= header hash {:?} =========", header.hash());
     let proof = darwinia_to_ethereum
         .get_headermmr_genproof(txblock, mmrblock, header.hash())
         .await?;

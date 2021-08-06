@@ -17,7 +17,7 @@ pub async fn start_darwinia(
 
     if let Some(block_number) = block_number {
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv();
+        let microkv = state.microkv_with_namespace();
         microkv.put("last-tracked-darwinia-block", &block_number)?;
     }
 
@@ -35,7 +35,7 @@ pub async fn start_ethereum(
 
     if let Some(block_number) = block_number {
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv();
+        let microkv = state.microkv_with_namespace();
         microkv.put("last-redeemed", &block_number)?;
     }
 

@@ -3,6 +3,7 @@ use std::time::Duration;
 use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
+use microkv::namespace::NamespaceMicroKV;
 use microkv::MicroKV;
 use tokio::time::sleep;
 
@@ -142,7 +143,7 @@ impl ExtrinsicsHelper {
     }
 
     async fn send_extrinsic(&self, ex: Extrinsic) -> anyhow::Result<()> {
-        let microkv = self.state.microkv();
+        let microkv = self.state.microkv_with_namespace(PangolinRopstenTask::NAME);
         do_send_extrinsic(
             microkv,
             Some(self.ethereum2darwinia.clone()),
@@ -158,7 +159,7 @@ impl ExtrinsicsHelper {
 
 #[allow(clippy::too_many_arguments)]
 async fn do_send_extrinsic(
-    microkv: &MicroKV,
+    microkv: NamespaceMicroKV,
     ethereum2darwinia: Option<Ethereum2Darwinia>,
     darwinia2ethereum: Option<Darwinia2Ethereum>,
     ethereum2darwinia_relayer: Option<FromEthereumAccount>,

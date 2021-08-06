@@ -44,7 +44,7 @@ bridge-traits = { path = "../traits" }
 
 component-state = { path = "../components/state" }
 support-keep = { path = "../supports/support-keep" }
-microkv = { git = "https://github.com/ex0dus-0x/microkv.git", branch = "master" }
+microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
 bridge-primitives = { path = "../primitives" }
 

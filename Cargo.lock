@@ -751,9 +751,9 @@ dependencies = [
 
 [[package]]
 name = "cargo-platform"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0226944a63d1bf35a3b5f948dd7c59e263db83695c9e8bffc4037de02e30f1d7"
+checksum = "cbdb825da8a5df079a43676dbe042702f1707b1109f713a01420fbb4cc71fa27"
 dependencies = [
  "serde 1.0.127",
 ]
@@ -4159,10 +4159,11 @@ dependencies = [
 
 [[package]]
 name = "microkv"
-version = "0.2.6"
-source = "git+https://github.com/ex0dus-0x/microkv.git?branch=master#e24fd0b1abf3f21dbcfe88c1df3fe16a781f2871"
+version = "0.2.7"
+source = "git+https://github.com/fewensa/microkv.git?branch=master#808a41166931ba0f98108edab552b1846a88cf3e"
 dependencies = [
  "bincode",
+ "dirs",
  "indexmap",
  "secstr",
  "serde 1.0.127",
@@ -9261,12 +9262,12 @@ checksum = "59547bce71d9c38b83d9c0e92b6066c4253371f15005def0c30d9657f50c7642"
 
 [[package]]
 name = "twox-hash"
-version = "1.6.0"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
+checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.7.3",
+ "rand 0.8.4",
  "static_assertions",
 ]
 

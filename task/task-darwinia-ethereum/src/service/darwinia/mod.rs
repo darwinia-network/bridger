@@ -168,7 +168,7 @@ impl DarwiniaServiceRunner {
     pub async fn start(&mut self, state: BridgeState) -> Result<()> {
         let mut tracker =
             DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), state.clone());
-        let microkv = state.microkv();
+        let microkv = state.microkv_with_namespace();
         loop {
             let header = tracker.next_block().await?;
 

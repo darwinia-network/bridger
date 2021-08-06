@@ -146,8 +146,6 @@ async fn start(
     let servce_config: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
     let ethereum_config: EthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
-    let microkv = state.microkv();
-
     // Web3 client
     let web3 = component_web3.component().await?;
 
@@ -166,7 +164,7 @@ async fn start(
         topics_list.clone(),
         sender_to_relay,
         sender_to_redeem,
-        microkv.clone(),
+        state.clone(),
         darwinia,
     );
     let mut tracker = EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
@@ -174,6 +172,7 @@ async fn start(
         topics_list,
         logs_handler,
         state.clone(),
+        DarwiniaEthereumTask::NAME.to_string(),
         "last-redeemed".to_string(),
         servce_config.interval_ethereum,
     );

@@ -32,7 +32,7 @@ lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threa
 postage = "0.4"
 
 web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
-microkv = { git = "https://github.com/ex0dus-0x/microkv.git", branch = "master" }
+microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 array-bytes = "1.1.0"
 
 bridge-traits = { path = "../../traits" }

@@ -1,5 +1,6 @@
 use std::fmt::{Debug, Formatter};
 
+use microkv::namespace::NamespaceMicroKV;
 use microkv::MicroKV;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -49,10 +50,17 @@ pub struct BridgeState {
 
 lifeline::impl_storage_clone!(BridgeState);
 
+const NS_SECURITY: &'static str = "bridger.security";
+
 impl BridgeState {
-    pub fn microkv(&self) -> &MicroKV {
-        &self.microkv
+    // pub fn microkv(&self) -> &MicroKV {
+    //     &self.microkv
+    // }
+
+    pub fn microkv_with_namespace(&self, namespace: impl AsRef<str>) -> NamespaceMicroKV {
+        self.microkv.namespace(namespace)
     }
+
     pub fn put_task_config_password(
         &self,
         task: impl AsRef<str>,
@@ -64,21 +72,24 @@ impl BridgeState {
         crate::keep::put_task_config_password(task, password)?;
         if store {
             let key = format!("{}@password", task);
-            self.microkv().put(key, &password.to_string())?;
+            self.microkv_with_namespace(NS_SECURITY)
+                .put(key, &password.to_string())?;
         }
         Ok(())
     }
+
     pub fn get_task_config_password(
         &self,
         task: impl AsRef<str>,
     ) -> anyhow::Result<Option<String>> {
         let task = task.as_ref();
         let key = format!("{}@password", task);
-        match self.microkv().get(key)? {
+        match self.microkv_with_namespace(NS_SECURITY).get(key)? {
             Some(v) => Ok(Some(v)),
             None => crate::keep::get_task_config_password(task),
         }
     }
+
     pub fn get_task_config_password_unwrap_or_default(
         &self,
         task: impl AsRef<str>,

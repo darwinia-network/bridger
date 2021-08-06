@@ -148,7 +148,7 @@ async fn start(
     let servce_config: SubstrateEthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
     let ethereum_config: EthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
-    let microkv = state.microkv();
+    let microkv = state.microkv_with_namespace();
 
     // Web3 client
     let web3 = component_web3.component().await?;

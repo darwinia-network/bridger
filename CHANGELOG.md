@@ -1,3 +1,21 @@
+## [0.4.5] - 2021-08-09
+
+### Fixed
+
+- failed to restart darwinia and ethereum service
+
+
+## [0.4.4] - 2021-08-05
+
+### Fixed
+- [fix channel closed error](https://github.com/darwinia-network/bridger/pull/231)
+
+
+## [0.4.3] - 2021-08-05
+
+### Fixed
+- [Upgrade subxt for Darwinia](https://github.com/darwinia-network/bridger/pull/229)
+
 ## [0.4.2] - 2021-08-05
 
 ### Fixed
@@ -12,7 +30,7 @@
 ### Fixed
 - [Start to early](https://github.com/darwinia-network/bridger/pull/226)
 - [CI/CD refactor](https://github.com/darwinia-network/bridger/pull/225)
-  
+
 ### Added
 - Pangolin-Ropsten specific feature(for testing)
 - Docs

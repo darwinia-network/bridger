@@ -73,14 +73,14 @@ Bridger(0.4.x) does not need these two files, so if you want to continue from th
     ./target/release/bridger task exec \
       --name task-darwinia-ethereum \
       --api start-darwinia \
-      --param block_number=$(cat ~/.bridger/last-redeemed)
+      --param block_number=$(cat ~/.bridger/last-tracked-darwinia-block)
    ```
 4. Start the ethereum subscribe service
    ```bash
    ./target/release/bridger task exec \
      --name task-darwinia-ethereum \
      --api start-ethereum \
-     --param block_number=$(cat ~/.bridger/last-tracked-darwinia-block)
+     --param block_number=$(cat ~/.bridger/last-redeemed)
    ```
 
 > IMPORTANT: Please don't start with `block_number` every time, because bridger(0.4.x) will remember the currently synchronized block as before, as long as it carries `block_number`, it will start from the specified block.

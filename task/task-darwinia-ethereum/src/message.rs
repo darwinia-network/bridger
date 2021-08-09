@@ -87,6 +87,7 @@ impl Message<DarwiniaEthereumBus> for ToGuardMessage {
 #[derive(Clone, Debug)]
 pub enum ToDarwiniaMessage {
     Start,
+    Restart(bool),
     Stop,
 }
 
@@ -98,10 +99,10 @@ impl Message<DarwiniaEthereumBus> for ToDarwiniaMessage {
 #[derive(Clone, Debug)]
 pub enum ToEthereumMessage {
     Start,
+    Restart(bool),
     Stop,
 }
 
 impl Message<DarwiniaEthereumBus> for ToEthereumMessage {
     type Channel = broadcast::Sender<Self>;
 }
-

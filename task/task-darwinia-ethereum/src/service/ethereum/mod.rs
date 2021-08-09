@@ -70,7 +70,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
         // Receiver & Sender
         let mut rx = bus.rx::<ToEthereumMessage>()?;
         let sender_to_relay = bus.tx::<ToRelayMessage>()?;
-        let mut sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
+        let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
         let sender_to_ethereum = bus.tx::<ToEthereumMessage>()?;
 
         // Datastore
@@ -112,7 +112,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                         let mut cloned_sender_to_ethereum = sender_to_ethereum.clone();
                         cloned_sender_to_ethereum
                             .send(ToEthereumMessage::Start)
-                            .await;
+                            .await?;
                     }
                     _ => continue,
                 }

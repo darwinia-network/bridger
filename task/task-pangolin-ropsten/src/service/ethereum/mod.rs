@@ -117,7 +117,7 @@ impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
                         let mut cloned_sender_to_ethereum = sender_to_ethereum.clone();
                         cloned_sender_to_ethereum
                             .send(ToEthereumMessage::Start)
-                            .await;
+                            .await?;
                     }
                     _ => continue,
                 }

@@ -53,9 +53,9 @@ lifeline::impl_storage_clone!(BridgeState);
 const NS_SECURITY: &'static str = "bridger.security";
 
 impl BridgeState {
-    // pub fn microkv(&self) -> &MicroKV {
-    //     &self.microkv
-    // }
+    pub fn microkv(&self) -> &MicroKV {
+        &self.microkv
+    }
 
     pub fn microkv_with_namespace(&self, namespace: impl AsRef<str>) -> NamespaceMicroKV {
         self.microkv.namespace(namespace)

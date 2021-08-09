@@ -152,7 +152,9 @@ impl RelayHelper {
     }
 
     pub async fn affirm(&self) -> anyhow::Result<()> {
-        let microkv = self.state.microkv_with_namespace();
+        let microkv = self
+            .state
+            .microkv_with_namespace(DarwiniaEthereumTask::NAME);
 
         let last_confirmed = self.darwinia.last_confirmed().await?;
         let mut relayed = microkv.get("relayed")?.unwrap_or(0);
@@ -203,7 +205,9 @@ impl RelayHelper {
     }
 
     pub async fn update_target(&self, block_number: u64) -> anyhow::Result<()> {
-        let microkv = self.state.microkv_with_namespace();
+        let microkv = self
+            .state
+            .microkv_with_namespace(DarwiniaEthereumTask::NAME);
 
         let target = microkv.get("target")?.unwrap_or(0);
 

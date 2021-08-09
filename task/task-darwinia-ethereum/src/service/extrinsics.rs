@@ -145,9 +145,7 @@ impl ExtrinsicsHelper {
     }
 
     async fn send_extrinsic(&self, ex: Extrinsic) -> anyhow::Result<()> {
-        let microkv = self
-            .state
-            .microkv_with_namespace(DarwiniaEthereumTask::NAME);
+        let microkv = self.state.microkv();
         do_send_extrinsic(
             microkv,
             Some(self.ethereum2darwinia.clone()),
@@ -163,7 +161,7 @@ impl ExtrinsicsHelper {
 
 #[allow(clippy::too_many_arguments)]
 async fn do_send_extrinsic(
-    microkv: NamespaceMicroKV,
+    microkv: &MicroKV,
     ethereum2darwinia: Option<Ethereum2Darwinia>,
     darwinia2ethereum: Option<Darwinia2Ethereum>,
     ethereum2darwinia_relayer: Option<FromEthereumAccount>,
@@ -171,6 +169,7 @@ async fn do_send_extrinsic(
     extrinsic: Extrinsic,
     spec_name: String,
 ) -> anyhow::Result<()> {
+    let microkv = microkv.namespace(DarwiniaEthereumTask::NAME);
     match extrinsic {
         Extrinsic::Affirm(parcel) => {
             let block_number = parcel.header.number;

@@ -51,7 +51,9 @@ impl DarwiniaBlockTracker {
     }
 
     async fn get_next_block(&mut self) -> Result<Option<Header<u32, BlakeTwo256>>> {
-        let kv = self.state.microkv_with_namespace();
+        let kv = self
+            .state
+            .microkv_with_namespace(DarwiniaEthereumTask::NAME);
         let next_block = kv.get("last-tracked-darwinia-block")?.unwrap_or(0u32) + 1;
         let finalized_block_hash = self.darwinia.finalized_head().await?;
         match self

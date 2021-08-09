@@ -87,6 +87,7 @@ impl Message<PangolinRopstenBus> for ToGuardMessage {
 #[derive(Clone, Debug)]
 pub enum ToDarwiniaMessage {
     Start,
+    Restart(bool),
     Stop,
 }
 
@@ -98,6 +99,7 @@ impl Message<PangolinRopstenBus> for ToDarwiniaMessage {
 #[derive(Clone, Debug)]
 pub enum ToEthereumMessage {
     Start,
+    Restart(bool),
     Stop,
 }
 

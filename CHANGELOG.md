@@ -1,3 +1,10 @@
+## [0.4.5] - 2021-08-09
+
+### Fixed
+
+- failed to restart darwinia and ethereum service
+
+
 ## [0.4.4] - 2021-08-05
 
 ### Fixed

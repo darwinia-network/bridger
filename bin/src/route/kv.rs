@@ -32,9 +32,15 @@ pub async fn put(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let microkv = microkv(param.namespace)?;
     let len = keys.len();
     for i in 0..len {
-        let key = keys.get(i).expect("unreachable");
-        let value = values.get(i).expect("unreachable");
-        microkv.put(key, value)?;
+        let key_input = keys.get(i).expect("unreachable");
+        let value_input = values.get(i).expect("unreachable");
+        if key_input.is_empty() {
+            continue;
+        }
+        // let (key, value) =
+        //     patch::helpers::spec_serialize_value(key_input.clone(), value_input.clone());
+        // microkv.put(key, &value)?;
+        patch::helpers::spec_serialize_value(&microkv, key_input.clone(), value_input.clone())?;
     }
     Resp::<String>::ok().response_json()
 }

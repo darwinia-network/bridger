@@ -1,11 +1,15 @@
+use std::collections::HashMap;
+
+use term_table::row::Row;
+use term_table::table_cell::{Alignment, TableCell};
 use term_table::{Table, TableStyle};
 
+use crate::patch;
 use crate::types::command::KvCommand;
 use crate::types::server::Resp;
 use crate::types::transfer::{KvListParam, KvOperationParam};
-use std::collections::HashMap;
-use term_table::row::Row;
-use term_table::table_cell::{Alignment, TableCell};
+
+const DEFAULT_NAMESPACE_VIEW: &'static str = "<DEFAULT>";
 
 pub async fn handle_kv(
     server: String,
@@ -13,6 +17,40 @@ pub async fn handle_kv(
     command: KvCommand,
 ) -> anyhow::Result<()> {
     match command {
+        KvCommand::Namespaces => {
+            if namespace.is_some() {
+                println!(
+                    "{}",
+                    namespace.unwrap_or_else(|| DEFAULT_NAMESPACE_VIEW.to_string())
+                );
+                return Ok(());
+            }
+            let resp = reqwest::Client::builder()
+                .build()?
+                .post(format!("{}/kv/namespaces", server))
+                .send()
+                .await?
+                .json::<Resp<Vec<String>>>()
+                .await?;
+            if resp.is_err() {
+                eprintln!("{}", resp.msg());
+                return Ok(());
+            }
+            match resp.data() {
+                Some(ns) => {
+                    for item in ns {
+                        if item.is_empty() {
+                            println!("{}", DEFAULT_NAMESPACE_VIEW);
+                        } else {
+                            println!("{}", item);
+                        }
+                    }
+                }
+                None => {
+                    println!("Not have any namespace");
+                }
+            }
+        }
         KvCommand::Put { kvs } => {
             let mut keys = vec![];
             let mut values = vec![];
@@ -94,16 +132,16 @@ pub async fn handle_kv(
                             let len = keys.len();
                             for ix in 0..len {
                                 let value = values.get(ix);
-                                let json = serde_json::to_string_pretty(&value)?;
+                                let view = patch::helpers::best_view_option(value)?;
                                 if include_key {
                                     let key = keys.get(ix).unwrap();
                                     table.add_row(Row::new(vec![
                                         TableCell::new_with_alignment(key, 1, Alignment::Left),
-                                        TableCell::new_with_alignment(json, 1, Alignment::Left),
+                                        TableCell::new_with_alignment(view, 1, Alignment::Left),
                                     ]));
                                 } else {
                                     table.add_row(Row::new(vec![TableCell::new_with_alignment(
-                                        json,
+                                        view,
                                         1,
                                         Alignment::Left,
                                     )]));
@@ -117,13 +155,14 @@ pub async fn handle_kv(
                                 for ix in 0..len {
                                     let key = keys.get(ix).unwrap();
                                     let value = values.get(ix);
-                                    let json = serde_json::to_string(&value)?;
+                                    let view = patch::helpers::best_view_option(value)?;
                                     println!("{}", key);
-                                    println!("{}", json);
+                                    println!("{}", view);
                                 }
                             } else {
                                 for item in values {
-                                    println!("{}", item.to_string());
+                                    let view = patch::helpers::best_view(item)?;
+                                    println!("{}", view);
                                 }
                             }
                         }

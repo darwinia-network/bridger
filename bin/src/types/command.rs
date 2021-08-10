@@ -51,6 +51,7 @@ pub enum CryptoCommand {
 
 #[derive(Debug, StructOpt)]
 pub enum KvCommand {
+    Namespaces,
     /// Put Key-Value to bridger database
     Put {
         /// keys and values one by one

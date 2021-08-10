@@ -157,8 +157,8 @@ impl RelayHelper {
             .microkv_with_namespace(DarwiniaEthereumTask::NAME);
 
         let last_confirmed = self.darwinia.last_confirmed().await?;
-        let mut relayed = microkv.get("relayed")?.unwrap_or(0);
-        let target = microkv.get("target")?.unwrap_or(0);
+        let mut relayed = microkv.get_as("relayed")?.unwrap_or(0);
+        let target = microkv.get_as("target")?.unwrap_or(0);
 
         trace!(
             target: DarwiniaEthereumTask::NAME,
@@ -209,7 +209,7 @@ impl RelayHelper {
             .state
             .microkv_with_namespace(DarwiniaEthereumTask::NAME);
 
-        let target = microkv.get("target")?.unwrap_or(0);
+        let target = microkv.get_as("target")?.unwrap_or(0);
 
         if block_number > target {
             microkv.put("target", &block_number)?;

@@ -11,6 +11,13 @@ fn microkv(namespace: Option<String>) -> anyhow::Result<NamespaceMicroKV> {
     Ok(state.microkv_with_namespace(namespace.unwrap_or_else(|| "".to_string())))
 }
 
+pub async fn ns(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
+    let state = support_keep::state::get_state_bridge_ok()?;
+    let microkv = state.microkv();
+    let ns = microkv.namespaces()?;
+    Resp::ok_with_data(ns).response_json()
+}
+
 pub async fn put(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
     let param: KvOperationParam = patch::hyper::deserialize_body(&mut req).await?;
     let keys = param.keys;
@@ -39,7 +46,7 @@ pub async fn get(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
         return Resp::<String>::err_with_msg("The keys is required").response_json();
     }
     let microkv = microkv(param.namespace)?;
-    let mut values: Vec<Option<serde_json::Value>> = vec![];
+    let mut values = vec![];
     for key in keys {
         let value = microkv.get(key)?;
         values.push(value);

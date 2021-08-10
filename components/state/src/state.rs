@@ -84,7 +84,7 @@ impl BridgeState {
     ) -> anyhow::Result<Option<String>> {
         let task = task.as_ref();
         let key = format!("{}@password", task);
-        match self.microkv_with_namespace(NS_SECURITY).get(key)? {
+        match self.microkv_with_namespace(NS_SECURITY).get_as(key)? {
             Some(v) => Ok(Some(v)),
             None => crate::keep::get_task_config_password(task),
         }

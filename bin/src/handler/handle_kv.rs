@@ -1,6 +1,11 @@
+use term_table::{Table, TableStyle};
+
 use crate::types::command::KvCommand;
 use crate::types::server::Resp;
 use crate::types::transfer::{KvListParam, KvOperationParam};
+use std::collections::HashMap;
+use term_table::row::Row;
+use term_table::table_cell::{Alignment, TableCell};
 
 pub async fn handle_kv(
     server: String,
@@ -41,10 +46,14 @@ pub async fn handle_kv(
             }
             println!("Success");
         }
-        KvCommand::Get { keys } => {
+        KvCommand::Get {
+            keys,
+            output,
+            include_key,
+        } => {
             let param = KvOperationParam {
                 namespace,
-                keys,
+                keys: keys.clone(),
                 values: vec![],
             };
             let resp = reqwest::Client::builder()
@@ -53,16 +62,72 @@ pub async fn handle_kv(
                 .json(&param)
                 .send()
                 .await?
-                .json::<Resp<serde_json::Value>>()
+                .json::<Resp<Vec<serde_json::Value>>>()
                 .await?;
             if resp.is_err() {
                 eprintln!("{}", resp.msg());
                 return Ok(());
             }
             match resp.data() {
-                Some(data) => {
-                    let output = serde_json::to_string_pretty(&data)?;
-                    println!("{}", output);
+                Some(values) => {
+                    let output = output.to_lowercase();
+                    match &output[..] {
+                        "json" => {
+                            if include_key {
+                                let mut map = HashMap::new();
+                                let mut ix = 0;
+                                for value in values {
+                                    let key = keys.get(ix).unwrap();
+                                    map.insert(key.to_string(), value.clone());
+                                }
+                                let json = serde_json::to_string_pretty(&map)?;
+                                println!("{}", json);
+                            } else {
+                                let json = serde_json::to_string_pretty(&values)?;
+                                println!("{}", json);
+                            }
+                        }
+                        "table" => {
+                            let mut table = Table::new();
+                            table.max_column_width = 40;
+                            table.style = TableStyle::simple();
+                            let len = keys.len();
+                            for ix in 0..len {
+                                let value = values.get(ix);
+                                let json = serde_json::to_string_pretty(&value)?;
+                                if include_key {
+                                    let key = keys.get(ix).unwrap();
+                                    table.add_row(Row::new(vec![
+                                        TableCell::new_with_alignment(key, 1, Alignment::Left),
+                                        TableCell::new_with_alignment(json, 1, Alignment::Left),
+                                    ]));
+                                } else {
+                                    table.add_row(Row::new(vec![TableCell::new_with_alignment(
+                                        json,
+                                        1,
+                                        Alignment::Left,
+                                    )]));
+                                }
+                            }
+                            println!("{}", table.render());
+                        }
+                        _ => {
+                            if include_key {
+                                let len = keys.len();
+                                for ix in 0..len {
+                                    let key = keys.get(ix).unwrap();
+                                    let value = values.get(ix);
+                                    let json = serde_json::to_string(&value)?;
+                                    println!("{}", key);
+                                    println!("{}", json);
+                                }
+                            } else {
+                                for item in values {
+                                    println!("{}", item.to_string());
+                                }
+                            }
+                        }
+                    }
                 }
                 None => {
                     println!("Not found these keys");

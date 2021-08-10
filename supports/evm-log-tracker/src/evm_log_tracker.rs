@@ -73,7 +73,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
     pub async fn next(&mut self) -> Result<Vec<Log>> {
         let mut result = vec![];
         let microkv = self.state.microkv_with_namespace(&self.task_name);
-        let from: u64 = microkv.get(&self.state_name)?.unwrap_or(0) + 1;
+        let from: u64 = microkv.get_as(&self.state_name)?.unwrap_or(0) + 1;
         let (from, to) = C::next_range(from, &self.client).await?;
         info!(
             "Heartbeat>>> Scanning on {} for new cross-chain transactions from {} to {} ...",

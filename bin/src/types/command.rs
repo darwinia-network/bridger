@@ -62,6 +62,12 @@ pub enum KvCommand {
         /// Get a value by key
         #[structopt()]
         keys: Vec<String>,
+        /// output mode, support  raw|table|json
+        #[structopt(short, long, default_value = "table")]
+        output: String,
+        /// the output is include key
+        #[structopt(long)]
+        include_key: bool,
     },
     /// List bridger database
     List {

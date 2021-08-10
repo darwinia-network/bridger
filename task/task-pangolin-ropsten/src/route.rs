@@ -8,6 +8,7 @@ use component_state::state::BridgeState;
 use crate::bus::PangolinRopstenBus;
 
 use crate::message::{ToDarwiniaMessage, ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
+use crate::routers::info;
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::PangolinRopstenTask;
 use array_bytes::hex2bytes_unchecked as bytes;
@@ -28,6 +29,7 @@ pub async fn dispatch_route(
         "redeem" => redeem(bus, param).await,
         "start-pangolin" => start_pangolin(bus, param).await,
         "start-ropsten" => start_ropsten(bus, param).await,
+        "info-d2e" => info::d2e(bus, param).await,
         _ => Ok(TaskTerminal::new("Unsupported command")),
     }
 }

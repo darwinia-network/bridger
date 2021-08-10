@@ -52,24 +52,42 @@ impl lifeline::Service for DarwiniaService {
         let service_name = format!("{}-service-darwinia-scan", PangolinRopstenTask::NAME);
         let _greet = Self::try_task(&service_name.clone(), async move {
             let mut is_started = false;
-            while let Some(ToDarwiniaMessage::Start) = rx.recv().await {
-                if is_started {
-                    log::warn!("The service {} has been started", service_name.clone());
-                    continue;
-                }
+            while let Some(message) = rx.recv().await {
+                match message {
+                    ToDarwiniaMessage::Start => {
+                        if is_started {
+                            log::warn!(
+                                target: PangolinRopstenTask::NAME,
+                                "The service {} has been started",
+                                service_name.clone()
+                            );
+                            continue;
+                        }
 
-                let cloned_state = state.clone();
-                let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
-                let cloned_sender_to_darwinia = sender_to_darwinia.clone();
-                tokio::spawn(async move {
-                    run(
-                        cloned_state,
-                        cloned_sender_to_extrinsics,
-                        cloned_sender_to_darwinia,
-                    )
-                    .await
-                });
-                is_started = true;
+                        let cloned_state = state.clone();
+                        let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
+                        let cloned_sender_to_darwinia = sender_to_darwinia.clone();
+                        tokio::spawn(async move {
+                            run(
+                                cloned_state,
+                                cloned_sender_to_extrinsics,
+                                cloned_sender_to_darwinia,
+                            )
+                            .await
+                        });
+                        is_started = true;
+                    }
+                    ToDarwiniaMessage::Restart(force) => {
+                        if force {
+                            is_started = false;
+                        }
+                        let mut cloned_sender_to_darwinia = sender_to_darwinia.clone();
+                        cloned_sender_to_darwinia
+                            .send(ToDarwiniaMessage::Start)
+                            .await?;
+                    }
+                    _ => continue,
+                }
             }
             Ok(())
         });
@@ -86,7 +104,7 @@ async fn run(
         error!(target: PangolinRopstenTask::NAME, "darwinia err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
         sender_to_darwinia
-            .send(ToDarwiniaMessage::Start)
+            .send(ToDarwiniaMessage::Restart(true))
             .await
             .unwrap();
     }

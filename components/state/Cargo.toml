@@ -28,7 +28,5 @@ bridge-traits = { path = "../../traits" }
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 
-# todo: wait to pr
-# https://github.com/ex0dus-0x/microkv/pull/10
-# https://github.com/ex0dus-0x/microkv/pull/11
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
+#microkv-less030 = { package = "microkv", git = "https://github.com/fewensa/microkv.git", branch = "less030" }

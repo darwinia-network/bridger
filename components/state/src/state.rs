@@ -29,13 +29,8 @@ impl BridgeComponent<BridgeStateConfig, BridgeState> for BridgeStateComponent {
 
     async fn component(&self) -> anyhow::Result<BridgeState> {
         let config_microkv = &self.config.microkv;
-        let dbname = config_microkv
-            .db_name
-            .clone()
-            .unwrap_or_else(|| MicrokvConfig::marker().to_string());
-        let kv = MicroKV::open_with_base_path(dbname, config_microkv.base_path.clone())?
-            .set_auto_commit(config_microkv.auto_commit);
-        Ok(BridgeState { microkv: kv })
+        let microkv = crate::microkv::microkv_instance(config_microkv)?;
+        Ok(BridgeState { microkv })
     }
 
     fn config(&self) -> &BridgeStateConfig {
@@ -50,7 +45,7 @@ pub struct BridgeState {
 
 lifeline::impl_storage_clone!(BridgeState);
 
-const NS_SECURITY: &'static str = "bridger.security";
+pub(crate) const NS_SECURITY: &'static str = "bridger.security";
 
 impl BridgeState {
     pub fn microkv(&self) -> &MicroKV {

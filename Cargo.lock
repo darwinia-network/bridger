@@ -4161,7 +4161,7 @@ dependencies = [
 [[package]]
 name = "microkv"
 version = "0.3.0"
-source = "git+https://github.com/fewensa/microkv.git?branch=master#b27792c85da3e339576e94b2a3d6e3c23de40fc1"
+source = "git+https://github.com/fewensa/microkv.git?branch=master#d8d259d26fd35f49d4a7a395d239ad7c04991945"
 dependencies = [
  "bincode",
  "dirs",
@@ -9281,7 +9281,7 @@ version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if 0.1.10",
  "rand 0.8.4",
  "static_assertions",
 ]

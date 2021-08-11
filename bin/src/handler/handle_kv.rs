@@ -9,7 +9,7 @@ use crate::types::command::KvCommand;
 use crate::types::server::Resp;
 use crate::types::transfer::{KvListParam, KvOperationParam};
 
-const DEFAULT_NAMESPACE_VIEW: &'static str = "<DEFAULT>";
+const DEFAULT_NAMESPACE_VIEW: &str = "<DEFAULT>";
 
 pub async fn handle_kv(
     server: String,
@@ -113,8 +113,7 @@ pub async fn handle_kv(
                         "json" => {
                             if include_key {
                                 let mut map = HashMap::new();
-                                let mut ix = 0;
-                                for value in values {
+                                for (ix, value) in values.iter().enumerate() {
                                     let key = keys.get(ix).unwrap();
                                     map.insert(key.to_string(), value.clone());
                                 }

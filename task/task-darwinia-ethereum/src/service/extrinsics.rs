@@ -3,7 +3,6 @@ use std::time::Duration;
 use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
-use microkv::namespace::NamespaceMicroKV;
 use microkv::MicroKV;
 use tokio::time::sleep;
 

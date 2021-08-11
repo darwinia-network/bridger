@@ -2,7 +2,6 @@ use std::time::Duration;
 
 use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
-use microkv::MicroKV;
 use postage::broadcast;
 use tokio::time::sleep;
 use web3::types::{Log, H160, H256};

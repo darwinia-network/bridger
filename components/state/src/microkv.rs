@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 
 use bridge_traits::bridge::config::BridgeConfig;
@@ -24,7 +23,7 @@ fn try_microkv(dbname: String, config: &MicrokvConfig) -> anyhow::Result<microkv
         Err(e) => match e.error {
             microkv::errors::ErrorType::MigrateError(from, to) => {
                 if &from == "<0.3.0" && to.starts_with("0.3.") {
-                    return try_microkv_migrate_less030_to_03x(dbname.clone(), config);
+                    return try_microkv_migrate_less030_to_03x(dbname, config);
                 }
                 Err(StandardError::Component(format!("Failed migrate microkv, {:?}", e.msg)).into())
             }
@@ -49,8 +48,7 @@ fn try_microkv_migrate_less030_to_03x(
     let key_last_redeemed_ropsten = "last-redeemed-ropsten".to_string();
     let key_password_darwinia_ethereum = "task-darwinia-ethereum@password".to_string();
 
-    let path_db =
-        microkv::helpers::get_db_path_with_base_path(dbname.clone(), config.base_path.clone());
+    let path_db = microkv::helpers::get_db_path_with_base_path(dbname, config.base_path.clone());
     let less030: microkv::history::MicroKVLess030 =
         microkv::helpers::read_file_and_deserialize_bincode(&path_db)?;
     let relayed: Option<u64> = less030.lock_read(|kv| {

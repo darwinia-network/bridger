@@ -1,6 +1,5 @@
 use hyper::{Body, Request, Response};
 use microkv::namespace::NamespaceMicroKV;
-use microkv::MicroKV;
 
 use crate::patch;
 use crate::types::server::Resp;

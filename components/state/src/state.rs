@@ -4,11 +4,10 @@ use microkv::namespace::NamespaceMicroKV;
 use microkv::MicroKV;
 
 use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::config::BridgeConfig;
 use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::error::BridgeResult;
 
-use crate::config::{BridgeStateConfig, MicrokvConfig};
+use crate::config::BridgeStateConfig;
 
 #[derive(Clone)]
 pub struct BridgeStateComponent {
@@ -45,7 +44,7 @@ pub struct BridgeState {
 
 lifeline::impl_storage_clone!(BridgeState);
 
-pub(crate) const NS_SECURITY: &'static str = "bridger.security";
+pub(crate) const NS_SECURITY: &str = "bridger.security";
 
 impl BridgeState {
     pub fn microkv(&self) -> &MicroKV {

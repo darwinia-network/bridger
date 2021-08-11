@@ -45,6 +45,10 @@ pub fn spec_serialize_value(
             let value = value.parse::<f64>()?;
             microkv.put(key, &value)?;
         }
+        "bool" => {
+            let value = value.parse::<bool>()?;
+            microkv.put(key, &value)?;
+        }
         _ => {
             return Err(
                 StandardError::Api(format!("Not support value type: {}", value_type)).into(),

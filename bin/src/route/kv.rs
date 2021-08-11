@@ -36,9 +36,6 @@ pub async fn put(mut req: Request<Body>) -> anyhow::Result<Response<Body>> {
         if key_input.is_empty() {
             continue;
         }
-        // let (key, value) =
-        //     patch::helpers::spec_serialize_value(key_input.clone(), value_input.clone());
-        // microkv.put(key, &value)?;
         patch::helpers::spec_serialize_value(&microkv, key_input.clone(), value_input.clone())?;
     }
     Resp::<String>::ok().response_json()

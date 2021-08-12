@@ -45,4 +45,7 @@ pub enum StandardError {
 
     #[error("Cli error: {0}")]
     Cli(String),
+
+    #[error("Component error: {0}")]
+    Component(String),
 }

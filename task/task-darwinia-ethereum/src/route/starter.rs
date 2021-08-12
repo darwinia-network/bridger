@@ -1,11 +1,12 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Sender};
 
-use bridge_traits::bridge::task::TaskTerminal;
+use bridge_traits::bridge::task::{BridgeSand, TaskTerminal};
 use component_state::state::BridgeState;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::message::{ToDarwiniaMessage, ToEthereumMessage};
+use crate::task::DarwiniaEthereumTask;
 
 pub async fn start_darwinia(
     bus: &DarwiniaEthereumBus,
@@ -17,7 +18,7 @@ pub async fn start_darwinia(
 
     if let Some(block_number) = block_number {
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv();
+        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
         microkv.put("last-tracked-darwinia-block", &block_number)?;
     }
 
@@ -35,7 +36,7 @@ pub async fn start_ethereum(
 
     if let Some(block_number) = block_number {
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv();
+        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
         microkv.put("last-redeemed", &block_number)?;
     }
 

@@ -152,11 +152,13 @@ impl RelayHelper {
     }
 
     pub async fn affirm(&self) -> anyhow::Result<()> {
-        let microkv = self.state.microkv();
+        let microkv = self
+            .state
+            .microkv_with_namespace(DarwiniaEthereumTask::NAME);
 
         let last_confirmed = self.darwinia.last_confirmed().await?;
-        let mut relayed = microkv.get("relayed")?.unwrap_or(0);
-        let target = microkv.get("target")?.unwrap_or(0);
+        let mut relayed = microkv.get_as("relayed")?.unwrap_or(0);
+        let target = microkv.get_as("target")?.unwrap_or(0);
 
         trace!(
             target: DarwiniaEthereumTask::NAME,
@@ -186,7 +188,9 @@ impl RelayHelper {
                 self.shadow.clone(),
                 target,
                 self.sender_to_extrinsics.clone(),
-            ).await {
+            )
+            .await
+            {
                 return Err(err);
             }
         } else {
@@ -201,9 +205,11 @@ impl RelayHelper {
     }
 
     pub async fn update_target(&self, block_number: u64) -> anyhow::Result<()> {
-        let microkv = self.state.microkv();
+        let microkv = self
+            .state
+            .microkv_with_namespace(DarwiniaEthereumTask::NAME);
 
-        let target = microkv.get("target")?.unwrap_or(0);
+        let target = microkv.get_as("target")?.unwrap_or(0);
 
         if block_number > target {
             microkv.put("target", &block_number)?;
@@ -277,7 +283,7 @@ where
             sender_to_extrinsics
                 .send(ToExtrinsicsMessage::Extrinsic(ex))
                 .await?
-        },
+        }
         Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(block, msg))) => {
             trace!(
                 target: DarwiniaEthereumTask::NAME,
@@ -285,7 +291,7 @@ where
                 block,
                 msg
             );
-        },
+        }
         Err(err) => {
             return Err(err.into());
         }

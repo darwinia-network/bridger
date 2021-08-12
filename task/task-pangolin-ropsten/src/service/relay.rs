@@ -150,11 +150,11 @@ impl RelayHelper {
     }
 
     pub async fn affirm(&self) -> anyhow::Result<()> {
-        let microkv = self.state.microkv();
+        let microkv = self.state.microkv_with_namespace(PangolinRopstenTask::NAME);
 
         let last_confirmed = self.darwinia.last_confirmed().await?;
-        let mut relayed = microkv.get("relayed")?.unwrap_or(0);
-        let target = microkv.get("target")?.unwrap_or(0);
+        let mut relayed = microkv.get_as("relayed")?.unwrap_or(0);
+        let target = microkv.get_as("target")?.unwrap_or(0);
 
         trace!(
             target: PangolinRopstenTask::NAME,
@@ -201,9 +201,9 @@ impl RelayHelper {
     }
 
     pub async fn update_target(&self, block_number: u64) -> anyhow::Result<()> {
-        let microkv = self.state.microkv();
+        let microkv = self.state.microkv_with_namespace(PangolinRopstenTask::NAME);
 
-        let target = microkv.get("target")?.unwrap_or(0);
+        let target = microkv.get_as("target")?.unwrap_or(0);
 
         if block_number > target {
             microkv.put("target", &block_number)?;

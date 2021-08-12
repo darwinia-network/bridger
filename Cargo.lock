@@ -751,9 +751,9 @@ dependencies = [
 
 [[package]]
 name = "cargo-platform"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0226944a63d1bf35a3b5f948dd7c59e263db83695c9e8bffc4037de02e30f1d7"
+checksum = "cbdb825da8a5df079a43676dbe042702f1707b1109f713a01420fbb4cc71fa27"
 dependencies = [
  "serde 1.0.127",
 ]
@@ -1320,6 +1320,7 @@ dependencies = [
  "task-darwinia-ethereum",
  "task-pangolin-millau",
  "task-pangolin-ropsten",
+ "term-table",
  "tokio 1.9.0",
 ]
 
@@ -4159,13 +4160,15 @@ dependencies = [
 
 [[package]]
 name = "microkv"
-version = "0.2.6"
-source = "git+https://github.com/ex0dus-0x/microkv.git?branch=master#e24fd0b1abf3f21dbcfe88c1df3fe16a781f2871"
+version = "0.3.0"
+source = "git+https://github.com/fewensa/microkv.git?branch=master#d8d259d26fd35f49d4a7a395d239ad7c04991945"
 dependencies = [
  "bincode",
+ "dirs",
  "indexmap",
  "secstr",
  "serde 1.0.127",
+ "serde_json",
  "sodiumoxide",
 ]
 
@@ -8807,6 +8810,7 @@ dependencies = [
  "async-recursion",
  "async-trait",
  "bridge-traits",
+ "colored",
  "component-ethereum",
  "component-http-client",
  "component-pangolin-subxt",
@@ -8818,6 +8822,7 @@ dependencies = [
  "linked-darwinia",
  "log",
  "microkv",
+ "parity-scale-codec",
  "postage",
  "reqwest 0.10.10",
  "secp256k1",
@@ -8862,6 +8867,17 @@ dependencies = [
  "redox_syscall 0.2.9",
  "remove_dir_all",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "term-table"
+version = "1.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "914a870243a0cf929e7c9b288fac886734c69d70e9c7854c421cf4272db631f3"
+dependencies = [
+ "lazy_static",
+ "regex",
+ "unicode-width",
 ]
 
 [[package]]
@@ -9261,12 +9277,12 @@ checksum = "59547bce71d9c38b83d9c0e92b6066c4253371f15005def0c30d9657f50c7642"
 
 [[package]]
 name = "twox-hash"
-version = "1.6.0"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
+checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.7.3",
+ "rand 0.8.4",
  "static_assertions",
 ]
 

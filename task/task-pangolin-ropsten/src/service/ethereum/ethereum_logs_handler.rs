@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use lifeline::Sender;
-use microkv::MicroKV;
+use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
@@ -18,7 +18,7 @@ pub(crate) struct EthereumLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-    microkv: MicroKV,
+    microkv: NamespaceMicroKV,
     darwinia_client: Darwinia,
 }
 
@@ -27,7 +27,7 @@ impl EthereumLogsHandler {
         topics_list: Vec<(H160, Vec<H256>)>,
         sender_to_relay: broadcast::Sender<ToRelayMessage>,
         sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-        microkv: MicroKV,
+        microkv: NamespaceMicroKV,
         darwinia_client: Darwinia,
     ) -> Self {
         EthereumLogsHandler {

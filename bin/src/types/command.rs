@@ -37,12 +37,12 @@ pub enum Opt {
 
 #[derive(Debug, StructOpt)]
 pub enum CryptoCommand {
-    /// encrypt a value
+    /// Encrypt a value
     Encrypt {
         #[structopt(flatten)]
         options: CryptoOptions,
     },
-    /// decrypt a value
+    /// Decrypt a value
     Decrypt {
         #[structopt(flatten)]
         options: CryptoOptions,
@@ -51,9 +51,11 @@ pub enum CryptoCommand {
 
 #[derive(Debug, StructOpt)]
 pub enum KvCommand {
+    /// Show all namespaces
+    Namespaces,
     /// Put Key-Value to bridger database
     Put {
-        /// keys and values one by one
+        /// Keys and Values one by one
         #[structopt()]
         kvs: Vec<String>,
     },
@@ -62,6 +64,12 @@ pub enum KvCommand {
         /// Get a value by key
         #[structopt()]
         keys: Vec<String>,
+        /// Output mode, support  raw|table|json
+        #[structopt(short, long, default_value = "raw")]
+        output: String,
+        /// The output is include key
+        #[structopt(long)]
+        include_key: bool,
     },
     /// List bridger database
     List {

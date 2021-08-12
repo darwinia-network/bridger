@@ -166,6 +166,7 @@ async fn do_send_extrinsic(
     extrinsic: Extrinsic,
     spec_name: String,
 ) -> anyhow::Result<()> {
+    let microkv = microkv.namespace(PangolinRopstenTask::NAME);
     match extrinsic {
         Extrinsic::Affirm(parcel) => {
             let block_number = parcel.header.number;

@@ -168,6 +168,7 @@ async fn do_send_extrinsic(
     extrinsic: Extrinsic,
     spec_name: String,
 ) -> anyhow::Result<()> {
+    let microkv = microkv.namespace(DarwiniaEthereumTask::NAME);
     match extrinsic {
         Extrinsic::Affirm(parcel) => {
             let block_number = parcel.header.number;
@@ -237,9 +238,8 @@ async fn do_send_extrinsic(
                 _ => {
                     if let Some(ethereum2darwinia) = &ethereum2darwinia {
                         if let Some(relayer) = &ethereum2darwinia_relayer {
-                            let ex_hash = ethereum2darwinia
-                                .redeem(relayer, redeem_for, proof)
-                                .await?;
+                            let ex_hash =
+                                ethereum2darwinia.redeem(relayer, redeem_for, proof).await?;
                             info!(
                                 target: DarwiniaEthereumTask::NAME,
                                 "Redeemed ethereum tx {:?} with extrinsic {:?}",

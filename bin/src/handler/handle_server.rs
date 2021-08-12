@@ -74,6 +74,7 @@ async fn router(options: ServerOptions) -> Router<Body, anyhow::Error> {
         .post("/task/config-template", route::task::task_config_template)
         .post("/task/:task_name/:task_route", route::task::task_route)
         .post("/task/set-password", route::task::set_password)
+        .post("/kv/namespaces", route::kv::ns)
         .post("/kv/put", route::kv::put)
         .post("/kv/get", route::kv::get)
         .post("/kv/list", route::kv::list)

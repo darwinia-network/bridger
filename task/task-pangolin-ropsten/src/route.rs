@@ -120,7 +120,7 @@ async fn start_pangolin(
 
     if let Some(block_number) = block_number {
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv();
+        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         microkv.put("last-tracked-pangolin-block", &block_number)?;
     }
 
@@ -138,7 +138,7 @@ async fn start_ropsten(
 
     if let Some(block_number) = block_number {
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv();
+        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         microkv.put("last-redeemed-ropsten", &block_number)?;
     }
 

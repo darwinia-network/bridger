@@ -165,7 +165,7 @@ async fn start(
     let servce_config: SubstrateEthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
     let ethereum_config: EthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
-    let microkv = state.microkv();
+    let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
 
     // Web3 client
     let web3 = component_web3.component().await?;
@@ -193,6 +193,7 @@ async fn start(
         topics_list,
         logs_handler,
         state.clone(),
+        PangolinRopstenTask::NAME.to_string(),
         "last-redeemed-ropsten".to_string(),
         servce_config.interval_ethereum,
     );

@@ -3,8 +3,8 @@ use std::time::Duration;
 
 use tokio::time::sleep;
 
-use web3::types::{Log, H160, H256};
 use component_state::state::BridgeState;
+use web3::types::{Log, H160, H256};
 
 use crate::{EvmChain, EvmClient, LogsHandler, Result};
 
@@ -14,6 +14,7 @@ pub struct EvmLogTracker<C: EvmChain, H: LogsHandler> {
     topics_list: Vec<(H160, Vec<H256>)>,
     logs_handler: H,
     state: BridgeState,
+    task_name: String,
     state_name: String,
     step_in_secs: u64,
     pub running: bool,
@@ -26,6 +27,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
         topics_list: Vec<(H160, Vec<H256>)>,
         logs_handler: H,
         state: BridgeState,
+        task_name: String,
         state_name: String,
         step_in_secs: u64,
     ) -> Self {
@@ -34,6 +36,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
             topics_list,
             logs_handler,
             state,
+            task_name,
             state_name,
             step_in_secs,
             running: false,
@@ -69,8 +72,8 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
 
     pub async fn next(&mut self) -> Result<Vec<Log>> {
         let mut result = vec![];
-        let microkv = self.state.microkv();
-        let from: u64 = microkv.get(&self.state_name)?.unwrap_or(0) + 1;
+        let microkv = self.state.microkv_with_namespace(&self.task_name);
+        let from: u64 = microkv.get_as(&self.state_name)?.unwrap_or(0) + 1;
         let (from, to) = C::next_range(from, &self.client).await?;
         info!(
             "Heartbeat>>> Scanning on {} for new cross-chain transactions from {} to {} ...",

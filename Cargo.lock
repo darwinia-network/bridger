@@ -224,9 +224,9 @@ dependencies = [
 
 [[package]]
 name = "async-process"
-version = "1.1.0"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a8f38756dd9ac84671c428afbf7c9f7495feff9ec5b0710f17100098e5b354ac"
+checksum = "b21b63ab5a0db0369deb913540af2892750e42d949faacc7a61495ac418a1692"
 dependencies = [
  "async-io",
  "blocking",
@@ -435,9 +435,9 @@ dependencies = [
 
 [[package]]
 name = "bitflags"
-version = "1.2.1"
+version = "1.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
+checksum = "2da1976d75adbe5fbc88130ecd119529cf1cc6a93ae1546d8696ee66f0d21af1"
 
 [[package]]
 name = "bitvec"
@@ -662,8 +662,8 @@ checksum = "771fe0050b883fcc3ea2359b1a96bcfbc090b7116eae7c3c512c7a083fdf23d3"
 
 [[package]]
 name = "bsc-primitives"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "ethbloom",
@@ -1253,8 +1253,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-balances"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-balances-rpc-runtime-api",
  "darwinia-support",
@@ -1268,8 +1268,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-balances-rpc-runtime-api"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-support",
  "parity-scale-codec",
@@ -1280,8 +1280,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridge-bsc"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "bsc-primitives",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1321,13 +1321,13 @@ dependencies = [
  "task-pangolin-millau",
  "task-pangolin-ropsten",
  "term-table",
- "tokio 1.9.0",
+ "tokio 1.10.0",
 ]
 
 [[package]]
 name = "darwinia-claims"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "darwinia-support",
@@ -1345,7 +1345,7 @@ dependencies = [
 [[package]]
 name = "darwinia-crab-backing"
 version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1355,8 +1355,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-crab-issuing"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1367,8 +1367,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-democracy"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1382,8 +1382,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-elections-phragmen"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1399,8 +1399,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-ethereum-backing"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "darwinia-relay-primitives",
@@ -1420,40 +1420,32 @@ dependencies = [
 
 [[package]]
 name = "darwinia-ethereum-issuing"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
- "darwinia-ethereum-issuing-contract",
+ "array-bytes",
+ "darwinia-ethereum-relay",
  "darwinia-evm",
  "darwinia-relay-primitives",
  "darwinia-support",
+ "dp-contract",
  "dp-evm",
  "dvm-ethereum",
  "ethereum-primitives",
- "ethereum-types",
+ "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "log",
  "parity-scale-codec",
- "serde 1.0.127",
- "serde_json",
+ "sha3 0.9.1",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
-name = "darwinia-ethereum-issuing-contract"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
-dependencies = [
- "ethabi 13.0.0",
- "ethereum-types",
-]
-
-[[package]]
 name = "darwinia-ethereum-relay"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "blake2-rfc",
@@ -1476,8 +1468,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-evm"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "darwinia-balances",
@@ -1503,8 +1495,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-evm-precompile-dispatch"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-evm",
  "dp-evm",
@@ -1517,9 +1509,10 @@ dependencies = [
 
 [[package]]
 name = "darwinia-evm-precompile-encoder"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
+ "darwinia-ethereum-issuing",
  "darwinia-evm",
  "darwinia-s2s-issuing",
  "darwinia-support",
@@ -1535,19 +1528,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "darwinia-evm-precompile-issuing"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
-dependencies = [
- "darwinia-evm",
- "dp-evm",
- "evm",
-]
-
-[[package]]
 name = "darwinia-evm-precompile-simple"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "dp-evm",
  "evm",
@@ -1558,8 +1541,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-evm-precompile-transfer"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "darwinia-evm",
@@ -1583,8 +1566,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-header-mmr"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "ckb-merkle-mountain-range",
  "darwinia-header-mmr-rpc-runtime-api",
@@ -1603,8 +1586,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-header-mmr-rpc-runtime-api"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-support",
  "parity-scale-codec",
@@ -1616,8 +1599,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-relay-authorities"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-relay-primitives",
  "darwinia-support",
@@ -1631,8 +1614,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-relay-primitives"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "parity-scale-codec",
@@ -1642,8 +1625,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-relayer-game"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-relay-primitives",
  "darwinia-support",
@@ -1657,8 +1640,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-s2s-backing"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "bp-runtime",
@@ -1679,8 +1662,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-s2s-issuing"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "bp-runtime",
@@ -1707,8 +1690,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-staking"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-staking-rpc-runtime-api",
  "darwinia-support",
@@ -1732,8 +1715,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-staking-rpc-runtime-api"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-support",
  "parity-scale-codec",
@@ -1744,8 +1727,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-support"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "bp-runtime",
@@ -1762,8 +1745,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-treasury"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1776,8 +1759,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-tron-backing"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1787,8 +1770,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-vesting"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1869,8 +1852,8 @@ checksum = "fea41bba32d969b513997752735605054bc0dfa92b4c56bf1189f2e174be7a10"
 
 [[package]]
 name = "dp-asset"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "ethereum-primitives",
  "parity-scale-codec",
@@ -1880,8 +1863,8 @@ dependencies = [
 
 [[package]]
 name = "dp-consensus"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "ethereum",
  "parity-scale-codec",
@@ -1894,18 +1877,19 @@ dependencies = [
 
 [[package]]
 name = "dp-contract"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "ethabi 13.0.0",
+ "ethereum-primitives",
  "ethereum-types",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
 name = "dp-evm"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "evm",
  "impl-trait-for-tuples",
@@ -1917,13 +1901,13 @@ dependencies = [
 
 [[package]]
 name = "dp-storage"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 
 [[package]]
 name = "drml-primitives"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1937,8 +1921,8 @@ checksum = "56899898ce76aaf4a0f24d914c97ea6ed976d42fec6ad33fcbb0a1103e07b2b0"
 
 [[package]]
 name = "dvm-dynamic-fee"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "async-trait",
  "darwinia-evm",
@@ -1952,8 +1936,8 @@ dependencies = [
 
 [[package]]
 name = "dvm-ethereum"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-evm",
  "darwinia-support",
@@ -1980,8 +1964,8 @@ dependencies = [
 
 [[package]]
 name = "dvm-rpc-runtime-api"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "darwinia-evm",
  "darwinia-support",
@@ -2207,8 +2191,8 @@ dependencies = [
 
 [[package]]
 name = "ethereum-primitives"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "ethash",
@@ -2298,7 +2282,7 @@ dependencies = [
  "component-state",
  "log",
  "thiserror",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "web3",
 ]
 
@@ -3066,7 +3050,7 @@ dependencies = [
  "http",
  "indexmap",
  "slab",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "tokio-util 0.6.7",
  "tracing",
 ]
@@ -3234,9 +3218,9 @@ dependencies = [
 
 [[package]]
 name = "http-body"
-version = "0.4.2"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60daa14be0e0786db0f03a9e57cb404c9d756eed2b6c62b9ea98ec5743ec75a9"
+checksum = "399c583b2979440c60be0821a6199eca73bc3c8dcd9d070d75ac726e2c6186e5"
 dependencies = [
  "bytes 1.0.1",
  "http",
@@ -3312,13 +3296,13 @@ dependencies = [
  "futures-util",
  "h2 0.3.3",
  "http",
- "http-body 0.4.2",
+ "http-body 0.4.3",
  "httparse",
  "httpdate 1.0.1",
  "itoa",
  "pin-project-lite 0.2.7",
  "socket2 0.4.1",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "tower-service",
  "tracing",
  "want",
@@ -3336,7 +3320,7 @@ dependencies = [
  "log",
  "rustls",
  "rustls-native-certs",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "tokio-rustls",
  "webpki 0.21.4",
 ]
@@ -3363,7 +3347,7 @@ dependencies = [
  "bytes 1.0.1",
  "hyper 0.14.11",
  "native-tls",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "tokio-native-tls",
 ]
 
@@ -3774,9 +3758,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.98"
+version = "0.2.99"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "320cfe77175da3a483efed4bc0adc1968ca050b098ce4f2f1c13a56626128790"
+checksum = "a7f823d141fe0a24df1e23b4af4e3c7ba9e5966ec514ea068c93024aa7deb765"
 
 [[package]]
 name = "libm"
@@ -3975,7 +3959,7 @@ dependencies = [
  "postage",
  "regex",
  "thiserror",
- "tokio 1.9.0",
+ "tokio 1.10.0",
 ]
 
 [[package]]
@@ -4014,7 +3998,7 @@ dependencies = [
  "postage",
  "serde 1.0.127",
  "serde_json",
- "tokio 1.9.0",
+ "tokio 1.10.0",
 ]
 
 [[package]]
@@ -4075,9 +4059,9 @@ dependencies = [
 
 [[package]]
 name = "matches"
-version = "0.1.8"
+version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ffc5c5338469d4d3ea17d269fa8ea3512ad247247c30bd2df69e68309ed0a08"
+checksum = "a3e378b66a060d48947b590737b30a1be76706c8dd7b8ba0f2fe3989c68a853f"
 
 [[package]]
 name = "matrixmultiply"
@@ -4122,8 +4106,8 @@ checksum = "71d96e3f3c0b6325d8ccd83c33b28acb183edcb6c67938ba104ec546854b0882"
 
 [[package]]
 name = "merkle-patricia-trie"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "hashbrown 0.9.1",
  "keccak-hash",
@@ -4410,9 +4394,9 @@ dependencies = [
 
 [[package]]
 name = "native-tls"
-version = "0.2.7"
+version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8d96b2e1c8da3957d58100b09f102c6d9cfdfced01b7ec5a8974044bb09dbd4"
+checksum = "48ba9f7719b5a0f42f338907614285fb5fd70e53858141f69898a1fb7203b24d"
 dependencies = [
  "lazy_static",
  "libc",
@@ -5215,8 +5199,8 @@ dependencies = [
 
 [[package]]
 name = "pangolin-bridge-primitives"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -5230,8 +5214,8 @@ dependencies = [
 
 [[package]]
 name = "pangolin-constants"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "drml-primitives",
  "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5239,8 +5223,8 @@ dependencies = [
 
 [[package]]
 name = "pangolin-runtime"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "array-bytes",
  "bp-message-dispatch",
@@ -5261,7 +5245,6 @@ dependencies = [
  "darwinia-evm",
  "darwinia-evm-precompile-dispatch",
  "darwinia-evm-precompile-encoder",
- "darwinia-evm-precompile-issuing",
  "darwinia-evm-precompile-simple",
  "darwinia-evm-precompile-transfer",
  "darwinia-header-mmr",
@@ -5346,8 +5329,8 @@ dependencies = [
 
 [[package]]
 name = "pangolin-runtime-system-params"
-version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#77362e1accbae6e370d5310f107f024f1c82d677"
+version = "2.6.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5490,7 +5473,7 @@ dependencies = [
  "cfg-if 1.0.0",
  "instant",
  "libc",
- "redox_syscall 0.2.9",
+ "redox_syscall 0.2.10",
  "smallvec",
  "winapi 0.3.9",
 ]
@@ -6025,9 +6008,9 @@ checksum = "41cc0f7e4d5d4544e8861606a285bb08d3e70712ccc7d2b84d7c0ccfaf4b05ce"
 
 [[package]]
 name = "redox_syscall"
-version = "0.2.9"
+version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ab49abadf3f9e1c4bc499e8845e152ad87d2ad2d30371841171169e9d75feee"
+checksum = "8383f39639269cde97d255a32bdb68c047337295414940c68bdd30c2e13203ff"
 dependencies = [
  "bitflags",
 ]
@@ -6039,7 +6022,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "528532f3d801c87aec9def2add9ca802fe569e44a544afe633765267840abe64"
 dependencies = [
  "getrandom 0.2.3",
- "redox_syscall 0.2.9",
+ "redox_syscall 0.2.10",
 ]
 
 [[package]]
@@ -6199,7 +6182,7 @@ dependencies = [
  "futures-core",
  "futures-util",
  "http",
- "http-body 0.4.2",
+ "http-body 0.4.3",
  "hyper 0.14.11",
  "hyper-tls 0.5.0",
  "ipnet",
@@ -6213,7 +6196,7 @@ dependencies = [
  "serde 1.0.127",
  "serde_json",
  "serde_urlencoded",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "tokio-native-tls",
  "url 2.2.2",
  "wasm-bindgen",
@@ -6833,9 +6816,9 @@ dependencies = [
 
 [[package]]
 name = "slab"
-version = "0.4.3"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f173ac3d1a7e3b28003f40de0b5ce7fe2710f9b9dc3fc38664cebee46b3b6527"
+checksum = "c307a32c1c5c437f38c7fd45d753050587732ba8628319fbdf12a7e289ccc590"
 
 [[package]]
 name = "slog"
@@ -8780,7 +8763,7 @@ dependencies = [
  "support-ethereum",
  "support-keep",
  "thiserror",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "web3",
 ]
 
@@ -8831,7 +8814,7 @@ dependencies = [
  "substrate-subxt",
  "support-ethereum",
  "thiserror",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "web3",
 ]
 
@@ -8852,7 +8835,7 @@ dependencies = [
  "serde 1.0.127",
  "serde_json",
  "support-keep",
- "tokio 1.9.0",
+ "tokio 1.10.0",
 ]
 
 [[package]]
@@ -8864,7 +8847,7 @@ dependencies = [
  "cfg-if 1.0.0",
  "libc",
  "rand 0.8.4",
- "redox_syscall 0.2.9",
+ "redox_syscall 0.2.10",
  "remove_dir_all",
  "winapi 0.3.9",
 ]
@@ -9036,9 +9019,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.9.0"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b7b349f11a7047e6d1276853e612d152f5e8a352c61917887cc2169e2366b4c"
+checksum = "01cf844b23c6131f624accf65ce0e4e9956a8bb329400ea5bcc26ae3a5c20b0b"
 dependencies = [
  "autocfg",
  "bytes 1.0.1",
@@ -9072,7 +9055,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7d995660bd2b7f8c1568414c1126076c13fbb725c40112dc0120b78eb9b717b"
 dependencies = [
  "native-tls",
- "tokio 1.9.0",
+ "tokio 1.10.0",
 ]
 
 [[package]]
@@ -9082,7 +9065,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc6844de72e57df1980054b38be3a9f4702aba4858be64dd700181a8a6d0e1b6"
 dependencies = [
  "rustls",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "webpki 0.21.4",
 ]
 
@@ -9094,7 +9077,7 @@ checksum = "7b2f3f698253f03119ac0102beaa64f67a67e08074d03a22d18784104543727f"
 dependencies = [
  "futures-core",
  "pin-project-lite 0.2.7",
- "tokio 1.9.0",
+ "tokio 1.10.0",
 ]
 
 [[package]]
@@ -9133,7 +9116,7 @@ dependencies = [
  "futures-sink",
  "log",
  "pin-project-lite 0.2.7",
- "tokio 1.9.0",
+ "tokio 1.10.0",
 ]
 
 [[package]]
@@ -9281,7 +9264,7 @@ version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "rand 0.8.4",
  "static_assertions",
 ]
@@ -9634,7 +9617,7 @@ dependencies = [
  "serde_json",
  "soketto 0.5.0",
  "tiny-keccak",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "tokio-stream",
  "tokio-util 0.6.7",
  "url 2.2.2",
@@ -9649,7 +9632,7 @@ checksum = "1f6d8d1636b2627fe63518d5a9b38a569405d9c9bc665c43c9c341de57227ebb"
 dependencies = [
  "native-tls",
  "thiserror",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "url 2.2.2",
 ]
 

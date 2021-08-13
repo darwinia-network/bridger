@@ -64,7 +64,6 @@ impl DarwiniaBlockTracker {
                     Ok(None)
                 } else {
                     let header = self.darwinia.get_block_by_number(next_block).await?;
-                    // kv.put("last-tracked-pangolin-block", &next_block);
                     Ok(Some(header))
                 }
             }

@@ -53,6 +53,7 @@ impl lifeline::Service for DarwiniaService {
         let _greet = Self::try_task(&service_name.clone(), async move {
             let mut is_started = false;
             while let Some(message) = rx.recv().await {
+                // todo:  not good way
                 match message {
                     ToDarwiniaMessage::Start => {
                         if is_started {
@@ -100,7 +101,7 @@ async fn run(
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
     mut sender_to_darwinia: postage::broadcast::Sender<ToDarwiniaMessage>,
 ) {
-    if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
+    if let Err(err) = start(state, sender_to_extrinsics).await {
         error!(target: PangolinRopstenTask::NAME, "darwinia err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
         sender_to_darwinia

@@ -54,6 +54,7 @@ impl lifeline::Service for DarwiniaService {
             let mut is_started = false;
             while let Some(message) = rx.recv().await {
                 // todo:  not good way
+                // todo:  use support_tracker
                 match message {
                     ToDarwiniaMessage::Start => {
                         if is_started {

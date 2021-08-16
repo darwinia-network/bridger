@@ -6,7 +6,7 @@ use tokio::time::sleep;
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_pangolin_subxt::darwinia::client::Darwinia;
-use component_state::state::BridgeState;
+use support_tracker::Tracker;
 
 use crate::error::Result;
 use crate::task::PangolinRopstenTask;
@@ -14,13 +14,12 @@ use crate::task::PangolinRopstenTask;
 /// DarwiniaTracker
 pub struct DarwiniaBlockTracker {
     darwinia: Darwinia,
-    state: BridgeState,
 }
 
 impl DarwiniaBlockTracker {
     /// new
-    pub fn new(darwinia: Darwinia, state: BridgeState) -> Self {
-        Self { darwinia, state }
+    pub fn new(darwinia: Darwinia) -> Self {
+        Self { darwinia }
     }
 
     /// get next block
@@ -50,9 +49,8 @@ impl DarwiniaBlockTracker {
         }
     }
 
-    async fn get_next_block(&self) -> Result<Option<Header<u32, BlakeTwo256>>> {
-        let kv = self.state.microkv_with_namespace(PangolinRopstenTask::NAME);
-        let next_block = kv.get_as("last-tracked-pangolin-block")?.unwrap_or(0u32) + 1;
+    async fn get_next_block(&self, tracker: &Tracker) -> Result<Option<Header<u32, BlakeTwo256>>> {
+        let next_block = tracker.next().await? as u32;
         let finalized_block_hash = self.darwinia.finalized_head().await?;
         match self
             .darwinia

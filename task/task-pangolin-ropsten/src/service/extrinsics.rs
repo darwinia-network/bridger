@@ -10,14 +10,14 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::account::DarwiniaAccount;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::config::DarwiniaSubxtConfig;
-use component_darwinia_subxt::{
+use component_ethereum::config::Web3Config;
+use component_pangolin_subxt::account::DarwiniaAccount;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_pangolin_subxt::config::DarwiniaSubxtConfig;
+use component_pangolin_subxt::{
     from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia},
     to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum},
 };
-use component_ethereum::config::Web3Config;
 use component_state::state::BridgeState;
 use support_ethereum::receipt::RedeemFor;
 

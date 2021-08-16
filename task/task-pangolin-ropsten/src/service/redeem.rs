@@ -9,8 +9,8 @@ use tokio::time::sleep;
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_pangolin_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
 use support_ethereum::receipt::RedeemFor;
 
@@ -39,7 +39,8 @@ impl Service for RedeemService {
         let _greet = Self::try_task(
             &format!("{}-service-redeem", PangolinRopstenTask::NAME),
             async move {
-                let mut helper = RedeemHelper::new(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await;
+                let mut helper =
+                    RedeemHelper::new(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await;
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
@@ -49,7 +50,11 @@ impl Service for RedeemService {
                                 // TODO: Consider the errors more carefully
                                 // Maybe a websocket err, so wait 10 secs to reconnect.
                                 sleep(Duration::from_secs(10)).await;
-                                helper = RedeemHelper::new(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await;
+                                helper = RedeemHelper::new(
+                                    sender_to_extrinsics.clone(),
+                                    sender_to_redeem.clone(),
+                                )
+                                .await;
                                 // TODO: Maybe need retry
                             }
                         }
@@ -136,7 +141,7 @@ impl RedeemHelper {
         shadow: Arc<Shadow>,
         tx: EthereumTransaction,
         mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-        mut sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>
+        mut sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
     ) -> anyhow::Result<()> {
         trace!(
             target: PangolinRopstenTask::NAME,
@@ -172,7 +177,9 @@ impl RedeemHelper {
                 last_confirmed,
             );
             sleep(Duration::from_secs(30)).await;
-            sender_to_redeem.send(ToRedeemMessage::EthereumTransaction(tx)).await?;
+            sender_to_redeem
+                .send(ToRedeemMessage::EthereumTransaction(tx))
+                .await?;
             return Ok(());
         }
 

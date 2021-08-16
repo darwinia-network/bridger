@@ -11,14 +11,14 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::account::DarwiniaAccount;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::config::DarwiniaSubxtConfig;
-use component_darwinia_subxt::darwinia::runtime::DarwiniaRuntime;
-use component_darwinia_subxt::events::EventInfo;
-use component_darwinia_subxt::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
 use component_ethereum::config::{EthereumConfig, Web3Config};
 use component_ethereum::web3::Web3Component;
+use component_pangolin_subxt::account::DarwiniaAccount;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_pangolin_subxt::config::DarwiniaSubxtConfig;
+use component_pangolin_subxt::darwinia::runtime::DarwiniaRuntime;
+use component_pangolin_subxt::events::EventInfo;
+use component_pangolin_subxt::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
 use component_state::state::BridgeState;
 pub use darwinia_tracker::DarwiniaBlockTracker;
 
@@ -126,10 +126,10 @@ async fn start(
 
     // Components
     let component_web3 = Web3Component::restore::<PangolinRopstenTask>()?;
-    let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
 
     // Darwinia client & account
-    let darwinia = component_darwinia_subxt.component().await?;
+    let darwinia = component_pangolin_subxt.component().await?;
     let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
     let account = DarwiniaAccount::new(
         config_darwinia.relayer_private_key,

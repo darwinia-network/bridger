@@ -9,7 +9,7 @@ use web3::transports::Http;
 use web3::types::{Address, H160, H256, U256};
 use web3::Web3;
 
-use component_darwinia_subxt::types::EcdsaSignature;
+use component_pangolin_subxt::types::EcdsaSignature;
 
 use crate::{error::Error, error::Result};
 

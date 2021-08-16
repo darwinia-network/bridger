@@ -10,9 +10,9 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_ethereum::config::EthereumConfig;
 use component_ethereum::web3::Web3Component;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
 use ethereum_logs_handler::EthereumLogsHandler;
 use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker};
@@ -159,7 +159,7 @@ async fn start(
 
     // Components
     let component_web3 = Web3Component::restore::<PangolinRopstenTask>()?;
-    let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
 
     // Config
     let servce_config: SubstrateEthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
@@ -171,7 +171,7 @@ async fn start(
     let web3 = component_web3.component().await?;
 
     // Darwinia client
-    let darwinia = component_darwinia_subxt.component().await?;
+    let darwinia = component_pangolin_subxt.component().await?;
 
     let topics_list = get_topics_list(ethereum_config);
 

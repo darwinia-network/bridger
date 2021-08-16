@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 
 use bridge_traits::bridge::config::{BridgeConfig, Config};
-use component_darwinia_subxt::config::DarwiniaSubxtConfig;
 use component_ethereum::config::{EthereumConfig, Web3Config};
 use component_http_client::HttpClientConfig;
+use component_pangolin_subxt::config::DarwiniaSubxtConfig;
 use component_shadow::ShadowConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

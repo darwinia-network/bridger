@@ -6,8 +6,8 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::bridge::task::TaskTerminal;
 use bridge_traits::error::StandardError;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_ethereum::web3::Web3Component;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 
 use crate::bus::PangolinRopstenBus;
 use crate::message::ToRedeemMessage;
@@ -36,8 +36,8 @@ pub async fn redeem(
     let tx_id = TransactionId::Hash(H256::from_slice(&bytes(eth_txhash)));
     let tx = web3.eth().transaction(tx_id).await?.unwrap();
 
-    let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-    let darwinia = component_darwinia_subxt.component().await?;
+    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+    let darwinia = component_pangolin_subxt.component().await?;
 
     let tx_hash = if the_type == "token" {
         EthereumTransactionHash::Token(tx.hash)

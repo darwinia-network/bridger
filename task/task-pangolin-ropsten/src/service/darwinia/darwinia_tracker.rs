@@ -5,7 +5,7 @@ use substrate_subxt::sp_runtime::traits::BlakeTwo256;
 use tokio::time::sleep;
 
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::darwinia::client::Darwinia;
+use component_pangolin_subxt::darwinia::client::Darwinia;
 use component_state::state::BridgeState;
 
 use crate::error::Result;

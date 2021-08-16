@@ -8704,6 +8704,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "support-tracker"
+version = "0.4.5"
+dependencies = [
+ "anyhow",
+ "log",
+ "microkv",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8816,7 +8825,6 @@ dependencies = [
  "component-pangolin-subxt",
  "component-shadow",
  "component-state",
- "env_logger 0.8.4",
  "evm-log-tracker",
  "lifeline",
  "linked-darwinia",
@@ -8830,6 +8838,7 @@ dependencies = [
  "serde_json",
  "substrate-subxt",
  "support-ethereum",
+ "support-tracker",
  "thiserror",
  "tokio 1.9.0",
  "web3",

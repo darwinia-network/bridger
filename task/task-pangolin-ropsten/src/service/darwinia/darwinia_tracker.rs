@@ -24,7 +24,7 @@ impl DarwiniaBlockTracker {
     }
 
     /// get next block
-    pub async fn next_block(&mut self) -> Result<Header<u32, BlakeTwo256>> {
+    pub async fn next_block(&self) -> Result<Header<u32, BlakeTwo256>> {
         loop {
             match self.get_next_block().await {
                 Ok(result) => {
@@ -50,7 +50,7 @@ impl DarwiniaBlockTracker {
         }
     }
 
-    async fn get_next_block(&mut self) -> Result<Option<Header<u32, BlakeTwo256>>> {
+    async fn get_next_block(&self) -> Result<Option<Header<u32, BlakeTwo256>>> {
         let kv = self.state.microkv_with_namespace(PangolinRopstenTask::NAME);
         let next_block = kv.get_as("last-tracked-pangolin-block")?.unwrap_or(0u32) + 1;
         let finalized_block_hash = self.darwinia.finalized_head().await?;

@@ -50,6 +50,8 @@ impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
 
 impl PangolinRopstenTask {
     pub async fn new(config: DarwiniaEthereumConfig, state: BridgeState) -> anyhow::Result<Self> {
+        crate::migrate::migrate(&state)?;
+
         config.store(Self::NAME)?;
         let bus = PangolinRopstenBus::default();
         bus.store_resource::<BridgeState>(state);

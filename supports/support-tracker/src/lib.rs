@@ -7,6 +7,7 @@ pub struct Tracker {
     key_curt: String,
     key_state: String,
     key_next: String,
+    key_skipped: String,
 }
 
 impl Tracker {
@@ -16,6 +17,7 @@ impl Tracker {
             key_curt: format!("{}.current", &key),
             key_state: format!("{}.state", &key),
             key_next: format!("{}.next", &key),
+            key_skipped: format!("{}.skipped", &key),
         }
     }
 }

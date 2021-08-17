@@ -108,6 +108,12 @@ impl Tracker {
         self.microkv.put(&self.key_next, &value)?;
         Ok(())
     }
+
+    pub fn queue(&self, blocks: Vec<usize>) -> anyhow::Result<()> {
+        let value: String = blocks.iter().join(",");
+        self.microkv.put(&self.key_next, &value)?;
+        Ok(())
+    }
 }
 
 fn parse_blocks_from_text(text: String) -> anyhow::Result<Vec<usize>> {

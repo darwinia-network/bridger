@@ -150,6 +150,7 @@ impl DarwiniaServiceRunner {
     pub async fn start(&mut self, tracker_raw: Tracker) -> Result<()> {
         let tracker_darwinia =
             PangolinBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), tracker_raw.clone());
+        let mut retry_times = 0;
         loop {
             let header = tracker_darwinia.next_block().await?;
 
@@ -196,12 +197,26 @@ impl DarwiniaServiceRunner {
                     if err_msg.contains("type size unavailable") {
                         tracker_raw.skip(header.number as usize)?;
                     } else {
+                        if retry_times > 10 {
+                            tracker_raw.skip(header.number as usize)?;
+                            log::error!(
+                                target: PangolinRopstenTask::NAME,
+                                "Retry {} times still failed: {}",
+                                retry_times,
+                                header.number
+                            );
+                            retry_times = 0;
+                            continue;
+                        }
                         tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+                        retry_times += 1;
                     }
                 }
             } else {
-                tracker_raw.skip(header.number as usize)?;
+                tracker_raw.finish(header.number as usize)?;
             }
+
+            retry_times = 0;
         }
     }
 

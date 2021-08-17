@@ -7,6 +7,7 @@ pub struct Tracker {
     microkv: NamespaceMicroKV,
     key_raw: String,
     key_curt: String,
+    key_finish: String,
     key_running: String,
     key_next: String,
     key_skipped: String,
@@ -18,6 +19,7 @@ impl Debug for Tracker {
         f.write_str("  microkv: ***,\n")?;
         f.write_str(&format!("  key_raw: {}\n", self.key_raw))?;
         f.write_str(&format!("  key_curt: {}\n", self.key_curt))?;
+        f.write_str(&format!("  key_finish: {}\n", self.key_finish))?;
         f.write_str(&format!("  key_running: {}\n", self.key_running))?;
         f.write_str(&format!("  key_next: {}\n", self.key_next))?;
         f.write_str(&format!("  key_skipped: {}\n", self.key_skipped))?;
@@ -33,6 +35,7 @@ impl Tracker {
             microkv,
             key_raw: key.to_string(),
             key_curt: format!("{}.current", key),
+            key_finish: format!("{}.finish", key),
             key_running: format!("{}.running", key),
             key_next: format!("{}.next", key),
             key_skipped: format!("{}.skipped", key),
@@ -72,7 +75,7 @@ impl Tracker {
         }
         let next: Option<String> = self.microkv.get_as(&self.key_next)?;
         if next.is_none() {
-            let curt: usize = self.microkv.get_as(&self.key_curt)?.unwrap_or(0);
+            let curt: usize = self.microkv.get_as(&self.key_finish)?.unwrap_or(0);
             let next = curt + 1;
             self.microkv.put(&self.key_curt, &next)?;
             return Ok(next);
@@ -91,6 +94,11 @@ impl Tracker {
         }
         self.microkv.put(&self.key_curt, &next)?;
         Ok(next)
+    }
+
+    pub fn finish(&self, block: usize) -> anyhow::Result<()> {
+        self.microkv.put(&self.key_finish, &block)?;
+        Ok(())
     }
 
     pub fn skip(&self, block: usize) -> anyhow::Result<()> {

@@ -20,6 +20,7 @@ fn init_log() {
         task-darwinia-ethereum=trace,
         task-pangolin-ropsten=trace,
 		support_s2s=debug,
+		support_tracker=debug,
 		bridge=info,
         evm_log_tracker=info,
         "#,

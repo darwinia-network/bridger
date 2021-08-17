@@ -1,11 +1,9 @@
 use std::collections::HashMap;
-use std::time::Duration;
 
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
 use postage::broadcast;
 use substrate_subxt::system::System;
-use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
@@ -21,6 +19,7 @@ use component_pangolin_subxt::events::EventInfo;
 use component_pangolin_subxt::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
 use component_state::state::BridgeState;
 pub use darwinia_tracker::DarwiniaBlockTracker;
+use support_tracker::Tracker;
 
 use crate::bus::PangolinRopstenBus;
 use crate::error::{Error, Result};
@@ -50,45 +49,13 @@ impl lifeline::Service for DarwiniaService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let service_name = format!("{}-service-darwinia-scan", PangolinRopstenTask::NAME);
+        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let tracker = Tracker::new(microkv, "scan.ropsten");
         let _greet = Self::try_task(&service_name.clone(), async move {
-            let mut is_started = false;
-            while let Some(message) = rx.recv().await {
-                // todo:  not good way
-                // todo:  use support_tracker
-                match message {
-                    ToDarwiniaMessage::Start => {
-                        if is_started {
-                            log::warn!(
-                                target: PangolinRopstenTask::NAME,
-                                "The service {} has been started",
-                                service_name.clone()
-                            );
-                            continue;
-                        }
-
-                        let cloned_state = state.clone();
-                        let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
-                        let cloned_sender_to_darwinia = sender_to_darwinia.clone();
-                        tokio::spawn(async move {
-                            run(
-                                cloned_state,
-                                cloned_sender_to_extrinsics,
-                                cloned_sender_to_darwinia,
-                            )
-                            .await
-                        });
-                        is_started = true;
-                    }
-                    ToDarwiniaMessage::Restart(force) => {
-                        if force {
-                            is_started = false;
-                        }
-                        let mut cloned_sender_to_darwinia = sender_to_darwinia.clone();
-                        cloned_sender_to_darwinia
-                            .send(ToDarwiniaMessage::Start)
-                            .await?;
-                    }
-                    _ => continue,
+            loop {
+                if let Err(e) = start(sender_to_extrinsics.clone(), tracker.clone()).await {
+                    error!(target: PangolinRopstenTask::NAME, "darwinia err {:#?}", e);
+                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
                 }
             }
             Ok(())
@@ -97,26 +64,14 @@ impl lifeline::Service for DarwiniaService {
     }
 }
 
-async fn run(
-    state: BridgeState,
-    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
-    mut sender_to_darwinia: postage::broadcast::Sender<ToDarwiniaMessage>,
-) {
-    if let Err(err) = start(state, sender_to_extrinsics).await {
-        error!(target: PangolinRopstenTask::NAME, "darwinia err {:#?}", err);
-        sleep(Duration::from_secs(10)).await;
-        sender_to_darwinia
-            .send(ToDarwiniaMessage::Restart(true))
-            .await
-            .unwrap();
-    }
-}
-
 async fn start(
-    state: BridgeState,
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    tracker: Tracker,
 ) -> anyhow::Result<()> {
-    info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
+    info!(
+        target: PangolinRopstenTask::NAME,
+        "PANGOLIN SCAN SERVICE RESTARTING..."
+    );
 
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
@@ -155,7 +110,7 @@ async fn start(
 
     info!(
         target: PangolinRopstenTask::NAME,
-        "✨ SERVICE STARTED: ETHEREUM <> DARWINIA DARWINIA SUBSCRIBE"
+        "✨ SERVICE STARTED: ROPSTEN <> PANGOLIN PANGOLIN SUBSCRIBE"
     );
 
     let mut runner = DarwiniaServiceRunner {
@@ -166,7 +121,7 @@ async fn start(
         delayed_extrinsics,
         spec_name,
     };
-    runner.start(state.clone()).await
+    runner.start(tracker).await
 }
 
 struct DarwiniaServiceRunner {
@@ -180,12 +135,11 @@ struct DarwiniaServiceRunner {
 
 impl DarwiniaServiceRunner {
     /// start
-    pub async fn start(&mut self, state: BridgeState) -> Result<()> {
-        let mut tracker =
-            DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), state.clone());
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+    pub async fn start(&mut self, tracker_raw: Tracker) -> Result<()> {
+        let mut tracker_darwinia =
+            DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), tracker_raw.clone());
         loop {
-            let header = tracker.next_block().await?;
+            let header = tracker_darwinia.next_block().await?;
 
             // debug
             trace!(
@@ -201,7 +155,7 @@ impl DarwiniaServiceRunner {
                     "An error occurred while processing the delayed extrinsics: {:?}", err
                 );
                 // Prevent too fast refresh errors
-                sleep(Duration::from_secs(30)).await;
+                tokio::time::sleep(std::time::Duration::from_secs(30)).await;
             }
 
             // handle events of the block
@@ -216,7 +170,7 @@ impl DarwiniaServiceRunner {
             // process events
             if let Err(err) = self.handle_events(&header, events).await {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-                    microkv.put("last-tracked-pangolin-block", &(header.number))?;
+                    tracker_raw.skip(header.number as usize)?;
                     return Err(err);
                 } else {
                     error!(
@@ -228,13 +182,13 @@ impl DarwiniaServiceRunner {
 
                     let err_msg = format!("{:?}", err).to_lowercase();
                     if err_msg.contains("type size unavailable") {
-                        microkv.put("last-tracked-pangolin-block", &(header.number))?;
+                        tracker_raw.skip(header.number as usize)?;
                     } else {
-                        sleep(Duration::from_secs(30)).await;
+                        tokio::time::sleep(std::time::Duration::from_secs(30)).await;
                     }
                 }
             } else {
-                microkv.put("last-tracked-pangolin-block", &(header.number))?;
+                tracker_raw.skip(header.number as usize)?;
             }
         }
     }

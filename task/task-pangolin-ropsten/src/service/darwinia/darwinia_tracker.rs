@@ -14,12 +14,13 @@ use crate::task::PangolinRopstenTask;
 /// DarwiniaTracker
 pub struct DarwiniaBlockTracker {
     darwinia: Darwinia,
+    tracker: Tracker,
 }
 
 impl DarwiniaBlockTracker {
     /// new
-    pub fn new(darwinia: Darwinia) -> Self {
-        Self { darwinia }
+    pub fn new(darwinia: Darwinia, tracker: Tracker) -> Self {
+        Self { darwinia, tracker }
     }
 
     /// get next block
@@ -49,8 +50,8 @@ impl DarwiniaBlockTracker {
         }
     }
 
-    async fn get_next_block(&self, tracker: &Tracker) -> Result<Option<Header<u32, BlakeTwo256>>> {
-        let next_block = tracker.next().await? as u32;
+    async fn get_next_block(&self) -> Result<Option<Header<u32, BlakeTwo256>>> {
+        let next_block = self.tracker.next().await? as u32;
         let finalized_block_hash = self.darwinia.finalized_head().await?;
         match self
             .darwinia

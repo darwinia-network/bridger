@@ -15,7 +15,6 @@ pub async fn dispatch_route(
     match &uri[..] {
         "relay" => relay::relay(bus, param).await,
         "redeem" => redeem::redeem(bus, param).await,
-        "start-pangolin" => starter::start_pangolin(bus, param).await,
         "start-ropsten" => starter::start_ropsten(bus, param).await,
         "info-d2e" => info::d2e(bus, param).await,
         _ => Ok(TaskTerminal::new("Unsupported command")),

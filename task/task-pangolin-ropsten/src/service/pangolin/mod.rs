@@ -18,7 +18,7 @@ use component_pangolin_subxt::darwinia::runtime::DarwiniaRuntime;
 use component_pangolin_subxt::events::EventInfo;
 use component_pangolin_subxt::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
 use component_state::state::BridgeState;
-pub use darwinia_tracker::DarwiniaBlockTracker;
+pub use pangolin_tracker::PangolinBlockTracker;
 use support_tracker::Tracker;
 
 use crate::bus::PangolinRopstenBus;
@@ -27,16 +27,16 @@ use crate::ethereum::Ethereum;
 use crate::message::{Extrinsic, ToDarwiniaMessage, ToExtrinsicsMessage};
 use crate::task::PangolinRopstenTask;
 
-mod darwinia_tracker;
+mod pangolin_tracker;
 
 #[derive(Debug)]
-pub struct DarwiniaService {
+pub struct PangolinService {
     _greet: Lifeline,
 }
 
-impl BridgeService for DarwiniaService {}
+impl BridgeService for PangolinService {}
 
-impl lifeline::Service for DarwiniaService {
+impl lifeline::Service for PangolinService {
     type Bus = PangolinRopstenBus;
     type Lifeline = anyhow::Result<Self>;
 
@@ -137,7 +137,7 @@ impl DarwiniaServiceRunner {
     /// start
     pub async fn start(&mut self, tracker_raw: Tracker) -> Result<()> {
         let mut tracker_darwinia =
-            DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), tracker_raw.clone());
+            PangolinBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), tracker_raw.clone());
         loop {
             let header = tracker_darwinia.next_block().await?;
 

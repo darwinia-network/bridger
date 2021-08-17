@@ -12,12 +12,12 @@ use crate::error::Result;
 use crate::task::PangolinRopstenTask;
 
 /// DarwiniaTracker
-pub struct DarwiniaBlockTracker {
+pub struct PangolinBlockTracker {
     darwinia: Darwinia,
     tracker: Tracker,
 }
 
-impl DarwiniaBlockTracker {
+impl PangolinBlockTracker {
     /// new
     pub fn new(darwinia: Darwinia, tracker: Tracker) -> Self {
         Self { darwinia, tracker }

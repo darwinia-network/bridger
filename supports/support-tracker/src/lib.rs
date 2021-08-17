@@ -109,6 +109,7 @@ impl Tracker {
                 .put(&self.key_skipped, &format!("{},{}", v, block))?,
             None => self.microkv.put(&self.key_skipped, &format!("{}", block))?,
         }
+        self.finish(block)?;
         Ok(())
     }
 

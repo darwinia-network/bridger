@@ -48,13 +48,13 @@ impl lifeline::Service for PangolinService {
 
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
-        let service_name = format!("{}-service-darwinia-scan", PangolinRopstenTask::NAME);
+        let service_name = format!("{}-service-pangolin-scan", PangolinRopstenTask::NAME);
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         let tracker = Tracker::new(microkv, "scan.pangolin");
         let _greet = Self::try_task(&service_name.clone(), async move {
             loop {
                 if let Err(e) = start(sender_to_extrinsics.clone(), tracker.clone()).await {
-                    error!(target: PangolinRopstenTask::NAME, "darwinia err {:#?}", e);
+                    error!(target: PangolinRopstenTask::NAME, "pangolin err {:#?}", e);
                     tokio::time::sleep(std::time::Duration::from_secs(10)).await;
                 }
             }

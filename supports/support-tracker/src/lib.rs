@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use microkv::namespace::NamespaceMicroKV;
+use std::fmt::{Debug, Formatter};
 
 #[derive(Clone)]
 pub struct Tracker {
@@ -9,6 +10,20 @@ pub struct Tracker {
     key_running: String,
     key_next: String,
     key_skipped: String,
+}
+
+impl Debug for Tracker {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Tracker {\n")?;
+        f.write_str("  microkv: ***,\n")?;
+        f.write_str(&format!("  key_raw: {}\n", self.key_raw))?;
+        f.write_str(&format!("  key_curt: {}\n", self.key_curt))?;
+        f.write_str(&format!("  key_running: {}\n", self.key_running))?;
+        f.write_str(&format!("  key_next: {}\n", self.key_next))?;
+        f.write_str(&format!("  key_skipped: {}\n", self.key_skipped))?;
+        f.write_str("}")?;
+        Ok(())
+    }
 }
 
 impl Tracker {

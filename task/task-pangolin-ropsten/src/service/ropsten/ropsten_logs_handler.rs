@@ -1,7 +1,6 @@
 use std::time::Duration;
 
 use lifeline::Sender;
-use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
@@ -14,34 +13,31 @@ use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::PangolinRopstenTask;
 
-pub(crate) struct EthereumLogsHandler {
+pub(crate) struct RopstenLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-    microkv: NamespaceMicroKV,
     darwinia_client: Darwinia,
 }
 
-impl EthereumLogsHandler {
+impl RopstenLogsHandler {
     pub fn new(
         topics_list: Vec<(H160, Vec<H256>)>,
         sender_to_relay: broadcast::Sender<ToRelayMessage>,
         sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-        microkv: NamespaceMicroKV,
         darwinia_client: Darwinia,
     ) -> Self {
-        EthereumLogsHandler {
+        RopstenLogsHandler {
             topics_list,
             sender_to_relay,
             sender_to_redeem,
-            microkv,
             darwinia_client,
         }
     }
 }
 
 #[async_trait]
-impl LogsHandler for EthereumLogsHandler {
+impl LogsHandler for RopstenLogsHandler {
     async fn handle(
         &mut self,
         _client: &EvmClient,
@@ -155,7 +151,7 @@ fn build_txs(
     txs
 }
 
-impl EthereumLogsHandler {
+impl RopstenLogsHandler {
     async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
         if self
             .darwinia_client
@@ -171,7 +167,6 @@ impl EthereumLogsHandler {
                 "This ethereum tx {:?} has already been redeemed.",
                 tx.enclosed_hash()
             );
-            self.microkv.put("last-redeemed-ropsten", &tx.block)?;
         } else {
             // delay to wait for possible previous extrinsics
             sleep(Duration::from_secs(12)).await;

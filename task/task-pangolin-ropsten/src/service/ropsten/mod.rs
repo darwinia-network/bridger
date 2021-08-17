@@ -14,13 +14,14 @@ use component_ethereum::config::EthereumConfig;
 use component_ethereum::web3::Web3Component;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
-use ropsten_logs_handler::EthereumLogsHandler;
+use ropsten_logs_handler::RopstenLogsHandler;
 use support_tracker_evm_log::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::PangolinRopstenBus;
 use crate::config::SubstrateEthereumConfig;
 use crate::message::{ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
 use crate::task::PangolinRopstenTask;
+use support_tracker::Tracker;
 
 mod ropsten_logs_handler;
 
@@ -80,46 +81,21 @@ impl lifeline::Service for RopstenScanService {
 
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
+        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let tracker = Tracker::new(microkv, "scan.ropsten");
+        let service_name = format!("{}-service-ropsten-scan", PangolinRopstenTask::NAME);
 
-        let service_name = format!("{}-service-ethereum-scan", PangolinRopstenTask::NAME);
         let _greet = Self::try_task(&service_name.clone(), async move {
-            let mut is_started = false;
-            while let Some(message) = rx.recv().await {
-                match message {
-                    ToEthereumMessage::Start => {
-                        if is_started {
-                            log::warn!(
-                                target: PangolinRopstenTask::NAME,
-                                "The service {} has been started",
-                                service_name.clone()
-                            );
-                            continue;
-                        }
-                        let cloned_state = state.clone();
-                        let cloned_sender_to_relay = sender_to_relay.clone();
-                        let cloned_sender_to_redeem = sender_to_redeem.clone();
-                        let cloned_sender_to_ethereum = sender_to_ethereum.clone();
-                        tokio::spawn(async move {
-                            run(
-                                cloned_state,
-                                cloned_sender_to_relay,
-                                cloned_sender_to_redeem,
-                                cloned_sender_to_ethereum,
-                            )
-                            .await
-                        });
-                        is_started = true;
-                    }
-                    ToEthereumMessage::Restart(force) => {
-                        if force {
-                            is_started = false;
-                        }
-                        let mut cloned_sender_to_ethereum = sender_to_ethereum.clone();
-                        cloned_sender_to_ethereum
-                            .send(ToEthereumMessage::Start)
-                            .await?;
-                    }
-                    _ => continue,
+            loop {
+                if let Err(err) = start(
+                    tracker.clone(),
+                    sender_to_relay.clone(),
+                    sender_to_redeem.clone(),
+                )
+                .await
+                {
+                    error!(target: PangolinRopstenTask::NAME, "ethereum err {:#?}", err);
+                    sleep(Duration::from_secs(10)).await;
                 }
             }
             Ok(())
@@ -128,34 +104,15 @@ impl lifeline::Service for RopstenScanService {
     }
 }
 
-async fn run(
-    state: BridgeState,
-    sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
-    sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
-    mut sender_to_ethereum: postage::broadcast::Sender<ToEthereumMessage>,
-) {
-    if let Err(err) = start(
-        state.clone(),
-        sender_to_relay.clone(),
-        sender_to_redeem.clone(),
-    )
-    .await
-    {
-        error!(target: PangolinRopstenTask::NAME, "ethereum err {:#?}", err);
-        sleep(Duration::from_secs(10)).await;
-        sender_to_ethereum
-            .send(ToEthereumMessage::Restart(true))
-            .await
-            .unwrap();
-    }
-}
-
 async fn start(
-    state: BridgeState,
+    tracker: Tracker,
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
 ) -> anyhow::Result<()> {
-    info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
+    info!(
+        target: PangolinRopstenTask::NAME,
+        "ROPSTEN SCAN SERVICE RESTARTING..."
+    );
 
     // Components
     let component_web3 = Web3Component::restore::<PangolinRopstenTask>()?;
@@ -164,8 +121,6 @@ async fn start(
     // Config
     let servce_config: SubstrateEthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
     let ethereum_config: EthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
-
-    let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
 
     // Web3 client
     let web3 = component_web3.component().await?;
@@ -181,24 +136,21 @@ async fn start(
     );
 
     let client = EvmClient::new(web3);
-    let logs_handler = EthereumLogsHandler::new(
+    let logs_handler = RopstenLogsHandler::new(
         topics_list.clone(),
         sender_to_relay,
         sender_to_redeem,
-        microkv.clone(),
         darwinia,
     );
-    let mut tracker = EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
+    let mut tracker_evm_log = EvmLogTracker::<Ethereum, RopstenLogsHandler>::new(
         client,
         topics_list,
         logs_handler,
-        state.clone(),
-        PangolinRopstenTask::NAME.to_string(),
-        "last-redeemed-ropsten".to_string(),
+        tracker,
         servce_config.interval_ethereum,
     );
 
-    tracker.start().await?;
+    tracker_evm_log.start().await?;
 
     Ok(())
 }

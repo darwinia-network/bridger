@@ -13,11 +13,23 @@ pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
 }
 
 fn migrate_scan_pangolin(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
-    let block_pangolin: Option<u64> = microkv.get_as("last-tracked-pangolin-block")?;
+    let key = "last-tracked-pangolin-block";
+    let block_pangolin: Option<u64> = microkv.get_as(key)?;
     if let Some(block) = block_pangolin {
         let tracker = Tracker::new(microkv.clone(), "scan.pangolin");
         tracker.queue(vec![block as usize])?;
-        microkv.delete("last-tracked-pangolin-block")?;
+        microkv.delete(key)?;
+    }
+    Ok(())
+}
+
+fn migrate_scan_opsten(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
+    let key = "last-redeemed-ropsten";
+    let block_ropsten: Option<u64> = microkv.get_as(key)?;
+    if let Some(block) = block_ropsten {
+        let tracker = Tracker::new(microkv.clone(), "scan.ropsten");
+        tracker.queue(vec![block as usize])?;
+        microkv.delete(key)?;
     }
     Ok(())
 }

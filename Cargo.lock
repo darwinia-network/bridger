@@ -8726,6 +8726,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "support-tracker-evm-log"
+version = "0.4.5"
+dependencies = [
+ "anyhow",
+ "array-bytes",
+ "async-trait",
+ "component-state",
+ "log",
+ "support-tracker",
+ "thiserror",
+ "tokio 1.9.0",
+ "web3",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8838,7 +8853,6 @@ dependencies = [
  "component-pangolin-subxt",
  "component-shadow",
  "component-state",
- "evm-log-tracker",
  "lifeline",
  "linked-darwinia",
  "log",
@@ -8852,6 +8866,7 @@ dependencies = [
  "substrate-subxt",
  "support-ethereum",
  "support-tracker",
+ "support-tracker-evm-log",
  "thiserror",
  "tokio 1.9.0",
  "web3",

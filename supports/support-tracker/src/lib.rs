@@ -45,7 +45,7 @@ impl Tracker {
             loop {
                 let secs = 3;
                 log::warn!(
-                    "The track key [{}] value isn't running (true), wait {} seconds check again.",
+                    "The track key [{}] isn't running (value is not `true`), wait {} seconds check again.",
                     &self.key_running,
                     secs
                 );

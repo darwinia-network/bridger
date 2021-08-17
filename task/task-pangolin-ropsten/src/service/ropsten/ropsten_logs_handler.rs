@@ -8,7 +8,7 @@ use web3::types::{Log, H160, H256};
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_pangolin_subxt::darwinia::client::Darwinia;
-use evm_log_tracker::{EvmClient, LogsHandler, Result};
+use support_tracker_evm_log::{EvmClient, LogsHandler, Result};
 
 use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};

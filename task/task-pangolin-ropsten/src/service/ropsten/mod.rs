@@ -14,15 +14,15 @@ use component_ethereum::config::EthereumConfig;
 use component_ethereum::web3::Web3Component;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
-use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker};
-use opsten_logs_handler::EthereumLogsHandler;
+use ropsten_logs_handler::EthereumLogsHandler;
+use support_tracker_evm_log::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::PangolinRopstenBus;
 use crate::config::SubstrateEthereumConfig;
 use crate::message::{ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
 use crate::task::PangolinRopstenTask;
 
-mod opsten_logs_handler;
+mod ropsten_logs_handler;
 
 fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
     let topics_setting = vec![
@@ -177,7 +177,7 @@ async fn start(
 
     info!(
         target: PangolinRopstenTask::NAME,
-        "✨ SERVICE STARTED: ETHEREUM <> DARWINIA ETHEREUM SUBSCRIBE"
+        "✨ SERVICE STARTED: ROPSTEN <> PANGOLIN ROPSTEN SUBSCRIBE"
     );
 
     let client = EvmClient::new(web3);

@@ -50,8 +50,8 @@ component-shadow = { path = "../../components/shadow" }
 component-http-client = { path = "../../components/http-client" }
 component-pangolin-subxt = { path = "../../components/client-pangolin-subxt" }
 
-evm-log-tracker = { path = "../../supports/evm-log-tracker" }
 support-ethereum = { path = "../../supports/support-ethereum" }
 support-tracker = { path = "../../supports/support-tracker" }
+support-tracker-evm-log = { path = "../../supports/support-tracker-evm-log" }
 
 

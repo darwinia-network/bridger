@@ -17,7 +17,7 @@ use component_pangolin_subxt::from_ethereum::{Account as FromEthereumAccount, Et
 use component_shadow::{Shadow, ShadowComponent};
 
 use crate::bus::PangolinRopstenBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::TaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToGuardMessage};
 use crate::task::PangolinRopstenTask;
 
@@ -79,7 +79,7 @@ async fn start(
 
     // Config
     let config_darwinia: DarwiniaSubxtConfig = Config::restore(PangolinRopstenTask::NAME)?;
-    let servce_config: SubstrateEthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let servce_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
     // Darwinia client & account
     let darwinia = component_pangolin_subxt.component().await?;

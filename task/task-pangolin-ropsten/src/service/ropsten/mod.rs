@@ -19,7 +19,7 @@ use support_tracker::Tracker;
 use support_tracker_evm_log::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::PangolinRopstenBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::TaskConfig;
 use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::task::PangolinRopstenTask;
 
@@ -132,7 +132,7 @@ async fn _start(
     let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
 
     // Config
-    let servce_config: SubstrateEthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let servce_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
     let ethereum_config: EthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
     // Web3 client

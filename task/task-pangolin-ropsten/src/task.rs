@@ -7,7 +7,7 @@ use bridge_traits::bridge::task::{
 use component_state::state::BridgeState;
 
 use crate::bus::PangolinRopstenBus;
-use crate::config::DarwiniaEthereumConfig;
+use crate::config::PangolinRopstenConfig;
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
 use crate::service::extrinsics::ExtrinsicsService;
 use crate::service::guard::GuardService;
@@ -40,7 +40,7 @@ impl BridgeTaskKeep for PangolinRopstenTask {
 
 impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
     fn config_template() -> anyhow::Result<serde_json::Value> {
-        Ok(serde_json::to_value(DarwiniaEthereumConfig::template())?)
+        Ok(serde_json::to_value(PangolinRopstenConfig::template())?)
     }
 
     fn stack(&mut self) -> &mut TaskStack<PangolinRopstenBus> {
@@ -49,7 +49,7 @@ impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
 }
 
 impl PangolinRopstenTask {
-    pub async fn new(config: DarwiniaEthereumConfig, state: BridgeState) -> anyhow::Result<Self> {
+    pub async fn new(config: PangolinRopstenConfig, state: BridgeState) -> anyhow::Result<Self> {
         crate::migrate::migrate(&state)?;
 
         config.store(Self::NAME)?;

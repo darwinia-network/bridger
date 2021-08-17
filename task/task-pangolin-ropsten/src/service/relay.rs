@@ -20,7 +20,7 @@ use component_state::state::BridgeState;
 use support_ethereum::block::EthereumHeader;
 
 use crate::bus::PangolinRopstenBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::TaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRelayMessage};
 use crate::task::PangolinRopstenTask;
 
@@ -42,7 +42,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         // Config
-        let servce_config: SubstrateEthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
+        let servce_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
         // State
         let state = bus.storage().clone_resource::<BridgeState>()?;

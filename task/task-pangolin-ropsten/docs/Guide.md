@@ -69,6 +69,7 @@ The bridger will record the set value.
   get \
   scan.pangolin.current \
   scan.pangolin.next \
+  scan.pangolin.finish \
   scan.pangolin.running \
   scan.pangolin.skipped \
   -o table --include-key
@@ -77,6 +78,8 @@ The bridger will record the set value.
 | scan.pangolin.current | 150                                    |
 +-----------------------+----------------------------------------+
 | scan.pangolin.next    | null                                   |
++-----------------------+----------------------------------------+
+| scan.pangolin.finish  | 149                                    |
 +-----------------------+----------------------------------------+
 | scan.pangolin.running | false                                  |
 +-----------------------+----------------------------------------+
@@ -94,6 +97,7 @@ The bridger will record the set value.
   get \
   scan.ropsten.current \
   scan.ropsten.next \
+  scan.ropsten.finish \
   scan.ropsten.running \
   scan.ropsten.skipped \
   -o table --include-key
@@ -102,6 +106,8 @@ The bridger will record the set value.
 | scan.ropsten.current | 3     |
 +----------------------+-------+
 | scan.ropsten.next    | null  |
++----------------------+-------+
+| scan.ropsten.finish  | 2     |
 +----------------------+-------+
 | scan.ropsten.running | false |
 +----------------------+-------+

@@ -4,7 +4,6 @@ use std::time::Duration;
 use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
 
-use component_state::state::BridgeState;
 use support_tracker::Tracker;
 
 use crate::{EvmChain, EvmClient, LogsHandler, Result};

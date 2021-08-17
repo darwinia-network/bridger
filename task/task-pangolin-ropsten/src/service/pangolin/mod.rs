@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
+use lifeline::{Bus, Lifeline, Sender, Task};
 use postage::broadcast;
 use substrate_subxt::system::System;
 
@@ -24,7 +24,7 @@ use support_tracker::Tracker;
 use crate::bus::PangolinRopstenBus;
 use crate::error::{Error, Result};
 use crate::ethereum::Ethereum;
-use crate::message::{Extrinsic, ToDarwiniaMessage, ToExtrinsicsMessage};
+use crate::message::{Extrinsic, ToExtrinsicsMessage};
 use crate::task::PangolinRopstenTask;
 
 mod pangolin_tracker;
@@ -42,29 +42,41 @@ impl lifeline::Service for PangolinService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
-        let mut rx = bus.rx::<ToDarwiniaMessage>()?;
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
-        let sender_to_darwinia = bus.tx::<ToDarwiniaMessage>()?;
 
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
-        let service_name = format!("{}-service-pangolin-scan", PangolinRopstenTask::NAME);
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         let tracker = Tracker::new(microkv, "scan.pangolin");
-        let _greet = Self::try_task(&service_name.clone(), async move {
-            loop {
-                if let Err(e) = start(sender_to_extrinsics.clone(), tracker.clone()).await {
-                    error!(target: PangolinRopstenTask::NAME, "pangolin err {:#?}", e);
-                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-                }
-            }
-            Ok(())
-        });
+
+        let _greet = Self::try_task(
+            &format!("{}-service-pangolin-scan", PangolinRopstenTask::NAME),
+            async move {
+                start(sender_to_extrinsics.clone(), tracker.clone()).await;
+                Ok(())
+            },
+        );
         Ok(Self { _greet })
     }
 }
 
 async fn start(
+    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    tracker: Tracker,
+) {
+    loop {
+        if let Err(e) = _start(sender_to_extrinsics.clone(), tracker.clone()).await {
+            let secs = 10;
+            error!(
+                target: PangolinRopstenTask::NAME,
+                "pangolin err {:#?}, wait {} seconds try again", e, secs
+            );
+            tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
+        }
+    }
+}
+
+async fn _start(
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
     tracker: Tracker,
 ) -> anyhow::Result<()> {
@@ -136,7 +148,7 @@ struct DarwiniaServiceRunner {
 impl DarwiniaServiceRunner {
     /// start
     pub async fn start(&mut self, tracker_raw: Tracker) -> Result<()> {
-        let mut tracker_darwinia =
+        let tracker_darwinia =
             PangolinBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), tracker_raw.clone());
         loop {
             let header = tracker_darwinia.next_block().await?;

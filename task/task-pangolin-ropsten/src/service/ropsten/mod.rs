@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
+use lifeline::{Bus, Lifeline, Task};
 use tokio::time::sleep;
 use web3::types::{H160, H256};
 
@@ -15,13 +15,13 @@ use component_ethereum::web3::Web3Component;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
 use ropsten_logs_handler::RopstenLogsHandler;
+use support_tracker::Tracker;
 use support_tracker_evm_log::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::PangolinRopstenBus;
 use crate::config::SubstrateEthereumConfig;
-use crate::message::{ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
+use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::task::PangolinRopstenTask;
-use support_tracker::Tracker;
 
 mod ropsten_logs_handler;
 
@@ -74,37 +74,50 @@ impl lifeline::Service for RopstenScanService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
-        let mut rx = bus.rx::<ToEthereumMessage>()?;
         let sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
-        let sender_to_ethereum = bus.tx::<ToEthereumMessage>()?;
 
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         let tracker = Tracker::new(microkv, "scan.ropsten");
-        let service_name = format!("{}-service-ropsten-scan", PangolinRopstenTask::NAME);
 
-        let _greet = Self::try_task(&service_name.clone(), async move {
-            loop {
-                if let Err(err) = start(
+        let _greet = Self::try_task(
+            &format!("{}-service-ropsten-scan", PangolinRopstenTask::NAME),
+            async move {
+                start(
                     tracker.clone(),
                     sender_to_relay.clone(),
                     sender_to_redeem.clone(),
                 )
-                .await
-                {
-                    error!(target: PangolinRopstenTask::NAME, "ethereum err {:#?}", err);
-                    sleep(Duration::from_secs(10)).await;
-                }
-            }
-            Ok(())
-        });
+                .await;
+                Ok(())
+            },
+        );
         Ok(Self { _greet })
     }
 }
 
 async fn start(
+    tracker: Tracker,
+    sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
+    sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+) {
+    loop {
+        if let Err(err) = _start(
+            tracker.clone(),
+            sender_to_relay.clone(),
+            sender_to_redeem.clone(),
+        )
+        .await
+        {
+            error!(target: PangolinRopstenTask::NAME, "ethereum err {:#?}", err);
+            sleep(Duration::from_secs(10)).await;
+        }
+    }
+}
+
+async fn _start(
     tracker: Tracker,
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,

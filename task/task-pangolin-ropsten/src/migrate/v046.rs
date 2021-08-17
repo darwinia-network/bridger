@@ -9,6 +9,7 @@ use crate::task::PangolinRopstenTask;
 pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
     let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
     migrate_scan_pangolin(&microkv)?;
+    migrate_scan_opsten(&microkv)?;
     Ok(())
 }
 

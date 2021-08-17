@@ -82,27 +82,3 @@ pub enum ToGuardMessage {
 impl Message<PangolinRopstenBus> for ToGuardMessage {
     type Channel = broadcast::Sender<Self>;
 }
-
-// *** ToDarwiniaMessage **
-#[derive(Clone, Debug)]
-pub enum ToDarwiniaMessage {
-    Start,
-    Restart(bool),
-    Stop,
-}
-
-impl Message<PangolinRopstenBus> for ToDarwiniaMessage {
-    type Channel = broadcast::Sender<Self>;
-}
-
-// *** ToEthereumMessage **
-#[derive(Clone, Debug)]
-pub enum ToEthereumMessage {
-    Start,
-    Restart(bool),
-    Stop,
-}
-
-impl Message<PangolinRopstenBus> for ToEthereumMessage {
-    type Channel = broadcast::Sender<Self>;
-}

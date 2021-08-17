@@ -78,7 +78,7 @@ impl Tracker {
             return Ok(next);
         }
         let mut plan_blocks = parse_blocks_from_text(next.unwrap())?;
-        let next = plan_blocks.first().unwrap_or(&1).clone();
+        let next = *plan_blocks.first().unwrap_or(&1);
         if !plan_blocks.is_empty() {
             plan_blocks.remove(0);
             let store_value: String = plan_blocks.iter().join(",");
@@ -134,15 +134,14 @@ impl Tracker {
 fn parse_blocks_from_text(text: String) -> anyhow::Result<Vec<usize>> {
     let text = text.trim();
     let mut blocks = vec![];
-    if text.starts_with("[") && text.ends_with("]") {
+    if text.starts_with('[') && text.ends_with(']') {
         blocks = serde_json::from_str(text)?;
     } else {
-        let arrs = text.split(",").collect::<Vec<&str>>();
+        let arrs = text.split(',').collect::<Vec<&str>>();
         for item in arrs {
             let item = item.trim();
-            match item.parse::<usize>() {
-                Ok(v) => blocks.push(v),
-                Err(_) => {}
+            if let Ok(v) = item.parse::<usize>() {
+                blocks.push(v);
             }
         }
     }

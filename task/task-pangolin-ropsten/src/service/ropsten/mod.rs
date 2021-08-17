@@ -14,15 +14,15 @@ use component_ethereum::config::EthereumConfig;
 use component_ethereum::web3::Web3Component;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
-use ethereum_logs_handler::EthereumLogsHandler;
 use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker};
+use opsten_logs_handler::EthereumLogsHandler;
 
 use crate::bus::PangolinRopstenBus;
 use crate::config::SubstrateEthereumConfig;
 use crate::message::{ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
 use crate::task::PangolinRopstenTask;
 
-mod ethereum_logs_handler;
+mod opsten_logs_handler;
 
 fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
     let topics_setting = vec![
@@ -61,13 +61,13 @@ fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
 }
 
 #[derive(Debug)]
-pub struct LikeDarwiniaWithLikeEthereumEthereumScanService {
+pub struct RopstenScanService {
     _greet: Lifeline,
 }
 
-impl BridgeService for LikeDarwiniaWithLikeEthereumEthereumScanService {}
+impl BridgeService for RopstenScanService {}
 
-impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
+impl lifeline::Service for RopstenScanService {
     type Bus = PangolinRopstenBus;
     type Lifeline = anyhow::Result<Self>;
 

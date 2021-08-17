@@ -23,6 +23,7 @@ fn init_log() {
 		support_tracker=debug,
 		bridge=info,
         evm_log_tracker=info,
+        support_tracker_evm_log=info,
         "#,
     );
     std::env::set_var("RUST_BACKTRACE", "1");

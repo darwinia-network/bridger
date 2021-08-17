@@ -6,7 +6,7 @@ pub struct Tracker {
     microkv: NamespaceMicroKV,
     key_raw: String,
     key_curt: String,
-    key_state: String, // todo: change use key_running and type is bool
+    key_running: String,
     key_next: String,
     key_skipped: String,
 }
@@ -18,7 +18,7 @@ impl Tracker {
             microkv,
             key_raw: key.to_string(),
             key_curt: format!("{}.current", key),
-            key_state: format!("{}.state", key),
+            key_running: format!("{}.running", key),
             key_next: format!("{}.next", key),
             key_skipped: format!("{}.skipped", key),
         }
@@ -26,31 +26,31 @@ impl Tracker {
 }
 
 impl Tracker {
-    pub fn state(&self) -> anyhow::Result<TrackState> {
-        let v = self
+    pub fn is_running(&self) -> anyhow::Result<bool> {
+        let running = self
             .microkv
-            .get_as(&self.key_state)?
+            .get_as(&self.key_running)?
             .map(|v: String| v.to_lowercase());
-        if Some("running".to_string()) == v {
-            return Ok(TrackState::Running);
+        if let Some(v) = running {
+            let v = v.trim();
+            let is_running = v == "true" || v == "1";
+            return Ok(is_running);
         }
-        Ok(TrackState::Paused)
+        Ok(false)
     }
 
     pub async fn next(&self) -> anyhow::Result<usize> {
-        let state = self.state()?;
-        if state == TrackState::Paused {
+        let is_running = self.is_running()?;
+        if !is_running {
             loop {
                 let secs = 3;
                 log::warn!(
-                    "The track key [{}] state is {:?}, wait {} seconds check again.",
-                    &self.key_state,
-                    state,
+                    "The track key [{}] value isn't running (true), wait {} seconds check again.",
+                    &self.key_running,
                     secs
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
-                let state = self.state()?;
-                if state != TrackState::Paused {
+                if self.is_running()? {
                     break;
                 }
             }
@@ -126,10 +126,4 @@ fn parse_blocks_from_text(text: String) -> anyhow::Result<Vec<usize>> {
         }
     }
     Ok(blocks)
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum TrackState {
-    Running,
-    Paused,
 }

@@ -7,6 +7,7 @@ pub mod relay;
 
 use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
+use std::hash::{Hash, Hasher};
 
 /// Ethereum transaction event with hash
 #[allow(dead_code)]
@@ -47,6 +48,13 @@ impl EthereumTransaction {
             EthereumTransactionHash::RegisterErc20Token(h) => h,
             EthereumTransactionHash::RedeemErc20Token(h) => h,
         }
+    }
+}
+
+impl Hash for EthereumTransaction {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        let txhash = self.enclosed_hash();
+        txhash.hash(state);
     }
 }
 

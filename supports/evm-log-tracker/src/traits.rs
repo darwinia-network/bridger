@@ -13,6 +13,8 @@ pub trait EvmChain {
 pub trait LogsHandler {
     async fn handle(
         &mut self,
+        from: u64,
+        to: u64,
         client: &EvmClient,
         topics_list: &Vec<(H160, Vec<H256>)>,
         logs: Vec<Log>,

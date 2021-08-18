@@ -5,6 +5,10 @@ use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
+use std::collections::{
+    HashMap,
+    HashSet,
+};
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::darwinia::client::Darwinia;
@@ -20,6 +24,7 @@ pub(crate) struct EthereumLogsHandler {
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
     microkv: NamespaceMicroKV,
     darwinia_client: Darwinia,
+    waited_redeem: HashMap<u64, HashSet<EthereumTransaction>>,
 }
 
 impl EthereumLogsHandler {
@@ -36,6 +41,7 @@ impl EthereumLogsHandler {
             sender_to_redeem,
             microkv,
             darwinia_client,
+            waited_redeem: HashMap::new(),
         }
     }
 }
@@ -44,6 +50,8 @@ impl EthereumLogsHandler {
 impl LogsHandler for EthereumLogsHandler {
     async fn handle(
         &mut self,
+        from: u64,
+        to: u64,
         _client: &EvmClient,
         _topics_list: &Vec<(H160, Vec<H256>)>,
         logs: Vec<Log>,
@@ -64,6 +72,13 @@ impl LogsHandler for EthereumLogsHandler {
             erc20_register_topic,
             erc20_lock_topic,
         );
+
+        let check_position = if txs.is_empty() {
+            to
+        } else {
+            from
+        };
+        self.check_redeem(check_position).await?;
 
         if !txs.is_empty() {
             // Send block number to `Relay Service`
@@ -156,22 +171,67 @@ fn build_txs(
 }
 
 impl EthereumLogsHandler {
+    async fn is_verified(&self, tx: &EthereumTransaction) -> anyhow::Result<bool> {
+        Ok(self
+           .darwinia_client
+           .verified(tx.block_hash, tx.index)
+           .await?
+           || self
+           .darwinia_client
+           .verified_issuing(tx.block_hash, tx.index)
+           .await?
+          )
+    }
+
+    async fn check_redeem(&mut self, check_position: u64) -> anyhow::Result<()> {
+        if self.waited_redeem.is_empty() {
+            trace!(
+                target: PangolinRopstenTask::NAME,
+                "no redeem waited, change last redeem to {:?}",
+                check_position
+            );
+            self.microkv.put("last-redeemed-ropsten", &check_position)?;
+            Ok(())
+        } else {
+            let block_numbers = self.waited_redeem.keys().copied().collect::<Vec<_>>();
+            let redeemed = block_numbers[0];
+            let checked = self.waited_redeem.remove(&redeemed);
+            if let Some(txs) = checked {
+                let mut reverted = txs.clone();
+                for tx in txs.iter() {
+                    match self.is_verified(&tx).await {
+                        Err(err) => {
+                            error!(target: PangolinRopstenTask::NAME, "check-redeem err: {:#?}", err);
+                            self.waited_redeem.insert(redeemed, reverted);
+                            return Err(err)
+                        },
+                        Ok(verified) => {
+                            if verified {
+                                info!(target: PangolinRopstenTask::NAME, "check-redeem verfied tx {:?} at {:?}", tx.tx_hash, tx.block);
+                                reverted.remove(&tx);
+                            } else {
+                                trace!(target: PangolinRopstenTask::NAME, "check-redeem not verfied tx {:?} at {:?}", tx.tx_hash, tx.block);
+                                self.waited_redeem.insert(redeemed, reverted);
+                                return Ok(())
+                            }
+                        }
+                    }
+                }
+            }
+            info!(target: PangolinRopstenTask::NAME, "change last redeem to {:?}", redeemed);
+            self.microkv.put("last-redeemed-ropsten", &redeemed)?;
+
+            Ok(())
+        }
+    }
+
     async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
-        if self
-            .darwinia_client
-            .verified(tx.block_hash, tx.index)
-            .await?
-            || self
-                .darwinia_client
-                .verified_issuing(tx.block_hash, tx.index)
-                .await?
-        {
+        if self.is_verified(&tx).await? {
             trace!(
                 target: PangolinRopstenTask::NAME,
                 "This ethereum tx {:?} has already been redeemed.",
                 tx.enclosed_hash()
             );
-            self.microkv.put("last-redeemed-ropsten", &tx.block)?;
         } else {
             // delay to wait for possible previous extrinsics
             sleep(Duration::from_secs(12)).await;
@@ -183,6 +243,9 @@ impl EthereumLogsHandler {
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;
+            self.waited_redeem.entry(tx.block).or_insert(
+                HashSet::new()
+                ).insert(tx.clone());
         }
 
         Ok(())

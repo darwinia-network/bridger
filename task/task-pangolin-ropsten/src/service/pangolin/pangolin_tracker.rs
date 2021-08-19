@@ -5,26 +5,26 @@ use substrate_subxt::sp_runtime::traits::BlakeTwo256;
 use tokio::time::sleep;
 
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::darwinia::client::Darwinia;
-use component_state::state::BridgeState;
+use component_pangolin_subxt::darwinia::client::Darwinia;
+use support_tracker::Tracker;
 
 use crate::error::Result;
 use crate::task::PangolinRopstenTask;
 
 /// DarwiniaTracker
-pub struct DarwiniaBlockTracker {
+pub struct PangolinBlockTracker {
     darwinia: Darwinia,
-    state: BridgeState,
+    tracker: Tracker,
 }
 
-impl DarwiniaBlockTracker {
+impl PangolinBlockTracker {
     /// new
-    pub fn new(darwinia: Darwinia, state: BridgeState) -> Self {
-        Self { darwinia, state }
+    pub fn new(darwinia: Darwinia, tracker: Tracker) -> Self {
+        Self { darwinia, tracker }
     }
 
     /// get next block
-    pub async fn next_block(&mut self) -> Result<Header<u32, BlakeTwo256>> {
+    pub async fn next_block(&self) -> Result<Header<u32, BlakeTwo256>> {
         loop {
             match self.get_next_block().await {
                 Ok(result) => {
@@ -50,9 +50,8 @@ impl DarwiniaBlockTracker {
         }
     }
 
-    async fn get_next_block(&mut self) -> Result<Option<Header<u32, BlakeTwo256>>> {
-        let kv = self.state.microkv_with_namespace(PangolinRopstenTask::NAME);
-        let next_block = kv.get_as("last-tracked-pangolin-block")?.unwrap_or(0u32) + 1;
+    async fn get_next_block(&self) -> Result<Option<Header<u32, BlakeTwo256>>> {
+        let next_block = self.tracker.next().await? as u32;
         let finalized_block_hash = self.darwinia.finalized_head().await?;
         match self
             .darwinia
@@ -64,7 +63,6 @@ impl DarwiniaBlockTracker {
                     Ok(None)
                 } else {
                     let header = self.darwinia.get_block_by_number(next_block).await?;
-                    // kv.put("last-tracked-pangolin-block", &next_block);
                     Ok(Some(header))
                 }
             }

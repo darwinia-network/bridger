@@ -49,7 +49,7 @@ atom = 0
 [shadow]
 endpoint = "https://ropsten.shadow.darwinia.network"
 
-[service]
+[task]
 interval_ethereum = 120
 interval_relay = 60
 interval_redeem = 90

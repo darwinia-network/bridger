@@ -1,3 +1,7 @@
+###
+# TODO: This crate is copied from client-darwinia-subxt, need to be modified to fit pangolin
+###
+
 [package]
 name = "component-pangolin-subxt"
 version = "0.4.5"

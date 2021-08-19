@@ -1,47 +1,47 @@
-use std::time::Duration;
-
-use lifeline::Sender;
-use microkv::namespace::NamespaceMicroKV;
+use lifeline::{Receiver, Sender};
 use postage::broadcast;
-use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
 
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::darwinia::client::Darwinia;
-use evm_log_tracker::{EvmClient, LogsHandler, Result};
+use component_pangolin_subxt::darwinia::client::Darwinia;
+use support_tracker::Tracker;
+use support_tracker_evm_log::{EvmClient, LogsHandler, Result};
 
 use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::PangolinRopstenTask;
 
-pub(crate) struct EthereumLogsHandler {
+pub(crate) struct RopstenLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-    microkv: NamespaceMicroKV,
+    receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
     darwinia_client: Darwinia,
+    tracker: Tracker,
 }
 
-impl EthereumLogsHandler {
+impl RopstenLogsHandler {
     pub fn new(
         topics_list: Vec<(H160, Vec<H256>)>,
         sender_to_relay: broadcast::Sender<ToRelayMessage>,
         sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-        microkv: NamespaceMicroKV,
+        receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
         darwinia_client: Darwinia,
+        tracker: Tracker,
     ) -> Self {
-        EthereumLogsHandler {
+        RopstenLogsHandler {
             topics_list,
             sender_to_relay,
             sender_to_redeem,
-            microkv,
+            receiver_redeem,
             darwinia_client,
+            tracker,
         }
     }
 }
 
 #[async_trait]
-impl LogsHandler for EthereumLogsHandler {
+impl LogsHandler for RopstenLogsHandler {
     async fn handle(
         &mut self,
         _client: &EvmClient,
@@ -155,7 +155,7 @@ fn build_txs(
     txs
 }
 
-impl EthereumLogsHandler {
+impl RopstenLogsHandler {
     async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
         if self
             .darwinia_client
@@ -171,10 +171,8 @@ impl EthereumLogsHandler {
                 "This ethereum tx {:?} has already been redeemed.",
                 tx.enclosed_hash()
             );
-            self.microkv.put("last-redeemed-ropsten", &tx.block)?;
+            self.tracker.finish(tx.block as usize)?;
         } else {
-            // delay to wait for possible previous extrinsics
-            sleep(Duration::from_secs(12)).await;
             trace!(
                 target: PangolinRopstenTask::NAME,
                 "send to redeem service: {:?}",
@@ -183,6 +181,14 @@ impl EthereumLogsHandler {
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;
+            while let Some(ToRedeemMessage::Complete(block)) = self.receiver_redeem.recv().await {
+                let except = tx.block as usize;
+                if block != except {
+                    continue;
+                }
+                self.tracker.finish(block)?;
+                break;
+            }
         }
 
         Ok(())

@@ -3491,6 +3491,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "69ddb889f9d0d08a67338271fa9b62996bc788c7796a5c18cf057420aaed5eaf"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5767,7 +5776,7 @@ checksum = "32d3ebd75ac2679c2af3a92246639f9fcc8a442ee420719cc4fe195b98dd5fa3"
 dependencies = [
  "bytes 1.0.1",
  "heck",
- "itertools",
+ "itertools 0.9.0",
  "log",
  "multimap",
  "petgraph",
@@ -5784,7 +5793,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "169a15f3008ecb5160cba7d37bcd690a7601b6d30cfb87a117d45e59d52af5d4"
 dependencies = [
  "anyhow",
- "itertools",
+ "itertools 0.9.0",
  "proc-macro2",
  "quote",
  "syn",
@@ -8687,6 +8696,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "support-tracker"
+version = "0.4.5"
+dependencies = [
+ "anyhow",
+ "itertools 0.10.1",
+ "log",
+ "microkv",
+ "serde 1.0.127",
+ "serde_json",
+ "tokio 1.10.0",
+]
+
+[[package]]
+name = "support-tracker-evm-log"
+version = "0.4.5"
+dependencies = [
+ "anyhow",
+ "array-bytes",
+ "async-trait",
+ "component-state",
+ "log",
+ "support-tracker",
+ "thiserror",
+ "tokio 1.10.0",
+ "web3",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8799,8 +8836,6 @@ dependencies = [
  "component-pangolin-subxt",
  "component-shadow",
  "component-state",
- "env_logger 0.8.4",
- "evm-log-tracker",
  "lifeline",
  "linked-darwinia",
  "log",
@@ -8813,6 +8848,8 @@ dependencies = [
  "serde_json",
  "substrate-subxt",
  "support-ethereum",
+ "support-tracker",
+ "support-tracker-evm-log",
  "thiserror",
  "tokio 1.10.0",
  "web3",

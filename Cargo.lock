@@ -8705,7 +8705,7 @@ dependencies = [
  "microkv",
  "serde 1.0.127",
  "serde_json",
- "tokio 1.9.0",
+ "tokio 1.10.0",
 ]
 
 [[package]]
@@ -8719,7 +8719,7 @@ dependencies = [
  "log",
  "support-tracker",
  "thiserror",
- "tokio 1.9.0",
+ "tokio 1.10.0",
  "web3",
 ]
 

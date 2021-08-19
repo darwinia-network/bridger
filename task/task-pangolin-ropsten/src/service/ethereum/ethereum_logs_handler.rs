@@ -243,8 +243,8 @@ impl EthereumLogsHandler {
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;
-            self.waited_redeem.entry(tx.block).or_insert(
-                HashSet::new()
+            self.waited_redeem.entry(tx.block).or_insert_with(
+                HashSet::new
                 ).insert(tx.clone());
         }
 

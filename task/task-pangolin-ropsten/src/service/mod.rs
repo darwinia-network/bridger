@@ -5,13 +5,12 @@ pub mod guard;
 pub mod redeem;
 pub mod relay;
 
-use std::cmp::{Ord, Ordering, PartialOrd};
 use web3::types::H256;
 use std::hash::{Hash, Hasher};
 
 /// Ethereum transaction event with hash
 #[allow(dead_code)]
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub enum EthereumTransactionHash {
     /// Deposit event
     Deposit(H256),
@@ -26,7 +25,7 @@ pub enum EthereumTransactionHash {
 }
 
 /// Reedeemable Ethereum transaction
-#[derive(PartialEq, Eq, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct EthereumTransaction {
     /// Transaction hash for the event
     pub tx_hash: EthereumTransactionHash,
@@ -58,14 +57,11 @@ impl Hash for EthereumTransaction {
     }
 }
 
-impl PartialOrd for EthereumTransaction {
-    fn partial_cmp(&self, o: &Self) -> Option<Ordering> {
-        self.block.partial_cmp(&o.block)
+impl PartialEq for EthereumTransaction {
+    fn eq(&self, other: &Self) -> bool {
+        self.block == other.block && self.index == other.index
     }
 }
 
-impl Ord for EthereumTransaction {
-    fn cmp(&self, o: &Self) -> Ordering {
-        self.block.cmp(&o.block)
-    }
-}
+impl Eq for EthereumTransaction {}
+

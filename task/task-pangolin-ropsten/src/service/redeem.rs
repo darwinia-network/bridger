@@ -43,20 +43,18 @@ impl Service for RedeemService {
                     RedeemHelper::new(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await;
 
                 while let Some(recv) = rx.recv().await {
-                    match recv {
-                        ToRedeemMessage::EthereumTransaction(tx) => {
-                            if let Err(err) = helper.redeem(tx).await {
-                                error!(target: PangolinRopstenTask::NAME, "redeem err: {:#?}", err);
-                                // TODO: Consider the errors more carefully
-                                // Maybe a websocket err, so wait 10 secs to reconnect.
-                                sleep(Duration::from_secs(10)).await;
-                                helper = RedeemHelper::new(
-                                    sender_to_extrinsics.clone(),
-                                    sender_to_redeem.clone(),
-                                )
-                                .await;
-                                // TODO: Maybe need retry
-                            }
+                    if let ToRedeemMessage::EthereumTransaction(tx) = recv {
+                        if let Err(err) = helper.redeem(tx).await {
+                            error!(target: PangolinRopstenTask::NAME, "redeem err: {:#?}", err);
+                            // TODO: Consider the errors more carefully
+                            // Maybe a websocket err, so wait 10 secs to reconnect.
+                            sleep(Duration::from_secs(10)).await;
+                            helper = RedeemHelper::new(
+                                sender_to_extrinsics.clone(),
+                                sender_to_redeem.clone(),
+                            )
+                            .await;
+                            // TODO: Maybe need retry
                         }
                     }
                 }

@@ -1,12 +1,13 @@
 use std::time::Duration;
 
-use lifeline::Sender;
+use lifeline::{Receiver, Sender};
 use postage::broadcast;
 use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_pangolin_subxt::darwinia::client::Darwinia;
+use support_tracker::Tracker;
 use support_tracker_evm_log::{EvmClient, LogsHandler, Result};
 
 use crate::message::{ToRedeemMessage, ToRelayMessage};
@@ -17,7 +18,9 @@ pub(crate) struct RopstenLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
+    receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
     darwinia_client: Darwinia,
+    tracker: Tracker,
 }
 
 impl RopstenLogsHandler {
@@ -25,13 +28,17 @@ impl RopstenLogsHandler {
         topics_list: Vec<(H160, Vec<H256>)>,
         sender_to_relay: broadcast::Sender<ToRelayMessage>,
         sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
+        receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
         darwinia_client: Darwinia,
+        tracker: Tracker,
     ) -> Self {
         RopstenLogsHandler {
             topics_list,
             sender_to_relay,
             sender_to_redeem,
+            receiver_redeem,
             darwinia_client,
+            tracker,
         }
     }
 }
@@ -167,9 +174,8 @@ impl RopstenLogsHandler {
                 "This ethereum tx {:?} has already been redeemed.",
                 tx.enclosed_hash()
             );
+            self.tracker.finish(tx.block as usize)?;
         } else {
-            // delay to wait for possible previous extrinsics
-            sleep(Duration::from_secs(12)).await;
             trace!(
                 target: PangolinRopstenTask::NAME,
                 "send to redeem service: {:?}",
@@ -178,6 +184,9 @@ impl RopstenLogsHandler {
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;
+            if let Some(ToRedeemMessage::Complete(block)) = self.receiver_redeem.recv().await {
+                self.tracker.finish(block)?;
+            }
         }
 
         Ok(())

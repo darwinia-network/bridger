@@ -181,8 +181,13 @@ impl RopstenLogsHandler {
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;
-            if let Some(ToRedeemMessage::Complete(block)) = self.receiver_redeem.recv().await {
+            while let Some(ToRedeemMessage::Complete(block)) = self.receiver_redeem.recv().await {
+                let except = tx.block as usize;
+                if block != except {
+                    continue;
+                }
                 self.tracker.finish(block)?;
+                break;
             }
         }
 

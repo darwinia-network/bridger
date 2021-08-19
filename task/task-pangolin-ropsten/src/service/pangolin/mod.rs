@@ -214,9 +214,8 @@ impl DarwiniaServiceRunner {
                 }
             } else {
                 tracker_raw.finish(header.number as usize)?;
+                retry_times = 0;
             }
-
-            retry_times = 0;
         }
     }
 

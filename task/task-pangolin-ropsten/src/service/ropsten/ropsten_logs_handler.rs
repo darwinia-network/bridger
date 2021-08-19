@@ -1,8 +1,5 @@
-use std::time::Duration;
-
 use lifeline::{Receiver, Sender};
 use postage::broadcast;
-use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
 
 use bridge_traits::bridge::task::BridgeSand;

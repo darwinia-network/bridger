@@ -117,9 +117,9 @@ The bridger will record the set value.
 
 explain:
 
-- current
+- `current`
   Currently scan block number
-- next
+- `next`
   Planned block number, if there is a value, the next time will start from this block. (support array, use `,` to split)
   ```bash
   ./target/release/bridger kv -n task-pangolin-ropsten \
@@ -127,7 +127,9 @@ explain:
     scan.ropsten.next 1,425,36987
   ```
   The order of scanning will be: `1` `425` `36987` `36988` `36989` ...
-- running
+- `finish`
+  Currently finished block number
+- `running`
   The scan is running
-- skipped
+- `skipped`
   Skipped block, maybe happened some error, these blocks need to be taken seriously

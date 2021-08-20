@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
+use lifeline::{Bus, Lifeline, Sender, Task};
 use postage::broadcast;
 use substrate_subxt::system::System;
 use tokio::time::sleep;
@@ -155,7 +155,7 @@ struct DarwiniaServiceRunner {
 impl DarwiniaServiceRunner {
     /// start
     pub async fn start(&mut self, tracker_raw: Tracker) -> Result<()> {
-        let mut tracker_darwinia =
+        let tracker_darwinia =
             DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), tracker_raw.clone());
         let mut retry_times = 0;
         loop {

@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
+use lifeline::{Bus, Lifeline, Task};
 use tokio::time::sleep;
 use web3::types::{H160, H256};
 

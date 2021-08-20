@@ -1,13 +1,9 @@
-use std::time::Duration;
-
 use lifeline::{Receiver, Sender};
 use postage::broadcast;
-use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::darwinia::client::Darwinia;
-use component_state::state::BridgeState;
 use support_tracker::Tracker;
 use support_tracker_evm_log::{EvmClient, LogsHandler, Result};
 

@@ -6,7 +6,6 @@ use tokio::time::sleep;
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::darwinia::client::Darwinia;
-use component_state::state::BridgeState;
 use support_tracker::Tracker;
 
 use crate::error::Result;

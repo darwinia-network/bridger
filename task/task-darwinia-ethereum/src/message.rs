@@ -47,6 +47,7 @@ impl Message<DarwiniaEthereumBus> for ToRelayMessage {
 #[derive(Clone, Debug)]
 pub enum ToRedeemMessage {
     EthereumTransaction(EthereumTransaction),
+    Complete(usize),
 }
 
 impl Message<DarwiniaEthereumBus> for ToRedeemMessage {
@@ -80,29 +81,5 @@ pub enum ToGuardMessage {
 }
 
 impl Message<DarwiniaEthereumBus> for ToGuardMessage {
-    type Channel = broadcast::Sender<Self>;
-}
-
-// *** ToDarwiniaMessage **
-#[derive(Clone, Debug)]
-pub enum ToDarwiniaMessage {
-    Start,
-    Restart(bool),
-    Stop,
-}
-
-impl Message<DarwiniaEthereumBus> for ToDarwiniaMessage {
-    type Channel = broadcast::Sender<Self>;
-}
-
-// *** ToEthereumMessage **
-#[derive(Clone, Debug)]
-pub enum ToEthereumMessage {
-    Start,
-    Restart(bool),
-    Stop,
-}
-
-impl Message<DarwiniaEthereumBus> for ToEthereumMessage {
     type Channel = broadcast::Sender<Self>;
 }

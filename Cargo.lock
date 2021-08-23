@@ -2273,20 +2273,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "evm-log-tracker"
-version = "0.4.5"
-dependencies = [
- "anyhow",
- "array-bytes",
- "async-trait",
- "component-state",
- "log",
- "thiserror",
- "tokio 1.10.0",
- "web3",
-]
-
-[[package]]
 name = "evm-runtime"
 version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

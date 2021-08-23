@@ -192,37 +192,39 @@ impl DarwiniaServiceRunner {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
                     tracker_raw.skip(header.number as usize)?;
                     return Err(err);
-                } else {
-                    error!(
-                        target: DarwiniaEthereumTask::NAME,
-                        "An error occurred while processing the events of block {}: {:?}",
-                        header.number,
-                        err
-                    );
-
-                    let err_msg = format!("{:?}", err).to_lowercase();
-                    if err_msg.contains("type size unavailable") {
-                        tracker_raw.skip(header.number as usize)?;
-                    } else {
-                        if retry_times > 10 {
-                            tracker_raw.skip(header.number as usize)?;
-                            log::error!(
-                                target: DarwiniaEthereumTask::NAME,
-                                "Retry {} times still failed: {}",
-                                retry_times,
-                                header.number
-                            );
-                            retry_times = 0;
-                            continue;
-                        }
-                        tokio::time::sleep(std::time::Duration::from_secs(30)).await;
-                        retry_times += 1;
-                    }
                 }
-            } else {
-                tracker_raw.finish(header.number as usize)?;
-                retry_times = 0;
+
+                error!(
+                    target: DarwiniaEthereumTask::NAME,
+                    "An error occurred while processing the events of block {}: {:?}",
+                    header.number,
+                    err
+                );
+
+                let err_msg = format!("{:?}", err).to_lowercase();
+                if err_msg.contains("type size unavailable") {
+                    tracker_raw.skip(header.number as usize)?;
+                    continue;
+                }
+
+                if retry_times > 10 {
+                    tracker_raw.skip(header.number as usize)?;
+                    log::error!(
+                        target: DarwiniaEthereumTask::NAME,
+                        "Retry {} times still failed: {}",
+                        retry_times,
+                        header.number
+                    );
+                    retry_times = 0;
+                    continue;
+                }
+                tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+                retry_times += 1;
+                continue;
             }
+
+            tracker_raw.finish(header.number as usize)?;
+            retry_times = 0;
         }
     }
 

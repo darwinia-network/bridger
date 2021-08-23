@@ -193,7 +193,8 @@ impl RopstenLogsHandler {
             self.tracker.finish(check_position as usize)?;
             Ok(())
         } else {
-            let block_numbers = self.waited_redeem.keys().copied().collect::<Vec<_>>();
+            let mut block_numbers = self.waited_redeem.keys().copied().collect::<Vec<_>>();
+            block_numbers.sort();
             let redeemed = block_numbers[0];
             let checked = self.waited_redeem.remove(&redeemed);
             if let Some(txs) = checked {

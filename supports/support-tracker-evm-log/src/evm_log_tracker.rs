@@ -40,13 +40,15 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
 
     pub async fn start(&mut self) -> anyhow::Result<()> {
         self.running = true;
+        let mut started: u64 = self.tracker.get_finished()? + 1;
         loop {
-            match self.next().await {
+            match self.next(started).await {
                 Err(err) => {
                     return Err(err);
                 }
-                Ok(logs) => {
-                    self.handle(logs).await?;
+                Ok((from, to, logs)) => {
+                    self.handle(from, to, logs).await?;
+                    started = to + 1;
                 }
             }
 
@@ -64,10 +66,9 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
         self.running = false;
     }
 
-    pub async fn next(&mut self) -> Result<Vec<Log>> {
+    pub async fn next(&mut self, from: u64) -> Result<(u64, u64, Vec<Log>)> {
         let mut result = vec![];
-        let from = self.tracker.next().await?;
-        let (from, to) = C::next_range(from as u64, &self.client).await?;
+        let (from, to) = C::next_range(from, &self.client).await?;
         info!(
             "Heartbeat>>> Scanning on {} for new cross-chain transactions from {} to {} ...",
             C::NAME,
@@ -78,13 +79,12 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
             let logs = self.client.get_logs(&topics.0, &topics.1, from, to).await?;
             result.extend_from_slice(&logs);
         }
-        Ok(result)
+        Ok((from, to, result))
     }
 
-    async fn handle(&mut self, logs: Vec<Log>) -> Result<()> {
+    async fn handle(&mut self, from: u64, to: u64, logs: Vec<Log>) -> Result<()> {
         self.logs_handler
-            //todo
-            .handle(0, 0, &self.client, &self.topics_list, logs)
+            .handle(from, to, &self.client, &self.topics_list, logs)
             .await?;
         Ok(())
     }

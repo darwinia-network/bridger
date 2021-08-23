@@ -13,10 +13,10 @@ impl LogsHandler for DefaultLogsHandler {
         _client: &EvmClient,
         _topics_list: &Vec<(H160, Vec<H256>)>,
         logs: Vec<Log>,
-    ) -> Result<()> {
+    ) -> Result<u64> {
         for log in logs {
             info!("{:?}", log);
         }
-        Ok(())
+        Ok(0)
     }
 }

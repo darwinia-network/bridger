@@ -1,4 +1,4 @@
-use lifeline::{Receiver, Sender};
+use lifeline::Sender;
 use postage::broadcast;
 use web3::types::{Log, H160, H256};
 use std::collections::{
@@ -19,7 +19,6 @@ pub(crate) struct RopstenLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-    receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
     darwinia_client: Darwinia,
     waited_redeem: HashMap<u64, HashSet<EthereumTransaction>>,
     tracker: Tracker,
@@ -30,7 +29,6 @@ impl RopstenLogsHandler {
         topics_list: Vec<(H160, Vec<H256>)>,
         sender_to_relay: broadcast::Sender<ToRelayMessage>,
         sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-        receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
         darwinia_client: Darwinia,
         tracker: Tracker,
     ) -> Self {
@@ -38,7 +36,6 @@ impl RopstenLogsHandler {
             topics_list,
             sender_to_relay,
             sender_to_redeem,
-            receiver_redeem,
             darwinia_client,
             waited_redeem: HashMap::new(),
             tracker,
@@ -55,7 +52,7 @@ impl LogsHandler for RopstenLogsHandler {
         _client: &EvmClient,
         _topics_list: &Vec<(H160, Vec<H256>)>,
         logs: Vec<Log>,
-    ) -> Result<()> {
+    ) -> Result<u64> {
         // TODO: check the address
         let bank_topic = self.topics_list[0].1[0];
         let issuing_topic = self.topics_list[1].1[0];
@@ -79,6 +76,9 @@ impl LogsHandler for RopstenLogsHandler {
             from
         };
         self.check_redeem(check_position).await?;
+        if !self.waited_redeem.is_empty() {
+            return Ok(from)
+        }
 
         if !txs.is_empty() {
             // Send block number to `Relay Service`
@@ -100,7 +100,7 @@ impl LogsHandler for RopstenLogsHandler {
             }
         }
 
-        Ok(())
+        Ok(to)
     }
 }
 

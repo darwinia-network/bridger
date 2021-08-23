@@ -195,32 +195,33 @@ impl RopstenLogsHandler {
         } else {
             let mut block_numbers = self.waited_redeem.keys().copied().collect::<Vec<_>>();
             block_numbers.sort();
-            let redeemed = block_numbers[0];
-            let checked = self.waited_redeem.remove(&redeemed);
-            if let Some(txs) = checked {
-                let mut reverted = txs.clone();
-                for tx in txs.iter() {
-                    match self.is_verified(&tx).await {
-                        Err(err) => {
-                            error!(target: PangolinRopstenTask::NAME, "check-redeem err: {:#?}", err);
-                            self.waited_redeem.insert(redeemed, reverted);
-                            return Err(err)
-                        },
-                        Ok(verified) => {
-                            if verified {
-                                info!(target: PangolinRopstenTask::NAME, "check-redeem verfied tx {:?} at {:?}", tx.tx_hash, tx.block);
-                                reverted.remove(&tx);
-                            } else {
-                                trace!(target: PangolinRopstenTask::NAME, "check-redeem not verfied tx {:?} at {:?}", tx.tx_hash, tx.block);
+            for redeemed in block_numbers {
+                let checked = self.waited_redeem.remove(&redeemed);
+                if let Some(txs) = checked {
+                    let mut reverted = txs.clone();
+                    for tx in txs.iter() {
+                        match self.is_verified(&tx).await {
+                            Err(err) => {
+                                error!(target: PangolinRopstenTask::NAME, "check-redeem err: {:#?}", err);
                                 self.waited_redeem.insert(redeemed, reverted);
-                                return Ok(())
+                                return Err(err)
+                            },
+                            Ok(verified) => {
+                                if verified {
+                                    info!(target: PangolinRopstenTask::NAME, "check-redeem verfied tx {:?} at {:?}", tx.tx_hash, tx.block);
+                                    reverted.remove(&tx);
+                                } else {
+                                    trace!(target: PangolinRopstenTask::NAME, "check-redeem not verfied tx {:?} at {:?}", tx.tx_hash, tx.block);
+                                    self.waited_redeem.insert(redeemed, reverted);
+                                    return Ok(())
+                                }
                             }
                         }
                     }
                 }
+                info!(target: PangolinRopstenTask::NAME, "new redeem confirmed, change last redeem to {:?}", redeemed);
+                self.tracker.finish(redeemed as usize)?;
             }
-            info!(target: PangolinRopstenTask::NAME, "change last redeem to {:?}", redeemed);
-            self.tracker.finish(redeemed as usize)?;
 
             Ok(())
         }
@@ -242,10 +243,11 @@ impl RopstenLogsHandler {
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;
-            self.waited_redeem.entry(tx.block).or_insert_with(
-                HashSet::new
-                ).insert(tx.clone());
+            trace!("finishe to send to redeem: {:?}", &tx.tx_hash);
         }
+        self.waited_redeem.entry(tx.block).or_insert_with(
+            HashSet::new
+            ).insert(tx.clone());
 
         Ok(())
     }

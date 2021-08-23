@@ -18,5 +18,5 @@ pub trait LogsHandler {
         client: &EvmClient,
         topics_list: &Vec<(H160, Vec<H256>)>,
         logs: Vec<Log>,
-    ) -> Result<u64>;
+    ) -> Result<()>;
 }

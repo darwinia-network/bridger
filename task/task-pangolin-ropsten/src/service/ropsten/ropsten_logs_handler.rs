@@ -52,7 +52,7 @@ impl LogsHandler for RopstenLogsHandler {
         _client: &EvmClient,
         _topics_list: &Vec<(H160, Vec<H256>)>,
         logs: Vec<Log>,
-    ) -> Result<u64> {
+    ) -> Result<()> {
         // TODO: check the address
         let bank_topic = self.topics_list[0].1[0];
         let issuing_topic = self.topics_list[1].1[0];
@@ -77,7 +77,7 @@ impl LogsHandler for RopstenLogsHandler {
         };
         self.check_redeem(check_position).await?;
         if !self.waited_redeem.is_empty() {
-            return Ok(from)
+            return Ok(())
         }
 
         if !txs.is_empty() {
@@ -100,7 +100,7 @@ impl LogsHandler for RopstenLogsHandler {
             }
         }
 
-        Ok(to)
+        Ok(())
     }
 }
 

@@ -11,16 +11,16 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
 use component_ethereum::error::BizError;
 use component_ethereum::error::ComponentEthereumError;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_pangolin_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
 use component_state::state::BridgeState;
 use support_ethereum::block::EthereumHeader;
 
 use crate::bus::PangolinRopstenBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::TaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRelayMessage};
 use crate::task::PangolinRopstenTask;
 
@@ -42,7 +42,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         // Config
-        let servce_config: SubstrateEthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
+        let servce_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
         // State
         let state = bus.storage().clone_resource::<BridgeState>()?;

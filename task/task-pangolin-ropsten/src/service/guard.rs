@@ -10,14 +10,14 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::account::DarwiniaAccount;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::config::DarwiniaSubxtConfig;
-use component_darwinia_subxt::from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia};
+use component_pangolin_subxt::account::DarwiniaAccount;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_pangolin_subxt::config::DarwiniaSubxtConfig;
+use component_pangolin_subxt::from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia};
 use component_shadow::{Shadow, ShadowComponent};
 
 use crate::bus::PangolinRopstenBus;
-use crate::config::SubstrateEthereumConfig;
+use crate::config::TaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToGuardMessage};
 use crate::task::PangolinRopstenTask;
 
@@ -74,15 +74,15 @@ async fn start(
     info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 
     // Components
-    let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
     let component_shadow = ShadowComponent::restore::<PangolinRopstenTask>()?;
 
     // Config
     let config_darwinia: DarwiniaSubxtConfig = Config::restore(PangolinRopstenTask::NAME)?;
-    let servce_config: SubstrateEthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let servce_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
     // Darwinia client & account
-    let darwinia = component_darwinia_subxt.component().await?;
+    let darwinia = component_pangolin_subxt.component().await?;
     let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
     let account = DarwiniaAccount::new(
         config_darwinia.relayer_private_key,

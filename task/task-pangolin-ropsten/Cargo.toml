@@ -34,31 +34,24 @@ web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", 
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 array-bytes = "1.1.0"
 
+secp256k1 = { version = "0.20", features = ["recovery"] }
+async-recursion = "0.3.2"
+substrate-subxt = { version = "0.15.3", git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "metadata" }
+
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.10", features = [ "json" ] }
+
 bridge-traits = { path = "../../traits" }
-
 linked-darwinia = { path = "../linked-darwinia" }
-
 
 component-state = { path = "../../components/state" }
 component-ethereum = { path = "../../components/ethereum" }
 component-shadow = { path = "../../components/shadow" }
 component-http-client = { path = "../../components/http-client" }
-
-#component-darwinia = { path = "../../components/client-darwinia" }
-component-darwinia-subxt = { package = "component-pangolin-subxt", path = "../../components/client-pangolin-subxt" }
+component-pangolin-subxt = { path = "../../components/client-pangolin-subxt" }
 
 support-ethereum = { path = "../../supports/support-ethereum" }
+support-tracker = { path = "../../supports/support-tracker" }
+support-tracker-evm-log = { path = "../../supports/support-tracker-evm-log" }
 
-evm-log-tracker = { path = "../../supports/evm-log-tracker" }
-
-tokio = { version = "1", features = ["full"] }
-
-env_logger = "0.8"
-substrate-subxt = { version = "0.15.3", git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "metadata" }
-secp256k1 = { version = "0.20", features = ["recovery"] }
-async-recursion = "0.3.2"
-
-[dependencies.reqwest]
-version = "0.10"
-features = ["json"]
 

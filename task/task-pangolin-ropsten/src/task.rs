@@ -7,14 +7,14 @@ use bridge_traits::bridge::task::{
 use component_state::state::BridgeState;
 
 use crate::bus::PangolinRopstenBus;
-use crate::config::DarwiniaEthereumConfig;
+use crate::config::PangolinRopstenConfig;
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
-use crate::service::darwinia::DarwiniaService;
-use crate::service::ethereum::LikeDarwiniaWithLikeEthereumEthereumScanService;
 use crate::service::extrinsics::ExtrinsicsService;
 use crate::service::guard::GuardService;
+use crate::service::pangolin::PangolinService;
 use crate::service::redeem::RedeemService;
 use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
+use crate::service::ropsten::RopstenScanService;
 
 #[derive(Debug)]
 pub struct PangolinRopstenTask {
@@ -40,7 +40,7 @@ impl BridgeTaskKeep for PangolinRopstenTask {
 
 impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
     fn config_template() -> anyhow::Result<serde_json::Value> {
-        Ok(serde_json::to_value(DarwiniaEthereumConfig::template())?)
+        Ok(serde_json::to_value(PangolinRopstenConfig::template())?)
     }
 
     fn stack(&mut self) -> &mut TaskStack<PangolinRopstenBus> {
@@ -49,17 +49,19 @@ impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
 }
 
 impl PangolinRopstenTask {
-    pub async fn new(config: DarwiniaEthereumConfig, state: BridgeState) -> anyhow::Result<Self> {
+    pub async fn new(config: PangolinRopstenConfig, state: BridgeState) -> anyhow::Result<Self> {
+        crate::migrate::migrate(&state)?;
+
         config.store(Self::NAME)?;
         let bus = PangolinRopstenBus::default();
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new(bus);
-        stack.spawn_service::<LikeDarwiniaWithLikeEthereumEthereumScanService>()?;
+        stack.spawn_service::<RopstenScanService>()?;
         stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>()?;
         stack.spawn_service::<RedeemService>()?;
         stack.spawn_service::<GuardService>()?;
-        stack.spawn_service::<DarwiniaService>()?;
+        stack.spawn_service::<PangolinService>()?;
         stack.spawn_service::<ExtrinsicsService>()?;
 
         let mut tx_scan = stack.bus().tx::<DarwiniaEthereumMessage>()?;

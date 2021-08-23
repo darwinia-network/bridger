@@ -47,6 +47,7 @@ impl Message<PangolinRopstenBus> for ToRelayMessage {
 #[derive(Clone, Debug)]
 pub enum ToRedeemMessage {
     EthereumTransaction(EthereumTransaction),
+    Complete(usize), // Complete redeem, the arguments is block number
 }
 
 impl Message<PangolinRopstenBus> for ToRedeemMessage {
@@ -80,29 +81,5 @@ pub enum ToGuardMessage {
 }
 
 impl Message<PangolinRopstenBus> for ToGuardMessage {
-    type Channel = broadcast::Sender<Self>;
-}
-
-// *** ToDarwiniaMessage **
-#[derive(Clone, Debug)]
-pub enum ToDarwiniaMessage {
-    Start,
-    Restart(bool),
-    Stop,
-}
-
-impl Message<PangolinRopstenBus> for ToDarwiniaMessage {
-    type Channel = broadcast::Sender<Self>;
-}
-
-// *** ToEthereumMessage **
-#[derive(Clone, Debug)]
-pub enum ToEthereumMessage {
-    Start,
-    Restart(bool),
-    Stop,
-}
-
-impl Message<PangolinRopstenBus> for ToEthereumMessage {
     type Channel = broadcast::Sender<Self>;
 }

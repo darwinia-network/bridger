@@ -8,10 +8,10 @@ use colored::*;
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::TaskTerminal;
 use bridge_traits::error::StandardError;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::events::EventInfo;
-use component_darwinia_subxt::rpc::FormatedMMR;
-use component_darwinia_subxt::to_ethereum::Darwinia2Ethereum;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_pangolin_subxt::events::EventInfo;
+use component_pangolin_subxt::rpc::FormatedMMR;
+use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
 
 use crate::bus::PangolinRopstenBus;
 use crate::task::PangolinRopstenTask;

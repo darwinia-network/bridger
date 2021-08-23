@@ -21,6 +21,7 @@ pub fn spec_serialize_value(
     key: String,
     value: String,
 ) -> anyhow::Result<()> {
+    let value = value.trim().to_string();
     if !key.contains("::") {
         microkv.put(key, &value)?;
         return Ok(());

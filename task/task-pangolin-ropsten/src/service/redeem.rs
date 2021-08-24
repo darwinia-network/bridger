@@ -54,6 +54,8 @@ impl Service for RedeemService {
                                 sender_to_redeem.clone(),
                             )
                             .await;
+                            // for any error when helper recreated, we need put this tx back to the
+                            // receive queue
                             let _ = helper.retry(tx);
                         }
                     }

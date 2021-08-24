@@ -22,6 +22,10 @@ pub(crate) struct RopstenLogsHandler {
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
     darwinia_client: Darwinia,
+    // this waited_redeem is used to check the finished redeem block
+    // maybe some transactions are in the same block. The block is confirmed when all the
+    // transactions in this block are confirmed. And the queue must be sorted by block number in
+    // order to avoid the missing of the older block.
     waited_redeem: HashMap<u64, HashSet<EthereumTransaction>>,
     tracker: Tracker,
 }
@@ -72,6 +76,9 @@ impl LogsHandler for RopstenLogsHandler {
             erc20_lock_topic,
         );
 
+        // if [from, to] blocks has no transactions we need, and the waited_redeem queue is empty.
+        // next time we only need to scan from `to` block. Other wise we need to scan from `from-1`
+        // block to ensure all the transactions in interval [from, to] to be checked.
         let check_position = if txs.is_empty() {
             to
         } else {

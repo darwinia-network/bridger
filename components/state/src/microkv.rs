@@ -12,7 +12,8 @@ pub fn microkv_instance(config: &MicrokvConfig) -> anyhow::Result<microkv::Micro
         .clone()
         .unwrap_or_else(|| MicrokvConfig::marker().to_string());
 
-    let microkv = try_microkv(dbname, config)?;
+    let mut microkv = try_microkv(dbname, config)?;
+    microkv = microkv.set_auto_commit(config.auto_commit);
     microkv.commit()?;
     Ok(microkv)
 }

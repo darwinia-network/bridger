@@ -185,6 +185,14 @@ impl RopstenLogsHandler {
           )
     }
 
+    fn is_redeem_submitted(&self, tx: &EthereumTransaction) -> bool {
+        let txset = self.waited_redeem.get(&tx.block);
+        if let Some(txs) = txset {
+            return txs.contains(&tx)
+        }
+        false
+    }
+
     async fn check_redeem(&mut self, check_position: u64) -> anyhow::Result<()> {
         if self.waited_redeem.is_empty() {
             trace!(
@@ -230,6 +238,9 @@ impl RopstenLogsHandler {
     }
 
     async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
+        if self.is_redeem_submitted(&tx) {
+            return Ok(())
+        }
         if self.is_verified(&tx).await? {
             trace!(
                 target: PangolinRopstenTask::NAME,
@@ -247,9 +258,7 @@ impl RopstenLogsHandler {
                 .await?;
             trace!("finishe to send to redeem: {:?}", &tx.tx_hash);
         }
-        self.waited_redeem.entry(tx.block).or_insert_with(
-            HashSet::new
-            ).insert(tx.clone());
+        self.waited_redeem.entry(tx.block).or_insert_with(HashSet::new).insert(tx.clone());
 
         Ok(())
     }

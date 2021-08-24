@@ -219,6 +219,7 @@ async fn do_send_extrinsic(
                         if let Some(relayer) = &ethereum2darwinia_relayer {
                             let ex_hash = ethereum2darwinia.register_erc20(relayer, proof).await?;
                             info!(
+                                target: PangolinRopstenTask::NAME,
                                 "register erc20 token tx {:?} with extrinsic {:?}",
                                 ethereum_tx.tx_hash, ex_hash
                             );
@@ -230,6 +231,7 @@ async fn do_send_extrinsic(
                         if let Some(relayer) = &ethereum2darwinia_relayer {
                             let ex_hash = ethereum2darwinia.redeem_erc20(relayer, proof).await?;
                             info!(
+                                target: PangolinRopstenTask::NAME,
                                 "redeem erc20 token tx {:?} with extrinsic {:?}",
                                 ethereum_tx.tx_hash, ex_hash
                             );

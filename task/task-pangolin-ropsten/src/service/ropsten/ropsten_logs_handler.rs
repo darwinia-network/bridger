@@ -15,6 +15,8 @@ use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::PangolinRopstenTask;
 
+const MAX_WAITED_REDEEM_COUNT: usize = 1024;
+
 pub(crate) struct RopstenLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
@@ -73,10 +75,10 @@ impl LogsHandler for RopstenLogsHandler {
         let check_position = if txs.is_empty() {
             to
         } else {
-            from
+            from - 1
         };
         self.check_redeem(check_position).await?;
-        if !self.waited_redeem.is_empty() {
+        if self.waited_redeem.len() >= MAX_WAITED_REDEEM_COUNT {
             return Ok(())
         }
 

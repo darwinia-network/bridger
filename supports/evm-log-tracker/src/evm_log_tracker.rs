@@ -46,18 +46,13 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
 
     pub async fn start(&mut self) -> anyhow::Result<()> {
         self.running = true;
-        let microkv = self.state.microkv_with_namespace(&self.task_name);
-        let mut started: u64 = microkv.get_as(&self.state_name)?.unwrap_or(0) + 1;
         loop {
-            match self.next(started).await {
+            match self.next().await {
                 Err(err) => {
                     return Err(err);
                 }
-                Ok((from, to, logs)) => {
-                    self.handle(from, to, logs).await?;
-                    started = to + 1;
-                    // todo if start in kv has a long distance with this started, we should wait
-                    // the processing
+                Ok(logs) => {
+                    self.handle(logs).await?;
                 }
             }
 
@@ -75,8 +70,10 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
         self.running = false;
     }
 
-    pub async fn next(&mut self, from: u64) -> Result<(u64, u64, Vec<Log>)> {
+    pub async fn next(&mut self) -> Result<Vec<Log>> {
         let mut result = vec![];
+        let microkv = self.state.microkv_with_namespace(&self.task_name);
+        let from: u64 = microkv.get_as(&self.state_name)?.unwrap_or(0) + 1;
         let (from, to) = C::next_range(from, &self.client).await?;
         info!(
             "Heartbeat>>> Scanning on {} for new cross-chain transactions from {} to {} ...",
@@ -88,12 +85,12 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
             let logs = self.client.get_logs(&topics.0, &topics.1, from, to).await?;
             result.extend_from_slice(&logs);
         }
-        Ok((from, to, result))
+        Ok(result)
     }
 
-    async fn handle(&mut self, from: u64, to: u64, logs: Vec<Log>) -> Result<()> {
+    async fn handle(&mut self, logs: Vec<Log>) -> Result<()> {
         self.logs_handler
-            .handle(from, to, &self.client, &self.topics_list, logs)
+            .handle(&self.client, &self.topics_list, logs)
             .await?;
         Ok(())
     }

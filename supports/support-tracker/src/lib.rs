@@ -101,10 +101,6 @@ impl Tracker {
         Ok(())
     }
 
-    pub fn get_finished(&self) -> anyhow::Result<u64> {
-        Ok(self.microkv.get_as(&self.key_finish)?.unwrap_or(0))
-    }
-
     pub fn skip(&self, block: usize) -> anyhow::Result<()> {
         let skipped: Option<String> = self.microkv.get_as(&self.key_skipped)?;
         match skipped {

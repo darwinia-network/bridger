@@ -43,6 +43,8 @@ impl BridgeTask<DarwiniaEthereumBus> for DarwiniaEthereumTask {
 
 impl DarwiniaEthereumTask {
     pub async fn new(config: DarwiniaEthereumConfig, state: BridgeState) -> anyhow::Result<Self> {
+        crate::migrate::migrate(&state)?;
+
         config.store(Self::NAME)?;
         let bus = DarwiniaEthereumBus::default();
         bus.store_resource::<BridgeState>(state);

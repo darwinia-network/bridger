@@ -9,7 +9,7 @@ pangolin-ropsten
 
 ## Run
 
-1. `./target/release/darwinia-bridger server`
+1. `./target/release/darwinia server`
    Start bridge server
 
 2. Open another shell

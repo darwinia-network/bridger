@@ -11,7 +11,6 @@ mod keys;
 mod mmr;
 mod parcel;
 mod relay;
-mod starter;
 
 pub async fn dispatch_route(
     bus: &DarwiniaEthereumBus,
@@ -20,8 +19,6 @@ pub async fn dispatch_route(
 ) -> anyhow::Result<TaskTerminal> {
     match &uri[..] {
         "relay" => relay::route(bus, param).await,
-        "start-darwinia" => starter::start_darwinia(bus, param).await,
-        "start-ethereum" => starter::start_ethereum(bus, param).await,
         "show-parcel" => parcel::show(bus, param).await,
         "affirm" => affirm::affirm(bus, param).await,
         "affirm-force" => affirm::affirm_force(bus, param).await,

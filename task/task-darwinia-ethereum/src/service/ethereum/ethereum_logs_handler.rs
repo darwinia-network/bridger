@@ -1,14 +1,11 @@
-use std::time::Duration;
-
-use lifeline::Sender;
+use lifeline::{Receiver, Sender};
 use postage::broadcast;
-use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::darwinia::client::Darwinia;
-use component_state::state::BridgeState;
-use evm_log_tracker::{EvmClient, LogsHandler, Result};
+use support_tracker::Tracker;
+use support_tracker_evm_log::{EvmClient, LogsHandler, Result};
 
 use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
@@ -18,8 +15,9 @@ pub(crate) struct EthereumLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-    state: BridgeState,
+    receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
     darwinia_client: Darwinia,
+    tracker: Tracker,
 }
 
 impl EthereumLogsHandler {
@@ -27,15 +25,17 @@ impl EthereumLogsHandler {
         topics_list: Vec<(H160, Vec<H256>)>,
         sender_to_relay: broadcast::Sender<ToRelayMessage>,
         sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-        state: BridgeState,
+        receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
         darwinia_client: Darwinia,
+        tracker: Tracker,
     ) -> Self {
         EthereumLogsHandler {
             topics_list,
             sender_to_relay,
             sender_to_redeem,
-            state,
+            receiver_redeem,
             darwinia_client,
+            tracker,
         }
     }
 }
@@ -138,23 +138,26 @@ impl EthereumLogsHandler {
                 "This ethereum tx {:?} has already been redeemed.",
                 tx.enclosed_hash()
             );
-            let microkv = self
-                .state
-                .microkv_with_namespace(DarwiniaEthereumTask::NAME);
-            microkv.put("last-redeemed", &tx.block)?;
-        } else {
-            // delay to wait for possible previous extrinsics
-            sleep(Duration::from_secs(12)).await;
-            trace!(
-                target: DarwiniaEthereumTask::NAME,
-                "send to redeem service: {:?}",
-                &tx.tx_hash
-            );
-            self.sender_to_redeem
-                .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
-                .await?;
+            self.tracker.finish(tx.block as usize)?;
+            return Ok(());
         }
 
+        trace!(
+            target: DarwiniaEthereumTask::NAME,
+            "send to redeem service: {:?}",
+            &tx.tx_hash
+        );
+        self.sender_to_redeem
+            .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
+            .await?;
+        while let Some(ToRedeemMessage::Complete(block)) = self.receiver_redeem.recv().await {
+            let except = tx.block as usize;
+            if block != except {
+                continue;
+            }
+            self.tracker.finish(block)?;
+            break;
+        }
         Ok(())
     }
 }

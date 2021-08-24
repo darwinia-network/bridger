@@ -8,8 +8,9 @@ pub mod config;
 pub mod task;
 
 mod bus;
-mod message;
-mod route;
-mod service;
 mod error;
 mod ethereum;
+mod message;
+mod migrate;
+mod route;
+mod service;

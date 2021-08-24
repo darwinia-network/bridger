@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
+use lifeline::{Bus, Lifeline, Task};
 use tokio::time::sleep;
 use web3::types::{H160, H256};
 
@@ -15,11 +15,12 @@ use component_ethereum::config::EthereumConfig;
 use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
 use ethereum_logs_handler::EthereumLogsHandler;
-use evm_log_tracker::{Ethereum, EvmClient, EvmLogTracker};
+use support_tracker::Tracker;
+use support_tracker_evm_log::{Ethereum, EvmClient, EvmLogTracker};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::TaskConfig;
-use crate::message::{ToEthereumMessage, ToRedeemMessage, ToRelayMessage};
+use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::task::DarwiniaEthereumTask;
 
 mod ethereum_logs_handler;
@@ -56,104 +57,82 @@ fn get_topics_list(ethereum_config: EthereumConfig) -> Vec<(H160, Vec<H256>)> {
 }
 
 #[derive(Debug)]
-pub struct LikeDarwiniaWithLikeEthereumEthereumScanService {
+pub struct EthereumScanService {
     _greet: Lifeline,
 }
 
-impl BridgeService for LikeDarwiniaWithLikeEthereumEthereumScanService {}
+impl BridgeService for EthereumScanService {}
 
-impl lifeline::Service for LikeDarwiniaWithLikeEthereumEthereumScanService {
+impl lifeline::Service for EthereumScanService {
     type Bus = DarwiniaEthereumBus;
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
-        let mut rx = bus.rx::<ToEthereumMessage>()?;
         let sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
-        let sender_to_ethereum = bus.tx::<ToEthereumMessage>()?;
+        let receiver_redeem = bus.rx::<ToRedeemMessage>()?;
 
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
-        let service_name = format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME);
-        let _greet = Self::try_task(&service_name.clone(), async move {
-            let mut is_started = false;
-            while let Some(message) = rx.recv().await {
-                match message {
-                    ToEthereumMessage::Start => {
-                        if is_started {
-                            log::warn!(
-                                target: DarwiniaEthereumTask::NAME,
-                                "The service {} has been started",
-                                service_name.clone()
-                            );
-                            continue;
-                        }
-                        let cloned_state = state.clone();
-                        let cloned_sender_to_relay = sender_to_relay.clone();
-                        let cloned_sender_to_redeem = sender_to_redeem.clone();
-                        let cloned_sender_to_ethereum = sender_to_ethereum.clone();
-                        tokio::spawn(async move {
-                            run(
-                                cloned_state,
-                                cloned_sender_to_relay,
-                                cloned_sender_to_redeem,
-                                cloned_sender_to_ethereum,
-                            )
-                            .await
-                        });
-                        is_started = true;
-                    }
-                    ToEthereumMessage::Restart(force) => {
-                        if force {
-                            is_started = false;
-                        }
-                        let mut cloned_sender_to_ethereum = sender_to_ethereum.clone();
-                        cloned_sender_to_ethereum
-                            .send(ToEthereumMessage::Start)
-                            .await?;
-                    }
-                    _ => continue,
-                }
-            }
-            Ok(())
-        });
+        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
+        let tracker = Tracker::new(microkv, "scan.ethereum");
+
+        let _greet = Self::try_task(
+            &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
+            async move {
+                start(
+                    sender_to_relay.clone(),
+                    sender_to_redeem.clone(),
+                    receiver_redeem.clone(),
+                    tracker.clone(),
+                )
+                .await;
+                Ok(())
+            },
+        );
         Ok(Self { _greet })
     }
 }
 
-async fn run(
-    state: BridgeState,
+async fn start(
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
-    mut sender_to_ethereum: postage::broadcast::Sender<ToEthereumMessage>,
+    receiver_redeem: postage::broadcast::Receiver<ToRedeemMessage>,
+    tracker: Tracker,
 ) {
-    if let Err(err) = start(
-        state.clone(),
-        sender_to_relay.clone(),
-        sender_to_redeem.clone(),
-    )
-    .await
-    {
-        error!(
-            target: DarwiniaEthereumTask::NAME,
-            "ethereum err {:#?}", err
-        );
-        sleep(Duration::from_secs(10)).await;
-        sender_to_ethereum
-            .send(ToEthereumMessage::Restart(true))
-            .await
-            .unwrap();
+    loop {
+        if let Err(err) = _start(
+            sender_to_relay.clone(),
+            sender_to_redeem.clone(),
+            receiver_redeem.clone(),
+            tracker.clone(),
+        )
+        .await
+        {
+            let secs = 10;
+            log::error!(
+                target: DarwiniaEthereumTask::NAME,
+                "ethereum err {:#?}, wait {} seconds",
+                err,
+                secs
+            );
+            sleep(Duration::from_secs(secs)).await;
+        }
     }
 }
 
-async fn start(
-    state: BridgeState,
+async fn _start(
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+    receiver_redeem: postage::broadcast::Receiver<ToRedeemMessage>,
+    tracker: Tracker,
 ) -> anyhow::Result<()> {
-    info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
+    info!(
+        target: DarwiniaEthereumTask::NAME,
+        "ETHEREUM SCAN SERVICE RESTARTING..."
+    );
 
     // Components
     let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
@@ -181,20 +160,19 @@ async fn start(
         topics_list.clone(),
         sender_to_relay,
         sender_to_redeem,
-        state.clone(),
+        receiver_redeem.clone(),
         darwinia,
+        tracker.clone(),
     );
-    let mut tracker = EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
+    let mut tracker_evm_log = EvmLogTracker::<Ethereum, EthereumLogsHandler>::new(
         client,
         topics_list,
         logs_handler,
-        state.clone(),
-        DarwiniaEthereumTask::NAME.to_string(),
-        "last-redeemed".to_string(),
+        tracker,
         servce_config.interval_ethereum,
     );
 
-    tracker.start().await?;
+    tracker_evm_log.start().await?;
 
     Ok(())
 }

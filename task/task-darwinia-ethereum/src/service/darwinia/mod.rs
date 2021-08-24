@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Task};
+use lifeline::{Bus, Lifeline, Sender, Task};
 use postage::broadcast;
 use substrate_subxt::system::System;
 use tokio::time::sleep;
@@ -21,11 +21,12 @@ use component_ethereum::config::{EthereumConfig, Web3Config};
 use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
 pub use darwinia_tracker::DarwiniaBlockTracker;
+use support_tracker::Tracker;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::error::{Error, Result};
 use crate::ethereum::Ethereum;
-use crate::message::{Extrinsic, ToDarwiniaMessage, ToExtrinsicsMessage};
+use crate::message::{Extrinsic, ToExtrinsicsMessage};
 use crate::task::DarwiniaEthereumTask;
 
 mod darwinia_tracker;
@@ -43,81 +44,51 @@ impl lifeline::Service for DarwiniaService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
-        let mut rx = bus.rx::<ToDarwiniaMessage>()?;
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
-        let sender_to_darwinia = bus.tx::<ToDarwiniaMessage>()?;
 
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
-        let service_name = format!("{}-service-darwinia-scan", DarwiniaEthereumTask::NAME);
-        let _greet = Self::try_task(&service_name.clone(), async move {
-            let mut is_started = false;
-            while let Some(message) = rx.recv().await {
-                match message {
-                    ToDarwiniaMessage::Start => {
-                        if is_started {
-                            log::warn!(
-                                target: DarwiniaEthereumTask::NAME,
-                                "The service {} has been started",
-                                service_name.clone()
-                            );
-                            continue;
-                        }
+        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
+        let tracker = Tracker::new(microkv, "scan.darwinia");
 
-                        let cloned_state = state.clone();
-                        let cloned_sender_to_extrinsics = sender_to_extrinsics.clone();
-                        let cloned_sender_to_darwinia = sender_to_darwinia.clone();
-                        tokio::spawn(async move {
-                            run(
-                                cloned_state,
-                                cloned_sender_to_extrinsics,
-                                cloned_sender_to_darwinia,
-                            )
-                            .await
-                        });
-                        is_started = true;
-                    }
-                    ToDarwiniaMessage::Restart(force) => {
-                        if force {
-                            is_started = false;
-                        }
-                        let mut cloned_sender_to_darwinia = sender_to_darwinia.clone();
-                        cloned_sender_to_darwinia
-                            .send(ToDarwiniaMessage::Start)
-                            .await?;
-                    }
-                    _ => continue,
-                }
-            }
-            Ok(())
-        });
+        let _greet = Self::try_task(
+            &format!("{}-service-darwinia-scan", DarwiniaEthereumTask::NAME),
+            async move {
+                start(sender_to_extrinsics.clone(), state.clone(), tracker.clone()).await;
+                Ok(())
+            },
+        );
         Ok(Self { _greet })
     }
 }
 
-async fn run(
-    state: BridgeState,
+async fn start(
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
-    mut sender_to_darwinia: postage::broadcast::Sender<ToDarwiniaMessage>,
+    state: BridgeState,
+    tracker: Tracker,
 ) {
-    if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
-        error!(
-            target: DarwiniaEthereumTask::NAME,
-            "darwinia err {:#?}", err
-        );
-        sleep(Duration::from_secs(10)).await;
-        sender_to_darwinia
-            .send(ToDarwiniaMessage::Restart(true))
-            .await
-            .unwrap();
+    loop {
+        if let Err(err) = _start(sender_to_extrinsics.clone(), state.clone(), tracker.clone()).await
+        {
+            let secs = 10;
+            error!(
+                target: DarwiniaEthereumTask::NAME,
+                "darwinia err {:#?}, wait {} seconds", err, secs
+            );
+            sleep(Duration::from_secs(secs)).await;
+        }
     }
 }
 
-async fn start(
-    state: BridgeState,
+async fn _start(
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    state: BridgeState,
+    tracker: Tracker,
 ) -> anyhow::Result<()> {
-    info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
+    info!(
+        target: DarwiniaEthereumTask::NAME,
+        "DARWINIA SCAN SERVICE RESTARTING..."
+    );
 
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
@@ -169,7 +140,7 @@ async fn start(
         delayed_extrinsics,
         spec_name,
     };
-    runner.start(state.clone()).await
+    runner.start(tracker).await
 }
 
 struct DarwiniaServiceRunner {
@@ -183,12 +154,12 @@ struct DarwiniaServiceRunner {
 
 impl DarwiniaServiceRunner {
     /// start
-    pub async fn start(&mut self, state: BridgeState) -> Result<()> {
-        let mut tracker =
-            DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), state.clone());
-        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
+    pub async fn start(&mut self, tracker_raw: Tracker) -> Result<()> {
+        let tracker_darwinia =
+            DarwiniaBlockTracker::new(self.darwinia2ethereum.darwinia.clone(), tracker_raw.clone());
+        let mut retry_times = 0;
         loop {
-            let header = tracker.next_block().await?;
+            let header = tracker_darwinia.next_block().await?;
 
             // debug
             trace!(
@@ -219,26 +190,41 @@ impl DarwiniaServiceRunner {
             // process events
             if let Err(err) = self.handle_events(&header, events).await {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-                    microkv.put("last-tracked-darwinia-block", &(header.number))?;
+                    tracker_raw.skip(header.number as usize)?;
                     return Err(err);
-                } else {
-                    error!(
-                        target: DarwiniaEthereumTask::NAME,
-                        "An error occurred while processing the events of block {}: {:?}",
-                        header.number,
-                        err
-                    );
-
-                    let err_msg = format!("{:?}", err).to_lowercase();
-                    if err_msg.contains("type size unavailable") {
-                        microkv.put("last-tracked-darwinia-block", &(header.number))?;
-                    } else {
-                        sleep(Duration::from_secs(30)).await;
-                    }
                 }
-            } else {
-                microkv.put("last-tracked-darwinia-block", &(header.number))?;
+
+                error!(
+                    target: DarwiniaEthereumTask::NAME,
+                    "An error occurred while processing the events of block {}: {:?}",
+                    header.number,
+                    err
+                );
+
+                let err_msg = format!("{:?}", err).to_lowercase();
+                if err_msg.contains("type size unavailable") {
+                    tracker_raw.skip(header.number as usize)?;
+                    continue;
+                }
+
+                if retry_times > 10 {
+                    tracker_raw.skip(header.number as usize)?;
+                    log::error!(
+                        target: DarwiniaEthereumTask::NAME,
+                        "Retry {} times still failed: {}",
+                        retry_times,
+                        header.number
+                    );
+                    retry_times = 0;
+                    continue;
+                }
+                tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+                retry_times += 1;
+                continue;
             }
+
+            tracker_raw.finish(header.number as usize)?;
+            retry_times = 0;
         }
     }
 

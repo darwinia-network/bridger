@@ -11,50 +11,110 @@ darwinia-ethereum
 ## Run
 
 1. `./target/release/bridger server`
-   it may take a while to run all services if the network is not good. this will run all services except the darwinia and ethereum subscribe services. These two services should be started manually.
-   
-
-Note: There are 6 sub services for now. Only 4 of them are automatically started, other 2 sub services require to set start `block_number` params. Due to [KV db enhancement issue](https://github.com/darwinia-network/bridger/pull/214), this has to be done using following cli.
+   Start bridge server
 
 2. Open another shell
 
-3. Start the darwinia subscribe service
-    ```bash
-    ./target/release/bridger task exec \
-      --name task-darwinia-ethereum \
-      --api start-darwinia
-    ```
-   or start it with a block_number
-    ```bash
-    ./target/release/bridger task exec \
-      --name task-darwinia-ethereum \
-      --api start-darwinia \
-      --param block_number=4230622
-    ```
+3. Set darwinia and ethereum scan block
 
-4. Start the ethereum subscribe service
-    ```bash
-    ./target/release/bridger task exec \
-      --name task-darwinia-ethereum \
-      --api start-ethereum
-    ```
-   or start it with a block_number
-    ```bash
-    ./target/release/bridger task exec \
-      --name task-darwinia-ethereum \
-      --api start-ethereum \
-      --param block_number=12856303
-    ```
+   ```bash
+   # set darwinia
+   ./target/release/bridger kv -n task-darwinia-ethereum put scan.darwinia.next 123456
+   # set ethereum
+   ./target/release/bridger kv -n task-darwinia-ethereum put scan.ethereum.next 123456
+   ```
 
-Query the block being synchronized:
+4. Set darwinia and ethereum scan to running
+
+   ```bash
+   # set darwinia
+   ./target/release/bridger kv -n task-darwinia-ethereum put scan.darwinia.running true
+   # set ethereum
+   ./target/release/bridger kv -n task-darwinia-ethereum put scan.ethereum.running true
+   ```
+
+
+### Query state
+
+
+**darwinia scan state**
 
 ```bash
-./target/release/bridger kv get last-tracked-darwinia-block last-redeemed
+./target/release/bridger kv \
+  -n task-darwinia-ethereum \
+  get \
+  scan.darwinia.current \
+  scan.darwinia.next \
+  scan.darwinia.finish \
+  scan.darwinia.running \
+  scan.darwinia.skipped \
+  -o table --include-key
+
++-----------------------+----------------------------------------+
+| scan.darwinia.current | 150                                    |
++-----------------------+----------------------------------------+
+| scan.darwinia.next    | null                                   |
++-----------------------+----------------------------------------+
+| scan.darwinia.finish  | 149                                    |
++-----------------------+----------------------------------------+
+| scan.darwinia.running | false                                  |
++-----------------------+----------------------------------------+
+| scan.darwinia.skipped | 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 |
+|                       | ,17,18,19,20,21,22,23,24,25,26,27,28,2 |
+|                       | 9,30,31,32,33,34,35,36,37,38,39,40,41  |
++-----------------------+----------------------------------------+
 ```
+
+**ethereum scan state**
+
+```bash
+./target/release/bridger kv \
+  -n task-darwinia-ethereum \
+  get \
+  scan.ethereum.current \
+  scan.ethereum.next \
+  scan.ethereum.finish \
+  scan.ethereum.running \
+  scan.ethereum.skipped \
+  -o table --include-key
+
++----------------------+-------+
+| scan.ethereum.current | 3     |
++----------------------+-------+
+| scan.ethereum.next    | null  |
++----------------------+-------+
+| scan.ethereum.finish  | 2     |
++----------------------+-------+
+| scan.ethereum.running | false |
++----------------------+-------+
+| scan.ethereum.skipped | null  |
++----------------------+-------+
+```
+
+explain:
+
+- `current`
+  Currently scan block number
+- `next`
+  Planned block number, if there is a value, the next time will start from this block. (support array, use `,` to split)
+  ```bash
+  ./target/release/bridger kv -n task-darwinia-ethereum \
+    put \
+    scan.ethereum.next 1,425,36987
+  ```
+  The order of scanning will be: `1` `425` `36987` `36988` `36989` ...
+- `finish`
+  Currently finished block number
+- `running`
+  The scan is running
+- `skipped`
+  Skipped block, maybe happened some error, these blocks need to be taken seriously
+
+
 
 ## Migrate
 
-### Migrate 0.3.x to 0.4.x
+### Migrate 0.3.x to <=0.4.5
 
 To keep the progress, bridger(0.3.x) will save two files.
 
@@ -83,7 +143,7 @@ Bridger(0.4.x) does not need these two files, so if you want to continue from th
      --param block_number=$(cat ~/.bridger/last-redeemed)
    ```
 
-> IMPORTANT: Please don't start with `block_number` every time, because bridger(0.4.x) will remember the currently synchronized block as before, as long as it carries `block_number`, it will start from the specified block.
+> From 0.4.6 the bridger removed `start-darwinia` and `start-ethereum` command, so there only support migrate to <0.4.6
 
 
 ## Security config
@@ -131,38 +191,6 @@ or without `--password` to start. then run the `set-password` command.
 ```
 
 ## Custom command
-
-### start-darwinia
-
-**params**
-
-| name         | type |
-| ------------ | ---- |
-| block_number | u64  |
-
-**examples**
-
-```bash
-./target/release/bridger task exec --name task-darwinia-darwinia --api start-darwinia
-
-# If you hit the error `No darwinia scan start`, the block number is the start point Darwinia to Ethereum bridge launched at:
-./target/release/bridger task exec --name task-darwinia-darwinia --api start-darwinia --param block_number=4230622
-```
-
-### start-ethereum
-
-**params**
-
-| name         | type |
-| ------------ | ---- |
-| block_number | u64  |
-
-**examples**
-
-```bash
-./target/release/bridger task exec --name task-darwinia-ethereum --api start-darwinia
-./target/release/bridger task exec --name task-darwinia-ethereum --api start-darwinia --param block_number=4230622
-```
 
 ### affirm
 

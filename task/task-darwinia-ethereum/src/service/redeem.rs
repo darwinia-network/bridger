@@ -41,19 +41,14 @@ impl Service for RedeemService {
                 let mut helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
 
                 while let Some(recv) = rx.recv().await {
-                    match recv {
-                        ToRedeemMessage::EthereumTransaction(tx) => {
-                            if let Err(err) = helper.redeem(tx).await {
-                                error!(
-                                    target: DarwiniaEthereumTask::NAME,
-                                    "redeem err: {:#?}", err
-                                );
-                                // TODO: Consider the errors more carefully
-                                // Maybe a websocket err, so wait 10 secs to reconnect.
-                                sleep(Duration::from_secs(10)).await;
-                                helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
-                                // TODO: Maybe need retry
-                            }
+                    if let ToRedeemMessage::EthereumTransaction(tx) = recv {
+                        if let Err(err) = helper.redeem(tx).await {
+                            error!(target: DarwiniaEthereumTask::NAME, "redeem err: {:#?}", err);
+                            // TODO: Consider the errors more carefully
+                            // Maybe a websocket err, so wait 10 secs to reconnect.
+                            sleep(Duration::from_secs(10)).await;
+                            helper = RedeemHelper::new(sender_to_extrinsics.clone()).await;
+                            // TODO: Maybe need retry
                         }
                     }
                 }
@@ -159,7 +154,9 @@ impl RedeemHelper {
             trace!(
                 target: DarwiniaEthereumTask::NAME,
                 "Ethereum tx {:?}'s block {} is large than last confirmed block {}",
-                tx.tx_hash, tx.block, last_confirmed,
+                tx.tx_hash,
+                tx.block,
+                last_confirmed,
             );
             return Ok(());
         }

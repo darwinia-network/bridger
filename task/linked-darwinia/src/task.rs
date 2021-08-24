@@ -5,6 +5,7 @@ use bridge_traits::bridge::task::{
 use crate::bus::DarwiniaLinkedBus;
 use crate::config::DarwiniaLinkedConfig;
 use crate::service::extrinsic::ExtrinsicService;
+use crate::service::guard::GuardService;
 
 #[derive(Debug)]
 pub struct DarwiniaLinked {
@@ -44,6 +45,7 @@ impl DarwiniaLinked {
         let bus = DarwiniaLinkedBus::default();
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<ExtrinsicService>()?;
+        stack.spawn_service::<GuardService>()?;
         Ok(Self { stack })
     }
 }

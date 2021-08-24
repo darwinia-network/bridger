@@ -196,7 +196,7 @@ impl RopstenLogsHandler {
             Ok(())
         } else {
             let mut block_numbers = self.waited_redeem.keys().copied().collect::<Vec<_>>();
-            block_numbers.sort();
+            block_numbers.sort_unstable();
             for redeemed in block_numbers {
                 let checked = self.waited_redeem.remove(&redeemed);
                 if let Some(txs) = checked {

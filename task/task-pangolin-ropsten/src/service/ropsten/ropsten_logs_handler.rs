@@ -220,7 +220,6 @@ impl RopstenLogsHandler {
                         match self.is_verified(&tx).await {
                             Err(err) => {
                                 error!(target: PangolinRopstenTask::NAME, "check-redeem err: {:#?}", err);
-                                self.waited_redeem.insert(redeemed, reverted);
                                 return Err(err)
                             },
                             Ok(verified) => {

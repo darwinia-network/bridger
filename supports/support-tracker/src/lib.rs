@@ -11,6 +11,9 @@ pub struct Tracker {
     key_running: String,
     key_next: String,
     key_skipped: String,
+    key_parallel_enable: String,
+    key_parallel_max: String,
+    key_parallel_records: String,
 }
 
 impl Debug for Tracker {
@@ -23,6 +26,15 @@ impl Debug for Tracker {
         f.write_str(&format!("  key_running: {}\n", self.key_running))?;
         f.write_str(&format!("  key_next: {}\n", self.key_next))?;
         f.write_str(&format!("  key_skipped: {}\n", self.key_skipped))?;
+        f.write_str(&format!(
+            "  key_parallel_enable: {}\n",
+            self.key_parallel_enable
+        ))?;
+        f.write_str(&format!("  key_parallel_max: {}\n", self.key_parallel_max))?;
+        f.write_str(&format!(
+            "  key_parallel_records: {}\n",
+            self.key_parallel_records
+        ))?;
         f.write_str("}")?;
         Ok(())
     }
@@ -39,22 +51,147 @@ impl Tracker {
             key_running: format!("{}.running", key),
             key_next: format!("{}.next", key),
             key_skipped: format!("{}.skipped", key),
+            key_parallel_enable: format!("{}.parallel.enable", key),
+            key_parallel_max: format!("{}.parallel.max", key),
+            key_parallel_records: format!("{}.parallel.records", key),
         }
     }
 }
 
 impl Tracker {
-    pub fn is_running(&self) -> anyhow::Result<bool> {
-        let running = self
+    async fn next_serial(&self) -> anyhow::Result<usize> {
+        let next: Option<String> = self.microkv.get_as(&self.key_next)?;
+        if next.is_none() {
+            let curt: usize = self.microkv.get_as(&self.key_finish)?.unwrap_or(0);
+            let next = curt + 1;
+            self.microkv.put(&self.key_curt, &next)?;
+            return Ok(next);
+        }
+        let mut plan_blocks = parse_blocks_from_text(next.unwrap())?;
+        let next = *plan_blocks.first().unwrap_or(&1);
+        if !plan_blocks.is_empty() {
+            plan_blocks.remove(0);
+            self.write_vec_usize(&self.key_next, &plan_blocks)?;
+        }
+        if plan_blocks.is_empty() {
+            self.microkv.delete(&self.key_next)?;
+        }
+        self.microkv.put(&self.key_curt, &next)?;
+        Ok(next)
+    }
+
+    async fn next_parallel(&self) -> anyhow::Result<usize> {
+        let parallel_max = self
             .microkv
-            .get_as(&self.key_running)?
+            .get(&self.key_parallel_max)?
+            .map(|value| value.as_u64())
+            .flatten()
+            .unwrap_or(128);
+
+        // if already have parallel records
+        let mut parallel_records;
+        let mut len;
+        loop {
+            let records: Option<String> = self.microkv.get_as(&self.key_parallel_records)?;
+            // not have parallel records, read from serial
+            if records.is_none() {
+                let next = self.next_serial().await?;
+                self.write_vec_usize(&self.key_parallel_records, &vec![next])?;
+                return Ok(next);
+            }
+            parallel_records = parse_blocks_from_text(records.unwrap())?;
+            len = parallel_records.len();
+            if len < parallel_max {
+                break;
+            }
+            // The block being executed cannot exceed the maximum
+            let secs = 10;
+            tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
+            log::warn!(
+                "The maximum value of parallel execution has been reached, wait {} seconds",
+                secs
+            );
+        }
+
+        let jump: Option<String> = self.microkv.get_as(&self.key_next)?;
+        let next_num = if let Some(jumpstr) = jump {
+            // jump to queue
+            let mut plan_blocks = parse_blocks_from_text(jumpstr)?;
+            let next = *plan_blocks.first().unwrap_or(&1);
+            if !plan_blocks.is_empty() {
+                plan_blocks.remove(0);
+                self.write_vec_usize(&self.key_next, &plan_blocks)?;
+            }
+            if plan_blocks.is_empty() {
+                self.microkv.delete(&self.key_next)?;
+            }
+            next
+        } else {
+            let last = parallel_records.get(len - 1).unwrap();
+            *last + 1;
+        };
+
+        // save current
+        self.microkv.put(&self.key_curt, &next_num)?;
+        // save parallel records
+        let mut records_save = parallel_records.clone();
+        records_save.push(next_num);
+        self.write_vec_usize(&self.key_parallel_records, &records_save)?;
+        Ok(next_num)
+    }
+
+    fn write_vec_usize(&self, key: impl AsRef<str>, values: &Vec<usize>) -> anyhow::Result<()> {
+        if values.is_empty() {
+            return Ok(());
+        }
+        let store_value: String = values.iter().join(",");
+        self.microkv.put(key.as_ref(), &store_value)?;
+        Ok(())
+    }
+
+    fn read_bool(&self, key: impl AsRef<str>) -> anyhow::Result<bool> {
+        let value = self
+            .microkv
+            .get_as(key.as_ref())?
             .map(|v: String| v.to_lowercase());
-        if let Some(v) = running {
+        if let Some(v) = value {
             let v = v.trim();
-            let is_running = v == "true" || v == "1";
-            return Ok(is_running);
+            let value_bool = v == "true" || v == "1";
+            return Ok(value_bool);
         }
         Ok(false)
+    }
+}
+
+impl Tracker {
+    pub fn is_running(&self) -> anyhow::Result<bool> {
+        self.read_bool(&self.key_running)
+    }
+
+    pub fn is_enable_parallel(&self) -> anyhow::Result<bool> {
+        self.read_bool(&self.key_parallel_enable)
+    }
+
+    pub fn correct_parallel_records(&self) -> anyhow::Result<()> {
+        if !self.is_enable_parallel() {
+            return Ok(());
+        }
+        let finish: Option<usize> = self.microkv.get_as(&self.key_finish)?;
+        let records: Option<String> = self.microkv.get_as(&self.key_parallel_records)?;
+        if finish.is_none() || records.is_none() {
+            return Ok(());
+        }
+        let finish = finish.unwrap();
+        let records = records.unwrap();
+        let mut parallel_records = parse_blocks_from_text(records.unwrap())?;
+        parallel_records.retain(|item| *item <= finish);
+        self.write_vec_usize(&self.key_parallel_records, &parallel_records)?;
+        Ok(())
+    }
+
+    pub fn clear_parallel_records(&self) -> anyhow::Result<()> {
+        self.microkv.delete(&self.key_parallel_records)?;
+        Ok(())
     }
 
     pub async fn next(&self) -> anyhow::Result<usize> {
@@ -73,31 +210,21 @@ impl Tracker {
                 }
             }
         }
-        let next: Option<String> = self.microkv.get_as(&self.key_next)?;
-        if next.is_none() {
-            let curt: usize = self.microkv.get_as(&self.key_finish)?.unwrap_or(0);
-            let next = curt + 1;
-            self.microkv.put(&self.key_curt, &next)?;
-            return Ok(next);
+        if self.is_enable_parallel()? {
+            self.next_parallel()
+        } else {
+            self.next_serial()
         }
-        let mut plan_blocks = parse_blocks_from_text(next.unwrap())?;
-        let next = *plan_blocks.first().unwrap_or(&1);
-        if !plan_blocks.is_empty() {
-            plan_blocks.remove(0);
-            let store_value: String = plan_blocks.iter().join(",");
-            if !plan_blocks.is_empty() {
-                self.microkv.put(&self.key_next, &store_value)?;
-            }
-        }
-        if plan_blocks.is_empty() {
-            self.microkv.delete(&self.key_next)?;
-        }
-        self.microkv.put(&self.key_curt, &next)?;
-        Ok(next)
     }
 
     pub fn finish(&self, block: usize) -> anyhow::Result<()> {
         self.microkv.put(&self.key_finish, &block)?;
+        let records: Option<String> = self.microkv.get_as(&self.key_parallel_records)?;
+        if let Some(record_text) = records {
+            let mut parallel_records = parse_blocks_from_text(record_text)?;
+            parallel_records.retain(|item| *item != block);
+            self.write_vec_usize(&self.key_parallel_records, &parallel_records)?;
+        }
         Ok(())
     }
 

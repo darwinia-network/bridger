@@ -1,10 +1,7 @@
 use lifeline::Sender;
 use postage::broadcast;
+use std::collections::{HashMap, HashSet};
 use web3::types::{Log, H160, H256};
-use std::collections::{
-    HashMap,
-    HashSet,
-};
 
 use bridge_traits::bridge::task::BridgeSand;
 use component_pangolin_subxt::darwinia::client::Darwinia;
@@ -79,14 +76,11 @@ impl LogsHandler for RopstenLogsHandler {
         // if [from, to] blocks has no transactions we need, and the waited_redeem queue is empty.
         // next time we only need to scan from `to` block. Other wise we need to scan from `from-1`
         // block to ensure all the transactions in interval [from, to] to be checked.
-        let check_position = if txs.is_empty() {
-            to
-        } else {
-            from - 1
-        };
+        let check_position = if txs.is_empty() { to } else { from - 1 };
         self.check_redeem(check_position).await?;
+
         if self.waited_redeem.len() >= MAX_WAITED_REDEEM_COUNT {
-            return Ok(())
+            return Ok(());
         }
 
         if !txs.is_empty() {
@@ -182,20 +176,19 @@ fn build_txs(
 impl RopstenLogsHandler {
     async fn is_verified(&self, tx: &EthereumTransaction) -> anyhow::Result<bool> {
         Ok(self
-           .darwinia_client
-           .verified(tx.block_hash, tx.index)
-           .await?
-           || self
-           .darwinia_client
-           .verified_issuing(tx.block_hash, tx.index)
-           .await?
-          )
+            .darwinia_client
+            .verified(tx.block_hash, tx.index)
+            .await?
+            || self
+                .darwinia_client
+                .verified_issuing(tx.block_hash, tx.index)
+                .await?)
     }
 
     fn is_redeem_submitted(&self, tx: &EthereumTransaction) -> bool {
         let txset = self.waited_redeem.get(&tx.block);
         if let Some(txs) = txset {
-            return txs.contains(&tx)
+            return txs.contains(&tx);
         }
         false
     }
@@ -208,44 +201,58 @@ impl RopstenLogsHandler {
                 check_position
             );
             self.tracker.finish(check_position as usize)?;
-            Ok(())
-        } else {
-            let mut block_numbers = self.waited_redeem.keys().copied().collect::<Vec<_>>();
-            block_numbers.sort_unstable();
-            for redeemed in block_numbers {
-                let checked = self.waited_redeem.remove(&redeemed);
-                if let Some(txs) = checked {
-                    let mut reverted = txs.clone();
-                    for tx in txs.iter() {
-                        match self.is_verified(&tx).await {
-                            Err(err) => {
-                                error!(target: PangolinRopstenTask::NAME, "check-redeem err: {:#?}", err);
-                                return Err(err)
-                            },
-                            Ok(verified) => {
-                                if verified {
-                                    info!(target: PangolinRopstenTask::NAME, "check-redeem verfied tx {:?} at {:?}", tx.tx_hash, tx.block);
-                                    reverted.remove(&tx);
-                                } else {
-                                    trace!(target: PangolinRopstenTask::NAME, "check-redeem not verfied tx {:?} at {:?}", tx.tx_hash, tx.block);
-                                    self.waited_redeem.insert(redeemed, reverted);
-                                    return Ok(())
-                                }
+            return Ok(());
+        }
+
+        let mut block_numbers = self.waited_redeem.keys().copied().collect::<Vec<_>>();
+        block_numbers.sort_unstable();
+        for redeemed in block_numbers {
+            let checked = self.waited_redeem.remove(&redeemed);
+            if let Some(txs) = checked {
+                let mut reverted = txs.clone();
+                for tx in txs.iter() {
+                    match self.is_verified(&tx).await {
+                        Err(err) => {
+                            error!(
+                                target: PangolinRopstenTask::NAME,
+                                "check-redeem err: {:#?}", err
+                            );
+                            return Err(err);
+                        }
+                        Ok(verified) => {
+                            if verified {
+                                info!(
+                                    target: PangolinRopstenTask::NAME,
+                                    "check-redeem verfied tx {:?} at {:?}", tx.tx_hash, tx.block
+                                );
+                                reverted.remove(&tx);
+                            } else {
+                                trace!(
+                                    target: PangolinRopstenTask::NAME,
+                                    "check-redeem not verfied tx {:?} at {:?}",
+                                    tx.tx_hash,
+                                    tx.block
+                                );
+                                self.waited_redeem.insert(redeemed, reverted);
+                                return Ok(());
                             }
                         }
                     }
                 }
-                info!(target: PangolinRopstenTask::NAME, "new redeem confirmed, change last redeem to {:?}", redeemed);
-                self.tracker.finish(redeemed as usize)?;
             }
-
-            Ok(())
+            info!(
+                target: PangolinRopstenTask::NAME,
+                "new redeem confirmed, change last redeem to {:?}", redeemed
+            );
+            self.tracker.finish(redeemed as usize)?;
         }
+
+        Ok(())
     }
 
     async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
         if self.is_redeem_submitted(&tx) {
-            return Ok(())
+            return Ok(());
         }
         if self.is_verified(&tx).await? {
             trace!(
@@ -264,7 +271,10 @@ impl RopstenLogsHandler {
                 .await?;
             trace!("finishe to send to redeem: {:?}", &tx.tx_hash);
         }
-        self.waited_redeem.entry(tx.block).or_insert_with(HashSet::new).insert(tx.clone());
+        self.waited_redeem
+            .entry(tx.block)
+            .or_insert_with(HashSet::new)
+            .insert(tx.clone());
 
         Ok(())
     }

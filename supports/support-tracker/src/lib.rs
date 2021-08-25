@@ -194,6 +194,30 @@ impl Tracker {
         Ok(())
     }
 
+    pub fn enable_parallel(&self) -> anyhow::Result<()> {
+        self.microkv.put(&self.key_parallel_enable, &true)?;
+        Ok(())
+    }
+
+    pub fn disable_parallel(&self) -> anyhow::Result<()> {
+        self.microkv.put(&self.key_parallel_enable, &false)?;
+        Ok(())
+    }
+
+    pub fn set_parallel_max(&self, max: u64) -> anyhow::Result<()> {
+        self.microkv.put(&self.key_parallel_max, &max)?;
+        Ok(())
+    }
+
+    pub fn parallel_records(&self) -> anyhow::Result<Vec<usize>> {
+        let records: Option<String> = self.microkv.get_as(&self.key_parallel_records)?;
+        if let Some(record_text) = records {
+            parse_blocks_from_text(record_text)
+        } else {
+            Ok(vec![])
+        }
+    }
+
     pub async fn next(&self) -> anyhow::Result<usize> {
         let is_running = self.is_running()?;
         if !is_running {

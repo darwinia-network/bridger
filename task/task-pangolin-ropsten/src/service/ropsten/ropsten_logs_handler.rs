@@ -23,6 +23,7 @@ pub(crate) struct RopstenLogsHandler {
     // maybe some transactions are in the same block. The block is confirmed when all the
     // transactions in this block are confirmed. And the queue must be sorted by block number in
     // order to avoid the missing of the older block.
+    // todo: remove it, we don't need it, will work use check service
     waited_redeem: HashMap<u64, HashSet<EthereumTransaction>>,
     tracker: Tracker,
 }

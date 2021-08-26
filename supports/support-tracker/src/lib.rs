@@ -47,21 +47,49 @@ impl Tracker {
 }
 
 impl Tracker {
-    pub fn is_running(&self) -> anyhow::Result<bool> {
-        let running = self
+    fn read_bool(&self, key: impl AsRef<str>) -> anyhow::Result<bool> {
+        let value = self
             .microkv
-            .get_as(&self.key_running)?
+            .get_as(key.as_ref())?
             .map(|v: String| v.to_lowercase());
-        if let Some(v) = running {
+        if let Some(v) = value {
             let v = v.trim();
-            let is_running = v == "true" || v == "1";
-            return Ok(is_running);
+            let value_bool = v == "true" || v == "1";
+            return Ok(value_bool);
         }
         Ok(false)
+    }
+}
+
+impl Tracker {
+    pub fn is_running(&self) -> anyhow::Result<bool> {
+        self.read_bool(&self.key_running)
+    }
+
+    pub fn is_fast_mode(&self) -> anyhow::Result<bool> {
+        self.read_bool(&self.key_fast_mode)
     }
 
     pub fn enable_fast_mode(&self) -> anyhow::Result<()> {
         self.microkv.put(&self.key_fast_mode, &true)?;
+        Ok(())
+    }
+
+    pub fn stop_running(&self) -> anyhow::Result<()> {
+        self.microkv.put(&self.key_running, &false)?;
+        Ok(())
+    }
+
+    pub fn start_running(&self) -> anyhow::Result<()> {
+        self.microkv.put(&self.key_running, &true)?;
+        Ok(())
+    }
+
+    pub fn reset_current(&self) -> anyhow::Result<()> {
+        let finish: Option<usize> = self.microkv.get_as(&self.key_finish)?;
+        if let Some(finish) = finish {
+            self.microkv.put(&self.key_curt, &finish)?;
+        }
         Ok(())
     }
 
@@ -83,7 +111,12 @@ impl Tracker {
         }
         let next: Option<String> = self.microkv.get_as(&self.key_next)?;
         if next.is_none() {
-            let curt: usize = self.microkv.get_as(&self.key_finish)?.unwrap_or(0);
+            let key = if self.is_fast_mode()? {
+                &self.key_curt
+            } else {
+                &self.key_finish
+            };
+            let curt: usize = self.microkv.get_as(key)?.unwrap_or(0);
             let next = curt + 1;
             self.microkv.put(&self.key_curt, &next)?;
             return Ok(next);

@@ -47,7 +47,6 @@ impl Message<DarwiniaEthereumBus> for ToRelayMessage {
 #[derive(Clone, Debug)]
 pub enum ToRedeemMessage {
     EthereumTransaction(EthereumTransaction),
-    Complete(usize),
 }
 
 impl Message<DarwiniaEthereumBus> for ToRedeemMessage {

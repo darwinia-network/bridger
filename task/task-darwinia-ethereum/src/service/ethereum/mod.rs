@@ -71,13 +71,13 @@ impl lifeline::Service for EthereumScanService {
         // Receiver & Sender
         let sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
-        let receiver_redeem = bus.rx::<ToRedeemMessage>()?;
 
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
         let tracker = Tracker::new(microkv, "scan.ethereum");
+        tracker.enable_fast_mode()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-ethereum-scan", DarwiniaEthereumTask::NAME),
@@ -85,7 +85,6 @@ impl lifeline::Service for EthereumScanService {
                 start(
                     sender_to_relay.clone(),
                     sender_to_redeem.clone(),
-                    receiver_redeem.clone(),
                     tracker.clone(),
                 )
                 .await;
@@ -99,14 +98,12 @@ impl lifeline::Service for EthereumScanService {
 async fn start(
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
-    receiver_redeem: postage::broadcast::Receiver<ToRedeemMessage>,
     tracker: Tracker,
 ) {
     loop {
         if let Err(err) = _start(
             sender_to_relay.clone(),
             sender_to_redeem.clone(),
-            receiver_redeem.clone(),
             tracker.clone(),
         )
         .await
@@ -126,7 +123,6 @@ async fn start(
 async fn _start(
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
-    receiver_redeem: postage::broadcast::Receiver<ToRedeemMessage>,
     tracker: Tracker,
 ) -> anyhow::Result<()> {
     info!(
@@ -160,7 +156,6 @@ async fn _start(
         topics_list.clone(),
         sender_to_relay,
         sender_to_redeem,
-        receiver_redeem.clone(),
         darwinia,
         tracker.clone(),
     );

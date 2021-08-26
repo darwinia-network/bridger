@@ -155,11 +155,13 @@ impl DarwiniaServiceRunner {
             let header = tracker_darwinia.next_block().await?;
 
             // debug
-            trace!(
-                target: PangolinRopstenTask::NAME,
-                "Darwinia block {}",
-                header.number
-            );
+            if header.number % 100 == 0 {
+                trace!(
+                    target: PangolinRopstenTask::NAME,
+                    "Darwinia block {}",
+                    header.number
+                );
+            }
 
             // handle the 'mmr root sign and send extrinsics' only block height reached
             if let Err(err) = self.handle_delayed_extrinsics(&header).await {
@@ -264,6 +266,9 @@ impl DarwiniaServiceRunner {
             // call ethereum_relay_authorities.request_authority and then sudo call
             // EthereumRelayAuthorities.add_authority will emit the event
             EventInfo::ScheduleAuthoritiesChangeEvent(event) => {
+                info!(
+                    target: PangolinRopstenTask::NAME,
+                    "find schedule authorities change event, number {:?}", header.number);
                 if self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)
@@ -299,12 +304,15 @@ impl DarwiniaServiceRunner {
                         .await?;
                     info!(
                         target: PangolinRopstenTask::NAME,
-                        "Submit authorities to ethereum with tx: {}", tx_hash
+                        "Submit authorities to ethereum at {:?} with tx: {}", header.number, tx_hash
                     );
                 }
             }
             // call ethereum_backing.lock will emit the event
             EventInfo::ScheduleMMRRootEvent(event) => {
+                info!(
+                    target: PangolinRopstenTask::NAME,
+                    "Find Schedule MMRRoot event at {:?}", header.number);
                 if self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)

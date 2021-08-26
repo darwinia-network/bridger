@@ -76,7 +76,6 @@ impl lifeline::Service for RopstenScanService {
         // Receiver & Sender
         let sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
-        let receiver_redeem = bus.rx::<ToRedeemMessage>()?;
 
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
@@ -90,7 +89,6 @@ impl lifeline::Service for RopstenScanService {
                     tracker.clone(),
                     sender_to_relay.clone(),
                     sender_to_redeem.clone(),
-                    receiver_redeem.clone(),
                 )
                 .await;
                 Ok(())
@@ -104,14 +102,12 @@ async fn start(
     tracker: Tracker,
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
-    receiver_redeem: postage::broadcast::Receiver<ToRedeemMessage>,
 ) {
     loop {
         if let Err(err) = _start(
             tracker.clone(),
             sender_to_relay.clone(),
             sender_to_redeem.clone(),
-            receiver_redeem.clone(),
         )
         .await
         {
@@ -125,7 +121,6 @@ async fn _start(
     tracker: Tracker,
     sender_to_relay: postage::broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
-    receiver_redeem: postage::broadcast::Receiver<ToRedeemMessage>,
 ) -> anyhow::Result<()> {
     info!(
         target: PangolinRopstenTask::NAME,
@@ -158,7 +153,6 @@ async fn _start(
         topics_list.clone(),
         sender_to_relay,
         sender_to_redeem,
-        receiver_redeem,
         darwinia,
         tracker.clone(),
     );

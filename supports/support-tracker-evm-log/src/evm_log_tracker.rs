@@ -45,8 +45,8 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
                 Err(err) => {
                     return Err(err);
                 }
-                Ok(logs) => {
-                    self.handle(logs).await?;
+                Ok((from, to, logs)) => {
+                    self.handle(from, to, logs).await?;
                 }
             }
 
@@ -64,7 +64,7 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
         self.running = false;
     }
 
-    pub async fn next(&mut self) -> Result<Vec<Log>> {
+    pub async fn next(&mut self) -> Result<(u64, u64, Vec<Log>)> {
         let mut result = vec![];
         let from = self.tracker.next().await?;
         let (from, to) = C::next_range(from as u64, &self.client).await?;
@@ -78,12 +78,12 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
             let logs = self.client.get_logs(&topics.0, &topics.1, from, to).await?;
             result.extend_from_slice(&logs);
         }
-        Ok(result)
+        Ok((from, to, result))
     }
 
-    async fn handle(&mut self, logs: Vec<Log>) -> Result<()> {
+    async fn handle(&mut self, from: u64, to: u64, logs: Vec<Log>) -> Result<()> {
         self.logs_handler
-            .handle(&self.client, &self.topics_list, logs)
+            .handle(from, to, &self.client, &self.topics_list, logs)
             .await?;
         Ok(())
     }

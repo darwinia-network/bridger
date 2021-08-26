@@ -44,7 +44,7 @@ impl Service for RedeemService {
 
                 while let Some(recv) = rx.recv().await {
                     if let ToRedeemMessage::EthereumTransaction(tx) = recv {
-                        if let Err(err) = helper.redeem(tx).await {
+                        if let Err(err) = helper.redeem(tx.clone()).await {
                             error!(target: PangolinRopstenTask::NAME, "redeem err: {:#?}", err);
                             // TODO: Consider the errors more carefully
                             // Maybe a websocket err, so wait 10 secs to reconnect.
@@ -54,7 +54,9 @@ impl Service for RedeemService {
                                 sender_to_redeem.clone(),
                             )
                             .await;
-                            // TODO: Maybe need retry
+                            // for any error when helper recreated, we need put this tx back to the
+                            // receive queue
+                            let _ = helper.retry(tx);
                         }
                     }
                 }
@@ -119,6 +121,11 @@ impl RedeemHelper {
             darwinia,
             shadow,
         })
+    }
+
+    pub async fn retry(&mut self, tx: EthereumTransaction) -> anyhow::Result<()> {
+        self.sender_to_redeem.send(ToRedeemMessage::EthereumTransaction(tx)).await?;
+        return Ok(());
     }
 
     pub async fn redeem(&self, tx: EthereumTransaction) -> anyhow::Result<()> {

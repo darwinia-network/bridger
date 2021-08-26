@@ -1,0 +1,20 @@
+[package]
+name = "task-pangolin-pangoro"
+version = "0.4.5"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2018"
+
+[dependencies]

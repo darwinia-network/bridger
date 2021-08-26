@@ -11,6 +11,7 @@ pub struct Tracker {
     key_running: String,
     key_next: String,
     key_skipped: String,
+    key_fast_mode: String,
 }
 
 impl Debug for Tracker {
@@ -23,6 +24,7 @@ impl Debug for Tracker {
         f.write_str(&format!("  key_running: {}\n", self.key_running))?;
         f.write_str(&format!("  key_next: {}\n", self.key_next))?;
         f.write_str(&format!("  key_skipped: {}\n", self.key_skipped))?;
+        f.write_str(&format!("  key_fast_mode: {}\n", self.key_fast_mode))?;
         f.write_str("}")?;
         Ok(())
     }
@@ -39,6 +41,7 @@ impl Tracker {
             key_running: format!("{}.running", key),
             key_next: format!("{}.next", key),
             key_skipped: format!("{}.skipped", key),
+            key_fast_mode: format!("{}.fast_mode", key),
         }
     }
 }
@@ -55,6 +58,11 @@ impl Tracker {
             return Ok(is_running);
         }
         Ok(false)
+    }
+
+    pub fn enable_fast_mode(&self) -> anyhow::Result<()> {
+        self.microkv.put(&self.key_fast_mode, &true)?;
+        Ok(())
     }
 
     pub async fn next(&self) -> anyhow::Result<usize> {

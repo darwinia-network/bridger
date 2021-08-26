@@ -223,7 +223,7 @@ impl RopstenLogsHandler {
                                 if verified {
                                     info!(
                                         target: PangolinRopstenTask::NAME,
-                                        "check-redeem verfied tx {:?} at {:?}",
+                                        "check-redeem verified tx {:?} at {:?}",
                                         tx.tx_hash,
                                         tx.block
                                     );
@@ -231,7 +231,7 @@ impl RopstenLogsHandler {
                                 } else {
                                     trace!(
                                         target: PangolinRopstenTask::NAME,
-                                        "check-redeem not verfied tx {:?} at {:?}",
+                                        "check-redeem not verified tx {:?} at {:?}",
                                         tx.tx_hash,
                                         tx.block
                                     );
@@ -272,7 +272,7 @@ impl RopstenLogsHandler {
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;
-            trace!("finishe to send to redeem: {:?}", &tx.tx_hash);
+            trace!("finished to send to redeem: {:?}", &tx.tx_hash);
         }
         self.waited_redeem
             .entry(tx.block)

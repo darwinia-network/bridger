@@ -22,7 +22,7 @@ use component_state::state::BridgeState;
 use support_ethereum::receipt::RedeemFor;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
+use crate::message::{Extrinsic, ToExtrinsicsMessage};
 use crate::task::DarwiniaEthereumTask;
 
 #[derive(Debug)]
@@ -39,7 +39,6 @@ impl Service for ExtrinsicsService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToExtrinsicsMessage>()?;
-        let send_redeem = bus.tx::<ToRedeemMessage>()?;
 
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
@@ -52,9 +51,7 @@ impl Service for ExtrinsicsService {
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToExtrinsicsMessage::Extrinsic(ex) => {
-                            while let Err(err) =
-                                helper.send_extrinsic(ex.clone(), send_redeem.clone()).await
-                            {
+                            while let Err(err) = helper.send_extrinsic(ex.clone()).await {
                                 error!(
                                     target: DarwiniaEthereumTask::NAME,
                                     "extrinsics err: {:#?}", err
@@ -146,14 +143,7 @@ impl ExtrinsicsHelper {
         })
     }
 
-    async fn send_extrinsic<SenderRedeem>(
-        &self,
-        ex: Extrinsic,
-        sender_redeem: SenderRedeem,
-    ) -> anyhow::Result<()>
-    where
-        SenderRedeem: lifeline::Sender<ToRedeemMessage>,
-    {
+    async fn send_extrinsic(&self, ex: Extrinsic) -> anyhow::Result<()> {
         let microkv = self.state.microkv();
         do_send_extrinsic(
             microkv,
@@ -163,14 +153,13 @@ impl ExtrinsicsHelper {
             Some(self.darwinia2ethereum_relayer.clone()),
             ex,
             self.spec_name.clone(),
-            sender_redeem,
         )
         .await
     }
 }
 
 #[allow(clippy::too_many_arguments)]
-async fn do_send_extrinsic<SenderRedeem>(
+async fn do_send_extrinsic(
     microkv: &MicroKV,
     ethereum2darwinia: Option<Ethereum2Darwinia>,
     darwinia2ethereum: Option<Darwinia2Ethereum>,
@@ -178,11 +167,7 @@ async fn do_send_extrinsic<SenderRedeem>(
     darwinia2ethereum_relayer: Option<ToEthereumAccount>,
     extrinsic: Extrinsic,
     spec_name: String,
-    mut sender_redeem: SenderRedeem,
-) -> anyhow::Result<()>
-where
-    SenderRedeem: lifeline::Sender<ToRedeemMessage>,
-{
+) -> anyhow::Result<()> {
     let microkv = microkv.namespace(DarwiniaEthereumTask::NAME);
     match extrinsic {
         Extrinsic::Affirm(parcel) => {
@@ -265,11 +250,6 @@ where
                     }
                 }
             }
-
-            // send redeem complete message
-            sender_redeem
-                .send(ToRedeemMessage::Complete(ethereum_tx.block as usize))
-                .await?;
         }
 
         Extrinsic::GuardVote(pending_block_number, aye) => {

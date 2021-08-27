@@ -1,4 +1,6 @@
-use lifeline::{Receiver, Sender};
+use std::collections::{HashMap, HashSet};
+
+use lifeline::Sender;
 use postage::broadcast;
 use web3::types::{Log, H160, H256};
 
@@ -11,12 +13,15 @@ use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::DarwiniaEthereumTask;
 
+const MAX_WAITED_REDEEM_COUNT: usize = 1024;
+
 pub(crate) struct EthereumLogsHandler {
     topics_list: Vec<(H160, Vec<H256>)>,
     sender_to_relay: broadcast::Sender<ToRelayMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-    receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
     darwinia_client: Darwinia,
+    // doc: https://github.com/darwinia-network/bridger/blob/6355b579c281955c7a3ce468e770f5528536496f/task/task-pangolin-ropsten/src/service/ropsten/ropsten_logs_handler.rs#L25-L28
+    waited_redeem: HashMap<u64, HashSet<EthereumTransaction>>,
     tracker: Tracker,
 }
 
@@ -25,7 +30,6 @@ impl EthereumLogsHandler {
         topics_list: Vec<(H160, Vec<H256>)>,
         sender_to_relay: broadcast::Sender<ToRelayMessage>,
         sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-        receiver_redeem: broadcast::Receiver<ToRedeemMessage>,
         darwinia_client: Darwinia,
         tracker: Tracker,
     ) -> Self {
@@ -33,8 +37,8 @@ impl EthereumLogsHandler {
             topics_list,
             sender_to_relay,
             sender_to_redeem,
-            receiver_redeem,
             darwinia_client,
+            waited_redeem: HashMap::new(),
             tracker,
         }
     }
@@ -44,8 +48,8 @@ impl EthereumLogsHandler {
 impl LogsHandler for EthereumLogsHandler {
     async fn handle(
         &mut self,
-        _from: u64,
-        _to: u64,
+        from: u64,
+        to: u64,
         _client: &EvmClient,
         _topics_list: &Vec<(H160, Vec<H256>)>,
         logs: Vec<Log>,
@@ -57,6 +61,14 @@ impl LogsHandler for EthereumLogsHandler {
 
         // Build all transactions from logs
         let txs = build_txs(logs, bank_topic, issuing_topic, relay_topic);
+
+        // doc: https://github.com/darwinia-network/bridger/blob/6355b579c281955c7a3ce468e770f5528536496f/task/task-pangolin-ropsten/src/service/ropsten/ropsten_logs_handler.rs#L79-L81
+        let check_position = if txs.is_empty() { to } else { from - 1 };
+        self.check_redeem(check_position).await?;
+        if self.waited_redeem.len() >= MAX_WAITED_REDEEM_COUNT {
+            // todo: there need stop scan running
+            return Ok(());
+        }
 
         if !txs.is_empty() {
             // Send block number to `Relay Service`
@@ -129,37 +141,109 @@ fn build_txs(
 }
 
 impl EthereumLogsHandler {
-    async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
-        if self
+    async fn is_verified(&self, tx: &EthereumTransaction) -> anyhow::Result<bool> {
+        Ok(self
             .darwinia_client
             .verified(tx.block_hash, tx.index)
             .await?
-        {
+            || self
+                .darwinia_client
+                .verified_issuing(tx.block_hash, tx.index)
+                .await?)
+    }
+
+    fn is_redeem_submitted(&self, tx: &EthereumTransaction) -> bool {
+        let txset = self.waited_redeem.get(&tx.block);
+        if let Some(txs) = txset {
+            return txs.contains(&tx);
+        }
+        false
+    }
+
+    async fn check_redeem(&mut self, check_position: u64) -> anyhow::Result<()> {
+        if self.waited_redeem.is_empty() {
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "no redeem waited, change last redeem to {:?}",
+                check_position
+            );
+            self.tracker.finish(check_position as usize)?;
+            return Ok(());
+        }
+
+        let mut block_numbers = self.waited_redeem.keys().copied().collect::<Vec<_>>();
+        block_numbers.sort_unstable();
+        for redeemed in block_numbers {
+            let checked = self.waited_redeem.remove(&redeemed);
+            if let Some(txs) = checked {
+                let mut reverted = txs.clone();
+                for tx in txs.iter() {
+                    match self.is_verified(&tx).await {
+                        Err(err) => {
+                            error!(
+                                target: DarwiniaEthereumTask::NAME,
+                                "check-redeem err: {:#?}", err
+                            );
+                            self.waited_redeem.insert(redeemed, reverted);
+                            return Err(err);
+                        }
+                        Ok(verified) => {
+                            if verified {
+                                info!(
+                                    target: DarwiniaEthereumTask::NAME,
+                                    "check-redeem verified tx {:?} at {:?}", tx.tx_hash, tx.block
+                                );
+                                reverted.remove(&tx);
+                            } else {
+                                trace!(
+                                    target: DarwiniaEthereumTask::NAME,
+                                    "check-redeem not verified tx {:?} at {:?}",
+                                    tx.tx_hash,
+                                    tx.block
+                                );
+                                self.waited_redeem.insert(redeemed, reverted);
+                                return Ok(());
+                            }
+                        }
+                    }
+                }
+            }
+            info!(
+                target: DarwiniaEthereumTask::NAME,
+                "new redeem confirmed, change last redeem to {:?}", redeemed
+            );
+            self.tracker.finish(redeemed as usize)?;
+        }
+
+        Ok(())
+    }
+
+    async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
+        if self.is_redeem_submitted(&tx) {
+            return Ok(());
+        }
+        if self.is_verified(&tx).await? {
             trace!(
                 target: DarwiniaEthereumTask::NAME,
                 "This ethereum tx {:?} has already been redeemed.",
                 tx.enclosed_hash()
             );
-            self.tracker.finish(tx.block as usize)?;
-            return Ok(());
+        } else {
+            trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "send to redeem service: {:?}",
+                &tx.tx_hash
+            );
+            self.sender_to_redeem
+                .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
+                .await?;
+            trace!("finished to send to redeem: {:?}", &tx.tx_hash);
         }
+        self.waited_redeem
+            .entry(tx.block)
+            .or_insert_with(HashSet::new)
+            .insert(tx.clone());
 
-        trace!(
-            target: DarwiniaEthereumTask::NAME,
-            "send to redeem service: {:?}",
-            &tx.tx_hash
-        );
-        self.sender_to_redeem
-            .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
-            .await?;
-        while let Some(ToRedeemMessage::Complete(block)) = self.receiver_redeem.recv().await {
-            let except = tx.block as usize;
-            if block != except {
-                continue;
-            }
-            self.tracker.finish(block)?;
-            break;
-        }
         Ok(())
     }
 }

@@ -81,6 +81,7 @@ impl lifeline::Service for RopstenScanService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         let tracker = Tracker::new(microkv, "scan.ropsten");
+        tracker.reset_current()?;
         tracker.enable_fast_mode()?;
 
         let _greet = Self::try_task(

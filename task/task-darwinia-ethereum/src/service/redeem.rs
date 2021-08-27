@@ -30,6 +30,7 @@ impl Service for RedeemService {
     type Bus = DarwiniaEthereumBus;
     type Lifeline = anyhow::Result<Self>;
 
+    #[allow(irrefutable_let_patterns)]
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToRedeemMessage>()?;

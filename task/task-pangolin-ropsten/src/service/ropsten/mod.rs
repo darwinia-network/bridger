@@ -81,6 +81,7 @@ impl lifeline::Service for RopstenScanService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         let tracker = Tracker::new(microkv, "scan.ropsten");
+        tracker.enable_fast_mode()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-ropsten-scan", PangolinRopstenTask::NAME),
@@ -113,6 +114,12 @@ async fn start(
         {
             error!(target: PangolinRopstenTask::NAME, "ethereum err {:#?}", err);
             sleep(Duration::from_secs(10)).await;
+            if let Err(e) = tracker.reset_current() {
+                error!(
+                    target: PangolinRopstenTask::NAME,
+                    "failed to reset current: {:?}", e
+                );
+            }
         }
     }
 }

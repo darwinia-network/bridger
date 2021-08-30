@@ -18,3 +18,34 @@ readme = 'README.md'
 edition = "2018"
 
 [dependencies]
+anyhow = "1.0"
+log = "0.4"
+codec = { package = "parity-scale-codec", version = "2.0.0" }
+async-trait = "0.1"
+num-traits = "0.2"
+futures = "0.3"
+async-std = "1.9"
+paste = "1.0"
+hex = "0.4"
+serde = { version = "1", features = ["derive"] }
+
+
+# Substrate Dependencies
+
+frame-support       = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-version          = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+
+
+## darwinia common
+common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+
+## pangolin
+pangolin-runtime    = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+
+## pangoro
+pangoro-runtime     = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+

@@ -135,16 +135,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d6e24d2cce90c53b948c46271bfb053e4bdc2db9b5d3f65e20f8cf28a1b7fc3"
 
 [[package]]
-name = "async-attributes"
-version = "1.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3203e79f4dd9bdda415ed03cf14dae5a2bf775c683a00f94e9cd1faf0f596e5"
-dependencies = [
- "quote",
- "syn",
-]
-
-[[package]]
 name = "async-channel"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -256,7 +246,6 @@ version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d9f06685bad74e0570f5213741bea82158279a4103d988e57bfada11ad230341"
 dependencies = [
- "async-attributes",
  "async-channel",
  "async-global-executor",
  "async-io",
@@ -401,7 +390,7 @@ dependencies = [
  "ellipse",
  "frame-metadata 13.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
- "futures 0.3.16",
+ "futures",
  "hex",
  "log",
  "pallet-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0)",
@@ -515,7 +504,7 @@ dependencies = [
 [[package]]
 name = "bp-header-chain"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
  "finality-grandpa",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -530,7 +519,7 @@ dependencies = [
 [[package]]
 name = "bp-message-dispatch"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
  "bp-runtime",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -541,11 +530,13 @@ dependencies = [
 [[package]]
 name = "bp-messages"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
+ "bitvec",
  "bp-runtime",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "impl-trait-for-tuples",
  "parity-scale-codec",
  "serde 1.0.127",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -554,7 +545,7 @@ dependencies = [
 [[package]]
 name = "bp-rialto"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -569,7 +560,7 @@ dependencies = [
 [[package]]
 name = "bp-runtime"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "hash-db",
@@ -586,7 +577,7 @@ dependencies = [
 [[package]]
 name = "bp-test-utils"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
  "bp-header-chain",
  "ed25519-dalek",
@@ -613,9 +604,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "bridge-primitives"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
+dependencies = [
+ "bp-messages",
+ "bp-runtime",
+ "common-primitives",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+]
+
+[[package]]
 name = "bridge-runtime-common"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
  "bp-message-dispatch",
  "bp-messages",
@@ -625,6 +631,7 @@ dependencies = [
  "pallet-bridge-dispatch",
  "pallet-bridge-grandpa",
  "pallet-bridge-messages",
+ "pallet-transaction-payment",
  "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -640,7 +647,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "config",
- "futures 0.3.16",
+ "futures",
  "lifeline",
  "log",
  "once_cell",
@@ -662,8 +669,8 @@ checksum = "771fe0050b883fcc3ea2359b1a96bcfbc090b7116eae7c3c512c7a083fdf23d3"
 
 [[package]]
 name = "bsc-primitives"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "ethbloom",
@@ -842,6 +849,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "client-pangolin-s2s"
+version = "0.4.5"
+dependencies = [
+ "headers-relay",
+ "parity-scale-codec",
+]
+
+[[package]]
 name = "cloudabi"
 version = "0.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -859,6 +874,15 @@ dependencies = [
  "atty",
  "lazy_static",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "common-primitives"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
+dependencies = [
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
@@ -883,7 +907,7 @@ dependencies = [
  "anyhow",
  "array-bytes",
  "async-trait",
- "bridge-primitives",
+ "bridge-primitives 0.4.5",
  "bridge-traits",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "jsonrpsee-http-client",
@@ -930,45 +954,6 @@ dependencies = [
  "log",
  "reqwest 0.11.4",
  "serde 1.0.127",
-]
-
-[[package]]
-name = "component-millau"
-version = "0.4.5"
-dependencies = [
- "bridge-traits",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "headers-relay",
- "millau-primitives",
- "millau-runtime",
- "pallet-transaction-payment",
- "parity-scale-codec",
- "relay-substrate-client",
- "relay-utils",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "component-pangolin"
-version = "0.4.5"
-dependencies = [
- "bridge-traits",
- "darwinia-ethereum-relay",
- "drml-primitives",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "headers-relay",
- "pallet-transaction-payment",
- "pangolin-runtime",
- "parity-scale-codec",
- "relay-substrate-client",
- "relay-utils",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
@@ -1253,8 +1238,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-balances"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-balances-rpc-runtime-api",
  "darwinia-support",
@@ -1268,8 +1253,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-balances-rpc-runtime-api"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-support",
  "parity-scale-codec",
@@ -1280,8 +1265,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridge-bsc"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "bsc-primitives",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1299,7 +1284,7 @@ version = "0.4.5"
 dependencies = [
  "anyhow",
  "async-recursion",
- "bridge-primitives",
+ "bridge-primitives 0.4.5",
  "bridge-traits",
  "colored",
  "component-state",
@@ -1318,7 +1303,6 @@ dependencies = [
  "structopt",
  "support-keep",
  "task-darwinia-ethereum",
- "task-pangolin-millau",
  "task-pangolin-ropsten",
  "term-table",
  "tokio 1.10.0",
@@ -1326,8 +1310,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-claims"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "darwinia-support",
@@ -1345,7 +1329,7 @@ dependencies = [
 [[package]]
 name = "darwinia-crab-backing"
 version = "2.5.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1355,8 +1339,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-crab-issuing"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1367,8 +1351,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-democracy"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1382,8 +1366,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-elections-phragmen"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1399,8 +1383,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-ethereum-backing"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "darwinia-relay-primitives",
@@ -1420,8 +1404,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-ethereum-issuing"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "darwinia-ethereum-relay",
@@ -1444,8 +1428,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-ethereum-relay"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "blake2-rfc",
@@ -1468,8 +1452,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-evm"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "darwinia-balances",
@@ -1495,8 +1479,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-evm-precompile-dispatch"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-evm",
  "dp-evm",
@@ -1509,8 +1493,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-evm-precompile-encoder"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-ethereum-issuing",
  "darwinia-evm",
@@ -1529,8 +1513,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-evm-precompile-simple"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "dp-evm",
  "evm",
@@ -1541,8 +1525,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-evm-precompile-transfer"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "darwinia-evm",
@@ -1566,8 +1550,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-header-mmr"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "ckb-merkle-mountain-range",
  "darwinia-header-mmr-rpc-runtime-api",
@@ -1586,8 +1570,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-header-mmr-rpc-runtime-api"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-support",
  "parity-scale-codec",
@@ -1599,8 +1583,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-relay-authorities"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-relay-primitives",
  "darwinia-support",
@@ -1614,8 +1598,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-relay-primitives"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "parity-scale-codec",
@@ -1625,8 +1609,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-relayer-game"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-relay-primitives",
  "darwinia-support",
@@ -1640,8 +1624,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-s2s-backing"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "bp-runtime",
@@ -1662,8 +1646,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-s2s-issuing"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "bp-runtime",
@@ -1690,8 +1674,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-staking"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-staking-rpc-runtime-api",
  "darwinia-support",
@@ -1715,8 +1699,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-staking-rpc-runtime-api"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-support",
  "parity-scale-codec",
@@ -1727,40 +1711,29 @@ dependencies = [
 
 [[package]]
 name = "darwinia-support"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "bp-runtime",
  "ethabi 13.0.0",
+ "ethereum",
  "ethereum-primitives",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "impl-trait-for-tuples",
  "num-traits 0.2.14",
  "parity-scale-codec",
+ "sha3 0.9.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "darwinia-treasury"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
-dependencies = [
- "darwinia-support",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec",
- "serde 1.0.127",
+ "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
 name = "darwinia-tron-backing"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1770,8 +1743,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-vesting"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -1852,8 +1825,8 @@ checksum = "fea41bba32d969b513997752735605054bc0dfa92b4c56bf1189f2e174be7a10"
 
 [[package]]
 name = "dp-asset"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "ethereum-primitives",
  "parity-scale-codec",
@@ -1863,8 +1836,8 @@ dependencies = [
 
 [[package]]
 name = "dp-consensus"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "ethereum",
  "parity-scale-codec",
@@ -1877,8 +1850,8 @@ dependencies = [
 
 [[package]]
 name = "dp-contract"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "ethabi 13.0.0",
  "ethereum-primitives",
@@ -1888,8 +1861,8 @@ dependencies = [
 
 [[package]]
 name = "dp-evm"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "evm",
  "impl-trait-for-tuples",
@@ -1901,17 +1874,8 @@ dependencies = [
 
 [[package]]
 name = "dp-storage"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
-
-[[package]]
-name = "drml-primitives"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
-dependencies = [
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 
 [[package]]
 name = "dtoa"
@@ -1921,8 +1885,8 @@ checksum = "56899898ce76aaf4a0f24d914c97ea6ed976d42fec6ad33fcbb0a1103e07b2b0"
 
 [[package]]
 name = "dvm-dynamic-fee"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "async-trait",
  "darwinia-evm",
@@ -1936,8 +1900,8 @@ dependencies = [
 
 [[package]]
 name = "dvm-ethereum"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-evm",
  "darwinia-support",
@@ -1951,6 +1915,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "libsecp256k1 0.5.0",
+ "log",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "parity-scale-codec",
  "rlp 0.5.1",
@@ -1964,8 +1929,8 @@ dependencies = [
 
 [[package]]
 name = "dvm-rpc-runtime-api"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "darwinia-evm",
  "darwinia-support",
@@ -2118,7 +2083,7 @@ dependencies = [
 [[package]]
 name = "ethabi"
 version = "13.0.0"
-source = "git+https://github.com/darwinia-network/ethabi.git?tag=v13.0.0-no-std#baacf174d5c2f12122c4ee3fe31506fb52069983"
+source = "git+https://github.com/darwinia-network/ethabi?tag=v13.0.0-no-std#baacf174d5c2f12122c4ee3fe31506fb52069983"
 dependencies = [
  "anyhow",
  "ethereum-types",
@@ -2191,8 +2156,8 @@ dependencies = [
 
 [[package]]
 name = "ethereum-primitives"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "ethash",
@@ -2285,28 +2250,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "failure"
-version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d32e9bd16cc02eae7db7ef620b392808b89f6a5e16bb3497d159c6b92a0f4f86"
-dependencies = [
- "backtrace",
- "failure_derive",
-]
-
-[[package]]
-name = "failure_derive"
-version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa4da3c766cd7a0db8242e326e9e4e081edd567072893ed320008189715366a4"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
- "synstructure",
-]
-
-[[package]]
 name = "fake-simd"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2328,29 +2271,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c832d0ed507622c7cb98e9b7f10426850fc9d38527ab8071778dcc3a81d45875"
 dependencies = [
  "either",
- "futures 0.3.16",
+ "futures",
  "futures-timer",
  "log",
  "num-traits 0.2.14",
  "parity-scale-codec",
  "parking_lot 0.11.1",
  "scale-info",
-]
-
-[[package]]
-name = "finality-relay"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
-dependencies = [
- "async-std",
- "async-trait",
- "backoff",
- "bp-header-chain",
- "futures 0.3.16",
- "headers-relay",
- "log",
- "num-traits 0.2.14",
- "relay-utils",
 ]
 
 [[package]]
@@ -2399,7 +2326,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5fc25a87fa4fd2094bffb06925852034d90a17f0d1e05197d4956d3555752191"
 dependencies = [
  "matches",
- "percent-encoding 2.1.0",
+ "percent-encoding",
 ]
 
 [[package]]
@@ -2424,7 +2351,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking"
 version = "3.1.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2456,7 +2383,7 @@ dependencies = [
 [[package]]
 name = "frame-election-provider-support"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2469,7 +2396,7 @@ dependencies = [
 [[package]]
 name = "frame-executive"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2495,7 +2422,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "13.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "serde 1.0.127",
@@ -2544,7 +2471,7 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "bitflags",
  "frame-metadata 13.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2609,7 +2536,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "Inflector",
  "frame-support-procedural-tools 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2646,7 +2573,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support-procedural-tools-derive 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "proc-macro-crate 1.0.0",
@@ -2681,7 +2608,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2719,7 +2646,7 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "impl-trait-for-tuples",
@@ -2753,7 +2680,7 @@ dependencies = [
 [[package]]
 name = "frame-system-benchmarking"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2767,7 +2694,7 @@ dependencies = [
 [[package]]
 name = "frame-system-rpc-runtime-api"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -2776,7 +2703,7 @@ dependencies = [
 [[package]]
 name = "frame-try-runtime"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "parity-scale-codec",
@@ -2812,12 +2739,6 @@ name = "funty"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fed34cd105917e91daa4da6b3728c47b068749d6a62c59811f06ed2ac71d9da7"
-
-[[package]]
-name = "futures"
-version = "0.1.31"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a471a38ef8ed83cd6e40aa59c1ffe17db6855c18e3604d9c4ed8c08ebc28678"
 
 [[package]]
 name = "futures"
@@ -2921,7 +2842,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67eb846bfd58e44a8481a00049e82c43e0ccb5d61f8dc071057cb19249dd4d78"
 dependencies = [
  "autocfg",
- "futures 0.1.31",
  "futures-channel",
  "futures-core",
  "futures-io",
@@ -3102,12 +3022,13 @@ dependencies = [
 [[package]]
 name = "headers-relay"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
+ "anyhow",
  "async-std",
  "async-trait",
  "backoff",
- "futures 0.3.16",
+ "futures",
  "linked-hash-map",
  "log",
  "num-traits 0.2.14",
@@ -3339,17 +3260,6 @@ dependencies = [
 
 [[package]]
 name = "idna"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38f09e0f0b1fb55fdee1f17470ad800da77af5186a1a76c026b679358b7e844e"
-dependencies = [
- "matches",
- "unicode-bidi",
- "unicode-normalization",
-]
-
-[[package]]
-name = "idna"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "418a0a6fab821475f634efe3ccc45c013f742efe03d853e8d3355d5cb850ecf8"
@@ -3443,9 +3353,9 @@ checksum = "68f2d64f2edebec4ce84ad108148e67e1064789bee435edc5b60ad398714a3a9"
 
 [[package]]
 name = "isahc"
-version = "1.4.0"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81c01404730bb4574bbacb59ca0855f969f8eabd688ca22866f2cc333f1a4f69"
+checksum = "431445cb4ba85a80cb1438a9ae8042dadb78ae4046ecee89ad027b614aa0ddb7"
 dependencies = [
  "async-channel",
  "crossbeam-utils",
@@ -3463,7 +3373,7 @@ dependencies = [
  "sluice",
  "tracing",
  "tracing-futures",
- "url 2.2.2",
+ "url",
  "waker-fn",
 ]
 
@@ -3523,81 +3433,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "jsonrpc-client-transports"
-version = "15.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "489b9c612e60c766f751ab40fcb43cbb55a1e10bb44a9b4307ed510ca598cbd7"
-dependencies = [
- "failure",
- "futures 0.1.31",
- "jsonrpc-core 15.1.0",
- "jsonrpc-pubsub",
- "log",
- "serde 1.0.127",
- "serde_json",
- "url 1.7.2",
-]
-
-[[package]]
-name = "jsonrpc-core"
-version = "15.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0745a6379e3edc893c84ec203589790774e4247420033e71a76d3ab4687991fa"
-dependencies = [
- "futures 0.1.31",
- "log",
- "serde 1.0.127",
- "serde_derive",
- "serde_json",
-]
-
-[[package]]
 name = "jsonrpc-core"
 version = "17.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d4467ab6dfa369b69e52bd0692e480c4d117410538526a57a304a0f2250fd95e"
 dependencies = [
- "futures 0.3.16",
+ "futures",
  "futures-executor",
  "futures-util",
  "log",
  "serde 1.0.127",
  "serde_derive",
  "serde_json",
-]
-
-[[package]]
-name = "jsonrpc-core-client"
-version = "15.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f764902d7b891344a0acb65625f32f6f7c6db006952143bd650209fbe7d94db"
-dependencies = [
- "jsonrpc-client-transports",
-]
-
-[[package]]
-name = "jsonrpc-derive"
-version = "15.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "99a847f9ec7bb52149b2786a17c9cb260d6effc6b8eeb8c16b343a487a7563a3"
-dependencies = [
- "proc-macro-crate 0.1.5",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "jsonrpc-pubsub"
-version = "15.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "639558e0604013be9787ae52f798506ae42bf4220fe587bdc5625871cc8b9c77"
-dependencies = [
- "jsonrpc-core 15.1.0",
- "log",
- "parking_lot 0.10.2",
- "rand 0.7.3",
- "serde 1.0.127",
 ]
 
 [[package]]
@@ -3616,7 +3463,7 @@ dependencies = [
  "serde 1.0.127",
  "serde_json",
  "thiserror",
- "url 2.2.2",
+ "url",
 ]
 
 [[package]]
@@ -3669,7 +3516,7 @@ dependencies = [
  "async-tls",
  "async-trait",
  "fnv",
- "futures 0.3.16",
+ "futures",
  "jsonrpsee-types",
  "log",
  "pin-project 1.0.8",
@@ -3677,7 +3524,7 @@ dependencies = [
  "serde_json",
  "soketto 0.4.2",
  "thiserror",
- "url 2.2.2",
+ "url",
  "webpki 0.22.0",
 ]
 
@@ -3781,7 +3628,7 @@ checksum = "08053fbef67cd777049ef7a95ebaca2ece370b4ed7712c3fa404d69a88cb741b"
 dependencies = [
  "atomic",
  "bytes 1.0.1",
- "futures 0.3.16",
+ "futures",
  "lazy_static",
  "libp2p-core",
  "libp2p-swarm",
@@ -3804,7 +3651,7 @@ dependencies = [
  "ed25519-dalek",
  "either",
  "fnv",
- "futures 0.3.16",
+ "futures",
  "futures-timer",
  "lazy_static",
  "libsecp256k1 0.3.5",
@@ -3834,7 +3681,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e04d8e1eef675029ec728ba14e8d0da7975d84b6679b699b4ae91a1de9c3a92"
 dependencies = [
  "either",
- "futures 0.3.16",
+ "futures",
  "libp2p-core",
  "log",
  "rand 0.7.3",
@@ -4101,8 +3948,8 @@ checksum = "71d96e3f3c0b6325d8ccd83c33b28acb183edcb6c67938ba104ec546854b0882"
 
 [[package]]
 name = "merkle-patricia-trie"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "hashbrown 0.9.1",
  "keccak-hash",
@@ -4123,21 +3970,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "messages-relay"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
-dependencies = [
- "async-std",
- "async-trait",
- "bp-messages",
- "futures 0.3.16",
- "hex",
- "log",
- "parking_lot 0.11.1",
- "relay-utils",
-]
-
-[[package]]
 name = "microkv"
 version = "0.3.0"
 source = "git+https://github.com/fewensa/microkv.git?branch=master#d8d259d26fd35f49d4a7a395d239ad7c04991945"
@@ -4149,75 +3981,6 @@ dependencies = [
  "serde 1.0.127",
  "serde_json",
  "sodiumoxide",
-]
-
-[[package]]
-name = "millau-primitives"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-launch.git?branch=pangolin-bridge#ce033c13592eb6613de8d1c965568ecc03d48834"
-dependencies = [
- "bp-messages",
- "bp-runtime",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "millau-runtime"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-launch.git?branch=pangolin-bridge#ce033c13592eb6613de8d1c965568ecc03d48834"
-dependencies = [
- "array-bytes",
- "bp-header-chain",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
- "darwinia-balances",
- "darwinia-s2s-backing",
- "darwinia-support",
- "dp-asset",
- "drml-primitives",
- "frame-executive",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system-rpc-runtime-api",
- "millau-primitives",
- "pallet-aura",
- "pallet-bridge-dispatch",
- "pallet-bridge-grandpa",
- "pallet-bridge-messages",
- "pallet-grandpa",
- "pallet-randomness-collective-flip",
- "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-shift-session-manager",
- "pallet-sudo",
- "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-transaction-payment",
- "pallet-transaction-payment-rpc-runtime-api",
- "pangolin-bridge-primitives",
- "pangolin-constants",
- "pangolin-runtime-system-params",
- "parity-scale-codec",
- "serde 1.0.127",
- "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-block-builder",
- "sp-consensus-aura",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-finality-grandpa",
- "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-offchain",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-transaction-pool",
- "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "substrate-wasm-builder 3.0.0",
 ]
 
 [[package]]
@@ -4351,7 +4114,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d91ec0a2440aaff5f78ec35631a7027d50386c6163aa975f7caa0d5da4b6ff8"
 dependencies = [
  "bytes 1.0.1",
- "futures 0.3.16",
+ "futures",
  "log",
  "pin-project 1.0.8",
  "smallvec",
@@ -4588,25 +4351,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-aura"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
-dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec",
- "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-consensus-aura",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "pallet-authority-discovery"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4636,7 +4383,7 @@ dependencies = [
 [[package]]
 name = "pallet-authorship"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4666,7 +4413,7 @@ dependencies = [
 [[package]]
 name = "pallet-babe"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4689,7 +4436,7 @@ dependencies = [
 [[package]]
 name = "pallet-balances"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4701,9 +4448,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-bounties"
+version = "3.0.0"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+dependencies = [
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-treasury",
+ "parity-scale-codec",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+]
+
+[[package]]
 name = "pallet-bridge-dispatch"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
  "bp-message-dispatch",
  "bp-runtime",
@@ -4719,7 +4479,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-grandpa"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
  "bp-header-chain",
  "bp-runtime",
@@ -4740,8 +4500,10 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-messages"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
+ "bitvec",
+ "bp-message-dispatch",
  "bp-messages",
  "bp-rialto",
  "bp-runtime",
@@ -4759,7 +4521,7 @@ dependencies = [
 [[package]]
 name = "pallet-collective"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4774,7 +4536,7 @@ dependencies = [
 [[package]]
 name = "pallet-election-provider-multi-phase"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-election-provider-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4793,7 +4555,7 @@ dependencies = [
 [[package]]
 name = "pallet-grandpa"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4814,7 +4576,7 @@ dependencies = [
 [[package]]
 name = "pallet-identity"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "enumflags2",
  "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4829,7 +4591,7 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4898,7 +4660,7 @@ dependencies = [
 [[package]]
 name = "pallet-membership"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4913,7 +4675,7 @@ dependencies = [
 [[package]]
 name = "pallet-multisig"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4927,7 +4689,7 @@ dependencies = [
 [[package]]
 name = "pallet-offences"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4943,7 +4705,7 @@ dependencies = [
 [[package]]
 name = "pallet-proxy"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4957,7 +4719,7 @@ dependencies = [
 [[package]]
 name = "pallet-randomness-collective-flip"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4970,7 +4732,7 @@ dependencies = [
 [[package]]
 name = "pallet-recovery"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "enumflags2",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -4984,7 +4746,7 @@ dependencies = [
 [[package]]
 name = "pallet-scheduler"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5018,7 +4780,7 @@ dependencies = [
 [[package]]
 name = "pallet-session"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5035,22 +4797,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-shift-session-manager"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
-dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec",
- "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "pallet-society"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5107,7 +4856,7 @@ dependencies = [
 [[package]]
 name = "pallet-sudo"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5137,7 +4886,7 @@ dependencies = [
 [[package]]
 name = "pallet-timestamp"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5152,9 +4901,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-tips"
+version = "3.0.0"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+dependencies = [
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-treasury",
+ "parity-scale-codec",
+ "serde 1.0.127",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+]
+
+[[package]]
 name = "pallet-transaction-payment"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5170,7 +4933,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc-runtime-api"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "pallet-transaction-payment",
  "parity-scale-codec",
@@ -5179,9 +4942,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-treasury"
+version = "3.0.0"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+dependencies = [
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "impl-trait-for-tuples",
+ "pallet-balances",
+ "parity-scale-codec",
+ "serde 1.0.127",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+]
+
+[[package]]
 name = "pallet-utility"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5193,39 +4971,26 @@ dependencies = [
 ]
 
 [[package]]
-name = "pangolin-bridge-primitives"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
-dependencies = [
- "bp-messages",
- "bp-runtime",
- "drml-primitives",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "pangolin-constants"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
- "drml-primitives",
+ "common-primitives",
  "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
 name = "pangolin-runtime"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "array-bytes",
  "bp-message-dispatch",
  "bp-messages",
  "bp-runtime",
+ "bridge-primitives 2.6.1",
  "bridge-runtime-common",
+ "common-primitives",
  "darwinia-balances",
  "darwinia-balances-rpc-runtime-api",
  "darwinia-bridge-bsc",
@@ -5251,12 +5016,10 @@ dependencies = [
  "darwinia-staking",
  "darwinia-staking-rpc-runtime-api",
  "darwinia-support",
- "darwinia-treasury",
  "darwinia-tron-backing",
  "darwinia-vesting",
  "dp-asset",
  "dp-evm",
- "drml-primitives",
  "dvm-dynamic-fee",
  "dvm-ethereum",
  "dvm-rpc-runtime-api",
@@ -5270,10 +5033,10 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
  "log",
- "millau-primitives",
  "pallet-authority-discovery",
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "pallet-babe",
+ "pallet-bounties",
  "pallet-bridge-dispatch",
  "pallet-bridge-grandpa",
  "pallet-bridge-messages",
@@ -5293,12 +5056,15 @@ dependencies = [
  "pallet-society",
  "pallet-sudo",
  "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-tips",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
+ "pallet-treasury",
  "pallet-utility",
- "pangolin-bridge-primitives",
  "pangolin-constants",
  "pangolin-runtime-system-params",
+ "pangoro-constants",
+ "pangoro-runtime-system-params",
  "parity-scale-codec",
  "serde 1.0.127",
  "smallvec",
@@ -5324,8 +5090,92 @@ dependencies = [
 
 [[package]]
 name = "pangolin-runtime-system-params"
-version = "2.6.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#0e04590e8d03c8d0156b0fe996edbc9da204e097"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
+dependencies = [
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "static_assertions",
+]
+
+[[package]]
+name = "pangoro-constants"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
+dependencies = [
+ "common-primitives",
+ "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+]
+
+[[package]]
+name = "pangoro-runtime"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
+dependencies = [
+ "array-bytes",
+ "bp-header-chain",
+ "bp-message-dispatch",
+ "bp-messages",
+ "bp-runtime",
+ "bridge-primitives 2.6.1",
+ "bridge-runtime-common",
+ "common-primitives",
+ "darwinia-balances",
+ "darwinia-s2s-backing",
+ "darwinia-staking",
+ "darwinia-support",
+ "dp-asset",
+ "frame-executive",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system-rpc-runtime-api",
+ "log",
+ "pallet-authority-discovery",
+ "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-babe",
+ "pallet-bridge-dispatch",
+ "pallet-bridge-grandpa",
+ "pallet-bridge-messages",
+ "pallet-election-provider-multi-phase",
+ "pallet-grandpa",
+ "pallet-im-online 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-offences",
+ "pallet-randomness-collective-flip",
+ "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-sudo",
+ "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-transaction-payment",
+ "pallet-transaction-payment-rpc-runtime-api",
+ "pangolin-constants",
+ "pangolin-runtime-system-params",
+ "pangoro-constants",
+ "pangoro-runtime-system-params",
+ "parity-scale-codec",
+ "serde 1.0.127",
+ "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-authority-discovery",
+ "sp-block-builder",
+ "sp-consensus-babe",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-finality-grandpa",
+ "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-npos-elections 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-offchain",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-transaction-pool",
+ "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "substrate-wasm-builder 3.0.0",
+]
+
+[[package]]
+name = "pangoro-runtime-system-params"
+version = "2.6.1"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=master#dbbf9ee522dd5907394123ebba9912b7d18fd800"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5344,11 +5194,11 @@ dependencies = [
  "byteorder",
  "data-encoding",
  "multihash",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "serde 1.0.127",
  "static_assertions",
  "unsigned-varint 0.7.0",
- "url 2.2.2",
+ "url",
 ]
 
 [[package]]
@@ -5497,12 +5347,6 @@ checksum = "216eaa586a190f0a738f2f918511eecfa90f13295abec0e457cdebcceda80cbd"
 dependencies = [
  "crypto-mac 0.8.0",
 ]
-
-[[package]]
-name = "percent-encoding"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31010dd2e1ac33d5b46a5b413495239882813e0369f8ed8a5e266f173602f831"
 
 [[package]]
 name = "percent-encoding"
@@ -6067,49 +5911,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 
 [[package]]
-name = "relay-substrate-client"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
-dependencies = [
- "async-std",
- "async-trait",
- "bp-header-chain",
- "bp-messages",
- "bp-runtime",
- "finality-relay",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "futures 0.3.16",
- "headers-relay",
- "jsonrpsee-proc-macros",
- "jsonrpsee-ws-client",
- "log",
- "num-traits 0.2.14",
- "pallet-balances",
- "parity-scale-codec",
- "rand 0.7.3",
- "relay-utils",
- "sc-rpc-api",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-finality-grandpa",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-storage 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "relay-utils"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#c9fe23aa081e2fb8353e96a33ad2f4c158d066b1"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=main#81b4442a57891added578a0b9c67b2b3fbf3a8f5"
 dependencies = [
  "ansi_term 0.12.1",
+ "anyhow",
  "async-std",
  "async-trait",
  "backoff",
  "env_logger 0.8.4",
- "futures 0.3.16",
+ "futures",
  "isahc",
  "jsonpath_lib",
  "log",
@@ -6151,14 +5963,14 @@ dependencies = [
  "mime",
  "mime_guess",
  "native-tls",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "pin-project-lite 0.2.7",
  "serde 1.0.127",
  "serde_json",
  "serde_urlencoded",
  "tokio 0.2.25",
  "tokio-tls",
- "url 2.2.2",
+ "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -6186,14 +5998,14 @@ dependencies = [
  "log",
  "mime",
  "native-tls",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "pin-project-lite 0.2.7",
  "serde 1.0.127",
  "serde_json",
  "serde_urlencoded",
  "tokio 1.10.0",
  "tokio-native-tls",
- "url 2.2.2",
+ "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -6265,7 +6077,7 @@ dependencies = [
  "http",
  "hyper 0.14.11",
  "lazy_static",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "regex",
 ]
 
@@ -6381,7 +6193,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4da5fcb054c46f5a5dff833b129285a93d3f0179531735e6c866e8cc307d2020"
 dependencies = [
- "futures 0.3.16",
+ "futures",
  "pin-project 0.4.28",
  "static_assertions",
 ]
@@ -6408,31 +6220,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
-]
-
-[[package]]
-name = "sc-rpc-api"
-version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
-dependencies = [
- "derive_more",
- "futures 0.3.16",
- "jsonrpc-core 15.1.0",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "jsonrpc-pubsub",
- "log",
- "parity-scale-codec",
- "parking_lot 0.11.1",
- "serde 1.0.127",
- "serde_json",
- "sp-chain-spec",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-rpc 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-tracing 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-transaction-pool",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
@@ -6826,11 +6613,11 @@ dependencies = [
 
 [[package]]
 name = "sluice"
-version = "0.5.4"
+version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8fa0333a60ff2e3474a6775cc611840c2a55610c831dd366503474c02f1a28f5"
+checksum = "6d7400c0eff44aa2fcb5e31a5f24ba9716ed90138769e4977a2ba6014ae63eb5"
 dependencies = [
- "futures-channel",
+ "async-channel",
  "futures-core",
  "futures-io",
 ]
@@ -6882,7 +6669,7 @@ checksum = "b5c71ed3d54db0a699f4948e1bb3e45b450fa31fe602621dee6680361d569c88"
 dependencies = [
  "base64 0.12.3",
  "bytes 0.5.6",
- "futures 0.3.16",
+ "futures",
  "httparse",
  "log",
  "rand 0.7.3",
@@ -6897,7 +6684,7 @@ checksum = "4919971d141dbadaa0e82b5d369e2d7666c98e4625046140615ca363e50d4daa"
 dependencies = [
  "base64 0.13.0",
  "bytes 1.0.1",
- "futures 0.3.16",
+ "futures",
  "httparse",
  "log",
  "rand 0.8.4",
@@ -6924,7 +6711,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "hash-db",
  "log",
@@ -6953,7 +6740,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate 1.0.0",
@@ -6977,7 +6764,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "serde 1.0.127",
@@ -7016,7 +6803,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.14",
@@ -7044,7 +6831,7 @@ dependencies = [
 [[package]]
 name = "sp-authority-discovery"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7067,7 +6854,7 @@ dependencies = [
 [[package]]
 name = "sp-authorship"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "async-trait",
  "parity-scale-codec",
@@ -7091,7 +6878,7 @@ dependencies = [
 [[package]]
 name = "sp-block-builder"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7103,9 +6890,9 @@ dependencies = [
 [[package]]
 name = "sp-blockchain"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
- "futures 0.3.16",
+ "futures",
  "log",
  "lru",
  "parity-scale-codec",
@@ -7119,21 +6906,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp-chain-spec"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
-dependencies = [
- "serde 1.0.127",
- "serde_json",
-]
-
-[[package]]
 name = "sp-consensus"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "async-trait",
- "futures 0.3.16",
+ "futures",
  "futures-timer",
  "libp2p",
  "log",
@@ -7155,26 +6933,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp-consensus-aura"
-version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
-dependencies = [
- "async-trait",
- "parity-scale-codec",
- "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-consensus",
- "sp-consensus-slots",
- "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "sp-consensus-babe"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "async-trait",
  "merlin",
@@ -7196,7 +6957,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-slots"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7206,7 +6967,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-vrf"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "schnorrkel",
@@ -7225,7 +6986,7 @@ dependencies = [
  "byteorder",
  "dyn-clonable",
  "ed25519-dalek",
- "futures 0.3.16",
+ "futures",
  "hash-db",
  "hash256-std-hasher",
  "hex",
@@ -7262,14 +7023,14 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "base58",
  "blake2-rfc",
  "byteorder",
  "dyn-clonable",
  "ed25519-dalek",
- "futures 0.3.16",
+ "futures",
  "hash-db",
  "hash256-std-hasher",
  "hex",
@@ -7314,7 +7075,7 @@ dependencies = [
  "byteorder",
  "dyn-clonable",
  "ed25519-dalek",
- "futures 0.3.16",
+ "futures",
  "hash-db",
  "hash256-std-hasher",
  "hex",
@@ -7351,7 +7112,7 @@ dependencies = [
 [[package]]
 name = "sp-database"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "kvdb",
  "parking_lot 0.11.1",
@@ -7370,7 +7131,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7402,7 +7163,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -7425,7 +7186,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-grandpa"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "finality-grandpa",
  "log",
@@ -7454,7 +7215,7 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "async-trait",
  "impl-trait-for-tuples",
@@ -7483,7 +7244,7 @@ name = "sp-io"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.0#dc9acd2d74a5451a63e34060a4c7869021780b3e"
 dependencies = [
- "futures 0.3.16",
+ "futures",
  "hash-db",
  "libsecp256k1 0.3.5",
  "log",
@@ -7505,9 +7266,9 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
- "futures 0.3.16",
+ "futures",
  "hash-db",
  "libsecp256k1 0.3.5",
  "log",
@@ -7533,7 +7294,7 @@ version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33fd69f0a6e91bedc2fb1c5cc3689c212474b6c918274cb4cb14dbbe3c428c14"
 dependencies = [
- "futures 0.3.16",
+ "futures",
  "hash-db",
  "libsecp256k1 0.3.5",
  "log",
@@ -7582,7 +7343,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.
 dependencies = [
  "async-trait",
  "derive_more",
- "futures 0.3.16",
+ "futures",
  "merlin",
  "parity-scale-codec",
  "parking_lot 0.11.1",
@@ -7594,11 +7355,11 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "async-trait",
  "derive_more",
- "futures 0.3.16",
+ "futures",
  "merlin",
  "parity-scale-codec",
  "parking_lot 0.11.1",
@@ -7615,7 +7376,7 @@ checksum = "db6ccd2baf189112355338e8b224dc513cd239b974dbd717f12b3dc7a7248c3b"
 dependencies = [
  "async-trait",
  "derive_more",
- "futures 0.3.16",
+ "futures",
  "merlin",
  "parity-scale-codec",
  "parking_lot 0.11.1",
@@ -7627,7 +7388,7 @@ dependencies = [
 [[package]]
 name = "sp-maybe-compressed-blob"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "ruzstd",
  "zstd",
@@ -7649,7 +7410,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "serde 1.0.127",
@@ -7673,7 +7434,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections-compact"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "proc-macro-crate 1.0.0",
  "proc-macro2",
@@ -7684,7 +7445,7 @@ dependencies = [
 [[package]]
 name = "sp-offchain"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7702,7 +7463,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "backtrace",
 ]
@@ -7760,7 +7521,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -7820,7 +7581,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -7867,7 +7628,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "Inflector",
  "proc-macro-crate 1.0.0",
@@ -7905,7 +7666,7 @@ dependencies = [
 [[package]]
 name = "sp-session"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7928,7 +7689,7 @@ dependencies = [
 [[package]]
 name = "sp-staking"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -7971,7 +7732,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "hash-db",
  "log",
@@ -8022,7 +7783,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.
 [[package]]
 name = "sp-std"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 
 [[package]]
 name = "sp-std"
@@ -8046,7 +7807,7 @@ dependencies = [
 [[package]]
 name = "sp-storage"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -8086,7 +7847,7 @@ dependencies = [
 [[package]]
 name = "sp-timestamp"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "async-trait",
  "futures-timer",
@@ -8116,7 +7877,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "erased-serde",
  "log",
@@ -8148,10 +7909,10 @@ dependencies = [
 [[package]]
 name = "sp-transaction-pool"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "derive_more",
- "futures 0.3.16",
+ "futures",
  "log",
  "parity-scale-codec",
  "serde 1.0.127",
@@ -8178,7 +7939,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -8207,9 +7968,9 @@ dependencies = [
 [[package]]
 name = "sp-utils"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
- "futures 0.3.16",
+ "futures",
  "futures-core",
  "futures-timer",
  "lazy_static",
@@ -8231,7 +7992,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -8257,7 +8018,7 @@ dependencies = [
 [[package]]
 name = "sp-version-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "parity-scale-codec",
  "proc-macro-crate 1.0.0",
@@ -8280,7 +8041,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -8493,7 +8254,7 @@ dependencies = [
 [[package]]
 name = "substrate-prometheus-endpoint"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "async-std",
  "derive_more",
@@ -8513,7 +8274,7 @@ dependencies = [
  "dyn-clone",
  "frame-metadata 13.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "futures 0.3.16",
+ "futures",
  "hex",
  "jsonrpsee-http-client",
  "jsonrpsee-proc-macros",
@@ -8533,7 +8294,7 @@ dependencies = [
  "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "substrate-subxt-proc-macro",
  "thiserror",
- "url 2.2.2",
+ "url",
 ]
 
 [[package]]
@@ -8570,7 +8331,7 @@ dependencies = [
 [[package]]
 name = "substrate-wasm-builder"
 version = "4.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "ansi_term 0.12.1",
  "atty",
@@ -8600,7 +8361,7 @@ name = "support-ethereum"
 version = "0.4.5"
 dependencies = [
  "anyhow",
- "bridge-primitives",
+ "bridge-primitives 0.4.5",
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log",
  "pallet-im-online 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8618,7 +8379,7 @@ dependencies = [
  "anyhow",
  "bridge-traits",
  "component-state",
- "futures 0.3.16",
+ "futures",
  "log",
  "once_cell",
  "serde 1.0.127",
@@ -8630,55 +8391,11 @@ name = "support-proc-macro"
 version = "0.4.5"
 dependencies = [
  "anyhow",
- "bridge-primitives",
+ "bridge-primitives 0.4.5",
  "proc-macro2",
  "proc_macro_roids",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "support-s2s"
-version = "0.4.5"
-dependencies = [
- "anyhow",
- "async-std",
- "async-trait",
- "bp-header-chain",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
- "component-millau",
- "component-pangolin",
- "drml-primitives",
- "finality-grandpa",
- "finality-relay",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "futures 0.3.16",
- "headers-relay",
- "hex",
- "log",
- "messages-relay",
- "millau-primitives",
- "millau-runtime",
- "num-traits 0.2.14",
- "pallet-bridge-messages",
- "pangolin-bridge-primitives",
- "pangolin-constants",
- "pangolin-runtime",
- "pangolin-runtime-system-params",
- "parity-scale-codec",
- "paste",
- "relay-substrate-client",
- "relay-utils",
- "serde 1.0.127",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-finality-grandpa",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "strum 0.21.0",
 ]
 
 [[package]]
@@ -8791,25 +8508,29 @@ dependencies = [
 ]
 
 [[package]]
-name = "task-pangolin-millau"
+name = "task-pangolin-pangoro"
 version = "0.4.5"
 dependencies = [
  "anyhow",
+ "async-std",
  "async-trait",
- "bridge-traits",
- "lifeline",
+ "common-primitives",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "futures",
+ "hex",
  "log",
+ "num-traits 0.2.14",
+ "pangolin-runtime",
+ "pangoro-runtime",
  "parity-scale-codec",
- "postage",
+ "paste",
  "serde 1.0.127",
- "serde_json",
- "support-keep",
- "support-s2s",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-finality-grandpa",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
-
-[[package]]
-name = "task-pangolin-pangoro"
-version = "0.4.5"
 
 [[package]]
 name = "task-pangolin-ropsten"
@@ -9397,25 +9118,14 @@ checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 
 [[package]]
 name = "url"
-version = "1.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd4e7c0d531266369519a4aa4f399d748bd37043b00bde1e4ff1f60a120b355a"
-dependencies = [
- "idna 0.1.5",
- "matches",
- "percent-encoding 1.0.1",
-]
-
-[[package]]
-name = "url"
 version = "2.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a507c383b2d33b5fc35d1861e77e6b383d158b2da5e14fe51b83dfedf6fd578c"
 dependencies = [
  "form_urlencoded",
- "idna 0.2.3",
+ "idna",
  "matches",
- "percent-encoding 2.1.0",
+ "percent-encoding",
 ]
 
 [[package]]
@@ -9576,7 +9286,7 @@ version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be0ecb0db480561e9a7642b5d3e4187c128914e58aa84330b9493e3eb68c5e7f"
 dependencies = [
- "futures 0.3.16",
+ "futures",
  "js-sys",
  "parking_lot 0.11.1",
  "pin-utils",
@@ -9629,11 +9339,11 @@ dependencies = [
  "derive_more",
  "ethabi 14.1.0",
  "ethereum-types",
- "futures 0.3.16",
+ "futures",
  "futures-timer",
  "headers",
  "hex",
- "jsonrpc-core 17.1.0",
+ "jsonrpc-core",
  "log",
  "parking_lot 0.11.1",
  "pin-project 1.0.8",
@@ -9647,7 +9357,7 @@ dependencies = [
  "tokio 1.10.0",
  "tokio-stream",
  "tokio-util 0.6.7",
- "url 2.2.2",
+ "url",
  "web3-async-native-tls",
 ]
 
@@ -9660,7 +9370,7 @@ dependencies = [
  "native-tls",
  "thiserror",
  "tokio 1.10.0",
- "url 2.2.2",
+ "url",
 ]
 
 [[package]]
@@ -9780,7 +9490,7 @@ dependencies = [
  "rand 0.7.3",
  "sha-1 0.8.2",
  "slab",
- "url 2.2.2",
+ "url",
 ]
 
 [[package]]

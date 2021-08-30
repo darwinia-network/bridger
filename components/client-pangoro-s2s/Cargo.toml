@@ -1,5 +1,5 @@
 [package]
-name = "component-pangolin-s2s"
+name = "component-pangoro-s2s"
 version = "0.4.5"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -26,12 +26,12 @@ headers-relay          = { git = "https://github.com/darwinia-network/parity-bri
 relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
 relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
 
+
 ## Bridge dependencies
-pangolin-runtime        = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
 common-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
 bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-darwinia-ethereum-relay = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-pangolin-constants      = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangoro-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
 
 
 
@@ -42,3 +42,4 @@ pallet-transaction-payment = { git = "https://github.com/darwinia-network/substr
 sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
 sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
 sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+

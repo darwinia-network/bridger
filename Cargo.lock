@@ -860,15 +860,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "client-pangolin-s2s"
-version = "0.4.5"
-dependencies = [
- "headers-relay",
- "parity-scale-codec",
- "relay-substrate-client",
-]
-
-[[package]]
 name = "cloudabi"
 version = "0.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -969,6 +960,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "component-pangolin-s2s"
+version = "0.4.5"
+dependencies = [
+ "bridge-primitives 2.6.1",
+ "bridge-traits",
+ "common-primitives",
+ "darwinia-ethereum-relay",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "headers-relay",
+ "pallet-transaction-payment",
+ "pangolin-constants",
+ "pangolin-runtime",
+ "parity-scale-codec",
+ "relay-substrate-client",
+ "relay-utils",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+]
+
+[[package]]
 name = "component-pangolin-subxt"
 version = "0.4.5"
 dependencies = [
@@ -992,6 +1005,27 @@ dependencies = [
  "support-ethereum",
  "thiserror",
  "web3",
+]
+
+[[package]]
+name = "component-pangoro-s2s"
+version = "0.4.5"
+dependencies = [
+ "bridge-primitives 2.6.1",
+ "bridge-traits",
+ "common-primitives",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "headers-relay",
+ "pallet-transaction-payment",
+ "pangoro-constants",
+ "pangoro-runtime",
+ "parity-scale-codec",
+ "relay-substrate-client",
+ "relay-utils",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]

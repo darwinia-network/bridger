@@ -97,4 +97,4 @@ impl TransactionSignScheme for PangoroChain {
 pub type SigningParams = sp_core::sr25519::Pair;
 
 /// Pangoro header type used in headers sync.
-pub type SyncHeader = relay_substrate_client::SyncHeader<pangoro_runtime::Header>;
+pub type SyncHeader = relay_substrate_client::SyncHeader<common_primitives::Header>;

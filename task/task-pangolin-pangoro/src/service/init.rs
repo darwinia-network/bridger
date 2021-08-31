@@ -6,9 +6,9 @@ use bridge_traits::bridge::task::BridgeSand;
 
 use crate::bus::PangolinPangoroBus;
 use crate::config::ChainInfoConfig;
-use crate::message::{BridgeName, PangolinPangoroMessageReceive, PangolinPangoroMessageSend};
+use crate::message::{PangolinPangoroMessageReceive, PangolinPangoroMessageSend};
 use crate::task::PangolinPangoroTask;
-use crate::types::InitBridge;
+use crate::types::{BridgeName, InitBridge};
 
 #[derive(Debug)]
 pub struct InitBridgeService {

@@ -6,9 +6,9 @@ use bridge_traits::bridge::task::BridgeSand;
 
 use crate::bus::PangolinPangoroBus;
 use crate::config::{ChainInfoConfig, RelayConfig};
-use crate::message::{BridgeName, PangolinPangoroMessageSend};
+use crate::message::PangolinPangoroMessageSend;
 use crate::task::PangolinPangoroTask;
-use crate::types::RelayHeadersAndMessagesInfo;
+use crate::types::{BridgeName, RelayHeadersAndMessagesInfo};
 
 #[derive(Debug)]
 pub struct RelayService {

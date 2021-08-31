@@ -5,4 +5,5 @@ mod bus;
 mod message;
 mod route;
 mod service;
+mod traits;
 mod types;

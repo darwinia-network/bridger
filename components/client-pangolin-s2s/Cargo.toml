@@ -27,11 +27,11 @@ relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bri
 relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
 
 ## Bridge dependencies
-pangolin-runtime        = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-common-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-darwinia-ethereum-relay = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-pangolin-constants      = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+common-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+bridge-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangolin-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
 
 
 

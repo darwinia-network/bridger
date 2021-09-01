@@ -71,7 +71,7 @@ impl TransactionSignScheme for PangolinChain {
                 frame_system::CheckNonce::<pangolin_runtime::Runtime>::from(signer_nonce),
                 frame_system::CheckWeight::<pangolin_runtime::Runtime>::new(),
                 pallet_transaction_payment::ChargeTransactionPayment::<pangolin_runtime::Runtime>::from(0),
-                darwinia_ethereum_relay::CheckEthereumRelayHeaderParcel::<pangolin_runtime::Runtime>::new(),
+                darwinia_bridge_ethereum::CheckEthereumRelayHeaderParcel::<pangolin_runtime::Runtime>::new(),
             ),
             (
                 pangolin_runtime::VERSION.spec_version,

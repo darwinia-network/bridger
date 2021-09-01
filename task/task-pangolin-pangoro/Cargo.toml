@@ -36,6 +36,7 @@ codec = { package = "parity-scale-codec", version = "2.0.0" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 hex = "0.4"
+futures = "0.3"
 
 strum = { version = "0.21", features = ["derive"] }
 
@@ -58,9 +59,14 @@ sp-version          = { git = "https://github.com/darwinia-network/substrate.git
 
 bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
 bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
 relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
 substrate-relay-helper = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
 relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+
 
 ## component
 component-pangolin-s2s = { path = "../../components/client-pangolin-s2s" }
@@ -68,10 +74,13 @@ component-pangoro-s2s  = { path = "../../components/client-pangoro-s2s" }
 
 ## darwinia common
 common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
 
 ## pangolin
-pangolin-runtime    = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangolin-runtime-system-params = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
 
 ## pangoro
-pangoro-runtime     = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangoro-runtime-system-params  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
 

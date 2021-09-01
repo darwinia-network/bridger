@@ -17,13 +17,11 @@ fn init_log() {
         serde=info,
         lifeline=debug,
         darwinia_bridge=debug,
+        bridge=info,
+        support_tracker_evm_log=info,
         task-darwinia-ethereum=trace,
         task-pangolin-ropsten=trace,
-        support_s2s=debug,
-        support_tracker=debug,
-        bridge=info,
-        evm_log_tracker=info,
-        support_tracker_evm_log=info,
+        task-pangolin-pangoro=trace,
         "#,
     );
     std::env::set_var("RUST_BACKTRACE", "1");

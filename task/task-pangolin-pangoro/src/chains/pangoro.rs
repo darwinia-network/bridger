@@ -425,7 +425,7 @@ mod s2s_messages {
                     pangoro_runtime::pangolin_messages::PangolinToPangoroConversionRate::key()
                         .to_vec(),
                 ),
-                pangoro_runtime::pangolin_messages::INITIAL_PANGORO_TO_PANGOLIN_CONVERSION_RATE,
+                pangoro_runtime::pangolin_messages::INITIAL_PANGOLIN_TO_PANGOLIN_CONVERSION_RATE,
             )),
         )
     }

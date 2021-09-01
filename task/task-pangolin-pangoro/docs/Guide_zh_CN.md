@@ -4,7 +4,7 @@ Bridge of pangolin-pangoro
 ## Prepare
 
 1. `cargo build --release`
-2. `cp .maintain/config/task-darwinia-pangoro.toml ~/.bridger`
+2. `cp .maintain/config/task-pangolin-pangoro.toml ~/.bridger`
 
    复制配置文件到默认目录 `~/.bridger`, 并且修改内容.
 

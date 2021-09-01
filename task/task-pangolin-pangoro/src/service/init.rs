@@ -104,7 +104,6 @@ macro_rules! select_bridge {
 
                 $generic
             }
-            _ => anyhow::bail!("Not support bridge {:?}", $bridge),
         }
     };
 }

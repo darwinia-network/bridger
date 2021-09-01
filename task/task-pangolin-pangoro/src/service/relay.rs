@@ -65,7 +65,6 @@ impl Service for RelayService {
                                 prometheus_params: config_relay.prometheus_params.clone(),
                                 relayer_mode: config_relay
                                     .relayer_mode
-                                    .clone()
                                     .unwrap_or(WrapperRelayerMode::Rational)
                                     .into(),
                             };

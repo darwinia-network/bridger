@@ -30,8 +30,7 @@ impl BridgeTaskKeep for PangolinPangoroTask {
         self
     }
     async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
-        // crate::route::dispatch_route(self.stack.bus(), uri, param).await
-        Ok(TaskTerminal::new("Unsupport command"))
+        crate::route::dispatch_route(self.stack.bus(), uri, param).await
     }
 }
 

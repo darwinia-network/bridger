@@ -50,12 +50,17 @@ impl Service for InitBridgeService {
                                     config_pangolin.to_chain_info()?,
                                 ),
                             };
-                            init_bridge(InitBridge {
-                                bridge,
-                                source: source_chain,
-                                target: target_chain,
+
+                            std::thread::spawn(move || {
+                                async_std::task::block_on(init_bridge(InitBridge {
+                                    bridge,
+                                    source: source_chain,
+                                    target: target_chain,
+                                }))
                             })
-                            .await?;
+                            .join()
+                            .map_err(|_| anyhow::Error::msg("Failed to join thread handle"))??;
+
                             tx.send(PangolinPangoroMessageReceive::FinishedInitBridge)
                                 .await?;
                         }

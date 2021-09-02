@@ -113,39 +113,24 @@ macro_rules! select_bridge {
     };
 }
 
-use futures::channel::mpsc;
-use std::thread;
-
 async fn init_bridge(init_bridge: InitBridge) -> anyhow::Result<()> {
     let bridge = init_bridge.bridge;
     let source_chain = init_bridge.source;
     let target_chain = init_bridge.target;
     select_bridge!(bridge, {
-        let (mut sender, mut receiver) = mpsc::channel::<(
-            relay_substrate_client::Client<Source>,
-            relay_substrate_client::Client<Target>,
-        )>(1);
-        let source_chain_clone = source_chain.clone();
-        let target_chain_clone = target_chain.clone();
-        thread::spawn(move || {
-            futures::executor::block_on(async move {
-                let source_client = source_chain_clone
-                    .to_substrate_relay_chain::<Source>()
-                    .await
-                    .unwrap();
-                let target_client = target_chain_clone
-                    .to_substrate_relay_chain::<Target>()
-                    .await
-                    .unwrap();
-                let clients = (source_client, target_client);
-                sender.try_send(clients).unwrap();
-            });
-        });
-        let (source_client, target_client) = receiver.try_next()?.unwrap();
-
+        let source_client = source_chain.to_substrate_relay_chain::<Source>().await?;
+        let target_client = target_chain.to_substrate_relay_chain::<Target>().await?;
         let target_sign = target_chain.to_keypair::<Target>()?;
-        log::debug!("source client -> {:?}", source_client);
-        log::debug!("target client -> {:?}", target_client);
+        log::debug!(
+            target: PangolinPangoroTask::NAME,
+            "source client -> {:?}",
+            source_client
+        );
+        log::debug!(
+            target: PangolinPangoroTask::NAME,
+            "target client -> {:?}",
+            target_client
+        );
 
         substrate_relay_helper::headers_initialize::initialize(
             source_client,

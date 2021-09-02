@@ -50,10 +50,12 @@ impl Service for InitBridgeService {
                                     config_pangolin.to_chain_info()?,
                                 ),
                             };
-                            init_bridge(InitBridge {
-                                bridge,
-                                source: source_chain,
-                                target: target_chain,
+                            let _ = tokio::task::spawn_blocking(|| {
+                                init_bridge(InitBridge {
+                                    bridge,
+                                    source: source_chain,
+                                    target: target_chain,
+                                })
                             })
                             .await?;
                             tx.send(PangolinPangoroMessageReceive::FinishedInitBridge)

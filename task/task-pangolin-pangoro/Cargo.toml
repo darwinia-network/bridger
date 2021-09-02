@@ -29,6 +29,8 @@ edition = "2018"
 #hex = "0.4"
 #serde = { version = "1", features = ["derive"] }
 
+tokio = { version = "*" }
+
 anyhow = "1.0"
 async-trait = "0.1"
 log = "0.4"

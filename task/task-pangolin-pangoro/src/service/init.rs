@@ -52,7 +52,7 @@ impl Service for InitBridgeService {
                             };
 
                             std::thread::spawn(move || {
-                                async_std::task::block_on(init_bridge(InitBridge {
+                                futures::executor::block_on(init_bridge(InitBridge {
                                     bridge,
                                     source: source_chain,
                                     target: target_chain,

@@ -11,7 +11,7 @@ Bridge of pangolin-pangoro
 
 ## Run
 
-1. `./target/release/bridger server`
+1. `bridger server`
    Start bridge server
 
 2. Open another shell

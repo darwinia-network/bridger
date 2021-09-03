@@ -11,7 +11,7 @@ Bridge of pangolin-pangoro
 
 ## Run
 
-1. `./target/release/bridger server`
+1. `bridger server`
    启动 bridger server
 
 2. 开启另外一个 Shell 窗口

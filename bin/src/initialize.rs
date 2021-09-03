@@ -17,7 +17,7 @@ fn init_log() {
         serde=info,
         lifeline=debug,
         darwinia_bridge=debug,
-        bridge=debug,
+        bridge=info,
         support_tracker_evm_log=info,
         task-darwinia-ethereum=trace,
         task-pangolin-ropsten=trace,

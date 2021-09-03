@@ -49,7 +49,8 @@ The currently darwinia-bridger supports these bridges, the config you can click 
 | type                | bridge            | doc                                                  |
 | ------------------- | ----------------- | ---------------------------------------------------- |
 | substrate-ethereum  | darwinia-ethereum | [Guide](./task/task-darwinia-ethereum/docs/Guide.md) |
-| substrate-substrate | pangolin-millau   | [Guide](./task/task-pangolin-millau/docs/Guide.md)   |
+| substrate-ethereum  | pangolin-ropsten  | [Guide](./task/task-pangolin-ropsten/docs/Guide.md)  |
+| substrate-substrate | pangolin-pangoro  | [Guide](./task/task-pangolin-pangoro/docs/Guide.md)  |
 
 ## Usage
 

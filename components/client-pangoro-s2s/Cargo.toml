@@ -1,0 +1,45 @@
+[package]
+name = "component-pangoro-s2s"
+version = "0.4.5"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2018"
+
+[dependencies]
+
+bridge-traits = { path = "../../traits" }
+
+codec                  = { package = "parity-scale-codec", version = "2.0.0" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+
+
+## Bridge dependencies
+pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+common-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangoro-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+
+
+
+## Substrate Dependencies
+frame-system               = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+frame-support              = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+

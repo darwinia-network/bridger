@@ -84,11 +84,11 @@ macro_rules! select_bridge {
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    let initialize_call = pangoro_runtime::BridgeGrandpaCall::<
+                    pangoro_runtime::BridgeGrandpaCall::<
                         pangoro_runtime::Runtime,
                         pangoro_runtime::WithPangolinGrandpa,
-                    >::initialize(init_data);
-                    pangoro_runtime::SudoCall::sudo(Box::new(initialize_call.into())).into()
+                    >::initialize(init_data)
+                    .into()
                 }
 
                 $generic
@@ -100,11 +100,11 @@ macro_rules! select_bridge {
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    let initialize_call = pangolin_runtime::BridgeGrandpaCall::<
+                    pangolin_runtime::BridgeGrandpaCall::<
                         pangolin_runtime::Runtime,
                         pangolin_runtime::WithPangoroGrandpa,
-                    >::initialize(init_data);
-                    pangolin_runtime::SudoCall::sudo(Box::new(initialize_call.into())).into()
+                    >::initialize(init_data)
+                    .into()
                 }
 
                 $generic

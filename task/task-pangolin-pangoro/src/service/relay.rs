@@ -68,7 +68,12 @@ impl Service for RelayService {
                                     .unwrap_or(WrapperRelayerMode::Rational)
                                     .into(),
                             };
-                            bridge_relay(relay_info).await?;
+
+                            std::thread::spawn(move || {
+                                futures::executor::block_on(bridge_relay(relay_info))
+                            })
+                            .join()
+                            .map_err(|_| anyhow::Error::msg("Failed to join thread handle"))??;
                         }
                         _ => continue,
                     }

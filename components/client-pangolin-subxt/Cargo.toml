@@ -36,8 +36,8 @@ web3 = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", f
 secp256k1 = { version = "0.20", features = ["recovery"] }
 
 jsonrpsee-types = "0.3"
-substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.3" }
-substrate-subxt-proc-macro = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.3" }
+substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "master" }
+substrate-subxt-proc-macro = { git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "master" }
 
 frame-support = { package = "frame-support", git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
 pallet-indices = { package = "pallet-indices", git = "https://github.com/darwinia-network/substrate.git", branch = "main" }

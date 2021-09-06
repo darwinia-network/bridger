@@ -8,6 +8,10 @@ Bridge of pangolin-pangoro
 
    复制配置文件到默认目录 `~/.bridger`, 并且修改内容.
 
+> 关于启动 `pangolin` 和 `pangoro` 参见 [darwinia-common](https://github.com/darwinia-network/darwinia-common#development).
+> 此外我们也部署了两个公共的测试链
+> - `pangolin`: wss://pangolin-rpc.darwinia.network
+> - `pangoro`: wss://pangoro-rpc.darwinia.network
 
 ## Run
 

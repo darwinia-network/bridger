@@ -915,17 +915,17 @@ dependencies = [
  "async-trait",
  "bridge-primitives 0.4.5",
  "bridge-traits",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "jsonrpsee-types 0.3.0",
  "log",
- "pallet-im-online 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-im-online 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "parity-scale-codec",
  "secp256k1",
  "serde 1.0.130",
  "serde_json",
- "substrate-subxt",
- "substrate-subxt-proc-macro",
+ "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.3)",
+ "substrate-subxt-proc-macro 0.15.3 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.3)",
  "support-ethereum",
  "thiserror",
  "web3",
@@ -999,8 +999,8 @@ dependencies = [
  "secp256k1",
  "serde 1.0.130",
  "serde_json",
- "substrate-subxt",
- "substrate-subxt-proc-macro",
+ "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=master)",
+ "substrate-subxt-proc-macro 0.15.3 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=master)",
  "support-ethereum",
  "thiserror",
  "web3",
@@ -4924,6 +4924,24 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "3.0.0"
+source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
+dependencies = [
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "log",
+ "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "parity-scale-codec",
+ "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+]
+
+[[package]]
+name = "pallet-im-online"
+version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -5217,6 +5235,28 @@ dependencies = [
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
+ "static_assertions",
+]
+
+[[package]]
+name = "pallet-staking"
+version = "3.0.0"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=main#33a1c49c38e7bfb8ff814a6496be429def773c14"
+dependencies = [
+ "frame-election-provider-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "log",
+ "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "parity-scale-codec",
+ "paste",
+ "serde 1.0.130",
+ "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "static_assertions",
 ]
 
@@ -9258,7 +9298,40 @@ dependencies = [
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
- "substrate-subxt-proc-macro",
+ "substrate-subxt-proc-macro 0.15.3 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.3)",
+ "thiserror",
+ "url 2.2.2",
+]
+
+[[package]]
+name = "substrate-subxt"
+version = "0.15.0"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=master#2b88b8355d8c18d8b62881d0eecb16fb0262b1e3"
+dependencies = [
+ "async-trait",
+ "dyn-clone",
+ "frame-metadata 13.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "futures 0.3.17",
+ "hex",
+ "jsonrpsee-http-client",
+ "jsonrpsee-proc-macros 0.3.0",
+ "jsonrpsee-types 0.3.0",
+ "jsonrpsee-ws-client 0.3.0",
+ "log",
+ "num-traits 0.2.14",
+ "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "parity-scale-codec",
+ "serde 1.0.130",
+ "serde_json",
+ "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-rpc 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "substrate-subxt-proc-macro 0.15.3 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=master)",
  "thiserror",
  "url 2.2.2",
 ]
@@ -9267,6 +9340,21 @@ dependencies = [
 name = "substrate-subxt-proc-macro"
 version = "0.15.3"
 source = "git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.3#931aa5ad6e5e460166e8ad7cf367fad18e67e584"
+dependencies = [
+ "async-trait",
+ "heck",
+ "proc-macro-crate 0.1.5",
+ "proc-macro-error 1.0.4",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "synstructure",
+]
+
+[[package]]
+name = "substrate-subxt-proc-macro"
+version = "0.15.3"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=master#2b88b8355d8c18d8b62881d0eecb16fb0262b1e3"
 dependencies = [
  "async-trait",
  "heck",
@@ -9474,7 +9562,7 @@ dependencies = [
  "secp256k1",
  "serde 1.0.130",
  "serde_json",
- "substrate-subxt",
+ "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.3)",
  "support-ethereum",
  "support-keep",
  "support-tracker",
@@ -9553,7 +9641,7 @@ dependencies = [
  "secp256k1",
  "serde 1.0.130",
  "serde_json",
- "substrate-subxt",
+ "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=master)",
  "support-ethereum",
  "support-tracker",
  "support-tracker-evm-log",

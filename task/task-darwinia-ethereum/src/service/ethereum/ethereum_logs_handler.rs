@@ -66,7 +66,13 @@ impl LogsHandler for EthereumLogsHandler {
         let check_position = if txs.is_empty() { to } else { from - 1 };
         self.check_redeem(check_position).await?;
         if self.waited_redeem.len() >= MAX_WAITED_REDEEM_COUNT {
-            // todo: there need stop scan running
+            info!(
+                target: DarwiniaEthereumTask::NAME,
+                "achieve redeem waited limit, pause scan, from: {:?}",
+                &from
+            );
+            self.tracker.flush_current(from as usize)?;
+ 
             return Ok(());
         }
 
@@ -89,6 +95,7 @@ impl LogsHandler for EthereumLogsHandler {
                 self.redeem(tx).await?;
             }
         }
+        self.tracker.flush_current(to as usize)?;
 
         Ok(())
     }

@@ -71,17 +71,17 @@ impl Tracker {
     }
 
     pub fn enable_fast_mode(&self) -> anyhow::Result<()> {
-        self.microkv.put(&self.key_fast_mode, &true)?;
+        self.microkv.put(&self.key_fast_mode, &String::from("true"))?;
         Ok(())
     }
 
     pub fn stop_running(&self) -> anyhow::Result<()> {
-        self.microkv.put(&self.key_running, &false)?;
+        self.microkv.put(&self.key_running, &String::from("false"))?;
         Ok(())
     }
 
     pub fn start_running(&self) -> anyhow::Result<()> {
-        self.microkv.put(&self.key_running, &true)?;
+        self.microkv.put(&self.key_running, &String::from("true"))?;
         Ok(())
     }
 
@@ -90,6 +90,11 @@ impl Tracker {
         if let Some(finish) = finish {
             self.microkv.put(&self.key_curt, &finish)?;
         }
+        Ok(())
+    }
+
+    pub fn flush_current(&self, to: usize) -> anyhow::Result<()> {
+        self.microkv.put(&self.key_curt, &to)?;
         Ok(())
     }
 

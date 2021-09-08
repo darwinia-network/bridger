@@ -77,6 +77,7 @@ impl lifeline::Service for EthereumScanService {
 
         let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
         let tracker = Tracker::new(microkv, "scan.ethereum");
+        tracker.reset_current()?;
         tracker.enable_fast_mode()?;
 
         let _greet = Self::try_task(

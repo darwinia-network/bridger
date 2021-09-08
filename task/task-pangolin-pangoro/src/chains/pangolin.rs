@@ -407,7 +407,7 @@ mod s2s_messages {
         }
     }
 
-    /// Add standalone metrics for the Rialto -> Millau messages loop.
+    /// Add standalone metrics for the Pangolin -> Pangoro messages loop.
     pub(crate) fn add_standalone_metrics(
         metrics_prefix: Option<String>,
         metrics_params: MetricsParams,

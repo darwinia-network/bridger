@@ -1,4 +1,3 @@
-use jsonrpsee_http_client::to_json_value;
 use substrate_subxt::{
     events::Raw,
     sp_core::storage::{StorageData, StorageKey},
@@ -56,8 +55,8 @@ impl Darwinia {
         hash: H256,
     ) -> Result<Option<HeaderMMR>> {
         let params = &[
-            to_json_value(block_number_of_member_leaf)?,
-            to_json_value(block_number_of_last_leaf)?,
+            serde_json::to_value(block_number_of_member_leaf)?,
+            serde_json::to_value(block_number_of_last_leaf)?,
         ];
         let result: HeaderMMRRpc = self
             .subxt

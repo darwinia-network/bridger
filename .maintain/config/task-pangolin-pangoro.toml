@@ -1,0 +1,25 @@
+[pangolin]
+# pangolin endpoint
+endpoint = "ws://127.0.0.1:23044"
+# the signer of pangolin
+signer = "//Alice"
+
+[pangoro]
+# pangoro endpoint
+endpoint = "ws://127.0.0.1:13044"
+# the signer of pangoro
+signer = "//Alice"
+
+[relay]
+# substrate-substrate bridger message relay lanes, default use `00000000`
+lanes = [ "00000000" ]
+# Auto start message relay, the default is false, because maybe the bridge hasn't been initialized yet;
+# since init, there can change to true.
+# WARNING: May be deleted in the future
+auto_start = false
+# (optional) The relay message signer, if not set will use [panglin.signer]
+signer_pangolin = "//Alice"
+# (optional) the relay message signer, if not set will use [pangoro.signer]
+signer_pangoro = "//Millau"
+# prometheus params
+prometheus_params = { no_prometheus = false, prometheus_host = "127.0.0.1", prometheus_port = 9616 }

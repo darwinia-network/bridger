@@ -8,6 +8,10 @@ Bridge of pangolin-pangoro
 
    Copy config to default config path `~/.bridger` and fill the content.
 
+> About start `pangolin` and `pangoro` chain you can read [darwinia-common](https://github.com/darwinia-network/darwinia-common#development).
+> In addition, we also deployed two public test chains
+> - `pangolin`: wss://pangolin-rpc.darwinia.network
+> - `pangoro`: wss://pangoro-rpc.darwinia.network
 
 ## Run
 

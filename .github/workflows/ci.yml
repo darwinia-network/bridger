@@ -1,4 +1,4 @@
-name: CI
+name: Check pull request
 
 on:
   push:

@@ -1,8 +1,8 @@
 use std::time::Duration;
 
 use bp_messages::MessageNonce;
-
 use bp_runtime::ChainId;
+use frame_support::weights::Weight;
 
 /// Declare chain const type
 pub trait ChainConst {
@@ -34,6 +34,17 @@ pub trait ChainConst {
     const AVERAGE_BLOCK_INTERVAL: Duration;
     /// Bridge chain id
     const BRIDGE_CHAIN_ID: ChainId;
+
+    /// Name of the messages pallet as it is declared in the `construct_runtime!()` at source chain.
+    const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str;
+    /// Name of the messages pallet as it is declared in the `construct_runtime!()` at target chain.
+    const MESSAGE_PALLET_NAME_AT_TARGET: &'static str;
+    /// Extra weight of the delivery transaction at the target chain, that is paid to cover
+    /// dispatch fee payment.
+    ///
+    /// If dispatch fee is paid at the source chain, then this weight is refunded by the
+    /// delivery transaction.
+    const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight;
 
     /// chain signing params
     type SigningParams;

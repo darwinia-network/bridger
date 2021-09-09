@@ -7,6 +7,7 @@ mod s2s_const {
 
     use bp_messages::MessageNonce;
     use bp_runtime::ChainId;
+    use frame_support::weights::Weight;
     use relay_substrate_client::Chain;
     use sp_version::RuntimeVersion;
 
@@ -46,6 +47,12 @@ mod s2s_const {
             bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
         const AVERAGE_BLOCK_INTERVAL: Duration = PangolinChain::AVERAGE_BLOCK_INTERVAL;
         const BRIDGE_CHAIN_ID: ChainId = bridge_primitives::PANGOLIN_CHAIN_ID;
+        const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str =
+            bridge_primitives::WITH_PANGOLIN_MESSAGES_PALLET_NAME;
+        const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
+            bridge_primitives::WITH_PANGORO_MESSAGES_PALLET_NAME;
+        const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight =
+            bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
         type SigningParams = common_primitives::SigningParams;
     }
 
@@ -109,6 +116,7 @@ mod s2s_headers {
 
         fn make_submit_finality_proof_transaction(
             &self,
+            era: bp_runtime::TransactionEraOf<PangoroChain>,
             transaction_nonce: <PangoroChain as Chain>::Index,
             header: component_pangolin_s2s::SyncHeader,
             proof: GrandpaJustification<common_primitives::Header>,
@@ -123,6 +131,7 @@ mod s2s_headers {
             let transaction = PangoroChain::sign_transaction(
                 genesis_hash,
                 &self.finality_pipeline.target_sign,
+                era,
                 transaction_nonce,
                 call,
             );
@@ -140,7 +149,8 @@ mod s2s_messages {
     use bp_messages::MessageNonce;
     use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
     use codec::Encode;
-    use frame_support::weights::GetDispatchInfo;
+    use frame_support::dispatch::GetDispatchInfo;
+    use frame_support::weights::Weight;
     use messages_relay::message_lane::MessageLane;
     use relay_substrate_client::{Client, TransactionSignScheme};
     use relay_utils::metrics::MetricsParams;
@@ -197,6 +207,13 @@ mod s2s_messages {
         const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str =
             PangoroChainConst::BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE;
 
+        const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str =
+            PangolinChainConst::MESSAGE_PALLET_NAME_AT_SOURCE;
+        const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
+            PangolinChainConst::MESSAGE_PALLET_NAME_AT_TARGET;
+        const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight =
+            PangolinChainConst::PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN;
+
         type SourceChain = PangolinChain;
         type TargetChain = PangoroChain;
 
@@ -222,6 +239,7 @@ mod s2s_messages {
             let transaction = PangolinChain::sign_transaction(
                 genesis_hash,
                 &self.message_lane.source_sign,
+                relay_substrate_client::TransactionEra::immortal(),
                 transaction_nonce,
                 call,
             );
@@ -272,6 +290,7 @@ mod s2s_messages {
             let transaction = PangoroChain::sign_transaction(
                 genesis_hash,
                 &self.message_lane.target_sign,
+                relay_substrate_client::TransactionEra::immortal(),
                 transaction_nonce,
                 call,
             );
@@ -290,20 +309,10 @@ mod s2s_messages {
     }
 
     /// Source node as messages source.
-    type PangolinSourceClient = SubstrateMessagesSource<
-        PangolinChain,
-        PangoroChain,
-        PangolinMessagesToPangoro,
-        pangolin_runtime::WithPangoroMessages,
-    >;
+    type PangolinSourceClient = SubstrateMessagesSource<PangolinMessagesToPangoro>;
 
     /// Target node as messages target.
-    type PangoroTargetClient = SubstrateMessagesTarget<
-        PangolinChain,
-        PangoroChain,
-        PangolinMessagesToPangoro,
-        pangoro_runtime::WithPangolinMessages,
-    >;
+    type PangoroTargetClient = SubstrateMessagesTarget<PangolinMessagesToPangoro>;
 
     pub struct PangolinMessagesToPangoroRunner;
 
@@ -389,14 +398,12 @@ mod s2s_messages {
                     source_client.clone(),
                     lane.clone(),
                     lane_id,
-                    PangoroChainConst::BRIDGE_CHAIN_ID,
                     params.target_to_source_headers_relay,
                 ),
                 PangoroTargetClient::new(
                     params.target_client,
                     lane,
                     lane_id,
-                    PangolinChainConst::BRIDGE_CHAIN_ID,
                     metrics_values,
                     params.source_to_target_headers_relay,
                 ),

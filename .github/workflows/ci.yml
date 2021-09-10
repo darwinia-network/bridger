@@ -15,14 +15,14 @@ jobs:
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2021-04-15
+          toolchain: nightly-2021-09-01
           override: true
           target: wasm32-unknown-unknown
 
       - name: Lint
         run: |
           rustup component add clippy
-          cargo clippy --all -- -D warnings
+          cargo clippy --all --locked -- -D warnings
 
       - name: Run tests
-        run: cargo test
+        run: cargo test --locked

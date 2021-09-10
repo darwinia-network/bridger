@@ -406,7 +406,7 @@ mod s2s_messages {
                     lane,
                     lane_id,
                     metrics_values,
-                    params.target_to_source_headers_relay,
+                    params.source_to_target_headers_relay,
                 ),
                 metrics_params,
                 futures::future::pending(),

@@ -150,7 +150,7 @@ impl ChainInfoConfig {
             port: host_port.2,
             signer: except_signer.or_else(|| self.signer.clone()),
             signer_password: self.signer_password.clone(),
-            transactions_mortality: Some(4),
+            transactions_mortality: Some(256),
         })
     }
 }

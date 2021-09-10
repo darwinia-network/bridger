@@ -124,6 +124,8 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
 
         let left_sign = source_chain.to_keypair::<Left>()?;
         let right_sign = target_chain.to_keypair::<Right>()?;
+        let left_transactions_mortality = source_chain.transactions_mortality()?;
+        let right_transactions_mortality = target_chain.transactions_mortality()?;
 
         let lanes = relay_info.lanes;
 
@@ -133,12 +135,14 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         let left_to_right_on_demand_headers = OnDemandHeadersRelay::new(
             left_client.clone(),
             right_client.clone(),
+            right_transactions_mortality,
             LeftToRightFinality::new(right_client.clone(), right_sign.clone()),
             MAX_MISSING_LEFT_HEADERS_AT_RIGHT,
         );
         let right_to_left_on_demand_headers = OnDemandHeadersRelay::new(
             right_client.clone(),
             left_client.clone(),
+            left_transactions_mortality,
             RightToLeftFinality::new(left_client.clone(), left_sign.clone()),
             MAX_MISSING_RIGHT_HEADERS_AT_LEFT,
         );

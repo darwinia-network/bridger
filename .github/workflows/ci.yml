@@ -22,7 +22,7 @@ jobs:
       - name: Lint
         run: |
           rustup component add clippy
-          cargo clippy --all -- -D warnings
+          cargo clippy --all --locked -- -D warnings
 
       - name: Run tests
-        run: cargo test
+        run: cargo test --locked

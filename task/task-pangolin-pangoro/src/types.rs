@@ -22,6 +22,7 @@ pub struct ChainInfo {
     pub signer: Option<String>,
     pub secure: bool,
     pub signer_password: Option<String>,
+    pub transactions_mortality: Option<u32>,
 }
 
 impl ChainInfo {
@@ -49,6 +50,23 @@ impl ChainInfo {
         };
         C::KeyPair::from_string(&signer, self.signer_password.as_deref())
             .map_err(|e| anyhow::format_err!("{:?}", e))
+    }
+
+    pub fn transactions_mortality(&self) -> anyhow::Result<Option<u32>> {
+        self.transactions_mortality
+            .map(|transactions_mortality| {
+                if !(4..=65536).contains(&transactions_mortality)
+                    || !transactions_mortality.is_power_of_two()
+                {
+                    Err(anyhow::format_err!(
+                        "Transactions mortality {} is not a power of two in a [4; 65536] range",
+                        transactions_mortality,
+                    ))
+                } else {
+                    Ok(transactions_mortality)
+                }
+            })
+            .transpose()
     }
 }
 

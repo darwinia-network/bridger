@@ -37,6 +37,7 @@ impl Chain for PangoroChain {
     type SignedBlock = pangoro_runtime::SignedBlock;
     type Call = pangoro_runtime::Call;
     type Balance = common_primitives::Balance;
+    type WeightToFee = pangoro_runtime::WeightToFee;
 }
 
 impl ChainWithBalances for PangoroChain {
@@ -56,6 +57,7 @@ impl TransactionSignScheme for PangoroChain {
     fn sign_transaction(
         genesis_hash: <Self::Chain as ChainBase>::Hash,
         signer: &Self::AccountKeyPair,
+        era: relay_substrate_client::TransactionEraOf<Self::Chain>,
         signer_nonce: <Self::Chain as Chain>::Index,
         call: <Self::Chain as Chain>::Call,
     ) -> Self::SignedTransaction {
@@ -74,7 +76,7 @@ impl TransactionSignScheme for PangoroChain {
                 pangoro_runtime::VERSION.spec_version,
                 pangoro_runtime::VERSION.transaction_version,
                 genesis_hash,
-                genesis_hash,
+                era.signed_payload(genesis_hash),
                 (),
                 (),
                 (),

@@ -76,6 +76,9 @@ pub struct ChainInfoConfig {
     pub secure: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signer_password: Option<String>,
+    /// Transactions mortality period, in blocks. MUST be a power of two in [4; 65536] range. MAY NOT be larger than `BlockHashCount` parameter of the chain system module.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transactions_mortality: Option<u32>,
 }
 
 impl BridgeConfig for ChainInfoConfig {
@@ -89,6 +92,7 @@ impl BridgeConfig for ChainInfoConfig {
             signer: Some("//Alice".to_string()),
             secure: false,
             signer_password: None,
+            transactions_mortality: None,
         }
     }
 }
@@ -146,6 +150,7 @@ impl ChainInfoConfig {
             port: host_port.2,
             signer: except_signer.or_else(|| self.signer.clone()),
             signer_password: self.signer_password.clone(),
+            transactions_mortality: Some(256),
         })
     }
 }

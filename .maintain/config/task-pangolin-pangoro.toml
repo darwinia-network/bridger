@@ -21,5 +21,11 @@ auto_start = false
 signer_pangolin = "//Alice"
 # (optional) the relay message signer, if not set will use [pangoro.signer]
 signer_pangoro = "//Millau"
+
+# Transactions mortality period, in blocks. MUST be a power of two in [4; 65536] range.
+# MAY NOT be larger than `BlockHashCount` parameter of the chain system module.
+# Discuss: https://github.com/darwinia-network/bridger/pull/266#discussion_r705943606
+#transactions_mortality = 256
+
 # prometheus params
 prometheus_params = { no_prometheus = false, prometheus_host = "127.0.0.1", prometheus_port = 9616 }

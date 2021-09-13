@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build-publish-github-release:
+  build-release:
     name: Build binary
     runs-on: ubuntu-latest
     steps:
@@ -31,7 +31,23 @@ jobs:
           args: |
             deploy/bin/*
 
-  build-publish-docker-image:
+      - name: Build rust docs
+        run: cargo doc --all --no-deps --release
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Install vercel
+        run: npm i -g vercel
+      - name: Deploy rust docs
+        run: |
+          mv vercel.json target/doc
+          mv target/doc target/${GITHUB_REPOSITORY#*/}
+          cd target/${GITHUB_REPOSITORY#*/}
+          vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering link --confirm
+          vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering deploy --prod
+
+
+  build-docker-image:
     name: Build Docker image
     runs-on: ubuntu-latest
     steps:

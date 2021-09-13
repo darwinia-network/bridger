@@ -19,21 +19,6 @@ jobs:
           override: true
           target: wasm32-unknown-unknown
 
-      - name: Build rust docs
-        run: cargo doc --all --no-deps --release
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - name: Install vercel
-        run: npm i -g vercel
-      - name: Deploy rust docs
-        run: |
-          mv vercel.json target/doc
-          mv target/doc target/${GITHUB_REPOSITORY#*/}
-          cd target/${GITHUB_REPOSITORY#*/}
-          vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering link --confirm
-          vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering deploy --prod
-
       - name: Lint
         run: |
           rustup component add clippy

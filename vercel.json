@@ -1,8 +1,5 @@
 {
 	"redirects": [
-		{ "source": "/", "destination": "/darwinia_bridge_primitives" }
-	],
-	"github": {
-		"silent": true
-	}
+		{ "source": "/", "destination": "/bridge_traits" }
+	]
 }

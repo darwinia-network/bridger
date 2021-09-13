@@ -11,6 +11,7 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
+      - run: echo ${{ github.repository.name }}
       - uses: actions/checkout@v2
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
@@ -29,8 +30,8 @@ jobs:
       - name: Deploy rust docs
         run: |
           mv vercel.json target/doc
-          mv target/doc target/${{ github.repository }}
-          cd target/${{ github.repository }}
+          mv target/doc target/bridger
+          cd target/bridger
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering link --confirm
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering deploy --prod
 

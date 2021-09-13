@@ -40,4 +40,4 @@ jobs:
           mv target/doc target/bridger
           cd target/bridger
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering link --confirm
-          vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering deploy
+          vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering deploy --prod

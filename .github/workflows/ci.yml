@@ -19,19 +19,11 @@ jobs:
           override: true
           target: wasm32-unknown-unknown
 
-      - name: Lint
-        run: |
-          rustup component add clippy
-          cargo clippy --all --locked -- -D warnings
-
-      - name: Run tests
-        run: cargo test --locked
-
       - name: Build rust docs
         run: cargo doc --all --no-deps --release
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '16'
       - name: Install vercel
         run: npm i -g vercel
       - name: Deploy rust docs
@@ -41,3 +33,11 @@ jobs:
           cd target/bridger
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering link --confirm
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering deploy --prod
+
+      - name: Lint
+        run: |
+          rustup component add clippy
+          cargo clippy --all --locked -- -D warnings
+
+      - name: Run tests
+        run: cargo test --locked

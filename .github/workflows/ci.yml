@@ -11,7 +11,7 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ github.repository }}
+      - run: echo ${GITHUB_REPOSITORY#*/}
       - uses: actions/checkout@v2
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1

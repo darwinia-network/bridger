@@ -1,3 +1,13 @@
+## [0.4.6] - 2021-09-15
+
+### Added
+
+- Pangolin-Pangoro bridge tasks
+
+### Fixed
+
+- Several bug fixes related to redeem and log
+
 ## [0.4.5] - 2021-08-09
 
 ### Fixed

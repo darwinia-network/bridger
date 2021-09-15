@@ -1,6 +1,6 @@
 [package]
 name = "darwinia-bridger"
-version = "0.4.5"
+version = "0.4.6"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"

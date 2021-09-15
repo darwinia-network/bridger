@@ -8,7 +8,7 @@ The darwinia-bridger will save some data to the embedded kv database. `kv` comma
 
 ```bash
 $ bridger kv
-bridger-kv 0.4.6
+bridger-kv 0.4.7
 The bridge kv db storage operation
 
 USAGE:

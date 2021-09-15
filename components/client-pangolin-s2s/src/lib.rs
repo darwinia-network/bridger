@@ -79,7 +79,7 @@ impl TransactionSignScheme for PangolinChain {
                 pangolin_runtime::VERSION.spec_version,
                 pangolin_runtime::VERSION.transaction_version,
                 genesis_hash,
-                era.signed_payload(genesis_hash),
+                genesis_hash, // era.signed_payload(genesis_hash),
                 (),
                 (),
                 (),

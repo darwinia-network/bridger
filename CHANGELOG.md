@@ -2,7 +2,7 @@
 
 ### Fixed
 
-- Anchor Runtime Spec version for Pangolin and Pangori
+- Anchor Runtime Spec version for Pangolin and Pangoro
 
 ## [0.4.6] - 2021-09-15
 

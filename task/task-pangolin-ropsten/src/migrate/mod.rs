@@ -1,15 +1,58 @@
+use bridge_traits::bridge::task::BridgeSand;
+use bridge_traits::error::StandardError;
 use component_state::state::BridgeState;
 
-mod v046;
+use crate::task::PangolinRopstenTask;
 
-pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
-    let current_version = env!("CARGO_PKG_VERSION").to_string();
-    migrate_spec_version(state, current_version)
+mod v0;
+mod v1;
+
+pub fn migrate(state: &BridgeState, version: usize) -> anyhow::Result<()> {
+    let saved_version = current_version(state)?;
+    // same version, no migrate
+    if saved_version == version {
+        return Ok(());
+    }
+
+    let steps: Vec<Box<dyn Fn(&BridgeState) -> anyhow::Result<()>>> =
+        vec![Box::new(v0::migrate), Box::new(v1::migrate)];
+
+    let max_version = steps.len() - 1;
+    if version > max_version {
+        return Err(StandardError::Migration(format!(
+            "Support max version: {}, but want upgrade to {}.",
+            max_version, version
+        ))
+        .into());
+    }
+    let from = if saved_version == 0 {
+        0
+    } else {
+        saved_version + 1
+    };
+    let to = version + 1;
+    for ix in from..to {
+        let migration = steps.get(ix).unwrap();
+        if let Err(e) = migration(state) {
+            return Err(StandardError::Migration(format!(
+                "Failed to migrate. step [{}]: {:?}",
+                ix, e
+            ))
+            .into());
+        }
+    }
+    flush_version(state, version)?;
+    Ok(())
 }
 
-pub fn migrate_spec_version(state: &BridgeState, version: String) -> anyhow::Result<()> {
-    match &version[..] {
-        "0.4.6" => v046::migrate(state),
-        _ => Ok(()),
-    }
+fn current_version(state: &BridgeState) -> anyhow::Result<usize> {
+    let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+    let version: Option<usize> = microkv.get_as(".version")?;
+    Ok(version.unwrap_or(0))
+}
+
+fn flush_version(state: &BridgeState, version: usize) -> anyhow::Result<()> {
+    let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+    microkv.put(".version", &version)?;
+    Ok(())
 }

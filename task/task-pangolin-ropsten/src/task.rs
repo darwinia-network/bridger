@@ -50,7 +50,7 @@ impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
 
 impl PangolinRopstenTask {
     pub async fn new(config: PangolinRopstenConfig, state: BridgeState) -> anyhow::Result<Self> {
-        crate::migrate::migrate(&state)?;
+        crate::migrate::migrate(&state, 1)?;
 
         config.store(Self::NAME)?;
         let bus = PangolinRopstenBus::default();

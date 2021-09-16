@@ -1,6 +1,6 @@
 [package]
 name = "task-template"
-version = "0.4.6"
+version = "0.4.7"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"

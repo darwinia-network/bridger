@@ -25,7 +25,13 @@ pub fn migrate(state: &BridgeState, version: usize) -> anyhow::Result<()> {
         ))
         .into());
     }
-    for ix in saved_version..version + 1 {
+    let from = if saved_version == 0 {
+        0
+    } else {
+        saved_version + 1
+    };
+    let to = version + 1;
+    for ix in from..to {
         let migration = steps.get(ix).unwrap();
         if let Err(e) = migration(state) {
             return Err(StandardError::Migration(format!(

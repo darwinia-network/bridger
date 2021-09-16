@@ -6,7 +6,7 @@ use support_tracker::Tracker;
 
 use crate::task::PangolinRopstenTask;
 
-pub fn migrate_v0(state: &BridgeState) -> anyhow::Result<()> {
+pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
     let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
     migrate_scan_pangolin(&microkv)?;
     migrate_scan_opsten(&microkv)?;

@@ -15,7 +15,7 @@ pub fn migrate(state: &BridgeState, version: usize) -> anyhow::Result<()> {
     }
 
     let steps: Vec<Box<dyn Fn(&BridgeState) -> anyhow::Result<()>>> =
-        vec![Box::new(v0::migrate_v0), Box::new(v1::migrate_v1)];
+        vec![Box::new(v0::migrate), Box::new(v1::migrate)];
 
     let max_version = steps.len() - 1;
     if version > max_version {

@@ -13,12 +13,12 @@ pub fn migrate_v1(state: &BridgeState) -> anyhow::Result<()> {
 }
 
 fn auto_start_scan(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
-    if let Some(_) = microkv.get("scan.pangolin.next")? {
+    if microkv.get("scan.pangolin.next")?.is_some() {
         let tracker_pangolin = Tracker::new(microkv.clone(), "scan.pangolin");
         tracker_pangolin.start_running()?;
     }
 
-    if let Some(_) = microkv.get("scan.ropsten.next")? {
+    if microkv.get("scan.ropsten.next")?.is_some() {
         let tracker_ropsten = Tracker::new(microkv.clone(), "scan.ropsten");
         tracker_ropsten.start_running()?;
     }

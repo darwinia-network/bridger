@@ -48,4 +48,7 @@ pub enum StandardError {
 
     #[error("Component error: {0}")]
     Component(String),
+
+    #[error("Migration error: {0}")]
+    Migration(String),
 }

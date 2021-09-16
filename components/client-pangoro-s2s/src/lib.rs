@@ -57,7 +57,7 @@ impl TransactionSignScheme for PangoroChain {
     fn sign_transaction(
         genesis_hash: <Self::Chain as ChainBase>::Hash,
         signer: &Self::AccountKeyPair,
-        era: relay_substrate_client::TransactionEraOf<Self::Chain>,
+        _era: relay_substrate_client::TransactionEraOf<Self::Chain>,
         signer_nonce: <Self::Chain as Chain>::Index,
         call: <Self::Chain as Chain>::Call,
     ) -> Self::SignedTransaction {

@@ -48,9 +48,9 @@ mod s2s_const {
         const AVERAGE_BLOCK_INTERVAL: Duration = PangolinChain::AVERAGE_BLOCK_INTERVAL;
         const BRIDGE_CHAIN_ID: ChainId = bridge_primitives::PANGOLIN_CHAIN_ID;
         const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str =
-            bridge_primitives::WITH_PANGOLIN_MESSAGES_PALLET_NAME;
-        const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
             bridge_primitives::WITH_PANGORO_MESSAGES_PALLET_NAME;
+        const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
+            bridge_primitives::WITH_PANGOLIN_MESSAGES_PALLET_NAME;
         const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight =
             bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
         type SigningParams = common_primitives::SigningParams;

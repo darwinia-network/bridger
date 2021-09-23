@@ -8,7 +8,7 @@ signer = "//Alice"
 
 [relay]
 # substrate-substrate bridger message relay lanes, default use `00000000`
-lanes = ["72746c6c"]
+lanes = ["726f6c69"]
 # Auto start message relay, the default is false, because maybe the bridge hasn't been initialized yet;
 # since init, there can change to true.
 # WARNING: May be deleted in the future

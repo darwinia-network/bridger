@@ -124,8 +124,10 @@ impl RedeemHelper {
     }
 
     pub async fn retry(&mut self, tx: EthereumTransaction) -> anyhow::Result<()> {
-        self.sender_to_redeem.send(ToRedeemMessage::EthereumTransaction(tx)).await?;
-        return Ok(());
+        self.sender_to_redeem
+            .send(ToRedeemMessage::EthereumTransaction(tx))
+            .await?;
+        Ok(())
     }
 
     pub async fn redeem(&self, tx: EthereumTransaction) -> anyhow::Result<()> {

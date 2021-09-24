@@ -11,9 +11,10 @@ pub fn init() -> anyhow::Result<()> {
 }
 
 fn init_log() {
-    std::env::set_var(
-        "RUST_LOG",
-        r#"
+    if option_env!("RUST_LOG").is_none() {
+        std::env::set_var(
+            "RUST_LOG",
+            r#"
         serde=info,
         lifeline=debug,
         darwinia_bridge=debug,
@@ -23,8 +24,11 @@ fn init_log() {
         task-pangolin-ropsten=trace,
         task-pangolin-pangoro=trace,
         "#,
-    );
-    std::env::set_var("RUST_BACKTRACE", "1");
+        );
+    }
+    if option_env!("RUST_BACKTRACE").is_none() {
+        std::env::set_var("RUST_BACKTRACE", "1");
+    }
     env_logger::init();
 }
 

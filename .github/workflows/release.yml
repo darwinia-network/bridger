@@ -14,7 +14,7 @@ jobs:
 
       - name: Build bridger
         env:
-          RUST_TOOLCHAIN: nightly-2021-04-15
+          RUST_TOOLCHAIN: nightly-2021-09-01
         run: |
           .maintain/setup-bridger.sh
 
@@ -31,6 +31,17 @@ jobs:
           args: |
             deploy/bin/*
 
+  build-rust-docs:
+    name: Build rust docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2021-04-15
+          target: wasm32-unknown-unknown
+          default: true
       - name: Build rust docs
         run: cargo doc --all --no-deps --release
       - uses: actions/setup-node@v2
@@ -45,7 +56,6 @@ jobs:
           cd target/${GITHUB_REPOSITORY#*/}
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering link --confirm
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering deploy --prod
-
 
   build-docker-image:
     name: Build Docker image

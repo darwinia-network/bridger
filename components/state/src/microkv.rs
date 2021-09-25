@@ -54,31 +54,31 @@ fn try_microkv_migrate_less030_to_03x(
         microkv::helpers::read_file_and_deserialize_bincode(&path_db)?;
     let relayed: Option<u64> = less030.lock_read(|kv| {
         kv.get(&key_relayed)
-            .and_then(|v| less030.decode_value(&v).ok())
+            .and_then(|v| less030.decode_value(v).ok())
     })?;
     let target: Option<u64> = less030.lock_read(|kv| {
         kv.get(&key_target)
-            .and_then(|v| less030.decode_value(&v).ok())
+            .and_then(|v| less030.decode_value(v).ok())
     })?;
     let last_tracked_darwinia_block: Option<u32> = less030.lock_read(|kv| {
         kv.get(&key_last_tracked_darwinia_block)
-            .and_then(|v| less030.decode_value(&v).ok())
+            .and_then(|v| less030.decode_value(v).ok())
     })?;
     let last_tracked_pangolin_block: Option<u32> = less030.lock_read(|kv| {
         kv.get(&key_last_tracked_pangolin_block)
-            .and_then(|v| less030.decode_value(&v).ok())
+            .and_then(|v| less030.decode_value(v).ok())
     })?;
     let last_redeemed: Option<u64> = less030.lock_read(|kv| {
         kv.get(&key_last_redeemed)
-            .and_then(|v| less030.decode_value(&v).ok())
+            .and_then(|v| less030.decode_value(v).ok())
     })?;
     let last_redeemed_ropsten: Option<u64> = less030.lock_read(|kv| {
         kv.get(&key_last_redeemed_ropsten)
-            .and_then(|v| less030.decode_value(&v).ok())
+            .and_then(|v| less030.decode_value(v).ok())
     })?;
     let password_darwinia_ethereum: Option<u64> = less030.lock_read(|kv| {
         kv.get(&key_password_darwinia_ethereum)
-            .and_then(|v| less030.decode_value(&v).ok())
+            .and_then(|v| less030.decode_value(v).ok())
     })?;
 
     // create 0.3.x microkv instance

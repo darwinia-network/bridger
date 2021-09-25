@@ -68,11 +68,10 @@ impl LogsHandler for EthereumLogsHandler {
         if self.waited_redeem.len() >= MAX_WAITED_REDEEM_COUNT {
             info!(
                 target: DarwiniaEthereumTask::NAME,
-                "achieve redeem waited limit, pause scan, from: {:?}",
-                &from
+                "achieve redeem waited limit, pause scan, from: {:?}", &from
             );
             self.tracker.flush_current(from as usize)?;
- 
+
             return Ok(());
         }
 
@@ -162,7 +161,7 @@ impl EthereumLogsHandler {
     fn is_redeem_submitted(&self, tx: &EthereumTransaction) -> bool {
         let txset = self.waited_redeem.get(&tx.block);
         if let Some(txs) = txset {
-            return txs.contains(&tx);
+            return txs.contains(tx);
         }
         false
     }
@@ -185,7 +184,7 @@ impl EthereumLogsHandler {
             if let Some(txs) = checked {
                 let mut reverted = txs.clone();
                 for tx in txs.iter() {
-                    match self.is_verified(&tx).await {
+                    match self.is_verified(tx).await {
                         Err(err) => {
                             error!(
                                 target: DarwiniaEthereumTask::NAME,
@@ -200,7 +199,7 @@ impl EthereumLogsHandler {
                                     target: DarwiniaEthereumTask::NAME,
                                     "check-redeem verified tx {:?} at {:?}", tx.tx_hash, tx.block
                                 );
-                                reverted.remove(&tx);
+                                reverted.remove(tx);
                             } else {
                                 trace!(
                                     target: DarwiniaEthereumTask::NAME,
@@ -226,10 +225,10 @@ impl EthereumLogsHandler {
     }
 
     async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
-        if self.is_redeem_submitted(&tx) {
+        if self.is_redeem_submitted(tx) {
             return Ok(());
         }
-        if self.is_verified(&tx).await? {
+        if self.is_verified(tx).await? {
             trace!(
                 target: DarwiniaEthereumTask::NAME,
                 "This ethereum tx {:?} has already been redeemed.",

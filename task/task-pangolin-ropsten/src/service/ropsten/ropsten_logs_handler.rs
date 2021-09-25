@@ -81,8 +81,7 @@ impl LogsHandler for RopstenLogsHandler {
         if self.waited_redeem.len() >= MAX_WAITED_REDEEM_COUNT {
             info!(
                 target: PangolinRopstenTask::NAME,
-                "achieve redeem waited limit, pause scan, from: {:?}",
-                &from
+                "achieve redeem waited limit, pause scan, from: {:?}", &from
             );
             self.tracker.flush_current(from as usize)?;
             return Ok(());
@@ -194,7 +193,7 @@ impl RopstenLogsHandler {
     fn is_redeem_submitted(&self, tx: &EthereumTransaction) -> bool {
         let txset = self.waited_redeem.get(&tx.block);
         if let Some(txs) = txset {
-            return txs.contains(&tx);
+            return txs.contains(tx);
         }
         false
     }
@@ -216,7 +215,7 @@ impl RopstenLogsHandler {
                 if let Some(txs) = checked {
                     let mut reverted = txs.clone();
                     for tx in txs.iter() {
-                        match self.is_verified(&tx).await {
+                        match self.is_verified(tx).await {
                             Err(err) => {
                                 error!(
                                     target: PangolinRopstenTask::NAME,
@@ -233,7 +232,7 @@ impl RopstenLogsHandler {
                                         tx.tx_hash,
                                         tx.block
                                     );
-                                    reverted.remove(&tx);
+                                    reverted.remove(tx);
                                 } else {
                                     trace!(
                                         target: PangolinRopstenTask::NAME,
@@ -260,10 +259,10 @@ impl RopstenLogsHandler {
     }
 
     async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
-        if self.is_redeem_submitted(&tx) {
+        if self.is_redeem_submitted(tx) {
             return Ok(());
         }
-        if self.is_verified(&tx).await? {
+        if self.is_verified(tx).await? {
             trace!(
                 target: PangolinRopstenTask::NAME,
                 "This ethereum tx {:?} has already been redeemed.",

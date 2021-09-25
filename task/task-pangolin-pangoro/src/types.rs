@@ -173,8 +173,6 @@ impl From<WrapperRelayerMode> for RelayerMode {
 
 #[derive(Debug, Clone)]
 pub struct RelayHeadersAndMessagesInfo {
-    pub bridge: BridgeName,
-
     pub source: ChainInfo,
     pub target: ChainInfo,
 

@@ -66,11 +66,7 @@ async fn start_relay(
     _param: serde_json::Value,
 ) -> anyhow::Result<TaskTerminal> {
     let mut sender = bus.tx::<PangolinPangoroMessageSend>()?;
-    sender
-        .send(PangolinPangoroMessageSend::Relay(
-            BridgeName::PangolinToPangoro,
-        ))
-        .await?;
+    sender.send(PangolinPangoroMessageSend::Relay).await?;
 
     let state_task = support_keep::state::get_state_task_unwrap(PangolinPangoroTask::NAME)?;
     let mut config_task: PangolinPangoroConfig = Config::load(state_task.config_path.clone())?;

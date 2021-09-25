@@ -8,7 +8,7 @@ use crate::types::BridgeName;
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum PangolinPangoroMessageSend {
     InitBridge(BridgeName),
-    Relay(BridgeName),
+    Relay,
 }
 
 impl Message<PangolinPangoroBus> for PangolinPangoroMessageSend {

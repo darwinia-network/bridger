@@ -2,6 +2,23 @@ use itertools::Itertools;
 use microkv::namespace::NamespaceMicroKV;
 use std::fmt::{Debug, Formatter};
 
+/// Track block number, based on microkv
+/// The tracker will store data to microkv database.
+/// The basic keys includes
+///
+/// name        | required | description
+/// ---         | ---      | ---
+/// key_raw     | Yes      | tracked key, user input, and all keys based on this
+/// key_curt    |          | currently value, <key_raw>.current
+/// key_finish  |          | finished value, <key_raw>.finish
+/// key_running |          | this track is running, default is null means false, <key_raw>.running
+/// key_next    |          | queuing for run, <key_raw>.next
+/// key_skipped |          | skipped block number, maybe failed to execute. <key_raw>.skipped
+///
+/// Have 3 mode
+/// 1. Normal
+/// 2. Fast mode (Not recommended)
+/// 3. Parallel mode (Recommended)
 #[derive(Clone)]
 pub struct Tracker {
     microkv: NamespaceMicroKV,
@@ -11,7 +28,14 @@ pub struct Tracker {
     key_running: String,
     key_next: String,
     key_skipped: String,
+
+    /// fast mode
     key_fast_mode: String,
+
+    /// parallel enable
+    key_parallel_enable: String,
+    key_parallel_max: String,
+    key_parallel_records: String,
 }
 
 impl Debug for Tracker {
@@ -25,12 +49,22 @@ impl Debug for Tracker {
         f.write_str(&format!("  key_next: {}\n", self.key_next))?;
         f.write_str(&format!("  key_skipped: {}\n", self.key_skipped))?;
         f.write_str(&format!("  key_fast_mode: {}\n", self.key_fast_mode))?;
+        f.write_str(&format!(
+            "  key_parallel_enable: {}\n",
+            self.key_parallel_enable
+        ))?;
+        f.write_str(&format!("  key_parallel_max: {}\n", self.key_parallel_max))?;
+        f.write_str(&format!(
+            "  key_parallel_records: {}\n",
+            self.key_parallel_records
+        ))?;
         f.write_str("}")?;
         Ok(())
     }
 }
 
 impl Tracker {
+    /// Create a tracker
     pub fn new(microkv: NamespaceMicroKV, key: impl AsRef<str>) -> Self {
         let key = key.as_ref();
         Self {
@@ -42,6 +76,10 @@ impl Tracker {
             key_next: format!("{}.next", key),
             key_skipped: format!("{}.skipped", key),
             key_fast_mode: format!("{}.fast_mode", key),
+
+            key_parallel_enable: format!("{}.parallel.enable", key),
+            key_parallel_max: format!("{}.parallel.max", key),
+            key_parallel_records: format!("{}.parallel.records", key),
         }
     }
 }
@@ -59,24 +97,37 @@ impl Tracker {
         }
         Ok(false)
     }
+
+    fn write_vec_usize(&self, key: impl AsRef<str>, values: &Vec<usize>) -> anyhow::Result<()> {
+        if values.is_empty() {
+            return Ok(());
+        }
+        let store_value: String = values.iter().join(",");
+        self.microkv.put(key.as_ref(), &store_value)?;
+        Ok(())
+    }
 }
 
 impl Tracker {
+    /// Track key is running, key: *.running
     pub fn is_running(&self) -> anyhow::Result<bool> {
         self.read_bool(&self.key_running)
     }
 
+    /// Is enabled fast mode, key: *.fast_mode
     pub fn is_fast_mode(&self) -> anyhow::Result<bool> {
         self.read_bool(&self.key_fast_mode)
     }
 
     pub fn enable_fast_mode(&self) -> anyhow::Result<()> {
-        self.microkv.put(&self.key_fast_mode, &String::from("true"))?;
+        self.microkv
+            .put(&self.key_fast_mode, &String::from("true"))?;
         Ok(())
     }
 
     pub fn stop_running(&self) -> anyhow::Result<()> {
-        self.microkv.put(&self.key_running, &String::from("false"))?;
+        self.microkv
+            .put(&self.key_running, &String::from("false"))?;
         Ok(())
     }
 
@@ -104,7 +155,7 @@ impl Tracker {
             loop {
                 let secs = 3;
                 log::warn!(
-                    "The track key [{}] isn't running (value is not `true`), wait {} seconds check again.",
+                    "The track [{}] isn't running (value is not `true`), wait {} seconds check again.",
                     &self.key_running,
                     secs
                 );

@@ -10,7 +10,6 @@ use crate::config::{PangolinPangoroConfig, RelayConfig};
 use crate::message::PangolinPangoroMessageSend;
 use crate::service::init::InitBridgeService;
 use crate::service::relay::RelayService;
-use crate::types::BridgeName;
 
 #[derive(Debug)]
 pub struct PangolinPangoroTask {
@@ -57,11 +56,7 @@ impl PangolinPangoroTask {
         let mut sender = stack.bus().tx::<PangolinPangoroMessageSend>()?;
         let relay_config: RelayConfig = Config::restore(Self::NAME)?;
         if relay_config.auto_start {
-            sender
-                .send(PangolinPangoroMessageSend::Relay(
-                    BridgeName::PangolinToPangoro,
-                ))
-                .await?;
+            sender.send(PangolinPangoroMessageSend::Relay).await?;
         }
 
         Ok(Self { stack })

@@ -172,18 +172,7 @@ impl RopstenLogsHandler {
                 .await?)
     }
 
-    fn is_redeem_submitted(&self, tx: &EthereumTransaction) -> bool {
-        let txset = self.waited_redeem.get(&tx.block);
-        if let Some(txs) = txset {
-            return txs.contains(tx);
-        }
-        false
-    }
-
     async fn redeem(&mut self, tx: &EthereumTransaction) -> anyhow::Result<()> {
-        if self.is_redeem_submitted(tx) {
-            return Ok(());
-        }
         if self.is_verified(tx).await? {
             trace!(
                 target: PangolinRopstenTask::NAME,

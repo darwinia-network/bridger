@@ -1,12 +1,14 @@
 use std::collections::{HashSet, VecDeque};
 use std::iter::FromIterator;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::error::StandardError;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::darwinia::client::Darwinia;
 use support_tracker::Tracker;
+use tokio::sync::Mutex;
 
 use crate::service::EthereumTransaction;
 use crate::task::PangolinRopstenTask;
@@ -31,11 +33,7 @@ impl RopstenScanChecker {
 
 async fn background_task(tracker: Tracker, queue: CheckerQueue) {
     loop {
-        // Component
-        let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-        // client
-        let darwinia = component_pangolin_subxt.component().await?;
-        if let Err(err) = start(&tracker, &darwinia, &queue).await {
+        if let Err(err) = start(&tracker, &queue).await {
             let secs = 10;
             error!(
                 target: PangolinRopstenTask::NAME,
@@ -46,12 +44,16 @@ async fn background_task(tracker: Tracker, queue: CheckerQueue) {
     }
 }
 
-async fn start(tracker: &Tracker, client: &Darwinia, queue: &CheckerQueue) -> anyhow::Result<()> {
-    let mut queue = queue.lock().map_err(|_e| {
-        StandardError::Other("failed to get waited check redeem list".to_string()).into()
-    })?;
-    if let Some(txs) = queue.pop_front() {
-        let blocks = HashSet::from_iter(txs.iter().map(|tx| tx.block).collect::<Vec<u64>>());
+async fn start(tracker: &Tracker, queue: &CheckerQueue) -> anyhow::Result<()> {
+    // Component
+    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+    // client
+    let client = component_pangolin_subxt.component().await?;
+
+    let mut txs_queue = queue.lock().await;
+    if let Some(txs) = txs_queue.pop_front() {
+        let blocks: HashSet<u64> =
+            HashSet::from_iter(txs.iter().map(|tx| tx.block).collect::<Vec<u64>>());
         let mut verified_blocks = vec![];
 
         // start check
@@ -59,10 +61,10 @@ async fn start(tracker: &Tracker, client: &Darwinia, queue: &CheckerQueue) -> an
             let mut all_verified = true;
             let txs_for_block = txs
                 .iter()
-                .filter(|tx| *(tx.block) == block)
+                .filter(|tx| tx.block == block)
                 .collect::<Vec<&EthereumTransaction>>();
             for tx in txs_for_block {
-                match is_verified(client, tx) {
+                match is_verified(&client, tx).await {
                     Ok(false) => all_verified = false,
                     Err(e) => {
                         all_verified = false;
@@ -74,6 +76,7 @@ async fn start(tracker: &Tracker, client: &Darwinia, queue: &CheckerQueue) -> an
                             e
                         );
                     }
+                    _ => {}
                 }
             }
 
@@ -84,14 +87,14 @@ async fn start(tracker: &Tracker, client: &Darwinia, queue: &CheckerQueue) -> an
         }
 
         // save check finish
-        for block in verified_blocks {
-            tracker.finish(block as usize)?;
+        for block in &verified_blocks {
+            tracker.finish(*block as usize)?;
         }
         // update queue
         let mut new_txs = txs.clone();
         new_txs.retain(|tx| !verified_blocks.contains(&tx.block));
         if !new_txs.is_empty() {
-            queue.push_front(new_txs);
+            txs_queue.push_front(new_txs);
         }
     }
     Ok(())
@@ -103,11 +106,8 @@ async fn is_verified(client: &Darwinia, tx: &EthereumTransaction) -> anyhow::Res
 }
 
 impl RopstenScanChecker {
-    pub async fn push(&self, txs: Vec<EthereumTransaction>) -> anyhow::Result<()> {
-        let mut queue = self.queue.lock().map_err(|_e| {
-            StandardError::Other("failed to get waited check redeem list".to_string()).into()
-        })?;
+    pub async fn push(&self, txs: Vec<EthereumTransaction>) {
+        let mut queue = self.queue.lock().await;
         queue.push_back(txs);
-        Ok(())
     }
 }

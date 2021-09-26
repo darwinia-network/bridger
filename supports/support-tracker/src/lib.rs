@@ -119,7 +119,7 @@ impl Tracker {
 impl Tracker {
     /// Update parallel records, when block finished, will remove by records
     pub fn update_parallel_records(&self, finish: usize) -> anyhow::Result<()> {
-        if !self.is_enabled_parallel() {
+        if !self.is_enabled_parallel()? {
             return Ok(());
         }
         let records: Option<String> = self.microkv.get_as(&self.key_parallel_records)?;
@@ -219,12 +219,12 @@ impl Tracker {
 
     /// Read next value use fast mode
     async fn next_fast_mode(&self) -> anyhow::Result<usize> {
-        self._next_with_entrypoint(&self.key_curt)
+        self._next_with_entrypoint(&self.key_curt).await
     }
 
     /// Read next value use normal mode
     async fn next_serial(&self) -> anyhow::Result<usize> {
-        self._next_with_entrypoint(&self.key_finish)
+        self._next_with_entrypoint(&self.key_finish).await
     }
 
     /// Read next Value use parallel mode
@@ -249,7 +249,7 @@ impl Tracker {
             }
             parallel_records = parse_blocks_from_text(records.unwrap())?;
             len = parallel_records.len();
-            if len < parallel_max {
+            if len < parallel_max as usize {
                 break;
             }
             // The block being executed cannot exceed the maximum
@@ -276,7 +276,7 @@ impl Tracker {
             next
         } else {
             let last = parallel_records.get(len - 1).unwrap();
-            *last + 1;
+            *last + 1
         };
 
         // save current
@@ -338,12 +338,12 @@ impl Tracker {
             }
         }
         if self.is_enabled_parallel()? {
-            return self.next_parallel();
+            return self.next_parallel().await;
         }
         if self.is_enabled_fast_mode()? {
-            return self.next_fast_mode();
+            return self.next_fast_mode().await;
         }
-        self.next_serial()
+        self.next_serial().await
     }
 
     /// When finished work, call this flush value.

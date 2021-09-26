@@ -87,16 +87,16 @@ impl RopstenScanRunner {
         let client = EvmClient::new(web3);
         let logs_handler = RopstenLogsHandler::new(
             topics_list.clone(),
-            sender_to_relay,
-            sender_to_redeem,
+            self.sender_to_relay.clone(),
+            self.sender_to_redeem.clone(),
             darwinia,
-            tracker.clone(),
+            self.tracker.clone(),
         );
         let mut tracker_evm_log = EvmLogTracker::<Ethereum, RopstenLogsHandler>::new(
             client,
             topics_list,
             logs_handler,
-            tracker,
+            self.tracker.clone(),
             servce_config.interval_ethereum,
         );
 

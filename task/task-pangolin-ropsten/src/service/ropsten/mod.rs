@@ -38,14 +38,15 @@ impl lifeline::Service for RopstenScanService {
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-        let tracker = Tracker::new(microkv, "scan.ropsten");
-        tracker.enable_parallel()?;
+        let tracker_scan = Tracker::new(microkv, "scan.ropsten");
+        tracker_scan.enable_parallel()?;
+        let tracker_check = tracker_scan.clone();
 
         let _greet_scan = Self::try_task(
             &format!("{}-service-ropsten-scan", PangolinRopstenTask::NAME),
             async move {
                 RopstenScanRunner::new(
-                    tracker.clone(),
+                    tracker_scan,
                     sender_to_relay.clone(),
                     sender_to_redeem.clone(),
                 )
@@ -59,15 +60,10 @@ impl lifeline::Service for RopstenScanService {
         let _greet_check = Self::try_task(
             &format!("{}-service-ropsten-check", PangolinRopstenTask::NAME),
             async move {
-                let checker = RopstenScanChecker::new(tracker.clone());
+                let checker = RopstenScanChecker::new(tracker_check);
                 while let Some(message) = receiver_redeem.recv().await {
                     if let ToRedeemMessage::Check(txs) = message {
-                        if let Err(_) = checker.push(txs) {
-                            log::error!(
-                                target: PangolinRopstenTask::NAME,
-                                "This error should not appear "
-                            );
-                        }
+                        checker.push(txs).await;
                     }
                 }
                 Ok(())

@@ -94,14 +94,13 @@ impl Tracker {
     fn read_bool(&self, key: impl AsRef<str>) -> anyhow::Result<bool> {
         let value = self
             .microkv
-            .get_as(key.as_ref())?
-            .map(|v: String| v.to_lowercase());
-        if let Some(v) = value {
-            let v = v.trim();
-            let value_bool = v == "true" || v == "1";
-            return Ok(value_bool);
+            .get(key.as_ref())?
+            .unwrap_or(serde_json::Value::Bool(false));
+        if value.is_boolean() {
+            return Ok(value.as_bool().unwrap_or(false));
         }
-        Ok(false)
+        let text = value.to_string().to_lowercase();
+        Ok(&text == "true" || &text == "1")
     }
 
     /// Write Vec<usize> to microkv

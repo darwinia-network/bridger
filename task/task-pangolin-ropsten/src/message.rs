@@ -47,7 +47,7 @@ impl Message<PangolinRopstenBus> for ToRelayMessage {
 #[derive(Clone, Debug)]
 pub enum ToRedeemMessage {
     EthereumTransaction(EthereumTransaction),
-    Complete(usize), // Complete redeem, the arguments is block number
+    Check(Vec<EthereumTransaction>), // Complete redeem, the arguments is block number
 }
 
 impl Message<PangolinRopstenBus> for ToRedeemMessage {

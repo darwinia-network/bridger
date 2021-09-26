@@ -45,12 +45,28 @@ async fn background_task(tracker: Tracker, queue: CheckerQueue) {
 }
 
 async fn start(tracker: &Tracker, queue: &CheckerQueue) -> anyhow::Result<()> {
+    log::info!(
+        target: PangolinRopstenTask::NAME,
+        "ROPSTEN CHECKER SERVICE RESTARTING..."
+    );
+
     // Component
     let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
     // client
     let client = component_pangolin_subxt.component().await?;
 
     let mut txs_queue = queue.lock().await;
+    let len = txs_queue.len();
+    if len == 0 {
+        let secs = 10;
+        log::info!(
+            target: PangolinRopstenTask::NAME,
+            "Not have transactions to check, wait {} seconds try again",
+            secs
+        );
+        tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
+        return Ok(());
+    }
     if let Some(txs) = txs_queue.pop_front() {
         let blocks: HashSet<u64> =
             HashSet::from_iter(txs.iter().map(|tx| tx.block).collect::<Vec<u64>>());

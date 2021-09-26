@@ -50,6 +50,13 @@ impl LogsHandler for RopstenLogsHandler {
         _topics_list: &Vec<(H160, Vec<H256>)>,
         logs: Vec<Log>,
     ) -> Result<()> {
+        log::debug!(
+            target: PangolinRopstenTask::NAME,
+            "Scan ropsten range: [{},{}]",
+            from,
+            to,
+        );
+
         // TODO: check the address
         let bank_topic = self.topics_list[0].1[0];
         let issuing_topic = self.topics_list[1].1[0];

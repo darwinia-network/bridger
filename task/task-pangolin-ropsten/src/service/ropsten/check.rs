@@ -74,16 +74,25 @@ async fn start(tracker: &Tracker, queue: &CheckerQueue) -> anyhow::Result<()> {
 
         // start check
         for block in blocks {
+            log::trace!(
+                target: PangolinRopstenTask::NAME,
+                "Check redeem block: {}",
+                block,
+            );
             let mut all_verified = true;
             let txs_for_block = txs
                 .iter()
                 .filter(|tx| tx.block == block)
                 .collect::<Vec<&EthereumTransaction>>();
+            let mut failed_tx = None;
             for tx in txs_for_block {
                 match is_verified(&client, tx).await {
-                    Ok(false) => all_verified = false,
-                    Err(e) => {
+                    Ok(false) => {
                         all_verified = false;
+                        failed_tx = Some(tx.clone());
+                        break;
+                    }
+                    Err(e) => {
                         log::error!(
                             target: PangolinRopstenTask::NAME,
                             "Failed verified redeem. [{}]: {}. {:?}",
@@ -91,15 +100,33 @@ async fn start(tracker: &Tracker, queue: &CheckerQueue) -> anyhow::Result<()> {
                             tx.block_hash,
                             e
                         );
+                        all_verified = false;
+                        failed_tx = Some(tx.clone());
+                        break;
                     }
                     _ => {}
                 }
             }
 
             if !all_verified {
+                log::trace!(
+                    target: PangolinRopstenTask::NAME,
+                    "Block {} check failed, reason about: {:?}",
+                    block,
+                    failed_tx,
+                );
                 continue;
             }
             verified_blocks.push(block);
+            log::trace!(
+                target: PangolinRopstenTask::NAME,
+                "Block {} successes check",
+                block,
+            );
+        }
+
+        if verified_blocks.is_empty() {
+            return Ok(());
         }
 
         // save check finish

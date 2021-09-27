@@ -106,6 +106,31 @@ impl Tracker {
         Ok(false)
     }
 
+    fn read_u64(&self, key: impl AsRef<str>) -> anyhow::Result<Option<u64>> {
+        let value = self.microkv.get(key.as_ref())?;
+        match value {
+            Some(v) => {
+                if v.is_number() {
+                    return Ok(v.as_u64());
+                }
+                if v.is_boolean() {
+                    return Ok(v.as_bool().map(|b| if b { 1 } else { 0 }));
+                }
+                if v.is_string() {
+                    return match v.as_str() {
+                        Some(t) => {
+                            let t = t.trim();
+                            Ok(Some((t.parse::<u64>()?)))
+                        }
+                        None => Ok(None),
+                    };
+                }
+                Ok(None)
+            }
+            None => Ok(None),
+        }
+    }
+
     /// Write Vec<usize> to microkv
     fn write_vec_usize(&self, key: impl AsRef<str>, values: &Vec<usize>) -> anyhow::Result<()> {
         if values.is_empty() {
@@ -231,12 +256,7 @@ impl Tracker {
 
     /// Read next Value use parallel mode
     async fn next_parallel(&self) -> anyhow::Result<usize> {
-        let parallel_max = self
-            .microkv
-            .get(&self.key_parallel_max)?
-            .map(|value| value.as_u64())
-            .flatten()
-            .unwrap_or(256);
+        let parallel_max = self.read_u64(&self.key_parallel_max)?.unwrap_or(256);
 
         // if already have parallel records
         let mut parallel_records;

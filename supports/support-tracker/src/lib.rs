@@ -99,8 +99,11 @@ impl Tracker {
         if value.is_boolean() {
             return Ok(value.as_bool().unwrap_or(false));
         }
-        let text = value.to_string().to_lowercase();
-        Ok(&text == "true" || &text == "1")
+        if value.is_string() {
+            let text = value.as_str().unwrap_or("false");
+            return Ok(text == "true" || text == "1");
+        }
+        Ok(false)
     }
 
     /// Write Vec<usize> to microkv

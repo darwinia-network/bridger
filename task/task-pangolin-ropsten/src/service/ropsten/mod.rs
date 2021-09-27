@@ -39,6 +39,7 @@ impl lifeline::Service for RopstenScanService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         let tracker_scan = Tracker::new(microkv, "scan.ropsten");
+        tracker_scan.clear_parallel_records()?;
         tracker_scan.enable_parallel()?;
         let tracker_check = tracker_scan.clone();
 

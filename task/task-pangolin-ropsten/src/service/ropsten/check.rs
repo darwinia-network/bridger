@@ -125,10 +125,6 @@ async fn start(tracker: &Tracker, queue: &CheckerQueue) -> anyhow::Result<()> {
             );
         }
 
-        if verified_blocks.is_empty() {
-            return Ok(());
-        }
-
         // save check finish
         for block in &verified_blocks {
             tracker.finish(*block as usize)?;
@@ -137,6 +133,9 @@ async fn start(tracker: &Tracker, queue: &CheckerQueue) -> anyhow::Result<()> {
         let mut new_txs = txs.clone();
         new_txs.retain(|tx| !verified_blocks.contains(&tx.block));
         if !new_txs.is_empty() {
+            for nt in &new_txs {
+                log::trace!(target: PangolinRopstenTask::NAME, "Check again: {:?}", nt);
+            }
             txs_queue.push_front(new_txs);
         }
     }

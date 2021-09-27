@@ -100,19 +100,27 @@ The bridger will record the set value.
   scan.ropsten.finish \
   scan.ropsten.running \
   scan.ropsten.skipped \
+  scan.ropsten.parallel.enable \
+  scan.ropsten.parallel.max \
+  scan.ropsten.parallel.records \
   -o table --include-key
-
-+----------------------+-------+
-| scan.ropsten.current | 3     |
-+----------------------+-------+
-| scan.ropsten.next    | null  |
-+----------------------+-------+
-| scan.ropsten.finish  | 2     |
-+----------------------+-------+
-| scan.ropsten.running | false |
-+----------------------+-------+
-| scan.ropsten.skipped | null  |
-+----------------------+-------+
++-------------------------------+----------------------------+
+| scan.ropsten.current          | 11039034                   |
++-------------------------------+----------------------------+
+| scan.ropsten.next             | null                       |
++-------------------------------+----------------------------+
+| scan.ropsten.finish           | 11039031                   |
++-------------------------------+----------------------------+
+| scan.ropsten.running          | true                       |
++-------------------------------+----------------------------+
+| scan.ropsten.skipped          | null                       |
++-------------------------------+----------------------------+
+| scan.ropsten.parallel.enable  | true                       |
++-------------------------------+----------------------------+
+| scan.ropsten.parallel.max     | null                       |
++-------------------------------+----------------------------+
+| scan.ropsten.parallel.records | 11039032,11039033,11039034 |
++-------------------------------+----------------------------+
 ```
 
 explain:

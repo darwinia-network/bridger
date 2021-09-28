@@ -190,7 +190,7 @@ impl DarwiniaServiceRunner {
             // process events
             if let Err(err) = self.handle_events(&header, events).await {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-                    tracker_raw.skip(header.number as usize)?;
+                    // todo: notify skipped, issue https://github.com/darwinia-network/bridger/issues/241
                     return Err(err);
                 }
 
@@ -203,12 +203,12 @@ impl DarwiniaServiceRunner {
 
                 let err_msg = format!("{:?}", err).to_lowercase();
                 if err_msg.contains("type size unavailable") {
-                    tracker_raw.skip(header.number as usize)?;
+                    // todo: notify skipped, issue https://github.com/darwinia-network/bridger/issues/241
                     continue;
                 }
 
                 if retry_times > 10 {
-                    tracker_raw.skip(header.number as usize)?;
+                    // todo: notify skipped, issue https://github.com/darwinia-network/bridger/issues/241
                     log::error!(
                         target: DarwiniaEthereumTask::NAME,
                         "Retry {} times still failed: {}",

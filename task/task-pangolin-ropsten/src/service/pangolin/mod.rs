@@ -185,34 +185,34 @@ impl DarwiniaServiceRunner {
             // process events
             if let Err(err) = self.handle_events(&header, events).await {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-                    tracker_raw.skip(header.number as usize)?;
+                    // todo: notify skipped, issue https://github.com/darwinia-network/bridger/issues/241
                     return Err(err);
-                } else {
-                    error!(
-                        target: PangolinRopstenTask::NAME,
-                        "An error occurred while processing the events of block {}: {:?}",
-                        header.number,
-                        err
-                    );
+                }
 
-                    let err_msg = format!("{:?}", err).to_lowercase();
-                    if err_msg.contains("type size unavailable") {
-                        tracker_raw.skip(header.number as usize)?;
-                    } else {
-                        if retry_times > 10 {
-                            tracker_raw.skip(header.number as usize)?;
-                            log::error!(
-                                target: PangolinRopstenTask::NAME,
-                                "Retry {} times still failed: {}",
-                                retry_times,
-                                header.number
-                            );
-                            retry_times = 0;
-                            continue;
-                        }
-                        tokio::time::sleep(std::time::Duration::from_secs(30)).await;
-                        retry_times += 1;
+                error!(
+                    target: PangolinRopstenTask::NAME,
+                    "An error occurred while processing the events of block {}: {:?}",
+                    header.number,
+                    err
+                );
+
+                let err_msg = format!("{:?}", err).to_lowercase();
+                if err_msg.contains("type size unavailable") {
+                    // todo: notify skipped, issue https://github.com/darwinia-network/bridger/issues/241
+                } else {
+                    if retry_times > 10 {
+                        // todo: notify skipped, issue https://github.com/darwinia-network/bridger/issues/241
+                        log::error!(
+                            target: PangolinRopstenTask::NAME,
+                            "Retry {} times still failed: {}",
+                            retry_times,
+                            header.number
+                        );
+                        retry_times = 0;
+                        continue;
                     }
+                    tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+                    retry_times += 1;
                 }
             } else {
                 tracker_raw.finish(header.number as usize)?;
@@ -268,7 +268,8 @@ impl DarwiniaServiceRunner {
             EventInfo::ScheduleAuthoritiesChangeEvent(event) => {
                 info!(
                     target: PangolinRopstenTask::NAME,
-                    "find schedule authorities change event, number {:?}", header.number);
+                    "find schedule authorities change event, number {:?}", header.number
+                );
                 if self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)
@@ -304,7 +305,9 @@ impl DarwiniaServiceRunner {
                         .await?;
                     info!(
                         target: PangolinRopstenTask::NAME,
-                        "Submit authorities to ethereum at {:?} with tx: {}", header.number, tx_hash
+                        "Submit authorities to ethereum at {:?} with tx: {}",
+                        header.number,
+                        tx_hash
                     );
                 }
             }
@@ -312,7 +315,8 @@ impl DarwiniaServiceRunner {
             EventInfo::ScheduleMMRRootEvent(event) => {
                 info!(
                     target: PangolinRopstenTask::NAME,
-                    "Find Schedule MMRRoot event at {:?}", header.number);
+                    "Find Schedule MMRRoot event at {:?}", header.number
+                );
                 if self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)

@@ -5,26 +5,16 @@ use std::fmt::{Debug, Formatter};
 #[derive(Clone)]
 pub struct Tracker {
     microkv: NamespaceMicroKV,
-    key_raw: String,
-    key_curt: String,
-    key_finish: String,
-    key_running: String,
-    key_next: String,
-    key_skipped: String,
-    key_fast_mode: String,
+    key_current: String,
+    key_planned: String,
 }
 
 impl Debug for Tracker {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str("Tracker {\n")?;
         f.write_str("  microkv: ***,\n")?;
-        f.write_str(&format!("  key_raw: {}\n", self.key_raw))?;
-        f.write_str(&format!("  key_curt: {}\n", self.key_curt))?;
-        f.write_str(&format!("  key_finish: {}\n", self.key_finish))?;
-        f.write_str(&format!("  key_running: {}\n", self.key_running))?;
-        f.write_str(&format!("  key_next: {}\n", self.key_next))?;
-        f.write_str(&format!("  key_skipped: {}\n", self.key_skipped))?;
-        f.write_str(&format!("  key_fast_mode: {}\n", self.key_fast_mode))?;
+        f.write_str(&format!("  key_current: {}\n", self.key_current))?;
+        f.write_str(&format!("  key_planned: {}\n", self.key_planned))?;
         f.write_str("}")?;
         Ok(())
     }
@@ -35,29 +25,52 @@ impl Tracker {
         let key = key.as_ref();
         Self {
             microkv,
-            key_raw: key.to_string(),
-            key_curt: format!("{}.current", key),
-            key_finish: format!("{}.finish", key),
-            key_running: format!("{}.running", key),
-            key_next: format!("{}.next", key),
-            key_skipped: format!("{}.skipped", key),
-            key_fast_mode: format!("{}.fast_mode", key),
+            key_current: format!("{}.current", key),
+            key_planned: format!("{}.planned", key),
         }
     }
 }
 
 impl Tracker {
+    /// Read bool value by a key
     fn read_bool(&self, key: impl AsRef<str>) -> anyhow::Result<bool> {
         let value = self
             .microkv
-            .get_as(key.as_ref())?
-            .map(|v: String| v.to_lowercase());
-        if let Some(v) = value {
-            let v = v.trim();
-            let value_bool = v == "true" || v == "1";
-            return Ok(value_bool);
+            .get(key.as_ref())?
+            .unwrap_or(serde_json::Value::Bool(false));
+        if value.is_boolean() {
+            return Ok(value.as_bool().unwrap_or(false));
+        }
+        if value.is_string() {
+            let text = value.as_str().unwrap_or("false");
+            return Ok(text == "true" || text == "1");
         }
         Ok(false)
+    }
+
+    fn read_u64(&self, key: impl AsRef<str>) -> anyhow::Result<Option<u64>> {
+        let value = self.microkv.get(key.as_ref())?;
+        match value {
+            Some(v) => {
+                if v.is_number() {
+                    return Ok(v.as_u64());
+                }
+                if v.is_boolean() {
+                    return Ok(v.as_bool().map(|b| if b { 1 } else { 0 }));
+                }
+                if v.is_string() {
+                    return match v.as_str() {
+                        Some(t) => {
+                            let t = t.trim();
+                            Ok(Some((t.parse::<u64>()?)))
+                        }
+                        None => Ok(None),
+                    };
+                }
+                Ok(None)
+            }
+            None => Ok(None),
+        }
     }
 }
 
@@ -66,35 +79,14 @@ impl Tracker {
         self.read_bool(&self.key_running)
     }
 
-    pub fn is_fast_mode(&self) -> anyhow::Result<bool> {
-        self.read_bool(&self.key_fast_mode)
-    }
-
-    pub fn enable_fast_mode(&self) -> anyhow::Result<()> {
-        self.microkv.put(&self.key_fast_mode, &String::from("true"))?;
-        Ok(())
-    }
-
     pub fn stop_running(&self) -> anyhow::Result<()> {
-        self.microkv.put(&self.key_running, &String::from("false"))?;
+        self.microkv
+            .put(&self.key_running, &String::from("false"))?;
         Ok(())
     }
 
     pub fn start_running(&self) -> anyhow::Result<()> {
         self.microkv.put(&self.key_running, &String::from("true"))?;
-        Ok(())
-    }
-
-    pub fn reset_current(&self) -> anyhow::Result<()> {
-        let finish: Option<usize> = self.microkv.get_as(&self.key_finish)?;
-        if let Some(finish) = finish {
-            self.microkv.put(&self.key_curt, &finish)?;
-        }
-        Ok(())
-    }
-
-    pub fn flush_current(&self, to: usize) -> anyhow::Result<()> {
-        self.microkv.put(&self.key_curt, &to)?;
         Ok(())
     }
 
@@ -147,58 +139,9 @@ impl Tracker {
         Ok(())
     }
 
-    pub fn skip(&self, block: usize) -> anyhow::Result<()> {
-        let skipped: Option<String> = self.microkv.get_as(&self.key_skipped)?;
-        match skipped {
-            Some(v) => self
-                .microkv
-                .put(&self.key_skipped, &format!("{},{}", v, block))?,
-            None => self.microkv.put(&self.key_skipped, &format!("{}", block))?,
-        }
-        self.finish(block)?;
-        Ok(())
-    }
-
-    pub fn retry_skipped(&self) -> anyhow::Result<()> {
-        let skipped: Option<String> = self.microkv.get_as(&self.key_skipped)?;
-        if let Some(v) = skipped {
-            let blocks = parse_blocks_from_text(v)?;
-            self.jump_the_queue(blocks)?;
-            self.microkv.delete(&self.key_skipped)?;
-        }
-        Ok(())
-    }
-
-    pub fn jump_the_queue(&self, mut blocks: Vec<usize>) -> anyhow::Result<()> {
-        let curt: Option<usize> = self.microkv.get_as(&self.key_curt)?;
-        if let Some(v) = curt {
-            blocks.push(v);
-        }
+    pub fn planned(&self, blocks: Vec<usize>) -> anyhow::Result<()> {
         let value: String = blocks.iter().join(",");
         self.microkv.put(&self.key_next, &value)?;
         Ok(())
     }
-
-    pub fn queue(&self, blocks: Vec<usize>) -> anyhow::Result<()> {
-        let value: String = blocks.iter().join(",");
-        self.microkv.put(&self.key_next, &value)?;
-        Ok(())
-    }
-}
-
-fn parse_blocks_from_text(text: String) -> anyhow::Result<Vec<usize>> {
-    let text = text.trim();
-    let mut blocks = vec![];
-    if text.starts_with('[') && text.ends_with(']') {
-        blocks = serde_json::from_str(text)?;
-    } else {
-        let arrs = text.split(',').collect::<Vec<&str>>();
-        for item in arrs {
-            let item = item.trim();
-            if let Ok(v) = item.parse::<usize>() {
-                blocks.push(v);
-            }
-        }
-    }
-    Ok(blocks)
 }

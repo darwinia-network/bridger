@@ -18,6 +18,7 @@ impl EvmClient {
 }
 
 impl EvmClient {
+    /// Query logs by topics
     #[allow(clippy::clone_on_copy)]
     pub async fn get_logs(
         &self,
@@ -40,12 +41,13 @@ impl EvmClient {
         Ok(self.web3.eth().logs(filter).await?)
     }
 
+    /// Query latest block number on evm chain
     pub async fn get_latest_block_number(&self) -> Result<u64> {
         let eth = self.web3.eth();
         let sync_state = eth.syncing().await?;
 
         let latest_block_number = match sync_state {
-            // TOOD: what the difference between eth_blockNumber and eth_getBlockByNumber("latest", false)
+            // TODO: what the difference between eth_blockNumber and eth_getBlockByNumber("latest", false)
             SyncState::NotSyncing => eth.block_number().await?.as_u64(),
             SyncState::Syncing(info) => info.current_block.as_u64(),
         };

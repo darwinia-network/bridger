@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use web3::types::{Log, H160, H256};
 
 use crate::{EvmClient, Result};
@@ -10,7 +12,8 @@ pub trait EvmChain {
 }
 
 #[async_trait]
-pub trait LogsHandler {
+pub trait LogsHandler: Clone + Debug {
+    // todo: change multiple arguments to a struct
     async fn handle(
         &mut self,
         from: u64,

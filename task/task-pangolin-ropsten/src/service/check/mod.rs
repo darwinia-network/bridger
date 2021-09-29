@@ -7,21 +7,21 @@ use component_state::state::BridgeState;
 use support_tracker::Tracker;
 
 use crate::bus::PangolinRopstenBus;
-use crate::service::redeem2::scan::RedeemScanner;
+use crate::service::check::scan::CheckScanner;
 use crate::task::PangolinRopstenTask;
 
 mod scan;
 
 /// Redeem service
 #[derive(Debug)]
-pub struct Redeem2Service {
+pub struct CheckService {
     _greet_scan: Lifeline,
     _greet_handler: Lifeline,
 }
 
-impl BridgeService for Redeem2Service {}
+impl BridgeService for CheckService {}
 
-impl Service for Redeem2Service {
+impl Service for CheckService {
     type Bus = PangolinRopstenBus;
     type Lifeline = anyhow::Result<Self>;
 
@@ -29,20 +29,20 @@ impl Service for Redeem2Service {
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-        let tracker_redeem = Tracker::new(microkv, "scan.ropsten.redeem");
+        let tracker_check = Tracker::new(microkv, "scan.ropsten.check");
 
         // scan task
         let _greet_scan = Self::try_task(
-            &format!("{}-service-redeem-scan", PangolinRopstenTask::NAME),
+            &format!("{}-service-checker-scan", PangolinRopstenTask::NAME),
             async move {
-                let scanner = RedeemScanner::new(tracker_redeem);
+                let scanner = CheckScanner::new(tracker_check);
                 scanner.start().await;
                 Ok(())
             },
         );
         // handler task
         let _greet_handler = Self::try_task(
-            &format!("{}-service-redeem-handler", PangolinRopstenTask::NAME),
+            &format!("{}-service-checker-handler", PangolinRopstenTask::NAME),
             async move { Ok(()) },
         );
         Ok(Self {

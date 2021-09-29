@@ -6,7 +6,7 @@ use web3::{
 
 use crate::Result;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct EvmClient {
     web3: Web3<Http>,
 }

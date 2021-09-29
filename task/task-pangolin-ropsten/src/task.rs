@@ -13,6 +13,7 @@ use crate::service::extrinsics::ExtrinsicsService;
 use crate::service::guard::GuardService;
 use crate::service::pangolin::PangolinService;
 use crate::service::redeem::RedeemService;
+use crate::service::redeem2::Redeem2Service;
 use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 use crate::service::ropsten::RopstenScanService;
 
@@ -63,6 +64,7 @@ impl PangolinRopstenTask {
         stack.spawn_service::<GuardService>()?;
         stack.spawn_service::<PangolinService>()?;
         stack.spawn_service::<ExtrinsicsService>()?;
+        stack.spawn_service::<Redeem2Service>()?;
 
         let mut tx_scan = stack.bus().tx::<DarwiniaEthereumMessage>()?;
         tx_scan

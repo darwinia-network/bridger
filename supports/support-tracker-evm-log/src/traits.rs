@@ -13,13 +13,17 @@ pub trait EvmChain {
 
 #[async_trait]
 pub trait LogsHandler: Clone + Debug {
-    // todo: change multiple arguments to a struct
-    async fn handle(
-        &mut self,
-        from: u64,
-        to: u64,
-        client: &EvmClient,
-        topics_list: &Vec<(H160, Vec<H256>)>,
-        logs: Vec<Log>,
-    ) -> Result<()>;
+    async fn handle(&mut self, data: EvmLogRangeData) -> Result<()>;
+}
+
+#[derive(Clone, Debug)]
+pub struct DefaultLogsHandler;
+
+#[derive(Clone, Debug)]
+pub struct EvmLogRangeData<'a> {
+    pub(crate) from: u64,
+    pub(crate) to: u64,
+    pub(crate) client: &'a EvmClient,
+    pub(crate) topics: &'a Vec<(H160, Vec<H256>)>,
+    pub(crate) logs: Vec<Log>,
 }

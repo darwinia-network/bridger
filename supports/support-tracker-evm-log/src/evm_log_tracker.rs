@@ -1,12 +1,11 @@
 use std::marker::PhantomData;
 use std::time::Duration;
 
-use tokio::time::sleep;
 use web3::types::{Log, H160, H256};
 
 use support_tracker::Tracker;
 
-use crate::{EvmChain, EvmClient, LogsHandler, Result};
+use crate::{EvmChain, EvmClient, EvmLogRangeData, LogsHandler, Result};
 
 #[derive(Debug)]
 pub struct EvmLogTracker<C: EvmChain, H: LogsHandler> {
@@ -41,20 +40,21 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
     pub async fn start(&mut self) -> anyhow::Result<()> {
         self.running = true;
         loop {
+            if !self.running {
+                break;
+            }
             match self.next().await {
                 Err(err) => {
                     return Err(err);
                 }
                 Ok((from, to, logs)) => {
-                    self.handle(from, to, logs).await?;
+                    let data =
+                        EvmLogRangeData::new(from, to, &self.client, &self.topics_list, logs);
+                    self.logs_handler.handle(data).await?;
                 }
             }
 
-            if !self.running {
-                break;
-            }
-
-            sleep(Duration::from_secs(self.step_in_secs)).await;
+            tokio::time::sleep(Duration::from_secs(self.step_in_secs)).await;
         }
 
         Ok(())
@@ -79,12 +79,5 @@ impl<C: EvmChain, H: LogsHandler> EvmLogTracker<C, H> {
             result.extend_from_slice(&logs);
         }
         Ok((from, to, result))
-    }
-
-    async fn handle(&mut self, from: u64, to: u64, logs: Vec<Log>) -> Result<()> {
-        self.logs_handler
-            .handle(from, to, &self.client, &self.topics_list, logs)
-            .await?;
-        Ok(())
     }
 }

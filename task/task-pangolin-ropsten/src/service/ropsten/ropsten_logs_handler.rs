@@ -94,9 +94,12 @@ impl LogsHandler for RopstenLogsHandler {
         for tx in &txs {
             self.redeem(tx).await?;
         }
+        // fixme: there need persist to kv db
         self.sender_to_redeem
             .send(ToRedeemMessage::Check(txs))
             .await?;
+
+        self.tracker.finish(to as usize)?;
         Ok(())
     }
 }

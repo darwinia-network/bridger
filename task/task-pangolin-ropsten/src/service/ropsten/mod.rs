@@ -1,8 +1,10 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Task};
 
+use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
 use support_tracker::Tracker;
 
@@ -11,8 +13,6 @@ use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::ropsten::check::RopstenScanChecker;
 use crate::service::ropsten::scan::RopstenScanRunner;
 use crate::task::PangolinRopstenTask;
-use bridge_traits::bridge::component::BridgeComponent;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 
 mod check;
 mod ropsten_logs_handler;
@@ -39,8 +39,6 @@ impl lifeline::Service for RopstenScanService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         let tracker_scan = Tracker::new(microkv, "scan.ropsten");
-        tracker_scan.clear_parallel_records()?;
-        tracker_scan.enable_parallel()?;
         let tracker_check = tracker_scan.clone();
 
         let _greet_scan = Self::try_task(

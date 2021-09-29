@@ -7,9 +7,9 @@ use postage::broadcast;
 
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
 use support_ethereum::receipt::{EthereumReceiptProofThing, RedeemFor};
+use support_ethereum::transaction::EthereumTransaction;
 
 use crate::bus::PangolinRopstenBus;
-use crate::service::EthereumTransaction;
 
 #[derive(Debug, Clone)]
 pub enum DarwiniaEthereumMessage {

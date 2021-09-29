@@ -20,6 +20,7 @@ use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
 use crate::task::PangolinRopstenTask;
 
 #[derive(Debug)]
+#[deprecated]
 pub struct RedeemService {
     _greet: Lifeline,
 }

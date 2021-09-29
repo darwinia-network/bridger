@@ -13,10 +13,10 @@ use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
 use support_ethereum::receipt::RedeemFor;
+use support_ethereum::transaction::{EthereumTransaction, EthereumTransactionHash};
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
-use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::DarwiniaEthereumTask;
 
 #[derive(Debug)]

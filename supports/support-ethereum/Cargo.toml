@@ -22,6 +22,8 @@ anyhow = "1.0"
 log = "0.4"
 rlp = "0.4.4"
 
+web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+
 serde = { version = "1", features = ["derive"] }
 codec = { package = "parity-scale-codec", version = "2.1", features = ["derive", "full"] }
 

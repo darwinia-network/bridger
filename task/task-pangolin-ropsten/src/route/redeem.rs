@@ -8,10 +8,10 @@ use bridge_traits::bridge::task::TaskTerminal;
 use bridge_traits::error::StandardError;
 use component_ethereum::web3::Web3Component;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use support_ethereum::transaction::{EthereumTransaction, EthereumTransactionHash};
 
 use crate::bus::PangolinRopstenBus;
 use crate::message::ToRedeemMessage;
-use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::PangolinRopstenTask;
 
 pub async fn redeem(

@@ -13,3 +13,4 @@ pub mod parcel;
 pub mod proof;
 pub mod proxy_type;
 pub mod receipt;
+pub mod transaction;

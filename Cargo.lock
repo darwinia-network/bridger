@@ -9365,6 +9365,7 @@ dependencies = [
  "rlp 0.4.6",
  "serde 1.0.130",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "web3",
 ]
 
 [[package]]

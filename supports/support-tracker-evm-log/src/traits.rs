@@ -16,9 +16,12 @@ pub trait LogsHandler: Clone + Debug {
     async fn handle(&mut self, data: EvmLogRangeData) -> Result<()>;
 }
 
+/// Default evm logs handler
+/// Will bee print all logs to console
 #[derive(Clone, Debug)]
 pub struct DefaultLogsHandler;
 
+/// Queried range data of evm logs
 #[derive(Clone, Debug)]
 pub struct EvmLogRangeData<'a> {
     pub(crate) from: u64,

@@ -9416,6 +9416,7 @@ dependencies = [
  "async-trait",
  "component-state",
  "log",
+ "support-ethereum",
  "support-tracker",
  "thiserror",
  "tokio 1.11.0",

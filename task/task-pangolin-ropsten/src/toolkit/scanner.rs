@@ -26,7 +26,7 @@ impl<T: LogsHandler> RopstenScanner<T> {
 impl<T: LogsHandler> RopstenScanner<T> {
     pub async fn start(&self) {
         while let Err(e) = self.run().await {
-            log::error!(target: PangolinRopstenTask::NAME, "ropsten err {:#?}", e);
+            log::error!(target: PangolinRopstenTask::NAME, "Ropsten err {:#?}", e);
             tokio::time::sleep(std::time::Duration::from_secs(10)).await;
         }
     }
@@ -39,7 +39,6 @@ impl<T: LogsHandler> RopstenScanner<T> {
 
         // Components
         let component_web3 = Web3Component::restore::<PangolinRopstenTask>()?;
-        let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
 
         // Config
         let servce_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
@@ -47,9 +46,6 @@ impl<T: LogsHandler> RopstenScanner<T> {
 
         // Web3 client
         let web3 = component_web3.component().await?;
-
-        // Pangolin client
-        let pangolin = component_pangolin_subxt.component().await?;
 
         let topics_list = component_ethereum::helpers::get_topics_list(ethereum_config);
 

@@ -81,7 +81,6 @@ impl RedeemHandler {
 #[async_trait]
 impl LogsHandler for RedeemHandler {
     async fn handle(&mut self, data: EvmLogRangeData) -> anyhow::Result<()> {
-        let to = data.to();
         let txs = data.transactions();
         if txs.is_empty() {
             self.tracker.finish(to as usize)?;
@@ -101,10 +100,10 @@ impl LogsHandler for RedeemHandler {
 
         let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
         // Substrate client
-        let pangolin = component_pangolin_subxt.component().await?;
+        let client = component_pangolin_subxt.component().await?;
 
         for tx in &txs {
-            if toolkit::is_verified(&pangolin, tx)? {
+            if toolkit::is_verified(&client, tx)? {
                 log::trace!(
                     target: PangolinRopstenTask::NAME,
                     "This ethereum tx {:?} has already been redeemed.",

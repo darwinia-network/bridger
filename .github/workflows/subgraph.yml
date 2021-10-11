@@ -10,6 +10,8 @@ jobs:
   ropsten:
     name: Deploy ropsten
     runs-on: ubuntu-latest
+    run:
+      working-directory: thegraph
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -17,7 +19,6 @@ jobs:
           node-version: '16'
       - name: Deploy
         run: |
-          cd the-graph
           npm i
           npm run codegen -- subgraph-ropsten.yaml
           npm run build -- subgraph-ropsten.yaml

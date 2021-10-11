@@ -26,7 +26,7 @@ type BackingEntity @entity {
   newAdmin: Bytes! # address
 }
 
-type Transaction @entity {
+type TransactionEntity @entity {
   id: ID!
   origin: TransactionOrigin!
   blockNumber: BigInt!

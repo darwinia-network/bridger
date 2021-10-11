@@ -1,6 +1,6 @@
 import { BigInt } from "@graphprotocol/graph-ts"
 import { backing, AdminChanged, Upgraded } from "../generated/backing/backing"
-import { BackingEntity, Transaction } from "../generated/schema"
+import { BackingEntity, TransactionEntity } from "../generated/schema"
 
 export function handleAdminChanged(event: AdminChanged): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -46,7 +46,7 @@ export function handleAdminChanged(event: AdminChanged): void {
 }
 
 export function handleUpgraded(event: Upgraded): void {
-  let tx = new Transaction(event.transaction.hash.toHex());
+  let tx = new TransactionEntity(event.transaction.hash.toHex());
   tx.origin = 'Backing';
   tx.blockNumber = event.block.number;
   tx.blockHash = event.block.hash;

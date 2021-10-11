@@ -1,3 +1,10 @@
+
+enum TransactionOrigin {
+  Bank
+  Relay
+  Backing
+}
+
 type BankEntity @entity {
   id: ID!
   count: BigInt!
@@ -17,4 +24,13 @@ type BackingEntity @entity {
   count: BigInt!
   previousAdmin: Bytes! # address
   newAdmin: Bytes! # address
+}
+
+type Transaction @entity {
+  id: ID!
+  origin: TransactionOrigin!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  txHash: Bytes!
+  txIndex: BigInt!
 }

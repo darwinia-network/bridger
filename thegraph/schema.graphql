@@ -9,22 +9,22 @@ enum TransactionOrigin {
 type BankEntity @entity {
   id: ID!
   count: BigInt!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
+  _token: Bytes! # address
+  _owner: Bytes! # address
 }
 
 type RelayEntity @entity {
   id: ID!
   count: BigInt!
-  previousAdmin: Bytes! # address
-  newAdmin: Bytes! # address
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
 }
 
 type BackingEntity @entity {
   id: ID!
   count: BigInt!
-  previousAdmin: Bytes! # address
-  newAdmin: Bytes! # address
+  sender: Bytes! # address
+  source: Bytes! # address
 }
 
 type IssuingEntity @entity {

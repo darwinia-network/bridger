@@ -14,16 +14,31 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - ProxyOwnershipTransferred
-        - Upgraded
+        - ClaimedTokens
+        - NewDeposit
+        - ClaimedDeposit
+        - TransferDeposit
+        - BurnAndRedeem
+        - LogSetAuthority
+        - LogSetOwner
       abis:
         - name: bank
           file: ./abis/bank.json
       eventHandlers:
-        - event: ProxyOwnershipTransferred(address,address)
-          handler: handleProxyOwnershipTransferred
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
+        - event: ClaimedTokens(indexed address,indexed address,uint256)
+          handler: handleClaimedTokens
+        - event: NewDeposit(indexed uint256,indexed address,uint256,uint256,uint256)
+          handler: handleNewDeposit
+        - event: ClaimedDeposit(indexed uint256,indexed address,uint256,bool,uint256)
+          handler: handleClaimedDeposit
+        - event: TransferDeposit(indexed uint256,indexed address,indexed address)
+          handler: handleTransferDeposit
+        - event: BurnAndRedeem(indexed uint256,address,uint48,uint48,uint64,uint128,bytes)
+          handler: handleBurnAndRedeem
+        - event: LogSetAuthority(indexed address)
+          handler: handleLogSetAuthority
+        - event: LogSetOwner(indexed address)
+          handler: handleLogSetOwner
       file: ./src/bank.ts
 
   - kind: ethereum/contract
@@ -38,16 +53,28 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - AdminChanged
-        - Upgraded
+        - OwnershipTransferred
+        - Paused
+        - ResetRootEvent
+        - SetAuthritiesEvent
+        - SetRootEvent
+        - Unpaused
       abis:
         - name: relay
           file: ./abis/relay.json
       eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Paused(address)
+          handler: handlePaused
+        - event: ResetRootEvent(address,bytes32,uint256)
+          handler: handleResetRootEvent
+        - event: SetAuthritiesEvent(uint32,address[],bytes32)
+          handler: handleSetAuthritiesEvent
+        - event: SetRootEvent(address,bytes32,uint256)
+          handler: handleSetRootEvent
+        - event: Unpaused(address)
+          handler: handleUnpaused
       file: ./src/relay.ts
 
   - kind: ethereum/contract
@@ -62,16 +89,28 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - AdminChanged
-        - Upgraded
+        - BackingLock
+        - NewTokenRegistered
+        - OwnershipTransferred
+        - RedeemTokenEvent
+        - RegistCompleted
+        - VerifyProof
       abis:
         - name: backing
           file: ./abis/backing.json
       eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
+        - event: BackingLock(indexed address,address,address,uint256,address,uint256)
+          handler: handleBackingLock
+        - event: NewTokenRegistered(indexed address,string,string,uint8,uint256)
+          handler: handleNewTokenRegistered
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: RedeemTokenEvent(address,address,address,uint256)
+          handler: handleRedeemTokenEvent
+        - event: RegistCompleted(address,address)
+          handler: handleRegistCompleted
+        - event: VerifyProof(uint32)
+          handler: handleVerifyProof
       file: ./src/backing.ts
 
   - kind: ethereum/contract

@@ -1,8 +1,16 @@
 import { BigInt } from "@graphprotocol/graph-ts"
-import { backing, AdminChanged, Upgraded } from "../generated/backing/backing"
-import { BackingEntity, TransactionEntity } from "../generated/schema"
+import {
+  backing,
+  BackingLock,
+  NewTokenRegistered,
+  OwnershipTransferred,
+  RedeemTokenEvent,
+  RegistCompleted,
+  VerifyProof
+} from "../generated/backing/backing"
+import { BackingEntity } from "../generated/schema"
 
-export function handleAdminChanged(event: AdminChanged): void {
+export function handleBackingLock(event: BackingLock): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
   let entity = BackingEntity.load(event.transaction.from.toHex())
@@ -20,8 +28,8 @@ export function handleAdminChanged(event: AdminChanged): void {
   entity.count = entity.count + BigInt.fromI32(1)
 
   // Entity fields can be set based on event parameters
-  entity.previousAdmin = event.params.previousAdmin
-  entity.newAdmin = event.params.newAdmin
+  entity.sender = event.params.sender
+  entity.source = event.params.source
 
   // Entities can be written to the store with `.save()`
   entity.save()
@@ -41,16 +49,26 @@ export function handleAdminChanged(event: AdminChanged): void {
   // The following functions can then be called on this contract to access
   // state variables and other data:
   //
-  // - contract.admin(...)
-  // - contract.implementation(...)
+  // - contract.allAssets(...)
+  // - contract.assetLength(...)
+  // - contract.assets(...)
+  // - contract.crossChainSync(...)
+  // - contract.getIssuingEvent(...)
+  // - contract.history(...)
+  // - contract.owner(...)
+  // - contract.registerFee(...)
+  // - contract.relay(...)
+  // - contract.substrateEventStorageKey(...)
+  // - contract.transferFee(...)
+  // - contract.verifyProof(...)
 }
 
-export function handleUpgraded(event: Upgraded): void {
-  let tx = new TransactionEntity(event.transaction.hash.toHex());
-  tx.origin = 'Backing';
-  tx.blockNumber = event.block.number;
-  tx.blockHash = event.block.hash;
-  tx.txHash = event.transaction.hash;
-  tx.txIndex = event.transaction.index;
-  tx.save()
-}
+export function handleNewTokenRegistered(event: NewTokenRegistered): void {}
+
+export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+
+export function handleRedeemTokenEvent(event: RedeemTokenEvent): void {}
+
+export function handleRegistCompleted(event: RegistCompleted): void {}
+
+export function handleVerifyProof(event: VerifyProof): void {}

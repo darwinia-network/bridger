@@ -1,14 +1,17 @@
 import { BigInt } from "@graphprotocol/graph-ts"
 import {
   bank,
-  ProxyOwnershipTransferred,
-  Upgraded
+  ClaimedTokens,
+  NewDeposit,
+  ClaimedDeposit,
+  TransferDeposit,
+  BurnAndRedeem,
+  LogSetAuthority,
+  LogSetOwner
 } from "../generated/bank/bank"
 import {BankEntity, TransactionEntity} from "../generated/schema"
 
-export function handleProxyOwnershipTransferred(
-  event: ProxyOwnershipTransferred
-): void {
+export function handleClaimedTokens(event: ClaimedTokens): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
   let entity = BankEntity.load(event.transaction.from.toHex())
@@ -26,8 +29,8 @@ export function handleProxyOwnershipTransferred(
   entity.count = entity.count + BigInt.fromI32(1)
 
   // Entity fields can be set based on event parameters
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
+  entity._token = event.params._token
+  entity._owner = event.params._owner
 
   // Entities can be written to the store with `.save()`
   entity.save()
@@ -47,11 +50,52 @@ export function handleProxyOwnershipTransferred(
   // The following functions can then be called on this contract to access
   // state variables and other data:
   //
-  // - contract.proxyOwner(...)
-  // - contract.implementation(...)
+  // - contract.userTotalDeposit(...)
+  // - contract.CONTRACT_USER_POINTS(...)
+  // - contract.userDeposits(...)
+  // - contract.CONTRACT_WATER_ERC20_TOKEN(...)
+  // - contract.CONTRACT_GOLD_ERC20_TOKEN(...)
+  // - contract.depositCount(...)
+  // - contract.CONTRACT_RING_ERC20_TOKEN(...)
+  // - contract.UINT_AUCTION_CUT(...)
+  // - contract.UINT_BANK_UNIT_INTEREST(...)
+  // - contract.CONTRACT_TOKEN_LOCATION(...)
+  // - contract.computePenalty(...)
+  // - contract.computeInterest(...)
+  // - contract.CONTRACT_KTON_ERC20_TOKEN(...)
+  // - contract.CONTRACT_WOOD_ERC20_TOKEN(...)
+  // - contract.CONTRACT_FIRE_ERC20_TOKEN(...)
+  // - contract.UINT_BANK_PENALTY_MULTIPLIER(...)
+  // - contract.isClaimRequirePenalty(...)
+  // - contract.CONTRACT_LAND_BASE(...)
+  // - contract.registry(...)
+  // - contract.CONTRACT_INTERSTELLAR_ENCODER(...)
+  // - contract.CONTRACT_PET_BASE(...)
+  // - contract.CONTRACT_SOIL_ERC20_TOKEN(...)
+  // - contract.owner(...)
+  // - contract.getDeposit(...)
+  // - contract.CONTRACT_OBJECT_OWNERSHIP(...)
+  // - contract.CONTRACT_TOKEN_USE(...)
+  // - contract.deposits(...)
+  // - contract.CONTRACT_ERC721_BRIDGE(...)
+  // - contract.CONTRACT_REVENUE_POOL(...)
+  // - contract.authority(...)
+  // - contract.getDepositIds(...)
+  // - contract.bytesToUint256(...)
+  // - contract.CONTRACT_LAND_RESOURCE(...)
+  // - contract.MONTH(...)
+  // - contract.UINT_REFERER_CUT(...)
+  // - contract.UINT_TOKEN_OFFER_CUT(...)
+  // - contract.CONTRACT_DIVIDENDS_POOL(...)
 }
 
-export function handleUpgraded(event: Upgraded): void {
+export function handleNewDeposit(event: NewDeposit): void {}
+
+export function handleClaimedDeposit(event: ClaimedDeposit): void {}
+
+export function handleTransferDeposit(event: TransferDeposit): void {}
+
+export function handleBurnAndRedeem(event: BurnAndRedeem): void {
   let tx = new TransactionEntity(event.transaction.hash.toHex());
   tx.origin = 'Bank';
   tx.blockNumber = event.block.number;
@@ -60,3 +104,7 @@ export function handleUpgraded(event: Upgraded): void {
   tx.txIndex = event.transaction.index;
   tx.save()
 }
+
+export function handleLogSetAuthority(event: LogSetAuthority): void {}
+
+export function handleLogSetOwner(event: LogSetOwner): void {}

@@ -1,8 +1,16 @@
 import { BigInt } from "@graphprotocol/graph-ts"
-import { relay, AdminChanged, Upgraded } from "../generated/relay/relay"
+import {
+  relay,
+  OwnershipTransferred,
+  Paused,
+  ResetRootEvent,
+  SetAuthritiesEvent,
+  SetRootEvent,
+  Unpaused
+} from "../generated/relay/relay"
 import {RelayEntity, TransactionEntity} from "../generated/schema"
 
-export function handleAdminChanged(event: AdminChanged): void {
+export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
   let entity = RelayEntity.load(event.transaction.from.toHex())
@@ -20,8 +28,8 @@ export function handleAdminChanged(event: AdminChanged): void {
   entity.count = entity.count + BigInt.fromI32(1)
 
   // Entity fields can be set based on event parameters
-  entity.previousAdmin = event.params.previousAdmin
-  entity.newAdmin = event.params.newAdmin
+  entity.previousOwner = event.params.previousOwner
+  entity.newOwner = event.params.newOwner
 
   // Entities can be written to the store with `.save()`
   entity.save()
@@ -41,11 +49,28 @@ export function handleAdminChanged(event: AdminChanged): void {
   // The following functions can then be called on this contract to access
   // state variables and other data:
   //
-  // - contract.admin(...)
-  // - contract.implementation(...)
+  // - contract.checkNetworkPrefix(...)
+  // - contract.checkRelayerNonce(...)
+  // - contract.getLockTokenReceipt(...)
+  // - contract.getMMRRoot(...)
+  // - contract.getNetworkPrefix(...)
+  // - contract.getRelayer(...)
+  // - contract.getRelayerCount(...)
+  // - contract.getRelayerNonce(...)
+  // - contract.getRelayerThreshold(...)
+  // - contract.isRelayer(...)
+  // - contract.mmrRootPool(...)
+  // - contract.owner(...)
+  // - contract.paused(...)
+  // - contract.verifyBlockProof(...)
+  // - contract.verifyRootAndDecodeReceipt(...)
 }
 
-export function handleUpgraded(event: Upgraded): void {
+export function handlePaused(event: Paused): void {}
+
+export function handleResetRootEvent(event: ResetRootEvent): void {}
+
+export function handleSetAuthritiesEvent(event: SetAuthritiesEvent): void {
   let tx = new TransactionEntity(event.transaction.hash.toHex());
   tx.origin = 'Relay';
   tx.blockNumber = event.block.number;
@@ -54,3 +79,7 @@ export function handleUpgraded(event: Upgraded): void {
   tx.txIndex = event.transaction.index;
   tx.save()
 }
+
+export function handleSetRootEvent(event: SetRootEvent): void {}
+
+export function handleUnpaused(event: Unpaused): void {}

@@ -1,6 +1,6 @@
 import { BigInt } from "@graphprotocol/graph-ts"
 import { relay, AdminChanged, Upgraded } from "../generated/relay/relay"
-import { RelayEntity } from "../generated/schema"
+import {RelayEntity, TransactionEntity} from "../generated/schema"
 
 export function handleAdminChanged(event: AdminChanged): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -45,4 +45,12 @@ export function handleAdminChanged(event: AdminChanged): void {
   // - contract.implementation(...)
 }
 
-export function handleUpgraded(event: Upgraded): void {}
+export function handleUpgraded(event: Upgraded): void {
+  let tx = new TransactionEntity(event.transaction.hash.toHex());
+  tx.origin = 'Relay';
+  tx.blockNumber = event.block.number;
+  tx.blockHash = event.block.hash;
+  tx.txHash = event.transaction.hash;
+  tx.txIndex = event.transaction.index;
+  tx.save()
+}

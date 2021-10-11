@@ -4,7 +4,7 @@ import {
   ProxyOwnershipTransferred,
   Upgraded
 } from "../generated/bank/bank"
-import { BankEntity } from "../generated/schema"
+import {BankEntity, TransactionEntity} from "../generated/schema"
 
 export function handleProxyOwnershipTransferred(
   event: ProxyOwnershipTransferred
@@ -51,4 +51,12 @@ export function handleProxyOwnershipTransferred(
   // - contract.implementation(...)
 }
 
-export function handleUpgraded(event: Upgraded): void {}
+export function handleUpgraded(event: Upgraded): void {
+  let tx = new TransactionEntity(event.transaction.hash.toHex());
+  tx.origin = 'Bank';
+  tx.blockNumber = event.block.number;
+  tx.blockHash = event.block.hash;
+  tx.txHash = event.transaction.hash;
+  tx.txIndex = event.transaction.index;
+  tx.save()
+}

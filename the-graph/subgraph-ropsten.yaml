@@ -1,0 +1,73 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: bank
+    network: ropsten
+    source:
+      address: "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e"
+      abi: bank
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - ProxyOwnershipTransferred
+        - Upgraded
+      abis:
+        - name: bank
+          file: ./abis/bank.json
+      eventHandlers:
+        - event: ProxyOwnershipTransferred(address,address)
+          handler: handleProxyOwnershipTransferred
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/bank.ts
+
+  - kind: ethereum/contract
+    name: relay
+    network: ropsten
+    source:
+      address: "0xd374292D512281b56198F0401b149370D680b89F"
+      abi: relay
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - AdminChanged
+        - Upgraded
+      abis:
+        - name: relay
+          file: ./abis/relay.json
+      eventHandlers:
+        - event: AdminChanged(address,address)
+          handler: handleAdminChanged
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/relay.ts
+
+  - kind: ethereum/contract
+    name: backing
+    network: ropsten
+    source:
+      address: "0xb2Bea2358d817dAE01B0FD0DC3aECB25910E65AA"
+      abi: backing
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - AdminChanged
+        - Upgraded
+      abis:
+        - name: backing
+          file: ./abis/backing.json
+      eventHandlers:
+        - event: AdminChanged(address,address)
+          handler: handleAdminChanged
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/backing.ts
+

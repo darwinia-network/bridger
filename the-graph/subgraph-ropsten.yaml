@@ -74,3 +74,38 @@ dataSources:
           handler: handleUpgraded
       file: ./src/backing.ts
 
+  - kind: ethereum/contract
+    name: issuing
+    network: ropsten
+    source:
+      address: "0x49262B932E439271d05634c32978294C7Ea15d0C"
+      abi: issuing
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - ClaimedTokens
+        - BurnAndRedeem
+        - Pause
+        - Unpause
+        - LogSetAuthority
+        - LogSetOwner
+      abis:
+        - name: issuing
+          file: ./abis/issuing.json
+      eventHandlers:
+        - event: ClaimedTokens(indexed address,indexed address,uint256)
+          handler: handleClaimedTokens
+        - event: BurnAndRedeem(indexed address,indexed address,uint256,bytes)
+          handler: handleBurnAndRedeem
+        - event: Pause()
+          handler: handlePause
+        - event: Unpause()
+          handler: handleUnpause
+        - event: LogSetAuthority(indexed address)
+          handler: handleLogSetAuthority
+        - event: LogSetOwner(indexed address)
+          handler: handleLogSetOwner
+      file: ./src/issuing.ts
+

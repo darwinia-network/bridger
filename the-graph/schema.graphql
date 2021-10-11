@@ -2,6 +2,7 @@
 enum TransactionOrigin {
   Bank
   Relay
+  Issuing
   Backing
 }
 
@@ -24,6 +25,13 @@ type BackingEntity @entity {
   count: BigInt!
   previousAdmin: Bytes! # address
   newAdmin: Bytes! # address
+}
+
+type IssuingEntity @entity {
+  id: ID!
+  count: BigInt!
+  token: Bytes! # address
+  owner: Bytes! # address
 }
 
 type TransactionEntity @entity {

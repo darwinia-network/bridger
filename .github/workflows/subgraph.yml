@@ -18,6 +18,7 @@ jobs:
       - name: Deploy
         run: |
           cd the-graph
+          npm i
           npm run codegen -- subgraph-ropsten.yaml
           npm run build -- subgraph-ropsten.yaml
           npm run deploy -- --access-token ${{ secrets.THE_GRAPH_TOKEN }} fewensa/bridge-ropsten subgraph-ropsten.yaml

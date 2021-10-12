@@ -6,7 +6,7 @@ pub(crate) struct QueryTransactionsVars {
     pub(crate) skip: u32,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransactionEntity {
     pub id: String,
     pub origin: TransactionOrigin,

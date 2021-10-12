@@ -10,6 +10,7 @@ use crate::graph::TheGraphLikeEth;
 
 pub mod config;
 pub mod graph;
+mod types;
 
 #[derive(Clone, Debug, Default)]
 pub struct TheGraphLikeEthComponent {

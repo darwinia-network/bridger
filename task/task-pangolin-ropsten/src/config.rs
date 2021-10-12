@@ -5,6 +5,7 @@ use component_ethereum::config::{EthereumConfig, Web3Config};
 use component_http_client::HttpClientConfig;
 use component_pangolin_subxt::config::DarwiniaSubxtConfig;
 use component_shadow::ShadowConfig;
+use component_thegraph_liketh::config::TheGraphLikeEthConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinRopstenConfig {
@@ -14,6 +15,7 @@ pub struct PangolinRopstenConfig {
     pub shadow: ShadowConfig,
     pub task: TaskConfig,
     pub http_client: HttpClientConfig,
+    pub thegraph: TheGraphLikeEthConfig,
 }
 
 impl PangolinRopstenConfig {
@@ -25,6 +27,7 @@ impl PangolinRopstenConfig {
         Config::store(name, self.shadow.clone())?;
         Config::store(name, self.task.clone())?;
         Config::store(name, self.http_client.clone())?;
+        Config::store(name, self.thegraph.clone())?;
         Ok(())
     }
     pub fn template() -> Self {
@@ -35,6 +38,7 @@ impl PangolinRopstenConfig {
             shadow: ShadowConfig::template(),
             task: TaskConfig::template(),
             http_client: HttpClientConfig::template(),
+            thegraph: TheGraphLikeEthConfig::template(),
         }
     }
 }

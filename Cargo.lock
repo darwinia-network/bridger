@@ -9608,6 +9608,7 @@ dependencies = [
  "component-pangolin-subxt",
  "component-shadow",
  "component-state",
+ "component-thegraph-liketh",
  "lifeline",
  "linked-darwinia",
  "log",

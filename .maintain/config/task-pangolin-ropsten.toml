@@ -57,3 +57,6 @@ interval_guard = 30
 
 [http_client]
 timeout = 3000
+
+[thegraph]
+endpoint = "https://api.thegraph.com/subgraphs/name/fewensa/bridge-ropsten"

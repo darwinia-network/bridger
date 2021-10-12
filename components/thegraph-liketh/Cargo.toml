@@ -1,0 +1,30 @@
+[package]
+name = "component-thegraph-liketh"
+version = "0.4.7"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://docs.rs/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2018"
+
+[dependencies]
+anyhow = "1"
+log = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+
+bridge-traits = { path = "../../traits" }
+
+## folow:
+## https://crates.io/crates/gql_client
+## https://github.com/arthurkhlghatyan/gql-client-rs/pull/13
+gql_client = { git = "https://github.com/vyneer/gql-client-rs.git", branch = "fix-serde-export" }

@@ -51,8 +51,6 @@ component-http-client = { path = "../../components/http-client" }
 component-pangolin-subxt = { path = "../../components/client-pangolin-subxt" }
 component-thegraph-liketh = { path = "../../components/thegraph-liketh" }
 
-support-ethereum = { path = "../../supports/support-ethereum" }
 support-tracker = { path = "../../supports/support-tracker" }
-support-tracker-evm-log = { path = "../../supports/support-tracker-evm-log" }
 
 

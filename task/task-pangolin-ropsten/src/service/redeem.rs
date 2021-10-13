@@ -1,56 +1,66 @@
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::config::Config;
-use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Channel, Lifeline, Service, Task};
-use postage::prelude::Sink;
+use std::sync::Arc;
+use std::time::Duration;
 
+use async_recursion::async_recursion;
+use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
+use postage::broadcast;
+use tokio::time::sleep;
+
+use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
-use component_state::state::BridgeState;
-use component_thegraph_liketh::TheGraphLikeEthComponent;
-use support_tracker::Tracker;
-use support_tracker_evm_log::{EvmLogRangeData, LogsHandler};
+use component_pangolin_subxt::from_ethereum::Ethereum2Darwinia;
+use component_shadow::{Shadow, ShadowComponent};
+use support_ethereum::receipt::RedeemFor;
 
 use crate::bus::PangolinRopstenBus;
-use crate::config::TaskConfig;
-use crate::message::{ToRedeemMessage, ToRelayMessage};
-use crate::service::redeem2::scan::RedeemScanner;
+use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
+use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::PangolinRopstenTask;
-use crate::toolkit;
-use crate::toolkit::scanner::RopstenScanner;
 
-/// Redeem service
 #[derive(Debug)]
-pub struct Redeem2Service {
+pub struct RedeemService {
     _greet: Lifeline,
 }
 
-impl BridgeService for Redeem2Service {}
+impl BridgeService for RedeemService {}
 
-impl Service for Redeem2Service {
+impl Service for RedeemService {
     type Bus = PangolinRopstenBus;
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        // Datastore
-        let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-        let tracker = Tracker::new(microkv, "scan.ropsten.redeem");
         // Receiver & Sender
-        let sender_to_relay = bus.tx::<ToRelayMessage>()?;
+        let mut rx = bus.rx::<ToRedeemMessage>()?;
         let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
+        let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
-        // scan task
         let _greet = Self::try_task(
             &format!("{}-service-redeem", PangolinRopstenTask::NAME),
             async move {
-                start(
-                    tracker.clone(),
-                    sender_to_relay.clone(),
-                    sender_to_redeem.clone(),
-                )
-                .await;
+                let mut helper =
+                    RedeemHelper::new(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await;
+
+                while let Some(recv) = rx.recv().await {
+                    if let ToRedeemMessage::EthereumTransaction(tx) = recv {
+                        if let Err(err) = helper.redeem(tx.clone()).await {
+                            error!(target: PangolinRopstenTask::NAME, "redeem err: {:#?}", err);
+                            // TODO: Consider the errors more carefully
+                            // Maybe a websocket err, so wait 10 secs to reconnect.
+                            sleep(Duration::from_secs(10)).await;
+                            helper = RedeemHelper::new(
+                                sender_to_extrinsics.clone(),
+                                sender_to_redeem.clone(),
+                            )
+                            .await;
+                            // for any error when helper recreated, we need put this tx back to the
+                            // receive queue
+                            let _ = helper.retry(tx);
+                        }
+                    }
+                }
+
                 Ok(())
             },
         );
@@ -58,83 +68,145 @@ impl Service for Redeem2Service {
     }
 }
 
-async fn start(
-    tracker: Tracker,
-    mut sender_to_relay: <ToRelayMessage::Channel as Channel>::Tx,
-    mut sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
-) {
-    while let Err(err) = run(&tracker, &mut sender_to_relay, &mut sender_to_redeem).await {
-        log::error!(
-            target: PangolinRopstenTask::NAME,
-            "ropsten redeem err {:#?}",
-            err
-        );
-        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-    }
+struct RedeemHelper {
+    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+    darwinia: Ethereum2Darwinia,
+    shadow: Arc<Shadow>,
 }
 
-async fn run(
-    tracker: &Tracker,
-    sender_to_relay: &mut <ToRelayMessage::Channel as Channel>::Tx,
-    sender_to_redeem: &mut <ToRedeemMessage::Channel as Channel>::Tx,
-) -> anyhow::Result<()> {
-    log::info!(
-        target: PangolinRopstenTask::NAME,
-        "ROPSTEN SCAN SERVICE RESTARTING..."
-    );
-
-    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
-    let thegraph_liketh = component_thegraph_liketh.component().await?;
-    let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
-
-    loop {
-        let offset = tracker.next().await?;
-        let limit = 10;
-
-        let txs = thegraph_liketh
-            .query_transactions(limit, offset as u32)
-            .await?;
-        // send transactions to relay
-        for tx in &txs {
-            log::trace!(
-                target: PangolinRopstenTask::NAME,
-                "{:?} in ethereum block {}",
-                &tx.tx_hash,
-                &tx.block
-            );
-            // question: why there use tx.blockNumber + 1
-            sender_to_relay
-                .send(ToRelayMessage::EthereumBlockNumber(tx.block_number + 1))
-                .await?;
-        }
-
-        // send transactions to redeem
-        for tx in &txs {
-            if toolkit::is_verified(&client, tx)? {
-                log::trace!(
+impl RedeemHelper {
+    #[async_recursion]
+    pub async fn new(
+        sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+        sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+    ) -> Self {
+        match RedeemHelper::build(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await {
+            Ok(helper) => helper,
+            Err(err) => {
+                error!(
                     target: PangolinRopstenTask::NAME,
-                    "This ethereum tx {:?} has already been redeemed.",
-                    tx.enclosed_hash()
+                    "redeem init err: {:#?}", err
                 );
-                continue;
+                sleep(Duration::from_secs(10)).await;
+                RedeemHelper::new(sender_to_extrinsics, sender_to_redeem).await
             }
+        }
+    }
 
-            log::trace!(
+    async fn build(
+        sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+        sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+    ) -> anyhow::Result<Self> {
+        info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
+
+        // Components
+        let component_darwinia = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+        let component_shadow = ShadowComponent::restore::<PangolinRopstenTask>()?;
+
+        // Darwinia client
+        let darwinia = component_darwinia.component().await?;
+        let darwinia = Ethereum2Darwinia::new(darwinia.clone());
+
+        // Shadow client
+        let shadow = Arc::new(component_shadow.component().await?);
+
+        info!(
+            target: PangolinRopstenTask::NAME,
+            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA REDEEM"
+        );
+        Ok(RedeemHelper {
+            sender_to_extrinsics,
+            sender_to_redeem,
+            darwinia,
+            shadow,
+        })
+    }
+
+    pub async fn retry(&mut self, tx: EthereumTransaction) -> anyhow::Result<()> {
+        self.sender_to_redeem
+            .send(ToRedeemMessage::EthereumTransaction(tx))
+            .await?;
+        Ok(())
+    }
+
+    pub async fn redeem(&self, tx: EthereumTransaction) -> anyhow::Result<()> {
+        RedeemHelper::do_redeem(
+            self.darwinia.clone(),
+            self.shadow.clone(),
+            tx,
+            self.sender_to_extrinsics.clone(),
+            self.sender_to_redeem.clone(),
+        )
+        .await?;
+
+        Ok(())
+    }
+
+    async fn do_redeem(
+        ethereum2darwinia: Ethereum2Darwinia,
+        shadow: Arc<Shadow>,
+        tx: EthereumTransaction,
+        mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+        mut sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+    ) -> anyhow::Result<()> {
+        trace!(
+            target: PangolinRopstenTask::NAME,
+            "Try to redeem ethereum tx {:?}...",
+            tx.tx_hash
+        );
+
+        // 1. Checking before redeem
+        if ethereum2darwinia
+            .darwinia
+            .verified(tx.block_hash, tx.index)
+            .await?
+            || ethereum2darwinia
+                .darwinia
+                .verified_issuing(tx.block_hash, tx.index)
+                .await?
+        {
+            trace!(
                 target: PangolinRopstenTask::NAME,
-                "send to redeem service: {:?}",
-                &tx.tx_hash
+                "Ethereum tx {:?} redeemed",
+                tx.tx_hash
             );
-            sender_to_redeem
-                .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
-                .await?;
-            log::trace!(
-                target: PangolinRopstenTask::NAME,
-                "finished to send to redeem: {:?}",
-                &tx.tx_hash
-            );
+            return Ok(());
         }
 
-        tracker.finish((offset + limit) - 1)?;
-        tokio::time::sleep(std::time::Duration::from_secs(task_config.interval_redeem)).await;
+        let last_confirmed = ethereum2darwinia.last_confirmed().await?;
+        if tx.block >= last_confirmed {
+            trace!(
+                target: PangolinRopstenTask::NAME,
+                "Ethereum tx {:?}'s block {} is large than last confirmed block {}",
+                tx.tx_hash,
+                tx.block,
+                last_confirmed,
+            );
+            sleep(Duration::from_secs(30)).await;
+            sender_to_redeem
+                .send(ToRedeemMessage::EthereumTransaction(tx))
+                .await?;
+            return Ok(());
+        }
+
+        // 2. Do redeem
+        let proof = shadow
+            .receipt(&format!("{:?}", tx.enclosed_hash()), last_confirmed)
+            .await?;
+        let redeem_for = match tx.tx_hash {
+            EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
+            EthereumTransactionHash::Token(_) => RedeemFor::Token,
+            EthereumTransactionHash::SetAuthorities(_) => RedeemFor::SetAuthorities,
+            EthereumTransactionHash::RegisterErc20Token(_) => RedeemFor::RegisterErc20Token,
+            EthereumTransactionHash::RedeemErc20Token(_) => RedeemFor::RedeemErc20Token,
+        };
+
+        let ex = Extrinsic::Redeem(redeem_for, proof, tx);
+        sender_to_extrinsics
+            .send(ToExtrinsicsMessage::Extrinsic(ex))
+            .await?;
+
+        Ok(())
     }
 }

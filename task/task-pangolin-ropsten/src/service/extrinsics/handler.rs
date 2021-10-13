@@ -30,18 +30,18 @@ pub struct ExtrinsicsHandler {
 }
 
 impl ExtrinsicsHandler {
-    #[async_recursion]
     pub async fn new(state: BridgeState) -> Self {
-        match ExtrinsicsHandler::build(state.clone()).await {
-            Ok(helper) => helper,
-            Err(err) => {
-                log::error!(
-                    target: PangolinRopstenTask::NAME,
-                    "extrinsics init err: {:#?}",
-                    err
-                );
-                tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-                ExtrinsicsHandler::new(state).await
+        loop {
+            match Self::build(state.clone()).await {
+                Ok(handler) => return handler,
+                Err(err) => {
+                    log::error!(
+                        target: PangolinRopstenTask::NAME,
+                        "extrinsics init err: {:#?}",
+                        err
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                }
             }
         }
     }

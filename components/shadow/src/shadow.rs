@@ -6,8 +6,8 @@ use serde::Serialize;
 use serde_json::Value;
 
 use bridge_traits::error::StandardError;
+use component_ethereum::client::EthereumClient;
 use component_ethereum::error::{BizError, ComponentEthereumResult};
-use component_ethereum::ethereum_rpc::EthereumRpc;
 use support_ethereum::mmr::{MMRRoot, MMRRootJson};
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
 use support_ethereum::proof::{EthereumRelayProofs, EthereumRelayProofsJson};
@@ -43,7 +43,7 @@ pub struct Shadow {
     /// shadow config
     pub config: ShadowConfig,
     /// Ethereum RPC
-    pub eth: EthereumRpc,
+    pub eth: EthereumClient,
     /// HTTP Client
     pub http: Client,
 }
@@ -90,7 +90,7 @@ impl Shadow {
         number: usize,
     ) -> ComponentEthereumResult<EthereumRelayHeaderParcel> {
         let mmr_root = self.get_parent_mmr_root(number).await?;
-        let header = self.eth.get_header_by_number(number as u64).await?;
+        let header = self.eth.rpc().get_header_by_number(number as u64).await?;
 
         Ok(EthereumRelayHeaderParcel {
             header,

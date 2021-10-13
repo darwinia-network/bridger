@@ -5,13 +5,16 @@ use reqwest::Client;
 use support_ethereum::block::{EthereumBlockRPC, EthereumHeader};
 use support_ethereum::receipt::EthReceiptBody;
 
+use crate::client::block::EthBlockRPCResp;
+use crate::client::rpc::block::EthBlockRPCResp;
+use crate::client::rpc::receipt::EthReceiptRPCResp;
 use crate::config::EthereumConfig;
 use crate::error::{ComponentEthereumError, ComponentEthereumResult};
-use crate::ethereum_rpc::block::EthBlockRPCResp;
-use crate::ethereum_rpc::receipt::EthReceiptRPCResp;
 
-/// Ethereum rpc set
-pub struct EthereumRpc {
+mod block;
+mod receipt;
+
+pub struct EthereumRpcClient {
     /// Reqwest client
     client: Client,
     /// config
@@ -20,7 +23,7 @@ pub struct EthereumRpc {
     atom: AtomicUsize,
 }
 
-impl EthereumRpc {
+impl EthereumRpcClient {
     pub fn new(client: Client, config: EthereumConfig) -> Self {
         let atom = AtomicUsize::new(config.atom);
         Self {
@@ -29,8 +32,9 @@ impl EthereumRpc {
             atom,
         }
     }
+
     /// Generate random RPC
-    pub fn rpc(&self) -> &str {
+    fn endpoint(&self) -> &str {
         let next = (self.atom.load(Ordering::SeqCst) + 1) % self.config.endpoint.len();
         self.atom.store(next, Ordering::SeqCst);
         &self.config.endpoint[next]
@@ -41,21 +45,15 @@ impl EthereumRpc {
 ///
 /// Verify the result of infura will not response empty header with hash
 /// 0x00000...
-// #[async_trait]
-impl EthereumRpc {
-    // type Header = EthereumHeader;
-    // type Receipt = EthReceiptBody;
-    // type Block = EthereumBlockRPC;
-
+impl EthereumRpcClient {
     pub async fn get_block_by_hash(
         &self,
         block: &str,
     ) -> ComponentEthereumResult<EthereumBlockRPC> {
-        Ok(
-            EthBlockRPCResp::get_by_hash(&self.client, self.rpc(), block)
-                .await?
-                .result,
-        )
+        let block = EthBlockRPCResp::get_by_hash(&self.client, self.rpc(), block)
+            .await?
+            .result;
+        Ok(block)
     }
 
     pub async fn get_block_by_number(

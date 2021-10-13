@@ -2,7 +2,7 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::error::BridgeResult;
-use component_ethereum::ethereum_rpc::EthereumRpcComponent;
+use component_ethereum::client::EthereumComponent;
 use component_http_client::HttpClientComponent;
 
 pub use self::config::*;
@@ -15,19 +15,19 @@ mod shadow;
 pub struct ShadowComponent {
     config: ShadowConfig,
     http_client_component: HttpClientComponent,
-    ethereum_rpc_component: EthereumRpcComponent,
+    ethereum_component: EthereumComponent,
 }
 
 impl ShadowComponent {
     pub fn new(
         config: ShadowConfig,
         http_client_component: HttpClientComponent,
-        ethereum_rpc_component: EthereumRpcComponent,
+        ethereum_component: EthereumComponent,
     ) -> Self {
         Self {
             config,
             http_client_component,
-            ethereum_rpc_component,
+            ethereum_component,
         }
     }
 }
@@ -38,7 +38,7 @@ impl BridgeComponent<ShadowConfig, Shadow> for ShadowComponent {
         let config: ShadowConfig = Config::restore_with_namespace(T::NAME, &namespace)?;
         let component_http_client =
             HttpClientComponent::restore_with_namespace::<T>(namespace.clone())?;
-        let component_ethereum_rpc = EthereumRpcComponent::restore_with_namespace::<T>(namespace)?;
+        let component_ethereum_rpc = EthereumComponent::restore_with_namespace::<T>(namespace)?;
         Ok(Self::new(
             config,
             component_http_client,
@@ -48,8 +48,12 @@ impl BridgeComponent<ShadowConfig, Shadow> for ShadowComponent {
 
     async fn component(&self) -> anyhow::Result<Shadow> {
         let http_client = self.http_client_component.component().await?;
-        let ethereum_rpc = self.ethereum_rpc_component.component().await?;
-        Ok(Shadow::new(self.config.clone(), http_client, ethereum_rpc))
+        let ethereum_client = self.ethereum_component.component().await?;
+        Ok(Shadow::new(
+            self.config.clone(),
+            http_client,
+            ethereum_client,
+        ))
     }
 
     fn config(&self) -> &ShadowConfig {

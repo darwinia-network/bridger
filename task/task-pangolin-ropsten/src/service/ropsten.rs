@@ -14,11 +14,10 @@ use support_tracker_evm_log::{EvmLogRangeData, LogsHandler};
 
 use crate::bus::PangolinRopstenBus;
 use crate::config::TaskConfig;
+use crate::helpers;
 use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::redeem2::scan::RedeemScanner;
 use crate::task::PangolinRopstenTask;
-use crate::toolkit;
-use crate::toolkit::scanner::RopstenScanner;
 
 /// Redeem service
 #[derive(Debug)]
@@ -87,6 +86,10 @@ async fn run(
     let thegraph_liketh = component_thegraph_liketh.component().await?;
     let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
+    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+    // Darwinia client
+    let darwinia = component_pangolin_subxt.component().await?;
+
     loop {
         let offset = tracker.next().await?;
         let limit = 10;
@@ -110,7 +113,7 @@ async fn run(
 
         // send transactions to redeem
         for tx in &txs {
-            if toolkit::is_verified(&client, tx)? {
+            if helpers::is_verified(&darwinia, tx)? {
                 log::trace!(
                     target: PangolinRopstenTask::NAME,
                     "This ethereum tx {:?} has already been redeemed.",

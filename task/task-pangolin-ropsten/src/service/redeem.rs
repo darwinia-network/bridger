@@ -16,9 +16,9 @@ use component_thegraph_liketh::types::TransactionEntity;
 use support_ethereum::receipt::RedeemFor;
 
 use crate::bus::PangolinRopstenBus;
+use crate::helpers;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
 use crate::task::PangolinRopstenTask;
-use crate::toolkit;
 
 #[derive(Debug)]
 pub struct RedeemService {
@@ -158,7 +158,7 @@ impl RedeemHelper {
         );
 
         // 1. Checking before redeem
-        if toolkit::is_verified(&ethereum2darwinia.darwinia, &tx)? {
+        if helpers::is_verified(&ethereum2darwinia.darwinia, &tx)? {
             log::trace!(
                 target: PangolinRopstenTask::NAME,
                 "Ethereum tx {:?} redeemed",

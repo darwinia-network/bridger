@@ -8,6 +8,7 @@ use lifeline::{Lifeline, Service, Task};
 
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::TransactionEntity;
 use component_thegraph_liketh::TheGraphLikeEthComponent;
@@ -15,8 +16,8 @@ use support_tracker::Tracker;
 
 use crate::bus::PangolinRopstenBus;
 use crate::config::TaskConfig;
+use crate::helpers;
 use crate::task::PangolinRopstenTask;
-use crate::toolkit;
 
 /// Check service
 #[derive(Debug)]
@@ -69,6 +70,10 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
     let thegraph_liketh = component_thegraph_liketh.component().await?;
     // let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
+    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+    // Darwinia client
+    let darwinia = component_pangolin_subxt.component().await?;
+
     loop {
         // todo: put this to config
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -99,7 +104,7 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
                 .collect::<Vec<&TransactionEntity>>();
             let mut failed_tx = None;
             for tx in txs_for_block {
-                match toolkit::is_verified(&client, tx).await {
+                match helpers::is_verified(&darwinia, tx).await {
                     Ok(false) => {
                         all_verified = false;
                         failed_tx = Some(tx.clone());

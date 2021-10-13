@@ -268,7 +268,8 @@ impl DarwiniaServiceRunner {
             EventInfo::ScheduleAuthoritiesChangeEvent(event) => {
                 info!(
                     target: PangolinRopstenTask::NAME,
-                    "find schedule authorities change event, number {:?}", header.number);
+                    "find schedule authorities change event, number {:?}", header.number
+                );
                 if self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)
@@ -304,7 +305,9 @@ impl DarwiniaServiceRunner {
                         .await?;
                     info!(
                         target: PangolinRopstenTask::NAME,
-                        "Submit authorities to ethereum at {:?} with tx: {}", header.number, tx_hash
+                        "Submit authorities to ethereum at {:?} with tx: {}",
+                        header.number,
+                        tx_hash
                     );
                 }
             }
@@ -312,7 +315,8 @@ impl DarwiniaServiceRunner {
             EventInfo::ScheduleMMRRootEvent(event) => {
                 info!(
                     target: PangolinRopstenTask::NAME,
-                    "Find Schedule MMRRoot event at {:?}", header.number);
+                    "Find Schedule MMRRoot event at {:?}", header.number
+                );
                 if self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)

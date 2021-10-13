@@ -63,6 +63,7 @@ export function handleBurnAndRedeem(event: BurnAndRedeem): void {
   tx.blockHash = event.block.hash;
   tx.txHash = event.transaction.hash;
   tx.txIndex = event.transaction.index;
+  tx.txType = 'Token';
   tx.save()
 }
 

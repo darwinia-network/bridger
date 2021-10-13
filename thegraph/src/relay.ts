@@ -77,6 +77,7 @@ export function handleSetAuthritiesEvent(event: SetAuthritiesEvent): void {
   tx.blockHash = event.block.hash;
   tx.txHash = event.transaction.hash;
   tx.txIndex = event.transaction.index;
+  tx.txType = 'SetAuthorities';
   tx.save()
 }
 

@@ -17,6 +17,7 @@ export function handleBackingLock(event: BackingLock): void {
   tx.blockHash = event.block.hash;
   tx.txHash = event.transaction.hash;
   tx.txIndex = event.transaction.index;
+  tx.txType = 'RedeemErc20Token';
   tx.save()
 }
 
@@ -27,6 +28,7 @@ export function handleNewTokenRegistered(event: NewTokenRegistered): void {
   tx.blockHash = event.block.hash;
   tx.txHash = event.transaction.hash;
   tx.txIndex = event.transaction.index;
+  tx.txType = 'RegisterErc20Token';
   tx.save()
 }
 

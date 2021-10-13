@@ -64,7 +64,11 @@ async fn start(
     mut sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
 ) {
     while let Err(err) = run(&tracker, &mut sender_to_relay, &mut sender_to_redeem).await {
-        log::error!(target: PangolinRopstenTask::NAME, "ropsten err {:#?}", err);
+        log::error!(
+            target: PangolinRopstenTask::NAME,
+            "ropsten redeem err {:#?}",
+            err
+        );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
     }
 }

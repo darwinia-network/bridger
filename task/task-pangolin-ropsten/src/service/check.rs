@@ -1,23 +1,22 @@
 use std::collections::HashSet;
 use std::iter::FromIterator;
 
+use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::config::Config;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
-use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
-use support_ethereum::transaction::EthereumTransaction;
+use component_thegraph_liketh::types::TransactionEntity;
+use component_thegraph_liketh::TheGraphLikeEthComponent;
 use support_tracker::Tracker;
-use support_tracker_evm_log::{EvmLogRangeData, LogsHandler};
 
 use crate::bus::PangolinRopstenBus;
-use crate::service::check::scan::CheckScanner;
+use crate::config::TaskConfig;
 use crate::task::PangolinRopstenTask;
 use crate::toolkit;
-use crate::toolkit::scanner::RopstenScanner;
 
 /// Check service
 #[derive(Debug)]
@@ -39,11 +38,9 @@ impl Service for CheckService {
 
         // scan task
         let _greet = Self::try_task(
-            &format!("{}-service-checker", PangolinRopstenTask::NAME),
+            &format!("{}-service-check", PangolinRopstenTask::NAME),
             async move {
-                let handler = CheckHandler::new(tracker.clone());
-                let scanner = RopstenScanner::new(tracker.clone(), handler);
-                scanner.start().await;
+                start(tracker.clone()).await;
                 Ok(())
             },
         );
@@ -51,35 +48,40 @@ impl Service for CheckService {
     }
 }
 
-#[derive(Clone, Debug)]
-struct CheckHandler {
-    tracker: Tracker,
-    times: u32,
-}
-
-impl CheckHandler {
-    pub fn new(tracker: Tracker) -> Self {
-        Self { tracker, times: 0 }
+async fn start(tracker: Tracker) {
+    while let Err(err) = run(&tracker).await {
+        log::error!(
+            target: PangolinRopstenTask::NAME,
+            "ropsten check err {:#?}",
+            err
+        );
+        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
     }
 }
 
-#[async_trait]
-impl LogsHandler for CheckHandler {
-    async fn handle(&mut self, data: EvmLogRangeData) -> anyhow::Result<()> {
-        self.times += 1;
-        let txs = data.transactions();
-        if txs.is_empty() {
-            self.tracker.finish(to as usize)?;
-            self.times = 0;
-            return Ok(());
-        }
-        let blocks: HashSet<u64> =
-            HashSet::from_iter(txs.iter().map(|tx| tx.block).collect::<Vec<u64>>());
-        let mut verified_blocks = vec![];
+async fn run(tracker: &Tracker) -> anyhow::Result<()> {
+    log::info!(
+        target: PangolinRopstenTask::NAME,
+        "ROPSTEN CHECK SERVICE RESTARTING..."
+    );
 
-        let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-        // Substrate client
-        let client = component_pangolin_subxt.component().await?;
+    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
+    let thegraph_liketh = component_thegraph_liketh.component().await?;
+    // let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
+
+    loop {
+        // todo: put this to config
+        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+
+        let offset = tracker.next().await?;
+        let limit = 10;
+
+        let txs = thegraph_liketh
+            .query_transactions(limit, offset as u32)
+            .await?;
+
+        let blocks: HashSet<u64> =
+            HashSet::from_iter(txs.iter().map(|tx| tx.block_number).collect::<Vec<u64>>());
 
         // start check
         for block in blocks {
@@ -90,10 +92,11 @@ impl LogsHandler for CheckHandler {
             );
 
             let mut all_verified = true;
+
             let txs_for_block = txs
                 .iter()
-                .filter(|tx| tx.block == block)
-                .collect::<Vec<&EthereumTransaction>>();
+                .filter(|tx| tx.block_number == block)
+                .collect::<Vec<&TransactionEntity>>();
             let mut failed_tx = None;
             for tx in txs_for_block {
                 match toolkit::is_verified(&client, tx).await {
@@ -125,16 +128,15 @@ impl LogsHandler for CheckHandler {
                     block,
                     failed_tx,
                 );
+                // todo: Set maximum time
                 continue;
             }
-            verified_blocks.push(block);
+            verified_blocks.push((offset + limit) - 1);
             log::trace!(
                 target: PangolinRopstenTask::NAME,
                 "Block {} successes check",
                 block,
             );
         }
-
-        todo!()
     }
 }

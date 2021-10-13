@@ -2,6 +2,7 @@
 
 use std::fmt::Debug;
 
+use component_thegraph_liketh::types::TransactionEntity;
 use lifeline::Message;
 use postage::broadcast;
 
@@ -46,8 +47,7 @@ impl Message<PangolinRopstenBus> for ToRelayMessage {
 // *** ToRedeemMessage **
 #[derive(Clone, Debug)]
 pub enum ToRedeemMessage {
-    EthereumTransaction(EthereumTransaction),
-    Complete(usize), // Complete redeem, the arguments is block number
+    EthereumTransaction(TransactionEntity),
 }
 
 impl Message<PangolinRopstenBus> for ToRedeemMessage {

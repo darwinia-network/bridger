@@ -1,4 +1,5 @@
 use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::config::Config;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Channel, Lifeline, Service, Task};
 use postage::prelude::Sink;
@@ -7,10 +8,12 @@ use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
+use component_thegraph_liketh::TheGraphLikeEthComponent;
 use support_tracker::Tracker;
 use support_tracker_evm_log::{EvmLogRangeData, LogsHandler};
 
 use crate::bus::PangolinRopstenBus;
+use crate::config::TaskConfig;
 use crate::message::{ToRedeemMessage, ToRelayMessage};
 use crate::service::redeem2::scan::RedeemScanner;
 use crate::task::PangolinRopstenTask;
@@ -33,23 +36,21 @@ impl Service for Redeem2Service {
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-        let tracker_redeem = Tracker::new(microkv, "scan.ropsten.redeem");
-
+        let tracker = Tracker::new(microkv, "scan.ropsten.redeem");
         // Receiver & Sender
         let sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
 
         // scan task
         let _greet = Self::try_task(
-            &format!("{}-service-redeem-scan", PangolinRopstenTask::NAME),
+            &format!("{}-service-redeem", PangolinRopstenTask::NAME),
             async move {
-                let handler = RedeemHandler::new(
-                    tracker_redeem.clone(),
+                start(
+                    tracker.clone(),
                     sender_to_relay.clone(),
                     sender_to_redeem.clone(),
-                );
-                let scanner = RopstenScanner::new(tracker_redeem.clone(), handler);
-                scanner.start().await;
+                )
+                .await;
                 Ok(())
             },
         );
@@ -57,35 +58,39 @@ impl Service for Redeem2Service {
     }
 }
 
-#[derive(Clone, Debug)]
-struct RedeemHandler {
+async fn start(
     tracker: Tracker,
-    sender_to_relay: <ToRelayMessage::Channel as Channel>::Tx,
-    sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
-}
-
-impl RedeemHandler {
-    pub fn new(
-        tracker: Tracker,
-        sender_to_relay: <ToRelayMessage::Channel as Channel>::Tx,
-        sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
-    ) -> Self {
-        Self {
-            tracker,
-            sender_to_relay,
-            sender_to_redeem,
-        }
+    mut sender_to_relay: <ToRelayMessage::Channel as Channel>::Tx,
+    mut sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
+) {
+    while let Err(err) = run(&tracker, &mut sender_to_relay, &mut sender_to_redeem).await {
+        log::error!(target: PangolinRopstenTask::NAME, "ropsten err {:#?}", err);
+        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
     }
 }
 
-#[async_trait]
-impl LogsHandler for RedeemHandler {
-    async fn handle(&mut self, data: EvmLogRangeData) -> anyhow::Result<()> {
-        let txs = data.transactions();
-        if txs.is_empty() {
-            self.tracker.finish(to as usize)?;
-            return Ok(());
-        }
+async fn run(
+    tracker: &Tracker,
+    sender_to_relay: &mut <ToRelayMessage::Channel as Channel>::Tx,
+    sender_to_redeem: &mut <ToRedeemMessage::Channel as Channel>::Tx,
+) -> anyhow::Result<()> {
+    log::info!(
+        target: PangolinRopstenTask::NAME,
+        "ROPSTEN SCAN SERVICE RESTARTING..."
+    );
+
+    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
+    let thegraph_liketh = component_thegraph_liketh.component().await?;
+    let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
+
+    loop {
+        let offset = tracker.next().await?;
+        let limit = 10;
+
+        let txs = thegraph_liketh
+            .query_transactions(limit, offset as u32)
+            .await?;
+        // send transactions to relay
         for tx in &txs {
             log::trace!(
                 target: PangolinRopstenTask::NAME,
@@ -93,15 +98,13 @@ impl LogsHandler for RedeemHandler {
                 &tx.tx_hash,
                 &tx.block
             );
-            self.sender_to_relay
-                .send(ToRelayMessage::EthereumBlockNumber(tx.block + 1))
+            // question: why there use tx.blockNumber + 1
+            sender_to_relay
+                .send(ToRelayMessage::EthereumBlockNumber(tx.block_number + 1))
                 .await?;
         }
 
-        let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-        // Substrate client
-        let client = component_pangolin_subxt.component().await?;
-
+        // send transactions to redeem
         for tx in &txs {
             if toolkit::is_verified(&client, tx)? {
                 log::trace!(
@@ -117,7 +120,7 @@ impl LogsHandler for RedeemHandler {
                 "send to redeem service: {:?}",
                 &tx.tx_hash
             );
-            self.sender_to_redeem
+            sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;
             log::trace!(
@@ -126,7 +129,8 @@ impl LogsHandler for RedeemHandler {
                 &tx.tx_hash
             );
         }
-        self.tracker.finish(to as usize)?;
-        Ok(())
+
+        tracker.finish((offset + limit) - 1)?;
+        tokio::time::sleep(std::time::Duration::from_secs(task_config.interval_redeem)).await;
     }
 }

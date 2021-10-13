@@ -7,6 +7,20 @@ pub(crate) struct QueryTransactionsVars {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum TransactionType {
+    /// Deposit event
+    Deposit,
+    /// Token event
+    Token,
+    /// SetAuthoritiesEvent
+    SetAuthorities,
+    /// RegisterErc20Token
+    RegisterErc20Token,
+    /// RedeemErc20Token
+    RedeemErc20Token,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransactionEntity {
     pub id: String,
     pub origin: TransactionOrigin,
@@ -20,4 +34,6 @@ pub struct TransactionEntity {
     #[serde(rename = "txIndex")]
     #[serde(deserialize_with = "serde_aux::field_attributes::deserialize_number_from_string")]
     pub tx_index: u64,
+    #[serde(rename = "txType")]
+    pub tx_type: TransactionType,
 }

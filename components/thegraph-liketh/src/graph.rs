@@ -16,7 +16,7 @@ impl<'a> TheGraphLikeEth<'a> {
 
 impl<'a> TheGraphLikeEth<'a> {
     /// Query transactions page
-    pub fn query_transactions(
+    pub async fn query_transactions(
         &self,
         first: u32,
         skip: u32,
@@ -35,6 +35,7 @@ impl<'a> TheGraphLikeEth<'a> {
             blockHash
             txHash
             txIndex
+            txType
           }
         }
         "#;

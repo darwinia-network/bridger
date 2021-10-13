@@ -19,7 +19,7 @@ use component_pangolin_subxt::{
     to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum},
 };
 use component_state::state::BridgeState;
-use support_ethereum::receipt::RedeemFor;
+use component_thegraph_liketh::types::TransactionType;
 
 use crate::bus::PangolinRopstenBus;
 use crate::message::{Extrinsic, ToExtrinsicsMessage};
@@ -51,9 +51,7 @@ impl Service for ExtrinsicsService {
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToExtrinsicsMessage::Extrinsic(ex) => {
-                            while let Err(err) =
-                                helper.send_extrinsic(ex.clone()).await
-                            {
+                            while let Err(err) = helper.send_extrinsic(ex.clone()).await {
                                 error!(
                                     target: PangolinRopstenTask::NAME,
                                     "extrinsics err: {:#?}", err
@@ -143,10 +141,7 @@ impl ExtrinsicsHelper {
         })
     }
 
-    async fn send_extrinsic(
-        &self,
-        ex: Extrinsic,
-    ) -> anyhow::Result<()> {
+    async fn send_extrinsic(&self, ex: Extrinsic) -> anyhow::Result<()> {
         let microkv = self.state.microkv();
         do_send_extrinsic(
             microkv,
@@ -192,68 +187,67 @@ async fn do_send_extrinsic(
             }
         }
 
-        Extrinsic::Redeem(redeem_for, proof, ethereum_tx) => {
-            match redeem_for {
-                RedeemFor::SetAuthorities => {
-                    if let Some(darwinia2ethereum) = &darwinia2ethereum {
-                        if let Some(relayer) = &darwinia2ethereum_relayer {
-                            let ex_hash = darwinia2ethereum
-                                .sync_authorities_change(relayer, proof)
-                                .await?;
-                            info!(
-                                target: PangolinRopstenTask::NAME,
-                                "Sent ethereum tx {:?} with extrinsic {:?}",
-                                ethereum_tx.tx_hash,
-                                ex_hash
-                            );
-                        } else {
-                            info!(
-                                target: PangolinRopstenTask::NAME,
-                                "cannot sync authorities changed without relayer account"
-                            );
-                        }
-                    }
-                }
-                RedeemFor::RegisterErc20Token => {
-                    if let Some(ethereum2darwinia) = &ethereum2darwinia {
-                        if let Some(relayer) = &ethereum2darwinia_relayer {
-                            let ex_hash = ethereum2darwinia.register_erc20(relayer, proof).await?;
-                            info!(
-                                target: PangolinRopstenTask::NAME,
-                                "register erc20 token tx {:?} with extrinsic {:?}",
-                                ethereum_tx.tx_hash, ex_hash
-                            );
-                        }
-                    }
-                }
-                RedeemFor::RedeemErc20Token => {
-                    if let Some(ethereum2darwinia) = &ethereum2darwinia {
-                        if let Some(relayer) = &ethereum2darwinia_relayer {
-                            let ex_hash = ethereum2darwinia.redeem_erc20(relayer, proof).await?;
-                            info!(
-                                target: PangolinRopstenTask::NAME,
-                                "redeem erc20 token tx {:?} with extrinsic {:?}",
-                                ethereum_tx.tx_hash, ex_hash
-                            );
-                        }
-                    }
-                }
-                _ => {
-                    if let Some(ethereum2darwinia) = &ethereum2darwinia {
-                        if let Some(relayer) = &ethereum2darwinia_relayer {
-                            let ex_hash =
-                                ethereum2darwinia.redeem(relayer, redeem_for, proof).await?;
-                            info!(
-                                target: PangolinRopstenTask::NAME,
-                                "Redeemed ethereum tx {:?} with extrinsic {:?}",
-                                ethereum_tx.tx_hash,
-                                ex_hash
-                            );
-                        }
+        Extrinsic::Redeem(proof, ethereum_tx) => match ethereum_tx.tx_type {
+            TransactionType::SetAuthorities => {
+                if let Some(darwinia2ethereum) = &darwinia2ethereum {
+                    if let Some(relayer) = &darwinia2ethereum_relayer {
+                        let ex_hash = darwinia2ethereum
+                            .sync_authorities_change(relayer, proof)
+                            .await?;
+                        info!(
+                            target: PangolinRopstenTask::NAME,
+                            "Sent ethereum tx {:?} with extrinsic {:?}",
+                            ethereum_tx.tx_hash,
+                            ex_hash
+                        );
+                    } else {
+                        info!(
+                            target: PangolinRopstenTask::NAME,
+                            "cannot sync authorities changed without relayer account"
+                        );
                     }
                 }
             }
-        }
+            TransactionType::RegisterErc20Token => {
+                if let Some(ethereum2darwinia) = &ethereum2darwinia {
+                    if let Some(relayer) = &ethereum2darwinia_relayer {
+                        let ex_hash = ethereum2darwinia.register_erc20(relayer, proof).await?;
+                        info!(
+                            target: PangolinRopstenTask::NAME,
+                            "register erc20 token tx {:?} with extrinsic {:?}",
+                            ethereum_tx.tx_hash,
+                            ex_hash
+                        );
+                    }
+                }
+            }
+            TransactionType::RedeemErc20Token => {
+                if let Some(ethereum2darwinia) = &ethereum2darwinia {
+                    if let Some(relayer) = &ethereum2darwinia_relayer {
+                        let ex_hash = ethereum2darwinia.redeem_erc20(relayer, proof).await?;
+                        info!(
+                            target: PangolinRopstenTask::NAME,
+                            "redeem erc20 token tx {:?} with extrinsic {:?}",
+                            ethereum_tx.tx_hash,
+                            ex_hash
+                        );
+                    }
+                }
+            }
+            _ => {
+                if let Some(ethereum2darwinia) = &ethereum2darwinia {
+                    if let Some(relayer) = &ethereum2darwinia_relayer {
+                        let ex_hash = ethereum2darwinia.redeem(relayer, redeem_for, proof).await?;
+                        info!(
+                            target: PangolinRopstenTask::NAME,
+                            "Redeemed ethereum tx {:?} with extrinsic {:?}",
+                            ethereum_tx.tx_hash,
+                            ex_hash
+                        );
+                    }
+                }
+            }
+        },
 
         Extrinsic::GuardVote(pending_block_number, aye) => {
             if let Some(ethereum2darwinia) = &ethereum2darwinia {

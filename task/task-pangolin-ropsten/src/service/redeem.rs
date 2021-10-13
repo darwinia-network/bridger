@@ -12,12 +12,13 @@ use bridge_traits::bridge::task::BridgeSand;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
+use component_thegraph_liketh::types::TransactionEntity;
 use support_ethereum::receipt::RedeemFor;
 
 use crate::bus::PangolinRopstenBus;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
-use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::PangolinRopstenTask;
+use crate::toolkit;
 
 #[derive(Debug)]
 pub struct RedeemService {
@@ -123,14 +124,14 @@ impl RedeemHelper {
         })
     }
 
-    pub async fn retry(&mut self, tx: EthereumTransaction) -> anyhow::Result<()> {
+    pub async fn retry(&mut self, tx: TransactionEntity) -> anyhow::Result<()> {
         self.sender_to_redeem
             .send(ToRedeemMessage::EthereumTransaction(tx))
             .await?;
         Ok(())
     }
 
-    pub async fn redeem(&self, tx: EthereumTransaction) -> anyhow::Result<()> {
+    pub async fn redeem(&self, tx: TransactionEntity) -> anyhow::Result<()> {
         RedeemHelper::do_redeem(
             self.darwinia.clone(),
             self.shadow.clone(),
@@ -146,27 +147,19 @@ impl RedeemHelper {
     async fn do_redeem(
         ethereum2darwinia: Ethereum2Darwinia,
         shadow: Arc<Shadow>,
-        tx: EthereumTransaction,
+        tx: TransactionEntity,
         mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
         mut sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
     ) -> anyhow::Result<()> {
-        trace!(
+        log::trace!(
             target: PangolinRopstenTask::NAME,
             "Try to redeem ethereum tx {:?}...",
             tx.tx_hash
         );
 
         // 1. Checking before redeem
-        if ethereum2darwinia
-            .darwinia
-            .verified(tx.block_hash, tx.index)
-            .await?
-            || ethereum2darwinia
-                .darwinia
-                .verified_issuing(tx.block_hash, tx.index)
-                .await?
-        {
-            trace!(
+        if toolkit::is_verified(&ethereum2darwinia.darwinia, &tx)? {
+            log::trace!(
                 target: PangolinRopstenTask::NAME,
                 "Ethereum tx {:?} redeemed",
                 tx.tx_hash
@@ -176,7 +169,7 @@ impl RedeemHelper {
 
         let last_confirmed = ethereum2darwinia.last_confirmed().await?;
         if tx.block >= last_confirmed {
-            trace!(
+            log::trace!(
                 target: PangolinRopstenTask::NAME,
                 "Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
@@ -194,15 +187,8 @@ impl RedeemHelper {
         let proof = shadow
             .receipt(&format!("{:?}", tx.enclosed_hash()), last_confirmed)
             .await?;
-        let redeem_for = match tx.tx_hash {
-            EthereumTransactionHash::Deposit(_) => RedeemFor::Deposit,
-            EthereumTransactionHash::Token(_) => RedeemFor::Token,
-            EthereumTransactionHash::SetAuthorities(_) => RedeemFor::SetAuthorities,
-            EthereumTransactionHash::RegisterErc20Token(_) => RedeemFor::RegisterErc20Token,
-            EthereumTransactionHash::RedeemErc20Token(_) => RedeemFor::RedeemErc20Token,
-        };
 
-        let ex = Extrinsic::Redeem(redeem_for, proof, tx);
+        let ex = Extrinsic::Redeem(proof, tx.clone());
         sender_to_extrinsics
             .send(ToExtrinsicsMessage::Extrinsic(ex))
             .await?;

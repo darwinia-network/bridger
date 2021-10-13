@@ -2,13 +2,12 @@
 
 use std::fmt::Debug;
 
-use component_thegraph_liketh::types::TransactionEntity;
 use lifeline::Message;
 use postage::broadcast;
 
+use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
 use support_ethereum::receipt::{EthereumReceiptProofThing, RedeemFor};
-use support_ethereum::transaction::EthereumTransaction;
 
 use crate::bus::PangolinRopstenBus;
 
@@ -61,10 +60,11 @@ pub enum ToExtrinsicsMessage {
 }
 
 pub type EcdsaMessage = [u8; 32];
+
 #[derive(Clone, Debug)]
 pub enum Extrinsic {
     Affirm(EthereumRelayHeaderParcel),
-    Redeem(RedeemFor, EthereumReceiptProofThing, EthereumTransaction),
+    Redeem(EthereumReceiptProofThing, TransactionEntity),
     GuardVote(u64, bool),
     SignAndSendMmrRoot(u32),
     SignAndSendAuthorities(EcdsaMessage),

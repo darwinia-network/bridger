@@ -16,15 +16,14 @@ strict = false
 endpoint = "https://ropsten.infura.io/v3/<YOUR_KEY>"
 
 [ethereum]
-endpoint = [ "https://ropsten.infura.io/v3/<YOUR_KEY>" ]
-
 # below two need to be all setted if you want to do the relay job
 # (optional) the person who will relay darwinia data to ethereum
 relayer_private_key = "0x..."
 # (optional) the darwinia account public key who will get the reward
 relayer_beneficiary_darwinia_account = "0x..."
 
-atom = 0
+# listen to set authorities
+subscribe_relay_address = "0xd374292D512281b56198F0401b149370D680b89F"
 
 [shadow]
 endpoint = "https://ropsten.shadow.darwinia.network"

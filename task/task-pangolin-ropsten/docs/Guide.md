@@ -19,8 +19,6 @@ pangolin-ropsten
    ```bash
    # set pangolin
    ./target/release/bridger kv -n task-pangolin-ropsten put scan.pangolin.next 123456
-   # set ropsten
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.next 123456
    ```
 
 4. Set pangolin and ropsten scan to running
@@ -28,38 +26,17 @@ pangolin-ropsten
    ```bash
    # set pangolin
    ./target/release/bridger kv -n task-pangolin-ropsten put scan.pangolin.running true
-   # set ropsten
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.running true
+   # set ropsten redeem scan
+   ./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.redeem.running true
+   # set ropsten check redeem
+   ./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.check.running true
    ```
 
 ## More
 
-### About start
-
-The pangolin and ropsten scan service you can control use `bridger kv` command.
-
-**Set is running**
-
-```bash
-# set pangolin
-./target/release/bridger kv -n task-pangolin-ropsten put scan.pangolin.running true
-# set ropsten
-./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.running true
-```
-
-**Set is stop**
-
-```bash
-# set pangolin
-./target/release/bridger kv -n task-pangolin-ropsten put scan.pangolin.running false
-# set ropsten
-./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.running false
-```
-
-The bridger will record the set value.
-
 ### Query state
 
+Deprecated
 
 **pangolin scan state**
 

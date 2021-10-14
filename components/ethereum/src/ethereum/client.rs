@@ -41,6 +41,10 @@ impl EthereumClient {
 }
 
 impl EthereumClient {
+    pub fn web3(&self) -> &Web3<Http> {
+        &self.web3
+    }
+
     pub async fn get_header_by_number(&self, block: u64) -> anyhow::Result<EthereumHeader> {
         let eth_block = BlockId::Number(BlockNumber::Number(block.into()));
         let block = self.web3.eth().block(eth_block).await?.ok_or_else(|| {

@@ -138,6 +138,9 @@ async fn run(
         }
 
         tracker.finish((offset + limit) - 1)?;
-        tokio::time::sleep(std::time::Duration::from_secs(task_config.interval_redeem)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(
+            task_config.interval_ethereum,
+        ))
+        .await;
     }
 }

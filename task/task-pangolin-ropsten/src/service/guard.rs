@@ -2,8 +2,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_recursion::async_recursion;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
-use postage::broadcast;
+use lifeline::{Bus, Channel, Lifeline, Receiver, Sender, Service, Task};
 use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -60,7 +59,7 @@ impl Service for GuardService {
 }
 
 #[async_recursion]
-async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>) {
+async fn run(sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx) {
     if let Err(err) = start(sender_to_extrinsics.clone()).await {
         error!(target: PangolinRopstenTask::NAME, "guard err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
@@ -69,7 +68,7 @@ async fn run(sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessag
 }
 
 async fn start(
-    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
 ) -> anyhow::Result<()> {
     info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 

@@ -2,8 +2,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_recursion::async_recursion;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
-use postage::broadcast;
+use lifeline::{Bus, Channel, Lifeline, Receiver, Sender, Service, Task};
 use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -70,8 +69,8 @@ impl Service for RedeemService {
 }
 
 struct RedeemHelper {
-    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
-    sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+    sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
     darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
 }
@@ -79,8 +78,8 @@ struct RedeemHelper {
 impl RedeemHelper {
     #[async_recursion]
     pub async fn new(
-        sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
-        sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+        sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+        sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
     ) -> Self {
         match RedeemHelper::build(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await {
             Ok(helper) => helper,
@@ -96,8 +95,8 @@ impl RedeemHelper {
     }
 
     async fn build(
-        sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
-        sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+        sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+        sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
     ) -> anyhow::Result<Self> {
         info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 
@@ -148,8 +147,8 @@ impl RedeemHelper {
         ethereum2darwinia: Ethereum2Darwinia,
         shadow: Arc<Shadow>,
         tx: TransactionEntity,
-        mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-        mut sender_to_redeem: postage::broadcast::Sender<ToRedeemMessage>,
+        mut sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+        mut sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
     ) -> anyhow::Result<()> {
         log::trace!(
             target: PangolinRopstenTask::NAME,

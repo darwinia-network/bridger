@@ -3,8 +3,7 @@ use std::time::Duration;
 
 use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
-use postage::broadcast;
+use lifeline::{Bus, Channel, Lifeline, Receiver, Sender, Service, Task};
 use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -96,7 +95,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
 
 struct RelayHelper {
     state: BridgeState,
-    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
     darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
 }
@@ -105,7 +104,7 @@ impl RelayHelper {
     #[async_recursion]
     pub async fn new(
         state: BridgeState,
-        sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+        sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
     ) -> Self {
         match RelayHelper::build(state.clone(), sender_to_extrinsics.clone()).await {
             Ok(helper) => helper,
@@ -122,7 +121,7 @@ impl RelayHelper {
 
     async fn build(
         state: BridgeState,
-        sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+        sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
     ) -> anyhow::Result<Self> {
         info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 

@@ -2,7 +2,6 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Channel, Lifeline, Service, Task};
-use postage::prelude::Sink;
 
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;

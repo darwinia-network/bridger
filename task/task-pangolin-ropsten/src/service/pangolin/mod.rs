@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Sender, Task};
-use postage::broadcast;
+use lifeline::{Bus, Channel, Lifeline, Sender, Task};
 use substrate_subxt::system::System;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -62,7 +61,7 @@ impl lifeline::Service for PangolinService {
 }
 
 async fn start(
-    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
     tracker: Tracker,
 ) {
     loop {
@@ -78,7 +77,7 @@ async fn start(
 }
 
 async fn _start(
-    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
     tracker: Tracker,
 ) -> anyhow::Result<()> {
     info!(
@@ -133,7 +132,7 @@ struct DarwiniaServiceRunner {
     darwinia2ethereum: Darwinia2Ethereum,
     account: ToEthereumAccount,
     ethereum: EthereumClient,
-    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
     delayed_extrinsics: HashMap<u32, Extrinsic>,
     spec_name: String,
 }

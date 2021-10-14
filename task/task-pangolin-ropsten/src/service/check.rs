@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::iter::FromIterator;
+use std::time::SystemTime;
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
@@ -68,80 +69,51 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
 
     let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
     let thegraph_liketh = component_thegraph_liketh.component().await?;
-    // let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
 
     let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
     // Darwinia client
     let darwinia = component_pangolin_subxt.component().await?;
 
+    let mut timing = SystemTime::now();
     loop {
-        // todo: put this to config
-        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-
-        let offset = tracker.next().await?;
-        let limit = 10;
+        let offset = tracker.current().await?;
+        let limit = 1;
 
         let txs = thegraph_liketh
             .query_transactions(limit, offset as u32)
             .await?;
+        if txs.is_empty() {
+            continue;
+        }
+        let tx = txs.get(0).unwrap();
 
-        let blocks: HashSet<u64> =
-            HashSet::from_iter(txs.iter().map(|tx| tx.block_number).collect::<Vec<u64>>());
-
-        // start check
-        for block in blocks {
-            log::trace!(
-                target: PangolinRopstenTask::NAME,
-                "Check redeem block: {}",
-                block,
-            );
-
-            let mut all_verified = true;
-
-            let txs_for_block = txs
-                .iter()
-                .filter(|tx| tx.block_number == block)
-                .collect::<Vec<&TransactionEntity>>();
-            let mut failed_tx = None;
-            for tx in txs_for_block {
-                match helpers::is_verified(&darwinia, tx).await {
-                    Ok(false) => {
-                        all_verified = false;
-                        failed_tx = Some(tx.clone());
-                        break;
-                    }
-                    Err(e) => {
-                        log::error!(
-                            target: PangolinRopstenTask::NAME,
-                            "Failed verified redeem. [{}]: {}. {:?}",
-                            tx.block,
-                            tx.block_hash,
-                            e
-                        );
-                        all_verified = false;
-                        failed_tx = Some(tx.clone());
-                        break;
-                    }
-                    _ => {}
-                }
-            }
-
-            if !all_verified {
-                log::trace!(
+        let verified = match helpers::is_verified(&darwinia, tx).await {
+            Ok(v) => v,
+            Err(e) => {
+                log::error!(
                     target: PangolinRopstenTask::NAME,
-                    "Block {} check failed, reason about: {:?}",
-                    block,
-                    failed_tx,
+                    "Failed verified redeem. [{}]: {}. {:?}",
+                    tx.block,
+                    tx.block_hash,
+                    e
                 );
-                // todo: Set maximum time
+                false
+            }
+        };
+        if verified {
+            tracker.finish(offset + limit)?;
+            timing = SystemTime::now();
+            continue;
+        }
+
+        if let Ok(elapsed) = timing.elapsed() {
+            let secs = elapsed.as_secs();
+            if secs >= task_config.check_timeout {
+                // todo: check timeout, skip thi transaction, write log
                 continue;
             }
-            verified_blocks.push((offset + limit) - 1);
-            log::trace!(
-                target: PangolinRopstenTask::NAME,
-                "Block {} successes check",
-                block,
-            );
         }
+        tokio::time::sleep(std::time::Duration::from_secs(task_config.interval_check)).await;
     }
 }

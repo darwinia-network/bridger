@@ -53,9 +53,8 @@ impl Tracker {
         Ok(())
     }
 
-    /// Read the next value
-    /// Generally the value is current+1, but if the planned have value, will use planned+1
-    pub async fn next(&self) -> anyhow::Result<usize> {
+    /// Read current value
+    pub async fn current(&self) -> anyhow::Result<usize> {
         let is_running = self.is_running()?;
         if !is_running {
             loop {
@@ -79,10 +78,15 @@ impl Tracker {
             }
             None => {
                 let current: usize = self.microkv.get_as(&self.key_current)?.unwrap_or(0);
-                let next = current + 1;
-                Ok(next)
+                Ok(current)
             }
         }
+    }
+
+    /// Read the next value
+    /// Generally the value is current+1, but if the planned have value, will use planned+1
+    pub async fn next(&self) -> anyhow::Result<usize> {
+        self.current().await.map(|v| v + 1)
     }
 
     /// Update current

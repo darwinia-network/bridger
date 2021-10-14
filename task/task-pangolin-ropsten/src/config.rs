@@ -49,10 +49,12 @@ pub struct TaskConfig {
     pub interval_ethereum: u64,
     /// relay service polling interval in seconds
     pub interval_relay: u64,
-    /// redeem service polling interval in seconds
-    pub interval_redeem: u64,
     /// guard service polling interval in seconds
     pub interval_guard: u64,
+    /// check service polling interval in seconds
+    pub interval_check: u64,
+    /// timeout for check transaction (unit: seconds)
+    pub check_timeout: u64,
 }
 
 impl BridgeConfig for TaskConfig {
@@ -64,8 +66,9 @@ impl BridgeConfig for TaskConfig {
         Self {
             interval_ethereum: 120,
             interval_relay: 60,
-            interval_redeem: 90,
             interval_guard: 30,
+            interval_check: 90,
+            check_timeout: (60 * 30) + 200,
         }
     }
 }

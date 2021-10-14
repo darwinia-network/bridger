@@ -89,7 +89,8 @@ async fn run(
     let darwinia = component_pangolin_subxt.component().await?;
 
     loop {
-        let offset = tracker.next().await?;
+        // fixme: when bridger restarted, may have some transaction not redeemed
+        let offset = tracker.current().await?;
         let limit = 10;
 
         let txs = thegraph_liketh
@@ -135,7 +136,7 @@ async fn run(
             );
         }
 
-        tracker.finish((offset + limit) - 1)?;
+        tracker.finish(offset + limit)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,
         ))

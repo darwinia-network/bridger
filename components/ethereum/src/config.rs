@@ -3,15 +3,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct EthereumConfig {
-    /// Rpc host
-    pub endpoint: Vec<String>,
-
     /// Relayer
     pub relayer_private_key: Option<String>,
     pub relayer_beneficiary_darwinia_account: Option<String>,
 
-    /// Counter
-    pub atom: usize,
+    pub subscribe_relay_address: String,
 }
 
 impl BridgeConfig for EthereumConfig {
@@ -21,10 +17,9 @@ impl BridgeConfig for EthereumConfig {
 
     fn template() -> Self {
         Self {
-            endpoint: vec!["https://mainnet.infura.io/v3/<api_key>".to_string()],
             relayer_private_key: Some("0x...".to_string()),
             relayer_beneficiary_darwinia_account: Some("0x...".to_string()),
-            atom: 0,
+            subscribe_relay_address: "0x...".to_string(),
         }
     }
 }

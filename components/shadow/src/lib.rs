@@ -2,7 +2,7 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::error::BridgeResult;
-use component_ethereum::client::EthereumComponent;
+use component_ethereum::ethereum::EthereumComponent;
 use component_http_client::HttpClientComponent;
 
 pub use self::config::*;
@@ -38,12 +38,8 @@ impl BridgeComponent<ShadowConfig, Shadow> for ShadowComponent {
         let config: ShadowConfig = Config::restore_with_namespace(T::NAME, &namespace)?;
         let component_http_client =
             HttpClientComponent::restore_with_namespace::<T>(namespace.clone())?;
-        let component_ethereum_rpc = EthereumComponent::restore_with_namespace::<T>(namespace)?;
-        Ok(Self::new(
-            config,
-            component_http_client,
-            component_ethereum_rpc,
-        ))
+        let component_ethereum = EthereumComponent::restore_with_namespace::<T>(namespace)?;
+        Ok(Self::new(config, component_http_client, component_ethereum))
     }
 
     async fn component(&self) -> anyhow::Result<Shadow> {

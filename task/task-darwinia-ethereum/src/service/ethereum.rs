@@ -5,41 +5,41 @@ use lifeline::{Bus, Channel, Lifeline, Service, Task};
 
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::TheGraphLikeEthComponent;
 use support_tracker::Tracker;
 
-use crate::bus::PangolinRopstenBus;
+use crate::bus::DarwiniaEthereumBus;
 use crate::config::TaskConfig;
 use crate::helpers;
 use crate::message::{ToRedeemMessage, ToRelayMessage};
-use crate::task::PangolinRopstenTask;
+use crate::task::DarwiniaEthereumTask;
 
 /// Redeem service
 #[derive(Debug)]
-pub struct RopstenScanService {
+pub struct EthereumScanService {
     _greet: Lifeline,
 }
 
-impl BridgeService for RopstenScanService {}
+impl BridgeService for EthereumScanService {}
 
-impl Service for RopstenScanService {
-    type Bus = PangolinRopstenBus;
+impl Service for EthereumScanService {
+    type Bus = DarwiniaEthereumBus;
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-        let tracker = Tracker::new(microkv, "scan.ropsten.redeem");
+        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
+        let tracker = Tracker::new(microkv, "scan.ethereum.redeem");
         // Receiver & Sender
         let sender_to_relay = bus.tx::<ToRelayMessage>()?;
         let sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
 
         // scan task
         let _greet = Self::try_task(
-            &format!("{}-service-redeem", PangolinRopstenTask::NAME),
+            &format!("{}-service-redeem", DarwiniaEthereumTask::NAME),
             async move {
                 start(
                     tracker.clone(),
@@ -61,8 +61,8 @@ async fn start(
 ) {
     while let Err(err) = run(&tracker, &mut sender_to_relay, &mut sender_to_redeem).await {
         log::error!(
-            target: PangolinRopstenTask::NAME,
-            "ropsten redeem err {:#?}",
+            target: DarwiniaEthereumTask::NAME,
+            "ethereum redeem err {:#?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -75,15 +75,15 @@ async fn run(
     sender_to_redeem: &mut <ToRedeemMessage::Channel as Channel>::Tx,
 ) -> anyhow::Result<()> {
     log::info!(
-        target: PangolinRopstenTask::NAME,
-        "ROPSTEN SCAN SERVICE RESTARTING..."
+        target: DarwiniaEthereumTask::NAME,
+        "ETHEREUM SCAN SERVICE RESTARTING..."
     );
 
-    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
+    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<DarwiniaEthereumTask>()?;
     let thegraph_liketh = component_thegraph_liketh.component().await?;
-    let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let task_config: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
-    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
     // Darwinia client
     let darwinia = component_pangolin_subxt.component().await?;
 
@@ -98,7 +98,7 @@ async fn run(
         // send transactions to relay
         for tx in &txs {
             log::trace!(
-                target: PangolinRopstenTask::NAME,
+                target: DarwiniaEthereumTask::NAME,
                 "{:?} in ethereum block {}",
                 &tx.tx_hash,
                 &tx.block
@@ -113,7 +113,7 @@ async fn run(
         for tx in &txs {
             if helpers::is_verified(&darwinia, tx)? {
                 log::trace!(
-                    target: PangolinRopstenTask::NAME,
+                    target: DarwiniaEthereumTask::NAME,
                     "This ethereum tx {:?} has already been redeemed.",
                     tx.enclosed_hash()
                 );
@@ -121,7 +121,7 @@ async fn run(
             }
 
             log::trace!(
-                target: PangolinRopstenTask::NAME,
+                target: DarwiniaEthereumTask::NAME,
                 "send to redeem service: {:?}",
                 &tx.tx_hash
             );
@@ -129,7 +129,7 @@ async fn run(
                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                 .await?;
             log::trace!(
-                target: PangolinRopstenTask::NAME,
+                target: DarwiniaEthereumTask::NAME,
                 "finished to send to redeem: {:?}",
                 &tx.tx_hash
             );

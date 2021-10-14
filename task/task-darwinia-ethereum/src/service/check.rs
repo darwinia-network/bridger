@@ -9,16 +9,16 @@ use lifeline::{Lifeline, Service, Task};
 
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::TransactionEntity;
 use component_thegraph_liketh::TheGraphLikeEthComponent;
 use support_tracker::Tracker;
 
-use crate::bus::PangolinRopstenBus;
+use crate::bus::DarwiniaEthereumBus;
 use crate::config::TaskConfig;
 use crate::helpers;
-use crate::task::PangolinRopstenTask;
+use crate::task::DarwiniaEthereumTask;
 
 /// Check service
 #[derive(Debug)]
@@ -29,18 +29,18 @@ pub struct CheckService {
 impl BridgeService for CheckService {}
 
 impl Service for CheckService {
-    type Bus = PangolinRopstenBus;
+    type Bus = DarwiniaEthereumBus;
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-        let tracker = Tracker::new(microkv, "scan.ropsten.check");
+        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
+        let tracker = Tracker::new(microkv, "scan.ethereum.check");
 
         // scan task
         let _greet = Self::try_task(
-            &format!("{}-service-check", PangolinRopstenTask::NAME),
+            &format!("{}-service-check", DarwiniaEthereumTask::NAME),
             async move {
                 start(tracker.clone()).await;
                 Ok(())
@@ -53,8 +53,8 @@ impl Service for CheckService {
 async fn start(tracker: Tracker) {
     while let Err(err) = run(&tracker).await {
         log::error!(
-            target: PangolinRopstenTask::NAME,
-            "ropsten check err {:#?}",
+            target: DarwiniaEthereumTask::NAME,
+            "ethereum check err {:#?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -63,15 +63,15 @@ async fn start(tracker: Tracker) {
 
 async fn run(tracker: &Tracker) -> anyhow::Result<()> {
     log::info!(
-        target: PangolinRopstenTask::NAME,
-        "ROPSTEN CHECK SERVICE RESTARTING..."
+        target: DarwiniaEthereumTask::NAME,
+        "ETHEREUM CHECK SERVICE RESTARTING..."
     );
 
-    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
+    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<DarwiniaEthereumTask>()?;
     let thegraph_liketh = component_thegraph_liketh.component().await?;
-    let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let task_config: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
 
-    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
     // Darwinia client
     let darwinia = component_pangolin_subxt.component().await?;
 
@@ -92,7 +92,7 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
             Ok(v) => v,
             Err(e) => {
                 log::error!(
-                    target: PangolinRopstenTask::NAME,
+                    target: DarwiniaEthereumTask::NAME,
                     "Failed verified redeem. [{}]: {}. {:?}",
                     tx.block_number,
                     tx.block_hash,

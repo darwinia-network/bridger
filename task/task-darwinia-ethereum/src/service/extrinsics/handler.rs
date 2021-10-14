@@ -17,7 +17,7 @@ use support_ethereum::parcel::EthereumRelayHeaderParcel;
 use support_ethereum::receipt::{EthereumReceiptProofThing, RedeemFor};
 
 use crate::message::{EcdsaMessage, Extrinsic};
-use crate::task::PangolinRopstenTask;
+use crate::task::DarwiniaEthereumTask;
 
 pub struct ExtrinsicsHandler {
     state: BridgeState,
@@ -36,7 +36,7 @@ impl ExtrinsicsHandler {
                 Ok(handler) => return handler,
                 Err(err) => {
                     log::error!(
-                        target: PangolinRopstenTask::NAME,
+                        target: DarwiniaEthereumTask::NAME,
                         "extrinsics init err: {:#?}",
                         err
                     );
@@ -48,16 +48,16 @@ impl ExtrinsicsHandler {
 
     async fn build(state: BridgeState) -> anyhow::Result<Self> {
         log::info!(
-            target: PangolinRopstenTask::NAME,
+            target: DarwiniaEthereumTask::NAME,
             "EXTRINSICS SERVICE RESTARTING..."
         );
 
         // Components
-        let component_darwinia = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
+        let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
 
         // Config
-        let config_darwinia: DarwiniaSubxtConfig = Config::restore(PangolinRopstenTask::NAME)?;
-        let config_web3: Web3Config = Config::restore(PangolinRopstenTask::NAME)?;
+        let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let config_web3: Web3Config = Config::restore(DarwiniaEthereumTask::NAME)?;
 
         // Darwinia client & accounts
         let darwinia = component_darwinia.component().await?;
@@ -77,11 +77,11 @@ impl ExtrinsicsHandler {
         let spec_name = darwinia.runtime_version().await?;
 
         log::info!(
-            target: PangolinRopstenTask::NAME,
+            target: DarwiniaEthereumTask::NAME,
             "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS"
         );
 
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
         Ok(ExtrinsicsHandler {
             state,
             ethereum2darwinia,
@@ -121,7 +121,7 @@ impl ExtrinsicsHandler {
             .affirm(&self.ethereum2darwinia_relayer, parcel)
             .await?;
         log::info!(
-            target: PangolinRopstenTask::NAME,
+            target: DarwiniaEthereumTask::NAME,
             "Affirmed ethereum block {} in extrinsic {:?}",
             block_number,
             ex_hash
@@ -142,36 +142,14 @@ impl ExtrinsicsHandler {
                     .sync_authorities_change(&self.darwinia2ethereum_relayer, proof)
                     .await?;
                 log::info!(
-                    target: PangolinRopstenTask::NAME,
+                    target: DarwiniaEthereumTask::NAME,
                     "Sent ethereum tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
             }
-            TransactionType::RegisterErc20Token => {
-                let ex_hash = self
-                    .ethereum2darwinia
-                    .register_erc20(&self.ethereum2darwinia_relayer, proof)
-                    .await?;
-                log::info!(
-                    target: PangolinRopstenTask::NAME,
-                    "register erc20 token tx {:?} with extrinsic {:?}",
-                    ethereum_tx.tx_hash,
-                    ex_hash
-                );
-            }
-            TransactionType::RedeemErc20Token => {
-                let ex_hash = self
-                    .ethereum2darwinia
-                    .redeem_erc20(&self.ethereum2darwinia_relayer, proof)
-                    .await?;
-                log::info!(
-                    target: PangolinRopstenTask::NAME,
-                    "redeem erc20 token tx {:?} with extrinsic {:?}",
-                    ethereum_tx.tx_hash,
-                    ex_hash
-                );
-            }
+            TransactionType::RegisterErc20Token => {}
+            TransactionType::RedeemErc20Token => {}
             _ => {
                 let redeem_for = match ethereum_tx.tx_type {
                     TransactionType::Deposit => RedeemFor::Deposit,
@@ -185,7 +163,7 @@ impl ExtrinsicsHandler {
                     .redeem(&self.ethereum2darwinia_relayer, redeem_for, proof)
                     .await?;
                 info!(
-                    target: PangolinRopstenTask::NAME,
+                    target: DarwiniaEthereumTask::NAME,
                     "Redeemed ethereum tx {:?} with extrinsic {:?}", ethereum_tx.tx_hash, ex_hash
                 );
             }
@@ -204,14 +182,14 @@ impl ExtrinsicsHandler {
             .await?;
         if aye {
             log::info!(
-                target: PangolinRopstenTask::NAME,
+                target: DarwiniaEthereumTask::NAME,
                 "Voted to approve: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
             );
         } else {
             log::info!(
-                target: PangolinRopstenTask::NAME,
+                target: DarwiniaEthereumTask::NAME,
                 "Voted to reject: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
@@ -222,7 +200,7 @@ impl ExtrinsicsHandler {
 
     async fn send_sign_and_send_mmr_root(&self, block_number: u32) -> anyhow::Result<()> {
         log::trace!(
-            target: PangolinRopstenTask::NAME,
+            target: DarwiniaEthereumTask::NAME,
             "Start sign and send mmr_root..."
         );
         let ex_hash = self
@@ -234,7 +212,7 @@ impl ExtrinsicsHandler {
             )
             .await?;
         log::info!(
-            target: PangolinRopstenTask::NAME,
+            target: DarwiniaEthereumTask::NAME,
             "Sign and send mmr root of block {} in extrinsic {:?}",
             block_number,
             ex_hash
@@ -244,7 +222,7 @@ impl ExtrinsicsHandler {
 
     async fn send_sign_and_send_authorities(&self, message: EcdsaMessage) -> anyhow::Result<()> {
         log::trace!(
-            target: PangolinRopstenTask::NAME,
+            target: DarwiniaEthereumTask::NAME,
             "Start sign and send authorities..."
         );
         let ex_hash = self
@@ -252,7 +230,7 @@ impl ExtrinsicsHandler {
             .ecdsa_sign_and_submit_signed_authorities(&self.darwinia2ethereum_relayer, message)
             .await?;
         log::info!(
-            target: PangolinRopstenTask::NAME,
+            target: DarwiniaEthereumTask::NAME,
             "Sign and send authorities in extrinsic {:?}",
             ex_hash
         );

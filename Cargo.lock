@@ -199,7 +199,7 @@ dependencies = [
  "parking",
  "polling",
  "slab",
- "socket2 0.4.1",
+ "socket2",
  "waker-fn",
  "winapi 0.3.9",
 ]
@@ -914,7 +914,7 @@ dependencies = [
  "bridge-traits",
  "component-http-client",
  "log",
- "reqwest 0.11.4",
+ "reqwest",
  "secp256k1",
  "serde 1.0.130",
  "support-ethereum",
@@ -930,7 +930,7 @@ dependencies = [
  "async-trait",
  "bridge-traits",
  "log",
- "reqwest 0.11.4",
+ "reqwest",
  "serde 1.0.130",
 ]
 
@@ -1011,7 +1011,7 @@ dependencies = [
  "component-ethereum",
  "component-http-client",
  "log",
- "reqwest 0.11.4",
+ "reqwest",
  "serde 1.0.130",
  "serde_json",
  "support-ethereum",
@@ -1231,7 +1231,7 @@ dependencies = [
  "openssl-probe",
  "openssl-sys",
  "schannel",
- "socket2 0.4.1",
+ "socket2",
  "winapi 0.3.9",
 ]
 
@@ -1360,7 +1360,7 @@ dependencies = [
  "linked-darwinia",
  "log",
  "microkv",
- "reqwest 0.11.4",
+ "reqwest",
  "routerify",
  "rpassword",
  "serde 1.0.130",
@@ -3059,7 +3059,7 @@ name = "gql_client"
 version = "1.0.1"
 source = "git+https://github.com/vyneer/gql-client-rs.git?branch=fix-serde-export#cf082bae3c549fdf4eaaad77c83e7626dd6cb7fd"
 dependencies = [
- "reqwest 0.11.4",
+ "reqwest",
  "serde 1.0.130",
 ]
 
@@ -3335,7 +3335,6 @@ dependencies = [
  "httpdate 0.3.2",
  "itoa",
  "pin-project 1.0.8",
- "socket2 0.3.19",
  "tokio 0.2.25",
  "tower-service",
  "tracing",
@@ -3359,7 +3358,7 @@ dependencies = [
  "httpdate 1.0.1",
  "itoa",
  "pin-project-lite 0.2.7",
- "socket2 0.4.1",
+ "socket2",
  "tokio 1.11.0",
  "tower-service",
  "tracing",
@@ -3381,19 +3380,6 @@ dependencies = [
  "tokio 1.11.0",
  "tokio-rustls",
  "webpki",
-]
-
-[[package]]
-name = "hyper-tls"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d979acc56dcb5b8dddba3917601745e877576475aa046df3226eabdecef78eed"
-dependencies = [
- "bytes 0.5.6",
- "hyper 0.13.10",
- "native-tls",
- "tokio 0.2.25",
- "tokio-tls",
 ]
 
 [[package]]
@@ -4293,16 +4279,6 @@ name = "mime"
 version = "0.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a60c7ce501c71e03a9c9c0d35b861413ae925bd979cc7a4e30d060069aaac8d"
-
-[[package]]
-name = "mime_guess"
-version = "2.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2684d4c2e97d99848d30b324b00c8fcc7e5c897b7cbb5819b09e7c90e8baf212"
-dependencies = [
- "mime",
- "unicase",
-]
 
 [[package]]
 name = "miniz_oxide"
@@ -6417,42 +6393,6 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.10.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0718f81a8e14c4dbb3b34cf23dc6aaf9ab8a0dfec160c534b3dbca1aaa21f47c"
-dependencies = [
- "base64 0.13.0",
- "bytes 0.5.6",
- "encoding_rs",
- "futures-core",
- "futures-util",
- "http",
- "http-body 0.3.1",
- "hyper 0.13.10",
- "hyper-tls 0.4.3",
- "ipnet",
- "js-sys",
- "lazy_static",
- "log",
- "mime",
- "mime_guess",
- "native-tls",
- "percent-encoding 2.1.0",
- "pin-project-lite 0.2.7",
- "serde 1.0.130",
- "serde_json",
- "serde_urlencoded",
- "tokio 0.2.25",
- "tokio-tls",
- "url 2.2.2",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
- "winreg",
-]
-
-[[package]]
-name = "reqwest"
 version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "246e9f61b9bb77df069a947682be06e31ac43ea37862e244a69f177694ea6d22"
@@ -6465,7 +6405,7 @@ dependencies = [
  "http",
  "http-body 0.4.3",
  "hyper 0.14.12",
- "hyper-tls 0.5.0",
+ "hyper-tls",
  "ipnet",
  "js-sys",
  "lazy_static",
@@ -7138,17 +7078,6 @@ name = "smallvec"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fe0f37c9e8f3c5a4a66ad655a93c74daac4ad00c441533bf5c6e7990bb42604e"
-
-[[package]]
-name = "socket2"
-version = "0.3.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "122e570113d28d773067fab24266b66753f6ea915758651696b6e35e49f88d6e"
-dependencies = [
- "cfg-if 1.0.0",
- "libc",
- "winapi 0.3.9",
-]
 
 [[package]]
 name = "socket2"
@@ -9524,27 +9453,22 @@ dependencies = [
  "async-recursion",
  "async-trait",
  "bridge-traits",
- "colored",
  "component-darwinia-subxt",
  "component-ethereum",
- "component-http-client",
  "component-shadow",
  "component-state",
+ "component-thegraph-liketh",
  "lifeline",
  "linked-darwinia",
  "log",
  "microkv",
  "parity-scale-codec",
  "postage",
- "reqwest 0.10.10",
- "secp256k1",
  "serde 1.0.130",
  "serde_json",
  "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.3)",
  "support-ethereum",
- "support-keep",
  "support-tracker",
- "support-tracker-evm-log",
  "thiserror",
  "tokio 1.11.0",
  "web3",
@@ -9869,12 +9793,8 @@ dependencies = [
  "bytes 0.5.6",
  "fnv",
  "futures-core",
- "iovec",
- "lazy_static",
  "memchr",
- "mio 0.6.23",
  "pin-project-lite 0.1.12",
- "slab",
 ]
 
 [[package]]
@@ -9938,16 +9858,6 @@ dependencies = [
  "futures-core",
  "pin-project-lite 0.2.7",
  "tokio 1.11.0",
-]
-
-[[package]]
-name = "tokio-tls"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a70f4fcd7b3b24fb194f837560168208f669ca8cb70d0c4b862944452396343"
-dependencies = [
- "native-tls",
- "tokio 0.2.25",
 ]
 
 [[package]]
@@ -10163,15 +10073,6 @@ dependencies = [
  "crunchy",
  "hex",
  "static_assertions",
-]
-
-[[package]]
-name = "unicase"
-version = "2.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50f37be617794602aabbeee0be4f259dc1778fabe05e2d67ee8f79326d5cb4f6"
-dependencies = [
- "version_check",
 ]
 
 [[package]]
@@ -10467,7 +10368,7 @@ dependencies = [
  "log",
  "parking_lot 0.11.2",
  "pin-project 1.0.8",
- "reqwest 0.11.4",
+ "reqwest",
  "rlp 0.5.1",
  "secp256k1",
  "serde 1.0.130",

@@ -22,37 +22,15 @@ strict = false
 endpoint = "https://mainnet.infura.io/v3/<YOUR_KEY>"
 
 [ethereum]
-# The endpoint of Ethereum RPC. You can use the public geth hosted by Darwinia, your self-hosted node, or any third-party Ethereum RPC service, such as Infura and Alchemy. For example:
-# https://mainnet.geth.darwinia.network
-endpoint = [ "https://mainnet.infura.io/v3/<YOUR_KEY>" ]
-
 # below two need to be all setted if you want to do the relay job
 # (optional) the person who will relay darwinia data to ethereum
 relayer_private_key = "0x..."
 # (optional) the darwinia account public key who will get the reward
 relayer_beneficiary_darwinia_account = "0x..."
 
-# useless for now
-subscribe_ring_address = "0x9469d013805bffb7d3debe5e7839237e535ec483"
-subscribe_kton_address = "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff"
-
-# listen to gringotts bank cross-chain transfer
-subscribe_bank_address = "0x649fdf6ee483a96e020b889571e93700fbd82d88"
-subscribe_bank_topics = ["0xe77bf2fa8a25e63c1e5e29e1b2fcb6586d673931e020c4e3ffede453b830fb12"]
-
-# listen to ring/kton cross-chain transfer
-subscribe_issuing_address = "0xea7938985898af7fd945b03b7bc2e405e744e913"
-subscribe_issuing_topics = ["0xc9dcda609937876978d7e0aa29857cb187aea06ad9e843fd23fd32108da73f10"]
-
 # listen to set authorities
 subscribe_relay_address = "0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49"
-subscribe_relay_topics = ["0x91d6d149c7e5354d1c671fe15a5a3332c47a38e15e8ac0339b24af3c1090690f"]
 
-# listen erc20 backing event, TODO: not used by darwinia-ethereum for now, workaround for overpass config checking
-subscribe_backing_address = ""
-subscribe_backing_topics = []
-
-atom = 0
 
 [shadow]
 # The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS. For example using the official service:
@@ -62,8 +40,12 @@ endpoint = "https://shadow.darwinia.network"
 enable_crypto = false
 interval_ethereum = 120
 interval_relay = 60
-interval_redeem = 90
 interval_guard = 30
+interval_check = 90
+check_timeout = 2000
 
 [http_client]
 timeout = 3000
+
+[thegraph]
+endpoint = "https://api.thegraph.com/subgraphs/name/fewensa/bridge-ethereum"

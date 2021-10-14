@@ -9,7 +9,7 @@ pub mod task;
 
 mod bus;
 mod error;
-mod ethereum;
+mod helpers;
 mod message;
 mod migrate;
 mod route;

@@ -110,6 +110,7 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
         if let Ok(elapsed) = timing.elapsed() {
             let secs = elapsed.as_secs();
             if secs >= task_config.check_timeout {
+                tracker.finish(offset + limit)?;
                 // todo: check timeout, skip thi transaction, write log
                 continue;
             }

@@ -8,6 +8,7 @@ use crate::ethereum::client::EthereumClient;
 use crate::web3::Web3Component;
 
 pub mod client;
+pub mod types;
 
 #[derive(Clone, Debug, Default)]
 pub struct EthereumComponent {

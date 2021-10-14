@@ -909,13 +909,14 @@ name = "component-ethereum"
 version = "0.4.7"
 dependencies = [
  "anyhow",
+ "array-bytes",
  "async-trait",
  "bridge-traits",
  "component-http-client",
  "log",
  "reqwest 0.11.4",
+ "secp256k1",
  "serde 1.0.130",
- "serde_json",
  "support-ethereum",
  "thiserror",
  "web3",

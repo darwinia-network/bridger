@@ -178,16 +178,13 @@ impl RelayHelper {
                 "Your are affirming ethereum block {}",
                 target
             );
-            if let Err(err) = do_affirm(
+            do_affirm(
                 self.darwinia.clone(),
                 self.shadow.clone(),
                 target,
                 self.sender_to_extrinsics.clone(),
             )
-            .await
-            {
-                return Err(err);
-            }
+            .await?
         } else {
             trace!(
                 target: PangolinRopstenTask::NAME,
@@ -216,7 +213,7 @@ pub async fn do_affirm(
     ethereum2darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
     target: u64,
-    mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+    mut sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
 ) -> anyhow::Result<()> {
     // /////////////////////////
     // checking before affirm

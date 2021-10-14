@@ -10,8 +10,7 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_ethereum::error::BizError;
-use component_ethereum::error::ComponentEthereumError;
+use component_ethereum::errors::BizError;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
@@ -271,15 +270,15 @@ pub async fn do_affirm(
                 .send(ToExtrinsicsMessage::Extrinsic(ex))
                 .await?
         }
-        Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(block, msg))) => {
-            trace!(
-                target: PangolinRopstenTask::NAME,
-                "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                block,
-                msg
-            );
-        }
         Err(err) => {
+            if let Some(&BizError::BlankEthereumMmrRoot(block, msg)) = err.downcast_ref() {
+                log::trace!(
+                    target: PangolinRopstenTask::NAME,
+                    "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                    block,
+                    msg
+                );
+            }
             return Err(err.into());
         }
     }

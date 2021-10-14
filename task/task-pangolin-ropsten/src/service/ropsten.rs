@@ -15,7 +15,6 @@ use crate::bus::PangolinRopstenBus;
 use crate::config::TaskConfig;
 use crate::helpers;
 use crate::message::{ToRedeemMessage, ToRelayMessage};
-use crate::service::redeem2::scan::RedeemScanner;
 use crate::task::PangolinRopstenTask;
 
 /// Redeem service

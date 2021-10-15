@@ -11,7 +11,7 @@ use component_darwinia_subxt::account::DarwiniaAccount;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_darwinia_subxt::config::DarwiniaSubxtConfig;
 use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
-use component_ethereum::error::BizError;
+use component_ethereum::errors::BizError;
 use component_shadow::ShadowComponent;
 use component_state::state::BridgeState;
 use support_ethereum::block::EthereumHeader;

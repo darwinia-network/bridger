@@ -49,7 +49,7 @@ pub async fn redeem(
     let block_hash_h256 = tx.block_hash.unwrap();
     let eth_tx = TransactionEntity {
         id: tx_hash.clone(),
-        origin: (),
+        origin: tx_type.belong(),
         block_number: tx.block_number.unwrap().as_u64(),
         block_hash: array_bytes::bytes2hex("0x", block_hash_h256.clone()),
         tx_hash,
@@ -58,13 +58,13 @@ pub async fn redeem(
     };
 
     if darwinia
-        .verified(block_hash_h256.clone(), eth_tx.index)
+        .verified(block_hash_h256.clone(), eth_tx.tx_index)
         .await?
     {
         trace!(
             target: PangolinRopstenTask::NAME,
             "This ethereum tx {:?} has already been redeemed.",
-            eth_tx.enclosed_hash()
+            &eth_tx.tx_hash
         );
     } else {
         trace!(

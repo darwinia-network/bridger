@@ -78,10 +78,10 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
     let mut timing = SystemTime::now();
     loop {
         let offset = tracker.current().await?;
-        let limit = 1;
+        let limit = 1usize;
 
         let txs = thegraph_liketh
-            .query_transactions(limit, offset as u32)
+            .query_transactions(limit as u32, offset as u32)
             .await?;
         if txs.is_empty() {
             continue;

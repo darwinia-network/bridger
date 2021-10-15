@@ -2,42 +2,43 @@ use bridge_traits::bridge::task::BridgeSand;
 use component_state::state::BridgeState;
 use microkv::namespace::NamespaceMicroKV;
 
-use crate::task::PangolinRopstenTask;
+use crate::task::DarwiniaEthereumTask;
 
 pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
-    let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-    migrate_tracker_ropsten(&microkv)?;
-    migrate_tracker_pangolin(&microkv)?;
+    let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
+    migrate_tracker_ethereum(&microkv)?;
+    migrate_tracker_darwinia(&microkv)?;
     Ok(())
 }
 
-fn migrate_tracker_ropsten(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
+fn migrate_tracker_ethereum(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     for key in vec![
-        "scan.ropsten.running",
-        "scan.ropsten.finish",
-        "scan.ropsten.current",
-        "scan.ropsten.next",
-        "scan.ropsten.skipped",
-        "scan.ropsten.fast_mode",
+        "scan.ethereum.running",
+        "scan.ethereum.finish",
+        "scan.ethereum.current",
+        "scan.ethereum.next",
+        "scan.ethereum.skipped",
+        "scan.ethereum.fast_mode",
     ] {
         microkv.delete(key)?;
     }
-    microkv.put("scan.ropsten.redeem.running", &true);
-    microkv.put("scan.ropsten.check.running", &true);
+    // todo: check there, save scan.ethereum.finish to scan.ethereum.redeem.current
+    microkv.put("scan.ethereum.redeem.running", &true);
+    microkv.put("scan.ethereum.check.running", &true);
     Ok(())
 }
 
-fn migrate_tracker_pangolin(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
-    if let Some(value) = microkv.get("scan.pangolin.finish")? {
+fn migrate_tracker_darwinia(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
+    if let Some(value) = microkv.get("scan.darwinia.finish")? {
         if value.is_number() {
-            microkv.put("scan.pangolin.current", &value.as_u64().unwrap_or(0));
+            microkv.put("scan.darwinia.current", &value.as_u64().unwrap_or(0));
         }
     }
     for key in vec![
-        "scan.pangolin.finish",
-        "scan.pangolin.next",
-        "scan.pangolin.skipped",
-        "scan.pangolin.fast_mode",
+        "scan.darwinia.finish",
+        "scan.darwinia.next",
+        "scan.darwinia.skipped",
+        "scan.darwinia.fast_mode",
     ] {
         microkv.delete(key)?;
     }

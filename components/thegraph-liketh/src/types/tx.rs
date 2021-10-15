@@ -20,6 +20,27 @@ pub enum TransactionType {
     RedeemErc20Token,
 }
 
+impl TransactionType {
+    pub fn belong(&self) -> TransactionOrigin {
+        match self {
+            TransactionType::Deposit => TransactionOrigin::Bank,
+            TransactionType::Token => TransactionOrigin::Issuing,
+            TransactionType::SetAuthorities => TransactionOrigin::Relay,
+            TransactionType::RegisterErc20Token => TransactionOrigin::Backing,
+            TransactionType::RedeemErc20Token => TransactionOrigin::Backing,
+        }
+    }
+}
+
+/// transaction origin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum TransactionOrigin {
+    Bank,
+    Relay,
+    Issuing,
+    Backing,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransactionEntity {
     pub id: String,

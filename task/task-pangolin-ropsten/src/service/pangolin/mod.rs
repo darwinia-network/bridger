@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Channel, Lifeline, Sender, Task};
+use postage::broadcast;
 use substrate_subxt::system::System;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -60,24 +61,19 @@ impl lifeline::Service for PangolinService {
     }
 }
 
-async fn start(
-    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
-    tracker: Tracker,
-) {
-    loop {
-        if let Err(e) = _start(sender_to_extrinsics.clone(), tracker.clone()).await {
-            let secs = 10;
-            error!(
-                target: PangolinRopstenTask::NAME,
-                "pangolin err {:#?}, wait {} seconds try again", e, secs
-            );
-            tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
-        }
+async fn start(sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>, tracker: Tracker) {
+    while let Err(e) = run(sender_to_extrinsics.clone(), tracker.clone()).await {
+        let secs = 10;
+        error!(
+            target: PangolinRopstenTask::NAME,
+            "pangolin err {:#?}, wait {} seconds try again", e, secs
+        );
+        tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
     }
 }
 
-async fn _start(
-    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+async fn run(
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     tracker: Tracker,
 ) -> anyhow::Result<()> {
     info!(
@@ -132,7 +128,7 @@ struct DarwiniaServiceRunner {
     darwinia2ethereum: Darwinia2Ethereum,
     account: ToEthereumAccount,
     ethereum: EthereumClient,
-    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     delayed_extrinsics: HashMap<u32, Extrinsic>,
     spec_name: String,
 }

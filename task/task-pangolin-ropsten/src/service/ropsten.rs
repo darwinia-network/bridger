@@ -1,7 +1,7 @@
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Channel, Lifeline, Service, Task};
+use lifeline::{Bus, Channel, Lifeline, Sender, Service, Task};
 
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
@@ -56,8 +56,8 @@ impl Service for RopstenScanService {
 
 async fn start(
     tracker: Tracker,
-    mut sender_to_relay: <ToRelayMessage::Channel as Channel>::Tx,
-    mut sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
+    mut sender_to_relay: impl Sender<ToRelayMessage>,
+    mut sender_to_redeem: impl Sender<ToRedeemMessage>,
 ) {
     while let Err(err) = run(&tracker, &mut sender_to_relay, &mut sender_to_redeem).await {
         log::error!(
@@ -71,8 +71,8 @@ async fn start(
 
 async fn run(
     tracker: &Tracker,
-    sender_to_relay: &mut <ToRelayMessage::Channel as Channel>::Tx,
-    sender_to_redeem: &mut <ToRedeemMessage::Channel as Channel>::Tx,
+    sender_to_relay: &mut impl Sender<ToRelayMessage>,
+    sender_to_redeem: &mut impl Sender<ToRedeemMessage>,
 ) -> anyhow::Result<()> {
     log::info!(
         target: PangolinRopstenTask::NAME,
@@ -90,10 +90,10 @@ async fn run(
     loop {
         // fixme: when bridger restarted, may have some transaction not redeemed
         let offset = tracker.current().await?;
-        let limit = 10;
+        let limit = 10usize;
 
         let txs = thegraph_liketh
-            .query_transactions(limit, offset as u32)
+            .query_transactions(limit as u32, offset as u32)
             .await?;
         // send transactions to relay
         for tx in &txs {
@@ -101,7 +101,7 @@ async fn run(
                 target: PangolinRopstenTask::NAME,
                 "{:?} in ethereum block {}",
                 &tx.tx_hash,
-                &tx.block
+                &tx.block_number
             );
             // question: why there use tx.blockNumber + 1
             sender_to_relay
@@ -111,11 +111,11 @@ async fn run(
 
         // send transactions to redeem
         for tx in &txs {
-            if helpers::is_verified(&darwinia, tx)? {
+            if helpers::is_verified(&darwinia, tx).await? {
                 log::trace!(
                     target: PangolinRopstenTask::NAME,
                     "This ethereum tx {:?} has already been redeemed.",
-                    tx.enclosed_hash()
+                    &tx.tx_hash
                 );
                 continue;
             }

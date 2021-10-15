@@ -93,12 +93,18 @@ impl Shadow {
     }
 
     /// Get Receipt
-    pub async fn receipt(&self, tx: &str, last: u64) -> anyhow::Result<EthereumReceiptProofThing> {
+    pub async fn receipt(
+        &self,
+        tx: impl AsRef<str>,
+        last: u64,
+    ) -> anyhow::Result<EthereumReceiptProofThing> {
         let resp = self
             .http
             .get(&format!(
                 "{}/ethereum/receipt/{}/{}",
-                &self.config.endpoint, tx, last
+                &self.config.endpoint,
+                tx.as_ref(),
+                last
             ))
             .send()
             .await?;

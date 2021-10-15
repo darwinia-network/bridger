@@ -4,17 +4,17 @@ use gql_client::Client;
 use crate::types::{QueryTransactionsVars, TheGraphResponse, TransactionEntity};
 
 /// thegraph toolkit, query ethereum/ropsten
-pub struct TheGraphLikeEth<'a> {
-    client: Client<'a>,
+pub struct TheGraphLikeEth {
+    client: Client,
 }
 
-impl<'a> TheGraphLikeEth<'a> {
-    pub fn new(client: Client<'a>) -> Self {
+impl TheGraphLikeEth {
+    pub fn new(client: Client) -> Self {
         Self { client }
     }
 }
 
-impl<'a> TheGraphLikeEth<'a> {
+impl TheGraphLikeEth {
     /// Query transactions page
     pub async fn query_transactions(
         &self,

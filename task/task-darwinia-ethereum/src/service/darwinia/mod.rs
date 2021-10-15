@@ -98,7 +98,7 @@ async fn _start(
     let config_web3: Web3Config = Config::restore(DarwiniaEthereumTask::NAME)?;
 
     // Components
-    let component_ethereum = EthereumComponent::restore::<PangolinRopstenTask>()?;
+    let component_ethereum = EthereumComponent::restore::<DarwiniaEthereumTask>()?;
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
 
     // Darwinia client & account

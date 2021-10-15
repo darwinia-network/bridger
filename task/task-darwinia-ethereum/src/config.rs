@@ -43,8 +43,11 @@ impl DarwiniaEthereumConfig {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, bridge_traits::BridgeCrypto)]
 pub struct TaskConfig {
+    /// the config is enable crypto
+    #[crypto(is_enable)]
+    pub enable_crypto: bool,
     /// ethereum scan service polling interval in seconds
     pub interval_ethereum: u64,
     /// relay service polling interval in seconds
@@ -64,6 +67,7 @@ impl BridgeConfig for TaskConfig {
 
     fn template() -> Self {
         Self {
+            enable_crypto: false,
             interval_ethereum: 120,
             interval_relay: 60,
             interval_guard: 30,

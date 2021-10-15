@@ -25,6 +25,7 @@ log = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
+colored = "2.0"
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage = "0.4"
@@ -46,8 +47,10 @@ component-ethereum = { path = "../../components/ethereum" }
 component-shadow = { path = "../../components/shadow" }
 component-darwinia-subxt = { path = "../../components/client-darwinia-subxt" }
 component-thegraph-liketh = { path = "../../components/thegraph-liketh" }
+component-http-client = { path = "../../components/http-client" }
 
 support-tracker = { path = "../../supports/support-tracker" }
 support-ethereum = { path = "../../supports/support-ethereum" }
+support-keep = { path = "../../supports/support-keep" }
 
 

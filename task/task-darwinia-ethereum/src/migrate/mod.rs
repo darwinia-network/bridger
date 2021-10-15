@@ -6,6 +6,7 @@ use crate::task::DarwiniaEthereumTask;
 
 mod v0;
 mod v1;
+mod v2;
 
 pub fn migrate(state: &BridgeState, version: usize) -> anyhow::Result<()> {
     let saved_version = current_version(state)?;

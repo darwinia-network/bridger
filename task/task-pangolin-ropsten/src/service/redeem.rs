@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use async_recursion::async_recursion;
 use lifeline::{Bus, Channel, Lifeline, Receiver, Sender, Service, Task};
+use postage::broadcast;
 use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -69,8 +70,8 @@ impl Service for RedeemService {
 }
 
 struct RedeemHelper {
-    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
-    sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
     darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
 }
@@ -78,8 +79,8 @@ struct RedeemHelper {
 impl RedeemHelper {
     #[async_recursion]
     pub async fn new(
-        sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
-        sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
+        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+        sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
     ) -> Self {
         match RedeemHelper::build(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await {
             Ok(helper) => helper,
@@ -95,8 +96,8 @@ impl RedeemHelper {
     }
 
     async fn build(
-        sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
-        sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
+        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+        sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
     ) -> anyhow::Result<Self> {
         info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 
@@ -147,8 +148,8 @@ impl RedeemHelper {
         ethereum2darwinia: Ethereum2Darwinia,
         shadow: Arc<Shadow>,
         tx: TransactionEntity,
-        mut sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
-        mut sender_to_redeem: <ToRedeemMessage::Channel as Channel>::Tx,
+        mut sender_to_extrinsics: impl Sender<ToExtrinsicsMessage>,
+        mut sender_to_redeem: impl Sender<ToRedeemMessage>,
     ) -> anyhow::Result<()> {
         log::trace!(
             target: PangolinRopstenTask::NAME,
@@ -157,7 +158,7 @@ impl RedeemHelper {
         );
 
         // 1. Checking before redeem
-        if helpers::is_verified(&ethereum2darwinia.darwinia, &tx)? {
+        if helpers::is_verified(&ethereum2darwinia.darwinia, &tx).await? {
             log::trace!(
                 target: PangolinRopstenTask::NAME,
                 "Ethereum tx {:?} redeemed",
@@ -167,12 +168,12 @@ impl RedeemHelper {
         }
 
         let last_confirmed = ethereum2darwinia.last_confirmed().await?;
-        if tx.block >= last_confirmed {
+        if tx.block_number >= last_confirmed {
             log::trace!(
                 target: PangolinRopstenTask::NAME,
                 "Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
-                tx.block,
+                tx.block_number,
                 last_confirmed,
             );
             sleep(Duration::from_secs(30)).await;
@@ -183,9 +184,7 @@ impl RedeemHelper {
         }
 
         // 2. Do redeem
-        let proof = shadow
-            .receipt(&format!("{:?}", tx.enclosed_hash()), last_confirmed)
-            .await?;
+        let proof = shadow.receipt(&tx.tx_hash, last_confirmed).await?;
 
         let ex = Extrinsic::Redeem(proof, tx.clone());
         sender_to_extrinsics

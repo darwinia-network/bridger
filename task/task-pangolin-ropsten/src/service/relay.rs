@@ -4,6 +4,7 @@ use std::time::Duration;
 use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Channel, Lifeline, Receiver, Sender, Service, Task};
+use postage::broadcast;
 use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -94,7 +95,7 @@ impl Service for LikeDarwiniaWithLikeEthereumRelayService {
 
 struct RelayHelper {
     state: BridgeState,
-    sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
 }
@@ -103,7 +104,7 @@ impl RelayHelper {
     #[async_recursion]
     pub async fn new(
         state: BridgeState,
-        sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> Self {
         match RelayHelper::build(state.clone(), sender_to_extrinsics.clone()).await {
             Ok(helper) => helper,
@@ -120,7 +121,7 @@ impl RelayHelper {
 
     async fn build(
         state: BridgeState,
-        sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> anyhow::Result<Self> {
         info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 
@@ -212,7 +213,7 @@ pub async fn do_affirm(
     ethereum2darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
     target: u64,
-    mut sender_to_extrinsics: <ToExtrinsicsMessage::Channel as Channel>::Tx,
+    mut sender_to_extrinsics: impl Sender<ToExtrinsicsMessage>,
 ) -> anyhow::Result<()> {
     // /////////////////////////
     // checking before affirm
@@ -271,13 +272,16 @@ pub async fn do_affirm(
                 .await?
         }
         Err(err) => {
-            if let Some(&BizError::BlankEthereumMmrRoot(block, msg)) = err.downcast_ref() {
-                log::trace!(
-                    target: PangolinRopstenTask::NAME,
-                    "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                    block,
-                    msg
-                );
+            if let Some(e) = err.downcast_ref::<BizError>() {
+                if let BizError::BlankEthereumMmrRoot(block, msg) = e {
+                    log::trace!(
+                        target: PangolinRopstenTask::NAME,
+                        "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                        block,
+                        msg
+                    );
+                    return Ok(());
+                }
             }
             return Err(err.into());
         }

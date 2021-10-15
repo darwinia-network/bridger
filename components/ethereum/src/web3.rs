@@ -8,7 +8,7 @@ use bridge_traits::error::{BridgeResult, StandardError};
 
 use crate::config::Web3Config;
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Web3Component {
     config: Web3Config,
 }

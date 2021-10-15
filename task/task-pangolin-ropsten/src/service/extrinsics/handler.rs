@@ -229,7 +229,7 @@ impl ExtrinsicsHandler {
             .darwinia2ethereum
             .ecdsa_sign_and_submit_signed_mmr_root(
                 &self.darwinia2ethereum_relayer,
-                spec_name,
+                self.spec_name.clone(),
                 block_number,
             )
             .await?;

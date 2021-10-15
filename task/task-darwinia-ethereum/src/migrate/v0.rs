@@ -17,8 +17,7 @@ fn migrate_scan_darwinia(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     let key = "last-tracked-darwinia-block";
     let block_pangolin: Option<u64> = microkv.get_as(key)?;
     if let Some(block) = block_pangolin {
-        let tracker = Tracker::new(microkv.clone(), "scan.darwinia");
-        tracker.queue(vec![block as usize])?;
+        microkv.put("scan.darwinia.next", &format!("{}", block))?;
         microkv.delete(key)?;
     }
     Ok(())
@@ -28,8 +27,7 @@ fn migrate_scan_ethereum(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     let key = "last-redeemed";
     let block_ropsten: Option<u64> = microkv.get_as(key)?;
     if let Some(block) = block_ropsten {
-        let tracker = Tracker::new(microkv.clone(), "scan.ethereum");
-        tracker.queue(vec![block as usize])?;
+        microkv.put("scan.ethereum.next", &format!("{}", block))?;
         microkv.delete(key)?;
     }
     Ok(())

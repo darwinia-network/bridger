@@ -12,8 +12,7 @@ use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
-use component_ethereum::error::BizError;
-use component_ethereum::error::ComponentEthereumError;
+use component_ethereum::errors::BizError;
 use component_shadow::{Shadow, ShadowComponent};
 use component_state::state::BridgeState;
 use support_ethereum::block::EthereumHeader;
@@ -284,15 +283,18 @@ where
                 .send(ToExtrinsicsMessage::Extrinsic(ex))
                 .await?
         }
-        Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(block, msg))) => {
-            trace!(
-                target: DarwiniaEthereumTask::NAME,
-                "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                block,
-                msg
-            );
-        }
         Err(err) => {
+            if let Some(e) = err.downcast_ref::<BizError>() {
+                if let BizError::BlankEthereumMmrRoot(block, msg) = e {
+                    log::trace!(
+                        target: DarwiniaEthereumTask::NAME,
+                        "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                        block,
+                        msg
+                    );
+                    return Ok(());
+                }
+            }
             return Err(err.into());
         }
     }

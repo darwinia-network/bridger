@@ -1036,6 +1036,7 @@ name = "component-thegraph-liketh"
 version = "0.4.7"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bridge-traits",
  "gql_client",
  "log",
@@ -3057,7 +3058,7 @@ dependencies = [
 [[package]]
 name = "gql_client"
 version = "1.0.1"
-source = "git+https://github.com/vyneer/gql-client-rs.git?branch=fix-serde-export#cf082bae3c549fdf4eaaad77c83e7626dd6cb7fd"
+source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#28499d7b5e7e2dcf2d833da83b535ca44817be75"
 dependencies = [
  "reqwest",
  "serde 1.0.130",
@@ -9453,8 +9454,10 @@ dependencies = [
  "async-recursion",
  "async-trait",
  "bridge-traits",
+ "colored",
  "component-darwinia-subxt",
  "component-ethereum",
+ "component-http-client",
  "component-shadow",
  "component-state",
  "component-thegraph-liketh",
@@ -9468,6 +9471,7 @@ dependencies = [
  "serde_json",
  "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.3)",
  "support-ethereum",
+ "support-keep",
  "support-tracker",
  "thiserror",
  "tokio 1.11.0",
@@ -9527,7 +9531,9 @@ dependencies = [
  "async-recursion",
  "async-trait",
  "bridge-traits",
+ "colored",
  "component-ethereum",
+ "component-http-client",
  "component-pangolin-subxt",
  "component-shadow",
  "component-state",

@@ -160,11 +160,9 @@ impl std::fmt::Display for EthereumHeader {
             "receipts_root: ",
             to_hex(&self.receipts_root, false)
         ));
-        msgs.push(format!(
-            "{:>19}{}",
-            "log_bloom: ",
-            &self.log_bloom.to_string()
-        ));
+        if let Some(log_bloom) = &self.log_bloom {
+            msgs.push(format!("{:>19}{}", "log_bloom: ", log_bloom.to_string()));
+        }
         msgs.push(format!("{:>19}{}", "gas_used: ", &self.gas_used.as_u128()));
         msgs.push(format!(
             "{:>19}{}",
@@ -211,7 +209,7 @@ pub struct EthereumHeaderJson {
     extra_data: String,
     state_root: String,
     receipts_root: String,
-    log_bloom: String,
+    log_bloom: Option<String>,
     gas_used: u128,
     gas_limit: u128,
     difficulty: u128,
@@ -232,7 +230,7 @@ impl From<EthereumHeader> for EthereumHeaderJson {
             extra_data: format!("0x{}", hex!(that.extra_data.to_vec())),
             state_root: format!("0x{}", hex!(that.state_root.to_vec())),
             receipts_root: format!("0x{}", hex!(that.receipts_root.to_vec())),
-            log_bloom: format!("0x{}", hex!(that.log_bloom.0.to_vec())),
+            log_bloom: that.log_bloom.map(|b| format!("0x{}", hex!(b.0.to_vec()))),
             gas_used: that.gas_used.as_u128(),
             gas_limit: that.gas_limit.as_u128(),
             difficulty: that.difficulty.as_u128(),
@@ -259,7 +257,9 @@ impl From<EthereumHeaderJson> for EthereumHeader {
             extra_data: bytes!(that.extra_data.as_str()),
             state_root: bytes!(that.state_root.as_str(), 32),
             receipts_root: bytes!(that.receipts_root.as_str(), 32),
-            log_bloom: Some(Bloom(bytes!(that.log_bloom.as_str(), 256))),
+            log_bloom: that
+                .log_bloom
+                .map(|bloom| Bloom(bytes!(bloom.as_str(), 256))),
             gas_used: U256::from(that.gas_used),
             gas_limit: U256::from(that.gas_limit),
             difficulty: U256::from(that.difficulty),

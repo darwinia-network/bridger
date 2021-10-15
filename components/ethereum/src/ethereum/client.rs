@@ -23,8 +23,8 @@ impl EthereumClient {
 
 impl EthereumClient {
     fn build_address(str: &str) -> anyhow::Result<Address> {
-        let address =
-            array_bytes::hex2bytes(&str[2..]).map_err(|_| Error::Hex2Bytes("str[2..]".into()))?;
+        let address = array_bytes::hex2bytes(&str[2..])
+            .map_err(|_| StandardError::Hex2Bytes("str[2..]".into()))?;
         let mut address_buffer = [0u8; 20];
         address_buffer.copy_from_slice(&address);
         Ok(Address::from(address_buffer))
@@ -47,10 +47,12 @@ impl EthereumClient {
 
     pub async fn get_header_by_number(&self, block: u64) -> anyhow::Result<EthereumHeader> {
         let eth_block = BlockId::Number(BlockNumber::Number(block.into()));
-        let block = self.web3.eth().block(eth_block).await?.ok_or_else(|| {
-            StandardError::Component(format!("The block [{}] not found", block)).into()
-        })?;
-        Ok(block.into())
+        match self.web3.eth().block(eth_block).await? {
+            Some(block) => Ok(block.into()),
+            None => {
+                Err(StandardError::Component(format!("The block [{}] not found", block)).into())
+            }
+        }
     }
 
     /// submit_authorities_set
@@ -59,12 +61,13 @@ impl EthereumClient {
         message: Vec<u8>,
         signatures: Vec<[u8; 65]>,
     ) -> anyhow::Result<H256> {
-        let relay_contract_address = Self::build_address(&relay_contract)?;
+        let relay_contract_address = Self::build_address(&self.config.subscribe_relay_address)?;
         let beneficiary = self
             .config
             .relayer_beneficiary_darwinia_account
+            .clone()
             .ok_or_else(|| {
-                StandardError::Component("You have no beneficiary configured.".to_string()).into()
+                StandardError::Component("You have no beneficiary configured.".to_string())
             })?;
         let secret_key = match &self.config.relayer_private_key {
             Some(seed) => {
@@ -76,13 +79,12 @@ impl EthereumClient {
         }
         .ok_or_else(|| {
             StandardError::Component("You have no ethereum private key configured.".to_string())
-                .into()
         })?;
 
         let key_ref = SecretKeyRef::new(&secret_key);
         let contract = Contract::from_json(
             self.web3.eth(),
-            self.relay_contract_address,
+            relay_contract_address,
             include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/abi/relay.json")),
         )?;
 

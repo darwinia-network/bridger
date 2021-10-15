@@ -12,6 +12,8 @@ pub struct Tracker {
     key_current: String,
     /// Planned to execute, after to running the next value is planned+1
     key_planned: String,
+    /// Control running
+    key_running: String,
 }
 
 impl Debug for Tracker {
@@ -20,6 +22,7 @@ impl Debug for Tracker {
         f.write_str("  microkv: ***,\n")?;
         f.write_str(&format!("  key_current: {}\n", self.key_current))?;
         f.write_str(&format!("  key_planned: {}\n", self.key_planned))?;
+        f.write_str(&format!("  key_running: {}\n", self.key_running))?;
         f.write_str("}")?;
         Ok(())
     }
@@ -33,6 +36,7 @@ impl Tracker {
             microkv,
             key_current: format!("{}.current", key),
             key_planned: format!("{}.planned", key),
+            key_running: format!("{}.running", key),
         }
     }
 }
@@ -43,13 +47,12 @@ impl Tracker {
     }
 
     pub fn stop_running(&self) -> anyhow::Result<()> {
-        self.microkv
-            .put(&self.key_running, &String::from("false"))?;
+        self.microkv.put(&self.key_running, &false)?;
         Ok(())
     }
 
     pub fn start_running(&self) -> anyhow::Result<()> {
-        self.microkv.put(&self.key_running, &String::from("true"))?;
+        self.microkv.put(&self.key_running, &true)?;
         Ok(())
     }
 

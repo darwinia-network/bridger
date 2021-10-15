@@ -5,10 +5,10 @@ use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_state::state::BridgeState;
 
-use crate::bus::PangolinRopstenBus;
+use crate::bus::DarwiniaEthereumBus;
 use crate::message::ToExtrinsicsMessage;
 use crate::service::extrinsics::handler::ExtrinsicsHandler;
-use crate::task::PangolinRopstenTask;
+use crate::task::DarwiniaEthereumTask;
 
 mod handler;
 
@@ -20,7 +20,7 @@ pub struct ExtrinsicsService {
 impl BridgeService for ExtrinsicsService {}
 
 impl Service for ExtrinsicsService {
-    type Bus = PangolinRopstenBus;
+    type Bus = DarwiniaEthereumBus;
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
@@ -31,7 +31,7 @@ impl Service for ExtrinsicsService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(
-            &format!("{}-service-extrinsics", PangolinRopstenTask::NAME),
+            &format!("{}-service-extrinsics", DarwiniaEthereumTask::NAME),
             async move {
                 let mut handler = ExtrinsicsHandler::new(state.clone()).await;
 
@@ -39,7 +39,7 @@ impl Service for ExtrinsicsService {
                     if let ToExtrinsicsMessage::Extrinsic(ex) = recv {
                         while let Err(err) = handler.send_extrinsic(ex.clone()).await {
                             log::error!(
-                                target: PangolinRopstenTask::NAME,
+                                target: DarwiniaEthereumTask::NAME,
                                 "extrinsics err: {:#?}",
                                 err
                             );

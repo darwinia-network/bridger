@@ -22,7 +22,6 @@ fn migrate_tracker_ethereum(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     ] {
         microkv.delete(key)?;
     }
-    // todo: check there, save scan.ethereum.finish to scan.ethereum.redeem.current
     microkv.put("scan.ethereum.redeem.running", &true)?;
     microkv.put("scan.ethereum.check.running", &true)?;
     Ok(())

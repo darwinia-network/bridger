@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Channel, Lifeline, Sender, Task};
+use lifeline::{Bus, Lifeline, Sender, Task};
 use postage::broadcast;
 use substrate_subxt::system::System;
 
@@ -9,10 +9,9 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_ethereum::config::{EthereumConfig, Web3Config};
+use component_ethereum::config::Web3Config;
 use component_ethereum::ethereum::client::EthereumClient;
 use component_ethereum::ethereum::EthereumComponent;
-use component_ethereum::web3::Web3Component;
 use component_pangolin_subxt::account::DarwiniaAccount;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::config::DarwiniaSubxtConfig;

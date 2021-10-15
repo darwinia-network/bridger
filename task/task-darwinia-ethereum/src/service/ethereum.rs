@@ -1,7 +1,7 @@
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Channel, Lifeline, Sender, Service, Task};
+use lifeline::{Bus, Lifeline, Sender, Service, Task};
 
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;

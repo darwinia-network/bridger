@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Channel, Lifeline, Receiver, Sender, Service, Task};
+use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 use postage::broadcast;
 use tokio::time::sleep;
 
@@ -272,18 +272,17 @@ pub async fn do_affirm(
                 .await?
         }
         Err(err) => {
-            if let Some(e) = err.downcast_ref::<BizError>() {
-                if let BizError::BlankEthereumMmrRoot(block, msg) = e {
-                    log::trace!(
-                        target: PangolinRopstenTask::NAME,
-                        "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                        block,
-                        msg
-                    );
-                    return Ok(());
-                }
+            if let Some(BizError::BlankEthereumMmrRoot(block, msg)) = err.downcast_ref::<BizError>()
+            {
+                log::trace!(
+                    target: PangolinRopstenTask::NAME,
+                    "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                    block,
+                    msg
+                );
+                return Ok(());
             }
-            return Err(err.into());
+            return Err(err);
         }
     }
 

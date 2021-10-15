@@ -183,18 +183,18 @@ impl GuardService {
                             .await?;
                     }
                     Err(err) => {
-                        if let Some(e) = err.downcast_ref::<BizError>() {
-                            if let BizError::BlankEthereumMmrRoot(block, msg) = e {
-                                log::trace!(
-                                    target: DarwiniaEthereumTask::NAME,
-                                    "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                                    block,
-                                    msg
-                                );
-                                return Ok(());
-                            }
+                        if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
+                            err.downcast_ref::<BizError>()
+                        {
+                            log::trace!(
+                                target: DarwiniaEthereumTask::NAME,
+                                "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                                block,
+                                msg
+                            );
+                            return Ok(());
                         }
-                        return Err(err.into());
+                        return Err(err);
                     }
                 }
             }

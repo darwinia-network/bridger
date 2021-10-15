@@ -20,7 +20,6 @@ use crate::message::{EcdsaMessage, Extrinsic};
 use crate::task::PangolinRopstenTask;
 
 pub struct ExtrinsicsHandler {
-    state: BridgeState,
     ethereum2darwinia: Ethereum2Darwinia,
     darwinia2ethereum: Darwinia2Ethereum,
     darwinia2ethereum_relayer: ToEthereumAccount,
@@ -83,7 +82,6 @@ impl ExtrinsicsHandler {
 
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         Ok(ExtrinsicsHandler {
-            state,
             ethereum2darwinia,
             darwinia2ethereum,
             darwinia2ethereum_relayer,

@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use microkv::namespace::NamespaceMicroKV;
 use std::fmt::{Debug, Formatter};
 
@@ -135,7 +134,7 @@ impl Tracker {
                     return match v.as_str() {
                         Some(t) => {
                             let t = t.trim();
-                            Ok(Some((t.parse::<u64>()?)))
+                            Ok(Some(t.parse()?))
                         }
                         None => Ok(None),
                     };

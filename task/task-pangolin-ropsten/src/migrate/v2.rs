@@ -12,7 +12,7 @@ pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
 }
 
 fn migrate_tracker_ropsten(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
-    for key in vec![
+    for key in [
         "scan.ropsten.running",
         "scan.ropsten.finish",
         "scan.ropsten.current",
@@ -22,18 +22,18 @@ fn migrate_tracker_ropsten(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     ] {
         microkv.delete(key)?;
     }
-    microkv.put("scan.ropsten.redeem.running", &true);
-    microkv.put("scan.ropsten.check.running", &true);
+    microkv.put("scan.ropsten.redeem.running", &true)?;
+    microkv.put("scan.ropsten.check.running", &true)?;
     Ok(())
 }
 
 fn migrate_tracker_pangolin(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     if let Some(value) = microkv.get("scan.pangolin.finish")? {
         if value.is_number() {
-            microkv.put("scan.pangolin.current", &value.as_u64().unwrap_or(0));
+            microkv.put("scan.pangolin.current", &value.as_u64().unwrap_or(0))?;
         }
     }
-    for key in vec![
+    for key in [
         "scan.pangolin.finish",
         "scan.pangolin.next",
         "scan.pangolin.skipped",

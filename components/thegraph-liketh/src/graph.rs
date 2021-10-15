@@ -16,6 +16,7 @@ impl TheGraphLikeEth {
 
 impl TheGraphLikeEth {
     /// Query transactions page
+    #[allow(irrefutable_let_patterns)]
     pub async fn query_transactions(
         &self,
         first: u32,

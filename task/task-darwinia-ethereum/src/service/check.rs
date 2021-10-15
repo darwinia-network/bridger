@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-use std::iter::FromIterator;
 use std::time::SystemTime;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -11,7 +9,6 @@ use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
-use component_thegraph_liketh::types::TransactionEntity;
 use component_thegraph_liketh::TheGraphLikeEthComponent;
 use support_tracker::Tracker;
 

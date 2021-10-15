@@ -12,7 +12,7 @@ pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
 }
 
 fn migrate_tracker_ethereum(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
-    for key in vec![
+    for key in [
         "scan.ethereum.running",
         "scan.ethereum.finish",
         "scan.ethereum.current",
@@ -23,18 +23,18 @@ fn migrate_tracker_ethereum(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
         microkv.delete(key)?;
     }
     // todo: check there, save scan.ethereum.finish to scan.ethereum.redeem.current
-    microkv.put("scan.ethereum.redeem.running", &true);
-    microkv.put("scan.ethereum.check.running", &true);
+    microkv.put("scan.ethereum.redeem.running", &true)?;
+    microkv.put("scan.ethereum.check.running", &true)?;
     Ok(())
 }
 
 fn migrate_tracker_darwinia(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     if let Some(value) = microkv.get("scan.darwinia.finish")? {
         if value.is_number() {
-            microkv.put("scan.darwinia.current", &value.as_u64().unwrap_or(0));
+            microkv.put("scan.darwinia.current", &value.as_u64().unwrap_or(0))?;
         }
     }
-    for key in vec![
+    for key in [
         "scan.darwinia.finish",
         "scan.darwinia.next",
         "scan.darwinia.skipped",

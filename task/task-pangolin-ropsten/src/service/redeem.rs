@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_recursion::async_recursion;
-use lifeline::{Bus, Channel, Lifeline, Receiver, Sender, Service, Task};
+use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 use postage::broadcast;
 use tokio::time::sleep;
 
@@ -13,7 +13,6 @@ use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
 use component_thegraph_liketh::types::TransactionEntity;
-use support_ethereum::receipt::RedeemFor;
 
 use crate::bus::PangolinRopstenBus;
 use crate::helpers;
@@ -31,6 +30,7 @@ impl Service for RedeemService {
     type Bus = PangolinRopstenBus;
     type Lifeline = anyhow::Result<Self>;
 
+    #[allow(irrefutable_let_patterns)]
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToRedeemMessage>()?;

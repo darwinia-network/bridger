@@ -23,6 +23,7 @@ impl Service for ExtrinsicsService {
     type Bus = PangolinRopstenBus;
     type Lifeline = anyhow::Result<Self>;
 
+    #[allow(irrefutable_let_patterns)]
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToExtrinsicsMessage>()?;

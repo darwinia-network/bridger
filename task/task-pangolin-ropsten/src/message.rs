@@ -5,9 +5,9 @@ use std::fmt::Debug;
 use lifeline::Message;
 use postage::broadcast;
 
-use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
+use component_thegraph_liketh::types::TransactionEntity;
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
-use support_ethereum::receipt::{EthereumReceiptProofThing, RedeemFor};
+use support_ethereum::receipt::EthereumReceiptProofThing;
 
 use crate::bus::PangolinRopstenBus;
 

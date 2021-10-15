@@ -13,7 +13,6 @@ use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
 use component_thegraph_liketh::types::TransactionEntity;
-use support_ethereum::receipt::RedeemFor;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::helpers;

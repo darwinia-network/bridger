@@ -19,13 +19,15 @@ impl TheGraphLikeEth {
     #[allow(irrefutable_let_patterns)]
     pub async fn query_transactions(
         &self,
+        from: u64,
         first: u32,
-        skip: u32,
     ) -> anyhow::Result<Vec<TransactionEntity>> {
         let query = r#"
-        query TransactionPage($first: Int!, $skip: Int!) {
+        query TransactionPage($from: Int!, $first: Int!) {
           transactionEntities(
-            skip: $skip
+            where: {
+              blockNumber_gt: $from
+            }
             first: $first
             orderBy: blockNumber
             orderDirection: asc
@@ -40,7 +42,7 @@ impl TheGraphLikeEth {
           }
         }
         "#;
-        let vars = QueryTransactionsVars { first, skip };
+        let vars = QueryTransactiofnsVars { from, skip };
         let data = self
             .client
             .query_with_vars::<TheGraphResponse, QueryTransactionsVars>(query, vars)

@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize)]
 pub(crate) struct QueryTransactionsVars {
+    pub(crate) from: u32,
     pub(crate) first: u32,
-    pub(crate) skip: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

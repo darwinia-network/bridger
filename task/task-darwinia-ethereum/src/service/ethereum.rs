@@ -88,13 +88,20 @@ async fn run(
     let darwinia = component_pangolin_subxt.component().await?;
 
     loop {
-        // fixme: when bridger restarted, may have some transaction not redeemed
-        let offset = tracker.current().await?;
+        let from = tracker.current().await?;
         let limit = 10usize;
 
         let txs = thegraph_liketh
-            .query_transactions(limit as u32, offset as u32)
+            .query_transactions(from as u64, limit as u32)
             .await?;
+        if txs.is_empty() {
+            log::trace!(
+                target: DarwiniaEthereumTask::NAME,
+                "Not have more transactions"
+            );
+            continue;
+        }
+
         // send transactions to relay
         for tx in &txs {
             log::trace!(
@@ -135,7 +142,8 @@ async fn run(
             );
         }
 
-        tracker.finish(offset + limit)?;
+        let latest = txs.get(txs.len() - 1).unwrap();
+        tracker.finish(latest.block_number as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,
         ))

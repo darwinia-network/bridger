@@ -24,6 +24,13 @@ fn migrate_tracker_ethereum(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     }
     microkv.put("scan.ethereum.redeem.running", &true)?;
     microkv.put("scan.ethereum.check.running", &true)?;
+    if let Some(value) = microkv.get("scan.ethereum.finish")? {
+        if value.is_number() {
+            let last_block = value.as_u64().unwrap();
+            microkv.put("scan.ethereum.redeem.current", &last_block)?;
+            microkv.put("scan.ethereum.check.current", &last_block)?;
+        }
+    }
     Ok(())
 }
 

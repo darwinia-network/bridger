@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize)]
 pub(crate) struct QueryTransactionsVars {
-    pub(crate) from: u32,
+    pub(crate) from: u64,
     pub(crate) first: u32,
 }
 

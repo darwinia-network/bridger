@@ -42,7 +42,7 @@ impl TheGraphLikeEth {
           }
         }
         "#;
-        let vars = QueryTransactiofnsVars { from, skip };
+        let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
             .query_with_vars::<TheGraphResponse, QueryTransactionsVars>(query, vars)
@@ -52,8 +52,8 @@ impl TheGraphLikeEth {
             return Ok(txs);
         }
         Err(StandardError::Component(format!(
-            "Failed to query transaction page. query: {}, vars: [first: {}, skip: {}]",
-            query, first, skip,
+            "Failed to query transaction page. query: {}, vars: [from: {}, limit: {}]",
+            query, from, first,
         ))
         .into())
     }

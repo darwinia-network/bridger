@@ -110,7 +110,8 @@ async fn run(
                 &tx.tx_hash,
                 &tx.block_number
             );
-            // question: why there use tx.blockNumber + 1
+            // Because of on-demand relay, we need use the next block's (block_number + 1)
+            // proofs to verify this block (block_number)
             sender_to_relay
                 .send(ToRelayMessage::EthereumBlockNumber(tx.block_number + 1))
                 .await?;

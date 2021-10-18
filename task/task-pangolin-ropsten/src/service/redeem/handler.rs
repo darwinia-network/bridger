@@ -4,6 +4,7 @@ use lifeline::Sender;
 use postage::broadcast;
 
 use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::task::BridgeSand;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
@@ -11,7 +12,6 @@ use component_thegraph_liketh::types::TransactionEntity;
 
 use crate::helpers;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
-use crate::service::redeem::RedeemHelper;
 use crate::task::PangolinRopstenTask;
 
 pub struct RedeemHandler {

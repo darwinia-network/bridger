@@ -12,7 +12,6 @@ use support_tracker::Tracker;
 
 use crate::bus::PangolinRopstenBus;
 use crate::config::TaskConfig;
-use crate::handlers;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
 use crate::service::redeem::handler::RedeemHandler;
 use crate::task::PangolinRopstenTask;
@@ -40,14 +39,20 @@ impl Service for RedeemService {
 
         // Receiver & Sender
         let mut rx = bus.rx::<ToRedeemMessage>()?;
-        let mut sender_to_redeem = bus.tx::<ToRedeemMessage>()?;
+        let sender_to_redeem_scan = bus.tx::<ToRedeemMessage>()?;
+        let mut sender_to_redeem_common = bus.tx::<ToRedeemMessage>()?;
         let sender_to_extrinsics_command = bus.tx::<ToExtrinsicsMessage>()?;
         let sender_to_extrinsics_scan = bus.tx::<ToExtrinsicsMessage>()?;
 
         let _greet_scan = Self::try_task(
             &format!("{}-service-redeem-scan", PangolinRopstenTask::NAME),
             async move {
-                start(tracker.clone(), sender_to_extrinsics_scan.clone()).await;
+                start(
+                    tracker.clone(),
+                    sender_to_extrinsics_scan.clone(),
+                    sender_to_redeem_scan.clone(),
+                )
+                .await;
                 Ok(())
             },
         );
@@ -55,9 +60,11 @@ impl Service for RedeemService {
         let _greet_command = Self::try_task(
             &format!("{}-service-redeem-command", PangolinRopstenTask::NAME),
             async move {
-                let mut handler =
-                    RedeemHandler::new(sender_to_extrinsics.clone(), sender_to_redeem.clone())
-                        .await;
+                let mut handler = RedeemHandler::new(
+                    sender_to_extrinsics_command.clone(),
+                    sender_to_redeem_common.clone(),
+                )
+                .await;
 
                 while let Some(recv) = rx.recv().await {
                     if let ToRedeemMessage::EthereumTransaction(tx) = recv {
@@ -72,12 +79,12 @@ impl Service for RedeemService {
                             tokio::time::sleep(std::time::Duration::from_secs(10)).await;
                             handler = RedeemHandler::new(
                                 sender_to_extrinsics_command.clone(),
-                                sender_to_redeem.clone(),
+                                sender_to_redeem_common.clone(),
                             )
                             .await;
                             // for any error when handler recreated, we need put this tx back to the
                             // receive queue
-                            if let Err(e) = sender_to_redeem
+                            if let Err(e) = sender_to_redeem_common
                                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                                 .await
                             {
@@ -102,8 +109,18 @@ impl Service for RedeemService {
     }
 }
 
-async fn start(tracker: Tracker, mut sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>) {
-    while let Err(err) = run(&tracker, &mut sender_to_extrinsics).await {
+async fn start(
+    tracker: Tracker,
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
+) {
+    while let Err(err) = run(
+        &tracker,
+        sender_to_extrinsics.clone(),
+        sender_to_redeem.clone(),
+    )
+    .await
+    {
         log::error!(
             target: PangolinRopstenTask::NAME,
             "ropsten redeem err {:#?}",
@@ -115,7 +132,8 @@ async fn start(tracker: Tracker, mut sender_to_extrinsics: broadcast::Sender<ToE
 
 async fn run(
     tracker: &Tracker,
-    sender_to_extrinsics: &mut broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
 ) -> anyhow::Result<()> {
     // the graph
     let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
@@ -140,6 +158,9 @@ async fn run(
             while let Err(e) = handler.redeem(tx.clone()).await {
                 tokio::time::sleep(std::time::Duration::from_secs(10)).await;
                 times += 1;
+                handler =
+                    RedeemHandler::new(sender_to_extrinsics.clone(), sender_to_redeem.clone())
+                        .await;
                 if times > 10 {
                     // todo: write log
                     log::error!(

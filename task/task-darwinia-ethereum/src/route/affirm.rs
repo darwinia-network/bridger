@@ -19,6 +19,7 @@ use support_ethereum::parcel::EthereumRelayHeaderParcel;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::message::ToExtrinsicsMessage;
+use crate::service::affirm::handler::AffirmHandler;
 use crate::task::DarwiniaEthereumTask;
 
 pub async fn affirm(
@@ -29,24 +30,14 @@ pub async fn affirm(
         .as_u64()
         .ok_or_else(|| StandardError::Api("The `block` parameter is required".to_string()))?;
 
-    // Shadow
-    let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
-    let shadow = component_shadow.component().await?;
-
-    // Darwinia client
-    let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
-    let darwinia = component_darwinia.component().await?;
-    let ethereum_to_darwinia = Ethereum2Darwinia::new(darwinia);
-
+    // State
+    let state = bus.storage().clone_resource::<BridgeState>()?;
+    let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
     let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
-    crate::service::relay::do_affirm(
-        ethereum_to_darwinia,
-        Arc::new(shadow),
-        block,
-        sender_to_extrinsics,
-    )
-    .await?;
+    let mut handler = AffirmHandler::new(microkv, sender_to_extrinsics).await;
+
+    handler.do_affirm(block).await?;
 
     Ok(TaskTerminal::new("success"))
 }

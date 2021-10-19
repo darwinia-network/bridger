@@ -65,5 +65,7 @@ fn migrate_affirm(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
             microkv.put("affirm.relayed", &value.as_u64().unwrap_or(0))?;
         }
     }
+    microkv.delete("target")?;
+    microkv.delete("relayed")?;
     Ok(())
 }

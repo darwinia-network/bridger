@@ -5,14 +5,14 @@ use postage::broadcast;
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
-use component_pangolin_subxt::from_ethereum::Ethereum2Darwinia;
+use component_darwinia_subxt::component::DarwiniaSubxtComponent;
+use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
 use component_thegraph_liketh::types::TransactionEntity;
 
 use crate::helpers;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
-use crate::task::PangolinRopstenTask;
+use crate::task::DarwiniaEthereumTask;
 
 pub struct RedeemHandler {
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
@@ -33,7 +33,7 @@ impl RedeemHandler {
                 Ok(v) => return v,
                 Err(err) => {
                     log::error!(
-                        target: PangolinRopstenTask::NAME,
+                        target: DarwiniaEthereumTask::NAME,
                         "Failed to create redeem handler, times: [{}] err: {:#?}",
                         times,
                         err
@@ -48,11 +48,11 @@ impl RedeemHandler {
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
         sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
     ) -> anyhow::Result<Self> {
-        log::info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
+        log::info!(target: DarwiniaEthereumTask::NAME, "SERVICE RESTARTING...");
 
         // Components
-        let component_darwinia = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-        let component_shadow = ShadowComponent::restore::<PangolinRopstenTask>()?;
+        let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+        let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
 
         // Darwinia client
         let darwinia = component_darwinia.component().await?;
@@ -62,7 +62,7 @@ impl RedeemHandler {
         let shadow = Arc::new(component_shadow.component().await?);
 
         log::info!(
-            target: PangolinRopstenTask::NAME,
+            target: DarwiniaEthereumTask::NAME,
             "✨ SERVICE STARTED: ETHEREUM <> DARWINIA REDEEM"
         );
         Ok(RedeemHandler {
@@ -77,7 +77,7 @@ impl RedeemHandler {
 impl RedeemHandler {
     pub async fn redeem(&mut self, tx: TransactionEntity) -> anyhow::Result<()> {
         log::trace!(
-            target: PangolinRopstenTask::NAME,
+            target: DarwiniaEthereumTask::NAME,
             "Try to redeem ethereum tx {:?}...",
             tx.tx_hash
         );
@@ -85,7 +85,7 @@ impl RedeemHandler {
         // 1. Checking before redeem
         if helpers::is_verified(&self.darwinia.darwinia, &tx).await? {
             log::trace!(
-                target: PangolinRopstenTask::NAME,
+                target: DarwiniaEthereumTask::NAME,
                 "Ethereum tx {:?} redeemed",
                 tx.tx_hash
             );
@@ -95,7 +95,7 @@ impl RedeemHandler {
         let last_confirmed = self.darwinia.last_confirmed().await?;
         if tx.block_number >= last_confirmed {
             log::trace!(
-                target: PangolinRopstenTask::NAME,
+                target: DarwiniaEthereumTask::NAME,
                 "Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
                 tx.block_number,

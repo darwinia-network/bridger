@@ -12,7 +12,7 @@ use support_tracker::Tracker;
 
 use crate::bus::PangolinRopstenBus;
 use crate::config::TaskConfig;
-use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRedeemMessage};
+use crate::message::{ToExtrinsicsMessage, ToRedeemMessage};
 use crate::service::redeem::handler::RedeemHandler;
 use crate::task::PangolinRopstenTask;
 
@@ -174,7 +174,7 @@ async fn run_scan(
             }
         }
 
-        let latest = txs.get(txs.len() - 1).unwrap();
+        let latest = txs.last().unwrap();
         tracker.finish(latest.block_number as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,

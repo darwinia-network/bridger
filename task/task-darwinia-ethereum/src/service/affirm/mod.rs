@@ -1,29 +1,19 @@
-use std::sync::Arc;
-use std::time::Duration;
-
-use async_recursion::async_recursion;
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
+use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
-use tokio::time::sleep;
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::from_ethereum::Ethereum2Darwinia;
-use component_ethereum::errors::BizError;
-use component_shadow::{Shadow, ShadowComponent};
 use component_state::state::BridgeState;
 use component_thegraph_liketh::TheGraphLikeEthComponent;
-use support_ethereum::block::EthereumHeader;
 use support_tracker::Tracker;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::TaskConfig;
-use crate::message::{Extrinsic, ToExtrinsicsMessage, ToRelayMessage};
+use crate::message::{ToExtrinsicsMessage, ToRelayMessage};
 use crate::service::affirm::handler::AffirmHandler;
 use crate::task::DarwiniaEthereumTask;
 
@@ -92,7 +82,7 @@ impl Service for AffirmService {
         let _greet_command = Self::try_task(
             &format!("{}-service-affirm-command", DarwiniaEthereumTask::NAME),
             async move {
-                let mut handler = AffirmHandler::new(
+                let handler = AffirmHandler::new(
                     microkv_command.clone(),
                     sender_to_extrinsics_command.clone(),
                 )
@@ -168,7 +158,7 @@ async fn run_scan(
     let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<DarwiniaEthereumTask>()?;
     let thegraph_liketh = component_thegraph_liketh.component().await?;
 
-    let mut handler = AffirmHandler::new(microkv, sender_to_extrinsics).await;
+    let handler = AffirmHandler::new(microkv, sender_to_extrinsics).await;
 
     loop {
         let from = tracker.current().await?;
@@ -184,7 +174,7 @@ async fn run_scan(
             handler.update_target(next_block_number)?;
         }
 
-        let latest = txs.get(txs.len() - 1).unwrap();
+        let latest = txs.last().unwrap();
         tracker.finish(latest.block_number as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,

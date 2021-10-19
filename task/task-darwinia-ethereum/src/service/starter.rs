@@ -12,7 +12,6 @@ use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
 use crate::service::affirm::AffirmService;
 use crate::service::check::CheckService;
 use crate::service::darwinia::DarwiniaService;
-use crate::service::ethereum::EthereumScanService;
 use crate::service::extrinsics::ExtrinsicsService;
 use crate::service::guard::GuardService;
 use crate::service::redeem::RedeemService;
@@ -74,7 +73,6 @@ where
         support_keep::task::running_task_downcast_mut(DarwiniaEthereumTask::NAME)?;
     let stack = task.stack();
 
-    stack.spawn_service::<EthereumScanService>()?;
     stack.spawn_service::<CheckService>()?;
     stack.spawn_service::<AffirmService>()?;
     stack.spawn_service::<RedeemService>()?;

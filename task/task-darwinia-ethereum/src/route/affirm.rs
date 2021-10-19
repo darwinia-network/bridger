@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use lifeline::dyn_bus::DynBus;
 use lifeline::Bus;
 

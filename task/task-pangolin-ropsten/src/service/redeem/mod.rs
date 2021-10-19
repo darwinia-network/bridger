@@ -40,14 +40,14 @@ impl Service for RedeemService {
         // Receiver & Sender
         let mut rx = bus.rx::<ToRedeemMessage>()?;
         let sender_to_redeem_scan = bus.tx::<ToRedeemMessage>()?;
-        let mut sender_to_redeem_common = bus.tx::<ToRedeemMessage>()?;
+        let mut sender_to_redeem_command = bus.tx::<ToRedeemMessage>()?;
         let sender_to_extrinsics_command = bus.tx::<ToExtrinsicsMessage>()?;
         let sender_to_extrinsics_scan = bus.tx::<ToExtrinsicsMessage>()?;
 
         let _greet_scan = Self::try_task(
             &format!("{}-service-redeem-scan", PangolinRopstenTask::NAME),
             async move {
-                start(
+                start_scan(
                     tracker.clone(),
                     sender_to_extrinsics_scan.clone(),
                     sender_to_redeem_scan.clone(),
@@ -62,7 +62,7 @@ impl Service for RedeemService {
             async move {
                 let mut handler = RedeemHandler::new(
                     sender_to_extrinsics_command.clone(),
-                    sender_to_redeem_common.clone(),
+                    sender_to_redeem_command.clone(),
                 )
                 .await;
 
@@ -79,12 +79,12 @@ impl Service for RedeemService {
                             tokio::time::sleep(std::time::Duration::from_secs(10)).await;
                             handler = RedeemHandler::new(
                                 sender_to_extrinsics_command.clone(),
-                                sender_to_redeem_common.clone(),
+                                sender_to_redeem_command.clone(),
                             )
                             .await;
                             // for any error when handler recreated, we need put this tx back to the
                             // receive queue
-                            if let Err(e) = sender_to_redeem_common
+                            if let Err(e) = sender_to_redeem_command
                                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                                 .await
                             {
@@ -109,12 +109,12 @@ impl Service for RedeemService {
     }
 }
 
-async fn start(
+async fn start_scan(
     tracker: Tracker,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
 ) {
-    while let Err(err) = run(
+    while let Err(err) = run_scan(
         &tracker,
         sender_to_extrinsics.clone(),
         sender_to_redeem.clone(),
@@ -130,7 +130,7 @@ async fn start(
     }
 }
 
-async fn run(
+async fn run_scan(
     tracker: &Tracker,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,

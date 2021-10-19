@@ -14,6 +14,7 @@ use component_darwinia_subxt::account::DarwiniaAccount;
 use component_darwinia_subxt::component::DarwiniaSubxtComponent;
 use component_darwinia_subxt::config::DarwiniaSubxtConfig;
 use component_darwinia_subxt::from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia};
+use component_ethereum::errors::BizError;
 use component_shadow::{Shadow, ShadowComponent};
 use component_state::state::BridgeState;
 
@@ -21,9 +22,6 @@ use crate::bus::DarwiniaEthereumBus;
 use crate::config::TaskConfig;
 use crate::message::{Extrinsic, ToExtrinsicsMessage, ToGuardMessage};
 use crate::task::DarwiniaEthereumTask;
-
-use component_ethereum::error::BizError;
-use component_ethereum::error::ComponentEthereumError;
 
 #[derive(Debug)]
 pub struct GuardService {
@@ -69,10 +67,7 @@ async fn run(
     sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
 ) {
     if let Err(err) = start(state.clone(), sender_to_extrinsics.clone()).await {
-        error!(
-            target: DarwiniaEthereumTask::NAME,
-            "guard err {:#?}", err
-        );
+        error!(target: DarwiniaEthereumTask::NAME, "guard err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
         run(state, sender_to_extrinsics).await;
     }
@@ -102,7 +97,9 @@ async fn start(
         config_darwinia.relayer_real_account,
     );
     let guard_account = FromEthereumAccount::new(account);
-    let is_tech_comm_member = ethereum2darwinia.is_tech_comm_member(None, &guard_account).await?;
+    let is_tech_comm_member = ethereum2darwinia
+        .is_tech_comm_member(None, &guard_account)
+        .await?;
 
     if is_tech_comm_member {
         // Shadow client
@@ -124,7 +121,8 @@ async fn start(
                 guard_account_clone,
                 shadow_clone,
                 sender_to_extrinsics_clone,
-            ).await?;
+            )
+            .await?;
 
             sleep(Duration::from_secs(servce_config.interval_guard)).await;
         }
@@ -183,19 +181,21 @@ impl GuardService {
                         sender_to_extrinsics
                             .send(ToExtrinsicsMessage::Extrinsic(ex))
                             .await?;
-                    },
-                    Err(ComponentEthereumError::Biz(BizError::BlankEthereumMmrRoot(block, msg))) => {
-                        trace!(
-                            target: DarwiniaEthereumTask::NAME,
-                            "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                            block,
-                            msg
-                        );
-                    },
-                    Err(err) => {
-                        return Err(err.into());
                     }
-
+                    Err(err) => {
+                        if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
+                            err.downcast_ref::<BizError>()
+                        {
+                            log::trace!(
+                                target: DarwiniaEthereumTask::NAME,
+                                "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                                block,
+                                msg
+                            );
+                            return Ok(());
+                        }
+                        return Err(err);
+                    }
                 }
             }
         }

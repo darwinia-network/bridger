@@ -9,8 +9,9 @@ use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_ethereum::config::{EthereumConfig, Web3Config};
-use component_ethereum::web3::Web3Component;
+use component_ethereum::config::Web3Config;
+use component_ethereum::ethereum::client::EthereumClient;
+use component_ethereum::ethereum::EthereumComponent;
 use component_pangolin_subxt::account::DarwiniaAccount;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::config::DarwiniaSubxtConfig;
@@ -18,12 +19,11 @@ use component_pangolin_subxt::darwinia::runtime::DarwiniaRuntime;
 use component_pangolin_subxt::events::EventInfo;
 use component_pangolin_subxt::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
 use component_state::state::BridgeState;
-pub use pangolin_tracker::PangolinBlockTracker;
+use pangolin_tracker::PangolinBlockTracker;
 use support_tracker::Tracker;
 
 use crate::bus::PangolinRopstenBus;
 use crate::error::{Error, Result};
-use crate::ethereum::Ethereum;
 use crate::message::{Extrinsic, ToExtrinsicsMessage};
 use crate::task::PangolinRopstenTask;
 
@@ -60,24 +60,19 @@ impl lifeline::Service for PangolinService {
     }
 }
 
-async fn start(
-    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
-    tracker: Tracker,
-) {
-    loop {
-        if let Err(e) = _start(sender_to_extrinsics.clone(), tracker.clone()).await {
-            let secs = 10;
-            error!(
-                target: PangolinRopstenTask::NAME,
-                "pangolin err {:#?}, wait {} seconds try again", e, secs
-            );
-            tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
-        }
+async fn start(sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>, tracker: Tracker) {
+    while let Err(e) = run(sender_to_extrinsics.clone(), tracker.clone()).await {
+        let secs = 10;
+        error!(
+            target: PangolinRopstenTask::NAME,
+            "pangolin err {:#?}, wait {} seconds try again", e, secs
+        );
+        tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
     }
 }
 
-async fn _start(
-    sender_to_extrinsics: postage::broadcast::Sender<ToExtrinsicsMessage>,
+async fn run(
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     tracker: Tracker,
 ) -> anyhow::Result<()> {
     info!(
@@ -89,11 +84,10 @@ async fn _start(
 
     // Config
     let config_darwinia: DarwiniaSubxtConfig = Config::restore(PangolinRopstenTask::NAME)?;
-    let config_ethereum: EthereumConfig = Config::restore(PangolinRopstenTask::NAME)?;
     let config_web3: Web3Config = Config::restore(PangolinRopstenTask::NAME)?;
 
     // Components
-    let component_web3 = Web3Component::restore::<PangolinRopstenTask>()?;
+    let component_ethereum = EthereumComponent::restore::<PangolinRopstenTask>()?;
     let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
 
     // Darwinia client & account
@@ -109,14 +103,7 @@ async fn _start(
         config_web3.endpoint,
     );
 
-    // Ethereum client
-    let web3 = component_web3.component().await?;
-    let ethereum = Ethereum::new(
-        web3,
-        config_ethereum.subscribe_relay_address,
-        config_ethereum.relayer_private_key,
-        config_ethereum.relayer_beneficiary_darwinia_account,
-    )?;
+    let ethereum = component_ethereum.component().await?;
 
     let spec_name = darwinia.runtime_version().await?;
 
@@ -139,7 +126,7 @@ async fn _start(
 struct DarwiniaServiceRunner {
     darwinia2ethereum: Darwinia2Ethereum,
     account: ToEthereumAccount,
-    ethereum: Ethereum,
+    ethereum: EthereumClient,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     delayed_extrinsics: HashMap<u32, Extrinsic>,
     spec_name: String,
@@ -185,7 +172,8 @@ impl DarwiniaServiceRunner {
             // process events
             if let Err(err) = self.handle_events(&header, events).await {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-                    tracker_raw.skip(header.number as usize)?;
+                    // todo: write log
+                    // tracker_raw.skip(header.number as usize)?;
                     return Err(err);
                 } else {
                     error!(
@@ -197,10 +185,12 @@ impl DarwiniaServiceRunner {
 
                     let err_msg = format!("{:?}", err).to_lowercase();
                     if err_msg.contains("type size unavailable") {
-                        tracker_raw.skip(header.number as usize)?;
+                        // todo: write log
+                        // tracker_raw.skip(header.number as usize)?;
                     } else {
                         if retry_times > 10 {
-                            tracker_raw.skip(header.number as usize)?;
+                            // todo: write log
+                            // tracker_raw.skip(header.number as usize)?;
                             log::error!(
                                 target: PangolinRopstenTask::NAME,
                                 "Retry {} times still failed: {}",
@@ -268,7 +258,8 @@ impl DarwiniaServiceRunner {
             EventInfo::ScheduleAuthoritiesChangeEvent(event) => {
                 info!(
                     target: PangolinRopstenTask::NAME,
-                    "find schedule authorities change event, number {:?}", header.number);
+                    "find schedule authorities change event, number {:?}", header.number
+                );
                 if self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)
@@ -296,7 +287,7 @@ impl DarwiniaServiceRunner {
                     let signatures = event
                         .signatures
                         .iter()
-                        .map(|s| s.1.clone())
+                        .map(|s| s.1.clone().0)
                         .collect::<Vec<_>>();
                     let tx_hash = self
                         .ethereum
@@ -304,7 +295,9 @@ impl DarwiniaServiceRunner {
                         .await?;
                     info!(
                         target: PangolinRopstenTask::NAME,
-                        "Submit authorities to ethereum at {:?} with tx: {}", header.number, tx_hash
+                        "Submit authorities to ethereum at {:?} with tx: {}",
+                        header.number,
+                        tx_hash
                     );
                 }
             }
@@ -312,7 +305,8 @@ impl DarwiniaServiceRunner {
             EventInfo::ScheduleMMRRootEvent(event) => {
                 info!(
                     target: PangolinRopstenTask::NAME,
-                    "Find Schedule MMRRoot event at {:?}", header.number);
+                    "Find Schedule MMRRoot event at {:?}", header.number
+                );
                 if self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)

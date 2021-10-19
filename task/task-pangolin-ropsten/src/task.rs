@@ -9,12 +9,12 @@ use component_state::state::BridgeState;
 use crate::bus::PangolinRopstenBus;
 use crate::config::PangolinRopstenConfig;
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
+use crate::service::affirm::AffirmService;
+use crate::service::check::CheckService;
 use crate::service::extrinsics::ExtrinsicsService;
 use crate::service::guard::GuardService;
 use crate::service::pangolin::PangolinService;
 use crate::service::redeem::RedeemService;
-use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
-use crate::service::ropsten::RopstenScanService;
 
 #[derive(Debug)]
 pub struct PangolinRopstenTask {
@@ -50,15 +50,15 @@ impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
 
 impl PangolinRopstenTask {
     pub async fn new(config: PangolinRopstenConfig, state: BridgeState) -> anyhow::Result<Self> {
-        crate::migrate::migrate(&state, 1)?;
+        crate::migrate::migrate(&state, 2)?;
 
         config.store(Self::NAME)?;
         let bus = PangolinRopstenBus::default();
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new(bus);
-        stack.spawn_service::<RopstenScanService>()?;
-        stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>()?;
+        stack.spawn_service::<AffirmService>()?;
+        stack.spawn_service::<CheckService>()?;
         stack.spawn_service::<RedeemService>()?;
         stack.spawn_service::<GuardService>()?;
         stack.spawn_service::<PangolinService>()?;

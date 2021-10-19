@@ -6,8 +6,8 @@ use serde::Serialize;
 use serde_json::Value;
 
 use bridge_traits::error::StandardError;
-use component_ethereum::error::{BizError, ComponentEthereumResult};
-use component_ethereum::ethereum_rpc::EthereumRpc;
+use component_ethereum::errors::BizError;
+use component_ethereum::ethereum::client::EthereumClient;
 use support_ethereum::mmr::{MMRRoot, MMRRootJson};
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
 use support_ethereum::proof::{EthereumRelayProofs, EthereumRelayProofsJson};
@@ -43,14 +43,14 @@ pub struct Shadow {
     /// shadow config
     pub config: ShadowConfig,
     /// Ethereum RPC
-    pub eth: EthereumRpc,
+    pub eth: EthereumClient,
     /// HTTP Client
     pub http: Client,
 }
 
 impl Shadow {
     /// Init Shadow API from config
-    pub fn new(config: ShadowConfig, http_client: Client, eth: EthereumRpc) -> Shadow {
+    pub fn new(config: ShadowConfig, http_client: Client, eth: EthereumClient) -> Shadow {
         Shadow {
             config,
             eth,
@@ -59,10 +59,7 @@ impl Shadow {
     }
 
     /// Get mmr
-    pub async fn get_parent_mmr_root(
-        &self,
-        block_number: usize,
-    ) -> ComponentEthereumResult<MMRRoot> {
+    pub async fn get_parent_mmr_root(&self, block_number: usize) -> anyhow::Result<MMRRoot> {
         let url = &format!(
             "{}/ethereum/parent_mmr_root/{}",
             &self.config.endpoint, block_number
@@ -85,10 +82,7 @@ impl Shadow {
     }
 
     /// Get HeaderParcel
-    pub async fn parcel(
-        &self,
-        number: usize,
-    ) -> ComponentEthereumResult<EthereumRelayHeaderParcel> {
+    pub async fn parcel(&self, number: usize) -> anyhow::Result<EthereumRelayHeaderParcel> {
         let mmr_root = self.get_parent_mmr_root(number).await?;
         let header = self.eth.get_header_by_number(number as u64).await?;
 
@@ -101,14 +95,16 @@ impl Shadow {
     /// Get Receipt
     pub async fn receipt(
         &self,
-        tx: &str,
+        tx: impl AsRef<str>,
         last: u64,
-    ) -> ComponentEthereumResult<EthereumReceiptProofThing> {
+    ) -> anyhow::Result<EthereumReceiptProofThing> {
         let resp = self
             .http
             .get(&format!(
                 "{}/ethereum/receipt/{}/{}",
-                &self.config.endpoint, tx, last
+                &self.config.endpoint,
+                tx.as_ref(),
+                last
             ))
             .send()
             .await?;
@@ -131,7 +127,7 @@ impl Shadow {
         member: u64,
         target: u64,
         last_leaf: u64,
-    ) -> ComponentEthereumResult<EthereumRelayProofs> {
+    ) -> anyhow::Result<EthereumRelayProofs> {
         log::info!(
             "Requesting proposal - member: {}, target: {}, last_leaf: {}",
             member,

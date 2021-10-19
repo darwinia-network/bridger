@@ -17,15 +17,15 @@ use component_darwinia_subxt::config::DarwiniaSubxtConfig;
 use component_darwinia_subxt::darwinia::runtime::DarwiniaRuntime;
 use component_darwinia_subxt::events::EventInfo;
 use component_darwinia_subxt::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
-use component_ethereum::config::{EthereumConfig, Web3Config};
-use component_ethereum::web3::Web3Component;
+use component_ethereum::config::Web3Config;
+use component_ethereum::ethereum::client::EthereumClient;
+use component_ethereum::ethereum::EthereumComponent;
 use component_state::state::BridgeState;
-pub use darwinia_tracker::DarwiniaBlockTracker;
+use darwinia_tracker::DarwiniaBlockTracker;
 use support_tracker::Tracker;
 
 use crate::bus::DarwiniaEthereumBus;
 use crate::error::{Error, Result};
-use crate::ethereum::Ethereum;
 use crate::message::{Extrinsic, ToExtrinsicsMessage};
 use crate::task::DarwiniaEthereumTask;
 
@@ -94,11 +94,10 @@ async fn _start(
 
     // Config
     let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-    let config_ethereum: EthereumConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
     let config_web3: Web3Config = Config::restore(DarwiniaEthereumTask::NAME)?;
 
     // Components
-    let component_web3 = Web3Component::restore::<DarwiniaEthereumTask>()?;
+    let component_ethereum = EthereumComponent::restore::<DarwiniaEthereumTask>()?;
     let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
 
     // Darwinia client & account
@@ -117,13 +116,7 @@ async fn _start(
     );
 
     // Ethereum client
-    let web3 = component_web3.component().await?;
-    let ethereum = Ethereum::new(
-        web3,
-        config_ethereum.subscribe_relay_address,
-        config_ethereum.relayer_private_key,
-        config_ethereum.relayer_beneficiary_darwinia_account,
-    )?;
+    let ethereum = component_ethereum.component().await?;
 
     let spec_name = darwinia.runtime_version().await?;
 
@@ -146,7 +139,7 @@ async fn _start(
 struct DarwiniaServiceRunner {
     darwinia2ethereum: Darwinia2Ethereum,
     account: ToEthereumAccount,
-    ethereum: Ethereum,
+    ethereum: EthereumClient,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     delayed_extrinsics: HashMap<u32, Extrinsic>,
     spec_name: String,
@@ -190,7 +183,8 @@ impl DarwiniaServiceRunner {
             // process events
             if let Err(err) = self.handle_events(&header, events).await {
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-                    tracker_raw.skip(header.number as usize)?;
+                    // todo: write log
+                    // tracker_raw.skip(header.number as usize)?;
                     return Err(err);
                 }
 
@@ -203,12 +197,14 @@ impl DarwiniaServiceRunner {
 
                 let err_msg = format!("{:?}", err).to_lowercase();
                 if err_msg.contains("type size unavailable") {
-                    tracker_raw.skip(header.number as usize)?;
+                    // todo: write log
+                    // tracker_raw.skip(header.number as usize)?;
                     continue;
                 }
 
                 if retry_times > 10 {
-                    tracker_raw.skip(header.number as usize)?;
+                    // todo: write log
+                    // tracker_raw.skip(header.number as usize)?;
                     log::error!(
                         target: DarwiniaEthereumTask::NAME,
                         "Retry {} times still failed: {}",
@@ -300,7 +296,7 @@ impl DarwiniaServiceRunner {
                     let signatures = event
                         .signatures
                         .iter()
-                        .map(|s| s.1.clone())
+                        .map(|s| s.1.clone().0)
                         .collect::<Vec<_>>();
                     let tx_hash = self
                         .ethereum

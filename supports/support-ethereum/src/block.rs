@@ -4,6 +4,7 @@ use std::{fmt::Debug, str::FromStr};
 use codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use sp_core::bytes::to_hex;
+use web3::types::{Block, H256};
 
 use bridge_primitives::{
     array::{Bloom, U256},
@@ -40,6 +41,34 @@ pub struct EthereumBlockRPC {
     base_fee_per_gas: Option<String>,
 }
 
+impl From<Block<H256>> for EthereumHeader {
+    fn from(block: Block<H256>) -> Self {
+        let seal = block
+            .seal_fields
+            .iter()
+            .map(|v| v.0.clone())
+            .collect::<Vec<Vec<u8>>>();
+        Self {
+            parent_hash: block.parent_hash.to_fixed_bytes(),
+            timestamp: block.timestamp.as_u64(),
+            number: block.number.unwrap().as_u64(),
+            author: block.author.to_fixed_bytes(),
+            transactions_root: block.transactions_root.to_fixed_bytes(),
+            uncles_hash: block.uncles_hash.to_fixed_bytes(),
+            extra_data: block.extra_data.0,
+            state_root: block.state_root.0,
+            receipts_root: block.receipts_root.to_fixed_bytes(),
+            log_bloom: block.logs_bloom.map(|item| Bloom(item.to_fixed_bytes())),
+            gas_used: block.gas_used.as_u128().into(),
+            gas_limit: block.gas_limit.as_u128().into(),
+            difficulty: block.difficulty.as_u128().into(),
+            seal,
+            base_fee_per_gas: None,
+            hash: block.hash.map(|item| item.to_fixed_bytes()),
+        }
+    }
+}
+
 impl From<EthereumBlockRPC> for EthereumHeader {
     fn from(that: EthereumBlockRPC) -> Self {
         let seal: Vec<Vec<u8>> = vec![
@@ -56,7 +85,7 @@ impl From<EthereumBlockRPC> for EthereumHeader {
             extra_data: bytes!(that.extra_data.as_str()),
             state_root: bytes!(that.state_root.as_str(), 32),
             receipts_root: bytes!(that.receipts_root.as_str(), 32),
-            log_bloom: Bloom(bytes!(that.logs_bloom.as_str(), 256)),
+            log_bloom: Some(Bloom(bytes!(that.logs_bloom.as_str(), 256))),
             gas_used: U256::from_str(&that.gas_used[2..]).unwrap_or_default(),
             gas_limit: U256::from_str(&that.gas_limit[2..]).unwrap_or_default(),
             difficulty: U256::from_str(&that.difficulty[2..]).unwrap_or_default(),
@@ -85,7 +114,7 @@ pub struct EthereumHeader {
     extra_data: Vec<u8>,
     state_root: [u8; 32],
     receipts_root: [u8; 32],
-    log_bloom: Bloom,
+    log_bloom: Option<Bloom>,
     gas_used: U256,
     gas_limit: U256,
     difficulty: U256,
@@ -131,11 +160,9 @@ impl std::fmt::Display for EthereumHeader {
             "receipts_root: ",
             to_hex(&self.receipts_root, false)
         ));
-        msgs.push(format!(
-            "{:>19}{}",
-            "log_bloom: ",
-            &self.log_bloom.to_string()
-        ));
+        if let Some(log_bloom) = &self.log_bloom {
+            msgs.push(format!("{:>19}{}", "log_bloom: ", log_bloom.to_string()));
+        }
         msgs.push(format!("{:>19}{}", "gas_used: ", &self.gas_used.as_u128()));
         msgs.push(format!(
             "{:>19}{}",
@@ -182,7 +209,7 @@ pub struct EthereumHeaderJson {
     extra_data: String,
     state_root: String,
     receipts_root: String,
-    log_bloom: String,
+    log_bloom: Option<String>,
     gas_used: u128,
     gas_limit: u128,
     difficulty: u128,
@@ -203,7 +230,7 @@ impl From<EthereumHeader> for EthereumHeaderJson {
             extra_data: format!("0x{}", hex!(that.extra_data.to_vec())),
             state_root: format!("0x{}", hex!(that.state_root.to_vec())),
             receipts_root: format!("0x{}", hex!(that.receipts_root.to_vec())),
-            log_bloom: format!("0x{}", hex!(that.log_bloom.0.to_vec())),
+            log_bloom: that.log_bloom.map(|b| format!("0x{}", hex!(b.0.to_vec()))),
             gas_used: that.gas_used.as_u128(),
             gas_limit: that.gas_limit.as_u128(),
             difficulty: that.difficulty.as_u128(),
@@ -230,7 +257,9 @@ impl From<EthereumHeaderJson> for EthereumHeader {
             extra_data: bytes!(that.extra_data.as_str()),
             state_root: bytes!(that.state_root.as_str(), 32),
             receipts_root: bytes!(that.receipts_root.as_str(), 32),
-            log_bloom: Bloom(bytes!(that.log_bloom.as_str(), 256)),
+            log_bloom: that
+                .log_bloom
+                .map(|bloom| Bloom(bytes!(bloom.as_str(), 256))),
             gas_used: U256::from(that.gas_used),
             gas_limit: U256::from(that.gas_limit),
             difficulty: U256::from(that.difficulty),

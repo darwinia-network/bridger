@@ -24,22 +24,20 @@ async-trait = "0.1"
 log = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-colored = "2.0"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
+colored = "2.0"
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage = "0.4"
 
-web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+web3 = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 array-bytes = "1.1.0"
 
-secp256k1 = { version = "0.20", features = ["recovery"] }
 async-recursion = "0.3.2"
 substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "master" }
 
 tokio = { version = "1", features = ["full"] }
-reqwest = { version = "0.10", features = [ "json" ] }
 
 bridge-traits = { path = "../../traits" }
 linked-darwinia = { path = "../linked-darwinia" }
@@ -47,11 +45,11 @@ linked-darwinia = { path = "../linked-darwinia" }
 component-state = { path = "../../components/state" }
 component-ethereum = { path = "../../components/ethereum" }
 component-shadow = { path = "../../components/shadow" }
-component-http-client = { path = "../../components/http-client" }
 component-pangolin-subxt = { path = "../../components/client-pangolin-subxt" }
+component-thegraph-liketh = { path = "../../components/thegraph-liketh" }
+component-http-client = { path = "../../components/http-client" }
 
-support-ethereum = { path = "../../supports/support-ethereum" }
 support-tracker = { path = "../../supports/support-tracker" }
-support-tracker-evm-log = { path = "../../supports/support-tracker-evm-log" }
+support-ethereum = { path = "../../supports/support-ethereum" }
 
 

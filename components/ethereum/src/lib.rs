@@ -1,4 +1,4 @@
 pub mod config;
-pub mod error;
-pub mod ethereum_rpc;
+pub mod errors;
+pub mod ethereum;
 pub mod web3;

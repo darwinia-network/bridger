@@ -9,12 +9,12 @@ use component_state::state::BridgeState;
 use crate::bus::DarwiniaEthereumBus;
 use crate::config::TaskConfig;
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
+use crate::service::affirm::AffirmService;
+use crate::service::check::CheckService;
 use crate::service::darwinia::DarwiniaService;
-use crate::service::ethereum::EthereumScanService;
 use crate::service::extrinsics::ExtrinsicsService;
 use crate::service::guard::GuardService;
 use crate::service::redeem::RedeemService;
-use crate::service::relay::LikeDarwiniaWithLikeEthereumRelayService;
 use crate::task::DarwiniaEthereumTask;
 
 #[derive(Debug)]
@@ -73,8 +73,8 @@ where
         support_keep::task::running_task_downcast_mut(DarwiniaEthereumTask::NAME)?;
     let stack = task.stack();
 
-    stack.spawn_service::<EthereumScanService>()?;
-    stack.spawn_service::<LikeDarwiniaWithLikeEthereumRelayService>()?;
+    stack.spawn_service::<CheckService>()?;
+    stack.spawn_service::<AffirmService>()?;
     stack.spawn_service::<RedeemService>()?;
     stack.spawn_service::<GuardService>()?;
     stack.spawn_service::<DarwiniaService>()?;

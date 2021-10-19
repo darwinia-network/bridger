@@ -8,10 +8,10 @@ use bridge_traits::bridge::task::TaskTerminal;
 use bridge_traits::error::StandardError;
 use component_ethereum::web3::Web3Component;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 
 use crate::bus::PangolinRopstenBus;
 use crate::message::ToRedeemMessage;
-use crate::service::{EthereumTransaction, EthereumTransactionHash};
 use crate::task::PangolinRopstenTask;
 
 pub async fn redeem(
@@ -39,27 +39,29 @@ pub async fn redeem(
     let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
     let darwinia = component_pangolin_subxt.component().await?;
 
-    let tx_hash = if the_type == "token" {
-        EthereumTransactionHash::Token(tx.hash)
-    } else if the_type == "deposit" {
-        EthereumTransactionHash::Deposit(tx.hash)
-    } else if the_type == "set_authorities" {
-        EthereumTransactionHash::SetAuthorities(tx.hash)
-    } else {
-        anyhow::bail!("err")
+    let tx_type = match the_type {
+        "token" => TransactionType::Token,
+        "deposit" => TransactionType::Deposit,
+        "set_authorities" => TransactionType::SetAuthorities,
+        _ => anyhow::bail!("err"),
     };
-    let eth_tx = EthereumTransaction {
+    let tx_hash = array_bytes::bytes2hex("0x", tx.hash);
+    let block_hash_h256 = tx.block_hash.unwrap();
+    let eth_tx = TransactionEntity {
+        id: tx_hash.clone(),
+        origin: tx_type.belong(),
+        block_number: tx.block_number.unwrap().as_u64(),
+        block_hash: array_bytes::bytes2hex("0x", block_hash_h256),
         tx_hash,
-        block_hash: tx.block_hash.unwrap(),
-        block: tx.block_number.unwrap().as_u64(),
-        index: tx.transaction_index.unwrap().as_u64(),
+        tx_index: tx.transaction_index.unwrap().as_u64(),
+        tx_type,
     };
 
-    if darwinia.verified(eth_tx.block_hash, eth_tx.index).await? {
+    if darwinia.verified(block_hash_h256, eth_tx.tx_index).await? {
         trace!(
             target: PangolinRopstenTask::NAME,
             "This ethereum tx {:?} has already been redeemed.",
-            eth_tx.enclosed_hash()
+            &eth_tx.tx_hash
         );
     } else {
         trace!(

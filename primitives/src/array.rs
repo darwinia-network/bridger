@@ -24,6 +24,8 @@ pub trait BigArray<'de>: Sized {
         D: Deserializer<'de>;
 }
 
+// todo: may there can direct use sp_core::primitive_types?
+
 // shared
 construct_uint! {
     #[derive(Encode, Decode, Serialize, Deserialize)]

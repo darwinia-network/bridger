@@ -5,11 +5,11 @@ use std::fmt::Debug;
 use lifeline::Message;
 use postage::broadcast;
 
+use component_thegraph_liketh::types::TransactionEntity;
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
-use support_ethereum::receipt::{EthereumReceiptProofThing, RedeemFor};
+use support_ethereum::receipt::EthereumReceiptProofThing;
 
 use crate::bus::DarwiniaEthereumBus;
-use crate::service::EthereumTransaction;
 
 #[derive(Debug, Clone)]
 pub enum DarwiniaEthereumMessage {
@@ -36,7 +36,6 @@ pub enum ToDarwiniaLinkedMessage {
 #[derive(Clone, Debug)]
 pub enum ToRelayMessage {
     EthereumBlockNumber(u64),
-    Relay,
 }
 
 impl Message<DarwiniaEthereumBus> for ToRelayMessage {
@@ -46,7 +45,7 @@ impl Message<DarwiniaEthereumBus> for ToRelayMessage {
 // *** ToRedeemMessage **
 #[derive(Clone, Debug)]
 pub enum ToRedeemMessage {
-    EthereumTransaction(EthereumTransaction),
+    EthereumTransaction(TransactionEntity),
 }
 
 impl Message<DarwiniaEthereumBus> for ToRedeemMessage {
@@ -63,7 +62,7 @@ pub type EcdsaMessage = [u8; 32];
 #[derive(Clone, Debug)]
 pub enum Extrinsic {
     Affirm(EthereumRelayHeaderParcel),
-    Redeem(RedeemFor, EthereumReceiptProofThing, EthereumTransaction),
+    Redeem(EthereumReceiptProofThing, TransactionEntity),
     GuardVote(u64, bool),
     SignAndSendMmrRoot(u32),
     SignAndSendAuthorities(EcdsaMessage),

@@ -10,11 +10,11 @@ use crate::bus::PangolinRopstenBus;
 use crate::config::PangolinRopstenConfig;
 use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
 use crate::service::affirm::AffirmService;
+use crate::service::check::CheckService;
 use crate::service::extrinsics::ExtrinsicsService;
 use crate::service::guard::GuardService;
 use crate::service::pangolin::PangolinService;
 use crate::service::redeem::RedeemService;
-use crate::service::ropsten::RopstenScanService;
 
 #[derive(Debug)]
 pub struct PangolinRopstenTask {
@@ -57,13 +57,12 @@ impl PangolinRopstenTask {
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new(bus);
-        stack.spawn_service::<RopstenScanService>()?;
         stack.spawn_service::<AffirmService>()?;
+        stack.spawn_service::<CheckService>()?;
         stack.spawn_service::<RedeemService>()?;
         stack.spawn_service::<GuardService>()?;
         stack.spawn_service::<PangolinService>()?;
         stack.spawn_service::<ExtrinsicsService>()?;
-        stack.spawn_service::<RopstenScanService>()?;
 
         let mut tx_scan = stack.bus().tx::<DarwiniaEthereumMessage>()?;
         tx_scan

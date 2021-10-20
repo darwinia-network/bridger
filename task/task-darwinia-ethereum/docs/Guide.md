@@ -10,7 +10,7 @@ darwinia-ethereum
 
 ## Run
 
-1. `./target/release/bridger server`
+1. `bridger server`
    Start bridge server
 
 2. Open another shell
@@ -19,18 +19,22 @@ darwinia-ethereum
 
    ```bash
    # set darwinia
-   ./target/release/bridger kv -n task-darwinia-ethereum put scan.darwinia.next 123456
+   bridger kv -n task-darwinia-ethereum put scan.darwinia.planned 123456
    # set ethereum
-   ./target/release/bridger kv -n task-darwinia-ethereum put scan.ethereum.next 123456
+   bridger kv -n task-darwinia-ethereum put scan.ethereum.check.planned 123456 \
+     scan.ethereum.redeem.planned 123456 \
+     scan.ethereum.affirm.planned 123456
    ```
 
 4. Set darwinia and ethereum scan to running
 
    ```bash
    # set darwinia
-   ./target/release/bridger kv -n task-darwinia-ethereum put scan.darwinia.running true
-   # set ethereum
-   ./target/release/bridger kv -n task-darwinia-ethereum put scan.ethereum.running true
+   bridger kv -n task-darwinia-ethereum put scan.darwinia.running true
+   # set ethereum check/redeem/affirm scan
+   bridger kv -n task-darwinia-ethereum put scan.ethereum.check.running true \
+     scan.ethereum.redeem.running true \
+     scan.ethereum.check.running true
    ```
 
 
@@ -40,75 +44,97 @@ darwinia-ethereum
 **darwinia scan state**
 
 ```bash
-./target/release/bridger kv \
+bridger kv \
   -n task-darwinia-ethereum \
   get \
   scan.darwinia.current \
-  scan.darwinia.next \
-  scan.darwinia.finish \
+  scan.darwinia.planned \
   scan.darwinia.running \
-  scan.darwinia.skipped \
   -o table --include-key
 
-+-----------------------+----------------------------------------+
-| scan.darwinia.current | 150                                    |
-+-----------------------+----------------------------------------+
-| scan.darwinia.next    | null                                   |
-+-----------------------+----------------------------------------+
-| scan.darwinia.finish  | 149                                    |
-+-----------------------+----------------------------------------+
-| scan.darwinia.running | false                                  |
-+-----------------------+----------------------------------------+
-| scan.darwinia.skipped | 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 |
-|                       | ,17,18,19,20,21,22,23,24,25,26,27,28,2 |
-|                       | 9,30,31,32,33,34,35,36,37,38,39,40,41  |
-+-----------------------+----------------------------------------+
++-----------------------+--------+
+| scan.darwinia.current | 502434 |
++-----------------------+--------+
+| scan.darwinia.planned | null   |
++-----------------------+--------+
+| scan.darwinia.running | true   |
++-----------------------+--------+
 ```
 
-**ethereum scan state**
+**ethereum affirm scan state**
 
 ```bash
-./target/release/bridger kv \
+bridger kv \
   -n task-darwinia-ethereum \
   get \
-  scan.ethereum.current \
-  scan.ethereum.next \
-  scan.ethereum.finish \
-  scan.ethereum.running \
-  scan.ethereum.skipped \
+  scan.ethereum.affirm.current \
+  scan.ethereum.affirm.planned \
+  scan.ethereum.affirm.running \
   -o table --include-key
 
-+----------------------+-------+
-| scan.ethereum.current | 3     |
-+----------------------+-------+
-| scan.ethereum.next    | null  |
-+----------------------+-------+
-| scan.ethereum.finish  | 2     |
-+----------------------+-------+
-| scan.ethereum.running | false |
-+----------------------+-------+
-| scan.ethereum.skipped | null  |
-+----------------------+-------+
++------------------------------+----------+
+| scan.ethereum.affirm.current | 10730129 |
++------------------------------+----------+
+| scan.ethereum.affirm.planned | null     |
++------------------------------+----------+
+| scan.ethereum.affirm.running | true     |
++------------------------------+----------+
+```
+
+**ethereum affirm scan state**
+
+```bash
+bridger kv \
+  -n task-darwinia-ethereum \
+  get \
+  scan.ethereum.redeem.current \
+  scan.ethereum.redeem.planned \
+  scan.ethereum.redeem.running \
+  -o table --include-key
+
++------------------------------+----------+
+| scan.ethereum.redeem.current | 10495250 |
++------------------------------+----------+
+| scan.ethereum.redeem.planned | null     |
++------------------------------+----------+
+| scan.ethereum.redeem.running | true     |
++------------------------------+----------+
+```
+
+**ethereum check scan state**
+
+```bash
+bridger kv \
+  -n task-darwinia-ethereum \
+  get \
+  scan.ethereum.check.current \
+  scan.ethereum.check.planned \
+  scan.ethereum.check.running \
+  -o table --include-key
+
++-----------------------------+----------+
+| scan.ethereum.check.current | 10861015 |
++-----------------------------+----------+
+| scan.ethereum.check.planned | null     |
++-----------------------------+----------+
+| scan.ethereum.check.running | true     |
++-----------------------------+----------+
 ```
 
 explain:
 
 - `current`
   Currently scan block number
-- `next`
-  Planned block number, if there is a value, the next time will start from this block. (support array, use `,` to split)
+- `planned`
+  Planned block number, If the value is set, the next times will start from this block.
   ```bash
-  ./target/release/bridger kv -n task-darwinia-ethereum \
+  bridger kv -n task-darwinia-ethereum \
     put \
-    scan.ethereum.next 1,425,36987
+    scan.ethereum.check.planned 36987
   ```
-  The order of scanning will be: `1` `425` `36987` `36988` `36989` ...
-- `finish`
-  Currently finished block number
+  WARNING: if you set planned, the next times start block is `planned + RANGE_LIMIT + 1`
 - `running`
   The scan is running
-- `skipped`
-  Skipped block, maybe happened some error, these blocks need to be taken seriously
 
 
 

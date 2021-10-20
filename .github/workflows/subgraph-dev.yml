@@ -1,4 +1,4 @@
-name: Deploy subgraph
+name: Deploy subgraph develop
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
           npm i
           npm run codegen -- subgraph-ropsten.yaml
           npm run build -- subgraph-ropsten.yaml
-          npm run deploy -- --access-token ${{ secrets.THE_GRAPH_TOKEN }} fewensa/bridge-ropsten subgraph-ropsten.yaml
+          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_DEV }} fewensa/bridge-ropsten subgraph-ropsten.yaml
 
   ethereum:
     name: Deploy ethereum
@@ -37,4 +37,4 @@ jobs:
           npm i
           npm run codegen -- subgraph-ethereum.yaml
           npm run build -- subgraph-ethereum.yaml
-          npm run deploy -- --access-token ${{ secrets.THE_GRAPH_TOKEN }} fewensa/bridge-ethereum subgraph-ethereum.yaml
+          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_DEV }} fewensa/bridge-ethereum subgraph-ethereum.yaml

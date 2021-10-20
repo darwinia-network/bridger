@@ -9,7 +9,7 @@ pangolin-ropsten
 
 ## Run
 
-1. `./target/release/darwinia server`
+1. `bridger server`
    Start bridge server
 
 2. Open another shell
@@ -18,18 +18,22 @@ pangolin-ropsten
 
    ```bash
    # set pangolin
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.pangolin.next 123456
+   bridger kv -n task-pangolin-ropsten put scan.pangolin.planned 123456
+   # set ropsten
+   bridger kv -n task-pangolin-ropsten put scan.ropsten.check.planned 123456 \
+     scan.ropsten.redeem.planned 123456 \
+     scan.ropsten.affirm.planned 123456
    ```
 
 4. Set pangolin and ropsten scan to running
 
    ```bash
    # set pangolin
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.pangolin.running true
-   # set ropsten redeem scan
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.redeem.running true
-   # set ropsten check redeem
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.check.running true
+   bridger kv -n task-pangolin-ropsten put scan.pangolin.running true
+   # set ropsten check/redeem/affirm scan
+   bridger kv -n task-pangolin-ropsten put scan.ropsten.check.running true \
+     scan.ropsten.redeem.running true \
+     scan.ropsten.check.running true
    ```
 
 ## More
@@ -41,72 +45,94 @@ Deprecated
 **pangolin scan state**
 
 ```bash
-./target/release/bridger kv \
+bridger kv \
   -n task-pangolin-ropsten \
   get \
   scan.pangolin.current \
-  scan.pangolin.next \
-  scan.pangolin.finish \
+  scan.pangolin.planned \
   scan.pangolin.running \
-  scan.pangolin.skipped \
   -o table --include-key
 
-+-----------------------+----------------------------------------+
-| scan.pangolin.current | 150                                    |
-+-----------------------+----------------------------------------+
-| scan.pangolin.next    | null                                   |
-+-----------------------+----------------------------------------+
-| scan.pangolin.finish  | 149                                    |
-+-----------------------+----------------------------------------+
-| scan.pangolin.running | false                                  |
-+-----------------------+----------------------------------------+
-| scan.pangolin.skipped | 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 |
-|                       | ,17,18,19,20,21,22,23,24,25,26,27,28,2 |
-|                       | 9,30,31,32,33,34,35,36,37,38,39,40,41  |
-+-----------------------+----------------------------------------+
++-----------------------+--------+
+| scan.pangolin.current | 502434 |
++-----------------------+--------+
+| scan.pangolin.planned | null   |
++-----------------------+--------+
+| scan.pangolin.running | true   |
++-----------------------+--------+
 ```
 
-**ropsten scan state**
+**ropsten affirm scan state**
 
 ```bash
-./target/release/bridger kv \
+bridger kv \
   -n task-pangolin-ropsten \
   get \
-  scan.ropsten.current \
-  scan.ropsten.next \
-  scan.ropsten.finish \
-  scan.ropsten.running \
-  scan.ropsten.skipped \
+  scan.ropsten.affirm.current \
+  scan.ropsten.affirm.planned \
+  scan.ropsten.affirm.running \
   -o table --include-key
 
-+----------------------+-------+
-| scan.ropsten.current | 3     |
-+----------------------+-------+
-| scan.ropsten.next    | null  |
-+----------------------+-------+
-| scan.ropsten.finish  | 2     |
-+----------------------+-------+
-| scan.ropsten.running | false |
-+----------------------+-------+
-| scan.ropsten.skipped | null  |
-+----------------------+-------+
++-----------------------------+----------+
+| scan.ropsten.affirm.current | 10730129 |
++-----------------------------+----------+
+| scan.ropsten.affirm.planned | null     |
++-----------------------------+----------+
+| scan.ropsten.affirm.running | true     |
++-----------------------------+----------+
+```
+
+**ropsten affirm scan state**
+
+```bash
+bridger kv \
+  -n task-pangolin-ropsten \
+  get \
+  scan.ropsten.redeem.current \
+  scan.ropsten.redeem.planned \
+  scan.ropsten.redeem.running \
+  -o table --include-key
+
++-----------------------------+----------+
+| scan.ropsten.redeem.current | 10495250 |
++-----------------------------+----------+
+| scan.ropsten.redeem.planned | null     |
++-----------------------------+----------+
+| scan.ropsten.redeem.running | true     |
++-----------------------------+----------+
+```
+
+**ropsten check scan state**
+
+```bash
+bridger kv \
+  -n task-pangolin-ropsten \
+  get \
+  scan.ropsten.check.current \
+  scan.ropsten.check.planned \
+  scan.ropsten.check.running \
+  -o table --include-key
+
++----------------------------+----------+
+| scan.ropsten.check.current | 10861015 |
++----------------------------+----------+
+| scan.ropsten.check.planned | null     |
++----------------------------+----------+
+| scan.ropsten.check.running | true     |
++----------------------------+----------+
 ```
 
 explain:
 
 - `current`
   Currently scan block number
-- `next`
-  Planned block number, if there is a value, the next time will start from this block. (support array, use `,` to split)
+- `planned`
+  Planned block number, If the value is set, the next times will start from this block.
   ```bash
-  ./target/release/bridger kv -n task-pangolin-ropsten \
+  bridger kv -n task-pangolin-ropsten \
     put \
-    scan.ropsten.next 1,425,36987
+    scan.ropsten.check.planned 36987
   ```
-  The order of scanning will be: `1` `425` `36987` `36988` `36989` ...
-- `finish`
-  Currently finished block number
+  WARNING: if you set planned, the next times start block is `planned + RANGE_LIMIT + 1`
 - `running`
   The scan is running
-- `skipped`
-  Skipped block, maybe happened some error, these blocks need to be taken seriously

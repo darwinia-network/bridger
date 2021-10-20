@@ -1,0 +1,39 @@
+name: Deploy subgraph production
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  ropsten:
+    name: Deploy ropsten
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Deploy
+        working-directory: thegraph
+        run: |
+          npm i
+          npm run codegen -- subgraph-ropsten.yaml
+          npm run build -- subgraph-ropsten.yaml
+          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_PROD }} darwinia-network/bridge-ropsten subgraph-ropsten.yaml
+
+  ethereum:
+    name: Deploy ethereum
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Deploy
+        working-directory: thegraph
+        run: |
+          npm i
+          npm run codegen -- subgraph-ethereum.yaml
+          npm run build -- subgraph-ethereum.yaml
+          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_PROD }} darwinia-network/bridge-ethereum subgraph-ethereum.yaml

@@ -48,4 +48,4 @@ check_timeout = 2000
 timeout = 3000
 
 [thegraph]
-endpoint = "https://api.thegraph.com/subgraphs/name/fewensa/bridge-ethereum"
+endpoint = "https://api.thegraph.com/subgraphs/name/darwinia-network/bridge-ethereum"

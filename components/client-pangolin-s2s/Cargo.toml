@@ -22,9 +22,9 @@ edition = "2018"
 bridge-traits = { path = "../../traits" }
 
 codec                  = { package = "parity-scale-codec", version = "2.0.0" }
-headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "main" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.5" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.5" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.5" }
 
 ## Bridge dependencies
 pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
@@ -36,9 +36,9 @@ pangolin-constants       = { git = "https://github.com/darwinia-network/darwinia
 
 
 ## Substrate Dependencies
-frame-system               = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
-frame-support              = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
-pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
-sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
-sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
-sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+frame-system               = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
+frame-support              = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
+pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
+sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
+sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
+sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }

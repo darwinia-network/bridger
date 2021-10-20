@@ -18,18 +18,21 @@ pangolin-ropsten
 
    ```bash
    # set pangolin
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.pangolin.next 123456
+   bridger kv -n task-pangolin-ropsten put scan.pangolin.planned 123456
+   bridger kv -n task-pangolin-ropsten put scan.ropsten.check.planned 123456 \
+     scan.ropsten.redeem.planned 123456 \
+     scan.ropsten.affirm.planned 123456
    ```
 
 4. Set pangolin and ropsten scan to running
 
    ```bash
    # set pangolin
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.pangolin.running true
-   # set ropsten redeem scan
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.redeem.running true
-   # set ropsten check redeem
-   ./target/release/bridger kv -n task-pangolin-ropsten put scan.ropsten.check.running true
+   bridger kv -n task-pangolin-ropsten put scan.pangolin.running true
+   # set ropsten check/redeem/affirm scan
+   bridger kv -n task-pangolin-ropsten put scan.ropsten.check.running true \
+     scan.ropsten.redeem.running true \
+     scan.ropsten.check.running true
    ```
 
 ## More

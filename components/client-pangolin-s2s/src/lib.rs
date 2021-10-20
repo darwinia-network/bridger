@@ -1,8 +1,11 @@
 use std::time::Duration;
 
 use bridge_traits::bridge::chain::{BridgeChain, ChainCategory};
-use codec::Encode;
-use relay_substrate_client::{Chain, ChainBase, ChainWithBalances, TransactionSignScheme};
+use codec::{Compact, Decode, Encode};
+use relay_substrate_client::{
+    BalanceOf, Chain, ChainBase, ChainWithBalances, IndexOf, TransactionEraOf,
+    TransactionSignScheme, UnsignedTransaction,
+};
 use sp_core::{storage::StorageKey, Pair};
 use sp_runtime::{generic::SignedPayload, traits::IdentifyAccount};
 
@@ -25,6 +28,11 @@ impl ChainBase for PangolinChain {
     type Hash = common_primitives::Hash;
     type Hasher = common_primitives::Hashing;
     type Header = common_primitives::Header;
+
+    type AccountId = common_primitives::AccountId;
+    type Balance = common_primitives::Balance;
+    type Index = common_primitives::Nonce;
+    type Signature = common_primitives::Signature;
 }
 
 impl Chain for PangolinChain {
@@ -34,11 +42,8 @@ impl Chain for PangolinChain {
     const STORAGE_PROOF_OVERHEAD: u32 = bridge_primitives::EXTRA_STORAGE_PROOF_SIZE;
     const MAXIMAL_ENCODED_ACCOUNT_ID_SIZE: u32 = bridge_primitives::MAXIMAL_ENCODED_ACCOUNT_ID_SIZE;
 
-    type AccountId = common_primitives::AccountId;
-    type Index = common_primitives::Nonce;
     type SignedBlock = pangolin_runtime::SignedBlock;
     type Call = pangolin_runtime::Call;
-    type Balance = common_primitives::Balance;
     type WeightToFee = pangolin_runtime::WeightToFee;
 }
 
@@ -59,20 +64,19 @@ impl TransactionSignScheme for PangolinChain {
     fn sign_transaction(
         genesis_hash: <Self::Chain as ChainBase>::Hash,
         signer: &Self::AccountKeyPair,
-        _era: relay_substrate_client::TransactionEraOf<Self::Chain>,
-        signer_nonce: <Self::Chain as Chain>::Index,
-        call: <Self::Chain as Chain>::Call,
+        _era: TransactionEraOf<Self::Chain>,
+        unsigned: UnsignedTransaction<Self::Chain>,
     ) -> Self::SignedTransaction {
         let raw_payload = SignedPayload::from_raw(
-            call,
+            unsigned.call,
             (
                 frame_system::CheckSpecVersion::<pangolin_runtime::Runtime>::new(),
                 frame_system::CheckTxVersion::<pangolin_runtime::Runtime>::new(),
                 frame_system::CheckGenesis::<pangolin_runtime::Runtime>::new(),
                 frame_system::CheckEra::<pangolin_runtime::Runtime>::from(sp_runtime::generic::Era::Immortal),
-                frame_system::CheckNonce::<pangolin_runtime::Runtime>::from(signer_nonce),
+                frame_system::CheckNonce::<pangolin_runtime::Runtime>::from(unsigned.nonce),
                 frame_system::CheckWeight::<pangolin_runtime::Runtime>::new(),
-                pallet_transaction_payment::ChargeTransactionPayment::<pangolin_runtime::Runtime>::from(0),
+                pallet_transaction_payment::ChargeTransactionPayment::<pangolin_runtime::Runtime>::from(unsigned.tip),
                 darwinia_bridge_ethereum::CheckEthereumRelayHeaderParcel::<pangolin_runtime::Runtime>::new(),
             ),
             (
@@ -96,5 +100,33 @@ impl TransactionSignScheme for PangolinChain {
             signature.into(),
             extra,
         )
+    }
+
+    fn is_signed(tx: &Self::SignedTransaction) -> bool {
+        tx.signature.is_some()
+    }
+
+    fn is_signed_by(signer: &Self::AccountKeyPair, tx: &Self::SignedTransaction) -> bool {
+        tx.signature
+            .as_ref()
+            .map(|(address, _, _)| {
+                let account_id: common_primitives::AccountId =
+                    (*signer.public().as_array_ref()).into();
+                *address == pangolin_runtime::Address::from(account_id)
+            })
+            .unwrap_or(false)
+    }
+
+    fn parse_transaction(tx: Self::SignedTransaction) -> Option<UnsignedTransaction<Self::Chain>> {
+        let extra = &tx.signature.as_ref()?.2;
+        Some(UnsignedTransaction {
+            call: tx.function,
+            nonce: Compact::<IndexOf<Self::Chain>>::decode(&mut &extra.4.encode()[..])
+                .ok()?
+                .into(),
+            tip: Compact::<BalanceOf<Self::Chain>>::decode(&mut &extra.6.encode()[..])
+                .ok()?
+                .into(),
+        })
     }
 }

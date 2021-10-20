@@ -35,7 +35,7 @@ microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 array-bytes = "1.1.0"
 
 async-recursion = "0.3.2"
-substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.3" }
+substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.3-patch.1" }
 
 tokio = { version = "1", features = ["full"] }
 

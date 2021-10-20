@@ -2,7 +2,9 @@ use bp_header_chain::InitializationData;
 use bp_runtime::Chain as ChainBase;
 use codec::Encode;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
-use relay_substrate_client::{Chain as RelaySubstrateClientChain, TransactionSignScheme};
+use relay_substrate_client::{
+    Chain as RelaySubstrateClientChain, TransactionSignScheme, UnsignedTransaction,
+};
 use sp_core::{Bytes, Pair};
 
 use bridge_traits::bridge::config::Config;
@@ -142,8 +144,10 @@ async fn init_bridge(init_bridge: InitBridge) -> anyhow::Result<()> {
                         *target_client.genesis_hash(),
                         &target_sign,
                         relay_substrate_client::TransactionEra::immortal(),
-                        transaction_nonce,
-                        encode_init_bridge(initialization_data),
+                        UnsignedTransaction::new(
+                            encode_init_bridge(initialization_data),
+                            transaction_nonce,
+                        ),
                     )
                     .encode(),
                 )

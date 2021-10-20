@@ -34,6 +34,7 @@ impl PangolinPangoroConfig {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RelayConfig {
+    /// Hex-encoded lane identifiers that should be served by the complex relay.
     pub lanes: Vec<HexLaneId>,
     pub auto_start: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,6 +45,23 @@ pub struct RelayConfig {
     pub relayer_mode: Option<WrapperRelayerMode>,
     #[serde(default)]
     pub prometheus_params: PrometheusParamsInfo,
+    /// If passed, only mandatory headers (headers that are changing the GRANDPA authorities set)
+    /// are relayed.
+    pub only_mandatory_headers: bool,
+    /// Create relayers fund accounts on both chains, if it does not exists yet.
+    pub create_relayers_fund_accounts: bool,
+    /// The SURI of secret key to use when transactions are submitted to the pangolin node.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pangolin_messages_pallet_owner: Option<String>,
+    /// The password for the SURI of secret key to use when transactions are submitted to the pangolin node.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pangolin_messages_pallet_owner_password: Option<String>,
+    /// The SURI of secret key to use when transactions are submitted to the pangoro node.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pangoro_messages_pallet_owner: Option<String>,
+    /// The password for the SURI of secret key to use when transactions are submitted to the pangoro node.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pangoro_messages_pallet_owner_password: Option<String>,
 }
 
 impl BridgeConfig for RelayConfig {
@@ -63,6 +81,12 @@ impl BridgeConfig for RelayConfig {
                 prometheus_host: "127.0.0.1".to_string(),
                 prometheus_port: 9616,
             },
+            only_mandatory_headers: false,
+            create_relayers_fund_accounts: false,
+            pangolin_messages_pallet_owner: Some("//PangoroMessagesOwner".to_string()),
+            pangolin_messages_pallet_owner_password: Some("123456".to_string()),
+            pangoro_messages_pallet_owner: Some("//PangolinMessagesOwner".to_string()),
+            pangoro_messages_pallet_owner_password: Some("123456".to_string()),
         }
     }
 }

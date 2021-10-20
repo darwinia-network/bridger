@@ -63,7 +63,7 @@ mod s2s_const {
 mod s2s_headers {
     use bp_header_chain::justification::GrandpaJustification;
     use codec::Encode;
-    use relay_substrate_client::{Chain, Client, TransactionSignScheme};
+    use relay_substrate_client::{Client, IndexOf, TransactionSignScheme, UnsignedTransaction};
     use sp_core::{Bytes, Pair};
     use substrate_relay_helper::finality_pipeline::{
         SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate,
@@ -118,14 +118,14 @@ mod s2s_headers {
         fn make_submit_finality_proof_transaction(
             &self,
             era: bp_runtime::TransactionEraOf<PangolinChain>,
-            transaction_nonce: <PangolinChain as Chain>::Index,
+            transaction_nonce: IndexOf<PangolinChain>,
             header: component_pangoro_s2s::SyncHeader,
             proof: GrandpaJustification<common_primitives::Header>,
         ) -> Bytes {
             let call = pangolin_runtime::BridgeGrandpaCall::<
                 pangolin_runtime::Runtime,
                 pangolin_runtime::WithPangoroGrandpa,
-            >::submit_finality_proof(header.into_inner(), proof)
+            >::submit_finality_proof(Box::new(header.into_inner()), proof)
             .into();
 
             let genesis_hash = *self.finality_pipeline.target_client.genesis_hash();
@@ -133,8 +133,7 @@ mod s2s_headers {
                 genesis_hash,
                 &self.finality_pipeline.target_sign,
                 era,
-                transaction_nonce,
-                call,
+                UnsignedTransaction::new(call, transaction_nonce),
             );
 
             Bytes(transaction.encode())
@@ -153,7 +152,7 @@ mod s2s_messages {
     use frame_support::dispatch::GetDispatchInfo;
     use frame_support::weights::Weight;
     use messages_relay::message_lane::MessageLane;
-    use relay_substrate_client::{Client, TransactionSignScheme};
+    use relay_substrate_client::{Client, IndexOf, TransactionSignScheme, UnsignedTransaction};
     use relay_utils::metrics::MetricsParams;
     use sp_core::{Bytes, Pair};
     use substrate_relay_helper::messages_lane::{
@@ -224,7 +223,7 @@ mod s2s_messages {
 
         fn make_messages_receiving_proof_transaction(
             &self,
-            transaction_nonce: <PangoroChain as relay_substrate_client::Chain>::Index,
+            transaction_nonce: IndexOf<PangoroChain>,
             _generated_at_block: component_pangolin_s2s::HeaderId,
             proof: <Self::MessageLane as MessageLane>::MessagesReceivingProof,
         ) -> Bytes {
@@ -241,8 +240,7 @@ mod s2s_messages {
                 genesis_hash,
                 &self.message_lane.source_sign,
                 relay_substrate_client::TransactionEra::immortal(),
-                transaction_nonce,
-                call,
+                UnsignedTransaction::new(call, transaction_nonce),
             );
             log::trace!(
                 target: "bridge",
@@ -263,7 +261,7 @@ mod s2s_messages {
 
         fn make_messages_delivery_transaction(
             &self,
-            transaction_nonce: <PangolinChain as relay_substrate_client::Chain>::Index,
+            transaction_nonce: IndexOf<PangolinChain>,
             _generated_at_header: component_pangoro_s2s::HeaderId,
             _nonces: RangeInclusive<MessageNonce>,
             proof: <Self::MessageLane as MessageLane>::MessagesProof,
@@ -292,8 +290,7 @@ mod s2s_messages {
                 genesis_hash,
                 &self.message_lane.target_sign,
                 relay_substrate_client::TransactionEra::immortal(),
-                transaction_nonce,
-                call,
+                UnsignedTransaction::new(call, transaction_nonce),
             );
             log::trace!(
                 target: "bridge",
@@ -435,5 +432,38 @@ mod s2s_messages {
                 pangoro_runtime::pangolin_messages::INITIAL_PANGOLIN_TO_PANGORO_CONVERSION_RATE,
             )),
         )
+    }
+
+    /// Update Pangoro -> Pangolin conversion rate, stored in Rialto runtime storage.
+    pub(crate) async fn update_pangoro_to_pangolin_conversion_rate(
+        client: Client<PangolinChain>,
+        signer: <PangolinChain as TransactionSignScheme>::AccountKeyPair,
+        updated_rate: f64,
+    ) -> anyhow::Result<()> {
+        let genesis_hash = *client.genesis_hash();
+        let signer_id = (*signer.public().as_array_ref()).into();
+        client
+            .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
+                Bytes(
+                    PangolinChain::sign_transaction(
+                        genesis_hash,
+                        &signer,
+                        relay_substrate_client::TransactionEra::immortal(),
+                        UnsignedTransaction::new(
+                            pangolin_runtime::BridgeMessagesCall::update_pallet_parameter(
+                                pangolin_runtime::pangoro_messages::PangolinToPangoroMessagesParameter::PangoroToPangolinConversionRate(
+                                    sp_runtime::FixedU128::from_float(updated_rate),
+                                ),
+                            )
+                                .into(),
+                            transaction_nonce,
+                        ),
+                    )
+                        .encode(),
+                )
+            })
+            .await
+            .map(drop)
+            .map_err(|err| anyhow::format_err!("{:?}", err))
     }
 }

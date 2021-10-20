@@ -1,5 +1,6 @@
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
+use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
 use substrate_relay_helper::messages_lane::{MessagesRelayParams, SubstrateMessageLane};
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
@@ -20,7 +21,17 @@ use crate::chains::pangoro::{
 use crate::config::{ChainInfoConfig, RelayConfig};
 use crate::message::PangolinPangoroMessageSend;
 use crate::task::PangolinPangoroTask;
-use crate::types::{RelayHeadersAndMessagesInfo, WrapperRelayerMode};
+use crate::types::{
+    MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo, WrapperRelayerMode,
+};
+
+/// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.
+///
+/// If it is zero, then transaction will be submitted every time we see difference between
+/// stored and real conversion rates. If it is large enough (e.g. > than 10 percents, which is 0.1),
+/// then rational relayers may stop relaying messages because they were submitted using
+/// lesser conversion rate.
+const CONVERSION_RATE_ALLOWED_DIFFERENCE_RATIO: f64 = 0.05;
 
 #[derive(Debug)]
 pub struct RelayService {
@@ -63,6 +74,24 @@ impl Service for RelayService {
                             .relayer_mode
                             .unwrap_or(WrapperRelayerMode::Rational)
                             .into(),
+                        create_relayers_fund_accounts: config_relay.create_relayers_fund_accounts,
+                        only_mandatory_headers: config_relay.only_mandatory_headers,
+                        pangolin_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams {
+                            messages_pallet_owner: config_relay
+                                .pangolin_messages_pallet_owner
+                                .clone(),
+                            messages_pallet_owner_password: config_relay
+                                .pangolin_messages_pallet_owner_password
+                                .clone(),
+                        },
+                        pangoro_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams {
+                            messages_pallet_owner: config_relay
+                                .pangoro_messages_pallet_owner
+                                .clone(),
+                            messages_pallet_owner_password: config_relay
+                                .pangoro_messages_pallet_owner_password
+                                .clone(),
+                        },
                     };
 
                     std::thread::spawn(move || {
@@ -99,6 +128,135 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
 
     let metrics_params: MetricsParams = relay_info.prometheus_params.clone().into();
     let metrics_params = relay_utils::relay_metrics(None, metrics_params).into_params();
+    let (metrics_params, pangolin_to_pangoro_metrics) =
+        crate::chains::pangolin::add_standalone_metrics(
+            None,
+            metrics_params,
+            pangolin_client.clone(),
+        )?;
+    let (metrics_params, pangoro_to_pangolin_metrics) =
+        crate::chains::pangoro::add_standalone_metrics(
+            None,
+            metrics_params,
+            pangoro_client.clone(),
+        )?;
+
+    const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
+				this is the command entrypoint, so nothing has been registered yet; \
+				qed";
+
+    let pangolin_messages_pallet_owner = relay_info
+        .pangolin_messages_pallet_owner_signing
+        .to_keypair::<PangolinChain>()?;
+    let pangoro_messages_pallet_owner = relay_info
+        .pangoro_messages_pallet_owner_signing
+        .to_keypair::<PangoroChain>()?;
+
+    if let Some(pangolin_messages_pallet_owner) = pangolin_messages_pallet_owner {
+        let pangolin_client = pangolin_client.clone();
+        substrate_relay_helper::conversion_rate_update::run_conversion_rate_update_loop(
+            pangolin_to_pangoro_metrics
+                .target_to_source_conversion_rate
+                .expect(METRIC_IS_SOME_PROOF),
+            pangolin_to_pangoro_metrics
+                .target_to_base_conversion_rate
+                .clone()
+                .expect(METRIC_IS_SOME_PROOF),
+            pangolin_to_pangoro_metrics
+                .source_to_base_conversion_rate
+                .clone()
+                .expect(METRIC_IS_SOME_PROOF),
+            CONVERSION_RATE_ALLOWED_DIFFERENCE_RATIO,
+            move |new_rate| {
+                log::info!(
+                    target: "bridge",
+                    "Going to update {} -> {} (on {}) conversion rate to {}.",
+                    PangoroChain::NAME,
+                    PangolinChain::NAME,
+                    PangolinChain::NAME,
+                    new_rate,
+                );
+                crate::chains::pangoro::update_pangoro_to_pangolin_conversion_rate(
+                    pangolin_client.clone(),
+                    pangolin_messages_pallet_owner.clone(),
+                    new_rate,
+                )
+            },
+        );
+    }
+
+    if let Some(pangoro_messages_pallet_owner) = pangoro_messages_pallet_owner {
+        let pangoro_client = pangoro_client.clone();
+        substrate_relay_helper::conversion_rate_update::run_conversion_rate_update_loop(
+            pangoro_to_pangolin_metrics
+                .target_to_source_conversion_rate
+                .expect(METRIC_IS_SOME_PROOF),
+            pangoro_to_pangolin_metrics
+                .target_to_base_conversion_rate
+                .clone()
+                .expect(METRIC_IS_SOME_PROOF),
+            pangoro_to_pangolin_metrics
+                .source_to_base_conversion_rate
+                .clone()
+                .expect(METRIC_IS_SOME_PROOF),
+            CONVERSION_RATE_ALLOWED_DIFFERENCE_RATIO,
+            move |new_rate| {
+                log::info!(
+                    target: "bridge",
+                    "Going to update {} -> {} (on {}) conversion rate to {}.",
+                    PangolinChain::NAME,
+                    PangoroChain::NAME,
+                    PangoroChain::NAME,
+                    new_rate,
+                );
+                crate::chains::pangolin::update_pangolin_to_pangoro_conversion_rate(
+                    pangoro_client.clone(),
+                    pangoro_messages_pallet_owner.clone(),
+                    new_rate,
+                )
+            },
+        );
+    }
+
+    if relay_info.create_relayers_fund_accounts {
+        let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
+            AccountIdOf<PangolinChain>,
+            bridge_primitives::AccountIdConverter,
+        >();
+        let relayers_fund_account_balance = pangolin_client
+            .free_native_balance(relayer_fund_acount_id.clone())
+            .await;
+        if let Err(relay_substrate_client::Error::AccountDoesNotExist) =
+            relayers_fund_account_balance
+        {
+            log::info!(target: "bridge", "Going to create relayers fund account at {}.", PangolinChain::NAME);
+            create_pangolin_account(
+                pangolin_client.clone(),
+                pangolin_sign.clone(),
+                relayer_fund_acount_id,
+            )
+            .await?;
+        }
+
+        let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
+            AccountIdOf<PangoroChain>,
+            bridge_primitives::AccountIdConverter,
+        >();
+        let relayers_fund_account_balance = pangoro_client
+            .free_native_balance(relayer_fund_acount_id.clone())
+            .await;
+        if let Err(relay_substrate_client::Error::AccountDoesNotExist) =
+            relayers_fund_account_balance
+        {
+            log::info!(target: "bridge", "Going to create relayers fund account at {}.", PangoroChain::NAME);
+            create_pangoro_account(
+                pangoro_client.clone(),
+                pangoro_sign.clone(),
+                relayer_fund_acount_id,
+            )
+            .await?;
+        }
+    }
 
     let pangolin_to_pangoro_on_demand_headers = OnDemandHeadersRelay::new(
         pangolin_client.clone(),
@@ -106,6 +264,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         pangoro_transactions_mortality,
         PangolinFinalityToPangoro::new(pangoro_client.clone(), pangoro_sign.clone()),
         pangolin_constants::BLOCKS_PER_SESSION,
+        relay_info.only_mandatory_headers,
     );
     let pangoro_to_pangolin_on_demand_headers = OnDemandHeadersRelay::new(
         pangoro_client.clone(),
@@ -113,6 +272,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         pangolin_transactions_mortality,
         PangoroFinalityToPangolin::new(pangolin_client.clone(), pangolin_sign.clone()),
         pangoro_constants::BLOCKS_PER_SESSION,
+        relay_info.only_mandatory_headers,
     );
 
     // Need 2x capacity since we consider both directions for each lane
@@ -168,4 +328,24 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         .map_err(|e| anyhow::format_err!("{}", e))?;
 
     futures::future::select_all(message_relays).await.0
+}
+
+async fn create_pangolin_account(
+    _left_client: Client<PangolinChain>,
+    _left_sign: <PangolinChain as TransactionSignScheme>::AccountKeyPair,
+    _account_id: AccountIdOf<PangolinChain>,
+) -> anyhow::Result<()> {
+    Err(anyhow::format_err!(
+        "Account creation is not supported by this bridge"
+    ))
+}
+
+async fn create_pangoro_account(
+    _left_client: Client<PangoroChain>,
+    _left_sign: <PangoroChain as TransactionSignScheme>::AccountKeyPair,
+    _account_id: AccountIdOf<PangoroChain>,
+) -> anyhow::Result<()> {
+    Err(anyhow::format_err!(
+        "Account creation is not supported by this bridge"
+    ))
 }

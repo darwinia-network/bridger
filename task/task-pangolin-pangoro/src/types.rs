@@ -4,6 +4,7 @@ use std::str::FromStr;
 use bp_messages::LaneId;
 use messages_relay::message_lane_loop::RelayerMode;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use sp_core::crypto::Pair;
 
 use crate::traits::CliChain;
 
@@ -42,8 +43,6 @@ impl ChainInfo {
 
     /// Parse signing params into chain-specific KeyPair.
     pub fn to_keypair<C: CliChain>(&self) -> anyhow::Result<C::KeyPair> {
-        use sp_core::crypto::Pair;
-
         let signer = match self.signer.clone() {
             Some(v) => v,
             None => anyhow::bail!("The chain [{}:{}] not set signer", self.host, self.port,),
@@ -179,4 +178,31 @@ pub struct RelayHeadersAndMessagesInfo {
     pub lanes: Vec<HexLaneId>,
     pub prometheus_params: PrometheusParamsInfo,
     pub relayer_mode: RelayerMode,
+    pub create_relayers_fund_accounts: bool,
+    pub only_mandatory_headers: bool,
+
+    pub pangolin_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
+    pub pangoro_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
+}
+
+#[derive(Debug, Clone)]
+pub struct MessagesPalletOwnerSigningParams {
+    pub messages_pallet_owner: Option<String>,
+    pub messages_pallet_owner_password: Option<String>,
+}
+
+impl MessagesPalletOwnerSigningParams {
+    /// Parse signing params into chain-specific KeyPair.
+    pub fn to_keypair<Chain: CliChain>(&self) -> anyhow::Result<Option<Chain::KeyPair>> {
+        let messages_pallet_owner = match self.messages_pallet_owner {
+            Some(ref messages_pallet_owner) => messages_pallet_owner,
+            None => return Ok(None),
+        };
+        Chain::KeyPair::from_string(
+            messages_pallet_owner,
+            self.messages_pallet_owner_password.as_deref(),
+        )
+        .map_err(|e| anyhow::format_err!("{:?}", e))
+        .map(Some)
+    }
 }

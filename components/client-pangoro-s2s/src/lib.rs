@@ -1,8 +1,11 @@
 //! Types used to connect to the Pangoro-Substrate chain.
 
 use bridge_traits::bridge::chain::{BridgeChain, ChainCategory};
-use codec::Encode;
-use relay_substrate_client::{Chain, ChainBase, ChainWithBalances, TransactionSignScheme};
+use codec::{Compact, Decode, Encode};
+use relay_substrate_client::{
+    BalanceOf, Chain, ChainBase, ChainWithBalances, IndexOf, TransactionEraOf,
+    TransactionSignScheme, UnsignedTransaction,
+};
 use sp_core::{storage::StorageKey, Pair};
 use sp_runtime::{generic::SignedPayload, traits::IdentifyAccount};
 use std::time::Duration;
@@ -23,6 +26,11 @@ impl ChainBase for PangoroChain {
     type Hash = common_primitives::Hash;
     type Hasher = common_primitives::Hashing;
     type Header = common_primitives::Header;
+
+    type AccountId = common_primitives::AccountId;
+    type Balance = common_primitives::Balance;
+    type Index = common_primitives::Nonce;
+    type Signature = common_primitives::Signature;
 }
 
 impl Chain for PangoroChain {
@@ -32,11 +40,8 @@ impl Chain for PangoroChain {
     const STORAGE_PROOF_OVERHEAD: u32 = bridge_primitives::EXTRA_STORAGE_PROOF_SIZE;
     const MAXIMAL_ENCODED_ACCOUNT_ID_SIZE: u32 = bridge_primitives::MAXIMAL_ENCODED_ACCOUNT_ID_SIZE;
 
-    type AccountId = common_primitives::AccountId;
-    type Index = common_primitives::Nonce;
     type SignedBlock = pangoro_runtime::SignedBlock;
     type Call = pangoro_runtime::Call;
-    type Balance = common_primitives::Balance;
     type WeightToFee = pangoro_runtime::WeightToFee;
 }
 
@@ -57,20 +62,19 @@ impl TransactionSignScheme for PangoroChain {
     fn sign_transaction(
         genesis_hash: <Self::Chain as ChainBase>::Hash,
         signer: &Self::AccountKeyPair,
-        _era: relay_substrate_client::TransactionEraOf<Self::Chain>,
-        signer_nonce: <Self::Chain as Chain>::Index,
-        call: <Self::Chain as Chain>::Call,
+        _era: TransactionEraOf<Self::Chain>,
+        unsigned: UnsignedTransaction<Self::Chain>,
     ) -> Self::SignedTransaction {
         let raw_payload = SignedPayload::from_raw(
-            call,
+            unsigned.call,
             (
                 frame_system::CheckSpecVersion::<pangoro_runtime::Runtime>::new(),
                 frame_system::CheckTxVersion::<pangoro_runtime::Runtime>::new(),
                 frame_system::CheckGenesis::<pangoro_runtime::Runtime>::new(),
                 frame_system::CheckEra::<pangoro_runtime::Runtime>::from(sp_runtime::generic::Era::Immortal),
-                frame_system::CheckNonce::<pangoro_runtime::Runtime>::from(signer_nonce),
+                frame_system::CheckNonce::<pangoro_runtime::Runtime>::from(unsigned.nonce),
                 frame_system::CheckWeight::<pangoro_runtime::Runtime>::new(),
-                pallet_transaction_payment::ChargeTransactionPayment::<pangoro_runtime::Runtime>::from(0),
+                pallet_transaction_payment::ChargeTransactionPayment::<pangoro_runtime::Runtime>::from(unsigned.tip),
             ),
             (
                 pangoro_runtime::VERSION.spec_version,
@@ -92,6 +96,34 @@ impl TransactionSignScheme for PangoroChain {
             signature.into(),
             extra,
         )
+    }
+
+    fn is_signed(tx: &Self::SignedTransaction) -> bool {
+        tx.signature.is_some()
+    }
+
+    fn is_signed_by(signer: &Self::AccountKeyPair, tx: &Self::SignedTransaction) -> bool {
+        tx.signature
+            .as_ref()
+            .map(|(address, _, _)| {
+                let account_id: common_primitives::AccountId =
+                    (*signer.public().as_array_ref()).into();
+                *address == pangoro_runtime::Address::from(account_id)
+            })
+            .unwrap_or(false)
+    }
+
+    fn parse_transaction(tx: Self::SignedTransaction) -> Option<UnsignedTransaction<Self::Chain>> {
+        let extra = &tx.signature.as_ref()?.2;
+        Some(UnsignedTransaction {
+            call: tx.function,
+            nonce: Compact::<IndexOf<Self::Chain>>::decode(&mut &extra.4.encode()[..])
+                .ok()?
+                .into(),
+            tip: Compact::<BalanceOf<Self::Chain>>::decode(&mut &extra.6.encode()[..])
+                .ok()?
+                .into(),
+        })
     }
 }
 

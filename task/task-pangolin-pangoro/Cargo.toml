@@ -62,16 +62,16 @@ component-pangolin-s2s = { path = "../../components/client-pangolin-s2s" }
 component-pangoro-s2s  = { path = "../../components/client-pangoro-s2s" }
 
 ## darwinia common
-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
+bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
 
 ## pangolin
-pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-pangolin-runtime-system-params = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-pangolin-constants             = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
+pangolin-runtime-system-params = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
+pangolin-constants             = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
 
 ## pangoro
-pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-pangoro-runtime-system-params  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
-pangoro-constants              = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "master" }
+pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
+pangoro-runtime-system-params  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
+pangoro-constants              = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
 

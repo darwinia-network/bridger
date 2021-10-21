@@ -55,7 +55,11 @@ impl Service for RelayService {
         let _greet = Self::try_task(
             &format!("{}-relay", PangolinPangoroTask::NAME),
             async move {
-                while let Some(_message) = rx.recv().await {
+                while let Some(message) = rx.recv().await {
+                    match message {
+                        PangolinPangoroMessageSend::Relay => {}
+                        _ => continue,
+                    }
                     let (source_chain, target_chain) = (
                         config_pangolin.to_chain_info_with_expect_signer(
                             config_relay.signer_pangolin.clone(),

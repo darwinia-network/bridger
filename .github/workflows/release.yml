@@ -14,7 +14,7 @@ jobs:
 
       - name: Build bridger
         env:
-          RUST_TOOLCHAIN: nightly-2021-09-01
+          RUST_TOOLCHAIN: nightly-2021-04-22
         run: |
           .maintain/setup-bridger.sh
 

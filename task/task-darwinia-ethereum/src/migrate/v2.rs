@@ -13,7 +13,7 @@ pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
 }
 
 fn migrate_tracker_ethereum(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
-    for key in [
+    for key in &[
         "scan.ethereum.running",
         "scan.ethereum.finish",
         "scan.ethereum.current",
@@ -43,7 +43,7 @@ fn migrate_tracker_darwinia(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
             microkv.put("scan.darwinia.current", &value.as_u64().unwrap_or(0))?;
         }
     }
-    for key in [
+    for key in &[
         "scan.darwinia.finish",
         "scan.darwinia.next",
         "scan.darwinia.skipped",

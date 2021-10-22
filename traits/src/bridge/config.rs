@@ -110,7 +110,11 @@ impl Config {
         let content = match format {
             ConfigFormat::Yml => serde_yaml::to_string(&config)?,
             ConfigFormat::Json => serde_json::to_string_pretty(&config)?,
-            ConfigFormat::Toml => toml::to_string(&config)?,
+            ConfigFormat::Toml => {
+                let value = serde_json::to_value(&config)?;
+                let value: toml::Value = serde_json::from_value(value)?;
+                toml::to_string(&value)?
+            }
         };
         Ok(content)
     }

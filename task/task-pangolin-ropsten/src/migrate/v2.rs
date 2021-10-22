@@ -13,7 +13,7 @@ pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
 }
 
 fn migrate_tracker_ropsten(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
-    for key in [
+    for key in &[
         "scan.ropsten.running",
         "scan.ropsten.finish",
         "scan.ropsten.current",
@@ -43,7 +43,7 @@ fn migrate_tracker_pangolin(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
             microkv.put("scan.pangolin.current", &value.as_u64().unwrap_or(0))?;
         }
     }
-    for key in [
+    for key in &[
         "scan.pangolin.finish",
         "scan.pangolin.next",
         "scan.pangolin.skipped",

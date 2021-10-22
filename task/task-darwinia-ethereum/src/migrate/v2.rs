@@ -13,7 +13,29 @@ pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
 }
 
 fn migrate_tracker_ethereum(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
-    for key in [
+    if let Some(value) = microkv.get("scan.ethereum.finish")? {
+        if value.is_number() {
+            let last_block = value.as_u64().unwrap();
+            microkv.put("scan.ethereum.redeem.current", &last_block)?;
+            microkv.put("scan.ethereum.check.current", &last_block)?;
+            microkv.put("scan.ethereum.affirm.current", &last_block)?;
+        }
+    }
+    if let Some(value) = microkv.get("scan.ethereum.running")? {
+        let mut is_running = false;
+        if value.is_boolean() {
+            is_running = value.as_bool().unwrap_or(false);
+        }
+        if value.is_string() {
+            is_running = value.as_str().map_or(false, |v| v == "true");
+        }
+        if is_running {
+            microkv.put("scan.ethereum.redeem.running", &true)?;
+            microkv.put("scan.ethereum.check.running", &true)?;
+            microkv.put("scan.ethereum.affirm.running", &true)?;
+        }
+    }
+    for key in &[
         "scan.ethereum.running",
         "scan.ethereum.finish",
         "scan.ethereum.current",
@@ -22,17 +44,6 @@ fn migrate_tracker_ethereum(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
         "scan.ethereum.fast_mode",
     ] {
         microkv.delete(key)?;
-    }
-    microkv.put("scan.ethereum.redeem.running", &true)?;
-    microkv.put("scan.ethereum.check.running", &true)?;
-    microkv.put("scan.ethereum.affirm.running", &true)?;
-    if let Some(value) = microkv.get("scan.ethereum.finish")? {
-        if value.is_number() {
-            let last_block = value.as_u64().unwrap();
-            microkv.put("scan.ethereum.redeem.current", &last_block)?;
-            microkv.put("scan.ethereum.check.current", &last_block)?;
-            microkv.put("scan.ethereum.affirm.current", &last_block)?;
-        }
     }
     Ok(())
 }
@@ -43,7 +54,7 @@ fn migrate_tracker_darwinia(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
             microkv.put("scan.darwinia.current", &value.as_u64().unwrap_or(0))?;
         }
     }
-    for key in [
+    for key in &[
         "scan.darwinia.finish",
         "scan.darwinia.next",
         "scan.darwinia.skipped",
@@ -59,13 +70,13 @@ fn migrate_affirm(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
         if value.is_number() {
             microkv.put("affirm.target", &value.as_u64().unwrap_or(0))?;
         }
+        microkv.delete("target")?;
     }
     if let Some(value) = microkv.get("relayed")? {
         if value.is_number() {
             microkv.put("affirm.relayed", &value.as_u64().unwrap_or(0))?;
         }
+        microkv.delete("relayed")?;
     }
-    microkv.delete("target")?;
-    microkv.delete("relayed")?;
     Ok(())
 }

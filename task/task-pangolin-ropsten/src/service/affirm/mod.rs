@@ -170,7 +170,8 @@ async fn run_scan(
         if txs.is_empty() {
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
-            ));
+            ))
+            .await;
             continue;
         }
 

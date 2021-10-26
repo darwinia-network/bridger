@@ -52,6 +52,11 @@ impl PangolinBlockTracker {
 
     async fn get_next_block(&self) -> Result<Option<Header<u32, BlakeTwo256>>> {
         let next_block = self.tracker.next().await? as u32;
+        log::trace!(
+            target: PangolinRopstenTask::NAME,
+            "Track pangolin block: {}",
+            next_block
+        );
         let finalized_block_hash = self.darwinia.finalized_head().await?;
         match self
             .darwinia

@@ -148,6 +148,12 @@ async fn run_scan(
         let from = tracker.current().await?;
         let limit = 10usize;
 
+        log::trace!(
+            target: PangolinRopstenTask::NAME,
+            "Track ropsten redeem block: {} and limit: {}",
+            from,
+            limit
+        );
         let txs = thegraph_liketh
             .query_transactions(from as u64, limit as u32)
             .await?;

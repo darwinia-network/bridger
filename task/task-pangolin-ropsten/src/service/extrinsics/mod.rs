@@ -41,7 +41,8 @@ impl Service for ExtrinsicsService {
                         while let Err(err) = handler.send_extrinsic(ex.clone()).await {
                             log::error!(
                                 target: PangolinRopstenTask::NAME,
-                                "extrinsics err: {:#?}",
+                                "Failed to send extrinsic {:#?} err: {:#?}",
+                                ex,
                                 err
                             );
 

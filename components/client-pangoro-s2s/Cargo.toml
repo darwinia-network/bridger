@@ -28,10 +28,10 @@ relay-utils            = { git = "https://github.com/darwinia-network/parity-bri
 
 
 ## Bridge dependencies
-pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
-common-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
-bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
-pangoro-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.7" }
+pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.8-1" }
+common-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.8-1" }
+bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.8-1" }
+pangoro-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.8-1" }
 
 
 

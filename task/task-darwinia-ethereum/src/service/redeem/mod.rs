@@ -151,6 +151,13 @@ async fn run_scan(
         let txs = thegraph_liketh
             .query_transactions(from as u64, limit as u32)
             .await?;
+        if txs.is_empty() {
+            tokio::time::sleep(std::time::Duration::from_secs(
+                task_config.interval_ethereum,
+            ))
+            .await;
+            continue;
+        }
 
         // send transactions to redeem
         for tx in &txs {

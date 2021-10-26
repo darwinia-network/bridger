@@ -81,8 +81,10 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
             .query_transactions(from as u64, limit as u32)
             .await?;
         if txs.is_empty() {
+            tokio::time::sleep(std::time::Duration::from_secs(task_config.interval_check)).await;
             continue;
         }
+
         let tx = txs.get(0).unwrap();
 
         let verified = match helpers::is_verified(&darwinia, tx).await {

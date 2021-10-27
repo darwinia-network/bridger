@@ -51,7 +51,6 @@ impl Runtime for DarwiniaRuntime {
         registry.register_type_size::<u128>("RingBalance");
         registry.register_type_size::<u128>("KtonBalance");
         registry.register_type_size::<u128>("Fee");
-        registry.register_type_size::<u128>("Fee<T>");
         registry.register_type_size::<[u8; 4]>("ChainId");
         registry.register_type_size::<[u8; 16]>("BridgeMessageId");
         registry.register_type_size::<[u8; 20]>("EthereumAddress");

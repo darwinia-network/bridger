@@ -181,8 +181,6 @@ impl DarwiniaServiceRunner {
 
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
                     // todo: write log
-                    retry_times = 0;
-                    continue;
                 }
 
                 let err_msg = format!("{:?}", err).to_lowercase();

@@ -183,7 +183,7 @@ impl DarwiniaServiceRunner {
             // process events
             if let Err(err) = self.handle_events(&header, events).await {
                 log::error!(
-                    target: PangolinRopstenTask::NAME,
+                    target: DarwiniaEthereumTask::NAME,
                     "An error occurred while processing the events of block {}: {:?}",
                     header.number,
                     err

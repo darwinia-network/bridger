@@ -11,7 +11,7 @@ pub fn init() -> anyhow::Result<()> {
 }
 
 fn init_log() {
-    if option_env!("RUST_LOG").is_none() {
+    if let Err(_) = std::env::var("RUST_LOG") {
         std::env::set_var(
             "RUST_LOG",
             r#"
@@ -26,7 +26,7 @@ fn init_log() {
         "#,
         );
     }
-    if option_env!("RUST_BACKTRACE").is_none() {
+    if let Err(_) = std::env::var("RUST_BACKTRACE") {
         std::env::set_var("RUST_BACKTRACE", "1");
     }
     env_logger::init();

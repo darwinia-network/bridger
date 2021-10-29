@@ -143,7 +143,7 @@ impl DarwiniaServiceRunner {
 
             // debug
             if header.number % 100 == 0 {
-                trace!(
+                log::trace!(
                     target: PangolinRopstenTask::NAME,
                     "Darwinia block {}",
                     header.number
@@ -152,9 +152,10 @@ impl DarwiniaServiceRunner {
 
             // handle the 'mmr root sign and send extrinsics' only block height reached
             if let Err(err) = self.handle_delayed_extrinsics(&header).await {
-                error!(
+                log::error!(
                     target: PangolinRopstenTask::NAME,
-                    "An error occurred while processing the delayed extrinsics: {:?}", err
+                    "An error occurred while processing the delayed extrinsics: {:?}",
+                    err
                 );
                 // Prevent too fast refresh errors
                 tokio::time::sleep(std::time::Duration::from_secs(30)).await;
@@ -171,43 +172,41 @@ impl DarwiniaServiceRunner {
 
             // process events
             if let Err(err) = self.handle_events(&header, events).await {
+                log::error!(
+                    target: PangolinRopstenTask::NAME,
+                    "An error occurred while processing the events of block {}: {:?}",
+                    header.number,
+                    err
+                );
+
                 if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
                     // todo: write log
-                    // tracker_raw.skip(header.number as usize)?;
+                    tracker_raw.finish(header.number as usize)?;
                     return Err(err);
-                } else {
-                    error!(
-                        target: PangolinRopstenTask::NAME,
-                        "An error occurred while processing the events of block {}: {:?}",
-                        header.number,
-                        err
-                    );
-
-                    let err_msg = format!("{:?}", err).to_lowercase();
-                    if err_msg.contains("type size unavailable") {
-                        // todo: write log
-                        // tracker_raw.skip(header.number as usize)?;
-                    } else {
-                        if retry_times > 10 {
-                            // todo: write log
-                            // tracker_raw.skip(header.number as usize)?;
-                            log::error!(
-                                target: PangolinRopstenTask::NAME,
-                                "Retry {} times still failed: {}",
-                                retry_times,
-                                header.number
-                            );
-                            retry_times = 0;
-                            continue;
-                        }
-                        tokio::time::sleep(std::time::Duration::from_secs(30)).await;
-                        retry_times += 1;
-                    }
                 }
-            } else {
-                tracker_raw.finish(header.number as usize)?;
-                retry_times = 0;
+
+                let err_msg = format!("{:?}", err).to_lowercase();
+                if err_msg.contains("type size unavailable") {
+                    // todo: write log
+                }
+
+                if retry_times > 10 {
+                    // todo: write log
+                    log::error!(
+                        target: PangolinRopstenTask::NAME,
+                        "Retry {} times still failed: {}",
+                        retry_times,
+                        header.number
+                    );
+                    retry_times = 0;
+                    continue;
+                }
+                tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+                retry_times += 1;
+                continue;
             }
+            tracker_raw.finish(header.number as usize)?;
+            retry_times = 0;
         }
     }
 

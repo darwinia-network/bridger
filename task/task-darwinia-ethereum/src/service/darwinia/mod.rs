@@ -155,7 +155,7 @@ impl DarwiniaServiceRunner {
             let header = tracker_darwinia.next_block().await?;
 
             // debug
-            trace!(
+            log::trace!(
                 target: DarwiniaEthereumTask::NAME,
                 "Darwinia block {}",
                 header.number
@@ -182,29 +182,26 @@ impl DarwiniaServiceRunner {
 
             // process events
             if let Err(err) = self.handle_events(&header, events).await {
-                if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
-                    // todo: write log
-                    // tracker_raw.skip(header.number as usize)?;
-                    return Err(err);
-                }
-
-                error!(
+                log::error!(
                     target: DarwiniaEthereumTask::NAME,
                     "An error occurred while processing the events of block {}: {:?}",
                     header.number,
                     err
                 );
 
+                if let Some(Error::RuntimeUpdated) = err.downcast_ref() {
+                    // todo: write log
+                    tracker_raw.finish(header.number as usize)?;
+                    return Err(err);
+                }
+
                 let err_msg = format!("{:?}", err).to_lowercase();
                 if err_msg.contains("type size unavailable") {
                     // todo: write log
-                    // tracker_raw.skip(header.number as usize)?;
-                    continue;
                 }
 
                 if retry_times > 10 {
                     // todo: write log
-                    // tracker_raw.skip(header.number as usize)?;
                     log::error!(
                         target: DarwiniaEthereumTask::NAME,
                         "Retry {} times still failed: {}",

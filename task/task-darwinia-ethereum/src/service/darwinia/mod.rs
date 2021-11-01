@@ -200,7 +200,7 @@ impl DarwiniaServiceRunner {
                     // todo: write log
                 }
 
-                if retry_times > 10 {
+                if retry_times > 3 {
                     // todo: write log
                     log::error!(
                         target: DarwiniaEthereumTask::NAME,

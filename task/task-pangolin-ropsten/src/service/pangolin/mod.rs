@@ -198,6 +198,7 @@ impl DarwiniaServiceRunner {
                         retry_times,
                         header.number
                     );
+                    tracker_raw.finish(header.number as usize)?;
                     retry_times = 0;
                     continue;
                 }

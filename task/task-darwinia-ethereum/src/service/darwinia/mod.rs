@@ -209,6 +209,7 @@ impl DarwiniaServiceRunner {
                         header.number
                     );
                     retry_times = 0;
+                    tracker_raw.finish(header.number as usize)?;
                     continue;
                 }
                 tokio::time::sleep(std::time::Duration::from_secs(30)).await;

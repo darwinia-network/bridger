@@ -3,6 +3,9 @@ name: Staging
 on:
   push:
     branches: [ master ]
+  # todo: just test, there need remove when merge to master
+  pull_request:
+    branches: [ master ]
 
 jobs:
 

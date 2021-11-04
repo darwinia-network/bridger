@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use bridge_traits::bridge::config::{BridgeConfig, Config};
 
-use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo, WrapperRelayerMode};
+use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinPangoroConfig {
@@ -41,8 +41,6 @@ pub struct RelayConfig {
     pub signer_pangolin: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signer_pangoro: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub relayer_mode: Option<WrapperRelayerMode>,
     #[serde(default)]
     pub prometheus_params: PrometheusParamsInfo,
     /// If passed, only mandatory headers (headers that are changing the GRANDPA authorities set)
@@ -75,7 +73,6 @@ impl BridgeConfig for RelayConfig {
             auto_start: false,
             signer_pangolin: Some("//Alice".to_string()),
             signer_pangoro: Some("//Alice".to_string()),
-            relayer_mode: Some(WrapperRelayerMode::Rational),
             prometheus_params: PrometheusParamsInfo {
                 no_prometheus: false,
                 prometheus_host: "127.0.0.1".to_string(),

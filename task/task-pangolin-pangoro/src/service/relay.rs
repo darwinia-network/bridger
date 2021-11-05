@@ -1,5 +1,6 @@
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
+use messages_relay::relay_strategy::AltruisticStrategy;
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
 use substrate_relay_helper::messages_lane::{MessagesRelayParams, SubstrateMessageLane};
@@ -291,6 +292,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                         <PangolinMessagesToPangoro as SubstrateMessageLane>::MessageLane,
                     >(&lane),
                 ),
+                relay_strategy: AltruisticStrategy,
             })
             .map_err(|e| anyhow::format_err!("{}", e))
             .boxed();
@@ -309,6 +311,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                         <PangoroMessagesToPangolin as SubstrateMessageLane>::MessageLane,
                     >(&lane),
                 ),
+                relay_strategy: AltruisticStrategy,
             })
             .map_err(|e| anyhow::format_err!("{}", e))
             .boxed();

@@ -151,7 +151,7 @@ mod s2s_messages {
     use frame_support::dispatch::GetDispatchInfo;
     use frame_support::weights::Weight;
     use messages_relay::message_lane::MessageLane;
-    use messages_relay::relay_strategy::altruistic_strategy::AltruisticStrategy;
+    use messages_relay::relay_strategy::AltruisticStrategy;
     use relay_substrate_client::{Client, IndexOf, TransactionSignScheme, UnsignedTransaction};
     use relay_utils::metrics::MetricsParams;
     use sp_core::{Bytes, Pair};
@@ -178,7 +178,6 @@ mod s2s_messages {
         <PangolinChainConst as ChainConst>::SigningParams,
         PangoroChain,
         <PangoroChainConst as ChainConst>::SigningParams,
-        AltruisticStrategy,
     >;
 
     #[derive(Clone)]
@@ -323,6 +322,7 @@ mod s2s_messages {
                 <PangolinChainConst as ChainConst>::SigningParams,
                 PangoroChain,
                 <PangoroChainConst as ChainConst>::SigningParams,
+                AltruisticStrategy,
             >,
         ) -> anyhow::Result<()> {
             let stall_timeout = Duration::from_secs(5 * 60);
@@ -337,7 +337,6 @@ mod s2s_messages {
                     target_client: params.target_client.clone(),
                     target_sign: params.target_sign,
                     relayer_id_at_source: relayer_id_at_Pangolin,
-                    _marker: Default::default(),
                 },
             };
 
@@ -391,6 +390,7 @@ mod s2s_messages {
                         max_messages_in_single_batch,
                         max_messages_weight_in_single_batch,
                         max_messages_size_in_single_batch,
+                        relay_strategy: params.relay_strategy,
                     },
                 },
                 PangolinSourceClient::new(

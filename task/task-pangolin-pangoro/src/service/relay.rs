@@ -291,7 +291,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                         <PangolinMessagesToPangoro as SubstrateMessageLane>::MessageLane,
                     >(&lane),
                 ),
-                relay_strategy: PangolinRelayStrategy::new(),
+                relay_strategy: PangolinRelayStrategy::new(pangolin_client.clone()),
             })
             .map_err(|e| anyhow::format_err!("{}", e))
             .boxed();
@@ -310,7 +310,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                         <PangoroMessagesToPangolin as SubstrateMessageLane>::MessageLane,
                     >(&lane),
                 ),
-                relay_strategy: PangoroRelayStrategy::new(),
+                relay_strategy: PangoroRelayStrategy::new(pangoro_client.clone()),
             })
             .map_err(|e| anyhow::format_err!("{}", e))
             .boxed();

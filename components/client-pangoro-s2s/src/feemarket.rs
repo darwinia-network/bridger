@@ -3,13 +3,18 @@ use messages_relay::message_lane_loop::{
     SourceClient as MessageLaneSourceClient, TargetClient as MessageLaneTargetClient,
 };
 use messages_relay::relay_strategy::{RelayReference, RelayStrategy};
+use relay_substrate_client::Client;
+
+use crate::PangoroChain;
 
 #[derive(Clone)]
-pub struct PangoroRelayStrategy {}
+pub struct PangoroRelayStrategy {
+    client: Client<PangoroChain>,
+}
 
 impl PangoroRelayStrategy {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(client: Client<PangoroChain>) -> Self {
+        Self { client }
     }
 }
 

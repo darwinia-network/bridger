@@ -888,13 +888,17 @@ dependencies = [
 name = "component-pangolin-s2s"
 version = "0.4.7"
 dependencies = [
+ "anyhow",
  "async-trait",
+ "bp-runtime",
  "bridge-primitives 2.6.8",
  "bridge-traits",
  "common-primitives",
  "darwinia-bridge-ethereum",
+ "dp-fee",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
+ "futures-test",
  "headers-relay",
  "messages-relay",
  "pallet-transaction-payment",
@@ -906,6 +910,7 @@ dependencies = [
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
+ "tokio 1.11.0",
 ]
 
 [[package]]
@@ -940,6 +945,7 @@ dependencies = [
  "bridge-primitives 2.6.8",
  "bridge-traits",
  "common-primitives",
+ "dp-fee",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "headers-relay",
@@ -2935,6 +2941,23 @@ name = "futures-task"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d3d00f4eddb73e498a54394f228cd55853bdf059259e8e7bc6e69d408892e99"
+
+[[package]]
+name = "futures-test"
+version = "0.3.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46b9f6d284a9595a613f881a7b08d46abaab1005995e6fe3ccfe2398f6aea492"
+dependencies = [
+ "futures-core",
+ "futures-executor",
+ "futures-io",
+ "futures-macro",
+ "futures-sink",
+ "futures-task",
+ "futures-util",
+ "pin-project 1.0.8",
+ "pin-utils",
+]
 
 [[package]]
 name = "futures-timer"

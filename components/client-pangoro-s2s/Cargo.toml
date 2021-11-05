@@ -33,7 +33,7 @@ pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-
 common-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-feemarket-strategy" }
 bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-feemarket-strategy" }
 pangoro-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-feemarket-strategy" }
-
+dp-fee                  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-feemarket-strategy" }
 
 
 ## Substrate Dependencies

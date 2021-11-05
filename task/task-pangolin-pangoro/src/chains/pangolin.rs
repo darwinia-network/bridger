@@ -151,7 +151,6 @@ mod s2s_messages {
     use frame_support::dispatch::GetDispatchInfo;
     use frame_support::weights::Weight;
     use messages_relay::message_lane::MessageLane;
-    use messages_relay::relay_strategy::AltruisticStrategy;
     use relay_substrate_client::{Client, IndexOf, TransactionSignScheme, UnsignedTransaction};
     use relay_utils::metrics::MetricsParams;
     use sp_core::{Bytes, Pair};
@@ -162,7 +161,7 @@ mod s2s_messages {
     use substrate_relay_helper::messages_source::SubstrateMessagesSource;
     use substrate_relay_helper::messages_target::SubstrateMessagesTarget;
 
-    use component_pangolin_s2s::PangolinChain;
+    use component_pangolin_s2s::{PangolinChain, PangolinRelayStrategy};
     use component_pangoro_s2s::PangoroChain;
 
     use crate::chains::pangolin::PangolinChainConst;
@@ -322,7 +321,7 @@ mod s2s_messages {
                 <PangolinChainConst as ChainConst>::SigningParams,
                 PangoroChain,
                 <PangoroChainConst as ChainConst>::SigningParams,
-                AltruisticStrategy,
+                PangolinRelayStrategy,
             >,
         ) -> anyhow::Result<()> {
             let stall_timeout = Duration::from_secs(5 * 60);

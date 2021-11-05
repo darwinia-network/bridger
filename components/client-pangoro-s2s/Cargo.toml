@@ -18,6 +18,7 @@ readme = 'README.md'
 edition = "2018"
 
 [dependencies]
+async-trait = "0.1"
 
 bridge-traits = { path = "../../traits" }
 
@@ -25,7 +26,7 @@ codec                  = { package = "parity-scale-codec", version = "2.0.0" }
 headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
 relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
 relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
-
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
 
 ## Bridge dependencies
 pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-feemarket-strategy" }

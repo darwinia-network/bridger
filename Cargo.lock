@@ -888,6 +888,7 @@ dependencies = [
 name = "component-pangolin-s2s"
 version = "0.4.7"
 dependencies = [
+ "async-trait",
  "bridge-primitives 2.6.8",
  "bridge-traits",
  "common-primitives",
@@ -895,6 +896,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "headers-relay",
+ "messages-relay",
  "pallet-transaction-payment",
  "pangolin-constants",
  "pangolin-runtime",
@@ -934,12 +936,14 @@ dependencies = [
 name = "component-pangoro-s2s"
 version = "0.4.7"
 dependencies = [
+ "async-trait",
  "bridge-primitives 2.6.8",
  "bridge-traits",
  "common-primitives",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "headers-relay",
+ "messages-relay",
  "pallet-transaction-payment",
  "pangoro-constants",
  "pangoro-runtime",

@@ -1,6 +1,5 @@
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
-use messages_relay::relay_strategy::AltruisticStrategy;
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
 use substrate_relay_helper::messages_lane::{MessagesRelayParams, SubstrateMessageLane};
@@ -9,8 +8,8 @@ use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_s2s::PangolinChain;
-use component_pangoro_s2s::PangoroChain;
+use component_pangolin_s2s::{PangolinChain, PangolinRelayStrategy};
+use component_pangoro_s2s::{PangoroChain, PangoroRelayStrategy};
 
 use crate::bus::PangolinPangoroBus;
 use crate::chains::pangolin::{
@@ -292,7 +291,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                         <PangolinMessagesToPangoro as SubstrateMessageLane>::MessageLane,
                     >(&lane),
                 ),
-                relay_strategy: AltruisticStrategy,
+                relay_strategy: PangolinRelayStrategy::new(),
             })
             .map_err(|e| anyhow::format_err!("{}", e))
             .boxed();
@@ -311,7 +310,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                         <PangoroMessagesToPangolin as SubstrateMessageLane>::MessageLane,
                     >(&lane),
                 ),
-                relay_strategy: AltruisticStrategy,
+                relay_strategy: PangoroRelayStrategy::new(),
             })
             .map_err(|e| anyhow::format_err!("{}", e))
             .boxed();

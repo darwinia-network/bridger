@@ -2,6 +2,7 @@ use codec::Encode;
 use common_primitives::AccountId;
 use common_primitives::Balance;
 use dp_fee::Relayer;
+use sp_core::storage::StorageKey;
 
 mod common;
 
@@ -10,14 +11,16 @@ async fn test_read_assigned_relayers() {
     let client = common::client().await.unwrap();
     let assigned_relayers: Option<Vec<Relayer<AccountId, Balance>>> = client
         .storage_value(
-            bp_runtime::storage_map_final_key_blake2_128concat(
-                "feeMarket",
-                "assignedRelayersStorage",
-                &[],
+            StorageKey(
+                common::storage_prefix(
+                    "FeeMarket".as_bytes(),
+                    "AssignedRelayersStorage".as_bytes(),
+                )
+                .to_vec(),
             ),
             None,
         )
         .await
         .unwrap();
-    println!("{:?}", assigned_relayers);
+    assert!(assigned_relayers.is_some());
 }

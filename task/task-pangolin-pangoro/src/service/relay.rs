@@ -1,7 +1,10 @@
+use common_primitives::AccountId;
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
+use sp_core::Pair;
+use sp_core::Public;
 use substrate_relay_helper::messages_lane::{MessagesRelayParams, SubstrateMessageLane};
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
 
@@ -291,7 +294,10 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                         <PangolinMessagesToPangoro as SubstrateMessageLane>::MessageLane,
                     >(&lane),
                 ),
-                relay_strategy: PangolinRelayStrategy::new(pangolin_client.clone()),
+                relay_strategy: PangolinRelayStrategy::new(
+                    pangolin_client.clone(),
+                    AccountId::from(pangolin_sign.public().0),
+                ),
             })
             .map_err(|e| anyhow::format_err!("{}", e))
             .boxed();
@@ -310,7 +316,10 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                         <PangoroMessagesToPangolin as SubstrateMessageLane>::MessageLane,
                     >(&lane),
                 ),
-                relay_strategy: PangoroRelayStrategy::new(pangoro_client.clone()),
+                relay_strategy: PangoroRelayStrategy::new(
+                    pangoro_client.clone(),
+                    AccountId::from(pangoro_sign.public().0),
+                ),
             })
             .map_err(|e| anyhow::format_err!("{}", e))
             .boxed();

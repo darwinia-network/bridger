@@ -490,7 +490,7 @@ dependencies = [
 [[package]]
 name = "bp-header-chain"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "finality-grandpa",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -505,7 +505,7 @@ dependencies = [
 [[package]]
 name = "bp-message-dispatch"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "bp-runtime",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -516,7 +516,7 @@ dependencies = [
 [[package]]
 name = "bp-messages"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "bitvec",
  "bp-runtime",
@@ -531,7 +531,7 @@ dependencies = [
 [[package]]
 name = "bp-runtime"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "hash-db",
@@ -548,7 +548,7 @@ dependencies = [
 [[package]]
 name = "bp-test-utils"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "bp-header-chain",
  "ed25519-dalek",
@@ -577,7 +577,7 @@ dependencies = [
 [[package]]
 name = "bridge-primitives"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -595,7 +595,7 @@ dependencies = [
 [[package]]
 name = "bridge-runtime-common"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "bp-message-dispatch",
  "bp-messages",
@@ -644,7 +644,7 @@ checksum = "771fe0050b883fcc3ea2359b1a96bcfbc090b7116eae7c3c512c7a083fdf23d3"
 [[package]]
 name = "bsc-primitives"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "ethbloom",
@@ -823,7 +823,7 @@ dependencies = [
 [[package]]
 name = "common-primitives"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -890,6 +890,7 @@ version = "0.4.7"
 dependencies = [
  "anyhow",
  "async-trait",
+ "bp-messages",
  "bp-runtime",
  "bridge-primitives 2.6.8",
  "bridge-traits",
@@ -900,6 +901,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "futures-test",
  "headers-relay",
+ "log",
  "messages-relay",
  "pallet-transaction-payment",
  "pangolin-constants",
@@ -941,7 +943,10 @@ dependencies = [
 name = "component-pangoro-s2s"
 version = "0.4.7"
 dependencies = [
+ "anyhow",
  "async-trait",
+ "bp-messages",
+ "bp-runtime",
  "bridge-primitives 2.6.8",
  "bridge-traits",
  "common-primitives",
@@ -949,6 +954,7 @@ dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "headers-relay",
+ "log",
  "messages-relay",
  "pallet-transaction-payment",
  "pangoro-constants",
@@ -1241,7 +1247,7 @@ dependencies = [
 [[package]]
 name = "darwinia-balances"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-balances-rpc-runtime-api",
  "darwinia-support",
@@ -1257,7 +1263,7 @@ dependencies = [
 [[package]]
 name = "darwinia-balances-rpc-runtime-api"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-support",
  "parity-scale-codec",
@@ -1269,7 +1275,7 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-bsc"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "bsc-primitives",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -1284,7 +1290,7 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-ethereum"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "blake2-rfc",
@@ -1339,7 +1345,7 @@ dependencies = [
 [[package]]
 name = "darwinia-claims"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "darwinia-support",
@@ -1357,7 +1363,7 @@ dependencies = [
 [[package]]
 name = "darwinia-democracy"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -1372,7 +1378,7 @@ dependencies = [
 [[package]]
 name = "darwinia-elections-phragmen"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -1389,7 +1395,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "darwinia-balances",
@@ -1417,7 +1423,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-dispatch"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-evm",
  "darwinia-support",
@@ -1432,7 +1438,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-misc"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-evm",
  "darwinia-support",
@@ -1453,7 +1459,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-simple"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "dp-evm",
  "evm",
@@ -1465,7 +1471,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-transfer"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "darwinia-evm",
@@ -1490,7 +1496,7 @@ dependencies = [
 [[package]]
 name = "darwinia-fee-market"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "bitvec",
  "bp-messages",
@@ -1513,7 +1519,7 @@ dependencies = [
 [[package]]
 name = "darwinia-fee-market-rpc-runtime-api"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "parity-scale-codec",
  "serde 1.0.130",
@@ -1524,7 +1530,7 @@ dependencies = [
 [[package]]
 name = "darwinia-header-mmr"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "ckb-merkle-mountain-range",
  "darwinia-header-mmr-rpc-runtime-api",
@@ -1544,7 +1550,7 @@ dependencies = [
 [[package]]
 name = "darwinia-header-mmr-rpc-runtime-api"
 version = "2.6.6"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-support",
  "parity-scale-codec",
@@ -1557,7 +1563,7 @@ dependencies = [
 [[package]]
 name = "darwinia-relay-authorities"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-relay-primitives",
  "darwinia-support",
@@ -1572,7 +1578,7 @@ dependencies = [
 [[package]]
 name = "darwinia-relay-primitives"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "parity-scale-codec",
@@ -1583,7 +1589,7 @@ dependencies = [
 [[package]]
 name = "darwinia-relayer-game"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-relay-primitives",
  "darwinia-support",
@@ -1598,7 +1604,7 @@ dependencies = [
 [[package]]
 name = "darwinia-staking"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-staking-rpc-runtime-api",
  "darwinia-support",
@@ -1623,7 +1629,7 @@ dependencies = [
 [[package]]
 name = "darwinia-staking-rpc-runtime-api"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-support",
  "parity-scale-codec",
@@ -1635,7 +1641,7 @@ dependencies = [
 [[package]]
 name = "darwinia-support"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "bp-messages",
@@ -1659,7 +1665,7 @@ dependencies = [
 [[package]]
 name = "darwinia-vesting"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -1747,7 +1753,7 @@ checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 [[package]]
 name = "dp-asset"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "ethereum-primitives",
  "parity-scale-codec",
@@ -1758,7 +1764,7 @@ dependencies = [
 [[package]]
 name = "dp-consensus"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "ethereum",
  "parity-scale-codec",
@@ -1772,7 +1778,7 @@ dependencies = [
 [[package]]
 name = "dp-contract"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "dp-asset",
  "ethabi 13.0.0",
@@ -1784,7 +1790,7 @@ dependencies = [
 [[package]]
 name = "dp-evm"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "evm",
  "impl-trait-for-tuples",
@@ -1797,7 +1803,7 @@ dependencies = [
 [[package]]
 name = "dp-fee"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "bp-messages",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -1809,7 +1815,7 @@ dependencies = [
 [[package]]
 name = "dp-storage"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 
 [[package]]
 name = "dtoa"
@@ -1820,7 +1826,7 @@ checksum = "56899898ce76aaf4a0f24d914c97ea6ed976d42fec6ad33fcbb0a1103e07b2b0"
 [[package]]
 name = "dvm-ethereum"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-evm",
  "darwinia-support",
@@ -1849,7 +1855,7 @@ dependencies = [
 [[package]]
 name = "dvm-rpc-runtime-api"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-evm",
  "darwinia-support",
@@ -2067,7 +2073,7 @@ dependencies = [
 [[package]]
 name = "ethereum-primitives"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "ethash",
@@ -2215,7 +2221,7 @@ dependencies = [
 [[package]]
 name = "finality-relay"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "anyhow",
  "async-std",
@@ -2785,7 +2791,7 @@ dependencies = [
 [[package]]
 name = "from-ethereum-issuing"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "darwinia-bridge-ethereum",
@@ -2809,7 +2815,7 @@ dependencies = [
 [[package]]
 name = "from-substrate-issuing"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "bp-messages",
@@ -3162,7 +3168,7 @@ dependencies = [
 [[package]]
 name = "headers-relay"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "anyhow",
  "async-std",
@@ -4163,7 +4169,7 @@ checksum = "71d96e3f3c0b6325d8ccd83c33b28acb183edcb6c67938ba104ec546854b0882"
 [[package]]
 name = "merkle-patricia-trie"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "hashbrown 0.9.1",
  "keccak-hash",
@@ -4186,7 +4192,7 @@ dependencies = [
 [[package]]
 name = "messages-relay"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "anyhow",
  "async-std",
@@ -4645,7 +4651,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-dispatch"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "bp-message-dispatch",
  "bp-runtime",
@@ -4661,7 +4667,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-grandpa"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "bp-header-chain",
  "bp-runtime",
@@ -4682,7 +4688,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-messages"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "bitvec",
  "bp-message-dispatch",
@@ -5244,7 +5250,7 @@ dependencies = [
 [[package]]
 name = "pangolin-constants"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "common-primitives",
  "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -5253,7 +5259,7 @@ dependencies = [
 [[package]]
 name = "pangolin-runtime"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "bp-message-dispatch",
@@ -5364,7 +5370,7 @@ dependencies = [
 [[package]]
 name = "pangolin-runtime-system-params"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -5375,7 +5381,7 @@ dependencies = [
 [[package]]
 name = "pangoro-constants"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "common-primitives",
  "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -5384,7 +5390,7 @@ dependencies = [
 [[package]]
 name = "pangoro-runtime"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "bp-header-chain",
@@ -5457,7 +5463,7 @@ dependencies = [
 [[package]]
 name = "pangoro-runtime-system-params"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -6232,7 +6238,7 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 [[package]]
 name = "relay-substrate-client"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "async-std",
  "async-trait",
@@ -6268,7 +6274,7 @@ dependencies = [
 [[package]]
 name = "relay-utils"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "ansi_term 0.12.1",
  "anyhow",
@@ -9111,7 +9117,7 @@ dependencies = [
 [[package]]
 name = "substrate-relay-helper"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#6531c1ffce443bd5e119a03c9ddee93803513b92"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?branch=darwinia-feemarket-strategy#3e794c390135b1c782efe30f5c96a75d2e678f85"
 dependencies = [
  "anyhow",
  "async-std",
@@ -9667,7 +9673,7 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 [[package]]
 name = "to-ethereum-backing"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "darwinia-relay-primitives",
@@ -9688,7 +9694,7 @@ dependencies = [
 [[package]]
 name = "to-substrate-backing"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "array-bytes",
  "bp-messages",
@@ -9712,7 +9718,7 @@ dependencies = [
 [[package]]
 name = "to-tron-backing"
 version = "2.6.8"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#ffeb1df93117c502dd78a03ef7fb4e19000f7743"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=darwinia-feemarket-strategy#c105f94f47581e97742ba8e7a337128cf9f5589f"
 dependencies = [
  "darwinia-support",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",

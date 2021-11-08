@@ -7,7 +7,6 @@ use messages_relay::message_lane_loop::{
 };
 use messages_relay::relay_strategy::{RelayReference, RelayStrategy};
 use relay_substrate_client::Client;
-use sp_core::storage::StorageKey;
 
 use crate::api::PangoroApi;
 use crate::PangoroChain;

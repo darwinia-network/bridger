@@ -4,7 +4,6 @@ use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
 use sp_core::Pair;
-use sp_core::Public;
 use substrate_relay_helper::messages_lane::{MessagesRelayParams, SubstrateMessageLane};
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
 

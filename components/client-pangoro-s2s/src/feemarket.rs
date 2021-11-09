@@ -26,9 +26,8 @@ impl PangoroRelayStrategy {
     }
 }
 
-#[async_trait::async_trait]
-impl RelayStrategy for PangoroRelayStrategy {
-    async fn decide<
+impl PangoroRelayStrategy {
+    pub async fn handle<
         P: MessageLane,
         SourceClient: MessageLaneSourceClient<P>,
         TargetClient: MessageLaneTargetClient<P>,
@@ -36,20 +35,30 @@ impl RelayStrategy for PangoroRelayStrategy {
         &self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> bool {
+        log::trace!(
+            "[Pangoro] Determine whether to relay for nonce: {}",
+            reference.nonce
+        );
         let nonce = &reference.nonce;
         let order = self
             .api
             .order(bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
             .await
             .map_err(|e| {
-                log::error!("Failed to query order: {:?}", e);
+                log::error!("[Pangoro] Failed to query order: {:?}", e);
             })
             .unwrap_or(None);
 
-        // If the order is not exists. Only one possibility,
-        // You are too far behind. so, you can skip this nonce directly
+        // If the order is not exists.
+        // 1. You are too behind.
+        // 2. The network question
+        // So, you can skip this currently
         // Related: https://github.com/darwinia-network/darwinia-common/blob/90add536ed320ec7e17898e695c65ee9d7ce79b0/frame/fee-market/src/lib.rs?#L177
         if order.is_none() {
+            log::trace!(
+                "[Pangoro] The order not found by nonce: {}",
+                reference.nonce
+            );
             return false;
         }
         // -----
@@ -84,7 +93,7 @@ impl RelayStrategy for PangoroRelayStrategy {
             .await
             .map_err(|e| {
                 log::error!(
-                    "Failed to query latest block, unable to decide whether to participate: {:?}",
+                    "[Pangoro] Failed to query latest block, unable to decide whether to participate: {:?}",
                     e
                 );
             })
@@ -102,6 +111,30 @@ impl RelayStrategy for PangoroRelayStrategy {
         if latest_block_number > maximum_timeout {
             return true;
         }
+        log::trace!(
+            "[Pangoro] Decided not to relay this nonce : {}",
+            reference.nonce
+        );
         false
+    }
+}
+
+#[async_trait::async_trait]
+impl RelayStrategy for PangoroRelayStrategy {
+    async fn decide<
+        P: MessageLane,
+        SourceClient: MessageLaneSourceClient<P>,
+        TargetClient: MessageLaneTargetClient<P>,
+    >(
+        &self,
+        reference: &mut RelayReference<P, SourceClient, TargetClient>,
+    ) -> bool {
+        let decide = self.handle(reference).await;
+        log::info!(
+            "[Pangoro] About nonce {} decide is {}",
+            reference.nonce,
+            decide
+        );
+        decide
     }
 }

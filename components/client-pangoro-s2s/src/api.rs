@@ -52,7 +52,7 @@ impl PangoroApi {
                 bp_runtime::storage_map_final_key_blake2_128concat(
                     "FeeMarket",
                     "Orders",
-                    &vec![laned_id.encode(), message_nonce.encode()].encode(),
+                    (laned_id, message_nonce).encode().as_slice(),
                 ),
                 None,
             )

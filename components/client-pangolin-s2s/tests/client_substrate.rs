@@ -1,8 +1,4 @@
-use std::str::FromStr;
-
 use sp_core::Pair;
-
-use component_pangolin_s2s::PangolinChain;
 
 mod common;
 

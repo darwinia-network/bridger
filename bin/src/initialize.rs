@@ -25,6 +25,8 @@ fn init_log() {
                 "task-darwinia-ethereum=trace",
                 "task-pangolin-ropsten=trace",
                 "task-pangolin-pangoro=trace",
+                "component_pangoro_s2s=trace",
+                "component_pangolin_s2s=trace",
             ]
             .join(","),
         );

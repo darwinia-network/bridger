@@ -46,8 +46,10 @@ impl RelayStrategy for PangolinRelayStrategy {
             })
             .unwrap_or(None);
 
-        // If the order is not exists. Only one possibility,
-        // You are too far behind. so, you can skip this nonce directly
+        // If the order is not exists.
+        // 1. You are too behind.
+        // 2. The network question
+        // So, you can skip this currently
         // Related: https://github.com/darwinia-network/darwinia-common/blob/90add536ed320ec7e17898e695c65ee9d7ce79b0/frame/fee-market/src/lib.rs?#L177
         if order.is_none() {
             return false;

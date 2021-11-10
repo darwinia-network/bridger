@@ -190,7 +190,7 @@ impl DarwiniaServiceRunner {
                     // todo: write log
                 }
 
-                if retry_times > 10 {
+                if retry_times > 3 {
                     // todo: write log
                     log::error!(
                         target: PangolinRopstenTask::NAME,
@@ -198,6 +198,7 @@ impl DarwiniaServiceRunner {
                         retry_times,
                         header.number
                     );
+                    tracker_raw.finish(header.number as usize)?;
                     retry_times = 0;
                     continue;
                 }

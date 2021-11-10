@@ -200,7 +200,7 @@ impl DarwiniaServiceRunner {
                     // todo: write log
                 }
 
-                if retry_times > 10 {
+                if retry_times > 3 {
                     // todo: write log
                     log::error!(
                         target: DarwiniaEthereumTask::NAME,
@@ -209,6 +209,7 @@ impl DarwiniaServiceRunner {
                         header.number
                     );
                     retry_times = 0;
+                    tracker_raw.finish(header.number as usize)?;
                     continue;
                 }
                 tokio::time::sleep(std::time::Duration::from_secs(30)).await;

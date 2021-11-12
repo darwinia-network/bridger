@@ -4,8 +4,9 @@ use common_primitives::AccountId;
 use common_primitives::Balance;
 use common_primitives::BlockNumber;
 use dp_fee::{Order, Relayer};
-use relay_substrate_client::Client;
+use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
 use sp_core::storage::StorageKey;
+use sp_core::{Bytes, Pair};
 
 use crate::{patch, PangoroChain};
 
@@ -21,6 +22,10 @@ impl PangoroApi {
 }
 
 impl PangoroApi {
+    pub async fn client(&self) -> &Client<PangoroChain> {
+        &self.client
+    }
+
     /// Query assigned relayers
     pub async fn assigned_relayers(
         &self,
@@ -64,5 +69,59 @@ impl PangoroApi {
         &self,
     ) -> anyhow::Result<common_primitives::BlockNumber> {
         Ok(self.client.best_finalized_header_number().await?)
+    }
+
+    /// Update relay fee
+    pub async fn update_relay_fee(
+        &self,
+        signer: <PangoroChain as TransactionSignScheme>::AccountKeyPair,
+        amount: <PangoroChain as ChainBase>::Balance,
+    ) -> anyhow::Result<()> {
+        let signer_id = (*signer.public().as_array_ref()).into();
+        let genesis_hash = self.client.genesis_hash().clone();
+        self.client
+            .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
+                Bytes(
+                    PangoroChain::sign_transaction(
+                        genesis_hash,
+                        &signer,
+                        relay_substrate_client::TransactionEra::immortal(),
+                        UnsignedTransaction::new(
+                            pangoro_runtime::FeeMarketCall::update_relay_fee(amount).into(),
+                            transaction_nonce,
+                        ),
+                    )
+                    .encode(),
+                )
+            })
+            .await?;
+        Ok(())
+    }
+
+    /// Update locked collateral
+    pub async fn update_locked_collateral(
+        &self,
+        signer: <PangoroChain as TransactionSignScheme>::AccountKeyPair,
+        amount: <PangoroChain as ChainBase>::Balance,
+    ) -> anyhow::Result<()> {
+        let signer_id = (*signer.public().as_array_ref()).into();
+        let genesis_hash = self.client.genesis_hash().clone();
+        self.client
+            .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
+                Bytes(
+                    PangoroChain::sign_transaction(
+                        genesis_hash,
+                        &signer,
+                        relay_substrate_client::TransactionEra::immortal(),
+                        UnsignedTransaction::new(
+                            pangoro_runtime::FeeMarketCall::update_locked_collateral(amount).into(),
+                            transaction_nonce,
+                        ),
+                    )
+                    .encode(),
+                )
+            })
+            .await?;
+        Ok(())
     }
 }

@@ -96,6 +96,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "array-init"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23589ecb866b460d3a0f1278834750268c607e8e28a1b982c907219f3178cd72"
+dependencies = [
+ "nodrop",
+]
+
+[[package]]
 name = "array_tool"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -995,6 +1004,21 @@ dependencies = [
  "microkv",
  "once_cell",
  "serde 1.0.130",
+]
+
+[[package]]
+name = "component-subscan"
+version = "0.4.7"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bridge-traits",
+ "log",
+ "reqwest",
+ "serde 1.0.130",
+ "serde-aux",
+ "serde-hex",
+ "serde_json",
 ]
 
 [[package]]
@@ -2472,7 +2496,7 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "serde 1.0.130",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-arithmetic 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2498,7 +2522,7 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "serde 1.0.130",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
@@ -2525,7 +2549,7 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "serde 1.0.130",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -2551,7 +2575,7 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "serde 1.0.130",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -3793,7 +3817,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8891bd853eff90e33024195d79d578dc984c82f9e0715fcd2b525a0c19d52811"
 dependencies = [
  "parity-util-mem",
- "smallvec",
+ "smallvec 1.6.1",
 ]
 
 [[package]]
@@ -3853,7 +3877,7 @@ dependencies = [
  "parity-multiaddr",
  "parking_lot 0.11.2",
  "pin-project 1.0.8",
- "smallvec",
+ "smallvec 1.6.1",
  "wasm-timer",
 ]
 
@@ -3884,7 +3908,7 @@ dependencies = [
  "ring",
  "rw-stream-sink",
  "sha2 0.9.8",
- "smallvec",
+ "smallvec 1.6.1",
  "thiserror",
  "unsigned-varint 0.7.0",
  "void",
@@ -3902,7 +3926,7 @@ dependencies = [
  "libp2p-core",
  "log",
  "rand 0.7.3",
- "smallvec",
+ "smallvec 1.6.1",
  "void",
  "wasm-timer",
 ]
@@ -4154,6 +4178,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "maybe-uninit"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
+
+[[package]]
 name = "memchr"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4334,7 +4364,7 @@ dependencies = [
  "futures 0.3.17",
  "log",
  "pin-project 1.0.8",
- "smallvec",
+ "smallvec 1.6.1",
  "unsigned-varint 0.7.0",
 ]
 
@@ -5232,7 +5262,7 @@ dependencies = [
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "parity-scale-codec",
  "serde 1.0.130",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -5378,7 +5408,7 @@ dependencies = [
  "pangoro-runtime-system-params",
  "parity-scale-codec",
  "serde 1.0.130",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-authority-discovery",
@@ -5635,7 +5665,7 @@ dependencies = [
  "cloudabi",
  "libc",
  "redox_syscall 0.1.57",
- "smallvec",
+ "smallvec 1.6.1",
  "winapi",
 ]
 
@@ -5649,7 +5679,7 @@ dependencies = [
  "instant",
  "libc",
  "redox_syscall 0.2.10",
- "smallvec",
+ "smallvec 1.6.1",
  "winapi",
 ]
 
@@ -6809,6 +6839,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde-hex"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca37e3e4d1b39afd7ff11ee4e947efae85adfddf4841787bfa47c470e96dc26d"
+dependencies = [
+ "array-init",
+ "serde 1.0.130",
+ "smallvec 0.6.14",
+]
+
+[[package]]
 name = "serde-hjson"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7006,6 +7047,15 @@ dependencies = [
  "async-channel",
  "futures-core",
  "futures-io",
+]
+
+[[package]]
+name = "smallvec"
+version = "0.6.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b97fcaeba89edba30f044a10c6a3cc39df9c3f17d7cd829dd1446cab35f890e0"
+dependencies = [
+ "maybe-uninit",
 ]
 
 [[package]]
@@ -8455,7 +8505,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "rand 0.7.3",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-panic-handler 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8477,7 +8527,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "rand 0.7.3",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
  "sp-panic-handler 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
@@ -8500,7 +8550,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "rand 0.7.3",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "sp-panic-handler 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
@@ -8523,7 +8573,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "rand 0.7.3",
- "smallvec",
+ "smallvec 1.6.1",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
  "sp-panic-handler 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
@@ -9463,6 +9513,7 @@ dependencies = [
  "common-primitives",
  "component-pangolin-s2s",
  "component-pangoro-s2s",
+ "component-subscan",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.5)",
  "futures 0.3.17",
  "hex",
@@ -9963,7 +10014,7 @@ dependencies = [
  "serde 1.0.130",
  "serde_json",
  "sharded-slab",
- "smallvec",
+ "smallvec 1.6.1",
  "thread_local",
  "tracing",
  "tracing-core",
@@ -9981,7 +10032,7 @@ dependencies = [
  "hashbrown 0.11.2",
  "log",
  "rustc-hex",
- "smallvec",
+ "smallvec 1.6.1",
 ]
 
 [[package]]

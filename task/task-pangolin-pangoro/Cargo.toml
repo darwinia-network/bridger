@@ -60,6 +60,7 @@ messages-relay         = { git = "https://github.com/darwinia-network/parity-bri
 ## component
 component-pangolin-s2s = { path = "../../components/client-pangolin-s2s" }
 component-pangoro-s2s  = { path = "../../components/client-pangoro-s2s" }
+component-subscan      = { path = "../../components/subscan" }
 
 ## darwinia common
 common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }

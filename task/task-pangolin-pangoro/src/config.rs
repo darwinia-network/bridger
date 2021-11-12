@@ -3,6 +3,7 @@ use std::str::FromStr;
 use serde::{Deserialize, Serialize};
 
 use bridge_traits::bridge::config::{BridgeConfig, Config};
+use component_subscan::SubscanConfig;
 
 use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
@@ -11,6 +12,8 @@ pub struct PangolinPangoroConfig {
     pub pangolin: ChainInfoConfig,
     pub pangoro: ChainInfoConfig,
     pub relay: RelayConfig,
+    pub pangolin_subscan: SubscanConfig,
+    pub pangoro_subscan: SubscanConfig,
 }
 
 impl PangolinPangoroConfig {
@@ -20,6 +23,8 @@ impl PangolinPangoroConfig {
         let name = sand_name.as_ref();
         Config::store_with_namespace(name, self.pangolin.clone(), "pangolin")?;
         Config::store_with_namespace(name, self.pangoro.clone(), "pangoro")?;
+        Config::store_with_namespace(name, self.pangolin_subscan.clone(), "pangolin")?;
+        Config::store_with_namespace(name, self.pangoro_subscan.clone(), "pangoro")?;
         Config::store(name, self.relay.clone())?;
         Ok(())
     }
@@ -28,6 +33,8 @@ impl PangolinPangoroConfig {
             pangolin: ChainInfoConfig::template(),
             pangoro: ChainInfoConfig::template(),
             relay: RelayConfig::template(),
+            pangolin_subscan: SubscanConfig::template(),
+            pangoro_subscan: SubscanConfig::template(),
         }
     }
 }

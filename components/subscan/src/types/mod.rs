@@ -1,4 +1,8 @@
-pub mod common;
-pub mod general;
+pub use self::common::*;
+pub use self::general::*;
+pub use self::price::*;
+
+mod common;
+mod general;
 mod patch;
-pub mod price;
+mod price;

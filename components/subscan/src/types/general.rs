@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+use serde_hex::SerHex;
+use serde_hex::StrictPfx;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ExtrinsicsData {
@@ -105,8 +107,8 @@ pub struct Extrinsic {
     pub nonce: u64,
     #[serde(deserialize_with = "super::patch::smart_deserialize_param")]
     pub params: Vec<Param>,
-    #[serde(with = "SerHex::<StrictPfx>")]
-    pub signature: [u8],
+    // #[serde(with = "SerHex::<StrictPfx>")]
+    pub signature: String,
     pub success: bool,
 }
 
@@ -128,7 +130,7 @@ pub struct Param {
     pub name: String,
     #[serde(rename = "type")]
     pub type_: String,
-    #[serde(with = "SerHex::<StrictPfx>")]
-    pub value: [u8],
+    // #[serde(with = "SerHex::<StrictPfx>")]
+    pub value: String,
     // pub value_raw: ""
 }

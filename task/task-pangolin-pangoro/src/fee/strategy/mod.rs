@@ -1,0 +1,1 @@
+mod crazy_strategy;

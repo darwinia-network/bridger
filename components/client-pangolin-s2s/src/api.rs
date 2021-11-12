@@ -27,9 +27,7 @@ impl PangolinApi {
     }
 
     /// Query assigned relayers
-    pub async fn assigned_relayers(
-        &self,
-    ) -> anyhow::Result<Option<Vec<Relayer<AccountId, Balance>>>> {
+    pub async fn assigned_relayers(&self) -> anyhow::Result<Vec<Relayer<AccountId, Balance>>> {
         Ok(self
             .client
             .storage_value(
@@ -42,7 +40,44 @@ impl PangolinApi {
                 ),
                 None,
             )
+            .await?
+            .unwrap_or_else(|| vec![]))
+    }
+
+    /// Query all relayers
+    pub async fn relayers(&self) -> anyhow::Result<Vec<AccountId>> {
+        Ok(self
+            .client
+            .storage_value(
+                StorageKey(
+                    patch::storage_prefix("FeeMarket".as_bytes(), "Relayers".as_bytes()).to_vec(),
+                ),
+                None,
+            )
+            .await?
+            .unwrap_or_else(|| vec![]))
+    }
+
+    /// Query relayer info by account id
+    pub async fn relayer(
+        &self,
+        account: AccountId,
+    ) -> anyhow::Result<Option<Relayer<AccountId, Balance>>> {
+        Ok(self
+            .client
+            .storage_value(
+                bp_runtime::storage_map_final_key_blake2_128concat(
+                    "FeeMarket",
+                    "RelayersMap",
+                    account.encode().as_slice(),
+                ),
+                None,
+            )
             .await?)
+    }
+
+    pub async fn is_relayer(&self, account: AccountId) -> anyhow::Result<bool> {
+        self.relayer(account).await.map(|item| item.is_some())
     }
 
     /// Query order

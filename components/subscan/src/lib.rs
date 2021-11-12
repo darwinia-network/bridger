@@ -10,7 +10,7 @@ pub use self::subscan::*;
 
 mod config;
 mod subscan;
-mod types;
+pub mod types;
 
 #[derive(Clone, Debug, Default)]
 pub struct SubscanComponent {

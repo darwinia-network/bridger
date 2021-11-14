@@ -55,8 +55,9 @@ impl ExtrinsicsHandler {
         let component_darwinia = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
 
         // Config
-        let config_darwinia: DarwiniaSubxtConfig = Config::restore(PangolinRopstenTask::NAME)?;
-        let config_web3: Web3Config = Config::restore(PangolinRopstenTask::NAME)?;
+        let config_darwinia: DarwiniaSubxtConfig =
+            Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+        let config_web3: Web3Config = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
 
         // Darwinia client & accounts
         let darwinia = component_darwinia.component().await?;

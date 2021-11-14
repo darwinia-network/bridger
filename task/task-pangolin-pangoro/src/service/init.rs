@@ -32,9 +32,9 @@ impl Service for InitBridgeService {
         let mut rx = bus.rx::<PangolinPangoroMessageSend>()?;
         let mut tx = bus.tx::<PangolinPangoroMessageReceive>()?;
         let config_pangolin: ChainInfoConfig =
-            Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangolin")?;
+            Config::restore_with_namespace_unwrap(PangolinPangoroTask::NAME, "pangolin")?;
         let config_pangoro: ChainInfoConfig =
-            Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangoro")?;
+            Config::restore_with_namespace_unwrap(PangolinPangoroTask::NAME, "pangoro")?;
 
         let _greet = Self::try_task(
             &format!("{}-init-bridge", PangolinPangoroTask::NAME),

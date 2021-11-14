@@ -47,10 +47,10 @@ impl Service for RelayService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let mut rx = bus.rx::<PangolinPangoroMessageSend>()?;
         let config_pangolin: ChainInfoConfig =
-            Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangolin")?;
+            Config::restore_with_namespace_unwrap(PangolinPangoroTask::NAME, "pangolin")?;
         let config_pangoro: ChainInfoConfig =
-            Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangoro")?;
-        let config_relay: RelayConfig = Config::restore(PangolinPangoroTask::NAME)?;
+            Config::restore_with_namespace_unwrap(PangolinPangoroTask::NAME, "pangoro")?;
+        let config_relay: RelayConfig = Config::restore_unwrap(PangolinPangoroTask::NAME)?;
 
         let _greet = Self::try_task(
             &format!("{}-relay", PangolinPangoroTask::NAME),
@@ -99,6 +99,8 @@ impl Service for RelayService {
                     })
                     .join()
                     .map_err(|_| anyhow::Error::msg("Failed to join thread handle"))??;
+
+                    // bridge_relay(relay_info).await?;
                 }
                 Ok(())
             },

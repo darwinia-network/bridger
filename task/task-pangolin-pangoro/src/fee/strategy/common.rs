@@ -21,10 +21,10 @@ pub struct StrategyHelper {
 impl StrategyHelper {
     pub async fn new() -> anyhow::Result<Self> {
         let config_pangolin: ChainInfoConfig =
-            Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangolin")?;
+            Config::restore_with_namespace_unwrap(PangolinPangoroTask::NAME, "pangolin")?;
         let config_pangoro: ChainInfoConfig =
-            Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangoro")?;
-        let config_relay: RelayConfig = Config::restore(PangolinPangoroTask::NAME)?;
+            Config::restore_with_namespace_unwrap(PangolinPangoroTask::NAME, "pangoro")?;
+        let config_relay: RelayConfig = Config::restore_unwrap(PangolinPangoroTask::NAME)?;
 
         let (pangolin_chain, pangoro_chain) = (
             config_pangolin

@@ -66,7 +66,7 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
 
     let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<DarwiniaEthereumTask>()?;
     let thegraph_liketh = component_thegraph_liketh.component().await?;
-    let task_config: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let task_config: TaskConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
     // Darwinia client

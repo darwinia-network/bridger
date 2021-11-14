@@ -1,6 +1,7 @@
-use bridge_traits::bridge::task::BridgeSand;
 use common_primitives::AccountId;
 use sp_core::Pair;
+
+use bridge_traits::bridge::task::BridgeSand;
 
 use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
@@ -57,6 +58,11 @@ impl CrazyStrategy {
         // Nice (
         // RISK: If the cost is not judged, it may be a negative benefit.
         let new_fee = min_fee - 1;
+        log::info!(
+            target: PangolinPangoroTask::NAME,
+            "[crazy] Update pangolin fee: {}",
+            new_fee
+        );
         pangolin_api
             .update_relay_fee(self.helper.pangolin_signer().clone(), new_fee)
             .await?;
@@ -91,6 +97,11 @@ impl CrazyStrategy {
         // Nice (
         // RISK: If the cost is not judged, it may be a negative benefit.
         let new_fee = min_fee - 1;
+        log::info!(
+            target: PangolinPangoroTask::NAME,
+            "[crazy] Update pangoro fee: {}",
+            new_fee
+        );
         pangoro_api
             .update_relay_fee(self.helper.pangoro_signer().clone(), new_fee)
             .await?;

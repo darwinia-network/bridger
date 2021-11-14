@@ -29,7 +29,8 @@ impl BridgeComponent<TheGraphLikeEthConfig, TheGraphLikeEth> for TheGraphLikeEth
     where
         Self: Sized,
     {
-        let config: TheGraphLikeEthConfig = Config::restore_with_namespace(T::NAME, namespace)?;
+        let config: TheGraphLikeEthConfig =
+            Config::restore_with_namespace_unwrap(T::NAME, namespace)?;
         Ok(Self::new(config))
     }
 

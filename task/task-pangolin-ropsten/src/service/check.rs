@@ -66,7 +66,7 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
 
     let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
     let thegraph_liketh = component_thegraph_liketh.component().await?;
-    let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let task_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
 
     let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
     // Darwinia client

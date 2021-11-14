@@ -35,7 +35,7 @@ impl ShadowComponent {
 #[async_trait::async_trait]
 impl BridgeComponent<ShadowConfig, Shadow> for ShadowComponent {
     fn restore_with_namespace<T: BridgeSand>(namespace: String) -> BridgeResult<Self> {
-        let config: ShadowConfig = Config::restore_with_namespace(T::NAME, &namespace)?;
+        let config: ShadowConfig = Config::restore_with_namespace_unwrap(T::NAME, &namespace)?;
         let component_http_client =
             HttpClientComponent::restore_with_namespace::<T>(namespace.clone())?;
         let component_ethereum = EthereumComponent::restore_with_namespace::<T>(namespace)?;

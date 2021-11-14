@@ -14,7 +14,7 @@ pub async fn keys(
     _bus: &DarwiniaEthereumBus,
     _param: serde_json::Value,
 ) -> anyhow::Result<TaskTerminal> {
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     let client = ClientBuilder::<DarwiniaRuntime>::new()
         .set_url(config_darwinia.endpoint)

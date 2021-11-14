@@ -22,7 +22,7 @@ impl Web3Component {
 #[async_trait::async_trait]
 impl BridgeComponent<Web3Config, Web3<Http>> for Web3Component {
     fn restore_with_namespace<T: BridgeSand>(namespace: String) -> BridgeResult<Self> {
-        let config: Web3Config = Config::restore_with_namespace(T::NAME, namespace)?;
+        let config: Web3Config = Config::restore_with_namespace_unwrap(T::NAME, namespace)?;
         Ok(Self::new(config))
     }
 

@@ -12,8 +12,11 @@ pub struct PangolinPangoroConfig {
     pub pangolin: ChainInfoConfig,
     pub pangoro: ChainInfoConfig,
     pub relay: RelayConfig,
-    pub pangolin_subscan: SubscanConfig,
-    pub pangoro_subscan: SubscanConfig,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pangolin_subscan: Option<SubscanConfig>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pangoro_subscan: Option<SubscanConfig>,
+    pub task: TaskConfig,
 }
 
 impl PangolinPangoroConfig {
@@ -23,8 +26,13 @@ impl PangolinPangoroConfig {
         let name = sand_name.as_ref();
         Config::store_with_namespace(name, self.pangolin.clone(), "pangolin")?;
         Config::store_with_namespace(name, self.pangoro.clone(), "pangoro")?;
-        Config::store_with_namespace(name, self.pangolin_subscan.clone(), "pangolin")?;
-        Config::store_with_namespace(name, self.pangoro_subscan.clone(), "pangoro")?;
+        if let Some(pangolin_subscan) = &self.pangolin_subscan {
+            Config::store_with_namespace(name, pangolin_subscan.clone(), "pangolin")?;
+        }
+        if let Some(pangoro_subscan) = &self.pangoro_subscan {
+            Config::store_with_namespace(name, pangoro_subscan.clone(), "pangoro")?;
+        }
+        Config::store(name, self.task.clone())?;
         Config::store(name, self.relay.clone())?;
         Ok(())
     }
@@ -33,10 +41,37 @@ impl PangolinPangoroConfig {
             pangolin: ChainInfoConfig::template(),
             pangoro: ChainInfoConfig::template(),
             relay: RelayConfig::template(),
-            pangolin_subscan: SubscanConfig::template(),
-            pangoro_subscan: SubscanConfig::template(),
+            pangolin_subscan: Some(SubscanConfig::template()),
+            pangoro_subscan: Some(SubscanConfig::template()),
+            task: TaskConfig::template(),
         }
     }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct TaskConfig {
+    pub interval_update_fee: u64,
+    pub update_fee_strategy: UpdateFeeStrategyType,
+}
+
+impl BridgeConfig for TaskConfig {
+    fn marker() -> &'static str {
+        "config-task-pangolin-pangoro"
+    }
+
+    fn template() -> Self {
+        Self {
+            interval_update_fee: 60,
+            update_fee_strategy: UpdateFeeStrategyType::Nothing,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, strum::EnumString)]
+pub enum UpdateFeeStrategyType {
+    Nothing,
+    Crazy,
+    Reasonable,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

@@ -40,3 +40,17 @@ create_relayers_fund_accounts = false
 no_prometheus = false
 prometheus_host = "127.0.0.1"
 prometheus_port = 9616
+
+[pangolin_subscan]
+endpoint = "https://pangolin.api.subscan.io"
+token = "12345abcde"
+timeout = 3000
+
+[pangoro_subscan]
+endpoint = "https://pangoro.api.subscan.io"
+token = "12345abcde"
+timeout = 3000
+
+[task]
+interval_update_fee = 60
+update_fee_strategy = "Nothing"

@@ -19,7 +19,8 @@ impl DarwiniaSubxtComponent {
 #[async_trait::async_trait]
 impl BridgeComponent<DarwiniaSubxtConfig, Darwinia> for DarwiniaSubxtComponent {
     fn restore_with_namespace<T: BridgeSand>(namespace: String) -> BridgeResult<Self> {
-        let config: DarwiniaSubxtConfig = Config::restore_with_namespace(T::NAME, namespace)?;
+        let config: DarwiniaSubxtConfig =
+            Config::restore_with_namespace_unwrap(T::NAME, namespace)?;
         Ok(Self::new(config))
     }
 

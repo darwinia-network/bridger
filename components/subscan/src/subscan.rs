@@ -23,12 +23,25 @@ impl Subscan {
 }
 
 impl Subscan {
+    pub fn endpoint(mut self, endpoint: impl AsRef<str>) -> Self {
+        self.endpoint = endpoint.as_ref().to_string();
+        self
+    }
+
+    pub fn token(mut self, token: impl AsRef<str>) -> Self {
+        self.token = token.as_ref().to_string();
+        self
+    }
+}
+
+impl Subscan {
     async fn _post<T: serde::de::DeserializeOwned>(
         &self,
         api: impl AsRef<str>,
         data_json_string: impl AsRef<str>,
     ) -> anyhow::Result<T> {
         let api = format!("{}{}", self.endpoint, api.as_ref());
+        log::trace!(target: "subscan", "POST {} WITH DATA: \n{}", api, data_json_string.as_ref());
         Ok(self
             .http
             .post(api)

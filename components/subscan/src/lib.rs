@@ -29,7 +29,7 @@ impl BridgeComponent<SubscanConfig, Subscan> for SubscanComponent {
     where
         Self: Sized,
     {
-        let config: SubscanConfig = Config::restore_with_namespace(T::NAME, &namespace)?;
+        let config: SubscanConfig = Config::restore_with_namespace_unwrap(T::NAME, &namespace)?;
         Ok(Self::new(config))
     }
 

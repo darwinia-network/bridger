@@ -34,8 +34,11 @@ impl BridgeComponent<SubscanConfig, Subscan> for SubscanComponent {
     }
 
     async fn component(&self) -> anyhow::Result<Subscan> {
-        let client = reqwest::Client::builder()
-            .timeout(Duration::from_secs(self.config.timeout.unwrap_or(3000)))
+        // let client = reqwest::Client::builder()
+        //     .timeout(Duration::from_secs(self.config.timeout.unwrap_or(3000)))
+        //     .build()?;
+        let client = reqwest::blocking::Client::builder()
+            .timeout(Duration::from_secs(self.config.timeout.unwrap_or(30)))
             .build()?;
         let subscan = Subscan::new(
             client,

@@ -92,21 +92,21 @@ pub struct Extrinsic {
     },
      */
     // pub account_display: null,
-    #[serde(with = "SerHex::<StrictPfx>")]
-    pub account_id: [u8; 32],
+    // #[serde(with = "SerHex::<StrictPfx>")]
+    // pub account_id: [u8; 32],
     // pub account_index: "",
     pub block_num: u32,
     pub block_timestamp: u64,
     pub call_module: String,
     pub call_module_function: String,
-    #[serde(with = "SerHex::<StrictPfx>")]
-    pub extrinsic_hash: [u8; 32],
+    // #[serde(with = "SerHex::<StrictPfx>")]
+    // pub extrinsic_hash: [u8; 32],
     pub extrinsic_index: String,
     #[serde(deserialize_with = "serde_aux::field_attributes::deserialize_number_from_string")]
     pub fee: u128,
     pub nonce: u64,
-    #[serde(deserialize_with = "super::patch::smart_deserialize_param")]
-    pub params: Vec<Param>,
+    // #[serde(deserialize_with = "super::patch::smart_deserialize_param")]
+    // pub params: Vec<Param>,
     // #[serde(with = "SerHex::<StrictPfx>")]
     pub signature: String,
     pub success: bool,

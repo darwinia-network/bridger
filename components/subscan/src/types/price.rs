@@ -21,6 +21,7 @@ pub struct OpenPrice {
         }
     }
      */
+    #[serde(deserialize_with = "serde_aux::field_attributes::deserialize_number_from_string")]
     pub price: f64,
     pub time: u64,
     pub height: u32,
@@ -29,6 +30,7 @@ pub struct OpenPrice {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct OpenPriceRecord {
+    #[serde(deserialize_with = "serde_aux::field_attributes::deserialize_number_from_string")]
     pub price: f64,
     pub time: u64,
     pub height: u32,

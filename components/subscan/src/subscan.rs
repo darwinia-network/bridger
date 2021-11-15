@@ -1,5 +1,3 @@
-use reqwest::{Client, RequestBuilder};
-
 use crate::types::ExtrinsicsData;
 use crate::types::OpenPrice;
 use crate::types::SubscanResponse;
@@ -7,13 +5,13 @@ use crate::types::SubscanResponse;
 #[derive(Clone, Debug)]
 pub struct Subscan {
     /// HTTP Client
-    http: Client,
+    http: reqwest::blocking::Client,
     endpoint: String,
     token: String,
 }
 
 impl Subscan {
-    pub fn new(http: Client, endpoint: String, token: String) -> Self {
+    pub fn new(http: reqwest::blocking::Client, endpoint: String, token: String) -> Self {
         Self {
             http,
             endpoint,
@@ -41,17 +39,18 @@ impl Subscan {
         data_json_string: impl AsRef<str>,
     ) -> anyhow::Result<T> {
         let api = format!("{}{}", self.endpoint, api.as_ref());
-        log::trace!(target: "subscan", "POST {} WITH DATA: \n{}", api, data_json_string.as_ref());
-        Ok(self
+        log::trace!(target: "subscan", "POST {} ---> {}", api, data_json_string.as_ref());
+        let data = serde_json::from_str::<serde_json::Value>(data_json_string.as_ref())?;
+        let value = self
             .http
             .post(api)
             .header("X-API-Key", &self.token)
             .header("Content-Type", "application/json")
-            .json(data_json_string.as_ref())
-            .send()
-            .await?
-            .json()
-            .await?)
+            .json(&data)
+            .send()?
+            .text()?;
+        log::trace!(target: "subscan", "<--- {}", value);
+        Ok(serde_json::from_str(&value)?)
     }
 
     pub fn _endpoint(&self) -> &String {
@@ -64,7 +63,7 @@ impl Subscan {
         page: u32,
         row: u32,
     ) -> anyhow::Result<SubscanResponse<ExtrinsicsData>> {
-        let data = format!(r#"{{"row": {},"page": {}}}"#, row, page);
+        let data = format!(r#"{{"row": {},"page": {}, "signed": "signed"}}"#, row, page);
         self._post("/api/scan/extrinsics", data).await
     }
 

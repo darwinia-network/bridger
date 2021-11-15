@@ -4,6 +4,7 @@ use sp_runtime::{FixedPointNumber, FixedU128};
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::BridgeSand;
+use bridge_traits::error::StandardError;
 use component_subscan::{Subscan, SubscanComponent};
 
 use crate::fee::strategy::common::StrategyHelper;
@@ -25,10 +26,12 @@ impl ReasonableStrategy {
         >("pangolin".to_string())?;
         let component_subscan_pangoro =
             SubscanComponent::restore_with_namespace::<PangolinPangoroTask>("pangoro".to_string())?;
+        let subscan_pangolin = component_subcan_pangolin.component().await?;
+        let subscan_pangoro = component_subscan_pangoro.component().await?;
         Ok(Self {
             helper,
-            subscan_pangolin: component_subcan_pangolin.component().await?,
-            subscan_pangoro: component_subscan_pangoro.component().await?,
+            subscan_pangolin,
+            subscan_pangoro,
         })
     }
 }
@@ -37,15 +40,18 @@ impl ReasonableStrategy {
     async fn _pangolin_open_price(&self) -> anyhow::Result<f64> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         match self.subscan_pangolin.price(now).await?.data() {
-            Ok(v) => Ok(v.price),
-            Err(_) => {
+            Ok(Some(v)) => Ok(v.price),
+            _ => {
                 let subscan_polkadot = self
                     .subscan_pangolin
                     .clone()
                     .endpoint("https://polkadot.api.subscan.io");
                 let open_price = subscan_polkadot.price(now).await?;
                 let data = open_price.data()?;
-                Ok(data.price)
+                match data {
+                    Some(v) => Ok(v.price),
+                    None => anyhow::bail!("Can not query pangolin price"),
+                }
             }
         }
     }
@@ -53,15 +59,18 @@ impl ReasonableStrategy {
     async fn _pangoro_open_price(&self) -> anyhow::Result<f64> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         match self.subscan_pangoro.price(now).await?.data() {
-            Ok(v) => Ok(v.price),
-            Err(_) => {
+            Ok(Some(v)) => Ok(v.price),
+            _ => {
                 let subscan_darwinia = self
                     .subscan_pangoro
                     .clone()
                     .endpoint("https://darwinia.api.subscan.io");
                 let open_price = subscan_darwinia.price(now).await?;
                 let data = open_price.data()?;
-                Ok(data.price)
+                match data {
+                    Some(v) => Ok(v.price),
+                    None => anyhow::bail!("Can not query pangoro price"),
+                }
             }
         }
     }
@@ -95,13 +104,19 @@ impl UpdateFeeStrategy for ReasonableStrategy {
     async fn handle(&self) -> anyhow::Result<()> {
         let top100_pangolin = self.subscan_pangolin.extrinsics(1, 100).await?;
         let top100_pangoro = self.subscan_pangoro.extrinsics(1, 100).await?;
+        let top100_pangolin = top100_pangolin.data()?.ok_or_else(|| {
+            StandardError::Api("Can not query pangolin extrinsics data".to_string())
+        })?;
+        let top100_pangoro = top100_pangoro.data()?.ok_or_else(|| {
+            StandardError::Api("Can not query pangoro extrinsics data".to_string())
+        })?;
 
-        let max_fee_pangolin = (&top100_pangolin.data()?.extrinsics)
+        let max_fee_pangolin = (&top100_pangolin.extrinsics)
             .iter()
             .map(|item| item.fee)
             .max()
             .unwrap_or(0);
-        let max_fee_pangoro = (&top100_pangoro.data()?.extrinsics)
+        let max_fee_pangoro = (&top100_pangoro.extrinsics)
             .iter()
             .map(|item| item.fee)
             .max()

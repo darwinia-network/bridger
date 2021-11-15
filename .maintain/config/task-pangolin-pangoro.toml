@@ -44,12 +44,12 @@ prometheus_port = 9616
 [pangolin_subscan]
 endpoint = "https://pangolin.api.subscan.io"
 token = "12345abcde"
-timeout = 3000
+timeout = 30
 
 [pangoro_subscan]
 endpoint = "https://pangoro.api.subscan.io"
 token = "12345abcde"
-timeout = 3000
+timeout = 30
 
 [task]
 interval_update_fee = 60

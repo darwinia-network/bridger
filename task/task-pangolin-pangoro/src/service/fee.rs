@@ -60,6 +60,10 @@ async fn cron_update_fee(config_task: TaskConfig) -> anyhow::Result<()> {
         // .await;
 
         // futures_timer::Delay::new(std::time::Duration::from_secs(3)).await?;
+
+        std::thread::sleep(std::time::Duration::from_secs(
+            config_task.interval_update_fee,
+        ));
     }
 }
 
@@ -70,6 +74,11 @@ async fn run_update_fee(config_task: TaskConfig) -> anyhow::Result<()> {
         Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangoro")?;
     let exists_subscan_config =
         subscan_config_pangolin.is_some() && subscan_config_pangoro.is_some();
+    log::info!(
+        target: PangolinPangoroTask::NAME,
+        "Use update fee strategy: {:?}",
+        config_task.update_fee_strategy
+    );
     match config_task.update_fee_strategy {
         UpdateFeeStrategyType::Nothing => NothingStrategy.handle().await,
         UpdateFeeStrategyType::Crazy => {

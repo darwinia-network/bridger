@@ -37,12 +37,12 @@ support-keep  = { path = "../../supports/support-keep" }
 
 ## Substrate Dependencies
 
-frame-support       = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-rc1" }
-sp-core             = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-rc1" }
-sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-rc1" }
-sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-rc1" }
-sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-rc1" }
-sp-version          = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-rc1" }
+frame-support       = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+sp-core             = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+sp-version          = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
 
 ## bridge common
 

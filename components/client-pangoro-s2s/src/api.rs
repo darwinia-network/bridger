@@ -38,7 +38,7 @@ impl PangoroApi {
                 None,
             )
             .await?
-            .unwrap_or_else(|| vec![]))
+            .unwrap_or_else(Vec::new))
     }
 
     /// Query order
@@ -71,7 +71,7 @@ impl PangoroApi {
                 None,
             )
             .await?
-            .unwrap_or_else(|| vec![]))
+            .unwrap_or_else(Vec::new))
     }
 
     /// Query relayer info by account id
@@ -110,7 +110,7 @@ impl PangoroApi {
         amount: <PangoroChain as ChainBase>::Balance,
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
-        let genesis_hash = self.client.genesis_hash().clone();
+        let genesis_hash = *self.client.genesis_hash();
         self.client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
                 Bytes(
@@ -137,7 +137,7 @@ impl PangoroApi {
         amount: <PangoroChain as ChainBase>::Balance,
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
-        let genesis_hash = self.client.genesis_hash().clone();
+        let genesis_hash = *self.client.genesis_hash();
         self.client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
                 Bytes(

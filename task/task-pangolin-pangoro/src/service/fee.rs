@@ -1,17 +1,12 @@
-use bridge_traits::bridge::config::Config;
 use lifeline::{Lifeline, Service, Task};
-use relay_substrate_client::TransactionSignScheme;
 
+use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_s2s::api::PangolinApi;
-use component_pangolin_s2s::PangolinChain;
-use component_pangoro_s2s::api::PangoroApi;
-use component_pangoro_s2s::PangoroChain;
 use component_subscan::SubscanConfig;
 
 use crate::bus::PangolinPangoroBus;
-use crate::config::{ChainInfoConfig, RelayConfig, TaskConfig, UpdateFeeStrategyType};
+use crate::config::{TaskConfig, UpdateFeeStrategyType};
 use crate::fee::strategy::{CrazyStrategy, ReasonableStrategy};
 use crate::fee::UpdateFeeStrategy;
 use crate::task::PangolinPangoroTask;
@@ -33,7 +28,7 @@ impl Service for UpdateFeeService {
             async move {
                 let config_task: TaskConfig = Config::restore_unwrap(PangolinPangoroTask::NAME)?;
                 std::thread::spawn(move || {
-                    futures::executor::block_on(cron_update_fee(config_task.clone()))
+                    futures::executor::block_on(cron_update_fee(config_task))
                 })
                 .join()
                 .map_err(|_| anyhow::Error::msg("Failed to join thread handle"))??;

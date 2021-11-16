@@ -1,7 +1,8 @@
 use crate::types::general::Param;
-use serde::de::{Error, Unexpected};
+use serde::de::Unexpected;
 use serde::{Deserialize, Deserializer};
 
+#[allow(dead_code)]
 pub(crate) fn smart_deserialize_param<'de, D>(deserializer: D) -> Result<Vec<Param>, D::Error>
 where
     D: Deserializer<'de>,
@@ -22,7 +23,7 @@ impl<'de> serde::de::Visitor<'de> for DeserializeVecParamFromStringOrVecVisitor 
     where
         E: serde::de::Error,
     {
-        serde_json::from_str(v).map_err(|e| E::invalid_value(Unexpected::Str(v), &self))
+        serde_json::from_str(v).map_err(|_e| E::invalid_value(Unexpected::Str(v), &self))
     }
 
     fn visit_newtype_struct<D>(self, deserializer: D) -> Result<Self::Value, D::Error>

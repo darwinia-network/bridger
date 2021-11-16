@@ -22,9 +22,9 @@ edition = "2018"
 bridge-traits = { path = "../../traits" }
 
 codec                  = { package = "parity-scale-codec", version = "2.0.0" }
-headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.5" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.5" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.5" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6" }
 
 
 ## Bridge dependencies

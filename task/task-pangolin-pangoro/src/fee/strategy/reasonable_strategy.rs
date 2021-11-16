@@ -11,6 +11,9 @@ use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
 use crate::task::PangolinPangoroTask;
 
+const MIN_RELAY_FEE_PANGOLIN: u128 = 15 * pangolin_constants::COIN;
+const MIN_RELAY_FEE_PANGORO: u128 = 15 * pangoro_constants::COIN;
+
 #[derive(Clone)]
 pub struct ReasonableStrategy {
     helper: StrategyHelper,
@@ -42,11 +45,11 @@ impl ReasonableStrategy {
         match self.subscan_pangolin.price(now).await?.data() {
             Ok(Some(v)) => Ok(v.price),
             _ => {
-                let subscan_polkadot = self
+                let subscan_dock = self
                     .subscan_pangolin
                     .clone()
-                    .endpoint("https://polkadot.api.subscan.io");
-                let open_price = subscan_polkadot.price(now).await?;
+                    .endpoint("https://dock.api.subscan.io");
+                let open_price = subscan_dock.price(now).await?;
                 let data = open_price.data()?;
                 match data {
                     Some(v) => Ok(v.price),
@@ -130,8 +133,8 @@ impl UpdateFeeStrategy for ReasonableStrategy {
                 .await?;
 
         // Nice (
-        let expect_fee_pangolin = top100_max_cost_pangolin * 15;
-        let expect_fee_pangoro = top100_max_cost_pangoro * 15;
+        let expect_fee_pangolin = MIN_RELAY_FEE_PANGOLIN + (top100_max_cost_pangolin * 15);
+        let expect_fee_pangoro = MIN_RELAY_FEE_PANGORO + (top100_max_cost_pangoro * 15);
 
         log::info!(
             target: PangolinPangoroTask::NAME,

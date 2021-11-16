@@ -12,7 +12,7 @@ use component_subscan::SubscanConfig;
 
 use crate::bus::PangolinPangoroBus;
 use crate::config::{ChainInfoConfig, RelayConfig, TaskConfig, UpdateFeeStrategyType};
-use crate::fee::strategy::{CrazyStrategy, NothingStrategy, ReasonableStrategy};
+use crate::fee::strategy::{CrazyStrategy, ReasonableStrategy};
 use crate::fee::UpdateFeeStrategy;
 use crate::task::PangolinPangoroTask;
 
@@ -46,6 +46,11 @@ impl Service for UpdateFeeService {
 }
 
 async fn cron_update_fee(config_task: TaskConfig) -> anyhow::Result<()> {
+    log::info!(
+        target: PangolinPangoroTask::NAME,
+        "Use update fee strategy: {:?}",
+        config_task.update_fee_strategy
+    );
     loop {
         if let Err(e) = run_update_fee(config_task.clone()).await {
             log::error!(
@@ -74,13 +79,8 @@ async fn run_update_fee(config_task: TaskConfig) -> anyhow::Result<()> {
         Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangoro")?;
     let exists_subscan_config =
         subscan_config_pangolin.is_some() && subscan_config_pangoro.is_some();
-    log::info!(
-        target: PangolinPangoroTask::NAME,
-        "Use update fee strategy: {:?}",
-        config_task.update_fee_strategy
-    );
     match config_task.update_fee_strategy {
-        UpdateFeeStrategyType::Nothing => NothingStrategy.handle().await,
+        UpdateFeeStrategyType::Nothing => Ok(()),
         UpdateFeeStrategyType::Crazy => {
             if !exists_subscan_config {
                 return Ok(());

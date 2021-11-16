@@ -40,3 +40,11 @@ If you want to use different strategy, follow these steps:
 2. Expose your strategy in [mod.rs](../src/fee/strategy/mod.rs)
 3. Add your strategy to config [config.rs@UpdateFeeStrategyType](../src/config.rs)
 4. Call your strategy in [fee.rs](../src/service/fee.rs)
+5. Don't forget change your config file to use your strategy.
+
+   ```toml
+   [task]
+   # 1800 seconds, 30 minutes
+   interval_update_fee = 1800
+   update_fee_strategy = "YourStrategy"
+   ```

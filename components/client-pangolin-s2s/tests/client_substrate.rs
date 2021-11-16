@@ -6,7 +6,7 @@ mod common;
 async fn test_read_assigned_relayers() {
     let api = common::api().await.unwrap();
     let assigned_relayers = api.assigned_relayers().await.unwrap();
-    assert!(assigned_relayers.is_some());
+    assert!(!assigned_relayers.is_empty());
 }
 
 #[test]

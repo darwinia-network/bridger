@@ -36,9 +36,9 @@ pangolin-constants       = { git = "https://github.com/darwinia-network/darwinia
 
 
 ## Substrate Dependencies
-frame-system               = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
-frame-support              = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
-pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
-sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
-sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
-sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.5" }
+frame-system               = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+frame-support              = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }

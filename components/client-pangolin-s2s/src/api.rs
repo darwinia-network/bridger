@@ -32,11 +32,8 @@ impl PangolinApi {
             .client
             .storage_value(
                 StorageKey(
-                    patch::storage_prefix(
-                        "FeeMarket".as_bytes(),
-                        "AssignedRelayersStorage".as_bytes(),
-                    )
-                    .to_vec(),
+                    patch::storage_prefix("FeeMarket".as_bytes(), "AssignedRelayers".as_bytes())
+                        .to_vec(),
                 ),
                 None,
             )

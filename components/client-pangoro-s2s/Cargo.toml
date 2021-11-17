@@ -25,12 +25,12 @@ log = "0.4"
 bridge-traits = { path = "../../traits" }
 
 codec                  = { package = "parity-scale-codec", version = "2.0.0" }
-headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-rc1" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-rc1" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-rc1" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-rc1" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-rc1" }
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-rc1" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
 
 
 ## Bridge dependencies
@@ -43,10 +43,10 @@ dp-fee                  = { git = "https://github.com/darwinia-network/darwinia-
 
 
 ## Substrate Dependencies
-frame-system               = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-frame-support              = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+frame-system               = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+frame-support              = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
 

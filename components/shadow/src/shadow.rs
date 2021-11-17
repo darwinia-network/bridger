@@ -4,6 +4,7 @@ use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
+use std::convert::TryInto;
 
 use bridge_traits::error::StandardError;
 use component_ethereum::errors::BizError;
@@ -116,7 +117,7 @@ impl Shadow {
                 Err(BizError::Bridger(err.as_str().unwrap().to_owned()).into())
             } else {
                 let json: EthereumReceiptProofThingJson = serde_json::from_value(result)?;
-                Ok(json.into())
+                Ok(json.try_into()?)
             }
         }
     }

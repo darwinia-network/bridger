@@ -1,10 +1,12 @@
 //! Ethereum receipt
+use std::convert::{TryFrom, TryInto};
 use std::fmt::Debug;
 
 use codec::{Decode, Encode};
 use rlp::{Encodable, RlpStream};
 use serde::{Deserialize, Serialize};
 
+use bridge_primitives::error::{BridgeBasicError, BridgeBasicResult};
 use bridge_primitives::{
     array::{Bloom, H160, H256},
     bytes, hex,
@@ -110,13 +112,15 @@ pub struct EthereumReceiptProofThingJson {
     pub mmr_proof: MMRProofJson,
 }
 
-impl From<EthereumReceiptProofThingJson> for EthereumReceiptProofThing {
-    fn from(that: EthereumReceiptProofThingJson) -> Self {
-        EthereumReceiptProofThing {
-            header: that.header.into(),
+impl TryFrom<EthereumReceiptProofThingJson> for EthereumReceiptProofThing {
+    type Error = BridgeBasicError;
+
+    fn try_from(that: EthereumReceiptProofThingJson) -> BridgeBasicResult<Self> {
+        Ok(EthereumReceiptProofThing {
+            header: that.header.try_into()?,
             receipt_proof: that.receipt_proof.into(),
             mmr_proof: that.mmr_proof.into(),
-        }
+        })
     }
 }
 

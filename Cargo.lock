@@ -1091,17 +1091,17 @@ dependencies = [
  "array-bytes",
  "async-trait",
  "bridge-traits",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "jsonrpsee-types",
  "log",
- "pallet-im-online 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-im-online 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "parity-scale-codec",
  "secp256k1",
  "serde 1.0.130",
  "serde_json",
- "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=master)",
- "substrate-subxt-proc-macro 0.15.3 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=master)",
+ "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.6)",
+ "substrate-subxt-proc-macro 0.15.3 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.6)",
  "support-ethereum",
  "thiserror",
  "web3",
@@ -2641,25 +2641,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "frame-benchmarking"
-version = "3.1.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "linregress",
- "log",
- "parity-scale-codec",
- "paste",
- "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime-interface 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-storage 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "frame-election-provider-support"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
@@ -2686,19 +2667,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "frame-election-provider-support"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec",
- "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-npos-elections 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "frame-executive"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6#74101dc21cfffb4c2d014fcc28edc166d5ca1b16"
@@ -2711,18 +2679,6 @@ dependencies = [
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "sp-tracing 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
-]
-
-[[package]]
-name = "frame-metadata"
-version = "13.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "073f7bef18421362441a1708f8528e442234954611f95bdc554b313fb321948e"
-dependencies = [
- "parity-scale-codec",
- "serde 1.0.130",
- "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -2750,39 +2706,13 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "13.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "parity-scale-codec",
- "serde 1.0.130",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "frame-support"
-version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04e521e6214615bd82ba6b5fc7fd40a9cc14fdeb40f83da5eba12aa2f8179fb8"
+checksum = "073f7bef18421362441a1708f8528e442234954611f95bdc554b313fb321948e"
 dependencies = [
- "bitflags",
- "frame-metadata 13.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "frame-support-procedural 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "impl-trait-for-tuples",
- "log",
- "once_cell",
  "parity-scale-codec",
- "paste",
  "serde 1.0.130",
- "smallvec",
- "sp-arithmetic 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-staking 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-state-machine 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-tracing 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -2841,11 +2771,12 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "04e521e6214615bd82ba6b5fc7fd40a9cc14fdeb40f83da5eba12aa2f8179fb8"
 dependencies = [
  "bitflags",
- "frame-metadata 13.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-support-procedural 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-metadata 13.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "frame-support-procedural 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "impl-trait-for-tuples",
  "log",
  "once_cell",
@@ -2853,28 +2784,15 @@ dependencies = [
  "paste",
  "serde 1.0.130",
  "smallvec",
- "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-state-machine 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-tracing 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "frame-support-procedural"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2668e24cbaba7f0e91d0c92a94bd1ae425a942608ad0b775db32477f5df4da9e"
-dependencies = [
- "Inflector",
- "frame-support-procedural-tools 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "proc-macro2",
- "quote",
- "syn",
+ "sp-arithmetic 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-staking 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-state-machine 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-tracing 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -2904,23 +2822,11 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2668e24cbaba7f0e91d0c92a94bd1ae425a942608ad0b775db32477f5df4da9e"
 dependencies = [
  "Inflector",
- "frame-support-procedural-tools 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "frame-support-procedural-tools"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4f88cfd111e004590f4542b75e6d3302137b9067d7e7219e4ac47a535c3b5c1"
-dependencies = [
- "frame-support-procedural-tools-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "proc-macro-crate 0.1.5",
+ "frame-support-procedural-tools 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "proc-macro2",
  "quote",
  "syn",
@@ -2953,21 +2859,11 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "frame-support-procedural-tools-derive 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "proc-macro-crate 1.0.0",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "frame-support-procedural-tools-derive"
-version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79285388b120ac96c15a791c56b26b9264f7231324fbe0fd05026acd92bf2e6a"
+checksum = "d4f88cfd111e004590f4542b75e6d3302137b9067d7e7219e4ac47a535c3b5c1"
 dependencies = [
+ "frame-support-procedural-tools-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "proc-macro-crate 0.1.5",
  "proc-macro2",
  "quote",
  "syn",
@@ -2996,28 +2892,12 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "79285388b120ac96c15a791c56b26b9264f7231324fbe0fd05026acd92bf2e6a"
 dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "frame-system"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5fedbff05d665c00bf4e089b4377fcb15b8bd37ebc3e5fc06665474cf6e25d7"
-dependencies = [
- "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "impl-trait-for-tuples",
- "parity-scale-codec",
- "serde 1.0.130",
- "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-version 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -3057,18 +2937,18 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f5fedbff05d665c00bf4e089b4377fcb15b8bd37ebc3e5fc06665474cf6e25d7"
 dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "impl-trait-for-tuples",
- "log",
  "parity-scale-codec",
  "serde 1.0.130",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-version 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -5369,22 +5249,6 @@ dependencies = [
 [[package]]
 name = "pallet-authorship"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47433a94141451e7079aabf3ca28f2bde8c642d84b568be9626e9b7cae8b11b1"
-dependencies = [
- "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "impl-trait-for-tuples",
- "parity-scale-codec",
- "sp-authorship 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "pallet-authorship"
-version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
@@ -5413,15 +5277,17 @@ dependencies = [
 [[package]]
 name = "pallet-authorship"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "47433a94141451e7079aabf3ca28f2bde8c642d84b568be9626e9b7cae8b11b1"
 dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "impl-trait-for-tuples",
  "parity-scale-codec",
- "sp-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-authorship 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -5606,25 +5472,6 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5149e46f347bfcf7852693a6c2b6143ace94ae1fc2a81ac87a99c92f027329b"
-dependencies = [
- "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-authorship 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-scale-codec",
- "serde 1.0.130",
- "sp-application-crypto 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-staking 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "pallet-im-online"
-version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3)",
@@ -5661,35 +5508,19 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "log",
- "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec",
- "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "pallet-indices"
-version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c080576a1fbb1187b7da9f4cba739076bbb197f44964892b2d392755920bbf63"
+checksum = "e5149e46f347bfcf7852693a6c2b6143ace94ae1fc2a81ac87a99c92f027329b"
 dependencies = [
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-authorship 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec",
  "serde 1.0.130",
+ "sp-application-crypto 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-keyring 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-staking 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -5711,16 +5542,33 @@ dependencies = [
 [[package]]
 name = "pallet-indices"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6#74101dc21cfffb4c2d014fcc28edc166d5ca1b16"
 dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "parity-scale-codec",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-keyring 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+]
+
+[[package]]
+name = "pallet-indices"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c080576a1fbb1187b7da9f4cba739076bbb197f44964892b2d392755920bbf63"
+dependencies = [
+ "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "frame-system 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-scale-codec",
+ "serde 1.0.130",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-keyring 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -5865,25 +5713,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-session"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "impl-trait-for-tuples",
- "pallet-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "parity-scale-codec",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "pallet-society"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6#74101dc21cfffb4c2d014fcc28edc166d5ca1b16"
@@ -5921,22 +5750,22 @@ dependencies = [
 [[package]]
 name = "pallet-staking"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6#74101dc21cfffb4c2d014fcc28edc166d5ca1b16"
 dependencies = [
- "frame-election-provider-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-election-provider-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "log",
- "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "pallet-session 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "parity-scale-codec",
  "paste",
  "serde 1.0.130",
- "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "static_assertions",
 ]
 
@@ -5985,23 +5814,6 @@ dependencies = [
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "sp-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
-]
-
-[[package]]
-name = "pallet-timestamp"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "frame-benchmarking 3.1.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "impl-trait-for-tuples",
- "log",
- "parity-scale-codec",
- "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-timestamp 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
 ]
 
 [[package]]
@@ -8451,23 +8263,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp-api"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "hash-db",
- "log",
- "parity-scale-codec",
- "sp-api-proc-macro 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-state-machine 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "thiserror",
-]
-
-[[package]]
 name = "sp-api-proc-macro"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
@@ -8489,31 +8284,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "sp-api-proc-macro"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "blake2-rfc",
- "proc-macro-crate 1.0.0",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "sp-application-crypto"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c52e2e6d43036b97c4fce1ed87c5262c1ffdc78c655ada4d3024a3f8094bdd2c"
-dependencies = [
- "parity-scale-codec",
- "serde 1.0.130",
- "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -8544,26 +8314,13 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "parity-scale-codec",
- "serde 1.0.130",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "sp-arithmetic"
-version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0f1c69966c192d1dee8521f0b29ece2b14db07b9b44d801a94e295234761645"
+checksum = "c52e2e6d43036b97c4fce1ed87c5262c1ffdc78c655ada4d3024a3f8094bdd2c"
 dependencies = [
- "integer-sqrt",
- "num-traits 0.2.14",
  "parity-scale-codec",
  "serde 1.0.130",
- "sp-debug-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -8598,15 +8355,15 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0f1c69966c192d1dee8521f0b29ece2b14db07b9b44d801a94e295234761645"
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.14",
  "parity-scale-codec",
  "serde 1.0.130",
- "sp-debug-derive 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "static_assertions",
+ "sp-debug-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -8619,18 +8376,6 @@ dependencies = [
  "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
-]
-
-[[package]]
-name = "sp-authorship"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ec68fb8e5a37548b06c14ee91a9c574cc330324c86d37810ec29dd4f8bc68d7"
-dependencies = [
- "parity-scale-codec",
- "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -8660,13 +8405,13 @@ dependencies = [
 [[package]]
 name = "sp-authorship"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1ec68fb8e5a37548b06c14ee91a9c574cc330324c86d37810ec29dd4f8bc68d7"
 dependencies = [
- "async-trait",
  "parity-scale-codec",
- "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-inherents 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -8773,51 +8518,6 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abbc8d4e9b8a7d5819ed26f1374017bb32833ef4890e4ff065e1da30669876bc"
-dependencies = [
- "base58",
- "blake2-rfc",
- "byteorder",
- "dyn-clonable",
- "ed25519-dalek",
- "futures 0.3.17",
- "hash-db",
- "hash256-std-hasher",
- "hex",
- "impl-serde",
- "lazy_static",
- "libsecp256k1 0.3.5",
- "log",
- "merlin",
- "num-traits 0.2.14",
- "parity-scale-codec",
- "parity-util-mem",
- "parking_lot 0.11.2",
- "primitive-types",
- "rand 0.7.3",
- "regex",
- "schnorrkel",
- "secrecy",
- "serde 1.0.130",
- "sha2 0.9.8",
- "sp-debug-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime-interface 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-storage 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-bip39",
- "thiserror",
- "tiny-bip39",
- "tiny-keccak",
- "twox-hash",
- "wasmi 0.6.2",
- "zeroize",
-]
-
-[[package]]
-name = "sp-core"
-version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "base58",
@@ -8907,7 +8607,8 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "abbc8d4e9b8a7d5819ed26f1374017bb32833ef4890e4ff065e1da30669876bc"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -8934,11 +8635,11 @@ dependencies = [
  "secrecy",
  "serde 1.0.130",
  "sha2 0.9.8",
- "sp-debug-derive 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime-interface 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-storage 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-debug-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime-interface 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-storage 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "substrate-bip39",
  "thiserror",
  "tiny-bip39",
@@ -8955,17 +8656,6 @@ source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.
 dependencies = [
  "kvdb",
  "parking_lot 0.11.2",
-]
-
-[[package]]
-name = "sp-debug-derive"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e80275f23b4e7ba8f54dec5f90f016530e7307d2ee9445f617ab986cbe97f31e"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -8991,23 +8681,12 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e80275f23b4e7ba8f54dec5f90f016530e7307d2ee9445f617ab986cbe97f31e"
 dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "sp-externalities"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fdc625f8c7b13b9a136d334888b21b5743d2081cb666cb03efca1dc9b8f74d1"
-dependencies = [
- "environmental",
- "parity-scale-codec",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-storage 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -9035,12 +8714,13 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2fdc625f8c7b13b9a136d334888b21b5743d2081cb666cb03efca1dc9b8f74d1"
 dependencies = [
  "environmental",
  "parity-scale-codec",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-storage 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-storage 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -9058,19 +8738,6 @@ dependencies = [
  "sp-keystore 0.9.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
-]
-
-[[package]]
-name = "sp-inherents"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2542380b535c6941502a0a3069a657eb5abb70fd67b11afa164d4a4b038ba73a"
-dependencies = [
- "parity-scale-codec",
- "parking_lot 0.11.2",
- "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "thiserror",
 ]
 
 [[package]]
@@ -9104,40 +8771,14 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "async-trait",
- "impl-trait-for-tuples",
- "parity-scale-codec",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "thiserror",
-]
-
-[[package]]
-name = "sp-io"
-version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33fd69f0a6e91bedc2fb1c5cc3689c212474b6c918274cb4cb14dbbe3c428c14"
+checksum = "2542380b535c6941502a0a3069a657eb5abb70fd67b11afa164d4a4b038ba73a"
 dependencies = [
- "futures 0.3.17",
- "hash-db",
- "libsecp256k1 0.3.5",
- "log",
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-keystore 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime-interface 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-state-machine 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-tracing 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-trie 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-wasm-interface 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "tracing",
- "tracing-core",
+ "thiserror",
 ]
 
 [[package]]
@@ -9193,7 +8834,8 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33fd69f0a6e91bedc2fb1c5cc3689c212474b6c918274cb4cb14dbbe3c428c14"
 dependencies = [
  "futures 0.3.17",
  "hash-db",
@@ -9201,30 +8843,17 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "parking_lot 0.11.2",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-keystore 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-maybe-compressed-blob 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime-interface 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-state-machine 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-tracing 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-wasm-interface 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-keystore 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime-interface 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-state-machine 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-tracing 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-trie 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-wasm-interface 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing",
  "tracing-core",
-]
-
-[[package]]
-name = "sp-keyring"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b59f2b0e94b2048d4984aa6eb40eef2e4c05d3adf27a083dd3c9b0fce74ef7a"
-dependencies = [
- "lazy_static",
- "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "strum 0.20.0",
 ]
 
 [[package]]
@@ -9252,29 +8881,13 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b59f2b0e94b2048d4984aa6eb40eef2e4c05d3adf27a083dd3c9b0fce74ef7a"
 dependencies = [
  "lazy_static",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "strum 0.20.0",
-]
-
-[[package]]
-name = "sp-keystore"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db6ccd2baf189112355338e8b224dc513cd239b974dbd717f12b3dc7a7248c3b"
-dependencies = [
- "async-trait",
- "derive_more",
- "futures 0.3.17",
- "merlin",
- "parity-scale-codec",
- "parking_lot 0.11.2",
- "schnorrkel",
  "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "strum 0.20.0",
 ]
 
 [[package]]
@@ -9313,7 +8926,8 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db6ccd2baf189112355338e8b224dc513cd239b974dbd717f12b3dc7a7248c3b"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -9322,8 +8936,8 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "schnorrkel",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -9339,15 +8953,6 @@ dependencies = [
 name = "sp-maybe-compressed-blob"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6#74101dc21cfffb4c2d014fcc28edc166d5ca1b16"
-dependencies = [
- "ruzstd",
- "zstd",
-]
-
-[[package]]
-name = "sp-maybe-compressed-blob"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "ruzstd",
  "zstd",
@@ -9380,19 +8985,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp-npos-elections"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "parity-scale-codec",
- "serde 1.0.130",
- "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-npos-elections-compact 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
 name = "sp-npos-elections-compact"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
@@ -9407,17 +8999,6 @@ dependencies = [
 name = "sp-npos-elections-compact"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6#74101dc21cfffb4c2d014fcc28edc166d5ca1b16"
-dependencies = [
- "proc-macro-crate 1.0.0",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "sp-npos-elections-compact"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
 dependencies = [
  "proc-macro-crate 1.0.0",
  "proc-macro2",
@@ -9438,15 +9019,6 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54702e109f1c8a870dd4065a497d2612d42cec5817126e96cc0658c5ea975784"
-dependencies = [
- "backtrace",
-]
-
-[[package]]
-name = "sp-panic-handler"
-version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
 dependencies = [
  "backtrace",
@@ -9463,7 +9035,8 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "54702e109f1c8a870dd4065a497d2612d42cec5817126e96cc0658c5ea975784"
 dependencies = [
  "backtrace",
 ]
@@ -9488,39 +9061,6 @@ dependencies = [
  "serde 1.0.130",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "tracing-core",
-]
-
-[[package]]
-name = "sp-rpc"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "rustc-hash",
- "serde 1.0.130",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "tracing-core",
-]
-
-[[package]]
-name = "sp-runtime"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfa4b353b76f04616dbdb8d269d58dcac47acb31c006d3b70e7b64233e68695e"
-dependencies = [
- "either",
- "hash256-std-hasher",
- "impl-trait-for-tuples",
- "log",
- "parity-scale-codec",
- "parity-util-mem",
- "paste",
- "rand 0.7.3",
- "serde 1.0.130",
- "sp-application-crypto 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-arithmetic 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -9569,7 +9109,8 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dfa4b353b76f04616dbdb8d269d58dcac47acb31c006d3b70e7b64233e68695e"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -9580,29 +9121,11 @@ dependencies = [
  "paste",
  "rand 0.7.3",
  "serde 1.0.130",
- "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-arithmetic 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "sp-runtime-interface"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2e5c88b4bc8d607e4e2ff767a85db58cf7101f3dd6064f06929342ea67fe8fb"
-dependencies = [
- "impl-trait-for-tuples",
- "parity-scale-codec",
- "primitive-types",
- "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime-interface-proc-macro 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-application-crypto 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-arithmetic 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-io 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-storage 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-tracing 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-wasm-interface 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "static_assertions",
 ]
 
 [[package]]
@@ -9642,31 +9165,19 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b2e5c88b4bc8d607e4e2ff767a85db58cf7101f3dd6064f06929342ea67fe8fb"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
  "primitive-types",
- "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime-interface-proc-macro 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-storage 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-tracing 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-wasm-interface 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime-interface-proc-macro 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-storage 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-tracing 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-wasm-interface 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "static_assertions",
-]
-
-[[package]]
-name = "sp-runtime-interface-proc-macro"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19a6c7c2251512c9e533d15db8a863b06ece1cbee778130dd9adbe44b6b39aa9"
-dependencies = [
- "Inflector",
- "proc-macro-crate 0.1.5",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -9696,10 +9207,11 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "19a6c7c2251512c9e533d15db8a863b06ece1cbee778130dd9adbe44b6b39aa9"
 dependencies = [
  "Inflector",
- "proc-macro-crate 1.0.0",
+ "proc-macro-crate 0.1.5",
  "proc-macro2",
  "quote",
  "syn",
@@ -9741,30 +9253,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp-session"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "parity-scale-codec",
- "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "sp-staking"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc729eb10f8809c61a1fe439ac118a4413de004aaf863003ee8752ac0b596e73"
-dependencies = [
- "parity-scale-codec",
- "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "sp-staking"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
@@ -9787,34 +9275,12 @@ dependencies = [
 [[package]]
 name = "sp-staking"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "parity-scale-codec",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
-]
-
-[[package]]
-name = "sp-state-machine"
-version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46fa4143e58e9130f726d4e8a9b86f3530a8bd19a2eedcdcf4af205f4b5a6d4f"
+checksum = "fc729eb10f8809c61a1fe439ac118a4413de004aaf863003ee8752ac0b596e73"
 dependencies = [
- "hash-db",
- "log",
- "num-traits 0.2.14",
  "parity-scale-codec",
- "parking_lot 0.11.2",
- "rand 0.7.3",
- "smallvec",
- "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-panic-handler 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-trie 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "thiserror",
- "trie-db",
- "trie-root",
 ]
 
 [[package]]
@@ -9866,7 +9332,8 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.9.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46fa4143e58e9130f726d4e8a9b86f3530a8bd19a2eedcdcf4af205f4b5a6d4f"
 dependencies = [
  "hash-db",
  "log",
@@ -9875,22 +9342,15 @@ dependencies = [
  "parking_lot 0.11.2",
  "rand 0.7.3",
  "smallvec",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-externalities 0.9.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-panic-handler 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-externalities 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-panic-handler 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-trie 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror",
- "tracing",
  "trie-db",
  "trie-root",
 ]
-
-[[package]]
-name = "sp-std"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35391ea974fa5ee869cb094d5b437688fbf3d8127d64d1b9fed5822a1ed39b12"
 
 [[package]]
 name = "sp-std"
@@ -9905,21 +9365,8 @@ source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.
 [[package]]
 name = "sp-std"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-
-[[package]]
-name = "sp-storage"
-version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86af458d4a0251c490cdde9dcaaccb88d398f3b97ac6694cdd49ed9337e6b961"
-dependencies = [
- "impl-serde",
- "parity-scale-codec",
- "ref-cast",
- "serde 1.0.130",
- "sp-debug-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
+checksum = "35391ea974fa5ee869cb094d5b437688fbf3d8127d64d1b9fed5822a1ed39b12"
 
 [[package]]
 name = "sp-storage"
@@ -9950,14 +9397,15 @@ dependencies = [
 [[package]]
 name = "sp-storage"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "86af458d4a0251c490cdde9dcaaccb88d398f3b97ac6694cdd49ed9337e6b961"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
  "ref-cast",
  "serde 1.0.130",
- "sp-debug-derive 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-debug-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -10008,37 +9456,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp-timestamp"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "async-trait",
- "futures-timer",
- "log",
- "parity-scale-codec",
- "sp-api 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-inherents 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "thiserror",
- "wasm-timer",
-]
-
-[[package]]
-name = "sp-tracing"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "567382d8d4e14fb572752863b5cd57a78f9e9a6583332b590b726f061f3ea957"
-dependencies = [
- "log",
- "parity-scale-codec",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "tracing",
- "tracing-core",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "sp-tracing"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.3#1d7f6e12c651d776fc0dc1adefd007bb60f60b63"
@@ -10077,16 +9494,12 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "567382d8d4e14fb572752863b5cd57a78f9e9a6583332b590b726f061f3ea957"
 dependencies = [
- "erased-serde",
  "log",
  "parity-scale-codec",
- "parking_lot 0.10.2",
- "serde 1.0.130",
- "serde_json",
- "slog",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing",
  "tracing-core",
  "tracing-subscriber",
@@ -10106,21 +9519,6 @@ dependencies = [
  "sp-blockchain",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "thiserror",
-]
-
-[[package]]
-name = "sp-trie"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b85b7f745da41ef825c6f7b93f1fdc897b03df94a4884adfbb70fbcd0aed1298"
-dependencies = [
- "hash-db",
- "memory-db",
- "parity-scale-codec",
- "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "trie-db",
- "trie-root",
 ]
 
 [[package]]
@@ -10154,13 +9552,14 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b85b7f745da41ef825c6f7b93f1fdc897b03df94a4884adfbb70fbcd0aed1298"
 dependencies = [
  "hash-db",
  "memory-db",
  "parity-scale-codec",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-core 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "trie-db",
  "trie-root",
 ]
@@ -10175,19 +9574,6 @@ dependencies = [
  "futures-timer",
  "lazy_static",
  "prometheus",
-]
-
-[[package]]
-name = "sp-version"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbeffa538a13d715d30e01d57a2636ba32845b737a29a3ea32403576588222e7"
-dependencies = [
- "impl-serde",
- "parity-scale-codec",
- "serde 1.0.130",
- "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -10219,14 +9605,14 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dbeffa538a13d715d30e01d57a2636ba32845b737a29a3ea32403576588222e7"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
  "serde 1.0.130",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-version-proc-macro 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-runtime 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -10251,30 +9637,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "sp-version-proc-macro"
-version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
-dependencies = [
- "parity-scale-codec",
- "proc-macro-crate 1.0.0",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "sp-wasm-interface"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b214e125666a6416cf30a70cc6a5dacd34a4e5197f8a3d479f714af7e1dc7a47"
-dependencies = [
- "impl-trait-for-tuples",
- "parity-scale-codec",
- "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "wasmi 0.6.2",
 ]
 
 [[package]]
@@ -10302,11 +9664,12 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=main#c94e0cdfe5556680dca1996004751eeb114755d7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b214e125666a6416cf30a70cc6a5dacd34a4e5197f8a3d479f714af7e1dc7a47"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "sp-std 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasmi 0.6.2",
 ]
 
@@ -10578,12 +9941,12 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.15.0"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=master#2b88b8355d8c18d8b62881d0eecb16fb0262b1e3"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.6#d63ee2c1715e6f469193ecaad54e89f97022035f"
 dependencies = [
  "async-trait",
  "dyn-clone",
- "frame-metadata 13.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "frame-metadata 13.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "futures 0.3.17",
  "hex",
  "jsonrpsee-http-client",
@@ -10592,18 +9955,18 @@ dependencies = [
  "jsonrpsee-ws-client",
  "log",
  "num-traits 0.2.14",
- "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "pallet-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
+ "pallet-indices 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "pallet-staking 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
  "parity-scale-codec",
  "serde 1.0.130",
  "serde_json",
- "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-rpc 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?branch=main)",
- "substrate-subxt-proc-macro 0.15.3 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=master)",
+ "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-rpc 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "sp-version 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6)",
+ "substrate-subxt-proc-macro 0.15.3 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.6)",
  "thiserror",
  "url 2.2.2",
 ]
@@ -10626,7 +9989,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.15.3"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?branch=master#2b88b8355d8c18d8b62881d0eecb16fb0262b1e3"
+source = "git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.6#d63ee2c1715e6f469193ecaad54e89f97022035f"
 dependencies = [
  "async-trait",
  "heck",
@@ -10886,7 +10249,7 @@ dependencies = [
  "postage",
  "serde 1.0.130",
  "serde_json",
- "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?branch=master)",
+ "substrate-subxt 0.15.0 (git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.6)",
  "support-ethereum",
  "support-tracker",
  "thiserror",

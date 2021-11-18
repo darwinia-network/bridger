@@ -69,11 +69,7 @@ impl Service for RedeemService {
                 while let Some(recv) = rx.recv().await {
                     if let ToRedeemMessage::EthereumTransaction(tx) = recv {
                         if let Err(err) = handler.redeem(tx.clone()).await {
-                            log::error!(
-                                target: PangolinRopstenTask::NAME,
-                                "redeem err: {:#?}",
-                                err
-                            );
+                            log::error!(target: PangolinRopstenTask::NAME, "redeem err: {:?}", err);
                             // TODO: Consider the errors more carefully
                             // Maybe a websocket err, so wait 10 secs to reconnect.
                             tokio::time::sleep(std::time::Duration::from_secs(10)).await;

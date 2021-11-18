@@ -221,7 +221,8 @@ impl ExtrinsicsHandler {
     async fn send_sign_and_send_mmr_root(&self, block_number: u32) -> anyhow::Result<()> {
         log::trace!(
             target: PangolinRopstenTask::NAME,
-            "Start sign and send mmr_root..."
+            "Start sign and send mmr_root for block: {}",
+            block_number,
         );
         let ex_hash = self
             .darwinia2ethereum

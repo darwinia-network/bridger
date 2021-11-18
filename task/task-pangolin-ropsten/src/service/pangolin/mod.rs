@@ -303,19 +303,29 @@ impl DarwiniaServiceRunner {
             }
             // call ethereum_backing.lock will emit the event
             EventInfo::ScheduleMMRRootEvent(event) => {
-                info!(
-                    target: PangolinRopstenTask::NAME,
-                    "Find Schedule MMRRoot event at {:?}", header.number
-                );
-                if self
+                let is_authority = self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)
-                    .await?
-                {
-                    info!(target: PangolinRopstenTask::NAME, "{}", event);
+                    .await?;
+                log::info!(
+                    target: PangolinRopstenTask::NAME,
+                    "Find Schedule MMRRoot event at {:?}",
+                    header.number
+                );
+                if is_authority {
+                    log::info!(
+                        target: PangolinRopstenTask::NAME,
+                        "SignAndSendMmrRoot Event: {}",
+                        event
+                    );
                     let ex = Extrinsic::SignAndSendMmrRoot(event.block_number);
                     self.delayed_extrinsics.insert(event.block_number, ex);
+                    return Ok(());
                 }
+                log::warn!(
+                    target: PangolinRopstenTask::NAME,
+                    "But you are not authority account."
+                );
             }
             _ => {}
         }

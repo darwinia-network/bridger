@@ -31,17 +31,17 @@ array-bytes = "1.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
-codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive", "full"] }
-web3 = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+codec     = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive", "full"] }
+web3      = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 secp256k1 = { version = "0.20", features = ["recovery"] }
 
 jsonrpsee-types = "0.3"
-substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "master" }
-substrate-subxt-proc-macro = { git = "https://github.com/darwinia-network/substrate-subxt.git", branch = "master" }
+substrate-subxt            = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.6" }
+substrate-subxt-proc-macro = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.6" }
 
-frame-support = { package = "frame-support", git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
-pallet-indices = { package = "pallet-indices", git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
-pallet-im-online = { package = "pallet-im-online", git = "https://github.com/darwinia-network/substrate.git", branch = "main" }
+frame-support    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+pallet-indices   = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+pallet-im-online = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
 
-bridge-traits = { path = "../../traits" }
+bridge-traits    = { path = "../../traits" }
 support-ethereum = { path = "../../supports/support-ethereum" }

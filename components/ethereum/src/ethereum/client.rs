@@ -1,5 +1,6 @@
 use bridge_traits::error::StandardError;
 use secp256k1::SecretKey;
+use std::convert::TryInto;
 use support_ethereum::block::EthereumHeader;
 use web3::contract::{Contract, Options};
 use web3::signing::SecretKeyRef;
@@ -48,7 +49,7 @@ impl EthereumClient {
     pub async fn get_header_by_number(&self, block: u64) -> anyhow::Result<EthereumHeader> {
         let eth_block = BlockId::Number(BlockNumber::Number(block.into()));
         match self.web3.eth().block(eth_block).await? {
-            Some(block) => Ok(block.into()),
+            Some(block) => Ok(block.try_into()?),
             None => {
                 Err(StandardError::Component(format!("The block [{}] not found", block)).into())
             }

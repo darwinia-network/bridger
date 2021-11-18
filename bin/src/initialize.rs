@@ -25,6 +25,7 @@ fn init_log() {
                 "task-darwinia-ethereum=trace",
                 "task-pangolin-ropsten=trace",
                 "task-pangolin-pangoro=trace",
+                "jsonrpsee_ws_client=error",
             ]
             .join(","),
         );

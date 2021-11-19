@@ -1,3 +1,4 @@
+use std::fmt::{Debug, Formatter};
 use substrate_subxt::{
     sp_core::{sr25519::Pair, Pair as PairTrait},
     system::System,
@@ -17,6 +18,15 @@ pub struct DarwiniaAccount {
     pub signer: PairSigner<DarwiniaRuntime, Pair>,
     /// proxy real
     pub real: Option<AccountId>,
+}
+
+impl Debug for DarwiniaAccount {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("account: {},", self.account_id));
+        f.write_str(&format!(" signer: <..>",));
+        f.write_str(&format!(" real: {:?}", self.real));
+        Ok(())
+    }
 }
 
 impl Clone for DarwiniaAccount {

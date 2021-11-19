@@ -79,6 +79,11 @@ impl ExtrinsicsHandler {
             target: PangolinRopstenTask::NAME,
             "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS"
         );
+        log::trace!(
+            target: PangolinRopstenTask::NAME,
+            "The spec_name is [{}]",
+            spec_name
+        );
 
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         Ok(ExtrinsicsHandler {
@@ -133,6 +138,12 @@ impl ExtrinsicsHandler {
         proof: EthereumReceiptProofThing,
         ethereum_tx: TransactionEntity,
     ) -> anyhow::Result<()> {
+        log::info!(
+            target: PangolinRopstenTask::NAME,
+            "Ready to send redeem. type is [{:?}] and tx is [{:?}]",
+            ethereum_tx.tx_type,
+            ethereum_tx.tx_hash
+        );
         match ethereum_tx.tx_type {
             TransactionType::SetAuthorities => {
                 let ex_hash = self
@@ -182,9 +193,11 @@ impl ExtrinsicsHandler {
                     .ethereum2darwinia
                     .redeem(&self.ethereum2darwinia_relayer, redeem_for, proof)
                     .await?;
-                info!(
+                log::info!(
                     target: PangolinRopstenTask::NAME,
-                    "Redeemed ethereum tx {:?} with extrinsic {:?}", ethereum_tx.tx_hash, ex_hash
+                    "Redeemed ethereum tx {:?} with extrinsic {:?}",
+                    ethereum_tx.tx_hash,
+                    ex_hash
                 );
             }
         }

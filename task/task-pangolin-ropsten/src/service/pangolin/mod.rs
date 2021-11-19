@@ -65,7 +65,7 @@ async fn start(sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>, tra
         let secs = 10;
         error!(
             target: PangolinRopstenTask::NAME,
-            "pangolin err {:#?}, wait {} seconds try again", e, secs
+            "pangolin err {:?}, wait {} seconds try again", e, secs
         );
         tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
     }
@@ -75,7 +75,7 @@ async fn run(
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     tracker: Tracker,
 ) -> anyhow::Result<()> {
-    info!(
+    log::info!(
         target: PangolinRopstenTask::NAME,
         "PANGOLIN SCAN SERVICE RESTARTING..."
     );

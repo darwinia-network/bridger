@@ -23,7 +23,7 @@ pub struct DarwiniaAccount {
 impl Debug for DarwiniaAccount {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(&format!("account: {},", self.account_id))?;
-        f.write_str(&format!(" signer: <..>",))?;
+        f.write_str(" signer: <..>,")?;
         f.write_str(&format!(" real: {:?}", self.real))?;
         Ok(())
     }

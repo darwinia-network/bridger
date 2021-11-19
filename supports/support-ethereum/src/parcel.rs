@@ -1,10 +1,12 @@
 //! Ethereum EthereumRelayHeaderParcel
+use std::convert::{TryFrom, TryInto};
 use std::fmt::Formatter;
 
 use codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use sp_core::bytes::to_hex;
 
+use bridge_primitives::error::{BridgeBasicError, BridgeBasicResult};
 use bridge_primitives::{bytes, hex};
 
 use crate::block::{EthereumHeader, EthereumHeaderJson};
@@ -47,20 +49,23 @@ pub struct EthereumRelayHeaderParcelJson {
     pub mmr_root: String,
 }
 
-impl From<EthereumRelayHeaderParcelJson> for EthereumRelayHeaderParcel {
-    fn from(that: EthereumRelayHeaderParcelJson) -> Self {
-        EthereumRelayHeaderParcel {
-            header: that.header.into(),
+impl TryFrom<EthereumRelayHeaderParcelJson> for EthereumRelayHeaderParcel {
+    type Error = BridgeBasicError;
+
+    fn try_from(that: EthereumRelayHeaderParcelJson) -> BridgeBasicResult<Self> {
+        Ok(EthereumRelayHeaderParcel {
+            header: that.header.try_into()?,
             mmr_root: bytes!(that.mmr_root.as_str(), 32),
-        }
+        })
     }
 }
 
-impl From<EthereumRelayHeaderParcel> for EthereumRelayHeaderParcelJson {
-    fn from(that: EthereumRelayHeaderParcel) -> Self {
-        EthereumRelayHeaderParcelJson {
-            header: that.header.into(),
+impl TryFrom<EthereumRelayHeaderParcel> for EthereumRelayHeaderParcelJson {
+    type Error = BridgeBasicError;
+    fn try_from(that: EthereumRelayHeaderParcel) -> BridgeBasicResult<Self> {
+        Ok(EthereumRelayHeaderParcelJson {
+            header: that.header.try_into()?,
             mmr_root: hex!(&that.mmr_root),
-        }
+        })
     }
 }

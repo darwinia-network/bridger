@@ -146,7 +146,7 @@ async fn run_scan(
 
         log::trace!(
             target: PangolinRopstenTask::NAME,
-            "Track ropsten redeem block: {} and limit: {}",
+            "[ropsten] Track redeem block: {} and limit: {}",
             from,
             limit
         );
@@ -154,6 +154,10 @@ async fn run_scan(
             .query_transactions(from as u64, limit as u32)
             .await?;
         if txs.is_empty() {
+            log::info!(
+                target: PangolinRopstenTask::NAME,
+                "[ropsten] Not found any transactions to redeem"
+            );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
             ))

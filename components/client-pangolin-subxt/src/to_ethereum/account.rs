@@ -7,7 +7,7 @@ use crate::account::DarwiniaAccount;
 use crate::types::EcdsaSignature;
 use crate::{error::Error, error::Result};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct EthereumAccount {
     /// ethereum url
     pub ethereum_url: String,
@@ -16,7 +16,7 @@ pub struct EthereumAccount {
 }
 
 /// Account
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Account(pub DarwiniaAccount, pub EthereumAccount);
 
 impl Account {

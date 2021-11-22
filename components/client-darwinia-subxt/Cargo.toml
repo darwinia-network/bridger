@@ -32,13 +32,13 @@ web3 = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", f
 secp256k1 = { version = "0.20", features = ["recovery"] }
 
 jsonrpsee-types = "0.3.1"
-substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.3-patch.1" }
-substrate-subxt-proc-macro = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.3-patch.1" }
+substrate-subxt            = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.6-1" }
+substrate-subxt-proc-macro = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.6-1" }
 
-frame-support = { package = "frame-support", git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.3" }
-pallet-indices = { package = "pallet-indices", git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.3" }
-pallet-im-online = { package = "pallet-im-online", git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.3" }
+frame-support    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+pallet-indices   = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+pallet-im-online = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
 
-bridge-traits = { path = "../../traits" }
-support-ethereum = { path = "../../supports/support-ethereum" }
+bridge-traits     = { path = "../../traits" }
+support-ethereum  = { path = "../../supports/support-ethereum" }
 bridge-primitives = { path = "../../primitives" }

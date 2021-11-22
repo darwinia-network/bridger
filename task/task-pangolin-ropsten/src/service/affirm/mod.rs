@@ -164,10 +164,20 @@ async fn run_scan(
         let from = tracker.current().await?;
         let limit = 10usize;
 
+        log::trace!(
+            target: PangolinRopstenTask::NAME,
+            "[ropsten] Track affirm block: {} and limit: {}",
+            from,
+            limit
+        );
         let txs = thegraph_liketh
             .query_transactions(from as u64, limit as u32)
             .await?;
         if txs.is_empty() {
+            log::info!(
+                target: PangolinRopstenTask::NAME,
+                "[ropsten] Not found any transactions to affirm"
+            );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
             ))

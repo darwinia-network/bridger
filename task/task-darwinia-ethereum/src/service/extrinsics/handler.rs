@@ -55,8 +55,9 @@ impl ExtrinsicsHandler {
         let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
 
         // Config
-        let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-        let config_web3: Web3Config = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let config_darwinia: DarwiniaSubxtConfig =
+            Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
+        let config_web3: Web3Config = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
         // Darwinia client & accounts
         let darwinia = component_darwinia.component().await?;

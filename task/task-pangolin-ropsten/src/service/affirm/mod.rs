@@ -117,7 +117,7 @@ async fn handle_affirm_relay(
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
 ) -> anyhow::Result<()> {
     // Config
-    let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let task_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
     let mut handler = AffirmHandler::new(microkv.clone(), sender_to_extrinsics.clone()).await;
     loop {
         if let Err(err) = handler.affirm().await {
@@ -152,7 +152,7 @@ async fn run_scan(
     microkv: NamespaceMicroKV,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
 ) -> anyhow::Result<()> {
-    let task_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let task_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
 
     // the graph
     let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;

@@ -161,7 +161,7 @@ mod s2s_messages {
     use substrate_relay_helper::messages_source::SubstrateMessagesSource;
     use substrate_relay_helper::messages_target::SubstrateMessagesTarget;
 
-    use component_pangolin_s2s::PangolinChain;
+    use component_pangolin_s2s::{PangolinChain, PangolinRelayStrategy};
     use component_pangoro_s2s::PangoroChain;
 
     use crate::chains::pangolin::PangolinChainConst;
@@ -321,6 +321,7 @@ mod s2s_messages {
                 <PangolinChainConst as ChainConst>::SigningParams,
                 PangoroChain,
                 <PangoroChainConst as ChainConst>::SigningParams,
+                PangolinRelayStrategy,
             >,
         ) -> anyhow::Result<()> {
             let stall_timeout = Duration::from_secs(5 * 60);
@@ -388,7 +389,7 @@ mod s2s_messages {
                         max_messages_in_single_batch,
                         max_messages_weight_in_single_batch,
                         max_messages_size_in_single_batch,
-                        relayer_mode: params.relayer_mode,
+                        relay_strategy: params.relay_strategy,
                     },
                 },
                 PangolinSourceClient::new(

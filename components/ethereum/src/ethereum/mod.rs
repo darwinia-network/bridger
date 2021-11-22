@@ -31,7 +31,7 @@ impl BridgeComponent<EthereumConfig, EthereumClient> for EthereumComponent {
     where
         Self: Sized,
     {
-        let config: EthereumConfig = Config::restore_with_namespace(T::NAME, &namespace)?;
+        let config: EthereumConfig = Config::restore_with_namespace_unwrap(T::NAME, &namespace)?;
         let web3_component = Web3Component::restore_with_namespace::<T>(namespace)?;
         Ok(Self::new(config, web3_component))
     }

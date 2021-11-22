@@ -18,27 +18,42 @@ readme = 'README.md'
 edition = "2018"
 
 [dependencies]
+anyhow = "1"
+async-trait = "0.1"
+log = "0.4"
 
 bridge-traits = { path = "../../traits" }
 
 codec                  = { package = "parity-scale-codec", version = "2.0.0" }
-headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
 
 ## Bridge dependencies
-pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10" }
-common-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10" }
-bridge-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10" }
-darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10" }
-pangolin-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10" }
+pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
+common-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
+bridge-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
+darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
+pangolin-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
+dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
 
 
 
 ## Substrate Dependencies
-frame-system               = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-frame-support              = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
-sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6" }
+frame-system               = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+frame-support              = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+pallet-transaction-payment = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
+
+
+[dev-dependencies]
+anyhow       = "1"
+futures-test = "0.3"
+tokio        = { version = "1", features = ["time"] }
+codec        = { package = "parity-scale-codec", version = "2.2.0" }
+

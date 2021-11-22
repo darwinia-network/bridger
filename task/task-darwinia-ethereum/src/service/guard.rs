@@ -84,8 +84,8 @@ async fn start(
     let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
 
     // Config
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-    let servce_config: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
+    let servce_config: TaskConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     // Darwinia client & account
     let darwinia = component_darwinia_subxt.component().await?;

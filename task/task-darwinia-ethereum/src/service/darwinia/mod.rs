@@ -93,8 +93,8 @@ async fn _start(
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
     // Config
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
-    let config_web3: Web3Config = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
+    let config_web3: Web3Config = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     // Components
     let component_ethereum = EthereumComponent::restore::<DarwiniaEthereumTask>()?;

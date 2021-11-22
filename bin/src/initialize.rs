@@ -22,11 +22,14 @@ fn init_log() {
                 "darwinia_bridge=debug",
                 "bridge=info",
                 "component_pangolin_subxt=trace",
+                "subscan=debug",
                 "support_tracker_evm_log=info",
                 "task-darwinia-ethereum=trace",
                 "task-pangolin-ropsten=trace",
                 "task-pangolin-pangoro=trace",
                 "jsonrpsee_ws_client=error",
+                "component_pangoro_s2s=trace",
+                "component_pangolin_s2s=trace",
             ]
             .join(","),
         );

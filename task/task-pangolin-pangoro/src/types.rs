@@ -2,7 +2,6 @@ use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
 use bp_messages::LaneId;
-use messages_relay::message_lane_loop::RelayerMode;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use sp_core::crypto::Pair;
 
@@ -150,26 +149,6 @@ impl From<PrometheusParamsInfo> for relay_utils::metrics::MetricsParams {
     }
 }
 
-/// Relayer operating mode.
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize, strum::EnumString)]
-pub enum WrapperRelayerMode {
-    /// The relayer doesn't care about rewards.
-    #[strum(serialize = "altruistic")]
-    Altruistic,
-    /// The relayer will deliver all messages and confirmations as long as he's not losing any funds. default value
-    #[strum(serialize = "rational")]
-    Rational,
-}
-
-impl From<WrapperRelayerMode> for RelayerMode {
-    fn from(wrm: WrapperRelayerMode) -> Self {
-        match wrm {
-            WrapperRelayerMode::Altruistic => RelayerMode::Altruistic,
-            WrapperRelayerMode::Rational => RelayerMode::Rational,
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct RelayHeadersAndMessagesInfo {
     pub source: ChainInfo,
@@ -177,7 +156,6 @@ pub struct RelayHeadersAndMessagesInfo {
 
     pub lanes: Vec<HexLaneId>,
     pub prometheus_params: PrometheusParamsInfo,
-    pub relayer_mode: RelayerMode,
     pub create_relayers_fund_accounts: bool,
     pub only_mandatory_headers: bool,
 

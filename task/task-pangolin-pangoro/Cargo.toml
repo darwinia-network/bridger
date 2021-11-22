@@ -47,15 +47,15 @@ sp-version          = { git = "https://github.com/darwinia-network/substrate.git
 
 ## bridge common
 
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
-bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
-substrate-relay-helper = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
-bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
-pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-feemarket-strategy" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
+bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
+substrate-relay-helper = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
+bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
+pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
 
 
 ## component
@@ -64,16 +64,16 @@ component-pangoro-s2s  = { path = "../../components/client-pangoro-s2s" }
 component-subscan      = { path = "../../components/subscan" }
 
 ## darwinia common
-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
+common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
+bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
 
 ## pangolin
-pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-pangolin-runtime-system-params = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-pangolin-constants             = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
+pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
+pangolin-runtime-system-params = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
+pangolin-constants             = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
 
 ## pangoro
-pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-pangoro-runtime-system-params  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
-pangoro-constants              = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "s2s" }
+pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
+pangoro-runtime-system-params  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
+pangoro-constants              = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
 

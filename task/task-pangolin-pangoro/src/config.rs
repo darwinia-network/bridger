@@ -90,6 +90,8 @@ pub struct RelayConfig {
     pub only_mandatory_headers: bool,
     /// Create relayers fund accounts on both chains, if it does not exists yet.
     pub create_relayers_fund_accounts: bool,
+
+    // todo: May we don't need these fields? because we removed update conversion.
     /// The SURI of secret key to use when transactions are submitted to the pangolin node.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pangolin_messages_pallet_owner: Option<String>,

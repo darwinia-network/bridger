@@ -77,10 +77,20 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
         let from = tracker.current().await?;
         let limit = 1usize;
 
+        log::trace!(
+            target: PangolinRopstenTask::NAME,
+            "[ropsten] Track check block: {} and limit: {}",
+            from,
+            limit
+        );
         let txs = thegraph_liketh
             .query_transactions(from as u64, limit as u32)
             .await?;
         if txs.is_empty() {
+            log::info!(
+                target: PangolinRopstenTask::NAME,
+                "[ropsten] All transactions checked"
+            );
             tokio::time::sleep(std::time::Duration::from_secs(task_config.interval_check)).await;
             continue;
         }

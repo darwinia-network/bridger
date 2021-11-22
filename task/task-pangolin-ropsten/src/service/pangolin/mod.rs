@@ -65,7 +65,7 @@ async fn start(sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>, tra
         let secs = 10;
         error!(
             target: PangolinRopstenTask::NAME,
-            "pangolin err {:#?}, wait {} seconds try again", e, secs
+            "pangolin err {:?}, wait {} seconds try again", e, secs
         );
         tokio::time::sleep(std::time::Duration::from_secs(secs)).await;
     }
@@ -75,7 +75,7 @@ async fn run(
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     tracker: Tracker,
 ) -> anyhow::Result<()> {
-    info!(
+    log::info!(
         target: PangolinRopstenTask::NAME,
         "PANGOLIN SCAN SERVICE RESTARTING..."
     );
@@ -303,19 +303,29 @@ impl DarwiniaServiceRunner {
             }
             // call ethereum_backing.lock will emit the event
             EventInfo::ScheduleMMRRootEvent(event) => {
-                info!(
-                    target: PangolinRopstenTask::NAME,
-                    "Find Schedule MMRRoot event at {:?}", header.number
-                );
-                if self
+                let is_authority = self
                     .darwinia2ethereum
                     .is_authority(block, &self.account)
-                    .await?
-                {
-                    info!(target: PangolinRopstenTask::NAME, "{}", event);
+                    .await?;
+                log::info!(
+                    target: PangolinRopstenTask::NAME,
+                    "Find Schedule MMRRoot event at {:?}",
+                    header.number
+                );
+                if is_authority {
+                    log::info!(
+                        target: PangolinRopstenTask::NAME,
+                        "SignAndSendMmrRoot Event: {}",
+                        event
+                    );
                     let ex = Extrinsic::SignAndSendMmrRoot(event.block_number);
                     self.delayed_extrinsics.insert(event.block_number, ex);
+                    return Ok(());
                 }
+                log::warn!(
+                    target: PangolinRopstenTask::NAME,
+                    "But you are not authority account."
+                );
             }
             _ => {}
         }

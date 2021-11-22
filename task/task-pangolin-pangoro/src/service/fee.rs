@@ -54,16 +54,11 @@ async fn cron_update_fee(config_task: TaskConfig) -> anyhow::Result<()> {
                 e
             );
         }
-        // tokio::time::sleep(std::time::Duration::from_secs(
-        //     config_task.interval_update_fee,
-        // ))
-        // .await;
 
-        // futures_timer::Delay::new(std::time::Duration::from_secs(3)).await?;
-
-        std::thread::sleep(std::time::Duration::from_secs(
+        futures_timer::Delay::new(std::time::Duration::from_secs(
             config_task.interval_update_fee,
-        ));
+        ))
+        .await;
     }
 }
 

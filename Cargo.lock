@@ -10949,6 +10949,7 @@ dependencies = [
  "component-subscan",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "futures 0.3.17",
+ "futures-timer",
  "hex",
  "lifeline",
  "log",

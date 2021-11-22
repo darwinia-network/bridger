@@ -411,4 +411,26 @@ mod s2s_messages {
             .await
         }
     }
+
+    /// Add standalone metrics for the Pangolin -> Pangoro messages loop.
+    pub(crate) fn add_standalone_metrics(
+        metrics_prefix: Option<String>,
+        metrics_params: MetricsParams,
+        source_client: Client<PangolinChain>,
+    ) -> anyhow::Result<(MetricsParams, StandaloneMessagesMetrics)> {
+        substrate_relay_helper::messages_lane::add_standalone_metrics::<PangolinMessagesToPangoro>(
+            metrics_prefix,
+            metrics_params,
+            source_client,
+            Some(crate::chains::PANGOLIN_ASSOCIATED_TOKEN_ID),
+            Some(crate::chains::PANGORO_ASSOCIATED_TOKEN_ID),
+            Some((
+                sp_core::storage::StorageKey(
+                    pangolin_runtime::pangoro_messages::PangoroToPangolinConversionRate::key()
+                        .to_vec(),
+                ),
+                pangolin_runtime::pangoro_messages::INITIAL_PANGORO_TO_PANGOLIN_CONVERSION_RATE,
+            )),
+        )
+    }
 }

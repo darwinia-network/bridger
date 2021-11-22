@@ -169,7 +169,9 @@ pub struct MessagesPalletOwnerSigningParams {
     pub messages_pallet_owner_password: Option<String>,
 }
 
+#[allow(dead_code)]
 impl MessagesPalletOwnerSigningParams {
+
     /// Parse signing params into chain-specific KeyPair.
     pub fn to_keypair<Chain: CliChain>(&self) -> anyhow::Result<Option<Chain::KeyPair>> {
         let messages_pallet_owner = match self.messages_pallet_owner {

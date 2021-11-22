@@ -25,13 +25,13 @@ use crate::message::PangolinPangoroMessageSend;
 use crate::task::PangolinPangoroTask;
 use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
-/// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.
-///
-/// If it is zero, then transaction will be submitted every time we see difference between
-/// stored and real conversion rates. If it is large enough (e.g. > than 10 percents, which is 0.1),
-/// then rational relayers may stop relaying messages because they were submitted using
-/// lesser conversion rate.
-const CONVERSION_RATE_ALLOWED_DIFFERENCE_RATIO: f64 = 0.05;
+// /// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.
+// ///
+// /// If it is zero, then transaction will be submitted every time we see difference between
+// /// stored and real conversion rates. If it is large enough (e.g. > than 10 percents, which is 0.1),
+// /// then rational relayers may stop relaying messages because they were submitted using
+// /// lesser conversion rate.
+// const CONVERSION_RATE_ALLOWED_DIFFERENCE_RATIO: f64 = 0.05;
 
 #[derive(Debug)]
 pub struct RelayService {
@@ -130,9 +130,9 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
     let metrics_params: MetricsParams = relay_info.prometheus_params.clone().into();
     let metrics_params = relay_utils::relay_metrics(None, metrics_params).into_params();
 
-    const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
-				this is the command entrypoint, so nothing has been registered yet; \
-				qed";
+    // const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
+	// 			this is the command entrypoint, so nothing has been registered yet; \
+	// 			qed";
 
     if relay_info.create_relayers_fund_accounts {
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<

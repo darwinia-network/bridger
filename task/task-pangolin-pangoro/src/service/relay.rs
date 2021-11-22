@@ -130,9 +130,9 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
     let metrics_params: MetricsParams = relay_info.prometheus_params.clone().into();
     let metrics_params = relay_utils::relay_metrics(None, metrics_params).into_params();
 
-    const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
-				this is the command entrypoint, so nothing has been registered yet; \
-				qed";
+    // const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
+	// 			this is the command entrypoint, so nothing has been registered yet; \
+	// 			qed";
 
     if relay_info.create_relayers_fund_accounts {
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<

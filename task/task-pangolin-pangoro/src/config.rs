@@ -90,20 +90,6 @@ pub struct RelayConfig {
     pub only_mandatory_headers: bool,
     /// Create relayers fund accounts on both chains, if it does not exists yet.
     pub create_relayers_fund_accounts: bool,
-
-    // todo: May we don't need these fields? because we removed update conversion.
-    /// The SURI of secret key to use when transactions are submitted to the pangolin node.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangolin_messages_pallet_owner: Option<String>,
-    /// The password for the SURI of secret key to use when transactions are submitted to the pangolin node.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangolin_messages_pallet_owner_password: Option<String>,
-    /// The SURI of secret key to use when transactions are submitted to the pangoro node.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangoro_messages_pallet_owner: Option<String>,
-    /// The password for the SURI of secret key to use when transactions are submitted to the pangoro node.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangoro_messages_pallet_owner_password: Option<String>,
 }
 
 impl BridgeConfig for RelayConfig {
@@ -124,10 +110,6 @@ impl BridgeConfig for RelayConfig {
             },
             only_mandatory_headers: false,
             create_relayers_fund_accounts: false,
-            pangolin_messages_pallet_owner: Some("//PangoroMessagesOwner".to_string()),
-            pangolin_messages_pallet_owner_password: Some("123456".to_string()),
-            pangoro_messages_pallet_owner: Some("//PangolinMessagesOwner".to_string()),
-            pangoro_messages_pallet_owner_password: Some("123456".to_string()),
         }
     }
 }

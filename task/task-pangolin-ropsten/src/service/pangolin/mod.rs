@@ -83,8 +83,8 @@ async fn run(
     let delayed_extrinsics: HashMap<u32, Extrinsic> = HashMap::new();
 
     // Config
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore(PangolinRopstenTask::NAME)?;
-    let config_web3: Web3Config = Config::restore(PangolinRopstenTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+    let config_web3: Web3Config = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
 
     // Components
     let component_ethereum = EthereumComponent::restore::<PangolinRopstenTask>()?;

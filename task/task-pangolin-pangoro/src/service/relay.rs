@@ -1,15 +1,17 @@
+use common_primitives::AccountId;
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
+use sp_core::Pair;
 use substrate_relay_helper::messages_lane::{MessagesRelayParams, SubstrateMessageLane};
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
 
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_s2s::PangolinChain;
-use component_pangoro_s2s::PangoroChain;
+use component_pangolin_s2s::{PangolinChain, PangolinRelayStrategy};
+use component_pangoro_s2s::{PangoroChain, PangoroRelayStrategy};
 
 use crate::bus::PangolinPangoroBus;
 use crate::chains::pangolin::{
@@ -21,9 +23,7 @@ use crate::chains::pangoro::{
 use crate::config::{ChainInfoConfig, RelayConfig};
 use crate::message::PangolinPangoroMessageSend;
 use crate::task::PangolinPangoroTask;
-use crate::types::{
-    MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo, WrapperRelayerMode,
-};
+use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
 /// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.
 ///
@@ -47,10 +47,10 @@ impl Service for RelayService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let mut rx = bus.rx::<PangolinPangoroMessageSend>()?;
         let config_pangolin: ChainInfoConfig =
-            Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangolin")?;
+            Config::restore_with_namespace_unwrap(PangolinPangoroTask::NAME, "pangolin")?;
         let config_pangoro: ChainInfoConfig =
-            Config::restore_with_namespace(PangolinPangoroTask::NAME, "pangoro")?;
-        let config_relay: RelayConfig = Config::restore(PangolinPangoroTask::NAME)?;
+            Config::restore_with_namespace_unwrap(PangolinPangoroTask::NAME, "pangoro")?;
+        let config_relay: RelayConfig = Config::restore_unwrap(PangolinPangoroTask::NAME)?;
 
         let _greet = Self::try_task(
             &format!("{}-relay", PangolinPangoroTask::NAME),
@@ -74,10 +74,6 @@ impl Service for RelayService {
                         target: target_chain,
                         lanes: config_relay.lanes.clone(),
                         prometheus_params: config_relay.prometheus_params.clone(),
-                        relayer_mode: config_relay
-                            .relayer_mode
-                            .unwrap_or(WrapperRelayerMode::Rational)
-                            .into(),
                         create_relayers_fund_accounts: config_relay.create_relayers_fund_accounts,
                         only_mandatory_headers: config_relay.only_mandatory_headers,
                         pangolin_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams {
@@ -103,6 +99,8 @@ impl Service for RelayService {
                     })
                     .join()
                     .map_err(|_| anyhow::Error::msg("Failed to join thread handle"))??;
+
+                    // bridge_relay(relay_info).await?;
                 }
                 Ok(())
             },
@@ -114,7 +112,6 @@ impl Service for RelayService {
 async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result<()> {
     let pangolin_chain = relay_info.source;
     let pangoro_chain = relay_info.target;
-    let relayer_mode = relay_info.relayer_mode;
 
     let pangolin_client = pangolin_chain
         .to_substrate_relay_chain::<PangolinChain>()
@@ -293,11 +290,14 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                 source_to_target_headers_relay: Some(pangolin_to_pangoro_on_demand_headers.clone()),
                 target_to_source_headers_relay: Some(pangoro_to_pangolin_on_demand_headers.clone()),
                 lane_id: lane,
-                relayer_mode,
                 metrics_params: metrics_params.clone().disable().metrics_prefix(
                     messages_relay::message_lane_loop::metrics_prefix::<
                         <PangolinMessagesToPangoro as SubstrateMessageLane>::MessageLane,
                     >(&lane),
+                ),
+                relay_strategy: PangolinRelayStrategy::new(
+                    pangolin_client.clone(),
+                    AccountId::from(pangolin_sign.public().0),
                 ),
             })
             .map_err(|e| anyhow::format_err!("{}", e))
@@ -312,11 +312,14 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                 source_to_target_headers_relay: Some(pangoro_to_pangolin_on_demand_headers.clone()),
                 target_to_source_headers_relay: Some(pangolin_to_pangoro_on_demand_headers.clone()),
                 lane_id: lane,
-                relayer_mode,
                 metrics_params: metrics_params.clone().disable().metrics_prefix(
                     messages_relay::message_lane_loop::metrics_prefix::<
                         <PangoroMessagesToPangolin as SubstrateMessageLane>::MessageLane,
                     >(&lane),
+                ),
+                relay_strategy: PangoroRelayStrategy::new(
+                    pangoro_client.clone(),
+                    AccountId::from(pangoro_sign.public().0),
                 ),
             })
             .map_err(|e| anyhow::format_err!("{}", e))

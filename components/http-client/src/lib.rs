@@ -21,7 +21,7 @@ impl HttpClientComponent {
 #[async_trait::async_trait]
 impl BridgeComponent<HttpClientConfig, reqwest::Client> for HttpClientComponent {
     fn restore_with_namespace<T: BridgeSand>(namespace: String) -> BridgeResult<Self> {
-        let config: HttpClientConfig = Config::restore_with_namespace(T::NAME, namespace)?;
+        let config: HttpClientConfig = Config::restore_with_namespace_unwrap(T::NAME, namespace)?;
         Ok(Self::new(config))
     }
 

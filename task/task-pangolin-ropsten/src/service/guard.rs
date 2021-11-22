@@ -70,8 +70,8 @@ async fn run(sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>) -> any
     let component_shadow = ShadowComponent::restore::<PangolinRopstenTask>()?;
 
     // Config
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore(PangolinRopstenTask::NAME)?;
-    let servce_config: TaskConfig = Config::restore(PangolinRopstenTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+    let servce_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
 
     // Darwinia client & account
     let darwinia = component_pangolin_subxt.component().await?;

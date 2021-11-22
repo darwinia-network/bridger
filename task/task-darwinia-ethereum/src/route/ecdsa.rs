@@ -23,10 +23,10 @@ pub async fn ecdsa(
         .ok_or_else(|| StandardError::Api("The `message` parameter is required".to_string()))?;
 
     let state = bus.storage().clone_resource::<BridgeState>()?;
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     // Web3
-    let config_web3: Web3Config = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let config_web3: Web3Config = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     // Darwinia client
     let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;

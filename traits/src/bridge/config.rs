@@ -73,8 +73,14 @@ impl Config {
 
     pub fn restore<S: AsRef<str>, B: BridgeConfig + DeserializeOwned>(
         sand_name: S,
-    ) -> BridgeResult<B> {
+    ) -> BridgeResult<Option<B>> {
         Self::restore_with_namespace(sand_name, DEFAULT_NAMESPACE)
+    }
+
+    pub fn restore_unwrap<S: AsRef<str>, B: BridgeConfig + DeserializeOwned>(
+        sand_name: S,
+    ) -> BridgeResult<B> {
+        Self::restore_with_namespace_unwrap(sand_name, DEFAULT_NAMESPACE)
     }
 
     pub fn restore_with_namespace<
@@ -84,7 +90,7 @@ impl Config {
     >(
         sand_name: S,
         namespace: N,
-    ) -> BridgeResult<B> {
+    ) -> BridgeResult<Option<B>> {
         let config_marker = B::marker();
         let key = format!(
             "{}:{}@{}",
@@ -93,16 +99,37 @@ impl Config {
             namespace.as_ref()
         );
         match INSTANCE.lock().unwrap().get(&key) {
-            Some(v) => serde_json::from_str(v).map_err(|e| {
+            Some(v) => Ok(Some(serde_json::from_str(v).map_err(|e| {
                 StandardError::Other(format!(
                     "The config cannot be deserialize, please check it. [{}] {:?}",
                     key, e
                 ))
-            }),
-            None => Err(StandardError::NotSupport(format!(
+            })?)),
+            None => Ok(None),
+        }
+    }
+
+    pub fn restore_with_namespace_unwrap<
+        S: AsRef<str>,
+        B: BridgeConfig + DeserializeOwned,
+        N: AsRef<str>,
+    >(
+        sand_name: S,
+        namespace: N,
+    ) -> BridgeResult<B> {
+        let key = format!(
+            "{}:{}@{}",
+            sand_name.as_ref(),
+            B::marker(),
+            namespace.as_ref()
+        );
+        match Self::restore_with_namespace(sand_name, namespace) {
+            Ok(Some(v)) => Ok(v),
+            Ok(None) => Err(StandardError::NotSupport(format!(
                 "Not support this config, please init this config after create task -> [{}]",
                 key
             ))),
+            Err(e) => Err(e),
         }
     }
 

@@ -8,6 +8,7 @@ use bridge_traits::bridge::task::{
 use crate::bus::PangolinPangoroBus;
 use crate::config::{PangolinPangoroConfig, RelayConfig};
 use crate::message::PangolinPangoroMessageSend;
+use crate::service::fee::UpdateFeeService;
 use crate::service::init::InitBridgeService;
 use crate::service::relay::RelayService;
 
@@ -50,11 +51,12 @@ impl PangolinPangoroTask {
         let bus = PangolinPangoroBus::default();
 
         let mut stack = TaskStack::new(bus);
+        stack.spawn_service::<UpdateFeeService>()?;
         stack.spawn_service::<InitBridgeService>()?;
         stack.spawn_service::<RelayService>()?;
 
         let mut sender = stack.bus().tx::<PangolinPangoroMessageSend>()?;
-        let relay_config: RelayConfig = Config::restore(Self::NAME)?;
+        let relay_config: RelayConfig = Config::restore_unwrap(Self::NAME)?;
         if relay_config.auto_start {
             sender.send(PangolinPangoroMessageSend::Relay).await?;
         }

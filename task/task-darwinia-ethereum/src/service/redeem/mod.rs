@@ -140,7 +140,7 @@ async fn run_scan(
     let thegraph_liketh = component_thegraph_liketh.component().await?;
 
     // task config
-    let task_config: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let task_config: TaskConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     let mut handler =
         RedeemHandler::new(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await;

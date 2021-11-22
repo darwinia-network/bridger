@@ -3,6 +3,7 @@ pub mod task;
 
 mod bus;
 mod chains;
+mod fee;
 mod message;
 mod route;
 mod service;

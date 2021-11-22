@@ -23,7 +23,7 @@ pub async fn guard(
     _param: serde_json::Value,
 ) -> anyhow::Result<TaskTerminal> {
     let state = bus.storage().clone_resource::<BridgeState>()?;
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     // Shadow
     let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;

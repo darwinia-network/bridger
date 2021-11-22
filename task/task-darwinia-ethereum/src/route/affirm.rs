@@ -49,7 +49,7 @@ pub async fn affirm_force(
         .ok_or_else(|| StandardError::Api("The `block` parameter is required".to_string()))?;
 
     let state = bus.storage().clone_resource::<BridgeState>()?;
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     // Shadow
     let component_shadow = ShadowComponent::restore::<DarwiniaEthereumTask>()?;
@@ -93,7 +93,7 @@ pub async fn affirm_raw(
         .ok_or_else(|| StandardError::Api("The `json` parameter is required".to_string()))?;
 
     let state = bus.storage().clone_resource::<BridgeState>()?;
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
     // Darwinia client
     let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;

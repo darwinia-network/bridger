@@ -30,7 +30,7 @@ impl Service for StarterService {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // task config
-        let config_task: TaskConfig = Config::restore(DarwiniaEthereumTask::NAME)?;
+        let config_task: TaskConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
         // State
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let mut tx_scan = bus.tx::<DarwiniaEthereumMessage>()?;

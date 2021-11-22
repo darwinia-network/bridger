@@ -21,6 +21,7 @@ fn init_log() {
                 "lifeline=debug",
                 "darwinia_bridge=debug",
                 "bridge=info",
+                "component_pangolin_subxt=trace",
                 "support_tracker_evm_log=info",
                 "task-darwinia-ethereum=trace",
                 "task-pangolin-ropsten=trace",

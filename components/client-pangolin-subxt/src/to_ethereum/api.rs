@@ -241,8 +241,9 @@ impl Darwinia2Ethereum {
             }
             None => {
                 log::trace!(
-                    "Ecdsa sign and submit mmr_root to darwinia, block_number: {}",
-                    block_number
+                    "Ecdsa sign and submit mmr_root to darwinia, block_number: {}, signature: {:?}",
+                    block_number,
+                    signature
                 );
                 let tx_hash = self
                     .darwinia

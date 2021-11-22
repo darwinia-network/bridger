@@ -32,15 +32,15 @@ no_prometheus = false
 prometheus_host = "127.0.0.1"
 prometheus_port = 9616
 
-[pangolin_subscan]
-endpoint = "https://pangolin.api.subscan.io"
-token = "12345abcde"
-timeout = 30
-
-[pangoro_subscan]
-endpoint = "https://pangoro.api.subscan.io"
-token = "12345abcde"
-timeout = 30
+#[pangolin_subscan]
+#endpoint = "https://pangolin.api.subscan.io"
+#token = "12345abcde"
+#timeout = 30
+#
+#[pangoro_subscan]
+#endpoint = "https://pangoro.api.subscan.io"
+#token = "12345abcde"
+#timeout = 30
 
 [task]
 # 1800 seconds, 30 minutes

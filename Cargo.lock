@@ -3203,7 +3203,7 @@ dependencies = [
 [[package]]
 name = "gql_client"
 version = "1.0.1"
-source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#28499d7b5e7e2dcf2d833da83b535ca44817be75"
+source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#f8ae4678810dcad8df6760a4e05d37a37fe5563f"
 dependencies = [
  "reqwest",
  "serde 1.0.130",

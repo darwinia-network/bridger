@@ -60,20 +60,21 @@ messages-relay         = { git = "https://github.com/darwinia-network/parity-bri
 
 ## component
 component-darwinia-s2s = { path = "../../components/client-darwinia-s2s" }
-component-crab-s2s  = { path = "../../components/client-crab-s2s" }
+component-crab-s2s     = { path = "../../components/client-crab-s2s" }
 component-subscan      = { path = "../../components/subscan" }
 
 ## darwinia common
-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
+bridge-primitives        = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.6" }
+common-primitives        = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.6" }
+darwinia-runtime-common  = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.6" }
 
 ## darwinia
-darwinia-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "master" }
+darwinia-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.6" }
 #pangolin-runtime-system-params = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
 #pangolin-constants             = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
 
 ## crab
-crab-runtime                   = { git = "https://github.com/darwinia-network/darwinia.git", branch = "master" }
+crab-runtime                   = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.6" }
 #pangoro-runtime-system-params  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
 #pangoro-constants              = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.6.10-2" }
 

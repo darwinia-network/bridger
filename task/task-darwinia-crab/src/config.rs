@@ -80,9 +80,9 @@ pub struct RelayConfig {
     pub lanes: Vec<HexLaneId>,
     pub auto_start: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub signer_pangolin: Option<String>,
+    pub signer_darwinia: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub signer_pangoro: Option<String>,
+    pub signer_crab: Option<String>,
     #[serde(default)]
     pub prometheus_params: PrometheusParamsInfo,
     /// If passed, only mandatory headers (headers that are changing the GRANDPA authorities set)
@@ -92,16 +92,16 @@ pub struct RelayConfig {
     pub create_relayers_fund_accounts: bool,
     /// The SURI of secret key to use when transactions are submitted to the pangolin node.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangolin_messages_pallet_owner: Option<String>,
+    pub darwinia_messages_pallet_owner: Option<String>,
     /// The password for the SURI of secret key to use when transactions are submitted to the pangolin node.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangolin_messages_pallet_owner_password: Option<String>,
+    pub darwinia_messages_pallet_owner_password: Option<String>,
     /// The SURI of secret key to use when transactions are submitted to the pangoro node.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangoro_messages_pallet_owner: Option<String>,
+    pub crab_messages_pallet_owner: Option<String>,
     /// The password for the SURI of secret key to use when transactions are submitted to the pangoro node.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangoro_messages_pallet_owner_password: Option<String>,
+    pub crab_messages_pallet_owner_password: Option<String>,
 }
 
 impl BridgeConfig for RelayConfig {
@@ -113,8 +113,8 @@ impl BridgeConfig for RelayConfig {
         Self {
             lanes: vec![HexLaneId::from_str("00000000").unwrap()],
             auto_start: false,
-            signer_pangolin: Some("//Alice".to_string()),
-            signer_pangoro: Some("//Alice".to_string()),
+            signer_darwinia: Some("//Alice".to_string()),
+            signer_crab: Some("//Alice".to_string()),
             prometheus_params: PrometheusParamsInfo {
                 no_prometheus: false,
                 prometheus_host: "127.0.0.1".to_string(),
@@ -122,10 +122,10 @@ impl BridgeConfig for RelayConfig {
             },
             only_mandatory_headers: false,
             create_relayers_fund_accounts: false,
-            pangolin_messages_pallet_owner: Some("//PangoroMessagesOwner".to_string()),
-            pangolin_messages_pallet_owner_password: Some("123456".to_string()),
-            pangoro_messages_pallet_owner: Some("//PangolinMessagesOwner".to_string()),
-            pangoro_messages_pallet_owner_password: Some("123456".to_string()),
+            darwinia_messages_pallet_owner: Some("//PangoroMessagesOwner".to_string()),
+            darwinia_messages_pallet_owner_password: Some("123456".to_string()),
+            crab_messages_pallet_owner: Some("//PangolinMessagesOwner".to_string()),
+            crab_messages_pallet_owner_password: Some("123456".to_string()),
         }
     }
 }

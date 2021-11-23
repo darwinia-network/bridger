@@ -6,6 +6,6 @@ pub mod darwinia;
 // Rialto as BTC and Millau as wBTC (only in relayer).
 
 /// The identifier of token, which value is associated with Rialto token value by relayer.
-pub(crate) const PANGOLIN_ASSOCIATED_TOKEN_ID: &str = "bitcoin";
+pub(crate) const DARWINIA_ASSOCIATED_TOKEN_ID: &str = "bitcoin";
 /// The identifier of token, which value is associated with Millau token value by relayer.
-pub(crate) const PANGORO_ASSOCIATED_TOKEN_ID: &str = "wrapped-bitcoin";
+pub(crate) const CRAB_ASSOCIATED_TOKEN_ID: &str = "wrapped-bitcoin";

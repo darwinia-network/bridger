@@ -2,9 +2,9 @@ use relay_substrate_client::TransactionSignScheme;
 
 use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::task::BridgeSand;
-use component_crab_s2s::api::PangoroApi;
+use component_crab_s2s::api::CrabApi;
 use component_crab_s2s::CrabChain;
-use component_darwinia_s2s::api::PangolinApi;
+use component_darwinia_s2s::api::DarwiniaApi;
 use component_darwinia_s2s::DarwiniaChain;
 
 use crate::config::{ChainInfoConfig, RelayConfig};
@@ -12,10 +12,10 @@ use crate::task::DarwiniaCrabTask;
 
 #[derive(Clone)]
 pub struct StrategyHelper {
-    pangolin_api: PangolinApi,
-    pangoro_api: PangoroApi,
-    pangolin_signer: <DarwiniaChain as TransactionSignScheme>::AccountKeyPair,
-    pangoro_signer: <CrabChain as TransactionSignScheme>::AccountKeyPair,
+    darwinia_api: DarwiniaApi,
+    crab_api: CrabApi,
+    darwinia_signer: <DarwiniaChain as TransactionSignScheme>::AccountKeyPair,
+    crab_signer: <CrabChain as TransactionSignScheme>::AccountKeyPair,
 }
 
 impl StrategyHelper {
@@ -37,28 +37,28 @@ impl StrategyHelper {
             .await?;
         let crab_client = crab_chain.to_substrate_relay_chain::<CrabChain>().await?;
 
-        let pangolin_signer = darwinia_chain.to_keypair::<DarwiniaChain>()?;
-        let pangoro_signer = crab_chain.to_keypair::<CrabChain>()?;
+        let darwinia_signer = darwinia_chain.to_keypair::<DarwiniaChain>()?;
+        let crab_signer = crab_chain.to_keypair::<CrabChain>()?;
         Ok(Self {
-            pangolin_api: PangolinApi::new(darwinia_client),
-            pangoro_api: PangoroApi::new(crab_client),
-            pangolin_signer,
-            pangoro_signer,
+            darwinia_api: DarwiniaApi::new(darwinia_client),
+            crab_api: CrabApi::new(crab_client),
+            darwinia_signer,
+            crab_signer,
         })
     }
 }
 
 impl StrategyHelper {
-    pub fn pangolin_api(&self) -> &PangolinApi {
-        &self.pangolin_api
+    pub fn darwinia_api(&self) -> &DarwiniaApi {
+        &self.darwinia_api
     }
-    pub fn pangoro_api(&self) -> &PangoroApi {
-        &self.pangoro_api
+    pub fn crab_api(&self) -> &CrabApi {
+        &self.crab_api
     }
-    pub fn pangolin_signer(&self) -> &<DarwiniaChain as TransactionSignScheme>::AccountKeyPair {
-        &self.pangolin_signer
+    pub fn darwinia_signer(&self) -> &<DarwiniaChain as TransactionSignScheme>::AccountKeyPair {
+        &self.darwinia_signer
     }
-    pub fn pangoro_signer(&self) -> &<CrabChain as TransactionSignScheme>::AccountKeyPair {
-        &self.pangoro_signer
+    pub fn crab_signer(&self) -> &<CrabChain as TransactionSignScheme>::AccountKeyPair {
+        &self.crab_signer
     }
 }

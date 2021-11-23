@@ -159,8 +159,8 @@ pub struct RelayHeadersAndMessagesInfo {
     pub create_relayers_fund_accounts: bool,
     pub only_mandatory_headers: bool,
 
-    pub pangolin_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
-    pub pangoro_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
+    pub darwinia_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
+    pub crab_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
 }
 
 #[derive(Debug, Clone)]

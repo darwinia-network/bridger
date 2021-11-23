@@ -27,34 +27,34 @@ mod s2s_const {
 
     impl ChainConst for CrabChainConst {
         const OUTBOUND_LANE_MESSAGE_DETAILS_METHOD: &'static str =
-            bridge_primitives::TO_PANGORO_MESSAGE_DETAILS_METHOD;
+            bridge_primitives::TO_CRAB_MESSAGE_DETAILS_METHOD;
         const OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD: &'static str =
-            bridge_primitives::TO_PANGORO_LATEST_GENERATED_NONCE_METHOD;
+            bridge_primitives::TO_CRAB_LATEST_GENERATED_NONCE_METHOD;
         const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            bridge_primitives::TO_PANGORO_LATEST_RECEIVED_NONCE_METHOD;
+            bridge_primitives::TO_CRAB_LATEST_RECEIVED_NONCE_METHOD;
         const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            bridge_primitives::FROM_PANGORO_LATEST_RECEIVED_NONCE_METHOD;
+            bridge_primitives::FROM_CRAB_LATEST_RECEIVED_NONCE_METHOD;
         const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
-            bridge_primitives::FROM_PANGORO_LATEST_CONFIRMED_NONCE_METHOD;
+            bridge_primitives::FROM_CRAB_LATEST_CONFIRMED_NONCE_METHOD;
         const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str =
-            bridge_primitives::FROM_PANGORO_UNREWARDED_RELAYERS_STATE;
+            bridge_primitives::FROM_CRAB_UNREWARDED_RELAYERS_STATE;
         const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
-            bridge_primitives::BEST_FINALIZED_PANGORO_HEADER_METHOD;
+            bridge_primitives::BEST_FINALIZED_CRAB_HEADER_METHOD;
         const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str =
-            bridge_primitives::BEST_FINALIZED_PANGORO_HEADER_METHOD;
+            bridge_primitives::BEST_FINALIZED_CRAB_HEADER_METHOD;
         const MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE: MessageNonce =
             bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
         const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce =
             bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
         const AVERAGE_BLOCK_INTERVAL: Duration = DarwiniaChain::AVERAGE_BLOCK_INTERVAL;
-        const BRIDGE_CHAIN_ID: ChainId = bridge_primitives::crab_chain_ID;
+        const BRIDGE_CHAIN_ID: ChainId = bridge_primitives::CRAB_CHAIN_ID;
         const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str =
-            bridge_primitives::WITH_PANGOLIN_MESSAGES_PALLET_NAME;
+            bridge_primitives::WITH_DARWINIA_MESSAGES_PALLET_NAME;
         const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
-            bridge_primitives::WITH_PANGORO_MESSAGES_PALLET_NAME;
+            bridge_primitives::WITH_CRAB_MESSAGES_PALLET_NAME;
         const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight =
             bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
-        type SigningParams = common_primitives::SigningParams;
+        type SigningParams = sp_core::sr25519::Pair;
     }
 
     // === end
@@ -231,7 +231,7 @@ mod s2s_messages {
             let call: crab_runtime::Call =
                 crab_runtime::BridgeMessagesCall::receive_messages_delivery_proof::<
                     crab_runtime::Runtime,
-                    crab_runtime::WithPangolinMessages,
+                    crab_runtime::WithDarwiniaMessages,
                 >(proof, relayers_state)
                 .into();
             let call_weight = call.get_dispatch_info().weight;
@@ -248,9 +248,9 @@ mod s2s_messages {
                 TARGET_NAME,
                 SOURCE_NAME,
                 call_weight,
-                crab_runtime_system_params::max_extrinsic_weight(),
+                darwinia_runtime_common::max_extrinsic_weight(),
                 transaction.encode().len(),
-                crab_runtime_system_params::max_extrinsic_size(),
+                darwinia_runtime_common::max_extrinsic_size(),
             );
             Bytes(transaction.encode())
         }
@@ -276,7 +276,7 @@ mod s2s_messages {
             let call: darwinia_runtime::Call =
                 darwinia_runtime::BridgeMessagesCall::receive_messages_proof::<
                     darwinia_runtime::Runtime,
-                    darwinia_runtime::WithPangoroMessages,
+                    darwinia_runtime::WithCrabMessages,
                 >(
                     self.message_lane.relayer_id_at_source.clone(),
                     proof,
@@ -298,9 +298,9 @@ mod s2s_messages {
                 SOURCE_NAME,
                 TARGET_NAME,
                 call_weight,
-                crab_runtime_system_params::max_extrinsic_weight(),
+                darwinia_runtime_common::max_extrinsic_weight(),
                 transaction.encode().len(),
-                darwinia_runtime_system_params::max_extrinsic_size(),
+                darwinia_runtime_common::max_extrinsic_size(),
             );
             Bytes(transaction.encode())
         }
@@ -342,13 +342,13 @@ mod s2s_messages {
 
             // 2/3 is reserved for proofs and tx overhead
             let max_messages_size_in_single_batch =
-                darwinia_runtime_system_params::max_extrinsic_size() / 3;
+                darwinia_runtime_common::max_extrinsic_size() / 3;
             let (max_messages_in_single_batch, max_messages_weight_in_single_batch) =
                 substrate_relay_helper::messages_lane::select_delivery_transaction_limits::<
                     // todo: there can be change to special weight
                     pallet_bridge_messages::weights::RialtoWeight<crab_runtime::Runtime>,
                 >(
-                    darwinia_runtime_system_params::max_extrinsic_weight(),
+                    darwinia_runtime_common::max_extrinsic_weight(),
                     DarwiniaChainConst::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
                 );
 
@@ -423,13 +423,13 @@ mod s2s_messages {
             metrics_prefix,
             metrics_params,
             source_client,
-            Some(crate::chains::crab_ASSOCIATED_TOKEN_ID),
-            Some(crate::chains::darwinia_ASSOCIATED_TOKEN_ID),
+            Some(crate::chains::CRAB_ASSOCIATED_TOKEN_ID),
+            Some(crate::chains::DARWINIA_ASSOCIATED_TOKEN_ID),
             Some((
                 sp_core::storage::StorageKey(
-                    crab_runtime::pangolin_messages::DarwiniaToCrabConversionRate::key().to_vec(),
+                    crab_runtime::darwinia_messages::DarwiniaToCrabConversionRate::key().to_vec(),
                 ),
-                crab_runtime::pangolin_messages::INITIAL_PANGOLIN_TO_PANGORO_CONVERSION_RATE,
+                crab_runtime::darwinia_messages::INITIAL_DARWINIA_TO_CRAB_CONVERSION_RATE,
             )),
         )
     }
@@ -451,7 +451,7 @@ mod s2s_messages {
                         relay_substrate_client::TransactionEra::immortal(),
                         UnsignedTransaction::new(
                             darwinia_runtime::BridgeMessagesCall::update_pallet_parameter(
-                                darwinia_runtime::pangoro_messages::DarwiniaToCrabMessagesParameter::CrabToDarwiniaConversionRate(
+                                darwinia_runtime::crab_messages::DarwiniaToCrabMessagesParameter::CrabToDarwiniaConversionRate(
                                     sp_runtime::FixedU128::from_float(updated_rate),
                                 ),
                             )

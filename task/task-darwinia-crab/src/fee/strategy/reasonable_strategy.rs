@@ -39,39 +39,39 @@ impl ReasonableStrategy {
 }
 
 impl ReasonableStrategy {
-    async fn _pangolin_open_price(&self) -> anyhow::Result<f64> {
+    async fn _darwinia_open_price(&self) -> anyhow::Result<f64> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         match self.subscan_darwinia.price(now).await?.data() {
             Ok(Some(v)) => Ok(v.price),
             _ => {
-                let subscan_dock = self
-                    .subscan_darwinia
-                    .clone()
-                    .endpoint("https://dock.api.subscan.io");
-                let open_price = subscan_dock.price(now).await?;
-                let data = open_price.data()?;
-                match data {
-                    Some(v) => Ok(v.price),
-                    None => anyhow::bail!("Can not query pangolin price"),
-                }
-            }
-        }
-    }
-
-    async fn _pangoro_open_price(&self) -> anyhow::Result<f64> {
-        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-        match self.subscan_crab.price(now).await?.data() {
-            Ok(Some(v)) => Ok(v.price),
-            _ => {
                 let subscan_darwinia = self
-                    .subscan_crab
+                    .subscan_darwinia
                     .clone()
                     .endpoint("https://darwinia.api.subscan.io");
                 let open_price = subscan_darwinia.price(now).await?;
                 let data = open_price.data()?;
                 match data {
                     Some(v) => Ok(v.price),
-                    None => anyhow::bail!("Can not query pangoro price"),
+                    None => anyhow::bail!("Can not query crab price"),
+                }
+            }
+        }
+    }
+
+    async fn _crab_open_price(&self) -> anyhow::Result<f64> {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+        match self.subscan_crab.price(now).await?.data() {
+            Ok(Some(v)) => Ok(v.price),
+            _ => {
+                let subscan_dock = self
+                    .subscan_crab
+                    .clone()
+                    .endpoint("https://dock.api.subscan.io");
+                let open_price = subscan_dock.price(now).await?;
+                let data = open_price.data()?;
+                match data {
+                    Some(v) => Ok(v.price),
+                    None => anyhow::bail!("Can not query darwinia price"),
                 }
             }
         }
@@ -79,24 +79,24 @@ impl ReasonableStrategy {
 
     async fn conversion_darwinia_to_crab(
         &self,
-        pangolin_currency: common_primitives::Balance,
+        darwinia_currency: common_primitives::Balance,
     ) -> anyhow::Result<common_primitives::Balance> {
-        let price_pangolin = self._pangolin_open_price().await?;
-        let price_pangoro = self._pangoro_open_price().await?;
-        let rate = price_pangolin / price_pangoro;
+        let price_darwinia = self._darwinia_open_price().await?;
+        let price_crab = self._crab_open_price().await?;
+        let rate = price_darwinia / price_crab;
         let rate = FixedU128::from_float(rate);
-        let ret = rate.saturating_mul_int(pangolin_currency);
+        let ret = rate.saturating_mul_int(darwinia_currency);
         Ok(ret)
     }
     async fn conversion_crab_to_darwinia(
         &self,
-        pangoro_currency: common_primitives::Balance,
+        crab_currency: common_primitives::Balance,
     ) -> anyhow::Result<common_primitives::Balance> {
-        let price_pangolin = self._pangolin_open_price().await?;
-        let price_pangoro = self._pangoro_open_price().await?;
-        let rate = price_pangoro / price_pangolin;
+        let price_darwinia = self._darwinia_open_price().await?;
+        let price_crab = self._crab_open_price().await?;
+        let rate = price_crab / price_darwinia;
         let rate = FixedU128::from_float(rate);
-        let ret = rate.saturating_mul_int(pangoro_currency);
+        let ret = rate.saturating_mul_int(crab_currency);
         Ok(ret)
     }
 }
@@ -107,27 +107,27 @@ impl UpdateFeeStrategy for ReasonableStrategy {
         let top100_darwinia = self.subscan_darwinia.extrinsics(1, 100).await?;
         let top100_crab = self.subscan_crab.extrinsics(1, 100).await?;
         let top100_darwinia = top100_darwinia.data()?.ok_or_else(|| {
-            StandardError::Api("Can not query pangolin extrinsics data".to_string())
+            StandardError::Api("Can not query darwinia extrinsics data".to_string())
         })?;
-        let top100_crab = top100_crab.data()?.ok_or_else(|| {
-            StandardError::Api("Can not query pangoro extrinsics data".to_string())
-        })?;
+        let top100_crab = top100_crab
+            .data()?
+            .ok_or_else(|| StandardError::Api("Can not query crab extrinsics data".to_string()))?;
 
-        let max_fee_pangolin = (&top100_darwinia.extrinsics)
+        let max_fee_darwinia = (&top100_darwinia.extrinsics)
             .iter()
             .map(|item| item.fee)
             .max()
             .unwrap_or(0);
-        let max_fee_pangoro = (&top100_crab.extrinsics)
+        let max_fee_crab = (&top100_crab.extrinsics)
             .iter()
             .map(|item| item.fee)
             .max()
             .unwrap_or(0);
 
         let top100_max_cost_darwinia =
-            max_fee_pangolin + self.conversion_crab_to_darwinia(max_fee_pangoro).await?;
+            max_fee_darwinia + self.conversion_crab_to_darwinia(max_fee_crab).await?;
         let top100_max_cost_crab =
-            max_fee_pangoro + self.conversion_darwinia_to_crab(max_fee_pangolin).await?;
+            max_fee_crab + self.conversion_darwinia_to_crab(max_fee_darwinia).await?;
 
         // Nice (
         let expect_fee_darwinia = MIN_RELAY_FEE_PANGOLIN + (top100_max_cost_darwinia * 15);

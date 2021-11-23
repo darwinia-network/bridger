@@ -56,7 +56,7 @@ pub struct TaskConfig {
 
 impl BridgeConfig for TaskConfig {
     fn marker() -> &'static str {
-        "config-task-pangolin-pangoro"
+        "config-task-darwinia-crab"
     }
 
     fn template() -> Self {
@@ -90,16 +90,16 @@ pub struct RelayConfig {
     pub only_mandatory_headers: bool,
     /// Create relayers fund accounts on both chains, if it does not exists yet.
     pub create_relayers_fund_accounts: bool,
-    /// The SURI of secret key to use when transactions are submitted to the pangolin node.
+    /// The SURI of secret key to use when transactions are submitted to the darwinia node.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub darwinia_messages_pallet_owner: Option<String>,
-    /// The password for the SURI of secret key to use when transactions are submitted to the pangolin node.
+    /// The password for the SURI of secret key to use when transactions are submitted to the darwinia node.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub darwinia_messages_pallet_owner_password: Option<String>,
-    /// The SURI of secret key to use when transactions are submitted to the pangoro node.
+    /// The SURI of secret key to use when transactions are submitted to the crab node.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub crab_messages_pallet_owner: Option<String>,
-    /// The password for the SURI of secret key to use when transactions are submitted to the pangoro node.
+    /// The password for the SURI of secret key to use when transactions are submitted to the crab node.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub crab_messages_pallet_owner_password: Option<String>,
 }

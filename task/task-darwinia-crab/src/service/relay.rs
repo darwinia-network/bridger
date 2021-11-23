@@ -107,22 +107,22 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         .await?;
     let crab_client = crab_chain.to_substrate_relay_chain::<CrabChain>().await?;
 
-    let pangolin_sign = darwinia_chain.to_keypair::<DarwiniaChain>()?;
+    let darwinia_sign = darwinia_chain.to_keypair::<DarwiniaChain>()?;
     let pangoro_sign = crab_chain.to_keypair::<CrabChain>()?;
-    let pangolin_transactions_mortality = darwinia_chain.transactions_mortality()?;
+    let darwinia_transactions_mortality = darwinia_chain.transactions_mortality()?;
     let pangoro_transactions_mortality = crab_chain.transactions_mortality()?;
 
     let lanes = relay_info.lanes;
 
     let metrics_params: MetricsParams = relay_info.prometheus_params.clone().into();
     let metrics_params = relay_utils::relay_metrics(None, metrics_params).into_params();
-    let (metrics_params, pangolin_to_pangoro_metrics) =
+    let (metrics_params, darwinia_to_crab_metrics) =
         crate::chains::darwinia::add_standalone_metrics(
             None,
             metrics_params,
             darwinia_client.clone(),
         )?;
-    let (metrics_params, pangoro_to_pangolin_metrics) =
+    let (metrics_params, crab_to_darwinia_metrics) =
         crate::chains::crab::add_standalone_metrics(None, metrics_params, crab_client.clone())?;
 
     const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
@@ -139,14 +139,14 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
     if let Some(darwinia_messages_pallet_owner) = darwinia_messages_pallet_owner {
         let darwinia_client = darwinia_client.clone();
         substrate_relay_helper::conversion_rate_update::run_conversion_rate_update_loop(
-            pangolin_to_pangoro_metrics
+            darwinia_to_crab_metrics
                 .target_to_source_conversion_rate
                 .expect(METRIC_IS_SOME_PROOF),
-            pangolin_to_pangoro_metrics
+            darwinia_to_crab_metrics
                 .target_to_base_conversion_rate
                 .clone()
                 .expect(METRIC_IS_SOME_PROOF),
-            pangolin_to_pangoro_metrics
+            darwinia_to_crab_metrics
                 .source_to_base_conversion_rate
                 .clone()
                 .expect(METRIC_IS_SOME_PROOF),
@@ -160,7 +160,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                     DarwiniaChain::NAME,
                     new_rate,
                 );
-                crate::chains::crab::update_pangoro_to_pangolin_conversion_rate(
+                crate::chains::crab::update_crab_to_darwinia_conversion_rate(
                     darwinia_client.clone(),
                     darwinia_messages_pallet_owner.clone(),
                     new_rate,
@@ -172,14 +172,14 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
     if let Some(crab_messages_pallet_owner) = crab_messages_pallet_owner {
         let crab_client = crab_client.clone();
         substrate_relay_helper::conversion_rate_update::run_conversion_rate_update_loop(
-            pangoro_to_pangolin_metrics
+            crab_to_darwinia_metrics
                 .target_to_source_conversion_rate
                 .expect(METRIC_IS_SOME_PROOF),
-            pangoro_to_pangolin_metrics
+            crab_to_darwinia_metrics
                 .target_to_base_conversion_rate
                 .clone()
                 .expect(METRIC_IS_SOME_PROOF),
-            pangoro_to_pangolin_metrics
+            crab_to_darwinia_metrics
                 .source_to_base_conversion_rate
                 .clone()
                 .expect(METRIC_IS_SOME_PROOF),
@@ -193,7 +193,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
                     CrabChain::NAME,
                     new_rate,
                 );
-                crate::chains::darwinia::update_pangolin_to_pangoro_conversion_rate(
+                crate::chains::darwinia::update_darwinia_to_crab_conversion_rate(
                     crab_client.clone(),
                     crab_messages_pallet_owner.clone(),
                     new_rate,
@@ -214,9 +214,9 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
             relayers_fund_account_balance
         {
             log::info!(target: "bridge", "Going to create relayers fund account at {}.", DarwiniaChain::NAME);
-            create_pangolin_account(
+            create_darwinia_account(
                 darwinia_client.clone(),
-                pangolin_sign.clone(),
+                darwinia_sign.clone(),
                 relayer_fund_acount_id,
             )
             .await?;
@@ -242,7 +242,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         }
     }
 
-    let pangolin_to_pangoro_on_demand_headers = OnDemandHeadersRelay::new(
+    let darwinia_to_crab_on_demand_headers = OnDemandHeadersRelay::new(
         darwinia_client.clone(),
         crab_client.clone(),
         pangoro_transactions_mortality,
@@ -250,11 +250,11 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         common_primitives::DARWINIA_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
-    let pangoro_to_pangolin_on_demand_headers = OnDemandHeadersRelay::new(
+    let crab_to_darwinia_on_demand_headers = OnDemandHeadersRelay::new(
         crab_client.clone(),
         darwinia_client.clone(),
-        pangolin_transactions_mortality,
-        CrabFinalityToDarwinia::new(darwinia_client.clone(), pangolin_sign.clone()),
+        darwinia_transactions_mortality,
+        CrabFinalityToDarwinia::new(darwinia_client.clone(), darwinia_sign.clone()),
         common_primitives::CRAB_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
@@ -264,13 +264,13 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
     for lane in lanes {
         let lane = lane.into();
 
-        let pangolin_to_crab_messages = DarwiniaMessagesToPangoroRunner::run(MessagesRelayParams {
+        let darwinia_to_crab_messages = DarwiniaMessagesToPangoroRunner::run(MessagesRelayParams {
             source_client: darwinia_client.clone(),
-            source_sign: pangolin_sign.clone(),
+            source_sign: darwinia_sign.clone(),
             target_client: crab_client.clone(),
             target_sign: pangoro_sign.clone(),
-            source_to_target_headers_relay: Some(pangolin_to_pangoro_on_demand_headers.clone()),
-            target_to_source_headers_relay: Some(pangoro_to_pangolin_on_demand_headers.clone()),
+            source_to_target_headers_relay: Some(darwinia_to_crab_on_demand_headers.clone()),
+            target_to_source_headers_relay: Some(crab_to_darwinia_on_demand_headers.clone()),
             lane_id: lane,
             metrics_params: metrics_params.clone().disable().metrics_prefix(
                 messages_relay::message_lane_loop::metrics_prefix::<
@@ -279,19 +279,19 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
             ),
             relay_strategy: DarwiniaRelayStrategy::new(
                 darwinia_client.clone(),
-                AccountId::from(pangolin_sign.public().0),
+                AccountId::from(darwinia_sign.public().0),
             ),
         })
         .map_err(|e| anyhow::format_err!("{}", e))
         .boxed();
 
-        let pangoro_to_darwinia_messages = CrabMessagesToDarwiniaRunner::run(MessagesRelayParams {
+        let crab_to_darwinia_messages = CrabMessagesToDarwiniaRunner::run(MessagesRelayParams {
             source_client: crab_client.clone(),
             source_sign: pangoro_sign.clone(),
             target_client: darwinia_client.clone(),
-            target_sign: pangolin_sign.clone(),
-            source_to_target_headers_relay: Some(pangoro_to_pangolin_on_demand_headers.clone()),
-            target_to_source_headers_relay: Some(pangolin_to_pangoro_on_demand_headers.clone()),
+            target_sign: darwinia_sign.clone(),
+            source_to_target_headers_relay: Some(crab_to_darwinia_on_demand_headers.clone()),
+            target_to_source_headers_relay: Some(darwinia_to_crab_on_demand_headers.clone()),
             lane_id: lane,
             metrics_params: metrics_params.clone().disable().metrics_prefix(
                 messages_relay::message_lane_loop::metrics_prefix::<
@@ -306,8 +306,8 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         .map_err(|e| anyhow::format_err!("{}", e))
         .boxed();
 
-        message_relays.push(pangolin_to_crab_messages);
-        message_relays.push(pangoro_to_darwinia_messages);
+        message_relays.push(darwinia_to_crab_messages);
+        message_relays.push(crab_to_darwinia_messages);
     }
 
     relay_utils::relay_metrics(None, metrics_params)
@@ -318,7 +318,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
     futures::future::select_all(message_relays).await.0
 }
 
-async fn create_pangolin_account(
+async fn create_darwinia_account(
     _left_client: Client<DarwiniaChain>,
     _left_sign: <DarwiniaChain as TransactionSignScheme>::AccountKeyPair,
     _account_id: AccountIdOf<DarwiniaChain>,

@@ -76,8 +76,8 @@ mod s2s_headers {
     use crate::chains::darwinia::DarwiniaChainConst;
     use crate::traits::ChainConst;
 
-    // === start pangolin headers to pangoro
-    /// Pangoro-to-Pangolin finality sync pipeline.
+    // === start crab headers to darwinia
+    /// Crab-to-Darwinia finality sync pipeline.
     pub(crate) type FinalityPipelineCrabFinalityToDarwinia = SubstrateFinalityToSubstrate<
         CrabChain,
         DarwiniaChain,
@@ -435,7 +435,7 @@ mod s2s_messages {
     }
 
     /// Update Pangoro -> Pangolin conversion rate, stored in Rialto runtime storage.
-    pub(crate) async fn update_pangoro_to_pangolin_conversion_rate(
+    pub(crate) async fn update_crab_to_darwinia_conversion_rate(
         client: Client<DarwiniaChain>,
         signer: <DarwiniaChain as TransactionSignScheme>::AccountKeyPair,
         updated_rate: f64,

@@ -413,7 +413,7 @@ mod s2s_messages {
         }
     }
 
-    /// Add standalone metrics for the Pangoro -> Pangolin messages loop.
+    /// Add standalone metrics for the Crab -> Darwinia messages loop.
     pub(crate) fn add_standalone_metrics(
         metrics_prefix: Option<String>,
         metrics_params: MetricsParams,
@@ -434,7 +434,7 @@ mod s2s_messages {
         )
     }
 
-    /// Update Pangoro -> Pangolin conversion rate, stored in Rialto runtime storage.
+    /// Update Crab -> Darwinia conversion rate, stored in Rialto runtime storage.
     pub(crate) async fn update_crab_to_darwinia_conversion_rate(
         client: Client<DarwiniaChain>,
         signer: <DarwiniaChain as TransactionSignScheme>::AccountKeyPair,

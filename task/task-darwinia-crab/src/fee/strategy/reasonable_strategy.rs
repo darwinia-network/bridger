@@ -11,8 +11,8 @@ use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
 use crate::task::DarwiniaCrabTask;
 
-const MIN_RELAY_FEE_PANGOLIN: u128 = 15 * common_primitives::COIN;
-const MIN_RELAY_FEE_PANGORO: u128 = 15 * common_primitives::COIN;
+const MIN_RELAY_FEE_DARWINIA: u128 = 15 * common_primitives::COIN;
+const MIN_RELAY_FEE_CRAB: u128 = 15 * common_primitives::COIN;
 
 #[derive(Clone)]
 pub struct ReasonableStrategy {
@@ -130,8 +130,8 @@ impl UpdateFeeStrategy for ReasonableStrategy {
             max_fee_crab + self.conversion_darwinia_to_crab(max_fee_darwinia).await?;
 
         // Nice (
-        let expect_fee_darwinia = MIN_RELAY_FEE_PANGOLIN + (top100_max_cost_darwinia * 15);
-        let expect_fee_crab = MIN_RELAY_FEE_PANGORO + (top100_max_cost_crab * 15);
+        let expect_fee_darwinia = MIN_RELAY_FEE_DARWINIA + (top100_max_cost_darwinia * 15);
+        let expect_fee_crab = MIN_RELAY_FEE_CRAB + (top100_max_cost_crab * 15);
 
         log::info!(
             target: DarwiniaCrabTask::NAME,

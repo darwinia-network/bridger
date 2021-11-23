@@ -13,7 +13,7 @@ use bridge_traits::bridge::task::BridgeSand;
 
 use crate::bus::DarwiniaCrabBus;
 use crate::config::ChainInfoConfig;
-use crate::message::{PangolinPangoroMessageReceive, PangolinPangoroMessageSend};
+use crate::message::{DarwiniaCrabMessageReceive, DarwiniaCrabMessageSend};
 use crate::task::DarwiniaCrabTask;
 use crate::types::{BridgeName, InitBridge};
 
@@ -29,8 +29,8 @@ impl Service for InitBridgeService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let mut rx = bus.rx::<PangolinPangoroMessageSend>()?;
-        let mut tx = bus.tx::<PangolinPangoroMessageReceive>()?;
+        let mut rx = bus.rx::<DarwiniaCrabMessageSend>()?;
+        let mut tx = bus.tx::<DarwiniaCrabMessageReceive>()?;
         let config_darwinia: ChainInfoConfig =
             Config::restore_with_namespace_unwrap(DarwiniaCrabTask::NAME, "darwinia")?;
         let config_crab: ChainInfoConfig =
@@ -41,7 +41,7 @@ impl Service for InitBridgeService {
             async move {
                 while let Some(message) = rx.recv().await {
                     match message {
-                        PangolinPangoroMessageSend::InitBridge(bridge) => {
+                        DarwiniaCrabMessageSend::InitBridge(bridge) => {
                             let (source_chain, target_chain) = match bridge {
                                 BridgeName::DarwiniaToCrab => (
                                     config_darwinia.to_chain_info()?,
@@ -63,7 +63,7 @@ impl Service for InitBridgeService {
                             .join()
                             .map_err(|_| anyhow::Error::msg("Failed to join thread handle"))??;
 
-                            tx.send(PangolinPangoroMessageReceive::FinishedInitBridge)
+                            tx.send(DarwiniaCrabMessageReceive::FinishedInitBridge)
                                 .await?;
                         }
                         _ => continue,

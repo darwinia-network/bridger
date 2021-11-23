@@ -8,7 +8,7 @@ use bridge_traits::error::StandardError;
 
 use crate::bus::DarwiniaCrabBus;
 use crate::config::DarwiniaCrabConfig;
-use crate::message::{PangolinPangoroMessageReceive, PangolinPangoroMessageSend};
+use crate::message::{DarwiniaCrabMessageReceive, DarwiniaCrabMessageSend};
 use crate::task::DarwiniaCrabTask;
 use crate::types::BridgeName;
 
@@ -42,16 +42,16 @@ async fn init_bridge(
     param: serde_json::Value,
 ) -> anyhow::Result<TaskTerminal> {
     let bridge_name = bridge_name_from_param(&param)?;
-    let mut sender = bus.tx::<PangolinPangoroMessageSend>()?;
-    let mut receiver = bus.rx::<PangolinPangoroMessageReceive>()?;
+    let mut sender = bus.tx::<DarwiniaCrabMessageSend>()?;
+    let mut receiver = bus.rx::<DarwiniaCrabMessageReceive>()?;
 
     sender
-        .send(PangolinPangoroMessageSend::InitBridge(bridge_name.clone()))
+        .send(DarwiniaCrabMessageSend::InitBridge(bridge_name.clone()))
         .await?;
 
     while let Some(recv) = receiver.recv().await {
         match recv {
-            PangolinPangoroMessageReceive::FinishedInitBridge => break,
+            DarwiniaCrabMessageReceive::FinishedInitBridge => break,
         }
     }
 
@@ -65,8 +65,8 @@ async fn start_relay(
     bus: &DarwiniaCrabBus,
     _param: serde_json::Value,
 ) -> anyhow::Result<TaskTerminal> {
-    let mut sender = bus.tx::<PangolinPangoroMessageSend>()?;
-    sender.send(PangolinPangoroMessageSend::Relay).await?;
+    let mut sender = bus.tx::<DarwiniaCrabMessageSend>()?;
+    sender.send(DarwiniaCrabMessageSend::Relay).await?;
 
     let state_task = support_keep::state::get_state_task_unwrap(DarwiniaCrabTask::NAME)?;
     let mut config_task: DarwiniaCrabConfig = Config::load(state_task.config_path.clone())?;

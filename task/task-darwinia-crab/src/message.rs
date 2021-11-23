@@ -6,20 +6,20 @@ use crate::bus::DarwiniaCrabBus;
 use crate::types::BridgeName;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub enum PangolinPangoroMessageSend {
+pub enum DarwiniaCrabMessageSend {
     InitBridge(BridgeName),
     Relay,
 }
 
-impl Message<DarwiniaCrabBus> for PangolinPangoroMessageSend {
+impl Message<DarwiniaCrabBus> for DarwiniaCrabMessageSend {
     type Channel = broadcast::Sender<Self>;
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub enum PangolinPangoroMessageReceive {
+pub enum DarwiniaCrabMessageReceive {
     FinishedInitBridge,
 }
 
-impl Message<DarwiniaCrabBus> for PangolinPangoroMessageReceive {
+impl Message<DarwiniaCrabBus> for DarwiniaCrabMessageReceive {
     type Channel = broadcast::Sender<Self>;
 }

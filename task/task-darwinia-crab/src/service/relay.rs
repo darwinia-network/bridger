@@ -21,7 +21,7 @@ use crate::chains::darwinia::{
     DarwiniaFinalityToCrab, DarwiniaMessagesToPangoro, DarwiniaMessagesToPangoroRunner,
 };
 use crate::config::{ChainInfoConfig, RelayConfig};
-use crate::message::PangolinPangoroMessageSend;
+use crate::message::DarwiniaCrabMessageSend;
 use crate::task::DarwiniaCrabTask;
 use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
@@ -45,7 +45,7 @@ impl Service for RelayService {
     type Lifeline = anyhow::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let mut rx = bus.rx::<PangolinPangoroMessageSend>()?;
+        let mut rx = bus.rx::<DarwiniaCrabMessageSend>()?;
         let config_darwinia: ChainInfoConfig =
             Config::restore_with_namespace_unwrap(DarwiniaCrabTask::NAME, "darwinia")?;
         let config_crab: ChainInfoConfig =
@@ -55,7 +55,7 @@ impl Service for RelayService {
         let _greet = Self::try_task(&format!("{}-relay", DarwiniaCrabTask::NAME), async move {
             while let Some(message) = rx.recv().await {
                 match message {
-                    PangolinPangoroMessageSend::Relay => {}
+                    DarwiniaCrabMessageSend::Relay => {}
                     _ => continue,
                 }
                 let (source_chain, target_chain) = (

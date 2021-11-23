@@ -7,7 +7,7 @@ use bridge_traits::bridge::task::{
 
 use crate::bus::DarwiniaCrabBus;
 use crate::config::{DarwiniaCrabConfig, RelayConfig};
-use crate::message::PangolinPangoroMessageSend;
+use crate::message::DarwiniaCrabMessageSend;
 use crate::service::fee::UpdateFeeService;
 use crate::service::init::InitBridgeService;
 use crate::service::relay::RelayService;
@@ -55,10 +55,10 @@ impl DarwiniaCrabTask {
         stack.spawn_service::<InitBridgeService>()?;
         stack.spawn_service::<RelayService>()?;
 
-        let mut sender = stack.bus().tx::<PangolinPangoroMessageSend>()?;
+        let mut sender = stack.bus().tx::<DarwiniaCrabMessageSend>()?;
         let relay_config: RelayConfig = Config::restore_unwrap(Self::NAME)?;
         if relay_config.auto_start {
-            sender.send(PangolinPangoroMessageSend::Relay).await?;
+            sender.send(DarwiniaCrabMessageSend::Relay).await?;
         }
 
         Ok(Self { stack })

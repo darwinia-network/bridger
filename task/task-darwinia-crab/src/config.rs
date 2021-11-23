@@ -122,9 +122,9 @@ impl BridgeConfig for RelayConfig {
             },
             only_mandatory_headers: false,
             create_relayers_fund_accounts: false,
-            darwinia_messages_pallet_owner: Some("//PangoroMessagesOwner".to_string()),
+            darwinia_messages_pallet_owner: Some("//CrabMessagesOwner".to_string()),
             darwinia_messages_pallet_owner_password: Some("123456".to_string()),
-            crab_messages_pallet_owner: Some("//PangolinMessagesOwner".to_string()),
+            crab_messages_pallet_owner: Some("//DarwiniaMessagesOwner".to_string()),
             crab_messages_pallet_owner_password: Some("123456".to_string()),
         }
     }

@@ -22,6 +22,15 @@ only_mandatory_headers = false
 # Create relayers fund accounts on both chains, if it does not exists yet.
 create_relayers_fund_accounts = false
 
+# The SURI of secret key to use when transactions are submitted to the pangolin node.
+#pangolin_messages_pallet_owner = "//PangoroMessagesOwner"
+# The password for the SURI of secret key to use when transactions are submitted to the pangolin node.
+#pangolin_messages_pallet_owner_password = "123456"
+# The SURI of secret key to use when transactions are submitted to the pangoro node.
+#pangoro_messages_pallet_owner = "//PangolinMessagesOwner"
+# The password for the SURI of secret key to use when transactions are submitted to the pangoro node.
+#pangoro_messages_pallet_owner_password = "123456"
+
 # Transactions mortality period, in blocks. MUST be a power of two in [4; 65536] range.
 # MAY NOT be larger than `BlockHashCount` parameter of the chain system module.
 # Discuss: https://github.com/darwinia-network/bridger/pull/266#discussion_r705943606

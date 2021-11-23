@@ -109,11 +109,7 @@ impl std::fmt::Display for EthereumHeader {
             "receipts_root: ",
             to_hex(&self.receipts_root, false)
         ));
-        msgs.push(format!(
-            "{:>19}{}",
-            "log_bloom: ",
-            self.log_bloom.to_string()
-        ));
+        msgs.push(format!("{:>19}{}", "log_bloom: ", self.log_bloom));
         msgs.push(format!("{:>19}{}", "gas_used: ", &self.gas_used.as_u128()));
         msgs.push(format!(
             "{:>19}{}",

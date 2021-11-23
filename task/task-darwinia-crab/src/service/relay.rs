@@ -25,14 +25,6 @@ use crate::message::DarwiniaCrabMessageSend;
 use crate::task::DarwiniaCrabTask;
 use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
-/// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.
-///
-/// If it is zero, then transaction will be submitted every time we see difference between
-/// stored and real conversion rates. If it is large enough (e.g. > than 10 percents, which is 0.1),
-/// then rational relayers may stop relaying messages because they were submitted using
-/// lesser conversion rate.
-const CONVERSION_RATE_ALLOWED_DIFFERENCE_RATIO: f64 = 0.05;
-
 #[derive(Debug)]
 pub struct RelayService {
     _greet: Lifeline,
@@ -116,91 +108,10 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
 
     let metrics_params: MetricsParams = relay_info.prometheus_params.clone().into();
     let metrics_params = relay_utils::relay_metrics(None, metrics_params).into_params();
-    let (metrics_params, darwinia_to_crab_metrics) =
-        crate::chains::darwinia::add_standalone_metrics(
-            None,
-            metrics_params,
-            darwinia_client.clone(),
-        )?;
-    let (metrics_params, crab_to_darwinia_metrics) =
-        crate::chains::crab::add_standalone_metrics(None, metrics_params, crab_client.clone())?;
 
-    const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
-				this is the command entrypoint, so nothing has been registered yet; \
-				qed";
-
-    let darwinia_messages_pallet_owner = relay_info
-        .darwinia_messages_pallet_owner_signing
-        .to_keypair::<DarwiniaChain>()?;
-    let crab_messages_pallet_owner = relay_info
-        .crab_messages_pallet_owner_signing
-        .to_keypair::<CrabChain>()?;
-
-    if let Some(darwinia_messages_pallet_owner) = darwinia_messages_pallet_owner {
-        let darwinia_client = darwinia_client.clone();
-        substrate_relay_helper::conversion_rate_update::run_conversion_rate_update_loop(
-            darwinia_to_crab_metrics
-                .target_to_source_conversion_rate
-                .expect(METRIC_IS_SOME_PROOF),
-            darwinia_to_crab_metrics
-                .target_to_base_conversion_rate
-                .clone()
-                .expect(METRIC_IS_SOME_PROOF),
-            darwinia_to_crab_metrics
-                .source_to_base_conversion_rate
-                .clone()
-                .expect(METRIC_IS_SOME_PROOF),
-            CONVERSION_RATE_ALLOWED_DIFFERENCE_RATIO,
-            move |new_rate| {
-                log::info!(
-                    target: "bridge",
-                    "Going to update {} -> {} (on {}) conversion rate to {}.",
-                    CrabChain::NAME,
-                    DarwiniaChain::NAME,
-                    DarwiniaChain::NAME,
-                    new_rate,
-                );
-                crate::chains::crab::update_crab_to_darwinia_conversion_rate(
-                    darwinia_client.clone(),
-                    darwinia_messages_pallet_owner.clone(),
-                    new_rate,
-                )
-            },
-        );
-    }
-
-    if let Some(crab_messages_pallet_owner) = crab_messages_pallet_owner {
-        let crab_client = crab_client.clone();
-        substrate_relay_helper::conversion_rate_update::run_conversion_rate_update_loop(
-            crab_to_darwinia_metrics
-                .target_to_source_conversion_rate
-                .expect(METRIC_IS_SOME_PROOF),
-            crab_to_darwinia_metrics
-                .target_to_base_conversion_rate
-                .clone()
-                .expect(METRIC_IS_SOME_PROOF),
-            crab_to_darwinia_metrics
-                .source_to_base_conversion_rate
-                .clone()
-                .expect(METRIC_IS_SOME_PROOF),
-            CONVERSION_RATE_ALLOWED_DIFFERENCE_RATIO,
-            move |new_rate| {
-                log::info!(
-                    target: "bridge",
-                    "Going to update {} -> {} (on {}) conversion rate to {}.",
-                    DarwiniaChain::NAME,
-                    CrabChain::NAME,
-                    CrabChain::NAME,
-                    new_rate,
-                );
-                crate::chains::darwinia::update_darwinia_to_crab_conversion_rate(
-                    crab_client.clone(),
-                    crab_messages_pallet_owner.clone(),
-                    new_rate,
-                )
-            },
-        );
-    }
+    // const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
+    // 			this is the command entrypoint, so nothing has been registered yet; \
+    // 			qed";
 
     if relay_info.create_relayers_fund_accounts {
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<

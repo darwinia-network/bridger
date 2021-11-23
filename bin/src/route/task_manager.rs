@@ -8,6 +8,7 @@ use bridge_traits::bridge::task::{BridgeSand, BridgeTask};
 use bridge_traits::error::StandardError;
 use linked_darwinia::task::DarwiniaLinked;
 use support_keep::types::TaskState;
+use task_darwinia_crab::task::DarwiniaCrabTask;
 use task_darwinia_ethereum::task::DarwiniaEthereumTask;
 use task_pangolin_pangoro::task::PangolinPangoroTask;
 use task_pangolin_ropsten::task::PangolinRopstenTask;
@@ -166,6 +167,11 @@ pub async fn start_task_single(base_path: PathBuf, param: TaskStartParam) -> any
             let task_config = Config::load(&path_config)?;
             let task = PangolinPangoroTask::new(task_config).await?;
             support_keep::task::keep_task(PangolinPangoroTask::NAME, Box::new(task))?;
+        }
+        DarwiniaCrabTask::NAME => {
+            let task_config = Config::load(&path_config)?;
+            let task = DarwiniaCrabTask::new(task_config).await?;
+            support_keep::task::keep_task(DarwiniaCrabTask::NAME, Box::new(task))?;
         }
         _ => return Err(StandardError::Api(format!("Unsupported task: [{}]", name)).into()),
     };

@@ -3,7 +3,7 @@ Fee Market Strategy
 
 ## Relay strategy
 
-In pangolin <> pangoro bridge. All relayers can decide whether to relay a transaction. Decide on your role (Assigned Relayer or Not Assigned Relayer).
+In Darwinia <> Crab bridge. All relayers can decide whether to relay a transaction. Decide on your role (Assigned Relayer or Not Assigned Relayer).
 Different roles will have different benefits.
 
 You can refer to this picture:
@@ -12,8 +12,8 @@ You can refer to this picture:
 
 So if you have good ideas, you can modify it yourself.
 
-- `pangolin`: [feemarket.rs](../../../components/client-pangolin-s2s/src/feemarket.rs)
-- `pangoro`: [feemarket.rs](../../../components/client-pangoro-s2s/src/feemarket.rs)
+- `darwinia`: [feemarket.rs](../../../components/client-darwinia-s2s/src/feemarket.rs)
+- `crab`: [feemarket.rs](../../../components/client-crab-s2s/src/feemarket.rs)
 
 ## Fee strategy
 

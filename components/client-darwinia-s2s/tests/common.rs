@@ -1,12 +1,12 @@
 use relay_substrate_client::Client;
 
-use component_pangolin_s2s::api::PangolinApi;
-use component_pangolin_s2s::PangolinChain;
+use component_darwinia_s2s::api::DarwiniaApi;
+use component_darwinia_s2s::DarwiniaChain;
 
 async fn client() -> anyhow::Result<Client<PangolinChain>> {
     Ok(
         relay_substrate_client::Client::new(relay_substrate_client::ConnectionParams {
-            host: "pangolin-rpc.darwinia.network".to_string(),
+            host: "rpc.darwinia.network".to_string(),
             port: 443,
             secure: true,
         })
@@ -14,7 +14,7 @@ async fn client() -> anyhow::Result<Client<PangolinChain>> {
     )
 }
 
-pub async fn api() -> anyhow::Result<PangolinApi> {
+pub async fn api() -> anyhow::Result<DarwiniaApi> {
     let client = client().await?;
-    Ok(PangolinApi::new(client))
+    Ok(DarwiniaApi::new(client))
 }

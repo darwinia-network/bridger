@@ -119,7 +119,7 @@ impl DarwiniaApi {
                         &signer,
                         relay_substrate_client::TransactionEra::immortal(),
                         UnsignedTransaction::new(
-                            pangolin_runtime::FeeMarketCall::update_relay_fee(amount).into(),
+                            darwinia_runtime::FeeMarketCall::update_relay_fee(amount).into(),
                             transaction_nonce,
                         ),
                     )
@@ -146,7 +146,7 @@ impl DarwiniaApi {
                         &signer,
                         relay_substrate_client::TransactionEra::immortal(),
                         UnsignedTransaction::new(
-                            pangolin_runtime::FeeMarketCall::update_locked_collateral(amount)
+                            darwinia_runtime::FeeMarketCall::update_locked_collateral(amount)
                                 .into(),
                             transaction_nonce,
                         ),

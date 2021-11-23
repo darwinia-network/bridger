@@ -119,7 +119,7 @@ impl CrabApi {
                         &signer,
                         relay_substrate_client::TransactionEra::immortal(),
                         UnsignedTransaction::new(
-                            pangoro_runtime::FeeMarketCall::update_relay_fee(amount).into(),
+                            crab_runtime::FeeMarketCall::update_relay_fee(amount).into(),
                             transaction_nonce,
                         ),
                     )
@@ -146,7 +146,7 @@ impl CrabApi {
                         &signer,
                         relay_substrate_client::TransactionEra::immortal(),
                         UnsignedTransaction::new(
-                            pangoro_runtime::FeeMarketCall::update_locked_collateral(amount).into(),
+                            crab_runtime::FeeMarketCall::update_locked_collateral(amount).into(),
                             transaction_nonce,
                         ),
                     )

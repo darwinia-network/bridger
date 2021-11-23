@@ -1081,6 +1081,7 @@ dependencies = [
  "bridge-primitives 0.11.6",
  "bridge-traits",
  "common-primitives 0.11.6",
+ "darwinia-bridge-ethereum 2.6.10 (git+https://github.com/darwinia-network/darwinia-common.git?tag=darwinia-v0.11.6-3)",
  "darwinia-runtime",
  "dp-fee 2.6.10 (git+https://github.com/darwinia-network/darwinia-common.git?tag=darwinia-v0.11.6-3)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -3946,7 +3947,7 @@ dependencies = [
 [[package]]
 name = "gql_client"
 version = "1.0.1"
-source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#28499d7b5e7e2dcf2d833da83b535ca44817be75"
+source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#f8ae4678810dcad8df6760a4e05d37a37fe5563f"
 dependencies = [
  "reqwest",
  "serde 1.0.130",
@@ -10987,7 +10988,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.8.4",
+ "rand 0.3.23",
  "static_assertions",
 ]
 

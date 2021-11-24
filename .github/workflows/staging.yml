@@ -19,8 +19,9 @@ jobs:
         run: |
           apt update -y
           apt install --no-install-recommends -y \
-            git curl libssl-dev ca-certificates \
-            make gcc g++ clang-4.0
+            git curl ca-certificates \
+            make gcc g++ clang-4.0 \
+            libssl-dev pkg-config
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1

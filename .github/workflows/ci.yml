@@ -19,7 +19,7 @@ jobs:
         run: |
           apt update -y
           apt install --no-install-recommends -y \
-            git curl openssl ca-certificates \
+            git curl libssl-dev ca-certificates \
             make gcc g++ clang-4.0
 
       - name: Install latest nightly

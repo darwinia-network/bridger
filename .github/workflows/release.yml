@@ -89,16 +89,13 @@ jobs:
 
           chmod +x shared/bridger
           docker build \
-            -t ${IMAGE_NAME} \
+            -t ${IMAGE_PUSH_NAME_TAG} \
+            -t ${IMAGE_PUSH_NAME_SHA} \
             -f .maintain/docker/Dockerfile \
             .
 
-          docker tag ${IMAGE_NAME} ${IMAGE_PUSH_NAME_TAG}
-          docker tag ${IMAGE_NAME} ${IMAGE_PUSH_NAME_SHA}
-
           docker push ${IMAGE_PUSH_NAME_TAG}
           docker push ${IMAGE_PUSH_NAME_SHA}
-
 
   complete-build:
     name: Complete build

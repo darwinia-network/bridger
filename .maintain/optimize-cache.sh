@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 
-set -xe
+set -x
 
 BIN_PATH=$(dirname $(readlink -f $0))
 WORK_PATH=${BIN_PATH}/../

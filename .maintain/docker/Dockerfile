@@ -8,4 +8,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY shared/bridger /usr/local/bin/
 
+EXPOSE 1098
+
 ENTRYPOINT [ "/usr/local/bin/bridger" ]

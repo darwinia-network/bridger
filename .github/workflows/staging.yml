@@ -6,29 +6,18 @@ on:
   workflow_dispatch:
 
 jobs:
-
   build-package:
-    name: Build binary
+    name: Build package
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:16.04
+      image: rust:1
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install dependencies
+      - name: Specify toolchain
         run: |
-          apt update -y
-          apt install --no-install-recommends -y \
-            git curl ca-certificates \
-            make gcc g++ clang-4.0 \
-            libssl-dev pkg-config
-
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          target: wasm32-unknown-unknown
-          default: true
+          rustup default nightly
+          rustup target add wasm32-unknown-unknown
 
       - name: Cache target
         uses: actions/cache@v2
@@ -37,8 +26,7 @@ jobs:
           key: ${{ runner.os }}-target
 
       - name: Build bridger
-        run: |
-          cargo build --release --target x86_64-unknown-linux-gnu
+        run: cargo build --release --target x86_64-unknown-linux-gnu
 
       - name: Collect shared
         run: |

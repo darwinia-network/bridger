@@ -49,10 +49,3 @@ sp-core                    = { git = "https://github.com/darwinia-network/substr
 sp-keyring                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
 sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", tag = "darwinia-v0.11.6-1" }
 
-
-[dev-dependencies]
-anyhow       = "1"
-futures-test = "0.3"
-tokio        = { version = "1", features = ["time"] }
-codec        = { package = "parity-scale-codec", version = "2.2.0" }
-

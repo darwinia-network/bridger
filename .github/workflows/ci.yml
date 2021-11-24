@@ -10,19 +10,38 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
+    container:
+      image: ubuntu:16.04
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          apt update -y
+          apt install --no-install-recommends -y \
+            git curl ca-certificates \
+            make gcc g++ clang-4.0 \
+            libssl-dev pkg-config
+
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           override: true
           target: wasm32-unknown-unknown
+          components: clippy
+
+      - name: Cache target
+        uses: actions/cache@v2
+        with:
+          path: target
+          key: ${{ runner.os }}-target
 
       - name: Lint
-        run: |
-          rustup component add clippy
-          cargo clippy --all --locked -- -D warnings
+        run: cargo clippy --all --locked -- -D warnings
 
       - name: Run tests
         run: cargo test --locked
+
+      - name: Optimize cache
+        run: .maintain/optimize-cache.sh || exit 0

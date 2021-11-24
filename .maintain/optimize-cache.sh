@@ -22,3 +22,17 @@ cargo clean -p darwinia-runtime --release
 cargo clean -p pangolin-runtime --release
 cargo clean -p pangoro-runtime --release
 
+cargo clean -p task-pangolin-pangoro --release
+cargo clean -p task-darwinia-crab --release
+cargo clean -p component-pangolin-s2s --release
+cargo clean -p component-pangoro-s2s --release
+cargo clean -p component-darwinia-s2s --release
+cargo clean -p component-crab-s2s --release
+
+cargo clean -p messages-relay --release
+cargo clean -p relay-utils --release
+cargo clean -p finality-relay --release
+cargo clean -p substrate-relay-helper --release
+cargo clean -p relay-substrate-client --release
+
+

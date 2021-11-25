@@ -1,5 +1,5 @@
 [package]
-name = "component-subquery-liketh"
+name = "component-subquery"
 version = "0.4.7"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"

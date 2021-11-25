@@ -1184,7 +1184,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "component-subquery-liketh"
+name = "component-subquery"
 version = "0.4.7"
 dependencies = [
  "anyhow",

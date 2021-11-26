@@ -47,7 +47,12 @@ impl TheGraphLikeEth {
             .client
             .query_with_vars::<TheGraphResponse, QueryTransactionsVars>(query, vars)
             .await
-            .unwrap();
+            .map_err(|e| {
+                StandardError::Component(format!(
+                    "Failed to send query request to thegraph: {:?}",
+                    e
+                ))
+            })?;
         if let TheGraphResponse::TransactionEntities(txs) = data {
             return Ok(txs);
         }

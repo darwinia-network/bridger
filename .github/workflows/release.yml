@@ -23,7 +23,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: target
-          key: ${{ runner.os }}-target
+          key: ${{ runner.os }}-target-${{ hashFiles('Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-target-
 
       - name: Build bridger
         run: cargo build --release --target x86_64-unknown-linux-gnu

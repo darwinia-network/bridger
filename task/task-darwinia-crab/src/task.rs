@@ -5,24 +5,24 @@ use bridge_traits::bridge::task::{
     BridgeSand, BridgeTask, BridgeTaskKeep, TaskStack, TaskTerminal,
 };
 
-use crate::bus::PangolinPangoroBus;
-use crate::config::{PangolinPangoroConfig, RelayConfig};
-use crate::message::PangolinPangoroMessageSend;
+use crate::bus::DarwiniaCrabBus;
+use crate::config::{DarwiniaCrabConfig, RelayConfig};
+use crate::message::DarwiniaCrabMessageSend;
 use crate::service::fee::UpdateFeeService;
 use crate::service::init::InitBridgeService;
 use crate::service::relay::RelayService;
 
 #[derive(Debug)]
-pub struct PangolinPangoroTask {
-    stack: TaskStack<PangolinPangoroBus>,
+pub struct DarwiniaCrabTask {
+    stack: TaskStack<DarwiniaCrabBus>,
 }
 
-impl BridgeSand for PangolinPangoroTask {
-    const NAME: &'static str = "task-pangolin-pangoro";
+impl BridgeSand for DarwiniaCrabTask {
+    const NAME: &'static str = "task-darwinia-crab";
 }
 
 #[async_trait::async_trait]
-impl BridgeTaskKeep for PangolinPangoroTask {
+impl BridgeTaskKeep for DarwiniaCrabTask {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
@@ -34,31 +34,31 @@ impl BridgeTaskKeep for PangolinPangoroTask {
     }
 }
 
-impl BridgeTask<PangolinPangoroBus> for PangolinPangoroTask {
+impl BridgeTask<DarwiniaCrabBus> for DarwiniaCrabTask {
     fn config_template() -> anyhow::Result<serde_json::Value> {
-        Ok(serde_json::to_value(PangolinPangoroConfig::template())?)
+        Ok(serde_json::to_value(DarwiniaCrabConfig::template())?)
     }
 
-    fn stack(&mut self) -> &mut TaskStack<PangolinPangoroBus> {
+    fn stack(&mut self) -> &mut TaskStack<DarwiniaCrabBus> {
         &mut self.stack
     }
 }
 
-impl PangolinPangoroTask {
-    pub async fn new(config: PangolinPangoroConfig) -> anyhow::Result<Self> {
+impl DarwiniaCrabTask {
+    pub async fn new(config: DarwiniaCrabConfig) -> anyhow::Result<Self> {
         config.store(Self::NAME)?;
 
-        let bus = PangolinPangoroBus::default();
+        let bus = DarwiniaCrabBus::default();
 
         let mut stack = TaskStack::new(bus);
+        stack.spawn_service::<UpdateFeeService>()?;
         stack.spawn_service::<InitBridgeService>()?;
         stack.spawn_service::<RelayService>()?;
-        stack.spawn_service::<UpdateFeeService>()?;
 
-        let mut sender = stack.bus().tx::<PangolinPangoroMessageSend>()?;
+        let mut sender = stack.bus().tx::<DarwiniaCrabMessageSend>()?;
         let relay_config: RelayConfig = Config::restore_unwrap(Self::NAME)?;
         if relay_config.auto_start {
-            sender.send(PangolinPangoroMessageSend::Relay).await?;
+            sender.send(DarwiniaCrabMessageSend::Relay).await?;
         }
 
         Ok(Self { stack })

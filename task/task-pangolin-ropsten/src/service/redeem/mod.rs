@@ -119,7 +119,7 @@ async fn start_scan(
     {
         log::error!(
             target: PangolinRopstenTask::NAME,
-            "ropsten redeem err {:#?}",
+            "ropsten redeem err {:?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;

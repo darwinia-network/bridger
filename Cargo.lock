@@ -1045,7 +1045,7 @@ dependencies = [
 
 [[package]]
 name = "component-crab-s2s"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1072,7 +1072,7 @@ dependencies = [
 
 [[package]]
 name = "component-darwinia-s2s"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -10267,7 +10267,7 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "task-darwinia-crab"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",

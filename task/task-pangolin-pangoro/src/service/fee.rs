@@ -27,12 +27,13 @@ impl Service for UpdateFeeService {
             &format!("{}-update-fee", PangolinPangoroTask::NAME),
             async move {
                 let config_task: TaskConfig = Config::restore_unwrap(PangolinPangoroTask::NAME)?;
-                std::thread::spawn(move || {
-                    futures::executor::block_on(cron_update_fee(config_task))
-                })
-                .join()
-                .map_err(|_| anyhow::Error::msg("Failed to join thread handle"))??;
+                // std::thread::spawn(move || {
+                //     futures::executor::block_on(cron_update_fee(config_task))
+                // })
+                // .join()
+                // .map_err(|_| anyhow::Error::msg("Failed to join thread handle"))??;
 
+                cron_update_fee(config_task).await?;
                 Ok(())
             },
         );

@@ -53,7 +53,7 @@ impl PangolinPangoroTask {
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<UpdateFeeService>()?;
         stack.spawn_service::<InitBridgeService>()?;
-        // stack.spawn_service::<RelayService>()?;
+        stack.spawn_service::<RelayService>()?;
 
         let mut sender = stack.bus().tx::<PangolinPangoroMessageSend>()?;
         let relay_config: RelayConfig = Config::restore_unwrap(Self::NAME)?;

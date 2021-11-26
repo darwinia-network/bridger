@@ -50,6 +50,11 @@ impl Runtime for DarwiniaRuntime {
         registry.register_type_size::<u128>("Balance");
         registry.register_type_size::<u128>("RingBalance");
         registry.register_type_size::<u128>("KtonBalance");
+        registry.register_type_size::<u32>("SpecVersion");
+        registry.register_type_size::<[u8; 4]>("LaneId");
+        registry.register_type_size::<u64>("MessageNonce");
+        registry.register_type_size::<[u8; 4]>("ChainId");
+        registry.register_type_size::<[u8; 16]>("BridgeMessageId");
         registry.register_type_size::<[u8; 20]>("EthereumAddress");
         registry.register_type_size::<[u8; 20]>("EcdsaAddress");
         registry.register_type_size::<H256>("MMRRoot");

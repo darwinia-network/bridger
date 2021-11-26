@@ -50,7 +50,6 @@ impl Runtime for DarwiniaRuntime {
         registry.register_type_size::<u128>("Balance");
         registry.register_type_size::<u128>("RingBalance");
         registry.register_type_size::<u128>("KtonBalance");
-        registry.register_type_size::<u128>("Fee");
         registry.register_type_size::<u32>("SpecVersion");
         registry.register_type_size::<[u8; 4]>("LaneId");
         registry.register_type_size::<u64>("MessageNonce");

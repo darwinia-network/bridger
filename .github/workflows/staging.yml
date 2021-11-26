@@ -1,43 +1,58 @@
 name: Staging
 
 on:
+  push:
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
-
-  build-publish-docker-image:
-    name: Build Docker image
+  build-package:
+    name: Build package
     runs-on: ubuntu-latest
+    container:
+      image: rust:1
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install dependencies
+      - name: Specify toolchain
         run: |
-          apt update -y
-          apt install --no-install-recommends -y \
-            git curl ca-certificates \
-            make gcc g++ clang-4.0
+          rustup default nightly
+          rustup target add wasm32-unknown-unknown
 
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+      - name: Cache target
+        uses: actions/cache@v2
         with:
-          toolchain: nightly-2021-04-22
-          target: wasm32-unknown-unknown
-          default: true
+          path: target
+          key: ${{ runner.os }}-target
 
       - name: Build bridger
-        run: |
-          cargo build --release --target x86_64-unknown-linux-gnu
+        run: cargo build --release --target x86_64-unknown-linux-gnu
 
       - name: Collect shared
         run: |
           mkdir -p shared
           mv target/x86_64-unknown-linux-gnu/release/bridger shared/
 
-      - uses: benjlevesque/short-sha@v1.2
-        id: short-sha
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
         with:
-          length: 7
+          name: bridger-artifact
+          path: shared
+
+      - name: Optimize cache
+        run: .maintain/optimize-cache.sh || exit 0
+
+  build-image:
+    name: Build image
+    runs-on: ubuntu-latest
+    needs: [build-package]
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: bridger-artifact
+          path: shared
 
       - name: Docker login
         uses: docker/login-action@v1
@@ -46,18 +61,32 @@ jobs:
           password: ${{ secrets.QUAY_IO_BOT_PASSWORD }}
           registry: quay.io
 
+      - uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+        with:
+          length: 7
+
       - name: Build and publish docker image
         run: |
           IMAGE_NAME=bridger
           IMAGE_PREFIX=quay.io/darwinia-network
           IMAGE_PUSH_NAME_SHA=${IMAGE_PREFIX}/${IMAGE_NAME}:sha-${SHA}
 
+          chmod +x shared/bridger
           docker build \
-            -t ${IMAGE_NAME} \
+            -t ${IMAGE_PUSH_NAME_SHA} \
             -f .maintain/docker/Dockerfile \
             .
 
-          docker tag ${IMAGE_NAME} ${IMAGE_PUSH_NAME_SHA}
-
           docker push ${IMAGE_PUSH_NAME_SHA}
+
+  clean-artifacts:
+    name: Clean artifacts
+    runs-on: ubuntu-latest
+    needs: [build-image]
+    if: always()
+    steps:
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: bridger-artifact
 

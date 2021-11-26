@@ -6,31 +6,27 @@ on:
       - 'v*'
 
 jobs:
-  build-release:
+  build-package:
     name: Build binary
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:16.04
+      image: rust:1
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install dependencies
+      - name: Specify toolchain
         run: |
-          apt update -y
-          apt install --no-install-recommends -y \
-            git curl ca-certificates \
-            make gcc g++ clang-4.0
+          rustup default nightly
+          rustup target add wasm32-unknown-unknown
 
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+      - name: Cache target
+        uses: actions/cache@v2
         with:
-          toolchain: nightly-2021-04-22
-          target: wasm32-unknown-unknown
-          default: true
+          path: target
+          key: ${{ runner.os }}-target
 
       - name: Build bridger
-        run: |
-          cargo build --release --target x86_64-unknown-linux-gnu
+        run: cargo build --release --target x86_64-unknown-linux-gnu
 
       - name: Collect shared
         run: |
@@ -43,10 +39,14 @@ jobs:
           name: bridger-artifact
           path: shared
 
+      - name: Optimize cache
+        run: .maintain/optimize-cache.sh || exit 0
+
+
   build-image:
     name: Build image
     runs-on: ubuntu-latest
-    needs: [build-release]
+    needs: [build-package]
     steps:
       - uses: actions/checkout@v2
 
@@ -76,17 +76,15 @@ jobs:
           IMAGE_PUSH_NAME_TAG=${IMAGE_PREFIX}/${IMAGE_NAME}:${GIT_TAG_NAME}
           IMAGE_PUSH_NAME_SHA=${IMAGE_PREFIX}/${IMAGE_NAME}:sha-${SHA}
 
+          chmod +x shared/bridger
           docker build \
-            -t ${IMAGE_NAME} \
+            -t ${IMAGE_PUSH_NAME_TAG} \
+            -t ${IMAGE_PUSH_NAME_SHA} \
             -f .maintain/docker/Dockerfile \
             .
 
-          docker tag ${IMAGE_NAME} ${IMAGE_PUSH_NAME_TAG}
-          docker tag ${IMAGE_NAME} ${IMAGE_PUSH_NAME_SHA}
-
           docker push ${IMAGE_PUSH_NAME_TAG}
           docker push ${IMAGE_PUSH_NAME_SHA}
-
 
   complete-build:
     name: Complete build
@@ -103,7 +101,8 @@ jobs:
       - name: Prepare deploy folder
         run: |
           mkdir deploy
-          tar cf bridger-x86_64-linux-gnu.tar.zst -C shared bridger -I pzstd
+          chmod +x shared/bridger
+          tar cjSf bridger-x86_64-linux-gnu.tar.bz2 -C shared bridger
           mv bridger-x86_64-linux-gnu.tar.zst deploy/
 
       - name: Hash file

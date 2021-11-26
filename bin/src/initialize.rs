@@ -2,6 +2,7 @@ use std::env;
 
 use bridge_traits::bridge::task::BridgeSand;
 use linked_darwinia::task::DarwiniaLinked;
+use task_darwinia_crab::task::DarwiniaCrabTask;
 use task_darwinia_ethereum::task::DarwiniaEthereumTask;
 use task_pangolin_pangoro::task::PangolinPangoroTask;
 use task_pangolin_ropsten::task::PangolinRopstenTask;
@@ -27,6 +28,7 @@ fn init_log() {
                 "task-darwinia-ethereum=trace",
                 "task-pangolin-ropsten=trace",
                 "task-pangolin-pangoro=trace",
+                "task-darwinia-crab=trace",
                 "jsonrpsee_ws_client=error",
                 "component_pangoro_s2s=trace",
                 "component_pangolin_s2s=trace",
@@ -47,5 +49,6 @@ fn init_keep() -> anyhow::Result<()> {
         DarwiniaEthereumTask::NAME,
         PangolinPangoroTask::NAME,
         PangolinRopstenTask::NAME,
+        DarwiniaCrabTask::NAME,
     ])
 }

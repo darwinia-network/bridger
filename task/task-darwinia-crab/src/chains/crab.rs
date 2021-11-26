@@ -11,49 +11,50 @@ mod s2s_const {
     use relay_substrate_client::Chain;
     use sp_version::RuntimeVersion;
 
-    use component_pangolin_s2s::PangolinChain;
+    use component_crab_s2s::CrabChain;
+    use component_darwinia_s2s::DarwiniaChain;
 
     use crate::traits::{ChainConst, CliChain};
 
     // === start const
-    impl CliChain for PangolinChain {
-        const RUNTIME_VERSION: RuntimeVersion = pangolin_runtime::VERSION;
+    impl CliChain for CrabChain {
+        const RUNTIME_VERSION: RuntimeVersion = crab_runtime::VERSION;
 
         type KeyPair = sp_core::sr25519::Pair;
     }
 
-    pub struct PangolinChainConst;
+    pub struct CrabChainConst;
 
-    impl ChainConst for PangolinChainConst {
+    impl ChainConst for CrabChainConst {
         const OUTBOUND_LANE_MESSAGE_DETAILS_METHOD: &'static str =
-            bridge_primitives::TO_PANGOLIN_MESSAGE_DETAILS_METHOD;
+            bridge_primitives::TO_CRAB_MESSAGE_DETAILS_METHOD;
         const OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD: &'static str =
-            bridge_primitives::TO_PANGOLIN_LATEST_GENERATED_NONCE_METHOD;
+            bridge_primitives::TO_CRAB_LATEST_GENERATED_NONCE_METHOD;
         const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            bridge_primitives::TO_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
+            bridge_primitives::TO_CRAB_LATEST_RECEIVED_NONCE_METHOD;
         const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            bridge_primitives::FROM_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
+            bridge_primitives::FROM_CRAB_LATEST_RECEIVED_NONCE_METHOD;
         const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
-            bridge_primitives::FROM_PANGOLIN_LATEST_CONFIRMED_NONCE_METHOD;
+            bridge_primitives::FROM_CRAB_LATEST_CONFIRMED_NONCE_METHOD;
         const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str =
-            bridge_primitives::FROM_PANGOLIN_UNREWARDED_RELAYERS_STATE;
+            bridge_primitives::FROM_CRAB_UNREWARDED_RELAYERS_STATE;
         const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
-            bridge_primitives::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
+            bridge_primitives::BEST_FINALIZED_CRAB_HEADER_METHOD;
         const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str =
-            bridge_primitives::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
+            bridge_primitives::BEST_FINALIZED_CRAB_HEADER_METHOD;
         const MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE: MessageNonce =
             bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
         const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce =
             bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
-        const AVERAGE_BLOCK_INTERVAL: Duration = PangolinChain::AVERAGE_BLOCK_INTERVAL;
-        const BRIDGE_CHAIN_ID: ChainId = bridge_primitives::PANGOLIN_CHAIN_ID;
+        const AVERAGE_BLOCK_INTERVAL: Duration = DarwiniaChain::AVERAGE_BLOCK_INTERVAL;
+        const BRIDGE_CHAIN_ID: ChainId = bridge_primitives::CRAB_CHAIN_ID;
         const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str =
-            bridge_primitives::WITH_PANGORO_MESSAGES_PALLET_NAME;
+            bridge_primitives::WITH_DARWINIA_MESSAGES_PALLET_NAME;
         const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
-            bridge_primitives::WITH_PANGOLIN_MESSAGES_PALLET_NAME;
+            bridge_primitives::WITH_CRAB_MESSAGES_PALLET_NAME;
         const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight =
             bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
-        type SigningParams = common_primitives::SigningParams;
+        type SigningParams = sp_core::sr25519::Pair;
     }
 
     // === end
@@ -68,33 +69,33 @@ mod s2s_headers {
         SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate,
     };
 
-    use component_pangolin_s2s::PangolinChain;
-    use component_pangoro_s2s::PangoroChain;
+    use component_crab_s2s::CrabChain;
+    use component_darwinia_s2s::DarwiniaChain;
 
-    use crate::chains::pangolin::PangolinChainConst;
-    use crate::chains::pangoro::PangoroChainConst;
+    use crate::chains::crab::CrabChainConst;
+    use crate::chains::darwinia::DarwiniaChainConst;
     use crate::traits::ChainConst;
 
-    // === start pangolin headers to pangoro
-    /// Pangolin-to-Pangoro finality sync pipeline.
-    pub(crate) type FinalityPipelinePangolinFinalityToPangoro = SubstrateFinalityToSubstrate<
-        PangolinChain,
-        PangoroChain,
-        <PangoroChainConst as ChainConst>::SigningParams,
+    // === start crab headers to darwinia
+    /// Crab-to-Darwinia finality sync pipeline.
+    pub(crate) type FinalityPipelineCrabFinalityToDarwinia = SubstrateFinalityToSubstrate<
+        CrabChain,
+        DarwiniaChain,
+        <DarwiniaChainConst as ChainConst>::SigningParams,
     >;
 
     #[derive(Clone, Debug)]
-    pub struct PangolinFinalityToPangoro {
-        finality_pipeline: FinalityPipelinePangolinFinalityToPangoro,
+    pub struct CrabFinalityToDarwinia {
+        finality_pipeline: FinalityPipelineCrabFinalityToDarwinia,
     }
 
-    impl PangolinFinalityToPangoro {
+    impl CrabFinalityToDarwinia {
         pub fn new(
-            target_client: Client<PangoroChain>,
-            target_sign: <PangoroChainConst as ChainConst>::SigningParams,
+            target_client: Client<DarwiniaChain>,
+            target_sign: <DarwiniaChainConst as ChainConst>::SigningParams,
         ) -> Self {
             Self {
-                finality_pipeline: FinalityPipelinePangolinFinalityToPangoro::new(
+                finality_pipeline: FinalityPipelineCrabFinalityToDarwinia::new(
                     target_client,
                     target_sign,
                 ),
@@ -102,13 +103,13 @@ mod s2s_headers {
         }
     }
 
-    impl SubstrateFinalitySyncPipeline for PangolinFinalityToPangoro {
-        type FinalitySyncPipeline = FinalityPipelinePangolinFinalityToPangoro;
+    impl SubstrateFinalitySyncPipeline for CrabFinalityToDarwinia {
+        type FinalitySyncPipeline = FinalityPipelineCrabFinalityToDarwinia;
 
         const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
-            PangolinChainConst::BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET;
+            CrabChainConst::BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET;
 
-        type TargetChain = PangoroChain;
+        type TargetChain = DarwiniaChain;
 
         fn transactions_author(&self) -> common_primitives::AccountId {
             (*self.finality_pipeline.target_sign.public().as_array_ref()).into()
@@ -116,19 +117,19 @@ mod s2s_headers {
 
         fn make_submit_finality_proof_transaction(
             &self,
-            era: bp_runtime::TransactionEraOf<PangoroChain>,
-            transaction_nonce: IndexOf<PangoroChain>,
-            header: component_pangolin_s2s::SyncHeader,
+            era: bp_runtime::TransactionEraOf<DarwiniaChain>,
+            transaction_nonce: IndexOf<DarwiniaChain>,
+            header: component_crab_s2s::SyncHeader,
             proof: GrandpaJustification<common_primitives::Header>,
         ) -> Bytes {
-            let call = pangoro_runtime::BridgeGrandpaCall::<
-                pangoro_runtime::Runtime,
-                pangoro_runtime::WithPangolinGrandpa,
+            let call = darwinia_runtime::BridgeGrandpaCall::<
+                darwinia_runtime::Runtime,
+                darwinia_runtime::WithCrabGrandpa,
             >::submit_finality_proof(Box::new(header.into_inner()), proof)
             .into();
 
             let genesis_hash = *self.finality_pipeline.target_client.genesis_hash();
-            let transaction = PangoroChain::sign_transaction(
+            let transaction = DarwiniaChain::sign_transaction(
                 genesis_hash,
                 &self.finality_pipeline.target_sign,
                 era,
@@ -161,60 +162,60 @@ mod s2s_messages {
     use substrate_relay_helper::messages_source::SubstrateMessagesSource;
     use substrate_relay_helper::messages_target::SubstrateMessagesTarget;
 
-    use component_pangolin_s2s::{PangolinChain, PangolinRelayStrategy};
-    use component_pangoro_s2s::PangoroChain;
+    use component_crab_s2s::{CrabChain, CrabRelayStrategy};
+    use component_darwinia_s2s::DarwiniaChain;
 
-    use crate::chains::pangolin::PangolinChainConst;
-    use crate::chains::pangoro::PangoroChainConst;
+    use crate::chains::crab::CrabChainConst;
+    use crate::chains::darwinia::DarwiniaChainConst;
     use crate::traits::ChainConst;
 
-    pub const SOURCE_NAME: &str = "pangolin";
-    pub const TARGET_NAME: &str = "pangoro";
+    pub const SOURCE_NAME: &str = "crab";
+    pub const TARGET_NAME: &str = "darwinia";
 
     /// Source-to-Target message lane.
-    pub type MessageLanePangolinMessagesToPangoro = SubstrateMessageLaneToSubstrate<
-        PangolinChain,
-        <PangolinChainConst as ChainConst>::SigningParams,
-        PangoroChain,
-        <PangoroChainConst as ChainConst>::SigningParams,
+    pub type MessageLaneCrabMessagesToDarwinia = SubstrateMessageLaneToSubstrate<
+        CrabChain,
+        <CrabChainConst as ChainConst>::SigningParams,
+        DarwiniaChain,
+        <DarwiniaChainConst as ChainConst>::SigningParams,
     >;
 
     #[derive(Clone)]
-    pub struct PangolinMessagesToPangoro {
-        message_lane: MessageLanePangolinMessagesToPangoro,
+    pub struct CrabMessagesToDarwinia {
+        message_lane: MessageLaneCrabMessagesToDarwinia,
     }
 
-    impl SubstrateMessageLane for PangolinMessagesToPangoro {
-        type MessageLane = MessageLanePangolinMessagesToPangoro;
+    impl SubstrateMessageLane for CrabMessagesToDarwinia {
+        type MessageLane = MessageLaneCrabMessagesToDarwinia;
 
         const OUTBOUND_LANE_MESSAGE_DETAILS_METHOD: &'static str =
-            PangoroChainConst::OUTBOUND_LANE_MESSAGE_DETAILS_METHOD;
+            DarwiniaChainConst::OUTBOUND_LANE_MESSAGE_DETAILS_METHOD;
         const OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD: &'static str =
-            PangoroChainConst::OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD;
+            DarwiniaChainConst::OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD;
         const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            PangoroChainConst::OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD;
+            DarwiniaChainConst::OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD;
 
         const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            PangolinChainConst::INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD;
+            CrabChainConst::INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD;
         const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
-            PangolinChainConst::INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD;
+            CrabChainConst::INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD;
         const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str =
-            PangolinChainConst::INBOUND_LANE_UNREWARDED_RELAYERS_STATE;
+            CrabChainConst::INBOUND_LANE_UNREWARDED_RELAYERS_STATE;
 
         const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
-            PangolinChainConst::BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET;
+            CrabChainConst::BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET;
         const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str =
-            PangoroChainConst::BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE;
+            DarwiniaChainConst::BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE;
 
         const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str =
-            PangolinChainConst::MESSAGE_PALLET_NAME_AT_SOURCE;
+            CrabChainConst::MESSAGE_PALLET_NAME_AT_SOURCE;
         const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
-            PangolinChainConst::MESSAGE_PALLET_NAME_AT_TARGET;
+            CrabChainConst::MESSAGE_PALLET_NAME_AT_TARGET;
         const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight =
-            PangolinChainConst::PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN;
+            CrabChainConst::PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN;
 
-        type SourceChain = PangolinChain;
-        type TargetChain = PangoroChain;
+        type SourceChain = CrabChain;
+        type TargetChain = DarwiniaChain;
 
         fn source_transactions_author(&self) -> common_primitives::AccountId {
             (*self.message_lane.source_sign.public().as_array_ref()).into()
@@ -222,20 +223,20 @@ mod s2s_messages {
 
         fn make_messages_receiving_proof_transaction(
             &self,
-            transaction_nonce: IndexOf<PangolinChain>,
-            _generated_at_block: component_pangoro_s2s::HeaderId,
+            transaction_nonce: IndexOf<CrabChain>,
+            _generated_at_block: component_darwinia_s2s::HeaderId,
             proof: <Self::MessageLane as MessageLane>::MessagesReceivingProof,
         ) -> Bytes {
             let (relayers_state, proof) = proof;
-            let call: pangolin_runtime::Call =
-                pangolin_runtime::BridgeMessagesCall::receive_messages_delivery_proof::<
-                    pangolin_runtime::Runtime,
-                    pangolin_runtime::WithPangoroMessages,
+            let call: crab_runtime::Call =
+                crab_runtime::BridgeMessagesCall::receive_messages_delivery_proof::<
+                    crab_runtime::Runtime,
+                    crab_runtime::WithDarwiniaMessages,
                 >(proof, relayers_state)
                 .into();
             let call_weight = call.get_dispatch_info().weight;
             let genesis_hash = *self.message_lane.source_client.genesis_hash();
-            let transaction = PangolinChain::sign_transaction(
+            let transaction = CrabChain::sign_transaction(
                 genesis_hash,
                 &self.message_lane.source_sign,
                 relay_substrate_client::TransactionEra::immortal(),
@@ -247,9 +248,9 @@ mod s2s_messages {
                 TARGET_NAME,
                 SOURCE_NAME,
                 call_weight,
-                pangolin_runtime_system_params::max_extrinsic_weight(),
+                darwinia_runtime_common::max_extrinsic_weight(),
                 transaction.encode().len(),
-                pangolin_runtime_system_params::max_extrinsic_size(),
+                darwinia_runtime_common::max_extrinsic_size(),
             );
             Bytes(transaction.encode())
         }
@@ -260,8 +261,8 @@ mod s2s_messages {
 
         fn make_messages_delivery_transaction(
             &self,
-            transaction_nonce: IndexOf<PangoroChain>,
-            _generated_at_header: component_pangolin_s2s::HeaderId,
+            transaction_nonce: IndexOf<DarwiniaChain>,
+            _generated_at_header: component_crab_s2s::HeaderId,
             _nonces: RangeInclusive<MessageNonce>,
             proof: <Self::MessageLane as MessageLane>::MessagesProof,
         ) -> Bytes {
@@ -272,10 +273,10 @@ mod s2s_messages {
                 ..
             } = proof;
             let messages_count = nonces_end - nonces_start + 1;
-            let call: pangoro_runtime::Call =
-                pangoro_runtime::BridgeMessagesCall::receive_messages_proof::<
-                    pangoro_runtime::Runtime,
-                    pangoro_runtime::WithPangolinMessages,
+            let call: darwinia_runtime::Call =
+                darwinia_runtime::BridgeMessagesCall::receive_messages_proof::<
+                    darwinia_runtime::Runtime,
+                    darwinia_runtime::WithCrabMessages,
                 >(
                     self.message_lane.relayer_id_at_source.clone(),
                     proof,
@@ -285,7 +286,7 @@ mod s2s_messages {
                 .into();
             let call_weight = call.get_dispatch_info().weight;
             let genesis_hash = *self.message_lane.target_client.genesis_hash();
-            let transaction = PangoroChain::sign_transaction(
+            let transaction = DarwiniaChain::sign_transaction(
                 genesis_hash,
                 &self.message_lane.target_sign,
                 relay_substrate_client::TransactionEra::immortal(),
@@ -297,58 +298,58 @@ mod s2s_messages {
                 SOURCE_NAME,
                 TARGET_NAME,
                 call_weight,
-                pangolin_runtime_system_params::max_extrinsic_weight(),
+                darwinia_runtime_common::max_extrinsic_weight(),
                 transaction.encode().len(),
-                pangoro_runtime_system_params::max_extrinsic_size(),
+                darwinia_runtime_common::max_extrinsic_size(),
             );
             Bytes(transaction.encode())
         }
     }
 
     /// Source node as messages source.
-    type PangolinSourceClient = SubstrateMessagesSource<PangolinMessagesToPangoro>;
+    type CrabSourceClient = SubstrateMessagesSource<CrabMessagesToDarwinia>;
 
     /// Target node as messages target.
-    type PangoroTargetClient = SubstrateMessagesTarget<PangolinMessagesToPangoro>;
+    type DarwiniaTargetClient = SubstrateMessagesTarget<CrabMessagesToDarwinia>;
 
-    pub struct PangolinMessagesToPangoroRunner;
+    pub struct CrabMessagesToDarwiniaRunner;
 
     #[allow(non_snake_case)]
-    impl PangolinMessagesToPangoroRunner {
+    impl CrabMessagesToDarwiniaRunner {
         pub async fn run(
             params: MessagesRelayParams<
-                PangolinChain,
-                <PangolinChainConst as ChainConst>::SigningParams,
-                PangoroChain,
-                <PangoroChainConst as ChainConst>::SigningParams,
-                PangolinRelayStrategy,
+                CrabChain,
+                <CrabChainConst as ChainConst>::SigningParams,
+                DarwiniaChain,
+                <DarwiniaChainConst as ChainConst>::SigningParams,
+                CrabRelayStrategy,
             >,
         ) -> anyhow::Result<()> {
             let stall_timeout = Duration::from_secs(5 * 60);
-            let relayer_id_at_Pangolin = (*params.source_sign.public().as_array_ref()).into();
+            let relayer_id_at_crab = (*params.source_sign.public().as_array_ref()).into();
 
             let lane_id = params.lane_id;
             let source_client = params.source_client;
-            let lane = PangolinMessagesToPangoro {
+            let lane = CrabMessagesToDarwinia {
                 message_lane: SubstrateMessageLaneToSubstrate {
                     source_client: source_client.clone(),
                     source_sign: params.source_sign,
                     target_client: params.target_client.clone(),
                     target_sign: params.target_sign,
-                    relayer_id_at_source: relayer_id_at_Pangolin,
+                    relayer_id_at_source: relayer_id_at_crab,
                 },
             };
 
             // 2/3 is reserved for proofs and tx overhead
             let max_messages_size_in_single_batch =
-                pangoro_runtime_system_params::max_extrinsic_size() / 3;
+                darwinia_runtime_common::max_extrinsic_size() / 3;
             let (max_messages_in_single_batch, max_messages_weight_in_single_batch) =
                 substrate_relay_helper::messages_lane::select_delivery_transaction_limits::<
                     // todo: there can be change to special weight
-                    pallet_bridge_messages::weights::RialtoWeight<pangolin_runtime::Runtime>,
+                    pallet_bridge_messages::weights::RialtoWeight<crab_runtime::Runtime>,
                 >(
-                    pangoro_runtime_system_params::max_extrinsic_weight(),
-                    PangoroChainConst::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
+                    darwinia_runtime_common::max_extrinsic_weight(),
+                    DarwiniaChainConst::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
                 );
 
             log::info!(
@@ -369,7 +370,7 @@ mod s2s_messages {
 
             let (metrics_params, metrics_values) = add_standalone_metrics(
                 Some(messages_relay::message_lane_loop::metrics_prefix::<
-                    <PangolinMessagesToPangoro as SubstrateMessageLane>::MessageLane,
+                    <CrabMessagesToDarwinia as SubstrateMessageLane>::MessageLane,
                 >(&lane_id)),
                 params.metrics_params,
                 source_client.clone(),
@@ -377,28 +378,28 @@ mod s2s_messages {
             messages_relay::message_lane_loop::run(
                 messages_relay::message_lane_loop::Params {
                     lane: lane_id,
-                    source_tick: PangolinChainConst::AVERAGE_BLOCK_INTERVAL,
-                    target_tick: PangoroChainConst::AVERAGE_BLOCK_INTERVAL,
+                    source_tick: CrabChainConst::AVERAGE_BLOCK_INTERVAL,
+                    target_tick: DarwiniaChainConst::AVERAGE_BLOCK_INTERVAL,
                     reconnect_delay: relay_utils::relay_loop::RECONNECT_DELAY,
                     stall_timeout,
                     delivery_params: messages_relay::message_lane_loop::MessageDeliveryParams {
                         max_unrewarded_relayer_entries_at_target:
-                            PangoroChainConst::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
+                            DarwiniaChainConst::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
                         max_unconfirmed_nonces_at_target:
-                            PangoroChainConst::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE,
+                            DarwiniaChainConst::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE,
                         max_messages_in_single_batch,
                         max_messages_weight_in_single_batch,
                         max_messages_size_in_single_batch,
                         relay_strategy: params.relay_strategy,
                     },
                 },
-                PangolinSourceClient::new(
+                CrabSourceClient::new(
                     source_client.clone(),
                     lane.clone(),
                     lane_id,
                     params.target_to_source_headers_relay,
                 ),
-                PangoroTargetClient::new(
+                DarwiniaTargetClient::new(
                     params.target_client,
                     lane,
                     lane_id,
@@ -412,24 +413,23 @@ mod s2s_messages {
         }
     }
 
-    /// Add standalone metrics for the Pangolin -> Pangoro messages loop.
+    /// Add standalone metrics for the Crab -> Darwinia messages loop.
     pub(crate) fn add_standalone_metrics(
         metrics_prefix: Option<String>,
         metrics_params: MetricsParams,
-        source_client: Client<PangolinChain>,
+        source_client: Client<CrabChain>,
     ) -> anyhow::Result<(MetricsParams, StandaloneMessagesMetrics)> {
-        substrate_relay_helper::messages_lane::add_standalone_metrics::<PangolinMessagesToPangoro>(
+        substrate_relay_helper::messages_lane::add_standalone_metrics::<CrabMessagesToDarwinia>(
             metrics_prefix,
             metrics_params,
             source_client,
-            Some(crate::chains::PANGOLIN_ASSOCIATED_TOKEN_ID),
-            Some(crate::chains::PANGORO_ASSOCIATED_TOKEN_ID),
+            Some(crate::chains::CRAB_ASSOCIATED_TOKEN_ID),
+            Some(crate::chains::DARWINIA_ASSOCIATED_TOKEN_ID),
             Some((
                 sp_core::storage::StorageKey(
-                    pangolin_runtime::pangoro_messages::PangoroToPangolinConversionRate::key()
-                        .to_vec(),
+                    crab_runtime::darwinia_messages::DarwiniaToCrabConversionRate::key().to_vec(),
                 ),
-                pangolin_runtime::pangoro_messages::INITIAL_PANGORO_TO_PANGOLIN_CONVERSION_RATE,
+                crab_runtime::darwinia_messages::INITIAL_DARWINIA_TO_CRAB_CONVERSION_RATE,
             )),
         )
     }

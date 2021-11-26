@@ -9,10 +9,10 @@ use crate::traits::CliChain;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, strum::EnumString)]
 pub enum BridgeName {
-    #[strum(serialize = "pangolin-to-pangoro")]
-    PangolinToPangoro,
-    #[strum(serialize = "pangoro-to-pangolin")]
-    PangoroToPangolin,
+    #[strum(serialize = "darwinia-to-crab")]
+    DarwiniaToCrab,
+    #[strum(serialize = "crab-to-darwinia")]
+    CrabToDarwinia,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -159,8 +159,8 @@ pub struct RelayHeadersAndMessagesInfo {
     pub create_relayers_fund_accounts: bool,
     pub only_mandatory_headers: bool,
 
-    pub pangolin_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
-    pub pangoro_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
+    pub darwinia_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
+    pub crab_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
 }
 
 #[derive(Debug, Clone)]
@@ -171,7 +171,6 @@ pub struct MessagesPalletOwnerSigningParams {
 
 #[allow(dead_code)]
 impl MessagesPalletOwnerSigningParams {
-
     /// Parse signing params into chain-specific KeyPair.
     pub fn to_keypair<Chain: CliChain>(&self) -> anyhow::Result<Option<Chain::KeyPair>> {
         let messages_pallet_owner = match self.messages_pallet_owner {

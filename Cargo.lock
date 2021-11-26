@@ -694,7 +694,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-primitives"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "base64 0.13.0",
  "log",
@@ -748,7 +748,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-traits"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1017,12 +1017,12 @@ dependencies = [
 
 [[package]]
 name = "component-darwinia-subxt"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "array-bytes",
  "async-trait",
- "bridge-primitives 0.4.7",
+ "bridge-primitives 0.4.8",
  "bridge-traits",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "jsonrpsee-types",
@@ -1042,7 +1042,7 @@ dependencies = [
 
 [[package]]
 name = "component-ethereum"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "array-bytes",
@@ -1060,7 +1060,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1072,7 +1072,7 @@ dependencies = [
 
 [[package]]
 name = "component-pangolin-s2s"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1103,7 +1103,7 @@ dependencies = [
 
 [[package]]
 name = "component-pangolin-subxt"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "array-bytes",
@@ -1127,7 +1127,7 @@ dependencies = [
 
 [[package]]
 name = "component-pangoro-s2s"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1155,7 +1155,7 @@ dependencies = [
 
 [[package]]
 name = "component-shadow"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1171,7 +1171,7 @@ dependencies = [
 
 [[package]]
 name = "component-state"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1185,7 +1185,7 @@ dependencies = [
 
 [[package]]
 name = "component-subscan"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1200,7 +1200,7 @@ dependencies = [
 
 [[package]]
 name = "component-thegraph-liketh"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1552,11 +1552,11 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridger"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-recursion",
- "bridge-primitives 0.4.7",
+ "bridge-primitives 0.4.8",
  "bridge-traits",
  "colored",
  "component-state",
@@ -4571,7 +4571,7 @@ dependencies = [
 
 [[package]]
 name = "linked-darwinia"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4593,7 +4593,7 @@ checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
 
 [[package]]
 name = "linked-template"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -9395,10 +9395,10 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "support-ethereum"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
- "bridge-primitives 0.4.7",
+ "bridge-primitives 0.4.8",
  "frame-support 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log",
  "pallet-im-online 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -9412,7 +9412,7 @@ dependencies = [
 
 [[package]]
 name = "support-keep"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "bridge-traits",
@@ -9426,10 +9426,10 @@ dependencies = [
 
 [[package]]
 name = "support-proc-macro"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
- "bridge-primitives 0.4.7",
+ "bridge-primitives 0.4.8",
  "proc-macro2",
  "proc_macro_roids",
  "quote",
@@ -9438,7 +9438,7 @@ dependencies = [
 
 [[package]]
 name = "support-tracker"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "itertools 0.10.1",
@@ -9514,7 +9514,7 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "task-darwinia-ethereum"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "array-bytes",
@@ -9547,7 +9547,7 @@ dependencies = [
 
 [[package]]
 name = "task-pangolin-pangoro"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -9593,7 +9593,7 @@ dependencies = [
 
 [[package]]
 name = "task-pangolin-ropsten"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "array-bytes",
@@ -9625,7 +9625,7 @@ dependencies = [
 
 [[package]]
 name = "task-template"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",

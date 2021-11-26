@@ -434,37 +434,4 @@ mod s2s_messages {
             )),
         )
     }
-
-    /// Update Pangoro -> Pangolin conversion rate, stored in Rialto runtime storage.
-    pub(crate) async fn update_pangoro_to_pangolin_conversion_rate(
-        client: Client<PangolinChain>,
-        signer: <PangolinChain as TransactionSignScheme>::AccountKeyPair,
-        updated_rate: f64,
-    ) -> anyhow::Result<()> {
-        let genesis_hash = *client.genesis_hash();
-        let signer_id = (*signer.public().as_array_ref()).into();
-        client
-            .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
-                Bytes(
-                    PangolinChain::sign_transaction(
-                        genesis_hash,
-                        &signer,
-                        relay_substrate_client::TransactionEra::immortal(),
-                        UnsignedTransaction::new(
-                            pangolin_runtime::BridgeMessagesCall::update_pallet_parameter(
-                                pangolin_runtime::pangoro_messages::PangolinToPangoroMessagesParameter::PangoroToPangolinConversionRate(
-                                    sp_runtime::FixedU128::from_float(updated_rate),
-                                ),
-                            )
-                                .into(),
-                            transaction_nonce,
-                        ),
-                    )
-                        .encode(),
-                )
-            })
-            .await
-            .map(drop)
-            .map_err(|err| anyhow::format_err!("{:?}", err))
-    }
 }

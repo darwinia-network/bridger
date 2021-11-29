@@ -23,7 +23,7 @@ fn init_log() {
                 "darwinia_bridge=debug",
                 "bridge=info",
                 "component_pangolin_subxt=trace",
-                "subscan=debug",
+                "subscan=trace",
                 "support_tracker_evm_log=info",
                 "task-darwinia-ethereum=trace",
                 "task-pangolin-ropsten=trace",

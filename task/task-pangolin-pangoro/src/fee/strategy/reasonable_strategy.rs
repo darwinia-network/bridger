@@ -11,8 +11,8 @@ use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
 use crate::task::PangolinPangoroTask;
 
-const MIN_RELAY_FEE_PANGOLIN: u128 = 15 * pangolin_constants::COIN;
-const MIN_RELAY_FEE_PANGORO: u128 = 15 * pangoro_constants::COIN;
+const MIN_RELAY_FEE_PANGOLIN: u128 = 15 * common_primitives::COIN;
+const MIN_RELAY_FEE_PANGORO: u128 = 15 * common_primitives::COIN;
 
 #[derive(Clone)]
 pub struct ReasonableStrategy {
@@ -114,12 +114,16 @@ impl UpdateFeeStrategy for ReasonableStrategy {
             StandardError::Api("Can not query pangoro extrinsics data".to_string())
         })?;
 
-        let max_fee_pangolin = (&top100_pangolin.extrinsics)
+        let max_fee_pangolin = top100_pangolin
+            .extrinsics
+            .unwrap_or_default()
             .iter()
             .map(|item| item.fee)
             .max()
             .unwrap_or(0);
-        let max_fee_pangoro = (&top100_pangoro.extrinsics)
+        let max_fee_pangoro = top100_pangoro
+            .extrinsics
+            .unwrap_or_default()
             .iter()
             .map(|item| item.fee)
             .max()

@@ -1285,6 +1285,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "component-subquery"
+version = "0.4.7"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bridge-traits",
+ "gql_client",
+ "log",
+ "serde 1.0.130",
+ "serde-aux",
+]
+
+[[package]]
 name = "component-subscan"
 version = "0.4.7"
 dependencies = [

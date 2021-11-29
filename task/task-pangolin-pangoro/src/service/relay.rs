@@ -179,7 +179,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         pangoro_client.clone(),
         pangoro_transactions_mortality,
         PangolinFinalityToPangoro::new(pangoro_client.clone(), pangoro_sign.clone()),
-        common_primitives::BLOCKS_PER_SESSION,
+        common_primitives::PANGOLIN_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
     let pangoro_to_pangolin_on_demand_headers = OnDemandHeadersRelay::new(
@@ -187,7 +187,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         pangolin_client.clone(),
         pangolin_transactions_mortality,
         PangoroFinalityToPangolin::new(pangolin_client.clone(), pangolin_sign.clone()),
-        common_primitives::BLOCKS_PER_SESSION,
+        common_primitives::PANGORO_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
 

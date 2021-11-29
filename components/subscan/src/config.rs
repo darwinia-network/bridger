@@ -5,7 +5,12 @@ use serde::{Deserialize, Serialize};
 pub struct SubscanConfig {
     pub endpoint: String,
     pub token: String,
+    #[serde(default = "_default_timeout")]
     pub timeout: Option<u64>,
+}
+
+fn _default_timeout() -> Option<u64> {
+    Some(30)
 }
 
 impl BridgeConfig for SubscanConfig {
@@ -17,7 +22,7 @@ impl BridgeConfig for SubscanConfig {
         Self {
             endpoint: "https://darwinia.api.subscan.io".to_string(),
             token: "123456".to_string(),
-            timeout: Some(3000),
+            timeout: Some(30),
         }
     }
 }

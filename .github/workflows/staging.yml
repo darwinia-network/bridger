@@ -90,4 +90,3 @@ jobs:
       - uses: geekyeggo/delete-artifact@v1
         with:
           name: bridger-artifact
-

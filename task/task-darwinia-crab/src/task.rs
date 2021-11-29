@@ -51,9 +51,10 @@ impl DarwiniaCrabTask {
         let bus = DarwiniaCrabBus::default();
 
         let mut stack = TaskStack::new(bus);
-        stack.spawn_service::<UpdateFeeService>()?;
         stack.spawn_service::<InitBridgeService>()?;
         stack.spawn_service::<RelayService>()?;
+        // fixme: https://github.com/darwinia-network/bridger/issues/319
+        stack.spawn_service::<UpdateFeeService>()?;
 
         let mut sender = stack.bus().tx::<DarwiniaCrabMessageSend>()?;
         let relay_config: RelayConfig = Config::restore_unwrap(Self::NAME)?;

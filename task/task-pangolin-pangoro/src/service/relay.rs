@@ -131,8 +131,8 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
     let metrics_params = relay_utils::relay_metrics(None, metrics_params).into_params();
 
     // const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
-	// 			this is the command entrypoint, so nothing has been registered yet; \
-	// 			qed";
+    // 			this is the command entrypoint, so nothing has been registered yet; \
+    // 			qed";
 
     if relay_info.create_relayers_fund_accounts {
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
@@ -179,7 +179,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         pangoro_client.clone(),
         pangoro_transactions_mortality,
         PangolinFinalityToPangoro::new(pangoro_client.clone(), pangoro_sign.clone()),
-        pangolin_constants::BLOCKS_PER_SESSION,
+        common_primitives::PANGOLIN_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
     let pangoro_to_pangolin_on_demand_headers = OnDemandHeadersRelay::new(
@@ -187,7 +187,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         pangolin_client.clone(),
         pangolin_transactions_mortality,
         PangoroFinalityToPangolin::new(pangolin_client.clone(), pangolin_sign.clone()),
-        pangoro_constants::BLOCKS_PER_SESSION,
+        common_primitives::PANGORO_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
 

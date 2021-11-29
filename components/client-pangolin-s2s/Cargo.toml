@@ -37,7 +37,6 @@ pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia
 common-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 bridge-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
-pangolin-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 
 

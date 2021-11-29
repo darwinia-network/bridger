@@ -37,7 +37,6 @@ bp-runtime             = { git = "https://github.com/darwinia-network/parity-bri
 pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 common-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
-pangoro-constants       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 dp-fee                  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 
 

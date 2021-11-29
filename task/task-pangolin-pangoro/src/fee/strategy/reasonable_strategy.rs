@@ -11,8 +11,8 @@ use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
 use crate::task::PangolinPangoroTask;
 
-const MIN_RELAY_FEE_PANGOLIN: u128 = 15 * pangolin_constants::COIN;
-const MIN_RELAY_FEE_PANGORO: u128 = 15 * pangoro_constants::COIN;
+const MIN_RELAY_FEE_PANGOLIN: u128 = 15 * common_primitives::COIN;
+const MIN_RELAY_FEE_PANGORO: u128 = 15 * common_primitives::COIN;
 
 #[derive(Clone)]
 pub struct ReasonableStrategy {

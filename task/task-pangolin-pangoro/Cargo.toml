@@ -66,14 +66,11 @@ component-subscan      = { path = "../../components/subscan" }
 ## darwinia common
 common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
+common-runtime      = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 
 ## pangolin
 pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
-pangolin-runtime-system-params = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
-pangolin-constants             = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 
 ## pangoro
 pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
-pangoro-runtime-system-params  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
-pangoro-constants              = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
 

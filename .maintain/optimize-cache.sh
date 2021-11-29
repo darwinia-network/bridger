@@ -11,8 +11,8 @@ cd ${WORK_PATH}
 
 rm -rf target/debug
 rm -rf target/release/wbuild
-rm -rf target/release/build
 rm -rf target/release/bridger.pdb
+rm -rf target/release/*.rlib
 rm -rf target/release/bridger
 rm -rf target/release/incremental
 rm -rf target/x86_64-unknown-linux-gnu

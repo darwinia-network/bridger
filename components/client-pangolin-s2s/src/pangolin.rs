@@ -38,7 +38,7 @@ impl ChainBase for PangolinChain {
 impl Chain for PangolinChain {
     const NAME: &'static str = "Pangolin";
     const AVERAGE_BLOCK_INTERVAL: Duration =
-        Duration::from_millis(pangolin_constants::MILLISECS_PER_BLOCK);
+        Duration::from_millis(common_primitives::MILLISECS_PER_BLOCK);
     const STORAGE_PROOF_OVERHEAD: u32 = bridge_primitives::EXTRA_STORAGE_PROOF_SIZE;
     const MAXIMAL_ENCODED_ACCOUNT_ID_SIZE: u32 = bridge_primitives::MAXIMAL_ENCODED_ACCOUNT_ID_SIZE;
 

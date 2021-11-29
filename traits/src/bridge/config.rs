@@ -139,6 +139,7 @@ impl Config {
             ConfigFormat::Json => serde_json::to_string_pretty(&config)?,
             ConfigFormat::Toml => {
                 let value = serde_json::to_value(&config)?;
+                log::trace!("{:#?}", value);
                 let value: toml::Value = serde_json::from_value(value)?;
                 toml::to_string(&value)?
             }

@@ -113,12 +113,16 @@ impl UpdateFeeStrategy for ReasonableStrategy {
             .data()?
             .ok_or_else(|| StandardError::Api("Can not query crab extrinsics data".to_string()))?;
 
-        let max_fee_darwinia = (&top100_darwinia.extrinsics)
+        let max_fee_darwinia = top100_darwinia
+            .extrinsics
+            .unwrap_or_default()
             .iter()
             .map(|item| item.fee)
             .max()
             .unwrap_or(0);
-        let max_fee_crab = (&top100_crab.extrinsics)
+        let max_fee_crab = top100_crab
+            .extrinsics
+            .unwrap_or_default()
             .iter()
             .map(|item| item.fee)
             .max()

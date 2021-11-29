@@ -5,7 +5,7 @@ use serde_hex::StrictPfx;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ExtrinsicsData {
     pub count: u32,
-    pub extrinsics: Vec<Extrinsic>,
+    pub extrinsics: Option<Vec<Extrinsic>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

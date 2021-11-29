@@ -114,12 +114,16 @@ impl UpdateFeeStrategy for ReasonableStrategy {
             StandardError::Api("Can not query pangoro extrinsics data".to_string())
         })?;
 
-        let max_fee_pangolin = (&top100_pangolin.extrinsics)
+        let max_fee_pangolin = top100_pangolin
+            .extrinsics
+            .unwrap_or_default()
             .iter()
             .map(|item| item.fee)
             .max()
             .unwrap_or(0);
-        let max_fee_pangoro = (&top100_pangoro.extrinsics)
+        let max_fee_pangoro = top100_pangoro
+            .extrinsics
+            .unwrap_or_default()
             .iter()
             .map(|item| item.fee)
             .max()

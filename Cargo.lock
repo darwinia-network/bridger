@@ -10387,6 +10387,7 @@ dependencies = [
  "component-pangolin-subxt",
  "component-shadow",
  "component-state",
+ "component-subquery",
  "component-thegraph-liketh",
  "lifeline",
  "linked-darwinia",

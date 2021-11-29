@@ -36,3 +36,7 @@ docker pull quay.io/darwinia-network/bridger:sha-{{ tag }}
 | pangolin-ropsten  | [Guide](../task/task-pangolin-ropsten/docs/Guide.md)  |
 | pangolin-pangoro  | [Guide](../task/task-pangolin-pangoro/docs/Guide.md)  |
 | darwinia-crab     | [Guide](../task/task-darwinia-crab/docs/Guide.md)     |
+
+***Known issue***
+https://github.com/darwinia-network/bridger/issues/319
+

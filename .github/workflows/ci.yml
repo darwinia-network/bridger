@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: rust:1
+    strategy:
+      matrix:
+        action: [clippy, test]
     steps:
       - uses: actions/checkout@v2
 
@@ -29,9 +32,11 @@ jobs:
           restore-keys: ${{ runner.os }}-target-
 
       - name: Lint
+        if: matrix.action == 'clippy'
         run: cargo clippy --release --all --locked -- -D warnings
 
       - name: Run tests
+        if: matrix.action == 'test'
         run: cargo test --release --locked
 
       - name: Optimize cache

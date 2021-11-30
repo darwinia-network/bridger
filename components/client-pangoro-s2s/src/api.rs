@@ -5,6 +5,7 @@ use common_primitives::Balance;
 use common_primitives::BlockNumber;
 use dp_fee::{Order, Relayer};
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
+use relay_utils::relay_loop::Client as RelayLoopClient;
 use sp_core::storage::StorageKey;
 use sp_core::{Bytes, Pair};
 
@@ -22,14 +23,17 @@ impl PangoroApi {
 }
 
 impl PangoroApi {
-    pub async fn client(&self) -> &Client<PangoroChain> {
-        &self.client
+    pub async fn client(&self) -> anyhow::Result<Client<PangoroChain>> {
+        let mut client = self.client.clone();
+        client.reconnect().await?;
+        Ok(client)
     }
 
     /// Query assigned relayers
     pub async fn assigned_relayers(&self) -> anyhow::Result<Vec<Relayer<AccountId, Balance>>> {
         Ok(self
-            .client
+            .client()
+            .await?
             .storage_value(
                 StorageKey(
                     patch::storage_prefix("FeeMarket".as_bytes(), "AssignedRelayers".as_bytes())
@@ -48,7 +52,8 @@ impl PangoroApi {
         message_nonce: MessageNonce,
     ) -> anyhow::Result<Option<Order<AccountId, BlockNumber, Balance>>> {
         Ok(self
-            .client
+            .client()
+            .await?
             .storage_value(
                 bp_runtime::storage_map_final_key_blake2_128concat(
                     "FeeMarket",
@@ -63,7 +68,8 @@ impl PangoroApi {
     /// Query all relayers
     pub async fn relayers(&self) -> anyhow::Result<Vec<AccountId>> {
         Ok(self
-            .client
+            .client()
+            .await?
             .storage_value(
                 StorageKey(
                     patch::storage_prefix("FeeMarket".as_bytes(), "Relayers".as_bytes()).to_vec(),
@@ -80,7 +86,8 @@ impl PangoroApi {
         account: AccountId,
     ) -> anyhow::Result<Option<Relayer<AccountId, Balance>>> {
         Ok(self
-            .client
+            .client()
+            .await?
             .storage_value(
                 bp_runtime::storage_map_final_key_blake2_128concat(
                     "FeeMarket",
@@ -100,7 +107,7 @@ impl PangoroApi {
     pub async fn best_finalized_header_number(
         &self,
     ) -> anyhow::Result<common_primitives::BlockNumber> {
-        Ok(self.client.best_finalized_header_number().await?)
+        Ok(self.client().await?.best_finalized_header_number().await?)
     }
 
     /// Update relay fee
@@ -110,8 +117,9 @@ impl PangoroApi {
         amount: <PangoroChain as ChainBase>::Balance,
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
-        let genesis_hash = *self.client.genesis_hash();
-        self.client
+        let client = self.client().await?;
+        let genesis_hash = *client.genesis_hash();
+        client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
                 Bytes(
                     PangoroChain::sign_transaction(
@@ -137,8 +145,9 @@ impl PangoroApi {
         amount: <PangoroChain as ChainBase>::Balance,
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
-        let genesis_hash = *self.client.genesis_hash();
-        self.client
+        let client = self.client().await?;
+        let genesis_hash = *client.genesis_hash();
+        client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
                 Bytes(
                     PangoroChain::sign_transaction(

@@ -1,7 +1,5 @@
 use sp_core::Pair;
 
-mod common;
-
 #[test]
 fn test_account() {
     let signer = "//Alice";

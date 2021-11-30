@@ -8,7 +8,7 @@ dataSources:
     source:
       address: "0x649fdf6ee483a96e020b889571e93700fbd82d88"
       abi: bank
-      startBlock: 5000000
+      startBlock: 13710000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -47,7 +47,7 @@ dataSources:
     source:
       address: "0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49"
       abi: relay
-      startBlock: 5000000
+      startBlock: 13710000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -83,7 +83,7 @@ dataSources:
     source:
       address: "0xea7938985898af7fd945b03b7bc2e405e744e913"
       abi: issuing
-      startBlock: 500000
+      startBlock: 13710000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

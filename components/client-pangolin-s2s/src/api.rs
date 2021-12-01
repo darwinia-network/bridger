@@ -8,7 +8,9 @@ use common_primitives::AccountId;
 use common_primitives::Balance;
 use common_primitives::BlockNumber;
 use dp_fee::{Order, Relayer};
-use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
+use relay_substrate_client::{
+    ChainBase, Client, HeaderIdOf, TransactionSignScheme, UnsignedTransaction,
+};
 use relay_utils::relay_loop::Client as RelayLoopClient;
 use relay_utils::MaybeConnectionError;
 use sp_core::storage::StorageKey;
@@ -28,125 +30,110 @@ impl PangolinApi {
 }
 
 impl PangolinApi {
-    async fn _storage_value<T: Send + Decode + 'static>(
-        &mut self,
-        storage_key: StorageKey,
-        block_hash: Option<<PangolinChain as relay_substrate_client::ChainBase>::Hash>,
-        times: u32,
-    ) -> anyhow::Result<Option<T>> {
-        loop {
-            if times > 10 {
-                return Err(StandardError::Api("Failed to query storage".to_string()).into());
-            }
-            match self
-                .client
-                .storage_value(storage_key.clone(), block_hash.clone())
-                .await
-            {
-                Ok(v) => return Ok(v),
-                Err(e) => {
-                    if e.is_connection_error() {
-                        self.client.reconnect().await?;
-                    }
-                }
-            }
-        }
-    }
-}
-
-impl PangolinApi {
-    pub async fn client(&self) -> anyhow::Result<Client<PangolinChain>> {
-        let mut client = self.client.clone();
-        client.reconnect().await?;
-        Ok(client)
-    }
-
     /// Query assigned relayers
     pub async fn assigned_relayers(&mut self) -> anyhow::Result<Vec<Relayer<AccountId, Balance>>> {
         let storage_key = StorageKey(
             patch::storage_prefix("FeeMarket".as_bytes(), "AssignedRelayers".as_bytes()).to_vec(),
         );
-        Ok(self
-            ._storage_value(storage_key, None, 0)
-            .await?
-            .unwrap_or_default())
-    }
-
-    /// Query all relayers
-    pub async fn relayers(&self) -> anyhow::Result<Vec<AccountId>> {
-        Ok(self
-            .client()
-            .await?
-            .storage_value(
-                StorageKey(
-                    patch::storage_prefix("FeeMarket".as_bytes(), "Relayers".as_bytes()).to_vec(),
-                ),
-                None,
-            )
-            .await?
-            .unwrap_or_else(Vec::new))
-    }
-
-    /// Query relayer info by account id
-    pub async fn relayer(
-        &self,
-        account: AccountId,
-    ) -> anyhow::Result<Option<Relayer<AccountId, Balance>>> {
-        Ok(self
-            .client()
-            .await?
-            .storage_value(
-                bp_runtime::storage_map_final_key_blake2_128concat(
-                    "FeeMarket",
-                    "RelayersMap",
-                    account.encode().as_slice(),
-                ),
-                None,
-            )
-            .await?)
-    }
-
-    pub async fn is_relayer(&self, account: AccountId) -> anyhow::Result<bool> {
-        self.relayer(account).await.map(|item| item.is_some())
+        match self.client.storage_value(storage_key, None).await {
+            Ok(v) => Ok(v.unwrap_or_default()),
+            Err(e) => {
+                if e.is_connection_error() {
+                    self.client.reconnect().await?;
+                }
+                Err(e)?
+            }
+        }
     }
 
     /// Query order
     pub async fn order(
-        &self,
+        &mut self,
         laned_id: LaneId,
         message_nonce: MessageNonce,
     ) -> anyhow::Result<Option<Order<AccountId, BlockNumber, Balance>>> {
-        Ok(self
-            .client()
-            .await?
-            .storage_value(
-                bp_runtime::storage_map_final_key_blake2_128concat(
-                    "FeeMarket",
-                    "Orders",
-                    (laned_id, message_nonce).encode().as_slice(),
-                ),
-                None,
-            )
-            .await?)
+        let storage_key = bp_runtime::storage_map_final_key_blake2_128concat(
+            "FeeMarket",
+            "Orders",
+            (laned_id, message_nonce).encode().as_slice(),
+        );
+        match self.client.storage_value(storage_key.clone(), None).await {
+            Ok(v) => Ok(v),
+            Err(e) => {
+                if e.is_connection_error() {
+                    self.client.reconnect().await?;
+                }
+                Err(e)?
+            }
+        }
+    }
+
+    /// Query all relayers
+    pub async fn relayers(&mut self) -> anyhow::Result<Vec<AccountId>> {
+        let storage_key = StorageKey(
+            patch::storage_prefix("FeeMarket".as_bytes(), "Relayers".as_bytes()).to_vec(),
+        );
+        match self.client.storage_value(storage_key, None).await {
+            Ok(v) => Ok(v.unwrap_or_default()),
+            Err(e) => {
+                if e.is_connection_error() {
+                    self.client.reconnect().await?;
+                }
+                Err(e)?
+            }
+        }
+    }
+
+    /// Query relayer info by account id
+    pub async fn relayer(
+        &mut self,
+        account: AccountId,
+    ) -> anyhow::Result<Option<Relayer<AccountId, Balance>>> {
+        let storage_key = bp_runtime::storage_map_final_key_blake2_128concat(
+            "FeeMarket",
+            "RelayersMap",
+            account.encode().as_slice(),
+        );
+        match self.client.storage_value(storage_key.clone(), None).await {
+            Ok(v) => Ok(v),
+            Err(e) => {
+                if e.is_connection_error() {
+                    self.client.reconnect().await?;
+                }
+                Err(e)?
+            }
+        }
+    }
+
+    pub async fn is_relayer(&mut self, account: AccountId) -> anyhow::Result<bool> {
+        self.relayer(account).await.map(|item| item.is_some())
     }
 
     /// Return number of the best finalized block.
     pub async fn best_finalized_header_number(
-        &self,
+        &mut self,
     ) -> anyhow::Result<common_primitives::BlockNumber> {
-        Ok(self.client().await?.best_finalized_header_number().await?)
+        match self.client.best_finalized_header_number().await {
+            Ok(v) => Ok(v),
+            Err(e) => {
+                if e.is_connection_error() {
+                    self.client.reconnect().await?;
+                }
+                Err(e)?
+            }
+        }
     }
 
     /// Update relay fee
     pub async fn update_relay_fee(
-        &self,
+        &mut self,
         signer: <PangolinChain as TransactionSignScheme>::AccountKeyPair,
         amount: <PangolinChain as ChainBase>::Balance,
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
-        let client = self.client().await?;
-        let genesis_hash = *client.genesis_hash();
-        client
+        let genesis_hash = *self.client.genesis_hash();
+        match self
+            .client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
                 Bytes(
                     PangolinChain::sign_transaction(
@@ -161,20 +148,28 @@ impl PangolinApi {
                     .encode(),
                 )
             })
-            .await?;
-        Ok(())
+            .await
+        {
+            Ok(_v) => Ok(()),
+            Err(e) => {
+                if e.is_connection_error() {
+                    self.client.reconnect().await?;
+                }
+                Err(e)?
+            }
+        }
     }
 
     /// Update locked collateral
     pub async fn update_locked_collateral(
-        &self,
+        &mut self,
         signer: <PangolinChain as TransactionSignScheme>::AccountKeyPair,
         amount: <PangolinChain as ChainBase>::Balance,
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
-        let client = self.client().await?;
-        let genesis_hash = *client.genesis_hash();
-        client
+        let genesis_hash = *self.client.genesis_hash();
+        match self
+            .client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
                 Bytes(
                     PangolinChain::sign_transaction(
@@ -190,7 +185,15 @@ impl PangolinApi {
                     .encode(),
                 )
             })
-            .await?;
-        Ok(())
+            .await
+        {
+            Ok(_v) => Ok(()),
+            Err(e) => {
+                if e.is_connection_error() {
+                    self.client.reconnect().await?;
+                }
+                Err(e)?
+            }
+        }
     }
 }

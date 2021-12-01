@@ -71,8 +71,9 @@ impl CrazyStrategy {
     }
 
     async fn handle_pangoro(&mut self) -> anyhow::Result<()> {
-        let pangoro_api = self.helper.pangoro_api();
         let my_id = AccountId::from(self.helper.pangoro_signer().public().0);
+        let pangoro_signer = self.helper.pangoro_signer().clone();
+        let pangoro_api = self.helper.pangoro_api_mut();
 
         if !pangoro_api.is_relayer(my_id.clone()).await? {
             log::warn!(
@@ -104,7 +105,7 @@ impl CrazyStrategy {
             new_fee
         );
         pangoro_api
-            .update_relay_fee(self.helper.pangoro_signer().clone(), new_fee)
+            .update_relay_fee(pangoro_signer, new_fee)
             .await?;
         Ok(())
     }

@@ -145,7 +145,7 @@ impl UpdateFeeStrategy for ReasonableStrategy {
             "[reasonable] Update pangoro fee: {}",
             expect_fee_pangoro
         );
-        let pangoro_api = self.helper.pangoro_api();
+        let pangoro_api = self.helper.pangoro_api_mut();
         pangoro_api
             .update_relay_fee(self.helper.pangoro_signer().clone(), expect_fee_pangoro)
             .await?;
@@ -155,7 +155,7 @@ impl UpdateFeeStrategy for ReasonableStrategy {
             "[reasonable] Update pangolin fee: {}",
             expect_fee_pangolin
         );
-        let pangolin_api = self.helper.pangolin_api();
+        let pangolin_api = self.helper.pangolin_api_mut();
         pangolin_api
             .update_relay_fee(self.helper.pangolin_signer().clone(), expect_fee_pangolin)
             .await?;

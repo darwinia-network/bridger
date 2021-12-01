@@ -11,8 +11,8 @@ use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
 use crate::task::DarwiniaCrabTask;
 
-const MIN_RELAY_FEE_DARWINIA: u128 = 15 * common_primitives::COIN;
-const MIN_RELAY_FEE_CRAB: u128 = 15 * common_primitives::COIN;
+const MIN_RELAY_FEE_DARWINIA: u128 = 15 * darwinia_common_primitives::COIN;
+const MIN_RELAY_FEE_CRAB: u128 = 15 * darwinia_common_primitives::COIN;
 
 #[derive(Clone)]
 pub struct ReasonableStrategy {
@@ -79,8 +79,8 @@ impl ReasonableStrategy {
 
     async fn conversion_darwinia_to_crab(
         &self,
-        darwinia_currency: common_primitives::Balance,
-    ) -> anyhow::Result<common_primitives::Balance> {
+        darwinia_currency: darwinia_common_primitives::Balance,
+    ) -> anyhow::Result<darwinia_common_primitives::Balance> {
         let price_darwinia = self._darwinia_open_price().await?;
         let price_crab = self._crab_open_price().await?;
         let rate = price_darwinia / price_crab;
@@ -90,8 +90,8 @@ impl ReasonableStrategy {
     }
     async fn conversion_crab_to_darwinia(
         &self,
-        crab_currency: common_primitives::Balance,
-    ) -> anyhow::Result<common_primitives::Balance> {
+        crab_currency: darwinia_common_primitives::Balance,
+    ) -> anyhow::Result<darwinia_common_primitives::Balance> {
         let price_darwinia = self._darwinia_open_price().await?;
         let price_crab = self._crab_open_price().await?;
         let rate = price_crab / price_darwinia;
@@ -103,7 +103,7 @@ impl ReasonableStrategy {
 
 #[async_trait::async_trait]
 impl UpdateFeeStrategy for ReasonableStrategy {
-    async fn handle(&self) -> anyhow::Result<()> {
+    async fn handle(&mut self) -> anyhow::Result<()> {
         let top100_darwinia = self.subscan_darwinia.extrinsics(1, 100).await?;
         let top100_crab = self.subscan_crab.extrinsics(1, 100).await?;
         let top100_darwinia = top100_darwinia.data()?.ok_or_else(|| {
@@ -137,14 +137,16 @@ impl UpdateFeeStrategy for ReasonableStrategy {
         let expect_fee_darwinia = MIN_RELAY_FEE_DARWINIA + (top100_max_cost_darwinia * 15);
         let expect_fee_crab = MIN_RELAY_FEE_CRAB + (top100_max_cost_crab * 15);
 
+        let crab_signer = self.helper.crab_signer().clone();
+        let darwinia_signer = self.helper.darwinia_signer().clone();
         log::info!(
             target: DarwiniaCrabTask::NAME,
             "[reasonable] Update crab fee: {}",
             expect_fee_crab
         );
-        let crab_api = self.helper.crab_api();
+        let crab_api = self.helper.crab_api_mut();
         crab_api
-            .update_relay_fee(self.helper.crab_signer().clone(), expect_fee_crab)
+            .update_relay_fee(crab_signer, expect_fee_crab)
             .await?;
 
         log::info!(
@@ -152,9 +154,9 @@ impl UpdateFeeStrategy for ReasonableStrategy {
             "[reasonable] Update darwinia fee: {}",
             expect_fee_darwinia
         );
-        let darwinia_api = self.helper.darwinia_api();
+        let darwinia_api = self.helper.darwinia_api_mut();
         darwinia_api
-            .update_relay_fee(self.helper.darwinia_signer().clone(), expect_fee_darwinia)
+            .update_relay_fee(darwinia_signer, expect_fee_darwinia)
             .await?;
         Ok(())
     }

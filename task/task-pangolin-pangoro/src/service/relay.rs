@@ -1,4 +1,4 @@
-use common_primitives::AccountId;
+use drml_common_primitives::AccountId;
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
@@ -137,7 +137,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
     if relay_info.create_relayers_fund_accounts {
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
             AccountIdOf<PangolinChain>,
-            bridge_primitives::AccountIdConverter,
+            drml_bridge_primitives::AccountIdConverter,
         >();
         let relayers_fund_account_balance = pangolin_client
             .free_native_balance(relayer_fund_acount_id.clone())
@@ -156,7 +156,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
 
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
             AccountIdOf<PangoroChain>,
-            bridge_primitives::AccountIdConverter,
+            drml_bridge_primitives::AccountIdConverter,
         >();
         let relayers_fund_account_balance = pangoro_client
             .free_native_balance(relayer_fund_acount_id.clone())
@@ -179,7 +179,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         pangoro_client.clone(),
         pangoro_transactions_mortality,
         PangolinFinalityToPangoro::new(pangoro_client.clone(), pangoro_sign.clone()),
-        common_primitives::PANGOLIN_BLOCKS_PER_SESSION,
+        drml_common_primitives::PANGOLIN_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
     let pangoro_to_pangolin_on_demand_headers = OnDemandHeadersRelay::new(
@@ -187,7 +187,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         pangolin_client.clone(),
         pangolin_transactions_mortality,
         PangoroFinalityToPangolin::new(pangolin_client.clone(), pangolin_sign.clone()),
-        common_primitives::PANGORO_BLOCKS_PER_SESSION,
+        drml_common_primitives::PANGORO_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
 

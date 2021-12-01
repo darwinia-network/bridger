@@ -74,14 +74,14 @@ async fn run_update_fee(config_task: TaskConfig) -> anyhow::Result<()> {
             if !exists_subscan_config {
                 return Ok(());
             }
-            let strategy = CrazyStrategy::new().await?;
+            let mut strategy = CrazyStrategy::new().await?;
             strategy.handle().await
         }
         UpdateFeeStrategyType::Reasonable => {
             if !exists_subscan_config {
                 return Ok(());
             }
-            let strategy = ReasonableStrategy::new().await?;
+            let mut strategy = ReasonableStrategy::new().await?;
             strategy.handle().await
         }
     }

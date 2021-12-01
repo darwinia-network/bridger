@@ -36,7 +36,7 @@ bp-runtime             = { git = "https://github.com/darwinia-network/parity-bri
 crab-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
 darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
 darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
-dp-fee                     = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "darwinia-v0.11.6-3" }
+dp-fee                     = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps-darwinia" }
 
 
 

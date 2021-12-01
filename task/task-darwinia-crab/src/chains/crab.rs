@@ -248,9 +248,9 @@ mod s2s_messages {
                 TARGET_NAME,
                 SOURCE_NAME,
                 call_weight,
-                darwinia_common_runtime::max_extrinsic_weight(),
+                darwinia_runtime_common::max_extrinsic_weight(),
                 transaction.encode().len(),
-                darwinia_common_runtime::max_extrinsic_size(),
+                darwinia_runtime_common::max_extrinsic_size(),
             );
             Bytes(transaction.encode())
         }
@@ -298,9 +298,9 @@ mod s2s_messages {
                 SOURCE_NAME,
                 TARGET_NAME,
                 call_weight,
-                darwinia_common_runtime::max_extrinsic_weight(),
+                darwinia_runtime_common::max_extrinsic_weight(),
                 transaction.encode().len(),
-                darwinia_common_runtime::max_extrinsic_size(),
+                darwinia_runtime_common::max_extrinsic_size(),
             );
             Bytes(transaction.encode())
         }
@@ -342,13 +342,13 @@ mod s2s_messages {
 
             // 2/3 is reserved for proofs and tx overhead
             let max_messages_size_in_single_batch =
-                darwinia_common_runtime::max_extrinsic_size() / 3;
+                darwinia_runtime_common::max_extrinsic_size() / 3;
             let (max_messages_in_single_batch, max_messages_weight_in_single_batch) =
                 substrate_relay_helper::messages_lane::select_delivery_transaction_limits::<
                     // todo: there can be change to special weight
                     pallet_bridge_messages::weights::RialtoWeight<crab_runtime::Runtime>,
                 >(
-                    darwinia_common_runtime::max_extrinsic_weight(),
+                    darwinia_runtime_common::max_extrinsic_weight(),
                     DarwiniaChainConst::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
                 );
 

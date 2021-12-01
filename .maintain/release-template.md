@@ -25,7 +25,7 @@ docker pull quay.io/darwinia-network/bridger:{{ tag }}
 #### Pull with the Git Commit SHA
 
 ```docker
-docker pull quay.io/darwinia-network/bridger:sha-{{ tag }}
+docker pull quay.io/darwinia-network/bridger:sha-{{ sha }}
 ```
 
 ## Guide

@@ -35,7 +35,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -57,7 +57,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -73,7 +73,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -94,7 +94,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -113,7 +113,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -149,7 +149,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -185,7 +185,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }

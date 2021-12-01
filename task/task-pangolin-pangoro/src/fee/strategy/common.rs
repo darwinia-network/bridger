@@ -60,12 +60,6 @@ impl StrategyHelper {
 }
 
 impl StrategyHelper {
-    pub fn pangolin_api(&self) -> &PangolinApi {
-        &self.pangolin_api
-    }
-    pub fn pangoro_api(&self) -> &PangoroApi {
-        &self.pangoro_api
-    }
     pub fn pangolin_signer(&self) -> &<PangolinChain as TransactionSignScheme>::AccountKeyPair {
         &self.pangolin_signer
     }

@@ -1,9 +1,9 @@
 use bp_messages::{LaneId, MessageNonce};
 use codec::Encode;
-use common_primitives::AccountId;
-use common_primitives::Balance;
-use common_primitives::BlockNumber;
 use dp_fee::{Order, Relayer};
+use drml_common_primitives::AccountId;
+use drml_common_primitives::Balance;
+use drml_common_primitives::BlockNumber;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
 use relay_utils::relay_loop::Client as RelayLoopClient;
 use relay_utils::MaybeConnectionError;
@@ -106,7 +106,7 @@ impl PangoroApi {
     /// Return number of the best finalized block.
     pub async fn best_finalized_header_number(
         &mut self,
-    ) -> anyhow::Result<common_primitives::BlockNumber> {
+    ) -> anyhow::Result<drml_common_primitives::BlockNumber> {
         match self.client.best_finalized_header_number().await {
             Ok(v) => Ok(v),
             Err(e) => {

@@ -11,8 +11,8 @@ use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
 use crate::task::PangolinPangoroTask;
 
-const MIN_RELAY_FEE_PANGOLIN: u128 = 15 * common_primitives::COIN;
-const MIN_RELAY_FEE_PANGORO: u128 = 15 * common_primitives::COIN;
+const MIN_RELAY_FEE_PANGOLIN: u128 = 15 * drml_common_primitives::COIN;
+const MIN_RELAY_FEE_PANGORO: u128 = 15 * drml_common_primitives::COIN;
 
 #[derive(Clone)]
 pub struct ReasonableStrategy {
@@ -80,8 +80,8 @@ impl ReasonableStrategy {
 
     async fn conversion_pangolin_to_pangoro(
         &self,
-        pangolin_currency: common_primitives::Balance,
-    ) -> anyhow::Result<common_primitives::Balance> {
+        pangolin_currency: drml_common_primitives::Balance,
+    ) -> anyhow::Result<drml_common_primitives::Balance> {
         let price_pangolin = self._pangolin_open_price().await?;
         let price_pangoro = self._pangoro_open_price().await?;
         let rate = price_pangolin / price_pangoro;
@@ -91,8 +91,8 @@ impl ReasonableStrategy {
     }
     async fn conversion_pangoro_to_pangolin(
         &self,
-        pangoro_currency: common_primitives::Balance,
-    ) -> anyhow::Result<common_primitives::Balance> {
+        pangoro_currency: drml_common_primitives::Balance,
+    ) -> anyhow::Result<drml_common_primitives::Balance> {
         let price_pangolin = self._pangolin_open_price().await?;
         let price_pangoro = self._pangoro_open_price().await?;
         let rate = price_pangoro / price_pangolin;

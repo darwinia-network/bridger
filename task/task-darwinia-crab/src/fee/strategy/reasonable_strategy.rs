@@ -11,8 +11,8 @@ use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
 use crate::task::DarwiniaCrabTask;
 
-const MIN_RELAY_FEE_DARWINIA: u128 = 15 * common_primitives::COIN;
-const MIN_RELAY_FEE_CRAB: u128 = 15 * common_primitives::COIN;
+const MIN_RELAY_FEE_DARWINIA: u128 = 15 * darwinia_common_primitives::COIN;
+const MIN_RELAY_FEE_CRAB: u128 = 15 * darwinia_common_primitives::COIN;
 
 #[derive(Clone)]
 pub struct ReasonableStrategy {
@@ -79,8 +79,8 @@ impl ReasonableStrategy {
 
     async fn conversion_darwinia_to_crab(
         &self,
-        darwinia_currency: common_primitives::Balance,
-    ) -> anyhow::Result<common_primitives::Balance> {
+        darwinia_currency: darwinia_common_primitives::Balance,
+    ) -> anyhow::Result<darwinia_common_primitives::Balance> {
         let price_darwinia = self._darwinia_open_price().await?;
         let price_crab = self._crab_open_price().await?;
         let rate = price_darwinia / price_crab;
@@ -90,8 +90,8 @@ impl ReasonableStrategy {
     }
     async fn conversion_crab_to_darwinia(
         &self,
-        crab_currency: common_primitives::Balance,
-    ) -> anyhow::Result<common_primitives::Balance> {
+        crab_currency: darwinia_common_primitives::Balance,
+    ) -> anyhow::Result<darwinia_common_primitives::Balance> {
         let price_darwinia = self._darwinia_open_price().await?;
         let price_crab = self._crab_open_price().await?;
         let rate = price_crab / price_darwinia;

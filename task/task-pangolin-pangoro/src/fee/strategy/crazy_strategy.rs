@@ -1,4 +1,4 @@
-use common_primitives::AccountId;
+use drml_common_primitives::AccountId;
 use sp_core::Pair;
 
 use bridge_traits::bridge::task::BridgeSand;

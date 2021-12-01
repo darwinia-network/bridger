@@ -27,33 +27,33 @@ mod s2s_const {
 
     impl ChainConst for CrabChainConst {
         const OUTBOUND_LANE_MESSAGE_DETAILS_METHOD: &'static str =
-            bridge_primitives::TO_CRAB_MESSAGE_DETAILS_METHOD;
+            darwinia_bridge_primitives::TO_CRAB_MESSAGE_DETAILS_METHOD;
         const OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD: &'static str =
-            bridge_primitives::TO_CRAB_LATEST_GENERATED_NONCE_METHOD;
+            darwinia_bridge_primitives::TO_CRAB_LATEST_GENERATED_NONCE_METHOD;
         const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            bridge_primitives::TO_CRAB_LATEST_RECEIVED_NONCE_METHOD;
+            darwinia_bridge_primitives::TO_CRAB_LATEST_RECEIVED_NONCE_METHOD;
         const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            bridge_primitives::FROM_CRAB_LATEST_RECEIVED_NONCE_METHOD;
+            darwinia_bridge_primitives::FROM_CRAB_LATEST_RECEIVED_NONCE_METHOD;
         const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
-            bridge_primitives::FROM_CRAB_LATEST_CONFIRMED_NONCE_METHOD;
+            darwinia_bridge_primitives::FROM_CRAB_LATEST_CONFIRMED_NONCE_METHOD;
         const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str =
-            bridge_primitives::FROM_CRAB_UNREWARDED_RELAYERS_STATE;
+            darwinia_bridge_primitives::FROM_CRAB_UNREWARDED_RELAYERS_STATE;
         const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
-            bridge_primitives::BEST_FINALIZED_CRAB_HEADER_METHOD;
+            darwinia_bridge_primitives::BEST_FINALIZED_CRAB_HEADER_METHOD;
         const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str =
-            bridge_primitives::BEST_FINALIZED_CRAB_HEADER_METHOD;
+            darwinia_bridge_primitives::BEST_FINALIZED_CRAB_HEADER_METHOD;
         const MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE: MessageNonce =
-            bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
+            darwinia_bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
         const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce =
-            bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+            darwinia_bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
         const AVERAGE_BLOCK_INTERVAL: Duration = DarwiniaChain::AVERAGE_BLOCK_INTERVAL;
-        const BRIDGE_CHAIN_ID: ChainId = bridge_primitives::CRAB_CHAIN_ID;
+        const BRIDGE_CHAIN_ID: ChainId = darwinia_bridge_primitives::CRAB_CHAIN_ID;
         const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str =
-            bridge_primitives::WITH_DARWINIA_MESSAGES_PALLET_NAME;
+            darwinia_bridge_primitives::WITH_DARWINIA_MESSAGES_PALLET_NAME;
         const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
-            bridge_primitives::WITH_CRAB_MESSAGES_PALLET_NAME;
+            darwinia_bridge_primitives::WITH_CRAB_MESSAGES_PALLET_NAME;
         const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight =
-            bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
+            darwinia_bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
         type SigningParams = sp_core::sr25519::Pair;
     }
 
@@ -111,7 +111,7 @@ mod s2s_headers {
 
         type TargetChain = DarwiniaChain;
 
-        fn transactions_author(&self) -> common_primitives::AccountId {
+        fn transactions_author(&self) -> darwinia_common_primitives::AccountId {
             (*self.finality_pipeline.target_sign.public().as_array_ref()).into()
         }
 
@@ -120,7 +120,7 @@ mod s2s_headers {
             era: bp_runtime::TransactionEraOf<DarwiniaChain>,
             transaction_nonce: IndexOf<DarwiniaChain>,
             header: component_crab_s2s::SyncHeader,
-            proof: GrandpaJustification<common_primitives::Header>,
+            proof: GrandpaJustification<darwinia_common_primitives::Header>,
         ) -> Bytes {
             let call = darwinia_runtime::BridgeGrandpaCall::<
                 darwinia_runtime::Runtime,
@@ -217,7 +217,7 @@ mod s2s_messages {
         type SourceChain = CrabChain;
         type TargetChain = DarwiniaChain;
 
-        fn source_transactions_author(&self) -> common_primitives::AccountId {
+        fn source_transactions_author(&self) -> darwinia_common_primitives::AccountId {
             (*self.message_lane.source_sign.public().as_array_ref()).into()
         }
 
@@ -255,7 +255,7 @@ mod s2s_messages {
             Bytes(transaction.encode())
         }
 
-        fn target_transactions_author(&self) -> common_primitives::AccountId {
+        fn target_transactions_author(&self) -> darwinia_common_primitives::AccountId {
             (*self.message_lane.target_sign.public().as_array_ref()).into()
         }
 

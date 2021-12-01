@@ -1,4 +1,4 @@
-use common_primitives::AccountId;
+use darwinia_common_primitives::AccountId;
 use sp_core::Pair;
 
 use bridge_traits::bridge::task::BridgeSand;

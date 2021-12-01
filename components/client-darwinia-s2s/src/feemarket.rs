@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use common_primitives::AccountId;
+use darwinia_common_primitives::AccountId;
 use messages_relay::message_lane::MessageLane;
 use messages_relay::message_lane_loop::{
     SourceClient as MessageLaneSourceClient, TargetClient as MessageLaneTargetClient,
@@ -39,7 +39,7 @@ impl RelayStrategy for DarwiniaRelayStrategy {
         let nonce = &reference.nonce;
         let order = self
             .api
-            .order(bridge_primitives::DARWINIA_CRAB_LANE, *nonce)
+            .order(darwinia_bridge_primitives::DARWINIA_CRAB_LANE, *nonce)
             .await
             .map_err(|e| {
                 log::error!("Failed to query order: {:?}", e);
@@ -94,7 +94,7 @@ impl RelayStrategy for DarwiniaRelayStrategy {
         let ranges = relayers
             .iter()
             .map(|item| item.valid_range.clone())
-            .collect::<Vec<Range<common_primitives::BlockNumber>>>();
+            .collect::<Vec<Range<darwinia_common_primitives::BlockNumber>>>();
 
         let mut maximum_timeout = 0;
         for range in ranges {

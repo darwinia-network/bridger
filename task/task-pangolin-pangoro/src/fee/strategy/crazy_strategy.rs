@@ -22,7 +22,7 @@ impl CrazyStrategy {
 
 #[async_trait::async_trait]
 impl UpdateFeeStrategy for CrazyStrategy {
-    async fn handle(&self) -> anyhow::Result<()> {
+    async fn handle(&mut self) -> anyhow::Result<()> {
         self.handle_pangolin().await?;
         self.handle_pangoro().await?;
         Ok(())
@@ -30,9 +30,10 @@ impl UpdateFeeStrategy for CrazyStrategy {
 }
 
 impl CrazyStrategy {
-    async fn handle_pangolin(&self) -> anyhow::Result<()> {
-        let pangolin_api = self.helper.pangolin_api();
+    async fn handle_pangolin(&mut self) -> anyhow::Result<()> {
         let my_id = AccountId::from(self.helper.pangolin_signer().public().0);
+        let pangolin_signer = self.helper.pangolin_signer().clone();
+        let pangolin_api = self.helper.pangolin_api_mut();
 
         if !pangolin_api.is_relayer(my_id.clone()).await? {
             log::warn!(
@@ -64,12 +65,12 @@ impl CrazyStrategy {
             new_fee
         );
         pangolin_api
-            .update_relay_fee(self.helper.pangolin_signer().clone(), new_fee)
+            .update_relay_fee(pangolin_signer, new_fee)
             .await?;
         Ok(())
     }
 
-    async fn handle_pangoro(&self) -> anyhow::Result<()> {
+    async fn handle_pangoro(&mut self) -> anyhow::Result<()> {
         let pangoro_api = self.helper.pangoro_api();
         let my_id = AccountId::from(self.helper.pangoro_signer().public().0);
 

@@ -33,7 +33,7 @@ impl RelayStrategy for DarwiniaRelayStrategy {
         SourceClient: MessageLaneSourceClient<P>,
         TargetClient: MessageLaneTargetClient<P>,
     >(
-        &self,
+        &mut self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> bool {
         let nonce = &reference.nonce;

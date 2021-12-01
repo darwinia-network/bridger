@@ -1,11 +1,16 @@
+use std::future::Future;
+use std::pin::Pin;
+
 use bp_messages::{LaneId, MessageNonce};
-use codec::Encode;
+use bridge_traits::error::StandardError;
+use codec::{Decode, Encode};
 use common_primitives::AccountId;
 use common_primitives::Balance;
 use common_primitives::BlockNumber;
 use dp_fee::{Order, Relayer};
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
 use relay_utils::relay_loop::Client as RelayLoopClient;
+use relay_utils::MaybeConnectionError;
 use sp_core::storage::StorageKey;
 use sp_core::{Bytes, Pair};
 
@@ -23,6 +28,33 @@ impl PangolinApi {
 }
 
 impl PangolinApi {
+    async fn _storage_value<T: Send + Decode + 'static>(
+        &mut self,
+        storage_key: StorageKey,
+        block_hash: Option<<PangolinChain as relay_substrate_client::ChainBase>::Hash>,
+        times: u32,
+    ) -> anyhow::Result<Option<T>> {
+        loop {
+            if times > 10 {
+                return Err(StandardError::Api("Failed to query storage".to_string()).into());
+            }
+            match self
+                .client
+                .storage_value(storage_key.clone(), block_hash.clone())
+                .await
+            {
+                Ok(v) => return Ok(v),
+                Err(e) => {
+                    if e.is_connection_error() {
+                        self.client.reconnect().await?;
+                    }
+                }
+            }
+        }
+    }
+}
+
+impl PangolinApi {
     pub async fn client(&self) -> anyhow::Result<Client<PangolinChain>> {
         let mut client = self.client.clone();
         client.reconnect().await?;
@@ -30,19 +62,14 @@ impl PangolinApi {
     }
 
     /// Query assigned relayers
-    pub async fn assigned_relayers(&self) -> anyhow::Result<Vec<Relayer<AccountId, Balance>>> {
+    pub async fn assigned_relayers(&mut self) -> anyhow::Result<Vec<Relayer<AccountId, Balance>>> {
+        let storage_key = StorageKey(
+            patch::storage_prefix("FeeMarket".as_bytes(), "AssignedRelayers".as_bytes()).to_vec(),
+        );
         Ok(self
-            .client()
+            ._storage_value(storage_key, None, 0)
             .await?
-            .storage_value(
-                StorageKey(
-                    patch::storage_prefix("FeeMarket".as_bytes(), "AssignedRelayers".as_bytes())
-                        .to_vec(),
-                ),
-                None,
-            )
-            .await?
-            .unwrap_or_else(Vec::new))
+            .unwrap_or_default())
     }
 
     /// Query all relayers

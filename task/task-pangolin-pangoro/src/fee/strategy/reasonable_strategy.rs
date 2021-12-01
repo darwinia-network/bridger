@@ -104,7 +104,7 @@ impl ReasonableStrategy {
 
 #[async_trait::async_trait]
 impl UpdateFeeStrategy for ReasonableStrategy {
-    async fn handle(&self) -> anyhow::Result<()> {
+    async fn handle(&mut self) -> anyhow::Result<()> {
         let top100_pangolin = self.subscan_pangolin.extrinsics(1, 100).await?;
         let top100_pangoro = self.subscan_pangoro.extrinsics(1, 100).await?;
         let top100_pangolin = top100_pangolin.data()?.ok_or_else(|| {

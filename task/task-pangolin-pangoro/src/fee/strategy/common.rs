@@ -51,6 +51,15 @@ impl StrategyHelper {
 }
 
 impl StrategyHelper {
+    pub fn pangolin_api_mut(&mut self) -> &mut PangolinApi {
+        &mut self.pangolin_api
+    }
+    pub fn pangoro_api_mut(&mut self) -> &mut PangoroApi {
+        &mut self.pangoro_api
+    }
+}
+
+impl StrategyHelper {
     pub fn pangolin_api(&self) -> &PangolinApi {
         &self.pangolin_api
     }

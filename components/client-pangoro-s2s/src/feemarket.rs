@@ -126,7 +126,7 @@ impl RelayStrategy for PangoroRelayStrategy {
         SourceClient: MessageLaneSourceClient<P>,
         TargetClient: MessageLaneTargetClient<P>,
     >(
-        &self,
+        &mut self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> bool {
         let decide = self.handle(reference).await;

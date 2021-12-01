@@ -25,19 +25,19 @@ log = "0.4"
 bridge-traits = { path = "../../traits" }
 
 codec                  = { package = "parity-scale-codec", version = "2.0.0" }
-headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-3" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-4" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-4" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-4" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-4" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-4" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-4" }
 
 
 ## Bridge dependencies
-pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
-common-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
-bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
-dp-fee                  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.7.0" }
+pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
+common-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
+bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
+dp-fee                  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
 
 
 

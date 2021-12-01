@@ -635,11 +635,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "bp-header-chain"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
+dependencies = [
+ "finality-grandpa",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "parity-scale-codec",
+ "serde 1.0.130",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-finality-grandpa",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+]
+
+[[package]]
 name = "bp-message-dispatch"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
 dependencies = [
- "bp-runtime",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "parity-scale-codec",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+]
+
+[[package]]
+name = "bp-message-dispatch"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
+dependencies = [
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "parity-scale-codec",
  "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -651,7 +677,22 @@ version = "0.1.0"
 source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
 dependencies = [
  "bitvec",
- "bp-runtime",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "impl-trait-for-tuples",
+ "parity-scale-codec",
+ "serde 1.0.130",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+]
+
+[[package]]
+name = "bp-messages"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
+dependencies = [
+ "bitvec",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "impl-trait-for-tuples",
@@ -678,11 +719,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "bp-runtime"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
+dependencies = [
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "hash-db",
+ "num-traits 0.2.14",
+ "parity-scale-codec",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-io 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-state-machine 0.9.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+]
+
+[[package]]
 name = "bp-test-utils"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
 dependencies = [
- "bp-header-chain",
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "ed25519-dalek",
+ "finality-grandpa",
+ "parity-scale-codec",
+ "sp-application-crypto 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-finality-grandpa",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+]
+
+[[package]]
+name = "bp-test-utils"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
+dependencies = [
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "ed25519-dalek",
  "finality-grandpa",
  "parity-scale-codec",
@@ -711,13 +784,13 @@ name = "bridge-primitives"
 version = "0.11.6"
 source = "git+https://github.com/darwinia-network/darwinia.git?tag=v0.11.6#c5143a275f834f61c5a9c3fccb462943b194395d"
 dependencies = [
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bridge-runtime-common 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "common-primitives 0.11.6",
  "darwinia-fee-market 2.6.10",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
- "pallet-bridge-dispatch",
+ "pallet-bridge-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "sp-api",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -727,15 +800,15 @@ dependencies = [
 [[package]]
 name = "bridge-primitives"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bridge-runtime-common 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "common-primitives 2.7.0",
  "darwinia-fee-market 2.7.0",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
- "pallet-bridge-dispatch",
+ "pallet-bridge-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "sp-api",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -747,14 +820,36 @@ name = "bridge-runtime-common"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
 dependencies = [
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "hash-db",
- "pallet-bridge-dispatch",
- "pallet-bridge-grandpa",
- "pallet-bridge-messages",
+ "pallet-bridge-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "pallet-bridge-grandpa 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "pallet-transaction-payment",
+ "parity-scale-codec",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-state-machine 0.9.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+]
+
+[[package]]
+name = "bridge-runtime-common"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
+dependencies = [
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "hash-db",
+ "pallet-bridge-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "pallet-bridge-grandpa 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "pallet-transaction-payment",
  "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -794,7 +889,7 @@ checksum = "771fe0050b883fcc3ea2359b1a96bcfbc090b7116eae7c3c512c7a083fdf23d3"
 [[package]]
 name = "bsc-primitives"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
  "ethbloom",
@@ -1037,7 +1132,7 @@ dependencies = [
 [[package]]
 name = "common-primitives"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -1046,7 +1141,7 @@ dependencies = [
 [[package]]
 name = "common-runtime"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "common-primitives 2.7.0",
  "darwinia-balances 2.7.0",
@@ -1069,8 +1164,8 @@ version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
- "bp-messages",
- "bp-runtime",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-primitives 0.11.6",
  "bridge-traits",
  "common-primitives 0.11.6",
@@ -1096,8 +1191,8 @@ version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
- "bp-messages",
- "bp-runtime",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-primitives 0.11.6",
  "bridge-traits",
  "common-primitives 0.11.6",
@@ -1179,8 +1274,8 @@ version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
- "bp-messages",
- "bp-runtime",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-primitives 2.7.0",
  "bridge-traits",
  "common-primitives 2.7.0",
@@ -1233,8 +1328,8 @@ version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
- "bp-messages",
- "bp-runtime",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-primitives 2.7.0",
  "bridge-traits",
  "common-primitives 2.7.0",
@@ -1395,11 +1490,11 @@ version = "0.11.6"
 source = "git+https://github.com/darwinia-network/darwinia.git?tag=v0.11.6#c5143a275f834f61c5a9c3fccb462943b194395d"
 dependencies = [
  "array-bytes",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "bridge-primitives 0.11.6",
- "bridge-runtime-common",
+ "bridge-runtime-common 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "common-primitives 0.11.6",
  "darwinia-balances 2.6.10",
  "darwinia-balances-rpc-runtime-api 2.6.10",
@@ -1434,9 +1529,9 @@ dependencies = [
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "pallet-babe",
  "pallet-bounties",
- "pallet-bridge-dispatch",
- "pallet-bridge-grandpa",
- "pallet-bridge-messages",
+ "pallet-bridge-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "pallet-bridge-grandpa 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "pallet-collective",
  "pallet-election-provider-multi-phase",
  "pallet-grandpa",
@@ -1694,7 +1789,7 @@ dependencies = [
 [[package]]
 name = "darwinia-balances"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-balances-rpc-runtime-api 2.7.0",
  "darwinia-support 2.7.0",
@@ -1722,7 +1817,7 @@ dependencies = [
 [[package]]
 name = "darwinia-balances-rpc-runtime-api"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-support 2.7.0",
  "parity-scale-codec",
@@ -1734,7 +1829,7 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-bsc"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "bsc-primitives",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -1773,7 +1868,7 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-ethereum"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
  "blake2-rfc",
@@ -1847,7 +1942,7 @@ dependencies = [
 [[package]]
 name = "darwinia-claims"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
  "darwinia-support 2.7.0",
@@ -1880,7 +1975,7 @@ dependencies = [
 [[package]]
 name = "darwinia-democracy"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-support 2.7.0",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -1912,7 +2007,7 @@ dependencies = [
 [[package]]
 name = "darwinia-elections-phragmen"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-support 2.7.0",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -1957,7 +2052,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
  "darwinia-balances 2.7.0",
@@ -1985,7 +2080,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-bridge-ethereum"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-evm 2.7.0",
  "darwinia-evm-precompile-utils",
@@ -2001,10 +2096,10 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-bridge-s2s"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
- "bp-message-dispatch",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "darwinia-evm 2.7.0",
  "darwinia-evm-precompile-utils",
  "darwinia-support 2.7.0",
@@ -2024,7 +2119,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-dispatch"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-evm 2.7.0",
  "darwinia-support 2.7.0",
@@ -2051,7 +2146,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-simple"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "dp-evm 2.7.0",
  "evm",
@@ -2088,7 +2183,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-transfer"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
  "darwinia-evm 2.7.0",
@@ -2113,7 +2208,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-utils"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-evm-precompile-utils-macro",
  "darwinia-support 2.7.0",
@@ -2123,7 +2218,7 @@ dependencies = [
 [[package]]
 name = "darwinia-evm-precompile-utils-macro"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "evm",
  "proc-macro2",
@@ -2139,15 +2234,15 @@ version = "2.6.10"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=darwinia-v0.11.6-3#ed73e1a2619107dbe02ce636f174c4570552c946"
 dependencies = [
  "bitvec",
- "bp-messages",
- "bp-runtime",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "darwinia-support 2.6.10",
  "dp-fee 2.6.10",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "log",
  "num-traits 0.2.14",
- "pallet-bridge-messages",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "pallet-timestamp",
  "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -2159,18 +2254,18 @@ dependencies = [
 [[package]]
 name = "darwinia-fee-market"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "bitvec",
- "bp-messages",
- "bp-runtime",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "darwinia-support 2.7.0",
  "dp-fee 2.7.0",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "log",
  "num-traits 0.2.14",
- "pallet-bridge-messages",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "pallet-timestamp",
  "parity-scale-codec",
  "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -2184,7 +2279,7 @@ name = "darwinia-fee-market-rpc-runtime-api"
 version = "2.6.10"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=darwinia-v0.11.6-3#ed73e1a2619107dbe02ce636f174c4570552c946"
 dependencies = [
- "bp-messages",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "parity-scale-codec",
  "serde 1.0.130",
  "sp-api",
@@ -2195,9 +2290,9 @@ dependencies = [
 [[package]]
 name = "darwinia-fee-market-rpc-runtime-api"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
- "bp-messages",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "parity-scale-codec",
  "serde 1.0.130",
  "sp-api",
@@ -2228,7 +2323,7 @@ dependencies = [
 [[package]]
 name = "darwinia-header-mmr"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "ckb-merkle-mountain-range",
  "darwinia-header-mmr-rpc-runtime-api 2.7.0",
@@ -2261,7 +2356,7 @@ dependencies = [
 [[package]]
 name = "darwinia-header-mmr-rpc-runtime-api"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-support 2.7.0",
  "parity-scale-codec",
@@ -2289,7 +2384,7 @@ dependencies = [
 [[package]]
 name = "darwinia-relay-authorities"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-relay-primitives 2.7.0",
  "darwinia-support 2.7.0",
@@ -2315,7 +2410,7 @@ dependencies = [
 [[package]]
 name = "darwinia-relay-primitives"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "parity-scale-codec",
@@ -2341,7 +2436,7 @@ dependencies = [
 [[package]]
 name = "darwinia-relayer-game"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-relay-primitives 2.7.0",
  "darwinia-support 2.7.0",
@@ -2358,11 +2453,11 @@ name = "darwinia-runtime"
 version = "0.11.6"
 source = "git+https://github.com/darwinia-network/darwinia.git?tag=v0.11.6#c5143a275f834f61c5a9c3fccb462943b194395d"
 dependencies = [
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "bridge-primitives 0.11.6",
- "bridge-runtime-common",
+ "bridge-runtime-common 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "common-primitives 0.11.6",
  "darwinia-balances 2.6.10",
  "darwinia-balances-rpc-runtime-api 2.6.10",
@@ -2393,9 +2488,9 @@ dependencies = [
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "pallet-babe",
  "pallet-bounties",
- "pallet-bridge-dispatch",
- "pallet-bridge-grandpa",
- "pallet-bridge-messages",
+ "pallet-bridge-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "pallet-bridge-grandpa 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "pallet-collective",
  "pallet-election-provider-multi-phase",
  "pallet-grandpa",
@@ -2489,7 +2584,7 @@ dependencies = [
 [[package]]
 name = "darwinia-staking"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-staking-rpc-runtime-api 2.7.0",
  "darwinia-support 2.7.0",
@@ -2525,7 +2620,7 @@ dependencies = [
 [[package]]
 name = "darwinia-staking-rpc-runtime-api"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-support 2.7.0",
  "parity-scale-codec",
@@ -2539,8 +2634,8 @@ name = "darwinia-support"
 version = "2.6.10"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=darwinia-v0.11.6-3#ed73e1a2619107dbe02ce636f174c4570552c946"
 dependencies = [
- "bp-messages",
- "bp-runtime",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "ethereum",
  "ethereum-primitives 2.6.10",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -2559,10 +2654,10 @@ dependencies = [
 [[package]]
 name = "darwinia-support"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
- "bp-messages",
- "bp-runtime",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "ethereum",
  "ethereum-primitives 2.7.0",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -2594,7 +2689,7 @@ dependencies = [
 [[package]]
 name = "darwinia-vesting"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-support 2.7.0",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -2712,7 +2807,7 @@ checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 [[package]]
 name = "dp-asset"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "ethereum-types",
  "parity-scale-codec",
@@ -2737,7 +2832,7 @@ dependencies = [
 [[package]]
 name = "dp-consensus"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "ethereum",
  "parity-scale-codec",
@@ -2751,9 +2846,9 @@ dependencies = [
 [[package]]
 name = "dp-contract"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
- "bp-messages",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "dp-asset",
  "ethabi 13.0.0",
  "ethereum-primitives 2.7.0",
@@ -2777,7 +2872,7 @@ dependencies = [
 [[package]]
 name = "dp-evm"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "evm",
  "impl-trait-for-tuples",
@@ -2792,7 +2887,7 @@ name = "dp-fee"
 version = "2.6.10"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=darwinia-v0.11.6-3#ed73e1a2619107dbe02ce636f174c4570552c946"
 dependencies = [
- "bp-messages",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -2802,9 +2897,9 @@ dependencies = [
 [[package]]
 name = "dp-fee"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
- "bp-messages",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "parity-scale-codec",
  "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -2814,11 +2909,11 @@ dependencies = [
 [[package]]
 name = "dp-s2s"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
- "bp-message-dispatch",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "dp-asset",
  "dp-contract",
  "parity-scale-codec",
@@ -2835,7 +2930,7 @@ source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=darwin
 [[package]]
 name = "dp-storage"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 
 [[package]]
 name = "dtoa"
@@ -2875,7 +2970,7 @@ dependencies = [
 [[package]]
 name = "dvm-ethereum"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-evm 2.7.0",
  "darwinia-support 2.7.0",
@@ -2922,7 +3017,7 @@ dependencies = [
 [[package]]
 name = "dvm-rpc-runtime-api"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-evm 2.7.0",
  "darwinia-support 2.7.0",
@@ -3171,7 +3266,7 @@ dependencies = [
 [[package]]
 name = "ethereum-primitives"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
  "ethash",
@@ -3319,13 +3414,13 @@ dependencies = [
 [[package]]
 name = "finality-relay"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
 dependencies = [
  "anyhow",
  "async-std",
  "async-trait",
  "backoff",
- "bp-header-chain",
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "futures 0.3.17",
  "headers-relay",
  "log",
@@ -3670,7 +3765,7 @@ dependencies = [
 [[package]]
 name = "from-ethereum-issuing"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
  "darwinia-bridge-ethereum 2.7.0",
@@ -3694,12 +3789,12 @@ dependencies = [
 [[package]]
 name = "from-substrate-issuing"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "darwinia-evm 2.7.0",
  "darwinia-support 2.7.0",
  "dp-asset",
@@ -4070,7 +4165,7 @@ dependencies = [
 [[package]]
 name = "headers-relay"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
 dependencies = [
  "anyhow",
  "async-std",
@@ -5538,7 +5633,7 @@ dependencies = [
 [[package]]
 name = "merkle-patricia-trie"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "hashbrown 0.9.1",
  "keccak-hash",
@@ -5561,13 +5656,13 @@ dependencies = [
 [[package]]
 name = "messages-relay"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
 dependencies = [
  "anyhow",
  "async-std",
  "async-trait",
- "bp-messages",
- "bp-runtime",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "futures 0.3.17",
  "hex",
  "log",
@@ -5652,7 +5747,7 @@ dependencies = [
 [[package]]
 name = "module-transaction-pause"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -6048,8 +6143,24 @@ name = "pallet-bridge-dispatch"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
 dependencies = [
- "bp-message-dispatch",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "log",
+ "parity-scale-codec",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+]
+
+[[package]]
+name = "pallet-bridge-dispatch"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
+dependencies = [
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "log",
@@ -6064,9 +6175,30 @@ name = "pallet-bridge-grandpa"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
 dependencies = [
- "bp-header-chain",
- "bp-runtime",
- "bp-test-utils",
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-test-utils 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "finality-grandpa",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "log",
+ "num-traits 0.2.14",
+ "parity-scale-codec",
+ "serde 1.0.130",
+ "sp-finality-grandpa",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-trie 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+]
+
+[[package]]
+name = "pallet-bridge-grandpa"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
+dependencies = [
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-test-utils 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "finality-grandpa",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -6086,9 +6218,29 @@ version = "0.1.0"
 source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
 dependencies = [
  "bitvec",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3)",
+ "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "log",
+ "num-traits 0.2.14",
+ "parity-scale-codec",
+ "serde 1.0.130",
+ "sp-core 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-runtime 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+ "sp-std 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
+]
+
+[[package]]
+name = "pallet-bridge-messages"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
+dependencies = [
+ "bitvec",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "log",
@@ -6500,14 +6652,14 @@ dependencies = [
 [[package]]
 name = "pangolin-runtime"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-primitives 2.7.0",
- "bridge-runtime-common",
+ "bridge-runtime-common 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "common-primitives 2.7.0",
  "common-runtime",
  "darwinia-balances 2.7.0",
@@ -6559,9 +6711,9 @@ dependencies = [
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "pallet-babe",
  "pallet-bounties",
- "pallet-bridge-dispatch",
- "pallet-bridge-grandpa",
- "pallet-bridge-messages",
+ "pallet-bridge-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "pallet-bridge-grandpa 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "pallet-collective",
  "pallet-election-provider-multi-phase",
  "pallet-grandpa",
@@ -6611,15 +6763,15 @@ dependencies = [
 [[package]]
 name = "pangoro-runtime"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
- "bp-header-chain",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-primitives 2.7.0",
- "bridge-runtime-common",
+ "bridge-runtime-common 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "common-primitives 2.7.0",
  "common-runtime",
  "darwinia-balances 2.7.0",
@@ -6645,9 +6797,9 @@ dependencies = [
  "pallet-authority-discovery",
  "pallet-authorship 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "pallet-babe",
- "pallet-bridge-dispatch",
- "pallet-bridge-grandpa",
- "pallet-bridge-messages",
+ "pallet-bridge-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "pallet-bridge-grandpa 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "pallet-election-provider-multi-phase",
  "pallet-grandpa",
  "pallet-im-online 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -7507,12 +7659,12 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 [[package]]
 name = "relay-substrate-client"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
 dependencies = [
  "async-std",
  "async-trait",
- "bp-header-chain",
- "bp-runtime",
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "finality-relay",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
  "frame-system 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -7543,7 +7695,7 @@ dependencies = [
 [[package]]
 name = "relay-utils"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
 dependencies = [
  "ansi_term 0.12.1",
  "anyhow",
@@ -10020,15 +10172,15 @@ dependencies = [
 [[package]]
 name = "substrate-relay-helper"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-3#e26d59105acb795161881e49eb14992b8b0c22fa"
+source = "git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4#495a773403e5827bbf9d7b20d97333f673628db9"
 dependencies = [
  "anyhow",
  "async-std",
  "async-trait",
- "bp-header-chain",
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bridge-runtime-common 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "finality-grandpa",
  "finality-relay",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",
@@ -10036,7 +10188,7 @@ dependencies = [
  "log",
  "messages-relay",
  "num-traits 0.2.14",
- "pallet-bridge-messages",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "parity-scale-codec",
  "relay-substrate-client",
  "relay-utils",
@@ -10246,11 +10398,11 @@ version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
- "bp-header-chain",
- "bp-messages",
- "bp-runtime",
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-primitives 0.11.6",
- "bridge-runtime-common",
+ "bridge-runtime-common 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-traits",
  "common-primitives 0.11.6",
  "component-crab-s2s",
@@ -10266,7 +10418,7 @@ dependencies = [
  "lifeline",
  "log",
  "messages-relay",
- "pallet-bridge-messages",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "parity-scale-codec",
  "postage",
  "relay-substrate-client",
@@ -10322,11 +10474,11 @@ version = "0.4.8"
 dependencies = [
  "anyhow",
  "async-trait",
- "bp-header-chain",
- "bp-messages",
- "bp-runtime",
+ "bp-header-chain 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-primitives 2.7.0",
- "bridge-runtime-common",
+ "bridge-runtime-common 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "bridge-traits",
  "common-primitives 2.7.0",
  "common-runtime",
@@ -10340,7 +10492,7 @@ dependencies = [
  "lifeline",
  "log",
  "messages-relay",
- "pallet-bridge-messages",
+ "pallet-bridge-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "pangolin-runtime",
  "pangoro-runtime",
  "parity-scale-codec",
@@ -10597,7 +10749,7 @@ dependencies = [
 [[package]]
 name = "to-ethereum-backing"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
  "darwinia-relay-primitives 2.7.0",
@@ -10618,12 +10770,12 @@ dependencies = [
 [[package]]
 name = "to-substrate-backing"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "array-bytes",
- "bp-message-dispatch",
- "bp-messages",
- "bp-runtime",
+ "bp-message-dispatch 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-messages 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
+ "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/parity-bridges-common.git?tag=darwinia-v0.11.6-4)",
  "darwinia-support 2.7.0",
  "dp-asset",
  "dp-contract",
@@ -10656,7 +10808,7 @@ dependencies = [
 [[package]]
 name = "to-tron-backing"
 version = "2.7.0"
-source = "git+https://github.com/darwinia-network/darwinia-common.git?tag=v2.7.0#567af4d9cbf16694cea7823d2087a3872d2d26c5"
+source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=bump-deps#dee6b8606aac443d4199d55797aaa3ac6202d74b"
 dependencies = [
  "darwinia-support 2.7.0",
  "frame-support 3.0.0 (git+https://github.com/darwinia-network/substrate.git?tag=darwinia-v0.11.6-1)",

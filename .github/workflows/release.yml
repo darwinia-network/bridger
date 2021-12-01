@@ -104,7 +104,7 @@ jobs:
           mkdir deploy
           chmod +x shared/bridger
           tar cjSf bridger-x86_64-linux-gnu.tar.bz2 -C shared bridger
-          mv bridger-x86_64-linux-gnu.tar.zst deploy/
+          mv bridger-x86_64-linux-gnu.tar.bz2 deploy/
 
       - name: Hash file
         run: |

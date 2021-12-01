@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use common_primitives::AccountId;
+use drml_common_primitives::AccountId;
 use messages_relay::message_lane::MessageLane;
 use messages_relay::message_lane_loop::{
     SourceClient as MessageLaneSourceClient, TargetClient as MessageLaneTargetClient,
@@ -32,7 +32,7 @@ impl PangoroRelayStrategy {
         SourceClient: MessageLaneSourceClient<P>,
         TargetClient: MessageLaneTargetClient<P>,
     >(
-        &self,
+        &mut self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> bool {
         log::trace!(
@@ -42,7 +42,7 @@ impl PangoroRelayStrategy {
         let nonce = &reference.nonce;
         let order = self
             .api
-            .order(bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
+            .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
             .await
             .map_err(|e| {
                 log::error!("[Pangoro] Failed to query order: {:?}", e);
@@ -101,7 +101,7 @@ impl PangoroRelayStrategy {
         let ranges = relayers
             .iter()
             .map(|item| item.valid_range.clone())
-            .collect::<Vec<Range<common_primitives::BlockNumber>>>();
+            .collect::<Vec<Range<drml_common_primitives::BlockNumber>>>();
 
         let mut maximum_timeout = 0;
         for range in ranges {
@@ -126,7 +126,7 @@ impl RelayStrategy for PangoroRelayStrategy {
         SourceClient: MessageLaneSourceClient<P>,
         TargetClient: MessageLaneTargetClient<P>,
     >(
-        &self,
+        &mut self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> bool {
         let decide = self.handle(reference).await;

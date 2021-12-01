@@ -1,4 +1,4 @@
-use common_primitives::AccountId;
+use darwinia_common_primitives::AccountId;
 use sp_core::Pair;
 
 use bridge_traits::bridge::task::BridgeSand;
@@ -22,7 +22,7 @@ impl CrazyStrategy {
 
 #[async_trait::async_trait]
 impl UpdateFeeStrategy for CrazyStrategy {
-    async fn handle(&self) -> anyhow::Result<()> {
+    async fn handle(&mut self) -> anyhow::Result<()> {
         self.handle_darwinia().await?;
         self.handle_crab().await?;
         Ok(())
@@ -30,9 +30,11 @@ impl UpdateFeeStrategy for CrazyStrategy {
 }
 
 impl CrazyStrategy {
-    async fn handle_darwinia(&self) -> anyhow::Result<()> {
-        let darwinia_api = self.helper.darwinia_api();
+    async fn handle_darwinia(&mut self) -> anyhow::Result<()> {
         let my_id = AccountId::from(self.helper.darwinia_signer().public().0);
+        let darwinia_signer = self.helper.darwinia_signer().clone();
+
+        let darwinia_api = self.helper.darwinia_api_mut();
 
         if !darwinia_api.is_relayer(my_id.clone()).await? {
             log::warn!(
@@ -64,14 +66,15 @@ impl CrazyStrategy {
             new_fee
         );
         darwinia_api
-            .update_relay_fee(self.helper.darwinia_signer().clone(), new_fee)
+            .update_relay_fee(darwinia_signer, new_fee)
             .await?;
         Ok(())
     }
 
-    async fn handle_crab(&self) -> anyhow::Result<()> {
-        let crab_api = self.helper.crab_api();
+    async fn handle_crab(&mut self) -> anyhow::Result<()> {
         let my_id = AccountId::from(self.helper.crab_signer().public().0);
+        let crab_signer = self.helper.crab_signer().clone();
+        let crab_api = self.helper.crab_api_mut();
 
         if !crab_api.is_relayer(my_id.clone()).await? {
             log::warn!(
@@ -102,9 +105,7 @@ impl CrazyStrategy {
             "[crazy] Update crab fee: {}",
             new_fee
         );
-        crab_api
-            .update_relay_fee(self.helper.crab_signer().clone(), new_fee)
-            .await?;
+        crab_api.update_relay_fee(crab_signer, new_fee).await?;
         Ok(())
     }
 }

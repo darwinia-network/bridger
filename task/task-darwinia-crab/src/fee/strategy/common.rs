@@ -49,12 +49,15 @@ impl StrategyHelper {
 }
 
 impl StrategyHelper {
-    pub fn darwinia_api(&self) -> &DarwiniaApi {
-        &self.darwinia_api
+    pub fn darwinia_api_mut(&mut self) -> &mut DarwiniaApi {
+        &mut self.darwinia_api
     }
-    pub fn crab_api(&self) -> &CrabApi {
-        &self.crab_api
+    pub fn crab_api_mut(&mut self) -> &mut CrabApi {
+        &mut self.crab_api
     }
+}
+
+impl StrategyHelper {
     pub fn darwinia_signer(&self) -> &<DarwiniaChain as TransactionSignScheme>::AccountKeyPair {
         &self.darwinia_signer
     }

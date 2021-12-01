@@ -33,10 +33,10 @@ bp-messages            = { git = "https://github.com/darwinia-network/parity-bri
 bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", tag = "darwinia-v0.11.6-4" }
 
 ## Bridge dependencies
-crab-runtime            = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
-common-primitives       = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
-bridge-primitives       = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
-dp-fee                  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "darwinia-v0.11.6-3" }
+crab-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
+darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
+darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
+dp-fee                     = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps-darwinia" }
 
 
 

@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use common_primitives::AccountId;
+use drml_common_primitives::AccountId;
 use messages_relay::message_lane::MessageLane;
 use messages_relay::message_lane_loop::{
     SourceClient as MessageLaneSourceClient, TargetClient as MessageLaneTargetClient,
@@ -39,7 +39,7 @@ impl RelayStrategy for PangolinRelayStrategy {
         let nonce = &reference.nonce;
         let order = self
             .api
-            .order(bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
+            .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
             .await
             .map_err(|e| {
                 log::error!("Failed to query order: {:?}", e);
@@ -94,7 +94,7 @@ impl RelayStrategy for PangolinRelayStrategy {
         let ranges = relayers
             .iter()
             .map(|item| item.valid_range.clone())
-            .collect::<Vec<Range<common_primitives::BlockNumber>>>();
+            .collect::<Vec<Range<drml_common_primitives::BlockNumber>>>();
 
         let mut maximum_timeout = 0;
         for range in ranges {

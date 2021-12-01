@@ -11,7 +11,10 @@ use sp_runtime::{generic::SignedPayload, traits::IdentifyAccount};
 use std::time::Duration;
 
 /// Pangoro header id.
-pub type HeaderId = relay_utils::HeaderId<common_primitives::Hash, common_primitives::BlockNumber>;
+pub type HeaderId = relay_utils::HeaderId<
+    darwinia_common_primitives::Hash,
+    darwinia_common_primitives::BlockNumber,
+>;
 
 /// Pangoro chain definition.
 #[derive(Debug, Clone, Copy)]
@@ -22,23 +25,24 @@ impl BridgeChain for CrabChain {
 }
 
 impl ChainBase for CrabChain {
-    type BlockNumber = common_primitives::BlockNumber;
-    type Hash = common_primitives::Hash;
-    type Hasher = common_primitives::Hashing;
-    type Header = common_primitives::Header;
+    type BlockNumber = darwinia_common_primitives::BlockNumber;
+    type Hash = darwinia_common_primitives::Hash;
+    type Hasher = darwinia_common_primitives::Hashing;
+    type Header = darwinia_common_primitives::Header;
 
-    type AccountId = common_primitives::AccountId;
-    type Balance = common_primitives::Balance;
-    type Index = common_primitives::Nonce;
-    type Signature = common_primitives::Signature;
+    type AccountId = darwinia_common_primitives::AccountId;
+    type Balance = darwinia_common_primitives::Balance;
+    type Index = darwinia_common_primitives::Nonce;
+    type Signature = darwinia_common_primitives::Signature;
 }
 
 impl Chain for CrabChain {
     const NAME: &'static str = "Crab";
     const AVERAGE_BLOCK_INTERVAL: Duration =
-        Duration::from_millis(common_primitives::MILLISECS_PER_BLOCK);
-    const STORAGE_PROOF_OVERHEAD: u32 = bridge_primitives::EXTRA_STORAGE_PROOF_SIZE;
-    const MAXIMAL_ENCODED_ACCOUNT_ID_SIZE: u32 = bridge_primitives::MAXIMAL_ENCODED_ACCOUNT_ID_SIZE;
+        Duration::from_millis(darwinia_common_primitives::MILLISECS_PER_BLOCK);
+    const STORAGE_PROOF_OVERHEAD: u32 = darwinia_bridge_primitives::EXTRA_STORAGE_PROOF_SIZE;
+    const MAXIMAL_ENCODED_ACCOUNT_ID_SIZE: u32 =
+        darwinia_bridge_primitives::MAXIMAL_ENCODED_ACCOUNT_ID_SIZE;
 
     type SignedBlock = crab_runtime::SignedBlock;
     type Call = crab_runtime::Call;
@@ -110,7 +114,7 @@ impl TransactionSignScheme for CrabChain {
         tx.signature
             .as_ref()
             .map(|(address, _, _)| {
-                let account_id: common_primitives::AccountId =
+                let account_id: darwinia_common_primitives::AccountId =
                     (*signer.public().as_array_ref()).into();
                 *address == crab_runtime::Address::from(account_id)
             })
@@ -135,4 +139,4 @@ impl TransactionSignScheme for CrabChain {
 pub type SigningParams = sp_core::sr25519::Pair;
 
 /// Pangoro header type used in headers sync.
-pub type SyncHeader = relay_substrate_client::SyncHeader<common_primitives::Header>;
+pub type SyncHeader = relay_substrate_client::SyncHeader<darwinia_common_primitives::Header>;

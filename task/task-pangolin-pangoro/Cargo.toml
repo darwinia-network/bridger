@@ -64,9 +64,9 @@ component-pangoro-s2s  = { path = "../../components/client-pangoro-s2s" }
 component-subscan      = { path = "../../components/subscan" }
 
 ## darwinia common
-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
-common-runtime      = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
+drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
+drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
+common-runtime          = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
 
 ## pangolin
 pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }

@@ -1,4 +1,4 @@
-use common_primitives::AccountId;
+use darwinia_common_primitives::AccountId;
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
@@ -116,7 +116,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
     if relay_info.create_relayers_fund_accounts {
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
             AccountIdOf<DarwiniaChain>,
-            bridge_primitives::AccountIdConverter,
+            darwinia_bridge_primitives::AccountIdConverter,
         >();
         let relayers_fund_account_balance = darwinia_client
             .free_native_balance(relayer_fund_acount_id.clone())
@@ -135,7 +135,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
 
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
             AccountIdOf<CrabChain>,
-            bridge_primitives::AccountIdConverter,
+            darwinia_bridge_primitives::AccountIdConverter,
         >();
         let relayers_fund_account_balance = crab_client
             .free_native_balance(relayer_fund_acount_id.clone())
@@ -158,7 +158,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         crab_client.clone(),
         pangoro_transactions_mortality,
         DarwiniaFinalityToCrab::new(crab_client.clone(), pangoro_sign.clone()),
-        common_primitives::DARWINIA_BLOCKS_PER_SESSION,
+        darwinia_common_primitives::DARWINIA_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
     let crab_to_darwinia_on_demand_headers = OnDemandHeadersRelay::new(
@@ -166,7 +166,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> anyhow::Result
         darwinia_client.clone(),
         darwinia_transactions_mortality,
         CrabFinalityToDarwinia::new(darwinia_client.clone(), darwinia_sign.clone()),
-        common_primitives::CRAB_BLOCKS_PER_SESSION,
+        darwinia_common_primitives::CRAB_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
 

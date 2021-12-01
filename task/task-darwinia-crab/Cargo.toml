@@ -64,9 +64,9 @@ component-crab-s2s     = { path = "../../components/client-crab-s2s" }
 component-subscan      = { path = "../../components/subscan" }
 
 ## darwinia common
-bridge-primitives        = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
-common-primitives        = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
-darwinia-runtime-common  = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
+darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
+darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
+darwinia-common-runtime    = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }
 
 ## darwinia
 darwinia-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "bump-deps" }

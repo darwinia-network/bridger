@@ -26,34 +26,34 @@ mod s2s_const {
 
     impl ChainConst for PangolinChainConst {
         const OUTBOUND_LANE_MESSAGE_DETAILS_METHOD: &'static str =
-            bridge_primitives::TO_PANGOLIN_MESSAGE_DETAILS_METHOD;
+            drml_bridge_primitives::TO_PANGOLIN_MESSAGE_DETAILS_METHOD;
         const OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD: &'static str =
-            bridge_primitives::TO_PANGOLIN_LATEST_GENERATED_NONCE_METHOD;
+            drml_bridge_primitives::TO_PANGOLIN_LATEST_GENERATED_NONCE_METHOD;
         const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            bridge_primitives::TO_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
+            drml_bridge_primitives::TO_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
         const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            bridge_primitives::FROM_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
+            drml_bridge_primitives::FROM_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
         const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
-            bridge_primitives::FROM_PANGOLIN_LATEST_CONFIRMED_NONCE_METHOD;
+            drml_bridge_primitives::FROM_PANGOLIN_LATEST_CONFIRMED_NONCE_METHOD;
         const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str =
-            bridge_primitives::FROM_PANGOLIN_UNREWARDED_RELAYERS_STATE;
+            drml_bridge_primitives::FROM_PANGOLIN_UNREWARDED_RELAYERS_STATE;
         const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
-            bridge_primitives::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
+            drml_bridge_primitives::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
         const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str =
-            bridge_primitives::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
+            drml_bridge_primitives::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
         const MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE: MessageNonce =
-            bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
+            drml_bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
         const MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE: MessageNonce =
-            bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+            drml_bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
         const AVERAGE_BLOCK_INTERVAL: Duration = PangolinChain::AVERAGE_BLOCK_INTERVAL;
-        const BRIDGE_CHAIN_ID: ChainId = bridge_primitives::PANGOLIN_CHAIN_ID;
+        const BRIDGE_CHAIN_ID: ChainId = drml_bridge_primitives::PANGOLIN_CHAIN_ID;
         const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str =
-            bridge_primitives::WITH_PANGORO_MESSAGES_PALLET_NAME;
+            drml_bridge_primitives::WITH_PANGORO_MESSAGES_PALLET_NAME;
         const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
-            bridge_primitives::WITH_PANGOLIN_MESSAGES_PALLET_NAME;
+            drml_bridge_primitives::WITH_PANGOLIN_MESSAGES_PALLET_NAME;
         const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight =
-            bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
-        type SigningParams = common_primitives::SigningParams;
+            drml_bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
+        type SigningParams = drml_common_primitives::SigningParams;
     }
 
     // === end
@@ -110,7 +110,7 @@ mod s2s_headers {
 
         type TargetChain = PangoroChain;
 
-        fn transactions_author(&self) -> common_primitives::AccountId {
+        fn transactions_author(&self) -> drml_common_primitives::AccountId {
             (*self.finality_pipeline.target_sign.public().as_array_ref()).into()
         }
 
@@ -119,7 +119,7 @@ mod s2s_headers {
             era: bp_runtime::TransactionEraOf<PangoroChain>,
             transaction_nonce: IndexOf<PangoroChain>,
             header: component_pangolin_s2s::SyncHeader,
-            proof: GrandpaJustification<common_primitives::Header>,
+            proof: GrandpaJustification<drml_common_primitives::Header>,
         ) -> Bytes {
             let call = pangoro_runtime::BridgeGrandpaCall::<
                 pangoro_runtime::Runtime,
@@ -216,7 +216,7 @@ mod s2s_messages {
         type SourceChain = PangolinChain;
         type TargetChain = PangoroChain;
 
-        fn source_transactions_author(&self) -> common_primitives::AccountId {
+        fn source_transactions_author(&self) -> drml_common_primitives::AccountId {
             (*self.message_lane.source_sign.public().as_array_ref()).into()
         }
 
@@ -254,7 +254,7 @@ mod s2s_messages {
             Bytes(transaction.encode())
         }
 
-        fn target_transactions_author(&self) -> common_primitives::AccountId {
+        fn target_transactions_author(&self) -> drml_common_primitives::AccountId {
             (*self.message_lane.target_sign.public().as_array_ref()).into()
         }
 

@@ -34,8 +34,8 @@ bp-runtime             = { git = "https://github.com/darwinia-network/parity-bri
 
 ## Bridge dependencies
 pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
-common-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
-bridge-primitives        = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
+drml-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
+drml-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
 darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
 dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "bump-deps" }
 

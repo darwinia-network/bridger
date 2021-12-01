@@ -1,8 +1,8 @@
 use bp_messages::{LaneId, MessageNonce};
 use codec::Encode;
-use common_primitives::AccountId;
-use common_primitives::Balance;
-use common_primitives::BlockNumber;
+use darwinia_common_primitives::AccountId;
+use darwinia_common_primitives::Balance;
+use darwinia_common_primitives::BlockNumber;
 use dp_fee::{Order, Relayer};
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
 use relay_utils::relay_loop::Client as RelayLoopClient;
@@ -35,7 +35,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -57,7 +57,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -73,7 +73,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -94,7 +94,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -106,14 +106,14 @@ impl CrabApi {
     /// Return number of the best finalized block.
     pub async fn best_finalized_header_number(
         &mut self,
-    ) -> anyhow::Result<common_primitives::BlockNumber> {
+    ) -> anyhow::Result<darwinia_common_primitives::BlockNumber> {
         match self.client.best_finalized_header_number().await {
             Ok(v) => Ok(v),
             Err(e) => {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -149,7 +149,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }
@@ -185,7 +185,7 @@ impl CrabApi {
                 if e.is_connection_error() {
                     self.client.reconnect().await?;
                 }
-                Err(e)?
+                Err(e.into())
             }
         }
     }

@@ -61,11 +61,10 @@ impl Subquery {
                     e
                 ))
             })?;
-        let wrapper = match data.data_by_key("mMRRootSignedEvents") {
-            Some(v) => v,
-            None => return Ok(Default::default()),
-        };
-        Ok(wrapper.nodes.clone())
+        Ok(data
+            .data_by_key("mMRRootSignedEvents")
+            .map(|item| item.nodes.clone())
+            .unwrap_or_default())
     }
 
     pub async fn query_schedule_mmr_root_event(
@@ -104,11 +103,10 @@ impl Subquery {
                     e
                 ))
             })?;
-        let wrapper = match data.data_by_key("scheduleMMRRootEvents") {
-            Some(v) => v,
-            None => return Ok(Default::default()),
-        };
-        Ok(wrapper.nodes.clone())
+        Ok(data
+            .data_by_key("scheduleMMRRootEvents")
+            .map(|item| item.nodes.clone())
+            .unwrap_or_default())
     }
 
     pub async fn query_schedule_authorities_change_event(
@@ -147,11 +145,10 @@ impl Subquery {
                     e
                 ))
             })?;
-        let wrapper = match data.data_by_key("scheduleAuthoritiesChangeEvents") {
-            Some(v) => v,
-            None => return Ok(Default::default()),
-        };
-        Ok(wrapper.nodes.clone())
+        Ok(data
+            .data_by_key("scheduleAuthoritiesChangeEvents")
+            .map(|item| item.nodes.clone())
+            .unwrap_or_default())
     }
 
     pub async fn query_authorities_change_signed_event(
@@ -197,10 +194,9 @@ impl Subquery {
                     e
                 ))
             })?;
-        let wrapper = match data.data_by_key("authoritiesChangeSignedEvents") {
-            Some(v) => v,
-            None => return Ok(Default::default()),
-        };
-        Ok(wrapper.nodes.clone())
+        Ok(data
+            .data_by_key("authoritiesChangeSignedEvents")
+            .map(|item| item.nodes.clone())
+            .unwrap_or_default())
     }
 }

@@ -1,8 +1,9 @@
 use bridge_traits::bridge::config::BridgeConfig;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct SubqueryConfig {
-    pub endpoint: string,
+    pub endpoint: String,
 }
 
 impl BridgeConfig for SubqueryConfig {

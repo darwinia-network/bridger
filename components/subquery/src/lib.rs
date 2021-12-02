@@ -10,6 +10,7 @@ use crate::subquery::Subquery;
 
 pub mod config;
 pub mod subquery;
+pub mod types;
 
 #[derive(Clone, Debug, Default)]
 pub struct SubqueryComponent {

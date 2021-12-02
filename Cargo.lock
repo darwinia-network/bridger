@@ -1237,9 +1237,11 @@ dependencies = [
  "async-trait",
  "bridge-traits",
  "gql_client",
+ "hex",
  "log",
  "serde 1.0.130",
  "serde-aux",
+ "serde-hex",
 ]
 
 [[package]]

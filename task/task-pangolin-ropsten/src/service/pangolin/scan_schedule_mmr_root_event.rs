@@ -15,7 +15,7 @@ impl ScanScheduleMMRRootEvent {
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
         microkv: NamespaceMicroKV,
     ) -> Self {
-        let tracker = Tracker::new(microkv, "scan.pangolin.schedule-authorities-change");
+        let tracker = Tracker::new(microkv, "scan.pangolin.schedule-mmr-root");
         Self {
             sender_to_extrinsics,
             tracker,

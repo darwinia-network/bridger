@@ -7,6 +7,7 @@ use crate::types::{
     ScheduleAuthoritiesChangeEvent, ScheduleMMRRootEvent, SubqueryResponse,
 };
 
+#[derive(Clone, Debug)]
 pub struct Subquery {
     client: Client,
 }

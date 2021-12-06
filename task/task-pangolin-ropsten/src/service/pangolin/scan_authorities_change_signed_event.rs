@@ -10,97 +10,96 @@ use std::convert::TryInto;
 use support_tracker::Tracker;
 
 use crate::message::ToExtrinsicsMessage;
+use crate::service::pangolin::types::ScanDataWrapper;
 use crate::task::PangolinRopstenTask;
 
-pub struct ScanAuthoritiesChangeSignedEvent {
-    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-    tracker: Tracker,
+pub struct ScanAuthoritiesChangeSignedEvent<'a> {
+    data: &'a ScanDataWrapper,
 }
 
-impl ScanAuthoritiesChangeSignedEvent {
-    pub fn new(
-        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-        microkv: NamespaceMicroKV,
-    ) -> Self {
-        let tracker = Tracker::new(microkv, "scan.pangolin.authorities-change-signed");
-        Self {
-            sender_to_extrinsics,
-            tracker,
-        }
+impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
+    pub fn new(data: &'a ScanDataWrapper) -> Self {
+        Self { data }
     }
 }
 
-impl ScanAuthoritiesChangeSignedEvent {
-    pub async fn start(&mut self) {}
-    async fn run(&mut self) -> anyhow::Result<()> {
-        // subquery
-        let component_subquery = SubqueryComponent::restore::<PangolinRopstenTask>()?;
-        let subquery = component_subquery.component().await?;
+impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
+    pub async fn handle(&mut self) -> anyhow::Result<Option<u32>> {
+        let spec_name = self.data.darwinia.runtime_version().await?;
+        let current_term = self
+            .data
+            .darwinia2ethereum
+            .get_current_authority_term()
+            .await?;
 
-        // darwinia
-        let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-        let darwinia = component_pangolin_subxt.component().await?;
+        let events = self
+            .data
+            .subquery
+            .query_authorities_change_signed_event(self.data.from, self.data.limit)
+            .await?;
 
-        // ethereum
-
-        let component_ethereum = EthereumComponent::restore::<PangolinRopstenTask>()?;
-        let ethereum = component_ethereum.component().await?;
-
-        let spec_name = darwinia.runtime_version().await?;
-        let current_term = darwinia2ethereum.get_current_authority_term().await?;
-
-        loop {
-            let from = self.tracker.current().await?;
-            let limit = 10usize;
+        log::debug!(
+            target: PangolinRopstenTask::NAME,
+            "[pangolin] Track pangolin AuthoritiesChangeSignedEvent block: {} and limit: {}",
+            self.data.from,
+            self.data.limit
+        );
+        if events.is_empty() {
             log::debug!(
                 target: PangolinRopstenTask::NAME,
-                "[pangolin] Track pangolin AuthoritiesChangeSignedEvent block: {} and limit: {}",
-                from,
-                limit
+                "[pangolin] Not have more AuthoritiesChangeSignedEvent"
             );
-            let events = subquery
-                .query_authorities_change_signed_event(from as u64, limit as u32)
+            return Ok(None);
+        }
+
+        for event in &events {
+            if event.term != current_term {
+                log::trace!(
+                    target: PangolinRopstenTask::NAME,
+                    "[pangolin] Queried AuthoritiesChangeSignedEvent but not in current term. the event term is {} and current term is {}. skip this.",
+                    event.term,
+                    current_term
+                );
+                continue;
+            }
+            log::trace!(
+                target: PangolinRopstenTask::NAME,
+                "[pangolin] Processing authorities change signed event in block {}",
+                event.at_block_number
+            );
+
+            let mut new_authorities = Vec::with_capacity(event.new_authorities.len());
+            for item in event.new_authorities {
+                let message = item.as_slice().try_into()?;
+                new_authorities.push(message);
+            }
+            let message = Darwinia2Ethereum::construct_authorities_message(
+                spec_name.clone(),
+                event.term,
+                new_authorities,
+            );
+
+            let raw_signatures = &event.signatures.nodes;
+            let mut signatures = Vec::with_capacity(raw_signatures.len());
+            for signature in raw_signatures {
+                let ecdsa_signature = signature.relay_authority_signature.as_slice().try_into()?;
+                signatures.push(ecdsa_signature);
+            }
+
+            let tx_hash = self
+                .data
+                .ethereum
+                .submit_authorities_set(message, signatures)
                 .await?;
 
-            for event in events {
-                if event.term != current_term {
-                    log::trace!(
-                        target: PangolinRopstenTask::NAME,
-                        "[pangolin] Queried AuthoritiesChangeSignedEvent but not in current term. the event term is {} and current term is {}. skip this.",
-                        event.term,
-                        current_term
-                    );
-                    continue;
-                }
-
-                let mut new_authorities = Vec::with_capacity(event.new_authorities.len());
-                for item in event.new_authorities {
-                    let message = item.as_slice().try_into()?;
-                    new_authorities.push(message);
-                }
-                let message = Darwinia2Ethereum::construct_authorities_message(
-                    spec_name.clone(),
-                    event.term,
-                    new_authorities,
-                );
-
-                let raw_signatures = &event.signatures.nodes;
-                let mut signatures = Vec::with_capacity(raw_signatures.len());
-                for signature in raw_signatures {
-                    let ecdsa_signature =
-                        signature.relay_authority_signature.as_slice().try_into()?;
-                    signatures.push(ecdsa_signature);
-                }
-
-                let tx_hash = ethereum.submit_authorities_set(message, signatures).await?;
-
-                log::info!(
-                    target: PangolinRopstenTask::NAME,
-                    "[pangolin] Submit authorities to ethereum at block {} with tx: {}",
-                    event.at_block_number,
-                    tx_hash
-                );
-            }
+            log::info!(
+                target: PangolinRopstenTask::NAME,
+                "[pangolin] Submit authorities to ethereum at block {} with tx: {}",
+                event.at_block_number,
+                tx_hash
+            );
         }
+        let latest = events.last().unwrap();
+        Ok(Some(latest.at_block_number))
     }
 }

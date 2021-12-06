@@ -86,18 +86,18 @@ impl ScanScheduleAuthoritiesChangeEvent {
                 if !need_to_sign {
                     log::trace!(
                         target: PangolinRopstenTask::NAME,
-                        "[pangolin] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {:?}",
+                        "[pangolin] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {}",
                         array_bytes::bytes2hex("0x", message),
-                        block_number
+                        event.at_block_number
                     );
                     continue;
                 }
 
                 log::trace!(
                     target: PangolinRopstenTask::NAME,
-                    "[pangolin] Try sign and send authorities with message: {} at block: {:?}",
+                    "[pangolin] Try sign and send authorities with message: {} at block: {}",
                     array_bytes::bytes2hex("0x", message),
-                    block_number
+                    event.at_block_number
                 );
                 let ex = Extrinsic::SignAndSendAuthorities(message);
                 self.sender_to_extrinsics

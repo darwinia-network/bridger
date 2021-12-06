@@ -20,7 +20,7 @@ use crate::service::pangolin::scan_schedule_mmr_root_event::ScanScheduleMMRRootE
 use crate::service::pangolin::types::ScanDataWrapper;
 use crate::task::PangolinRopstenTask;
 
-pub struct PangolinScanner
+pub struct PangolinScanner;
 
 impl PangolinScanner {
     pub async fn start(

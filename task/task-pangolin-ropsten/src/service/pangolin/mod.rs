@@ -47,7 +47,7 @@ impl lifeline::Service for PangolinService {
                 PangolinRopstenTask::NAME
             ),
             async move {
-                let scanner =
+                let mut scanner =
                     ScanAuthoritiesChangeSignedEvent::new(sender_to_extrinsics.clone(), microkv);
                 scanner.start().await;
                 Ok(())
@@ -64,7 +64,7 @@ impl lifeline::Service for PangolinService {
                 PangolinRopstenTask::NAME
             ),
             async move {
-                let scanner =
+                let mut scanner =
                     ScanScheduleAuthoritiesChangeEvent::new(sender_to_extrinsics.clone(), microkv);
                 scanner.start().await;
                 Ok(())
@@ -81,7 +81,8 @@ impl lifeline::Service for PangolinService {
                 PangolinRopstenTask::NAME
             ),
             async move {
-                let scanner = ScanScheduleMMRRootEvent::new(sender_to_extrinsics.clone(), microkv);
+                let mut scanner =
+                    ScanScheduleMMRRootEvent::new(sender_to_extrinsics.clone(), microkv);
                 scanner.start().await;
                 Ok(())
             },

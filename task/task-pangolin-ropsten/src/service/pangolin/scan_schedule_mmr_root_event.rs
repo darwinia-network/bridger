@@ -24,5 +24,5 @@ impl ScanScheduleMMRRootEvent {
 }
 
 impl ScanScheduleMMRRootEvent {
-    pub async fn start(&self) {}
+    pub async fn start(&mut self) {}
 }

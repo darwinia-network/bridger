@@ -24,5 +24,5 @@ impl ScanAuthoritiesChangeSignedEvent {
 }
 
 impl ScanAuthoritiesChangeSignedEvent {
-    pub async fn start(&self) {}
+    pub async fn start(&mut self) {}
 }

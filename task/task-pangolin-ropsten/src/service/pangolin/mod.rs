@@ -17,6 +17,7 @@ use support_tracker::Tracker;
 
 use crate::bus::PangolinRopstenBus;
 use crate::message::ToExtrinsicsMessage;
+use crate::service::pangolin::pangolin_scanner::PangolinScanner;
 use crate::service::pangolin::scan_authorities_change_signed_event::ScanAuthoritiesChangeSignedEvent;
 use crate::service::pangolin::scan_schedule_authorities_change_event::ScanScheduleAuthoritiesChangeEvent;
 use crate::service::pangolin::scan_schedule_mmr_root_event::ScanScheduleMMRRootEvent;
@@ -30,9 +31,7 @@ mod types;
 
 #[derive(Debug)]
 pub struct PangolinService {
-    _greet_scan_authorities_change_signed: Lifeline,
-    _greet_scan_schedule_authorities_change: Lifeline,
-    _greet_scan_schedule_mmr_root: Lifeline,
+    _greet: Lifeline,
 }
 
 impl BridgeService for PangolinService {}
@@ -44,61 +43,21 @@ impl lifeline::Service for PangolinService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
-        // scan-authorities-change-signed
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let tracker = Tracker::new(microkv, "scan.pangolin");
 
         let _greet_scan_authorities_change_signed = Self::try_task(
-            &format!(
-                "{}-service-pangolin-scan-authorities-change-signed",
-                PangolinRopstenTask::NAME
-            ),
+            &format!("{}-service-pangolin-scan", PangolinRopstenTask::NAME),
             async move {
-                let mut scanner =
-                    ScanAuthoritiesChangeSignedEvent::new(sender_to_extrinsics.clone(), microkv);
-                scanner.start().await;
+                let mut scanner = PangolinScanner;
+                scanner
+                    .start(tracker.clone(), sender_to_extrinsics.clone())
+                    .await;
                 Ok(())
             },
         );
 
-        // scan-schedule-authorities-change
-        let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-
-        let _greet_scan_schedule_authorities_change = Self::try_task(
-            &format!(
-                "{}-service-pangolin-scan-schedule-authorities-change",
-                PangolinRopstenTask::NAME
-            ),
-            async move {
-                let mut scanner =
-                    ScanScheduleAuthoritiesChangeEvent::new(sender_to_extrinsics.clone(), microkv);
-                scanner.start().await;
-                Ok(())
-            },
-        );
-
-        // scan-schedule-mmr-root
-        let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-
-        let _greet_scan_schedule_mmr_root = Self::try_task(
-            &format!(
-                "{}-service-pangolin-scan-schedule-mmr-root",
-                PangolinRopstenTask::NAME
-            ),
-            async move {
-                let mut scanner =
-                    ScanScheduleMMRRootEvent::new(sender_to_extrinsics.clone(), microkv);
-                scanner.start().await;
-                Ok(())
-            },
-        );
-
-        Ok(Self {
-            _greet_scan_authorities_change_signed,
-            _greet_scan_schedule_authorities_change,
-            _greet_scan_schedule_mmr_root,
-        })
+        Ok(Self { _greet })
     }
 }

@@ -1,8 +1,5 @@
-use crate::message::ToExtrinsicsMessage;
-use crate::service::pangolin::scan_authorities_change_signed_event::ScanAuthoritiesChangeSignedEvent;
-use crate::service::pangolin::scan_schedule_authorities_change_event::ScanScheduleAuthoritiesChangeEvent;
-use crate::service::pangolin::scan_schedule_mmr_root_event::ScanScheduleMMRRootEvent;
-use crate::service::pangolin::types::ScanDataWrapper;
+use postage::broadcast;
+
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
@@ -14,12 +11,16 @@ use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
 use component_state::state::BridgeState;
 use component_subquery::subquery::Subquery;
 use component_subquery::SubqueryComponent;
-use postage::broadcast;
 use support_tracker::Tracker;
 
+use crate::message::ToExtrinsicsMessage;
+use crate::service::pangolin::scan_authorities_change_signed_event::ScanAuthoritiesChangeSignedEvent;
+use crate::service::pangolin::scan_schedule_authorities_change_event::ScanScheduleAuthoritiesChangeEvent;
+use crate::service::pangolin::scan_schedule_mmr_root_event::ScanScheduleMMRRootEvent;
+use crate::service::pangolin::types::ScanDataWrapper;
 use crate::task::PangolinRopstenTask;
 
-pub struct PangolinScanner {}
+pub struct PangolinScanner
 
 impl PangolinScanner {
     pub async fn start(

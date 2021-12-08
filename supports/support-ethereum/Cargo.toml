@@ -25,12 +25,12 @@ rlp = "0.4.4"
 web3 = { version = "0.16.0", git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 
 serde = { version = "1", features = ["derive"] }
-codec = { package = "parity-scale-codec", version = "2.1", features = ["derive", "full"] }
+codec = { package = "parity-scale-codec", version = "2.3.1", features = ["derive", "full"] }
 
-frame-support = "3.0.0"
-pallet-indices = "3.0.0"
-pallet-im-online = "3.0.0"
-sp-core = "3.0.0"
+frame-support    = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
+pallet-indices   = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
+pallet-im-online = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
+sp-core          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
 
 bridge-primitives = { path = "../../primitives" }
 

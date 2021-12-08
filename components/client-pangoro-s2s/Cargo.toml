@@ -24,7 +24,7 @@ log = "0.4"
 
 bridge-traits = { path = "../../traits" }
 
-codec                  = { package = "parity-scale-codec", version = "2.0.0" }
+codec                  = { package = "parity-scale-codec", version = "2.3.1" }
 headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
 relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
 relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }

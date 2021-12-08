@@ -1,10 +1,11 @@
 use gql_client::Client;
+use std::collections::HashMap;
 
 use bridge_traits::error::StandardError;
 
 use crate::types::{
-    AuthoritiesChangeSignedEvent, EmptyQueryVar, MMRRootSignedEvent, QueryTransactionsVars,
-    ScheduleAuthoritiesChangeEvent, ScheduleMMRRootEvent, SubqueryResponse,
+    AuthoritiesChangeSignedEvent, DataWrapper, EmptyQueryVar, MMRRootSignedEvent,
+    QueryTransactionsVars, ScheduleAuthoritiesChangeEvent, ScheduleMMRRootEvent,
 };
 
 #[derive(Clone, Debug)]
@@ -52,7 +53,7 @@ impl Subquery {
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
-            .query_with_vars_unwrap::<SubqueryResponse<MMRRootSignedEvent>, QueryTransactionsVars>(
+            .query_with_vars_unwrap::<HashMap<String, DataWrapper<MMRRootSignedEvent>>, QueryTransactionsVars>(
                 query, vars,
             )
             .await
@@ -63,7 +64,7 @@ impl Subquery {
                 ))
             })?;
         Ok(data
-            .data_by_key("mMRRootSignedEvents")
+            .get("mMRRootSignedEvents")
             .map(|item| item.nodes.clone())
             .unwrap_or_default())
     }
@@ -72,7 +73,7 @@ impl Subquery {
         &self,
     ) -> anyhow::Result<Option<ScheduleMMRRootEvent>> {
         let query = r#"
-        query ScheduleMMRRootPage() {
+        query ScheduleMMRRootPage {
           scheduleMMRRootEvents(
             first: 1
             orderBy: AT_BLOCK_NUMBER_DESC
@@ -88,7 +89,7 @@ impl Subquery {
         "#;
         let data = self
             .client
-            .query_with_vars_unwrap::<SubqueryResponse<ScheduleMMRRootEvent>, EmptyQueryVar>(
+            .query_with_vars_unwrap::<HashMap<String, DataWrapper<ScheduleMMRRootEvent>>, EmptyQueryVar>(
                 query,
                 EmptyQueryVar,
             )
@@ -100,7 +101,7 @@ impl Subquery {
                 ))
             })?;
         let rets = data
-            .data_by_key("scheduleMMRRootEvents")
+            .get("scheduleMMRRootEvents")
             .map(|item| item.nodes.clone())
             .unwrap_or_default();
         Ok(rets.first().cloned())
@@ -132,7 +133,7 @@ impl Subquery {
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
-            .query_with_vars_unwrap::<SubqueryResponse<ScheduleAuthoritiesChangeEvent>, QueryTransactionsVars>(
+            .query_with_vars_unwrap::<HashMap<String, DataWrapper<ScheduleAuthoritiesChangeEvent>>, QueryTransactionsVars>(
                 query, vars,
             )
             .await
@@ -143,7 +144,7 @@ impl Subquery {
                 ))
             })?;
         Ok(data
-            .data_by_key("scheduleAuthoritiesChangeEvents")
+            .get("scheduleAuthoritiesChangeEvents")
             .map(|item| item.nodes.clone())
             .unwrap_or_default())
     }
@@ -181,7 +182,7 @@ impl Subquery {
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
-            .query_with_vars_unwrap::<SubqueryResponse<AuthoritiesChangeSignedEvent>, QueryTransactionsVars>(
+            .query_with_vars_unwrap::<HashMap<String, DataWrapper<AuthoritiesChangeSignedEvent>>, QueryTransactionsVars>(
                 query, vars,
             )
             .await
@@ -192,7 +193,7 @@ impl Subquery {
                 ))
             })?;
         Ok(data
-            .data_by_key("authoritiesChangeSignedEvents")
+            .get("authoritiesChangeSignedEvents")
             .map(|item| item.nodes.clone())
             .unwrap_or_default())
     }

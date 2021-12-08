@@ -52,7 +52,7 @@ impl Subquery {
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
-            .query_with_vars::<SubqueryResponse<MMRRootSignedEvent>, QueryTransactionsVars>(
+            .query_with_vars_unwrap::<SubqueryResponse<MMRRootSignedEvent>, QueryTransactionsVars>(
                 query, vars,
             )
             .await
@@ -88,7 +88,7 @@ impl Subquery {
         "#;
         let data = self
             .client
-            .query_with_vars::<SubqueryResponse<ScheduleMMRRootEvent>, EmptyQueryVar>(
+            .query_with_vars_unwrap::<SubqueryResponse<ScheduleMMRRootEvent>, EmptyQueryVar>(
                 query,
                 EmptyQueryVar,
             )
@@ -132,7 +132,7 @@ impl Subquery {
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
-            .query_with_vars::<SubqueryResponse<ScheduleAuthoritiesChangeEvent>, QueryTransactionsVars>(
+            .query_with_vars_unwrap::<SubqueryResponse<ScheduleAuthoritiesChangeEvent>, QueryTransactionsVars>(
                 query, vars,
             )
             .await
@@ -181,7 +181,7 @@ impl Subquery {
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
-            .query_with_vars::<SubqueryResponse<AuthoritiesChangeSignedEvent>, QueryTransactionsVars>(
+            .query_with_vars_unwrap::<SubqueryResponse<AuthoritiesChangeSignedEvent>, QueryTransactionsVars>(
                 query, vars,
             )
             .await

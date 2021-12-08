@@ -1,12 +1,14 @@
+use std::convert::TryInto;
+
+use microkv::namespace::NamespaceMicroKV;
+use postage::broadcast;
+
 use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::task::BridgeSand;
 use component_ethereum::ethereum::EthereumComponent;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
 use component_subquery::SubqueryComponent;
-use microkv::namespace::NamespaceMicroKV;
-use postage::broadcast;
-use std::convert::TryInto;
-
 use support_tracker::Tracker;
 
 use crate::message::ToExtrinsicsMessage;
@@ -14,11 +16,11 @@ use crate::service::pangolin::types::ScanDataWrapper;
 use crate::task::PangolinRopstenTask;
 
 pub struct ScanAuthoritiesChangeSignedEvent<'a> {
-    data: &'a ScanDataWrapper,
+    data: &'a mut ScanDataWrapper,
 }
 
 impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
-    pub fn new(data: &'a ScanDataWrapper) -> Self {
+    pub fn new(data: &'a mut ScanDataWrapper) -> Self {
         Self { data }
     }
 }
@@ -69,7 +71,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
             );
 
             let mut new_authorities = Vec::with_capacity(event.new_authorities.len());
-            for item in event.new_authorities {
+            for item in &event.new_authorities {
                 let message = item.as_slice().try_into()?;
                 new_authorities.push(message);
             }

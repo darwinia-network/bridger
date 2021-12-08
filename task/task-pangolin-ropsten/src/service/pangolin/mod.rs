@@ -47,7 +47,7 @@ impl lifeline::Service for PangolinService {
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
         let tracker = Tracker::new(microkv, "scan.pangolin");
 
-        let _greet_scan_authorities_change_signed = Self::try_task(
+        let _greet = Self::try_task(
             &format!("{}-service-pangolin-scan", PangolinRopstenTask::NAME),
             async move {
                 let mut scanner = PangolinScanner;

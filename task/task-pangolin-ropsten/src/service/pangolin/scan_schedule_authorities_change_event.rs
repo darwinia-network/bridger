@@ -1,9 +1,11 @@
+use std::convert::TryInto;
+
 use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
-use std::convert::TryInto;
 
 use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::task::BridgeSand;
 use component_pangolin_subxt::account::DarwiniaAccount;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::to_ethereum::Account as ToEthereumAccount;
@@ -17,17 +19,17 @@ use crate::service::pangolin::types::ScanDataWrapper;
 use crate::task::PangolinRopstenTask;
 
 pub struct ScanScheduleAuthoritiesChangeEvent<'a> {
-    data: &'a ScanDataWrapper,
+    data: &'a mut ScanDataWrapper,
 }
 
 impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
-    pub fn new(data: &'a ScanDataWrapper) -> Self {
+    pub fn new(data: &'a mut ScanDataWrapper) -> Self {
         Self { data }
     }
 }
 
 impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
-    pub fn handle(&mut self) -> anyhow::Result<Option<u32>> {
+    pub async fn handle(&mut self) -> anyhow::Result<Option<u32>> {
         let events = self
             .data
             .subquery
@@ -37,25 +39,26 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
         log::debug!(
             target: PangolinRopstenTask::NAME,
             "[pangolin] Track pangolin ScheduleAuthoritiesChangeEvent block: {} and limit: {}",
-            from,
-            limit
+            self.data.from,
+            self.data.limit
         );
         if events.is_empty() {
             log::debug!("[pangolin] Not have more ScheduleAuthoritiesChangeEvent");
             return Ok(None);
         }
-        for event in events {
+        for event in &events {
             let block_number = Some(event.at_block_number);
             let message = event.message.as_slice().try_into()?;
             let need_to_sign = self
                 .data
                 .darwinia2ethereum
                 .is_authority(block_number, &self.data.account)
-                && self.data.darwinia2ethereum.need_to_sign_authorities(
-                    block_number,
-                    &self.data.account,
-                    message,
-                );
+                .await?
+                && self
+                    .data
+                    .darwinia2ethereum
+                    .need_to_sign_authorities(block_number, &self.data.account, message)
+                    .await?;
 
             if !need_to_sign {
                 log::trace!(

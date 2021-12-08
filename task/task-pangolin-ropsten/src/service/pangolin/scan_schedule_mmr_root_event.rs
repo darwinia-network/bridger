@@ -1,49 +1,59 @@
-use bridge_traits::bridge::component::BridgeComponent;
-use component_pangolin_subxt::account::DarwiniaAccount;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
-use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
-use component_subquery::SubqueryComponent;
 use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
+use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::task::BridgeSand;
+use component_pangolin_subxt::account::DarwiniaAccount;
+use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
+use component_subquery::SubqueryComponent;
 use support_tracker::Tracker;
 
-use crate::message::ToExtrinsicsMessage;
+use crate::message::{Extrinsic, ToExtrinsicsMessage};
 use crate::service::pangolin::types::ScanDataWrapper;
 use crate::task::PangolinRopstenTask;
 
 pub struct ScanScheduleMMRRootEvent<'a> {
-    data: &'a ScanDataWrapper,
+    data: &'a mut ScanDataWrapper,
 }
 
 impl<'a> ScanScheduleMMRRootEvent<'a> {
-    pub fn new(data: &'a ScanDataWrapper) -> Self {
+    pub fn new(data: &'a mut ScanDataWrapper) -> Self {
         Self { data }
     }
 }
 
 impl<'a> ScanScheduleMMRRootEvent<'a> {
-    pub async fn handle(&mut self) -> anyhow::Result<Option<u32>> {
-        let events = self
+    pub async fn handle(&mut self) -> anyhow::Result<()> {
+        let event = self
             .data
             .subquery
-            .query_schedule_mmr_root_event(self.data.from, 1)
+            .query_latest_schedule_mmr_root_event()
             .await?;
-        log::debug!(
-            target: PangolinRopstenTask::NAME,
-            "[pangolin] Track pangolin ScheduleMMRRootEvent block: {} and limit: 1",
-            self.data.from
-        );
-        if events.is_empty() {
+        if event.is_none() {
             log::debug!(
                 target: PangolinRopstenTask::NAME,
                 "[pangolin] Not have more ScheduleMMRRootEvent"
             );
-            return Ok(None);
+            return Ok(());
+        }
+        let latest = event.unwrap();
+        if latest.emitted == 1 {
+            log::debug!(
+                target: PangolinRopstenTask::NAME,
+                "[pangolin] The latest ScheduleMMRRootEvent is emitted. don't do this again."
+            );
+            return Ok(());
+        } else {
+            log::debug!(
+                target: PangolinRopstenTask::NAME,
+                "[pangolin] Queried latest ScheduleMMRRootEvent event block is: {} and at block: {}",
+                latest.event_block_number,
+                latest.at_block_number
+            );
         }
 
-        let latest = events.last().unwrap();
         let event_block_number = latest.event_block_number;
 
         let finalized_block_hash = self.data.darwinia.finalized_head().await?;
@@ -60,26 +70,30 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
                     "[pangolin] Can not get last block header by finalized block hash: {}",
                     finalized_block_hash
                 );
-                return Ok(None);
+                return Ok(());
             }
         };
-        if finalized_block_header_number >= event_block_number
-            && self
-                .data
-                .darwinia2ethereum
-                .need_to_sign_mmr_root_of(
-                    &self.data.account,
-                    event_block_number,
-                    Some(finalized_block_header_number),
-                )
-                .await?
-        {
-            let sender = self.data.sender_to_extrinsics_mut();
-            sender
-                .send(ToExtrinsicsMessage::Extrinsic(delayed_ex.clone()))
-                .await?;
+
+        if event_block_number < finalized_block_header_number {
+            return Ok(());
         }
 
-        Ok(Some(latest.at_block_number))
+        if !self
+            .data
+            .darwinia2ethereum
+            .need_to_sign_mmr_root_of(
+                &self.data.account,
+                event_block_number,
+                Some(finalized_block_header_number),
+            )
+            .await?
+        {
+            return Ok(());
+        }
+
+        let sender = self.data.sender_to_extrinsics_mut();
+        let ex = Extrinsic::SignAndSendMmrRoot(latest.event_block_number);
+        sender.send(ToExtrinsicsMessage::Extrinsic(ex)).await?;
+        Ok(())
     }
 }

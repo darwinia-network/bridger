@@ -1,11 +1,14 @@
 use postage::broadcast;
 
 use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::config::Config;
 use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
+use component_ethereum::config::Web3Config;
 use component_ethereum::ethereum::EthereumComponent;
 use component_pangolin_subxt::account::DarwiniaAccount;
 use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use component_pangolin_subxt::config::DarwiniaSubxtConfig;
 use component_pangolin_subxt::to_ethereum::Account as ToEthereumAccount;
 use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
 use component_state::state::BridgeState;
@@ -60,7 +63,16 @@ impl PangolinScanner {
         let ethereum = component_ethereum.component().await?;
 
         let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-        let account = account1;
+
+        // config
+        let config_darwinia: DarwiniaSubxtConfig =
+            Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+        let config_web3: Web3Config = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+
+        let account = DarwiniaAccount::new(
+            config_darwinia.relayer_private_key,
+            config_darwinia.relayer_real_account,
+        );
         let account = ToEthereumAccount::new(
             account.clone(),
             config_darwinia.ecdsa_authority_private_key,
@@ -89,18 +101,17 @@ impl PangolinScanner {
             wrapper.from = from as u64;
             wrapper.limit = limit;
             let mut scan_authorities_change_signed_event =
-                ScanAuthoritiesChangeSignedEvent::new(&wrapper);
+                ScanAuthoritiesChangeSignedEvent::new(&mut wrapper);
             let max_0 = scan_authorities_change_signed_event.handle().await?;
 
             let mut scan_schedule_authorities_change_event =
-                ScanScheduleAuthoritiesChangeEvent::new(&wrapper);
+                ScanScheduleAuthoritiesChangeEvent::new(&mut wrapper);
             let max_1 = scan_schedule_authorities_change_event.handle().await?;
 
-            let mut scan_schedule_mmr_root_event = ScanScheduleMMRRootEvent::new(&wrapper);
-            let max_2 = scan_schedule_mmr_root_event.handle().await?;
+            let mut scan_schedule_mmr_root_event = ScanScheduleMMRRootEvent::new(&mut wrapper);
+            scan_schedule_mmr_root_event.handle().await?;
 
             let max_block_number = std::cmp::max(max_0, max_1);
-            let max_block_number = std::cmp::max(max_block_number, max_2);
             if let Some(block_number) = max_block_number {
                 tracker.finish(block_number as usize)?;
             }

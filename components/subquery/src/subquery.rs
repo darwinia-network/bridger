@@ -3,7 +3,7 @@ use gql_client::Client;
 use bridge_traits::error::StandardError;
 
 use crate::types::{
-    AuthoritiesChangeSignedEvent, MMRRootSignedEvent, QueryTransactionsVars,
+    AuthoritiesChangeSignedEvent, EmptyQueryVar, MMRRootSignedEvent, QueryTransactionsVars,
     ScheduleAuthoritiesChangeEvent, ScheduleMMRRootEvent, SubqueryResponse,
 };
 
@@ -68,34 +68,29 @@ impl Subquery {
             .unwrap_or_default())
     }
 
-    pub async fn query_schedule_mmr_root_event(
+    pub async fn query_latest_schedule_mmr_root_event(
         &self,
-        from: u64,
-        first: u32,
-    ) -> anyhow::Result<Vec<ScheduleMMRRootEvent>> {
+    ) -> anyhow::Result<Option<ScheduleMMRRootEvent>> {
         let query = r#"
-        query ScheduleMMRRootPage($from: Int!, $first: Int!) {
+        query ScheduleMMRRootPage() {
           scheduleMMRRootEvents(
-            first: $first
-            orderBy: AT_BLOCK_NUMBER_ASC
-            filter: {
-              atBlockNumber: {
-                greaterThan: $from
-              }
-            }
+            first: 1
+            orderBy: AT_BLOCK_NUMBER_DESC
           ) {
             nodes {
+              id
               atBlockNumber
               eventBlockNumber
+              emitted
             }
           }
         }
         "#;
-        let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
-            .query_with_vars::<SubqueryResponse<ScheduleMMRRootEvent>, QueryTransactionsVars>(
-                query, vars,
+            .query_with_vars::<SubqueryResponse<ScheduleMMRRootEvent>, EmptyQueryVar>(
+                query,
+                EmptyQueryVar,
             )
             .await
             .map_err(|e| {
@@ -104,10 +99,11 @@ impl Subquery {
                     e
                 ))
             })?;
-        Ok(data
+        let rets = data
             .data_by_key("scheduleMMRRootEvents")
             .map(|item| item.nodes.clone())
-            .unwrap_or_default())
+            .unwrap_or_default();
+        Ok(rets.first().cloned())
     }
 
     pub async fn query_schedule_authorities_change_event(

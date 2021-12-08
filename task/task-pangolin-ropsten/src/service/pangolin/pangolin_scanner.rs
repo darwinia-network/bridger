@@ -2,7 +2,6 @@ use postage::broadcast;
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::config::Config;
-use bridge_traits::bridge::service::BridgeService;
 use bridge_traits::bridge::task::BridgeSand;
 use component_ethereum::config::Web3Config;
 use component_ethereum::ethereum::EthereumComponent;
@@ -11,8 +10,6 @@ use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_pangolin_subxt::config::DarwiniaSubxtConfig;
 use component_pangolin_subxt::to_ethereum::Account as ToEthereumAccount;
 use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
-use component_state::state::BridgeState;
-use component_subquery::subquery::Subquery;
 use component_subquery::SubqueryComponent;
 use support_tracker::Tracker;
 

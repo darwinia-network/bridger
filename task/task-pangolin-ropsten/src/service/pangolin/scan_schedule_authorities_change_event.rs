@@ -1,18 +1,8 @@
 use std::convert::TryInto;
 
 use lifeline::Sender;
-use microkv::namespace::NamespaceMicroKV;
-use postage::broadcast;
 
-use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_subxt::account::DarwiniaAccount;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
-use component_pangolin_subxt::to_ethereum::Account as ToEthereumAccount;
-use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
-use component_pangolin_subxt::types::EcdsaMessage;
-use component_subquery::SubqueryComponent;
-use support_tracker::Tracker;
 
 use crate::message::{Extrinsic, ToExtrinsicsMessage};
 use crate::service::pangolin::types::ScanDataWrapper;

@@ -45,7 +45,7 @@ impl TheGraphLikeEth {
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
-            .query_with_vars::<TheGraphResponse, QueryTransactionsVars>(query, vars)
+            .query_with_vars_unwrap::<TheGraphResponse, QueryTransactionsVars>(query, vars)
             .await
             .map_err(|e| {
                 StandardError::Component(format!(

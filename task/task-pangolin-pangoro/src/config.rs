@@ -176,8 +176,8 @@ impl ChainInfoConfig {
         let endpoint = self
             .endpoint
             .replace(if secure { "wss://" } else { "ws://" }, "")
-            .replace("/", "")
-            .replace(" ", "");
+            .replace('/', "")
+            .replace(' ', "");
         let host_port = endpoint.split(':').collect::<Vec<&str>>();
         let host = host_port.get(0).unwrap_or(&"127.0.0.1");
         let port = host_port

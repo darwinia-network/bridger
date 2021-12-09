@@ -10315,6 +10315,7 @@ dependencies = [
  "component-http-client",
  "component-shadow",
  "component-state",
+ "component-subquery",
  "component-thegraph-liketh",
  "lifeline",
  "linked-darwinia",

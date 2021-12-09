@@ -39,18 +39,19 @@ substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.g
 
 tokio = { version = "1", features = ["full"] }
 
-bridge-traits = { path = "../../traits" }
+bridge-traits   = { path = "../../traits" }
 linked-darwinia = { path = "../linked-darwinia" }
 
-component-state = { path = "../../components/state" }
-component-ethereum = { path = "../../components/ethereum" }
-component-shadow = { path = "../../components/shadow" }
-component-darwinia-subxt = { path = "../../components/client-darwinia-subxt" }
+component-state           = { path = "../../components/state" }
+component-ethereum        = { path = "../../components/ethereum" }
+component-shadow          = { path = "../../components/shadow" }
+component-darwinia-subxt  = { path = "../../components/client-darwinia-subxt" }
 component-thegraph-liketh = { path = "../../components/thegraph-liketh" }
-component-http-client = { path = "../../components/http-client" }
+component-http-client     = { path = "../../components/http-client" }
+component-subquery        = { path = "../../components/subquery" }
 
-support-tracker = { path = "../../supports/support-tracker" }
+support-tracker  = { path = "../../supports/support-tracker" }
 support-ethereum = { path = "../../supports/support-ethereum" }
-support-keep = { path = "../../supports/support-keep" }
+support-keep     = { path = "../../supports/support-keep" }
 
 

@@ -5,8 +5,8 @@ use lifeline::Sender;
 use bridge_traits::bridge::task::BridgeSand;
 
 use crate::message::{Extrinsic, ToExtrinsicsMessage};
-use crate::service::pangolin::types::ScanDataWrapper;
-use crate::task::PangolinRopstenTask;
+use crate::service::darwinia::types::ScanDataWrapper;
+use crate::task::DarwiniaEthereumTask;
 
 pub struct ScanScheduleAuthoritiesChangeEvent<'a> {
     data: &'a mut ScanDataWrapper,
@@ -27,13 +27,16 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
             .await?;
 
         log::debug!(
-            target: PangolinRopstenTask::NAME,
-            "[pangolin] Track pangolin ScheduleAuthoritiesChangeEvent block: {} and limit: {}",
+            target: DarwiniaEthereumTask::NAME,
+            "[darwinia] Track darwinia ScheduleAuthoritiesChangeEvent block: {} and limit: {}",
             self.data.from,
             self.data.limit
         );
         if events.is_empty() {
-            log::debug!("[pangolin] Not have more ScheduleAuthoritiesChangeEvent");
+            log::debug!(
+                target: DarwiniaEthereumTask::NAME,
+                "[darwinia] Not have more ScheduleAuthoritiesChangeEvent"
+            );
             return Ok(None);
         }
         for event in &events {
@@ -52,8 +55,8 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
 
             if !need_to_sign {
                 log::trace!(
-                    target: PangolinRopstenTask::NAME,
-                    "[pangolin] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {}",
+                    target: DarwiniaEthereumTask::NAME,
+                    "[darwinia] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {}",
                     array_bytes::bytes2hex("0x", message),
                     event.at_block_number
                 );
@@ -61,8 +64,8 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
             }
 
             log::trace!(
-                target: PangolinRopstenTask::NAME,
-                "[pangolin] Try sign and send authorities with message: {} at block: {}",
+                target: DarwiniaEthereumTask::NAME,
+                "[darwinia] Try sign and send authorities with message: {} at block: {}",
                 array_bytes::bytes2hex("0x", message),
                 event.at_block_number
             );

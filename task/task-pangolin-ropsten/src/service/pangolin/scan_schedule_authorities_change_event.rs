@@ -33,7 +33,10 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
             self.data.limit
         );
         if events.is_empty() {
-            log::debug!("[pangolin] Not have more ScheduleAuthoritiesChangeEvent");
+            log::debug!(
+                target: PangolinRopstenTask::NAME,
+                "[pangolin] Not have more ScheduleAuthoritiesChangeEvent"
+            );
             return Ok(None);
         }
         for event in &events {

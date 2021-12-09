@@ -3,8 +3,8 @@ use lifeline::Sender;
 use bridge_traits::bridge::task::BridgeSand;
 
 use crate::message::{Extrinsic, ToExtrinsicsMessage};
-use crate::service::pangolin::types::ScanDataWrapper;
-use crate::task::PangolinRopstenTask;
+use crate::service::darwinia::types::ScanDataWrapper;
+use crate::task::DarwiniaEthereumTask;
 
 pub struct ScanScheduleMMRRootEvent<'a> {
     data: &'a mut ScanDataWrapper,
@@ -25,22 +25,22 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             .await?;
         if event.is_none() {
             log::debug!(
-                target: PangolinRopstenTask::NAME,
-                "[pangolin] Not have more ScheduleMMRRootEvent"
+                target: DarwiniaEthereumTask::NAME,
+                "[darwinia] Not have more ScheduleMMRRootEvent"
             );
             return Ok(());
         }
         let latest = event.unwrap();
         if latest.emitted == 1 {
             log::debug!(
-                target: PangolinRopstenTask::NAME,
-                "[pangolin] The latest ScheduleMMRRootEvent is emitted. don't do this again."
+                target: DarwiniaEthereumTask::NAME,
+                "[darwinia] The latest ScheduleMMRRootEvent is emitted. don't do this again."
             );
             return Ok(());
         } else {
             log::debug!(
-                target: PangolinRopstenTask::NAME,
-                "[pangolin] Queried latest ScheduleMMRRootEvent event block is: {} and at block: {}",
+                target: DarwiniaEthereumTask::NAME,
+                "[darwinia] Queried latest ScheduleMMRRootEvent event block is: {} and at block: {}",
                 latest.event_block_number,
                 latest.at_block_number
             );
@@ -58,8 +58,8 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             Some(v) => v,
             None => {
                 log::warn!(
-                    target: PangolinRopstenTask::NAME,
-                    "[pangolin] Can not get last block header by finalized block hash: {}",
+                    target: DarwiniaEthereumTask::NAME,
+                    "[darwinia] Can not get last block header by finalized block hash: {}",
                     finalized_block_hash
                 );
                 return Ok(());

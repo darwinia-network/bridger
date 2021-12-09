@@ -89,7 +89,7 @@ impl DarwiniaScanner {
         loop {
             let from = tracker.current().await?;
             let limit = 10u32;
-            log::debug!(
+            log::info!(
                 target: DarwiniaEthereumTask::NAME,
                 "[darwinia] Track darwinia scan block: {} and limit: {}",
                 from,

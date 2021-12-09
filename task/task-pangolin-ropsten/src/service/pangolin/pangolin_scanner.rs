@@ -89,7 +89,7 @@ impl PangolinScanner {
         loop {
             let from = tracker.current().await?;
             let limit = 10u32;
-            log::debug!(
+            log::info!(
                 target: PangolinRopstenTask::NAME,
                 "[pangolin] Track pangolin scan block: {} and limit: {}",
                 from,

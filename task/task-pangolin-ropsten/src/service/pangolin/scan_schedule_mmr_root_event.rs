@@ -24,7 +24,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             .query_latest_schedule_mmr_root_event()
             .await?;
         if event.is_none() {
-            log::debug!(
+            log::info!(
                 target: PangolinRopstenTask::NAME,
                 "[pangolin] Not have more ScheduleMMRRootEvent"
             );
@@ -32,13 +32,13 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         }
         let latest = event.unwrap();
         if latest.emitted == 1 {
-            log::debug!(
+            log::info!(
                 target: PangolinRopstenTask::NAME,
                 "[pangolin] The latest ScheduleMMRRootEvent is emitted. don't do this again."
             );
             return Ok(());
         } else {
-            log::debug!(
+            log::info!(
                 target: PangolinRopstenTask::NAME,
                 "[pangolin] Queried latest ScheduleMMRRootEvent event block is: {} and at block: {}",
                 latest.event_block_number,
@@ -80,9 +80,21 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             )
             .await?
         {
+            log::warn!(
+                target: PangolinRopstenTask::NAME,
+                "[pangolin] Don't need to sign mmr root for this event block: {} and at block: {}",
+                latest.event_block_number,
+                latest.at_block_number
+            );
             return Ok(());
         }
 
+        log::info!(
+            target: PangolinRopstenTask::NAME,
+            "[pangolin] Send sign mmr root for event block: {} and at block: {}",
+            latest.event_block_number,
+            latest.at_block_number
+        );
         let sender = self.data.sender_to_extrinsics_mut();
         let ex = Extrinsic::SignAndSendMmrRoot(latest.event_block_number);
         sender.send(ToExtrinsicsMessage::Extrinsic(ex)).await?;

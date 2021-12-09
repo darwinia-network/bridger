@@ -33,7 +33,7 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
             self.data.limit
         );
         if events.is_empty() {
-            log::debug!(
+            log::info!(
                 target: PangolinRopstenTask::NAME,
                 "[pangolin] Not have more ScheduleAuthoritiesChangeEvent"
             );
@@ -63,7 +63,7 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
                 continue;
             }
 
-            log::trace!(
+            log::info!(
                 target: PangolinRopstenTask::NAME,
                 "[pangolin] Try sign and send authorities with message: {} at block: {}",
                 array_bytes::bytes2hex("0x", message),

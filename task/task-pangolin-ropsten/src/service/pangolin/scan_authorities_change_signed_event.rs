@@ -38,7 +38,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
             self.data.limit
         );
         if events.is_empty() {
-            log::debug!(
+            log::info!(
                 target: PangolinRopstenTask::NAME,
                 "[pangolin] Not have more AuthoritiesChangeSignedEvent"
             );
@@ -47,7 +47,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
 
         for event in &events {
             if event.term != current_term {
-                log::trace!(
+                log::info!(
                     target: PangolinRopstenTask::NAME,
                     "[pangolin] Queried AuthoritiesChangeSignedEvent but not in current term. the event term is {} and current term is {}. skip this.",
                     event.term,

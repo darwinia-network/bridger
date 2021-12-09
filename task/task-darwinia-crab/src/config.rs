@@ -176,13 +176,13 @@ impl ChainInfoConfig {
         let endpoint = self
             .endpoint
             .replace(if secure { "wss://" } else { "ws://" }, "")
-            .replace("/", "")
-            .replace(" ", "");
+            .replace('/', "")
+            .replace(' ', "");
         let host_port = endpoint.split(':').collect::<Vec<&str>>();
         let host = host_port.get(0).unwrap_or(&"127.0.0.1");
         let port = host_port
             .get(1)
-            .unwrap_or_else(|| if secure { &"443" } else { &"80" });
+            .unwrap_or(if secure { &"443" } else { &"80" });
         Ok((secure, host.to_string(), port.parse::<u16>()?))
     }
 

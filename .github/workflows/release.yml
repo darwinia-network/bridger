@@ -4,14 +4,13 @@ on:
   push:
     tags:
       - 'v*'
-
 env:
   OPENSSL_DIR: /home/runner/openssl
   OPENSSL_STATIC: 1
 
 jobs:
   build-package:
-    name: Build binary
+    name: Build package
     runs-on: ubuntu-latest
     container:
       image: rust:1

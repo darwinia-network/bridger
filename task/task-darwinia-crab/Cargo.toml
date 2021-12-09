@@ -64,13 +64,13 @@ component-crab-s2s     = { path = "../../components/client-crab-s2s" }
 component-subscan      = { path = "../../components/subscan" }
 
 ## darwinia common
-darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-v0.11.7" }
-darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-v0.11.7" }
-darwinia-common-runtime    = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-v0.11.7" }
+darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "master" }
+darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "master" }
+darwinia-common-runtime    = { git = "https://github.com/darwinia-network/darwinia.git", branch = "master" }
 
 ## darwinia
-darwinia-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-v0.11.7" }
+darwinia-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "master" }
 
 ## crab
-crab-runtime                   = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-v0.11.7" }
+crab-runtime                   = { git = "https://github.com/darwinia-network/darwinia.git", branch = "master" }
 

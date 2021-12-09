@@ -1318,7 +1318,7 @@ dependencies = [
 [[package]]
 name = "crab-runtime"
 version = "0.11.6"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.11.7#43642a6d21a8741773d13f717d0b30c5ada745f0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#586c3222e0cfb40e74c789c2c0a204016baab9a8"
 dependencies = [
  "array-bytes",
  "bp-message-dispatch",
@@ -1671,7 +1671,7 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-primitives"
 version = "0.11.6"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.11.7#43642a6d21a8741773d13f717d0b30c5ada745f0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#586c3222e0cfb40e74c789c2c0a204016baab9a8"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -1739,7 +1739,7 @@ dependencies = [
 [[package]]
 name = "darwinia-common-primitives"
 version = "0.11.6"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.11.7#43642a6d21a8741773d13f717d0b30c5ada745f0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#586c3222e0cfb40e74c789c2c0a204016baab9a8"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -1749,7 +1749,7 @@ dependencies = [
 [[package]]
 name = "darwinia-common-runtime"
 version = "0.11.6"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.11.7#43642a6d21a8741773d13f717d0b30c5ada745f0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#586c3222e0cfb40e74c789c2c0a204016baab9a8"
 dependencies = [
  "darwinia-balances",
  "darwinia-common-primitives",
@@ -2052,7 +2052,7 @@ dependencies = [
 [[package]]
 name = "darwinia-runtime"
 version = "0.11.6"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.11.7#43642a6d21a8741773d13f717d0b30c5ada745f0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#586c3222e0cfb40e74c789c2c0a204016baab9a8"
 dependencies = [
  "bp-message-dispatch",
  "bp-messages",

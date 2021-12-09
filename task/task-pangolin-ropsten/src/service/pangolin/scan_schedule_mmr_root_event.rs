@@ -70,10 +70,10 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             }
         };
 
-        if event_block_number < finalized_block_header_number {
+        if finalized_block_header_number < event_block_number {
             log::info!(
                 target: PangolinRopstenTask::NAME,
-                "[pangolin] The finalized block number ({}) is less than event block number ({}). do nothing.",
+                "[pangolin] The finalized block number ({}) less than event block number ({}). do nothing.",
                 finalized_block_header_number,
                 event_block_number
             );

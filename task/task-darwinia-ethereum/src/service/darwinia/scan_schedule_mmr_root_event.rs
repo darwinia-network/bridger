@@ -8,11 +8,15 @@ use crate::task::DarwiniaEthereumTask;
 
 pub struct ScanScheduleMMRRootEvent<'a> {
     data: &'a mut ScanDataWrapper,
+    latest_submitted: Option<u32>,
 }
 
 impl<'a> ScanScheduleMMRRootEvent<'a> {
     pub fn new(data: &'a mut ScanDataWrapper) -> Self {
-        Self { data }
+        Self {
+            data,
+            latest_submitted: None,
+        }
     }
 }
 
@@ -67,6 +71,21 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         };
 
         if event_block_number < finalized_block_header_number {
+            log::info!(
+                target: DarwiniaEthereumTask::NAME,
+                "[darwinia] The finalized block number ({}) is less than event block number ({}). do nothing.",
+                finalized_block_header_number,
+                event_block_number
+            );
+            return Ok(());
+        }
+
+        if Some(event_block_number) == self.latest_submitted {
+            log::info!(
+                target: DarwiniaEthereumTask::NAME,
+                "[darwinia] This event block number ({}) is already submitted. Don't submit again.",
+                event_block_number
+            );
             return Ok(());
         }
 
@@ -98,6 +117,8 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         let sender = self.data.sender_to_extrinsics_mut();
         let ex = Extrinsic::SignAndSendMmrRoot(latest.event_block_number);
         sender.send(ToExtrinsicsMessage::Extrinsic(ex)).await?;
+
+        self.latest_submitted = Some(event_block_number);
         Ok(())
     }
 }

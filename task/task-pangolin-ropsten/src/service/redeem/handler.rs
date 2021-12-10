@@ -75,7 +75,7 @@ impl RedeemHandler {
 }
 
 impl RedeemHandler {
-    pub async fn redeem(&mut self, tx: TransactionEntity) -> anyhow::Result<()> {
+    pub async fn redeem(&mut self, tx: TransactionEntity) -> anyhow::Result<Option<u64>> {
         log::trace!(
             target: PangolinRopstenTask::NAME,
             "[ropsten] Try to redeem ethereum tx {:?}... in block {}",
@@ -90,7 +90,7 @@ impl RedeemHandler {
                 "[ropsten] Ethereum tx {:?} redeemed",
                 tx.tx_hash
             );
-            return Ok(());
+            return Ok(Some(tx.block_number));
         }
 
         let last_confirmed = self.darwinia.last_confirmed().await?;
@@ -106,7 +106,7 @@ impl RedeemHandler {
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx))
                 .await?;
-            return Ok(());
+            return Ok(None);
         }
 
         // 2. Do redeem
@@ -123,6 +123,6 @@ impl RedeemHandler {
             .send(ToExtrinsicsMessage::Extrinsic(ex))
             .await?;
 
-        Ok(())
+        Ok(Some(tx.block_number.clone()))
     }
 }

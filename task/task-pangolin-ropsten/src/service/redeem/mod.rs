@@ -170,35 +170,66 @@ async fn run_scan(
             txs.len()
         );
 
+        let mut latest_redeem_block_number = None;
         // send transactions to redeem
         for tx in &txs {
             let mut times = 0;
-            while let Err(e) = handler.redeem(tx.clone()).await {
-                tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-                times += 1;
-                handler =
-                    RedeemHandler::new(sender_to_extrinsics.clone(), sender_to_redeem.clone())
-                        .await;
-                if times > 10 {
-                    // todo: write log
-                    log::error!(
+            match handler.redeem(tx.clone()).await {
+                Ok(Some(latest)) => {
+                    log::trace!(
                         target: PangolinRopstenTask::NAME,
-                        "[ropsten] Failed to send redeem message. tx: {:?}, err: {:?}",
-                        tx,
-                        e
+                        "[ropsten] Change latest redeemed block number to: {}",
+                        latest
+                    );
+                    latest_redeem_block_number = Some(latest);
+                }
+                Ok(None) => {
+                    log::trace!(
+                        target: PangolinRopstenTask::NAME,
+                        "[ropsten] Latest redeemed block number is: {:?}",
+                        latest_redeem_block_number
                     );
                     break;
+                }
+                Err(e) => {
+                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                    times += 1;
+                    handler =
+                        RedeemHandler::new(sender_to_extrinsics.clone(), sender_to_redeem.clone())
+                            .await;
+                    if times > 10 {
+                        // todo: write log
+                        log::error!(
+                            target: PangolinRopstenTask::NAME,
+                            "[ropsten] Failed to send redeem message. tx: {:?}, err: {:?}",
+                            tx,
+                            e
+                        );
+                        break;
+                    }
                 }
             }
         }
 
-        let latest = txs.last().unwrap();
+        if latest_redeem_block_number.is_none() {
+            log::info!(
+                target: PangolinRopstenTask::NAME,
+                "[ropsten] Not have any block redeemed. please wait affirm"
+            );
+            tokio::time::sleep(std::time::Duration::from_secs(
+                task_config.interval_ethereum,
+            ))
+            .await;
+            continue;
+        }
+
+        let latest = latest_redeem_block_number.unwrap();
         log::info!(
             target: PangolinRopstenTask::NAME,
             "[ropsten] Set scan redeem block number to: {}",
-            latest.block_number
+            latest
         );
-        tracker.finish(latest.block_number as usize)?;
+        tracker.finish(latest as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,
         ))

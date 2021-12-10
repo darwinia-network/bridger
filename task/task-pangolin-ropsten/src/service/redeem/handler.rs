@@ -123,6 +123,6 @@ impl RedeemHandler {
             .send(ToExtrinsicsMessage::Extrinsic(ex))
             .await?;
 
-        Ok(Some(tx.block_number.clone()))
+        Ok(Some(tx.block_number))
     }
 }

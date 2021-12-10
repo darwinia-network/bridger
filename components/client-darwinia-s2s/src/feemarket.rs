@@ -7,6 +7,7 @@ use messages_relay::message_lane_loop::{
 };
 use messages_relay::relay_strategy::{RelayReference, RelayStrategy};
 use relay_substrate_client::Client;
+use relay_utils::MaybeConnectionError;
 
 use crate::api::DarwiniaApi;
 use crate::DarwiniaChain;

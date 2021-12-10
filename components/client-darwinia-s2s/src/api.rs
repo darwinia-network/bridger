@@ -6,7 +6,6 @@ use darwinia_common_primitives::BlockNumber;
 use dp_fee::{Order, Relayer};
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
 use relay_utils::relay_loop::Client as RelayLoopClient;
-use relay_utils::MaybeConnectionError;
 use sp_core::storage::StorageKey;
 use sp_core::{Bytes, Pair};
 
@@ -87,9 +86,7 @@ impl DarwiniaApi {
     }
 
     /// Return number of the best finalized block.
-    pub async fn best_finalized_header_number(
-        &self,
-    ) -> anyhow::Result<drml_common_primitives::BlockNumber> {
+    pub async fn best_finalized_header_number(&self) -> anyhow::Result<BlockNumber> {
         Ok(self.client.best_finalized_header_number().await?)
     }
 

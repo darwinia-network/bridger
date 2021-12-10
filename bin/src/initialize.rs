@@ -32,6 +32,8 @@ fn init_log() {
                 "jsonrpsee_ws_client=error",
                 "component_pangoro_s2s=trace",
                 "component_pangolin_s2s=trace",
+                "component_darwinia_s2s=trace",
+                "component_crab_s2s=trace",
             ]
             .join(","),
         );

@@ -1,4 +1,5 @@
 use darwinia_common_primitives::AccountId;
+use relay_utils::MaybeConnectionError;
 use sp_core::Pair;
 
 use bridge_traits::bridge::task::BridgeSand;
@@ -23,8 +24,69 @@ impl CrazyStrategy {
 #[async_trait::async_trait]
 impl UpdateFeeStrategy for CrazyStrategy {
     async fn handle(&mut self) -> anyhow::Result<()> {
-        self.handle_darwinia().await?;
-        self.handle_crab().await?;
+        let mut times = 0;
+        loop {
+            times += 1;
+            if times > 3 {
+                log::error!(
+                    target: DarwiniaCrabTask::NAME,
+                    "[darwinia] Try reconnect many times({}), skip update fee (update fee strategy crazy)",
+                    times
+                );
+                break;
+            }
+            match self.handle_darwinia().await {
+                Ok(_) => break,
+                Err(e) => {
+                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
+                        if client_error.is_connection_error() {
+                            log::debug!(
+                                "[darwinia] Try reconnect to chain (update fee strategy crazy)"
+                            );
+                            if let Err(re) = self.helper.reconnect_darwinia().await {
+                                log::error!(
+                                    "[darwinia] Failed to reconnect substrate client: {:?} (update fee strategy crazy)",
+                                    re
+                                );
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        times = 0;
+        loop {
+            times += 1;
+            if times > 3 {
+                log::error!(
+                    target: DarwiniaCrabTask::NAME,
+                    "[crab] Try reconnect many times({}), skip update fee",
+                    times
+                );
+                break;
+            }
+            match self.handle_crab().await {
+                Ok(_) => break,
+                Err(e) => {
+                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
+                        if client_error.is_connection_error() {
+                            log::debug!(
+                                "[crab] Try reconnect to chain (update fee strategy crazy)"
+                            );
+                            if let Err(re) = self.helper.reconnect_crab().await {
+                                log::error!(
+                                    "[crab] Failed to reconnect substrate client: {:?} (update fee strategy crazy)",
+                                    re
+                                );
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -34,7 +96,7 @@ impl CrazyStrategy {
         let my_id = AccountId::from(self.helper.darwinia_signer().public().0);
         let darwinia_signer = self.helper.darwinia_signer().clone();
 
-        let darwinia_api = self.helper.darwinia_api_mut();
+        let darwinia_api = self.helper.darwinia_api();
 
         if !darwinia_api.is_relayer(my_id.clone()).await? {
             log::warn!(
@@ -74,7 +136,7 @@ impl CrazyStrategy {
     async fn handle_crab(&mut self) -> anyhow::Result<()> {
         let my_id = AccountId::from(self.helper.crab_signer().public().0);
         let crab_signer = self.helper.crab_signer().clone();
-        let crab_api = self.helper.crab_api_mut();
+        let crab_api = self.helper.crab_api();
 
         if !crab_api.is_relayer(my_id.clone()).await? {
             log::warn!(

@@ -99,6 +99,15 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
         let verified = match helpers::is_verified(&darwinia, tx).await {
             Ok(v) => v,
             Err(e) => {
+                if let Some(xte) = e.downcast_ref::<substrate_subxt::Error>() {
+                    if let substrate_subxt::Error::Rpc(_) = xte {
+                        return Err(e);
+                    }
+                }
+                let err_msg = format!("{:?}", e).to_lowercase();
+                if err_msg.contains("restart") {
+                    return Err(e);
+                }
                 log::error!(
                     target: PangolinRopstenTask::NAME,
                     "Failed verified redeem. [{}]: {}. {:?}",

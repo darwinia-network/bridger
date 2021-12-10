@@ -14,8 +14,8 @@ pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
 
 fn migrate_scan_darwinia(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     let key = "last-tracked-darwinia-block";
-    let block_pangolin: Option<u64> = microkv.get_as(key)?;
-    if let Some(block) = block_pangolin {
+    let block_darwinia: Option<u64> = microkv.get_as(key)?;
+    if let Some(block) = block_darwinia {
         microkv.put("scan.darwinia.next", &format!("{}", block))?;
         microkv.delete(key)?;
     }

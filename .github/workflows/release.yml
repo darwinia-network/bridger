@@ -35,7 +35,7 @@ jobs:
       - name: Build zlib
         run: |
           curl -L https://github.com/madler/zlib/archive/refs/tags/v1.2.11.tar.gz | tar xz
-          z zlib-1.2.11
+          cd zlib-1.2.11
           ./configure --prefix=/root/${{ env.ZLIB_DIR }} --static
           make -j4
           make install

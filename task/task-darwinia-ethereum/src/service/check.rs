@@ -68,9 +68,9 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
     let thegraph_liketh = component_thegraph_liketh.component().await?;
     let task_config: TaskConfig = Config::restore_unwrap(DarwiniaEthereumTask::NAME)?;
 
-    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
+    let component_darwinia_subxt = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
     // Darwinia client
-    let darwinia = component_pangolin_subxt.component().await?;
+    let darwinia = component_darwinia_subxt.component().await?;
 
     let mut timing = SystemTime::now();
     loop {

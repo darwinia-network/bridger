@@ -113,15 +113,15 @@ impl RedeemHandler {
         let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
 
         let ex = Extrinsic::Redeem(proof, tx.clone());
-        self.sender_to_extrinsics
-            .send(ToExtrinsicsMessage::Extrinsic(ex))
-            .await?;
         log::info!(
-            target: PangolinRopstenTask::NAME,
-            "[ethereum] Redeem extrinsic sent to extrinsics service: {:?}. at ethereum block: {}",
+            target: DarwiniaEthereumTask::NAME,
+            "[ethereum] Redeem extrinsic send to extrinsics service: {:?}. at ethereum block: {}",
             ex,
             tx.block_number
         );
+        self.sender_to_extrinsics
+            .send(ToExtrinsicsMessage::Extrinsic(ex))
+            .await?;
 
         Ok(())
     }

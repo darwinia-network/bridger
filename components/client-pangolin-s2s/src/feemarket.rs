@@ -141,6 +141,7 @@ impl RelayStrategy for PangolinRelayStrategy {
                 Err(e) => {
                     if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
                         if client_error.is_connection_error() {
+                            log::debug!("[pangolin] Try reconnect to chain");
                             if let Err(re) = self.api.reconnect().await {
                                 log::error!(
                                     "[pangolin] Failed to reconnect substrate client: {:?}",

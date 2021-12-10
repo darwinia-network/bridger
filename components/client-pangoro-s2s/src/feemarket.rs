@@ -144,6 +144,7 @@ impl RelayStrategy for PangoroRelayStrategy {
                 Err(e) => {
                     if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
                         if client_error.is_connection_error() {
+                            log::debug!("[pangoro] Try reconnect to chain");
                             if let Err(re) = self.api.reconnect().await {
                                 log::error!(
                                     "[pangoro] Failed to reconnect substrate client: {:?}",

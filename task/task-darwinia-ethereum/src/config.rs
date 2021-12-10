@@ -5,6 +5,7 @@ use component_darwinia_subxt::config::DarwiniaSubxtConfig;
 use component_ethereum::config::{EthereumConfig, Web3Config};
 use component_http_client::HttpClientConfig;
 use component_shadow::ShadowConfig;
+use component_subquery::config::SubqueryConfig;
 use component_thegraph_liketh::config::TheGraphLikeEthConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -16,6 +17,7 @@ pub struct DarwiniaEthereumConfig {
     pub task: TaskConfig,
     pub http_client: HttpClientConfig,
     pub thegraph: TheGraphLikeEthConfig,
+    pub subquery: SubqueryConfig,
 }
 
 impl DarwiniaEthereumConfig {
@@ -28,6 +30,7 @@ impl DarwiniaEthereumConfig {
         Config::store(name, self.task.clone())?;
         Config::store(name, self.http_client.clone())?;
         Config::store(name, self.thegraph.clone())?;
+        Config::store(name, self.subquery.clone())?;
         Ok(())
     }
     pub fn template() -> Self {
@@ -39,6 +42,7 @@ impl DarwiniaEthereumConfig {
             task: TaskConfig::template(),
             http_client: HttpClientConfig::template(),
             thegraph: TheGraphLikeEthConfig::template(),
+            subquery: SubqueryConfig::template(),
         }
     }
 }

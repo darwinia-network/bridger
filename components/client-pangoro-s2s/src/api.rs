@@ -94,7 +94,7 @@ impl PangoroApi {
 
     /// Update relay fee
     pub async fn update_relay_fee(
-        &mut self,
+        &self,
         signer: <PangoroChain as TransactionSignScheme>::AccountKeyPair,
         amount: <PangoroChain as ChainBase>::Balance,
     ) -> anyhow::Result<()> {

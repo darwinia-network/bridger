@@ -1,3 +1,5 @@
+use relay_substrate_client::ChainBase;
+use relay_utils::MaybeConnectionError;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use sp_runtime::{FixedPointNumber, FixedU128};
@@ -5,6 +7,8 @@ use sp_runtime::{FixedPointNumber, FixedU128};
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::error::StandardError;
+use component_pangolin_s2s::PangolinChain;
+use component_pangoro_s2s::PangoroChain;
 use component_subscan::{Subscan, SubscanComponent};
 
 use crate::fee::strategy::common::StrategyHelper;
@@ -102,6 +106,40 @@ impl ReasonableStrategy {
     }
 }
 
+impl ReasonableStrategy {
+    async fn update_pangolin_fee(
+        &self,
+        expect_fee_pangolin: <PangolinChain as ChainBase>::Balance,
+    ) -> anyhow::Result<()> {
+        log::info!(
+            target: PangolinPangoroTask::NAME,
+            "[reasonable] Update pangolin fee: {}",
+            expect_fee_pangolin
+        );
+        let pangolin_signer = self.helper.pangolin_signer().clone();
+        let pangolin_api = self.helper.pangolin_api();
+        pangolin_api
+            .update_relay_fee(pangolin_signer.clone(), expect_fee_pangolin)
+            .await
+    }
+
+    async fn update_pangoro_fee(
+        &self,
+        expect_fee_pangoro: <PangoroChain as ChainBase>::Balance,
+    ) -> anyhow::Result<()> {
+        log::info!(
+            target: PangolinPangoroTask::NAME,
+            "[reasonable] Update pangoro fee: {}",
+            expect_fee_pangoro
+        );
+        let pangoro_signer = self.helper.pangoro_signer().clone();
+        let pangoro_api = self.helper.pangoro_api();
+        pangoro_api
+            .update_relay_fee(pangoro_signer.clone(), expect_fee_pangoro)
+            .await
+    }
+}
+
 #[async_trait::async_trait]
 impl UpdateFeeStrategy for ReasonableStrategy {
     async fn handle(&mut self) -> anyhow::Result<()> {
@@ -140,29 +178,71 @@ impl UpdateFeeStrategy for ReasonableStrategy {
         let expect_fee_pangolin = MIN_RELAY_FEE_PANGOLIN + (top100_max_cost_pangolin * 15);
         let expect_fee_pangoro = MIN_RELAY_FEE_PANGORO + (top100_max_cost_pangoro * 15);
 
-        log::info!(
-            target: PangolinPangoroTask::NAME,
-            "[reasonable] Update pangoro fee: {}",
-            expect_fee_pangoro
-        );
+        let mut times = 0;
+        loop {
+            times += 1;
+            if times > 3 {
+                log::error!(
+                    target: PangolinPangoroTask::NAME,
+                    "[pangoro] Try reconnect many times({}), skip update fee (update fee strategy reasonable)",
+                    times
+                );
+                break;
+            }
+            match self.update_pangoro_fee(expect_fee_pangoro).await {
+                Ok(_) => break,
+                Err(e) => {
+                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
+                        if client_error.is_connection_error() {
+                            log::debug!(
+                                "[pangoro] Try reconnect to chain (update fee strategy reasonable)"
+                            );
+                            if let Err(re) = self.helper.reconnect_pangoro().await {
+                                log::error!(
+                                    "[pangoro] Failed to reconnect substrate client: {:?} (update fee strategy)",
+                                    re
+                                );
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-        let pangoro_signer = self.helper.pangoro_signer().clone();
-        let pangolin_signer = self.helper.pangolin_signer().clone();
+        times = 0;
+        loop {
+            times += 1;
+            if times > 3 {
+                log::error!(
+                    target: PangolinPangoroTask::NAME,
+                    "[pangolin] Try reconnect many times({}), skip update fee (update fee strategy reasonable)",
+                    times
+                );
+                break;
+            }
 
-        let pangoro_api = self.helper.pangoro_api_mut();
-        pangoro_api
-            .update_relay_fee(pangoro_signer, expect_fee_pangoro)
-            .await?;
+            match self.update_pangolin_fee(expect_fee_pangolin).await {
+                Ok(_) => break,
+                Err(e) => {
+                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
+                        if client_error.is_connection_error() {
+                            log::debug!(
+                                "[pangolin] Try reconnect to chain (update fee strategy reasonable)"
+                            );
+                            if let Err(re) = self.helper.reconnect_pangolin().await {
+                                log::error!(
+                                    "[pangolin] Failed to reconnect substrate client: {:?} (update fee strategy)",
+                                    re
+                                );
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-        log::info!(
-            target: PangolinPangoroTask::NAME,
-            "[reasonable] Update pangolin fee: {}",
-            expect_fee_pangolin
-        );
-        let pangolin_api = self.helper.pangolin_api_mut();
-        pangolin_api
-            .update_relay_fee(pangolin_signer, expect_fee_pangolin)
-            .await?;
         Ok(())
     }
 }

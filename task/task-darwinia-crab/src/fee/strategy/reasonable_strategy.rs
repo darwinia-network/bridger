@@ -1,3 +1,5 @@
+use relay_substrate_client::ChainBase;
+use relay_utils::MaybeConnectionError;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use sp_runtime::{FixedPointNumber, FixedU128};
@@ -5,6 +7,8 @@ use sp_runtime::{FixedPointNumber, FixedU128};
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::BridgeSand;
 use bridge_traits::error::StandardError;
+use component_crab_s2s::CrabChain;
+use component_darwinia_s2s::DarwiniaChain;
 use component_subscan::{Subscan, SubscanComponent};
 
 use crate::fee::strategy::common::StrategyHelper;
@@ -101,6 +105,40 @@ impl ReasonableStrategy {
     }
 }
 
+impl ReasonableStrategy {
+    async fn update_darwinia_fee(
+        &self,
+        expect_fee_darwinia: <DarwiniaChain as ChainBase>::Balance,
+    ) -> anyhow::Result<()> {
+        log::info!(
+            target: DarwiniaCrabTask::NAME,
+            "[reasonable] Update darwinia fee: {}",
+            expect_fee_darwinia
+        );
+        let darwinia_signer = self.helper.darwinia_signer().clone();
+        let darwinia_api = self.helper.darwinia_api();
+        darwinia_api
+            .update_relay_fee(darwinia_signer.clone(), expect_fee_darwinia)
+            .await
+    }
+
+    async fn update_crab_fee(
+        &self,
+        expect_fee_crab: <CrabChain as ChainBase>::Balance,
+    ) -> anyhow::Result<()> {
+        log::info!(
+            target: DarwiniaCrabTask::NAME,
+            "[reasonable] Update crab fee: {}",
+            expect_fee_crab
+        );
+        let crab_signer = self.helper.crab_signer().clone();
+        let crab_api = self.helper.crab_api();
+        crab_api
+            .update_relay_fee(crab_signer.clone(), expect_fee_crab)
+            .await
+    }
+}
+
 #[async_trait::async_trait]
 impl UpdateFeeStrategy for ReasonableStrategy {
     async fn handle(&mut self) -> anyhow::Result<()> {
@@ -137,27 +175,71 @@ impl UpdateFeeStrategy for ReasonableStrategy {
         let expect_fee_darwinia = MIN_RELAY_FEE_DARWINIA + (top100_max_cost_darwinia * 15);
         let expect_fee_crab = MIN_RELAY_FEE_CRAB + (top100_max_cost_crab * 15);
 
-        let crab_signer = self.helper.crab_signer().clone();
-        let darwinia_signer = self.helper.darwinia_signer().clone();
-        log::info!(
-            target: DarwiniaCrabTask::NAME,
-            "[reasonable] Update crab fee: {}",
-            expect_fee_crab
-        );
-        let crab_api = self.helper.crab_api_mut();
-        crab_api
-            .update_relay_fee(crab_signer, expect_fee_crab)
-            .await?;
+        let mut times = 0;
+        loop {
+            times += 1;
+            if times > 3 {
+                log::error!(
+                    target: DarwiniaCrabTask::NAME,
+                    "[darwinia] Try reconnect many times({}), skip update fee (update fee strategy reasonable)",
+                    times
+                );
+                break;
+            }
+            match self.update_darwinia_fee(expect_fee_darwinia).await {
+                Ok(_) => break,
+                Err(e) => {
+                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
+                        if client_error.is_connection_error() {
+                            log::debug!(
+                                "[darwinia] Try reconnect to chain (update fee strategy reasonable)"
+                            );
+                            if let Err(re) = self.helper.reconnect_darwinia().await {
+                                log::error!(
+                                    "[darwinia] Failed to reconnect substrate client: {:?} (update fee strategy)",
+                                    re
+                                );
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-        log::info!(
-            target: DarwiniaCrabTask::NAME,
-            "[reasonable] Update darwinia fee: {}",
-            expect_fee_darwinia
-        );
-        let darwinia_api = self.helper.darwinia_api_mut();
-        darwinia_api
-            .update_relay_fee(darwinia_signer, expect_fee_darwinia)
-            .await?;
+        times = 0;
+        loop {
+            times += 1;
+            if times > 3 {
+                log::error!(
+                    target: DarwiniaCrabTask::NAME,
+                    "[crab] Try reconnect many times({}), skip update fee (update fee strategy reasonable)",
+                    times
+                );
+                break;
+            }
+
+            match self.update_crab_fee(expect_fee_crab).await {
+                Ok(_) => break,
+                Err(e) => {
+                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
+                        if client_error.is_connection_error() {
+                            log::debug!(
+                                "[crab] Try reconnect to chain (update fee strategy reasonable)"
+                            );
+                            if let Err(re) = self.helper.reconnect_crab().await {
+                                log::error!(
+                                    "[crab] Failed to reconnect substrate client: {:?} (update fee strategy)",
+                                    re
+                                );
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         Ok(())
     }
 }

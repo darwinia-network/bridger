@@ -2,15 +2,16 @@
 
 ## Upgrade Guide
 
-[Upgrade guide for version v0.4.8](https://github.com/darwinia-network/bridger/issues/315)
+Fixed several bugs for substrate to substrate bridges.
+There is a [known bug](https://github.com/darwinia-network/bridger/issues/343) in this version for ethereum bridge, please use v0.4.5 instead.
 
 ## Added
 
-- Darwinia <> Crab bridge task #324
+None
 
 ## Changed
 
-- Change Ethereum/Ropsten scan use thegraph #286
+- Bug Fixes
 
 ## Resources
 
@@ -38,5 +39,6 @@ docker pull quay.io/darwinia-network/bridger:sha-{{ sha }}
 | darwinia-crab     | [Guide](../task/task-darwinia-crab/docs/Guide.md)     |
 
 ***Known issue***
-https://github.com/darwinia-network/bridger/issues/319
+https://github.com/darwinia-network/bridger/issues/343
+https://github.com/darwinia-network/bridger/issues/347
 

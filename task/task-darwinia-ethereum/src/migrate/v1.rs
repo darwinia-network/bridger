@@ -14,8 +14,8 @@ pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
 
 fn auto_start_scan(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     if microkv.get("scan.darwinia.next")?.is_some() {
-        let tracker_pangolin = Tracker::new(microkv.clone(), "scan.darwinia");
-        tracker_pangolin.start_running()?;
+        let tracker_darwinia = Tracker::new(microkv.clone(), "scan.darwinia");
+        tracker_darwinia.start_running()?;
     }
 
     if microkv.get("scan.ethereum.next")?.is_some() {

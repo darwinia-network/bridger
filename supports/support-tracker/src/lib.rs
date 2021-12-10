@@ -75,6 +75,7 @@ impl Tracker {
 
         match self.read_u64(&self.key_planned)? {
             Some(planned) => {
+                self.microkv.put(&self.key_current, &planned)?;
                 self.microkv.delete(&self.key_planned)?;
                 Ok(planned as usize)
             }

@@ -24,10 +24,7 @@ impl DarwiniaApi {
 
 impl DarwiniaApi {
     pub async fn reconnect(&mut self) -> anyhow::Result<()> {
-        let mut client = self.client.clone();
-        client.reconnect().await?;
-        self.client = client;
-        Ok(())
+        Ok(self.client.reconnect().await?)
     }
 
     /// Query assigned relayers

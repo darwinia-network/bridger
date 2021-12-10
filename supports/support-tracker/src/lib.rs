@@ -80,8 +80,8 @@ impl Tracker {
                 Ok(planned as usize)
             }
             None => {
-                let current: usize = self.microkv.get_as(&self.key_current)?.unwrap_or(0);
-                Ok(current)
+                let current = self.read_u64(&self.key_current)?.unwrap_or(0);
+                Ok(current as usize)
             }
         }
     }

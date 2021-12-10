@@ -54,4 +54,9 @@ prometheus_port = 9616
 [task]
 # 1800 seconds, 30 minutes
 interval_update_fee = 1800
+
+# Bundle 3 strategy update your fee
+# - Nothing:    Nothing to do
+# - Crazy:      If the first assigned relay is not mine. set the first assigned relayer's fee-1 to your fee.
+# - Reasonable: Query rencently orders from subscan. and calculate your fee.
 update_fee_strategy = "Nothing"

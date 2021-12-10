@@ -71,7 +71,7 @@ impl Service for RedeemService {
                         if let Err(err) = handler.redeem(tx.clone()).await {
                             log::error!(
                                 target: DarwiniaEthereumTask::NAME,
-                                "redeem err: {:#?}",
+                                "[ethereum] redeem err: {:#?}",
                                 err
                             );
                             // TODO: Consider the errors more carefully
@@ -123,7 +123,7 @@ async fn start_scan(
     {
         log::error!(
             target: DarwiniaEthereumTask::NAME,
-            "ethereum redeem err {:?}",
+            "[ethereum] redeem err {:?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -168,6 +168,11 @@ async fn run_scan(
             .await;
             continue;
         }
+        log::debug!(
+            target: DarwiniaEthereumTask::NAME,
+            "[ethereum] Found {} transactions wait to redeem",
+            txs.len()
+        );
 
         // send transactions to redeem
         for tx in &txs {
@@ -182,7 +187,7 @@ async fn run_scan(
                     // todo: write log
                     log::error!(
                         target: DarwiniaEthereumTask::NAME,
-                        "Failed to send redeem message. tx: {:?}, err: {:?}",
+                        "[ethereum] Failed to send redeem message. tx: {:?}, err: {:?}",
                         tx,
                         e
                     );
@@ -192,6 +197,11 @@ async fn run_scan(
         }
 
         let latest = txs.last().unwrap();
+        log::info!(
+            target: DarwiniaEthereumTask::NAME,
+            "[ethereum] Set scan redeem block number to: {}",
+            latest.block_number
+        );
         tracker.finish(latest.block_number as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,

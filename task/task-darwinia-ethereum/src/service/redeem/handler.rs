@@ -34,7 +34,7 @@ impl RedeemHandler {
                 Err(err) => {
                     log::error!(
                         target: DarwiniaEthereumTask::NAME,
-                        "Failed to create redeem handler, times: [{}] err: {:#?}",
+                        "[ethereum] Failed to create redeem handler, times: [{}] err: {:#?}",
                         times,
                         err
                     );
@@ -78,15 +78,16 @@ impl RedeemHandler {
     pub async fn redeem(&mut self, tx: TransactionEntity) -> anyhow::Result<()> {
         log::trace!(
             target: DarwiniaEthereumTask::NAME,
-            "Try to redeem ethereum tx {:?}...",
-            tx.tx_hash
+            "[ethereum] Try to redeem ethereum tx {:?}... in block {}",
+            tx.tx_hash,
+            tx.block_number
         );
 
         // 1. Checking before redeem
         if helpers::is_verified(&self.darwinia.darwinia, &tx).await? {
             log::trace!(
                 target: DarwiniaEthereumTask::NAME,
-                "Ethereum tx {:?} redeemed",
+                "[ethereum] Ethereum tx {:?} redeemed",
                 tx.tx_hash
             );
             return Ok(());
@@ -96,7 +97,7 @@ impl RedeemHandler {
         if tx.block_number >= last_confirmed {
             log::trace!(
                 target: DarwiniaEthereumTask::NAME,
-                "Ethereum tx {:?}'s block {} is large than last confirmed block {}",
+                "[ethereum] Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
                 tx.block_number,
                 last_confirmed,
@@ -115,6 +116,12 @@ impl RedeemHandler {
         self.sender_to_extrinsics
             .send(ToExtrinsicsMessage::Extrinsic(ex))
             .await?;
+        log::info!(
+            target: PangolinRopstenTask::NAME,
+            "[ethereum] Redeem extrinsic sent to extrinsics service: {:?}. at ethereum block: {}",
+            ex,
+            tx.block_number
+        );
 
         Ok(())
     }

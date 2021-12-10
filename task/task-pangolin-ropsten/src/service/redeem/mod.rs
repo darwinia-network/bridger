@@ -119,7 +119,7 @@ async fn start_scan(
     {
         log::error!(
             target: PangolinRopstenTask::NAME,
-            "ropsten redeem err {:?}",
+            "[ropsten] redeem err {:?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -164,6 +164,11 @@ async fn run_scan(
             .await;
             continue;
         }
+        log::debug!(
+            target: PangolinRopstenTask::NAME,
+            "[ropsten] Found {} transactions wait to redeem",
+            txs.len()
+        );
 
         // send transactions to redeem
         for tx in &txs {
@@ -178,7 +183,7 @@ async fn run_scan(
                     // todo: write log
                     log::error!(
                         target: PangolinRopstenTask::NAME,
-                        "Failed to send redeem message. tx: {:?}, err: {:?}",
+                        "[ropsten] Failed to send redeem message. tx: {:?}, err: {:?}",
                         tx,
                         e
                     );
@@ -188,6 +193,11 @@ async fn run_scan(
         }
 
         let latest = txs.last().unwrap();
+        log::info!(
+            target: PangolinRopstenTask::NAME,
+            "[ropsten] Set scan redeem block number to: {}",
+            latest.block_number
+        );
         tracker.finish(latest.block_number as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,

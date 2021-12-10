@@ -427,9 +427,9 @@ mod s2s_messages {
             Some(crate::chains::DARWINIA_ASSOCIATED_TOKEN_ID),
             Some((
                 sp_core::storage::StorageKey(
-                    crab_runtime::darwinia_messages::DarwiniaToCrabConversionRate::key().to_vec(),
+                    crab_runtime::darwinia_message::DarwiniaToCrabConversionRate::key().to_vec(),
                 ),
-                crab_runtime::darwinia_messages::INITIAL_DARWINIA_TO_CRAB_CONVERSION_RATE,
+                crab_runtime::darwinia_message::INITIAL_DARWINIA_TO_CRAB_CONVERSION_RATE,
             )),
         )
     }

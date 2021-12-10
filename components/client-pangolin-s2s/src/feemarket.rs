@@ -7,6 +7,7 @@ use messages_relay::message_lane_loop::{
 };
 use messages_relay::relay_strategy::{RelayReference, RelayStrategy};
 use relay_substrate_client::Client;
+use relay_utils::MaybeConnectionError;
 
 use crate::api::PangolinApi;
 use crate::PangolinChain;
@@ -26,26 +27,21 @@ impl PangolinRelayStrategy {
     }
 }
 
-#[async_trait::async_trait]
-impl RelayStrategy for PangolinRelayStrategy {
-    async fn decide<
+impl PangolinRelayStrategy {
+    async fn handle<
         P: MessageLane,
         SourceClient: MessageLaneSourceClient<P>,
         TargetClient: MessageLaneTargetClient<P>,
     >(
-        &mut self,
+        &self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
-    ) -> bool {
+    ) -> anyhow::Result<bool> {
         let nonce = &reference.nonce;
         log::trace!("[pangolin] Determine whether to relay for nonce: {}", nonce);
         let order = self
             .api
             .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
-            .await
-            .map_err(|e| {
-                log::error!("[pangolin] Failed to query order: {:?}", e);
-            })
-            .unwrap_or(None);
+            .await?;
 
         // If the order is not exists.
         // 1. You are too behind.
@@ -57,7 +53,7 @@ impl RelayStrategy for PangolinRelayStrategy {
                 "[pangolin] Not found order by nonce: {}, so decide don't relay this nonce",
                 nonce
             );
-            return false;
+            return Ok(false);
         }
         // -----
 
@@ -70,7 +66,7 @@ impl RelayStrategy for PangolinRelayStrategy {
                 "[pangolin] Not found any assigned relayers so relay this nonce({}) anyway",
                 nonce
             );
-            return true;
+            return Ok(true);
         }
 
         // -----
@@ -87,23 +83,13 @@ impl RelayStrategy for PangolinRelayStrategy {
                 "[pangolin] You are assigned relayer, you must be relay this nonce({})",
                 nonce
             );
-            return true;
+            return Ok(true);
         }
 
         // -----
 
         // If you aren't assigned relayer, only participate in the part about time out, earn more rewards
-        let latest_block_number = self
-            .api
-            .best_finalized_header_number()
-            .await
-            .map_err(|e| {
-                log::error!(
-                    "[pangolin] Failed to query latest block, unable to decide whether to participate: {:?}",
-                    e
-                );
-            })
-            .unwrap_or(0);
+        let latest_block_number = self.api.best_finalized_header_number().await?;
         let ranges = relayers
             .iter()
             .map(|item| item.valid_range.clone())
@@ -119,12 +105,62 @@ impl RelayStrategy for PangolinRelayStrategy {
                 "[pangolin] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
                 nonce
             );
-            return true;
+            return Ok(true);
         }
         log::info!(
             "[pangolin] You aren't assigned relay. and this nonce({}) is ontime. so don't relay this",
             nonce
         );
-        false
+        Ok(false)
+    }
+}
+
+#[async_trait::async_trait]
+impl RelayStrategy for PangolinRelayStrategy {
+    async fn decide<
+        P: MessageLane,
+        SourceClient: MessageLaneSourceClient<P>,
+        TargetClient: MessageLaneTargetClient<P>,
+    >(
+        &mut self,
+        reference: &mut RelayReference<P, SourceClient, TargetClient>,
+    ) -> bool {
+        let mut times = 0;
+        loop {
+            times += 1;
+            if times > 5 {
+                log::error!(
+                    "[pangolin] Try decide failed many times ({}). so decide don't relay this nonce({}) at the moment",
+                    times,
+                    reference.nonce
+                );
+                return false;
+            }
+            let decide = match self.handle(reference).await {
+                Ok(v) => v,
+                Err(e) => {
+                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
+                        if client_error.is_connection_error() {
+                            if let Err(re) = self.api.reconnect().await {
+                                log::error!(
+                                    "[pangolin] Failed to reconnect substrate client: {:?}",
+                                    re
+                                );
+                                continue;
+                            }
+                        }
+                    }
+
+                    log::error!("[pangolin] Failed to decide relay: {:?}", e);
+                    continue;
+                }
+            };
+            log::info!(
+                "[pangolin] About nonce {} decide is {}",
+                reference.nonce,
+                decide
+            );
+            return decide;
+        }
     }
 }

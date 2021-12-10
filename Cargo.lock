@@ -1229,7 +1229,7 @@ dependencies = [
  "gql_client",
  "hex",
  "log",
- "serde 1.0.130",
+ "serde 1.0.131",
  "serde-aux",
  "serde-hex",
 ]

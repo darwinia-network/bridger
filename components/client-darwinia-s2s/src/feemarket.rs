@@ -26,30 +26,25 @@ impl DarwiniaRelayStrategy {
     }
 }
 
-#[async_trait::async_trait]
-impl RelayStrategy for DarwiniaRelayStrategy {
-    async fn decide<
+impl DarwiniaRelayStrategy {
+    async fn handle<
         P: MessageLane,
         SourceClient: MessageLaneSourceClient<P>,
         TargetClient: MessageLaneTargetClient<P>,
     >(
-        &mut self,
+        &self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
-    ) -> bool {
+    ) -> anyhow::Result<bool> {
         let nonce = &reference.nonce;
         log::trace!(
-            "[crab] Determine whether to relay for nonce: {}",
+            "[darwinia] Determine whether to relay for nonce: {}",
             reference.nonce
         );
 
         let order = self
             .api
             .order(darwinia_bridge_primitives::DARWINIA_CRAB_LANE, *nonce)
-            .await
-            .map_err(|e| {
-                log::error!("[darwinia] Failed to query order: {:?}", e);
-            })
-            .unwrap_or(None);
+            .await?;
 
         // If the order is not exists.
         // 1. You are too behind.
@@ -58,10 +53,10 @@ impl RelayStrategy for DarwiniaRelayStrategy {
         // Related: https://github.com/darwinia-network/darwinia-common/blob/90add536ed320ec7e17898e695c65ee9d7ce79b0/frame/fee-market/src/lib.rs?#L177
         if order.is_none() {
             log::info!(
-                "[crab] Not found order by nonce: {}, so decide don't relay this nonce",
+                "[darwinia] Not found order by nonce: {}, so decide don't relay this nonce",
                 nonce
             );
-            return false;
+            return Ok(false);
         }
         // -----
 
@@ -71,10 +66,10 @@ impl RelayStrategy for DarwiniaRelayStrategy {
         // If not have any assigned relayers, everyone participates in the relay.
         if relayers.is_empty() {
             log::info!(
-                "[crab] Not found any assigned relayers so relay this nonce({}) anyway",
+                "[darwinia] Not found any assigned relayers so relay this nonce({}) anyway",
                 nonce
             );
-            return true;
+            return Ok(true);
         }
 
         // -----
@@ -88,26 +83,16 @@ impl RelayStrategy for DarwiniaRelayStrategy {
         // you can still get relay rewards.
         if is_assigned_relayer {
             log::info!(
-                "[crab] You are assigned relayer, you must be relay this nonce({})",
+                "[darwinia] You are assigned relayer, you must be relay this nonce({})",
                 nonce
             );
-            return true;
+            return Ok(true);
         }
 
         // -----
 
         // If you aren't assigned relayer, only participate in the part about time out, earn more rewards
-        let latest_block_number = self
-            .api
-            .best_finalized_header_number()
-            .await
-            .map_err(|e| {
-                log::error!(
-                    "[darwinia] Failed to query latest block, unable to decide whether to participate: {:?}",
-                    e
-                );
-            })
-            .unwrap_or(0);
+        let latest_block_number = self.api.best_finalized_header_number().await?;
         let ranges = relayers
             .iter()
             .map(|item| item.valid_range.clone())
@@ -120,15 +105,66 @@ impl RelayStrategy for DarwiniaRelayStrategy {
         // If this order has timed out, decide to relay
         if latest_block_number > maximum_timeout {
             log::info!(
-                "[crab] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
+                "[darwinia] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
                 nonce
             );
-            return true;
+            return Ok(true);
         }
         log::info!(
-            "[crab] You aren't assigned relay. and this nonce({}) is ontime. so don't relay this",
+            "[darwinia] You aren't assigned relay. and this nonce({}) is ontime. so don't relay this",
             nonce
         );
-        false
+        Ok(false)
+    }
+}
+
+#[async_trait::async_trait]
+impl RelayStrategy for DarwiniaRelayStrategy {
+    async fn decide<
+        P: MessageLane,
+        SourceClient: MessageLaneSourceClient<P>,
+        TargetClient: MessageLaneTargetClient<P>,
+    >(
+        &mut self,
+        reference: &mut RelayReference<P, SourceClient, TargetClient>,
+    ) -> bool {
+        let mut times = 0;
+        loop {
+            times += 1;
+            if times > 5 {
+                log::error!(
+                    "[darwinia] Try decide failed many times ({}). so decide don't relay this nonce({}) at the moment",
+                    times,
+                    reference.nonce
+                );
+                return false;
+            }
+            let decide = match self.handle(reference).await {
+                Ok(v) => v,
+                Err(e) => {
+                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
+                        if client_error.is_connection_error() {
+                            log::debug!("[darwinia] Try reconnect to chain");
+                            if let Err(re) = self.api.reconnect().await {
+                                log::error!(
+                                    "[darwinia] Failed to reconnect substrate client: {:?}",
+                                    re
+                                );
+                                continue;
+                            }
+                        }
+                    }
+
+                    log::error!("[darwinia] Failed to decide relay: {:?}", e);
+                    continue;
+                }
+            };
+            log::info!(
+                "[darwinia] About nonce {} decide is {}",
+                reference.nonce,
+                decide
+            );
+            return decide;
+        }
     }
 }

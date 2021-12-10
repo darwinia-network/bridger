@@ -7,6 +7,7 @@ use messages_relay::message_lane_loop::{
 };
 use messages_relay::relay_strategy::{RelayReference, RelayStrategy};
 use relay_substrate_client::Client;
+use relay_utils::MaybeConnectionError;
 
 use crate::api::CrabApi;
 use crate::CrabChain;
@@ -34,7 +35,7 @@ impl CrabRelayStrategy {
     >(
         &mut self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
-    ) -> bool {
+    ) -> anyhow::Result<bool> {
         log::trace!(
             "[crab] Determine whether to relay for nonce: {}",
             reference.nonce
@@ -43,11 +44,7 @@ impl CrabRelayStrategy {
         let order = self
             .api
             .order(darwinia_bridge_primitives::DARWINIA_CRAB_LANE, *nonce)
-            .await
-            .map_err(|e| {
-                log::error!("[crab] Failed to query order: {:?}", e);
-            })
-            .unwrap_or(None);
+            .await?;
 
         // If the order is not exists.
         // 1. You are too behind.
@@ -59,7 +56,7 @@ impl CrabRelayStrategy {
                 "[crab] Not found order by nonce: {}, so decide don't relay this nonce",
                 nonce
             );
-            return false;
+            return Ok(false);
         }
         // -----
 
@@ -72,7 +69,7 @@ impl CrabRelayStrategy {
                 "[crab] Not found any assigned relayers so relay this nonce({}) anyway",
                 nonce
             );
-            return true;
+            return Ok(true);
         }
 
         // -----
@@ -89,23 +86,13 @@ impl CrabRelayStrategy {
                 "[crab] You are assigned relayer, you must be relay this nonce({})",
                 nonce
             );
-            return true;
+            return Ok(true);
         }
 
         // -----
 
         // If you aren't assigned relayer, only participate in the part about time out, earn more rewards
-        let latest_block_number = self
-            .api
-            .best_finalized_header_number()
-            .await
-            .map_err(|e| {
-                log::error!(
-                    "[crab] Failed to query latest block, unable to decide whether to participate: {:?}",
-                    e
-                );
-            })
-            .unwrap_or(0);
+        let latest_block_number = self.api.best_finalized_header_number().await?;
         let ranges = relayers
             .iter()
             .map(|item| item.valid_range.clone())
@@ -121,13 +108,13 @@ impl CrabRelayStrategy {
                 "[crab] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
                 nonce
             );
-            return true;
+            return Ok(true);
         }
         log::info!(
             "[crab] You aren't assigned relay. and this nonce({}) is ontime. so don't relay this",
             nonce
         );
-        false
+        Ok(false)
     }
 }
 
@@ -141,12 +128,43 @@ impl RelayStrategy for CrabRelayStrategy {
         &mut self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> bool {
-        let decide = self.handle(reference).await;
-        log::info!(
-            "[crab] About nonce {} decide is {}",
-            reference.nonce,
-            decide
-        );
-        decide
+        let mut times = 0;
+        loop {
+            times += 1;
+            if times > 5 {
+                log::error!(
+                    "[crab] Try decide failed many times ({}). so decide don't relay this nonce({}) at the moment",
+                    times,
+                    reference.nonce
+                );
+                return false;
+            }
+            let decide = match self.handle(reference).await {
+                Ok(v) => v,
+                Err(e) => {
+                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
+                        if client_error.is_connection_error() {
+                            log::debug!("[crab] Try reconnect to chain");
+                            if let Err(re) = self.api.reconnect().await {
+                                log::error!(
+                                    "[crab] Failed to reconnect substrate client: {:?}",
+                                    re
+                                );
+                                continue;
+                            }
+                        }
+                    }
+
+                    log::error!("[crab] Failed to decide relay: {:?}", e);
+                    continue;
+                }
+            };
+            log::info!(
+                "[crab] About nonce {} decide is {}",
+                reference.nonce,
+                decide
+            );
+            return decide;
+        }
     }
 }

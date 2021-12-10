@@ -33,7 +33,7 @@ impl PangoroRelayStrategy {
         SourceClient: MessageLaneSourceClient<P>,
         TargetClient: MessageLaneTargetClient<P>,
     >(
-        &mut self,
+        &self,
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> anyhow::Result<bool> {
         log::trace!(

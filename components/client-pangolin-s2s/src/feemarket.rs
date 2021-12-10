@@ -37,12 +37,13 @@ impl RelayStrategy for PangolinRelayStrategy {
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> bool {
         let nonce = &reference.nonce;
+        log::trace!("[pangolin] Determine whether to relay for nonce: {}", nonce);
         let order = self
             .api
             .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
             .await
             .map_err(|e| {
-                log::error!("Failed to query order: {:?}", e);
+                log::error!("[pangolin] Failed to query order: {:?}", e);
             })
             .unwrap_or(None);
 
@@ -52,6 +53,10 @@ impl RelayStrategy for PangolinRelayStrategy {
         // So, you can skip this currently
         // Related: https://github.com/darwinia-network/darwinia-common/blob/90add536ed320ec7e17898e695c65ee9d7ce79b0/frame/fee-market/src/lib.rs?#L177
         if order.is_none() {
+            log::info!(
+                "[pangolin] Not found order by nonce: {}, so decide don't relay this nonce",
+                nonce
+            );
             return false;
         }
         // -----
@@ -61,6 +66,10 @@ impl RelayStrategy for PangolinRelayStrategy {
 
         // If not have any assigned relayers, everyone participates in the relay.
         if relayers.is_empty() {
+            log::info!(
+                "[pangolin] Not found any assigned relayers so relay this nonce({}) anyway",
+                nonce
+            );
             return true;
         }
 
@@ -74,6 +83,10 @@ impl RelayStrategy for PangolinRelayStrategy {
         // Even though it is a timeout, although it will slash your deposit after the timeout is delivered,
         // you can still get relay rewards.
         if is_assigned_relayer {
+            log::info!(
+                "[pangolin] You are assigned relayer, you must be relay this nonce({})",
+                nonce
+            );
             return true;
         }
 
@@ -86,7 +99,7 @@ impl RelayStrategy for PangolinRelayStrategy {
             .await
             .map_err(|e| {
                 log::error!(
-                    "Failed to query latest block, unable to decide whether to participate: {:?}",
+                    "[pangolin] Failed to query latest block, unable to decide whether to participate: {:?}",
                     e
                 );
             })
@@ -102,8 +115,16 @@ impl RelayStrategy for PangolinRelayStrategy {
         }
         // If this order has timed out, decide to relay
         if latest_block_number > maximum_timeout {
+            log::info!(
+                "[pangolin] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
+                nonce
+            );
             return true;
         }
+        log::info!(
+            "[pangolin] You aren't assigned relay. and this nonce({}) is ontime. so don't relay this",
+            nonce
+        );
         false
     }
 }

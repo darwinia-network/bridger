@@ -36,7 +36,7 @@ impl PangoroRelayStrategy {
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> bool {
         log::trace!(
-            "[Pangoro] Determine whether to relay for nonce: {}",
+            "[pangoro] Determine whether to relay for nonce: {}",
             reference.nonce
         );
         let nonce = &reference.nonce;
@@ -45,7 +45,7 @@ impl PangoroRelayStrategy {
             .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
             .await
             .map_err(|e| {
-                log::error!("[Pangoro] Failed to query order: {:?}", e);
+                log::error!("[pangoro] Failed to query order: {:?}", e);
             })
             .unwrap_or(None);
 
@@ -55,9 +55,9 @@ impl PangoroRelayStrategy {
         // So, you can skip this currently
         // Related: https://github.com/darwinia-network/darwinia-common/blob/90add536ed320ec7e17898e695c65ee9d7ce79b0/frame/fee-market/src/lib.rs?#L177
         if order.is_none() {
-            log::trace!(
-                "[Pangoro] The order not found by nonce: {}",
-                reference.nonce
+            log::info!(
+                "[pangoro] Not found order by nonce: {}, so decide don't relay this nonce",
+                nonce
             );
             return false;
         }
@@ -68,6 +68,10 @@ impl PangoroRelayStrategy {
 
         // If not have any assigned relayers, everyone participates in the relay.
         if relayers.is_empty() {
+            log::info!(
+                "[pangoro] Not found any assigned relayers so relay this nonce({}) anyway",
+                nonce
+            );
             return true;
         }
 
@@ -81,6 +85,10 @@ impl PangoroRelayStrategy {
         // Even though it is a timeout, although it will slash your deposit after the timeout is delivered,
         // you can still get relay rewards.
         if is_assigned_relayer {
+            log::info!(
+                "[pangoro] You are assigned relayer, you must be relay this nonce({})",
+                nonce
+            );
             return true;
         }
 
@@ -93,7 +101,7 @@ impl PangoroRelayStrategy {
             .await
             .map_err(|e| {
                 log::error!(
-                    "[Pangoro] Failed to query latest block, unable to decide whether to participate: {:?}",
+                    "[pangoro] Failed to query latest block, unable to decide whether to participate: {:?}",
                     e
                 );
             })
@@ -109,11 +117,15 @@ impl PangoroRelayStrategy {
         }
         // If this order has timed out, decide to relay
         if latest_block_number > maximum_timeout {
+            log::info!(
+                "[pangoro] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
+                nonce
+            );
             return true;
         }
-        log::trace!(
-            "[Pangoro] Decided not to relay this nonce : {}",
-            reference.nonce
+        log::info!(
+            "[pangoro] You aren't assigned relay. and this nonce({}) is ontime. so don't relay this",
+            nonce
         );
         false
     }
@@ -131,7 +143,7 @@ impl RelayStrategy for PangoroRelayStrategy {
     ) -> bool {
         let decide = self.handle(reference).await;
         log::info!(
-            "[Pangoro] About nonce {} decide is {}",
+            "[pangoro] About nonce {} decide is {}",
             reference.nonce,
             decide
         );

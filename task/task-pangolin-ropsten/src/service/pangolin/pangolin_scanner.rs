@@ -1,3 +1,4 @@
+use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -25,11 +26,16 @@ pub struct PangolinScanner;
 impl PangolinScanner {
     pub async fn start(
         &self,
+        microkv: NamespaceMicroKV,
         tracker: Tracker,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) {
         while let Err(err) = self
-            .run(tracker.clone(), sender_to_extrinsics.clone())
+            .run(
+                microkv.clone(),
+                tracker.clone(),
+                sender_to_extrinsics.clone(),
+            )
             .await
         {
             log::error!(
@@ -44,6 +50,7 @@ impl PangolinScanner {
 
     async fn run(
         &self,
+        microkv: NamespaceMicroKV,
         tracker: Tracker,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> anyhow::Result<()> {
@@ -105,7 +112,8 @@ impl PangolinScanner {
                 ScanScheduleAuthoritiesChangeEvent::new(&mut wrapper);
             let max_1 = scan_schedule_authorities_change_event.handle().await?;
 
-            let mut scan_schedule_mmr_root_event = ScanScheduleMMRRootEvent::new(&mut wrapper);
+            let mut scan_schedule_mmr_root_event =
+                ScanScheduleMMRRootEvent::new(&mut wrapper, microkv.clone());
             scan_schedule_mmr_root_event.handle().await?;
 
             let max_block_number = std::cmp::max(max_0, max_1);

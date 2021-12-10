@@ -1,4 +1,5 @@
 use lifeline::Sender;
+use microkv::namespace::NamespaceMicroKV;
 
 use bridge_traits::bridge::task::BridgeSand;
 
@@ -8,15 +9,12 @@ use crate::task::PangolinRopstenTask;
 
 pub struct ScanScheduleMMRRootEvent<'a> {
     data: &'a mut ScanDataWrapper,
-    latest_submitted: Option<u32>,
+    microkv: NamespaceMicroKV,
 }
 
 impl<'a> ScanScheduleMMRRootEvent<'a> {
-    pub fn new(data: &'a mut ScanDataWrapper) -> Self {
-        Self {
-            data,
-            latest_submitted: None,
-        }
+    pub fn new(data: &'a mut ScanDataWrapper, microkv: NamespaceMicroKV) -> Self {
+        Self { data, microkv }
     }
 }
 
@@ -38,7 +36,9 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         if latest.emitted == 1 {
             log::info!(
                 target: PangolinRopstenTask::NAME,
-                "[pangolin] The latest ScheduleMMRRootEvent is emitted. don't do this again."
+                "[pangolin] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. don't do this again.",
+                latest.event_block_number,
+                latest.at_block_number
             );
             return Ok(());
         } else {
@@ -80,7 +80,8 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             return Ok(());
         }
 
-        if Some(event_block_number) == self.latest_submitted {
+        let saved_latest: Option<u32> = self.microkv.get_as("latest_mmr_root_sign")?;
+        if Some(event_block_number) == saved_latest {
             log::info!(
                 target: PangolinRopstenTask::NAME,
                 "[pangolin] This event block number ({}) is already submitted. Don't submit again.",
@@ -118,7 +119,8 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         let ex = Extrinsic::SignAndSendMmrRoot(latest.event_block_number);
         sender.send(ToExtrinsicsMessage::Extrinsic(ex)).await?;
 
-        self.latest_submitted = Some(event_block_number);
+        self.microkv
+            .put("latest_mmr_root_sign", &event_block_number)?;
         Ok(())
     }
 }

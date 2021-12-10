@@ -34,7 +34,7 @@ impl RedeemHandler {
                 Err(err) => {
                     log::error!(
                         target: PangolinRopstenTask::NAME,
-                        "Failed to create redeem handler, times: [{}] err: {:#?}",
+                        "[ropsten] Failed to create redeem handler, times: [{}] err: {:#?}",
                         times,
                         err
                     );
@@ -75,28 +75,29 @@ impl RedeemHandler {
 }
 
 impl RedeemHandler {
-    pub async fn redeem(&mut self, tx: TransactionEntity) -> anyhow::Result<()> {
+    pub async fn redeem(&mut self, tx: TransactionEntity) -> anyhow::Result<Option<u64>> {
         log::trace!(
             target: PangolinRopstenTask::NAME,
-            "Try to redeem ethereum tx {:?}...",
-            tx.tx_hash
+            "[ropsten] Try to redeem ethereum tx {:?}... in block {}",
+            tx.tx_hash,
+            tx.block_number
         );
 
         // 1. Checking before redeem
         if helpers::is_verified(&self.darwinia.darwinia, &tx).await? {
             log::trace!(
                 target: PangolinRopstenTask::NAME,
-                "Ethereum tx {:?} redeemed",
+                "[ropsten] Ethereum tx {:?} redeemed",
                 tx.tx_hash
             );
-            return Ok(());
+            return Ok(Some(tx.block_number));
         }
 
         let last_confirmed = self.darwinia.last_confirmed().await?;
         if tx.block_number >= last_confirmed {
             log::trace!(
                 target: PangolinRopstenTask::NAME,
-                "Ethereum tx {:?}'s block {} is large than last confirmed block {}",
+                "[ropsten] Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
                 tx.block_number,
                 last_confirmed,
@@ -105,17 +106,23 @@ impl RedeemHandler {
             self.sender_to_redeem
                 .send(ToRedeemMessage::EthereumTransaction(tx))
                 .await?;
-            return Ok(());
+            return Ok(None);
         }
 
         // 2. Do redeem
         let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
 
         let ex = Extrinsic::Redeem(proof, tx.clone());
+        log::info!(
+            target: PangolinRopstenTask::NAME,
+            "[ropsten] Redeem extrinsic send to extrinsics service: {:?}. at ropsten block: {}",
+            ex,
+            tx.block_number
+        );
         self.sender_to_extrinsics
             .send(ToExtrinsicsMessage::Extrinsic(ex))
             .await?;
 
-        Ok(())
+        Ok(Some(tx.block_number.clone()))
     }
 }

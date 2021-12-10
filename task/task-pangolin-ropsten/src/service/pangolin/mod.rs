@@ -33,14 +33,18 @@ impl lifeline::Service for PangolinService {
 
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
-        let tracker = Tracker::new(microkv, "scan.pangolin");
+        let tracker = Tracker::new(microkv.clone(), "scan.pangolin");
 
         let _greet = Self::try_task(
             &format!("{}-service-pangolin-scan", PangolinRopstenTask::NAME),
             async move {
                 let scanner = PangolinScanner;
                 scanner
-                    .start(tracker.clone(), sender_to_extrinsics.clone())
+                    .start(
+                        microkv.clone(),
+                        tracker.clone(),
+                        sender_to_extrinsics.clone(),
+                    )
                     .await;
                 Ok(())
             },

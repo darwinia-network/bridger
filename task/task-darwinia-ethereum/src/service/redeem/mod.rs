@@ -71,7 +71,7 @@ impl Service for RedeemService {
                         if let Err(err) = handler.redeem(tx.clone()).await {
                             log::error!(
                                 target: DarwiniaEthereumTask::NAME,
-                                "redeem err: {:#?}",
+                                "[ethereum] redeem err: {:#?}",
                                 err
                             );
                             // TODO: Consider the errors more carefully
@@ -123,7 +123,7 @@ async fn start_scan(
     {
         log::error!(
             target: DarwiniaEthereumTask::NAME,
-            "ethereum redeem err {:?}",
+            "[ethereum] redeem err {:?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -168,31 +168,72 @@ async fn run_scan(
             .await;
             continue;
         }
+        log::debug!(
+            target: DarwiniaEthereumTask::NAME,
+            "[ethereum] Found {} transactions wait to redeem",
+            txs.len()
+        );
 
+        let mut latest_redeem_block_number = None;
         // send transactions to redeem
         for tx in &txs {
             let mut times = 0;
-            while let Err(e) = handler.redeem(tx.clone()).await {
-                tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-                times += 1;
-                handler =
-                    RedeemHandler::new(sender_to_extrinsics.clone(), sender_to_redeem.clone())
-                        .await;
-                if times > 10 {
-                    // todo: write log
-                    log::error!(
+            match handler.redeem(tx.clone()).await {
+                Ok(Some(latest)) => {
+                    log::trace!(
                         target: DarwiniaEthereumTask::NAME,
-                        "Failed to send redeem message. tx: {:?}, err: {:?}",
-                        tx,
-                        e
+                        "[ethereum] Change latest redeemed block number to: {}",
+                        latest
+                    );
+                    latest_redeem_block_number = Some(latest);
+                }
+                Ok(None) => {
+                    log::trace!(
+                        target: DarwiniaEthereumTask::NAME,
+                        "[ethereum] Latest redeemed block number is: {:?}",
+                        latest_redeem_block_number
                     );
                     break;
+                }
+                Err(e) => {
+                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                    times += 1;
+                    handler =
+                        RedeemHandler::new(sender_to_extrinsics.clone(), sender_to_redeem.clone())
+                            .await;
+                    if times > 10 {
+                        // todo: write log
+                        log::error!(
+                            target: DarwiniaEthereumTask::NAME,
+                            "[ethereum] Failed to send redeem message. tx: {:?}, err: {:?}",
+                            tx,
+                            e
+                        );
+                        break;
+                    }
                 }
             }
         }
 
-        let latest = txs.last().unwrap();
-        tracker.finish(latest.block_number as usize)?;
+        if latest_redeem_block_number.is_none() {
+            log::info!(
+                target: DarwiniaEthereumTask::NAME,
+                "[ethereum] Not have any block redeemed. please wait affirm"
+            );
+            tokio::time::sleep(std::time::Duration::from_secs(
+                task_config.interval_ethereum,
+            ))
+            .await;
+            continue;
+        }
+
+        let latest = latest_redeem_block_number.unwrap();
+        log::info!(
+            target: DarwiniaEthereumTask::NAME,
+            "[ethereum] Set scan redeem block number to: {}",
+            latest
+        );
+        tracker.finish(latest as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,
         ))

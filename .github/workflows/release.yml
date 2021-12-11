@@ -37,7 +37,7 @@ jobs:
         run: |
           curl https://www.openssl.org/source/openssl-1.1.1l.tar.gz | tar xz
           cd openssl-1.1.1l
-          ./config --prefix=${{ env.OPENSSL_DIR }} -static
+          ./config --prefix=${{ env.OPENSSL_DIR }} -static -fPIC
           make -j4
           make install
 

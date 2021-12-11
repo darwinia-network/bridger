@@ -26,6 +26,14 @@ jobs:
             make gcc g++ clang-4.0 \
             libssl-dev pkg-config
 
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          target: wasm32-unknown-unknown
+          components: clippy
+
       - name: Build openssl
         run: |
           curl https://www.openssl.org/source/openssl-1.1.1l.tar.gz | tar xz

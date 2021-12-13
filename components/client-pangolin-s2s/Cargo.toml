@@ -25,19 +25,19 @@ log = "0.4"
 bridge-traits = { path = "../../traits" }
 
 codec                  = { package = "parity-scale-codec", version = "2.3.1" }
-headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "realtime-version-darwinia" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "realtime-version-darwinia" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "realtime-version-darwinia" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "realtime-version-darwinia" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "realtime-version-darwinia" }
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "realtime-version-darwinia" }
+headers-relay          = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
 
 ## Bridge dependencies
-pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
-drml-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
-drml-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
-darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
-dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
+pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+drml-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+drml-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
 
 
 

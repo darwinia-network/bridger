@@ -3,8 +3,8 @@ use std::time::Duration;
 use bridge_traits::bridge::chain::{BridgeChain, ChainCategory};
 use codec::{Compact, Decode, Encode};
 use relay_substrate_client::{
-    BalanceOf, Chain, ChainBase, ChainWithBalances, IndexOf, SignParam, TransactionEraOf,
-    TransactionSignScheme, UnsignedTransaction,
+    BalanceOf, Chain, ChainBase, ChainWithBalances, IndexOf, SignParam, TransactionSignScheme,
+    UnsignedTransaction,
 };
 use sp_core::{storage::StorageKey, Pair};
 use sp_runtime::{generic::SignedPayload, traits::IdentifyAccount};

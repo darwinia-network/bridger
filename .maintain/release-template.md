@@ -2,16 +2,15 @@
 
 ## Upgrade Guide
 
-Fixed several bugs for substrate to substrate bridges.
-There is a [known bug](https://github.com/darwinia-network/bridger/issues/343) in this version for ethereum bridge, please use v0.4.5 instead.
-
 ## Added
 
-None
+- https://github.com/darwinia-network/bridger/pull/358
 
 ## Changed
 
-- Bug Fixes
+- https://github.com/darwinia-network/bridger/pull/357
+- https://github.com/darwinia-network/bridger/pull/356
+- https://github.com/darwinia-network/bridger/pull/361
 
 ## Resources
 
@@ -33,12 +32,12 @@ docker pull quay.io/darwinia-network/bridger:sha-{{ sha }}
 
 | bridge            | doc                                                   |
 | ----------------- | ----------------------------------------------------- |
-| darwinia-ethereum | [Guide](../task/task-darwinia-ethereum/docs/Guide.md) |
-| pangolin-ropsten  | [Guide](../task/task-pangolin-ropsten/docs/Guide.md)  |
-| pangolin-pangoro  | [Guide](../task/task-pangolin-pangoro/docs/Guide.md)  |
-| darwinia-crab     | [Guide](../task/task-darwinia-crab/docs/Guide.md)     |
+| darwinia-ethereum | [Guide](https://github.com/darwinia-network/bridger/blob/master/task/task-darwinia-ethereum/docs/Guide.md) |
+| pangolin-ropsten  | [Guide](https://github.com/darwinia-network/bridger/blob/master/task/task-pangolin-ropsten/docs/Guide.md)  |
+| pangolin-pangoro  | [Guide](https://github.com/darwinia-network/bridger/blob/master/task/task-pangolin-pangoro/docs/Guide.md)  |
+| darwinia-crab     | [Guide](https://github.com/darwinia-network/bridger/blob/master/task/task-darwinia-crab/docs/Guide.md)     |
 
 ***Known issue***
-https://github.com/darwinia-network/bridger/issues/343
-https://github.com/darwinia-network/bridger/issues/347
+
+- https://github.com/darwinia-network/bridger/issues/319
 

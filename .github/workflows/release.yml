@@ -7,36 +7,37 @@ on:
 env:
   OPENSSL_DIR: /home/runner/openssl
   OPENSSL_STATIC: 1
-  ZLIB_DIR: /home/runner/zlib
-  LIBZ_SYS_STATIC: 1
 
 jobs:
   build-package:
     name: Build package
     runs-on: ubuntu-latest
     container:
-      image: rust:1
+      image: ubuntu:16.04
     steps:
       - uses: actions/checkout@v2
 
-      - name: Specify toolchain
+      - name: Install dependencies
         run: |
-          rustup default nightly
-          rustup target add wasm32-unknown-unknown
+          apt update -y
+          apt install --no-install-recommends -y \
+            git curl ca-certificates \
+            make gcc g++ clang-4.0 \
+            libssl-dev pkg-config
+
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2021-12-07
+          override: true
+          target: wasm32-unknown-unknown
+          components: clippy
 
       - name: Build openssl
         run: |
           curl https://www.openssl.org/source/openssl-1.1.1l.tar.gz | tar xz
           cd openssl-1.1.1l
-          ./config --prefix=${{ env.OPENSSL_DIR }} -static
-          make -j4
-          make install
-
-      - name: Build zlib
-        run: |
-          curl -L https://github.com/madler/zlib/archive/refs/tags/v1.2.11.tar.gz | tar xz
-          cd zlib-1.2.11
-          ./configure --prefix=/root/${{ env.ZLIB_DIR }} --static
+          ./config --prefix=${{ env.OPENSSL_DIR }} -static -fPIC
           make -j4
           make install
 
@@ -48,7 +49,7 @@ jobs:
           restore-keys: ${{ runner.os }}-bridger-
 
       - name: Build bridger
-        run: RUSTFLAGS="-C target-feature=+crt-static -L ${{ env.ZLIB_DIR }}" cargo b --release --target x86_64-unknown-linux-gnu
+        run: cargo build --release --target x86_64-unknown-linux-gnu
 
       - name: Collect shared
         run: |

@@ -62,7 +62,9 @@ mod s2s_const {
 mod s2s_headers {
     use bp_header_chain::justification::GrandpaJustification;
     use codec::Encode;
-    use relay_substrate_client::{Client, IndexOf, TransactionSignScheme, UnsignedTransaction};
+    use relay_substrate_client::{
+        Client, IndexOf, SignParam, TransactionSignScheme, UnsignedTransaction,
+    };
     use sp_core::{Bytes, Pair};
     use substrate_relay_helper::finality_pipeline::{
         SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate,
@@ -120,7 +122,7 @@ mod s2s_headers {
             transaction_nonce: IndexOf<PangoroChain>,
             header: component_pangolin_s2s::SyncHeader,
             proof: GrandpaJustification<drml_common_primitives::Header>,
-        ) -> Bytes {
+        ) -> relay_substrate_client::Result<Bytes> {
             let call = pangoro_runtime::BridgeGrandpaCall::<
                 pangoro_runtime::Runtime,
                 pangoro_runtime::WithPangolinGrandpa,
@@ -128,14 +130,21 @@ mod s2s_headers {
             .into();
 
             let genesis_hash = *self.finality_pipeline.target_client.genesis_hash();
-            let transaction = PangoroChain::sign_transaction(
+            let runtime_version = self
+                .finality_pipeline
+                .target_client
+                .runtime_version()
+                .await?;
+            let transaction = PangoroChain::sign_transaction(SignParam {
+                spec_version: runtime_version.spec_version,
+                transaction_version: runtime_version.transaction_version,
                 genesis_hash,
-                &self.finality_pipeline.target_sign,
+                signer: self.finality_pipeline.target_sign.clone(),
                 era,
-                UnsignedTransaction::new(call, transaction_nonce),
-            );
+                unsigned: UnsignedTransaction::new(call, transaction_nonce),
+            });
 
-            Bytes(transaction.encode())
+            Ok(Bytes(transaction.encode()))
         }
     }
 
@@ -151,7 +160,9 @@ mod s2s_messages {
     use frame_support::dispatch::GetDispatchInfo;
     use frame_support::weights::Weight;
     use messages_relay::message_lane::MessageLane;
-    use relay_substrate_client::{Client, IndexOf, TransactionSignScheme, UnsignedTransaction};
+    use relay_substrate_client::{
+        Client, IndexOf, SignParam, TransactionSignScheme, UnsignedTransaction,
+    };
     use relay_utils::metrics::MetricsParams;
     use sp_core::{Bytes, Pair};
     use substrate_relay_helper::messages_lane::{
@@ -225,7 +236,7 @@ mod s2s_messages {
             transaction_nonce: IndexOf<PangolinChain>,
             _generated_at_block: component_pangoro_s2s::HeaderId,
             proof: <Self::MessageLane as MessageLane>::MessagesReceivingProof,
-        ) -> Bytes {
+        ) -> relay_substrate_client::Result<Bytes> {
             let (relayers_state, proof) = proof;
             let call: pangolin_runtime::Call =
                 pangolin_runtime::BridgeMessagesCall::receive_messages_delivery_proof::<
@@ -235,12 +246,15 @@ mod s2s_messages {
                 .into();
             let call_weight = call.get_dispatch_info().weight;
             let genesis_hash = *self.message_lane.source_client.genesis_hash();
-            let transaction = PangolinChain::sign_transaction(
+            let runtime_version = self.message_lane.source_client.runtime_version().await?;
+            let transaction = PangolinChain::sign_transaction(SignParam {
+                spec_version: runtime_version.spec_version,
+                transaction_version: runtime_version.transaction_version,
                 genesis_hash,
-                &self.message_lane.source_sign,
-                relay_substrate_client::TransactionEra::immortal(),
-                UnsignedTransaction::new(call, transaction_nonce),
-            );
+                signer: self.message_lane.source_sign.clone(),
+                era: relay_substrate_client::TransactionEra::immortal(),
+                unsigned: UnsignedTransaction::new(call, transaction_nonce),
+            });
             log::trace!(
                 target: "bridge",
                 "Prepared {} -> {} confirmation transaction. Weight: {}/{}, size: {}/{}",
@@ -251,7 +265,7 @@ mod s2s_messages {
                 transaction.encode().len(),
                 common_runtime::max_extrinsic_size(),
             );
-            Bytes(transaction.encode())
+            Ok(Bytes(transaction.encode()))
         }
 
         fn target_transactions_author(&self) -> drml_common_primitives::AccountId {
@@ -264,7 +278,7 @@ mod s2s_messages {
             _generated_at_header: component_pangolin_s2s::HeaderId,
             _nonces: RangeInclusive<MessageNonce>,
             proof: <Self::MessageLane as MessageLane>::MessagesProof,
-        ) -> Bytes {
+        ) -> relay_substrate_client::Result<Bytes> {
             let (dispatch_weight, proof) = proof;
             let FromBridgedChainMessagesProof {
                 ref nonces_start,
@@ -285,12 +299,15 @@ mod s2s_messages {
                 .into();
             let call_weight = call.get_dispatch_info().weight;
             let genesis_hash = *self.message_lane.target_client.genesis_hash();
-            let transaction = PangoroChain::sign_transaction(
+            let runtime_version = self.message_lane.target_client.runtime_version().await?;
+            let transaction = PangoroChain::sign_transaction(SignParam {
+                spec_version: runtime_version.spec_version,
+                transaction_version: runtime_version.transaction_version,
                 genesis_hash,
-                &self.message_lane.target_sign,
-                relay_substrate_client::TransactionEra::immortal(),
-                UnsignedTransaction::new(call, transaction_nonce),
-            );
+                signer: self.message_lane.target_sign.clone(),
+                era: relay_substrate_client::TransactionEra::immortal(),
+                unsigned: UnsignedTransaction::new(call, transaction_nonce),
+            });
             log::trace!(
                 target: "bridge",
                 "Prepared {} -> {} delivery transaction. Weight: {}/{}, size: {}/{}",
@@ -301,7 +318,7 @@ mod s2s_messages {
                 transaction.encode().len(),
                 common_runtime::max_extrinsic_size(),
             );
-            Bytes(transaction.encode())
+            Ok(Bytes(transaction.encode()))
         }
     }
 

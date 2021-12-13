@@ -104,6 +104,7 @@ mod s2s_headers {
         }
     }
 
+    #[async_trait::async_trait]
     impl SubstrateFinalitySyncPipeline for PangolinFinalityToPangoro {
         type FinalitySyncPipeline = FinalityPipelinePangolinFinalityToPangoro;
 
@@ -116,7 +117,7 @@ mod s2s_headers {
             (*self.finality_pipeline.target_sign.public().as_array_ref()).into()
         }
 
-        fn make_submit_finality_proof_transaction(
+        async fn make_submit_finality_proof_transaction(
             &self,
             era: bp_runtime::TransactionEraOf<PangoroChain>,
             transaction_nonce: IndexOf<PangoroChain>,
@@ -195,6 +196,7 @@ mod s2s_messages {
         message_lane: MessageLanePangolinMessagesToPangoro,
     }
 
+    #[async_trait::async_trait]
     impl SubstrateMessageLane for PangolinMessagesToPangoro {
         type MessageLane = MessageLanePangolinMessagesToPangoro;
 
@@ -231,7 +233,7 @@ mod s2s_messages {
             (*self.message_lane.source_sign.public().as_array_ref()).into()
         }
 
-        fn make_messages_receiving_proof_transaction(
+        async fn make_messages_receiving_proof_transaction(
             &self,
             transaction_nonce: IndexOf<PangolinChain>,
             _generated_at_block: component_pangoro_s2s::HeaderId,
@@ -272,7 +274,7 @@ mod s2s_messages {
             (*self.message_lane.target_sign.public().as_array_ref()).into()
         }
 
-        fn make_messages_delivery_transaction(
+        async fn make_messages_delivery_transaction(
             &self,
             transaction_nonce: IndexOf<PangoroChain>,
             _generated_at_header: component_pangolin_s2s::HeaderId,

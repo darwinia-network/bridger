@@ -65,7 +65,7 @@ impl TransactionSignScheme for PangolinChain {
 
     fn sign_transaction(param: SignParam<Self>) -> Self::SignedTransaction {
         let raw_payload = SignedPayload::from_raw(
-            param.unsigned.call,
+            param.unsigned.call.clone(),
             (
                 frame_system::CheckSpecVersion::<pangolin_runtime::Runtime>::new(),
                 frame_system::CheckTxVersion::<pangolin_runtime::Runtime>::new(),
@@ -88,7 +88,7 @@ impl TransactionSignScheme for PangolinChain {
             ),
         );
         let signature = raw_payload.using_encoded(|payload| param.signer.sign(payload));
-        let signer: sp_runtime::MultiSigner = signer.public().into();
+        let signer: sp_runtime::MultiSigner = param.signer.public().into();
         let (call, extra, _) = raw_payload.deconstruct();
 
         pangolin_runtime::UncheckedExtrinsic::new_signed(

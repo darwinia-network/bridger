@@ -4,7 +4,9 @@ use dp_fee::{Order, Relayer};
 use drml_common_primitives::AccountId;
 use drml_common_primitives::Balance;
 use drml_common_primitives::BlockNumber;
-use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
+use relay_substrate_client::{
+    ChainBase, Client, SignParam, TransactionSignScheme, UnsignedTransaction,
+};
 use relay_utils::relay_loop::Client as RelayLoopClient;
 use sp_core::storage::StorageKey;
 use sp_core::{Bytes, Pair};
@@ -97,20 +99,23 @@ impl PangoroApi {
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
         let genesis_hash = *self.client.genesis_hash();
+        let runtime_version = self.client.runtime_version().await?;
         self.client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
-                Bytes(
-                    PangoroChain::sign_transaction(
+                Ok(Bytes(
+                    PangoroChain::sign_transaction(SignParam {
+                        spec_version: runtime_version.spec_version,
+                        transaction_version: runtime_version.transaction_version,
                         genesis_hash,
-                        &signer,
-                        relay_substrate_client::TransactionEra::immortal(),
-                        UnsignedTransaction::new(
+                        signer,
+                        era: relay_substrate_client::TransactionEra::immortal(),
+                        unsigned: UnsignedTransaction::new(
                             pangoro_runtime::FeeMarketCall::update_relay_fee(amount).into(),
                             transaction_nonce,
                         ),
-                    )
+                    })
                     .encode(),
-                )
+                ))
             })
             .await?;
         Ok(())
@@ -124,20 +129,23 @@ impl PangoroApi {
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
         let genesis_hash = *self.client.genesis_hash();
+        let runtime_version = self.client.runtime_version().await?;
         self.client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
-                Bytes(
-                    PangoroChain::sign_transaction(
+                Ok(Bytes(
+                    PangoroChain::sign_transaction(SignParam {
+                        spec_version: runtime_version.spec_version,
+                        transaction_version: runtime_version.transaction_version,
                         genesis_hash,
-                        &signer,
-                        relay_substrate_client::TransactionEra::immortal(),
-                        UnsignedTransaction::new(
+                        signer,
+                        era: relay_substrate_client::TransactionEra::immortal(),
+                        unsigned: UnsignedTransaction::new(
                             pangoro_runtime::FeeMarketCall::update_locked_collateral(amount).into(),
                             transaction_nonce,
                         ),
-                    )
+                    })
                     .encode(),
-                )
+                ))
             })
             .await?;
         Ok(())

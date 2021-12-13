@@ -3,7 +3,7 @@
 use bridge_traits::bridge::chain::{BridgeChain, ChainCategory};
 use codec::{Compact, Decode, Encode};
 use relay_substrate_client::{
-    BalanceOf, Chain, ChainBase, ChainWithBalances, IndexOf, TransactionEraOf,
+    BalanceOf, Chain, ChainBase, ChainWithBalances, IndexOf, SignParam, TransactionEraOf,
     TransactionSignScheme, UnsignedTransaction,
 };
 use sp_core::{storage::StorageKey, Pair};
@@ -63,14 +63,9 @@ impl TransactionSignScheme for CrabChain {
     type AccountKeyPair = sp_core::sr25519::Pair;
     type SignedTransaction = crab_runtime::UncheckedExtrinsic;
 
-    fn sign_transaction(
-        genesis_hash: <Self::Chain as ChainBase>::Hash,
-        signer: &Self::AccountKeyPair,
-        _era: TransactionEraOf<Self::Chain>,
-        unsigned: UnsignedTransaction<Self::Chain>,
-    ) -> Self::SignedTransaction {
+    fn sign_transaction(param: SignParam<Self>) -> Self::SignedTransaction {
         let raw_payload = SignedPayload::from_raw(
-            unsigned.call,
+            param.unsigned.call.clone(),
             (
                 frame_system::CheckSpecVersion::<crab_runtime::Runtime>::new(),
                 frame_system::CheckTxVersion::<crab_runtime::Runtime>::new(),
@@ -78,24 +73,24 @@ impl TransactionSignScheme for CrabChain {
                 frame_system::CheckEra::<crab_runtime::Runtime>::from(
                     sp_runtime::generic::Era::Immortal,
                 ),
-                frame_system::CheckNonce::<crab_runtime::Runtime>::from(unsigned.nonce),
+                frame_system::CheckNonce::<crab_runtime::Runtime>::from(param.unsigned.nonce),
                 frame_system::CheckWeight::<crab_runtime::Runtime>::new(),
                 pallet_transaction_payment::ChargeTransactionPayment::<crab_runtime::Runtime>::from(
-                    unsigned.tip,
+                    param.unsigned.tip,
                 ),
             ),
             (
-                crab_runtime::VERSION.spec_version,
-                crab_runtime::VERSION.transaction_version,
-                genesis_hash,
-                genesis_hash, //era.signed_payload(genesis_hash),
+                param.spec_version,
+                param.transaction_version,
+                param.genesis_hash,
+                param.genesis_hash, //era.signed_payload(genesis_hash),
                 (),
                 (),
                 (),
             ),
         );
-        let signature = raw_payload.using_encoded(|payload| signer.sign(payload));
-        let signer: sp_runtime::MultiSigner = signer.public().into();
+        let signature = raw_payload.using_encoded(|payload| param.signer.sign(payload));
+        let signer: sp_runtime::MultiSigner = param.signer.public().into();
         let (call, extra, _) = raw_payload.deconstruct();
 
         crab_runtime::UncheckedExtrinsic::new_signed(

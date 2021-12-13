@@ -4,7 +4,9 @@ use darwinia_common_primitives::AccountId;
 use darwinia_common_primitives::Balance;
 use darwinia_common_primitives::BlockNumber;
 use dp_fee::{Order, Relayer};
-use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
+use relay_substrate_client::{
+    ChainBase, Client, SignParam, TransactionSignScheme, UnsignedTransaction,
+};
 use relay_utils::relay_loop::Client as RelayLoopClient;
 use sp_core::storage::StorageKey;
 use sp_core::{Bytes, Pair};
@@ -95,20 +97,23 @@ impl CrabApi {
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
         let genesis_hash = *self.client.genesis_hash();
+        let runtime_version = self.client.runtime_version().await?;
         self.client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
-                Bytes(
-                    CrabChain::sign_transaction(
+                Ok(Bytes(
+                    CrabChain::sign_transaction(SignParam {
+                        spec_version: runtime_version.spec_version,
+                        transaction_version: runtime_version.transaction_version,
                         genesis_hash,
-                        &signer,
-                        relay_substrate_client::TransactionEra::immortal(),
-                        UnsignedTransaction::new(
+                        signer,
+                        era: relay_substrate_client::TransactionEra::immortal(),
+                        unsigned: UnsignedTransaction::new(
                             crab_runtime::FeeMarketCall::update_relay_fee(amount).into(),
                             transaction_nonce,
                         ),
-                    )
+                    })
                     .encode(),
-                )
+                ))
             })
             .await?;
         Ok(())
@@ -122,20 +127,23 @@ impl CrabApi {
     ) -> anyhow::Result<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
         let genesis_hash = *self.client.genesis_hash();
+        let runtime_version = self.client.runtime_version().await?;
         self.client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
-                Bytes(
-                    CrabChain::sign_transaction(
+                Ok(Bytes(
+                    CrabChain::sign_transaction(SignParam {
+                        spec_version: runtime_version.spec_version,
+                        transaction_version: runtime_version.transaction_version,
                         genesis_hash,
-                        &signer,
-                        relay_substrate_client::TransactionEra::immortal(),
-                        UnsignedTransaction::new(
+                        signer,
+                        era: relay_substrate_client::TransactionEra::immortal(),
+                        unsigned: UnsignedTransaction::new(
                             crab_runtime::FeeMarketCall::update_locked_collateral(amount).into(),
                             transaction_nonce,
                         ),
-                    )
+                    })
                     .encode(),
-                )
+                ))
             })
             .await?;
         Ok(())

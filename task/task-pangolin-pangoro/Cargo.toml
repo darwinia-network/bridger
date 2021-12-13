@@ -64,13 +64,13 @@ component-pangoro-s2s  = { path = "../../components/client-pangoro-s2s" }
 component-subscan      = { path = "../../components/subscan" }
 
 ## darwinia common
-drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
-drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
-common-runtime          = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
+drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
+common-runtime          = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
 
 ## pangolin
-pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
 
 ## pangoro
-pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
 

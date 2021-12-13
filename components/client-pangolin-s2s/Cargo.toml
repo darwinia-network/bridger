@@ -33,11 +33,11 @@ bp-messages            = { git = "https://github.com/darwinia-network/parity-bri
 bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "realtime-version-darwinia" }
 
 ## Bridge dependencies
-pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
-drml-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
-drml-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
-darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
-dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
+drml-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
+drml-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
+darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
+dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "realtime-runtime" }
 
 
 

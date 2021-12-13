@@ -253,7 +253,7 @@ mod s2s_messages {
                 spec_version: runtime_version.spec_version,
                 transaction_version: runtime_version.transaction_version,
                 genesis_hash,
-                signer: self.message_lane.source_sign.clone(),
+                signer: self.message_lane.target_sign.clone(),
                 era: relay_substrate_client::TransactionEra::immortal(),
                 unsigned: UnsignedTransaction::new(call, transaction_nonce),
             });

@@ -302,7 +302,7 @@ mod s2s_messages {
                 .into();
             let call_weight = call.get_dispatch_info().weight;
             let genesis_hash = *self.message_lane.target_client.genesis_hash();
-            let runtime_version = self.message_lane.source_client.runtime_version().await?;
+            let runtime_version = self.message_lane.target_client.runtime_version().await?;
             let transaction = DarwiniaChain::sign_transaction(SignParam {
                 spec_version: runtime_version.spec_version,
                 transaction_version: runtime_version.transaction_version,

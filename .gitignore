@@ -1,6 +1,3 @@
 **/*.DS_Store
-/target
+target
 .idea
-darwinia/target
-primitives/target
-substrate-relay/target

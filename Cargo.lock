@@ -1332,8 +1332,8 @@ dependencies = [
 
 [[package]]
 name = "crab-runtime"
-version = "0.11.7"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#6459922d19dd119000fa807350e98081b1a0a5ed"
+version = "0.11.7-1"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=main#c163f512ae5afd7275a0af294654ca31a30abc2f"
 dependencies = [
  "array-bytes",
  "bp-message-dispatch",
@@ -1690,8 +1690,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-bridge-primitives"
-version = "0.11.7"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#6459922d19dd119000fa807350e98081b1a0a5ed"
+version = "0.11.7-1"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=main#c163f512ae5afd7275a0af294654ca31a30abc2f"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -1758,8 +1758,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-common-primitives"
-version = "0.11.7"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#6459922d19dd119000fa807350e98081b1a0a5ed"
+version = "0.11.7-1"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=main#c163f512ae5afd7275a0af294654ca31a30abc2f"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -1768,8 +1768,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-common-runtime"
-version = "0.11.7"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#6459922d19dd119000fa807350e98081b1a0a5ed"
+version = "0.11.7-1"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=main#c163f512ae5afd7275a0af294654ca31a30abc2f"
 dependencies = [
  "darwinia-balances",
  "darwinia-common-primitives",
@@ -2071,8 +2071,8 @@ dependencies = [
 
 [[package]]
 name = "darwinia-runtime"
-version = "0.11.7"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=master#6459922d19dd119000fa807350e98081b1a0a5ed"
+version = "0.11.7-1"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=main#c163f512ae5afd7275a0af294654ca31a30abc2f"
 dependencies = [
  "bp-message-dispatch",
  "bp-messages",

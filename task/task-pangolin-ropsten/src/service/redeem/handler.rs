@@ -102,10 +102,10 @@ impl RedeemHandler {
                 tx.block_number,
                 last_confirmed,
             );
-            tokio::time::sleep(std::time::Duration::from_secs(30)).await;
-            self.sender_to_redeem
-                .send(ToRedeemMessage::EthereumTransaction(tx))
-                .await?;
+            // tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+            // self.sender_to_redeem
+            //     .send(ToRedeemMessage::EthereumTransaction(tx))
+            //     .await?;
             return Ok(None);
         }
 

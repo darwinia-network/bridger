@@ -5,7 +5,7 @@ authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
 license = "MIT"
-documentation = "https://docs.rs/bridger"
+documentation = "https://rust-docs.darwinia.network/bridger"
 homepage = "https://github.com/darwinia-network/bridger"
 include = [
   "Cargo.toml",
@@ -23,3 +23,12 @@ name = "bridger"
 path = "src/main.rs"
 
 [dependencies]
+
+colored = "2"
+requestty = "0.1"
+
+tracing = "0.1"
+tracing-subscriber = "0.2"
+tracing-attributes = "0.1"
+color-eyre = "0.5"
+strum = { version = "0.21.0", features = ["derive"] }

@@ -69,7 +69,38 @@ impl Config {
 }
 
 impl Config {
-    fn raw_config(config: impl Serialize, format: &ConfigFormat) -> color_eyre::Result<String> {
+    /// Store without file format, if the config is exists will be replace it.
+    /// If not choose toml default.
+    pub fn store(name: Names, config: impl Serialize) -> color_eyre::Result<()> {
+        Self::new().persist(name.name(), config, None)
+    }
+
+    /// Store config to file, the name argument is file name
+    pub fn store_with_format(
+        name: Names,
+        config: impl Serialize,
+        format: ConfigFormat,
+    ) -> color_eyre::Result<()> {
+        Self::new().persist(name.name(), config, Some(format))
+    }
+
+    /// Restore config from file by name
+    pub fn restore<T: DeserializeOwned>(name: Names) -> color_eyre::Result<T> {
+        Self::new().load(name.name())
+    }
+
+    /// The config file is exists
+    pub fn exists(name: Names) -> color_eyre::Result<bool> {
+        Ok(Self::new().find_config_file(name.name())?.is_some())
+    }
+}
+
+impl Config {
+    fn raw_config(
+        &self,
+        config: impl Serialize,
+        format: &ConfigFormat,
+    ) -> color_eyre::Result<String> {
         let content = match format {
             ConfigFormat::Yml => serde_yaml::to_string(&config)?,
             ConfigFormat::Json => serde_json::to_string_pretty(&config)?,
@@ -79,54 +110,15 @@ impl Config {
                 toml::to_string(&value)?
             }
         };
-        tracing::trace!(target = "config", "raw config:\n {}", content);
+        // This is danger log output
+        // tracing::trace!(target: "config", "raw config: \n{}", content);
         Ok(content)
     }
-}
 
-impl Config {
-    /// Store config to file, the name argument is file name
-    pub fn store(
-        name: Names,
-        config: impl Serialize,
-        format: ConfigFormat,
-    ) -> color_eyre::Result<()> {
-        let raw_config = Self::raw_config(config, &format)?;
-        Self::new().persist(name.name(), raw_config, format)
-    }
-
-    /// Restore config from file by name
-    pub fn restore<T: DeserializeOwned>(name: Names) -> color_eyre::Result<T> {
-        Self::new().load(name.name())
-    }
-}
-
-impl Config {
-    fn persist(
+    fn find_config_file(
         &self,
         name: impl AsRef<str>,
-        config: String,
-        format: ConfigFormat,
-    ) -> color_eyre::Result<()> {
-        if !self.base_path.exists() {
-            std::fs::create_dir_all(&self.base_path)?;
-        }
-        let path = self
-            .base_path
-            .join(format!("{}.{}", name.as_ref(), format.extension()));
-        std::fs::write(path, config)?;
-        Ok(())
-    }
-
-    fn load<T: DeserializeOwned>(&self, name: impl AsRef<str>) -> color_eyre::Result<T> {
-        if !self.base_path.exists() {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
-                format!("The config path {:?} not found", &self.base_path),
-            )
-            .into());
-        }
-
+    ) -> color_eyre::Result<Option<(PathBuf, ConfigFormat)>> {
         let mut config_file = None;
         let read_dir = std::fs::read_dir(&self.base_path)?;
         for path in read_dir {
@@ -146,11 +138,66 @@ impl Config {
                 break;
             }
         }
-        let path = config_file.ok_or(BridgerError::Config(format!(
-            "Not found config file for name: {}",
-            name.as_ref()
-        )))?;
+        match config_file {
+            Some(v) => {
+                let extension = v
+                    .extension()
+                    .map(|v| v.to_str())
+                    .flatten()
+                    .map(|s| match &s.to_lowercase()[..] {
+                        "toml" => Some(ConfigFormat::Toml),
+                        "json" => Some(ConfigFormat::Json),
+                        "yml" => Some(ConfigFormat::Yml),
+                        _ => None,
+                    })
+                    .flatten();
+                match extension {
+                    Some(e) => Ok(Some((v, e))),
+                    None => Ok(None),
+                }
+            }
+            None => Ok(None),
+        }
+    }
 
+    fn persist(
+        &self,
+        name: impl AsRef<str>,
+        config: impl Serialize,
+        format: Option<ConfigFormat>,
+    ) -> color_eyre::Result<()> {
+        if !self.base_path.exists() {
+            std::fs::create_dir_all(&self.base_path)?;
+        }
+        let format = format.unwrap_or(
+            self.find_config_file(name.as_ref())?
+                .map(|(_, format)| format)
+                .unwrap_or(ConfigFormat::Toml),
+        );
+
+        let config = self.raw_config(config, &format)?;
+        let path = self
+            .base_path
+            .join(format!("{}.{}", name.as_ref(), format.extension()));
+        std::fs::write(path, config)?;
+        Ok(())
+    }
+
+    fn load<T: DeserializeOwned>(&self, name: impl AsRef<str>) -> color_eyre::Result<T> {
+        if !self.base_path.exists() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("The config path {:?} not found", &self.base_path),
+            )
+            .into());
+        }
+
+        let (path, _) = self
+            .find_config_file(name.as_ref())?
+            .ok_or(BridgerError::Config(format!(
+                "Not found config file for name: {}",
+                name.as_ref()
+            )))?;
         let mut c = config::Config::default();
         c.merge(config::File::from(path.clone()))?;
         let tc = c.try_into::<T>().map_err(|e| {

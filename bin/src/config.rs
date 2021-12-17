@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_with::rust::string_empty_as_none;
 
 use crate::command::types::RegistryType;
 
@@ -16,6 +17,7 @@ pub struct BridgerRegistry {
     #[serde(rename = "type")]
     pub type_: RegistryType,
     /// The path of registry
+    #[serde(with = "string_empty_as_none")]
     pub path: Option<String>,
 }
 

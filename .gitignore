@@ -3,5 +3,3 @@ target
 .idea
 
 /Cargo.lock
-bridger/Cargo.lock
-supports/Cargo.lock

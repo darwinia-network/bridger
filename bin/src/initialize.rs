@@ -1,7 +1,10 @@
+use crate::config::BridgerConfig;
+use support_config::{Config, ConfigFormat, Names};
 use tracing::Level;
 
 pub fn init() -> color_eyre::Result<()> {
     init_log()?;
+    init_default_config()?;
     Ok(())
 }
 
@@ -27,4 +30,9 @@ fn init_log() -> color_eyre::Result<()> {
 
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
     Ok(())
+}
+
+fn init_default_config() -> color_eyre::Result<()> {
+    let config = BridgerConfig::default();
+    Config::store(Names::Bridger, config, ConfigFormat::Toml)
 }

@@ -1,8 +1,23 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use support_common::error::BridgerError;
+
+/// The config names
+#[derive(Clone, Debug)]
+pub enum Names {
+    /// Bridger
+    Bridger,
+}
+
+impl Names {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Bridger => "bridger",
+        }
+    }
+}
 
 /// Config helpers. store config to file or restore from file
 #[derive(Debug)]
@@ -37,10 +52,18 @@ impl ConfigFormat {
 
 impl Config {
     fn new() -> Self {
-        let basic_path = dirs::home_dir()
+        let path_env = std::env::var("BRIDGER_HOME");
+        let is_from_env = path_env.is_ok();
+        let basic_path = path_env
+            .map(|v| Path::new(&v).join(""))
+            .ok()
+            .or(dirs::home_dir())
             .or(std::env::current_exe().ok())
             .unwrap_or(std::env::temp_dir());
-        let base_path = basic_path.join(".bridger");
+        let mut base_path = basic_path;
+        if !is_from_env {
+            base_path = base_path.join(".bridger");
+        }
         Self { base_path }
     }
 }
@@ -64,17 +87,17 @@ impl Config {
 impl Config {
     /// Store config to file, the name argument is file name
     pub fn store(
-        name: impl AsRef<str>,
+        name: Names,
         config: impl Serialize,
         format: ConfigFormat,
     ) -> color_eyre::Result<()> {
         let raw_config = Self::raw_config(config, &format)?;
-        Self::new().persist(name, raw_config, format)
+        Self::new().persist(name.name(), raw_config, format)
     }
 
     /// Restore config from file by name
-    pub fn restore<T: DeserializeOwned>(name: impl AsRef<str>) -> color_eyre::Result<()> {
-        Self::new().load(name)
+    pub fn restore<T: DeserializeOwned>(name: Names) -> color_eyre::Result<T> {
+        Self::new().load(name.name())
     }
 }
 

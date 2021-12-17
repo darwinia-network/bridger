@@ -14,6 +14,6 @@ pub enum Opt {
         #[structopt(long)]
         path: Option<String>,
     },
-    /// List all commands
+    /// List all bridges
     List,
 }

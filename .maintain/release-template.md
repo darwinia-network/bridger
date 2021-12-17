@@ -2,15 +2,9 @@
 
 ## Upgrade Guide
 
-## Added
-
-- https://github.com/darwinia-network/bridger/pull/358
-
 ## Changed
 
-- https://github.com/darwinia-network/bridger/pull/357
-- https://github.com/darwinia-network/bridger/pull/356
-- https://github.com/darwinia-network/bridger/pull/361
+- https://github.com/darwinia-network/bridger/pull/363
 
 ## Resources
 

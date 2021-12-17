@@ -41,22 +41,22 @@ impl Tracker {
 }
 
 impl Tracker {
-    pub fn is_running(&self) -> anyhow::Result<bool> {
+    pub fn is_running(&self) -> color_eyre::Result<bool> {
         self.read_bool(&self.key_running)
     }
 
-    pub fn stop_running(&self) -> anyhow::Result<()> {
+    pub fn stop_running(&self) -> color_eyre::Result<()> {
         self.microkv.put(&self.key_running, &false)?;
         Ok(())
     }
 
-    pub fn start_running(&self) -> anyhow::Result<()> {
+    pub fn start_running(&self) -> color_eyre::Result<()> {
         self.microkv.put(&self.key_running, &true)?;
         Ok(())
     }
 
     /// Read current value
-    pub async fn current(&self) -> anyhow::Result<usize> {
+    pub async fn current(&self) -> color_eyre::Result<usize> {
         let is_running = self.is_running()?;
         if !is_running {
             loop {
@@ -88,17 +88,17 @@ impl Tracker {
 
     /// Read the next value
     /// Generally the value is current+1, but if the planned have value, will use planned+1
-    pub async fn next(&self) -> anyhow::Result<usize> {
+    pub async fn next(&self) -> color_eyre::Result<usize> {
         self.current().await.map(|v| v + 1)
     }
 
     /// Update current
-    pub fn finish(&self, block: usize) -> anyhow::Result<()> {
+    pub fn finish(&self, block: usize) -> color_eyre::Result<()> {
         self.microkv.put(&self.key_current, &block)?;
         Ok(())
     }
 
-    pub fn planned(&self, block: usize) -> anyhow::Result<()> {
+    pub fn planned(&self, block: usize) -> color_eyre::Result<()> {
         self.microkv.put(&self.key_planned, &block)?;
         Ok(())
     }
@@ -106,7 +106,7 @@ impl Tracker {
 
 impl Tracker {
     /// Read bool value by a key
-    fn read_bool(&self, key: impl AsRef<str>) -> anyhow::Result<bool> {
+    fn read_bool(&self, key: impl AsRef<str>) -> color_eyre::Result<bool> {
         let value = self
             .microkv
             .get(key.as_ref())?
@@ -121,7 +121,7 @@ impl Tracker {
         Ok(false)
     }
 
-    fn read_u64(&self, key: impl AsRef<str>) -> anyhow::Result<Option<u64>> {
+    fn read_u64(&self, key: impl AsRef<str>) -> color_eyre::Result<Option<u64>> {
         let value = self.microkv.get(key.as_ref())?;
         match value {
             Some(v) => {

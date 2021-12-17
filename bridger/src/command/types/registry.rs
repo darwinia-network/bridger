@@ -1,6 +1,6 @@
-use strum::{EnumString, EnumVariantNames};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, EnumString, EnumVariantNames)]
+#[derive(Clone, Debug, Deserialize, Serialize, strum::EnumString, strum::EnumVariantNames)]
 #[strum(serialize_all = "kebab_case")]
 pub enum RegistryType {
     Local,

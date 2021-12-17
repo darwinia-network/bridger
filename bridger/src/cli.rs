@@ -11,6 +11,6 @@ pub fn execute(opt: Opt) -> color_eyre::Result<()> {
 fn run(opt: Opt) -> color_eyre::Result<()> {
     match opt {
         Opt::List => handler::exec_list(),
-        Opt::Registry => handler::handle_registry(),
+        Opt::Registry { type_, path } => handler::handle_registry(type_, path),
     }
 }

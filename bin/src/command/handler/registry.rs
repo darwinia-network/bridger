@@ -27,8 +27,8 @@ fn handle_set(type_: RegistryType, mut path: Option<String>) -> color_eyre::Resu
     let mut config: BridgerConfig = Config::restore(Names::Bridger)?;
     tracing::trace!(
         target: "bridger",
-        "Set registry [{:?}]{}",
-        type_,
+        "Set registry [{}]{}",
+        format!("{:?}", type_).cyan(),
         if let Some(v) = &path { format!(": {}", v) } else { Default::default() }
     );
     config.registry.type_ = type_;

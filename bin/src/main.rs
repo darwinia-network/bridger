@@ -5,6 +5,7 @@ use crate::command::types::Opt;
 mod cli;
 mod command;
 mod config;
+mod external;
 mod initialize;
 
 fn main() -> color_eyre::Result<()> {

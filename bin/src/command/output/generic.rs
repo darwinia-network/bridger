@@ -1,5 +1,8 @@
+#![allow(dead_code)]
+
 use std::process;
 
+use crate::command::types::OutputFormat;
 use colored::Colorize;
 
 pub fn output_ok() {
@@ -13,4 +16,13 @@ pub fn output_err_and_exit(msg: impl AsRef<str>) -> ! {
 
 pub fn output_err(msg: impl AsRef<str>) {
     eprintln!("{}", msg.as_ref().red());
+}
+
+pub fn output_text(text: impl AsRef<str>) {
+    println!("{}", text.as_ref());
+}
+
+pub fn unsupport_output_format(output: OutputFormat) {
+    let outf = format!("{:?}", output);
+    println!("Not support this format: [{}]", &outf[..].red());
 }

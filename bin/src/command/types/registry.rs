@@ -18,8 +18,8 @@ pub enum RegistryType {
 pub enum RegistryOpt {
     /// Set registry
     Set {
-        /// Registry type, support local|github|server, default is github
-        #[structopt(long = "type", default_value = "local")]
+        /// Registry type, support local|github|server
+        #[structopt(long = "type", default_value = "github")]
         type_: RegistryType,
         /// The path of registry
         #[structopt(long)]

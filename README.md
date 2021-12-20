@@ -59,7 +59,7 @@ The latest help texts are also available in `bridger --help`.
 
 ```
 $ bridger
-bridger 0.4.7
+bridger 0.4.11
 Darwinia bridger
 
 USAGE:

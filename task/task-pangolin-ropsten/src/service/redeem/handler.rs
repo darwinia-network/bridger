@@ -16,6 +16,7 @@ use crate::task::PangolinRopstenTask;
 
 pub struct RedeemHandler {
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+    #[allow(dead_code)]
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
     darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,

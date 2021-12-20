@@ -1,6 +1,10 @@
-use crate::config::BridgerConfig;
-use support_config::{Config, ConfigFormat, Names};
+use std::str::FromStr;
 use tracing::Level;
+use tracing_subscriber::EnvFilter;
+
+use support_config::{Config, ConfigFormat, Names};
+
+use crate::config::BridgerConfig;
 
 pub fn init() -> color_eyre::Result<()> {
     init_log()?;
@@ -14,20 +18,35 @@ fn init_log() -> color_eyre::Result<()> {
         std::env::set_var("RUST_SPANTRACE", "1");
         std::env::set_var("RUST_LIB_BACKTRACE", "full");
     }
-    let log_filter = std::env::var("RUST_LOG").unwrap_or_else(|_| {
-        let filter = "trace,hyper=error";
-        std::env::set_var("RUST_LOG", filter);
-        filter.to_string()
-    });
+
+    let def_log_filter = ["trace", "hyper=error"].join(",");
+
+    let use_json_adapter = std::env::var("LOG_ADAPTER")
+        .map(|v| &v.to_lowercase()[..] == "json")
+        .unwrap_or_default();
+    let max_log_level = std::env::var("LOG_MAX_LEVEL")
+        .map(|v| Level::from_str(&v).unwrap_or(Level::TRACE))
+        .unwrap_or(Level::TRACE);
+
+    if use_json_adapter {
+        let subscriber = tracing_subscriber::FmtSubscriber::builder()
+            .with_max_level(max_log_level)
+            .with_env_filter(
+                EnvFilter::try_from_default_env().unwrap_or(EnvFilter::from(def_log_filter)),
+            )
+            .json()
+            .finish();
+        tracing::subscriber::set_global_default(subscriber)
+            .expect("setting default subscriber failed");
+        return Ok(());
+    }
 
     let subscriber = tracing_subscriber::FmtSubscriber::builder()
-        // all spans/events with a level higher than TRACE (e.g, debug, info, warn, etc.)
-        // will be written to stdout.
-        .with_max_level(Level::TRACE)
-        .with_env_filter(log_filter)
-        // builds the subscriber.
+        .with_max_level(max_log_level)
+        .with_env_filter(
+            EnvFilter::try_from_default_env().unwrap_or(EnvFilter::from(def_log_filter)),
+        )
         .finish();
-
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
     Ok(())
 }

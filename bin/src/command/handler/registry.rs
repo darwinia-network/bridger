@@ -25,6 +25,12 @@ fn handle_set(type_: RegistryType, mut path: Option<String>) -> color_eyre::Resu
         output_err_and_exit("Please provide `--path <path>`");
     }
     let mut config: BridgerConfig = Config::restore(Names::Bridger)?;
+    tracing::trace!(
+        target: "bridger",
+        "Set registry [{:?}]{}",
+        type_,
+        if let Some(v) = &path { format!(": {}", v) } else { Default::default() }
+    );
     config.registry.type_ = type_;
     config.registry.path = path;
     Config::store(Names::Bridger, config)?;

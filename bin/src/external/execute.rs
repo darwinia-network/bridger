@@ -1,3 +1,4 @@
+use support_common::error::BridgerError;
 use support_config::{Config, Names};
 
 use crate::command::types::RegistryType;
@@ -22,6 +23,18 @@ impl ExternalExecutor {
 impl ExternalExecutor {
     /// Execute external subcommand
     pub fn execute(&self) -> color_eyre::Result<()> {
+        if support_common::constants::ALLOW_BINARY_PREFIX
+            .iter()
+            .find(|&&item| self.command.starts_with(item))
+            .is_none()
+        {
+            return Err(BridgerError::UnsupportExternal(format!(
+                "Not support this subcommand: {}",
+                self.command
+            ))
+            .into());
+        }
+
         let config: BridgerConfig = Config::restore(Names::Bridger)?;
         let registry = config.registry;
 

@@ -1,4 +1,5 @@
 use structopt::StructOpt;
+use support_common::error::BridgerError;
 
 use crate::command::types::Opt;
 use crate::external::execute::ExternalExecutor;
@@ -21,7 +22,12 @@ fn main() -> color_eyre::Result<()> {
                 let sub_command = &args_orig[1..2][0];
                 let sub_args = &args_orig[2..];
                 let executor = ExternalExecutor::new(sub_command.clone(), sub_args.to_vec());
-                executor.execute()?;
+                if let Err(ez) = executor.execute() {
+                    if let Some(BridgerError::UnsupportExternal(_msg)) = ez.downcast_ref() {
+                        e.exit();
+                    }
+                    return Err(ez);
+                }
                 return Ok(());
             }
             e.exit();

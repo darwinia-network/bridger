@@ -6,6 +6,9 @@ pub enum BridgerError {
     #[error("Config error: {0}")]
     Config(String),
 
+    #[error("Subcommand error: {0}")]
+    Subcommand(String),
+
     #[error("Custom error: {0}")]
     Custom(String),
 

@@ -26,3 +26,5 @@ tracing = "0.1"
 tracing-subscriber = "0.2"
 tracing-attributes = "0.1"
 color-eyre = "0.5"
+
+tokio = { version = "1", features = ["full"] }

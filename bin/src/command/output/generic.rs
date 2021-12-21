@@ -2,8 +2,9 @@
 
 use std::process;
 
-use crate::command::types::OutputFormat;
 use colored::Colorize;
+
+use crate::command::types::OutputFormat;
 
 pub fn output_ok() {
     println!("{}", "Success".green())

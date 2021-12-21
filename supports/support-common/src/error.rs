@@ -9,6 +9,9 @@ pub enum BridgerError {
     #[error("Subcommand error: {0}")]
     Subcommand(String),
 
+    #[error("Failed to call: `{0} {1}` {2}")]
+    Process(String, String, String),
+
     #[error("Custom error: {0}")]
     Custom(String),
 

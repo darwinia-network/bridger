@@ -10,3 +10,12 @@ pub enum CompileChannel {
     /// Release
     Release,
 }
+
+impl CompileChannel {
+    pub fn name(&self) -> &'static str {
+        match self {
+            CompileChannel::Debug => "debug",
+            CompileChannel::Release => "release",
+        }
+    }
+}

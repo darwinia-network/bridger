@@ -3,6 +3,7 @@ use colored::Colorize;
 
 use support_common::error::BridgerError;
 
+use crate::external;
 use crate::external::execute::ISubcommandExecutor;
 use crate::external::types::CompileChannel;
 
@@ -25,13 +26,13 @@ impl CompileSourceExecutor {
 
 impl ISubcommandExecutor for CompileSourceExecutor {
     fn execute(&self, _path: Option<String>) -> color_eyre::Result<()> {
-        self.compile_bridge()?;
+        self.compile_and_execute_bridge()?;
         Ok(())
     }
 }
 
 impl CompileSourceExecutor {
-    fn compile_bridge(&self) -> color_eyre::Result<()> {
+    fn compile_and_execute_bridge(&self) -> color_eyre::Result<()> {
         let path_crate = std::env::current_dir()?;
         let path_bridge = path_crate.join("bridges").join(&self.command);
         if !path_bridge.exists() {
@@ -90,26 +91,11 @@ impl CompileSourceExecutor {
                     self.command.clone()
                 });
 
-        let mut builder_bridge = ProcessBuilder::new(path_binary);
-        builder_bridge.args(self.args.as_slice()).cwd(&path_bridge);
-        for (n, v) in std::env::vars() {
-            builder_bridge.env(&n, v);
-        }
-
-        tracing::info!(
-            "Execute `{} {}` in path: {}",
-            &self.command.green(),
-            self.args.join(" ").green(),
-            path_bridge.display()
-        );
-        if let Err(e) = builder_bridge.exec() {
-            return Err(BridgerError::Process(
-                self.command.clone(),
-                self.args.join(" "),
-                format!("{:?}", e),
-            )
-            .into());
-        }
-        Ok(())
+        external::provider::common::execute_binary(
+            self.command.clone(),
+            path_binary,
+            self.args.clone(),
+            path_bridge,
+        )
     }
 }

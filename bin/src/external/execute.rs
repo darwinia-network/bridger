@@ -1,11 +1,7 @@
-use colored::Colorize;
+use support_config::{Config, Names};
 
 use crate::command::types::RegistryType;
 use crate::config::BridgerConfig;
-use support_common::error::BridgerError;
-use support_config::{Config, Names};
-
-use crate::external;
 use crate::external::provider::{CompileSourceExecutor, PrecompiledBinaryExecutor};
 use crate::external::types::CompileChannel;
 
@@ -39,7 +35,8 @@ impl ExternalExecutor {
                 executor.execute(None)
             }
             RegistryType::Github | RegistryType::Server => {
-                let executor = PrecompiledBinaryExecutor::new();
+                let executor =
+                    PrecompiledBinaryExecutor::new(self.command.clone(), self.args.clone());
                 executor.execute(registry.path)
             }
         }

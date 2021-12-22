@@ -6,9 +6,9 @@ pub fn list_externals(
 ) -> color_eyre::Result<(PathBuf, Vec<String>)> {
     let base_path = except_base_path
         .or(std::env::current_exe()?.parent().map(|v| v.join("")))
-        .ok_or(BridgerError::Custom(
-            "Can not get base path for external command".to_string(),
-        ))?;
+        .ok_or_else(|| {
+            BridgerError::Custom("Can not get base path for external command".to_string())
+        })?;
     tracing::trace!("The external base path is: {:?}", base_path);
     let read_dir = std::fs::read_dir(&base_path)?;
     let mut binaries = Vec::new();
@@ -21,10 +21,9 @@ pub fn list_externals(
             Some(v) => v.to_string_lossy().to_string(),
             None => continue,
         };
-        if support_common::constants::ALLOW_BINARY_PREFIX
+        if !support_common::constants::ALLOW_BINARY_PREFIX
             .iter()
-            .find(|&&item| name.starts_with(item))
-            .is_none()
+            .any(|&item| name.starts_with(item))
         {
             continue;
         }

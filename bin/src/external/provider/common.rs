@@ -25,9 +25,7 @@ pub fn execute_binary(
         cwd.display()
     );
     if let Err(e) = builder_bridge.exec() {
-        return Err(
-            BridgerError::Process(command.clone(), args.join(" "), format!("{:?}", e)).into(),
-        );
+        return Err(BridgerError::Process(command, args.join(" "), format!("{:?}", e)).into());
     }
     Ok(())
 }

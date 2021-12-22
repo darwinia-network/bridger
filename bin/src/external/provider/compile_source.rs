@@ -1,5 +1,6 @@
 use cargo_util::ProcessBuilder;
 use colored::Colorize;
+use std::path::PathBuf;
 
 use support_common::error::BridgerError;
 
@@ -7,6 +8,7 @@ use crate::external;
 use crate::external::execute::ISubcommandExecutor;
 use crate::external::types::CompileChannel;
 
+/// Compile source code and execute binary
 #[derive(Clone, Debug)]
 pub struct CompileSourceExecutor {
     command: String,
@@ -26,29 +28,45 @@ impl CompileSourceExecutor {
 
 impl ISubcommandExecutor for CompileSourceExecutor {
     fn execute(&self, _path: Option<String>) -> color_eyre::Result<()> {
-        self.compile_and_execute_bridge()?;
+        self.try_compile_and_execute()?;
         Ok(())
     }
 }
 
 impl CompileSourceExecutor {
-    fn compile_and_execute_bridge(&self) -> color_eyre::Result<()> {
+    fn try_compile_and_execute(&self) -> color_eyre::Result<()> {
         let path_crate = std::env::current_dir()?;
-        let path_bridge = path_crate.join("bridges").join(&self.command);
-        if !path_bridge.exists() {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
-                format!(
-                    "The bridge [{}] folder not exists. full path is: {:?}",
-                    &self.command, &path_bridge
-                ),
-            )
+
+        let mut exists = false;
+        for prefix in support_common::constants::ALLOW_BINARY_PREFIX {
+            let command = format!("{}{}", prefix, self.command);
+            let path_bridge = path_crate.join("bridges").join(&command);
+            if !path_bridge.exists() {
+                continue;
+            }
+            exists = true;
+            self.try_compile_and_execute_with_command(path_bridge, command)?;
+            break;
+        }
+        if !exists {
+            return Err(BridgerError::UnsupportExternal(format!(
+                "Not support this subcommand: {}",
+                self.command
+            ))
             .into());
         }
+        Ok(())
+    }
 
+    fn try_compile_and_execute_with_command(
+        &self,
+        path_bridge: PathBuf,
+        command: impl AsRef<str>,
+    ) -> color_eyre::Result<()> {
+        let command = command.as_ref();
         tracing::info!(
             "Try compile {} in path: {}",
-            &self.command.blue(),
+            &command.blue(),
             path_bridge.display()
         );
         let mut args = Vec::<String>::new();
@@ -58,7 +76,7 @@ impl CompileSourceExecutor {
             args.push(name);
         }
         args.push("-p".to_string());
-        args.push(self.command.clone());
+        args.push(command.to_string());
         let args = args.as_slice();
 
         let mut builder_cargo = ProcessBuilder::new("cargo");
@@ -86,13 +104,13 @@ impl CompileSourceExecutor {
                 .join("target")
                 .join(self.channel.name())
                 .join(if cfg!(windows) {
-                    format!("{}.exe", &self.command)
+                    format!("{}.exe", &command)
                 } else {
-                    self.command.clone()
+                    command.to_string()
                 });
 
         external::provider::common::execute_binary(
-            self.command.clone(),
+            command.to_string(),
             path_binary,
             self.args.clone(),
             path_bridge,

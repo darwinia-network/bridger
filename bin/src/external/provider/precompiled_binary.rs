@@ -31,12 +31,9 @@ impl ISubcommandExecutor for PrecompiledBinaryExecutor {
         // get path of binary
         let (command, path_binary) = self.download_and_extract_binary(path, false)?;
 
-        let cwd = path_binary
-            .parent()
-            .map(|v| v.join(""))
-            .ok_or(BridgerError::Subcommand(
-                "Can not get current binary path".to_string(),
-            ))?;
+        let cwd = path_binary.parent().map(|v| v.join("")).ok_or_else(|| {
+            BridgerError::Subcommand("Can not get current binary path".to_string())
+        })?;
         external::provider::common::execute_binary(command, path_binary, self.args.clone(), cwd)
     }
 }
@@ -71,17 +68,17 @@ impl PrecompiledBinaryExecutor {
     ) -> color_eyre::Result<PathBuf> {
         let command = command.as_ref();
         // https://github.com/darwinia-network/bridger/releases/download/v0.4.11/bridger-x86_64-linux-gnu.tar.bz2
-        let path = path.ok_or(BridgerError::Subcommand(
-            "Missing remote base url for precompiled binary".to_string(),
-        ))?;
+        let path = path.ok_or_else(|| {
+            BridgerError::Subcommand("Missing remote base url for precompiled binary".to_string())
+        })?;
         let package_name = self.package_name(command)?;
         let remote_url = format!("{}/releases/download/{}/{}", path, VERSION, package_name);
         let path_binary_base = std::env::current_exe()?
             .parent()
             .map(|v| v.join(""))
-            .ok_or(BridgerError::Subcommand(
-                "Can not get current binary path".to_string(),
-            ))?;
+            .ok_or_else(|| {
+                BridgerError::Subcommand("Can not get current binary path".to_string())
+            })?;
 
         let path_binary = path_binary_base.join(if cfg!(windows) {
             format!("{}.exe", command)
@@ -92,14 +89,12 @@ impl PrecompiledBinaryExecutor {
         let path_download_package = path_binary_base.join(&package_name);
 
         tracing::trace!("Force mode: {}", force);
-        if force {
-            if path_download_package.exists() {
-                tracing::trace!(
-                    "The download package is exists. remove it. {}",
-                    path_download_package.display()
-                );
-                std::fs::remove_file(&path_download_package)?;
-            }
+        if force && path_download_package.exists() {
+            tracing::trace!(
+                "The download package is exists. remove it. {}",
+                path_download_package.display()
+            );
+            std::fs::remove_file(&path_download_package)?;
         }
 
         if !force && path_binary.exists() {
@@ -127,14 +122,12 @@ impl PrecompiledBinaryExecutor {
             output::output_text("Downloaded");
         }
 
-        if force {
-            if path_binary.exists() {
-                tracing::trace!(
-                    "The binary file is exists. remove it. {}",
-                    path_binary.display()
-                );
-                std::fs::remove_file(&path_binary)?;
-            }
+        if force && path_binary.exists() {
+            tracing::trace!(
+                "The binary file is exists. remove it. {}",
+                path_binary.display()
+            );
+            std::fs::remove_file(&path_binary)?;
         }
 
         output::output_text(format!("Start extract {}", path_download_package.display()));

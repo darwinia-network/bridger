@@ -27,7 +27,8 @@ fn init_log() -> color_eyre::Result<()> {
         let subscriber = tracing_subscriber::FmtSubscriber::builder()
             .with_max_level(max_log_level)
             .with_env_filter(
-                EnvFilter::try_from_default_env().unwrap_or(EnvFilter::from(def_log_filter)),
+                EnvFilter::try_from_default_env()
+                    .unwrap_or_else(|_| EnvFilter::from(def_log_filter)),
             )
             .json()
             .finish();
@@ -39,7 +40,7 @@ fn init_log() -> color_eyre::Result<()> {
     let subscriber = tracing_subscriber::FmtSubscriber::builder()
         .with_max_level(max_log_level)
         .with_env_filter(
-            EnvFilter::try_from_default_env().unwrap_or(EnvFilter::from(def_log_filter)),
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::from(def_log_filter)),
         )
         .finish();
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");

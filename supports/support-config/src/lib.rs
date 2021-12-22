@@ -57,9 +57,9 @@ impl Config {
         let basic_path = path_env
             .map(|v| Path::new(&v).join(""))
             .ok()
-            .or(dirs::home_dir())
-            .or(std::env::current_exe().ok())
-            .unwrap_or(std::env::temp_dir());
+            .or_else(dirs::home_dir)
+            .or_else(|| std::env::current_exe().ok())
+            .unwrap_or_else(std::env::temp_dir);
         let mut base_path = basic_path;
         if !is_from_env {
             base_path = base_path.join(".bridger");
@@ -192,12 +192,9 @@ impl Config {
             .into());
         }
 
-        let (path, _) = self
-            .find_config_file(name.as_ref())?
-            .ok_or(BridgerError::Config(format!(
-                "Not found config file for name: {}",
-                name.as_ref()
-            )))?;
+        let (path, _) = self.find_config_file(name.as_ref())?.ok_or_else(|| {
+            BridgerError::Config(format!("Not found config file for name: {}", name.as_ref()))
+        })?;
         let mut c = config::Config::default();
         c.merge(config::File::from(path.clone()))?;
         let tc = c.try_into::<T>().map_err(|e| {

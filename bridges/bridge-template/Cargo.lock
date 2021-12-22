@@ -96,6 +96,7 @@ dependencies = [
  "lifeline",
  "postage",
  "support-initialize",
+ "support-lifeline",
  "tokio",
  "tracing",
  "tracing-attributes",
@@ -625,6 +626,14 @@ dependencies = [
  "tracing",
  "tracing-attributes",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "support-lifeline"
+version = "0.5.0"
+dependencies = [
+ "color-eyre",
+ "lifeline",
 ]
 
 [[package]]

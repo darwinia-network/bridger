@@ -24,6 +24,7 @@ fn init_log() {
                 "bridge=info",
                 "component_pangolin_subxt=trace",
                 "subscan=trace",
+                "tracker=trace",
                 "support_tracker_evm_log=info",
                 "task-darwinia-ethereum=trace",
                 "task-pangolin-ropsten=trace",

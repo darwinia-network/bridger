@@ -31,6 +31,7 @@ impl ExternalExecutor {
                     self.command.clone(),
                     self.args.clone(),
                     CompileChannel::Debug,
+                    None,
                 );
                 executor.execute(None)
             }

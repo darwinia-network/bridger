@@ -14,14 +14,21 @@ pub struct CompileSourceExecutor {
     command: String,
     args: Vec<String>,
     channel: CompileChannel,
+    toolchain_version: Option<String>,
 }
 
 impl CompileSourceExecutor {
-    pub fn new(command: String, args: Vec<String>, channel: CompileChannel) -> Self {
+    pub fn new(
+        command: String,
+        args: Vec<String>,
+        channel: CompileChannel,
+        toolchain_version: Option<String>,
+    ) -> Self {
         Self {
             command,
             args,
             channel,
+            toolchain_version,
         }
     }
 }
@@ -70,6 +77,9 @@ impl CompileSourceExecutor {
             path_bridge.display()
         );
         let mut args = Vec::<String>::new();
+        if let Some(toolchain) = &self.toolchain_version {
+            args.push(format!("+{}", toolchain));
+        }
         args.push("build".to_string());
         if self.channel == CompileChannel::Release {
             let name = format!("--{}", self.channel.name());

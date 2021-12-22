@@ -48,7 +48,7 @@ fn handle_get(out: OutputFormat) -> color_eyre::Result<()> {
                 output::output_text(format!(
                     "{}: {}",
                     "PATH".bold(),
-                    config.registry.path.unwrap_or(Default::default())
+                    config.registry.path.unwrap_or_default()
                 ));
             }
         }
@@ -69,7 +69,7 @@ fn handle_get(out: OutputFormat) -> color_eyre::Result<()> {
             table.add_row(Row::new(vec![
                 TableCell::new_with_alignment(format!("{:?}", registry.type_), 2, Alignment::Left),
                 TableCell::new_with_alignment(
-                    registry.path.unwrap_or(Default::default()),
+                    registry.path.unwrap_or_default(),
                     2,
                     Alignment::Left,
                 ),

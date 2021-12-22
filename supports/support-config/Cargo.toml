@@ -21,9 +21,6 @@ edition = "2021"
 color-eyre = "0.5"
 
 tracing = "0.1"
-tracing-subscriber = "0.2"
-tracing-attributes = "0.1"
-
 
 strum = { version = "0.21", features = ["derive"] }
 dirs = "4"

@@ -1,5 +1,5 @@
 [package]
-name = "bridge-template"
+name = "support-initialize"
 version = "0.5.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -17,20 +17,9 @@ keywords = ["substrate", "darwinia"]
 readme = 'README.md'
 edition = "2021"
 
-[[bin]]
-name = "bridge-template"
-path = "src/main.rs"
-
 [dependencies]
 tracing = "0.1"
 tracing-subscriber = "0.2"
 tracing-attributes = "0.1"
+
 color-eyre = "0.5"
-
-tokio = { version = "1", features = ["full"] }
-
-lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
-postage = "0.4"
-
-support-initialize = { path = "../../supports/support-initialize" }
-

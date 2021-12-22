@@ -2,7 +2,7 @@ name: Check pull request
 
 on:
   push:
-    branches: [ master, refactor-bridger, refactor-base ]
+    branches: [ master ]
   pull_request:
     branches: [ master, refactor-bridger, refactor-base ]
 

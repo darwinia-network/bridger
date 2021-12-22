@@ -20,11 +20,11 @@ jobs:
 
       - name: Lint
         if: matrix.action == 'clippy'
-        run: cargo clippy --release --all --locked -- -D warnings
+        run: cargo clippy --release --all -- -D warnings
 
       - name: Run tests
         if: matrix.action == 'test'
-        run: cargo test --release --locked
+        run: cargo test --release
 
   check-bridges:
     name: Check bridge
@@ -40,8 +40,8 @@ jobs:
 
       - name: Lint
         if: matrix.action == 'clippy'
-        run: cargo clippy --manifest-path bridges/${{ matrix.bridge }} --release --all --locked -- -D warnings
+        run: cargo clippy --manifest-path bridges/${{ matrix.bridge }}/Cargo.toml --release --all --locked -- -D warnings
 
       - name: Run tests
         if: matrix.action == 'test'
-        run: cargo test --manifest-path bridges/${{ matrix.bridge }} --release --locked
+        run: cargo test --manifest-path bridges/${{ matrix.bridge }}/Cargo.toml --release --locked

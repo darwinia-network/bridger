@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use structopt::StructOpt;
 
-use crate::command::types::OutputFormat;
+use support_terminal::output::OutputFormat;
 
 #[derive(
     Clone, Debug, Deserialize, Eq, PartialEq, Serialize, strum::EnumString, strum::EnumVariantNames,

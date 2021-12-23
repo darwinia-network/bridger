@@ -5,7 +5,7 @@ use crate::bridge::TemplateTaskBus;
 
 #[derive(Debug, Clone)]
 pub enum TemplateTaskMessage {
-    SomeEvent,
+    SomeEvent(u64),
     StopSomeService,
 }
 

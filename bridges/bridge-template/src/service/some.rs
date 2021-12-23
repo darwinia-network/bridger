@@ -21,8 +21,8 @@ impl Service for SomeService {
         let _greet = Self::try_task("template-service-some", async move {
             while let Some(message) = rx.recv().await {
                 match message {
-                    TemplateTaskMessage::SomeEvent => {
-                        tracing::debug!("recv a new some message: {:?}", message);
+                    TemplateTaskMessage::SomeEvent(times) => {
+                        tracing::debug!("Receive a new some event. times: {}", times);
                     }
                     TemplateTaskMessage::StopSomeService => {
                         break;

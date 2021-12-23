@@ -2,8 +2,8 @@ use std::io::Cursor;
 use std::path::PathBuf;
 
 use support_common::error::BridgerError;
+use support_terminal::output;
 
-use crate::command::output;
 use crate::external;
 use crate::external::execute::ISubcommandExecutor;
 

@@ -1,4 +1,5 @@
-use crate::command::output;
+use support_terminal::output;
+
 use crate::external;
 
 pub fn exec_list() -> color_eyre::Result<()> {

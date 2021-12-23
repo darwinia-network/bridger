@@ -1,7 +1,7 @@
 use lifeline::Message;
 use postage::broadcast;
 
-use crate::bus::TemplateTaskBus;
+use crate::bridge::TemplateTaskBus;
 
 #[derive(Debug, Clone)]
 pub enum TemplateTaskMessage {

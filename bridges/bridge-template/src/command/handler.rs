@@ -16,6 +16,7 @@ pub async fn handle_start(_basic_options: BasicOptions) -> color_eyre::Result<()
         times += 1;
         if times > 10 {
             sender.send(TemplateTaskMessage::StopSomeService).await?;
+            return Ok(());
         }
         sender.send(TemplateTaskMessage::SomeEvent).await?;
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;

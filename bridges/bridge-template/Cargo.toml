@@ -39,5 +39,4 @@ postage  = "0.4"
 support-common = { path = "../../supports/support-common" }
 support-lifeline   = { path = "../../supports/support-lifeline" }
 support-terminal   = { path = "../../supports/support-terminal" }
-support-config     = { path = "../../supports/support-config" }
 

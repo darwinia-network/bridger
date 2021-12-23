@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use support_config::types::HttpClientConfig;
+
+use support_common::types::HttpClientConfig;
 
 /// Bridge template config
 #[derive(Clone, Debug, Deserialize, Serialize)]

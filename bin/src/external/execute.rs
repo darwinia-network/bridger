@@ -1,4 +1,4 @@
-use support_config::{Config, Names};
+use support_common::config::{Config, Names};
 
 use crate::command::types::RegistryType;
 use crate::config::BridgerConfig;

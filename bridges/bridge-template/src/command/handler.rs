@@ -1,5 +1,5 @@
 use lifeline::{Bus, Sender};
-use support_config::{Config, Names};
+use support_common::config::{Config, Names};
 
 use support_terminal::types::BasicOptions;
 

@@ -2,7 +2,8 @@ use std::path::{Path, PathBuf};
 
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use support_common::error::BridgerError;
+
+use crate::error::BridgerError;
 
 /// The config names
 #[derive(Clone, Debug)]

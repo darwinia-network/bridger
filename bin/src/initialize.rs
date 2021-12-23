@@ -1,4 +1,4 @@
-use support_config::{Config, ConfigFormat, Names};
+use support_common::config::{Config, ConfigFormat, Names};
 
 use crate::config::BridgerConfig;
 

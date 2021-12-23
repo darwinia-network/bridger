@@ -1,4 +1,5 @@
 mod bus;
+mod command;
 mod message;
 mod service;
 mod task;

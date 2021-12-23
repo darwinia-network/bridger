@@ -1,6 +1,7 @@
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 
 use component_http_client::HttpClientComponent;
+use support_lifeline::service::BridgeService;
 
 use crate::bus::TemplateTaskBus;
 use crate::message::{TemplateTaskMessage, ToTemplateLinkedMessage};
@@ -28,8 +29,7 @@ impl Service for SomeService {
                     match message {
                         TemplateTaskMessage::SomeEvent => {
                             tx.send(ToTemplateLinkedMessage::SomeEvent).await?;
-                            log::debug!(
-                                target: TemplateTask::NAME,
+                            tracing::debug!(
                                 "[{}] recv a new some message: {:?}",
                                 TemplateTask::NAME,
                                 message

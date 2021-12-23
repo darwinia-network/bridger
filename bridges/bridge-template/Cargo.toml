@@ -36,7 +36,7 @@ serde     = { version = "1", features = ["derive"] }
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage  = "0.4"
 
-support-initialize = { path = "../../supports/support-initialize" }
+support-common = { path = "../../supports/support-common" }
 support-lifeline   = { path = "../../supports/support-lifeline" }
 support-terminal   = { path = "../../supports/support-terminal" }
 support-config     = { path = "../../supports/support-config" }

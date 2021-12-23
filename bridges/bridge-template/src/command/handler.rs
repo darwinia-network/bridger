@@ -1,10 +1,13 @@
 use lifeline::{Bus, Sender};
+use support_config::{Config, Names};
 
 use support_terminal::types::BasicOptions;
 
-use crate::bridge::{TemplateTask, TemplateTaskMessage};
+use crate::bridge::{TemplateTask, TemplateTaskConfig, TemplateTaskMessage};
 
 pub async fn handle_start(_basic_options: BasicOptions) -> color_eyre::Result<()> {
+    let config: TemplateTaskConfig = Config::restore(Names::BridgeTemplate)?;
+
     tracing::info!("Start bridge template");
     let task = TemplateTask::new()?;
     let stack = task.stack();

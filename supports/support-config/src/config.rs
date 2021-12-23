@@ -9,12 +9,15 @@ use support_common::error::BridgerError;
 pub enum Names {
     /// Bridger
     Bridger,
+    /// Bridge tempalte
+    BridgeTemplate,
 }
 
 impl Names {
     pub fn name(&self) -> &'static str {
         match self {
             Self::Bridger => "bridger",
+            Self::BridgeTemplate => "bridge-template",
         }
     }
 }
@@ -193,7 +196,11 @@ impl Config {
         }
 
         let (path, _) = self.find_config_file(name.as_ref())?.ok_or_else(|| {
-            BridgerError::Config(format!("Not found config file for name: {}", name.as_ref()))
+            BridgerError::Config(format!(
+                "Not found config file for name: {} in path: {}",
+                name.as_ref(),
+                self.base_path.display()
+            ))
         })?;
         let mut c = config::Config::default();
         c.merge(config::File::from(path.clone()))?;

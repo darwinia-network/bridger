@@ -115,8 +115,8 @@ dependencies = [
  "serde 1.0.132",
  "structopt",
  "strum",
+ "support-common",
  "support-config",
- "support-initialize",
  "support-lifeline",
  "support-terminal",
  "tokio",
@@ -936,7 +936,11 @@ dependencies = [
 name = "support-common"
 version = "0.5.0"
 dependencies = [
+ "color-eyre",
  "thiserror",
+ "tracing",
+ "tracing-attributes",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -954,16 +958,6 @@ dependencies = [
  "support-common",
  "toml",
  "tracing",
-]
-
-[[package]]
-name = "support-initialize"
-version = "0.5.0"
-dependencies = [
- "color-eyre",
- "tracing",
- "tracing-attributes",
- "tracing-subscriber",
 ]
 
 [[package]]

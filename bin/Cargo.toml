@@ -44,5 +44,4 @@ zip = "0.5"
 
 support-config     = { path = "../supports/support-config" }
 support-common     = { path = "../supports/support-common" }
-support-initialize = { path = "../supports/support-initialize" }
 support-terminal   = { path = "../supports/support-terminal" }

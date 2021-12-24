@@ -4,10 +4,9 @@ use term_table::table_cell::{Alignment, TableCell};
 use term_table::{Table, TableStyle};
 
 use support_config::{Config, Names};
+use support_terminal::output::{self, OutputFormat};
 
-use crate::command::output;
-use crate::command::output::output_err_and_exit;
-use crate::command::types::{OutputFormat, RegistryOpt, RegistryType};
+use crate::command::types::{RegistryOpt, RegistryType};
 use crate::config::BridgerConfig;
 
 pub fn handle_registry(opt: RegistryOpt) -> color_eyre::Result<()> {
@@ -22,7 +21,7 @@ fn handle_set(type_: RegistryType, mut path: Option<String>) -> color_eyre::Resu
         path = Some("https://github.com/darwinia-network/bridger".to_string());
     }
     if type_ != RegistryType::Local && path.is_none() {
-        output_err_and_exit("Please provide `--path <path>`");
+        output::output_err_and_exit("Please provide `--path <path>`");
     }
     let mut config: BridgerConfig = Config::restore(Names::Bridger)?;
     tracing::trace!(
@@ -48,7 +47,7 @@ fn handle_get(out: OutputFormat) -> color_eyre::Result<()> {
                 output::output_text(format!(
                     "{}: {}",
                     "PATH".bold(),
-                    config.registry.path.unwrap_or(Default::default())
+                    config.registry.path.unwrap_or_default()
                 ));
             }
         }
@@ -69,7 +68,7 @@ fn handle_get(out: OutputFormat) -> color_eyre::Result<()> {
             table.add_row(Row::new(vec![
                 TableCell::new_with_alignment(format!("{:?}", registry.type_), 2, Alignment::Left),
                 TableCell::new_with_alignment(
-                    registry.path.unwrap_or(Default::default()),
+                    registry.path.unwrap_or_default(),
                     2,
                     Alignment::Left,
                 ),

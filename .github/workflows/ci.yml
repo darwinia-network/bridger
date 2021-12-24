@@ -27,7 +27,7 @@ jobs:
         run: cargo test --release
 
   check-bridges:
-    name: Check bridge
+    name: Check bridge-${{ matrix.bridge }}
     runs-on: ubuntu-latest
     container:
       image: rust:1

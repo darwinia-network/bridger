@@ -2,6 +2,7 @@
 members = [
   "bin",
   "supports/*",
+  "components/*",
 ]
 exclude = [
   "bridges/bridge-template"

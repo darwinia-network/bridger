@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use support_common::types::HttpClientConfig;
+use component_http_client::HttpClientVendor;
 
 /// Bridge template config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TemplateTaskConfig {
     /// Http client config
-    pub http_client: HttpClientConfig,
+    pub http_client: HttpClientVendor,
 }

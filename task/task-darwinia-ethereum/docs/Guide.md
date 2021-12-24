@@ -81,7 +81,7 @@ bridger kv \
 +------------------------------+----------+
 ```
 
-**ethereum affirm scan state**
+**ethereum redeem scan state**
 
 ```bash
 bridger kv \

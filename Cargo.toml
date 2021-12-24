@@ -5,5 +5,5 @@ members = [
   "components/*",
 ]
 exclude = [
-  "bridges/bridge-template"
+  "bridges/template"
 ]

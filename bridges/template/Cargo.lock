@@ -127,8 +127,6 @@ dependencies = [
  "support-terminal",
  "tokio",
  "tracing",
- "tracing-attributes",
- "tracing-subscriber",
 ]
 
 [[package]]

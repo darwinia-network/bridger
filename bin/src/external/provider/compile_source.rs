@@ -54,8 +54,13 @@ impl CompileSourceExecutor {
                     continue;
                 }
             }
+            if let Err(e) = self.try_compile_and_execute_with_command(path_bridge, full_command) {
+                if let Some(BridgerError::Subcommand(msg)) = e.downcast_ref() {
+                    tracing::error!("{}", msg);
+                    continue;
+                }
+            }
             exists = true;
-            self.try_compile_and_execute_with_command(path_bridge, full_command)?;
             break;
         }
         if !exists {
@@ -112,15 +117,21 @@ impl CompileSourceExecutor {
 
         // when compiled success, prepare execute this binary
 
-        let path_binary =
-            path_bridge
-                .join("target")
-                .join(self.channel.name())
-                .join(if cfg!(windows) {
-                    format!("{}.exe", &command)
-                } else {
-                    command.to_string()
-                });
+        let base_path = path_bridge.join("target").join(self.channel.name());
+        let platform_command = if cfg!(windows) {
+            format!("{}.exe", &command)
+        } else {
+            command.to_string()
+        };
+        let path_binary = base_path.join(&platform_command);
+        if !path_binary.exists() {
+            return Err(BridgerError::Subcommand(format!(
+                "The command {} not found in path: {}",
+                &platform_command,
+                base_path.display()
+            ))
+            .into());
+        }
 
         external::provider::common::execute_binary(
             command.to_string(),

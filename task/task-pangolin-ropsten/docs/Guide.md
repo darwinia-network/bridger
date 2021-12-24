@@ -82,7 +82,7 @@ bridger kv \
 +-----------------------------+----------+
 ```
 
-**ropsten affirm scan state**
+**ropsten redeem scan state**
 
 ```bash
 bridger kv \

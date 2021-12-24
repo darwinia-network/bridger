@@ -72,6 +72,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "array-bytes"
+version = "1.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ad284aeb45c13f2fb4f084de4a420ebf447423bdf9386c0540ce33cb3ef4b8c"
+
+[[package]]
 name = "arrayref"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -274,6 +280,9 @@ dependencies = [
  "strum 0.21.0",
  "substrate-subxt",
  "support-common",
+ "support-ethereum",
+ "support-lifeline",
+ "support-terminal",
  "support-tracker",
  "tokio",
  "tracing",
@@ -392,6 +401,17 @@ dependencies = [
  "owo-colors",
  "tracing-core",
  "tracing-error",
+]
+
+[[package]]
+name = "colored"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3616f750b84d8f0de8a58bda93e08e2a81ad3f523089b05f1dffecab48c6cbd"
+dependencies = [
+ "atty",
+ "lazy_static",
+ "winapi",
 ]
 
 [[package]]
@@ -1304,7 +1324,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f28220f89297a075ddc7245cd538076ee98b01f2a9c23a53a4f1105d5a322808"
 dependencies = [
- "rlp",
+ "rlp 0.5.1",
 ]
 
 [[package]]
@@ -1982,6 +2002,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-im-online"
+version = "4.0.0-dev"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "log",
+ "pallet-authorship",
+ "parity-scale-codec",
+ "sp-application-crypto",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-staking",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-indices"
 version = "4.0.0-dev"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
@@ -2604,6 +2642,15 @@ dependencies = [
  "untrusted",
  "web-sys",
  "winapi",
+]
+
+[[package]]
+name = "rlp"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1190dcc8c3a512f1eef5d09bb8c84c7f39e1054e174d1795482e18f5272f2e73"
+dependencies = [
+ "rustc-hex",
 ]
 
 [[package]]
@@ -3692,6 +3739,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "support-ethereum"
+version = "0.5.0"
+dependencies = [
+ "anyhow",
+ "array-bytes",
+ "frame-support",
+ "log",
+ "pallet-im-online",
+ "pallet-indices",
+ "parity-scale-codec",
+ "rlp 0.4.6",
+ "serde 1.0.132",
+ "sp-core",
+ "web3",
+]
+
+[[package]]
+name = "support-lifeline"
+version = "0.5.0"
+dependencies = [
+ "color-eyre",
+ "lifeline",
+]
+
+[[package]]
+name = "support-terminal"
+version = "0.5.0"
+dependencies = [
+ "colored",
+ "serde 1.0.132",
+ "structopt",
+ "strum 0.21.0",
+]
+
+[[package]]
 name = "support-tracker"
 version = "0.5.0"
 dependencies = [
@@ -4298,7 +4380,7 @@ dependencies = [
  "parking_lot 0.11.2",
  "pin-project 1.0.8",
  "reqwest",
- "rlp",
+ "rlp 0.5.1",
  "secp256k1",
  "serde 1.0.132",
  "serde_json",

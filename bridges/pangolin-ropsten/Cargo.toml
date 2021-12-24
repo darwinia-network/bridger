@@ -41,6 +41,8 @@ microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
 substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.7" }
 
-
 support-common     = { path = "../../supports/support-common" }
+support-lifeline   = { path = "../../supports/support-lifeline" }
+support-terminal   = { path = "../../supports/support-terminal" }
 support-tracker    = { path = "../../supports/support-tracker" }
+support-ethereum    = { path = "../../supports/support-ethereum" }

@@ -33,7 +33,7 @@ pangolin-ropsten
    # set ropsten check/redeem/affirm scan
    bridger kv -n task-pangolin-ropsten put scan.ropsten.check.running true \
      scan.ropsten.redeem.running true \
-     scan.ropsten.check.running true
+     scan.ropsten.affirm.running true
    ```
 
 ## More

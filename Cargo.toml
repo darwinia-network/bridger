@@ -4,5 +4,6 @@ members = [
   "supports/*",
 ]
 exclude = [
-  "bridges/bridge-template"
+  "bridges/bridge-template",
+  "bridges/pangolin-ropsten"
 ]

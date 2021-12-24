@@ -27,7 +27,7 @@ jobs:
         run: cargo test --release
 
   check-bridges:
-    name: Check bridge
+    name: Check bridge-${{ matrix.bridge }}
     runs-on: ubuntu-latest
     container:
       image: rust:1
@@ -41,11 +41,11 @@ jobs:
       - name: Lint
         if: matrix.action == 'clippy'
         run: |
-          cd bridges/bridge-${{ matrix.bridge }}
+          cd bridges/${{ matrix.bridge }}
           cargo clippy --release --all --locked -- -D warnings
 
       - name: Run tests
         if: matrix.action == 'test'
         run: |
-          cd bridges/bridge-${{ matrix.bridge }}
+          cd bridges/${{ matrix.bridge }}
           cargo test --release --locked

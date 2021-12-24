@@ -3,7 +3,7 @@ use term_table::row::Row;
 use term_table::table_cell::{Alignment, TableCell};
 use term_table::{Table, TableStyle};
 
-use support_config::{Config, Names};
+use support_common::config::{Config, Names};
 use support_terminal::output::{self, OutputFormat};
 
 use crate::command::types::{RegistryOpt, RegistryType};

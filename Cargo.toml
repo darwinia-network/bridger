@@ -2,8 +2,9 @@
 members = [
   "bin",
   "supports/*",
+  "components/*",
 ]
 exclude = [
-  "bridges/bridge-template",
+  "bridges/template",
   "bridges/pangolin-ropsten"
 ]

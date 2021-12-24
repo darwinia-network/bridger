@@ -1,9 +1,9 @@
-use support_config::{Config, ConfigFormat, Names};
+use support_common::config::{Config, ConfigFormat, Names};
 
 use crate::config::BridgerConfig;
 
 pub fn init() -> color_eyre::Result<()> {
-    support_initialize::init()?;
+    support_common::initialize::init()?;
     init_default_config()?;
     Ok(())
 }

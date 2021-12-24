@@ -5,16 +5,16 @@ use std::fmt::Debug;
 use codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use sp_core::bytes::to_hex;
-use sp_core::{H256, U256};
-use web3::ethabi::ethereum_types::Bloom;
 use web3::types::Block;
+
+use support_primitives::array::{Bloom, H256, U256};
 
 use crate::error::BridgeEthereumError;
 
 impl TryFrom<Block<H256>> for EthereumHeader {
-    type Error = BridgeBasicError;
+    type Error = BridgeEthereumError;
 
-    fn try_from(block: Block<H256>) -> Result<Self, BridgeEthereumError> {
+    fn try_from(block: Block<H256>) -> Result<Self, Self::Error> {
         let seal = block
             .seal_fields
             .iter()
@@ -34,7 +34,7 @@ impl TryFrom<Block<H256>> for EthereumHeader {
                 block
                     .logs_bloom
                     .ok_or_else(|| {
-                        BridgeBasicError::Other("The `logs_bloom` is required".to_string())
+                        BridgeEthereumError::Other("The `logs_bloom` is required".to_string())
                     })?
                     .to_fixed_bytes(),
             ),
@@ -164,9 +164,9 @@ pub struct EthereumHeaderJson {
 }
 
 impl TryFrom<EthereumHeader> for EthereumHeaderJson {
-    type Error = BridgeBasicError;
+    type Error = BridgeEthereumError;
 
-    fn try_from(that: EthereumHeader) -> Result<Self, BridgeEthereumError> {
+    fn try_from(that: EthereumHeader) -> Result<Self, Self::Error> {
         Ok(Self {
             parent_hash: array_bytes::bytes2hex("0x", that.parent_hash),
             timestamp: that.timestamp,
@@ -193,9 +193,9 @@ impl TryFrom<EthereumHeader> for EthereumHeaderJson {
 }
 
 impl TryFrom<EthereumHeaderJson> for EthereumHeader {
-    type Error = BridgeBasicError;
+    type Error = BridgeEthereumError;
 
-    fn try_from(that: EthereumHeaderJson) -> Result<Self, BridgeEthereumError> {
+    fn try_from(that: EthereumHeaderJson) -> Result<Self, Self::Error> {
         Ok(Self {
             parent_hash: array_bytes::hex2array(that.parent_hash)?,
             timestamp: that.timestamp,

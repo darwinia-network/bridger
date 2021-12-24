@@ -717,7 +717,7 @@ dependencies = [
  "serde_json",
  "sha3",
  "thiserror",
- "uint",
+ "uint 0.9.1",
 ]
 
 [[package]]
@@ -744,7 +744,7 @@ dependencies = [
  "impl-rlp",
  "impl-serde",
  "primitive-types 0.9.1",
- "uint",
+ "uint 0.9.1",
 ]
 
 [[package]]
@@ -2325,7 +2325,7 @@ dependencies = [
  "impl-codec",
  "impl-rlp",
  "impl-serde",
- "uint",
+ "uint 0.9.1",
 ]
 
 [[package]]
@@ -2337,7 +2337,7 @@ dependencies = [
  "fixed-hash",
  "impl-codec",
  "impl-serde",
- "uint",
+ "uint 0.9.1",
 ]
 
 [[package]]
@@ -3742,16 +3742,17 @@ dependencies = [
 name = "support-ethereum"
 version = "0.5.0"
 dependencies = [
- "anyhow",
  "array-bytes",
  "frame-support",
- "log",
  "pallet-im-online",
  "pallet-indices",
  "parity-scale-codec",
  "rlp 0.4.6",
  "serde 1.0.132",
  "sp-core",
+ "support-primitives",
+ "thiserror",
+ "tracing",
  "web3",
 ]
 
@@ -3761,6 +3762,16 @@ version = "0.5.0"
 dependencies = [
  "color-eyre",
  "lifeline",
+]
+
+[[package]]
+name = "support-primitives"
+version = "0.5.0"
+dependencies = [
+ "parity-scale-codec",
+ "rlp 0.4.6",
+ "serde 1.0.132",
+ "uint 0.8.5",
 ]
 
 [[package]]
@@ -4130,6 +4141,18 @@ name = "typenum"
 version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b63708a265f51345575b27fe43f9500ad611579e764c79edbc2037b1121959ec"
+
+[[package]]
+name = "uint"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9db035e67dfaf7edd9aebfe8676afcd63eed53c8a4044fed514c8cccf1835177"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "rustc-hex",
+ "static_assertions",
+]
 
 [[package]]
 name = "uint"

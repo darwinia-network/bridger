@@ -6,6 +6,8 @@ use codec::{Decode, Encode};
 use rlp::{Encodable, RlpStream};
 use serde::{Deserialize, Serialize};
 
+use support_primitives::array::{Bloom, H160, H256};
+
 use crate::block::{EthereumHeader, EthereumHeaderJson};
 use crate::error::BridgeEthereumError;
 use crate::mmr::{MMRProof, MMRProofJson};
@@ -81,7 +83,7 @@ impl TryFrom<EthereumReceiptProofJson> for EthereumReceiptProof {
 
         Ok(Self {
             index: u64::from_str_radix(index, 16).unwrap_or(0),
-            proof: array_bytes::hex2array(that.proof.as_str())?,
+            proof: array_bytes::hex2bytes(that.proof)?,
             header_hash: hash,
         })
     }
@@ -110,13 +112,13 @@ pub struct EthereumReceiptProofThingJson {
 }
 
 impl TryFrom<EthereumReceiptProofThingJson> for EthereumReceiptProofThing {
-    type Error = BridgeBasicError;
+    type Error = BridgeEthereumError;
 
-    fn try_from(that: EthereumReceiptProofThingJson) -> BridgeBasicResult<Self> {
-        Ok(EthereumReceiptProofThing {
+    fn try_from(that: EthereumReceiptProofThingJson) -> Result<Self, Self::Error> {
+        Ok(Self {
             header: that.header.try_into()?,
-            receipt_proof: that.receipt_proof.into(),
-            mmr_proof: that.mmr_proof.into(),
+            receipt_proof: that.receipt_proof.try_into()?,
+            mmr_proof: that.mmr_proof.try_into()?,
         })
     }
 }
@@ -183,37 +185,41 @@ pub struct EthReceiptBody {
     pub transaction_index: String,
 }
 
-impl From<EthReceiptBody> for EthereumReceipt {
-    fn from(that: EthReceiptBody) -> Self {
-        EthereumReceipt {
+impl TryFrom<EthReceiptBody> for EthereumReceipt {
+    type Error = BridgeEthereumError;
+    fn try_from(that: EthReceiptBody) -> Result<Self, Self::Error> {
+        Ok(Self {
             gas_used: u64::from_str_radix(&that.cumulative_gas_used.as_str()[2..], 16)
                 .unwrap_or_default(),
-            log_bloom: Bloom(bytes!(that.logs_bloom.as_str(), 256)),
-            logs: that
-                .logs
-                .iter()
-                .map(|l| -> LogEntry {
-                    LogEntry {
-                        address: H160(bytes!(l.address.as_str(), 20)),
-                        topics: l
-                            .topics
-                            .iter()
-                            .map(|t| H256(bytes!(t.as_str(), 32)))
-                            .collect(),
-                        data: bytes!(l.data.as_str()),
+            log_bloom: Bloom(array_bytes::hex2array(that.logs_bloom)?), // 256
+            logs: {
+                let mut rets = Vec::with_capacity(that.logs.len());
+                for item in that.logs {
+                    let mut topics = Vec::with_capacity(item.topics.len());
+                    for topic in item.topics {
+                        let bytes = H256(array_bytes::hex2array(topic)?);
+                        topics.push(bytes);
                     }
-                })
-                .collect(),
+                    let entry = LogEntry {
+                        address: H160(array_bytes::hex2array(item.address)?), // 20
+                        topics,
+                        data: array_bytes::hex2bytes(item.data)?,
+                    };
+                    rets.push(entry);
+                }
+                rets
+            },
             outcome: {
                 if that.status.len() == 66 {
-                    TransactionOutcome::StateRoot(H256(bytes!(that.status.as_str(), 32)))
+                    TransactionOutcome::StateRoot(H256(array_bytes::hex2array(that.status)?))
+                // , 32
                 } else {
                     TransactionOutcome::StatusCode(
                         u8::from_str_radix(&that.status.as_str()[2..], 16).unwrap_or(0),
                     )
                 }
             },
-        }
+        })
     }
 }
 

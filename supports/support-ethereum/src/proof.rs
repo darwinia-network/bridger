@@ -1,8 +1,8 @@
 //! Ethereum Relay Proof
-use crate::error::BridgeEthereumError;
 use codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
+use crate::error::BridgeEthereumError;
 use crate::ethash::{EthashProof, EthashProofJson};
 
 /// Darwinia eth relay header thing
@@ -31,12 +31,13 @@ impl TryFrom<EthereumRelayProofsJson> for EthereumRelayProofs {
             let bytes = array_bytes::hex2array(item)?; // 32
             mmr_proof.push(bytes);
         }
+        let mut ethash_proof = Vec::with_capacity(that.ethash_proof.len());
+        for item in that.ethash_proof {
+            let data = item.try_into()?;
+            ethash_proof.push(data);
+        }
         Ok(Self {
-            ethash_proof: that
-                .ethash_proof
-                .iter()
-                .map(|p| Into::<EthashProof>::into(p.to_owned()))
-                .collect(),
+            ethash_proof,
             mmr_proof,
         })
     }

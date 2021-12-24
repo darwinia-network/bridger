@@ -1,16 +1,17 @@
 use thiserror::Error as ThisError;
 
 /// Bridge ethereum error
+#[derive(ThisError, Debug)]
 pub enum BridgeEthereumError {
-    #[error("Crypto error: {0}")]
-    Crypto(String),
-
     #[error("Other error: {0}")]
     Other(String),
 
     #[error("Array bytes error: {0}")]
-    ArrayBytes(#[from] array_bytes::Error),
+    ArrayBytes(String),
+}
 
-    #[error("Custom error: {0}")]
-    Custom(Box<dyn std::error::Error + Send + Sync>),
+impl From<array_bytes::Error> for BridgeEthereumError {
+    fn from(error: array_bytes::Error) -> Self {
+        Self::ArrayBytes(format!("{:?}", error))
+    }
 }

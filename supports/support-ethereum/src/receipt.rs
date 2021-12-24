@@ -64,8 +64,9 @@ impl TryFrom<EthereumReceiptProof> for EthereumReceiptProofJson {
     }
 }
 
-impl From<EthereumReceiptProofJson> for EthereumReceiptProof {
-    fn from(that: EthereumReceiptProofJson) -> Self {
+impl TryFrom<EthereumReceiptProofJson> for EthereumReceiptProof {
+    type Error = BridgeEthereumError;
+    fn try_from(that: EthereumReceiptProofJson) -> Result<Self, Self::Error> {
         let index = if that.index.starts_with("0x") {
             &that.index[2..]
         } else {
@@ -73,16 +74,16 @@ impl From<EthereumReceiptProofJson> for EthereumReceiptProof {
         };
 
         let hash = if !that.header_hash.is_empty() {
-            bytes!(that.header_hash.as_str(), 32)
+            array_bytes::hex2array(that.header_hash.as_str())?
         } else {
             [0; 32]
         };
 
-        EthereumReceiptProof {
+        Ok(Self {
             index: u64::from_str_radix(index, 16).unwrap_or(0),
-            proof: bytes!(that.proof.as_str()),
+            proof: array_bytes::hex2array(that.proof.as_str())?,
             header_hash: hash,
-        }
+        })
     }
 }
 

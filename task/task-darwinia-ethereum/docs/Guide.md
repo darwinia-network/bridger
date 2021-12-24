@@ -34,7 +34,7 @@ darwinia-ethereum
    # set ethereum check/redeem/affirm scan
    bridger kv -n task-darwinia-ethereum put scan.ethereum.check.running true \
      scan.ethereum.redeem.running true \
-     scan.ethereum.check.running true
+     scan.ethereum.affirm.running true
    ```
 
 

@@ -46,13 +46,16 @@ impl CompileSourceExecutor {
 
         let mut exists = false;
         for prefix in support_common::constants::ALLOW_BINARY_PREFIX {
-            let command = format!("{}{}", prefix, self.command);
-            let path_bridge = path_crate.join("bridges").join(&command);
+            let mut path_bridge = path_crate.join("bridges").join(&self.command);
+            let full_command = format!("{}{}", prefix, self.command);
             if !path_bridge.exists() {
-                continue;
+                path_bridge = path_crate.join("bridges").join(&full_command);
+                if !path_bridge.exists() {
+                    continue;
+                }
             }
             exists = true;
-            self.try_compile_and_execute_with_command(path_bridge, command)?;
+            self.try_compile_and_execute_with_command(path_bridge, full_command)?;
             break;
         }
         if !exists {

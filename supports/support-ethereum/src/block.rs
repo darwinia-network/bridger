@@ -5,9 +5,9 @@ use std::fmt::Debug;
 use codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use sp_core::bytes::to_hex;
-use web3::types::Block;
+use web3::types::{Block, H256};
 
-use support_primitives::array::{Bloom, H256, U256};
+use support_primitives::array::{Bloom, U256};
 
 use crate::error::BridgeEthereumError;
 

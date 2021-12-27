@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
 use web3::transports::Http;
 use web3::Web3;
 
-use crate::ethereum::client::{EthereumClient, EthereumConfig};
+use crate::ethereum::client::{EthereumClient, _EthereumConfig};
 
 pub mod client;
 pub mod types;
@@ -20,7 +21,7 @@ pub struct EthereumProvider {
 impl EthereumProvider {
     /// Get ethereum client instance
     pub fn component(&self, web3: Web3<Http>) -> color_eyre::Result<EthereumClient> {
-        let config = EthereumConfig {
+        let config = _EthereumConfig {
             relayer_private_key: self.relayer_private_key.clone(),
             relayer_beneficiary_darwinia_account: self.relayer_beneficiary_darwinia_account.clone(),
             subscribe_relay_address: self.subscribe_relay_address.clone(),

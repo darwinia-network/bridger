@@ -12,7 +12,9 @@ use support_ethereum::block::EthereumHeader;
 use crate::errors::EthereumComponentError;
 use crate::ethereum::types::GasPrice;
 
-pub(crate) struct EthereumConfig {
+/// Inner ethereum config struct
+#[doc(hidden)]
+pub struct _EthereumConfig {
     /// Ethereum relayer private key
     pub relayer_private_key: Option<String>,
     /// The darwinia account key
@@ -23,21 +25,22 @@ pub(crate) struct EthereumConfig {
 
 /// Ethereum client
 pub struct EthereumClient {
-    config: EthereumConfig,
+    config: _EthereumConfig,
     web3: Web3<Http>,
 }
 
 impl EthereumClient {
     /// Create an ethereum client
-    pub fn new(config: EthereumConfig, web3: Web3<Http>) -> Self {
+    pub fn new(config: _EthereumConfig, web3: Web3<Http>) -> Self {
         Self { config, web3 }
     }
 }
 
 impl EthereumClient {
     fn build_address(str: &str) -> color_eyre::Result<Address> {
-        let address = array_bytes::hex2bytes(&str[2..])
-            .map_err(|_| StandardError::Hex2Bytes("str[2..]".into()))?;
+        let address = array_bytes::hex2bytes(&str[2..]).map_err(|_| {
+            EthereumComponentError::WrongKey("str[2..]".to_string(), str.to_string())
+        })?;
         let mut address_buffer = [0u8; 20];
         address_buffer.copy_from_slice(&address);
         Ok(Address::from(address_buffer))
@@ -64,9 +67,7 @@ impl EthereumClient {
         let eth_block = BlockId::Number(BlockNumber::Number(block.into()));
         match self.web3.eth().block(eth_block).await? {
             Some(block) => Ok(block.try_into()?),
-            None => {
-                Err(StandardError::Component(format!("The block [{}] not found", block)).into())
-            }
+            None => Err(EthereumComponentError::BlockNotFound(block).into()),
         }
     }
 

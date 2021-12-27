@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use web3::transports::Http;
 use web3::Web3;
 
@@ -11,8 +12,6 @@ pub struct Web3Provider {
 impl Web3Provider {
     /// Get web3 instance
     pub fn component(&self) -> color_eyre::Result<Web3<Http>> {
-        Ok(Web3::new(Http::new(&self.config.endpoint).map_err(
-            |e| StandardError::NewHttpError(self.config.endpoint.clone(), e.to_string()),
-        )?))
+        Ok(Web3::new(Http::new(&self.endpoint)?))
     }
 }

@@ -9,6 +9,8 @@ pub enum EthereumComponentError {
     NoBeneficiaryAccount,
     #[error("Wrong {0} key ({1}), failed parse to bytes.")]
     WrongKey(String, String),
+    #[error("The block [{0}] not found")]
+    BlockNotFound(u64),
 }
 
 #[derive(ThisError, Debug)]

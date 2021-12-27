@@ -2,14 +2,14 @@ use serde::{Deserialize, Serialize};
 use web3::transports::Http;
 use web3::Web3;
 
-use crate::ethereum::client::{EthereumClient, _EthereumConfig};
+use crate::ethereum::client::EthereumClient;
 use crate::web3::{Web3Component, Web3Config};
 
 pub mod client;
 pub mod types;
 
 /// Ethereum provider
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct EthereumConfig {
     /// Ethereum relayer private key
     pub relayer_private_key: Option<String>,
@@ -17,6 +17,16 @@ pub struct EthereumConfig {
     pub relayer_beneficiary_darwinia_account: Option<String>,
     /// Contract relay address
     pub subscribe_relay_address: String,
+}
+
+impl Default for EthereumConfig {
+    fn default() -> Self {
+        Self {
+            relayer_private_key: Some("0x...".to_string()),
+            relayer_beneficiary_darwinia_account: Some("0x...".to_string()),
+            subscribe_relay_address: "0x...".to_string(),
+        }
+    }
 }
 
 /// Ethereum component

@@ -47,7 +47,7 @@ impl TheGraphLikeEth {
             .client
             .query_with_vars_unwrap::<TheGraphResponse, QueryTransactionsVars>(query, vars)
             .await
-            .map_err(|e| TheGraphLikethComponentError::from(e))?;
+            .map_err(TheGraphLikethComponentError::from)?;
         if let TheGraphResponse::TransactionEntities(txs) = data {
             return Ok(txs);
         }

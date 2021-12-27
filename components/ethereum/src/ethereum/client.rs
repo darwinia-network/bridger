@@ -72,7 +72,7 @@ impl EthereumClient {
             .config
             .relayer_beneficiary_darwinia_account
             .clone()
-            .ok_or_else(|| EthereumComponentError::NoBeneficiaryAccount)?;
+            .ok_or(EthereumComponentError::NoBeneficiaryAccount)?;
         let secret_key = match &self.config.relayer_private_key {
             Some(seed) => {
                 let private_key = array_bytes::hex2bytes(&seed[2..]).map_err(|_| {
@@ -82,7 +82,7 @@ impl EthereumClient {
             }
             None => None,
         }
-        .ok_or_else(|| EthereumComponentError::NoPrivateKey)?;
+        .ok_or(EthereumComponentError::NoPrivateKey)?;
 
         let key_ref = SecretKeyRef::new(&secret_key);
         let contract = Contract::from_json(

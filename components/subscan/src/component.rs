@@ -8,7 +8,7 @@ impl SubscanComponent {
         let client = reqwest::blocking::Client::builder()
             .timeout(std::time::Duration::from_secs(config.timeout.unwrap_or(30)))
             .build()?;
-        let subscan = Subscan::new(client, config.endpoint.clone(), config.token.clone());
+        let subscan = Subscan::new(client, config.endpoint, config.token);
         Ok(subscan)
     }
 }

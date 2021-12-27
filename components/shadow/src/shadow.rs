@@ -116,7 +116,7 @@ impl Shadow {
         if let Some(err) = result.get("error") {
             let msg = err
                 .as_str()
-                .ok_or(BizError::Other("Failed parse error message".to_string()))?;
+                .ok_or_else(|| BizError::Other("Failed parse error message".to_string()))?;
             Err(BizError::Other(msg.to_owned()).into())
         } else {
             let json: EthereumReceiptProofThingJson = serde_json::from_value(result)?;

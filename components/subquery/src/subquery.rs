@@ -58,7 +58,7 @@ impl Subquery {
                 query, vars,
             )
             .await
-            .map_err(|e| SubqueryComponentError::from(e))?;
+            .map_err(SubqueryComponentError::from)?;
         Ok(data
             .get("mMRRootSignedEvents")
             .map(|item| item.nodes.clone())
@@ -90,7 +90,7 @@ impl Subquery {
                 EmptyQueryVar,
             )
             .await
-            .map_err(|e| SubqueryComponentError::from(e))?;
+            .map_err(SubqueryComponentError::from)?;
         let rets = data
             .get("scheduleMMRRootEvents")
             .map(|item| item.nodes.clone())
@@ -128,7 +128,7 @@ impl Subquery {
                 query, vars,
             )
             .await
-            .map_err(|e| SubqueryComponentError::from(e))?;
+            .map_err(SubqueryComponentError::from)?;
         Ok(data
             .get("scheduleAuthoritiesChangeEvents")
             .map(|item| item.nodes.clone())
@@ -172,7 +172,7 @@ impl Subquery {
                 query, vars,
             )
             .await
-            .map_err(|e| SubqueryComponentError::from(e))?;
+            .map_err(SubqueryComponentError::from)?;
         Ok(data
             .get("authoritiesChangeSignedEvents")
             .map(|item| item.nodes.clone())

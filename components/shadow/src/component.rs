@@ -1,6 +1,5 @@
 use component_ethereum::ethereum::{EthereumComponent, EthereumConfig};
 use component_ethereum::web3::Web3Config;
-use component_http_client::{HttpClientComponent, HttpClientConfig};
 
 use crate::{Shadow, ShadowConfig};
 

@@ -1,6 +1,4 @@
 use serde::{Deserialize, Serialize};
-use web3::transports::Http;
-use web3::Web3;
 
 use crate::ethereum::client::EthereumClient;
 use crate::web3::{Web3Component, Web3Config};

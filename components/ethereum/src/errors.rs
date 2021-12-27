@@ -15,6 +15,9 @@ pub enum EthereumComponentError {
 
 #[derive(ThisError, Debug)]
 pub enum BizError {
+    #[error("Other Error: {0}")]
+    Other(String),
+
     #[error("Heartbeat>>> Scanning ethereum too fast from {0}, the latest block number is {1}")]
     ScanningEthereumTooFast(u64, u64),
 

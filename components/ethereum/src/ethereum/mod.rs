@@ -3,13 +3,14 @@ use web3::transports::Http;
 use web3::Web3;
 
 use crate::ethereum::client::{EthereumClient, _EthereumConfig};
+use crate::web3::{Web3Component, Web3Config};
 
 pub mod client;
 pub mod types;
 
 /// Ethereum provider
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub struct EthereumProvider {
+pub struct EthereumConfig {
     /// Ethereum relayer private key
     pub relayer_private_key: Option<String>,
     /// The darwinia account key
@@ -18,14 +19,16 @@ pub struct EthereumProvider {
     pub subscribe_relay_address: String,
 }
 
-impl EthereumProvider {
+/// Ethereum component
+pub struct EthereumComponent;
+
+impl EthereumComponent {
     /// Get ethereum client instance
-    pub fn component(&self, web3: Web3<Http>) -> color_eyre::Result<EthereumClient> {
-        let config = _EthereumConfig {
-            relayer_private_key: self.relayer_private_key.clone(),
-            relayer_beneficiary_darwinia_account: self.relayer_beneficiary_darwinia_account.clone(),
-            subscribe_relay_address: self.subscribe_relay_address.clone(),
-        };
-        Ok(EthereumClient::new(config, web3))
+    pub fn component(
+        ethereum_config: EthereumConfig,
+        web3_config: Web3Config,
+    ) -> color_eyre::Result<EthereumClient> {
+        let web3 = Web3Component::component(web3_config)?;
+        Ok(EthereumClient::new(ethereum_config, web3))
     }
 }

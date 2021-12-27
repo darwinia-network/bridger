@@ -11,27 +11,17 @@ use support_ethereum::block::EthereumHeader;
 
 use crate::errors::EthereumComponentError;
 use crate::ethereum::types::GasPrice;
-
-/// Inner ethereum config struct
-#[doc(hidden)]
-pub struct _EthereumConfig {
-    /// Ethereum relayer private key
-    pub relayer_private_key: Option<String>,
-    /// The darwinia account key
-    pub relayer_beneficiary_darwinia_account: Option<String>,
-    /// Contract relay address
-    pub subscribe_relay_address: String,
-}
+use crate::ethereum::EthereumConfig;
 
 /// Ethereum client
 pub struct EthereumClient {
-    config: _EthereumConfig,
+    config: EthereumConfig,
     web3: Web3<Http>,
 }
 
 impl EthereumClient {
     /// Create an ethereum client
-    pub fn new(config: _EthereumConfig, web3: Web3<Http>) -> Self {
+    pub fn new(config: EthereumConfig, web3: Web3<Http>) -> Self {
         Self { config, web3 }
     }
 }

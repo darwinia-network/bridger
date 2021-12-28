@@ -3,25 +3,30 @@ use std::fmt::{Debug, Formatter};
 use microkv::namespace::NamespaceMicroKV;
 use microkv::MicroKV;
 
-use crate::config::BridgeStateConfig;
+use support_common::constants;
 
-/// Bridge state component
-#[derive(Clone)]
-pub struct BridgeStateComponent;
+use crate::config::MicrokvConfig;
 
-impl BridgeStateComponent {
-    pub fn component(config: BridgeStateConfig) -> color_eyre::Result<BridgeState> {
-        let microkv = crate::microkv::microkv_instance(&config.microkv)?;
-        Ok(BridgeState { microkv })
-    }
-}
-
+/// Bridger state
 #[derive(Clone)]
 pub struct BridgeState {
     microkv: MicroKV,
 }
 
 lifeline::impl_storage_clone!(BridgeState);
+
+impl BridgeState {
+    pub fn new() -> color_eyre::Result<Self> {
+        let base_path = constants::bridger_home();
+        let config_microkv = MicrokvConfig {
+            base_path,
+            db_name: Some("database".to_string()),
+            auto_commit: true,
+        };
+        let microkv = crate::microkv::microkv_instance(&config_microkv)?;
+        Ok(Self { microkv })
+    }
+}
 
 impl BridgeState {
     pub fn microkv(&self) -> &MicroKV {

@@ -1,7 +1,8 @@
-use component_state::state::BridgeState;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Sender};
 
+use component_state::state::BridgeState;
+use support_common::config::{Config, Names};
 use support_lifeline::task::TaskStack;
 
 use crate::bridge::PangolinRopstenBus;
@@ -26,11 +27,12 @@ impl PangolinRopstenTask {
 }
 
 impl PangolinRopstenTask {
-    pub async fn new(
-        config: PangolinRopstenConfig,
-        state: BridgeState,
-    ) -> color_eyre::Result<Self> {
+    pub async fn new() -> color_eyre::Result<Self> {
+        let state = BridgeState::new()?;
+        // check config
+        let _bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
+
         crate::migrate::migrate(&microkv, 2)?;
 
         let bus = PangolinRopstenBus::default();
@@ -50,5 +52,11 @@ impl PangolinRopstenTask {
             .await?;
 
         Ok(Self { stack })
+    }
+}
+
+impl PangolinRopstenTask {
+    pub fn stack(&self) -> &TaskStack<PangolinRopstenBus> {
+        &self.stack
     }
 }

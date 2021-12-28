@@ -502,6 +502,7 @@ dependencies = [
  "lifeline",
  "microkv",
  "serde 1.0.132",
+ "support-common",
  "thiserror",
  "tracing",
 ]

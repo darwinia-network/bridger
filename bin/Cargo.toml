@@ -45,4 +45,4 @@ zip = "0.5"
 support-common     = { path = "../supports/support-common" }
 support-terminal   = { path = "../supports/support-terminal" }
 
-#component-state    = { path = "../components/state" }
+component-state    = { path = "../components/state" }

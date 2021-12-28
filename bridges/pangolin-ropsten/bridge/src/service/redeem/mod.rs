@@ -2,19 +2,18 @@ use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 use postage::broadcast;
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::config::Config;
-use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::BridgeSand;
 use component_state::state::BridgeState;
+use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use component_thegraph_liketh::TheGraphLikeEthComponent;
+use support_common::config::{Config, Names};
+use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
-use crate::bus::PangolinRopstenBus;
-use crate::config::TaskConfig;
-use crate::message::{ToExtrinsicsMessage, ToRedeemMessage};
+use crate::bridge::PangolinRopstenBus;
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::TaskConfig;
+use crate::bridge::{PangolinRopstenConfig, ToExtrinsicsMessage, ToRedeemMessage};
 use crate::service::redeem::handler::RedeemHandler;
-use crate::task::PangolinRopstenTask;
 
 mod handler;
 
@@ -34,7 +33,7 @@ impl Service for RedeemService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
         let tracker = Tracker::new(microkv, "scan.ropsten.redeem");
 
         // Receiver & Sender
@@ -45,7 +44,7 @@ impl Service for RedeemService {
         let sender_to_extrinsics_scan = bus.tx::<ToExtrinsicsMessage>()?;
 
         let _greet_scan = Self::try_task(
-            &format!("{}-service-redeem-scan", PangolinRopstenTask::NAME),
+            &format!("{}-service-redeem-scan", PangolinRopstenTask::name()),
             async move {
                 start_scan(
                     tracker.clone(),
@@ -58,7 +57,7 @@ impl Service for RedeemService {
         );
 
         let _greet_command = Self::try_task(
-            &format!("{}-service-redeem-command", PangolinRopstenTask::NAME),
+            &format!("{}-service-redeem-command", PangolinRopstenTask::name()),
             async move {
                 let mut handler = RedeemHandler::new(
                     sender_to_extrinsics_command.clone(),
@@ -69,7 +68,11 @@ impl Service for RedeemService {
                 while let Some(recv) = rx.recv().await {
                     if let ToRedeemMessage::EthereumTransaction(tx) = recv {
                         if let Err(err) = handler.redeem(tx.clone()).await {
-                            log::error!(target: PangolinRopstenTask::NAME, "redeem err: {:?}", err);
+                            tracing::error!(
+                                target: "pangolin-ropsten",
+                                "redeem err: {:?}",
+                                err
+                            );
                             // TODO: Consider the errors more carefully
                             // Maybe a websocket err, so wait 10 secs to reconnect.
                             tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -84,8 +87,8 @@ impl Service for RedeemService {
                                 .send(ToRedeemMessage::EthereumTransaction(tx.clone()))
                                 .await
                             {
-                                log::error!(
-                                    target: PangolinRopstenTask::NAME,
+                                tracing::error!(
+                                    target: "pangolin-ropsten",
                                     "Failed to retry send redeem message, tx: {:?} err: {:?}",
                                     tx,
                                     e
@@ -117,8 +120,8 @@ async fn start_scan(
     )
     .await
     {
-        log::error!(
-            target: PangolinRopstenTask::NAME,
+        tracing::error!(
+            target: "pangolin-ropsten",
             "[ropsten] redeem err {:?}",
             err
         );
@@ -131,12 +134,13 @@ async fn run_scan(
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
 ) -> color_eyre::Result<()> {
-    // the graph
-    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
-    let thegraph_liketh = component_thegraph_liketh.component().await?;
+    let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
     // task config
-    let task_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+    let task_config: TaskConfig = bridge_config.task;
+
+    // the graph
+    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
 
     let mut handler =
         RedeemHandler::new(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await;
@@ -144,8 +148,8 @@ async fn run_scan(
         let from = tracker.current().await?;
         let limit = 10usize;
 
-        log::trace!(
-            target: PangolinRopstenTask::NAME,
+        tracing::trace!(
+            target: "pangolin-ropsten",
             "[ropsten] Track redeem block: {} and limit: {}",
             from,
             limit
@@ -154,8 +158,8 @@ async fn run_scan(
             .query_transactions(from as u64, limit as u32)
             .await?;
         if txs.is_empty() {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[ropsten] Not found any transactions to redeem"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
@@ -164,8 +168,8 @@ async fn run_scan(
             .await;
             continue;
         }
-        log::debug!(
-            target: PangolinRopstenTask::NAME,
+        tracing::debug!(
+            target: "pangolin-ropsten",
             "[ropsten] Found {} transactions wait to redeem",
             txs.len()
         );
@@ -176,16 +180,16 @@ async fn run_scan(
             let mut times = 0;
             match handler.redeem(tx.clone()).await {
                 Ok(Some(latest)) => {
-                    log::trace!(
-                        target: PangolinRopstenTask::NAME,
+                    tracing::trace!(
+                        target: "pangolin-ropsten",
                         "[ropsten] Change latest redeemed block number to: {}",
                         latest
                     );
                     latest_redeem_block_number = Some(latest);
                 }
                 Ok(None) => {
-                    log::trace!(
-                        target: PangolinRopstenTask::NAME,
+                    tracing::trace!(
+                        target: "pangolin-ropsten",
                         "[ropsten] Latest redeemed block number is: {:?}",
                         latest_redeem_block_number
                     );
@@ -199,8 +203,8 @@ async fn run_scan(
                             .await;
                     if times > 10 {
                         // todo: write log
-                        log::error!(
-                            target: PangolinRopstenTask::NAME,
+                        tracing::error!(
+                            target: "pangolin-ropsten",
                             "[ropsten] Failed to send redeem message. tx: {:?}, err: {:?}",
                             tx,
                             e
@@ -212,8 +216,8 @@ async fn run_scan(
         }
 
         if latest_redeem_block_number.is_none() {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[ropsten] Not have any block redeemed. please wait affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
@@ -224,8 +228,8 @@ async fn run_scan(
         }
 
         let latest = latest_redeem_block_number.unwrap();
-        log::info!(
-            target: PangolinRopstenTask::NAME,
+        tracing::info!(
+            target: "pangolin-ropsten",
             "[ropsten] Set scan redeem block number to: {}",
             latest
         );

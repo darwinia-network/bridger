@@ -12,6 +12,8 @@ pub enum Names {
     Bridger,
     /// Bridge tempalte
     BridgeTemplate,
+    /// Bridge pangolin-ropsten
+    BridgePangolinRopsten,
 }
 
 impl Names {
@@ -19,6 +21,7 @@ impl Names {
         match self {
             Self::Bridger => "bridger",
             Self::BridgeTemplate => "bridge-template",
+            Self::BridgePangolinRopsten => "bridge-pangolin-ropsten",
         }
     }
 }

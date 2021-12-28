@@ -1,21 +1,21 @@
-use bridge_traits::bridge::task::BridgeSand;
-use bridge_traits::error::StandardError;
-use component_state::state::BridgeState;
+use microkv::namespace::NamespaceMicroKV;
 
-use crate::task::PangolinRopstenTask;
+use support_common::error::BridgerError;
+
+use crate::bridge::PangolinRopstenTask;
 
 mod v0;
 mod v1;
 mod v2;
 
-pub fn migrate(state: &BridgeState, version: usize) -> color_eyre::Result<()> {
+pub fn migrate(microkv: &NamespaceMicroKV, version: usize) -> color_eyre::Result<()> {
     let saved_version = current_version(state)?;
     // same version, no migrate
     if saved_version == version {
         return Ok(());
     }
 
-    let steps: Vec<Box<dyn Fn(&BridgeState) -> color_eyre::Result<()>>> = vec![
+    let steps: Vec<Box<dyn Fn(&NamespaceMicroKV) -> color_eyre::Result<()>>> = vec![
         Box::new(v0::migrate),
         Box::new(v1::migrate),
         Box::new(v2::migrate),
@@ -23,7 +23,7 @@ pub fn migrate(state: &BridgeState, version: usize) -> color_eyre::Result<()> {
 
     let max_version = steps.len() - 1;
     if version > max_version {
-        return Err(StandardError::Migration(format!(
+        return Err(BridgerError::Migration(format!(
             "Support max version: {}, but want upgrade to {}.",
             max_version, version
         ))
@@ -38,25 +38,23 @@ pub fn migrate(state: &BridgeState, version: usize) -> color_eyre::Result<()> {
     for ix in from..to {
         let migration = steps.get(ix).unwrap();
         if let Err(e) = migration(state) {
-            return Err(StandardError::Migration(format!(
+            return Err(BridgerError::Migration(format!(
                 "Failed to migrate. step [{}]: {:?}",
                 ix, e
             ))
             .into());
         }
     }
-    flush_version(state, version)?;
+    flush_version(microkv, version)?;
     Ok(())
 }
 
-fn current_version(state: &BridgeState) -> color_eyre::Result<usize> {
-    let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+fn current_version(microkv: &NamespaceMicroKV) -> color_eyre::Result<usize> {
     let version: Option<usize> = microkv.get_as(".version")?;
     Ok(version.unwrap_or(0))
 }
 
-fn flush_version(state: &BridgeState, version: usize) -> color_eyre::Result<()> {
-    let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+fn flush_version(microkv: &NamespaceMicroKV, version: usize) -> color_eyre::Result<()> {
     microkv.put(".version", &version)?;
     Ok(())
 }

@@ -4,21 +4,19 @@ use std::time::Duration;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 use tokio::time::sleep;
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::config::Config;
-use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::BridgeSand;
+use client_pangolin::account::DarwiniaAccount;
+use client_pangolin::component::DarwiniaSubxtComponent;
+use client_pangolin::config::DarwiniaSubxtConfig;
+use client_pangolin::from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia};
 use component_ethereum::errors::BizError;
-use component_pangolin_subxt::account::DarwiniaAccount;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
-use component_pangolin_subxt::config::DarwiniaSubxtConfig;
-use component_pangolin_subxt::from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia};
 use component_shadow::{Shadow, ShadowComponent};
+use support_common::config::{Config, Names};
+use support_lifeline::service::BridgeService;
 
-use crate::bus::PangolinRopstenBus;
-use crate::config::TaskConfig;
-use crate::message::{Extrinsic, ToExtrinsicsMessage, ToGuardMessage};
-use crate::task::PangolinRopstenTask;
+use crate::bridge::PangolinRopstenBus;
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::TaskConfig;
+use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage, ToGuardMessage};
 
 #[derive(Debug)]
 pub struct GuardService {
@@ -37,7 +35,7 @@ impl Service for GuardService {
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         let _greet = Self::try_task(
-            &format!("{}-service-guard", PangolinRopstenTask::NAME),
+            &format!("{}-service-guard", PangolinRopstenTask::name()),
             async move {
                 //
                 tokio::spawn(async move { start(sender_to_extrinsics).await });
@@ -57,7 +55,7 @@ impl Service for GuardService {
 
 async fn start(mut sender_to_extrinsics: impl Sender<ToExtrinsicsMessage>) {
     while let Err(err) = run(&mut sender_to_extrinsics).await {
-        log::error!(target: PangolinRopstenTask::NAME, "guard err {:#?}", err);
+        tracing::error!(target: "pangolin-ropsten", "guard err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
     }
 }
@@ -65,19 +63,18 @@ async fn start(mut sender_to_extrinsics: impl Sender<ToExtrinsicsMessage>) {
 async fn run(
     sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
 ) -> color_eyre::Result<()> {
-    log::info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
+    tracing::info!(target: "pangolin-ropsten", "SERVICE RESTARTING...");
 
-    // Components
-    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-    let component_shadow = ShadowComponent::restore::<PangolinRopstenTask>()?;
+    let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
     // Config
-    let config_darwinia: DarwiniaSubxtConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
-    let servce_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+    let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
+    let servce_config: TaskConfig = bridge_config.task;
 
     // Darwinia client & account
-    let darwinia = component_pangolin_subxt.component().await?;
+    let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
     let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
+
     let account = DarwiniaAccount::new(
         config_darwinia.relayer_private_key,
         config_darwinia.relayer_real_account,
@@ -89,10 +86,15 @@ async fn run(
 
     if is_tech_comm_member {
         // Shadow client
-        let shadow = Arc::new(component_shadow.component().await?);
+        let shadow = ShadowComponent::component(
+            bridge_config.shadow,
+            bridge_config.ethereum,
+            bridge_config.web3,
+        )?;
+        let shadow = Arc::new(shadow);
 
-        log::info!(
-            target: PangolinRopstenTask::NAME,
+        tracing::info!(
+            target: "pangolin-ropsten",
             "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
         );
 
@@ -123,16 +125,16 @@ impl GuardService {
         shadow: Arc<Shadow>,
         sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
     ) -> color_eyre::Result<()> {
-        log::trace!(
-            target: PangolinRopstenTask::NAME,
+        tracing::trace!(
+            target: "pangolin-ropsten",
             "Checking pending headers..."
         );
 
         let last_confirmed = ethereum2darwinia.last_confirmed().await?;
         let pending_headers = ethereum2darwinia.pending_headers().await?;
         if !pending_headers.is_empty() {
-            log::trace!(
-                target: PangolinRopstenTask::NAME,
+            tracing::trace!(
+                target: "pangolin-ropsten",
                 "pending headers: {:?}",
                 pending_headers
                     .clone()
@@ -168,8 +170,8 @@ impl GuardService {
                         if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
                             err.downcast_ref::<BizError>()
                         {
-                            log::trace!(
-                                target: PangolinRopstenTask::NAME,
+                            tracing::trace!(
+                                target: "pangolin-ropsten",
                                 "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
                                 block,
                                 msg

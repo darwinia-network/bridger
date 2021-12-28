@@ -1,11 +1,9 @@
 use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 
-use bridge_traits::bridge::task::BridgeSand;
-
-use crate::message::{Extrinsic, ToExtrinsicsMessage};
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::{Extrinsic, ToExtrinsicsMessage};
 use crate::service::pangolin::types::ScanDataWrapper;
-use crate::task::PangolinRopstenTask;
 
 pub struct ScanScheduleMMRRootEvent<'a> {
     data: &'a mut ScanDataWrapper,
@@ -26,24 +24,24 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             .query_latest_schedule_mmr_root_event()
             .await?;
         if event.is_none() {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] Not have more ScheduleMMRRootEvent"
             );
             return Ok(());
         }
         let latest = event.unwrap();
         if latest.emitted == 1 {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. don't do this again.",
                 latest.event_block_number,
                 latest.at_block_number
             );
             return Ok(());
         } else {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] Queried latest ScheduleMMRRootEvent event block is: {} and at block: {}",
                 latest.event_block_number,
                 latest.at_block_number
@@ -61,8 +59,8 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         {
             Some(v) => v,
             None => {
-                log::warn!(
-                    target: PangolinRopstenTask::NAME,
+                tracing::warn!(
+                    target: "pangolin-ropsten",
                     "[pangolin] Can not get last block header by finalized block hash: {}",
                     finalized_block_hash
                 );
@@ -71,8 +69,8 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         };
 
         if finalized_block_header_number < event_block_number {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] The finalized block number ({}) less than event block number ({}). do nothing.",
                 finalized_block_header_number,
                 event_block_number
@@ -82,8 +80,8 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
 
         let saved_latest: Option<u32> = self.microkv.get_as("latest_mmr_root_sign")?;
         if Some(event_block_number) == saved_latest {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] This event block number ({}) is already submitted. Don't submit again.",
                 event_block_number
             );
@@ -100,8 +98,8 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             )
             .await?
         {
-            log::warn!(
-                target: PangolinRopstenTask::NAME,
+            tracing::warn!(
+                target: "pangolin-ropsten",
                 "[pangolin] Don't need to sign mmr root for this event block: {} and at block: {}",
                 latest.event_block_number,
                 latest.at_block_number
@@ -109,8 +107,8 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             return Ok(());
         }
 
-        log::info!(
-            target: PangolinRopstenTask::NAME,
+        tracing::info!(
+            target: "pangolin-ropsten",
             "[pangolin] Send sign mmr root for event block: {} and at block: {}",
             latest.event_block_number,
             latest.at_block_number

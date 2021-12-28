@@ -1,21 +1,22 @@
 use std::time::SystemTime;
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::config::Config;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
-use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
+use bridge_traits::bridge::component::BridgeComponent;
+use bridge_traits::bridge::config::Config;
+use client_pangolin::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
+use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use component_thegraph_liketh::TheGraphLikeEthComponent;
+use support_common::config::{Config, Names};
+use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
-use crate::bus::PangolinRopstenBus;
-use crate::config::TaskConfig;
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::TaskConfig;
+use crate::bridge::{PangolinRopstenBus, PangolinRopstenConfig};
 use crate::helpers;
-use crate::task::PangolinRopstenTask;
 
 /// Check service
 #[derive(Debug)]
@@ -32,12 +33,12 @@ impl Service for CheckService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
         let tracker = Tracker::new(microkv, "scan.ropsten.check");
 
         // scan task
         let _greet = Self::try_task(
-            &format!("{}-service-check", PangolinRopstenTask::NAME),
+            &format!("{}-service-check", PangolinRopstenTask::name()),
             async move {
                 start(tracker.clone()).await;
                 Ok(())
@@ -49,8 +50,8 @@ impl Service for CheckService {
 
 async fn start(tracker: Tracker) {
     while let Err(err) = run(&tracker).await {
-        log::error!(
-            target: PangolinRopstenTask::NAME,
+        tracing::error!(
+            target: "pangolin-ropsten",
             "ropsten check err {:#?}",
             err
         );
@@ -59,26 +60,25 @@ async fn start(tracker: Tracker) {
 }
 
 async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
-    log::info!(
-        target: PangolinRopstenTask::NAME,
+    tracing::info!(
+        target: "pangolin-ropsten",
         "ROPSTEN CHECK SERVICE RESTARTING..."
     );
+    let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
+    let task_config: TaskConfig = bridge_config.task;
 
-    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
-    let thegraph_liketh = component_thegraph_liketh.component().await?;
-    let task_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph).await?;
 
-    let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
     // Darwinia client
-    let darwinia = component_pangolin_subxt.component().await?;
+    let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
 
     let mut timing = SystemTime::now();
     loop {
         let from = tracker.current().await?;
         let limit = 1usize;
 
-        log::trace!(
-            target: PangolinRopstenTask::NAME,
+        tracing::trace!(
+            target: "pangolin-ropsten",
             "[ropsten] Track check block: {} and limit: {}",
             from,
             limit
@@ -87,8 +87,8 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
             .query_transactions(from as u64, limit as u32)
             .await?;
         if txs.is_empty() {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[ropsten] All transactions checked"
             );
             tokio::time::sleep(std::time::Duration::from_secs(task_config.interval_check)).await;
@@ -108,8 +108,8 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
                 if err_msg.contains("restart") {
                     return Err(e);
                 }
-                log::error!(
-                    target: PangolinRopstenTask::NAME,
+                tracing::error!(
+                    target: "pangolin-ropsten",
                     "Failed verified redeem. [{}]: {}. {:?}",
                     tx.block_number,
                     tx.block_hash,

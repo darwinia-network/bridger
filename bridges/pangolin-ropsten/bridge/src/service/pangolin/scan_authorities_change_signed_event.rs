@@ -1,10 +1,9 @@
 use std::convert::TryInto;
 
-use bridge_traits::bridge::task::BridgeSand;
-use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
+use client_pangolin::to_ethereum::Darwinia2Ethereum;
 
+use crate::bridge::PangolinRopstenTask;
 use crate::service::pangolin::types::ScanDataWrapper;
-use crate::task::PangolinRopstenTask;
 
 pub struct ScanAuthoritiesChangeSignedEvent<'a> {
     data: &'a mut ScanDataWrapper,
@@ -31,15 +30,15 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
             .query_authorities_change_signed_event(self.data.from, self.data.limit)
             .await?;
 
-        log::debug!(
-            target: PangolinRopstenTask::NAME,
+        tracing::debug!(
+            target: "pangolin-ropsten",
             "[pangolin] Track pangolin AuthoritiesChangeSignedEvent block: {} and limit: {}",
             self.data.from,
             self.data.limit
         );
         if events.is_empty() {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] Not have more AuthoritiesChangeSignedEvent"
             );
             return Ok(None);
@@ -47,16 +46,16 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
 
         for event in &events {
             if event.term != current_term {
-                log::info!(
-                    target: PangolinRopstenTask::NAME,
+                tracing::info!(
+                    target: "pangolin-ropsten",
                     "[pangolin] Queried AuthoritiesChangeSignedEvent but not in current term. the event term is {} and current term is {}. skip this.",
                     event.term,
                     current_term
                 );
                 continue;
             }
-            log::trace!(
-                target: PangolinRopstenTask::NAME,
+            tracing::trace!(
+                target: "pangolin-ropsten",
                 "[pangolin] Processing authorities change signed event in block {}",
                 event.at_block_number
             );
@@ -85,8 +84,8 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
                 .submit_authorities_set(message, signatures)
                 .await?;
 
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] Submit authorities to ethereum at block {} with tx: {}",
                 event.at_block_number,
                 tx_hash

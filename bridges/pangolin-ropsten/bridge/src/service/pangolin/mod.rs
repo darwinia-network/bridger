@@ -1,15 +1,14 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Task};
 
-use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::BridgeSand;
 use component_state::state::BridgeState;
+use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
-use crate::bus::PangolinRopstenBus;
-use crate::message::ToExtrinsicsMessage;
+use crate::bridge::PangolinRopstenBus;
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::ToExtrinsicsMessage;
 use crate::service::pangolin::pangolin_scanner::PangolinScanner;
-use crate::task::PangolinRopstenTask;
 
 mod pangolin_scanner;
 mod scan_authorities_change_signed_event;
@@ -32,11 +31,11 @@ impl lifeline::Service for PangolinService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
         let tracker = Tracker::new(microkv.clone(), "scan.pangolin");
 
         let _greet = Self::try_task(
-            &format!("{}-service-pangolin-scan", PangolinRopstenTask::NAME),
+            &format!("{}-service-pangolin-scan", PangolinRopstenTask::name()),
             async move {
                 let scanner = PangolinScanner;
                 scanner

@@ -3,19 +3,18 @@ use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::config::Config;
-use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::BridgeSand;
 use component_state::state::BridgeState;
+use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use component_thegraph_liketh::TheGraphLikeEthComponent;
+use support_common::config::{Config, Names};
+use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
-use crate::bus::PangolinRopstenBus;
-use crate::config::TaskConfig;
-use crate::message::{ToExtrinsicsMessage, ToRelayMessage};
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::TaskConfig;
+use crate::bridge::{PangolinRopstenBus, PangolinRopstenConfig};
+use crate::bridge::{ToExtrinsicsMessage, ToRelayMessage};
 use crate::service::affirm::handler::AffirmHandler;
-use crate::task::PangolinRopstenTask;
 
 mod handler;
 
@@ -37,12 +36,12 @@ impl Service for AffirmService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         // affirm scan
-        let microkv_scan = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let microkv_scan = state.microkv_with_namespace(PangolinRopstenTask::name());
         let tracker = Tracker::new(microkv_scan, "scan.ropsten.affirm");
-        let microkv_scan = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let microkv_scan = state.microkv_with_namespace(PangolinRopstenTask::name());
         let sender_to_extrinsics_scan = bus.tx::<ToExtrinsicsMessage>()?;
         let _greet_scan = Self::try_task(
-            &format!("{}-service-affirm-scan", PangolinRopstenTask::NAME),
+            &format!("{}-service-affirm-scan", PangolinRopstenTask::name()),
             async move {
                 start_scan(
                     tracker.clone(),
@@ -56,17 +55,17 @@ impl Service for AffirmService {
 
         // affirm relay service
         let sender_to_extrinsics_relay = bus.tx::<ToExtrinsicsMessage>()?;
-        let microkv_relay = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let microkv_relay = state.microkv_with_namespace(PangolinRopstenTask::name());
         let _greet_relay = Self::try_task(
-            &format!("{}-service-affirm-relay", PangolinRopstenTask::NAME),
+            &format!("{}-service-affirm-relay", PangolinRopstenTask::name()),
             async move {
                 if let Err(e) =
                     handle_affirm_relay(microkv_relay.clone(), sender_to_extrinsics_relay.clone())
                         .await
                 {
                     // todo: write log
-                    log::error!(
-                        target: PangolinRopstenTask::NAME,
+                    tracing::error!(
+                        target: "pangolin-ropsten",
                         "Failed to handle affirm relay, err: {:?}",
                         e
                     );
@@ -78,9 +77,9 @@ impl Service for AffirmService {
         // receive affirm command
         let mut rx = bus.rx::<ToRelayMessage>()?;
         let sender_to_extrinsics_command = bus.tx::<ToExtrinsicsMessage>()?;
-        let microkv_command = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+        let microkv_command = state.microkv_with_namespace(PangolinRopstenTask::name());
         let _greet_command = Self::try_task(
-            &format!("{}-service-affirm-command", PangolinRopstenTask::NAME),
+            &format!("{}-service-affirm-command", PangolinRopstenTask::name()),
             async move {
                 let handler = AffirmHandler::new(
                     microkv_command.clone(),
@@ -91,8 +90,8 @@ impl Service for AffirmService {
                 while let Some(recv) = rx.recv().await {
                     match recv {
                         ToRelayMessage::EthereumBlockNumber(block_number) => {
-                            log::trace!(
-                                target: PangolinRopstenTask::NAME,
+                            tracing::trace!(
+                                target: "pangolin-ropsten",
                                 "Received new ethereum block number to affirm: {}",
                                 block_number
                             );
@@ -117,11 +116,13 @@ async fn handle_affirm_relay(
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
 ) -> color_eyre::Result<()> {
     // Config
-    let task_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+    let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
+    let task_config = bridge_config.task;
+
     let mut handler = AffirmHandler::new(microkv.clone(), sender_to_extrinsics.clone()).await;
     loop {
         if let Err(err) = handler.affirm().await {
-            log::error!(target: PangolinRopstenTask::NAME, "affirm err: {:#?}", err);
+            tracing::error!(target: "pangolin-ropsten", "affirm err: {:#?}", err);
             // TODO: Consider the errors more carefully
             // Maybe a websocket err, so wait 10 secs to reconnect.
             tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -139,8 +140,8 @@ async fn start_scan(
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
 ) {
     while let Err(err) = run_scan(&tracker, microkv.clone(), sender_to_extrinsics.clone()).await {
-        log::error!(
-            target: PangolinRopstenTask::NAME,
+        tracing::error!(
+            target: "pangolin-ropsten",
             "Failed to run scan ropsten transaction. err: {:?}",
             err
         );
@@ -152,11 +153,11 @@ async fn run_scan(
     microkv: NamespaceMicroKV,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
 ) -> color_eyre::Result<()> {
-    let task_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+    let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
+    let task_config = bridge_config.task;
 
     // the graph
-    let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
-    let thegraph_liketh = component_thegraph_liketh.component().await?;
+    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
 
     let handler = AffirmHandler::new(microkv, sender_to_extrinsics).await;
 
@@ -164,8 +165,8 @@ async fn run_scan(
         let from = tracker.current().await?;
         let limit = 10usize;
 
-        log::trace!(
-            target: PangolinRopstenTask::NAME,
+        tracing::trace!(
+            target: "pangolin-ropsten",
             "[ropsten] Track affirm block: {} and limit: {}",
             from,
             limit
@@ -174,8 +175,8 @@ async fn run_scan(
             .query_transactions(from as u64, limit as u32)
             .await?;
         if txs.is_empty() {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[ropsten] Not found any transactions to affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(

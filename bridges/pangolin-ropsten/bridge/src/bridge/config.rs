@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use component_ethereum::config::{EthereumConfig, Web3Config};
+use client_pangolin::config::DarwiniaSubxtConfig;
+use component_ethereum::ethereum::EthereumConfig;
+use component_ethereum::web3::Web3Config;
 use component_http_client::HttpClientConfig;
-use component_pangolin_subxt::config::DarwiniaSubxtConfig;
 use component_shadow::ShadowConfig;
-use component_subquery::config::SubqueryConfig;
+use component_subquery::SubqueryConfig;
 use component_thegraph_liketh::config::TheGraphLikeEthConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

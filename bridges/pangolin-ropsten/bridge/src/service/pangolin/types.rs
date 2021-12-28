@@ -1,11 +1,11 @@
 use postage::broadcast;
 
+use client_pangolin::darwinia::client::Darwinia;
+use client_pangolin::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
 use component_ethereum::ethereum::client::EthereumClient;
-use component_pangolin_subxt::darwinia::client::Darwinia;
-use component_pangolin_subxt::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
-use component_subquery::subquery::Subquery;
+use component_subquery::Subquery;
 
-use crate::message::ToExtrinsicsMessage;
+use crate::bridge::ToExtrinsicsMessage;
 
 pub struct ScanDataWrapper {
     pub from: u64,

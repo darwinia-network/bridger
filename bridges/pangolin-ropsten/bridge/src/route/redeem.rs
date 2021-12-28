@@ -2,17 +2,13 @@ use array_bytes::hex2bytes_unchecked as bytes;
 use lifeline::{Bus, Sender};
 use web3::types::{TransactionId, H256};
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::task::BridgeSand;
-use bridge_traits::bridge::task::TaskTerminal;
-use bridge_traits::error::StandardError;
+use client_pangolin::component::DarwiniaSubxtComponent;
 use component_ethereum::web3::Web3Component;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
 use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 
-use crate::bus::PangolinRopstenBus;
-use crate::message::ToRedeemMessage;
-use crate::task::PangolinRopstenTask;
+use crate::bridge::PangolinRopstenBus;
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::ToRedeemMessage;
 
 pub async fn redeem(
     bus: &PangolinRopstenBus,
@@ -65,13 +61,13 @@ pub async fn redeem(
         .await?
     {
         trace!(
-            target: PangolinRopstenTask::NAME,
+            target: "pangolin-ropsten",
             "This ethereum tx {:?} has already been redeemed.",
             &eth_tx.tx_hash
         );
     } else {
         trace!(
-            target: PangolinRopstenTask::NAME,
+            target: "pangolin-ropsten",
             "send to redeem service: {:?}",
             &eth_tx.tx_hash
         );

@@ -1,6 +1,6 @@
 use bridge_traits::bridge::task::TaskTerminal;
 
-use crate::bus::PangolinRopstenBus;
+use crate::bridge::PangolinRopstenBus;
 
 mod info;
 mod redeem;

@@ -277,11 +277,14 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 name = "bridge-pangolin-ropsten"
 version = "0.5.0"
 dependencies = [
+ "array-bytes",
  "async-trait",
+ "client-pangolin",
  "color-eyre",
  "component-ethereum",
  "component-http-client",
  "component-shadow",
+ "component-state",
  "component-subquery",
  "component-thegraph-liketh",
  "lifeline",
@@ -487,6 +490,18 @@ dependencies = [
  "serde 1.0.132",
  "serde_json",
  "support-ethereum",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "component-state"
+version = "0.5.0"
+dependencies = [
+ "color-eyre",
+ "lifeline",
+ "microkv",
+ "serde 1.0.132",
  "thiserror",
  "tracing",
 ]

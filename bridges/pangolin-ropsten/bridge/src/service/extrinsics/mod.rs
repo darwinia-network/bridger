@@ -1,14 +1,13 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 
-use bridge_traits::bridge::service::BridgeService;
-use bridge_traits::bridge::task::BridgeSand;
 use component_state::state::BridgeState;
+use support_lifeline::service::BridgeService;
 
-use crate::bus::PangolinRopstenBus;
-use crate::message::ToExtrinsicsMessage;
+use crate::bridge::PangolinRopstenBus;
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::ToExtrinsicsMessage;
 use crate::service::extrinsics::handler::ExtrinsicsHandler;
-use crate::task::PangolinRopstenTask;
 
 mod handler;
 
@@ -32,15 +31,15 @@ impl Service for ExtrinsicsService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
         let _greet = Self::try_task(
-            &format!("{}-service-extrinsics", PangolinRopstenTask::NAME),
+            &format!("{}-service-extrinsics", PangolinRopstenTask::name()),
             async move {
                 let mut handler = ExtrinsicsHandler::new(state.clone()).await;
 
                 while let Some(recv) = rx.recv().await {
                     if let ToExtrinsicsMessage::Extrinsic(ex) = recv {
                         while let Err(err) = handler.send_extrinsic(ex.clone()).await {
-                            log::error!(
-                                target: PangolinRopstenTask::NAME,
+                            tracing::error!(
+                                target: "pangolin-ropsten",
                                 "Failed to send extrinsic {:?} err: {:?}",
                                 ex,
                                 err

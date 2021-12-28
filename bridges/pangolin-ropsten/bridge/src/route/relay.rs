@@ -3,8 +3,8 @@ use lifeline::{Bus, Sender};
 use bridge_traits::bridge::task::TaskTerminal;
 use bridge_traits::error::StandardError;
 
-use crate::bus::PangolinRopstenBus;
-use crate::message::ToRelayMessage;
+use crate::bridge::PangolinRopstenBus;
+use crate::bridge::ToRelayMessage;
 
 pub async fn relay(
     bus: &PangolinRopstenBus,

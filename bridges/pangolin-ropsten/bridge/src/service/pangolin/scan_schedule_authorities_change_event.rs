@@ -2,11 +2,9 @@ use std::convert::TryInto;
 
 use lifeline::Sender;
 
-use bridge_traits::bridge::task::BridgeSand;
-
-use crate::message::{Extrinsic, ToExtrinsicsMessage};
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::{Extrinsic, ToExtrinsicsMessage};
 use crate::service::pangolin::types::ScanDataWrapper;
-use crate::task::PangolinRopstenTask;
 
 pub struct ScanScheduleAuthoritiesChangeEvent<'a> {
     data: &'a mut ScanDataWrapper,
@@ -26,15 +24,15 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
             .query_schedule_authorities_change_event(self.data.from, self.data.limit)
             .await?;
 
-        log::debug!(
-            target: PangolinRopstenTask::NAME,
+        tracing::debug!(
+            target: "pangolin-ropsten",
             "[pangolin] Track pangolin ScheduleAuthoritiesChangeEvent block: {} and limit: {}",
             self.data.from,
             self.data.limit
         );
         if events.is_empty() {
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] Not have more ScheduleAuthoritiesChangeEvent"
             );
             return Ok(None);
@@ -54,8 +52,8 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
                     .await?;
 
             if !need_to_sign {
-                log::trace!(
-                    target: PangolinRopstenTask::NAME,
+                tracing::trace!(
+                    target: "pangolin-ropsten",
                     "[pangolin] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {}",
                     array_bytes::bytes2hex("0x", message),
                     event.at_block_number
@@ -63,8 +61,8 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
                 continue;
             }
 
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] Try sign and send authorities with message: {} at block: {}",
                 array_bytes::bytes2hex("0x", message),
                 event.at_block_number

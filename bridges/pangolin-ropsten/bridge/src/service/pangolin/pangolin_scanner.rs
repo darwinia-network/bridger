@@ -1,25 +1,23 @@
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::config::Config;
-use bridge_traits::bridge::task::BridgeSand;
-use component_ethereum::config::Web3Config;
+use client_pangolin::account::DarwiniaAccount;
+use client_pangolin::component::DarwiniaSubxtComponent;
+use client_pangolin::config::DarwiniaSubxtConfig;
+use client_pangolin::to_ethereum::Account as ToEthereumAccount;
+use client_pangolin::to_ethereum::Darwinia2Ethereum;
 use component_ethereum::ethereum::EthereumComponent;
-use component_pangolin_subxt::account::DarwiniaAccount;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
-use component_pangolin_subxt::config::DarwiniaSubxtConfig;
-use component_pangolin_subxt::to_ethereum::Account as ToEthereumAccount;
-use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
+use component_ethereum::web3::Web3Config;
 use component_subquery::SubqueryComponent;
+use support_common::config::{Config, Names};
 use support_tracker::Tracker;
 
-use crate::message::ToExtrinsicsMessage;
+use crate::bridge::ToExtrinsicsMessage;
+use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};
 use crate::service::pangolin::scan_authorities_change_signed_event::ScanAuthoritiesChangeSignedEvent;
 use crate::service::pangolin::scan_schedule_authorities_change_event::ScanScheduleAuthoritiesChangeEvent;
 use crate::service::pangolin::scan_schedule_mmr_root_event::ScanScheduleMMRRootEvent;
 use crate::service::pangolin::types::ScanDataWrapper;
-use crate::task::PangolinRopstenTask;
 
 pub struct PangolinScanner;
 
@@ -38,8 +36,8 @@ impl PangolinScanner {
             )
             .await
         {
-            log::error!(
-                target: PangolinRopstenTask::NAME,
+            tracing::error!(
+                target: "pangolin-ropsten",
                 "[pangolin] An error occurred while processing the extrinsics: {:?}",
                 err
             );
@@ -54,24 +52,23 @@ impl PangolinScanner {
         tracker: Tracker,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> color_eyre::Result<()> {
-        // subquery
-        let component_subquery = SubqueryComponent::restore::<PangolinRopstenTask>()?;
-        let subquery = component_subquery.component().await?;
-
-        // darwinia
-        let component_pangolin_subxt = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-        let darwinia = component_pangolin_subxt.component().await?;
-
-        // ethereum
-        let component_ethereum = EthereumComponent::restore::<PangolinRopstenTask>()?;
-        let ethereum = component_ethereum.component().await?;
-
-        let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
+        let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
         // config
-        let config_darwinia: DarwiniaSubxtConfig =
-            Config::restore_unwrap(PangolinRopstenTask::NAME)?;
-        let config_web3: Web3Config = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
+        let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
+        let config_web3: Web3Config = bridge_config.web3;
+
+        // subquery
+        let subquery = SubqueryComponent::component(bridge_config.subquery)?;
+
+        // darwinia
+        let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
+
+        // ethereum
+        let ethereum =
+            EthereumComponent::component(bridge_config.ethereum, config_web3.clone()).await?;
+
+        let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
 
         let account = DarwiniaAccount::new(
             config_darwinia.relayer_private_key,
@@ -96,8 +93,8 @@ impl PangolinScanner {
         loop {
             let from = tracker.current().await?;
             let limit = 10u32;
-            log::info!(
-                target: PangolinRopstenTask::NAME,
+            tracing::info!(
+                target: "pangolin-ropsten",
                 "[pangolin] Track pangolin scan block: {} and limit: {}",
                 from,
                 limit

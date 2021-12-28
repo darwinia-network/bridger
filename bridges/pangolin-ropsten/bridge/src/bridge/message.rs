@@ -9,7 +9,7 @@ use component_thegraph_liketh::types::TransactionEntity;
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
 use support_ethereum::receipt::EthereumReceiptProofThing;
 
-use crate::bus::PangolinRopstenBus;
+use crate::bridge::PangolinRopstenBus;
 
 #[derive(Debug, Clone)]
 pub enum DarwiniaEthereumMessage {

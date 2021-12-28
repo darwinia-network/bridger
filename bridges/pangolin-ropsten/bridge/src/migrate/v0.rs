@@ -1,12 +1,8 @@
 use microkv::namespace::NamespaceMicroKV;
 
-use bridge_traits::bridge::task::BridgeSand;
-use component_state::state::BridgeState;
+use crate::bridge::PangolinRopstenTask;
 
-use crate::task::PangolinRopstenTask;
-
-pub fn migrate(state: &BridgeState) -> color_eyre::Result<()> {
-    let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
+pub fn migrate(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
     migrate_scan_pangolin(&microkv)?;
     migrate_scan_opsten(&microkv)?;
     Ok(())

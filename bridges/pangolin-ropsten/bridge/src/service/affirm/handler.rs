@@ -1,19 +1,20 @@
-use lifeline::Sender;
 use std::sync::Arc;
 
+use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
 use bridge_traits::bridge::component::BridgeComponent;
 use bridge_traits::bridge::task::BridgeSand;
+use client_pangolin::component::DarwiniaSubxtComponent;
+use client_pangolin::from_ethereum::Ethereum2Darwinia;
 use component_ethereum::errors::BizError;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
-use component_pangolin_subxt::from_ethereum::Ethereum2Darwinia;
 use component_shadow::{Shadow, ShadowComponent};
+use support_common::config::{Config, Names};
 use support_ethereum::block::EthereumHeader;
 
-use crate::message::{Extrinsic, ToExtrinsicsMessage};
-use crate::task::PangolinRopstenTask;
+use crate::bridge::PangolinRopstenTask;
+use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage};
 
 pub struct AffirmHandler {
     microkv: NamespaceMicroKV,
@@ -31,8 +32,8 @@ impl AffirmHandler {
             match AffirmHandler::build(microkv.clone(), sender_to_extrinsics.clone()).await {
                 Ok(handler) => return handler,
                 Err(err) => {
-                    log::error!(
-                        target: PangolinRopstenTask::NAME,
+                    tracing::error!(
+                        target: "pangolin-ropsten",
                         "Failed to init affirm handler. err: {:#?}",
                         err
                     );
@@ -46,21 +47,23 @@ impl AffirmHandler {
         microkv: NamespaceMicroKV,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> color_eyre::Result<Self> {
-        log::info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
-
-        // Components
-        let component_darwinia = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-        let component_shadow = ShadowComponent::restore::<PangolinRopstenTask>()?;
+        tracing::info!(target: "pangolin-ropsten", "SERVICE RESTARTING...");
+        let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
         // Darwinia client
-        let darwinia = component_darwinia.component().await?;
+        let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia)?;
         let darwinia = Ethereum2Darwinia::new(darwinia.clone());
 
         // Shadow client
-        let shadow = Arc::new(component_shadow.component().await?);
+        let shadow = ShadowComponent::component(
+            bridge_config.shadow,
+            bridge_config.ethereum,
+            bridge_config.web3,
+        )?;
+        let shadow = Arc::new(shadow);
 
-        log::info!(
-            target: PangolinRopstenTask::NAME,
+        tracing::info!(
+            target: "pangolin-ropsten",
             "✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY"
         );
         Ok(AffirmHandler {
@@ -78,8 +81,8 @@ impl AffirmHandler {
         let mut relayed = self.microkv.get_as("affirm.relayed")?.unwrap_or(0);
         let target = self.microkv.get_as("affirm.target")?.unwrap_or(0);
 
-        log::trace!(
-            target: PangolinRopstenTask::NAME,
+        tracing::trace!(
+            target: "pangolin-ropsten",
             "The last confirmed ethereum block is {}",
             last_confirmed
         );
@@ -88,23 +91,23 @@ impl AffirmHandler {
             self.microkv.put("affirm.relayed", &last_confirmed)?;
             relayed = last_confirmed;
         } else {
-            log::trace!(
-                target: PangolinRopstenTask::NAME,
+            tracing::trace!(
+                target: "pangolin-ropsten",
                 "The last relayed ethereum block is {}",
                 relayed
             );
         }
 
         if target > relayed {
-            log::trace!(
-                target: PangolinRopstenTask::NAME,
+            tracing::trace!(
+                target: "pangolin-ropsten",
                 "Your are affirming ethereum block {}",
                 target
             );
             self.do_affirm(target).await?
         } else {
-            log::trace!(
-                target: PangolinRopstenTask::NAME,
+            tracing::trace!(
+                target: "pangolin-ropsten",
                 "You do not need to affirm ethereum block {}",
                 target
             );
@@ -132,8 +135,8 @@ impl AffirmHandler {
         for pending_header in pending_headers {
             let pending_block_number = pending_header.1.header.number;
             if pending_block_number >= target {
-                log::trace!(
-                    target: PangolinRopstenTask::NAME,
+                tracing::trace!(
+                    target: "pangolin-ropsten",
                     "The affirming target block {} is in pending",
                     target
                 );
@@ -145,8 +148,8 @@ impl AffirmHandler {
         for (_game_id, game) in self.darwinia.affirmations().await?.iter() {
             for (_round_id, affirmations) in game.iter() {
                 if Ethereum2Darwinia::contains(affirmations, target) {
-                    log::trace!(
-                        target: PangolinRopstenTask::NAME,
+                    tracing::trace!(
+                        target: "pangolin-ropsten",
                         "The affirming target block {} is in the relayer game",
                         target
                     );
@@ -155,8 +158,8 @@ impl AffirmHandler {
             }
         }
 
-        log::trace!(
-            target: PangolinRopstenTask::NAME,
+        tracing::trace!(
+            target: "pangolin-ropsten",
             "Prepare to affirm ethereum block: {}",
             target
         );
@@ -164,8 +167,8 @@ impl AffirmHandler {
         match self.shadow.parcel(target as usize).await {
             Ok(parcel) => {
                 if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
-                    log::trace!(
-                        target: PangolinRopstenTask::NAME,
+                    tracing::trace!(
+                        target: "pangolin-ropsten",
                         "Shadow service failed to provide parcel for block {}",
                         target
                     );
@@ -184,8 +187,8 @@ impl AffirmHandler {
                 if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
                     err.downcast_ref::<BizError>()
                 {
-                    log::trace!(
-                        target: PangolinRopstenTask::NAME,
+                    tracing::trace!(
+                        target: "pangolin-ropsten",
                         "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
                         block,
                         msg

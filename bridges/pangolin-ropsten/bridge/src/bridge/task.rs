@@ -1,14 +1,12 @@
+use component_state::state::BridgeState;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Sender};
 
-use bridge_traits::bridge::task::{
-    BridgeSand, BridgeTask, BridgeTaskKeep, TaskStack, TaskTerminal,
-};
-use component_state::state::BridgeState;
+use support_lifeline::task::TaskStack;
 
-use crate::bus::PangolinRopstenBus;
-use crate::config::PangolinRopstenConfig;
-use crate::message::{DarwiniaEthereumMessage, EthereumScanMessage};
+use crate::bridge::PangolinRopstenBus;
+use crate::bridge::PangolinRopstenConfig;
+use crate::bridge::{DarwiniaEthereumMessage, EthereumScanMessage};
 use crate::service::affirm::AffirmService;
 use crate::service::check::CheckService;
 use crate::service::extrinsics::ExtrinsicsService;
@@ -21,34 +19,9 @@ pub struct PangolinRopstenTask {
     stack: TaskStack<PangolinRopstenBus>,
 }
 
-impl BridgeSand for PangolinRopstenTask {
-    const NAME: &'static str = "task-pangolin-ropsten";
-}
-
-#[async_trait::async_trait]
-impl BridgeTaskKeep for PangolinRopstenTask {
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-        self
-    }
-    async fn route(
-        &self,
-        uri: String,
-        param: serde_json::Value,
-    ) -> color_eyre::Result<TaskTerminal> {
-        crate::route::dispatch_route(self.stack.bus(), uri, param).await
-    }
-}
-
-impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
-    fn config_template() -> color_eyre::Result<serde_json::Value> {
-        Ok(serde_json::to_value(PangolinRopstenConfig::template())?)
-    }
-
-    fn stack(&mut self) -> &mut TaskStack<PangolinRopstenBus> {
-        &mut self.stack
+impl PangolinRopstenTask {
+    pub fn name() -> &'static str {
+        "task-pangolin-ropsten"
     }
 }
 
@@ -57,7 +30,8 @@ impl PangolinRopstenTask {
         config: PangolinRopstenConfig,
         state: BridgeState,
     ) -> color_eyre::Result<Self> {
-        crate::migrate::migrate(&state, 2)?;
+        let microkv = state.microkv_with_namespace(PangolinRopstenTask::name()());
+        crate::migrate::migrate(&microkv, 2)?;
 
         config.store(Self::NAME)?;
         let bus = PangolinRopstenBus::default();

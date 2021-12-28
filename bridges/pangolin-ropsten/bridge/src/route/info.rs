@@ -13,8 +13,8 @@ use component_pangolin_subxt::events::EventInfo;
 use component_pangolin_subxt::rpc::FormatedMMR;
 use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
 
-use crate::bus::PangolinRopstenBus;
-use crate::task::PangolinRopstenTask;
+use crate::bridge::PangolinRopstenBus;
+use crate::bridge::PangolinRopstenTask;
 
 #[derive(Default, Debug)]
 struct TxProofWithMMRProof {

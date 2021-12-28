@@ -1,6 +1,6 @@
 use structopt::StructOpt;
 
-use crate::command::types::AffirmOpts;
+use crate::command::types::{AffirmOpts, ConfirmOpts};
 
 /// Bridge pangolin-ropsten options
 #[derive(Debug, StructOpt)]
@@ -13,5 +13,11 @@ pub enum Opts {
         /// Commands of affirm
         #[structopt(flatten)]
         command: AffirmOpts,
+    },
+    /// Do confirm
+    Confirm {
+        /// Commands of confirm
+        #[structopt(flatten)]
+        command: ConfirmOpts,
     },
 }

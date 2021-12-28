@@ -18,6 +18,12 @@ pub enum BridgerError {
     #[error("Custom error: {0}")]
     Custom(String),
 
+    #[error("Hex error: {0}")]
+    Hex(String),
+
+    #[error("Hex error: {0}")]
+    Migration(String),
+
     #[error("Wrap error: {0}")]
     Wrap(Box<dyn std::error::Error + Send + Sync>),
 }

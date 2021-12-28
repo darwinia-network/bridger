@@ -1,0 +1,557 @@
+[
+  {
+    "constant": true,
+    "inputs": [{ "name": "", "type": "address" }],
+    "name": "userTotalDeposit",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_USER_POINTS",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "name": "", "type": "address" },
+      { "name": "", "type": "uint256" }
+    ],
+    "name": "userDeposits",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_benificiary", "type": "address" },
+      { "name": "_amount", "type": "uint256" },
+      { "name": "_months", "type": "uint256" }
+    ],
+    "name": "deposit",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "owner_", "type": "address" }],
+    "name": "setOwner",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_WATER_ERC20_TOKEN",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_GOLD_ERC20_TOKEN",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "depositCount",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_RING_ERC20_TOKEN",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UINT_AUCTION_CUT",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UINT_BANK_UNIT_INTEREST",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_TOKEN_LOCATION",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "_depositID", "type": "uint256" }],
+    "name": "computePenalty",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_benificiary", "type": "address" },
+      { "name": "_depositID", "type": "uint256" }
+    ],
+    "name": "transferDeposit",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "name": "_value", "type": "uint256" },
+      { "name": "_month", "type": "uint256" },
+      { "name": "_unitInterest", "type": "uint256" }
+    ],
+    "name": "computeInterest",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_KTON_ERC20_TOKEN",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_WOOD_ERC20_TOKEN",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "_depositID", "type": "uint256" }],
+    "name": "claimDeposit",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_FIRE_ERC20_TOKEN",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UINT_BANK_PENALTY_MULTIPLIER",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "_depositID", "type": "uint256" }],
+    "name": "isClaimRequirePenalty",
+    "outputs": [{ "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_LAND_BASE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "authority_", "type": "address" }],
+    "name": "setAuthority",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "registry",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_INTERSTELLAR_ENCODER",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_PET_BASE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_SOIL_ERC20_TOKEN",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "_id", "type": "uint256" }],
+    "name": "getDeposit",
+    "outputs": [
+      { "name": "", "type": "address" },
+      { "name": "", "type": "uint128" },
+      { "name": "", "type": "uint128" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "uint256" },
+      { "name": "", "type": "bool" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_OBJECT_OWNERSHIP",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_TOKEN_USE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "_registry", "type": "address" }],
+    "name": "setRegistry",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "", "type": "uint256" }],
+    "name": "deposits",
+    "outputs": [
+      { "name": "depositor", "type": "address" },
+      { "name": "months", "type": "uint48" },
+      { "name": "startAt", "type": "uint48" },
+      { "name": "value", "type": "uint128" },
+      { "name": "unitInterest", "type": "uint64" },
+      { "name": "claimed", "type": "bool" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "_registry", "type": "address" }],
+    "name": "initializeContract",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_ERC721_BRIDGE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_REVENUE_POOL",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "authority",
+    "outputs": [{ "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_from", "type": "address" },
+      { "name": "_amount", "type": "uint256" },
+      { "name": "_data", "type": "bytes" }
+    ],
+    "name": "tokenFallback",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "_user", "type": "address" }],
+    "name": "getDepositIds",
+    "outputs": [{ "name": "", "type": "uint256[]" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "name": "_encodedParam", "type": "bytes" }],
+    "name": "bytesToUint256",
+    "outputs": [{ "name": "a", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_LAND_RESOURCE",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "MONTH",
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UINT_REFERER_CUT",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "_token", "type": "address" }],
+    "name": "claimTokens",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_amount", "type": "uint256" },
+      { "name": "_months", "type": "uint256" }
+    ],
+    "name": "deposit",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "name": "_depositID", "type": "uint256" }],
+    "name": "claimDepositWithPenalty",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UINT_TOKEN_OFFER_CUT",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "CONTRACT_DIVIDENDS_POOL",
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_depositID", "type": "uint256" },
+      { "name": "_data", "type": "bytes" }
+    ],
+    "name": "burnAndRedeem",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "_token", "type": "address" },
+      { "indexed": true, "name": "_owner", "type": "address" },
+      { "indexed": false, "name": "_amount", "type": "uint256" }
+    ],
+    "name": "ClaimedTokens",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "_depositID", "type": "uint256" },
+      { "indexed": true, "name": "_depositor", "type": "address" },
+      { "indexed": false, "name": "_value", "type": "uint256" },
+      { "indexed": false, "name": "_month", "type": "uint256" },
+      { "indexed": false, "name": "_interest", "type": "uint256" }
+    ],
+    "name": "NewDeposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "_depositID", "type": "uint256" },
+      { "indexed": true, "name": "_depositor", "type": "address" },
+      { "indexed": false, "name": "_value", "type": "uint256" },
+      { "indexed": false, "name": "isPenalty", "type": "bool" },
+      { "indexed": false, "name": "penaltyAmount", "type": "uint256" }
+    ],
+    "name": "ClaimedDeposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "_depositID", "type": "uint256" },
+      { "indexed": true, "name": "_oldDepositor", "type": "address" },
+      { "indexed": true, "name": "_newDepositor", "type": "address" }
+    ],
+    "name": "TransferDeposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "name": "_depositID", "type": "uint256" },
+      { "indexed": false, "name": "_depositor", "type": "address" },
+      { "indexed": false, "name": "_months", "type": "uint48" },
+      { "indexed": false, "name": "_startAt", "type": "uint48" },
+      { "indexed": false, "name": "_unitInterest", "type": "uint64" },
+      { "indexed": false, "name": "_value", "type": "uint128" },
+      { "indexed": false, "name": "_data", "type": "bytes" }
+    ],
+    "name": "BurnAndRedeem",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "name": "authority", "type": "address" }],
+    "name": "LogSetAuthority",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "name": "owner", "type": "address" }],
+    "name": "LogSetOwner",
+    "type": "event"
+  }
+]

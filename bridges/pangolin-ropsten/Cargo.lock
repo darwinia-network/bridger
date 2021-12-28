@@ -78,6 +78,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ad284aeb45c13f2fb4f084de4a420ebf447423bdf9386c0540ce33cb3ef4b8c"
 
 [[package]]
+name = "array-init"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23589ecb866b460d3a0f1278834750268c607e8e28a1b982c907219f3178cd72"
+dependencies = [
+ "nodrop",
+]
+
+[[package]]
 name = "arrayref"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -270,6 +279,11 @@ version = "0.5.0"
 dependencies = [
  "async-trait",
  "color-eyre",
+ "component-ethereum",
+ "component-http-client",
+ "component-shadow",
+ "component-subquery",
+ "component-thegraph-liketh",
  "lifeline",
  "microkv",
  "parity-scale-codec",
@@ -349,6 +363,7 @@ dependencies = [
  "libc",
  "num-integer",
  "num-traits 0.2.14",
+ "time",
  "winapi",
 ]
 
@@ -365,6 +380,29 @@ dependencies = [
  "textwrap",
  "unicode-width",
  "vec_map",
+]
+
+[[package]]
+name = "client-pangolin"
+version = "0.5.0"
+dependencies = [
+ "anyhow",
+ "array-bytes",
+ "async-trait",
+ "frame-support",
+ "jsonrpsee-types",
+ "log",
+ "pallet-im-online",
+ "pallet-indices",
+ "parity-scale-codec",
+ "secp256k1",
+ "serde 1.0.132",
+ "serde_json",
+ "substrate-subxt",
+ "substrate-subxt-proc-macro",
+ "support-ethereum",
+ "thiserror",
+ "web3",
 ]
 
 [[package]]
@@ -412,6 +450,73 @@ dependencies = [
  "atty",
  "lazy_static",
  "winapi",
+]
+
+[[package]]
+name = "component-ethereum"
+version = "0.5.0"
+dependencies = [
+ "array-bytes",
+ "color-eyre",
+ "reqwest",
+ "secp256k1",
+ "serde 1.0.132",
+ "support-ethereum",
+ "thiserror",
+ "tracing",
+ "web3",
+]
+
+[[package]]
+name = "component-http-client"
+version = "0.5.0"
+dependencies = [
+ "color-eyre",
+ "reqwest",
+ "serde 1.0.132",
+ "tracing",
+]
+
+[[package]]
+name = "component-shadow"
+version = "0.5.0"
+dependencies = [
+ "color-eyre",
+ "component-ethereum",
+ "reqwest",
+ "serde 1.0.132",
+ "serde_json",
+ "support-ethereum",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "component-subquery"
+version = "0.5.0"
+dependencies = [
+ "async-trait",
+ "color-eyre",
+ "gql_client",
+ "hex",
+ "serde 1.0.132",
+ "serde-aux",
+ "serde-hex",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "component-thegraph-liketh"
+version = "0.5.0"
+dependencies = [
+ "async-trait",
+ "color-eyre",
+ "gql_client",
+ "serde 1.0.132",
+ "serde-aux",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]
@@ -529,7 +634,7 @@ version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c1a816186fa68d9e426e3cb4ae4dff1fcd8e4a2c34b781bf7a822574a0d0aac8"
 dependencies = [
- "sct",
+ "sct 0.6.1",
 ]
 
 [[package]]
@@ -863,7 +968,7 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "serde 1.0.132",
- "smallvec",
+ "smallvec 1.7.0",
  "sp-arithmetic",
  "sp-core",
  "sp-inherents",
@@ -1078,6 +1183,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78cc372d058dcf6d5ecd98510e7fbc9e5aec4d21de70f65fea8fecebcd881bd4"
 
 [[package]]
+name = "gql_client"
+version = "1.0.1"
+source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#8e905eb9e8100efcb4849b659c0df2ea1a07a97e"
+dependencies = [
+ "reqwest",
+ "serde 1.0.132",
+ "serde_json",
+]
+
+[[package]]
 name = "h2"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1278,11 +1393,24 @@ dependencies = [
  "futures-util",
  "hyper",
  "log",
- "rustls",
+ "rustls 0.19.1",
  "rustls-native-certs",
  "tokio",
- "tokio-rustls",
- "webpki",
+ "tokio-rustls 0.22.0",
+ "webpki 0.21.4",
+]
+
+[[package]]
+name = "hyper-rustls"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d87c48c02e0dc5e3b849a2041db3029fd066650f8f717c07bf8ed78ccb895cac"
+dependencies = [
+ "http",
+ "hyper",
+ "rustls 0.20.2",
+ "tokio",
+ "tokio-rustls 0.23.2",
 ]
 
 [[package]]
@@ -1443,7 +1571,7 @@ dependencies = [
  "fnv",
  "futures",
  "hyper",
- "hyper-rustls",
+ "hyper-rustls 0.22.1",
  "jsonrpsee-types",
  "jsonrpsee-utils",
  "log",
@@ -1509,14 +1637,14 @@ dependencies = [
  "jsonrpsee-types",
  "log",
  "pin-project 1.0.8",
- "rustls",
+ "rustls 0.19.1",
  "rustls-native-certs",
  "serde 1.0.132",
  "serde_json",
  "soketto 0.6.0",
  "thiserror",
  "tokio",
- "tokio-rustls",
+ "tokio-rustls 0.22.0",
  "tokio-util",
  "url",
 ]
@@ -1678,6 +1806,12 @@ checksum = "add85d4dd35074e6fedc608f8c8f513a3548619a9024b751949ef0e8e45a4d84"
 dependencies = [
  "rawpointer",
 ]
+
+[[package]]
+name = "maybe-uninit"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 
 [[package]]
 name = "memchr"
@@ -2182,7 +2316,7 @@ dependencies = [
  "cloudabi",
  "libc",
  "redox_syscall 0.1.57",
- "smallvec",
+ "smallvec 1.7.0",
  "winapi",
 ]
 
@@ -2196,7 +2330,7 @@ dependencies = [
  "instant",
  "libc",
  "redox_syscall 0.2.10",
- "smallvec",
+ "smallvec 1.7.0",
  "winapi",
 ]
 
@@ -2608,6 +2742,7 @@ dependencies = [
  "http",
  "http-body",
  "hyper",
+ "hyper-rustls 0.23.0",
  "hyper-tls",
  "ipnet",
  "js-sys",
@@ -2617,15 +2752,19 @@ dependencies = [
  "native-tls",
  "percent-encoding",
  "pin-project-lite",
+ "rustls 0.20.2",
+ "rustls-pemfile",
  "serde 1.0.132",
  "serde_json",
  "serde_urlencoded",
  "tokio",
  "tokio-native-tls",
+ "tokio-rustls 0.23.2",
  "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
+ "webpki-roots",
  "winreg",
 ]
 
@@ -2705,8 +2844,20 @@ dependencies = [
  "base64",
  "log",
  "ring",
- "sct",
- "webpki",
+ "sct 0.6.1",
+ "webpki 0.21.4",
+]
+
+[[package]]
+name = "rustls"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d37e5e2290f3e040b594b1a9e04377c2c671f1a1cfd9bfdef82106ac1c113f84"
+dependencies = [
+ "log",
+ "ring",
+ "sct 0.7.0",
+ "webpki 0.22.0",
 ]
 
 [[package]]
@@ -2716,9 +2867,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5a07b7c1885bd8ed3831c289b7870b13ef46fe0e856d288c30d9cc17d75a2092"
 dependencies = [
  "openssl-probe",
- "rustls",
+ "rustls 0.19.1",
  "schannel",
  "security-framework",
+]
+
+[[package]]
+name = "rustls-pemfile"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5eebeaeb360c87bfb72e84abdb3447159c0eaececf1bef2aecd65a8be949d1c9"
+dependencies = [
+ "base64",
 ]
 
 [[package]]
@@ -2785,6 +2945,16 @@ name = "sct"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b362b83898e0e69f38515b82ee15aa80636befe47c3b6d3d89a911e78fc228ce"
+dependencies = [
+ "ring",
+ "untrusted",
+]
+
+[[package]]
+name = "sct"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d53dcdb7c9f8158937a7981b48accfd39a43af418591a5d008c7b22b5e1b7ca4"
 dependencies = [
  "ring",
  "untrusted",
@@ -2869,6 +3039,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b9875c23cf305cd1fd7eb77234cbb705f21ea6a72c637a5c6db5fe4b8e7f008"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-aux"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae50f53d4b01e854319c1f5b854cd59471f054ea7e554988850d3f36ca1dc852"
+dependencies = [
+ "chrono",
+ "serde 1.0.132",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
+name = "serde-hex"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca37e3e4d1b39afd7ff11ee4e947efae85adfddf4841787bfa47c470e96dc26d"
+dependencies = [
+ "array-init",
+ "serde 1.0.132",
+ "smallvec 0.6.14",
 ]
 
 [[package]]
@@ -3038,6 +3231,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8347046d4ebd943127157b94d63abb990fcf729dc4e9978927fdf4ac3c998d06"
 dependencies = [
  "erased-serde",
+]
+
+[[package]]
+name = "smallvec"
+version = "0.6.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b97fcaeba89edba30f044a10c6a3cc39df9c3f17d7cd829dd1446cab35f890e0"
+dependencies = [
+ "maybe-uninit",
 ]
 
 [[package]]
@@ -3432,7 +3634,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "rand 0.7.3",
- "smallvec",
+ "smallvec 1.7.0",
  "sp-core",
  "sp-externalities",
  "sp-panic-handler",
@@ -3878,6 +4080,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "time"
+version = "0.1.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca8a50ef2360fbd1eeb0ecd46795a87a19024eb4b53c5dc916ca1fd95fe62438"
+dependencies = [
+ "libc",
+ "winapi",
+]
+
+[[package]]
 name = "tiny-bip39"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3966,9 +4178,20 @@ version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc6844de72e57df1980054b38be3a9f4702aba4858be64dd700181a8a6d0e1b6"
 dependencies = [
- "rustls",
+ "rustls 0.19.1",
  "tokio",
- "webpki",
+ "webpki 0.21.4",
+]
+
+[[package]]
+name = "tokio-rustls"
+version = "0.23.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a27d5f2b839802bd8267fa19b0530f5a08b9c08cd417976be2a65d130fe1c11b"
+dependencies = [
+ "rustls 0.20.2",
+ "tokio",
+ "webpki 0.22.0",
 ]
 
 [[package]]
@@ -4089,7 +4312,7 @@ dependencies = [
  "serde 1.0.132",
  "serde_json",
  "sharded-slab",
- "smallvec",
+ "smallvec 1.7.0",
  "thread_local",
  "tracing",
  "tracing-core",
@@ -4107,7 +4330,7 @@ dependencies = [
  "hashbrown",
  "log",
  "rustc-hex",
- "smallvec",
+ "smallvec 1.7.0",
 ]
 
 [[package]]
@@ -4436,6 +4659,25 @@ checksum = "b8e38c0608262c46d4a56202ebabdeb094cef7e560ca7a226c6bf055188aa4ea"
 dependencies = [
  "ring",
  "untrusted",
+]
+
+[[package]]
+name = "webpki"
+version = "0.22.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f095d78192e208183081cc07bc5515ef55216397af48b873e5edcd72637fa1bd"
+dependencies = [
+ "ring",
+ "untrusted",
+]
+
+[[package]]
+name = "webpki-roots"
+version = "0.22.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c475786c6f47219345717a043a37ec04cb4bc185e28853adcc4fa0a947eba630"
+dependencies = [
+ "webpki 0.22.0",
 ]
 
 [[package]]

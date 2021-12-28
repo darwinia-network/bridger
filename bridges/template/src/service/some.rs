@@ -1,6 +1,7 @@
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
-use support_common::config::{Config, Names};
 
+use component_http_client::HttpClientComponent;
+use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::{TemplateTaskBus, TemplateTaskConfig, TemplateTaskMessage};
@@ -20,7 +21,7 @@ impl Service for SomeService {
         tracing::trace!("Spawn service some");
         let mut rx = bus.rx::<TemplateTaskMessage>()?;
         let config: TemplateTaskConfig = Config::restore(Names::BridgeTemplate)?;
-        let client = config.http_client.component()?;
+        let client = HttpClientComponent::component(config.http_client)?;
 
         let _greet = Self::try_task("template-service-some", async move {
             while let Some(message) = rx.recv().await {

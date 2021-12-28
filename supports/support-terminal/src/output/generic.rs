@@ -27,3 +27,7 @@ pub fn unsupport_output_format(output: OutputFormat) {
     let outf = format!("{:?}", output);
     println!("Not support this format: [{}]", &outf[..].red());
 }
+
+pub fn output_warning(text: impl AsRef<str>) {
+    println!("⚠️{}", text.as_ref().yellow());
+}

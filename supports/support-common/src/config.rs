@@ -1,8 +1,9 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
+use crate::constants;
 use crate::error::BridgerError;
 
 /// The config names
@@ -12,6 +13,8 @@ pub enum Names {
     Bridger,
     /// Bridge tempalte
     BridgeTemplate,
+    /// Bridge pangolin-ropsten
+    BridgePangolinRopsten,
 }
 
 impl Names {
@@ -19,6 +22,7 @@ impl Names {
         match self {
             Self::Bridger => "bridger",
             Self::BridgeTemplate => "bridge-template",
+            Self::BridgePangolinRopsten => "bridge-pangolin-ropsten",
         }
     }
 }
@@ -56,18 +60,7 @@ impl ConfigFormat {
 
 impl Config {
     fn new() -> Self {
-        let path_env = std::env::var("BRIDGER_HOME");
-        let is_from_env = path_env.is_ok();
-        let basic_path = path_env
-            .map(|v| Path::new(&v).join(""))
-            .ok()
-            .or_else(dirs::home_dir)
-            .or_else(|| std::env::current_exe().ok())
-            .unwrap_or_else(std::env::temp_dir);
-        let mut base_path = basic_path;
-        if !is_from_env {
-            base_path = base_path.join(".bridger");
-        }
+        let base_path = constants::bridger_home();
         Self { base_path }
     }
 }

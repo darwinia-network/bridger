@@ -119,16 +119,17 @@ async fn run(
 }
 
 impl GuardService {
-    async fn guard(
+    pub async fn extrinsics(
         ethereum2darwinia: Ethereum2Darwinia,
         guard_account: FromEthereumAccount,
         shadow: Arc<Shadow>,
-        sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
-    ) -> color_eyre::Result<()> {
+    ) -> color_eyre::Result<Vec<Extrinsic>> {
         tracing::trace!(
             target: "pangolin-ropsten",
             "Checking pending headers..."
         );
+
+        let mut extrinsics = Vec::new();
 
         let last_confirmed = ethereum2darwinia.last_confirmed().await?;
         let pending_headers = ethereum2darwinia.pending_headers().await?;
@@ -162,21 +163,19 @@ impl GuardService {
                         } else {
                             Extrinsic::GuardVote(pending_block_number, false)
                         };
-                        sender_to_extrinsics
-                            .send(ToExtrinsicsMessage::Extrinsic(ex))
-                            .await?;
+                        extrinsics.push(ex);
                     }
                     Err(err) => {
                         if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
                             err.downcast_ref::<BizError>()
                         {
-                            tracing::trace!(
+                            tracing::warn!(
                                 target: "pangolin-ropsten",
                                 "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
                                 block,
                                 msg
                             );
-                            return Ok(());
+                            return Ok(extrinsics);
                         }
                         return Err(err);
                     }
@@ -184,6 +183,21 @@ impl GuardService {
             }
         }
 
+        Ok(extrinsics)
+    }
+
+    async fn guard(
+        ethereum2darwinia: Ethereum2Darwinia,
+        guard_account: FromEthereumAccount,
+        shadow: Arc<Shadow>,
+        sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
+    ) -> color_eyre::Result<()> {
+        let extrinsics = Self::extrinsics(ethereum2darwinia, guard_account, shadow).await?;
+
+        for extrinsic in extrinsics {
+            let message = ToExtrinsicsMessage::Extrinsic(extrinsic);
+            sender_to_extrinsics.send(message).await?;
+        }
         Ok(())
     }
 }

@@ -1,5 +1,3 @@
-use lifeline::{Bus, Sender};
-
 use crate::bridge::PangolinRopstenTask;
 
 pub async fn handle_start() -> color_eyre::Result<()> {

@@ -56,6 +56,7 @@ impl PangolinRopstenTask {
 }
 
 impl PangolinRopstenTask {
+    #[allow(dead_code)]
     pub fn stack(&self) -> &TaskStack<PangolinRopstenBus> {
         &self.stack
     }

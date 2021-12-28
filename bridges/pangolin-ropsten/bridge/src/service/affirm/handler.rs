@@ -49,7 +49,7 @@ impl AffirmHandler {
 
         // Darwinia client
         let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
-        let darwinia = Ethereum2Darwinia::new(darwinia.clone());
+        let darwinia = Ethereum2Darwinia::new(darwinia);
 
         // Shadow client
         let shadow = ShadowComponent::component(

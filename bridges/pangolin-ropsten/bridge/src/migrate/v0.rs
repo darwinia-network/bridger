@@ -1,8 +1,8 @@
 use microkv::namespace::NamespaceMicroKV;
 
 pub fn migrate(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
-    migrate_scan_pangolin(&microkv)?;
-    migrate_scan_opsten(&microkv)?;
+    migrate_scan_pangolin(microkv)?;
+    migrate_scan_opsten(microkv)?;
     Ok(())
 }
 

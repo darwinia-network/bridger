@@ -1,9 +1,9 @@
 use microkv::namespace::NamespaceMicroKV;
 
 pub fn migrate(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
-    migrate_tracker_ropsten(&microkv)?;
-    migrate_tracker_pangolin(&microkv)?;
-    migrate_affirm(&microkv)?;
+    migrate_tracker_ropsten(microkv)?;
+    migrate_tracker_pangolin(microkv)?;
+    migrate_affirm(microkv)?;
     Ok(())
 }
 

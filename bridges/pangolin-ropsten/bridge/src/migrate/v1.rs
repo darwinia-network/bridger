@@ -3,7 +3,7 @@ use microkv::namespace::NamespaceMicroKV;
 use support_tracker::Tracker;
 
 pub fn migrate(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
-    auto_start_scan(&microkv)?;
+    auto_start_scan(microkv)?;
     Ok(())
 }
 

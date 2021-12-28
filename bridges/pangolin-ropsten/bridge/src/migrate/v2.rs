@@ -1,7 +1,5 @@
 use microkv::namespace::NamespaceMicroKV;
 
-use crate::bridge::PangolinRopstenTask;
-
 pub fn migrate(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
     migrate_tracker_ropsten(&microkv)?;
     migrate_tracker_pangolin(&microkv)?;

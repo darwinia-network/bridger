@@ -3,12 +3,9 @@ use std::time::SystemTime;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::config::Config;
 use client_pangolin::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::component::TheGraphLikeEthComponent;
-use component_thegraph_liketh::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
@@ -67,7 +64,7 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
     let task_config: TaskConfig = bridge_config.task;
 
-    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph).await?;
+    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
 
     // Darwinia client
     let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;

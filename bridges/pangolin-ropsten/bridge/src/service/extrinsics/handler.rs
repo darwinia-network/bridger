@@ -1,8 +1,5 @@
 use microkv::namespace::NamespaceMicroKV;
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::config::Config;
-use bridge_traits::bridge::task::BridgeSand;
 use client_pangolin::account::DarwiniaAccount;
 use client_pangolin::component::DarwiniaSubxtComponent;
 use client_pangolin::config::DarwiniaSubxtConfig;

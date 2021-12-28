@@ -2,7 +2,6 @@ use std::convert::TryInto;
 
 use client_pangolin::to_ethereum::Darwinia2Ethereum;
 
-use crate::bridge::PangolinRopstenTask;
 use crate::service::pangolin::types::ScanDataWrapper;
 
 pub struct ScanAuthoritiesChangeSignedEvent<'a> {

@@ -9,7 +9,6 @@ use component_shadow::{Shadow, ShadowComponent};
 use component_thegraph_liketh::types::TransactionEntity;
 use support_common::config::{Config, Names};
 
-use crate::bridge::PangolinRopstenTask;
 use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage, ToRedeemMessage};
 use crate::helpers;
 
@@ -53,7 +52,7 @@ impl RedeemHandler {
         let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
         // Darwinia client
-        let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia)?;
+        let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
         let darwinia = Ethereum2Darwinia::new(darwinia.clone());
 
         // Shadow client

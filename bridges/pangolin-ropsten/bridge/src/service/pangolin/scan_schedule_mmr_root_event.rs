@@ -1,7 +1,6 @@
 use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 
-use crate::bridge::PangolinRopstenTask;
 use crate::bridge::{Extrinsic, ToExtrinsicsMessage};
 use crate::service::pangolin::types::ScanDataWrapper;
 

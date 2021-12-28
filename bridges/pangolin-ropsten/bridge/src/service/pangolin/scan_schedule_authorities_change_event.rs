@@ -2,7 +2,6 @@ use std::convert::TryInto;
 
 use lifeline::Sender;
 
-use crate::bridge::PangolinRopstenTask;
 use crate::bridge::{Extrinsic, ToExtrinsicsMessage};
 use crate::service::pangolin::types::ScanDataWrapper;
 

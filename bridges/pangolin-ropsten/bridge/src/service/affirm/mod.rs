@@ -5,13 +5,11 @@ use postage::broadcast;
 
 use component_state::state::BridgeState;
 use component_thegraph_liketh::component::TheGraphLikeEthComponent;
-use component_thegraph_liketh::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
 use crate::bridge::PangolinRopstenTask;
-use crate::bridge::TaskConfig;
 use crate::bridge::{PangolinRopstenBus, PangolinRopstenConfig};
 use crate::bridge::{ToExtrinsicsMessage, ToRelayMessage};
 use crate::service::affirm::handler::AffirmHandler;
@@ -95,7 +93,9 @@ impl Service for AffirmService {
                                 "Received new ethereum block number to affirm: {}",
                                 block_number
                             );
-                            handler.update_target(block_number)?;
+                            if let Err(e) = handler.update_target(block_number) {
+                                tracing::error!(target: "pangolin-ropsten", "{:?}", e);
+                            }
                         }
                     }
                 }

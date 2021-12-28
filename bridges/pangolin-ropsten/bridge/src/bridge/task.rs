@@ -30,10 +30,9 @@ impl PangolinRopstenTask {
         config: PangolinRopstenConfig,
         state: BridgeState,
     ) -> color_eyre::Result<Self> {
-        let microkv = state.microkv_with_namespace(PangolinRopstenTask::name()());
+        let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
         crate::migrate::migrate(&microkv, 2)?;
 
-        config.store(Self::NAME)?;
         let bus = PangolinRopstenBus::default();
         bus.store_resource::<BridgeState>(state);
 

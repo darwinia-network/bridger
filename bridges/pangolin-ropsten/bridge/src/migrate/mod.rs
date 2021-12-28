@@ -2,14 +2,12 @@ use microkv::namespace::NamespaceMicroKV;
 
 use support_common::error::BridgerError;
 
-use crate::bridge::PangolinRopstenTask;
-
 mod v0;
 mod v1;
 mod v2;
 
 pub fn migrate(microkv: &NamespaceMicroKV, version: usize) -> color_eyre::Result<()> {
-    let saved_version = current_version(state)?;
+    let saved_version = current_version(microkv)?;
     // same version, no migrate
     if saved_version == version {
         return Ok(());
@@ -37,7 +35,7 @@ pub fn migrate(microkv: &NamespaceMicroKV, version: usize) -> color_eyre::Result
     let to = version + 1;
     for ix in from..to {
         let migration = steps.get(ix).unwrap();
-        if let Err(e) = migration(state) {
+        if let Err(e) = migration(microkv) {
             return Err(BridgerError::Migration(format!(
                 "Failed to migrate. step [{}]: {:?}",
                 ix, e

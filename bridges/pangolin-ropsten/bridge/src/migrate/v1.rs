@@ -2,8 +2,6 @@ use microkv::namespace::NamespaceMicroKV;
 
 use support_tracker::Tracker;
 
-use crate::bridge::PangolinRopstenTask;
-
 pub fn migrate(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
     auto_start_scan(&microkv)?;
     Ok(())

@@ -4,8 +4,6 @@ use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::task::BridgeSand;
 use client_pangolin::component::DarwiniaSubxtComponent;
 use client_pangolin::from_ethereum::Ethereum2Darwinia;
 use component_ethereum::errors::BizError;
@@ -13,7 +11,6 @@ use component_shadow::{Shadow, ShadowComponent};
 use support_common::config::{Config, Names};
 use support_ethereum::block::EthereumHeader;
 
-use crate::bridge::PangolinRopstenTask;
 use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage};
 
 pub struct AffirmHandler {
@@ -51,7 +48,7 @@ impl AffirmHandler {
         let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
         // Darwinia client
-        let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia)?;
+        let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
         let darwinia = Ethereum2Darwinia::new(darwinia.clone());
 
         // Shadow client

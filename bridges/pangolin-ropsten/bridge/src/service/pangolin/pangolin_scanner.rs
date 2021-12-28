@@ -12,8 +12,8 @@ use component_subquery::SubqueryComponent;
 use support_common::config::{Config, Names};
 use support_tracker::Tracker;
 
+use crate::bridge::PangolinRopstenConfig;
 use crate::bridge::ToExtrinsicsMessage;
-use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};
 use crate::service::pangolin::scan_authorities_change_signed_event::ScanAuthoritiesChangeSignedEvent;
 use crate::service::pangolin::scan_schedule_authorities_change_event::ScanScheduleAuthoritiesChangeEvent;
 use crate::service::pangolin::scan_schedule_mmr_root_event::ScanScheduleMMRRootEvent;
@@ -65,8 +65,7 @@ impl PangolinScanner {
         let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
 
         // ethereum
-        let ethereum =
-            EthereumComponent::component(bridge_config.ethereum, config_web3.clone()).await?;
+        let ethereum = EthereumComponent::component(bridge_config.ethereum, config_web3.clone())?;
 
         let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
 

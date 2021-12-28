@@ -21,7 +21,7 @@ impl BridgeService for ExtrinsicsService {}
 
 impl Service for ExtrinsicsService {
     type Bus = PangolinRopstenBus;
-    type Lifeline = anyhow::Result<Self>;
+    type Lifeline = color_eyre::Result<Self>;
 
     #[allow(irrefutable_let_patterns)]
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {

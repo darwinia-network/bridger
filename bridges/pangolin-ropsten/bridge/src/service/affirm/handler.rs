@@ -45,7 +45,7 @@ impl AffirmHandler {
     async fn build(
         microkv: NamespaceMicroKV,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-    ) -> anyhow::Result<Self> {
+    ) -> color_eyre::Result<Self> {
         log::info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 
         // Components
@@ -73,7 +73,7 @@ impl AffirmHandler {
 }
 
 impl AffirmHandler {
-    pub async fn affirm(&mut self) -> anyhow::Result<()> {
+    pub async fn affirm(&mut self) -> color_eyre::Result<()> {
         let last_confirmed = self.darwinia.last_confirmed().await?;
         let mut relayed = self.microkv.get_as("affirm.relayed")?.unwrap_or(0);
         let target = self.microkv.get_as("affirm.target")?.unwrap_or(0);
@@ -113,7 +113,7 @@ impl AffirmHandler {
         Ok(())
     }
 
-    pub fn update_target(&self, block_number: u64) -> anyhow::Result<()> {
+    pub fn update_target(&self, block_number: u64) -> color_eyre::Result<()> {
         let target = self.microkv.get_as("affirm.target")?.unwrap_or(0);
 
         if block_number > target {
@@ -123,7 +123,7 @@ impl AffirmHandler {
         Ok(())
     }
 
-    async fn do_affirm(&mut self, target: u64) -> anyhow::Result<()> {
+    async fn do_affirm(&mut self, target: u64) -> color_eyre::Result<()> {
         // /////////////////////////
         // checking before affirm
         // /////////////////////////

@@ -17,7 +17,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
 }
 
 impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
-    pub async fn handle(&mut self) -> anyhow::Result<Option<u32>> {
+    pub async fn handle(&mut self) -> color_eyre::Result<Option<u32>> {
         let spec_name = self.data.darwinia.runtime_version().await?;
         let current_term = self
             .data

@@ -5,14 +5,14 @@ use component_state::state::BridgeState;
 
 use crate::task::PangolinRopstenTask;
 
-pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
+pub fn migrate(state: &BridgeState) -> color_eyre::Result<()> {
     let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
     migrate_scan_pangolin(&microkv)?;
     migrate_scan_opsten(&microkv)?;
     Ok(())
 }
 
-fn migrate_scan_pangolin(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
+fn migrate_scan_pangolin(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
     let key = "last-tracked-pangolin-block";
     let block_pangolin: Option<u64> = microkv.get_as(key)?;
     if let Some(block) = block_pangolin {
@@ -22,7 +22,7 @@ fn migrate_scan_pangolin(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn migrate_scan_opsten(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
+fn migrate_scan_opsten(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
     let key = "last-redeemed-ropsten";
     let block_ropsten: Option<u64> = microkv.get_as(key)?;
     if let Some(block) = block_ropsten {

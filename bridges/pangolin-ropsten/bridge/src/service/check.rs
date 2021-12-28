@@ -27,7 +27,7 @@ impl BridgeService for CheckService {}
 
 impl Service for CheckService {
     type Bus = PangolinRopstenBus;
-    type Lifeline = anyhow::Result<Self>;
+    type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Datastore
@@ -58,7 +58,7 @@ async fn start(tracker: Tracker) {
     }
 }
 
-async fn run(tracker: &Tracker) -> anyhow::Result<()> {
+async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
     log::info!(
         target: PangolinRopstenTask::NAME,
         "ROPSTEN CHECK SERVICE RESTARTING..."
@@ -99,7 +99,9 @@ async fn run(tracker: &Tracker) -> anyhow::Result<()> {
         let verified = match helpers::is_verified(&darwinia, tx).await {
             Ok(v) => v,
             Err(e) => {
-                if let Some(substrate_subxt::Error::Rpc(_)) = e.downcast_ref::<substrate_subxt::Error>() {
+                if let Some(substrate_subxt::Error::Rpc(_)) =
+                    e.downcast_ref::<substrate_subxt::Error>()
+                {
                     return Err(e);
                 }
                 let err_msg = format!("{:?}", e).to_lowercase();

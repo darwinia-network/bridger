@@ -53,7 +53,7 @@ impl PangolinScanner {
         microkv: NamespaceMicroKV,
         tracker: Tracker,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-    ) -> anyhow::Result<()> {
+    ) -> color_eyre::Result<()> {
         // subquery
         let component_subquery = SubqueryComponent::restore::<PangolinRopstenTask>()?;
         let subquery = component_subquery.component().await?;

@@ -48,7 +48,7 @@ impl RedeemHandler {
     async fn build(
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
         sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-    ) -> anyhow::Result<Self> {
+    ) -> color_eyre::Result<Self> {
         log::info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 
         // Components
@@ -76,7 +76,7 @@ impl RedeemHandler {
 }
 
 impl RedeemHandler {
-    pub async fn redeem(&mut self, tx: TransactionEntity) -> anyhow::Result<Option<u64>> {
+    pub async fn redeem(&mut self, tx: TransactionEntity) -> color_eyre::Result<Option<u64>> {
         log::trace!(
             target: PangolinRopstenTask::NAME,
             "[ropsten] Try to redeem ethereum tx {:?}... in block {}",

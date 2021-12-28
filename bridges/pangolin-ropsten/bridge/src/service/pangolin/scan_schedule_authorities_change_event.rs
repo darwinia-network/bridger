@@ -19,7 +19,7 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
 }
 
 impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
-    pub async fn handle(&mut self) -> anyhow::Result<Option<u32>> {
+    pub async fn handle(&mut self) -> color_eyre::Result<Option<u32>> {
         let events = self
             .data
             .subquery

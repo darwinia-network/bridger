@@ -29,7 +29,7 @@ impl BridgeService for GuardService {}
 
 impl Service for GuardService {
     type Bus = PangolinRopstenBus;
-    type Lifeline = anyhow::Result<Self>;
+    type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
@@ -62,7 +62,9 @@ async fn start(mut sender_to_extrinsics: impl Sender<ToExtrinsicsMessage>) {
     }
 }
 
-async fn run(sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>) -> anyhow::Result<()> {
+async fn run(
+    sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
+) -> color_eyre::Result<()> {
     log::info!(target: PangolinRopstenTask::NAME, "SERVICE RESTARTING...");
 
     // Components
@@ -120,7 +122,7 @@ impl GuardService {
         guard_account: FromEthereumAccount,
         shadow: Arc<Shadow>,
         sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
-    ) -> anyhow::Result<()> {
+    ) -> color_eyre::Result<()> {
         log::trace!(
             target: PangolinRopstenTask::NAME,
             "Checking pending headers..."

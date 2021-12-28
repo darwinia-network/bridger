@@ -4,7 +4,7 @@ use bridge_traits::error::StandardError;
 use component_pangolin_subxt::darwinia::client::Darwinia;
 use component_thegraph_liketh::types::TransactionEntity;
 
-pub async fn is_verified(client: &Darwinia, tx: &TransactionEntity) -> anyhow::Result<bool> {
+pub async fn is_verified(client: &Darwinia, tx: &TransactionEntity) -> color_eyre::Result<bool> {
     let block_hash = hex_to_h256(&tx.block_hash)?;
     let tx_index = tx.tx_index;
     let verified = client.verified(block_hash, tx_index).await?
@@ -12,7 +12,7 @@ pub async fn is_verified(client: &Darwinia, tx: &TransactionEntity) -> anyhow::R
     Ok(verified)
 }
 
-pub fn hex_to_h256(hash: impl AsRef<str>) -> anyhow::Result<H256> {
+pub fn hex_to_h256(hash: impl AsRef<str>) -> color_eyre::Result<H256> {
     let bytes = array_bytes::hex2bytes(hash)
         .map_err(|_e| StandardError::Hex2Bytes("Failed to convert hex to bytes".to_string()))?;
     Ok(H256::from_slice(&bytes))

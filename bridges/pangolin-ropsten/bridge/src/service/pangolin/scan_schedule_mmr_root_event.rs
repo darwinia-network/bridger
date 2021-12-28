@@ -19,7 +19,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
 }
 
 impl<'a> ScanScheduleMMRRootEvent<'a> {
-    pub async fn handle(&mut self) -> anyhow::Result<()> {
+    pub async fn handle(&mut self) -> color_eyre::Result<()> {
         let event = self
             .data
             .subquery

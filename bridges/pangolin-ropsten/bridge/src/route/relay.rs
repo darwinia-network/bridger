@@ -9,7 +9,7 @@ use crate::message::ToRelayMessage;
 pub async fn relay(
     bus: &PangolinRopstenBus,
     param: serde_json::Value,
-) -> anyhow::Result<TaskTerminal> {
+) -> color_eyre::Result<TaskTerminal> {
     let mut sender = bus.tx::<ToRelayMessage>()?;
     let block_number = param
         .get("block_number")

@@ -8,14 +8,14 @@ mod v0;
 mod v1;
 mod v2;
 
-pub fn migrate(state: &BridgeState, version: usize) -> anyhow::Result<()> {
+pub fn migrate(state: &BridgeState, version: usize) -> color_eyre::Result<()> {
     let saved_version = current_version(state)?;
     // same version, no migrate
     if saved_version == version {
         return Ok(());
     }
 
-    let steps: Vec<Box<dyn Fn(&BridgeState) -> anyhow::Result<()>>> = vec![
+    let steps: Vec<Box<dyn Fn(&BridgeState) -> color_eyre::Result<()>>> = vec![
         Box::new(v0::migrate),
         Box::new(v1::migrate),
         Box::new(v2::migrate),
@@ -49,13 +49,13 @@ pub fn migrate(state: &BridgeState, version: usize) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn current_version(state: &BridgeState) -> anyhow::Result<usize> {
+fn current_version(state: &BridgeState) -> color_eyre::Result<usize> {
     let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
     let version: Option<usize> = microkv.get_as(".version")?;
     Ok(version.unwrap_or(0))
 }
 
-fn flush_version(state: &BridgeState, version: usize) -> anyhow::Result<()> {
+fn flush_version(state: &BridgeState, version: usize) -> color_eyre::Result<()> {
     let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
     microkv.put(".version", &version)?;
     Ok(())

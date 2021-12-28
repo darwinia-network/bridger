@@ -33,13 +33,17 @@ impl BridgeTaskKeep for PangolinRopstenTask {
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
     }
-    async fn route(&self, uri: String, param: serde_json::Value) -> anyhow::Result<TaskTerminal> {
+    async fn route(
+        &self,
+        uri: String,
+        param: serde_json::Value,
+    ) -> color_eyre::Result<TaskTerminal> {
         crate::route::dispatch_route(self.stack.bus(), uri, param).await
     }
 }
 
 impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
-    fn config_template() -> anyhow::Result<serde_json::Value> {
+    fn config_template() -> color_eyre::Result<serde_json::Value> {
         Ok(serde_json::to_value(PangolinRopstenConfig::template())?)
     }
 
@@ -49,7 +53,10 @@ impl BridgeTask<PangolinRopstenBus> for PangolinRopstenTask {
 }
 
 impl PangolinRopstenTask {
-    pub async fn new(config: PangolinRopstenConfig, state: BridgeState) -> anyhow::Result<Self> {
+    pub async fn new(
+        config: PangolinRopstenConfig,
+        state: BridgeState,
+    ) -> color_eyre::Result<Self> {
         crate::migrate::migrate(&state, 2)?;
 
         config.store(Self::NAME)?;

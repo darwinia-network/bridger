@@ -4,7 +4,7 @@ use microkv::namespace::NamespaceMicroKV;
 
 use crate::task::PangolinRopstenTask;
 
-pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
+pub fn migrate(state: &BridgeState) -> color_eyre::Result<()> {
     let microkv = state.microkv_with_namespace(PangolinRopstenTask::NAME);
     migrate_tracker_ropsten(&microkv)?;
     migrate_tracker_pangolin(&microkv)?;
@@ -12,7 +12,7 @@ pub fn migrate(state: &BridgeState) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn migrate_tracker_ropsten(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
+fn migrate_tracker_ropsten(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
     if let Some(value) = microkv.get("scan.ropsten.finish")? {
         if value.is_number() {
             let last_block = value.as_u64().unwrap();
@@ -48,7 +48,7 @@ fn migrate_tracker_ropsten(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn migrate_tracker_pangolin(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
+fn migrate_tracker_pangolin(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
     if let Some(value) = microkv.get("scan.pangolin.finish")? {
         if value.is_number() {
             microkv.put("scan.pangolin.current", &value.as_u64().unwrap_or(0))?;
@@ -65,7 +65,7 @@ fn migrate_tracker_pangolin(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn migrate_affirm(microkv: &NamespaceMicroKV) -> anyhow::Result<()> {
+fn migrate_affirm(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
     if let Some(value) = microkv.get("target")? {
         if value.is_number() {
             microkv.put("affirm.target", &value.as_u64().unwrap_or(0))?;

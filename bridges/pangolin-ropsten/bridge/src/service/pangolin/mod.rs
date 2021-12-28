@@ -26,7 +26,7 @@ impl BridgeService for PangolinService {}
 
 impl lifeline::Service for PangolinService {
     type Bus = PangolinRopstenBus;
-    type Lifeline = anyhow::Result<Self>;
+    type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let state = bus.storage().clone_resource::<BridgeState>()?;

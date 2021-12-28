@@ -30,7 +30,7 @@ impl BridgeService for AffirmService {}
 
 impl Service for AffirmService {
     type Bus = PangolinRopstenBus;
-    type Lifeline = anyhow::Result<Self>;
+    type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // State
@@ -115,7 +115,7 @@ impl Service for AffirmService {
 async fn handle_affirm_relay(
     microkv: NamespaceMicroKV,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-) -> anyhow::Result<()> {
+) -> color_eyre::Result<()> {
     // Config
     let task_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
     let mut handler = AffirmHandler::new(microkv.clone(), sender_to_extrinsics.clone()).await;
@@ -151,7 +151,7 @@ async fn run_scan(
     tracker: &Tracker,
     microkv: NamespaceMicroKV,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-) -> anyhow::Result<()> {
+) -> color_eyre::Result<()> {
     let task_config: TaskConfig = Config::restore_unwrap(PangolinRopstenTask::NAME)?;
 
     // the graph

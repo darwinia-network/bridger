@@ -28,7 +28,7 @@ impl BridgeService for RedeemService {}
 
 impl Service for RedeemService {
     type Bus = PangolinRopstenBus;
-    type Lifeline = anyhow::Result<Self>;
+    type Lifeline = color_eyre::Result<Self>;
 
     #[allow(irrefutable_let_patterns)]
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
@@ -130,7 +130,7 @@ async fn run_scan(
     tracker: &Tracker,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
-) -> anyhow::Result<()> {
+) -> color_eyre::Result<()> {
     // the graph
     let component_thegraph_liketh = TheGraphLikeEthComponent::restore::<PangolinRopstenTask>()?;
     let thegraph_liketh = component_thegraph_liketh.component().await?;

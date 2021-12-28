@@ -45,7 +45,7 @@ impl ExtrinsicsHandler {
         }
     }
 
-    async fn build(state: BridgeState) -> anyhow::Result<Self> {
+    async fn build(state: BridgeState) -> color_eyre::Result<Self> {
         log::info!(
             target: PangolinRopstenTask::NAME,
             "EXTRINSICS SERVICE RESTARTING..."
@@ -99,7 +99,7 @@ impl ExtrinsicsHandler {
 }
 
 impl ExtrinsicsHandler {
-    pub async fn send_extrinsic(&self, extrinsic: Extrinsic) -> anyhow::Result<()> {
+    pub async fn send_extrinsic(&self, extrinsic: Extrinsic) -> color_eyre::Result<()> {
         match extrinsic {
             Extrinsic::Affirm(parcel) => self.send_affirm(parcel).await?,
             Extrinsic::Redeem(proof, ethereum_tx) => self.send_redeem(proof, ethereum_tx).await?,
@@ -118,7 +118,7 @@ impl ExtrinsicsHandler {
         Ok(())
     }
 
-    async fn send_affirm(&self, parcel: EthereumRelayHeaderParcel) -> anyhow::Result<()> {
+    async fn send_affirm(&self, parcel: EthereumRelayHeaderParcel) -> color_eyre::Result<()> {
         let block_number = parcel.header.number;
         let ex_hash = self
             .ethereum2darwinia
@@ -138,7 +138,7 @@ impl ExtrinsicsHandler {
         &self,
         proof: EthereumReceiptProofThing,
         ethereum_tx: TransactionEntity,
-    ) -> anyhow::Result<()> {
+    ) -> color_eyre::Result<()> {
         log::info!(
             target: PangolinRopstenTask::NAME,
             "Ready to send redeem. type is [{:?}] and tx is [{:?}]",
@@ -205,7 +205,11 @@ impl ExtrinsicsHandler {
         Ok(())
     }
 
-    async fn send_guard_vote(&self, pending_block_number: u64, aye: bool) -> anyhow::Result<()> {
+    async fn send_guard_vote(
+        &self,
+        pending_block_number: u64,
+        aye: bool,
+    ) -> color_eyre::Result<()> {
         let ex_hash = self
             .ethereum2darwinia
             .vote_pending_relay_header_parcel(
@@ -232,7 +236,7 @@ impl ExtrinsicsHandler {
         Ok(())
     }
 
-    async fn send_sign_and_send_mmr_root(&self, block_number: u32) -> anyhow::Result<()> {
+    async fn send_sign_and_send_mmr_root(&self, block_number: u32) -> color_eyre::Result<()> {
         log::trace!(
             target: PangolinRopstenTask::NAME,
             "Start sign and send mmr_root for block: {}",
@@ -255,7 +259,10 @@ impl ExtrinsicsHandler {
         Ok(())
     }
 
-    async fn send_sign_and_send_authorities(&self, message: EcdsaMessage) -> anyhow::Result<()> {
+    async fn send_sign_and_send_authorities(
+        &self,
+        message: EcdsaMessage,
+    ) -> color_eyre::Result<()> {
         log::trace!(
             target: PangolinRopstenTask::NAME,
             "Start sign and send authorities..."

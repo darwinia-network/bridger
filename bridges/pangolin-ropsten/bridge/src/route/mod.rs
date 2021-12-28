@@ -10,7 +10,7 @@ pub async fn dispatch_route(
     bus: &PangolinRopstenBus,
     uri: String,
     param: serde_json::Value,
-) -> anyhow::Result<TaskTerminal> {
+) -> color_eyre::Result<TaskTerminal> {
     match &uri[..] {
         "relay" => relay::relay(bus, param).await,
         "redeem" => redeem::redeem(bus, param).await,

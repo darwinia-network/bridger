@@ -60,7 +60,7 @@ impl std::fmt::Display for TxProofWithMMRProof {
 pub async fn d2e(
     _bus: &PangolinRopstenBus,
     param: serde_json::Value,
-) -> anyhow::Result<TaskTerminal> {
+) -> color_eyre::Result<TaskTerminal> {
     let network = param["network"]
         .as_str()
         .ok_or_else(|| StandardError::Api("The `network` parameter is required".to_string()))?;

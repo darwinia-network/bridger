@@ -17,7 +17,7 @@ use crate::task::PangolinRopstenTask;
 pub async fn redeem(
     bus: &PangolinRopstenBus,
     param: serde_json::Value,
-) -> anyhow::Result<TaskTerminal> {
+) -> color_eyre::Result<TaskTerminal> {
     let mut sender = bus.tx::<ToRedeemMessage>()?;
     // param: type, cross-chain transaction type
     let the_type = param
@@ -43,7 +43,7 @@ pub async fn redeem(
         "token" => TransactionType::Token,
         "deposit" => TransactionType::Deposit,
         "set_authorities" => TransactionType::SetAuthorities,
-        _ => anyhow::bail!("err"),
+        _ => color_eyre::bail!("err"),
     };
     let tx_hash = array_bytes::bytes2hex("0x", tx.hash);
     let block_hash_h256 = tx.block_hash.unwrap();

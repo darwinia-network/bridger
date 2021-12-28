@@ -386,12 +386,11 @@ dependencies = [
 name = "client-pangolin"
 version = "0.5.0"
 dependencies = [
- "anyhow",
  "array-bytes",
  "async-trait",
+ "color-eyre",
  "frame-support",
  "jsonrpsee-types",
- "log",
  "pallet-im-online",
  "pallet-indices",
  "parity-scale-codec",
@@ -402,6 +401,7 @@ dependencies = [
  "substrate-subxt-proc-macro",
  "support-ethereum",
  "thiserror",
+ "tracing",
  "web3",
 ]
 

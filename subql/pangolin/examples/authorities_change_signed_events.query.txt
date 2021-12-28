@@ -1,0 +1,18 @@
+{
+	authoritiesChangeSignedEvents(first: 5) {
+    nodes {
+      id
+      term
+      timestamp
+      newAuthorities
+      signatures {
+        nodes {
+          account
+          relayAuthoritySignature
+          eventModule
+          eventName
+        }
+      }
+    }
+  }
+}

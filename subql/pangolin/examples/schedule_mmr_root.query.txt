@@ -1,0 +1,10 @@
+{
+	scheduleMMRRootEvents(first: 5) {
+    nodes {
+      id
+      atBlockNumber
+      eventBlockNumber
+      timestamp
+    }
+  }
+}

@@ -1,16 +1,15 @@
-use codec::Encode;
 use colored::*;
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::task::TaskTerminal;
-use bridge_traits::error::StandardError;
-use component_darwinia_subxt::component::DarwiniaSubxtComponent;
-use component_darwinia_subxt::events::EventInfo;
-use component_darwinia_subxt::rpc::FormatedMMR;
-use component_darwinia_subxt::to_ethereum::Darwinia2Ethereum;
+use client_darwinia::component::DarwiniaSubxtComponent;
+use client_darwinia::events::EventInfo;
+use client_darwinia::rpc::FormatedMMR;
+use client_darwinia::to_ethereum::Darwinia2Ethereum;
+use codec::Encode;
+use support_common::config::{Config, Names};
+use support_terminal::output;
 
-use crate::bus::DarwiniaEthereumBus;
-use crate::task::DarwiniaEthereumTask;
+use crate::bridge::DarwiniaEthereumConfig;
+use crate::command::types::{D2eCommand, InfoOpts};
 
 #[derive(Default, Debug)]
 struct TxProofWithMMRProof {
@@ -53,26 +52,21 @@ impl std::fmt::Display for TxProofWithMMRProof {
     }
 }
 
-pub async fn d2e(
-    _bus: &DarwiniaEthereumBus,
-    param: serde_json::Value,
-) -> color_eyre::Result<TaskTerminal> {
-    let network = param["network"]
-        .as_str()
-        .ok_or_else(|| StandardError::Api("The `network` parameter is required".to_string()))?;
-    let txblock = param["txblock"]
-        .as_u64()
-        .ok_or_else(|| StandardError::Api("The `txblock` parameter is required".to_string()))?;
-    let mmrblock = param["mmrblock"]
-        .as_u64()
-        .ok_or_else(|| StandardError::Api("The `mmrblock` parameter is required".to_string()))?;
-    let signblock = param["signblock"]
-        .as_u64()
-        .ok_or_else(|| StandardError::Api("The `signblock` parameter is required".to_string()))?;
+pub async fn handle_info(opts: InfoOpts) -> color_eyre::Result<()> {
+    match opts {
+        InfoOpts::D2e { command } => handle_d2e(command).await,
+    }
+}
+
+async fn handle_d2e(command: D2eCommand) -> color_eyre::Result<()> {
+    let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
+    let network = command.network;
+    let txblock = command.txblock;
+    let mmrblock = command.mmrblock;
+    let signblock = command.signblock;
 
     // Darwinia client
-    let component_darwinia = DarwiniaSubxtComponent::restore::<DarwiniaEthereumTask>()?;
-    let darwinia = component_darwinia.component().await?;
+    let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
     let darwinia_to_ethereum = Darwinia2Ethereum::new(darwinia.clone());
 
     // mmr root block
@@ -90,7 +84,7 @@ pub async fn d2e(
     let event_proof = darwinia
         .get_event_proof(
             array_bytes::hex2bytes(
-                "f8860dda3d08046cf2706b92bf7202eaae7a79191c90e76297e0895605b8b457",
+                "0x096dba4ef2fc920b80ae081a80d4d5ca485b407d88f37d5fd6a2c59e5a696691",
             )
             .unwrap(),
             header.hash(),
@@ -143,5 +137,7 @@ pub async fn d2e(
         }
     }
 
-    Ok(TaskTerminal::new(format!("{}", result)))
+    let msg = format!("{}", result);
+    output::output_text(msg);
+    Ok(())
 }

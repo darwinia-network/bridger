@@ -42,7 +42,7 @@ microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
 substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.7" }
 
-#client-pangolin    = { path = "../client-pangolin" }
+client-darwinia    = { path = "../client-darwinia" }
 
 support-common     = { path = "../../../supports/support-common" }
 support-lifeline   = { path = "../../../supports/support-lifeline" }

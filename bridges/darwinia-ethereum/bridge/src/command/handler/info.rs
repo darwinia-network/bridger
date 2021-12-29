@@ -1,20 +1,15 @@
-// this router command is use to get storage event proof with signatures.
-// For example, the storage updated in transaction at block 205, the mmr to sign block is 210 and
-// the sign block is 216, then the command is as follows
-// bridger task exec --name task-pangolin-ropsten --api info-d2e --param network=Pangolin --param txblock=205 --param mmrblock=210 --param signblock=216
-use codec::Encode;
 use colored::*;
 
-use bridge_traits::bridge::component::BridgeComponent;
-use bridge_traits::bridge::task::TaskTerminal;
-use bridge_traits::error::StandardError;
-use component_pangolin_subxt::component::DarwiniaSubxtComponent;
-use component_pangolin_subxt::events::EventInfo;
-use component_pangolin_subxt::rpc::FormatedMMR;
-use component_pangolin_subxt::to_ethereum::Darwinia2Ethereum;
+use client_darwinia::component::DarwiniaSubxtComponent;
+use client_darwinia::events::EventInfo;
+use client_darwinia::rpc::FormatedMMR;
+use client_darwinia::to_ethereum::Darwinia2Ethereum;
+use codec::Encode;
+use support_common::config::{Config, Names};
+use support_terminal::output;
 
-use crate::bridge::PangolinRopstenBus;
-use crate::bridge::PangolinRopstenTask;
+use crate::bridge::DarwiniaEthereumConfig;
+use crate::command::types::{D2eCommand, InfoOpts};
 
 #[derive(Default, Debug)]
 struct TxProofWithMMRProof {
@@ -57,29 +52,21 @@ impl std::fmt::Display for TxProofWithMMRProof {
     }
 }
 
-pub async fn d2e(
-    _bus: &PangolinRopstenBus,
-    param: serde_json::Value,
-) -> color_eyre::Result<TaskTerminal> {
-    let network = param["network"]
-        .as_str()
-        .ok_or_else(|| StandardError::Api("The `network` parameter is required".to_string()))?;
-    let txblock: u64 = param["txblock"]
-        .as_str()
-        .ok_or_else(|| StandardError::Api("The `txblock` parameter is required".to_string()))?
-        .parse()?;
-    let mmrblock: u64 = param["mmrblock"]
-        .as_str()
-        .ok_or_else(|| StandardError::Api("The `mmrblock` parameter is required".to_string()))?
-        .parse()?;
-    let signblock: u64 = param["signblock"]
-        .as_str()
-        .ok_or_else(|| StandardError::Api("The `signblock` parameter is required".to_string()))?
-        .parse()?;
+pub async fn handle_info(opts: InfoOpts) -> color_eyre::Result<()> {
+    match opts {
+        InfoOpts::D2e { command } => handle_d2e(command).await,
+    }
+}
+
+async fn handle_d2e(command: D2eCommand) -> color_eyre::Result<()> {
+    let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
+    let network = command.network;
+    let txblock = command.txblock;
+    let mmrblock = command.mmrblock;
+    let signblock = command.signblock;
 
     // Darwinia client
-    let component_darwinia = DarwiniaSubxtComponent::restore::<PangolinRopstenTask>()?;
-    let darwinia = component_darwinia.component().await?;
+    let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
     let darwinia_to_ethereum = Darwinia2Ethereum::new(darwinia.clone());
 
     // mmr root block
@@ -150,5 +137,7 @@ pub async fn d2e(
         }
     }
 
-    Ok(TaskTerminal::new(format!("{}", result)))
+    let msg = format!("{}", result);
+    output::output_text(msg);
+    Ok(())
 }

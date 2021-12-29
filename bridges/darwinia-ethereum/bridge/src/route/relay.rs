@@ -3,11 +3,11 @@ use lifeline::{Bus, Sender};
 use bridge_traits::bridge::task::TaskTerminal;
 use bridge_traits::error::StandardError;
 
-use crate::bridge::PangolinRopstenBus;
-use crate::bridge::ToRelayMessage;
+use crate::bus::DarwiniaEthereumBus;
+use crate::message::ToRelayMessage;
 
-pub async fn relay(
-    bus: &PangolinRopstenBus,
+pub async fn route(
+    bus: &DarwiniaEthereumBus,
     param: serde_json::Value,
 ) -> color_eyre::Result<TaskTerminal> {
     let mut sender = bus.tx::<ToRelayMessage>()?;
@@ -20,5 +20,6 @@ pub async fn relay(
             block_number.parse::<u64>().unwrap(),
         ))
         .await?;
+
     Ok(TaskTerminal::new("success"))
 }

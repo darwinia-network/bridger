@@ -13,5 +13,6 @@ fn run(opt: Opt) -> color_eyre::Result<()> {
     match opt {
         Opt::List => handler::exec_list(),
         Opt::Registry { command } => handler::handle_registry(command),
+        Opt::Kv { namespace, command } => handler::handle_kv(namespace, command),
     }
 }

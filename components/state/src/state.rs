@@ -23,6 +23,12 @@ impl BridgeState {
             db_name: Some("database".to_string()),
             auto_commit: true,
         };
+        let store_path = &config_microkv.base_path.join("database.kv");
+        tracing::debug!(
+            target: "component-state",
+            "KVDB PATH: {} and the auto_commit is opened",
+            store_path.display()
+        );
         let microkv = crate::microkv::microkv_instance(&config_microkv)?;
         Ok(Self { microkv })
     }

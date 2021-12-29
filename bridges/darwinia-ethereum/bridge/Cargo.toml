@@ -1,0 +1,58 @@
+[package]
+name = "bridge-darwinia-ethereum"
+version = "0.5.0"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://rust-docs.darwinia.network/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2021"
+
+[dependencies]
+
+tracing = "0.1"
+color-eyre = "0.5"
+
+tokio = { version = "1", features = ["full"] }
+
+colored     = "2"
+structopt   = "0.3"
+strum       = { version = "0.21", features = ["derive"] }
+
+lifeline    = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
+postage     = "0.4"
+
+array-bytes = "1.4"
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
+codec       = { package = "parity-scale-codec", version = "2.3.1" }
+
+
+web3    = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
+
+substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.7" }
+
+#client-pangolin    = { path = "../client-pangolin" }
+
+support-common     = { path = "../../../supports/support-common" }
+support-lifeline   = { path = "../../../supports/support-lifeline" }
+support-terminal   = { path = "../../../supports/support-terminal" }
+support-tracker    = { path = "../../../supports/support-tracker" }
+support-ethereum   = { path = "../../../supports/support-ethereum" }
+
+component-ethereum        = { path = "../../../components/ethereum" }
+component-shadow          = { path = "../../../components/shadow" }
+component-subquery        = { path = "../../../components/subquery" }
+component-thegraph-liketh = { path = "../../../components/thegraph-liketh" }
+component-http-client     = { path = "../../../components/http-client" }
+component-state           = { path = "../../../components/state" }

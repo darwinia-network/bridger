@@ -33,7 +33,7 @@ jobs:
       image: rust:1
     strategy:
       matrix:
-        bridge: [template, pangolin-ropsten]
+        bridge: [template, pangolin-ropsten, darwinia-ethereum]
         action: [clippy, test]
     steps:
       - uses: actions/checkout@v2

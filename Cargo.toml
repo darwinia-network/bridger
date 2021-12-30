@@ -9,4 +9,5 @@ exclude = [
   "bridges/pangolin-ropsten",
   "bridges/pangolin-pangoro",
   "bridges/darwinia-ethereum",
+  "bridges/darwinia-crab",
 ]

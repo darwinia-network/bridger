@@ -75,9 +75,7 @@ fn start() -> color_eyre::Result<()> {
         },
         crab_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams {
             messages_pallet_owner: config_relay.crab_messages_pallet_owner.clone(),
-            messages_pallet_owner_password: config_relay
-                .crab_messages_pallet_owner_password
-                .clone(),
+            messages_pallet_owner_password: config_relay.crab_messages_pallet_owner_password,
         },
     };
 

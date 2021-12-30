@@ -75,11 +75,6 @@ pub struct ChainInfoConfig {
 }
 
 impl ChainInfoConfig {
-    pub fn check(&self) -> color_eyre::Result<()> {
-        self.host_port()?;
-        Ok(())
-    }
-
     fn host_port(&self) -> color_eyre::Result<(bool, String, u16)> {
         if self.endpoint.find("ws://").unwrap_or(usize::MAX) != 0
             && self.endpoint.find("wss://").unwrap_or(usize::MAX) != 0
@@ -101,18 +96,6 @@ impl ChainInfoConfig {
             .get(1)
             .unwrap_or(if secure { &"443" } else { &"80" });
         Ok((secure, host.to_string(), port.parse::<u16>()?))
-    }
-
-    pub fn secure(&self) -> color_eyre::Result<bool> {
-        Ok(self.host_port()?.0)
-    }
-
-    pub fn host(&self) -> color_eyre::Result<String> {
-        Ok(self.host_port()?.1)
-    }
-
-    pub fn port(&self) -> color_eyre::Result<u16> {
-        Ok(self.host_port()?.2)
     }
 
     pub fn to_chain_info(&self) -> color_eyre::Result<ChainInfo> {

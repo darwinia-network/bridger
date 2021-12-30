@@ -86,9 +86,7 @@ fn start() -> color_eyre::Result<()> {
         },
         pangoro_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams {
             messages_pallet_owner: config_relay.pangoro_messages_pallet_owner.clone(),
-            messages_pallet_owner_password: config_relay
-                .pangoro_messages_pallet_owner_password
-                .clone(),
+            messages_pallet_owner_password: config_relay.pangoro_messages_pallet_owner_password,
         },
     };
 

@@ -26,25 +26,25 @@ impl UpdateFeeStrategy for CrazyStrategy {
             times += 1;
             if times > 3 {
                 tracing::error!(
-                    target: "pangolin-pangoro",
-                    "[pangolin] Try reconnect many times({}), skip update fee (update fee strategy crazy)",
+                    target: "darwinia-crab",
+                    "[darwinia] Try reconnect many times({}), skip update fee (update fee strategy crazy)",
                     times
                 );
                 break;
             }
-            match self.handle_pangolin().await {
+            match self.handle_darwinia().await {
                 Ok(_) => break,
                 Err(e) => {
                     if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
                         if client_error.is_connection_error() {
                             tracing::debug!(
-                                target: "pangolin-pangoro",
-                                "[pangolin] Try reconnect to chain (update fee strategy crazy)"
+                                target: "darwinia-crab",
+                                "[darwinia] Try reconnect to chain (update fee strategy crazy)"
                             );
-                            if let Err(re) = self.helper.reconnect_pangolin().await {
+                            if let Err(re) = self.helper.reconnect_darwinia().await {
                                 tracing::error!(
-                                    target: "pangolin-pangoro",
-                                    "[pangolin] Failed to reconnect substrate client: {:?} (update fee strategy crazy)",
+                                    target: "darwinia-crab",
+                                    "[darwinia] Failed to reconnect substrate client: {:?} (update fee strategy crazy)",
                                     re
                                 );
                                 continue;
@@ -60,25 +60,25 @@ impl UpdateFeeStrategy for CrazyStrategy {
             times += 1;
             if times > 3 {
                 tracing::error!(
-                    target: "pangolin-pangoro",
-                    "[pangolin] Try reconnect many times({}), skip update fee",
+                    target: "darwinia-crab",
+                    "[crab] Try reconnect many times({}), skip update fee",
                     times
                 );
                 break;
             }
-            match self.handle_pangoro().await {
+            match self.handle_crab().await {
                 Ok(_) => break,
                 Err(e) => {
                     if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
                         if client_error.is_connection_error() {
                             tracing::debug!(
-                                target: "pangolin-pangoro",
-                                "[pangoro] Try reconnect to chain (update fee strategy crazy)"
+                                target: "darwinia-crab",
+                                "[crab] Try reconnect to chain (update fee strategy crazy)"
                             );
-                            if let Err(re) = self.helper.reconnect_pangoro().await {
+                            if let Err(re) = self.helper.reconnect_crab().await {
                                 tracing::error!(
-                                    target: "pangolin-pangoro",
-                                    "[pangoro] Failed to reconnect substrate client: {:?} (update fee strategy crazy)",
+                                    target: "darwinia-crab",
+                                    "[crab] Failed to reconnect substrate client: {:?} (update fee strategy crazy)",
                                     re
                                 );
                                 continue;
@@ -93,21 +93,22 @@ impl UpdateFeeStrategy for CrazyStrategy {
 }
 
 impl CrazyStrategy {
-    async fn handle_pangolin(&mut self) -> color_eyre::Result<()> {
-        let my_id = AccountId::from(self.helper.pangolin_signer().public().0);
-        let pangolin_signer = self.helper.pangolin_signer().clone();
-        let pangolin_api = self.helper.pangolin_api();
+    async fn handle_darwinia(&mut self) -> color_eyre::Result<()> {
+        let my_id = AccountId::from(self.helper.darwinia_signer().public().0);
+        let darwinia_signer = self.helper.darwinia_signer().clone();
 
-        if !pangolin_api.is_relayer(my_id.clone()).await? {
+        let darwinia_api = self.helper.darwinia_api();
+
+        if !darwinia_api.is_relayer(my_id.clone()).await? {
             tracing::warn!(
-                target: "pangolin-pangoro",
+                target: "darwinia-crab",
                 "You are not a relayer, please register first"
             );
             return Ok(());
         }
 
         // Query all assigned relayers
-        let assigned_relayers = pangolin_api.assigned_relayers().await?;
+        let assigned_relayers = darwinia_api.assigned_relayers().await?;
         let min_fee = match assigned_relayers.get(0) {
             Some(relayer) => {
                 if relayer.id == my_id {
@@ -123,31 +124,31 @@ impl CrazyStrategy {
         // RISK: If the cost is not judged, it may be a negative benefit.
         let new_fee = min_fee - 1;
         tracing::info!(
-            target: "pangolin-pangoro",
-            "[crazy] Update pangolin fee: {}",
+            target: "darwinia-crab",
+            "[crazy] Update darwinia fee: {}",
             new_fee
         );
-        pangolin_api
-            .update_relay_fee(pangolin_signer, new_fee)
+        darwinia_api
+            .update_relay_fee(darwinia_signer, new_fee)
             .await?;
         Ok(())
     }
 
-    async fn handle_pangoro(&mut self) -> color_eyre::Result<()> {
-        let my_id = AccountId::from(self.helper.pangoro_signer().public().0);
-        let pangoro_signer = self.helper.pangoro_signer().clone();
-        let pangoro_api = self.helper.pangoro_api();
+    async fn handle_crab(&mut self) -> color_eyre::Result<()> {
+        let my_id = AccountId::from(self.helper.crab_signer().public().0);
+        let crab_signer = self.helper.crab_signer().clone();
+        let crab_api = self.helper.crab_api();
 
-        if !pangoro_api.is_relayer(my_id.clone()).await? {
+        if !crab_api.is_relayer(my_id.clone()).await? {
             tracing::warn!(
-                target: "pangolin-pangoro",
+                target: "darwinia-crab",
                 "You are not a relayer, please register first"
             );
             return Ok(());
         }
 
         // Query all assigned relayers
-        let assigned_relayers = pangoro_api.assigned_relayers().await?;
+        let assigned_relayers = crab_api.assigned_relayers().await?;
         let min_fee = match assigned_relayers.get(0) {
             Some(relayer) => {
                 if relayer.id == my_id {
@@ -163,13 +164,11 @@ impl CrazyStrategy {
         // RISK: If the cost is not judged, it may be a negative benefit.
         let new_fee = min_fee - 1;
         tracing::info!(
-            target: "pangolin-pangoro",
-            "[crazy] Update pangoro fee: {}",
+            target: "darwinia-crab",
+            "[crazy] Update crab fee: {}",
             new_fee
         );
-        pangoro_api
-            .update_relay_fee(pangoro_signer, new_fee)
-            .await?;
+        crab_api.update_relay_fee(crab_signer, new_fee).await?;
         Ok(())
     }
 }

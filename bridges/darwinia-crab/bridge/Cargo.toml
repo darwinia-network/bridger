@@ -18,3 +18,67 @@ readme = 'README.md'
 edition = "2021"
 
 [dependencies]
+tracing = "0.1"
+color-eyre = "0.5"
+
+async-trait = "0.1"
+
+tokio = { version = "1", features = ["full"] }
+colored     = "2"
+structopt   = "0.3"
+strum       = { version = "0.21", features = ["derive"] }
+
+codec = { package = "parity-scale-codec", version = "2.3.1" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hex = "0.4"
+futures = "0.3"
+futures-timer = "3"
+
+lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
+postage = "0.4"
+
+
+## Substrate Dependencies
+
+frame-support       = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
+sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
+sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
+sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
+sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
+sp-version          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
+
+## bridge common
+
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+substrate-relay-helper = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.11.7" }
+
+
+## component
+client-darwinia        = { path = "../client-darwinia" }
+client-crab            = { path = "../client-crab" }
+component-subscan      = { path = "../../../components/subscan" }
+
+## support
+support-common     = { path = "../../../supports/support-common" }
+support-lifeline   = { path = "../../../supports/support-lifeline" }
+support-terminal   = { path = "../../../supports/support-terminal" }
+
+## darwinia common
+darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
+darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
+darwinia-common-runtime    = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
+
+## darwinia
+darwinia-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
+
+## crab
+crab-runtime                   = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
+

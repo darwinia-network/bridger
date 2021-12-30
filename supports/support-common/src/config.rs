@@ -17,6 +17,8 @@ pub enum Names {
     BridgePangolinRopsten,
     /// Bridge darwinia-ethereum
     BridgeDarwiniaEthereum,
+    /// Bridge pangolin-pangoro
+    BridgePangolinPangoro,
 }
 
 impl Names {
@@ -26,6 +28,7 @@ impl Names {
             Self::BridgeTemplate => "bridge-template",
             Self::BridgePangolinRopsten => "bridge-pangolin-ropsten",
             Self::BridgeDarwiniaEthereum => "bridge-darwinia-ethereum",
+            Self::BridgePangolinPangoro => "bridge-pangolin-pangoro",
         }
     }
 }

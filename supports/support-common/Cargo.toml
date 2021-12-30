@@ -22,8 +22,8 @@ edition = "2021"
 thiserror = "1.0"
 
 tracing = "0.1"
-tracing-subscriber = "0.2"
 tracing-attributes = "0.1"
+tracing-subscriber = { version = "0.2", features = ["chrono"] }
 
 color-eyre = "0.5"
 

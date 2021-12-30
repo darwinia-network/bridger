@@ -5,11 +5,11 @@ use crate::command::types::{
     AffirmOpts, ConfirmOpts, EcdsaOpts, InfoOpts, MmrOpts, ParcelOpts, RelayOpts,
 };
 
-/// Bridge pangolin-ropsten options
+/// Bridge darwinia-ethereum options
 #[derive(Debug, StructOpt)]
-#[structopt(name = "pangolin-ropsten", about = "Bridge pangolin-ropsten")]
+#[structopt(name = "darwinia-ethereum", about = "Bridge darwinia-ethereum")]
 pub enum Opts {
-    /// Start bridge pangolin-ropsten
+    /// Start bridge darwinia-ethereum
     Start,
     /// Do affirm
     Affirm {

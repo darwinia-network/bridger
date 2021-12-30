@@ -6,5 +6,7 @@ members = [
 ]
 exclude = [
   "bridges/template",
-  "bridges/pangolin-ropsten"
+  "bridges/pangolin-ropsten",
+  "bridges/pangolin-pangoro",
+  "bridges/darwinia-ethereum",
 ]

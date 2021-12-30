@@ -1,7 +1,6 @@
 use bp_header_chain::InitializationData;
 use bp_runtime::Chain as ChainBase;
 use codec::Encode;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 use relay_substrate_client::{
     Chain as RelaySubstrateClientChain, SignParam, TransactionSignScheme, UnsignedTransaction,
 };
@@ -9,63 +8,39 @@ use sp_core::{Bytes, Pair};
 
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
-use support_lifeline::service::BridgeService;
+use support_terminal::output;
 
-use crate::bridge::PangolinPangoroBus;
-use crate::bridge::PangolinPangoroTask;
 use crate::bridge::{ChainInfoConfig, PangolinPangoroConfig};
-use crate::bridge::{PangolinPangoroMessageReceive, PangolinPangoroMessageSend};
 use crate::types::{BridgeName, InitBridge};
 
-#[derive(Debug)]
-pub struct InitBridgeService {
-    _greet: Lifeline,
-}
+pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
+    tracing::info!(target: "pangolin-pangoro", "Init bridge {:?}", bridge);
+    let bridge_config: PangolinPangoroConfig = Config::restore(Names::BridgePangolinPangoro)?;
+    let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
+    let config_pangoro: ChainInfoConfig = bridge_config.pangoro;
 
-impl BridgeService for InitBridgeService {}
+    let (source_chain, target_chain) = match bridge {
+        BridgeName::PangolinToPangoro => (
+            config_pangolin.to_chain_info()?,
+            config_pangoro.to_chain_info()?,
+        ),
+        BridgeName::PangoroToPangolin => (
+            config_pangoro.to_chain_info()?,
+            config_pangolin.to_chain_info()?,
+        ),
+    };
+    std::thread::spawn(move || {
+        futures::executor::block_on(init_bridge(InitBridge {
+            bridge,
+            source: source_chain,
+            target: target_chain,
+        }))
+    })
+    .join()
+    .map_err(|_| BridgerError::Custom("Failed to join thread handle".to_string()))??;
 
-impl Service for InitBridgeService {
-    type Bus = PangolinPangoroBus;
-    type Lifeline = color_eyre::Result<Self>;
-
-    fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let mut rx = bus.rx::<PangolinPangoroMessageSend>()?;
-        let mut tx = bus.tx::<PangolinPangoroMessageReceive>()?;
-        let bridge_config: PangolinPangoroConfig = Config::restore(Names::BridgePangolinPangoro)?;
-        let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
-        let config_pangoro: ChainInfoConfig = bridge_config.pangoro;
-
-        let _greet = Self::try_task(
-            &format!("{}-init-bridge", PangolinPangoroTask::name()),
-            async move {
-                let (source_chain, target_chain) = match bridge {
-                    BridgeName::PangolinToPangoro => (
-                        config_pangolin.to_chain_info()?,
-                        config_pangoro.to_chain_info()?,
-                    ),
-                    BridgeName::PangoroToPangolin => (
-                        config_pangoro.to_chain_info()?,
-                        config_pangolin.to_chain_info()?,
-                    ),
-                };
-
-                std::thread::spawn(move || {
-                    futures::executor::block_on(init_bridge(InitBridge {
-                        bridge,
-                        source: source_chain,
-                        target: target_chain,
-                    }))
-                })
-                .join()
-                .map_err(|_| {
-                    BridgerError::Custom("Failed to join thread handle".to_string()).into()
-                })??;
-
-                Ok(())
-            },
-        );
-        Ok(Self { _greet })
-    }
+    output::output_ok();
+    Ok(())
 }
 
 macro_rules! select_bridge {

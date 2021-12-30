@@ -92,7 +92,9 @@ fn start() -> color_eyre::Result<()> {
         },
     };
 
-    futures::executor::block_on(bridge_relay(relay_info))?;
+    std::thread::spawn(move || futures::executor::block_on(bridge_relay(relay_info)))
+        .join()
+        .map_err(|_| BridgerError::Custom("Failed to join thread handle".to_string()))??;
 
     // bridge_relay(relay_info).await?;
     Ok(())

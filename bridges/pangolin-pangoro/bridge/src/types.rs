@@ -4,15 +4,15 @@ use std::str::FromStr;
 use bp_messages::LaneId;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use sp_core::crypto::Pair;
+
 use support_common::error::BridgerError;
 
 use crate::traits::CliChain;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, strum::EnumString)]
+#[strum(serialize_all = "kebab_case")]
 pub enum BridgeName {
-    #[strum(serialize = "pangolin-to-pangoro")]
     PangolinToPangoro,
-    #[strum(serialize = "pangoro-to-pangolin")]
     PangoroToPangolin,
 }
 

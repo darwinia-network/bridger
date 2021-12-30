@@ -42,7 +42,9 @@ impl Service for UpdateFeeService {
 fn start() -> color_eyre::Result<()> {
     let bridge_config: PangolinPangoroConfig = Config::restore(Names::BridgePangolinPangoro)?;
     let config_task: TaskConfig = bridge_config.task;
-    futures::executor::block_on(cron_update_fee(config_task))?;
+    std::thread::spawn(move || futures::executor::block_on(cron_update_fee(config_task)))
+        .join()
+        .map_err(|_| BridgerError::Custom("Failed to join thread handle".to_string()))??;
     Ok(())
 }
 

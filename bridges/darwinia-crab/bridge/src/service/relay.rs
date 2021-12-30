@@ -22,7 +22,6 @@ use crate::chains::crab::{
 use crate::chains::darwinia::{
     DarwiniaFinalityToCrab, DarwiniaMessagesToCrab, DarwiniaMessagesToCrabRunner,
 };
-use crate::message::DarwiniaCrabMessageSend;
 use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
 #[derive(Debug)]
@@ -84,7 +83,7 @@ fn start() -> color_eyre::Result<()> {
 
     std::thread::spawn(move || futures::executor::block_on(bridge_relay(relay_info)))
         .join()
-        .map_err(|_| color_eyre::Error::msg("Failed to join thread handle"))??;
+        .map_err(|_| BridgerError::Custom("Failed to join thread handle".to_string()))??;
 
     // bridge_relay(relay_info).await?;
     Ok(())
@@ -226,7 +225,11 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         .await
         .map_err(|e| BridgerError::Custom(format!("{:?}", e)))?;
 
-    futures::future::select_all(message_relays).await.0
+    if let Err(e) = futures::future::select_all(message_relays).await.0 {
+        tracing::error!(target: "darwinia-crab", "{:?}", e);
+        return Err(BridgerError::Custom("Failed to start relay".to_string()).into());
+    }
+    Ok(())
 }
 
 async fn create_darwinia_account(

@@ -1,4 +1,4 @@
-use drml_common_primitives::AccountId;
+use darwinia_common_primitives::AccountId;
 use relay_utils::MaybeConnectionError;
 use sp_core::Pair;
 

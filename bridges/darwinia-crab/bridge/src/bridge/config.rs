@@ -1,8 +1,7 @@
-use std::str::FromStr;
-
 use serde::{Deserialize, Serialize};
 
 use component_subscan::SubscanConfig;
+use support_common::error::BridgerError;
 
 use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
@@ -80,7 +79,10 @@ impl ChainInfoConfig {
         if self.endpoint.find("ws://").unwrap_or(usize::MAX) != 0
             && self.endpoint.find("wss://").unwrap_or(usize::MAX) != 0
         {
-            color_eyre::bail!("The entrypoint isn't websocket protocol")
+            return Err(BridgerError::Custom(
+                "The entrypoint isn't websocket protocol".to_string(),
+            )
+            .into());
         }
         let secure = self.endpoint.starts_with("wss://");
         let endpoint = self

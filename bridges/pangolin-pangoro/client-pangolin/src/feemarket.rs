@@ -37,7 +37,11 @@ impl PangolinRelayStrategy {
         reference: &mut RelayReference<P, SourceClient, TargetClient>,
     ) -> color_eyre::Result<bool> {
         let nonce = &reference.nonce;
-        tracing::trace!("[pangolin] Determine whether to relay for nonce: {}", nonce);
+        tracing::trace!(
+            target: "client-pangolin",
+            "[pangolin] Determine whether to relay for nonce: {}",
+            nonce
+        );
         let order = self
             .api
             .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
@@ -50,6 +54,7 @@ impl PangolinRelayStrategy {
         // Related: https://github.com/darwinia-network/darwinia-common/blob/90add536ed320ec7e17898e695c65ee9d7ce79b0/frame/fee-market/src/lib.rs?#L177
         if order.is_none() {
             tracing::info!(
+                target: "client-pangolin",
                 "[pangolin] Not found order by nonce: {}, so decide don't relay this nonce",
                 nonce
             );
@@ -63,6 +68,7 @@ impl PangolinRelayStrategy {
         // If not have any assigned relayers, everyone participates in the relay.
         if relayers.is_empty() {
             tracing::info!(
+                target: "client-pangolin",
                 "[pangolin] Not found any assigned relayers so relay this nonce({}) anyway",
                 nonce
             );
@@ -80,6 +86,7 @@ impl PangolinRelayStrategy {
         // you can still get relay rewards.
         if is_assigned_relayer {
             tracing::info!(
+                target: "client-pangolin",
                 "[pangolin] You are assigned relayer, you must be relay this nonce({})",
                 nonce
             );
@@ -102,12 +109,14 @@ impl PangolinRelayStrategy {
         // If this order has timed out, decide to relay
         if latest_block_number > maximum_timeout {
             tracing::info!(
+                target: "client-pangolin",
                 "[pangolin] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
                 nonce
             );
             return Ok(true);
         }
         tracing::info!(
+            target: "client-pangolin",
             "[pangolin] You aren't assigned relay. and this nonce({}) is ontime. so don't relay this",
             nonce
         );
@@ -130,6 +139,7 @@ impl RelayStrategy for PangolinRelayStrategy {
             times += 1;
             if times > 5 {
                 tracing::error!(
+                    target: "client-pangolin",
                     "[pangolin] Try decide failed many times ({}). so decide don't relay this nonce({}) at the moment",
                     times,
                     reference.nonce
@@ -141,7 +151,7 @@ impl RelayStrategy for PangolinRelayStrategy {
                 Err(e) => {
                     if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
                         if client_error.is_connection_error() {
-                            tracing::debug!("[pangolin] Try reconnect to chain");
+                            tracing::debug!(target: "client-pangolin", "[pangolin] Try reconnect to chain");
                             if let Err(re) = self.api.reconnect().await {
                                 tracing::error!(
                                     "[pangolin] Failed to reconnect substrate client: {:?}",
@@ -152,11 +162,12 @@ impl RelayStrategy for PangolinRelayStrategy {
                         }
                     }
 
-                    tracing::error!("[pangolin] Failed to decide relay: {:?}", e);
+                    tracing::error!(target: "client-pangolin","[pangolin] Failed to decide relay: {:?}", e);
                     continue;
                 }
             };
             tracing::info!(
+                target: "client-pangolin",
                 "[pangolin] About nonce {} decide is {}",
                 reference.nonce,
                 decide

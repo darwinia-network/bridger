@@ -201,10 +201,12 @@ impl UpdateFeeStrategy for ReasonableStrategy {
                     if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
                         if client_error.is_connection_error() {
                             tracing::debug!(
+                                target: "pangolin-pangoro",
                                 "[pangoro] Try reconnect to chain (update fee strategy reasonable)"
                             );
                             if let Err(re) = self.helper.reconnect_pangoro().await {
                                 tracing::error!(
+                                    target: "pangolin-pangoro",
                                     "[pangoro] Failed to reconnect substrate client: {:?} (update fee strategy)",
                                     re
                                 );
@@ -234,10 +236,12 @@ impl UpdateFeeStrategy for ReasonableStrategy {
                     if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
                         if client_error.is_connection_error() {
                             tracing::debug!(
+                                target: "pangolin-pangoro",
                                 "[pangolin] Try reconnect to chain (update fee strategy reasonable)"
                             );
                             if let Err(re) = self.helper.reconnect_pangolin().await {
                                 tracing::error!(
+                                    target: "pangolin-pangoro",
                                     "[pangolin] Failed to reconnect substrate client: {:?} (update fee strategy)",
                                     re
                                 );

@@ -1,5 +1,5 @@
 [package]
-name = "bridge-pangolin-pangoro"
+name = "bridge-darwinia-crab"
 version = "0.5.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -18,7 +18,6 @@ readme = 'README.md'
 edition = "2021"
 
 [dependencies]
-
 tracing = "0.1"
 color-eyre = "0.5"
 
@@ -38,6 +37,7 @@ futures-timer = "3"
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage = "0.4"
+
 
 ## Substrate Dependencies
 
@@ -62,8 +62,8 @@ messages-relay         = { git = "https://github.com/darwinia-network/parity-bri
 
 
 ## component
-client-pangolin        = { path = "../client-pangolin" }
-client-pangoro         = { path = "../client-pangoro" }
+client-darwinia        = { path = "../client-darwinia" }
+client-crab            = { path = "../client-crab" }
 component-subscan      = { path = "../../../components/subscan" }
 
 ## support
@@ -72,12 +72,13 @@ support-lifeline   = { path = "../../../supports/support-lifeline" }
 support-terminal   = { path = "../../../supports/support-terminal" }
 
 ## darwinia common
-drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
-drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
-common-runtime          = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
+darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
+darwinia-common-runtime    = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
 
-## pangolin
-pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+## darwinia
+darwinia-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
 
-## pangoro
-pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.11.7" }
+## crab
+crab-runtime                   = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }
+

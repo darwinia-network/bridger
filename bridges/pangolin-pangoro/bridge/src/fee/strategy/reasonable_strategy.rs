@@ -10,7 +10,7 @@ use component_subscan::{Subscan, SubscanComponent};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 
-use crate::bridge::{PangolinPangoroConfig, PangolinPangoroTask};
+use crate::bridge::PangolinPangoroConfig;
 use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
 

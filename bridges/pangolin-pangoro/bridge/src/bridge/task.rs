@@ -1,9 +1,6 @@
-use lifeline::{Bus, Sender};
-
 use support_lifeline::task::TaskStack;
 
 use crate::bridge::PangolinPangoroBus;
-use crate::bridge::PangolinPangoroMessageSend;
 use crate::service::fee::UpdateFeeService;
 use crate::service::relay::RelayService;
 

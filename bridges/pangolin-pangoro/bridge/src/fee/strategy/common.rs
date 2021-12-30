@@ -6,8 +6,8 @@ use client_pangoro::api::PangoroApi;
 use client_pangoro::PangoroChain;
 use support_common::config::{Config, Names};
 
+use crate::bridge::PangolinPangoroConfig;
 use crate::bridge::{ChainInfoConfig, RelayConfig};
-use crate::bridge::{PangolinPangoroConfig, PangolinPangoroTask};
 
 #[derive(Clone)]
 pub struct StrategyHelper {

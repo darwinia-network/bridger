@@ -1,6 +1,6 @@
 use drml_common_primitives::AccountId;
 use futures::{FutureExt, TryFutureExt};
-use lifeline::{Bus, Lifeline, Receiver, Service, Task};
+use lifeline::{Lifeline, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
 use sp_core::Pair;
@@ -13,7 +13,6 @@ use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 
-use crate::bridge::PangolinPangoroMessageSend;
 use crate::bridge::PangolinPangoroTask;
 use crate::bridge::{ChainInfoConfig, RelayConfig};
 use crate::bridge::{PangolinPangoroBus, PangolinPangoroConfig};
@@ -44,7 +43,7 @@ impl Service for RelayService {
     type Bus = PangolinPangoroBus;
     type Lifeline = color_eyre::Result<Self>;
 
-    fn spawn(bus: &Self::Bus) -> Self::Lifeline {
+    fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
             &format!("{}-relay", PangolinPangoroTask::name()),
             async move {

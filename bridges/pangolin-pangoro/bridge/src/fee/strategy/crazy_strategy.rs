@@ -2,7 +2,6 @@ use drml_common_primitives::AccountId;
 use relay_utils::MaybeConnectionError;
 use sp_core::Pair;
 
-use crate::bridge::PangolinPangoroTask;
 use crate::fee::strategy::common::StrategyHelper;
 use crate::fee::UpdateFeeStrategy;
 

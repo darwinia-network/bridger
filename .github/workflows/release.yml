@@ -1,0 +1,21 @@
+name: Check pull request
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-bridger:
+    name: Build package
+    runs-on: ubuntu-latest
+    container:
+      image: rust:1
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          cd frame
+          cargo build --release

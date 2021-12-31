@@ -1,12 +1,20 @@
 name: Check pull request
 
+#on:
+#  push:
+#    tags:
+#      - "v*"
+
 on:
   push:
-    tags:
-      - "v*"
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
 env:
   OPENSSL_DIR: /home/runner/openssl
   OPENSSL_STATIC: 1
+  RUST_TOOLCHAIN: nightly-2021-12-07
 
 jobs:
   build-linux:
@@ -39,7 +47,7 @@ jobs:
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2021-12-07
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
           override: true
           target: wasm32-unknown-unknown
           components: clippy
@@ -55,7 +63,7 @@ jobs:
         run: |
           mkdir -p shared
           zip -jr \
-            shared/bridger-linux-$(uname -m).zip \
+            shared/bridger-linux-x86_64.zip \
             frame/target/x86_64-unknown-linux-gnu/release/bridger
 
       - name: Build bridge-${{ matrix.package }}
@@ -69,7 +77,7 @@ jobs:
         run: |
           mkdir -p shared
           zip -jr \
-            shared/bridge-${{ matrix.package }}-linux-$(uname -m).zip \
+            shared/bridge-${{ matrix.package }}-linux-x86_64.zip \
             bridges/${{ matrix.package }}/target/x86_64-unknown-linux-gnu/release/bridge-${{ matrix.package }}
 
       - name: Upload shared-binary

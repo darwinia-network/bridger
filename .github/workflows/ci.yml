@@ -20,11 +20,15 @@ jobs:
 
       - name: Lint
         if: matrix.action == 'clippy'
-        run: cargo clippy --release --all -- -D warnings
+        run: |
+          cd frame
+          cargo clippy --release --all -- -D warnings
 
       - name: Run tests
         if: matrix.action == 'test'
-        run: cargo test --release
+        run: |
+          cd frame
+          cargo test --release
 
   check-bridges:
     name: Check bridge-${{ matrix.bridge }} ${{ matrix.action }}

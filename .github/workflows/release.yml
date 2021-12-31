@@ -17,79 +17,79 @@ env:
   RUST_TOOLCHAIN: nightly-2021-12-07
 
 jobs:
-  build-linux:
-    name: Build package [linux]
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu:16.04
-    strategy:
-      matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: |
-          apt update -y
-          apt install --no-install-recommends -y \
-            git curl ca-certificates \
-            make gcc g++ clang-4.0 \
-            libssl-dev pkg-config zip
-
-      - name: Build openssl
-        run: |
-          curl https://www.openssl.org/source/openssl-1.1.1l.tar.gz | tar xz
-          cd openssl-1.1.1l
-          ./config --prefix=${{ env.OPENSSL_DIR }} -static -fPIC
-          make -j4
-          make install
-
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          override: true
-
-      - name: Build bridger
-        if: matrix.package == 'bridger'
-        run: |
-          cd frame
-          cargo build --release --target x86_64-unknown-linux-gnu
-
-      - name: Collect shared for bridger
-        if: matrix.package == 'bridger'
-        run: |
-          mkdir -p shared
-          zip -jr \
-            shared/bridger-linux-x86_64.zip \
-            frame/target/x86_64-unknown-linux-gnu/release/bridger
-
-      - name: Build bridge-${{ matrix.package }}
-        if: matrix.package != 'bridger'
-        run: |
-          cd bridges/${{ matrix.package }}
-          cargo build --release --target x86_64-unknown-linux-gnu
-
-      - name: Collect shared for bridge-${{ matrix.package }}
-        if: matrix.package != 'bridger'
-        run: |
-          mkdir -p shared
-          zip -jr \
-            shared/bridge-${{ matrix.package }}-linux-x86_64.zip \
-            bridges/${{ matrix.package }}/target/x86_64-unknown-linux-gnu/release/bridge-${{ matrix.package }}
-
-      - name: Upload shared-binary
-        uses: actions/upload-artifact@v2
-        with:
-          name: bridger-artifact
-          path: shared
+#  build-linux:
+#    name: Build package [linux]
+#    runs-on: ubuntu-latest
+#    container:
+#      image: ubuntu:16.04
+#    strategy:
+#      matrix:
+#        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Install dependencies
+#        run: |
+#          apt update -y
+#          apt install --no-install-recommends -y \
+#            git curl ca-certificates \
+#            make gcc g++ clang-4.0 \
+#            libssl-dev pkg-config zip
+#
+#      - name: Build openssl
+#        run: |
+#          curl https://www.openssl.org/source/openssl-1.1.1l.tar.gz | tar xz
+#          cd openssl-1.1.1l
+#          ./config --prefix=${{ env.OPENSSL_DIR }} -static -fPIC
+#          make -j4
+#          make install
+#
+#      - name: Install rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: ${{ env.RUST_TOOLCHAIN }}
+#          override: true
+#
+#      - name: Build bridger
+#        if: matrix.package == 'bridger'
+#        run: |
+#          cd frame
+#          cargo build --release --target x86_64-unknown-linux-gnu
+#
+#      - name: Collect shared for bridger
+#        if: matrix.package == 'bridger'
+#        run: |
+#          mkdir -p shared
+#          zip -jr \
+#            shared/bridger-linux-x86_64.zip \
+#            frame/target/x86_64-unknown-linux-gnu/release/bridger
+#
+#      - name: Build bridge-${{ matrix.package }}
+#        if: matrix.package != 'bridger'
+#        run: |
+#          cd bridges/${{ matrix.package }}
+#          cargo build --release --target x86_64-unknown-linux-gnu
+#
+#      - name: Collect shared for bridge-${{ matrix.package }}
+#        if: matrix.package != 'bridger'
+#        run: |
+#          mkdir -p shared
+#          zip -jr \
+#            shared/bridge-${{ matrix.package }}-linux-x86_64.zip \
+#            bridges/${{ matrix.package }}/target/x86_64-unknown-linux-gnu/release/bridge-${{ matrix.package }}
+#
+#      - name: Upload shared-binary
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: bridger-artifact
+#          path: shared
 
   build-win:
     name: Build package [windows]
     runs-on: windows-latest
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        package: [bridger]
     steps:
       - uses: actions/checkout@v2
 
@@ -100,18 +100,27 @@ jobs:
           override: true
           target: x86_64-pc-windows-msvc
 
-  build-macos:
-    name: Build package [macos]
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
-    steps:
-      - uses: actions/checkout@v2
+      - uses: lukka/get-cmake@latest
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v10
 
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          override: true
-          target: x86_64-apple-darwin
+      - name: Install dependencies
+        run: |
+          vcpkg --version
+
+
+#  build-macos:
+#    name: Build package [macos]
+#    runs-on: macos-latest
+#    strategy:
+#      matrix:
+#        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Install rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: ${{ env.RUST_TOOLCHAIN }}
+#          override: true
+#          target: x86_64-apple-darwin

@@ -77,7 +77,7 @@ jobs:
             shared/bridge-${{ matrix.package }}-linux-x86_64.zip \
             bridges/${{ matrix.package }}/target/x86_64-unknown-linux-gnu/release/bridge-${{ matrix.package }}
 
-      - name: Upload shared-binary
+      - name: Upload shared
         uses: actions/upload-artifact@v2
         with:
           name: bridger-artifact
@@ -148,6 +148,12 @@ jobs:
             shared/bridge-${{ matrix.package }}-windows-x86_64.zip `
             bridges/${{ matrix.package }}/target/x86_64-pc-windows-msvc/release/bridge-${{ matrix.package }}.exe
 
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: bridger-artifact
+          path: shared
+
 
   build-macos:
     name: Build package [macos]
@@ -195,4 +201,10 @@ jobs:
           zip \
             shared/bridge-${{ matrix.package }}-macos-x86_64.zip \
             bridges/${{ matrix.package }}/target/x86_64-apple-darwin/release/bridge-${{ matrix.package }}
+
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: bridger-artifact
+          path: shared
 

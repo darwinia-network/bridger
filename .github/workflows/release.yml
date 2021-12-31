@@ -89,7 +89,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        package: [bridger]
+        package: [bridger, pangolin-ropsten]
     steps:
       - uses: actions/checkout@v2
 
@@ -99,9 +99,17 @@ jobs:
         with:
           vcpkgGitCommitId: 1085a57da0725c19e19586025438e8c16f34c890
 
+      - uses: MinoruSekine/setup-scoop
+        with:
+          add_extras_bucket: true
+          scoop_checkup: true
+          scoop_update: true
+
       - name: Install dependencies
         run: |
-          vcpkg --version
+          vcpkg install openssl
+          scoop install 7z
+          scoop install busybox
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
@@ -109,6 +117,35 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
           override: true
           target: x86_64-pc-windows-msvc
+
+      - name: Build bridger
+        if: matrix.package == 'bridger'
+        run: |
+          cd frame
+          cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Collect shared for bridger
+        if: matrix.package == 'bridger'
+        run: |
+          mkdir -p shared
+          7z a -tzip \
+            shared/bridger-windows-x86_64.zip \
+            frame/target/x86_64-pc-windows-msvc/release/bridger.exe
+
+      - name: Build bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          cd bridges/${{ matrix.package }}
+          cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Collect shared for bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          mkdir -p shared
+          7z a -tzip \
+            shared/bridge-${{ matrix.package }}-windows-x86_64.zip \
+            bridges/${{ matrix.package }}/target/x86_64-pc-windows-msvc/release/bridge-${{ matrix.package }}.exe
+
 
 
 #  build-macos:

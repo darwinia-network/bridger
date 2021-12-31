@@ -99,7 +99,8 @@ jobs:
         with:
           vcpkgGitCommitId: 1085a57da0725c19e19586025438e8c16f34c890
 
-      - uses: MinoruSekine/setup-scoop
+      - name: Setup scoop
+        uses: MinoruSekine/setup-scoop
         with:
           add_extras_bucket: true
           scoop_checkup: true

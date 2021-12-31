@@ -34,7 +34,7 @@ jobs:
           apt install --no-install-recommends -y \
             git curl ca-certificates \
             make gcc g++ clang-4.0 \
-            libssl-dev pkg-config
+            libssl-dev pkg-config zip
 
       - name: Build openssl
         run: |

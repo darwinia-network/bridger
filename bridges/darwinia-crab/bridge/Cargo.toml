@@ -64,12 +64,12 @@ messages-relay         = { git = "https://github.com/darwinia-network/parity-bri
 ## component
 client-darwinia        = { path = "../client-darwinia" }
 client-crab            = { path = "../client-crab" }
-component-subscan      = { path = "../../../components/subscan" }
+component-subscan      = { path = "../../../frame/components/subscan" }
 
 ## support
-support-common     = { path = "../../../supports/support-common" }
-support-lifeline   = { path = "../../../supports/support-lifeline" }
-support-terminal   = { path = "../../../supports/support-terminal" }
+support-common     = { path = "../../../frame/supports/support-common" }
+support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
+support-terminal   = { path = "../../../frame/supports/support-terminal" }
 
 ## darwinia common
 darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", tag = "v0.11.7-1" }

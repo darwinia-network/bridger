@@ -17,6 +17,7 @@ fn init_log() -> color_eyre::Result<()> {
 
     let def_log_filter = [
         "info",
+        "bridger=trace",
         "pangolin-pangoro=trace",
         "pangolin-ropsten=trace",
         "darwinia-ethereum=trace",

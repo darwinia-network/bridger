@@ -21,6 +21,12 @@ fn main() -> color_eyre::Result<()> {
                 let args_orig: Vec<String> = std::env::args().collect();
                 let sub_command = &args_orig[1..2][0];
                 let sub_args = &args_orig[2..];
+                tracing::debug!(
+                    target: "bridger",
+                    "Found subcommand ({}) and args: {}",
+                    sub_command,
+                    sub_args.join(" ")
+                );
                 let executor = ExternalExecutor::new(sub_command.clone(), sub_args.to_vec());
                 if let Err(ez) = executor.execute() {
                     if let Some(BridgerError::UnsupportExternal(_msg)) = ez.downcast_ref() {

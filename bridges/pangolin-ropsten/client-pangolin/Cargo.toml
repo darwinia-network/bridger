@@ -40,4 +40,4 @@ frame-support    = { git = "https://github.com/darwinia-network/substrate.git", 
 pallet-indices   = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
 pallet-im-online = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.11.7" }
 
-support-ethereum = { path = "../../../supports/support-ethereum" }
+support-ethereum = { path = "../../../frame/supports/support-ethereum" }

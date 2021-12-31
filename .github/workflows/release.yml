@@ -15,7 +15,6 @@ env:
   OPENSSL_DIR: /home/runner/openssl
   OPENSSL_STATIC: 1
   RUST_TOOLCHAIN: nightly-2021-12-07
-  PACKAGES: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
 
 jobs:
   build-linux:
@@ -25,7 +24,7 @@ jobs:
       image: ubuntu:16.04
     strategy:
       matrix:
-        package: ${{ env.PACKAGES }}
+        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
     steps:
       - uses: actions/checkout@v2
 

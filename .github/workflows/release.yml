@@ -2,20 +2,80 @@ name: Check pull request
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - "v*"
+env:
+  OPENSSL_DIR: /home/runner/openssl
+  OPENSSL_STATIC: 1
 
 jobs:
-  build-bridger:
+  build-linux:
     name: Build package
     runs-on: ubuntu-latest
     container:
-      image: rust:1
+      image: ubuntu:16.04
+    strategy:
+      matrix:
+        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run tests
+      - name: Install dependencies
+        run: |
+          apt update -y
+          apt install --no-install-recommends -y \
+            git curl ca-certificates \
+            make gcc g++ clang-4.0 \
+            libssl-dev pkg-config
+
+      - name: Build openssl
+        run: |
+          curl https://www.openssl.org/source/openssl-1.1.1l.tar.gz | tar xz
+          cd openssl-1.1.1l
+          ./config --prefix=${{ env.OPENSSL_DIR }} -static -fPIC
+          make -j4
+          make install
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2021-12-07
+          override: true
+          target: wasm32-unknown-unknown
+          components: clippy
+
+      - name: Build bridger
+        if: matrix.package == 'bridger'
         run: |
           cd frame
-          cargo build --release
+          cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Collect shared for bridger
+        if: matrix.package == 'bridger'
+        run: |
+          mkdir -p shared
+          zip -jr \
+            shared/bridger-linux-$(uname -m).zip \
+            frame/target/x86_64-unknown-linux-gnu/release/bridger
+
+      - name: Build bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          cd bridges/${{ matrix.package }}
+          cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Collect shared for bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          mkdir -p shared
+          zip -jr \
+            shared/bridge-${{ matrix.package }}-linux-$(uname -m).zip \
+            bridges/${{ matrix.package }}/target/x86_64-unknown-linux-gnu/release/bridge-${{ matrix.package }}
+
+      - name: Upload shared-binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: bridger-artifact
+          path: shared
+
+

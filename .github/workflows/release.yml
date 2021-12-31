@@ -93,13 +93,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          override: true
-          target: x86_64-pc-windows-msvc
-
       - uses: lukka/get-cmake@latest
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v10
@@ -107,6 +100,13 @@ jobs:
       - name: Install dependencies
         run: |
           vcpkg --version
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          override: true
+          target: x86_64-pc-windows-msvc
 
 
 #  build-macos:

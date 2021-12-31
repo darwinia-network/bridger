@@ -15,16 +15,17 @@ env:
   OPENSSL_DIR: /home/runner/openssl
   OPENSSL_STATIC: 1
   RUST_TOOLCHAIN: nightly-2021-12-07
+  PACKAGES: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
 
 jobs:
   build-linux:
-    name: Build package [linux]
+    name: [linux] Build package
     runs-on: ubuntu-latest
     container:
       image: ubuntu:16.04
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        package: ${{ env.PACKAGES }}
     steps:
       - uses: actions/checkout@v2
 
@@ -50,7 +51,6 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
           override: true
           target: wasm32-unknown-unknown
-          components: clippy
 
       - name: Build bridger
         if: matrix.package == 'bridger'
@@ -86,3 +86,42 @@ jobs:
           name: bridger-artifact
           path: shared
 
+  build-win:
+    name: [windows] Build package
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          override: true
+          target: wasm32-unknown-unknown
+
+      # https://github.com/actions-rs/toolchain/issues/165
+      - name: Add more target for rust toolchain
+        run: rustup target add x86_64-pc-windows-msvc
+
+  build-macos:
+    name: [macos] Build package
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          override: true
+          target: wasm32-unknown-unknown
+
+      # https://github.com/actions-rs/toolchain/issues/165
+      - name: Add more target for rust toolchain
+        run: rustup target add x86_64-apple-darwin

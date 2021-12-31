@@ -83,116 +83,117 @@ jobs:
 #          name: bridger-artifact
 #          path: shared
 
-#  build-win:
-#    name: Build package [windows]
-#    runs-on: windows-latest
-#    strategy:
-#      matrix:
-#        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - uses: lukka/get-cmake@latest
-#      - name: Setup vcpkg
-#        uses: lukka/run-vcpkg@v10
-#        with:
-#          vcpkgGitCommitId: 1085a57da0725c19e19586025438e8c16f34c890
-#
-#      - name: Setup scoop
-#        uses: MinoruSekine/setup-scoop@v1
-#        with:
-#          add_extras_bucket: true
-#          scoop_checkup: true
-#          scoop_update: true
-#
-#      - name: Install dependencies
-#        run: |
-#          vcpkg install openssl:x64-windows-static
-#          scoop install git
-#          scoop install 7zip
-#          scoop install busybox
-#          scoop install make
-#
-#      - name: Install rust toolchain
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: ${{ env.RUST_TOOLCHAIN }}
-#          target: x86_64-pc-windows-msvc
-#
-#      - name: Build bridger
-#        if: matrix.package == 'bridger'
-#        run: |
-#          cd frame
-#          cargo build --release --target x86_64-pc-windows-msvc
-#
-#      - name: Collect shared for bridger
-#        if: matrix.package == 'bridger'
-#        run: |
-#          mkdir -p shared
-#          7z a -tzip \
-#            shared/bridger-windows-x86_64.zip \
-#            frame/target/x86_64-pc-windows-msvc/release/bridger.exe
-#
-#      - name: Build bridge-${{ matrix.package }}
-#        if: matrix.package != 'bridger'
-#        run: |
-#          cd bridges/${{ matrix.package }}
-#          cargo build --release --target x86_64-pc-windows-msvc
-#
-#      - name: Collect shared for bridge-${{ matrix.package }}
-#        if: matrix.package != 'bridger'
-#        run: |
-#          mkdir -p shared
-#          7z a -tzip \
-#            shared/bridge-${{ matrix.package }}-windows-x86_64.zip \
-#            bridges/${{ matrix.package }}/target/x86_64-pc-windows-msvc/release/bridge-${{ matrix.package }}.exe
 
-
-
-  build-macos:
-    name: Build package [macos]
-    runs-on: macos-latest
+  build-win:
+    name: Build package [windows]
+    runs-on: windows-latest
     strategy:
       matrix:
         package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
     steps:
       - uses: actions/checkout@v2
 
+      - uses: lukka/get-cmake@latest
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgGitCommitId: 1085a57da0725c19e19586025438e8c16f34c890
+
+      - name: Setup scoop
+        uses: MinoruSekine/setup-scoop@v1
+        with:
+          add_extras_bucket: true
+          scoop_checkup: true
+          scoop_update: true
+
       - name: Install dependencies
         run: |
-          brew install openssl
+          vcpkg install openssl:x64-windows-static
+          scoop install git
+          scoop install 7zip
+          scoop install busybox
+          scoop install make
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
-          target: x86_64-apple-darwin
+          target: x86_64-pc-windows-msvc
 
       - name: Build bridger
         if: matrix.package == 'bridger'
         run: |
           cd frame
-          cargo build --release --target x86_64-apple-darwin
+          cargo build --release --target x86_64-pc-windows-msvc
 
       - name: Collect shared for bridger
         if: matrix.package == 'bridger'
         run: |
           mkdir -p shared
-          zip \
-            shared/bridger-macos-x86_64.zip \
-            frame/target/x86_64-apple-darwin/release/bridger
+          7z a -tzip ^
+            shared/bridger-windows-x86_64.zip ^
+            frame/target/x86_64-pc-windows-msvc/release/bridger.exe
 
       - name: Build bridge-${{ matrix.package }}
         if: matrix.package != 'bridger'
         run: |
           cd bridges/${{ matrix.package }}
-          cargo build --release --target x86_64-apple-darwin
+          cargo build --release --target x86_64-pc-windows-msvc
 
       - name: Collect shared for bridge-${{ matrix.package }}
         if: matrix.package != 'bridger'
         run: |
           mkdir -p shared
-          zip \
-            shared/bridge-${{ matrix.package }}-macos-x86_64.zip \
-            bridges/${{ matrix.package }}/target/x86_64-apple-darwin/release/bridge-${{ matrix.package }}
+          7z a -tzip ^
+            shared/bridge-${{ matrix.package }}-windows-x86_64.zip ^
+            bridges/${{ matrix.package }}/target/x86_64-pc-windows-msvc/release/bridge-${{ matrix.package }}.exe
+
+
+
+#  build-macos:
+#    name: Build package [macos]
+#    runs-on: macos-latest
+#    strategy:
+#      matrix:
+#        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Install dependencies
+#        run: |
+#          brew install openssl
+#
+#      - name: Install rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: ${{ env.RUST_TOOLCHAIN }}
+#          target: x86_64-apple-darwin
+#
+#      - name: Build bridger
+#        if: matrix.package == 'bridger'
+#        run: |
+#          cd frame
+#          cargo build --release --target x86_64-apple-darwin
+#
+#      - name: Collect shared for bridger
+#        if: matrix.package == 'bridger'
+#        run: |
+#          mkdir -p shared
+#          zip \
+#            shared/bridger-macos-x86_64.zip \
+#            frame/target/x86_64-apple-darwin/release/bridger
+#
+#      - name: Build bridge-${{ matrix.package }}
+#        if: matrix.package != 'bridger'
+#        run: |
+#          cd bridges/${{ matrix.package }}
+#          cargo build --release --target x86_64-apple-darwin
+#
+#      - name: Collect shared for bridge-${{ matrix.package }}
+#        if: matrix.package != 'bridger'
+#        run: |
+#          mkdir -p shared
+#          zip \
+#            shared/bridge-${{ matrix.package }}-macos-x86_64.zip \
+#            bridges/${{ matrix.package }}/target/x86_64-apple-darwin/release/bridge-${{ matrix.package }}
 

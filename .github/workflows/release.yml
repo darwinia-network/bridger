@@ -100,7 +100,7 @@ jobs:
           vcpkgGitCommitId: 1085a57da0725c19e19586025438e8c16f34c890
 
       - name: Setup scoop
-        uses: MinoruSekine/setup-scoop@main
+        uses: MinoruSekine/setup-scoop@v1
         with:
           add_extras_bucket: true
           scoop_checkup: true
@@ -109,7 +109,8 @@ jobs:
       - name: Install dependencies
         run: |
           vcpkg install openssl
-          scoop install 7z
+          scoop install git
+          scoop install 7zip
           scoop install busybox
 
       - name: Install rust toolchain

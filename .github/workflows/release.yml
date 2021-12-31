@@ -154,7 +154,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten]
+        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
     steps:
       - uses: actions/checkout@v2
 

@@ -18,7 +18,7 @@ env:
 
 jobs:
   build-linux:
-    name: [linux] Build package
+    name: linux Build package
     runs-on: ubuntu-latest
     container:
       image: ubuntu:16.04

@@ -130,8 +130,8 @@ jobs:
         if: matrix.package == 'bridger'
         run: |
           mkdir -p shared
-          7z a -tzip ^
-            shared/bridger-windows-x86_64.zip ^
+          7z a -tzip `
+            shared/bridger-windows-x86_64.zip `
             frame/target/x86_64-pc-windows-msvc/release/bridger.exe
 
       - name: Build bridge-${{ matrix.package }}
@@ -144,8 +144,8 @@ jobs:
         if: matrix.package != 'bridger'
         run: |
           mkdir -p shared
-          7z a -tzip ^
-            shared/bridge-${{ matrix.package }}-windows-x86_64.zip ^
+          7z a -tzip `
+            shared/bridge-${{ matrix.package }}-windows-x86_64.zip `
             bridges/${{ matrix.package }}/target/x86_64-pc-windows-msvc/release/bridge-${{ matrix.package }}.exe
 
 

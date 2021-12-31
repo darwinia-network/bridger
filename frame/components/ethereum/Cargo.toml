@@ -1,0 +1,31 @@
+[package]
+name = "component-ethereum"
+version = "0.5.0"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://rust-docs.darwinia.network/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2021"
+
+[dependencies]
+tracing = "0.1"
+color-eyre = "0.5"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+
+web3 = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+reqwest = { version = "0.11", features = ["rustls-tls", "json"] }
+array-bytes = "1.1.0"
+secp256k1 = { version = "0.20", features = ["recovery"] }
+
+support-ethereum = { path = "../../supports/support-ethereum" }

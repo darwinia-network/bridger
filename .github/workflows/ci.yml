@@ -1,0 +1,55 @@
+name: Check pull request
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master, refactor-bridger, refactor-base ]
+
+jobs:
+  check-bridger:
+    name: Check bridger
+    runs-on: ubuntu-latest
+    container:
+      image: rust:1
+    strategy:
+      matrix:
+        action: [clippy, test]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Lint
+        if: matrix.action == 'clippy'
+        run: |
+          cd frame
+          cargo clippy --release --all -- -D warnings
+
+      - name: Run tests
+        if: matrix.action == 'test'
+        run: |
+          cd frame
+          cargo test --release
+
+  check-bridges:
+    name: Check bridge-${{ matrix.bridge }} ${{ matrix.action }}
+    runs-on: ubuntu-latest
+    container:
+      image: rust:1
+    strategy:
+      matrix:
+        bridge: [template, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        action: [clippy, test]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Lint
+        if: matrix.action == 'clippy'
+        run: |
+          cd bridges/${{ matrix.bridge }}
+          cargo clippy --release --all --locked -- -D warnings
+
+      - name: Run tests
+        if: matrix.action == 'test'
+        run: |
+          cd bridges/${{ matrix.bridge }}
+          cargo test --release --locked

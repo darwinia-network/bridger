@@ -1,0 +1,53 @@
+
+enum TransactionOrigin {
+  Bank
+  Relay
+  Issuing
+  Backing
+}
+
+enum TransactionType {
+  Deposit            # Deposit event
+  Token              # Token event
+  SetAuthorities     # SetAuthoritiesEvent
+  RegisterErc20Token # RegisterErc20Token
+  RedeemErc20Token   # RedeemErc20Token
+}
+
+type BankEntity @entity {
+  id: ID!
+  count: BigInt!
+  _token: Bytes! # address
+  _owner: Bytes! # address
+}
+
+type RelayEntity @entity {
+  id: ID!
+  count: BigInt!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+}
+
+type BackingEntity @entity {
+  id: ID!
+  count: BigInt!
+  sender: Bytes! # address
+  source: Bytes! # address
+}
+
+type IssuingEntity @entity {
+  id: ID!
+  count: BigInt!
+  token: Bytes! # address
+  owner: Bytes! # address
+}
+
+type TransactionEntity @entity {
+  id: ID!
+  origin: TransactionOrigin!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  txHash: Bytes!
+  txIndex: BigInt!
+  txType: TransactionType!
+}

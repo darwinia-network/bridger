@@ -1,0 +1,29 @@
+[package]
+name = "support-tracker"
+version = "0.5.0"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://rust-docs.darwinia.network/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2021"
+
+[dependencies]
+color-eyre = "0.5"
+tracing = "0.1"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
+
+tokio = { version = "1", features = ["time"] }

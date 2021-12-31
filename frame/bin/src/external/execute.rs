@@ -22,6 +22,7 @@ impl ExternalExecutor {
 impl ExternalExecutor {
     /// Execute external subcommand
     pub fn execute(&self) -> color_eyre::Result<()> {
+        tracing::trace!("Try execute external command");
         let config: BridgerConfig = Config::restore(Names::Bridger)?;
         let registry = config.registry;
 

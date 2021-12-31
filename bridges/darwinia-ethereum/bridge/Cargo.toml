@@ -44,15 +44,15 @@ substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.g
 
 client-darwinia    = { path = "../client-darwinia" }
 
-support-common     = { path = "../../../supports/support-common" }
-support-lifeline   = { path = "../../../supports/support-lifeline" }
-support-terminal   = { path = "../../../supports/support-terminal" }
-support-tracker    = { path = "../../../supports/support-tracker" }
-support-ethereum   = { path = "../../../supports/support-ethereum" }
+support-common     = { path = "../../../frame/supports/support-common" }
+support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
+support-terminal   = { path = "../../../frame/supports/support-terminal" }
+support-tracker    = { path = "../../../frame/supports/support-tracker" }
+support-ethereum   = { path = "../../../frame/supports/support-ethereum" }
 
-component-ethereum        = { path = "../../../components/ethereum" }
-component-shadow          = { path = "../../../components/shadow" }
-component-subquery        = { path = "../../../components/subquery" }
-component-thegraph-liketh = { path = "../../../components/thegraph-liketh" }
-component-http-client     = { path = "../../../components/http-client" }
-component-state           = { path = "../../../components/state" }
+component-ethereum        = { path = "../../../frame/components/ethereum" }
+component-shadow          = { path = "../../../frame/components/shadow" }
+component-subquery        = { path = "../../../frame/components/subquery" }
+component-thegraph-liketh = { path = "../../../frame/components/thegraph-liketh" }
+component-http-client     = { path = "../../../frame/components/http-client" }
+component-state           = { path = "../../../frame/components/state" }

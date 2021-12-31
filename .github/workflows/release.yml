@@ -1,4 +1,4 @@
-name: Release
+name: Check pull request
 
 on:
   push:
@@ -9,11 +9,14 @@ env:
   OPENSSL_STATIC: 1
 
 jobs:
-  build-package:
+  build-linux:
     name: Build package
     runs-on: ubuntu-latest
     container:
       image: ubuntu:16.04
+    strategy:
+      matrix:
+        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
     steps:
       - uses: actions/checkout@v2
 
@@ -25,14 +28,6 @@ jobs:
             make gcc g++ clang-4.0 \
             libssl-dev pkg-config
 
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2021-12-07
-          override: true
-          target: wasm32-unknown-unknown
-          components: clippy
-
       - name: Build openssl
         run: |
           curl https://www.openssl.org/source/openssl-1.1.1l.tar.gz | tar xz
@@ -41,135 +36,46 @@ jobs:
           make -j4
           make install
 
-      - name: Cache target
-        uses: actions/cache@v2
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
         with:
-          path: target
-          key: ${{ runner.os }}-bridger-${{ hashFiles('Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-bridger-
+          toolchain: nightly-2021-12-07
+          override: true
+          target: wasm32-unknown-unknown
+          components: clippy
 
       - name: Build bridger
-        run: cargo build --release --target x86_64-unknown-linux-gnu
+        if: matrix.package == 'bridger'
+        run: |
+          cd frame
+          cargo build --release --target x86_64-unknown-linux-gnu
 
-      - name: Collect shared
+      - name: Collect shared for bridger
+        if: matrix.package == 'bridger'
         run: |
           mkdir -p shared
-          mv target/x86_64-unknown-linux-gnu/release/bridger shared/
+          zip -jr \
+            shared/bridger-linux-$(uname -m).zip \
+            frame/target/x86_64-unknown-linux-gnu/release/bridger
 
-      - name: Upload shared
+      - name: Build bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          cd bridges/${{ matrix.package }}
+          cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Collect shared for bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          mkdir -p shared
+          zip -jr \
+            shared/bridge-${{ matrix.package }}-linux-$(uname -m).zip \
+            bridges/${{ matrix.package }}/target/x86_64-unknown-linux-gnu/release/bridge-${{ matrix.package }}
+
+      - name: Upload shared-binary
         uses: actions/upload-artifact@v2
         with:
           name: bridger-artifact
           path: shared
 
-      - name: Optimize cache
-        run: .maintain/optimize-cache.sh || exit 0
 
-  build-image:
-    name: Build image
-    runs-on: ubuntu-latest
-    needs: [build-package]
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/download-artifact@v2
-        with:
-          name: bridger-artifact
-          path: shared
-
-      - name: Docker login
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.QUAY_IO_BOT_USERNAME }}
-          password: ${{ secrets.QUAY_IO_BOT_PASSWORD }}
-          registry: quay.io
-
-      - uses: olegtarasov/get-tag@v2.1
-        id: tag-name
-      - uses: benjlevesque/short-sha@v1.2
-        id: short-sha
-        with:
-          length: 7
-
-      - name: Build and publish docker image
-        run: |
-          IMAGE_NAME=bridger
-          IMAGE_PREFIX=quay.io/darwinia-network
-          IMAGE_PUSH_NAME_TAG=${IMAGE_PREFIX}/${IMAGE_NAME}:${GIT_TAG_NAME}
-          IMAGE_PUSH_NAME_SHA=${IMAGE_PREFIX}/${IMAGE_NAME}:sha-${SHA}
-
-          chmod +x shared/bridger
-          docker build \
-            -t ${IMAGE_PUSH_NAME_TAG} \
-            -t ${IMAGE_PUSH_NAME_SHA} \
-            -f .maintain/docker/Dockerfile \
-            .
-
-          docker push ${IMAGE_PUSH_NAME_TAG}
-          docker push ${IMAGE_PUSH_NAME_SHA}
-
-  complete-build:
-    name: Complete build
-    runs-on: ubuntu-latest
-    needs: [build-image]
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/download-artifact@v2
-        with:
-          name: bridger-artifact
-          path: shared
-
-      - name: Prepare deploy folder
-        run: |
-          mkdir deploy
-          chmod +x shared/bridger
-          tar cjSf bridger-x86_64-linux-gnu.tar.bz2 -C shared bridger
-          mv bridger-x86_64-linux-gnu.tar.bz2 deploy/
-
-      - name: Hash file
-        run: |
-          (cd deploy && sha256sum * | tee sha256sums.txt)
-
-      - uses: olegtarasov/get-tag@v2.1
-        id: tag-name
-      - uses: benjlevesque/short-sha@v1.2
-        id: short-sha
-        with:
-          length: 7
-
-      - name: Generate template data
-        run: |
-
-          echo 'Template data:'
-          jq -n \
-            --arg tag "$GIT_TAG_NAME" \
-            --arg sha "$SHA" \
-            '{
-              tag: $tag,
-              sha: $sha
-            }' | tee shared/template_data.json
-
-      - name: Render release page
-        uses: jayamanikharyono/jinja-action@v0.1
-        with:
-          datafile: shared/template_data.json
-          path: .maintain/release-template.md
-
-      - name: Publish github release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            deploy/*
-          body_path: ".maintain/release-template.md"
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-  clean-artifacts:
-    name: Clean artifacts
-    runs-on: ubuntu-latest
-    needs: [complete-build]
-    if: always()
-    steps:
-      - uses: geekyeggo/delete-artifact@v1
-        with:
-          name: bridger-artifact

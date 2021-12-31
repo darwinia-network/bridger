@@ -17,8 +17,8 @@ env:
   RUST_TOOLCHAIN: nightly-2021-12-07
 
 jobs:
-  build-l:
-    name: [linux] Build package
+  build-linux:
+    name: Build package [linux]
     runs-on: ubuntu-latest
     container:
       image: ubuntu:16.04
@@ -85,8 +85,8 @@ jobs:
           name: bridger-artifact
           path: shared
 
-  build-w:
-    name: [windows] Build package
+  build-win:
+    name: Build package [windows]
     runs-on: windows-latest
     strategy:
       matrix:
@@ -105,8 +105,8 @@ jobs:
       - name: Add more target for rust toolchain
         run: rustup target add x86_64-pc-windows-msvc
 
-  build-m:
-    name: [macos] Build package
+  build-macos:
+    name: Build package [macos]
     runs-on: macos-latest
     strategy:
       matrix:

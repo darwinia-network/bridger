@@ -132,7 +132,7 @@ jobs:
           mkdir -p shared
           7z a -tzip `
             shared/bridger-windows-x86_64.zip `
-            frame/target/x86_64-pc-windows-msvc/release/bridger.exe
+            ./frame/target/x86_64-pc-windows-msvc/release/bridger.exe
 
       - name: Build bridge-${{ matrix.package }}
         if: matrix.package != 'bridger'
@@ -146,7 +146,7 @@ jobs:
           mkdir -p shared
           7z a -tzip `
             shared/bridge-${{ matrix.package }}-windows-x86_64.zip `
-            bridges/${{ matrix.package }}/target/x86_64-pc-windows-msvc/release/bridge-${{ matrix.package }}.exe
+            ./bridges/${{ matrix.package }}/target/x86_64-pc-windows-msvc/release/bridge-${{ matrix.package }}.exe
 
       - name: Upload shared
         uses: actions/upload-artifact@v2
@@ -186,7 +186,7 @@ jobs:
           mkdir -p shared
           zip \
             shared/bridger-macos-x86_64.zip \
-            frame/target/x86_64-apple-darwin/release/bridger
+            ./frame/target/x86_64-apple-darwin/release/bridger
 
       - name: Build bridge-${{ matrix.package }}
         if: matrix.package != 'bridger'
@@ -200,7 +200,7 @@ jobs:
           mkdir -p shared
           zip \
             shared/bridge-${{ matrix.package }}-macos-x86_64.zip \
-            bridges/${{ matrix.package }}/target/x86_64-apple-darwin/release/bridge-${{ matrix.package }}
+            ./bridges/${{ matrix.package }}/target/x86_64-apple-darwin/release/bridge-${{ matrix.package }}
 
       - name: Upload shared
         uses: actions/upload-artifact@v2

@@ -8,6 +8,7 @@ on:
 
 env:
   RUST_TOOLCHAIN: stable
+  SUBQUERY_CLI_VERSION: v0.1.0
 
 jobs:
   deploy-subquery:
@@ -25,7 +26,12 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
 
       - name: Install dependencies
-        run: cargo install subquery-cli --git https://github.com/fewensa/subquery-cli
+        run: |
+          mkdir -p $HOME/.local/bin
+          curl -L \
+            https://github.com/fewensa/subquery-cli/releases/download/${{ env.SUBQUERY_CLI_VERSION }}/bridger-linux-x86_64.zip | \
+            unzip -d $HOME/.local/bin/
+          echo ::add-path::$HOME/.local/bin
 
       - name: Deploy
         run: |

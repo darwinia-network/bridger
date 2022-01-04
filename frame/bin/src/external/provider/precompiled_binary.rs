@@ -106,8 +106,30 @@ impl PrecompiledBinaryExecutor {
             path_download_package.display(),
         );
         if !path_download_package.exists() {
-            output::output_text(format!("Downloading `{}`", remote_url));
-            let response = reqwest::blocking::get(&remote_url)?;
+            let mut url_package = remote_url.clone();
+            let mut response;
+            let mut times = 0;
+            loop {
+                times += 1;
+                if times > 5 {
+                    return Err(BridgerError::Custom(format!(
+                        "Too many redirect times for download url: {}",
+                        &remote_url
+                    ))
+                    .into());
+                }
+                output::output_text(format!("Downloading `{}`", url_package));
+                response = reqwest::blocking::get(&url_package)?;
+                let code = response.status().as_u16();
+                if code == 302 {
+                    let headers = response.headers();
+                    if let Some(value) = headers.get("Location") {
+                        url_package = value.to_str()?.to_string();
+                        continue;
+                    }
+                }
+                break;
+            }
             let code = response.status().as_u16();
             if code != 200 || code != 201 {
                 return Err(BridgerError::Custom(format!(

@@ -96,8 +96,11 @@ impl Config {
     }
 
     /// The config file is exists
-    pub fn exists(name: Names) -> color_eyre::Result<bool> {
-        Ok(Self::new().find_config_file(name.name())?.is_some())
+    pub fn exists(name: Names) -> bool {
+        Self::new()
+            .find_config_file(name.name())
+            .unwrap_or_default()
+            .is_some()
     }
 }
 
@@ -126,6 +129,10 @@ impl Config {
         name: impl AsRef<str>,
     ) -> color_eyre::Result<Option<(PathBuf, ConfigFormat)>> {
         let mut config_file = None;
+        if !self.base_path.exists() {
+            tracing::warn!(target: "bridger", "The base_path ({}) is not found.", self.base_path.display());
+            return Ok(None);
+        }
         let read_dir = std::fs::read_dir(&self.base_path)?;
         for path in read_dir {
             let file = path?.path();

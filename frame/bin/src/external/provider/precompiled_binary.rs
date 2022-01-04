@@ -88,9 +88,10 @@ impl PrecompiledBinaryExecutor {
 
         let path_download_package = path_binary_base.join(&package_name);
 
-        tracing::trace!("Force mode: {}", force);
+        tracing::trace!(target: "bridger", "Force mode: {}", force);
         if force && path_download_package.exists() {
             tracing::trace!(
+                target: "bridger",
                 "The download package is exists. remove it. {}",
                 path_download_package.display()
             );
@@ -102,6 +103,7 @@ impl PrecompiledBinaryExecutor {
         }
 
         tracing::trace!(
+            target: "bridger",
             "Download package path is: {}",
             path_download_package.display(),
         );
@@ -121,17 +123,17 @@ impl PrecompiledBinaryExecutor {
                 output::output_text(format!("Downloading `{}`", url_package));
                 response = reqwest::blocking::get(&url_package)?;
                 let code = response.status().as_u16();
-                if code == 302 {
-                    let headers = response.headers();
-                    if let Some(value) = headers.get("Location") {
-                        url_package = value.to_str()?.to_string();
-                        continue;
-                    }
+                tracing::trace!(target: "bridger", "Response code is: {}", code);
+                let headers = response.headers();
+                if let Some(value) = headers.get("Location") {
+                    url_package = value.to_str()?.to_string();
+                    tracing::trace!(target: "bridger", "Found redirect location: {}", &url_package);
+                    continue;
                 }
                 break;
             }
             let code = response.status().as_u16();
-            if code != 200 || code != 201 {
+            if code != 200 && code != 201 {
                 return Err(BridgerError::Custom(format!(
                     "[{}] Failed to download package. the url is: {}",
                     code, remote_url
@@ -146,6 +148,7 @@ impl PrecompiledBinaryExecutor {
 
         if force && path_binary.exists() {
             tracing::trace!(
+                target: "bridger",
                 "The binary file is exists. remove it. {}",
                 path_binary.display()
             );
@@ -165,15 +168,16 @@ impl PrecompiledBinaryExecutor {
             {
                 let comment = zip_inner_file.comment();
                 if !comment.is_empty() {
-                    tracing::debug!("File {} comment: {}", i, comment);
+                    tracing::debug!(target: "bridger", "File {} comment: {}", i, comment);
                 }
             }
 
             if (&*zip_inner_file.name()).ends_with('/') {
-                tracing::debug!("File {} extracted to \"{}\"", i, outpath.display());
+                tracing::debug!(target: "bridger", "File {} extracted to \"{}\"", i, outpath.display());
                 std::fs::create_dir_all(&outpath)?;
             } else {
                 tracing::debug!(
+                    target: "bridger",
                     "File {} extracted to \"{}\" ({} bytes)",
                     i,
                     outpath.display(),

@@ -228,7 +228,7 @@ jobs:
       - name: Extract linux package
         run: |
           mkdir -p dist
-          for z in shared/*.zip; do unzip $z -d dist/; done
+          for z in shared/*-linux-x86_64.zip; do unzip $z -d dist/; done
 
       - name: Build and publish docker image
         run: |
@@ -248,7 +248,7 @@ jobs:
   complete-build:
     name: Complete build
     runs-on: ubuntu-latest
-    needs: [ build-linux, build-win, build-macos ]
+    needs: [ build-win, build-macos, build-docker-image ]
     steps:
       - uses: actions/checkout@v2
 

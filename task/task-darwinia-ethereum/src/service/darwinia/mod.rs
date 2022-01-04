@@ -33,14 +33,18 @@ impl lifeline::Service for DarwiniaService {
 
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
         let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::NAME);
-        let tracker = Tracker::new(microkv, "scan.darwinia");
+        let tracker = Tracker::new(microkv.clone(), "scan.darwinia");
 
         let _greet = Self::try_task(
             &format!("{}-service-darwinia-scan", DarwiniaEthereumTask::NAME),
             async move {
                 let scanner = DarwiniaScanner;
                 scanner
-                    .start(tracker.clone(), sender_to_extrinsics.clone())
+                    .start(
+                        microkv.clone(),
+                        tracker.clone(),
+                        sender_to_extrinsics.clone()
+                    )
                     .await;
                 Ok(())
             },

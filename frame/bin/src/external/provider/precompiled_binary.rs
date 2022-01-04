@@ -203,7 +203,7 @@ impl PrecompiledBinaryExecutor {
             }
         }
 
-        // std::fs::remove_file(&path_download_package)?;
+        std::fs::remove_file(&path_download_package)?;
         Ok(path_binary)
     }
 

@@ -19,6 +19,7 @@ pub fn execute_binary(
     }
 
     tracing::info!(
+        target: "bridger",
         "Execute `{} {}` in path: {}",
         &command.green(),
         args.join(" ").green(),

@@ -34,6 +34,10 @@ jobs:
           unzip subquery-linux-x86_64.zip -d $HOME/.local/bin/
           rm -rf subquery-linux-x86_64.zip
 
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.1
+
       - name: Deploy
         run: |
           subquery login --sid ${{ secrets.SUBQUERY_SID }}
@@ -45,7 +49,7 @@ jobs:
           subquery deployment deploy \
             --org ${{ env.SUBQUERY_ORG }} \
             --key subql-bridge-${{ matrix.chain }} \
-            --branch master \
+            --branch ${{ steps.branch-name.outputs.current_branch }} \
             --sub-folder subql/${{ matrix.chain }} \
             --type stage \
             --force

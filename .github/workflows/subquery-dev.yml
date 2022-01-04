@@ -9,7 +9,7 @@ on:
 env:
   RUST_TOOLCHAIN: stable
   SUBQUERY_CLI_VERSION: 0.1.3
-  SUBQUERY_ORG: fewensa
+  SUBQUERY_ORG: darwinia-network
 
 jobs:
   deploy-subquery:

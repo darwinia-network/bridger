@@ -30,7 +30,7 @@ jobs:
         run: npm i -g vercel
       - name: Deploy rust docs
         run: |
-          mv vercel.json frame/target/doc
+          mv .maintain/vercel.json frame/target/doc
           mv frame/target/doc frame/target/${GITHUB_REPOSITORY#*/}
           cd frame/target/${GITHUB_REPOSITORY#*/}
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering link --confirm

@@ -72,7 +72,7 @@ impl PrecompiledBinaryExecutor {
             BridgerError::Subcommand("Missing remote base url for precompiled binary".to_string())
         })?;
         let package_name = self.package_name(command)?;
-        let remote_url = format!("{}/releases/download/{}/{}", path, VERSION, package_name);
+        let remote_url = format!("{}/releases/download/v{}/{}", path, VERSION, package_name);
         let path_binary_base = std::env::current_exe()?
             .parent()
             .map(|v| v.join(""))

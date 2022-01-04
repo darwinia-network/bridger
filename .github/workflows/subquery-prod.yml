@@ -1,9 +1,11 @@
 name: Deploy subquery develop
 
+
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 env:
   RUST_TOOLCHAIN: stable

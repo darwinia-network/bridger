@@ -31,7 +31,6 @@ jobs:
           curl -LO https://github.com/fewensa/subquery-cli/releases/download/${{ env.SUBQUERY_CLI_VERSION }}/subquery-linux-x86_64.zip
           unzip subquery-linux-x86_64.zip -d $HOME/.local/bin/
           rm -rf subquery-linux-x86_64.zip
-          echo ::add-path::$HOME/.local/bin
 
       - name: Deploy
         run: |

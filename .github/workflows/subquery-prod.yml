@@ -17,6 +17,7 @@ jobs:
     name: Deploy subquery
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         chain: [ pangolin, darwinia ]
     steps:

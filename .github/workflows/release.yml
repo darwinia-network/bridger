@@ -211,12 +211,12 @@ jobs:
           name: bridger-artifact
           path: shared
 
-      - name: Docker login
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.QUAY_IO_BOT_USERNAME }}
-          password: ${{ secrets.QUAY_IO_BOT_PASSWORD }}
-          registry: quay.io
+      # - name: Docker login
+      #   uses: docker/login-action@v1
+      #   with:
+      #     username: ${{ secrets.QUAY_IO_BOT_USERNAME }}
+      #     password: ${{ secrets.QUAY_IO_BOT_PASSWORD }}
+      #     registry: quay.io
 
       - uses: olegtarasov/get-tag@v2.1
         id: tag-name
@@ -228,11 +228,7 @@ jobs:
       - name: Extract linux package
         run: |
           mkdir -p dist
-          unzip -j shared/bridger.zip -d dist/
-          unzip -j shared/bridge-pangolin-pangoro.zip -d dist/
-          unzip -j shared/bridge-pangolin-ropsten.zip -d dist/
-          unzip -j shared/bridge-darwinia-crab.zip -d dist/
-          unzip -j shared/bridge-darwinia-ethereum.zip -d dist/
+          for z in shared/*.zip; do unzip $z -d dist/; done
 
       - name: Build and publish docker image
         run: |
@@ -245,8 +241,8 @@ jobs:
             -t ${IMAGE_PUSH_NAME_SHA} \
             -f .maintain/docker/Dockerfile \
             .
-          docker push ${IMAGE_PUSH_NAME_TAG}
-          docker push ${IMAGE_PUSH_NAME_SHA}
+          # docker push ${IMAGE_PUSH_NAME_TAG}
+          # docker push ${IMAGE_PUSH_NAME_SHA}
 
 
   complete-build:

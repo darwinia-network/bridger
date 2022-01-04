@@ -5,11 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY dist/bridger /usr/local/bin/
-COPY dist/bridge-pangolin-pangoro /usr/local/bin/
-COPY dist/bridge-pangolin-ropsten /usr/local/bin/
-COPY dist/bridge-darwinia-crab /usr/local/bin/
-COPY dist/bridge-darwinia-ethereum /usr/local/bin/
+COPY dist/ /usr/local/bin
 
 EXPOSE 1098
 

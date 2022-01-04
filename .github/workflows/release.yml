@@ -102,14 +102,12 @@ jobs:
       - name: Setup scoop
         uses: MinoruSekine/setup-scoop@v1
         with:
-          add_extras_bucket: true
           scoop_checkup: true
           scoop_update: true
 
       - name: Install dependencies
         run: |
           vcpkg install openssl:x64-windows-static
-          scoop install git
           scoop install 7zip
           scoop install busybox
           scoop install make
@@ -209,3 +207,108 @@ jobs:
           name: bridger-artifact
           path: shared
 
+  build-docker-image:
+    name: Build image
+    runs-on: ubuntu-latest
+    needs: [ build-linux ]
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: bridger-artifact
+          path: shared
+
+      - name: Docker login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.QUAY_IO_BOT_USERNAME }}
+          password: ${{ secrets.QUAY_IO_BOT_PASSWORD }}
+          registry: quay.io
+
+      - uses: olegtarasov/get-tag@v2.1
+        id: tag-name
+      - uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+        with:
+          length: 7
+
+      - name: Extract linux package
+        run: |
+          mkdir -p dist
+          unzip -j shared/bridger.zip -d dist/
+          unzip -j shared/bridge-pangolin-pangoro.zip -d dist/
+          unzip -j shared/bridge-pangolin-ropsten.zip -d dist/
+          unzip -j shared/bridge-darwinia-crab.zip -d dist/
+          unzip -j shared/bridge-darwinia-ethereum.zip -d dist/
+
+      - name: Build and publish docker image
+        run: |
+          IMAGE_NAME=bridger
+          IMAGE_PREFIX=quay.io/darwinia-network
+          # IMAGE_PUSH_NAME_TAG=${IMAGE_PREFIX}/${IMAGE_NAME}:${GIT_TAG_NAME}
+          IMAGE_PUSH_NAME_SHA=${IMAGE_PREFIX}/${IMAGE_NAME}:sha-${SHA}
+            # -t ${IMAGE_PUSH_NAME_TAG} \
+          docker build \
+            -t ${IMAGE_PUSH_NAME_SHA} \
+            -f .maintain/docker/Dockerfile \
+            .
+          # docker push ${IMAGE_PUSH_NAME_TAG}
+          docker push ${IMAGE_PUSH_NAME_SHA}
+
+
+  complete-build:
+    name: Complete build
+    runs-on: ubuntu-latest
+    needs: [ build-linux, build-win, build-macos ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: bridger-artifact
+          path: shared
+
+      - name: Hash file
+        run: |
+          (cd shared && sha256sum * | tee sha256sums.txt)
+
+      - uses: olegtarasov/get-tag@v2.1
+        id: tag-name
+      - uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+        with:
+          length: 7
+
+      - name: Generate template data
+        run: |
+          echo 'Template data:'
+          jq -n \
+            --arg tag "$GIT_TAG_NAME" \
+            --arg sha "$SHA" \
+            '{
+              tag: $tag,
+              sha: $sha
+            }' | tee template_data.json
+
+      - name: Render release page
+        uses: jayamanikharyono/jinja-action@v0.1
+        with:
+          datafile: template_data.json
+          path: .maintain/release-template.md
+
+      - name: Publish github release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            shared/*
+          body_path: ".maintain/release-template.md"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  clean-artifacts:
+    name: Clean artifacts
+    runs-on: ubuntu-latest
+    needs: [ complete-build ]
+    if: always()
+    steps:
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: bridger-artifact

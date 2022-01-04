@@ -1,0 +1,32 @@
+name: Deploy subquery develop
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  RUST_TOOLCHAIN: stable
+
+jobs:
+  deploy-subquery:
+    name: Deploy subquery
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        chain: [ pangolin, darwinia ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+
+      - name: Install dependencies
+        run: cargo install subquery-cli --git https://github.com/fewensa/subquery-cli
+
+      - name: Deploy
+        run: |
+          subquery -h

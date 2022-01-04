@@ -2,9 +2,8 @@ name: Deploy subquery develop
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - 'v*'
 
 env:
   RUST_TOOLCHAIN: stable
@@ -37,11 +36,9 @@ jobs:
         run: |
           subquery login --sid ${{ secrets.SUBQUERY_SID }}
 
-          subquery project create \
+          subquery deployment promote \
             --org ${{ env.SUBQUERY_ORG }} \
-            --key subql-bridge-${{ matrix.chain }} \
-            --repo https://github.com/fewensa/bridger \
-            --check
+            --key subql-bridge-${{ matrix.chain }}
 
           subquery deployment deploy \
             --org ${{ env.SUBQUERY_ORG }} \

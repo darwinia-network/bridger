@@ -28,9 +28,9 @@ jobs:
       - name: Install dependencies
         run: |
           mkdir -p $HOME/.local/bin
-          curl -L \
-            https://github.com/fewensa/subquery-cli/releases/download/${{ env.SUBQUERY_CLI_VERSION }}/bridger-linux-x86_64.zip | \
-            unzip -d $HOME/.local/bin/
+          curl -LO https://github.com/fewensa/subquery-cli/releases/download/${{ env.SUBQUERY_CLI_VERSION }}/subquery-linux-x86_64.zip
+          unzip subquery-linux-x86_64.zip -d $HOME/.local/bin/
+          rm -rf subquery-linux-x86_64.zip
           echo ::add-path::$HOME/.local/bin
 
       - name: Deploy

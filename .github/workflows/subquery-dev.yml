@@ -41,7 +41,7 @@ jobs:
           subquery project create \
             --org ${{ env.SUBQUERY_ORG }} \
             --key subql-bridge-${{ matrix.chain }} \
-            --repo https://github.com/fewensa/bridger \
+            --repo https://github.com/darwinia-network/bridger \
             --check
 
           subquery deployment deploy \

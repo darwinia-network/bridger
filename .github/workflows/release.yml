@@ -77,6 +77,12 @@ jobs:
           name: bridger-artifact
           path: shared
 
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: octocat/hello-world
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
 
   build-win:
     name: Build package [windows]
@@ -146,6 +152,12 @@ jobs:
           name: bridger-artifact
           path: shared
 
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: octocat/hello-world
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
 
   build-macos:
     name: Build package [macos]
@@ -200,6 +212,13 @@ jobs:
         with:
           name: bridger-artifact
           path: shared
+
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: octocat/hello-world
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
 
   build-docker-image:
     name: Build image

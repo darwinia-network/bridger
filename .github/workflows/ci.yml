@@ -30,6 +30,13 @@ jobs:
           cd frame
           cargo test --release
 
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: octocat/hello-world
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
+
   check-bridges:
     name: Check bridge-${{ matrix.bridge }} ${{ matrix.action }}
     runs-on: ubuntu-latest
@@ -54,8 +61,9 @@ jobs:
           cd bridges/${{ matrix.bridge }}
           cargo test --release --locked
 
-  fail-fast:
-    runs-on: ubuntu-latest
-    needs: [ check-bridger, check-bridges ]
-    steps:
-      - run: echo Done
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: octocat/hello-world
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}

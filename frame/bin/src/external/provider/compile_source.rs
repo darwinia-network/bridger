@@ -46,7 +46,7 @@ impl CompileSourceExecutor {
             .parent()
             .ok_or_else(|| {
                 BridgerError::Subcommand("Can not get the binary path for bridger".to_string())
-            })?x
+            })?
             .join("");
         tracing::trace!("The execute path is: {}", path_exe.display());
 

@@ -36,10 +36,8 @@ pub fn list_externals(
                     "exe" | "bat" | "cmd" => {}
                     _ => continue,
                 }
-            } else {
-                if extension != "sh" {
-                    continue;
-                }
+            } else if extension != "sh" {
+                continue;
             }
         }
         binaries.push(name);

@@ -2,7 +2,7 @@ name: Staging
 
 on:
   push:
-    branches: [ master, refactor-base ]
+    branches: [ master ]
   workflow_dispatch:
 
 env:

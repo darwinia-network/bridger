@@ -1,3 +1,4 @@
+use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
 use bridge_traits::bridge::component::BridgeComponent;
@@ -25,11 +26,12 @@ pub struct DarwiniaScanner;
 impl DarwiniaScanner {
     pub async fn start(
         &self,
+        microkv: NamespaceMicroKV,
         tracker: Tracker,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) {
         while let Err(err) = self
-            .run(tracker.clone(), sender_to_extrinsics.clone())
+            .run(microkv.clone(),tracker.clone(), sender_to_extrinsics.clone())
             .await
         {
             log::error!(
@@ -44,6 +46,7 @@ impl DarwiniaScanner {
 
     async fn run(
         &self,
+        microkv: NamespaceMicroKV,
         tracker: Tracker,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> anyhow::Result<()> {
@@ -98,14 +101,14 @@ impl DarwiniaScanner {
             wrapper.from = from as u64;
             wrapper.limit = limit;
             let mut scan_authorities_change_signed_event =
-                ScanAuthoritiesChangeSignedEvent::new(&mut wrapper);
+                ScanAuthoritiesChangeSignedEvent::new(&mut wrapper, );
             let max_0 = scan_authorities_change_signed_event.handle().await?;
 
             let mut scan_schedule_authorities_change_event =
                 ScanScheduleAuthoritiesChangeEvent::new(&mut wrapper);
             let max_1 = scan_schedule_authorities_change_event.handle().await?;
 
-            let mut scan_schedule_mmr_root_event = ScanScheduleMMRRootEvent::new(&mut wrapper);
+            let mut scan_schedule_mmr_root_event = ScanScheduleMMRRootEvent::new(&mut wrapper, microkv.clone());
             scan_schedule_mmr_root_event.handle().await?;
 
             let max_block_number = std::cmp::max(max_0, max_1);

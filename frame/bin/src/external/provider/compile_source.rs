@@ -48,12 +48,12 @@ impl CompileSourceExecutor {
                 BridgerError::Subcommand("Can not get the binary path for bridger".to_string())
             })?
             .join("");
-        tracing::trace!("The execute path is: {}", path_exe.display());
+        tracing::trace!(target: "bridger", "The execute path is: {}", path_exe.display());
 
         let mut exists = false;
         for prefix in support_common::constants::ALLOW_BINARY_PREFIX {
             let mut path_bridge = path_exe.join("../../../bridges").join(&self.command);
-            tracing::trace!("Try detect binary fo path: {}", path_bridge.display());
+            tracing::trace!(target: "bridger", "Try detect binary fo path: {}", path_bridge.display());
             let full_command = format!("{}{}", prefix, self.command);
             if !path_bridge.exists() {
                 path_bridge = path_exe.join("../../../bridges").join(&full_command);
@@ -63,7 +63,7 @@ impl CompileSourceExecutor {
             }
             if let Err(e) = self.try_compile_and_execute_with_command(path_bridge, full_command) {
                 if let Some(BridgerError::Subcommand(msg)) = e.downcast_ref() {
-                    tracing::error!("{}", msg);
+                    tracing::error!(target: "bridger", "{}", msg);
                     continue;
                 }
             }

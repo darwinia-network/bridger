@@ -3,9 +3,9 @@
 
 set -x
 
-BIN_PATH=$(dirname $(readlink -f $0))
+BIN_PATH=$(cd "$(dirname "$0")"; pwd -P)
 
-#export BRIDGER_HOME=D:/dev/darwinia-network/_data/bridger
+#export BRIDGER_HOME=/$HOME/.bridger
 
 cargo build \
   --manifest-path $BIN_PATH/frame/Cargo.toml \

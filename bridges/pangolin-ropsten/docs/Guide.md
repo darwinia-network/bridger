@@ -141,4 +141,4 @@ explain:
 
 ## Custom command
 
-Please read [darwinia-ethereum](../../darwinia-ethereum/docs/Guide.md#custom_command)
+Please read [darwinia-ethereum](../../darwinia-ethereum/docs/Guide.md#custom-command)

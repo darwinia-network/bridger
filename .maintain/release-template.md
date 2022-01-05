@@ -4,7 +4,7 @@
 
 ## Changed
 
-- https://github.com/darwinia-network/bridger/pull/366
+- https://github.com/darwinia-network/bridger/pull/387
 
 ## Resources
 

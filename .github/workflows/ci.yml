@@ -57,3 +57,5 @@ jobs:
   fail-fast:
     runs-on: ubuntu-latest
     needs: [ check-bridger, check-bridges ]
+    steps:
+      - run: echo Done

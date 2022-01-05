@@ -9,7 +9,7 @@ Bridge of darwinia-crab
    Copy config to default config path `~/.bridger` and fill the content.
 
 > About start `darwinia` and `crab` chain you can read [darwinia](https://github.com/darwinia-network/darwinia#building).
-> In addition, we also deployed two public test chains
+> In addition, we also deployed two public chains
 > - `darwinia`: wss://rpc.darwinia.network
 > - `crab`: wss://crab-rpc.darwinia.network
 

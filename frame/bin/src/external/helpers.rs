@@ -32,11 +32,14 @@ pub fn list_externals(
         }
         if let Some(extension) = path.extension().map(|item| item.to_str()).flatten() {
             if cfg!(windows) {
-                if extension != "exe" {
-                    continue;
+                match extension {
+                    "exe" | "bat" | "cmd" => {}
+                    _ => continue,
                 }
             } else {
-                continue;
+                if extension != "sh" {
+                    continue;
+                }
             }
         }
         binaries.push(name);

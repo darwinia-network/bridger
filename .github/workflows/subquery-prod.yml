@@ -8,7 +8,7 @@ on:
 
 env:
   RUST_TOOLCHAIN: stable
-  SUBQUERY_CLI_VERSION: 0.1.3
+  SUBQUERY_CLI_VERSION: 0.1.4
   SUBQUERY_ORG: darwinia-network
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
 
       - name: Deploy
         run: |
-          subquery login --sid ${{ secrets.SUBQUERY_SID }}
+          subquery login --token ${{ secrets.SUBQUERY_TOKEN }}
 
           subquery deployment promote \
             --org ${{ env.SUBQUERY_ORG }} \

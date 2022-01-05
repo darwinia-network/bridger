@@ -44,7 +44,7 @@ impl CompileSourceExecutor {
     fn try_compile_and_execute(&self) -> color_eyre::Result<()> {
         let path_exe = std::env::current_exe()?
             .parent()
-            .ok_or_else(|| {
+            .ok_or({
                 BridgerError::Subcommand("Can not get the binary path for bridger".to_string())
             })?
             .join("");

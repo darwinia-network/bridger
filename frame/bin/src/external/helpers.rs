@@ -9,7 +9,7 @@ pub fn list_externals(
         .ok_or_else(|| {
             BridgerError::Custom("Can not get base path for external command".to_string())
         })?;
-    tracing::trace!("The external base path is: {:?}", base_path);
+    tracing::trace!(target: "bridger", "The external base path is: {:?}", base_path);
     let read_dir = std::fs::read_dir(&base_path)?;
     let mut binaries = Vec::new();
     for dir in read_dir {
@@ -29,6 +29,18 @@ pub fn list_externals(
         }
         if &name == "bridger" || &name == "bridger.exe" {
             continue;
+        }
+        if let Some(extension) = path.extension().map(|item| item.to_str()).flatten() {
+            if cfg!(windows) {
+                match extension {
+                    "exe" | "bat" | "cmd" => {}
+                    _ => continue,
+                }
+            } else {
+                if extension != "sh" {
+                    continue;
+                }
+            }
         }
         binaries.push(name);
     }

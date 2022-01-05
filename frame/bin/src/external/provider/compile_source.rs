@@ -87,6 +87,7 @@ impl CompileSourceExecutor {
     ) -> color_eyre::Result<()> {
         let command = command.as_ref();
         tracing::info!(
+            target: "bridger",
             "Try compile {} in path: {}",
             &command.blue(),
             path_bridge.display()
@@ -108,6 +109,7 @@ impl CompileSourceExecutor {
         builder_cargo.args(args).cwd(&path_bridge);
 
         tracing::info!(
+            target: "bridger",
             "Execute `{} {}` in path: {}",
             "cargo".green(),
             args.join(" ").green(),

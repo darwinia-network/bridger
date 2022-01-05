@@ -34,7 +34,6 @@ pub enum UpdateFeeStrategyType {
 pub struct RelayConfig {
     /// Hex-encoded lane identifiers that should be served by the complex relay.
     pub lanes: Vec<HexLaneId>,
-    pub auto_start: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signer_darwinia: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]

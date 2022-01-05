@@ -42,4 +42,4 @@ timeout = 3000
 endpoint = "https://api.thegraph.com/subgraphs/name/darwinia-network/bridge-ropsten"
 
 [subquery]
-endpoint = "https://api.subquery.network/sq/darwinia-network/bridge-pangolin-ropsten"
+endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-pangolin"

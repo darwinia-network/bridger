@@ -103,11 +103,7 @@ jobs:
       - name: Extract linux package
         run: |
           mkdir -p dist
-          unzip -j shared/bridger.zip -d dist/
-          unzip -j shared/bridge-pangolin-pangoro.zip -d dist/
-          unzip -j shared/bridge-pangolin-ropsten.zip -d dist/
-          unzip -j shared/bridge-darwinia-crab.zip -d dist/
-          unzip -j shared/bridge-darwinia-ethereum.zip -d dist/
+          for z in shared/*-linux-x86_64.zip; do unzip $z -d dist/; done
 
       - name: Build and publish docker image
         run: |

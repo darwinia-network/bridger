@@ -11,6 +11,7 @@ The bridger program will read some environments.
 | `LOG_ADAPTER`    | Custom log adapter, you can use `json` value. after do this, all logs will output use json format.                                |
 | `LOG_MAX_LEVEL`  | Max log level, default is `trace`                                                                                                 |
 | `RUST_BACKTRACE` | You can set  `1` or `0` to enable or disable error full error trace                                                               |
+| `RUST_LOG`       | Custom log level for target or crate                                                                                              |
 
 ## Compile
 

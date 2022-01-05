@@ -30,6 +30,15 @@ pub fn list_externals(
         if &name == "bridger" || &name == "bridger.exe" {
             continue;
         }
+        if let Some(extension) = path.extension().map(|item| item.to_str()).flatten() {
+            if cfg!(windows) {
+                if extension != "exe" {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+        }
         binaries.push(name);
     }
     Ok((base_path, binaries))

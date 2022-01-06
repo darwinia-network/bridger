@@ -61,7 +61,6 @@ impl Service for AffirmService {
                     handle_affirm_relay(microkv_relay.clone(), sender_to_extrinsics_relay.clone())
                         .await
                 {
-                    // todo: write log
                     tracing::error!(
                         target: "darwinia-ethereum",
                         "Failed to handle affirm relay, err: {:?}",

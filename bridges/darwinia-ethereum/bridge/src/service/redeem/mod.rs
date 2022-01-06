@@ -201,7 +201,6 @@ async fn run_scan(
                         RedeemHandler::new(sender_to_extrinsics.clone(), sender_to_redeem.clone())
                             .await;
                     if times > 10 {
-                        // todo: write log
                         tracing::error!(
                             target: "darwinia-ethereum",
                             "[ethereum] Failed to send redeem message. tx: {:?}, err: {:?}",

@@ -1,0 +1,20 @@
+# Query recent mmr root signed events
+{
+	mMRRootSignedEvents(first: 5) {
+    nodes {
+      id
+      atBlockNumber
+      eventBlockNumber
+      mmrRoot
+      timestamp
+      signatures {
+        nodes {
+          account
+          relayAuthoritySignature
+          eventModule
+          eventName
+        }
+      }
+    }
+  }
+}

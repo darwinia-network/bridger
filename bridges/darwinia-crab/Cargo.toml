@@ -1,0 +1,6 @@
+[workspace]
+members = [
+  "bridge",
+  "client-darwinia",
+  "client-crab",
+]

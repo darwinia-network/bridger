@@ -5,6 +5,8 @@ on:
     tags:
       - 'v*'
 
+env:
+  RUST_TOOLCHAIN: nightly-2021-12-07
 
 jobs:
 
@@ -16,11 +18,11 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2021-04-15
-          target: wasm32-unknown-unknown
-          default: true
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
       - name: Build rust docs
-        run: cargo doc --all --no-deps --release
+        run: |
+          cd frame
+          cargo doc --all --no-deps --release
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
@@ -28,9 +30,8 @@ jobs:
         run: npm i -g vercel
       - name: Deploy rust docs
         run: |
-          mv vercel.json target/doc
-          mv target/doc target/${GITHUB_REPOSITORY#*/}
-          cd target/${GITHUB_REPOSITORY#*/}
+          mv .maintain/vercel.json frame/target/doc
+          mv frame/target/doc frame/target/${GITHUB_REPOSITORY#*/}
+          cd frame/target/${GITHUB_REPOSITORY#*/}
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering link --confirm
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering deploy --prod
-

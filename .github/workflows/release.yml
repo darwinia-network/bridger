@@ -4,16 +4,21 @@ on:
   push:
     tags:
       - "v*"
+
 env:
   OPENSSL_DIR: /home/runner/openssl
   OPENSSL_STATIC: 1
+  RUST_TOOLCHAIN: nightly-2021-12-07
 
 jobs:
-  build-package:
-    name: Build package
+  build-linux:
+    name: Build package [linux]
     runs-on: ubuntu-latest
     container:
       image: ubuntu:16.04
+    strategy:
+      matrix:
+        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
     steps:
       - uses: actions/checkout@v2
 
@@ -23,15 +28,7 @@ jobs:
           apt install --no-install-recommends -y \
             git curl ca-certificates \
             make gcc g++ clang-4.0 \
-            libssl-dev pkg-config
-
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2021-12-07
-          override: true
-          target: wasm32-unknown-unknown
-          components: clippy
+            libssl-dev pkg-config zip
 
       - name: Build openssl
         run: |
@@ -41,20 +38,38 @@ jobs:
           make -j4
           make install
 
-      - name: Cache target
-        uses: actions/cache@v2
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
         with:
-          path: target
-          key: ${{ runner.os }}-bridger-${{ hashFiles('Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-bridger-
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
 
       - name: Build bridger
-        run: cargo build --release --target x86_64-unknown-linux-gnu
+        if: matrix.package == 'bridger'
+        run: |
+          cd frame
+          cargo build --release --target x86_64-unknown-linux-gnu
 
-      - name: Collect shared
+      - name: Collect shared for bridger
+        if: matrix.package == 'bridger'
         run: |
           mkdir -p shared
-          mv target/x86_64-unknown-linux-gnu/release/bridger shared/
+          zip -jr \
+            shared/bridger-linux-x86_64.zip \
+            frame/target/x86_64-unknown-linux-gnu/release/bridger
+
+      - name: Build bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          cd bridges/${{ matrix.package }}
+          cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Collect shared for bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          mkdir -p shared
+          zip -jr \
+            shared/bridge-${{ matrix.package }}-linux-x86_64.zip \
+            bridges/${{ matrix.package }}/target/x86_64-unknown-linux-gnu/release/bridge-${{ matrix.package }}
 
       - name: Upload shared
         uses: actions/upload-artifact@v2
@@ -62,13 +77,153 @@ jobs:
           name: bridger-artifact
           path: shared
 
-      - name: Optimize cache
-        run: .maintain/optimize-cache.sh || exit 0
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: darwinia-network/bridger
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
 
-  build-image:
+  build-win:
+    name: Build package [windows]
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: lukka/get-cmake@latest
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgGitCommitId: 1085a57da0725c19e19586025438e8c16f34c890
+
+      - name: Setup scoop
+        uses: MinoruSekine/setup-scoop@v1
+        with:
+          scoop_checkup: true
+          scoop_update: true
+
+      - name: Install dependencies
+        run: |
+          vcpkg install openssl:x64-windows-static
+          scoop install 7zip
+          scoop install busybox
+          scoop install make
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          target: x86_64-pc-windows-msvc
+
+      - name: Build bridger
+        if: matrix.package == 'bridger'
+        run: |
+          cd frame
+          cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Collect shared for bridger
+        if: matrix.package == 'bridger'
+        run: |
+          mkdir -p shared
+          7z a -tzip `
+            shared/bridger-windows-x86_64.zip `
+            ./frame/target/x86_64-pc-windows-msvc/release/bridger.exe
+
+      - name: Build bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          cd bridges/${{ matrix.package }}
+          cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Collect shared for bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          mkdir -p shared
+          7z a -tzip `
+            shared/bridge-${{ matrix.package }}-windows-x86_64.zip `
+            ./bridges/${{ matrix.package }}/target/x86_64-pc-windows-msvc/release/bridge-${{ matrix.package }}.exe
+
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: bridger-artifact
+          path: shared
+
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: darwinia-network/bridger
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
+
+  build-macos:
+    name: Build package [macos]
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          brew install openssl
+          brew install p7zip
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          target: x86_64-apple-darwin
+
+      - name: Build bridger
+        if: matrix.package == 'bridger'
+        run: |
+          cd frame
+          cargo build --release --target x86_64-apple-darwin
+
+      - name: Collect shared for bridger
+        if: matrix.package == 'bridger'
+        run: |
+          mkdir -p shared
+          7z a -tzip \
+            shared/bridger-macos-x86_64.zip \
+            ./frame/target/x86_64-apple-darwin/release/bridger
+
+      - name: Build bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          cd bridges/${{ matrix.package }}
+          cargo build --release --target x86_64-apple-darwin
+
+      - name: Collect shared for bridge-${{ matrix.package }}
+        if: matrix.package != 'bridger'
+        run: |
+          mkdir -p shared
+          7z a -tzip \
+            shared/bridge-${{ matrix.package }}-macos-x86_64.zip \
+            ./bridges/${{ matrix.package }}/target/x86_64-apple-darwin/release/bridge-${{ matrix.package }}
+
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: bridger-artifact
+          path: shared
+
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: darwinia-network/bridger
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
+
+  build-docker-image:
     name: Build image
     runs-on: ubuntu-latest
-    needs: [build-package]
+    needs: [ build-linux ]
     steps:
       - uses: actions/checkout@v2
 
@@ -91,27 +246,30 @@ jobs:
         with:
           length: 7
 
+      - name: Extract linux package
+        run: |
+          mkdir -p dist
+          for z in shared/*-linux-x86_64.zip; do unzip $z -d dist/; done
+
       - name: Build and publish docker image
         run: |
           IMAGE_NAME=bridger
           IMAGE_PREFIX=quay.io/darwinia-network
           IMAGE_PUSH_NAME_TAG=${IMAGE_PREFIX}/${IMAGE_NAME}:${GIT_TAG_NAME}
           IMAGE_PUSH_NAME_SHA=${IMAGE_PREFIX}/${IMAGE_NAME}:sha-${SHA}
-
-          chmod +x shared/bridger
           docker build \
             -t ${IMAGE_PUSH_NAME_TAG} \
             -t ${IMAGE_PUSH_NAME_SHA} \
             -f .maintain/docker/Dockerfile \
             .
-
           docker push ${IMAGE_PUSH_NAME_TAG}
           docker push ${IMAGE_PUSH_NAME_SHA}
+
 
   complete-build:
     name: Complete build
     runs-on: ubuntu-latest
-    needs: [build-image]
+    needs: [ build-win, build-macos, build-docker-image ]
     steps:
       - uses: actions/checkout@v2
 
@@ -120,16 +278,9 @@ jobs:
           name: bridger-artifact
           path: shared
 
-      - name: Prepare deploy folder
-        run: |
-          mkdir deploy
-          chmod +x shared/bridger
-          tar cjSf bridger-x86_64-linux-gnu.tar.bz2 -C shared bridger
-          mv bridger-x86_64-linux-gnu.tar.bz2 deploy/
-
       - name: Hash file
         run: |
-          (cd deploy && sha256sum * | tee sha256sums.txt)
+          (cd shared && sha256sum * | tee sha256sums.txt)
 
       - uses: olegtarasov/get-tag@v2.1
         id: tag-name
@@ -140,7 +291,6 @@ jobs:
 
       - name: Generate template data
         run: |
-
           echo 'Template data:'
           jq -n \
             --arg tag "$GIT_TAG_NAME" \
@@ -148,26 +298,26 @@ jobs:
             '{
               tag: $tag,
               sha: $sha
-            }' | tee shared/template_data.json
+            }' | tee template_data.json
 
       - name: Render release page
         uses: jayamanikharyono/jinja-action@v0.1
         with:
-          datafile: shared/template_data.json
+          datafile: template_data.json
           path: .maintain/release-template.md
 
       - name: Publish github release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            deploy/*
+            shared/*
           body_path: ".maintain/release-template.md"
           token: ${{ secrets.GITHUB_TOKEN }}
 
   clean-artifacts:
     name: Clean artifacts
     runs-on: ubuntu-latest
-    needs: [complete-build]
+    needs: [ complete-build ]
     if: always()
     steps:
       - uses: geekyeggo/delete-artifact@v1

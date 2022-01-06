@@ -1,0 +1,57 @@
+name: Deploy subquery develop
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  RUST_TOOLCHAIN: stable
+  SUBQUERY_CLI_VERSION: 0.1.4
+  SUBQUERY_ORG: darwinia-network
+
+jobs:
+  deploy-subquery:
+    name: Deploy subquery
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        chain: [ pangolin, darwinia ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+
+      - name: Install dependencies
+        run: |
+          mkdir -p $HOME/.local/bin
+          curl -LO https://github.com/fewensa/subquery-cli/releases/download/v${{ env.SUBQUERY_CLI_VERSION }}/subquery-linux-x86_64.zip
+          unzip subquery-linux-x86_64.zip -d $HOME/.local/bin/
+          rm -rf subquery-linux-x86_64.zip
+
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.1
+
+      - name: Deploy
+        run: |
+          subquery login --token ${{ secrets.SUBQUERY_TOKEN }}
+
+          subquery project create \
+            --org ${{ env.SUBQUERY_ORG }} \
+            --key subql-bridge-${{ matrix.chain }} \
+            --repo https://github.com/darwinia-network/bridger \
+            --check
+
+          subquery deployment deploy \
+            --org ${{ env.SUBQUERY_ORG }} \
+            --key subql-bridge-${{ matrix.chain }} \
+            --branch ${{ steps.branch-name.outputs.current_branch }} \
+            --sub-folder subql/${{ matrix.chain }} \
+            --type stage \
+            --force

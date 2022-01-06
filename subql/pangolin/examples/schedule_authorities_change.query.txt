@@ -1,0 +1,9 @@
+{
+	scheduleAuthoritiesChangeEvents(first: 5) {
+    nodes {
+      id
+      message
+      timestamp
+    }
+  }
+}

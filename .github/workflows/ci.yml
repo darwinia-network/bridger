@@ -7,8 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-    name: Build and Test
+  check-bridger:
+    name: Check bridger
     runs-on: ubuntu-latest
     container:
       image: rust:1
@@ -18,26 +18,52 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Specify toolchain
-        run: |
-          rustup default nightly
-          rustup component add clippy
-          rustup target add wasm32-unknown-unknown
-
-      - name: Cache target
-        uses: actions/cache@v2
-        with:
-          path: target
-          key: ${{ runner.os }}-bridger-${{ hashFiles('Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-bridger-
-
       - name: Lint
         if: matrix.action == 'clippy'
-        run: cargo clippy --release --all --locked -- -D warnings
+        run: |
+          cd frame
+          cargo clippy --release --all -- -D warnings
 
       - name: Run tests
         if: matrix.action == 'test'
-        run: cargo test --release --locked
+        run: |
+          cd frame
+          cargo test --release
 
-      - name: Optimize cache
-        run: .maintain/optimize-cache.sh || exit 0
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: darwinia-network/bridger
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
+
+  check-bridges:
+    name: Check bridge-${{ matrix.bridge }} ${{ matrix.action }}
+    runs-on: ubuntu-latest
+    container:
+      image: rust:1
+    strategy:
+      matrix:
+        bridge: [template, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        action: [clippy, test]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Lint
+        if: matrix.action == 'clippy'
+        run: |
+          cd bridges/${{ matrix.bridge }}
+          cargo clippy --release --all --locked -- -D warnings
+
+      - name: Run tests
+        if: matrix.action == 'test'
+        run: |
+          cd bridges/${{ matrix.bridge }}
+          cargo test --release --locked
+
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: darwinia-network/bridger
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}

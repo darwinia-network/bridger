@@ -1,0 +1,52 @@
+[darwinia]
+# The WebSocket endpoint of any archive node (`darwinia --pruning=archive`) and enabling offchain-indexing, supports `ws://` and `wss://`.
+endpoint = "ws://127.0.0.1:9944"
+
+# Private key in hex of your account or proxy account to sign relay extrinsics. It is highly recommended to use a proxy account to prevent exposing your main account's private key.
+# Proxy account is an account that can "perform" on behalf of your "real" account.
+# To allow an account proxying extrinsics, you need to open [Extrinsics in apps.darwinia.network](https://apps.darwinia.network/#/extrinsics), switch to your "real" account, and submit the `proxy.addProxy(proxy_account, ProxyType.EthereumBridge, 0)` extrinsic to delegate it.
+# private key of relayer, or, private key of proxy
+# Here is a [tool](https://polkadot.subscan.io/tools/ss58_transform) provided by Subscan that helps convert SS58 addresses to public keys.
+relayer_private_key = "0x..."
+# (optional) real account public key
+# If you set `seed` to the private key of your proxy account, you have to set this to the public key of your "real" account as well.
+relayer_real_account = "0x..."
+
+# private key to sign ecdsa messages
+ecdsa_authority_private_key = "0x..."
+
+strict = false
+
+[web3]
+endpoint = "https://mainnet.infura.io/v3/<YOUR_KEY>"
+
+[ethereum]
+# below two need to be all setted if you want to do the relay job
+# (optional) the person who will relay darwinia data to ethereum
+relayer_private_key = "0x..."
+# (optional) the darwinia account public key who will get the reward
+relayer_beneficiary_darwinia_account = "0x..."
+
+# listen to set authorities
+subscribe_relay_address = "0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49"
+
+
+[shadow]
+# The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS. For example using the official service:
+endpoint = "https://shadow.darwinia.network"
+
+[task]
+interval_ethereum = 120
+interval_relay = 60
+interval_guard = 30
+interval_check = 90
+check_timeout = 2000
+
+[http_client]
+timeout = 3000
+
+[thegraph]
+endpoint = "https://api.thegraph.com/subgraphs/name/darwinia-network/bridge-ethereum"
+
+[subquery]
+endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-darwinia"

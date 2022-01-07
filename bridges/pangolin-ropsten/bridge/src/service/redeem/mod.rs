@@ -1,5 +1,5 @@
 use lifeline::dyn_bus::DynBus;
-use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
+use lifeline::{Bus, Lifeline, Service, Task};
 use postage::broadcast;
 
 use component_state::state::BridgeState;

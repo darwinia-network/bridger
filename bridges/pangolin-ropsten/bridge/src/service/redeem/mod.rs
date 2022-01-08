@@ -57,7 +57,7 @@ impl Service for RedeemService {
 
 async fn start_scan(
     tracker: Tracker,
-    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
 ) {
     while let Err(err) = run_scan(
         &tracker,
@@ -76,7 +76,7 @@ async fn start_scan(
 
 async fn run_scan(
     tracker: &Tracker,
-    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
 ) -> color_eyre::Result<()> {
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
@@ -86,8 +86,7 @@ async fn run_scan(
     // the graph
     let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
 
-    let mut handler =
-        RedeemHandler::new(sender_to_extrinsics.clone()).await;
+    let mut handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
     loop {
         let from = tracker.current().await?;
         let limit = 10usize;

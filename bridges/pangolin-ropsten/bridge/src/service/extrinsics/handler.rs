@@ -1,4 +1,5 @@
 use microkv::namespace::NamespaceMicroKV;
+use uuid::Uuid;
 
 use client_pangolin::account::DarwiniaAccount;
 use client_pangolin::component::DarwiniaSubxtComponent;
@@ -24,6 +25,7 @@ pub struct ExtrinsicsHandler {
     ethereum2darwinia_relayer: FromEthereumAccount,
     spec_name: String,
     microkv: NamespaceMicroKV,
+    message_kv: NamespaceMicroKV,
 }
 
 impl ExtrinsicsHandler {
@@ -82,6 +84,7 @@ impl ExtrinsicsHandler {
         );
 
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
+        let message_kv: NamespaceMicroKV = state.microkv_with_namespace(PangolinRopstenTask::name().to_owned() + "-messages");
         Ok(ExtrinsicsHandler {
             ethereum2darwinia,
             darwinia2ethereum,
@@ -89,6 +92,7 @@ impl ExtrinsicsHandler {
             ethereum2darwinia_relayer,
             spec_name,
             microkv,
+            message_kv
         })
     }
 }
@@ -272,5 +276,37 @@ impl ExtrinsicsHandler {
             ex_hash
         );
         Ok(())
+    }
+}
+
+impl ExtrinsicsHandler {
+    pub fn collect_message(&self, message: &Extrinsic) -> color_eyre::Result<()> {
+        let new_uuid = Uuid::new_v4();
+        self.message_kv.put(new_uuid.to_string(), message)?;
+        Ok(())
+    }
+
+    pub async fn consume_message(&self) -> color_eyre::Result<()> {
+        loop {
+            let mut extrinsics = self.message_kv.keys()?;
+            if extrinsics.is_empty() {
+                tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+            }
+            while let Some(key) = extrinsics.pop() {
+                let ex: Extrinsic = self.message_kv.get_as_unwrap(&key)?;
+                match self.send_extrinsic(ex.clone()).await {
+                    Ok(_) => self.message_kv.delete(&key)?,
+                    Err(err) => {
+                        tracing::error!(
+                            target: "pangolin-ropsten",
+                            "Failed to send extrinsic {:?} err: {:?}",
+                            ex,
+                            err
+                        );
+                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    }
+                }
+            }
+        }
     }
 }

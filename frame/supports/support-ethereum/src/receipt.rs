@@ -34,7 +34,7 @@ impl Default for RedeemFor {
 }
 
 /// Ethereum Receipt Proof
-#[derive(Clone, Debug, Default, Encode, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Encode, PartialEq, Eq)]
 pub struct EthereumReceiptProof {
     /// Proof index
     pub index: u64,
@@ -90,7 +90,7 @@ impl TryFrom<EthereumReceiptProofJson> for EthereumReceiptProof {
 }
 
 /// Ethereum ReceiptProofThing
-#[derive(Clone, Debug, Default, PartialEq, Eq, Encode)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default, PartialEq, Eq, Encode)]
 pub struct EthereumReceiptProofThing {
     /// Ethereum Header
     pub header: EthereumHeader,

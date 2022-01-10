@@ -9,26 +9,23 @@ use component_shadow::{Shadow, ShadowComponent};
 use component_thegraph_liketh::types::TransactionEntity;
 use support_common::config::{Config, Names};
 
-use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage, ToRedeemMessage};
+use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage};
 use crate::helpers;
 
 pub struct RedeemHandler {
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-    #[allow(dead_code)]
-    sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
     darwinia: Ethereum2Darwinia,
     shadow: Arc<Shadow>,
 }
 
 impl RedeemHandler {
     pub async fn new(
-        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-        sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
+        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
     ) -> Self {
         let mut times = 0;
         loop {
             times += 1;
-            match Self::build(sender_to_extrinsics.clone(), sender_to_redeem.clone()).await {
+            match Self::build(sender_to_extrinsics.clone()).await {
                 Ok(v) => return v,
                 Err(err) => {
                     tracing::error!(
@@ -44,8 +41,7 @@ impl RedeemHandler {
     }
 
     async fn build(
-        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-        sender_to_redeem: broadcast::Sender<ToRedeemMessage>,
+        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
     ) -> color_eyre::Result<Self> {
         tracing::info!(target: "pangolin-ropsten", "SERVICE RESTARTING...");
 
@@ -69,7 +65,6 @@ impl RedeemHandler {
         );
         Ok(RedeemHandler {
             sender_to_extrinsics,
-            sender_to_redeem,
             darwinia,
             shadow,
         })
@@ -104,10 +99,6 @@ impl RedeemHandler {
                 tx.block_number,
                 last_confirmed,
             );
-            // tokio::time::sleep(std::time::Duration::from_secs(30)).await;
-            // self.sender_to_redeem
-            //     .send(ToRedeemMessage::EthereumTransaction(tx))
-            //     .await?;
             return Ok(None);
         }
 

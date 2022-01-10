@@ -42,16 +42,6 @@ impl Message<PangolinRopstenBus> for ToRelayMessage {
     type Channel = broadcast::Sender<Self>;
 }
 
-// *** ToRedeemMessage **
-#[derive(Clone, Debug)]
-pub enum ToRedeemMessage {
-    EthereumTransaction(TransactionEntity),
-}
-
-impl Message<PangolinRopstenBus> for ToRedeemMessage {
-    type Channel = broadcast::Sender<Self>;
-}
-
 // *** ToExtrinsicsMessage **
 #[derive(Clone, Debug)]
 pub enum ToExtrinsicsMessage {

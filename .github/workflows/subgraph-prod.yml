@@ -21,8 +21,8 @@ jobs:
         working-directory: thegraph
         run: |
           npm i
-          npm run codegen -- subgraph-ropsten.yaml
-          npm run build -- subgraph-ropsten.yaml
+          npm run codegen -- subgraph-${{ matrix.chain }}.yaml
+          npm run build -- subgraph-${{ matrix.chain }}.yaml
           npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_PROD }} \
             darwinia-network/bridge-${{ matrix.chain }} \
             subgraph-${{ matrix.chain }}.yaml

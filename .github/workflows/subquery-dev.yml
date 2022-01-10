@@ -34,6 +34,11 @@ jobs:
         id: branch-name
         uses: tj-actions/branch-names@v5.1
 
+      - uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+        with:
+          length: 7
+
       - name: Deploy
         run: |
           set -xe
@@ -46,7 +51,11 @@ jobs:
             --repo https://github.com/darwinia-network/bridger \
             --check
 
-          if [ -n "$(git diff ${{ steps.branch-name.outputs.current_branch }} master subql/${{ matrix.chain }}/schema.graphql)" ]; then
+          DIFF_SCHEMA=$(git diff \
+            ${SHA} \
+            master \
+            subql/${{ matrix.chain }}/schema.graphql || exit 1)
+          if [ -n "${DIFF_SCHEMA}" ]; then
             echo 'Hard deploy subql/${{ matrix.chain }}'
             subquery deployment deploy \
               --org ${{ env.SUBQUERY_ORG }} \

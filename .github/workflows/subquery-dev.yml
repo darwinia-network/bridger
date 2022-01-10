@@ -36,6 +36,8 @@ jobs:
 
       - name: Deploy
         run: |
+          set -xe
+
           subquery login --token ${{ secrets.SUBQUERY_TOKEN }}
 
           subquery project create \

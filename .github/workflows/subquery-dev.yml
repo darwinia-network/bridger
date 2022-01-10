@@ -45,6 +45,7 @@ jobs:
             --check
 
           if [ -n "$(git diff ${{ steps.branch-name.outputs.current_branch }} master subql/${{ matrix.chain }}/schema.graphql)" ]; then
+            echo 'Hard deploy subql/${{ matrix.chain }}'
             subquery deployment deploy \
               --org ${{ env.SUBQUERY_ORG }} \
               --key subql-bridge-${{ matrix.chain }} \
@@ -53,6 +54,7 @@ jobs:
               --type stage \
               --force
           else
+            echo 'Soft deploy subql/${{ matrix.chain }}'
             subquery deployment deploy \
               --org ${{ env.SUBQUERY_ORG }} \
               --key subql-bridge-${{ matrix.chain }} \

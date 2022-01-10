@@ -7,8 +7,7 @@ on:
     branches: [ master ]
 
 env:
-  RUST_TOOLCHAIN: stable
-  SUBQUERY_CLI_VERSION: 0.1.4
+  SUBQUERY_CLI_VERSION: 0.1.5
   SUBQUERY_ORG: darwinia-network
 
 jobs:
@@ -21,11 +20,6 @@ jobs:
         chain: [ pangolin, darwinia ]
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
 
       - name: Install dependencies
         run: |
@@ -53,5 +47,4 @@ jobs:
             --key subql-bridge-${{ matrix.chain }} \
             --branch ${{ steps.branch-name.outputs.current_branch }} \
             --sub-folder subql/${{ matrix.chain }} \
-            --type stage \
-            --force
+            --type stage

@@ -99,7 +99,7 @@ impl ExtrinsicsHandler {
             Extrinsic::Affirm(parcel) => self.send_affirm(parcel).await?,
             Extrinsic::Redeem(proof, ethereum_tx) => self.send_redeem(proof, ethereum_tx).await?,
             Extrinsic::GuardVote(pending_block_number, aye) => {
-                self.send_guard_vote(pending_block_number, aye).await?
+                self.send_guard_vote_on_condition(pending_block_number, aye).await?
             }
             Extrinsic::SignAndSendMmrRoot(block_number) => {
                 self.send_sign_and_send_mmr_root(block_number).await?
@@ -197,6 +197,27 @@ impl ExtrinsicsHandler {
                 );
             }
         }
+        Ok(())
+    }
+
+    async fn send_guard_vote_on_condition(
+        &self,
+        pending_block_number: u64,
+        aye: bool
+    ) -> color_eyre::Result<()> {
+        let guard: u64 = 0;
+        match (self.microkv.get_as_unwrap("latest_guard_vote"), guard) {
+            (Err(_), latest) | (Ok(latest), _) if latest < pending_block_number => {
+                self.send_guard_vote(pending_block_number, aye)
+                    .await
+                    .map(|_| self.microkv.put("latest_guard_vote", &pending_block_number))??;
+            }
+            _ => tracing::info!(
+                target: "pangolin-ropsten",
+                "The vote(block num: {}) has already been taken",
+                pending_block_number,
+            ),
+        };
         Ok(())
     }
 

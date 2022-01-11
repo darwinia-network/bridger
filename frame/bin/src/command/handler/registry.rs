@@ -34,7 +34,7 @@ fn handle_version(value: Option<String>, bundle: bool) -> color_eyre::Result<()>
             config
                 .registry
                 .version
-                .unwrap_or(bundle_version.to_string()),
+                .unwrap_or_else(|| bundle_version.to_string()),
         );
         return Ok(());
     }

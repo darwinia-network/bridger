@@ -49,7 +49,10 @@ impl PrecompiledBinaryExecutor {
         force: bool,
     ) -> color_eyre::Result<(String, PathBuf)> {
         let config: BridgerConfig = Config::restore(Names::Bridger)?;
-        let version = config.registry.version.unwrap_or(VERSION.to_string());
+        let version = config
+            .registry
+            .version
+            .unwrap_or_else(|| VERSION.to_string());
         for prefix in support_common::constants::ALLOW_BINARY_PREFIX {
             let command = format!("{}{}", prefix, self.command);
 

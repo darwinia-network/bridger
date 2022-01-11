@@ -4,6 +4,7 @@ use std::fmt::Debug;
 
 use lifeline::Message;
 use postage::broadcast;
+use serde::{Serialize, Deserialize};
 
 use component_thegraph_liketh::types::TransactionEntity;
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
@@ -49,7 +50,7 @@ pub enum ToExtrinsicsMessage {
 }
 
 pub type EcdsaMessage = [u8; 32];
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Extrinsic {
     Affirm(EthereumRelayHeaderParcel),
     Redeem(EthereumReceiptProofThing, TransactionEntity),

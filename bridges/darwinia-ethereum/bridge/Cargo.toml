@@ -28,6 +28,8 @@ colored     = "2"
 structopt   = "0.3"
 strum       = { version = "0.21", features = ["derive"] }
 
+rand        = "0.8.4"
+
 lifeline    = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage     = "0.4"
 

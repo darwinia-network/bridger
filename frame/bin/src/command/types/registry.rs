@@ -34,10 +34,10 @@ pub enum RegistryOpt {
     /// Set registry version, If the value is set, this version of the bridge will be downloaded
     Version {
         /// The version
-        #[structopt(flatten)]
+        #[structopt()]
         value: Option<String>,
         /// Set version to bridger bundle, if true, not use the value parameter
-        #[structopt(flatten)]
+        #[structopt(long)]
         bundle: bool,
     },
 }

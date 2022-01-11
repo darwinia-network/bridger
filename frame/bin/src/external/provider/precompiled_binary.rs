@@ -1,6 +1,10 @@
 use std::io::Cursor;
 use std::path::PathBuf;
+use std::process::Command;
+use support_common::config::{Config, Names};
+use sysinfo::{ProcessExt, System, SystemExt};
 
+use crate::config::BridgerConfig;
 use support_common::error::BridgerError;
 use support_terminal::output;
 
@@ -44,9 +48,18 @@ impl PrecompiledBinaryExecutor {
         path: Option<String>,
         force: bool,
     ) -> color_eyre::Result<(String, PathBuf)> {
+        let config: BridgerConfig = Config::restore(Names::Bridger)?;
+        let version = config.registry.version.unwrap_or(VERSION.to_string());
         for prefix in support_common::constants::ALLOW_BINARY_PREFIX {
             let command = format!("{}{}", prefix, self.command);
-            match self.download_and_extract_binary_with_command(path.clone(), &command, force) {
+
+            output::output_text(format!("Try execute {}@{}", command, version));
+            match self.download_and_extract_binary_with_command(
+                path.clone(),
+                &version,
+                &command,
+                force,
+            ) {
                 Ok(v) => return Ok((command, v)),
                 Err(e) => {
                     output::output_err(format!("{:?}", e.to_string()));
@@ -63,16 +76,18 @@ impl PrecompiledBinaryExecutor {
     fn download_and_extract_binary_with_command(
         &self,
         path: Option<String>,
+        version: impl AsRef<str>,
         command: impl AsRef<str>,
         force: bool,
     ) -> color_eyre::Result<PathBuf> {
         let command = command.as_ref();
+        let version = version.as_ref();
         // https://github.com/darwinia-network/bridger/releases/download/v0.4.11/bridger-x86_64-linux-gnu.tar.bz2
         let path = path.ok_or_else(|| {
             BridgerError::Subcommand("Missing remote base url for precompiled binary".to_string())
         })?;
         let package_name = self.package_name(command)?;
-        let remote_url = format!("{}/releases/download/v{}/{}", path, VERSION, package_name);
+        let remote_url = format!("{}/releases/download/v{}/{}", path, version, package_name);
         let path_binary_base = std::env::current_exe()?
             .parent()
             .map(|v| v.join(""))
@@ -99,7 +114,63 @@ impl PrecompiledBinaryExecutor {
         }
 
         if !force && path_binary.exists() {
-            return Ok(path_binary);
+            let version_output = Command::new(&path_binary).args(["--version"]).output()?;
+            match version_output.status.code() {
+                Some(0) => {
+                    let stdout = String::from_utf8_lossy(&version_output.stdout).into_owned();
+                    let parts: Vec<&str> = stdout.split(' ').collect();
+                    let binary_version = parts.get(1);
+                    if let Some(&bversion) = &binary_version {
+                        if bversion == version {
+                            return Ok(path_binary);
+                        }
+                    }
+                    tracing::warn!(
+                        target: "bridger",
+                        "The except version is {}, but the binary ({}) version is: {}",
+                        version,
+                        command,
+                        binary_version.unwrap_or(&"UNKNOWN")
+                    );
+                    let mut sys = System::new_all();
+                    sys.refresh_all();
+                    for (pid, process) in sys.processes() {
+                        if !process.name().contains(command) {
+                            continue;
+                        }
+                        if cfg!(windows) {
+                            return Err(BridgerError::Custom(format!(
+                                "The {} is running (PID: {}), can not update to new version",
+                                command, pid
+                            ))
+                            .into());
+                        } else {
+                            tracing::warn!(
+                                target: "bridger",
+                                "The binary ({}) will updated to {}, after done, please restart your running progress.",
+                                command,
+                                version
+                            );
+                        }
+                        break;
+                    }
+                    tracing::trace!(
+                        target: "bridger",
+                        "The version changed, remove old binary for command: {}",
+                        command
+                    );
+                    std::fs::remove_file(&path_binary)?;
+                }
+                _ => {
+                    let stderr = String::from_utf8_lossy(&version_output.stderr).into_owned();
+                    return Err(BridgerError::Subcommand(format!(
+                        "Can not get version from [{}]: {}",
+                        path_binary.display(),
+                        stderr
+                    ))
+                    .into());
+                }
+            }
         }
 
         tracing::trace!(

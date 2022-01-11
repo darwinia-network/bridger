@@ -29,7 +29,7 @@ fn handle_version(value: Option<String>, bundle: bool) -> color_eyre::Result<()>
     }
 
     if value.is_none() {
-        let mut config: BridgerConfig = Config::restore(Names::Bridger)?;
+        let config: BridgerConfig = Config::restore(Names::Bridger)?;
         output::output_text(
             config
                 .registry

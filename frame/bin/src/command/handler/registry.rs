@@ -9,11 +9,41 @@ use support_terminal::output::{self, OutputFormat};
 use crate::command::types::{RegistryOpt, RegistryType};
 use crate::config::BridgerConfig;
 
+/// Handle registry command
 pub fn handle_registry(opt: RegistryOpt) -> color_eyre::Result<()> {
     match opt {
         RegistryOpt::Set { type_, path } => handle_set(type_, path),
         RegistryOpt::Get { output } => handle_get(output),
+        RegistryOpt::Version { value, bundle } => handle_version(value, bundle),
     }
+}
+
+fn handle_version(value: Option<String>, bundle: bool) -> color_eyre::Result<()> {
+    let bundle_version = env!("CARGO_PKG_VERSION");
+    if bundle {
+        let mut config: BridgerConfig = Config::restore(Names::Bridger)?;
+        config.registry.version = Some(bundle_version.to_string());
+        Config::store(Names::Bridger, config)?;
+        output::output_text(bundle_version);
+        return Ok(());
+    }
+
+    if value.is_none() {
+        let mut config: BridgerConfig = Config::restore(Names::Bridger)?;
+        output::output_text(
+            config
+                .registry
+                .version
+                .unwrap_or(bundle_version.to_string()),
+        );
+        return Ok(());
+    }
+
+    let mut config: BridgerConfig = Config::restore(Names::Bridger)?;
+    config.registry.version = value.clone();
+    Config::store(Names::Bridger, config)?;
+    output::output_text(value.expect("Unreachable"));
+    Ok(())
 }
 
 fn handle_set(type_: RegistryType, mut path: Option<String>) -> color_eyre::Result<()> {

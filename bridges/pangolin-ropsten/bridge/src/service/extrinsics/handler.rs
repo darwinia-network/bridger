@@ -1,5 +1,7 @@
 use microkv::namespace::NamespaceMicroKV;
-use uuid::Uuid;
+use std::time::{SystemTime, UNIX_EPOCH};
+use rand::{Rng, thread_rng};
+use rand::distributions::Alphanumeric;
 
 use client_pangolin::account::DarwiniaAccount;
 use client_pangolin::component::DarwiniaSubxtComponent;
@@ -281,14 +283,27 @@ impl ExtrinsicsHandler {
 
 impl ExtrinsicsHandler {
     pub fn collect_message(&self, message: &Extrinsic) -> color_eyre::Result<()> {
-        let new_uuid = Uuid::new_v4();
-        self.message_kv.put(new_uuid.to_string(), message)?;
+        let mut key: String = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_string();
+
+        if let Ok(true) = self.message_kv.exists(&key) {
+            let random: String = thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(1)
+                .map(char::from)
+                .collect();
+            key += &random;
+        }
+        self.message_kv.put(key, message)?;
         Ok(())
     }
 
     pub async fn consume_message(&self) -> color_eyre::Result<()> {
         loop {
-            let mut extrinsics = self.message_kv.keys()?;
+            let mut extrinsics = self.message_kv.sorted_keys()?;
             if extrinsics.is_empty() {
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
             }

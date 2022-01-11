@@ -40,6 +40,7 @@ serde_with = "1"
 reqwest = { version = "0.11", features = ["blocking", "rustls-tls"] }
 cargo-util = "0.1"
 sys-info = "0.9"
+sysinfo = "0.22"
 zip = "0.5"
 
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }

@@ -81,8 +81,7 @@ impl ExtrinsicsHandler {
         );
 
         let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::name());
-        let message_kv =
-            state.microkv_with_namespace(DarwiniaEthereumTask::name().to_owned() + "-messages");
+        let message_kv = state.microkv_with_namespace(format!("{}-messages", DarwiniaEthereumTask::name()));
         Ok(ExtrinsicsHandler {
             ethereum2darwinia,
             darwinia2ethereum,
@@ -271,6 +270,7 @@ impl ExtrinsicsHandler {
             let mut extrinsics = self.message_kv.sorted_keys()?;
             if extrinsics.is_empty() {
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+                continue
             }
             while let Some(key) = extrinsics.pop() {
                 let ex: Extrinsic = self.message_kv.get_as_unwrap(&key)?;

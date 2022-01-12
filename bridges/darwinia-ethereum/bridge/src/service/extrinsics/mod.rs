@@ -54,12 +54,13 @@ impl Service for ExtrinsicsService {
         let _consume = Self::try_task(
             &format!("{}-service-extrinsics", DarwiniaEthereumTask::name()),
             async move {
-                let handler = ExtrinsicsHandler::new(state.clone()).await;
-                if handler.consume_message().await.is_err() {
+                let mut handler = ExtrinsicsHandler::new(state.clone()).await;
+                while handler.consume_message().await.is_err() {
                     tracing::error!(
                         target: "darwinia-ethereum",
                         "Failed to consume extrinsics in database"
                     );
+                    handler = ExtrinsicsHandler::new(state.clone()).await;
                 }
                 Ok(())
             }

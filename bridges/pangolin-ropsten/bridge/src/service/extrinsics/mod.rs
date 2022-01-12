@@ -55,12 +55,13 @@ impl Service for ExtrinsicsService {
         let _consume = Self::try_task(
             &format!("{}-service-extrinsics", PangolinRopstenTask::name()),
             async move {
-                let handler = ExtrinsicsHandler::new(state.clone()).await;
-                if handler.consume_message().await.is_err() {
-                    tracing::info!(
+                let mut handler = ExtrinsicsHandler::new(state.clone()).await;
+                while handler.consume_message().await.is_err() {
+                    tracing::error!(
                         target: "pangolin-ropsten",
                         "Failed to consume extrinsics in database"
                     );
+                    handler = ExtrinsicsHandler::new(state.clone()).await;
                 }
                 Ok(())
             }

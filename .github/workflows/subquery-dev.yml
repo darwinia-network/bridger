@@ -1,14 +1,15 @@
 name: Deploy subquery develop
 
+## IMPORTANT: Please you know, direct push code to master doesn't trigger this action
+#  push:
+#    branches: [ master ]
+
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 env:
-  RUST_TOOLCHAIN: stable
-  SUBQUERY_CLI_VERSION: 0.1.4
+  SUBQUERY_CLI_VERSION: 0.1.5
   SUBQUERY_ORG: darwinia-network
 
 jobs:
@@ -21,11 +22,8 @@ jobs:
         chain: [ pangolin, darwinia ]
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          fetch-depth: 0
 
       - name: Install dependencies
         run: |
@@ -38,8 +36,15 @@ jobs:
         id: branch-name
         uses: tj-actions/branch-names@v5.1
 
+      - uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+        with:
+          length: 7
+
       - name: Deploy
         run: |
+          set -xe
+
           subquery login --token ${{ secrets.SUBQUERY_TOKEN }}
 
           subquery project create \
@@ -48,10 +53,25 @@ jobs:
             --repo https://github.com/darwinia-network/bridger \
             --check
 
-          subquery deployment deploy \
-            --org ${{ env.SUBQUERY_ORG }} \
-            --key subql-bridge-${{ matrix.chain }} \
-            --branch ${{ steps.branch-name.outputs.current_branch }} \
-            --sub-folder subql/${{ matrix.chain }} \
-            --type stage \
-            --force
+          DIFF_SCHEMA=$(git diff \
+            ${SHA} \
+            origin/master \
+            subql/${{ matrix.chain }}/schema.graphql || exit 1)
+          if [ -n "${DIFF_SCHEMA}" ]; then
+            echo 'Hard deploy subql/${{ matrix.chain }}'
+            subquery deployment deploy \
+              --org ${{ env.SUBQUERY_ORG }} \
+              --key subql-bridge-${{ matrix.chain }} \
+              --branch ${{ steps.branch-name.outputs.current_branch }} \
+              --sub-folder subql/${{ matrix.chain }} \
+              --type stage \
+              --force
+          else
+            echo 'Soft deploy subql/${{ matrix.chain }}'
+            subquery deployment deploy \
+              --org ${{ env.SUBQUERY_ORG }} \
+              --key subql-bridge-${{ matrix.chain }} \
+              --branch ${{ steps.branch-name.outputs.current_branch }} \
+              --sub-folder subql/${{ matrix.chain }} \
+              --type stage
+          fi

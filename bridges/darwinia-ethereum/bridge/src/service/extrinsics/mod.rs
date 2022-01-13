@@ -37,17 +37,35 @@ impl Service for ExtrinsicsService {
 
                 while let Some(recv) = rx.recv().await {
                     if let ToExtrinsicsMessage::Extrinsic(ex) = recv {
+                        let mut times = 0;
                         while let Err(err) = handler.send_extrinsic(ex.clone()).await {
+                            handler = ExtrinsicsHandler::new(state.clone()).await;
+
+                            if let Some(substrate_subxt::Error::Rpc(_)) =
+                                e.downcast_ref::<substrate_subxt::Error>()
+                            {
+                                times += 1;
+                                if times > 5 {
+                                    tracing::error!(
+                                        target: "darwinia-ethereum",
+                                        "Try send extrinsic {:?} many times, give up this currently, please focus this extrinsics",
+                                        ex
+                                    );
+                                    break;
+                                }
+
+                                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                                continue;
+                            }
+
                             tracing::error!(
                                 target: "darwinia-ethereum",
-                                "extrinsics err: {:#?}",
+                                "Failed to send extrinsic {:?} err: {:?}",
+                                ex,
                                 err
                             );
 
-                            // TODO: Consider the errors more carefully
-
                             tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                            handler = ExtrinsicsHandler::new(state.clone()).await;
                         }
                     }
                 }

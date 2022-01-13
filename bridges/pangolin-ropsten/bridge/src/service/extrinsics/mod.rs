@@ -42,7 +42,7 @@ impl Service for ExtrinsicsService {
                             handler = ExtrinsicsHandler::new(state.clone()).await;
 
                             if let Some(substrate_subxt::Error::Rpc(_)) =
-                                e.downcast_ref::<substrate_subxt::Error>()
+                                err.downcast_ref::<substrate_subxt::Error>()
                             {
                                 times += 1;
                                 if times > 5 {

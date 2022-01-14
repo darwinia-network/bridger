@@ -10,6 +10,9 @@ use client_darwinia::config::DarwiniaSubxtConfig;
 use client_darwinia::from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia};
 use component_ethereum::errors::BizError;
 use component_shadow::{Shadow, ShadowComponent};
+use component_state::state::BridgeState;
+use lifeline::dyn_bus::DynBus;
+use microkv::namespace::NamespaceMicroKV;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
@@ -32,13 +35,16 @@ impl Service for GuardService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         // Receiver & Sender
         let mut rx = bus.rx::<ToGuardMessage>()?;
+        let state = bus.storage().clone_resource::<BridgeState>()?;
+        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::name());
+
         let sender_to_extrinsics = bus.tx::<ToExtrinsicsMessage>()?;
 
         let _greet = Self::try_task(
             &format!("{}-service-guard", DarwiniaEthereumTask::name()),
             async move {
                 //
-                tokio::spawn(async move { start(sender_to_extrinsics).await });
+                tokio::spawn(async move { start(sender_to_extrinsics, &microkv).await });
 
                 while let Some(recv) = rx.recv().await {
                     match recv {
@@ -53,8 +59,11 @@ impl Service for GuardService {
     }
 }
 
-async fn start(mut sender_to_extrinsics: impl Sender<ToExtrinsicsMessage>) {
-    while let Err(err) = run(&mut sender_to_extrinsics).await {
+async fn start(
+    mut sender_to_extrinsics: impl Sender<ToExtrinsicsMessage>,
+    microkv: &NamespaceMicroKV
+) {
+    while let Err(err) = run(&mut sender_to_extrinsics, microkv).await {
         tracing::error!(target: "darwinia-ethereum", "guard err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
     }
@@ -62,6 +71,7 @@ async fn start(mut sender_to_extrinsics: impl Sender<ToExtrinsicsMessage>) {
 
 async fn run(
     sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
+    microkv: &NamespaceMicroKV
 ) -> color_eyre::Result<()> {
     tracing::info!(target: "darwinia-ethereum", "SERVICE RESTARTING...");
 
@@ -108,6 +118,7 @@ async fn run(
                 guard_account_clone,
                 shadow_clone,
                 sender_to_extrinsics,
+                microkv
             )
             .await?;
 
@@ -191,12 +202,39 @@ impl GuardService {
         guard_account: FromEthereumAccount,
         shadow: Arc<Shadow>,
         sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
+        microkv: &NamespaceMicroKV
     ) -> color_eyre::Result<()> {
         let extrinsics = Self::extrinsics(ethereum2darwinia, guard_account, shadow).await?;
 
+        if extrinsics.is_empty() {
+            return Ok(())
+        }
+
+        let max_block = *extrinsics
+            .iter()
+            .map(|ex| {
+                if let Extrinsic::GuardVote(block_num, _) = ex { block_num } else { &0u64 }
+            })
+            .max()
+            .unwrap();
+
+        let latest: u64 = microkv.get_as_unwrap("latest_guard_vote_block_num").unwrap_or(0u64);
         for extrinsic in extrinsics {
-            let message = ToExtrinsicsMessage::Extrinsic(extrinsic);
-            sender_to_extrinsics.send(message).await?;
+            if let Extrinsic::GuardVote(block_num, _) = extrinsic {
+                if block_num > latest {
+                    let message = ToExtrinsicsMessage::Extrinsic(extrinsic);
+                    sender_to_extrinsics.send(message).await?;
+                } else {
+                    tracing::info!(
+                        target: "darwinia-ethereum",
+                        "Skip guard vote for block: {}",
+                        &block_num
+                    );
+                }
+            }
+        }
+        if max_block > latest {
+            microkv.put("latest_guard_vote_block_num", &max_block)?;
         }
         Ok(())
     }

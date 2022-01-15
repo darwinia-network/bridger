@@ -30,7 +30,7 @@ if [ "${PACKAGE}" == "darwinia-ethereum" ]; then
 fi
 
 if [ "${PACKAGE}" == "pangolin-pangoro" ]; then
-  _clippy --manifest-path ${WORK_PATH}/bridges/pangolin-pangoro/Cargo.toml \
+  _clippy ${WORK_PATH}/bridges/pangolin-pangoro/Cargo.toml \
     --locked
 fi
 

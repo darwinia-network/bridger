@@ -1,4 +1,6 @@
 use structopt::StructOpt;
+
+use support_command_kv::KvOpts;
 use support_terminal::types::BasicOptions;
 
 use crate::command::types::{
@@ -59,5 +61,11 @@ pub enum Opts {
         /// Commands of parcel
         #[structopt(flatten)]
         command: RelayOpts,
+    },
+    /// Kv command
+    Kv {
+        /// Commands of kv
+        #[structopt(flatten)]
+        command: KvOpts,
     },
 }

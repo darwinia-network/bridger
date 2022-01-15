@@ -22,7 +22,7 @@ pub struct DarwiniaEthereumTask {
 
 impl DarwiniaEthereumTask {
     pub fn name() -> &'static str {
-        "task-darwinia-ethereum"
+        "darwinia-ethereum"
     }
 }
 

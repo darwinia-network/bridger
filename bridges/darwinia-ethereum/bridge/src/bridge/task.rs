@@ -1,7 +1,7 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Sender};
 
-use component_state::state::BridgeState;
+use component_state::state::{BridgeState, StateOptions};
 use support_common::config::{Config, Names};
 use support_lifeline::task::TaskStack;
 
@@ -28,7 +28,9 @@ impl DarwiniaEthereumTask {
 
 impl DarwiniaEthereumTask {
     pub async fn new() -> color_eyre::Result<Self> {
-        let state = BridgeState::new()?;
+        let state = BridgeState::new(StateOptions {
+            db_name: Self::name().to_string(),
+        })?;
         // check config
         let _bridge_config: DarwiniaEthereumConfig =
             Config::restore(Names::BridgeDarwiniaEthereum)?;

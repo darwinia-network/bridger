@@ -11,7 +11,7 @@ use crate::config::MicrokvConfig;
 #[derive(Clone, Debug, Default)]
 pub struct StateOptions {
     /// Kv database store file name
-    pub db_name: Option<String>,
+    pub db_name: String,
 }
 
 /// Bridger state
@@ -23,15 +23,11 @@ pub struct BridgeState {
 lifeline::impl_storage_clone!(BridgeState);
 
 impl BridgeState {
-    pub fn new() -> color_eyre::Result<Self> {
-        Self::with_options(StateOptions { db_name: None })
-    }
-
-    pub fn with_options(options: StateOptions) -> color_eyre::Result<Self> {
+    pub fn new(options: StateOptions) -> color_eyre::Result<Self> {
         let base_path = constants::bridger_home();
         let config_microkv = MicrokvConfig {
             base_path,
-            db_name: options.db_name,
+            db_name: Some(options.db_name),
             auto_commit: true,
         };
         let db_name = config_microkv

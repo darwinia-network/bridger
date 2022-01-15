@@ -14,13 +14,14 @@ use support_terminal::output::OutputFormat;
 
 use crate::types::KvOpts;
 
+/// Handle kv command
 pub fn handle_kv(
     state_option: StateOptions,
     namespace: Option<String>,
     opt: KvOpts,
 ) -> color_eyre::Result<()> {
     let namespace = namespace.unwrap_or_default();
-    let state = BridgeState::with_options(state_option)?;
+    let state = BridgeState::new(state_option)?;
     let microkv = state.microkv_with_namespace(namespace);
     match opt {
         KvOpts::Namespaces => handle_namespaces(state.microkv()),

@@ -20,7 +20,7 @@ pub async fn execute(opts: Opts) -> color_eyre::Result<()> {
         Opts::Kv { command } => {
             let task_name = DarwiniaEthereumTask::name();
             let state_options = StateOptions {
-                db_name: Some(task_name.to_string()),
+                db_name: task_name.to_string(),
             };
             support_command_kv::handle_kv(state_options, Some(task_name.to_string()), command)
         }

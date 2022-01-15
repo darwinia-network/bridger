@@ -291,6 +291,7 @@ dependencies = [
  "microkv",
  "parity-scale-codec",
  "postage",
+ "rand 0.8.4",
  "serde 1.0.133",
  "serde_json",
  "structopt",
@@ -3891,7 +3892,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.15.0"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
+source = "git+https://github.com/darwinia-network/subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
 dependencies = [
  "async-trait",
  "dyn-clone",
@@ -3924,7 +3925,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.15.3"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
+source = "git+https://github.com/darwinia-network/subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
 dependencies = [
  "async-trait",
  "heck",

@@ -3,6 +3,17 @@ use structopt::StructOpt;
 
 use support_terminal::output::OutputFormat;
 
+/// Namespace kv options, the special namespace is allowed
+#[derive(Clone, Debug, Deserialize, Serialize, StructOpt)]
+pub struct NamespaceKvOpts {
+    /// Namespace
+    #[structopt(short, long)]
+    pub namespace: Option<String>,
+    /// Kv commands
+    #[structopt(flatten)]
+    pub command: KvOpts,
+}
+
 /// Kv options
 #[derive(Clone, Debug, Deserialize, Serialize, StructOpt)]
 pub enum KvOpts {

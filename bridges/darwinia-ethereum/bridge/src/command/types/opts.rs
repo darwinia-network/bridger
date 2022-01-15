@@ -1,6 +1,6 @@
 use structopt::StructOpt;
 
-use support_command_kv::KvOpts;
+use support_command_kv::NamespaceKvOpts;
 use support_terminal::types::BasicOptions;
 
 use crate::command::types::{
@@ -66,6 +66,6 @@ pub enum Opts {
     Kv {
         /// Commands of kv
         #[structopt(flatten)]
-        command: KvOpts,
+        command: NamespaceKvOpts,
     },
 }

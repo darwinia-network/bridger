@@ -19,10 +19,11 @@ pub async fn execute(opts: Opts) -> color_eyre::Result<()> {
         Opts::Relay { command } => handler::handle_relay(command).await,
         Opts::Kv { command } => {
             let task_name = PangolinRopstenTask::name();
+            let namespace = command.namespace.unwrap_or_else(|| task_name.to_string());
             let state_options = StateOptions {
                 db_name: task_name.to_string(),
             };
-            support_command_kv::handle_kv(state_options, Some(task_name.to_string()), command)
+            support_command_kv::handle_kv(state_options, Some(namespace), command.command)
         }
     }
 }

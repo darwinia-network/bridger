@@ -33,7 +33,7 @@ impl BridgeState {
         let db_name = config_microkv
             .db_name
             .clone()
-            .unwrap_or("database".to_string());
+            .unwrap_or_else(|| "database".to_string());
         let store_path = &config_microkv.base_path.join(format!("{}.kv", db_name));
         tracing::debug!(
             target: "component-state",

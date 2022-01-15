@@ -14,6 +14,7 @@ mod handler;
 #[derive(Debug)]
 pub struct ExtrinsicsService {
     _greet: Lifeline,
+    _consume: Lifeline
 }
 
 impl BridgeService for ExtrinsicsService {}
@@ -30,32 +31,44 @@ impl Service for ExtrinsicsService {
         // Datastore
         let state = bus.storage().clone_resource::<BridgeState>()?;
 
+        let greet_state = state.clone();
         let _greet = Self::try_task(
             &format!("{}-service-extrinsics", PangolinRopstenTask::name()),
             async move {
-                let mut handler = ExtrinsicsHandler::new(state.clone()).await;
-
+                let handler = ExtrinsicsHandler::new(greet_state.clone()).await;
                 while let Some(recv) = rx.recv().await {
                     if let ToExtrinsicsMessage::Extrinsic(ex) = recv {
-                        while let Err(err) = handler.send_extrinsic(ex.clone()).await {
-                            tracing::error!(
+                        if handler.collect_message(&ex).is_err() {
+                            tracing::info!(
                                 target: "pangolin-ropsten",
-                                "Failed to send extrinsic {:?} err: {:?}",
-                                ex,
-                                err
+                                "Failed to save extrinsic {:?}",
+                                &ex
                             );
-
-                            // TODO: Consider the errors more carefully
-
-                            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                            handler = ExtrinsicsHandler::new(state.clone()).await;
                         }
                     }
                 }
 
                 Ok(())
-            },
+            }
         );
-        Ok(Self { _greet })
+
+        let _consume = Self::try_task(
+            &format!("{}-service-extrinsics", PangolinRopstenTask::name()),
+            async move {
+                let mut handler = ExtrinsicsHandler::new(state.clone()).await;
+                while handler.consume_message().await.is_err() {
+                    tracing::error!(
+                        target: "pangolin-ropsten",
+                        "Failed to consume extrinsics in database"
+                    );
+                    handler = ExtrinsicsHandler::new(state.clone()).await;
+                }
+                Ok(())
+            }
+        );
+        Ok(Self {
+            _greet,
+            _consume
+        })
     }
 }

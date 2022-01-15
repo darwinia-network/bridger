@@ -38,7 +38,7 @@ impl TryFrom<MMRRoot> for MMRRootJson {
 }
 
 /// MMR Proof
-#[derive(Clone, Decode, Debug, Encode, Default, PartialEq, Eq)]
+#[derive(Clone, Decode, Debug, Serialize, Deserialize, Encode, Default, PartialEq, Eq)]
 pub struct MMRProof {
     /// The index of member leaf
     pub member_leaf_index: u64,

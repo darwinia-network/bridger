@@ -1,4 +1,7 @@
 use microkv::namespace::NamespaceMicroKV;
+use std::time::{SystemTime, UNIX_EPOCH};
+use rand::{Rng, thread_rng};
+use rand::distributions::Alphanumeric;
 
 use client_pangolin::account::DarwiniaAccount;
 use client_pangolin::component::DarwiniaSubxtComponent;
@@ -24,6 +27,7 @@ pub struct ExtrinsicsHandler {
     ethereum2darwinia_relayer: FromEthereumAccount,
     spec_name: String,
     microkv: NamespaceMicroKV,
+    message_kv: NamespaceMicroKV,
 }
 
 impl ExtrinsicsHandler {
@@ -82,6 +86,7 @@ impl ExtrinsicsHandler {
         );
 
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
+        let message_kv: NamespaceMicroKV = state.microkv_with_namespace(format!("{}-messages", PangolinRopstenTask::name()));
         Ok(ExtrinsicsHandler {
             ethereum2darwinia,
             darwinia2ethereum,
@@ -89,6 +94,7 @@ impl ExtrinsicsHandler {
             ethereum2darwinia_relayer,
             spec_name,
             microkv,
+            message_kv
         })
     }
 }
@@ -272,5 +278,61 @@ impl ExtrinsicsHandler {
             ex_hash
         );
         Ok(())
+    }
+}
+
+impl ExtrinsicsHandler {
+    pub fn collect_message(&self, message: &Extrinsic) -> color_eyre::Result<()> {
+        let mut key: String = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+            .to_string();
+
+        if let Ok(true) = self.message_kv.exists(&key) {
+            let random: String = thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(1)
+                .map(char::from)
+                .collect();
+            key += &random;
+        }
+        self.message_kv.put(key, message)?;
+        Ok(())
+    }
+
+    pub async fn consume_message(&self) -> color_eyre::Result<()> {
+        loop {
+            let extrinsics = self.message_kv.sorted_keys()?;
+            if extrinsics.is_empty() {
+                tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+                continue
+            }
+            for key in extrinsics.iter() {
+                let ex: Extrinsic = self.message_kv.get_as_unwrap(&key)?;
+                match self.send_extrinsic(ex.clone()).await {
+                    Ok(_) => self.message_kv.delete(&key)?,
+                    Err(err) => {
+                        if let Some(substrate_subxt::Error::Rpc(_)) = err.downcast_ref::<substrate_subxt::Error>() {
+                            tracing::warn!(
+                                target: "pangolin-ropsten",
+                                "Connection Error. Try to resend later. extrinsic: {:?}",
+                                ex,
+                            );
+                            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                            break;
+                        } else {
+                            self.message_kv.delete(&key)?;
+                            tracing::error!(
+                                target: "pangolin-ropsten",
+                                "Failed to send extrinsic {:?} err: {:?}",
+                                ex,
+                                err
+                            );
+                        }
+                    }
+                }
+            }
+        }
     }
 }

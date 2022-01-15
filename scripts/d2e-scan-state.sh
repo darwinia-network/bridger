@@ -8,7 +8,9 @@ BRIDGER=${WORK_PATH}/bridger.sh
 
 NAMESPACE=$1
 
-${BRIDGER} kv -n ${NAMESPACE} get -o table --include-key \
+KV="${BRIDGER} ${NAMESPACE} kv"
+
+${KV} get -o table --include-key \
   scan.pangolin.running \
   scan.ropsten.check.running \
   scan.ropsten.check.current \

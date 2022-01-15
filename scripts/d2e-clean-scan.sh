@@ -8,8 +8,10 @@ BRIDGER=${WORK_PATH}/bridger.sh
 
 NAMESPACE=$1
 
+KV="${BRIDGER} ${NAMESPACE} kv"
 
-${BRIDGER} kv -n ${NAMESPACE} remove \
+
+${KV} remove \
   scan.pangolin.running \
   scan.ropsten.check.running \
   scan.ropsten.check.current \
@@ -22,4 +24,4 @@ ${BRIDGER} kv -n ${NAMESPACE} remove \
   scan.ropsten.affirm.planned
 
 
-${BRIDGER} kv -n ${NAMESPACE} keys
+${KV} keys

@@ -34,9 +34,9 @@ impl DarwiniaEthereumTask {
         // check config
         let _bridge_config: DarwiniaEthereumConfig =
             Config::restore(Names::BridgeDarwiniaEthereum)?;
-        let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::name());
+        let microkv = state.microkv();
 
-        crate::migrate::migrate(&microkv, 2)?;
+        crate::migrate::migrate(&microkv, 3)?;
 
         let bus = DarwiniaEthereumBus::default();
         bus.store_resource::<BridgeState>(state);

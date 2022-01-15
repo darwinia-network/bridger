@@ -277,12 +277,23 @@ impl ExtrinsicsHandler {
                 match self.send_extrinsic(ex.clone()).await {
                     Ok(_) => self.message_kv.delete(&key)?,
                     Err(err) => {
-                        tracing::error!(
-                        target: "darwinia-ethereum",
-                            "extrinsics err: {:#?}",
-                            err
-                        );
-                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                        if let Some(substrate_subxt::Error::Rpc(_)) = err.downcast_ref::<substrate_subxt::Error>() {
+                            tracing::warn!(
+                                target: "darwinia-ethereum",
+                                "Connection Error. Try to resend later. extrinsic: {:?}",
+                                ex,
+                            );
+                            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                            break;
+                        } else {
+                            self.message_kv.delete(&key)?;
+                            tracing::error!(
+                                target: "darwinia-ethereum",
+                                "Failed to send extrinsic {:?} err: {:?}",
+                                ex,
+                                err
+                            );
+                        }
                     }
                 }
             }

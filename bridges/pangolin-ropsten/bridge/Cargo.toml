@@ -40,7 +40,7 @@ codec       = { package = "parity-scale-codec", version = "2.3.1" }
 web3    = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
-substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.7" }
+substrate-subxt = { git = "https://github.com/darwinia-network/subxt.git", tag = "darwinia-v0.11.7" }
 
 client-pangolin    = { path = "../client-pangolin" }
 

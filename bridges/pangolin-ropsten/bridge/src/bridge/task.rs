@@ -35,7 +35,7 @@ impl PangolinRopstenTask {
         let _bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
         let microkv = state.microkv();
 
-        crate::migrate::migrate(&microkv, 3)?;
+        crate::migrate::migrate(microkv, 3)?;
 
         let bus = PangolinRopstenBus::default();
         bus.store_resource::<BridgeState>(state);

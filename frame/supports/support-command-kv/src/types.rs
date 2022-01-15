@@ -5,7 +5,9 @@ use support_terminal::output::OutputFormat;
 
 /// Kv options
 #[derive(Clone, Debug, Deserialize, Serialize, StructOpt)]
-pub enum KvOpt {
+pub enum KvOpts {
+    /// Show all namespaces
+    Namespaces,
     /// Put Key-Value to bridger database
     Put {
         /// Keys and Values one by one

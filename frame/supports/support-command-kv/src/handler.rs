@@ -1,35 +1,41 @@
 use std::collections::HashMap;
 
+use microkv::namespace::NamespaceMicroKV;
+use microkv::MicroKV;
+use serde_json::Value;
 use term_table::row::Row;
 use term_table::table_cell::{Alignment, TableCell};
 use term_table::{Table, TableStyle};
 
-use component_state::state::BridgeState;
-use microkv::namespace::NamespaceMicroKV;
-use serde_json::Value;
+use component_state::state::{BridgeState, StateOptions};
 use support_common::error::BridgerError;
 use support_terminal::output;
 use support_terminal::output::OutputFormat;
 
-use crate::types::KvOpt;
+use crate::types::KvOpts;
 
-pub fn handle_kv(namespace: Option<String>, opt: KvOpt) -> color_eyre::Result<()> {
+pub fn handle_kv(
+    state_option: StateOptions,
+    namespace: Option<String>,
+    opt: KvOpts,
+) -> color_eyre::Result<()> {
     let namespace = namespace.unwrap_or_default();
-    let state = BridgeState::new()?;
+    let state = BridgeState::with_options(state_option)?;
+    let microkv = state.microkv_with_namespace(namespace);
     match opt {
-        KvOpt::Put { kvs } => handle_put(&state, namespace, kvs),
-        KvOpt::Get {
+        KvOpts::Namespaces => handle_namespaces(state.microkv()),
+        KvOpts::Put { kvs } => handle_put(&microkv, kvs),
+        KvOpts::Get {
             keys,
             output,
             include_key,
-        } => handle_get(&state, namespace, keys, output, include_key),
-        KvOpt::Keys { sorted } => handle_keys(&state, namespace, sorted),
-        KvOpt::Remove { keys } => handle_remove(&state, namespace, keys),
+        } => handle_get(&microkv, keys, output, include_key),
+        KvOpts::Keys { sorted } => handle_keys(&microkv, sorted),
+        KvOpts::Remove { keys } => handle_remove(&microkv, keys),
     }
 }
 
-fn handle_namespaces(state: &BridgeState) -> color_eyre::Result<()> {
-    let microkv = state.microkv();
+fn handle_namespaces(microkv: &MicroKV) -> color_eyre::Result<()> {
     let namespaces = microkv.namespaces()?;
     for ns in namespaces {
         output::output_text(ns);
@@ -37,7 +43,7 @@ fn handle_namespaces(state: &BridgeState) -> color_eyre::Result<()> {
     Ok(())
 }
 
-fn handle_put(state: &BridgeState, namespace: String, kvs: Vec<String>) -> color_eyre::Result<()> {
+fn handle_put(microkv: &NamespaceMicroKV, kvs: Vec<String>) -> color_eyre::Result<()> {
     let mut keys = Vec::new();
     let mut values = Vec::new();
     for (ix, value) in kvs.iter().enumerate() {
@@ -50,7 +56,6 @@ fn handle_put(state: &BridgeState, namespace: String, kvs: Vec<String>) -> color
     if keys.len() != values.len() {
         output::output_err_and_exit("The Key-Value length not same");
     }
-    let microkv = state.microkv_with_namespace(namespace);
 
     let len = keys.len();
     for i in 0..len {
@@ -59,20 +64,18 @@ fn handle_put(state: &BridgeState, namespace: String, kvs: Vec<String>) -> color
         if key.is_empty() {
             continue;
         }
-        spec_serialize_value(&microkv, key, value)?;
+        spec_serialize_value(microkv, key, value)?;
     }
     output::output_ok();
     Ok(())
 }
 
 fn handle_get(
-    state: &BridgeState,
-    namespace: String,
+    microkv: &NamespaceMicroKV,
     keys: Vec<String>,
     output_format: OutputFormat,
     include_key: bool,
 ) -> color_eyre::Result<()> {
-    let microkv = state.microkv_with_namespace(namespace);
     let mut kvs = Vec::new();
     for key in keys {
         let value = microkv.get(&key)?;
@@ -138,8 +141,7 @@ fn handle_get(
     Ok(())
 }
 
-fn handle_keys(state: &BridgeState, namespace: String, sorted: bool) -> color_eyre::Result<()> {
-    let microkv = state.microkv_with_namespace(namespace);
+fn handle_keys(microkv: &NamespaceMicroKV, sorted: bool) -> color_eyre::Result<()> {
     let keys = if sorted {
         microkv.sorted_keys()?
     } else {
@@ -149,12 +151,7 @@ fn handle_keys(state: &BridgeState, namespace: String, sorted: bool) -> color_ey
     Ok(())
 }
 
-fn handle_remove(
-    state: &BridgeState,
-    namespace: String,
-    keys: Vec<String>,
-) -> color_eyre::Result<()> {
-    let microkv = state.microkv_with_namespace(namespace);
+fn handle_remove(microkv: &NamespaceMicroKV, keys: Vec<String>) -> color_eyre::Result<()> {
     for key in keys {
         microkv.delete(key)?;
     }
@@ -210,14 +207,14 @@ fn spec_serialize_value(
     Ok(())
 }
 
-pub fn best_view_option(value: &Option<Value>) -> color_eyre::Result<String> {
+fn best_view_option(value: &Option<Value>) -> color_eyre::Result<String> {
     match value {
         Some(v) => best_view(v),
         None => Ok("null".to_string()),
     }
 }
 
-pub fn best_view(value: &Value) -> color_eyre::Result<String> {
+fn best_view(value: &Value) -> color_eyre::Result<String> {
     if value.is_string() {
         return Ok(value.as_str().unwrap_or("").to_string());
     }

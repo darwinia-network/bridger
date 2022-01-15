@@ -22,7 +22,7 @@ pub struct PangolinRopstenTask {
 
 impl PangolinRopstenTask {
     pub fn name() -> &'static str {
-        "task-pangolin-ropsten"
+        "pangolin-ropsten"
     }
 }
 

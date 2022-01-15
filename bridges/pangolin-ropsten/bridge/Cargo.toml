@@ -49,6 +49,7 @@ support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }
 support-tracker    = { path = "../../../frame/supports/support-tracker" }
 support-ethereum   = { path = "../../../frame/supports/support-ethereum" }
+support-command-kv = { path = "../../../frame/supports/support-command-kv" }
 
 component-ethereum        = { path = "../../../frame/components/ethereum" }
 component-shadow          = { path = "../../../frame/components/shadow" }

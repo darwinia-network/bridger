@@ -267,12 +267,12 @@ impl ExtrinsicsHandler {
 
     pub async fn consume_message(&self) -> color_eyre::Result<()> {
         loop {
-            let mut extrinsics = self.message_kv.sorted_keys()?;
+            let extrinsics = self.message_kv.sorted_keys()?;
             if extrinsics.is_empty() {
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
                 continue
             }
-            while let Some(key) = extrinsics.pop() {
+            for key in extrinsics.iter() {
                 let ex: Extrinsic = self.message_kv.get_as_unwrap(&key)?;
                 match self.send_extrinsic(ex.clone()).await {
                     Ok(_) => self.message_kv.delete(&key)?,

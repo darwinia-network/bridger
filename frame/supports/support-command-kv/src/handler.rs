@@ -1,23 +1,22 @@
 use std::collections::HashMap;
 
-use serde_json::Value;
 use term_table::row::Row;
 use term_table::table_cell::{Alignment, TableCell};
 use term_table::{Table, TableStyle};
 
 use component_state::state::BridgeState;
 use microkv::namespace::NamespaceMicroKV;
+use serde_json::Value;
 use support_common::error::BridgerError;
 use support_terminal::output;
 use support_terminal::output::OutputFormat;
 
-use crate::command::types::KvOpt;
+use crate::types::KvOpt;
 
 pub fn handle_kv(namespace: Option<String>, opt: KvOpt) -> color_eyre::Result<()> {
     let namespace = namespace.unwrap_or_default();
     let state = BridgeState::new()?;
     match opt {
-        KvOpt::Namespaces => handle_namespaces(&state),
         KvOpt::Put { kvs } => handle_put(&state, namespace, kvs),
         KvOpt::Get {
             keys,

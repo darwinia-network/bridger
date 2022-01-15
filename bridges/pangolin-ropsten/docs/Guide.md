@@ -13,9 +13,9 @@ pangolin-ropsten
 
    ```bash
    # set pangolin
-   bridger kv -n task-pangolin-ropsten put scan.pangolin.planned 123456
+   bridger pangolin-ropsten kv put scan.pangolin.planned 123456
    # set ropsten
-   bridger kv -n task-pangolin-ropsten put scan.ropsten.check.planned 123456 \
+   bridger pangolin-ropsten kv put scan.ropsten.check.planned 123456 \
      scan.ropsten.redeem.planned 123456 \
      scan.ropsten.affirm.planned 123456
    ```
@@ -24,9 +24,9 @@ pangolin-ropsten
 
    ```bash
    # set pangolin
-   bridger kv -n task-pangolin-ropsten put scan.pangolin.running true
+   bridger pangolin-ropsten kv put scan.pangolin.running true
    # set ropsten check/redeem/affirm scan
-   bridger kv -n task-pangolin-ropsten put scan.ropsten.check.running true \
+   bridger pangolin-ropsten kv put scan.ropsten.check.running true \
      scan.ropsten.redeem.running true \
      scan.ropsten.affirm.running true
    ```
@@ -122,7 +122,7 @@ explain:
 - `planned`
   Planned block number, If the value is set, the next times will start from this block.
   ```bash
-  bridger kv -n task-pangolin-ropsten \
+  bridger pangolin-ropsten kv \
     put \
     scan.ropsten.check.planned 36987
   ```

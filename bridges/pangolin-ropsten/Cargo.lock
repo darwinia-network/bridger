@@ -33,7 +33,7 @@ version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fcb51a0695d8f838b1ee009b3fbf66bda078cd64590202a864a8f3e8c4315c47"
 dependencies = [
- "getrandom 0.2.3",
+ "getrandom 0.2.4",
  "once_cell",
  "version_check",
 ]
@@ -297,6 +297,7 @@ dependencies = [
  "structopt",
  "strum 0.21.0",
  "substrate-subxt",
+ "support-command-kv",
  "support-common",
  "support-ethereum",
  "support-lifeline",
@@ -591,9 +592,9 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-queue"
-version = "0.3.2"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b10ddc024425c88c2ad148c1b0fd53f4c6d38db9697c9f1588381212fa657c9"
+checksum = "b979d76c9fcb84dffc80a73f7290da0f83e4c95773494674cb44b76d13a7a110"
 dependencies = [
  "cfg-if 1.0.0",
  "crossbeam-utils",
@@ -601,9 +602,9 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-utils"
-version = "0.8.5"
+version = "0.8.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d82cfc11ce7f2c3faef78d8a684447b40d503d9681acebed6cb728d45940c4db"
+checksum = "cfcae03edb34f947e64acdb1c33ec169824e20657e9ecb61cef6c8c74dcb8120"
 dependencies = [
  "cfg-if 1.0.0",
  "lazy_static",
@@ -886,6 +887,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e88a8acf291dafb59c2d96e8f59828f3838bb1a70398823ade51a84de6a6deed"
 
 [[package]]
+name = "fastrand"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "779d043b6a0b90cc4c0ed7ee380a6504394cee7efd7db050e3774eee387324b2"
+dependencies = [
+ "instant",
+]
+
+[[package]]
 name = "fixed-hash"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -985,7 +995,7 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "serde 1.0.133",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-arithmetic",
  "sp-core",
  "sp-inherents",
@@ -1184,9 +1194,9 @@ dependencies = [
 
 [[package]]
 name = "getrandom"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fcd999463524c52659517fe2cea98493cfe485d10565e7b0fb07dbba7ad2753"
+checksum = "418d37c8b1d42553c93648be529cb70f920d3baf8ef469b74b9638df426e0b4c"
 dependencies = [
  "cfg-if 1.0.0",
  "libc",
@@ -1868,7 +1878,7 @@ dependencies = [
 [[package]]
 name = "microkv"
 version = "0.3.0"
-source = "git+https://github.com/fewensa/microkv.git?branch=master#0f5cffa7246e7e604ee10854c49d87e61c4a95c8"
+source = "git+https://github.com/fewensa/microkv.git?branch=master#89d983721e588dfad1460dcdf1c48c97c1ef7a14"
 dependencies = [
  "bincode",
  "dirs 3.0.2",
@@ -2115,9 +2125,9 @@ dependencies = [
 
 [[package]]
 name = "openssl-probe"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28988d872ab76095a6e6ac88d99b54fd267702734fd7ffe610ca27f533ddb95a"
+checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
 name = "openssl-sys"
@@ -2333,7 +2343,7 @@ dependencies = [
  "cloudabi",
  "libc",
  "redox_syscall 0.1.57",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "winapi",
 ]
 
@@ -2347,7 +2357,7 @@ dependencies = [
  "instant",
  "libc",
  "redox_syscall 0.2.10",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "winapi",
 ]
 
@@ -2619,7 +2629,7 @@ version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d34f1408f55294453790c48b2f1ebbb1c5b4b7563eb1f418bcfcfdbb06ebb4e7"
 dependencies = [
- "getrandom 0.2.3",
+ "getrandom 0.2.4",
 ]
 
 [[package]]
@@ -2686,7 +2696,7 @@ version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "528532f3d801c87aec9def2add9ca802fe569e44a544afe633765267840abe64"
 dependencies = [
- "getrandom 0.2.3",
+ "getrandom 0.2.4",
  "redox_syscall 0.2.10",
 ]
 
@@ -2747,15 +2757,16 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.11.8"
+version = "0.11.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c4e0a76dc12a116108933f6301b95e83634e0c47b0afbed6abbaa0601e99258"
+checksum = "87f242f1488a539a79bac6dbe7c8609ae43b7914b7736210f239a37cccb32525"
 dependencies = [
  "base64",
  "bytes",
  "encoding_rs",
  "futures-core",
  "futures-util",
+ "h2",
  "http",
  "http-body",
  "hyper",
@@ -3261,9 +3272,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.7.0"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ecab6c735a6bb4139c0caafd0cc3635748bbb3acf4550e8138122099251f309"
+checksum = "f2dd574626839106c320a323308629dcb1acfc96e32a8cba364ddc61ac23ee83"
 
 [[package]]
 name = "socket2"
@@ -3651,7 +3662,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "rand 0.7.3",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-core",
  "sp-externalities",
  "sp-panic-handler",
@@ -3939,6 +3950,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
+name = "support-command-kv"
+version = "0.5.0"
+dependencies = [
+ "color-eyre",
+ "component-state",
+ "microkv",
+ "serde 1.0.133",
+ "serde_json",
+ "structopt",
+ "strum 0.21.0",
+ "support-common",
+ "support-terminal",
+ "term-table",
+ "tracing",
+]
+
+[[package]]
 name = "support-common"
 version = "0.5.0"
 dependencies = [
@@ -4046,16 +4074,27 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "tempfile"
-version = "3.2.0"
+version = "3.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dac1c663cfc93810f88aed9b8941d48cabf856a1b111c29a40439018d870eb22"
+checksum = "5cdb1ef4eaeeaddc8fbd371e5017057064af0911902ef36b39801f67cc6d79e4"
 dependencies = [
  "cfg-if 1.0.0",
+ "fastrand",
  "libc",
- "rand 0.8.4",
  "redox_syscall 0.2.10",
  "remove_dir_all",
  "winapi",
+]
+
+[[package]]
+name = "term-table"
+version = "1.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d5e59d7fb313157de2a568be8d81e4d7f9af6e50e697702e8e00190a6566d3b8"
+dependencies = [
+ "lazy_static",
+ "regex",
+ "unicode-width",
 ]
 
 [[package]]
@@ -4329,7 +4368,7 @@ dependencies = [
  "serde 1.0.133",
  "serde_json",
  "sharded-slab",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "thread_local",
  "tracing",
  "tracing-core",
@@ -4347,7 +4386,7 @@ dependencies = [
  "hashbrown",
  "log",
  "rustc-hex",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
 ]
 
 [[package]]
@@ -4754,18 +4793,18 @@ dependencies = [
 
 [[package]]
 name = "zeroize"
-version = "1.4.3"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d68d9dcec5f9b43a30d38c49f91dfedfaac384cb8f085faca366c26207dd1619"
+checksum = "cc222aec311c323c717f56060324f32b82da1ce1dd81d9a09aa6a9030bfe08db"
 dependencies = [
  "zeroize_derive",
 ]
 
 [[package]]
 name = "zeroize_derive"
-version = "1.2.2"
+version = "1.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65f1a51723ec88c66d5d1fe80c841f17f63587d6691901d66be9bec6c3b51f73"
+checksum = "81e8f13fef10b63c06356d65d416b070798ddabcadc10d3ece0c5be9b3c7eddb"
 dependencies = [
  "proc-macro2",
  "quote",

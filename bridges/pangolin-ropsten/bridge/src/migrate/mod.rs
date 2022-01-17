@@ -1,22 +1,25 @@
 use microkv::namespace::NamespaceMicroKV;
+use microkv::MicroKV;
 
 use support_common::error::BridgerError;
 
 mod v0;
 mod v1;
 mod v2;
+mod v3;
 
-pub fn migrate(microkv: &NamespaceMicroKV, version: usize) -> color_eyre::Result<()> {
+pub fn migrate(microkv: &MicroKV, version: usize) -> color_eyre::Result<()> {
     let saved_version = current_version(microkv)?;
     // same version, no migrate
     if saved_version == version {
         return Ok(());
     }
 
-    let steps: Vec<Box<dyn Fn(&NamespaceMicroKV) -> color_eyre::Result<()>>> = vec![
+    let steps: Vec<Box<dyn Fn(&MicroKV) -> color_eyre::Result<()>>> = vec![
         Box::new(v0::migrate),
         Box::new(v1::migrate),
         Box::new(v2::migrate),
+        Box::new(v3::migrate),
     ];
 
     let max_version = steps.len() - 1;
@@ -47,12 +50,23 @@ pub fn migrate(microkv: &NamespaceMicroKV, version: usize) -> color_eyre::Result
     Ok(())
 }
 
-fn current_version(microkv: &NamespaceMicroKV) -> color_eyre::Result<usize> {
-    let version: Option<usize> = microkv.get_as(".version")?;
+fn current_version(microkv: &MicroKV) -> color_eyre::Result<usize> {
+    let n_microkv = better_namespace_kv(microkv)?;
+    let version: Option<usize> = n_microkv.get_as(".version")?;
     Ok(version.unwrap_or(0))
 }
 
-fn flush_version(microkv: &NamespaceMicroKV, version: usize) -> color_eyre::Result<()> {
-    microkv.put(".version", &version)?;
+fn flush_version(microkv: &MicroKV, version: usize) -> color_eyre::Result<()> {
+    let n_microkv = better_namespace_kv(microkv)?;
+    n_microkv.put(".version", &version)?;
     Ok(())
+}
+
+fn better_namespace_kv(microkv: &MicroKV) -> color_eyre::Result<NamespaceMicroKV> {
+    let nss = microkv.namespaces()?;
+    if let Some(old) = nss.iter().find(|&ns| &ns[..] == "task-pangolin-ropsten") {
+        Ok(microkv.namespace(old))
+    } else {
+        Ok(microkv.namespace("pangolin-ropsten"))
+    }
 }

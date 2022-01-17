@@ -1,3 +1,6 @@
+use component_state::state::StateOptions;
+
+use crate::bridge::DarwiniaEthereumTask;
 use crate::command::handler;
 use crate::Opts;
 
@@ -14,5 +17,13 @@ pub async fn execute(opts: Opts) -> color_eyre::Result<()> {
         Opts::Mmr { command } => handler::handle_mmr(command).await,
         Opts::Parcel { command, output } => handler::handle_parcel(command, output).await,
         Opts::Relay { command } => handler::handle_relay(command).await,
+        Opts::Kv { command } => {
+            let task_name = DarwiniaEthereumTask::name();
+            let namespace = command.namespace.unwrap_or_else(|| task_name.to_string());
+            let state_options = StateOptions {
+                db_name: task_name.to_string(),
+            };
+            support_command_kv::handle_kv(state_options, Some(namespace), command.command)
+        }
     }
 }

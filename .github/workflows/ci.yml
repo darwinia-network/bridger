@@ -16,9 +16,9 @@ jobs:
       matrix:
         action:
           - name: Clippy
-            run: cargo clippy --locked --all -- -D warnings
+            run: cargo clippy --all -- -D warnings
           - name: Test
-            run: cargo test --locked --all
+            run: cargo test --all
     steps:
       - uses: actions/checkout@v2
 

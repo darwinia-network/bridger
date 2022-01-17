@@ -2,9 +2,9 @@ name: Check pull request
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   check-bridger:
@@ -14,21 +14,18 @@ jobs:
       image: rust:1
     strategy:
       matrix:
-        action: [clippy, test]
+        action:
+          - name: Clippy
+            run: cargo clippy --locked --all -- -D warnings
+          - name: Test
+            run: cargo test --locked --all
     steps:
       - uses: actions/checkout@v2
 
-      - name: Lint
-        if: matrix.action == 'clippy'
+      - name: ${{ matrix.action.name }}
         run: |
           cd frame
-          cargo clippy --release --all -- -D warnings
-
-      - name: Run tests
-        if: matrix.action == 'test'
-        run: |
-          cd frame
-          cargo test --release
+          ${{ matrix.action.run }}
 
       - uses: vishnudxb/cancel-workflow@v1.2
         if: failure()
@@ -44,22 +41,26 @@ jobs:
       image: rust:1
     strategy:
       matrix:
-        bridge: [template, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
-        action: [clippy, test]
+        action:
+          - name: Clippy
+            run: cargo clippy --locked --all -- -D warnings
+          - name: Test
+            run: cargo test --locked --all
+        bridge:
+          [
+            template,
+            pangolin-ropsten,
+            darwinia-ethereum,
+            pangolin-pangoro,
+            darwinia-crab,
+          ]
     steps:
       - uses: actions/checkout@v2
 
-      - name: Lint
-        if: matrix.action == 'clippy'
+      - name: ${{ matrix.action.name }}
         run: |
           cd bridges/${{ matrix.bridge }}
-          cargo clippy --release --all --locked -- -D warnings
-
-      - name: Run tests
-        if: matrix.action == 'test'
-        run: |
-          cd bridges/${{ matrix.bridge }}
-          cargo test --release --locked
+          ${{ matrix.action.run }}
 
       - uses: vishnudxb/cancel-workflow@v1.2
         if: failure()

@@ -3,3 +3,5 @@ target
 .idea
 
 /Cargo.lock
+
+scripts/*.local.sh

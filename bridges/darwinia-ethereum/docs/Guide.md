@@ -13,9 +13,9 @@ darwinia-ethereum
 
    ```bash
    # set darwinia
-   bridger kv -n task-darwinia-ethereum put scan.darwinia.planned 123456
+   bridger darwinia-ethereum kv put scan.darwinia.planned 123456
    # set ethereum
-   bridger kv -n task-darwinia-ethereum put scan.ethereum.check.planned 123456 \
+   bridger darwinia-ethereum kv put scan.ethereum.check.planned 123456 \
      scan.ethereum.redeem.planned 123456 \
      scan.ethereum.affirm.planned 123456
    ```
@@ -24,9 +24,9 @@ darwinia-ethereum
 
    ```bash
    # set darwinia
-   bridger kv -n task-darwinia-ethereum put scan.darwinia.running true
+   bridger darwinia-ethereum kv put scan.darwinia.running true
    # set ethereum check/redeem/affirm scan
-   bridger kv -n task-darwinia-ethereum put scan.ethereum.check.running true \
+   bridger darwinia-ethereum kv put scan.ethereum.check.running true \
      scan.ethereum.redeem.running true \
      scan.ethereum.affirm.running true
    ```
@@ -122,7 +122,7 @@ explain:
 - `planned`
   Planned block number, If the value is set, the next times will start from this block.
   ```bash
-  bridger kv -n task-darwinia-ethereum \
+  bridger darwinia-ethereum kv \
     put \
     scan.ethereum.check.planned 36987
   ```

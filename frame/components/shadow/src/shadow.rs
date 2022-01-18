@@ -66,7 +66,7 @@ impl Shadow {
             &self.config.endpoint, block_number
         );
         let resp = self.http.get(url).send().await?;
-        if resp.status() != StatusCode::OK || resp.status() != StatusCode::CREATED {
+        if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
             return Err(ShadowComponentError::InternalServer(resp.text().await?).into());
         }
 
@@ -109,7 +109,7 @@ impl Shadow {
             ))
             .send()
             .await?;
-        if resp.status() != StatusCode::OK || resp.status() != StatusCode::CREATED {
+        if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
             return Err(ShadowComponentError::InternalServer(resp.text().await?).into());
         }
         let result: Value = resp.json().await?;
@@ -151,7 +151,7 @@ impl Shadow {
             .send()
             .await?;
 
-        if resp.status() != StatusCode::OK || resp.status() != StatusCode::CREATED {
+        if resp.status() == StatusCode::INTERNAL_SERVER_ERROR {
             return Err(ShadowComponentError::InternalServer(resp.text().await?).into());
         }
         let result: ProofResult = resp.json().await?;

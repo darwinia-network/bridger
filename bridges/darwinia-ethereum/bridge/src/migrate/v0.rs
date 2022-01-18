@@ -1,8 +1,10 @@
 use microkv::namespace::NamespaceMicroKV;
+use microkv::MicroKV;
 
-pub fn migrate(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
-    migrate_scan_darwinia(microkv)?;
-    migrate_scan_ethereum(microkv)?;
+pub fn migrate(microkv: &MicroKV) -> color_eyre::Result<()> {
+    let n_microkv = microkv.namespace("task-darwinia-ethereum");
+    migrate_scan_darwinia(&n_microkv)?;
+    migrate_scan_ethereum(&n_microkv)?;
     Ok(())
 }
 

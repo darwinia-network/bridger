@@ -291,11 +291,13 @@ dependencies = [
  "microkv",
  "parity-scale-codec",
  "postage",
+ "rand 0.8.4",
  "serde 1.0.132",
  "serde_json",
  "structopt",
  "strum 0.21.0",
  "substrate-subxt",
+ "support-command-kv",
  "support-common",
  "support-ethereum",
  "support-lifeline",
@@ -1867,7 +1869,7 @@ dependencies = [
 [[package]]
 name = "microkv"
 version = "0.3.0"
-source = "git+https://github.com/fewensa/microkv.git?branch=master#0f5cffa7246e7e604ee10854c49d87e61c4a95c8"
+source = "git+https://github.com/fewensa/microkv.git?branch=master#89d983721e588dfad1460dcdf1c48c97c1ef7a14"
 dependencies = [
  "bincode",
  "dirs 3.0.2",
@@ -3880,7 +3882,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt"
 version = "0.15.0"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
+source = "git+https://github.com/darwinia-network/subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
 dependencies = [
  "async-trait",
  "dyn-clone",
@@ -3913,7 +3915,7 @@ dependencies = [
 [[package]]
 name = "substrate-subxt-proc-macro"
 version = "0.15.3"
-source = "git+https://github.com/darwinia-network/substrate-subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
+source = "git+https://github.com/darwinia-network/subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
 dependencies = [
  "async-trait",
  "heck",
@@ -3936,6 +3938,23 @@ name = "subtle"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
+
+[[package]]
+name = "support-command-kv"
+version = "0.5.0"
+dependencies = [
+ "color-eyre",
+ "component-state",
+ "microkv",
+ "serde 1.0.132",
+ "serde_json",
+ "structopt",
+ "strum 0.21.0",
+ "support-common",
+ "support-terminal",
+ "term-table",
+ "tracing",
+]
 
 [[package]]
 name = "support-common"
@@ -4055,6 +4074,17 @@ dependencies = [
  "redox_syscall 0.2.10",
  "remove_dir_all",
  "winapi",
+]
+
+[[package]]
+name = "term-table"
+version = "1.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d5e59d7fb313157de2a568be8d81e4d7f9af6e50e697702e8e00190a6566d3b8"
+dependencies = [
+ "lazy_static",
+ "regex",
+ "unicode-width",
 ]
 
 [[package]]

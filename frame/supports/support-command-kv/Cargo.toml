@@ -1,5 +1,5 @@
 [package]
-name = "darwinia-bridger"
+name = "support-command-kv"
 version = "0.5.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -17,15 +17,7 @@ keywords = ["substrate", "darwinia"]
 readme = 'README.md'
 edition = "2021"
 
-
-[[bin]]
-name = "bridger"
-path = "src/main.rs"
-
 [dependencies]
-
-colored = "2"
-requestty = "0.1"
 
 structopt = "0.3"
 
@@ -36,16 +28,10 @@ term-table = "1.3"
 strum = { version = "0.21", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-serde_with = "1"
-reqwest = { version = "0.11", features = ["blocking", "rustls-tls"] }
-cargo-util = "0.1"
-sys-info = "0.9"
-sysinfo = "0.22"
-zip = "0.5"
 
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
-support-common     = { path = "../supports/support-common" }
-support-terminal   = { path = "../supports/support-terminal" }
+support-common     = { path = "../support-common" }
+support-terminal   = { path = "../support-terminal" }
 
-component-state    = { path = "../components/state" }
+component-state    = { path = "../../components/state" }

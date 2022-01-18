@@ -1,8 +1,10 @@
 use microkv::namespace::NamespaceMicroKV;
+use microkv::MicroKV;
 
-pub fn migrate(microkv: &NamespaceMicroKV) -> color_eyre::Result<()> {
-    migrate_scan_pangolin(microkv)?;
-    migrate_scan_opsten(microkv)?;
+pub fn migrate(microkv: &MicroKV) -> color_eyre::Result<()> {
+    let n_microkv = microkv.namespace("task-pangolin-ropsten");
+    migrate_scan_pangolin(&n_microkv)?;
+    migrate_scan_opsten(&n_microkv)?;
     Ok(())
 }
 

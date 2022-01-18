@@ -28,6 +28,8 @@ colored     = "2"
 structopt   = "0.3"
 strum       = { version = "0.21", features = ["derive"] }
 
+rand        = "0.8.4"
+
 lifeline    = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage     = "0.4"
 
@@ -40,7 +42,7 @@ codec       = { package = "parity-scale-codec", version = "2.3.1" }
 web3    = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
-substrate-subxt = { git = "https://github.com/darwinia-network/substrate-subxt.git", tag = "darwinia-v0.11.7" }
+substrate-subxt = { git = "https://github.com/darwinia-network/subxt.git", tag = "darwinia-v0.11.7" }
 
 client-darwinia    = { path = "../client-darwinia" }
 
@@ -49,6 +51,7 @@ support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }
 support-tracker    = { path = "../../../frame/supports/support-tracker" }
 support-ethereum   = { path = "../../../frame/supports/support-ethereum" }
+support-command-kv = { path = "../../../frame/supports/support-command-kv" }
 
 component-ethereum        = { path = "../../../frame/components/ethereum" }
 component-shadow          = { path = "../../../frame/components/shadow" }

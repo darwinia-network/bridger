@@ -19,6 +19,9 @@ pub struct BridgerRegistry {
     /// The path of registry
     #[serde(with = "string_empty_as_none")]
     pub path: Option<String>,
+    /// The version of bridge
+    #[serde(with = "string_empty_as_none")]
+    pub version: Option<String>,
 }
 
 impl Default for BridgerRegistry {
@@ -26,6 +29,7 @@ impl Default for BridgerRegistry {
         Self {
             type_: RegistryType::Github,
             path: Some("https://github.com/darwinia-network/bridger".to_string()),
+            version: None,
         }
     }
 }

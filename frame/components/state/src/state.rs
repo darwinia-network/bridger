@@ -7,6 +7,13 @@ use support_common::constants;
 
 use crate::config::MicrokvConfig;
 
+/// Bridge state options
+#[derive(Clone, Debug, Default)]
+pub struct StateOptions {
+    /// Kv database store file name
+    pub db_name: String,
+}
+
 /// Bridger state
 #[derive(Clone)]
 pub struct BridgeState {
@@ -16,14 +23,18 @@ pub struct BridgeState {
 lifeline::impl_storage_clone!(BridgeState);
 
 impl BridgeState {
-    pub fn new() -> color_eyre::Result<Self> {
+    pub fn new(options: StateOptions) -> color_eyre::Result<Self> {
         let base_path = constants::bridger_home();
         let config_microkv = MicrokvConfig {
             base_path,
-            db_name: Some("database".to_string()),
+            db_name: Some(options.db_name),
             auto_commit: true,
         };
-        let store_path = &config_microkv.base_path.join("database.kv");
+        let db_name = config_microkv
+            .db_name
+            .clone()
+            .unwrap_or_else(|| "database".to_string());
+        let store_path = &config_microkv.base_path.join(format!("{}.kv", db_name));
         tracing::debug!(
             target: "component-state",
             "KVDB PATH: {} and the auto_commit is opened",

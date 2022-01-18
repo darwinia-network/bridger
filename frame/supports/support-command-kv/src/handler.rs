@@ -22,10 +22,10 @@ pub fn handle_kv(
 ) -> color_eyre::Result<()> {
     let namespace = namespace.unwrap_or_default();
     let state = BridgeState::new(state_option)?;
-    let microkv = state.microkv_with_namespace(namespace);
+    let microkv = state.microkv_with_namespace(&namespace);
     match opt {
         KvOpts::Namespaces => handle_namespaces(state.microkv()),
-        KvOpts::Put { kvs } => handle_put(&microkv, kvs),
+        KvOpts::Put { kvs } => handle_put(&microkv, kvs, &namespace),
         KvOpts::Get {
             keys,
             output,
@@ -44,7 +44,7 @@ fn handle_namespaces(microkv: &MicroKV) -> color_eyre::Result<()> {
     Ok(())
 }
 
-fn handle_put(microkv: &NamespaceMicroKV, kvs: Vec<String>) -> color_eyre::Result<()> {
+fn handle_put(microkv: &NamespaceMicroKV, kvs: Vec<String>, namespace: &str) -> color_eyre::Result<()> {
     let mut keys = Vec::new();
     let mut values = Vec::new();
     for (ix, value) in kvs.iter().enumerate() {
@@ -65,10 +65,23 @@ fn handle_put(microkv: &NamespaceMicroKV, kvs: Vec<String>) -> color_eyre::Resul
         if key.is_empty() {
             continue;
         }
-        spec_serialize_value(microkv, key, value)?;
+        let value_type: Option<String> = try_get_value_type(namespace, key);
+        spec_serialize_value(microkv, key, value, value_type)?;
     }
     output::output_ok();
     Ok(())
+}
+
+fn try_get_value_type(namespace: &str, key: &str) -> Option<String> {
+    let schema = include_str!("schema.toml");
+    if let toml::Value::Table(table) = schema.parse::<toml::Value>().unwrap() {
+        if let Some(toml::Value::Table(ns)) = table.get(namespace) {
+            return ns
+                .get(key)
+                .map(|value| value.as_str().unwrap().to_owned() )
+        }
+    }
+    None
 }
 
 fn handle_get(
@@ -166,20 +179,21 @@ fn spec_serialize_value(
     microkv: &NamespaceMicroKV,
     key: impl AsRef<str>,
     value: impl AsRef<str>,
+    value_type: Option<impl AsRef<str>>
 ) -> color_eyre::Result<()> {
     let key = key.as_ref();
     let value = value.as_ref();
 
     let value = value.trim().to_string();
-    if !key.contains("::") {
-        microkv.put(key, &value)?;
-        return Ok(());
-    }
-    let mut split = key.split("::").collect::<Vec<&str>>();
-    let key = split.first().unwrap().to_string();
-    split.remove(0);
-    let value_type: String = split.join("::");
-    match &value_type[..] {
+    let value_type = match value_type {
+        None => {
+            output::output_warning(format!("Schema of '{}' not found, use String as default", key));
+            "String".to_owned()
+        },
+        Some(v) => v.as_ref().to_owned()
+    };
+
+    match value_type.as_ref() {
         "String" | "string" | "str" => {
             microkv.put(key, &value)?;
         }

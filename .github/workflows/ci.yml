@@ -12,20 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: rust:1
-    strategy:
-      matrix:
-        action:
-          - name: Clippy
-            run: cargo clippy --all -- -D warnings
-          - name: Test
-            run: cargo test --all
     steps:
       - uses: actions/checkout@v2
 
-      - name: ${{ matrix.action.name }}
+      - name: Lint
         run: |
           cd frame
-          ${{ matrix.action.run }}
+          cargo clippy --release --all -- -D warnings
+      - name: Run tests
+        run: |
+          cd frame
+          cargo test --release
 
       - uses: vishnudxb/cancel-workflow@v1.2
         if: failure()
@@ -35,17 +32,12 @@ jobs:
           access_token: ${{ github.token }}
 
   check-bridges:
-    name: Check bridge-${{ matrix.bridge }} ${{ matrix.action }}
+    name: Check bridge-${{ matrix.bridge }}
     runs-on: ubuntu-latest
     container:
       image: rust:1
     strategy:
       matrix:
-        action:
-          - name: Clippy
-            run: cargo clippy --locked --all -- -D warnings
-          - name: Test
-            run: cargo test --locked --all
         bridge:
           [
             template,
@@ -57,10 +49,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: ${{ matrix.action.name }}
+      - name: Lint
         run: |
           cd bridges/${{ matrix.bridge }}
-          ${{ matrix.action.run }}
+          cargo clippy --release --all --locked -- -D warnings
+      - name: Run tests
+        run: |
+          cd bridges/${{ matrix.bridge }}
+          cargo test --release --locked
 
       - uses: vishnudxb/cancel-workflow@v1.2
         if: failure()

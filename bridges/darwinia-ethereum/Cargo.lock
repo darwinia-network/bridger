@@ -3953,6 +3953,7 @@ dependencies = [
  "support-common",
  "support-terminal",
  "term-table",
+ "toml",
  "tracing",
 ]
 

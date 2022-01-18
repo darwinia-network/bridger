@@ -1,0 +1,21 @@
+[pangolin-ropsten]
+  "scan.pangolin.planned" =	"u64"
+  "scan.ropsten.check.planned" = "u64"
+  "scan.ropsten.redeem.planned" =	"u64"
+  "scan.ropsten.affirm.planned" =	"u64"
+  "scan.pangolin.running" =	"bool"
+  "scan.ropsten.check.running" = "bool"
+  "scan.ropsten.redeem.running" =	"bool"
+  "scan.ropsten.affirm.running" =	"bool"
+  "affirm.target" = "u64"
+
+[darwinia-ethereum]
+  "scan.darwinia.planned" = "u64"
+  "scan.ethereum.check.planned" = "u64"
+  "scan.ethereum.redeem.planned" = "u64"
+  "scan.ethereum.affirm.planned" = "u64"
+  "scan.darwinia.running" = "bool"
+  "scan.ethereum.check.running" = "bool"
+  "scan.ethereum.redeem.running" = "bool"
+  "scan.ethereum.affirm.running" = "bool"
+  "affirm.target" = "u64"

@@ -35,3 +35,4 @@ support-common     = { path = "../support-common" }
 support-terminal   = { path = "../support-terminal" }
 
 component-state    = { path = "../../components/state" }
+toml = "0.5.8"

@@ -1,11 +1,8 @@
-pub mod account;
-pub mod component;
-pub mod config;
-pub mod darwinia;
-pub mod error;
-pub mod events;
-pub mod frame;
-pub mod from_ethereum;
-pub mod rpc;
-pub mod to_ethereum;
-pub mod types;
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
+    }
+}

@@ -390,25 +390,6 @@ dependencies = [
 [[package]]
 name = "client-pangolin"
 version = "0.5.0"
-dependencies = [
- "array-bytes",
- "async-trait",
- "color-eyre",
- "frame-support",
- "jsonrpsee-types",
- "pallet-im-online",
- "pallet-indices",
- "parity-scale-codec",
- "secp256k1",
- "serde 1.0.133",
- "serde_json",
- "substrate-subxt",
- "substrate-subxt-proc-macro",
- "support-ethereum",
- "thiserror",
- "tracing",
- "web3",
-]
 
 [[package]]
 name = "cloudabi"

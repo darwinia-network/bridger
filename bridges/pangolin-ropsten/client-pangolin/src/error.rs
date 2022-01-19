@@ -4,7 +4,7 @@ use thiserror::Error as ThisError;
 
 /// Error enum.
 #[derive(ThisError, Debug)]
-pub enum Error {
+pub enum ClientError {
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
 
@@ -52,5 +52,3 @@ pub enum Error {
     #[error("Other error: {0}")]
     Other(String),
 }
-
-pub type Result<T> = color_eyre::Result<T, Error>;

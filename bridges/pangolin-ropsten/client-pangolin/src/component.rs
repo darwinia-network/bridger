@@ -6,7 +6,7 @@ use crate::config::{ClientConfig, PangolinSubxtConfig};
 
 const MAX_ATTEMPTS: u32 = 6;
 
-/// Darwinia subxt component
+/// Subxt component
 pub struct SubxtComponent;
 
 impl SubxtComponent {

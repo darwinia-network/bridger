@@ -1,6 +1,7 @@
 use subxt::Client;
 
 use crate::config::PangolinSubxtConfig;
+use crate::ethereum::{FromEthereumApi, ToEthereumApi};
 
 /// Pangolin client
 #[derive(Clone)]
@@ -24,4 +25,14 @@ impl PangolinClient {
 }
 
 /// patch rpc api
-impl PangolinClient {}
+impl PangolinClient {
+    /// From ethereum api
+    pub fn eth_from(&self) -> FromEthereumApi {
+        FromEthereumApi::new(&self)
+    }
+
+    /// To ethereum api
+    pub fn eth_to(&self) -> ToEthereumApi {
+        ToEthereumApi::new(&self)
+    }
+}

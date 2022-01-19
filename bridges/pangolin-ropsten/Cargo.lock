@@ -63,15 +63,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84450d0b4a8bd1ba4144ce8ce718fbc5d071358b1e5384bace6536b3d1f2d5b3"
 
 [[package]]
-name = "approx"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "072df7202e63b127ab55acfe16ce97013d5b97bf160489336d3f1840fd78e99e"
-dependencies = [
- "num-traits 0.2.14",
-]
-
-[[package]]
 name = "array-bytes"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -163,19 +154,6 @@ dependencies = [
  "miniz_oxide",
  "object",
  "rustc-demangle",
-]
-
-[[package]]
-name = "bae"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33b8de67cc41132507eeece2584804efcb15f85ba516e34c944b7667f480397a"
-dependencies = [
- "heck",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -302,7 +280,6 @@ dependencies = [
  "serde_json",
  "structopt",
  "strum 0.21.0",
- "substrate-subxt",
  "support-command-kv",
  "support-common",
  "support-ethereum",
@@ -653,15 +630,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ct-logs"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1a816186fa68d9e426e3cb4ae4dff1fcd8e4a2c34b781bf7a822574a0d0aac8"
-dependencies = [
- "sct 0.6.1",
-]
-
-[[package]]
 name = "curve25519-dalek"
 version = "2.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -988,38 +956,6 @@ checksum = "5fc25a87fa4fd2094bffb06925852034d90a17f0d1e05197d4956d3555752191"
 dependencies = [
  "matches",
  "percent-encoding",
-]
-
-[[package]]
-name = "frame-benchmarking"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "frame-support",
- "frame-system",
- "linregress",
- "log",
- "parity-scale-codec",
- "paste",
- "sp-api",
- "sp-io 4.0.0-dev",
- "sp-runtime 4.0.0-dev",
- "sp-runtime-interface 4.0.0-dev",
- "sp-std 4.0.0-dev",
- "sp-storage 4.0.0-dev",
-]
-
-[[package]]
-name = "frame-election-provider-support"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "sp-arithmetic 4.0.0-dev",
- "sp-npos-elections",
- "sp-std 4.0.0-dev",
 ]
 
 [[package]]
@@ -1487,23 +1423,6 @@ dependencies = [
 
 [[package]]
 name = "hyper-rustls"
-version = "0.22.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f9f7a97316d44c0af9b0301e65010573a853a9fc97046d7331d7f6bc0fd5a64"
-dependencies = [
- "ct-logs",
- "futures-util",
- "hyper",
- "log",
- "rustls 0.19.1",
- "rustls-native-certs 0.5.0",
- "tokio",
- "tokio-rustls 0.22.0",
- "webpki 0.21.4",
-]
-
-[[package]]
-name = "hyper-rustls"
 version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d87c48c02e0dc5e3b849a2041db3029fd066650f8f717c07bf8ed78ccb895cac"
@@ -1511,10 +1430,10 @@ dependencies = [
  "http",
  "hyper",
  "log",
- "rustls 0.20.2",
- "rustls-native-certs 0.6.1",
+ "rustls",
+ "rustls-native-certs",
  "tokio",
- "tokio-rustls 0.23.2",
+ "tokio-rustls",
  "webpki-roots",
 ]
 
@@ -1680,10 +1599,10 @@ checksum = "726b6cb76e568aefc4cc127fdb39cb9d92c176f4df0385eaf8053f770351719c"
 dependencies = [
  "jsonrpsee-client-transport",
  "jsonrpsee-core",
- "jsonrpsee-http-client 0.7.0",
- "jsonrpsee-proc-macros 0.7.0",
- "jsonrpsee-types 0.7.0",
- "jsonrpsee-ws-client 0.7.0",
+ "jsonrpsee-http-client",
+ "jsonrpsee-proc-macros",
+ "jsonrpsee-types",
+ "jsonrpsee-ws-client",
 ]
 
 [[package]]
@@ -1695,13 +1614,13 @@ dependencies = [
  "futures",
  "http",
  "jsonrpsee-core",
- "jsonrpsee-types 0.7.0",
+ "jsonrpsee-types",
  "pin-project 1.0.10",
- "rustls-native-certs 0.6.1",
+ "rustls-native-certs",
  "soketto 0.7.1",
  "thiserror",
  "tokio",
- "tokio-rustls 0.23.2",
+ "tokio-rustls",
  "tokio-util",
  "tracing",
  "webpki-roots",
@@ -1720,7 +1639,7 @@ dependencies = [
  "futures-channel",
  "futures-util",
  "hyper",
- "jsonrpsee-types 0.7.0",
+ "jsonrpsee-types",
  "rustc-hash",
  "serde 1.0.133",
  "serde_json",
@@ -1732,56 +1651,21 @@ dependencies = [
 
 [[package]]
 name = "jsonrpsee-http-client"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa96aee30f40b97f1831e6ab7ba63d65b73d73ae418e1437bae2a47bbdf3aff6"
-dependencies = [
- "async-trait",
- "fnv",
- "futures",
- "hyper",
- "hyper-rustls 0.22.1",
- "jsonrpsee-types 0.3.1",
- "jsonrpsee-utils",
- "log",
- "serde 1.0.133",
- "serde_json",
- "thiserror",
- "tokio",
- "url",
-]
-
-[[package]]
-name = "jsonrpsee-http-client"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b7ca9f9028b3a9cd3c7c5b876f037def9368c6ba6498fd2d3162bdbece1d0ef9"
 dependencies = [
  "async-trait",
  "hyper",
- "hyper-rustls 0.23.0",
+ "hyper-rustls",
  "jsonrpsee-core",
- "jsonrpsee-types 0.7.0",
+ "jsonrpsee-types",
  "rustc-hash",
  "serde 1.0.133",
  "serde_json",
  "thiserror",
  "tokio",
  "tracing",
-]
-
-[[package]]
-name = "jsonrpsee-proc-macros"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8edb341d35279b59c79d7fe9e060a51aec29d45af99cc7c72ea7caa350fa71a4"
-dependencies = [
- "Inflector",
- "bae",
- "proc-macro-crate 1.1.0",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -1794,24 +1678,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "jsonrpsee-types"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4cc738fd55b676ada3271ef7c383a14a0867a2a88b0fa941311bf5fc0a29d498"
-dependencies = [
- "async-trait",
- "beef",
- "futures-channel",
- "futures-util",
- "hyper",
- "log",
- "serde 1.0.133",
- "serde_json",
- "soketto 0.6.0",
- "thiserror",
 ]
 
 [[package]]
@@ -1829,41 +1695,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "jsonrpsee-utils"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d674f0eafa768a66c5cd3ad3131c5d966b1425a475bc87be84acc6dc48321b01"
-dependencies = [
- "futures-util",
- "hyper",
- "jsonrpsee-types 0.3.1",
-]
-
-[[package]]
-name = "jsonrpsee-ws-client"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9841352dbecf4c2ed5dc71698df9f1660262ae4e0b610e968602529bdbcf7b30"
-dependencies = [
- "async-trait",
- "fnv",
- "futures",
- "jsonrpsee-types 0.3.1",
- "log",
- "pin-project 1.0.10",
- "rustls 0.19.1",
- "rustls-native-certs 0.5.0",
- "serde 1.0.133",
- "serde_json",
- "soketto 0.6.0",
- "thiserror",
- "tokio",
- "tokio-rustls 0.22.0",
- "tokio-util",
- "url",
-]
-
-[[package]]
 name = "jsonrpsee-ws-client"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1871,7 +1702,7 @@ checksum = "c97f67449d58b8d90ad57986d12dacab8fd594759ff64eb5e6b6e84e470db977"
 dependencies = [
  "jsonrpsee-client-transport",
  "jsonrpsee-core",
- "jsonrpsee-types 0.7.0",
+ "jsonrpsee-types",
 ]
 
 [[package]]
@@ -1904,12 +1735,6 @@ name = "libc"
 version = "0.2.112"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b03d17f364a3a042d5e5d46b053bbbf82c92c9430c592dd4c064dc6ee997125"
-
-[[package]]
-name = "libm"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7d73b3f436185384286bd8098d17ec07c9a7d2388a6599f824d8502b529702a"
 
 [[package]]
 name = "libsecp256k1"
@@ -2020,16 +1845,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
 
 [[package]]
-name = "linregress"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6c601a85f5ecd1aba625247bca0031585fb1c446461b142878a16f8245ddeb8"
-dependencies = [
- "nalgebra",
- "statrs",
-]
-
-[[package]]
 name = "lock_api"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2070,15 +1885,6 @@ name = "matches"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3e378b66a060d48947b590737b30a1be76706c8dd7b8ba0f2fe3989c68a853f"
-
-[[package]]
-name = "matrixmultiply"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "add85d4dd35074e6fedc608f8c8f513a3548619a9024b751949ef0e8e45a4d84"
-dependencies = [
- "rawpointer",
-]
 
 [[package]]
 name = "maybe-uninit"
@@ -2174,35 +1980,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "nalgebra"
-version = "0.27.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "462fffe4002f4f2e1f6a9dcf12cc1a6fc0e15989014efc02a941d3e0f5dc2120"
-dependencies = [
- "approx",
- "matrixmultiply",
- "nalgebra-macros",
- "num-complex",
- "num-rational 0.4.0",
- "num-traits 0.2.14",
- "rand 0.8.4",
- "rand_distr",
- "simba",
- "typenum",
-]
-
-[[package]]
-name = "nalgebra-macros"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01fcc0b8149b4632adc89ac3b7b31a12fb6099a0317a4eb2ebff574ef7de7218"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "native-tls"
 version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2258,15 +2035,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num-complex"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26873667bbbb7c5182d4a37c1add32cdf09f841af72da53318fdb81543c15085"
-dependencies = [
- "num-traits 0.2.14",
-]
-
-[[package]]
 name = "num-integer"
 version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2289,17 +2057,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num-rational"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d41702bd167c2df5520b384281bc111a4b5efcf7fbc4c9c222c815b07e0a6a6a"
-dependencies = [
- "autocfg",
- "num-integer",
- "num-traits 0.2.14",
-]
-
-[[package]]
 name = "num-traits"
 version = "0.1.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2315,7 +2072,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a64b1ec5cda2586e284722486d802acf1f7dbdc623e2bfc57e65ca1cd099290"
 dependencies = [
  "autocfg",
- "libm",
 ]
 
 [[package]]
@@ -2439,65 +2195,6 @@ dependencies = [
  "sp-keyring",
  "sp-runtime 4.0.0-dev",
  "sp-std 4.0.0-dev",
-]
-
-[[package]]
-name = "pallet-session"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "frame-support",
- "frame-system",
- "impl-trait-for-tuples",
- "log",
- "pallet-timestamp",
- "parity-scale-codec",
- "sp-core 4.0.0-dev",
- "sp-io 4.0.0-dev",
- "sp-runtime 4.0.0-dev",
- "sp-session",
- "sp-staking",
- "sp-std 4.0.0-dev",
- "sp-trie 4.0.0-dev",
-]
-
-[[package]]
-name = "pallet-staking"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "frame-election-provider-support",
- "frame-support",
- "frame-system",
- "log",
- "pallet-authorship",
- "pallet-session",
- "parity-scale-codec",
- "paste",
- "serde 1.0.133",
- "sp-application-crypto 4.0.0-dev",
- "sp-io 4.0.0-dev",
- "sp-runtime 4.0.0-dev",
- "sp-staking",
- "sp-std 4.0.0-dev",
- "static_assertions",
-]
-
-[[package]]
-name = "pallet-timestamp"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "impl-trait-for-tuples",
- "log",
- "parity-scale-codec",
- "sp-inherents",
- "sp-runtime 4.0.0-dev",
- "sp-std 4.0.0-dev",
- "sp-timestamp",
 ]
 
 [[package]]
@@ -2880,16 +2577,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rand_distr"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "964d548f8e7d12e102ef183a0de7e98180c9f8729f555897a857b96e48122d2f"
-dependencies = [
- "num-traits 0.2.14",
- "rand 0.8.4",
-]
-
-[[package]]
 name = "rand_hc"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2915,12 +2602,6 @@ checksum = "16abd0c1b639e9eb4d7c50c0b8100b0d0f849be2349829c740fe8e6eb4816429"
 dependencies = [
  "rand_core 0.5.1",
 ]
-
-[[package]]
-name = "rawpointer"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60a357793950651c4ed0f3f52338f53b2f809f32d83a07f72909fa13e4c6c1e3"
 
 [[package]]
 name = "redox_syscall"
@@ -3017,7 +2698,7 @@ dependencies = [
  "http",
  "http-body",
  "hyper",
- "hyper-rustls 0.23.0",
+ "hyper-rustls",
  "hyper-tls",
  "ipnet",
  "js-sys",
@@ -3027,14 +2708,14 @@ dependencies = [
  "native-tls",
  "percent-encoding",
  "pin-project-lite",
- "rustls 0.20.2",
+ "rustls",
  "rustls-pemfile",
  "serde 1.0.133",
  "serde_json",
  "serde_urlencoded",
  "tokio",
  "tokio-native-tls",
- "tokio-rustls 0.23.2",
+ "tokio-rustls",
  "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -3112,39 +2793,14 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.19.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35edb675feee39aec9c99fa5ff985081995a06d594114ae14cbe797ad7b7a6d7"
-dependencies = [
- "base64",
- "log",
- "ring",
- "sct 0.6.1",
- "webpki 0.21.4",
-]
-
-[[package]]
-name = "rustls"
 version = "0.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d37e5e2290f3e040b594b1a9e04377c2c671f1a1cfd9bfdef82106ac1c113f84"
 dependencies = [
  "log",
  "ring",
- "sct 0.7.0",
- "webpki 0.22.0",
-]
-
-[[package]]
-name = "rustls-native-certs"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a07b7c1885bd8ed3831c289b7870b13ef46fe0e856d288c30d9cc17d75a2092"
-dependencies = [
- "openssl-probe",
- "rustls 0.19.1",
- "schannel",
- "security-framework",
+ "sct",
+ "webpki",
 ]
 
 [[package]]
@@ -3252,16 +2908,6 @@ name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
-
-[[package]]
-name = "sct"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b362b83898e0e69f38515b82ee15aa80636befe47c3b6d3d89a911e78fc228ce"
-dependencies = [
- "ring",
- "untrusted",
-]
 
 [[package]]
 name = "sct"
@@ -3529,18 +3175,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f054c6c1a6e95179d6f23ed974060dcefb2d9388bb7256900badad682c499de4"
 
 [[package]]
-name = "simba"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e82063457853d00243beda9952e910b82593e4b07ae9f721b9278a99a0d3d5c"
-dependencies = [
- "approx",
- "num-complex",
- "num-traits 0.2.14",
- "paste",
-]
-
-[[package]]
 name = "slab"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3609,21 +3243,6 @@ dependencies = [
 
 [[package]]
 name = "soketto"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a74e48087dbeed4833785c2f3352b59140095dc192dce966a3bfc155020a439f"
-dependencies = [
- "base64",
- "bytes",
- "futures",
- "httparse",
- "log",
- "rand 0.8.4",
- "sha-1",
-]
-
-[[package]]
-name = "soketto"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "41d1c5305e39e09653383c2c7244f2f78b3bcae37cf50c64cb4789c9f5096ec2"
@@ -3635,35 +3254,6 @@ dependencies = [
  "log",
  "rand 0.8.4",
  "sha-1",
-]
-
-[[package]]
-name = "sp-api"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "hash-db",
- "log",
- "parity-scale-codec",
- "sp-api-proc-macro",
- "sp-core 4.0.0-dev",
- "sp-runtime 4.0.0-dev",
- "sp-state-machine 0.10.0-dev",
- "sp-std 4.0.0-dev",
- "sp-version 4.0.0-dev",
- "thiserror",
-]
-
-[[package]]
-name = "sp-api-proc-macro"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "blake2-rfc",
- "proc-macro-crate 1.1.0",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -4003,30 +3593,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp-npos-elections"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "parity-scale-codec",
- "serde 1.0.133",
- "sp-arithmetic 4.0.0-dev",
- "sp-core 4.0.0-dev",
- "sp-npos-elections-compact",
- "sp-std 4.0.0-dev",
-]
-
-[[package]]
-name = "sp-npos-elections-compact"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "proc-macro-crate 1.1.0",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
@@ -4043,17 +3609,6 @@ dependencies = [
  "backtrace",
  "lazy_static",
  "regex",
-]
-
-[[package]]
-name = "sp-rpc"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "rustc-hash",
- "serde 1.0.133",
- "sp-core 4.0.0-dev",
- "tracing-core",
 ]
 
 [[package]]
@@ -4161,19 +3716,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp-session"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "parity-scale-codec",
- "sp-api",
- "sp-core 4.0.0-dev",
- "sp-runtime 4.0.0-dev",
- "sp-staking",
- "sp-std 4.0.0-dev",
-]
-
-[[package]]
 name = "sp-staking"
 version = "4.0.0-dev"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
@@ -4266,23 +3808,6 @@ dependencies = [
  "serde 1.0.133",
  "sp-debug-derive 4.0.0",
  "sp-std 4.0.0",
-]
-
-[[package]]
-name = "sp-timestamp"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.11.7#e892c2378f4f2cc7fd29814932eb3d8f0639c0d9"
-dependencies = [
- "async-trait",
- "futures-timer",
- "log",
- "parity-scale-codec",
- "sp-api",
- "sp-inherents",
- "sp-runtime 4.0.0-dev",
- "sp-std 4.0.0-dev",
- "thiserror",
- "wasm-timer",
 ]
 
 [[package]]
@@ -4452,19 +3977,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
-name = "statrs"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05bdbb8e4e78216a85785a85d3ec3183144f98d0097b9281802c019bb07a6f05"
-dependencies = [
- "approx",
- "lazy_static",
- "nalgebra",
- "num-traits 0.2.14",
- "rand 0.8.4",
-]
-
-[[package]]
 name = "strsim"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4553,54 +4065,6 @@ dependencies = [
  "schnorrkel",
  "sha2 0.9.9",
  "zeroize",
-]
-
-[[package]]
-name = "substrate-subxt"
-version = "0.15.0"
-source = "git+https://github.com/darwinia-network/subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
-dependencies = [
- "async-trait",
- "dyn-clone",
- "frame-metadata 14.0.0-dev",
- "frame-support",
- "futures",
- "hex",
- "jsonrpsee-http-client 0.3.1",
- "jsonrpsee-proc-macros 0.3.1",
- "jsonrpsee-types 0.3.1",
- "jsonrpsee-ws-client 0.3.1",
- "log",
- "num-traits 0.2.14",
- "pallet-indices",
- "pallet-staking",
- "parity-scale-codec",
- "serde 1.0.133",
- "serde_json",
- "sp-application-crypto 4.0.0-dev",
- "sp-core 4.0.0-dev",
- "sp-rpc",
- "sp-runtime 4.0.0-dev",
- "sp-std 4.0.0-dev",
- "sp-version 4.0.0-dev",
- "substrate-subxt-proc-macro",
- "thiserror",
- "url",
-]
-
-[[package]]
-name = "substrate-subxt-proc-macro"
-version = "0.15.3"
-source = "git+https://github.com/darwinia-network/subxt.git?tag=darwinia-v0.11.7#91c613c7ed77ec8e56fd98e27784946c820124b2"
-dependencies = [
- "async-trait",
- "heck",
- "proc-macro-crate 0.1.5",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
- "synstructure",
 ]
 
 [[package]]
@@ -4961,24 +4425,13 @@ dependencies = [
 
 [[package]]
 name = "tokio-rustls"
-version = "0.22.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc6844de72e57df1980054b38be3a9f4702aba4858be64dd700181a8a6d0e1b6"
-dependencies = [
- "rustls 0.19.1",
- "tokio",
- "webpki 0.21.4",
-]
-
-[[package]]
-name = "tokio-rustls"
 version = "0.23.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a27d5f2b839802bd8267fa19b0530f5a08b9c08cd417976be2a65d130fe1c11b"
 dependencies = [
- "rustls 0.20.2",
+ "rustls",
  "tokio",
- "webpki 0.22.0",
+ "webpki",
 ]
 
 [[package]]
@@ -5345,21 +4798,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0237232789cf037d5480773fe568aac745bfe2afbc11a863e97901780a6b47cc"
 
 [[package]]
-name = "wasm-timer"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be0ecb0db480561e9a7642b5d3e4187c128914e58aa84330b9493e3eb68c5e7f"
-dependencies = [
- "futures",
- "js-sys",
- "parking_lot 0.11.2",
- "pin-utils",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
-]
-
-[[package]]
 name = "wasmi"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5368,7 +4806,7 @@ dependencies = [
  "downcast-rs",
  "libc",
  "memory_units",
- "num-rational 0.2.4",
+ "num-rational",
  "num-traits 0.2.14",
  "parity-wasm",
  "wasmi-validation",
@@ -5440,16 +4878,6 @@ dependencies = [
 
 [[package]]
 name = "webpki"
-version = "0.21.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8e38c0608262c46d4a56202ebabdeb094cef7e560ca7a226c6bf055188aa4ea"
-dependencies = [
- "ring",
- "untrusted",
-]
-
-[[package]]
-name = "webpki"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f095d78192e208183081cc07bc5515ef55216397af48b873e5edcd72637fa1bd"
@@ -5464,7 +4892,7 @@ version = "0.22.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "552ceb903e957524388c4d3475725ff2c8b7960922063af6ce53c9a43da07449"
 dependencies = [
- "webpki 0.22.0",
+ "webpki",
 ]
 
 [[package]]

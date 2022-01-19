@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use client_pangolin::config::DarwiniaSubxtConfig;
+use client_pangolin::config::ClientConfig;
 use component_ethereum::ethereum::EthereumConfig;
 use component_ethereum::web3::Web3Config;
 use component_http_client::HttpClientConfig;
@@ -10,7 +10,7 @@ use component_thegraph_liketh::config::TheGraphLikeEthConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinRopstenConfig {
-    pub darwinia: DarwiniaSubxtConfig,
+    pub darwinia: ClientConfig,
     pub web3: Web3Config,
     pub ethereum: EthereumConfig,
     pub shadow: ShadowConfig,

@@ -1,5 +1,5 @@
 use client_pangolin::client::PangolinClient;
-use client_pangolin::component::SubxtComponent;
+use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::config::ClientConfig;
 
 pub async fn client() -> color_eyre::Result<PangolinClient> {
@@ -9,5 +9,5 @@ pub async fn client() -> color_eyre::Result<PangolinClient> {
         relayer_real_account: None,
         ecdsa_authority_private_key: None,
     };
-    SubxtComponent::component(config).await
+    PangolinClientComponent::component(config).await
 }

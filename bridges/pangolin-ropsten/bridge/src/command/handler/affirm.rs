@@ -1,8 +1,7 @@
+use client_pangolin::client::PangolinClient;
+use client_pangolin::component::PangolinClientComponent;
 use colored::Colorize;
 
-use client_pangolin::account::DarwiniaAccount;
-use client_pangolin::component::DarwiniaSubxtComponent;
-use client_pangolin::from_ethereum::Ethereum2Darwinia;
 use component_ethereum::errors::BizError;
 use component_shadow::ShadowComponent;
 use support_common::config::{Config, Names};
@@ -57,7 +56,7 @@ async fn handle_do(
     let config_darwinia = bridge_config.darwinia;
 
     // Darwinia client
-    let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
+    let client = PangolinClientComponent::component(config_darwinia.clone()).await?;
     let ethereum_to_darwinia = Ethereum2Darwinia::new(darwinia);
 
     // Account

@@ -9,9 +9,9 @@ use crate::error::ClientError;
 const MAX_ATTEMPTS: u32 = 6;
 
 /// Subxt component
-pub struct SubxtComponent;
+pub struct PangolinClientComponent;
 
-impl SubxtComponent {
+impl PangolinClientComponent {
     /// Get subxt client instance
     pub async fn component(config: ClientConfig) -> color_eyre::Result<PangolinClient> {
         let mut attempts = 1;

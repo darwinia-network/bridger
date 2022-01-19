@@ -2,6 +2,8 @@
 
 use thiserror::Error as ThisError;
 
+pub type ClientResult<T> = Result<T, ClientError>;
+
 /// Error enum.
 #[derive(ThisError, Debug)]
 pub enum ClientError {

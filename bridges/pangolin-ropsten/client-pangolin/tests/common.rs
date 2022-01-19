@@ -1,8 +1,8 @@
+use client_pangolin::client::PangolinClient;
 use client_pangolin::component::SubxtComponent;
-use client_pangolin::config::{ClientConfig, PangolinSubxtConfig};
-use subxt::Client;
+use client_pangolin::config::ClientConfig;
 
-pub async fn client() -> color_eyre::Result<Client<PangolinSubxtConfig>> {
+pub async fn client() -> color_eyre::Result<PangolinClient> {
     let config = ClientConfig {
         endpoint: "https://pangolin-rpc.darwinia.network".to_string(),
         relayer_private_key: "0x1234".to_string(),

@@ -1,8 +1,9 @@
 use std::{thread, time};
 
-use subxt::{Client, ClientBuilder};
+use subxt::ClientBuilder;
 
-use crate::config::{ClientConfig, PangolinSubxtConfig};
+use crate::client::PangolinClient;
+use crate::config::ClientConfig;
 use crate::error::ClientError;
 
 const MAX_ATTEMPTS: u32 = 6;
@@ -12,16 +13,14 @@ pub struct SubxtComponent;
 
 impl SubxtComponent {
     /// Get subxt client instance
-    pub async fn component(
-        config: ClientConfig,
-    ) -> color_eyre::Result<Client<PangolinSubxtConfig>> {
+    pub async fn component(config: ClientConfig) -> color_eyre::Result<PangolinClient> {
         let mut attempts = 1;
         let mut wait_secs = 1;
         let endpoint = Self::correct_url(&config.endpoint)?;
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
             return match ClientBuilder::new().set_url(&endpoint).build().await {
-                Ok(client) => Ok(client),
+                Ok(client) => Ok(PangolinClient::new(client)),
                 Err(err) => {
                     if attempts < MAX_ATTEMPTS {
                         attempts += 1;

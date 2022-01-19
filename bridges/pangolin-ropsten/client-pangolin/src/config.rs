@@ -15,6 +15,7 @@ pub struct ClientConfig {
 }
 
 /// Pangolin subxt config
+#[derive(Clone)]
 pub enum PangolinSubxtConfig {}
 
 impl subxt::Config for PangolinSubxtConfig {

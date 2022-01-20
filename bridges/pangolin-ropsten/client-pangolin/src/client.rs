@@ -1,19 +1,25 @@
+use crate::codegen::api::RuntimeApi;
 use subxt::Client;
 
 use crate::config::PangolinSubxtConfig;
-use crate::ethereum::{FromEthereumApi, ToEthereumApi};
+use crate::ethereum::{EthereumApi, FromEthereumApi, ToEthereumApi};
 
 /// Pangolin client
 #[derive(Clone)]
 pub struct PangolinClient {
     /// Subxt client
     subxt: Client<PangolinSubxtConfig>,
+    runtime: RuntimeApi<PangolinSubxtConfig>,
 }
 
 impl PangolinClient {
     /// Create a new pangolin client
     pub fn new(client: Client<PangolinSubxtConfig>) -> Self {
-        Self { subxt: client }
+        let runtime = RuntimeApi::from(client.clone());
+        Self {
+            subxt: client,
+            runtime,
+        }
     }
 }
 
@@ -26,13 +32,13 @@ impl PangolinClient {
 
 /// patch rpc api
 impl PangolinClient {
-    /// From ethereum api
-    pub fn eth_from(&self) -> FromEthereumApi {
-        FromEthereumApi::new(&self)
+    /// Runtime api
+    pub fn runtime(&self) -> &RuntimeApi<PangolinSubxtConfig> {
+        &self.runtime
     }
 
-    /// To ethereum api
-    pub fn eth_to(&self) -> ToEthereumApi {
-        ToEthereumApi::new(&self)
+    /// Ethereum api
+    pub fn ethereum(&self) -> EthereumApi {
+        EthereumApi::new(&self)
     }
 }

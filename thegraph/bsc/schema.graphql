@@ -1,0 +1,12 @@
+type Block @entity {
+  id: ID!,
+  author: Bytes!,
+  parentHash: Bytes!,
+  stateRoot: Bytes!,
+  transactionsRoot: Bytes!,
+  receiptsRoot: Bytes!,
+  number: BigInt!,
+  gasUsed: BigInt!,
+  gasLimit: BigInt!,
+  timestamp: BigInt!
+}

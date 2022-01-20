@@ -1,5 +1,8 @@
 use codec::{Decode, Encode};
 
+/// Substrate balance type
+pub type Balance = u128;
+
 /// EcdsaSignature
 #[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
 pub struct EcdsaSignature(pub [u8; 65]);

@@ -22,14 +22,15 @@ tracing = "0.1"
 color-eyre = "0.5"
 thiserror = "1"
 
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
 
-codec     = { package = "parity-scale-codec", version = "2.3.1", default-features = false, features = ["derive", "full"] }
-web3      = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
-secp256k1 = { version = "0.20", features = ["recovery"] }
+array-bytes = "1.4"
 
-subxt = { git = "https://github.com/paritytech/subxt.git" }
+codec       = { package = "parity-scale-codec", version = "2.3.1", default-features = false, features = ["derive", "full"] }
+web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+secp256k1   = { version = "0.20", features = ["recovery"] }
+subxt       = { git = "https://github.com/paritytech/subxt.git" }
 
 
 support-ethereum = { path = "../../../frame/supports/support-ethereum" }

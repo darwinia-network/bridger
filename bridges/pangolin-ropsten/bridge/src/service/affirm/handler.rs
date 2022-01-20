@@ -1,11 +1,11 @@
 use std::sync::Arc;
 
+use client_pangolin::client::PangolinClient;
+use client_pangolin::component::PangolinClientComponent;
 use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
-use client_pangolin::component::DarwiniaSubxtComponent;
-use client_pangolin::from_ethereum::Ethereum2Darwinia;
 use component_ethereum::errors::BizError;
 use component_shadow::{Shadow, ShadowComponent};
 use support_common::config::{Config, Names};
@@ -16,7 +16,7 @@ use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage};
 pub struct AffirmHandler {
     microkv: NamespaceMicroKV,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-    darwinia: Ethereum2Darwinia,
+    client: PangolinClient,
     shadow: Arc<Shadow>,
 }
 
@@ -47,9 +47,8 @@ impl AffirmHandler {
         tracing::info!(target: "pangolin-ropsten", "SERVICE RESTARTING...");
         let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
-        // Darwinia client
-        let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
-        let darwinia = Ethereum2Darwinia::new(darwinia);
+        // Subxt client
+        let client = PangolinClientComponent::component(bridge_config.darwinia).await?;
 
         // Shadow client
         let shadow = ShadowComponent::component(
@@ -61,12 +60,12 @@ impl AffirmHandler {
 
         tracing::info!(
             target: "pangolin-ropsten",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY"
+            "✨ SERVICE STARTED: ROPSTEN <> PANGOLIN RELAY"
         );
         Ok(AffirmHandler {
             microkv,
             sender_to_extrinsics,
-            darwinia,
+            client,
             shadow,
         })
     }
@@ -74,7 +73,7 @@ impl AffirmHandler {
 
 impl AffirmHandler {
     pub async fn affirm(&mut self) -> color_eyre::Result<()> {
-        let last_confirmed = self.darwinia.last_confirmed().await?;
+        let last_confirmed = self.client.ethereum().last_confirmed().await?;
         let mut relayed = self.microkv.get_as("affirm.relayed")?.unwrap_or(0);
         let target = self.microkv.get_as("affirm.target")?.unwrap_or(0);
 
@@ -128,9 +127,14 @@ impl AffirmHandler {
         // checking before affirm
         // /////////////////////////
         // 1. pendings check
-        let pending_headers = self.darwinia.pending_headers().await?;
+        let pending_headers = self
+            .client
+            .ethereum()
+            .relay_storage()
+            .pending_relay_header_parcels(None)
+            .await?;
         for pending_header in pending_headers {
-            let pending_block_number = pending_header.1.header.number;
+            let pending_block_number = pending_header.1.header.number as u64;
             if pending_block_number >= target {
                 tracing::trace!(
                     target: "pangolin-ropsten",
@@ -141,10 +145,10 @@ impl AffirmHandler {
             }
         }
 
-        // 1. affirmations check
-        for (_game_id, game) in self.darwinia.affirmations().await?.iter() {
+        // 2. affirmations check
+        for (_game_id, game) in self.client.ethereum().affirmations().await?.iter() {
             for (_round_id, affirmations) in game.iter() {
-                if Ethereum2Darwinia::contains(affirmations, target) {
+                if client_pangolin::helpers::affirmations_contains_block(affirmations, target) {
                     tracing::trace!(
                         target: "pangolin-ropsten",
                         "The affirming target block {} is in the relayer game",

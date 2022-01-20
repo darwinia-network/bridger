@@ -380,6 +380,7 @@ dependencies = [
 name = "client-pangolin"
 version = "0.5.0"
 dependencies = [
+ "array-bytes",
  "color-eyre",
  "parity-scale-codec",
  "secp256k1",

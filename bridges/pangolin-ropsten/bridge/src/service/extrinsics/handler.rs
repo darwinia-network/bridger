@@ -1,10 +1,11 @@
 use microkv::namespace::NamespaceMicroKV;
-use std::time::{SystemTime, UNIX_EPOCH};
-use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use client_pangolin::account::DarwiniaAccount;
-use client_pangolin::component::DarwiniaSubxtComponent;
+use client_pangolin::client::PangolinClient;
+use client_pangolin::component::{DarwiniaSubxtComponent, PangolinClientComponent};
 use client_pangolin::config::DarwiniaSubxtConfig;
 use client_pangolin::{
     from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia},
@@ -21,10 +22,11 @@ use crate::bridge::{EcdsaMessage, Extrinsic};
 use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};
 
 pub struct ExtrinsicsHandler {
-    ethereum2darwinia: Ethereum2Darwinia,
-    darwinia2ethereum: Darwinia2Ethereum,
-    darwinia2ethereum_relayer: ToEthereumAccount,
-    ethereum2darwinia_relayer: FromEthereumAccount,
+    // ethereum2darwinia: Ethereum2Darwinia,
+    // darwinia2ethereum: Darwinia2Ethereum,
+    // darwinia2ethereum_relayer: ToEthereumAccount,
+    // ethereum2darwinia_relayer: FromEthereumAccount,
+    client: PangolinClient,
     spec_name: String,
     microkv: NamespaceMicroKV,
     message_kv: NamespaceMicroKV,
@@ -56,24 +58,26 @@ impl ExtrinsicsHandler {
 
         // Config
         let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
-        let config_web3: Web3Config = bridge_config.web3;
-
+        // let config_web3: Web3Config = bridge_config.web3;
+        //
         // Darwinia client & accounts
-        let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
-        let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-        let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-        let account = DarwiniaAccount::new(
-            config_darwinia.relayer_private_key,
-            config_darwinia.relayer_real_account,
-        );
-        let darwinia2ethereum_relayer = ToEthereumAccount::new(
-            account.clone(),
-            config_darwinia.ecdsa_authority_private_key,
-            config_web3.endpoint,
-        );
-        let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
+        // let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
+        // let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
+        // let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
+        // let account = DarwiniaAccount::new(
+        //     config_darwinia.relayer_private_key,
+        //     config_darwinia.relayer_real_account,
+        // );
+        // let darwinia2ethereum_relayer = ToEthereumAccount::new(
+        //     account.clone(),
+        //     config_darwinia.ecdsa_authority_private_key,
+        //     config_web3.endpoint,
+        // );
+        // let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
+        //
+        // let spec_name = darwinia.runtime_version().await?;
 
-        let spec_name = darwinia.runtime_version().await?;
+        let client = PangolinClientComponent::component(config_darwinia).await?;
 
         tracing::info!(
             target: "pangolin-ropsten",
@@ -86,15 +90,13 @@ impl ExtrinsicsHandler {
         );
 
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
-        let message_kv: NamespaceMicroKV = state.microkv_with_namespace(format!("{}-messages", PangolinRopstenTask::name()));
+        let message_kv: NamespaceMicroKV =
+            state.microkv_with_namespace(format!("{}-messages", PangolinRopstenTask::name()));
         Ok(ExtrinsicsHandler {
-            ethereum2darwinia,
-            darwinia2ethereum,
-            darwinia2ethereum_relayer,
-            ethereum2darwinia_relayer,
+            client,
             spec_name,
             microkv,
-            message_kv
+            message_kv,
         })
     }
 }
@@ -306,14 +308,16 @@ impl ExtrinsicsHandler {
             let extrinsics = self.message_kv.sorted_keys()?;
             if extrinsics.is_empty() {
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-                continue
+                continue;
             }
             for key in extrinsics.iter() {
                 let ex: Extrinsic = self.message_kv.get_as_unwrap(&key)?;
                 match self.send_extrinsic(ex.clone()).await {
                     Ok(_) => self.message_kv.delete(&key)?,
                     Err(err) => {
-                        if let Some(substrate_subxt::Error::Rpc(_)) = err.downcast_ref::<substrate_subxt::Error>() {
+                        if let Some(substrate_subxt::Error::Rpc(_)) =
+                            err.downcast_ref::<substrate_subxt::Error>()
+                        {
                             tracing::warn!(
                                 target: "pangolin-ropsten",
                                 "Connection Error. Try to resend later. extrinsic: {:?}",

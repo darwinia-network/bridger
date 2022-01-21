@@ -1,11 +1,11 @@
 use std::sync::Arc;
 
-use client_pangolin::client::PangolinClient;
-use client_pangolin::component::PangolinClientComponent;
 use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
+use client_pangolin::client::PangolinClient;
+use client_pangolin::component::PangolinClientComponent;
 use component_ethereum::errors::BizError;
 use component_shadow::{Shadow, ShadowComponent};
 use support_common::config::{Config, Names};

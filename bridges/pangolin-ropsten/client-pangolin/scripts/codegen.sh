@@ -19,7 +19,7 @@ OUTPUT_FILE=${OUTPUT_PATH}/runtime.rs
 
 mkdir -p ${OUTPUT_PATH}
 
-${SUBXT} codegen --url ${ENDPOINT} > ${OUTPUT_FILE}
+${SUBXT} codegen --url ${ENDPOINT} --derive Clone > ${OUTPUT_FILE}
 
 cargo fmt -- ${OUTPUT_FILE} || true
 

@@ -262,7 +262,7 @@ impl<'a> EthereumApi<'a> {
     ) -> ClientResult<subxt::sp_core::H256> {
         let account = self.client.account();
         let runtime_version = self.client.subxt().rpc().runtime_version(None).await?;
-        let spec_name = runtime_version.spec_name.to_string();
-        Ok()
+        // let spec_name = runtime_version.spec_name.to_string();
+        Ok(1.into())
     }
 }

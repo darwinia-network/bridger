@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
-use subxt::{sp_core, sp_runtime};
+use subxt::{sp_core, sp_runtime, StorageEntry};
+
+use crate::codegen::api::DefaultAccountData;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientConfig {
@@ -28,4 +30,16 @@ impl subxt::Config for PangolinSubxtConfig {
     type Header = sp_runtime::generic::Header<Self::BlockNumber, sp_runtime::traits::BlakeTwo256>;
     type Signature = sp_runtime::MultiSignature;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
+}
+
+impl subxt::AccountData<PangolinSubxtConfig> for DefaultAccountData {
+    fn storage_entry(account_id: <PangolinSubxtConfig as subxt::Config>::AccountId) -> Self {
+        Self(account_id)
+    }
+
+    fn nonce(
+        result: &<Self as StorageEntry>::Value,
+    ) -> <PangolinSubxtConfig as subxt::Config>::Index {
+        result.nonce
+    }
 }

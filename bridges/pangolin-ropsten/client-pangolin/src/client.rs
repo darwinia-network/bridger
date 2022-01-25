@@ -9,7 +9,7 @@ use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
 #[derive(Clone)]
 pub struct PangolinClient {
     /// Runtime api
-    runtime: RuntimeApi<PangolinSubxtConfig, NodeRuntimeSignedExtra>,
+    client: Client<PangolinSubxtConfig>,
     /// Darwinia Account
     account: DarwiniaAccount,
 }
@@ -17,10 +17,7 @@ pub struct PangolinClient {
 impl PangolinClient {
     /// Create a new pangolin client
     pub fn new(client: Client<PangolinSubxtConfig>, account: DarwiniaAccount) -> Self {
-        Self {
-            runtime: client.to_runtime_api(),
-            account,
-        }
+        Self { client, account }
     }
 }
 
@@ -35,11 +32,12 @@ impl PangolinClient {
 impl PangolinClient {
     /// Get original subxt client
     pub fn subxt(&self) -> &Client<PangolinSubxtConfig> {
-        &self.runtime.client
+        &self.client
     }
+
     /// Runtime api
-    pub fn runtime(&self) -> &RuntimeApi<PangolinSubxtConfig, NodeRuntimeSignedExtra> {
-        &self.runtime
+    pub fn runtime(&self) -> RuntimeApi<PangolinSubxtConfig, NodeRuntimeSignedExtra> {
+        self.client.clone().to_runtime_api()
     }
 
     /// Ethereum api

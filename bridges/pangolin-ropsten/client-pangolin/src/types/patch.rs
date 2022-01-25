@@ -23,7 +23,6 @@ pub type NodeRuntimeSignedExtra =
     DefaultExtraWithTxPayment<PangolinSubxtConfig, ChargeAssetTxPayment<PangolinSubxtConfig>>;
 
 /// Ethereum receipt proof
-#[derive(Clone, Debug)]
 pub struct EthereumReceiptProofThing {
     /// Ethereum header
     pub header: ethereum_primitives::header::Header,

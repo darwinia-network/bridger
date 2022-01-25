@@ -11,15 +11,17 @@ use crate::types::NodeRuntimeSignedExtra;
 
 /// AccountId
 pub type AccountId = <PangolinSubxtConfig as subxt::Config>::AccountId;
+/// Signer
+pub type Signer = PairSigner<PangolinSubxtConfig, NodeRuntimeSignedExtra, Pair>;
 
 /// Account
 pub struct DarwiniaAccount {
     /// Account Id
-    pub account_id: AccountId,
+    account_id: AccountId,
     /// signer of the account
-    pub signer: PairSigner<PangolinSubxtConfig, NodeRuntimeSignedExtra, Pair>,
+    signer: Signer,
     /// proxy real
-    pub real: Option<AccountId>,
+    real: Option<AccountId>,
 }
 
 impl Debug for DarwiniaAccount {
@@ -59,9 +61,26 @@ impl DarwiniaAccount {
             real,
         }
     }
+}
 
-    /// get the real account
-    pub fn real(&self) -> &AccountId {
+impl DarwiniaAccount {
+    /// get account id
+    pub fn account_id(&self) -> &AccountId {
+        &self.account_id
+    }
+
+    /// get signer
+    pub fn signer(&self) -> &Signer {
+        &self.signer
+    }
+
+    /// get real account
+    pub fn real(&self) -> &Option<AccountId> {
+        &self.real
+    }
+
+    /// get raw real account
+    pub fn real_account(&self) -> &AccountId {
         if let Some(real_account_id) = &self.real {
             real_account_id
         } else {

@@ -69,10 +69,10 @@ impl<'a> EthereumApi<'a> {
     /// Submit affirmation
     pub async fn affirm(
         &self,
-        account: &DarwiniaAccount,
         parcel: EthereumRelayHeaderParcel,
     ) -> ClientResult<subxt::sp_core::H256> {
-        let v = match &account.real {
+        let account = self.client.account();
+        let v = match account.real() {
             Some(real) => {
                 let call = runtime_types::pangolin_runtime::Call::EthereumRelay(
                     runtime_types::darwinia_bridge_ethereum::Call::affirm {
@@ -85,7 +85,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit(&account.signer)
+                    .sign_and_submit(account.signer())
                     .await?
             }
             None => {
@@ -94,10 +94,15 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_relay()
                     .affirm(parcel, None)
-                    .sign_and_submit(&account.signer)
+                    .sign_and_submit(account.signer())
                     .await?
             }
         };
         Ok(v)
+    }
+
+    /// Sync authorities change
+    pub async fn sync_authorities_change(&self) -> ClientResult<subxt::sp_core::H256> {
+        Ok(1)
     }
 }

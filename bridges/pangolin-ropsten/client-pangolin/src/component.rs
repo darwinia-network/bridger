@@ -5,6 +5,7 @@ use subxt::ClientBuilder;
 use crate::client::PangolinClient;
 use crate::config::ClientConfig;
 use crate::error::ClientError;
+use crate::types::DarwiniaAccount;
 
 const MAX_ATTEMPTS: u32 = 6;
 
@@ -17,10 +18,14 @@ impl PangolinClientComponent {
         let mut attempts = 1;
         let mut wait_secs = 1;
         let endpoint = Self::correct_url(&config.endpoint)?;
+        let account = DarwiniaAccount::new(
+            config.relayer_private_key.clone(),
+            config.relayer_real_account.clone(),
+        );
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
             return match ClientBuilder::new().set_url(&endpoint).build().await {
-                Ok(client) => Ok(PangolinClient::new(client)),
+                Ok(client) => Ok(PangolinClient::new(client, account.clone())),
                 Err(err) => {
                     if attempts < MAX_ATTEMPTS {
                         attempts += 1;

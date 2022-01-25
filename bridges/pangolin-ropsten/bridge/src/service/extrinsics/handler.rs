@@ -22,7 +22,7 @@ pub struct ExtrinsicsHandler {
     // darwinia2ethereum: Darwinia2Ethereum,
     // darwinia2ethereum_relayer: ToEthereumAccount,
     // ethereum2darwinia_relayer: FromEthereumAccount,
-    darwinia_account: DarwiniaAccount,
+    // darwinia_account: DarwiniaAccount,
     client: PangolinClient,
     spec_name: String,
     microkv: NamespaceMicroKV,
@@ -74,27 +74,17 @@ impl ExtrinsicsHandler {
         //
         // let spec_name = darwinia.runtime_version().await?;
 
-        let darwinia_account = DarwiniaAccount::new(
-            config_darwinia.relayer_private_key.clone(),
-            config_darwinia.relayer_real_account.clone(),
-        );
         let client = PangolinClientComponent::component(config_darwinia).await?;
 
         tracing::info!(
             target: "pangolin-ropsten",
             "✨ SERVICE STARTED: ROPSTEN <> PANGOLIN EXTRINSICS"
         );
-        tracing::trace!(
-            target: "pangolin-ropsten",
-            "The spec_name is [{}]",
-            spec_name
-        );
 
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
         let message_kv: NamespaceMicroKV =
             state.microkv_with_namespace(format!("{}-messages", PangolinRopstenTask::name()));
         Ok(ExtrinsicsHandler {
-            darwinia_account,
             client,
             spec_name,
             microkv,
@@ -125,11 +115,7 @@ impl ExtrinsicsHandler {
 
     async fn send_affirm(&self, parcel: EthereumRelayHeaderParcel) -> color_eyre::Result<()> {
         let block_number = parcel.header.number;
-        let ex_hash = self
-            .client
-            .ethereum()
-            .affirm(&self.darwinia_account, parcel)
-            .await?;
+        let ex_hash = self.client.ethereum().affirm(parcel).await?;
         tracing::info!(
             target: "pangolin-ropsten",
             "Affirmed ethereum block {} in extrinsic {:?}",

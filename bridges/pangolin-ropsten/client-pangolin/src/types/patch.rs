@@ -3,7 +3,6 @@ use subxt::extrinsic::ChargeAssetTxPayment;
 use subxt::DefaultExtraWithTxPayment;
 
 use crate::config::PangolinSubxtConfig;
-use crate::types;
 use crate::types::{
     darwinia_bridge_ethereum, darwinia_relay_primitives, ethereum_primitives, Balance,
 };
@@ -11,7 +10,7 @@ use crate::types::{
 /// Real realy affirmation types
 pub type BetterRelayAffirmation = darwinia_relay_primitives::relayer_game::RelayAffirmation<
     darwinia_bridge_ethereum::EthereumRelayHeaderParcel,
-    PangolinSubxtConfig::AccountId,
+    <PangolinSubxtConfig as subxt::Config>::AccountId,
     Balance,
     darwinia_relay_primitives::relayer_game::RelayAffirmationId<u64>,
 >;

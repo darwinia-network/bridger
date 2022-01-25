@@ -14,17 +14,12 @@ if [ -z "${SUBXT}" ]; then
   cargo install subxt-cli
 fi
 
-METADATA_SCALA=${WORK_PATH}/metadata.scale
 OUTPUT_PATH=${WORK_PATH}/src/codegen
 OUTPUT_FILE=${OUTPUT_PATH}/runtime.rs
 
 mkdir -p ${OUTPUT_PATH}
 
-${SUBXT} metadata --url ${ENDPOINT} -f bytes > ${METADATA_SCALA}
-
-${SUBXT} codegen -f ${METADATA_SCALA} > ${OUTPUT_FILE}
+${SUBXT} codegen --url ${ENDPOINT} > ${OUTPUT_FILE}
 
 cargo fmt -- ${OUTPUT_FILE} || true
-
-rm -rf ${METADATA_SCALA}
 

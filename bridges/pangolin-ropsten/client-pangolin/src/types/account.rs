@@ -1,12 +1,11 @@
-use crate::config::PangolinSubxtConfig;
 use std::fmt::{Debug, Formatter};
+
 use subxt::{
     sp_core::{sr25519::Pair, Pair as PairTrait},
-    system::System,
-    DefaultExtra, PairSigner,
+    PairSigner,
 };
 
-use crate::darwinia::runtime::DarwiniaRuntime;
+use crate::config::PangolinSubxtConfig;
 use crate::types::NodeRuntimeSignedExtra;
 
 /// AccountId

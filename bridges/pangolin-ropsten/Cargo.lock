@@ -4083,7 +4083,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 [[package]]
 name = "subxt"
 version = "0.15.0"
-source = "git+https://github.com/paritytech/subxt.git#b358d6ffefec404b163d4e32ed6cd911e58c81f1"
+source = "git+https://github.com/paritytech/subxt.git#934aebcc2caca1df1c3e30aec319f1eb1d2dd253"
 dependencies = [
  "async-trait",
  "bitvec",
@@ -4110,7 +4110,7 @@ dependencies = [
 [[package]]
 name = "subxt-codegen"
 version = "0.2.0"
-source = "git+https://github.com/paritytech/subxt.git#b358d6ffefec404b163d4e32ed6cd911e58c81f1"
+source = "git+https://github.com/paritytech/subxt.git#934aebcc2caca1df1c3e30aec319f1eb1d2dd253"
 dependencies = [
  "async-trait",
  "darling",
@@ -4128,7 +4128,7 @@ dependencies = [
 [[package]]
 name = "subxt-macro"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/subxt.git#b358d6ffefec404b163d4e32ed6cd911e58c81f1"
+source = "git+https://github.com/paritytech/subxt.git#934aebcc2caca1df1c3e30aec319f1eb1d2dd253"
 dependencies = [
  "async-trait",
  "darling",

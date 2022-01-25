@@ -16,3 +16,10 @@ async fn test_block_hash_from_block_number() {
         .unwrap();
     assert!(block_hash.is_some());
 }
+
+#[tokio::test]
+async fn test_spec_version() {
+    let client = common::client().await.unwrap();
+    let version = client.subxt().rpc().runtime_version(None).await.unwrap();
+    println!("{:?}", version);
+}

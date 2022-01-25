@@ -22,7 +22,7 @@ pub enum ClientError {
     CannotConnectToWeb3(#[from] web3::Error),
 
     #[error(transparent)]
-    SubxtError(#[from] subxt::Error),
+    SubxtBasicError(#[from] subxt::BasicError),
 
     #[error("No signer seed set for authority, please check your config.toml")]
     NoAuthoritySignerSeed,

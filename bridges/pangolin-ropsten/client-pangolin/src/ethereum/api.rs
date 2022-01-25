@@ -1,16 +1,12 @@
 use std::collections::HashMap;
 
 use crate::client::PangolinClient;
-use crate::codegen::api::{ethereum_relay, ethereum_relayer_game, runtime_types};
-use crate::config::PangolinSubxtConfig;
+use crate::codegen::api::runtime_types;
 use crate::error::{ClientError, ClientResult};
 use crate::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use crate::types::pangolin_runtime::pallets::proxy::ProxyType;
 use crate::types::to_ethereum_backing::pallet::RedeemFor;
-use crate::types::{
-    darwinia_bridge_ethereum, ethereum_primitives, AffirmationsReturn, BetterRelayAffirmation,
-    DarwiniaAccount, EthereumReceiptProofThing,
-};
+use crate::types::{AffirmationsReturn, BetterRelayAffirmation, EthereumReceiptProofThing};
 
 /// Ethereum api
 pub struct EthereumApi<'a> {
@@ -258,5 +254,15 @@ impl<'a> EthereumApi<'a> {
             }
         };
         Ok(v)
+    }
+
+    /// submit_signed_mmr_root
+    pub async fn ecdsa_sign_and_submit_signed_mmr_root(
+        &self,
+    ) -> ClientResult<subxt::sp_core::H256> {
+        let account = self.client.account();
+        let runtime_version = self.client.subxt().rpc().runtime_version(None).await?;
+        let spec_name = runtime_version.spec_name.to_string();
+        Ok()
     }
 }

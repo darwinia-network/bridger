@@ -2,14 +2,14 @@ use subxt::Client;
 
 use crate::codegen::api::RuntimeApi;
 use crate::config::PangolinSubxtConfig;
-use crate::ethereum::{EthereumApi, FromEthereumApi, ToEthereumApi};
-use crate::types::DarwiniaAccount;
+use crate::ethereum::EthereumApi;
+use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
 
 /// Pangolin client
 #[derive(Clone)]
 pub struct PangolinClient {
     /// Runtime api
-    runtime: RuntimeApi<PangolinSubxtConfig>,
+    runtime: RuntimeApi<PangolinSubxtConfig, NodeRuntimeSignedExtra>,
     /// Darwinia Account
     account: DarwiniaAccount,
 }
@@ -18,7 +18,7 @@ impl PangolinClient {
     /// Create a new pangolin client
     pub fn new(client: Client<PangolinSubxtConfig>, account: DarwiniaAccount) -> Self {
         Self {
-            runtime: RuntimeApi::from(client),
+            runtime: client.to_runtime_api(),
             account,
         }
     }
@@ -38,7 +38,7 @@ impl PangolinClient {
         &self.runtime.client
     }
     /// Runtime api
-    pub fn runtime(&self) -> &RuntimeApi<PangolinSubxtConfig> {
+    pub fn runtime(&self) -> &RuntimeApi<PangolinSubxtConfig, NodeRuntimeSignedExtra> {
         &self.runtime
     }
 

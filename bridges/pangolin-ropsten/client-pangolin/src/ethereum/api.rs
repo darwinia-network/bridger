@@ -6,7 +6,10 @@ use crate::config::PangolinSubxtConfig;
 use crate::error::ClientResult;
 use crate::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use crate::types::pangolin_runtime::pallets::proxy::ProxyType;
-use crate::types::{AffirmationsReturn, BetterRelayAffirmation, DarwiniaAccount};
+use crate::types::{
+    darwinia_bridge_ethereum, ethereum_primitives, AffirmationsReturn, BetterRelayAffirmation,
+    DarwiniaAccount, EthereumReceiptProofThing,
+};
 
 /// Ethereum api
 pub struct EthereumApi<'a> {
@@ -102,7 +105,35 @@ impl<'a> EthereumApi<'a> {
     }
 
     /// Sync authorities change
-    pub async fn sync_authorities_change(&self) -> ClientResult<subxt::sp_core::H256> {
-        Ok(1)
+    pub async fn sync_authorities_change(
+        &self,
+        proof: EthereumReceiptProofThing,
+    ) -> ClientResult<subxt::sp_core::H256> {
+        let account = self.client.account();
+        let v = match account.real() {
+            Some(real) => {
+                let call = runtime_types::pangolin_runtime::Call::EthereumBacking(
+                    runtime_types::to_ethereum_backing::pallet::Call::sync_authorities_change {
+                        proof: (proof.header, proof.receipt_proof, proof.mmr_proof),
+                    },
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .proxy()
+                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+            None => {
+                self.client
+                    .runtime()
+                    .tx()
+                    .ethereum_backing()
+                    .sync_authorities_change((proof.header, proof.receipt_proof, proof.mmr_proof))
+                    .await?
+            }
+        };
+        Ok(v)
     }
 }

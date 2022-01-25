@@ -3,9 +3,10 @@ use std::collections::HashMap;
 use crate::client::PangolinClient;
 use crate::codegen::api::{ethereum_relay, ethereum_relayer_game, runtime_types};
 use crate::config::PangolinSubxtConfig;
-use crate::error::ClientResult;
+use crate::error::{ClientError, ClientResult};
 use crate::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use crate::types::pangolin_runtime::pallets::proxy::ProxyType;
+use crate::types::to_ethereum_backing::pallet::RedeemFor;
 use crate::types::{
     darwinia_bridge_ethereum, ethereum_primitives, AffirmationsReturn, BetterRelayAffirmation,
     DarwiniaAccount, EthereumReceiptProofThing,
@@ -131,6 +132,93 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_issuing()
                     .register_erc20((proof.header, proof.receipt_proof, proof.mmr_proof))
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+        };
+        Ok(v)
+    }
+
+    /// redeem erc20
+    pub async fn redeem_erc20(
+        &self,
+        proof: EthereumReceiptProofThing,
+    ) -> ClientResult<subxt::sp_core::H256> {
+        let account = self.client.account();
+        let v = match account.real() {
+            Some(real) => {
+                let call = runtime_types::pangolin_runtime::Call::EthereumIssuing(
+                    runtime_types::from_ethereum_issuing::pallet::Call::redeem_erc20 {
+                        proof: (proof.header, proof.receipt_proof, proof.mmr_proof),
+                    },
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .proxy()
+                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+            None => {
+                self.client
+                    .runtime()
+                    .tx()
+                    .ethereum_issuing()
+                    .redeem_erc20((proof.header, proof.receipt_proof, proof.mmr_proof))
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+        };
+        Ok(v)
+    }
+
+    /// Redeem
+    pub async fn redeem(
+        &self,
+        act: RedeemFor,
+        proof: EthereumReceiptProofThing,
+    ) -> ClientResult<subxt::sp_core::H256> {
+        let ethereum_tx_hash = proof
+            .header
+            .hash
+            .map(|hash| array_bytes::bytes2hex("", &hash))
+            .ok_or(ClientError::NoHeaderHashInEthereumReceiptProofOfThing)?;
+        let account = self.client.account();
+        let v = match account.real() {
+            Some(real) => {
+                tracing::trace!(
+                    target: "client-pangolin",
+                    "Proxy redeem ethereum tx 0x{:?} for real account {:?}",
+                    ethereum_tx_hash,
+                    real
+                );
+                let call = runtime_types::pangolin_runtime::Call::EthereumBacking(
+                    runtime_types::to_ethereum_backing::pallet::Call::redeem {
+                        act,
+                        proof: (proof.header, proof.receipt_proof, proof.mmr_proof),
+                    },
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .proxy()
+                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+            None => {
+                tracing::trace!(
+                    target: "client-pangolin",
+                    "Redeem ethereum tx {:?} with account {:?}",
+                    ethereum_tx_hash,
+                    &account.account_id()
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .ethereum_backing()
+                    .redeem(act, (proof.header, proof.receipt_proof, proof.mmr_proof))
                     .sign_and_submit(account.signer())
                     .await?
             }

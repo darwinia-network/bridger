@@ -8,11 +8,13 @@ use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::config::ClientConfig;
 use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use client_pangolin::types::to_ethereum_backing::pallet::RedeemFor;
 use client_pangolin::types::{DarwiniaAccount, EthereumReceiptProofThing};
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 use support_common::config::{Config, Names};
+use support_common::error::BridgerError;
 
 use crate::bridge::{EcdsaMessage, Extrinsic};
 use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};
@@ -161,10 +163,7 @@ impl ExtrinsicsHandler {
                 );
             }
             TransactionType::RedeemErc20Token => {
-                let ex_hash = self
-                    .ethereum2darwinia
-                    .redeem_erc20(&self.ethereum2darwinia_relayer, proof)
-                    .await?;
+                let ex_hash = self.client.ethereum().redeem_erc20(proof).await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
                     "redeem erc20 token tx {:?} with extrinsic {:?}",
@@ -176,14 +175,12 @@ impl ExtrinsicsHandler {
                 let redeem_for = match ethereum_tx.tx_type {
                     TransactionType::Deposit => RedeemFor::Deposit,
                     TransactionType::Token => RedeemFor::Token,
-                    TransactionType::SetAuthorities => RedeemFor::SetAuthorities,
-                    TransactionType::RegisterErc20Token => RedeemFor::RegisterErc20Token,
-                    TransactionType::RedeemErc20Token => RedeemFor::RedeemErc20Token,
+                    // TransactionType::SetAuthorities => RedeemFor::SetAuthorities,
+                    // TransactionType::RegisterErc20Token => RedeemFor::RegisterErc20Token,
+                    // TransactionType::RedeemErc20Token => RedeemFor::RedeemErc20Token,
+                    _ => return Err(BridgerError::Custom("Unreachable".to_string()).into()),
                 };
-                let ex_hash = self
-                    .ethereum2darwinia
-                    .redeem(&self.ethereum2darwinia_relayer, redeem_for, proof)
-                    .await?;
+                let ex_hash = self.client.ethereum().redeem(redeem_for, proof).await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
                     "Redeemed ethereum tx {:?} with extrinsic {:?}",

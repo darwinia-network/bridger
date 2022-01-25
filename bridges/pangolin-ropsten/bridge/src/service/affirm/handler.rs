@@ -129,8 +129,9 @@ impl AffirmHandler {
         // 1. pendings check
         let pending_headers = self
             .client
-            .ethereum()
-            .relay_storage()
+            .runtime()
+            .storage()
+            .ethereum_relay()
             .pending_relay_header_parcels(None)
             .await?;
         for pending_header in pending_headers {

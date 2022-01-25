@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use subxt::extrinsic::ChargeAssetTxPayment;
+use subxt::DefaultExtraWithTxPayment;
 
 use crate::config::PangolinSubxtConfig;
 use crate::types;
@@ -14,3 +16,7 @@ pub type BetterRelayAffirmation = types::darwinia_relay_primitives::relayer_game
 
 /// Affirmations return data types
 pub type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<BetterRelayAffirmation>>>;
+
+/// Node runtime signed extra
+pub type NodeRuntimeSignedExtra =
+    DefaultExtraWithTxPayment<PangolinSubxtConfig, ChargeAssetTxPayment<PangolinSubxtConfig>>;

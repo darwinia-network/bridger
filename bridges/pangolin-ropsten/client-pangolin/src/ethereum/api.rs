@@ -1,10 +1,12 @@
 use std::collections::HashMap;
 
 use crate::client::PangolinClient;
-use crate::codegen::api::{ethereum_relay, ethereum_relayer_game};
+use crate::codegen::api::{ethereum_relay, ethereum_relayer_game, runtime_types};
 use crate::config::PangolinSubxtConfig;
 use crate::error::ClientResult;
-use crate::types::{AffirmationsReturn, BetterRelayAffirmation};
+use crate::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use crate::types::pangolin_runtime::pallets::proxy::ProxyType;
+use crate::types::{AffirmationsReturn, BetterRelayAffirmation, DarwiniaAccount};
 
 /// Ethereum api
 pub struct EthereumApi<'a> {
@@ -19,31 +21,28 @@ impl<'a> EthereumApi<'a> {
 }
 
 impl<'a> EthereumApi<'a> {
-    /// relay storage api
-    pub fn relay_storage(&self) -> ethereum_relay::storage::StorageApi<PangolinSubxtConfig> {
-        ethereum_relay::storage::StorageApi::new(&self.client.subxt())
-    }
-
-    /// relayer game storage api
-    pub fn relayer_game_storage(
-        &self,
-    ) -> ethereum_relayer_game::storage::StorageApi<PangolinSubxtConfig> {
-        ethereum_relayer_game::storage::StorageApi::new(&self.client.subxt())
-    }
-}
-
-impl<'a> EthereumApi<'a> {
     /// Get the last confirmed block
     pub async fn last_confirmed(&self) -> ClientResult<u64> {
-        let api = self.relay_storage();
-        let blocks: Vec<u64> = api.confirmed_block_numbers(None).await?;
+        let blocks = self
+            .client
+            .runtime()
+            .storage()
+            .ethereum_relay()
+            .confirmed_block_numbers(None)
+            .await?;
         Ok(blocks.iter().max().cloned().unwrap_or(0))
     }
 
     /// Affirmations
     pub async fn affirmations(&self) -> ClientResult<AffirmationsReturn> {
         let mut result = HashMap::new();
-        let mut iter = self.relayer_game_storage().affirmations_iter(None).await?;
+        let mut iter = self
+            .client
+            .runtime()
+            .storage()
+            .ethereum_relayer_game()
+            .affirmations_iter(None)
+            .await?;
         while let Some((mut storage_key, affirmations)) = iter.next().await? {
             // get game id
             let game_id: &mut [u8] = &mut storage_key.0[32..40];
@@ -65,5 +64,40 @@ impl<'a> EthereumApi<'a> {
             game.insert(round_id, affirmations);
         }
         Ok(result)
+    }
+
+    /// Submit affirmation
+    pub async fn affirm(
+        &self,
+        account: &DarwiniaAccount,
+        parcel: EthereumRelayHeaderParcel,
+    ) -> ClientResult<subxt::sp_core::H256> {
+        let v = match &account.real {
+            Some(real) => {
+                let call = runtime_types::pangolin_runtime::Call::EthereumRelay(
+                    runtime_types::darwinia_bridge_ethereum::Call::affirm {
+                        ethereum_relay_header_parcel: parcel,
+                        optional_ethereum_relay_proofs: None,
+                    },
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .proxy()
+                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
+                    .sign_and_submit(&account.signer)
+                    .await?
+            }
+            None => {
+                self.client
+                    .runtime()
+                    .tx()
+                    .ethereum_relay()
+                    .affirm(parcel, None)
+                    .sign_and_submit(&account.signer)
+                    .await?
+            }
+        };
+        Ok(v)
     }
 }

@@ -1,22 +1,18 @@
+use std::time::{SystemTime, UNIX_EPOCH};
+
 use microkv::namespace::NamespaceMicroKV;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
-use std::time::{SystemTime, UNIX_EPOCH};
 
-use client_pangolin::account::DarwiniaAccount;
 use client_pangolin::client::PangolinClient;
-use client_pangolin::component::{DarwiniaSubxtComponent, PangolinClientComponent};
-use client_pangolin::config::DarwiniaSubxtConfig;
-use client_pangolin::{
-    from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia},
-    to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum},
-};
+use client_pangolin::component::PangolinClientComponent;
+use client_pangolin::config::ClientConfig;
+use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use client_pangolin::types::DarwiniaAccount;
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 use support_common::config::{Config, Names};
-use support_ethereum::parcel::EthereumRelayHeaderParcel;
-use support_ethereum::receipt::{EthereumReceiptProofThing, RedeemFor};
 
 use crate::bridge::{EcdsaMessage, Extrinsic};
 use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};
@@ -26,6 +22,7 @@ pub struct ExtrinsicsHandler {
     // darwinia2ethereum: Darwinia2Ethereum,
     // darwinia2ethereum_relayer: ToEthereumAccount,
     // ethereum2darwinia_relayer: FromEthereumAccount,
+    darwinia_account: DarwiniaAccount,
     client: PangolinClient,
     spec_name: String,
     microkv: NamespaceMicroKV,
@@ -57,7 +54,7 @@ impl ExtrinsicsHandler {
         let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
         // Config
-        let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
+        let config_darwinia: ClientConfig = bridge_config.darwinia;
         // let config_web3: Web3Config = bridge_config.web3;
         //
         // Darwinia client & accounts
@@ -77,11 +74,15 @@ impl ExtrinsicsHandler {
         //
         // let spec_name = darwinia.runtime_version().await?;
 
+        let darwinia_account = DarwiniaAccount::new(
+            config_darwinia.relayer_private_key.clone(),
+            config_darwinia.relayer_real_account.clone(),
+        );
         let client = PangolinClientComponent::component(config_darwinia).await?;
 
         tracing::info!(
             target: "pangolin-ropsten",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS"
+            "✨ SERVICE STARTED: ROPSTEN <> PANGOLIN EXTRINSICS"
         );
         tracing::trace!(
             target: "pangolin-ropsten",
@@ -93,6 +94,7 @@ impl ExtrinsicsHandler {
         let message_kv: NamespaceMicroKV =
             state.microkv_with_namespace(format!("{}-messages", PangolinRopstenTask::name()));
         Ok(ExtrinsicsHandler {
+            darwinia_account,
             client,
             spec_name,
             microkv,
@@ -124,8 +126,9 @@ impl ExtrinsicsHandler {
     async fn send_affirm(&self, parcel: EthereumRelayHeaderParcel) -> color_eyre::Result<()> {
         let block_number = parcel.header.number;
         let ex_hash = self
-            .ethereum2darwinia
-            .affirm(&self.ethereum2darwinia_relayer, parcel)
+            .client
+            .ethereum()
+            .affirm(&self.darwinia_account, parcel)
             .await?;
         tracing::info!(
             target: "pangolin-ropsten",

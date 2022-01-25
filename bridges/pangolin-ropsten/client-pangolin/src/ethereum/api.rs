@@ -104,6 +104,40 @@ impl<'a> EthereumApi<'a> {
         Ok(v)
     }
 
+    /// Register erc20 token
+    pub async fn register_erc20(
+        &self,
+        proof: EthereumReceiptProofThing,
+    ) -> ClientResult<subxt::sp_core::H256> {
+        let account = self.client.account();
+        let v = match account.real() {
+            Some(real) => {
+                let call = runtime_types::pangolin_runtime::Call::EthereumIssuing(
+                    runtime_types::from_ethereum_issuing::pallet::Call::register_erc20 {
+                        proof: (proof.header, proof.receipt_proof, proof.mmr_proof),
+                    },
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .proxy()
+                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+            None => {
+                self.client
+                    .runtime()
+                    .tx()
+                    .ethereum_issuing()
+                    .register_erc20((proof.header, proof.receipt_proof, proof.mmr_proof))
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+        };
+        Ok(v)
+    }
+
     /// Sync authorities change
     pub async fn sync_authorities_change(
         &self,
@@ -131,6 +165,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_backing()
                     .sync_authorities_change((proof.header, proof.receipt_proof, proof.mmr_proof))
+                    .sign_and_submit(account.signer())
                     .await?
             }
         };

@@ -8,7 +8,7 @@ use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::config::ClientConfig;
 use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
-use client_pangolin::types::DarwiniaAccount;
+use client_pangolin::types::{DarwiniaAccount, EthereumReceiptProofThing};
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
@@ -140,8 +140,9 @@ impl ExtrinsicsHandler {
         match ethereum_tx.tx_type {
             TransactionType::SetAuthorities => {
                 let ex_hash = self
-                    .darwinia2ethereum
-                    .sync_authorities_change(&self.darwinia2ethereum_relayer, proof)
+                    .client
+                    .ethereum()
+                    .sync_authorities_change(proof)
                     .await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
@@ -151,10 +152,7 @@ impl ExtrinsicsHandler {
                 );
             }
             TransactionType::RegisterErc20Token => {
-                let ex_hash = self
-                    .ethereum2darwinia
-                    .register_erc20(&self.ethereum2darwinia_relayer, proof)
-                    .await?;
+                let ex_hash = self.client.ethereum().register_erc20(proof).await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
                     "register erc20 token tx {:?} with extrinsic {:?}",

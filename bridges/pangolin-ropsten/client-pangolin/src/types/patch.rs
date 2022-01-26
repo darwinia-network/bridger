@@ -12,7 +12,7 @@ pub type BetterRelayAffirmation = darwinia_relay_primitives::relayer_game::Relay
     darwinia_bridge_ethereum::EthereumRelayHeaderParcel,
     <PangolinSubxtConfig as subxt::Config>::AccountId,
     Balance,
-    darwinia_relay_primitives::relayer_game::RelayAffirmationId<u64>,
+    u64,
 >;
 
 /// Affirmations return data types

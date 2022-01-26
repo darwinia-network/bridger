@@ -36,9 +36,8 @@ impl<'a> EthereumApi<'a> {
     /// Affirmations
     pub async fn affirmations(&self) -> ClientResult<AffirmationsReturn> {
         let mut result = HashMap::new();
-        let mut iter = self
-            .client
-            .runtime()
+        let runtime = self.client.runtime();
+        let mut iter = runtime
             .storage()
             .ethereum_relayer_game()
             .affirmations_iter(None)
@@ -263,6 +262,8 @@ impl<'a> EthereumApi<'a> {
         let account = self.client.account();
         let runtime_version = self.client.subxt().rpc().runtime_version(None).await?;
         // let spec_name = runtime_version.spec_name.to_string();
-        Ok(1.into())
+        // Ok(1.into())
+        let h = self.client.subxt().rpc().block_hash(None).await?;
+        Ok(h.unwrap())
     }
 }

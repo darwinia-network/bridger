@@ -101,4 +101,25 @@ impl PangolinClient {
             })?;
         Ok(spec_name.to_string())
     }
+
+    /// is_tech_comm_member
+    pub async fn is_tech_comm_member(
+        &self,
+        block_number: Option<u32>,
+        account: Option<DarwiniaAccount>,
+    ) -> ClientResult<bool> {
+        let block_hash = self
+            .subxt()
+            .rpc()
+            .block_hash(Some(BlockNumber::from(block_number)))
+            .await?;
+        let members = self
+            .runtime()
+            .storage()
+            .technical_committee()
+            .members(block_hash)
+            .await?;
+        let account = account.unwrap_or(self.account.clone());
+        Ok(members.contains(account.real_account()))
+    }
 }

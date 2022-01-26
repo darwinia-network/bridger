@@ -1,12 +1,14 @@
 use std::time::SystemTime;
 
+use client_pangolin::client::PangolinClient;
+use client_pangolin::component::PangolinClientComponent;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
-use client_pangolin::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
+use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
@@ -66,8 +68,8 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
 
     let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
 
-    // Darwinia client
-    let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
+    // Pangolin client
+    let client = PangolinClientComponent::component(bridge_config.darwinia).await?;
 
     let mut timing = SystemTime::now();
     loop {
@@ -93,18 +95,16 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
         }
         let tx = txs.get(0).unwrap();
 
-        let verified = match helpers::is_verified(&darwinia, tx).await {
+        let tx_hash = array_bytes::hex2bytes(&tx.block_hash).map_err(|_e| {
+            BridgerError::Hex(format!(
+                "Failed to convert hex({}) to bytes.",
+                &tx.block_hash
+            ))
+        })?;
+        let tx_index = tx.tx_index;
+        let verified = match client.ethereum().is_verified(&tx_hash, tx_index).await {
             Ok(v) => v,
             Err(e) => {
-                if let Some(substrate_subxt::Error::Rpc(_)) =
-                    e.downcast_ref::<substrate_subxt::Error>()
-                {
-                    return Err(e);
-                }
-                let err_msg = format!("{:?}", e).to_lowercase();
-                if err_msg.contains("restart") {
-                    return Err(e);
-                }
                 tracing::error!(
                     target: "pangolin-ropsten",
                     "Failed verified redeem. [{}]: {}. {:?}",
@@ -125,7 +125,12 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
             let secs = elapsed.as_secs();
             if secs >= task_config.check_timeout {
                 tracker.finish(tx.block_number as usize)?;
-                // todo: check timeout, skip thi transaction, write log
+                tracing::warn!(
+                    target: "pangolin-ropsten",
+                    "The transaction {:?}({}) check redeem long time, skipped",
+                    tx_hash,
+                    tx_index,
+                );
                 continue;
             }
         }

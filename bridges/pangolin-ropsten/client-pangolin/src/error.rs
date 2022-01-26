@@ -7,6 +7,18 @@ pub type ClientResult<T> = Result<T, ClientError>;
 /// Error enum.
 #[derive(ThisError, Debug)]
 pub enum ClientError {
+    #[error(transparent)]
+    SubxtBasicError(#[from] subxt::BasicError),
+
+    #[error("No header hash in EthereumReceiptProofOfThing")]
+    NoHeaderHashInEthereumReceiptProofOfThing,
+
+    #[error("Wrong seed: {0}")]
+    Seed(String),
+
+    #[error("Other error: {0}")]
+    Other(String),
+
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
 
@@ -20,9 +32,6 @@ pub enum ClientError {
 
     #[error("Failed to connect ethereum rpc http endpoint")]
     CannotConnectToWeb3(#[from] web3::Error),
-
-    #[error(transparent)]
-    SubxtBasicError(#[from] subxt::BasicError),
 
     #[error("No signer seed set for authority, please check your config.toml")]
     NoAuthoritySignerSeed,
@@ -47,10 +56,4 @@ pub enum ClientError {
 
     #[error("Not technical committee member")]
     NotTechnicalCommitteeMember,
-
-    #[error("No header hash in EthereumReceiptProofOfThing")]
-    NoHeaderHashInEthereumReceiptProofOfThing,
-
-    #[error("Other error: {0}")]
-    Other(String),
 }

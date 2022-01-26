@@ -6,6 +6,7 @@ use subxt::{
 };
 
 use crate::config::PangolinSubxtConfig;
+use crate::error::{ClientError, ClientResult};
 use crate::types::NodeRuntimeSignedExtra;
 
 /// AccountId
@@ -44,9 +45,10 @@ impl Clone for DarwiniaAccount {
 
 impl DarwiniaAccount {
     /// Create a new Account
-    pub fn new(seed: String, real: Option<String>) -> DarwiniaAccount {
+    pub fn new(seed: String, real: Option<String>) -> ClientResult<Self> {
         // signer to sign darwinia extrinsic
-        let pair = Pair::from_string(&seed, None).unwrap(); // if not a valid seed
+        let pair =
+            Pair::from_string(&seed, None).map_err(|e| ClientError::Seed(format!("{:?}", e)))?; // if not a valid seed
         let signer = PairSigner::new(pair);
         let public = signer.signer().public().0;
         let account_id = AccountId::from(public);
@@ -54,11 +56,11 @@ impl DarwiniaAccount {
         // real account, convert to account id
         let real = real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real)));
 
-        DarwiniaAccount {
+        Ok(Self {
             account_id,
             signer,
             real,
-        }
+        })
     }
 }
 

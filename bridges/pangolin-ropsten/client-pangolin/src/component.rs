@@ -21,7 +21,7 @@ impl PangolinClientComponent {
         let account = DarwiniaAccount::new(
             config.relayer_private_key.clone(),
             config.relayer_real_account.clone(),
-        );
+        )?;
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
             return match ClientBuilder::new().set_url(&endpoint).build().await {

@@ -21,5 +21,8 @@ async fn test_block_hash_from_block_number() {
 async fn test_spec_version() {
     let client = common::client().await.unwrap();
     let version = client.subxt().rpc().runtime_version(None).await.unwrap();
-    println!("{:?}", version);
+    assert_eq!(
+        version.other.get("specName"),
+        Some(&serde_json::Value::String("Pangolin".to_string()))
+    );
 }

@@ -1,6 +1,7 @@
 use substrate_subxt::sp_core::H256;
 
 use client_pangolin::darwinia::client::Darwinia;
+use client_pangolin::types::primitive_types::H256;
 use component_thegraph_liketh::types::TransactionEntity;
 use support_common::error::BridgerError;
 

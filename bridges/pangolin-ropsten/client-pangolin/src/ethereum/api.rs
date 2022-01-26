@@ -352,4 +352,24 @@ impl<'a> EthereumApi<'a> {
         };
         Ok(v)
     }
+
+    /// The tx is verified
+    pub async fn is_verified(&self, block_hash: &[u8], tx_index: u64) -> ClientResult<bool> {
+        let hash = subxt::sp_core::H256::from_slice(block_hash);
+        let v0: bool = self
+            .client
+            .runtime()
+            .storage()
+            .ethereum_backing()
+            .verified_proof(hash, tx_index, None)
+            .await?;
+        let v1: bool = self
+            .client
+            .runtime()
+            .storage()
+            .ethereum_issuing()
+            .verified_issuing_proof(hash, tx_index, None)
+            .await?;
+        Ok(v0 || v1)
+    }
 }

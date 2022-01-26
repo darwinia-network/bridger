@@ -88,6 +88,7 @@ impl PangolinClient {
         Ok(mmr_root)
     }
 
+    /// Query spec name
     pub async fn spec_name(&self) -> ClientResult<String> {
         let runtime_version = self.subxt().rpc().runtime_version(None).await?;
         let spec_name = runtime_version

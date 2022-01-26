@@ -1,7 +1,8 @@
+use pangolin_subxt::api::RuntimeApi;
+use subxt::rpc::NumberOrHex;
 use subxt::sp_runtime::traits::Header;
 use subxt::{BlockNumber, Client};
 
-use crate::codegen::api::RuntimeApi;
 use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::ethereum::EthereumApi;
@@ -111,7 +112,7 @@ impl PangolinClient {
         let block_hash = self
             .subxt()
             .rpc()
-            .block_hash(Some(BlockNumber::from(block_number)))
+            .block_hash(block_number.map(|block| NumberOrHex::Number(block as u64).into()))
             .await?;
         let members = self
             .runtime()

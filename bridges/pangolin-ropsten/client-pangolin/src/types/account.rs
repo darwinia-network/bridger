@@ -1,3 +1,4 @@
+use pangolin_subxt::api::runtime_types::darwinia_claims::EcdsaSignature;
 use secp256k1::SecretKey;
 use std::fmt::{Debug, Formatter};
 
@@ -11,7 +12,6 @@ use web3::Web3;
 
 use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
-use crate::types::darwinia_claims::EcdsaSignature;
 use crate::types::NodeRuntimeSignedExtra;
 
 /// AccountId

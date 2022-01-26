@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 
+use pangolin_subxt::api::runtime_types;
+use pangolin_subxt::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use pangolin_subxt::api::runtime_types::pangolin_runtime::pallets::proxy::ProxyType;
+use pangolin_subxt::api::runtime_types::to_ethereum_backing::pallet::RedeemFor;
+
 use crate::client::PangolinClient;
-use crate::codegen::api::runtime_types;
 use crate::error::{ClientError, ClientResult};
 use crate::helpers;
-use crate::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
-use crate::types::pangolin_runtime::pallets::proxy::ProxyType;
-use crate::types::to_ethereum_backing::pallet::RedeemFor;
 use crate::types::{
     AffirmationsReturn, BetterRelayAffirmation, EcdsaMessage, EthereumAccount,
     EthereumReceiptProofThing,
@@ -292,7 +293,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit(account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
             None => {
@@ -307,7 +308,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_relay_authorities()
                     .submit_signed_mmr_root(block_number, signature.0)
-                    .sign_and_submit(account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
         };
@@ -336,7 +337,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit(account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
             None => {
@@ -346,7 +347,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_relay_authorities()
                     .submit_signed_authorities(signature.0)
-                    .sign_and_submit(account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
         };

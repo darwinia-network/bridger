@@ -1,7 +1,6 @@
+use pangolin_subxt::api::DefaultAccountData;
 use serde::{Deserialize, Serialize};
 use subxt::{sp_core, sp_runtime, StorageEntry};
-
-use crate::codegen::api::DefaultAccountData;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientConfig {

@@ -5,5 +5,3 @@ pub mod error;
 pub mod ethereum;
 pub mod helpers;
 pub mod types;
-
-mod codegen;

@@ -1,14 +1,16 @@
-use codec::Encode;
 use std::collections::HashMap;
+
+use codec::Encode;
+use pangolin_subxt::api::runtime_types::{
+    darwinia_bridge_ethereum, darwinia_relay_primitives, ethereum_primitives,
+};
 use subxt::extrinsic::ChargeAssetTxPayment;
 use subxt::DefaultExtraWithTxPayment;
 
 use crate::config::PangolinSubxtConfig;
-use crate::types::{
-    darwinia_bridge_ethereum, darwinia_relay_primitives, ethereum_primitives, Balance,
-};
+use crate::types::Balance;
 
-/// Real realy affirmation types
+/// Real relay affirmation types
 pub type BetterRelayAffirmation = darwinia_relay_primitives::relayer_game::RelayAffirmation<
     darwinia_bridge_ethereum::EthereumRelayHeaderParcel,
     <PangolinSubxtConfig as subxt::Config>::AccountId,

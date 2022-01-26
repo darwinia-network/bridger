@@ -42,7 +42,6 @@ rand        = "0.8.4"
 web3    = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
-#substrate-subxt = { git = "https://github.com/darwinia-network/subxt.git", tag = "darwinia-v0.11.7" }
 
 client-pangolin    = { path = "../client-pangolin" }
 
@@ -50,7 +49,6 @@ support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }
 support-tracker    = { path = "../../../frame/supports/support-tracker" }
-support-ethereum   = { path = "../../../frame/supports/support-ethereum" }
 support-command-kv = { path = "../../../frame/supports/support-command-kv" }
 
 component-ethereum        = { path = "../../../frame/components/ethereum" }

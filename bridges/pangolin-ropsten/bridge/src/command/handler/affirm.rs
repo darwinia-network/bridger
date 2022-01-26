@@ -1,13 +1,12 @@
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use colored::Colorize;
+use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 
 use component_ethereum::errors::BizError;
 use component_shadow::ShadowComponent;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
-use support_ethereum::block::EthereumHeader;
-use support_ethereum::parcel::EthereumRelayHeaderParcel;
 use support_terminal::output;
 
 use crate::bridge::PangolinRopstenConfig;
@@ -72,6 +71,7 @@ async fn handle_do(
             if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
                 return Err(BizError::ParcelFromShadowIsEmpty(block.unwrap()).into());
             }
+            client.ethereum().affirm(parcel)
             let ex_hash = ethereum_to_darwinia
                 .affirm(&from_ethereum_account, parcel)
                 .await?;

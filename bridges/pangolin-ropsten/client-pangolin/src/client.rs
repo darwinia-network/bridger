@@ -87,4 +87,17 @@ impl PangolinClient {
         };
         Ok(mmr_root)
     }
+
+    pub async fn spec_name(&self) -> ClientResult<String> {
+        let runtime_version = self.subxt().rpc().runtime_version(None).await?;
+        let spec_name = runtime_version
+            .other
+            .get("specName")
+            .ok_or_else(|| ClientError::Other(format!("Failed to query spec name")))?
+            .as_str()
+            .ok_or_else(|| {
+                ClientError::Other(format!("The spec name not found in runtime version"))
+            })?;
+        Ok(spec_name.to_string())
+    }
 }

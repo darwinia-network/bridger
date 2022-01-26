@@ -266,15 +266,7 @@ impl<'a> EthereumApi<'a> {
         block_number: u32,
     ) -> ClientResult<subxt::sp_core::H256> {
         let darwinia_account = self.client.account();
-        let runtime_version = self.client.subxt().rpc().runtime_version(None).await?;
-        let spec_name = runtime_version
-            .other
-            .get("specName")
-            .ok_or_else(|| ClientError::Other(format!("Failed to query spec name")))?
-            .as_str()
-            .ok_or_else(|| {
-                ClientError::Other(format!("The spec name not found in runtime version"))
-            })?;
+        let spec_name = self.client.spec_name().await?;
 
         // get mmr root from darwinia
         let mmr_root = self.client.get_mmr_root(block_number).await?;

@@ -1,6 +1,6 @@
 use codec::Encode;
 
-use crate::types::{BetterRelayAffirmation, _S};
+use crate::types::{BetterRelayAffirmation, EcdsaAddress, _S};
 
 /// affirmations contains block?
 pub fn affirmations_contains_block(affirmations: &[BetterRelayAffirmation], block: u64) -> bool {
@@ -45,6 +45,36 @@ pub fn encode_mmr_root_message(
         _2: op_code,
         _3: block_number,
         _4: mmr_root,
+    };
+    let encoded: &[u8] = &message.encode();
+    encoded.to_vec()
+}
+
+pub fn encode_authorities_message(
+    spec_name: impl AsRef<str>,
+    term: u32,
+    next_authorities: Vec<EcdsaAddress>,
+) -> Vec<u8> {
+    let spec_name = spec_name.as_ref();
+    let op_code: [u8; 4] = [180, 188, 244, 151];
+    tracing::debug!(
+        target: "client-pangolin",
+        "Infos to construct eth authorities message: {}, {}, {}, {:?}",
+        spec_name,
+        array_bytes::bytes2hex("", &op_code),
+        term,
+        next_authorities
+            .iter()
+            .map(|a| array_bytes::bytes2hex("", &a))
+            .collect::<Vec<_>>()
+            .join(", ")
+    );
+    // scale encode & sign
+    let message = _S {
+        _1: spec_name,
+        _2: op_code,
+        _3: term,
+        _4: next_authorities,
     };
     let encoded: &[u8] = &message.encode();
     encoded.to_vec()

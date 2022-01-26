@@ -20,11 +20,6 @@ use crate::bridge::{EcdsaMessage, Extrinsic};
 use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};
 
 pub struct ExtrinsicsHandler {
-    // ethereum2darwinia: Ethereum2Darwinia,
-    // darwinia2ethereum: Darwinia2Ethereum,
-    // darwinia2ethereum_relayer: ToEthereumAccount,
-    // ethereum2darwinia_relayer: FromEthereumAccount,
-    // darwinia_account: DarwiniaAccount,
     client: PangolinClient,
     ethereum_account: EthereumAccount,
     spec_name: String,

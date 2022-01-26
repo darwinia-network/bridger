@@ -1,11 +1,8 @@
+use client_pangolin::client::PangolinClient;
+use client_pangolin::component::PangolinClientComponent;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
-use client_pangolin::account::DarwiniaAccount;
-use client_pangolin::component::DarwiniaSubxtComponent;
-use client_pangolin::config::DarwiniaSubxtConfig;
-use client_pangolin::to_ethereum::Account as ToEthereumAccount;
-use client_pangolin::to_ethereum::Darwinia2Ethereum;
 use component_ethereum::ethereum::EthereumComponent;
 use component_ethereum::web3::Web3Config;
 use component_subquery::SubqueryComponent;
@@ -61,32 +58,19 @@ impl PangolinScanner {
         // subquery
         let subquery = SubqueryComponent::component(bridge_config.subquery)?;
 
-        // darwinia
-        let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
-
         // ethereum
         let ethereum = EthereumComponent::component(bridge_config.ethereum, config_web3.clone())?;
 
-        let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
+        // pangolin client
+        let client = PangolinClientComponent::component(config_darwinia).await?;
 
-        let account = DarwiniaAccount::new(
-            config_darwinia.relayer_private_key,
-            config_darwinia.relayer_real_account,
-        );
-        let account = ToEthereumAccount::new(
-            account.clone(),
-            config_darwinia.ecdsa_authority_private_key,
-            config_web3.endpoint,
-        );
         let mut wrapper = ScanDataWrapper {
             from: 0,
             limit: 0,
             sender_to_extrinsics,
             subquery,
-            darwinia,
             ethereum,
-            darwinia2ethereum,
-            account,
+            pangolin: client,
         };
 
         loop {

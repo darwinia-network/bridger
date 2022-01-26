@@ -1,7 +1,5 @@
 use std::convert::TryInto;
 
-use client_pangolin::to_ethereum::Darwinia2Ethereum;
-
 use crate::service::pangolin::types::ScanDataWrapper;
 
 pub struct ScanAuthoritiesChangeSignedEvent<'a> {
@@ -16,11 +14,13 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
 
 impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
     pub async fn handle(&mut self) -> color_eyre::Result<Option<u32>> {
-        let spec_name = self.data.darwinia.runtime_version().await?;
-        let current_term = self
-            .data
-            .darwinia2ethereum
-            .get_current_authority_term()
+        let client = &self.data.pangolin;
+
+        let current_term: u32 = client
+            .runtime()
+            .storage()
+            .ethereum_relay_authorities()
+            .next_term(None)
             .await?;
 
         let events = self
@@ -64,8 +64,9 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
                 let message = item.as_slice().try_into()?;
                 new_authorities.push(message);
             }
-            let message = Darwinia2Ethereum::construct_authorities_message(
-                spec_name.clone(),
+            let spec_name = client.spec_name().await?;
+            let message = client_pangolin::helpers::encode_authorities_message(
+                spec_name,
                 event.term,
                 new_authorities,
             );

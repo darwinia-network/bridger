@@ -8,7 +8,8 @@ use crate::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use crate::types::pangolin_runtime::pallets::proxy::ProxyType;
 use crate::types::to_ethereum_backing::pallet::RedeemFor;
 use crate::types::{
-    AffirmationsReturn, BetterRelayAffirmation, EthereumAccount, EthereumReceiptProofThing,
+    AffirmationsReturn, BetterRelayAffirmation, EcdsaMessage, EthereumAccount,
+    EthereumReceiptProofThing,
 };
 
 /// Ethereum api
@@ -318,7 +319,45 @@ impl<'a> EthereumApi<'a> {
                     .await?
             }
         };
+        Ok(v)
+    }
 
+    /// submit signed authorities
+    pub async fn ecdsa_sign_and_submit_signed_authorities(
+        &self,
+        ethereum_account: EthereumAccount,
+        message: EcdsaMessage,
+    ) -> ClientResult<subxt::sp_core::H256> {
+        let signature = ethereum_account.ecdsa_sign(&message)?;
+        let darwinia_account = self.client.account();
+
+        let v = match darwinia_account.real() {
+            Some(real) => {
+                tracing::trace!(target: "client-pangolin", "Proxyed ecdsa sign and submit authorities to darwinia");
+                let call = runtime_types::pangolin_runtime::Call::EthereumRelayAuthorities(
+                    runtime_types::darwinia_relay_authorities::Call::submit_signed_authorities {
+                        signature: signature.0,
+                    },
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .proxy()
+                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+            None => {
+                tracing::trace!(target: "client-pangolin", "Ecdsa sign and submit authorities to darwinia");
+                self.client
+                    .runtime()
+                    .tx()
+                    .ethereum_relay_authorities()
+                    .submit_signed_authorities(signature.0)
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+        };
         Ok(v)
     }
 }

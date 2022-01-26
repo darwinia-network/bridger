@@ -26,6 +26,7 @@ pub struct ExtrinsicsHandler {
     // ethereum2darwinia_relayer: FromEthereumAccount,
     // darwinia_account: DarwiniaAccount,
     client: PangolinClient,
+    ethereum_account: EthereumAccount,
     spec_name: String,
     microkv: NamespaceMicroKV,
     message_kv: NamespaceMicroKV,
@@ -57,24 +58,12 @@ impl ExtrinsicsHandler {
 
         // Config
         let config_darwinia: ClientConfig = bridge_config.darwinia;
-        // let config_web3: Web3Config = bridge_config.web3;
-        //
-        // Darwinia client & accounts
-        // let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
-        // let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-        // let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-        // let account = DarwiniaAccount::new(
-        //     config_darwinia.relayer_private_key,
-        //     config_darwinia.relayer_real_account,
-        // );
-        // let darwinia2ethereum_relayer = ToEthereumAccount::new(
-        //     account.clone(),
-        //     config_darwinia.ecdsa_authority_private_key,
-        //     config_web3.endpoint,
-        // );
-        // let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
-        //
-        // let spec_name = darwinia.runtime_version().await?;
+        let config_web3: Web3Config = bridge_config.web3;
+
+        let ethereum_account = EthereumAccount::new(
+            config_web3.endpoint,
+            config_darwinia.ecdsa_authority_private_key.clone(),
+        );
 
         let client = PangolinClientComponent::component(config_darwinia).await?;
 
@@ -88,6 +77,7 @@ impl ExtrinsicsHandler {
             state.microkv_with_namespace(format!("{}-messages", PangolinRopstenTask::name()));
         Ok(ExtrinsicsHandler {
             client,
+            ethereum_account,
             spec_name,
             microkv,
             message_kv,
@@ -229,16 +219,11 @@ impl ExtrinsicsHandler {
             "Start sign and send mmr_root for block: {}",
             block_number,
         );
-        let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
-        let ethereum_account = EthereumAccount::new(
-            bridge_config.web3.endpoint,
-            bridge_config.darwinia.ecdsa_authority_private_key,
-        );
 
         let ex_hash = self
             .client
             .ethereum()
-            .ecdsa_sign_and_submit_signed_mmr_root(ethereum_account, block_number)
+            .ecdsa_sign_and_submit_signed_mmr_root(self.ethereum_account.clone(), block_number)
             .await?;
         tracing::info!(
             target: "pangolin-ropsten",
@@ -258,8 +243,9 @@ impl ExtrinsicsHandler {
             "Start sign and send authorities..."
         );
         let ex_hash = self
-            .darwinia2ethereum
-            .ecdsa_sign_and_submit_signed_authorities(&self.darwinia2ethereum_relayer, message)
+            .client
+            .ethereum()
+            .ecdsa_sign_and_submit_signed_authorities(self.ethereum_account.clone(), message)
             .await?;
         tracing::info!(
             target: "pangolin-ropsten",

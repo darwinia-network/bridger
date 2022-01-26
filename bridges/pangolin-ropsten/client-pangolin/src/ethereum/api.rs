@@ -261,8 +261,15 @@ impl<'a> EthereumApi<'a> {
     ) -> ClientResult<subxt::sp_core::H256> {
         let account = self.client.account();
         let runtime_version = self.client.subxt().rpc().runtime_version(None).await?;
-        // let spec_name = runtime_version.spec_name.to_string();
-        // Ok(1.into())
+        let spec_name = runtime_version
+            .other
+            .get("specName")
+            .ok_or_else(|| ClientError::Other(format!("Failed to query spec name")))?
+            .as_str()
+            .ok_or_else(|| {
+                ClientError::Other(format!("The spec name not found in runtime version"))
+            })?;
+
         let h = self.client.subxt().rpc().block_hash(None).await?;
         Ok(h.unwrap())
     }

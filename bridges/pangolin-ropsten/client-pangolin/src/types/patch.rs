@@ -1,3 +1,4 @@
+use codec::Encode;
 use std::collections::HashMap;
 use subxt::extrinsic::ChargeAssetTxPayment;
 use subxt::DefaultExtraWithTxPayment;
@@ -30,4 +31,24 @@ pub struct EthereumReceiptProofThing {
     pub receipt_proof: ethereum_primitives::receipt::ReceiptProof,
     /// MMR proof
     pub mmr_proof: darwinia_bridge_ethereum::MMRProof,
+}
+
+/// Encode mmr root message
+#[derive(Encode)]
+pub struct _S<_1, _2, _3, _4>
+where
+    _1: Encode,
+    _2: Encode,
+    _3: Encode,
+    _4: Encode,
+{
+    /// spec name
+    pub _1: _1,
+    /// op code, mmr root: 0x479fbdf9, next authorities: 0xb4bcf497
+    pub _2: _2,
+    /// block_number or term
+    #[codec(compact)]
+    pub _3: _3,
+    /// mmr_root or next authorities
+    pub _4: _4,
 }

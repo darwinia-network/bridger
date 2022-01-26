@@ -5,7 +5,7 @@ use subxt::ClientBuilder;
 use crate::client::PangolinClient;
 use crate::config::ClientConfig;
 use crate::error::ClientError;
-use crate::types::DarwiniaAccount;
+use crate::types::{DarwiniaAccount, EthereumAccount};
 
 const MAX_ATTEMPTS: u32 = 6;
 
@@ -18,10 +18,8 @@ impl PangolinClientComponent {
         let mut attempts = 1;
         let mut wait_secs = 1;
         let endpoint = Self::correct_url(&config.endpoint)?;
-        let account = DarwiniaAccount::new(
-            config.relayer_private_key.clone(),
-            config.relayer_real_account.clone(),
-        )?;
+        let account =
+            DarwiniaAccount::new(config.relayer_private_key, config.relayer_real_account)?;
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
             return match ClientBuilder::new().set_url(&endpoint).build().await {

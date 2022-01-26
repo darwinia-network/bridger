@@ -9,7 +9,7 @@ use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::config::ClientConfig;
 use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use client_pangolin::types::to_ethereum_backing::pallet::RedeemFor;
-use client_pangolin::types::{DarwiniaAccount, EthereumReceiptProofThing};
+use client_pangolin::types::{DarwiniaAccount, EthereumAccount, EthereumReceiptProofThing};
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
@@ -229,13 +229,16 @@ impl ExtrinsicsHandler {
             "Start sign and send mmr_root for block: {}",
             block_number,
         );
+        let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
+        let ethereum_account = EthereumAccount::new(
+            bridge_config.web3.endpoint,
+            bridge_config.darwinia.ecdsa_authority_private_key,
+        );
+
         let ex_hash = self
-            .darwinia2ethereum
-            .ecdsa_sign_and_submit_signed_mmr_root(
-                &self.darwinia2ethereum_relayer,
-                self.spec_name.clone(),
-                block_number,
-            )
+            .client
+            .ethereum()
+            .ecdsa_sign_and_submit_signed_mmr_root(ethereum_account, block_number)
             .await?;
         tracing::info!(
             target: "pangolin-ropsten",

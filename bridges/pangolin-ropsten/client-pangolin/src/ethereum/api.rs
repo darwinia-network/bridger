@@ -3,10 +3,13 @@ use std::collections::HashMap;
 use crate::client::PangolinClient;
 use crate::codegen::api::runtime_types;
 use crate::error::{ClientError, ClientResult};
+use crate::helpers;
 use crate::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use crate::types::pangolin_runtime::pallets::proxy::ProxyType;
 use crate::types::to_ethereum_backing::pallet::RedeemFor;
-use crate::types::{AffirmationsReturn, BetterRelayAffirmation, EthereumReceiptProofThing};
+use crate::types::{
+    AffirmationsReturn, BetterRelayAffirmation, EthereumAccount, EthereumReceiptProofThing,
+};
 
 /// Ethereum api
 pub struct EthereumApi<'a> {
@@ -258,8 +261,10 @@ impl<'a> EthereumApi<'a> {
     /// submit_signed_mmr_root
     pub async fn ecdsa_sign_and_submit_signed_mmr_root(
         &self,
+        ethereum_account: EthereumAccount,
+        block_number: u32,
     ) -> ClientResult<subxt::sp_core::H256> {
-        let account = self.client.account();
+        let darwinia_account = self.client.account();
         let runtime_version = self.client.subxt().rpc().runtime_version(None).await?;
         let spec_name = runtime_version
             .other
@@ -270,7 +275,50 @@ impl<'a> EthereumApi<'a> {
                 ClientError::Other(format!("The spec name not found in runtime version"))
             })?;
 
-        let h = self.client.subxt().rpc().block_hash(None).await?;
-        Ok(h.unwrap())
+        // get mmr root from darwinia
+        let mmr_root = self.client.get_mmr_root(block_number).await?;
+        let encoded = helpers::encode_mmr_root_message(spec_name, block_number, mmr_root);
+        let hash = web3::signing::keccak256(&encoded);
+        let signature = ethereum_account.ecdsa_sign(&hash)?;
+
+        let v = match darwinia_account.real() {
+            Some(real) => {
+                tracing::trace!(
+                    target: "client-pangolin",
+                    "Proxyed ecdsa sign and submit mmr_root to darwinia, block_number: {}",
+                    block_number
+                );
+                let call = runtime_types::pangolin_runtime::Call::EthereumRelayAuthorities(
+                    runtime_types::darwinia_relay_authorities::Call::submit_signed_mmr_root {
+                        block_number,
+                        signature: signature.0,
+                    },
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .proxy()
+                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+            None => {
+                tracing::trace!(
+                    target: "client-pangolin",
+                    "Ecdsa sign and submit mmr_root to darwinia, block_number: {}, signature: {:?}",
+                    block_number,
+                    signature
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .ethereum_relay_authorities()
+                    .submit_signed_mmr_root(block_number, signature.0)
+                    .sign_and_submit(account.signer())
+                    .await?
+            }
+        };
+
+        Ok(v)
     }
 }

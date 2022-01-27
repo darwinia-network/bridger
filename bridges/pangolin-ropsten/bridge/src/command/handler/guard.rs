@@ -1,8 +1,5 @@
-use std::sync::Arc;
-
 use client_pangolin::component::PangolinClientComponent;
 use component_shadow::component::ShadowComponent;
-use component_shadow::ShadowComponent;
 use support_common::config::{Config, Names};
 use support_terminal::output;
 

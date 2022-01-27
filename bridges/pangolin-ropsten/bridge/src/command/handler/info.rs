@@ -1,6 +1,5 @@
 use support_terminal::output;
 
-use crate::bridge::PangolinRopstenConfig;
 use crate::command::types::{D2eCommand, InfoOpts};
 
 pub async fn handle_info(opts: InfoOpts) -> color_eyre::Result<()> {

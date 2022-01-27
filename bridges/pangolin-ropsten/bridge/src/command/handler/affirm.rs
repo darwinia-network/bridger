@@ -1,4 +1,3 @@
-use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use colored::Colorize;
@@ -61,7 +60,7 @@ async fn handle_do(
     match mode {
         AffirmMode::Block => {
             let block_number = parcel.header.number;
-            if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
+            if parcel.parent_mmr_root.to_fixed_bytes() == [0u8; 32] {
                 return Err(BizError::ParcelFromShadowIsEmpty(block.unwrap()).into());
             }
             let ex_hash = client.ethereum().affirm(parcel).await?;

@@ -25,16 +25,6 @@ pub type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<BetterRelayAffirmati
 pub type NodeRuntimeSignedExtra =
     DefaultExtraWithTxPayment<PangolinSubxtConfig, ChargeAssetTxPayment<PangolinSubxtConfig>>;
 
-/// Ethereum receipt proof
-pub struct EthereumReceiptProofThing {
-    /// Ethereum header
-    pub header: ethereum_primitives::header::Header,
-    /// Receipt proof
-    pub receipt_proof: ethereum_primitives::receipt::ReceiptProof,
-    /// MMR proof
-    pub mmr_proof: darwinia_bridge_ethereum::MMRProof,
-}
-
 /// Encode mmr root message
 #[derive(Encode)]
 pub struct _S<_1, _2, _3, _4>

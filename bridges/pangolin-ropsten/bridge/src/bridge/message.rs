@@ -2,11 +2,12 @@
 
 use std::fmt::Debug;
 
-use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use lifeline::Message;
 use postage::broadcast;
 use serde::{Deserialize, Serialize};
 
+use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use client_pangolin::types::{EcdsaMessage, EthereumReceiptProofThing};
 use component_thegraph_liketh::types::TransactionEntity;
 
 use crate::bridge::PangolinRopstenBus;

@@ -5,13 +5,13 @@ use postage::broadcast;
 
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
-use component_shadow::{Shadow, ShadowComponent};
+use component_shadow::component::ShadowComponent;
+use component_shadow::shadow::Shadow;
 use component_thegraph_liketh::types::TransactionEntity;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 
 use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage};
-use crate::helpers;
 
 pub struct RedeemHandler {
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
@@ -115,7 +115,7 @@ impl RedeemHandler {
         // 2. Do redeem
         let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
 
-        let ex = Extrinsic::Redeem(proof, tx.clone());
+        let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(
             target: "pangolin-ropsten",
             "[ropsten] Redeem extrinsic send to extrinsics service: {:?}. at ropsten block: {}",

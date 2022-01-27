@@ -6,6 +6,7 @@ use pangolin_subxt::api::runtime_types::pangolin_runtime::pallets::proxy::ProxyT
 use pangolin_subxt::api::runtime_types::to_ethereum_backing::pallet::RedeemFor;
 
 use crate::client::PangolinClient;
+use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::helpers;
 use crate::types::{
@@ -372,5 +373,63 @@ impl<'a> EthereumApi<'a> {
             .verified_issuing_proof(hash, tx_index, None)
             .await?;
         Ok(v0 || v1)
+    }
+
+    /// Is authority
+    pub async fn is_authority(
+        &self,
+        block_number: Option<u32>,
+        account: &<PangolinSubxtConfig as subxt::Config>::AccountId,
+    ) -> ClientResult<bool> {
+        let hash = self
+            .client
+            .subxt()
+            .rpc()
+            .block_hash(block_number.map(|v| v.into()))
+            .await?;
+        let authorities = self
+            .client
+            .runtime()
+            .storage()
+            .ethereum_relay_authorities()
+            .authorities(hash)
+            .await?;
+        Ok(authorities
+            .iter()
+            .position(|v| &v.account_id == account)
+            .is_some())
+    }
+
+    /// need to sign authorities
+    pub async fn need_to_sign_authorities(
+        &self,
+        block_number: Option<u32>,
+        account: &<PangolinSubxtConfig as subxt::Config>::AccountId,
+        message: EcdsaMessage,
+    ) -> ClientResult<bool> {
+        let hash = self
+            .client
+            .subxt()
+            .rpc()
+            .block_hash(block_number.map(|v| v.into()))
+            .await?;
+        let ret = self
+            .client
+            .runtime()
+            .storage()
+            .ethereum_relay_authorities()
+            .authorities_to_sign(hash)
+            .await?;
+        match ret {
+            None => Ok(false),
+            Some(r) => {
+                if r.0 == message {
+                    let includes = r.1.iter().any(|a| &a.0 == account);
+                    Ok(!includes)
+                } else {
+                    Ok(false)
+                }
+            }
+        }
     }
 }

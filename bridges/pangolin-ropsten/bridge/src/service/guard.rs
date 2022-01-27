@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use std::time::Duration;
 
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
@@ -6,6 +5,7 @@ use tokio::time::sleep;
 
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
+use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
 use component_shadow::component::ShadowComponent;
 use component_shadow::shadow::Shadow;
@@ -17,7 +17,6 @@ use support_lifeline::service::BridgeService;
 
 use crate::bridge::PangolinRopstenBus;
 use crate::bridge::PangolinRopstenTask;
-use crate::bridge::TaskConfig;
 use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage, ToGuardMessage};
 
 #[derive(Debug)]
@@ -77,8 +76,8 @@ async fn run(
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
     // Config
-    let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
-    let servce_config: TaskConfig = bridge_config.task;
+    let config_darwinia = bridge_config.darwinia;
+    let servce_config = bridge_config.task;
 
     // Darwinia client & account
     let client = PangolinClientComponent::component(config_darwinia).await?;
@@ -148,17 +147,18 @@ impl GuardService {
             if last_confirmed <= pending_block_number {
                 continue;
             }
-            let has_voted = match client.account().real() {
-                Some(real) => voting_state.contains(real),
-                None => voting_state.contains(client.account().account_id()),
-            };
+            let real_account = client.account().real_account();
+            let has_voted = voting_state.ayes.contains(real_account)
+                || voting_state.nays.contains(real_account);
             if has_voted {
                 continue;
             }
 
             match shadow.parcel(pending_block_number as usize).await {
                 Ok(parcel_from_shadow) => {
-                    let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
+                    let parcel_from_shadow: EthereumRelayHeaderParcel =
+                        parcel_from_shadow.try_into()?;
+                    let ex = if is_same_as(&pending_parcel, &parcel_from_shadow) {
                         Extrinsic::GuardVote(pending_block_number, true)
                     } else {
                         Extrinsic::GuardVote(pending_block_number, false)
@@ -232,4 +232,8 @@ impl GuardService {
 
         Ok(())
     }
+}
+
+fn is_same_as(a: &EthereumRelayHeaderParcel, b: &EthereumRelayHeaderParcel) -> bool {
+    a.header.hash == b.header.hash && a.parent_mmr_root == b.parent_mmr_root
 }

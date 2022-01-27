@@ -39,15 +39,15 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
         for event in &events {
             let block_number = Some(event.at_block_number);
             let message = event.message.as_slice().try_into()?;
-            let need_to_sign = self
-                .data
-                .darwinia2ethereum
-                .is_authority(block_number, &self.data.account)
+            let pangolin = &self.data.pangolin;
+            let real_account = pangolin.account().real_account();
+            let need_to_sign = pangolin
+                .ethereum()
+                .is_authority(block_number, real_account)
                 .await?
-                && self
-                    .data
-                    .darwinia2ethereum
-                    .need_to_sign_authorities(block_number, &self.data.account, message)
+                && pangolin
+                    .ethereum()
+                    .need_to_sign_authorities(block_number, real_account, message)
                     .await?;
 
             if !need_to_sign {

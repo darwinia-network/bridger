@@ -1,12 +1,11 @@
 use pangolin_subxt::api::RuntimeApi;
-use subxt::sp_core::H256;
 use subxt::sp_runtime::traits::Header;
-use subxt::{BlockNumber, Client};
+use subxt::Client;
 
 use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::ethereum::EthereumApi;
-use crate::types::{DarwiniaAccount, HeaderMMRRpc, NodeRuntimeSignedExtra};
+use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
 
 /// Pangolin client
 #[derive(Clone)]

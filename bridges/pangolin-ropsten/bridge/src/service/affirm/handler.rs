@@ -6,10 +6,11 @@ use postage::broadcast;
 
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
+use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
-use component_shadow::{Shadow, ShadowComponent};
+use component_shadow::component::ShadowComponent;
+use component_shadow::shadow::Shadow;
 use support_common::config::{Config, Names};
-use support_ethereum::block::EthereumHeader;
 
 use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage};
 
@@ -168,7 +169,8 @@ impl AffirmHandler {
 
         match self.shadow.parcel(target as usize).await {
             Ok(parcel) => {
-                if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
+                let parcel: EthereumRelayHeaderParcel = parcel.try_into()?;
+                if parcel.parent_mmr_root.to_fixed_bytes() == [0u8; 32] {
                     tracing::trace!(
                         target: "pangolin-ropsten",
                         "Shadow service failed to provide parcel for block {}",

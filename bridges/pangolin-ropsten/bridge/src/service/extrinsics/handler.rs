@@ -9,9 +9,7 @@ use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::config::ClientConfig;
 use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use client_pangolin::types::to_ethereum_backing::pallet::RedeemFor;
-use client_pangolin::types::{
-    DarwiniaAccount, EcdsaMessage, EthereumAccount, EthereumReceiptProofThing,
-};
+use client_pangolin::types::{EcdsaMessage, EthereumAccount, EthereumReceiptProofThing};
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
@@ -24,7 +22,6 @@ use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};
 pub struct ExtrinsicsHandler {
     client: PangolinClient,
     ethereum_account: EthereumAccount,
-    spec_name: String,
     microkv: NamespaceMicroKV,
     message_kv: NamespaceMicroKV,
 }
@@ -75,7 +72,6 @@ impl ExtrinsicsHandler {
         Ok(ExtrinsicsHandler {
             client,
             ethereum_account,
-            spec_name,
             microkv,
             message_kv,
         })
@@ -285,25 +281,14 @@ impl ExtrinsicsHandler {
                 match self.send_extrinsic(ex.clone()).await {
                     Ok(_) => self.message_kv.delete(&key)?,
                     Err(err) => {
-                        if let Some(substrate_subxt::Error::Rpc(_)) =
-                            err.downcast_ref::<substrate_subxt::Error>()
-                        {
-                            tracing::warn!(
-                                target: "pangolin-ropsten",
-                                "Connection Error. Try to resend later. extrinsic: {:?}",
-                                ex,
-                            );
-                            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                            break;
-                        } else {
-                            self.message_kv.delete(&key)?;
-                            tracing::error!(
-                                target: "pangolin-ropsten",
-                                "Failed to send extrinsic {:?} err: {:?}",
-                                ex,
-                                err
-                            );
-                        }
+                        self.message_kv.delete(&key)?;
+                        tracing::error!(
+                            target: "pangolin-ropsten",
+                            "Failed to send extrinsic {:?} err: {:?}",
+                            ex,
+                            err
+                        );
+                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     }
                 }
             }

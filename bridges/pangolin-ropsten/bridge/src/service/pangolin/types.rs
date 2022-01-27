@@ -1,8 +1,6 @@
-use client_pangolin::client::PangolinClient;
 use postage::broadcast;
 
-use client_pangolin::darwinia::client::Darwinia;
-use client_pangolin::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
+use client_pangolin::client::PangolinClient;
 use component_ethereum::ethereum::client::EthereumClient;
 use component_subquery::Subquery;
 

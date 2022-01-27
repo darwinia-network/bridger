@@ -1,10 +1,8 @@
-use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
 use component_ethereum::ethereum::EthereumComponent;
-use component_ethereum::web3::Web3Config;
 use component_subquery::SubqueryComponent;
 use support_common::config::{Config, Names};
 use support_tracker::Tracker;
@@ -52,8 +50,8 @@ impl PangolinScanner {
         let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
         // config
-        let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
-        let config_web3: Web3Config = bridge_config.web3;
+        let config_darwinia = bridge_config.darwinia;
+        let config_web3 = bridge_config.web3;
 
         // subquery
         let subquery = SubqueryComponent::component(bridge_config.subquery)?;

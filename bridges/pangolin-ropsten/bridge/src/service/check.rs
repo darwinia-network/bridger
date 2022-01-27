@@ -1,6 +1,5 @@
 use std::time::SystemTime;
 
-use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
@@ -15,7 +14,6 @@ use support_tracker::Tracker;
 use crate::bridge::PangolinRopstenTask;
 use crate::bridge::TaskConfig;
 use crate::bridge::{PangolinRopstenBus, PangolinRopstenConfig};
-use crate::helpers;
 
 /// Check service
 #[derive(Debug)]

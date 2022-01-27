@@ -1,5 +1,5 @@
 use client_pangolin::component::PangolinClientComponent;
-use client_pangolin::types::{EcdsaMessage, EthereumAccount};
+use client_pangolin::types::EthereumAccount;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_terminal::output;

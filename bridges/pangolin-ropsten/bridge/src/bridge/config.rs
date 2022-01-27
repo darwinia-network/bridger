@@ -4,7 +4,7 @@ use client_pangolin::config::ClientConfig;
 use component_ethereum::ethereum::EthereumConfig;
 use component_ethereum::web3::Web3Config;
 use component_http_client::HttpClientConfig;
-use component_shadow::ShadowConfig;
+use component_shadow::config::ShadowConfig;
 use component_subquery::SubqueryConfig;
 use component_thegraph_liketh::config::TheGraphLikeEthConfig;
 

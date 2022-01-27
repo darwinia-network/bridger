@@ -48,8 +48,6 @@ pub enum ToExtrinsicsMessage {
     Extrinsic(Extrinsic),
 }
 
-pub type EcdsaMessage = [u8; 32];
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Extrinsic {
     Affirm(EthereumRelayHeaderParcel),

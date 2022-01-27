@@ -1,11 +1,12 @@
 use pangolin_subxt::api::RuntimeApi;
+use subxt::sp_core::H256;
 use subxt::sp_runtime::traits::Header;
 use subxt::{BlockNumber, Client};
 
 use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::ethereum::EthereumApi;
-use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
+use crate::types::{DarwiniaAccount, HeaderMMRRpc, NodeRuntimeSignedExtra};
 
 /// Pangolin client
 #[derive(Clone)]
@@ -52,12 +53,7 @@ impl PangolinClient {
     /// get mmr root
     pub async fn get_mmr_root(&self, leaf_index: u32) -> ClientResult<subxt::sp_core::H256> {
         let block_number = leaf_index + 1;
-        let block_hash = self
-            .subxt()
-            .rpc()
-            .block_hash(Some(BlockNumber::from(block_number)))
-            .await?;
-        let header = self.subxt().rpc().header(block_hash).await?;
+        let header = self.header_by_number(block_number).await?;
 
         let mmr_root = if let Some(header) = header {
             // get digest_item from header
@@ -122,4 +118,35 @@ impl PangolinClient {
         let account = account.unwrap_or(self.account.clone());
         Ok(members.contains(account.real_account()))
     }
+
+    /// query header by block number
+    pub async fn header_by_number(
+        &self,
+        number: u32,
+    ) -> ClientResult<Option<<PangolinSubxtConfig as subxt::Config>::Header>> {
+        match self.subxt().rpc().block_hash(Some(number.into())).await? {
+            Some(hash) => Ok(self.subxt().rpc().header(Some(hash)).await?),
+            None => Ok(None),
+        }
+    }
+
+    // /// get mmr root of darwinia
+    // pub async fn header_mmr_gen_proof(
+    //     &self,
+    //     block_number_of_member_leaf: u64,
+    //     block_number_of_last_leaf: u64,
+    //     hash: H256,
+    // ) -> ClientResult<()> {
+    //     let params = &[
+    //         serde_json::to_value(block_number_of_member_leaf)?,
+    //         serde_json::to_value(block_number_of_last_leaf)?,
+    //     ];
+    //     let v: HeaderMMRRpc = self
+    //         .client
+    //         .rpc()
+    //         .client
+    //         .request("headerMMR_genProof", params)
+    //         .await?;
+    //     Ok(())
+    // }
 }

@@ -4,7 +4,6 @@ use crate::ethereum::client::EthereumClient;
 use crate::web3::{Web3Component, Web3Config};
 
 pub mod client;
-pub mod types;
 
 /// Ethereum provider
 #[derive(Clone, Debug, Serialize, Deserialize)]

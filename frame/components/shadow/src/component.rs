@@ -1,7 +1,8 @@
 use component_ethereum::ethereum::{EthereumComponent, EthereumConfig};
 use component_ethereum::web3::Web3Config;
 
-use crate::{Shadow, ShadowConfig};
+use crate::config::ShadowConfig;
+use crate::shadow::Shadow;
 
 /// Shadow component
 pub struct ShadowComponent;

@@ -1,5 +1,3 @@
-use std::convert::TryInto;
-
 use secp256k1::SecretKey;
 use web3::contract::{Contract, Options};
 use web3::signing::SecretKeyRef;
@@ -8,8 +6,8 @@ use web3::types::{Address, Block, BlockId, BlockNumber, H256, U256};
 use web3::Web3;
 
 use crate::errors::EthereumComponentError;
-use crate::ethereum::types::GasPrice;
 use crate::ethereum::EthereumConfig;
+use crate::types::ethereum::GasPrice;
 
 /// Ethereum client
 pub struct EthereumClient {

@@ -26,7 +26,7 @@ pub async fn handle_affirm(opts: AffirmOpts) -> color_eyre::Result<()> {
 async fn handle_do(
     mode: AffirmMode,
     block: Option<u64>,
-    raw_json: Option<String>,
+    _raw_json: Option<String>,
 ) -> color_eyre::Result<()> {
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
@@ -41,14 +41,15 @@ async fn handle_do(
                 bridge_config.ethereum,
                 bridge_config.web3,
             )?;
-            shadow.parcel(block as usize + 1).await?
+            shadow.parcel(block as usize + 1).await?.try_into()?
         }
         AffirmMode::Raw => {
-            let json = raw_json.ok_or_else(|| {
-                BridgerError::Custom("You are missing `--raw` parameter".to_string())
-            })?;
-            serde_json::from_str(&json)
-                .map_err(|e| BridgerError::Custom(format!("Failed to deserde json: {:?}", e)))?
+            // let json = raw_json.ok_or_else(|| {
+            //     BridgerError::Custom("You are missing `--raw` parameter".to_string())
+            // })?;
+            // serde_json::from_str(&json)
+            //     .map_err(|e| BridgerError::Custom(format!("Failed to deserde json: {:?}", e)))?
+            return Err(BridgerError::Custom("Not support this feature now".to_string()).into());
         }
     };
 
@@ -56,14 +57,6 @@ async fn handle_do(
 
     // Darwinia client
     let client = PangolinClientComponent::component(config_darwinia.clone()).await?;
-    let ethereum_to_darwinia = Ethereum2Darwinia::new(darwinia);
-
-    // Account
-    let darwinia_account = DarwiniaAccount::new(
-        config_darwinia.relayer_private_key,
-        config_darwinia.relayer_real_account,
-    );
-    let from_ethereum_account = client_pangolin::from_ethereum::Account::new(darwinia_account);
 
     match mode {
         AffirmMode::Block => {
@@ -71,21 +64,14 @@ async fn handle_do(
             if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
                 return Err(BizError::ParcelFromShadowIsEmpty(block.unwrap()).into());
             }
-            client.ethereum().affirm(parcel)
-            let ex_hash = ethereum_to_darwinia
-                .affirm(&from_ethereum_account, parcel)
-                .await?;
+            let ex_hash = client.ethereum().affirm(parcel).await?;
             output::output_text(format!(
                 "Affirmed ethereum block {} in extrinsic {:?}",
                 block_number, ex_hash
             ));
         }
         AffirmMode::Raw => {
-            // affirm
-            let hash = ethereum_to_darwinia
-                .affirm(&from_ethereum_account, parcel)
-                .await?;
-            output::output_text(format!("Extrinsic hash: {:?}", hash));
+            return Err(BridgerError::Custom("Not support this feature now".to_string()).into());
         }
     }
     Ok(())
@@ -95,11 +81,10 @@ async fn handle_state() -> color_eyre::Result<()> {
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
     // Darwinia client
-    let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
-    let ethereum_to_darwinia = Ethereum2Darwinia::new(darwinia);
+    let client = PangolinClientComponent::component(bridge_config.darwinia).await?;
 
     let mut output = vec![];
-    for (game_id, game) in ethereum_to_darwinia.affirmations().await?.iter() {
+    for (game_id, game) in client.ethereum().affirmations().await?.iter() {
         output.push(format!("{}", &format!("--- GAME {} ---", game_id).bold()));
         for (round_id, affirmations) in game.iter() {
             output.push(format!("ROUND {}", round_id));

@@ -4,10 +4,8 @@ use secp256k1::SecretKey;
 use web3::contract::{Contract, Options};
 use web3::signing::SecretKeyRef;
 use web3::transports::Http;
-use web3::types::{Address, BlockId, BlockNumber, H256, U256};
+use web3::types::{Address, Block, BlockId, BlockNumber, H256, U256};
 use web3::Web3;
-
-use support_ethereum::block::EthereumHeader;
 
 use crate::errors::EthereumComponentError;
 use crate::ethereum::types::GasPrice;
@@ -53,10 +51,10 @@ impl EthereumClient {
     }
 
     /// Get ethereum header by block number
-    pub async fn get_header_by_number(&self, block: u64) -> color_eyre::Result<EthereumHeader> {
+    pub async fn get_header_by_number(&self, block: u64) -> color_eyre::Result<Block<H256>> {
         let eth_block = BlockId::Number(BlockNumber::Number(block.into()));
         match self.web3.eth().block(eth_block).await? {
-            Some(block) => Ok(block.try_into()?),
+            Some(block) => Ok(block),
             None => Err(EthereumComponentError::BlockNotFound(block).into()),
         }
     }

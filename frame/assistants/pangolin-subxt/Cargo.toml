@@ -19,7 +19,8 @@ edition = "2021"
 
 [dependencies]
 
-thiserror = "1"
+thiserror   = "1"
+array-bytes = "1.4"
 
 subxt       = { git = "https://github.com/paritytech/subxt.git" }
 codec       = { package = "parity-scale-codec", version = "2.3.1", default-features = false, features = ["derive", "full"] }

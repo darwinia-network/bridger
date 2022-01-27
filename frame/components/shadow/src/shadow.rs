@@ -9,12 +9,10 @@ use serde_json::Value;
 
 use component_ethereum::errors::BizError;
 use component_ethereum::ethereum::client::EthereumClient;
-use support_ethereum::mmr::{MMRRoot, MMRRootJson};
-use support_ethereum::parcel::EthereumRelayHeaderParcel;
-use support_ethereum::proof::{EthereumRelayProofs, EthereumRelayProofsJson};
-use support_ethereum::receipt::{EthereumReceiptProofThing, EthereumReceiptProofThingJson};
 
-use crate::{ShadowComponentError, ShadowConfig};
+use crate::config::ShadowConfig;
+use crate::error::ShadowComponentError;
+use crate::types::MMRRootJson;
 
 #[derive(Serialize)]
 struct Proposal {
@@ -60,7 +58,10 @@ impl Shadow {
     }
 
     /// Get mmr
-    pub async fn get_parent_mmr_root(&self, block_number: usize) -> color_eyre::Result<MMRRoot> {
+    pub async fn get_parent_mmr_root(
+        &self,
+        block_number: usize,
+    ) -> color_eyre::Result<MMRRootJson> {
         let url = &format!(
             "{}/ethereum/parent_mmr_root/{}",
             &self.config.endpoint, block_number
@@ -75,7 +76,7 @@ impl Shadow {
             .await
             .context(format!("Fail to parse json to MMRRootJson: {}", url))?;
         match result {
-            ParentMmrRootResult::Result(json) => Ok(json.try_into()?),
+            ParentMmrRootResult::Result(json) => Ok(json),
             ParentMmrRootResult::Error { error } => {
                 Err(BizError::BlankEthereumMmrRoot(block_number, error).into())
             }

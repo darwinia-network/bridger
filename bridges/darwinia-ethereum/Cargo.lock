@@ -466,7 +466,6 @@ dependencies = [
  "reqwest",
  "secp256k1",
  "serde 1.0.132",
- "support-ethereum",
  "thiserror",
  "tracing",
  "web3",
@@ -488,10 +487,10 @@ version = "0.5.0"
 dependencies = [
  "color-eyre",
  "component-ethereum",
+ "parity-scale-codec",
  "reqwest",
  "serde 1.0.132",
  "serde_json",
- "support-ethereum",
  "thiserror",
  "tracing",
 ]

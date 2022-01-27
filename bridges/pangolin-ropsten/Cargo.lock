@@ -1968,6 +1968,7 @@ name = "pangolin-subxt"
 version = "0.5.0"
 dependencies = [
  "array-bytes",
+ "component-shadow",
  "parity-scale-codec",
  "subxt",
  "thiserror",

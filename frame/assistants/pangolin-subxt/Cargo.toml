@@ -27,3 +27,5 @@ codec       = { package = "parity-scale-codec", version = "2.3.1", default-featu
 
 web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master" }
 
+
+component-shadow = { path = "../../components/shadow" }

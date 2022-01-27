@@ -9,14 +9,16 @@ use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::config::ClientConfig;
 use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use client_pangolin::types::to_ethereum_backing::pallet::RedeemFor;
-use client_pangolin::types::{DarwiniaAccount, EthereumAccount, EthereumReceiptProofThing};
+use client_pangolin::types::{
+    DarwiniaAccount, EcdsaMessage, EthereumAccount, EthereumReceiptProofThing,
+};
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 
-use crate::bridge::{EcdsaMessage, Extrinsic};
+use crate::bridge::Extrinsic;
 use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};
 
 pub struct ExtrinsicsHandler {

@@ -35,3 +35,5 @@ sp-core          = { git = "https://github.com/darwinia-network/substrate.git", 
 
 support-primitives = { path = "../support-primitives" }
 
+component-shadow   = { path = "../../components/shadow" }
+

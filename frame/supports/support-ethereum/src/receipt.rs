@@ -3,14 +3,15 @@ use std::convert::{TryFrom, TryInto};
 use std::fmt::Debug;
 
 use codec::{Decode, Encode};
+use component_shadow::types::{EthereumReceiptProofJson, EthereumReceiptProofThingJson};
 use rlp::{Encodable, RlpStream};
 use serde::{Deserialize, Serialize};
 
 use support_primitives::array::{Bloom, H160, H256};
 
-use crate::block::{EthereumHeader, EthereumHeaderJson};
+use crate::block::EthereumHeader;
 use crate::error::BridgeEthereumError;
-use crate::mmr::{MMRProof, MMRProofJson};
+use crate::mmr::MMRProof;
 
 /// Redeem for
 #[derive(Clone, Debug, Encode, PartialEq, Eq)]
@@ -42,17 +43,6 @@ pub struct EthereumReceiptProof {
     pub proof: Vec<u8>,
     /// Ethereum Header Hash
     pub header_hash: [u8; 32],
-}
-
-/// Ethereum Receipt Proof Json
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct EthereumReceiptProofJson {
-    /// Proof index
-    pub index: String,
-    /// Receipt Proof
-    pub proof: String,
-    /// Ethereum Header Hash
-    pub header_hash: String,
 }
 
 impl TryFrom<EthereumReceiptProof> for EthereumReceiptProofJson {
@@ -98,17 +88,6 @@ pub struct EthereumReceiptProofThing {
     pub receipt_proof: EthereumReceiptProof,
     /// MMR Proof
     pub mmr_proof: MMRProof,
-}
-
-/// Ethereum ReceiptProofThing Json
-#[derive(Debug, Serialize, Deserialize)]
-pub struct EthereumReceiptProofThingJson {
-    /// Ethereum Header
-    pub header: EthereumHeaderJson,
-    /// Ethereum Receipt Proof
-    pub receipt_proof: EthereumReceiptProofJson,
-    /// MMR Proof
-    pub mmr_proof: MMRProofJson,
 }
 
 impl TryFrom<EthereumReceiptProofThingJson> for EthereumReceiptProofThing {

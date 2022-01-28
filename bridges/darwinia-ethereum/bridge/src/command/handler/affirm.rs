@@ -4,7 +4,7 @@ use client_darwinia::account::DarwiniaAccount;
 use client_darwinia::component::DarwiniaSubxtComponent;
 use client_darwinia::from_ethereum::Ethereum2Darwinia;
 use component_ethereum::errors::BizError;
-use component_shadow::ShadowComponent;
+use component_shadow::component::ShadowComponent;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_ethereum::block::EthereumHeader;
@@ -43,7 +43,7 @@ async fn handle_do(
                 bridge_config.ethereum,
                 bridge_config.web3,
             )?;
-            shadow.parcel(block as usize + 1).await?
+            shadow.parcel(block as usize + 1).await?.try_into()?
         }
         AffirmMode::Raw => {
             let json = raw_json.ok_or_else(|| {

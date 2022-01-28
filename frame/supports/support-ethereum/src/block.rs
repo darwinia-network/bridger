@@ -3,6 +3,7 @@ use std::convert::TryFrom;
 use std::fmt::Debug;
 
 use codec::{Decode, Encode};
+use component_shadow::types::EthereumHeaderJson;
 use serde::{Deserialize, Serialize};
 use sp_core::bytes::to_hex;
 use web3::types::{Block, H256};
@@ -138,57 +139,6 @@ impl std::fmt::Display for EthereumHeader {
         }
 
         write!(f, "{}", msgs.join("\n"))
-    }
-}
-
-/// Darwinia Eth header Json foramt
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Default, Encode, Clone)]
-pub struct EthereumHeaderJson {
-    parent_hash: String,
-    timestamp: u64,
-    /// Block Number
-    pub number: u64,
-    author: String,
-    transactions_root: String,
-    uncles_hash: String,
-    extra_data: String,
-    state_root: String,
-    receipts_root: String,
-    log_bloom: String,
-    gas_used: u128,
-    gas_limit: u128,
-    difficulty: u128,
-    seal: Vec<String>,
-    pub base_fee_per_gas: Option<u128>,
-    hash: String,
-}
-
-impl TryFrom<EthereumHeader> for EthereumHeaderJson {
-    type Error = BridgeEthereumError;
-
-    fn try_from(that: EthereumHeader) -> Result<Self, Self::Error> {
-        Ok(Self {
-            parent_hash: array_bytes::bytes2hex("0x", that.parent_hash),
-            timestamp: that.timestamp,
-            number: that.number,
-            author: array_bytes::bytes2hex("0x", that.author),
-            transactions_root: array_bytes::bytes2hex("0x", that.transactions_root),
-            uncles_hash: array_bytes::bytes2hex("0x", that.uncles_hash),
-            extra_data: array_bytes::bytes2hex("0x", that.extra_data),
-            state_root: array_bytes::bytes2hex("0x", that.state_root),
-            receipts_root: array_bytes::bytes2hex("0x", that.receipts_root),
-            log_bloom: array_bytes::bytes2hex("0x", that.log_bloom.0),
-            gas_used: that.gas_used.as_u128(),
-            gas_limit: that.gas_limit.as_u128(),
-            difficulty: that.difficulty.as_u128(),
-            seal: that
-                .seal
-                .iter()
-                .map(|s| array_bytes::bytes2hex("0x", s))
-                .collect(),
-            base_fee_per_gas: that.base_fee_per_gas.map(|v| v.as_u128()),
-            hash: array_bytes::bytes2hex("0x", that.hash.unwrap_or_default()),
-        })
     }
 }
 

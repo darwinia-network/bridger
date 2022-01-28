@@ -5,7 +5,8 @@ use postage::broadcast;
 
 use client_darwinia::component::DarwiniaSubxtComponent;
 use client_darwinia::from_ethereum::Ethereum2Darwinia;
-use component_shadow::{Shadow, ShadowComponent};
+use component_shadow::component::ShadowComponent;
+use component_shadow::shadow::Shadow;
 use component_thegraph_liketh::types::TransactionEntity;
 use support_common::config::{Config, Names};
 
@@ -19,9 +20,7 @@ pub struct RedeemHandler {
 }
 
 impl RedeemHandler {
-    pub async fn new(
-        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
-    ) -> Self {
+    pub async fn new(sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>) -> Self {
         let mut times = 0;
         loop {
             times += 1;
@@ -41,7 +40,7 @@ impl RedeemHandler {
     }
 
     async fn build(
-        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
+        sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> color_eyre::Result<Self> {
         tracing::info!(target: "darwinia-ethereum", "SERVICE RESTARTING...");
 
@@ -105,7 +104,7 @@ impl RedeemHandler {
         // 2. Do redeem
         let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
 
-        let ex = Extrinsic::Redeem(proof, tx.clone());
+        let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(
             target: "darwinia-ethereum",
             "[ethereum] Redeem extrinsic send to extrinsics service: {:?}. at ethereum block: {}",

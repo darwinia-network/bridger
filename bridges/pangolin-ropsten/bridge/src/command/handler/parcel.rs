@@ -1,4 +1,4 @@
-use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_shadow::component::ShadowComponent;
 use support_common::config::{Config, Names};
 use support_terminal::output;

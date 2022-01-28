@@ -126,7 +126,7 @@ impl TryFrom<EthereumReceiptProofJson> for ethereum_primitives::receipt::Receipt
 }
 
 impl TryFrom<MMRProofJson> for darwinia_bridge_ethereum::MMRProof {
-    type Error = BridgeEthereumError;
+    type Error = ConvertTypeError;
 
     fn try_from(that: MMRProofJson) -> Result<Self, Self::Error> {
         let mut proof = Vec::with_capacity(that.proof.len());

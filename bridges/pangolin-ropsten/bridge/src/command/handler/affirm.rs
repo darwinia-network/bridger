@@ -1,7 +1,7 @@
-use client_pangolin::component::PangolinClientComponent;
-use client_pangolin::types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use colored::Colorize;
 
+use client_pangolin::component::PangolinClientComponent;
+use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
 use component_shadow::component::ShadowComponent;
 use support_common::config::{Config, Names};

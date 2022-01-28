@@ -49,14 +49,15 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
 
         let event_block_number = latest.event_block_number;
 
-        let finalized_block_hash = self.data.darwinia.finalized_head().await?;
-        let finalized_block_header_number = match self
-            .data
-            .darwinia
-            .get_block_number_by_hash(finalized_block_hash)
-            .await?
-        {
-            Some(v) => v,
+        let pangolin = &self.data.pangolin;
+        let finalized_block_hash = pangolin.subxt().rpc().finalized_head().await?;
+        let block = pangolin
+            .subxt()
+            .rpc()
+            .block(Some(finalized_block_hash))
+            .await?;
+        let finalized_block_header_number = match block {
+            Some(v) => v.block.header.number,
             None => {
                 tracing::warn!(
                     target: "pangolin-ropsten",
@@ -87,13 +88,12 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             return Ok(());
         }
 
-        if !self
-            .data
-            .darwinia2ethereum
+        if !pangolin
+            .ethereum()
             .need_to_sign_mmr_root_of(
-                &self.data.account,
                 event_block_number,
                 Some(finalized_block_header_number),
+                pangolin.account().real_account(),
             )
             .await?
         {

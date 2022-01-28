@@ -7,7 +7,7 @@ BIN_PATH=$(cd "$(dirname "$0")"; pwd -P)
 WORK_PATH=${BIN_PATH}/../
 
 
-SUBXT=$(which subxt)
+SUBXT=$(which subxt || echo '')
 
 if [ -z "${SUBXT}" ]; then
   cargo install --branch parity-master  --git https://github.com/darwinia-network/subxt

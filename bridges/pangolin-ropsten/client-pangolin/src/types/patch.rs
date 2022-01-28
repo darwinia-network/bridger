@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 
 use codec::Encode;
-use pangolin_subxt::api::runtime_types::{
-    darwinia_bridge_ethereum, darwinia_relay_primitives, ethereum_primitives,
-};
+use pangolin_subxt::api::runtime_types::{darwinia_bridge_ethereum, darwinia_relay_primitives};
 use subxt::extrinsic::ChargeAssetTxPayment;
 use subxt::DefaultExtraWithTxPayment;
 

@@ -432,4 +432,30 @@ impl<'a> EthereumApi<'a> {
             }
         }
     }
+
+    /// need to sign mmr root of block
+    pub async fn need_to_sign_mmr_root_of(
+        &self,
+        block_number: u32,
+        exec_block_number: Option<u32>,
+        account: &<PangolinSubxtConfig as subxt::Config>::AccountId,
+    ) -> ClientResult<bool> {
+        let exec_block_hash = self
+            .client
+            .subxt()
+            .rpc()
+            .block_hash(exec_block_number.map(|v| v.into()))
+            .await?;
+        let mmr_roots_to_sign = self
+            .client
+            .runtime()
+            .storage()
+            .ethereum_relay_authorities()
+            .mmr_roots_to_sign(block_number, exec_block_hash)
+            .await?;
+        match mmr_roots_to_sign {
+            None => Ok(false),
+            Some(m) => Ok(m.signatures.iter().any(|a| &a.0 == account)),
+        }
+    }
 }

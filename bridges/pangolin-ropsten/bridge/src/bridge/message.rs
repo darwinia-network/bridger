@@ -4,7 +4,7 @@ use std::fmt::Debug;
 
 use lifeline::Message;
 use postage::broadcast;
-// use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use client_pangolin::types::{EcdsaMessage, EthereumReceiptProofThing};
@@ -49,7 +49,7 @@ pub enum ToExtrinsicsMessage {
     Extrinsic(Extrinsic),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum Extrinsic {
     Affirm(EthereumRelayHeaderParcel),
     Redeem(EthereumReceiptProofThing, TransactionEntity),

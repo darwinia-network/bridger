@@ -8,7 +8,6 @@ use crate::command::types::MmrOpts;
 
 pub async fn handle_mmr(opts: MmrOpts) -> color_eyre::Result<()> {
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
-    let network = opts.network;
     let mmrblock = opts.mmrblock;
     let config_darwinia = bridge_config.darwinia;
 

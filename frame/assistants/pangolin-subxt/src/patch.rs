@@ -1,7 +1,7 @@
 use crate::api::runtime_types::{darwinia_bridge_ethereum, ethereum_primitives};
 
 /// Ethereum receipt proof
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, codec::Encode, codec::Decode)]
 pub struct EthereumReceiptProofThing {
     /// Ethereum header
     pub header: ethereum_primitives::header::Header,

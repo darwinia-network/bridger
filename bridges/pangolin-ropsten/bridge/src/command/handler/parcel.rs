@@ -1,4 +1,3 @@
-use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_shadow::component::ShadowComponent;
 use support_common::config::{Config, Names};
 use support_terminal::output;
@@ -21,7 +20,6 @@ pub async fn handle_parcel(opts: ParcelOpts, basic: BasicOptions) -> color_eyre:
 
     // Get parcel
     let parcel = shadow.parcel(block as usize).await?;
-    let parcel: EthereumRelayHeaderParcel = parcel.try_into()?;
     let text = match output_format {
         OutputFormat::Json => serde_json::to_string(&parcel)?,
         _ => format!("{:?}", parcel),

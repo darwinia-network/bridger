@@ -1970,6 +1970,7 @@ dependencies = [
  "array-bytes",
  "component-shadow",
  "parity-scale-codec",
+ "serde 1.0.133",
  "subxt",
  "thiserror",
  "web3",

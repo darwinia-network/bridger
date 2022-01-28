@@ -44,7 +44,7 @@ impl PangolinClient {
 
     /// Ethereum api
     pub fn ethereum(&self) -> EthereumApi {
-        EthereumApi::new(&self)
+        EthereumApi::new(self)
     }
 }
 
@@ -89,10 +89,10 @@ impl PangolinClient {
         let spec_name = runtime_version
             .other
             .get("specName")
-            .ok_or_else(|| ClientError::Other(format!("Failed to query spec name")))?
+            .ok_or_else(|| ClientError::Other("Failed to query spec name".to_string()))?
             .as_str()
             .ok_or_else(|| {
-                ClientError::Other(format!("The spec name not found in runtime version"))
+                ClientError::Other("The spec name not found in runtime version".to_string())
             })?;
         Ok(spec_name.to_string())
     }
@@ -114,7 +114,7 @@ impl PangolinClient {
             .technical_committee()
             .members(block_hash)
             .await?;
-        let account = account.unwrap_or(self.account.clone());
+        let account = account.unwrap_or_else(|| self.account.clone());
         Ok(members.contains(account.real_account()))
     }
 

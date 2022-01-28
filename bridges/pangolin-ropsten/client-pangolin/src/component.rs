@@ -30,7 +30,7 @@ impl PangolinClientComponent {
                         wait_secs *= 2; // backoff
                         continue;
                     }
-                    Err(err)?
+                    Err(err.into())
                 }
             };
         }

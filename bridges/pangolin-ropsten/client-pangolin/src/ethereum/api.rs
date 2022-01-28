@@ -394,10 +394,7 @@ impl<'a> EthereumApi<'a> {
             .ethereum_relay_authorities()
             .authorities(hash)
             .await?;
-        Ok(authorities
-            .iter()
-            .position(|v| &v.account_id == account)
-            .is_some())
+        Ok(authorities.iter().any(|v| &v.account_id == account))
     }
 
     /// need to sign authorities

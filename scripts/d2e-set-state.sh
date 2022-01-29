@@ -33,6 +33,6 @@ if [ "${NAMESPACE}" == "pangolin-ropsten" ]; then
 
 fi
 
-#sh -f ${BIN_PATH}/d2e-scan-state.sh ${NAMESPACE}
+sh -f ${BIN_PATH}/d2e-scan-state.sh ${NAMESPACE}
 
 

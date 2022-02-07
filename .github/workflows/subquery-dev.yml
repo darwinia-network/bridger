@@ -9,7 +9,7 @@ on:
     branches: [ master ]
 
 env:
-  SUBQUERY_CLI_VERSION: 0.1.5
+  SUBQUERY_CLI_VERSION: 0.2.0
   SUBQUERY_ORG: darwinia-network
 
 jobs:
@@ -45,9 +45,7 @@ jobs:
         run: |
           set -xe
 
-          subquery login --token ${{ secrets.SUBQUERY_TOKEN }}
-
-          subquery project create \
+          subquery --token ${{ secrets.SUBQUERY_TOKEN }} project create \
             --org ${{ env.SUBQUERY_ORG }} \
             --key subql-bridge-${{ matrix.chain }} \
             --repo https://github.com/darwinia-network/bridger \
@@ -59,7 +57,7 @@ jobs:
             subql/${{ matrix.chain }}/schema.graphql || exit 1)
           if [ -n "${DIFF_SCHEMA}" ]; then
             echo 'Hard deploy subql/${{ matrix.chain }}'
-            subquery deployment deploy \
+            subquery --token ${{ secrets.SUBQUERY_TOKEN }} deployment deploy \
               --org ${{ env.SUBQUERY_ORG }} \
               --key subql-bridge-${{ matrix.chain }} \
               --branch ${{ steps.branch-name.outputs.current_branch }} \
@@ -68,7 +66,7 @@ jobs:
               --force
           else
             echo 'Soft deploy subql/${{ matrix.chain }}'
-            subquery deployment deploy \
+            subquery --token ${{ secrets.SUBQUERY_TOKEN }} deployment deploy \
               --org ${{ env.SUBQUERY_ORG }} \
               --key subql-bridge-${{ matrix.chain }} \
               --branch ${{ steps.branch-name.outputs.current_branch }} \

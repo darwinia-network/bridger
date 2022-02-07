@@ -7,7 +7,7 @@ on:
       - 'v*'
 
 env:
-  SUBQUERY_CLI_VERSION: 0.1.5
+  SUBQUERY_CLI_VERSION: 0.2.0
   SUBQUERY_ORG: darwinia-network
 
 jobs:
@@ -34,13 +34,11 @@ jobs:
 
       - name: Deploy
         run: |
-          subquery login --token ${{ secrets.SUBQUERY_TOKEN }}
-
-          subquery deployment promote \
+          subquery --token ${{ secrets.SUBQUERY_TOKEN }} deployment promote \
             --org ${{ env.SUBQUERY_ORG }} \
             --key subql-bridge-${{ matrix.chain }}
 
-          subquery deployment deploy \
+          subquery --token ${{ secrets.SUBQUERY_TOKEN }} deployment deploy \
             --org ${{ env.SUBQUERY_ORG }} \
             --key subql-bridge-${{ matrix.chain }} \
             --branch ${{ steps.branch-name.outputs.current_branch }} \

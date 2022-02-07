@@ -124,13 +124,13 @@ impl PrecompiledBinaryExecutor {
                     let parts: Vec<&str> = stdout.split(' ').collect();
                     let binary_version = parts.get(1);
                     if let Some(&bversion) = &binary_version {
-                        if bversion == version {
+                        if bversion.trim() == version.trim() {
                             return Ok(path_binary);
                         }
                     }
                     tracing::warn!(
                         target: "bridger",
-                        "The except version is {}, but the binary ({}) version is: {}",
+                        "The except version is [{}], but the binary's ({}) version is [{}].",
                         version,
                         command,
                         binary_version.unwrap_or(&"UNKNOWN")

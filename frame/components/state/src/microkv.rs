@@ -15,7 +15,7 @@ pub fn microkv_instance(config: &MicrokvConfig) -> color_eyre::Result<microkv::M
 
 fn try_microkv(dbname: String, config: &MicrokvConfig) -> color_eyre::Result<microkv::MicroKV> {
     Ok(microkv::MicroKV::open_with_base_path(
-        dbname.clone(),
+        dbname,
         config.base_path.clone(),
     )?)
 }

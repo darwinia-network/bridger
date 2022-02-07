@@ -10,6 +10,7 @@ dataSources:
     kind: substrate/Runtime
     startBlock: 6200000
     mapping:
+      file: ./dist/index.js
       handlers:
         - handler: handleBlock
           kind: substrate/BlockHandler

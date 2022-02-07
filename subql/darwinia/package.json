@@ -1,7 +1,7 @@
 {
-  "name": "subql-pangolin-bridger",
+  "name": "subql-bridge-darwinia",
   "version": "1.0.0",
-  "description": "Pangolin network",
+  "description": "Darwinia network",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
@@ -19,9 +19,9 @@
   "author": "Darwinia",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@polkadot/api": "^6",
-    "@subql/cli": "latest",
+    "@polkadot/api": "^7",
     "@subql/types": "latest",
-    "typescript": "4.4.4"
+    "typescript": "^4.1.3",
+    "@subql/cli": "latest"
   }
 }

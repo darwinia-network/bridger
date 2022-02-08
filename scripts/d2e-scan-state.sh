@@ -12,7 +12,11 @@ KV="${BRIDGER} ${NAMESPACE} kv"
 
 if [ "${NAMESPACE}" == "pangolin-ropsten" ]; then
   ${KV} get -o table --include-key \
+    affirm.relayed \
+    affirm.target \
     scan.pangolin.running \
+    scan.pangolin.current \
+    scan.pangolin.planned \
     scan.ropsten.check.running \
     scan.ropsten.check.current \
     scan.ropsten.check.planned \

@@ -14522,6 +14522,16 @@ pub mod api {
                 const PALLET: &'static str = "Ethereum";
                 const EVENT: &'static str = "Executed";
             }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct DvmTransfer(
+                pub runtime_types::primitive_types::H160,
+                pub runtime_types::primitive_types::H160,
+                pub runtime_types::primitive_types::U256,
+            );
+            impl ::subxt::Event for DvmTransfer {
+                const PALLET: &'static str = "Ethereum";
+                const EVENT: &'static str = "DvmTransfer";
+            }
         }
         pub mod storage {
             use super::runtime_types;
@@ -18560,6 +18570,12 @@ pub mod api {
                         runtime_types::primitive_types::H160,
                         ::subxt::sp_core::H256,
                         runtime_types::evm_core::error::ExitReason,
+                    ),
+                    #[codec(index = 1)]
+                    DVMTransfer(
+                        runtime_types::primitive_types::H160,
+                        runtime_types::primitive_types::H160,
+                        runtime_types::primitive_types::U256,
                     ),
                 }
             }

@@ -26,3 +26,23 @@ async fn test_spec_version() {
         Some(&serde_json::Value::String("Pangolin".to_string()))
     );
 }
+
+#[tokio::test]
+async fn test_transfer() {
+    let client = common::client().await.unwrap();
+    let account = client.account();
+
+    let value = 10 * 1000000000;
+    let tx = client
+        .runtime()
+        .tx()
+        .balances()
+        .transfer(
+            subxt::sp_runtime::MultiAddress::Id(account.account_id().clone()),
+            value,
+        )
+        .sign_and_submit(account.signer())
+        .await
+        .unwrap();
+    println!("{:?}", tx);
+}

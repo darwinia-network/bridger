@@ -30,7 +30,7 @@ array-bytes = "1.4"
 codec       = { package = "parity-scale-codec", version = "2.3.1", default-features = false, features = ["derive", "full"] }
 web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 secp256k1   = { version = "0.20", features = ["recovery"] }
-subxt       = { git = "https://github.com/paritytech/subxt.git" } # may don't need this
+subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
 
 pangolin-subxt   = { path = "../../../frame/assistants/pangolin-subxt" }
 

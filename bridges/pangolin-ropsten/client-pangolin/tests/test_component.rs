@@ -29,23 +29,3 @@ async fn test_spec_version() {
         Some(&serde_json::Value::String("Pangolin".to_string()))
     );
 }
-
-#[tokio::test]
-async fn test_transfer() {
-    let client = common::client().await.unwrap();
-    let account = client.account();
-
-    let dest =
-        AccountId::from_ss58check("2tgx1a7shMw35EhRkXm2mkHF8bqq8j6ryzxDx5xFP9m5Kcsz").unwrap();
-
-    let value: u128 = 10 * 1000000000;
-    let tx = client
-        .runtime()
-        .tx()
-        .balances()
-        .transfer(dest.into(), value)
-        .sign_and_submit(account.signer())
-        .await
-        .unwrap();
-    println!("{:?}", tx);
-}

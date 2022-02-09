@@ -1,3 +1,6 @@
+use client_pangolin::types::AccountId;
+use subxt::sp_core::crypto::Ss58Codec;
+
 mod common;
 
 #[tokio::test]
@@ -32,15 +35,15 @@ async fn test_transfer() {
     let client = common::client().await.unwrap();
     let account = client.account();
 
-    let value = 10 * 1000000000;
+    let dest =
+        AccountId::from_ss58check("2tgx1a7shMw35EhRkXm2mkHF8bqq8j6ryzxDx5xFP9m5Kcsz").unwrap();
+
+    let value: u128 = 10 * 1000000000;
     let tx = client
         .runtime()
         .tx()
         .balances()
-        .transfer(
-            subxt::sp_runtime::MultiAddress::Id(account.account_id().clone()),
-            value,
-        )
+        .transfer(dest.into(), value)
         .sign_and_submit(account.signer())
         .await
         .unwrap();

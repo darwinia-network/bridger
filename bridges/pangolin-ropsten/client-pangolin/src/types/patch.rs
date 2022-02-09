@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use codec::Encode;
 use pangolin_subxt::api::runtime_types::{darwinia_bridge_ethereum, darwinia_relay_primitives};
-use subxt::extrinsic::ChargeAssetTxPayment;
+use subxt::extrinsic::ChargeTransactionPayment;
 use subxt::DefaultExtraWithTxPayment;
 
 use crate::config::PangolinSubxtConfig;
@@ -21,7 +21,7 @@ pub type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<BetterRelayAffirmati
 
 /// Node runtime signed extra
 pub type NodeRuntimeSignedExtra =
-    DefaultExtraWithTxPayment<PangolinSubxtConfig, ChargeAssetTxPayment<PangolinSubxtConfig>>;
+    DefaultExtraWithTxPayment<PangolinSubxtConfig, ChargeTransactionPayment<PangolinSubxtConfig>>;
 
 /// Encode mmr root message
 #[derive(Encode)]

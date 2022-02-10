@@ -13744,7 +13744,7 @@ pub mod api {
                 >,
             }
             impl ::subxt::Call for affirm {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "affirm";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -13756,7 +13756,7 @@ pub mod api {
                 >,
             }
             impl ::subxt::Call for dispute_and_affirm {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "dispute_and_affirm";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -13769,7 +13769,7 @@ pub mod api {
                     ::std::vec::Vec<runtime_types::darwinia_bridge_ethereum::EthereumRelayProofs>,
             }
             impl ::subxt::Call for complete_relay_proofs {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "complete_relay_proofs";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -13786,7 +13786,7 @@ pub mod api {
                 >,
             }
             impl ::subxt::Call for extend_affirmation {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "extend_affirmation";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -13795,7 +13795,7 @@ pub mod api {
                 pub aye: ::core::primitive::bool,
             }
             impl ::subxt::Call for vote_pending_relay_header_parcel {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "vote_pending_relay_header_parcel";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -13806,7 +13806,7 @@ pub mod api {
                 pub mmr_proof: runtime_types::darwinia_bridge_ethereum::MMRProof,
             }
             impl ::subxt::Call for check_receipt {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "check_receipt";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -13815,7 +13815,7 @@ pub mod api {
                 pub new: ::core::primitive::u128,
             }
             impl ::subxt::Call for set_receipt_verify_fee {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "set_receipt_verify_fee";
             }
             #[derive(
@@ -13829,13 +13829,13 @@ pub mod api {
                 pub confirmed_block_number: ::core::primitive::u64,
             }
             impl ::subxt::Call for remove_confirmed_parcel_of {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "remove_confirmed_parcel_of";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct clean_confirmed_parcels;
             impl ::subxt::Call for clean_confirmed_parcels {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "clean_confirmed_parcels";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -13844,7 +13844,7 @@ pub mod api {
                     runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel,
             }
             impl ::subxt::Call for set_confirmed_parcel {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const FUNCTION: &'static str = "set_confirmed_parcel";
             }
             pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
@@ -14022,7 +14022,7 @@ pub mod api {
                 >,
             );
             impl ::subxt::Event for Affirmed {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "Affirmed";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -14033,7 +14033,7 @@ pub mod api {
                 >,
             );
             impl ::subxt::Event for DisputedAndAffirmed {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "DisputedAndAffirmed";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -14044,7 +14044,7 @@ pub mod api {
                 >,
             );
             impl ::subxt::Event for Extended {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "Extended";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -14053,7 +14053,7 @@ pub mod api {
                 pub ::std::vec::Vec<::core::primitive::u64>,
             );
             impl ::subxt::Event for NewRound {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "NewRound";
             }
             #[derive(
@@ -14065,7 +14065,7 @@ pub mod api {
             )]
             pub struct GameOver(pub ::core::primitive::u64);
             impl ::subxt::Event for GameOver {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "GameOver";
             }
             #[derive(
@@ -14077,7 +14077,7 @@ pub mod api {
             )]
             pub struct RemoveConfirmedParcel(pub ::core::primitive::u64);
             impl ::subxt::Event for RemoveConfirmedParcel {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "RemoveConfirmedParcel";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -14087,7 +14087,7 @@ pub mod api {
                 pub runtime_types::ethereum_primitives::header::Header,
             );
             impl ::subxt::Event for VerifyReceipt {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "VerifyReceipt";
             }
             #[derive(
@@ -14099,13 +14099,13 @@ pub mod api {
             )]
             pub struct Pended(pub ::core::primitive::u64);
             impl ::subxt::Event for Pended {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "Pended";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct GuardVoted(pub ::core::primitive::u64, pub ::core::primitive::bool);
             impl ::subxt::Event for GuardVoted {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "GuardVoted";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -14114,7 +14114,7 @@ pub mod api {
                 pub ::std::vec::Vec<::core::primitive::u8>,
             );
             impl ::subxt::Event for PendingRelayHeaderParcelConfirmed {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "PendingRelayHeaderParcelConfirmed";
             }
             #[derive(
@@ -14126,7 +14126,7 @@ pub mod api {
             )]
             pub struct PendingRelayHeaderParcelRejected(pub ::core::primitive::u64);
             impl ::subxt::Event for PendingRelayHeaderParcelRejected {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const EVENT: &'static str = "PendingRelayHeaderParcelRejected";
             }
         }
@@ -14134,7 +14134,7 @@ pub mod api {
             use super::runtime_types;
             pub struct ConfirmedHeaderParcels(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for ConfirmedHeaderParcels {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ConfirmedHeaderParcels";
                 type Value = runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14146,7 +14146,7 @@ pub mod api {
             }
             pub struct ConfirmedBlockNumbers;
             impl ::subxt::StorageEntry for ConfirmedBlockNumbers {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ConfirmedBlockNumbers";
                 type Value = ::std::vec::Vec<::core::primitive::u64>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14155,7 +14155,7 @@ pub mod api {
             }
             pub struct BestConfirmedBlockNumber;
             impl ::subxt::StorageEntry for BestConfirmedBlockNumber {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "BestConfirmedBlockNumber";
                 type Value = ::core::primitive::u64;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14164,7 +14164,7 @@ pub mod api {
             }
             pub struct ConfirmedDepth;
             impl ::subxt::StorageEntry for ConfirmedDepth {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ConfirmedDepth";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14173,7 +14173,7 @@ pub mod api {
             }
             pub struct DagsMerkleRoots(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for DagsMerkleRoots {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "DagsMerkleRoots";
                 type Value = runtime_types::ethereum_types::hash::H128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14185,7 +14185,7 @@ pub mod api {
             }
             pub struct ReceiptVerifyFee;
             impl ::subxt::StorageEntry for ReceiptVerifyFee {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ReceiptVerifyFee";
                 type Value = ::core::primitive::u128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14194,7 +14194,7 @@ pub mod api {
             }
             pub struct PendingRelayHeaderParcels;
             impl ::subxt::StorageEntry for PendingRelayHeaderParcels {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "PendingRelayHeaderParcels";
                 type Value = ::std::vec::Vec<(
                     ::core::primitive::u32,
@@ -20968,7 +20968,7 @@ pub mod api {
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
                 pub struct UncheckedExtrinsic<_0, _1, _2, _3>(
-                    pub 
+                    pub
                         runtime_types::sp_runtime::generic::unchecked_extrinsic::UncheckedExtrinsic<
                             _0,
                             _1,

@@ -22,6 +22,7 @@ fn init_log() -> color_eyre::Result<()> {
         "pangolin-ropsten=trace",
         "darwinia-ethereum=trace",
         "darwinia-crab=trace",
+        "client-pangolin=trace",
         "lifeline=debug",
         "bridge=info",
         "messages_relay=trace",

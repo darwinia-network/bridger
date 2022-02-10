@@ -78,7 +78,7 @@ impl AffirmHandler {
         let mut relayed = self.microkv.get_as("affirm.relayed")?.unwrap_or(0);
         let target = self.microkv.get_as("affirm.target")?.unwrap_or(0);
 
-        tracing::trace!(
+        tracing::info!(
             target: "pangolin-ropsten",
             "The last confirmed ethereum block is {}",
             last_confirmed

@@ -36,7 +36,9 @@ impl<'a> EthereumApi<'a> {
             .ethereum_relay()
             .confirmed_block_numbers(None)
             .await?;
-        Ok(blocks.iter().max().cloned().unwrap_or(0))
+        let last_confirmed = blocks.iter().max().cloned().unwrap_or(0);
+        tracing::trace!(target: "client-pangolin", "Last ethereum relay confirmed block numbers: {}", last_confirmed);
+        Ok(last_confirmed)
     }
 
     /// Affirmations

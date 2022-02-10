@@ -1,6 +1,3 @@
-use client_pangolin::types::AccountId;
-use subxt::sp_core::crypto::Ss58Codec;
-
 mod common;
 
 #[tokio::test]
@@ -28,4 +25,43 @@ async fn test_spec_version() {
         version.other.get("specName"),
         Some(&serde_json::Value::String("Pangolin".to_string()))
     );
+}
+
+#[tokio::test]
+async fn test_system_number() {
+    let client = common::client().await.unwrap();
+    let number = client
+        .runtime()
+        .storage()
+        .system()
+        .number(None)
+        .await
+        .unwrap();
+    println!("{:?}", number);
+}
+
+#[tokio::test]
+async fn test_technical_committee_members() {
+    let client = common::client().await.unwrap();
+    let members = client
+        .runtime()
+        .storage()
+        .technical_committee()
+        .members(None)
+        .await
+        .unwrap();
+    println!("{:?}", members);
+}
+
+#[tokio::test]
+async fn test_query_ethereum_relay_confirmed_block_numbers() {
+    let client = common::client().await.unwrap();
+    let blocks = client
+        .runtime()
+        .storage()
+        .ethereum_relay()
+        .confirmed_block_numbers(None)
+        .await
+        .unwrap();
+    println!("{:?}", blocks);
 }

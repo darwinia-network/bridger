@@ -1,3 +1,5 @@
+use subxt::{BasicError, MetadataError};
+
 mod common;
 
 #[tokio::test]
@@ -81,13 +83,24 @@ async fn test_query_ethereum_relay_confirmed_block_numbers() {
 #[tokio::test]
 async fn test_next_term() {
     let client = common::client().await.unwrap();
-    let current_term = client
+    let current_term = match client
         .runtime()
         .storage()
         .ethereum_relay_authorities()
         .next_term(None)
         .await
-        .unwrap();
+    {
+        Ok(v) => v as u32,
+        Err(e) => match e {
+            BasicError::Metadata(MetadataError::PalletNotFound(pallet_name)) => {
+                match &pallet_name[..] {
+                    "Instance1DarwiniaRelayAuthorities" => 0u32,
+                    _ => panic!("PalletNotfound(\"{}\")", pallet_name),
+                }
+            }
+            _ => panic!("{:?}", e),
+        },
+    };
     println!("{}", current_term);
 }
 

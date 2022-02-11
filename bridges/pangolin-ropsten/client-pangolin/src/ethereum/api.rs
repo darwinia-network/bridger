@@ -4,6 +4,7 @@ use pangolin_subxt::api::runtime_types;
 use pangolin_subxt::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use pangolin_subxt::api::runtime_types::pangolin_runtime::pallets::proxy::ProxyType;
 use pangolin_subxt::api::runtime_types::to_ethereum_backing::pallet::RedeemFor;
+use subxt::{BasicError, MetadataError};
 
 use crate::client::PangolinClient;
 use crate::config::PangolinSubxtConfig;
@@ -464,5 +465,35 @@ impl<'a> EthereumApi<'a> {
             }
             Some(m) => Ok(m.signatures.iter().any(|a| &a.0 == account)),
         }
+    }
+
+    /// hack query ethereum relay authorities next term.
+    /// todo: fix storage prefix name same with pallet name is better way
+    pub async fn ethereum_relay_authorities_next_term(&self) -> ClientResult<u32> {
+        let current_term = match self
+            .client
+            .runtime()
+            .storage()
+            .ethereum_relay_authorities()
+            .next_term(None)
+            .await
+        {
+            Ok(v) => v,
+            Err(e) => match e {
+                BasicError::Metadata(MetadataError::PalletNotFound(pallet_name)) => {
+                    match &pallet_name[..] {
+                        "Instance1DarwiniaRelayAuthorities" => 0u32,
+                        _ => {
+                            return Err(BasicError::Metadata(MetadataError::PalletNotFound(
+                                pallet_name,
+                            ))
+                            .into())
+                        }
+                    }
+                }
+                _ => return Err(e.into()),
+            },
+        };
+        Ok(current_term)
     }
 }

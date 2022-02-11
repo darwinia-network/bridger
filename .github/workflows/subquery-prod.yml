@@ -44,4 +44,6 @@ jobs:
             --branch ${{ steps.branch-name.outputs.current_branch }} \
             --sub-folder subql/${{ matrix.chain }} \
             --type stage \
+            --indexer-image-version v0.27.2-0 \
+            --query-image-version v0.10.1-0 \
             --force

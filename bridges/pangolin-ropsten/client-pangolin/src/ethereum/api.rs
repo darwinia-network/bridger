@@ -453,7 +453,15 @@ impl<'a> EthereumApi<'a> {
             .mmr_roots_to_sign(block_number, exec_block_hash)
             .await?;
         match mmr_roots_to_sign {
-            None => Ok(false),
+            None => {
+                tracing::debug!(
+                    target: "client-pangolin",
+                    "No mmr root found in block {} and exec block {}",
+                    block_number,
+                    exec_block_number.unwrap_or(0)
+                );
+                Ok(false)
+            }
             Some(m) => Ok(m.signatures.iter().any(|a| &a.0 == account)),
         }
     }

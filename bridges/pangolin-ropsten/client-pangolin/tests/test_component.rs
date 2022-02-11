@@ -65,3 +65,15 @@ async fn test_query_ethereum_relay_confirmed_block_numbers() {
         .unwrap();
     println!("{:?}", blocks);
 }
+
+// #[tokio::test]
+// async fn test_mmr_roots_to_sign() {
+//     let client = common::client().await.unwrap();
+//     let mmr_roots_to_sign = client
+//         .runtime()
+//         .storage()
+//         .ethereum_relay_authorities()
+//         .mmr_roots_to_sign(block_number, exec_block_hash)
+//         .await
+//         .unwrap();
+// }

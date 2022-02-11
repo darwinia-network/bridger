@@ -77,3 +77,42 @@ async fn test_query_ethereum_relay_confirmed_block_numbers() {
 //         .await
 //         .unwrap();
 // }
+
+#[tokio::test]
+async fn test_next_term() {
+    let client = common::client().await.unwrap();
+    let current_term = client
+        .runtime()
+        .storage()
+        .ethereum_relay_authorities()
+        .next_term(None)
+        .await
+        .unwrap();
+    println!("{}", current_term);
+}
+
+#[tokio::test]
+async fn authorities_to_sign() {
+    let client = common::client().await.unwrap();
+    let atd = client
+        .runtime()
+        .storage()
+        .ethereum_relay_authorities()
+        .authorities_to_sign(None)
+        .await
+        .unwrap();
+    println!("{:?}", atd);
+}
+
+#[tokio::test]
+async fn authorities() {
+    let client = common::client().await.unwrap();
+    let atd = client
+        .runtime()
+        .storage()
+        .ethereum_relay_authorities()
+        .authorities(None)
+        .await
+        .unwrap();
+    println!("{:?}", atd);
+}

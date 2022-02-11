@@ -16,11 +16,16 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
     pub async fn handle(&mut self) -> color_eyre::Result<Option<u32>> {
         let client = &self.data.pangolin;
 
-        let current_term: u32 = client
-            .runtime()
-            .storage()
-            .ethereum_relay_authorities()
-            .next_term(None)
+        // let current_term: u32 = client
+        //     .runtime()
+        //     .storage()
+        //     .ethereum_relay_authorities()
+        //     .next_term(None)
+        //     .await?;
+        // fixme: It's not a good way, the best is update storage prefix with pallet name
+        let current_term = client
+            .ethereum()
+            .ethereum_relay_authorities_next_term()
             .await?;
 
         let events = self

@@ -31,5 +31,5 @@ dataSources:
 network:
   genesisHash: '0xce44bd16fc276f9e457b452577b6c2678e57768260012af127479fed806da7e7'
   endpoint: wss://pangolin-rpc.darwinia.network
-#  chaintypes:
-#    file: ./types.yaml
+  chaintypes:
+    file: ./dist/chaintypes.js

@@ -32,4 +32,5 @@ network:
   genesisHash: '0x729cb8f2cf428adcf81fe69610edda32c5711b2ff17de747e8604a3587021db8'
   endpoint: wss://rpc.darwinia.network/
   chaintypes:
-    file: ./types.yaml
+    file: ./dist/chaintypes.js
+

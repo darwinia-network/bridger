@@ -22,6 +22,10 @@
     "@polkadot/api": "^7",
     "@subql/types": "latest",
     "typescript": "^4.1.3",
-    "@subql/cli": "latest"
+    "@subql/cli": "latest",
+    "@darwinia/types": "latest"
+  },
+  "exports": {
+    "chaintypes": "src/chaintypes.ts"
   }
 }

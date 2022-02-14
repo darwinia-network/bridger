@@ -55,25 +55,13 @@ jobs:
             ${SHA} \
             origin/master \
             subql/${{ matrix.chain }}/schema.graphql || exit 1)
-          if [ -n "${DIFF_SCHEMA}" ]; then
-            echo 'Hard deploy subql/${{ matrix.chain }}'
-            subquery --token ${{ secrets.SUBQUERY_TOKEN }} deployment deploy \
-              --org ${{ env.SUBQUERY_ORG }} \
-              --key subql-bridge-${{ matrix.chain }} \
-              --branch ${{ steps.branch-name.outputs.current_branch }} \
-              --sub-folder subql/${{ matrix.chain }} \
-              --type stage \
-              --indexer-image-version v0.27.2-0 \
-              --query-image-version v0.10.1-0 \
-              --force
-          else
-            echo 'Soft deploy subql/${{ matrix.chain }}'
-            subquery --token ${{ secrets.SUBQUERY_TOKEN }} deployment deploy \
-              --org ${{ env.SUBQUERY_ORG }} \
-              --key subql-bridge-${{ matrix.chain }} \
-              --branch ${{ steps.branch-name.outputs.current_branch }} \
-              --sub-folder subql/${{ matrix.chain }} \
-              --type stage \
-              --indexer-image-version v0.27.2-0 \
-              --query-image-version v0.10.1-0
-          fi
+
+          echo 'Soft deploy subql/${{ matrix.chain }}'
+          subquery --token ${{ secrets.SUBQUERY_TOKEN }} deployment deploy ${DIFF_SCHEMA:+--force} \
+            --org ${{ env.SUBQUERY_ORG }} \
+            --key subql-bridge-${{ matrix.chain }} \
+            --branch ${{ steps.branch-name.outputs.current_branch }} \
+            --sub-folder subql/${{ matrix.chain }} \
+            --type stage \
+            --indexer-image-version v0.27.2-0 \
+            --query-image-version v0.10.1-0

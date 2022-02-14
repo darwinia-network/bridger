@@ -7,6 +7,17 @@ import {
   Signature
 } from '../types';
 
+export async function handleSlashOnMisbehavior(event: FastEvent) {
+  const atBlock = event.blockNumber;
+  const scheduleMMRRootBlock = atBlock - 30;
+  const schedule_mmr_root_event = await ScheduleMMRRootEvent.get(scheduleMMRRootBlock.toString());
+  if (schedule_mmr_root_event.emitted == 1) {
+    return;
+  }
+  schedule_mmr_root_event.outdated = 1;
+  await schedule_mmr_root_event.save();
+}
+
 export async function storeMMRRootSignedEvent(event: FastEvent) {
   /*
   [

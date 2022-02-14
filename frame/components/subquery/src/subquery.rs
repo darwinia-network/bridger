@@ -79,6 +79,7 @@ impl Subquery {
               atBlockNumber
               eventBlockNumber
               emitted
+              outdated
             }
           }
         }

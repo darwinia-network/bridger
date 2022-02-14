@@ -38,14 +38,23 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
                 latest.at_block_number
             );
             return Ok(());
-        } else {
+        }
+        if latest.outdated == 1 {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] Queried latest ScheduleMMRRootEvent event block is: {} and at block: {}",
+                "[pangolin] The latest ScheduleMMRRootEvent is outdated. event block is: {} and at block: {}. don't do this.",
                 latest.event_block_number,
                 latest.at_block_number
             );
+            return Ok(());
         }
+
+        tracing::info!(
+            target: "pangolin-ropsten",
+            "[pangolin] Queried latest ScheduleMMRRootEvent event block is: {} and at block: {}",
+            latest.event_block_number,
+            latest.at_block_number
+        );
 
         let event_block_number = latest.event_block_number;
 

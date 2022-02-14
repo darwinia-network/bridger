@@ -463,7 +463,17 @@ impl<'a> EthereumApi<'a> {
                 );
                 Ok(false)
             }
-            Some(m) => Ok(m.signatures.iter().any(|a| &a.0 == account)),
+            Some(m) => {
+                let need = !m.signatures.iter().any(|a| &a.0 == account);
+                if !need {
+                    tracing::debug!(
+                        target: "client-pangolin",
+                        "The account({:?}) is signed. don't need sign again",
+                        &account
+                    );
+                }
+                Ok(need)
+            }
         }
     }
 
@@ -487,7 +497,7 @@ impl<'a> EthereumApi<'a> {
                             return Err(BasicError::Metadata(MetadataError::PalletNotFound(
                                 pallet_name,
                             ))
-                            .into())
+                            .into());
                         }
                     }
                 }

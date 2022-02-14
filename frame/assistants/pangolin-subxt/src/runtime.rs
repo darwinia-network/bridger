@@ -15205,7 +15205,7 @@ pub mod api {
             use super::runtime_types;
             pub struct RelayHeaderParcelToResolve;
             impl ::subxt::StorageEntry for RelayHeaderParcelToResolve {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "RelayHeaderParcelToResolve";
                 type Value = ::std::vec::Vec<::core::primitive::u64>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15214,7 +15214,7 @@ pub mod api {
             }
             pub struct Affirmations(pub ::core::primitive::u64, pub ::core::primitive::u32);
             impl ::subxt::StorageEntry for Affirmations {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "Affirmations";
                 type Value = ::std::vec::Vec<
                     runtime_types::darwinia_relay_primitives::relayer_game::RelayAffirmation<
@@ -15233,7 +15233,7 @@ pub mod api {
             }
             pub struct BestConfirmedHeaderId(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for BestConfirmedHeaderId {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "BestConfirmedHeaderId";
                 type Value = ::core::primitive::u64;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15245,7 +15245,7 @@ pub mod api {
             }
             pub struct RoundCounts(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for RoundCounts {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "RoundCounts";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15257,7 +15257,7 @@ pub mod api {
             }
             pub struct AffirmTime(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for AffirmTime {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "AffirmTime";
                 type Value = (::core::primitive::u32, ::core::primitive::u32);
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15269,7 +15269,7 @@ pub mod api {
             }
             pub struct GamesToUpdate(pub ::core::primitive::u32);
             impl ::subxt::StorageEntry for GamesToUpdate {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "GamesToUpdate";
                 type Value = ::std::vec::Vec<::core::primitive::u64>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15281,7 +15281,7 @@ pub mod api {
             }
             pub struct Stakes(pub ::subxt::sp_core::crypto::AccountId32);
             impl ::subxt::StorageEntry for Stakes {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "Stakes";
                 type Value = ::core::primitive::u128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15293,7 +15293,7 @@ pub mod api {
             }
             pub struct GameSamplePoints(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for GameSamplePoints {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "GameSamplePoints";
                 type Value = ::std::vec::Vec<::std::vec::Vec<::core::primitive::u64>>;
                 fn key(&self) -> ::subxt::StorageEntryKey {

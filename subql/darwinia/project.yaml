@@ -8,7 +8,7 @@ schema:
 dataSources:
   - name: main
     kind: substrate/Runtime
-    startBlock: 6200000
+    startBlock: 7200000
     mapping:
       file: ./dist/index.js
       handlers:

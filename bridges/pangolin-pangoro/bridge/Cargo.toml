@@ -72,12 +72,12 @@ support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }
 
 ## darwinia common
-drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
-drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
-common-runtime          = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
+drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
+drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
+common-runtime          = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
 
 ## pangolin
-pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
+pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix", features = ["no-wasm"] }
 
 ## pangoro
-pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
+pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix", features = ["no-wasm"] }

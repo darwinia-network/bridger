@@ -31,11 +31,11 @@ bp-messages            = { git = "https://github.com/darwinia-network/parity-bri
 bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
 
 ## Bridge dependencies
-pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
-drml-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
-drml-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
-darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
-dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.3" }
+pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix", features = ["no-wasm"] }
+drml-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
+drml-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
+darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
+dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
 
 ## Substrate Dependencies
 frame-system               = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }

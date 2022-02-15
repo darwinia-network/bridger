@@ -38,6 +38,7 @@ type ScheduleMMRRootEvent @entity {
   atBlockNumber: Int!
   eventBlockNumber: Int!
   emitted: Int!
+  outdated: Int!
 
   timestamp: Date
 }

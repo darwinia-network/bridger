@@ -1,8 +1,5 @@
-use substrate_subxt::ClientBuilder;
+use client_pangolin::component::PangolinClientComponent;
 
-use client_pangolin::darwinia::runtime::DarwiniaRuntime;
-use client_pangolin::frame::sudo::KeyStoreExt;
-use client_pangolin::frame::technical_committee::MembersStoreExt;
 use support_common::config::{Config, Names};
 use support_terminal::output;
 
@@ -12,13 +9,14 @@ pub async fn handle_keys() -> color_eyre::Result<()> {
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
     let config_darwinia = bridge_config.darwinia;
 
-    let client = ClientBuilder::<DarwiniaRuntime>::new()
-        .set_url(config_darwinia.endpoint)
-        .build()
+    let client = PangolinClientComponent::component(config_darwinia).await?;
+    let sudo = client.runtime().storage().sudo().key(None).await?;
+    let technical_committee_members = client
+        .runtime()
+        .storage()
+        .technical_committee()
+        .members(None)
         .await?;
-    let sudo = client.key(None).await?;
-    // let sudo_ss58 = sudo.to_string();
-    let technical_committee_members = client.members(None).await?;
 
     let msgs = vec![
         format!("sudo key: {:?}", sudo),

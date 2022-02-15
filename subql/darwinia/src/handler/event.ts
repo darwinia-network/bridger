@@ -20,6 +20,10 @@ export class EventHandler {
     const eventKey = `${eventSection}:${eventMethod}`;
     logger.info(`[event] Received event: [${eventKey}] [${eventId}] in block ${blockNumber}`);
     switch (eventKey) {
+      case 'ethereumRelayAuthorities:SlashOnMisbehavior': {
+        await storage.handleSlashOnMisbehavior(this.event);
+        return;
+      }
       case 'ethereumRelayAuthorities:MMRRootSigned': {
         await storage.storeMMRRootSignedEvent(this.event);
         return;

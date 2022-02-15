@@ -1,7 +1,7 @@
 use client_darwinia::account::DarwiniaAccount;
 use client_darwinia::component::DarwiniaSubxtComponent;
 use client_darwinia::from_ethereum::Ethereum2Darwinia;
-use component_shadow::ShadowComponent;
+use component_shadow::component::ShadowComponent;
 use support_common::config::{Config, Names};
 use support_terminal::output;
 
@@ -35,7 +35,7 @@ pub async fn handle_confirm(opts: ConfirmOpts) -> color_eyre::Result<()> {
     let parcel = shadow.parcel(block as usize).await?;
 
     ethereum_to_darwinia
-        .set_confirmed_parcel(&from_ethereum_account, parcel)
+        .set_confirmed_parcel(&from_ethereum_account, parcel.try_into()?)
         .await?;
 
     let msg = format!("Set confirmed block {} succeed!", block);

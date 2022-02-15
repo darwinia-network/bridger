@@ -25,35 +25,35 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
 
         tracing::debug!(
             target: "pangolin-ropsten",
-            "[pangolin] Track pangolin ScheduleAuthoritiesChangeEvent block: {} and limit: {}",
+            "[pangolin] [schedule-authorities-change] Track pangolin ScheduleAuthoritiesChangeEvent block: {} and limit: {}",
             self.data.from,
             self.data.limit
         );
         if events.is_empty() {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] Not have more ScheduleAuthoritiesChangeEvent"
+                "[pangolin] [schedule-authorities-change] Not have more ScheduleAuthoritiesChangeEvent"
             );
             return Ok(None);
         }
         for event in &events {
             let block_number = Some(event.at_block_number);
             let message = event.message.as_slice().try_into()?;
-            let need_to_sign = self
-                .data
-                .darwinia2ethereum
-                .is_authority(block_number, &self.data.account)
+            let pangolin = &self.data.pangolin;
+            let real_account = pangolin.account().real_account();
+            let need_to_sign = pangolin
+                .ethereum()
+                .is_authority(block_number, real_account)
                 .await?
-                && self
-                    .data
-                    .darwinia2ethereum
-                    .need_to_sign_authorities(block_number, &self.data.account, message)
+                && pangolin
+                    .ethereum()
+                    .need_to_sign_authorities(block_number, real_account, message)
                     .await?;
 
             if !need_to_sign {
                 tracing::trace!(
                     target: "pangolin-ropsten",
-                    "[pangolin] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {}",
+                    "[pangolin] [schedule-authorities-change] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {}",
                     array_bytes::bytes2hex("0x", message),
                     event.at_block_number
                 );
@@ -62,7 +62,7 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
 
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] Try sign and send authorities with message: {} at block: {}",
+                "[pangolin] [schedule-authorities-change] Try sign and send authorities with message: {} at block: {}",
                 array_bytes::bytes2hex("0x", message),
                 event.at_block_number
             );

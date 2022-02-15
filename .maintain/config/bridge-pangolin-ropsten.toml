@@ -1,6 +1,6 @@
 [darwinia]
 # a offchain-indexing opening pangolin node
-endpoint = "wss://pangolin-rpc.darwinia.network"
+endpoint = "https://pangolin-rpc.darwinia.network"
 
 # private key of relayer, or, private key of proxy
 relayer_private_key = "0x..."

@@ -7,9 +7,11 @@ use postage::broadcast;
 use client_darwinia::component::DarwiniaSubxtComponent;
 use client_darwinia::from_ethereum::Ethereum2Darwinia;
 use component_ethereum::errors::BizError;
-use component_shadow::{Shadow, ShadowComponent};
+use component_shadow::component::ShadowComponent;
+use component_shadow::shadow::Shadow;
 use support_common::config::{Config, Names};
 use support_ethereum::block::EthereumHeader;
+use support_ethereum::parcel::EthereumRelayHeaderParcel;
 
 use crate::bridge::{DarwiniaEthereumConfig, Extrinsic, ToExtrinsicsMessage};
 
@@ -163,6 +165,7 @@ impl AffirmHandler {
 
         match self.shadow.parcel(target as usize).await {
             Ok(parcel) => {
+                let parcel: EthereumRelayHeaderParcel = parcel.try_into()?;
                 if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
                     tracing::trace!(
                         target: "darwinia-ethereum",

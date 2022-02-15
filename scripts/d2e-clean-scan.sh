@@ -11,17 +11,23 @@ NAMESPACE=$1
 KV="${BRIDGER} ${NAMESPACE} kv"
 
 
-${KV} remove \
-  scan.pangolin.running \
-  scan.ropsten.check.running \
-  scan.ropsten.check.current \
-  scan.ropsten.check.planned \
-  scan.ropsten.redeem.running \
-  scan.ropsten.redeem.current \
-  scan.ropsten.redeem.planned \
-  scan.ropsten.affirm.running \
-  scan.ropsten.affirm.current \
-  scan.ropsten.affirm.planned
+if [ "${NAMESPACE}" == "pangolin-ropsten" ]; then
 
+  ${KV} remove \
+    scan.pangolin.running \
+    scan.pangolin.current \
+    scan.pangolin.planned \
+    scan.ropsten.check.running \
+    scan.ropsten.check.current \
+    scan.ropsten.check.planned \
+    scan.ropsten.redeem.running \
+    scan.ropsten.redeem.current \
+    scan.ropsten.redeem.planned \
+    scan.ropsten.affirm.running \
+    scan.ropsten.affirm.current \
+    scan.ropsten.affirm.planned
 
-${KV} keys
+  ${KV} keys
+
+fi
+

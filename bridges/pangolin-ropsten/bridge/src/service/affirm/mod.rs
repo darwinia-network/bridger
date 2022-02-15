@@ -121,7 +121,12 @@ async fn handle_affirm_relay(
     let mut handler = AffirmHandler::new(microkv.clone(), sender_to_extrinsics.clone()).await;
     loop {
         if let Err(err) = handler.affirm().await {
-            tracing::error!(target: "pangolin-ropsten", "affirm err: {:#?}", err);
+            tracing::error!(
+                target: "pangolin-ropsten",
+                chain = "ropsten",
+                action = "affirm",
+                "[ropsten] [affirm] affirm err: {:#?}", err
+            );
             // TODO: Consider the errors more carefully
             // Maybe a websocket err, so wait 10 secs to reconnect.
             tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -141,7 +146,9 @@ async fn start_scan(
     while let Err(err) = run_scan(&tracker, microkv.clone(), sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "pangolin-ropsten",
-            "Failed to run scan ropsten transaction. err: {:?}",
+            chain = "ropsten",
+            action = "affirm",
+            "[ropsten] [affirm] Failed to run scan ropsten transaction. err: {:?}",
             err
         );
     }
@@ -166,7 +173,9 @@ async fn run_scan(
 
         tracing::trace!(
             target: "pangolin-ropsten",
-            "[ropsten] Track affirm block: {} and limit: {}",
+            chain = "ropsten",
+            action = "affirm",
+            "[ropsten] [affirm] Track affirm block: {} and limit: {}",
             from,
             limit
         );
@@ -176,7 +185,9 @@ async fn run_scan(
         if txs.is_empty() {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[ropsten] Not found any transactions to affirm"
+                chain = "ropsten",
+                action = "affirm",
+                "[ropsten] [affirm] Not found any transactions to affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,

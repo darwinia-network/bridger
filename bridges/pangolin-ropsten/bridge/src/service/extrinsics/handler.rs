@@ -1,31 +1,27 @@
-use microkv::namespace::NamespaceMicroKV;
 use std::time::{SystemTime, UNIX_EPOCH};
-use rand::{Rng, thread_rng};
-use rand::distributions::Alphanumeric;
 
-use client_pangolin::account::DarwiniaAccount;
-use client_pangolin::component::DarwiniaSubxtComponent;
-use client_pangolin::config::DarwiniaSubxtConfig;
-use client_pangolin::{
-    from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia},
-    to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum},
-};
+use microkv::namespace::NamespaceMicroKV;
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
+
+use client_pangolin::client::PangolinClient;
+use client_pangolin::component::PangolinClientComponent;
+use client_pangolin::config::ClientConfig;
+use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use client_pangolin::types::runtime_types::to_ethereum_backing::pallet::RedeemFor;
+use client_pangolin::types::{EcdsaMessage, EthereumAccount, EthereumReceiptProofThing};
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 use support_common::config::{Config, Names};
-use support_ethereum::parcel::EthereumRelayHeaderParcel;
-use support_ethereum::receipt::{EthereumReceiptProofThing, RedeemFor};
+use support_common::error::BridgerError;
 
-use crate::bridge::{EcdsaMessage, Extrinsic};
+use crate::bridge::Extrinsic;
 use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};
 
 pub struct ExtrinsicsHandler {
-    ethereum2darwinia: Ethereum2Darwinia,
-    darwinia2ethereum: Darwinia2Ethereum,
-    darwinia2ethereum_relayer: ToEthereumAccount,
-    ethereum2darwinia_relayer: FromEthereumAccount,
-    spec_name: String,
+    client: PangolinClient,
+    ethereum_account: EthereumAccount,
     microkv: NamespaceMicroKV,
     message_kv: NamespaceMicroKV,
 }
@@ -38,7 +34,7 @@ impl ExtrinsicsHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "pangolin-ropsten",
-                        "extrinsics init err: {:#?}",
+                        "[pangolin] [extrinsics] extrinsics init err: {:#?}",
                         err
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -55,46 +51,29 @@ impl ExtrinsicsHandler {
         let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
         // Config
-        let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
+        let config_darwinia: ClientConfig = bridge_config.darwinia;
         let config_web3: Web3Config = bridge_config.web3;
 
-        // Darwinia client & accounts
-        let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
-        let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-        let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-        let account = DarwiniaAccount::new(
-            config_darwinia.relayer_private_key,
-            config_darwinia.relayer_real_account,
-        );
-        let darwinia2ethereum_relayer = ToEthereumAccount::new(
-            account.clone(),
-            config_darwinia.ecdsa_authority_private_key,
+        let ethereum_account = EthereumAccount::new(
             config_web3.endpoint,
+            config_darwinia.ecdsa_authority_private_key.clone(),
         );
-        let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
 
-        let spec_name = darwinia.runtime_version().await?;
+        let client = PangolinClientComponent::component(config_darwinia).await?;
 
         tracing::info!(
             target: "pangolin-ropsten",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS"
-        );
-        tracing::trace!(
-            target: "pangolin-ropsten",
-            "The spec_name is [{}]",
-            spec_name
+            "✨ SERVICE STARTED: ROPSTEN <> PANGOLIN EXTRINSICS"
         );
 
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
-        let message_kv: NamespaceMicroKV = state.microkv_with_namespace(format!("{}-messages", PangolinRopstenTask::name()));
+        let message_kv: NamespaceMicroKV =
+            state.microkv_with_namespace(format!("{}-messages", PangolinRopstenTask::name()));
         Ok(ExtrinsicsHandler {
-            ethereum2darwinia,
-            darwinia2ethereum,
-            darwinia2ethereum_relayer,
-            ethereum2darwinia_relayer,
-            spec_name,
+            client,
+            ethereum_account,
             microkv,
-            message_kv
+            message_kv,
         })
     }
 }
@@ -121,13 +100,10 @@ impl ExtrinsicsHandler {
 
     async fn send_affirm(&self, parcel: EthereumRelayHeaderParcel) -> color_eyre::Result<()> {
         let block_number = parcel.header.number;
-        let ex_hash = self
-            .ethereum2darwinia
-            .affirm(&self.ethereum2darwinia_relayer, parcel)
-            .await?;
+        let ex_hash = self.client.ethereum().affirm(parcel).await?;
         tracing::info!(
             target: "pangolin-ropsten",
-            "Affirmed ethereum block {} in extrinsic {:?}",
+            "[pangolin] [extrinsics] Affirmed ethereum block {} in extrinsic {:?}",
             block_number,
             ex_hash
         );
@@ -142,43 +118,38 @@ impl ExtrinsicsHandler {
     ) -> color_eyre::Result<()> {
         tracing::info!(
             target: "pangolin-ropsten",
-            "Ready to send redeem. type is [{:?}] and tx is [{:?}]",
+            "[pangolin] [extrinsics] Ready to send redeem. type is [{:?}] and tx is [{:?}]",
             ethereum_tx.tx_type,
             ethereum_tx.tx_hash
         );
         match ethereum_tx.tx_type {
             TransactionType::SetAuthorities => {
                 let ex_hash = self
-                    .darwinia2ethereum
-                    .sync_authorities_change(&self.darwinia2ethereum_relayer, proof)
+                    .client
+                    .ethereum()
+                    .sync_authorities_change(proof)
                     .await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "Sent ethereum tx {:?} with extrinsic {:?}",
+                    "[pangolin] [extrinsics] Sent ethereum tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
             }
             TransactionType::RegisterErc20Token => {
-                let ex_hash = self
-                    .ethereum2darwinia
-                    .register_erc20(&self.ethereum2darwinia_relayer, proof)
-                    .await?;
+                let ex_hash = self.client.ethereum().register_erc20(proof).await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "register erc20 token tx {:?} with extrinsic {:?}",
+                    "[pangolin] [extrinsics] register erc20 token tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
             }
             TransactionType::RedeemErc20Token => {
-                let ex_hash = self
-                    .ethereum2darwinia
-                    .redeem_erc20(&self.ethereum2darwinia_relayer, proof)
-                    .await?;
+                let ex_hash = self.client.ethereum().redeem_erc20(proof).await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "redeem erc20 token tx {:?} with extrinsic {:?}",
+                    "[pangolin] [extrinsics] redeem erc20 token tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
@@ -187,17 +158,15 @@ impl ExtrinsicsHandler {
                 let redeem_for = match ethereum_tx.tx_type {
                     TransactionType::Deposit => RedeemFor::Deposit,
                     TransactionType::Token => RedeemFor::Token,
-                    TransactionType::SetAuthorities => RedeemFor::SetAuthorities,
-                    TransactionType::RegisterErc20Token => RedeemFor::RegisterErc20Token,
-                    TransactionType::RedeemErc20Token => RedeemFor::RedeemErc20Token,
+                    // TransactionType::SetAuthorities => RedeemFor::SetAuthorities,
+                    // TransactionType::RegisterErc20Token => RedeemFor::RegisterErc20Token,
+                    // TransactionType::RedeemErc20Token => RedeemFor::RedeemErc20Token,
+                    _ => return Err(BridgerError::Custom("Unreachable".to_string()).into()),
                 };
-                let ex_hash = self
-                    .ethereum2darwinia
-                    .redeem(&self.ethereum2darwinia_relayer, redeem_for, proof)
-                    .await?;
+                let ex_hash = self.client.ethereum().redeem(redeem_for, proof).await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "Redeemed ethereum tx {:?} with extrinsic {:?}",
+                    "[pangolin] [extrinsics] Redeemed ethereum tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
@@ -212,24 +181,24 @@ impl ExtrinsicsHandler {
         aye: bool,
     ) -> color_eyre::Result<()> {
         let ex_hash = self
-            .ethereum2darwinia
-            .vote_pending_relay_header_parcel(
-                &self.ethereum2darwinia_relayer,
-                pending_block_number,
-                aye,
-            )
+            .client
+            .runtime()
+            .tx()
+            .ethereum_relay()
+            .vote_pending_relay_header_parcel(pending_block_number, aye)
+            .sign_and_submit(self.client.account().signer())
             .await?;
         if aye {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "Voted to approve: {}, ex hash: {:?}",
+                "[pangolin] [extrinsics] Voted to approve: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
             );
         } else {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "Voted to reject: {}, ex hash: {:?}",
+                "[pangolin] [extrinsics] Voted to reject: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
             );
@@ -240,20 +209,18 @@ impl ExtrinsicsHandler {
     async fn send_sign_and_send_mmr_root(&self, block_number: u32) -> color_eyre::Result<()> {
         tracing::trace!(
             target: "pangolin-ropsten",
-            "Start sign and send mmr_root for block: {}",
+            "[pangolin] [extrinsics] Start sign and send mmr_root for block: {}",
             block_number,
         );
+
         let ex_hash = self
-            .darwinia2ethereum
-            .ecdsa_sign_and_submit_signed_mmr_root(
-                &self.darwinia2ethereum_relayer,
-                self.spec_name.clone(),
-                block_number,
-            )
+            .client
+            .ethereum()
+            .ecdsa_sign_and_submit_signed_mmr_root(self.ethereum_account.clone(), block_number)
             .await?;
         tracing::info!(
             target: "pangolin-ropsten",
-            "Sign and send mmr root of block {} in extrinsic {:?}",
+            "[pangolin] [extrinsics] Sign and send mmr root of block {} in extrinsic {:?}",
             block_number,
             ex_hash
         );
@@ -266,15 +233,16 @@ impl ExtrinsicsHandler {
     ) -> color_eyre::Result<()> {
         tracing::trace!(
             target: "pangolin-ropsten",
-            "Start sign and send authorities..."
+            "[pangolin] [extrinsics] Start sign and send authorities..."
         );
         let ex_hash = self
-            .darwinia2ethereum
-            .ecdsa_sign_and_submit_signed_authorities(&self.darwinia2ethereum_relayer, message)
+            .client
+            .ethereum()
+            .ecdsa_sign_and_submit_signed_authorities(self.ethereum_account.clone(), message)
             .await?;
         tracing::info!(
             target: "pangolin-ropsten",
-            "Sign and send authorities in extrinsic {:?}",
+            "[pangolin] [extrinsics] Sign and send authorities in extrinsic {:?}",
             ex_hash
         );
         Ok(())
@@ -306,30 +274,21 @@ impl ExtrinsicsHandler {
             let extrinsics = self.message_kv.sorted_keys()?;
             if extrinsics.is_empty() {
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-                continue
+                continue;
             }
             for key in extrinsics.iter() {
                 let ex: Extrinsic = self.message_kv.get_as_unwrap(&key)?;
                 match self.send_extrinsic(ex.clone()).await {
                     Ok(_) => self.message_kv.delete(&key)?,
                     Err(err) => {
-                        if let Some(substrate_subxt::Error::Rpc(_)) = err.downcast_ref::<substrate_subxt::Error>() {
-                            tracing::warn!(
-                                target: "pangolin-ropsten",
-                                "Connection Error. Try to resend later. extrinsic: {:?}",
-                                ex,
-                            );
-                            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                            break;
-                        } else {
-                            self.message_kv.delete(&key)?;
-                            tracing::error!(
-                                target: "pangolin-ropsten",
-                                "Failed to send extrinsic {:?} err: {:?}",
-                                ex,
-                                err
-                            );
-                        }
+                        self.message_kv.delete(&key)?;
+                        tracing::error!(
+                            target: "pangolin-ropsten",
+                            "[pangolin] [extrinsics] Failed to send extrinsic {:?} err: {:?}",
+                            ex,
+                            err
+                        );
+                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     }
                 }
             }

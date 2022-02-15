@@ -1,8 +1,9 @@
+use std::sync::Arc;
+
 use client_darwinia::account::DarwiniaAccount;
 use client_darwinia::component::DarwiniaSubxtComponent;
 use client_darwinia::from_ethereum::Ethereum2Darwinia;
-use component_shadow::ShadowComponent;
-use std::sync::Arc;
+use component_shadow::component::ShadowComponent;
 use support_common::config::{Config, Names};
 use support_terminal::output;
 

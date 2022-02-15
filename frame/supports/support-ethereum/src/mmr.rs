@@ -1,4 +1,5 @@
 use codec::{Decode, Encode};
+use component_shadow::types::MMRProofJson;
 use serde::{Deserialize, Serialize};
 
 use crate::error::BridgeEthereumError;
@@ -46,17 +47,6 @@ pub struct MMRProof {
     pub last_leaf_index: u64,
     /// The mmrProof of two leaves above
     pub proof: Vec<[u8; 32]>,
-}
-
-/// MMR Proof Json
-#[derive(Clone, Debug, Decode, Encode, Default, Serialize, Deserialize, PartialEq, Eq)]
-pub struct MMRProofJson {
-    /// The index of member leaf
-    pub member_leaf_index: u64,
-    /// The index of of last leaf
-    pub last_leaf_index: u64,
-    /// The mmr proof of the two leaves above
-    pub proof: Vec<String>,
 }
 
 impl TryFrom<MMRProofJson> for MMRProof {

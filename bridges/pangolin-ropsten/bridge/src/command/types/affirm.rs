@@ -24,7 +24,7 @@ pub enum AffirmOpts {
         /// The block number for ethereum
         #[structopt(long)]
         block: Option<u64>,
-        /// Raw parcel json data
+        /// Raw parcel json data * (not support now)
         #[structopt(long = "raw")]
         raw_json: Option<String>,
     },

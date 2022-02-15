@@ -14,7 +14,7 @@ mod handler;
 #[derive(Debug)]
 pub struct ExtrinsicsService {
     _greet: Lifeline,
-    _consume: Lifeline
+    _consume: Lifeline,
 }
 
 impl BridgeService for ExtrinsicsService {}
@@ -33,7 +33,7 @@ impl Service for ExtrinsicsService {
 
         let greet_state = state.clone();
         let _greet = Self::try_task(
-            &format!("{}-service-extrinsics", PangolinRopstenTask::name()),
+            &format!("{}-service-extrinsics-collect", PangolinRopstenTask::name()),
             async move {
                 let handler = ExtrinsicsHandler::new(greet_state.clone()).await;
                 while let Some(recv) = rx.recv().await {
@@ -49,11 +49,11 @@ impl Service for ExtrinsicsService {
                 }
 
                 Ok(())
-            }
+            },
         );
 
         let _consume = Self::try_task(
-            &format!("{}-service-extrinsics", PangolinRopstenTask::name()),
+            &format!("{}-service-extrinsics-consume", PangolinRopstenTask::name()),
             async move {
                 let mut handler = ExtrinsicsHandler::new(state.clone()).await;
                 while handler.consume_message().await.is_err() {
@@ -64,11 +64,8 @@ impl Service for ExtrinsicsService {
                     handler = ExtrinsicsHandler::new(state.clone()).await;
                 }
                 Ok(())
-            }
+            },
         );
-        Ok(Self {
-            _greet,
-            _consume
-        })
+        Ok(Self { _greet, _consume })
     }
 }

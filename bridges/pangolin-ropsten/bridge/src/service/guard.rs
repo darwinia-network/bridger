@@ -1,15 +1,14 @@
-use std::sync::Arc;
 use std::time::Duration;
 
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
 use tokio::time::sleep;
 
-use client_pangolin::account::DarwiniaAccount;
-use client_pangolin::component::DarwiniaSubxtComponent;
-use client_pangolin::config::DarwiniaSubxtConfig;
-use client_pangolin::from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia};
+use client_pangolin::client::PangolinClient;
+use client_pangolin::component::PangolinClientComponent;
+use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
-use component_shadow::{Shadow, ShadowComponent};
+use component_shadow::component::ShadowComponent;
+use component_shadow::shadow::Shadow;
 use component_state::state::BridgeState;
 use lifeline::dyn_bus::DynBus;
 use microkv::namespace::NamespaceMicroKV;
@@ -18,7 +17,6 @@ use support_lifeline::service::BridgeService;
 
 use crate::bridge::PangolinRopstenBus;
 use crate::bridge::PangolinRopstenTask;
-use crate::bridge::TaskConfig;
 use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage, ToGuardMessage};
 
 #[derive(Debug)]
@@ -61,93 +59,75 @@ impl Service for GuardService {
 
 async fn start(
     mut sender_to_extrinsics: impl Sender<ToExtrinsicsMessage>,
-    microkv: &NamespaceMicroKV
+    microkv: &NamespaceMicroKV,
 ) {
     while let Err(err) = run(&mut sender_to_extrinsics, microkv).await {
-        tracing::error!(target: "pangolin-ropsten", "guard err {:#?}", err);
+        tracing::error!(target: "pangolin-ropsten", "[pangolin] [guard] guard err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
     }
 }
 
 async fn run(
     sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
-    microkv: &NamespaceMicroKV
+    microkv: &NamespaceMicroKV,
 ) -> color_eyre::Result<()> {
     tracing::info!(target: "pangolin-ropsten", "SERVICE RESTARTING...");
 
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
     // Config
-    let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
-    let servce_config: TaskConfig = bridge_config.task;
+    let config_darwinia = bridge_config.darwinia;
+    let servce_config = bridge_config.task;
 
     // Darwinia client & account
-    let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
-    let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-
-    let account = DarwiniaAccount::new(
-        config_darwinia.relayer_private_key,
-        config_darwinia.relayer_real_account,
-    );
-    let guard_account = FromEthereumAccount::new(account);
-    let is_tech_comm_member = ethereum2darwinia
-        .is_tech_comm_member(None, &guard_account)
-        .await?;
-
-    if is_tech_comm_member {
-        // Shadow client
-        let shadow = ShadowComponent::component(
-            bridge_config.shadow,
-            bridge_config.ethereum,
-            bridge_config.web3,
-        )?;
-        let shadow = Arc::new(shadow);
-
-        tracing::info!(
-            target: "pangolin-ropsten",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
-        );
-
-        loop {
-            let ethereum2darwinia_clone = ethereum2darwinia.clone();
-            let guard_account_clone = guard_account.clone();
-            let shadow_clone = shadow.clone();
-
-            GuardService::guard(
-                ethereum2darwinia_clone,
-                guard_account_clone,
-                shadow_clone,
-                sender_to_extrinsics,
-                microkv
-            )
-            .await?;
-
-            sleep(Duration::from_secs(servce_config.interval_guard)).await;
-        }
+    let client = PangolinClientComponent::component(config_darwinia).await?;
+    let is_tech_comm_member = client.is_tech_comm_member(None, None).await?;
+    if !is_tech_comm_member {
+        return Ok(());
     }
 
-    Ok(())
+    // Shadow client
+    let shadow = ShadowComponent::component(
+        bridge_config.shadow,
+        bridge_config.ethereum,
+        bridge_config.web3,
+    )?;
+
+    tracing::info!(
+        target: "pangolin-ropsten",
+        "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
+    );
+
+    loop {
+        GuardService::guard(&client, &shadow, sender_to_extrinsics, microkv).await?;
+        sleep(Duration::from_secs(servce_config.interval_guard)).await;
+    }
 }
 
 impl GuardService {
     pub async fn extrinsics(
-        ethereum2darwinia: Ethereum2Darwinia,
-        guard_account: FromEthereumAccount,
-        shadow: Arc<Shadow>,
+        client: &PangolinClient,
+        shadow: &Shadow,
     ) -> color_eyre::Result<Vec<Extrinsic>> {
         tracing::trace!(
             target: "pangolin-ropsten",
-            "Checking pending headers..."
+            "[pangolin] [guard] Checking pending headers..."
         );
 
         let mut extrinsics = Vec::new();
 
-        let last_confirmed = ethereum2darwinia.last_confirmed().await?;
-        let pending_headers = ethereum2darwinia.pending_headers().await?;
+        let last_confirmed = client.ethereum().last_confirmed().await?;
+        let pending_headers = client
+            .runtime()
+            .storage()
+            .ethereum_relay()
+            .pending_relay_header_parcels(None)
+            .await?;
+
         if !pending_headers.is_empty() {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                "pending headers: {:?}",
+                "[pangolin] [guard] pending headers: {:?}",
                 pending_headers
                     .clone()
                     .iter()
@@ -164,32 +144,40 @@ impl GuardService {
             // high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
             // and,
             // have not voted
-            if pending_block_number > last_confirmed
-                && !ethereum2darwinia.has_voted(&guard_account, voting_state)
-            {
-                match shadow.parcel(pending_block_number as usize).await {
-                    Ok(parcel_from_shadow) => {
-                        let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
-                            Extrinsic::GuardVote(pending_block_number, true)
-                        } else {
-                            Extrinsic::GuardVote(pending_block_number, false)
-                        };
-                        extrinsics.push(ex);
+            if last_confirmed <= pending_block_number {
+                continue;
+            }
+            let real_account = client.account().real_account();
+            let has_voted = voting_state.ayes.contains(real_account)
+                || voting_state.nays.contains(real_account);
+            if has_voted {
+                continue;
+            }
+
+            match shadow.parcel(pending_block_number as usize).await {
+                Ok(parcel_from_shadow) => {
+                    let parcel_from_shadow: EthereumRelayHeaderParcel =
+                        parcel_from_shadow.try_into()?;
+                    let ex = if is_same_as(&pending_parcel, &parcel_from_shadow) {
+                        Extrinsic::GuardVote(pending_block_number, true)
+                    } else {
+                        Extrinsic::GuardVote(pending_block_number, false)
+                    };
+                    extrinsics.push(ex);
+                }
+                Err(err) => {
+                    if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
+                        err.downcast_ref::<BizError>()
+                    {
+                        tracing::warn!(
+                            target: "pangolin-ropsten",
+                            "[pangolin] [guard] The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                            block,
+                            msg
+                        );
+                        return Ok(extrinsics);
                     }
-                    Err(err) => {
-                        if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
-                            err.downcast_ref::<BizError>()
-                        {
-                            tracing::warn!(
-                                target: "pangolin-ropsten",
-                                "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                                block,
-                                msg
-                            );
-                            return Ok(extrinsics);
-                        }
-                        return Err(err);
-                    }
+                    return Err(err);
                 }
             }
         }
@@ -198,27 +186,32 @@ impl GuardService {
     }
 
     async fn guard(
-        ethereum2darwinia: Ethereum2Darwinia,
-        guard_account: FromEthereumAccount,
-        shadow: Arc<Shadow>,
+        client: &PangolinClient,
+        shadow: &Shadow,
         sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
-        microkv: &NamespaceMicroKV
+        microkv: &NamespaceMicroKV,
     ) -> color_eyre::Result<()> {
-        let extrinsics = Self::extrinsics(ethereum2darwinia, guard_account, shadow).await?;
+        let extrinsics = Self::extrinsics(client, shadow).await?;
 
         if extrinsics.is_empty() {
-            return Ok(())
+            return Ok(());
         }
 
         let max_block = *extrinsics
             .iter()
             .map(|ex| {
-                if let Extrinsic::GuardVote(block_num, _) = ex { block_num } else { &0u64 }
+                if let Extrinsic::GuardVote(block_num, _) = ex {
+                    block_num
+                } else {
+                    &0u64
+                }
             })
             .max()
             .unwrap();
 
-        let latest: u64 = microkv.get_as_unwrap("latest_guard_vote_block_num").unwrap_or(0u64);
+        let latest: u64 = microkv
+            .get_as_unwrap("latest_guard_vote_block_num")
+            .unwrap_or(0u64);
         for extrinsic in extrinsics {
             if let Extrinsic::GuardVote(block_num, _) = extrinsic {
                 if block_num > latest {
@@ -227,7 +220,7 @@ impl GuardService {
                 } else {
                     tracing::info!(
                         target: "pangolin-ropsten",
-                        "Skip guard vote for block: {}",
+                        "[pangolin] [guard] Skip guard vote for block: {}",
                         &block_num
                     );
                 }
@@ -237,6 +230,10 @@ impl GuardService {
             microkv.put("latest_guard_vote_block_num", &max_block)?;
         }
 
-       Ok(())
+        Ok(())
     }
+}
+
+fn is_same_as(a: &EthereumRelayHeaderParcel, b: &EthereumRelayHeaderParcel) -> bool {
+    a.header.hash == b.header.hash && a.parent_mmr_root == b.parent_mmr_root
 }

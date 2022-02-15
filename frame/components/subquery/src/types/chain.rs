@@ -31,6 +31,7 @@ pub struct ScheduleMMRRootEvent {
     #[serde(rename = "eventBlockNumber")]
     pub event_block_number: u32,
     pub emitted: u32,
+    pub outdated: u32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

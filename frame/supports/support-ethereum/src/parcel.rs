@@ -3,10 +3,11 @@ use std::convert::{TryFrom, TryInto};
 use std::fmt::Formatter;
 
 use codec::{Decode, Encode};
+use component_shadow::types::{EthereumHeaderJson, HeaderParcel};
 use serde::{Deserialize, Serialize};
 use sp_core::bytes::to_hex;
 
-use crate::block::{EthereumHeader, EthereumHeaderJson};
+use crate::block::EthereumHeader;
 use crate::error::BridgeEthereumError;
 
 /// Ethereum EthereumRelayHeaderParcel
@@ -58,12 +59,13 @@ impl TryFrom<EthereumRelayHeaderParcelJson> for EthereumRelayHeaderParcel {
     }
 }
 
-impl TryFrom<EthereumRelayHeaderParcel> for EthereumRelayHeaderParcelJson {
+impl TryFrom<HeaderParcel> for EthereumRelayHeaderParcel {
     type Error = BridgeEthereumError;
-    fn try_from(that: EthereumRelayHeaderParcel) -> Result<Self, Self::Error> {
+
+    fn try_from(value: HeaderParcel) -> Result<Self, Self::Error> {
         Ok(Self {
-            header: that.header.try_into()?,
-            mmr_root: array_bytes::bytes2hex("", &that.mmr_root),
+            header: value.header.try_into()?,
+            mmr_root: array_bytes::hex2array(value.mmr_root.mmr_root)?,
         })
     }
 }

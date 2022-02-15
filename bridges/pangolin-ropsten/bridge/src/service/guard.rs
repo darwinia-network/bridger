@@ -62,7 +62,7 @@ async fn start(
     microkv: &NamespaceMicroKV,
 ) {
     while let Err(err) = run(&mut sender_to_extrinsics, microkv).await {
-        tracing::error!(target: "pangolin-ropsten", "guard err {:#?}", err);
+        tracing::error!(target: "pangolin-ropsten", "[pangolin] [guard] guard err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
     }
 }
@@ -111,7 +111,7 @@ impl GuardService {
     ) -> color_eyre::Result<Vec<Extrinsic>> {
         tracing::trace!(
             target: "pangolin-ropsten",
-            "Checking pending headers..."
+            "[pangolin] [guard] Checking pending headers..."
         );
 
         let mut extrinsics = Vec::new();
@@ -127,7 +127,7 @@ impl GuardService {
         if !pending_headers.is_empty() {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                "pending headers: {:?}",
+                "[pangolin] [guard] pending headers: {:?}",
                 pending_headers
                     .clone()
                     .iter()
@@ -171,7 +171,7 @@ impl GuardService {
                     {
                         tracing::warn!(
                             target: "pangolin-ropsten",
-                            "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                            "[pangolin] [guard] The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
                             block,
                             msg
                         );
@@ -220,7 +220,7 @@ impl GuardService {
                 } else {
                     tracing::info!(
                         target: "pangolin-ropsten",
-                        "Skip guard vote for block: {}",
+                        "[pangolin] [guard] Skip guard vote for block: {}",
                         &block_num
                     );
                 }

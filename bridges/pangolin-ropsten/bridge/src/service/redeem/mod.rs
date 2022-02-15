@@ -18,7 +18,7 @@ mod handler;
 
 #[derive(Debug)]
 pub struct RedeemService {
-    _greet_scan: Lifeline
+    _greet_scan: Lifeline,
 }
 
 impl BridgeService for RedeemService {}
@@ -40,34 +40,25 @@ impl Service for RedeemService {
         let _greet_scan = Self::try_task(
             &format!("{}-service-redeem-scan", PangolinRopstenTask::name()),
             async move {
-                start_scan(
-                    tracker.clone(),
-                    sender_to_extrinsics_scan.clone()
-                )
-                .await;
+                start_scan(tracker.clone(), sender_to_extrinsics_scan.clone()).await;
                 Ok(())
             },
         );
 
-        Ok(Self {
-            _greet_scan
-        })
+        Ok(Self { _greet_scan })
     }
 }
 
 async fn start_scan(
     tracker: Tracker,
-    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
 ) {
-    while let Err(err) = run_scan(
-        &tracker,
-        sender_to_extrinsics.clone()
-    )
-    .await
-    {
+    while let Err(err) = run_scan(&tracker, sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "pangolin-ropsten",
-            "[ropsten] redeem err {:?}",
+            chain = "ropsten",
+            action = "redeem",
+            "[ropsten] [redeem] redeem err {:?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -76,7 +67,7 @@ async fn start_scan(
 
 async fn run_scan(
     tracker: &Tracker,
-    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
 ) -> color_eyre::Result<()> {
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
@@ -93,7 +84,9 @@ async fn run_scan(
 
         tracing::trace!(
             target: "pangolin-ropsten",
-            "[ropsten] Track redeem block: {} and limit: {}",
+            chain = "ropsten",
+            action = "redeem",
+            "[ropsten] [redeem] Track redeem block: {} and limit: {}",
             from,
             limit
         );
@@ -102,8 +95,8 @@ async fn run_scan(
             .await?;
         if txs.is_empty() {
             tracing::info!(
-                target: "pangolin-ropsten",
-                "[ropsten] Not found any transactions to redeem"
+                target: "pangolin-ropsten", chain = "ropsten", action = "redeem",
+                "[ropsten] [redeem] Not found any transactions to redeem"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
@@ -113,7 +106,9 @@ async fn run_scan(
         }
         tracing::debug!(
             target: "pangolin-ropsten",
-            "[ropsten] Found {} transactions wait to redeem",
+            chain = "ropsten",
+            action = "redeem",
+            "[ropsten] [redeem] Found {} transactions wait to redeem",
             txs.len()
         );
 
@@ -125,7 +120,9 @@ async fn run_scan(
                 Ok(Some(latest)) => {
                     tracing::trace!(
                         target: "pangolin-ropsten",
-                        "[ropsten] Change latest redeemed block number to: {}",
+                        chain = "ropsten",
+                        action = "redeem",
+                        "[ropsten] [redeem] Change latest redeemed block number to: {}",
                         latest
                     );
                     latest_redeem_block_number = Some(latest);
@@ -133,7 +130,9 @@ async fn run_scan(
                 Ok(None) => {
                     tracing::trace!(
                         target: "pangolin-ropsten",
-                        "[ropsten] Latest redeemed block number is: {:?}",
+                        chain = "ropsten",
+                        action = "redeem",
+                        "[ropsten] [redeem] Latest redeemed block number is: {:?}",
                         latest_redeem_block_number
                     );
                     break;
@@ -145,7 +144,9 @@ async fn run_scan(
                     if times > 10 {
                         tracing::error!(
                             target: "pangolin-ropsten",
-                            "[ropsten] Failed to send redeem message. tx: {:?}, err: {:?}",
+                            chain = "ropsten",
+                            action = "redeem",
+                            "[ropsten] [redeem] Failed to send redeem message. tx: {:?}, err: {:?}",
                             tx,
                             e
                         );
@@ -156,9 +157,11 @@ async fn run_scan(
         }
 
         if latest_redeem_block_number.is_none() {
-            tracing::info!(
+            tracing::warn!(
                 target: "pangolin-ropsten",
-                "[ropsten] Not have any block redeemed. please wait affirm"
+                chain = "ropsten",
+                action = "redeem",
+                "[ropsten] [redeem] Not have any block redeemed. please wait affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
@@ -170,7 +173,9 @@ async fn run_scan(
         let latest = latest_redeem_block_number.unwrap();
         tracing::info!(
             target: "pangolin-ropsten",
-            "[ropsten] Set scan redeem block number to: {}",
+            chain = "ropsten",
+            action = "redeem",
+            "[ropsten] [redeem] Set scan redeem block number to: {}",
             latest
         );
         tracker.finish(latest as usize)?;

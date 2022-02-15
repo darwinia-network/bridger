@@ -49,7 +49,7 @@ async fn start(tracker: Tracker) {
     while let Err(err) = run(&tracker).await {
         tracing::error!(
             target: "pangolin-ropsten",
-            "ropsten check err {:#?}",
+            "[ropsten] [check] ropsten check err {:#?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -76,7 +76,7 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
 
         tracing::trace!(
             target: "pangolin-ropsten",
-            "[ropsten] Track check block: {} and limit: {}",
+            "[ropsten] [check] Track check block: {} and limit: {}",
             from,
             limit
         );
@@ -86,7 +86,7 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
         if txs.is_empty() {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[ropsten] All transactions checked"
+                "[ropsten] [check] All transactions checked"
             );
             tokio::time::sleep(std::time::Duration::from_secs(task_config.interval_check)).await;
             continue;
@@ -105,7 +105,7 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
             Err(e) => {
                 tracing::error!(
                     target: "pangolin-ropsten",
-                    "Failed verified redeem. [{}]: {}. {:?}",
+                    "[ropsten] [check] Failed verified redeem. [{}]: {}. {:?}",
                     tx.block_number,
                     tx.block_hash,
                     e
@@ -125,7 +125,7 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
                 tracker.finish(tx.block_number as usize)?;
                 tracing::warn!(
                     target: "pangolin-ropsten",
-                    "The transaction {:?}({}) check redeem long time, skipped",
+                    "[ropsten] [check] The transaction {:?}({}) check redeem long time, skipped",
                     tx_hash,
                     tx_index,
                 );

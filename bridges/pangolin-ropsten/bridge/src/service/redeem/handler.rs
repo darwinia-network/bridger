@@ -73,7 +73,9 @@ impl RedeemHandler {
     pub async fn redeem(&mut self, tx: TransactionEntity) -> color_eyre::Result<Option<u64>> {
         tracing::trace!(
             target: "pangolin-ropsten",
-            "[ropsten] Try to redeem ethereum tx {:?}... in block {}",
+            chain = "ropsten",
+            action = "redeem",
+            "[ropsten] [redeem] Try to redeem ethereum tx {:?}... in block {}",
             tx.tx_hash,
             tx.block_number
         );
@@ -94,7 +96,9 @@ impl RedeemHandler {
         {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                "[ropsten] Ethereum tx {:?} redeemed",
+                chain = "ropsten",
+                action = "redeem",
+                "[ropsten] [redeem] Ethereum tx {:?} redeemed",
                 tx.tx_hash
             );
             return Ok(Some(tx.block_number));
@@ -104,7 +108,9 @@ impl RedeemHandler {
         if tx.block_number >= last_confirmed {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                "[ropsten] Ethereum tx {:?}'s block {} is large than last confirmed block {}",
+                chain = "ropsten",
+                action = "redeem",
+                "[ropsten] [redeem] Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
                 tx.block_number,
                 last_confirmed,
@@ -118,7 +124,9 @@ impl RedeemHandler {
         let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(
             target: "pangolin-ropsten",
-            "[ropsten] Redeem extrinsic send to extrinsics service: {:?}. at ropsten block: {}",
+            chain = "ropsten",
+            action = "redeem",
+            "[ropsten] [redeem] Redeem extrinsic send to extrinsics service: {:?}. at ropsten block: {}",
             ex,
             tx.block_number
         );

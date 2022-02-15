@@ -36,14 +36,14 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
 
         tracing::debug!(
             target: "pangolin-ropsten",
-            "[pangolin] Track pangolin AuthoritiesChangeSignedEvent block: {} and limit: {}",
+            "[pangolin] [authorities-change] Track pangolin AuthoritiesChangeSignedEvent block: {} and limit: {}",
             self.data.from,
             self.data.limit
         );
         if events.is_empty() {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] Not have more AuthoritiesChangeSignedEvent"
+                "[pangolin] [authorities-change] Not have more AuthoritiesChangeSignedEvent"
             );
             return Ok(None);
         }
@@ -52,7 +52,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
             if event.term != current_term {
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "[pangolin] Queried AuthoritiesChangeSignedEvent but not in current term. the event term is {} and current term is {}. skip this.",
+                    "[pangolin] [authorities-change] Queried AuthoritiesChangeSignedEvent but not in current term. the event term is {} and current term is {}. skip this.",
                     event.term,
                     current_term
                 );
@@ -60,7 +60,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
             }
             tracing::trace!(
                 target: "pangolin-ropsten",
-                "[pangolin] Processing authorities change signed event in block {}",
+                "[pangolin] [authorities-change] Processing authorities change signed event in block {}",
                 event.at_block_number
             );
 
@@ -91,7 +91,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
 
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] Submit authorities to ethereum at block {} with tx: {}",
+                "[pangolin] [authorities-change] Submit authorities to ethereum at block {} with tx: {}",
                 event.at_block_number,
                 tx_hash
             );

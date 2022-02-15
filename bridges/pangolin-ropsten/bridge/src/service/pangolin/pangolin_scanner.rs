@@ -33,7 +33,7 @@ impl PangolinScanner {
         {
             tracing::error!(
                 target: "pangolin-ropsten",
-                "[pangolin] An error occurred while processing the extrinsics: {:?}",
+                "[pangolin] [scanner] An error occurred while processing the extrinsics: {:?}",
                 err
             );
             // Prevent too fast refresh errors
@@ -76,7 +76,7 @@ impl PangolinScanner {
             let limit = 10u32;
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] Track pangolin scan block: {} and limit: {}",
+                "[pangolin] [scanner] Track pangolin scan block: {} and limit: {}",
                 from,
                 limit
             );

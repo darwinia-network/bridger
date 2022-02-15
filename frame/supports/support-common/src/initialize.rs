@@ -10,10 +10,10 @@ pub fn init() -> color_eyre::Result<()> {
 
 fn init_log() -> color_eyre::Result<()> {
     color_eyre::install()?;
-    if std::env::var("RUST_BACKTRACE").is_err() {
-        std::env::set_var("RUST_SPANTRACE", "1");
-        std::env::set_var("RUST_LIB_BACKTRACE", "full");
-    }
+    // if std::env::var("RUST_BACKTRACE").is_err() {
+    //     std::env::set_var("RUST_SPANTRACE", "1");
+    //     std::env::set_var("RUST_LIB_BACKTRACE", "full");
+    // }
 
     let def_log_filter = [
         "info",

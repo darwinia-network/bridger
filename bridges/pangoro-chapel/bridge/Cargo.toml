@@ -11,7 +11,8 @@ include = [
   "Cargo.toml",
   "**/*.rs",
   "README.md",
-  "LICENSE"
+  "LICENSE",
+  "src/BSCValidatorSet_abi.json"
 ]
 keywords = ["substrate", "darwinia"]
 readme = 'README.md'
@@ -40,4 +41,4 @@ support-terminal   = { path = "../../../frame/supports/support-terminal" }
 
 component-http-client = { path = "../../../frame/components/http-client" }
 
-web3 = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+web3 = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }

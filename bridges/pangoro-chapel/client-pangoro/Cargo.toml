@@ -28,9 +28,9 @@ serde_json  = "1"
 array-bytes = "1.4"
 
 codec       = { package = "parity-scale-codec", version = "2.3.1", default-features = false, features = ["derive", "full"] }
-web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 secp256k1   = { version = "0.20", features = ["recovery"] }
 subxt       = { git = "https://github.com/paritytech/subxt.git" }
+web3 = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }
 
 pangoro-subxt   = { path = "../../../frame/assistants/pangoro-subxt" }
 

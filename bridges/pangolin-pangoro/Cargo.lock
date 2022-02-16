@@ -1029,6 +1029,7 @@ dependencies = [
  "drml-common-primitives",
  "frame-support",
  "frame-system",
+ "messages-relay",
  "pallet-transaction-payment",
  "pangoro-runtime",
  "parity-scale-codec",

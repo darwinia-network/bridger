@@ -4,7 +4,7 @@ use lifeline::{Lifeline, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
 use sp_core::Pair;
-use substrate_relay_helper::messages_lane::{MessagesRelayParams, SubstrateMessageLane};
+use substrate_relay_helper::messages_lane::MessagesRelayParams;
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
 use substrate_relay_helper::TransactionParams;
 
@@ -17,12 +17,8 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::PangolinPangoroTask;
 use crate::bridge::{ChainInfoConfig, RelayConfig};
 use crate::bridge::{PangolinPangoroBus, PangolinPangoroConfig};
-use crate::chains::pangolin::{
-    PangolinFinalityToPangoro, PangolinMessagesToPangoro, PangolinMessagesToPangoroRunner,
-};
-use crate::chains::pangoro::{
-    PangoroFinalityToPangolin, PangoroMessagesToPangolin, PangoroMessagesToPangolinRunner,
-};
+use crate::chains::pangolin::{PangolinFinalityToPangoro, PangolinMessagesToPangoro};
+use crate::chains::pangoro::{PangoroFinalityToPangolin, PangoroMessagesToPangolin};
 use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
 // /// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.

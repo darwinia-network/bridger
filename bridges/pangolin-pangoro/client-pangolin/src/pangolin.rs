@@ -33,11 +33,11 @@ impl ChainBase for PangolinChain {
     type Signature = drml_common_primitives::Signature;
 
     fn max_extrinsic_size() -> u32 {
-        drml_bridge_primitives::Panglin::max_extrinsic_size()
+        drml_bridge_primitives::Pangolin::max_extrinsic_size()
     }
 
     fn max_extrinsic_weight() -> Weight {
-        drml_bridge_primitives::Panglin::max_extrinsic_weight()
+        drml_bridge_primitives::Pangolin::max_extrinsic_weight()
     }
 }
 
@@ -132,11 +132,11 @@ impl TransactionSignScheme for PangolinChain {
     }
 
     fn is_signed(tx: &Self::SignedTransaction) -> bool {
-        tx.signature.is_some()
+        tx.0.signature.is_some()
     }
 
     fn is_signed_by(signer: &Self::AccountKeyPair, tx: &Self::SignedTransaction) -> bool {
-        tx.signature
+        tx.0.signature
             .as_ref()
             .map(|(address, _, _)| {
                 let account_id: drml_common_primitives::AccountId =
@@ -147,9 +147,9 @@ impl TransactionSignScheme for PangolinChain {
     }
 
     fn parse_transaction(tx: Self::SignedTransaction) -> Option<UnsignedTransaction<Self::Chain>> {
-        let extra = &tx.signature.as_ref()?.2;
+        let extra = &tx.0.signature.as_ref()?.2;
         Some(UnsignedTransaction {
-            call: tx.function,
+            call: tx.0.function,
             nonce: Compact::<IndexOf<Self::Chain>>::decode(&mut &extra.4.encode()[..])
                 .ok()?
                 .into(),

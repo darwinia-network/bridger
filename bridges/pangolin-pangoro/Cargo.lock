@@ -706,7 +706,6 @@ dependencies = [
  "client-pangoro",
  "color-eyre",
  "colored",
- "common-runtime",
  "component-subscan",
  "drml-bridge-primitives",
  "drml-common-primitives",

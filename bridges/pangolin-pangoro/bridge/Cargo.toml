@@ -74,7 +74,6 @@ support-terminal   = { path = "../../../frame/supports/support-terminal" }
 ## darwinia common
 drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
 drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
-common-runtime          = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix" }
 
 ## pangolin
 pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "xavier-try-fix", features = ["no-wasm"] }

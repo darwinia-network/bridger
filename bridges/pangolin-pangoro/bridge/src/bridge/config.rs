@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use strum::{EnumString, EnumVariantNames};
 
 use component_subscan::SubscanConfig;
 use support_common::error::BridgerError;
@@ -71,6 +72,24 @@ pub struct ChainInfoConfig {
     /// Transactions mortality period, in blocks. MUST be a power of two in [4; 65536] range. MAY NOT be larger than `BlockHashCount` parameter of the chain system module.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transactions_mortality: Option<u32>,
+    /// Runtime version mode, default is bundle
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub runtime_version_mode: Option<RuntimeVersionMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spec_version: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transaction_version: Option<u32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, EnumString, EnumVariantNames)]
+#[strum(serialize_all = "kebab_case")]
+pub enum RuntimeVersionMode {
+    /// Auto query version from chain
+    Auto,
+    /// Custom `spec_version` and `transaction_version`
+    Custom,
+    /// Read version from bundle dependencies directly.
+    Bundle,
 }
 
 impl ChainInfoConfig {
@@ -113,6 +132,9 @@ impl ChainInfoConfig {
             signer: except_signer.or_else(|| self.signer.clone()),
             signer_password: self.signer_password.clone(),
             transactions_mortality: Some(256),
+            runtime_version_mode: self.runtime_version_mode.clone(),
+            spec_version: self.spec_version,
+            transaction_version: self.transaction_version,
         })
     }
 }

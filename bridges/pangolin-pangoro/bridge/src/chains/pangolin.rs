@@ -60,269 +60,73 @@ mod s2s_const {
 }
 
 mod s2s_headers {
-    use bp_header_chain::justification::GrandpaJustification;
-    use codec::Encode;
-    use relay_substrate_client::{
-        Client, IndexOf, SignParam, TransactionSignScheme, UnsignedTransaction,
-    };
-    use sp_core::{Bytes, Pair};
-    use substrate_relay_helper::finality_pipeline::{
-        SubstrateFinalitySyncPipeline, SubstrateFinalityToSubstrate,
-    };
 
     use client_pangolin::PangolinChain;
     use client_pangoro::PangoroChain;
+    use substrate_relay_helper::finality_pipeline::{
+        DirectSubmitFinalityProofCallBuilder, SubstrateFinalitySyncPipeline,
+    };
 
-    use crate::chains::pangolin::PangolinChainConst;
-    use crate::chains::pangoro::PangoroChainConst;
-    use crate::traits::ChainConst;
-
-    // === start pangolin headers to pangoro
-    /// Pangolin-to-Pangoro finality sync pipeline.
-    pub(crate) type FinalityPipelinePangolinFinalityToPangoro = SubstrateFinalityToSubstrate<
-        PangolinChain,
-        PangoroChain,
-        <PangoroChainConst as ChainConst>::SigningParams,
-    >;
-
+    /// Description of Pangolin -> Pangoro finalized headers bridge.
     #[derive(Clone, Debug)]
-    pub struct PangolinFinalityToPangoro {
-        finality_pipeline: FinalityPipelinePangolinFinalityToPangoro,
-    }
+    pub struct PangolinFinalityToPangoro;
 
-    impl PangolinFinalityToPangoro {
-        pub fn new(
-            target_client: Client<PangoroChain>,
-            target_sign: <PangoroChainConst as ChainConst>::SigningParams,
-        ) -> Self {
-            Self {
-                finality_pipeline: FinalityPipelinePangolinFinalityToPangoro::new(
-                    target_client,
-                    target_sign,
-                ),
-            }
-        }
-    }
-
-    #[async_trait::async_trait]
     impl SubstrateFinalitySyncPipeline for PangolinFinalityToPangoro {
-        type FinalitySyncPipeline = FinalityPipelinePangolinFinalityToPangoro;
-
-        const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
-            PangolinChainConst::BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET;
-
+        type SourceChain = PangolinChain;
         type TargetChain = PangoroChain;
 
-        fn transactions_author(&self) -> drml_common_primitives::AccountId {
-            (*self.finality_pipeline.target_sign.public().as_array_ref()).into()
-        }
-
-        async fn make_submit_finality_proof_transaction(
-            &self,
-            era: bp_runtime::TransactionEraOf<PangoroChain>,
-            transaction_nonce: IndexOf<PangoroChain>,
-            header: client_pangolin::SyncHeader,
-            proof: GrandpaJustification<drml_common_primitives::Header>,
-        ) -> relay_substrate_client::Result<Bytes> {
-            let call = pangoro_runtime::BridgeGrandpaCall::<
-                pangoro_runtime::Runtime,
-                pangoro_runtime::WithPangolinGrandpa,
-            >::submit_finality_proof(Box::new(header.into_inner()), proof)
-            .into();
-
-            let genesis_hash = *self.finality_pipeline.target_client.genesis_hash();
-            let runtime_version = self
-                .finality_pipeline
-                .target_client
-                .runtime_version()
-                .await?;
-            let transaction = PangoroChain::sign_transaction(SignParam {
-                spec_version: runtime_version.spec_version,
-                transaction_version: runtime_version.transaction_version,
-                genesis_hash,
-                signer: self.finality_pipeline.target_sign.clone(),
-                era,
-                unsigned: UnsignedTransaction::new(call, transaction_nonce),
-            });
-
-            Ok(Bytes(transaction.encode()))
-        }
+        type SubmitFinalityProofCallBuilder = DirectSubmitFinalityProofCallBuilder<
+            Self,
+            pangoro_runtime::Runtime,
+            pangoro_runtime::WithPangolinGrandpa,
+        >;
+        type TransactionSignScheme = PangoroChain;
     }
 
     // === end
 }
 
 mod s2s_messages {
-    use std::{ops::RangeInclusive, time::Duration};
 
-    use bp_messages::MessageNonce;
-    use bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
     use codec::Encode;
-    use frame_support::dispatch::GetDispatchInfo;
-    use frame_support::weights::Weight;
-    use messages_relay::message_lane::MessageLane;
-    use relay_substrate_client::{
-        Client, IndexOf, SignParam, TransactionSignScheme, UnsignedTransaction,
-    };
-    use relay_utils::metrics::MetricsParams;
     use sp_core::{Bytes, Pair};
+
+    use client_pangolin::{PangolinChain, PangolinRelayStrategy};
+    use client_pangoro::PangoroChain;
+    use relay_substrate_client::{Client, SignParam, TransactionSignScheme, UnsignedTransaction};
     use substrate_relay_helper::messages_lane::{
-        MessagesRelayParams, StandaloneMessagesMetrics, SubstrateMessageLane,
-        SubstrateMessageLaneToSubstrate,
+        DirectReceiveMessagesDeliveryProofCallBuilder, DirectReceiveMessagesProofCallBuilder,
+        SubstrateMessageLane,
     };
     use substrate_relay_helper::messages_source::SubstrateMessagesSource;
     use substrate_relay_helper::messages_target::SubstrateMessagesTarget;
 
-    use client_pangolin::{PangolinChain, PangolinRelayStrategy};
-    use client_pangoro::PangoroChain;
-    use support_common::error::BridgerError;
+    #[derive(Clone, Debug)]
+    pub struct PangolinMessagesToPangoro;
 
-    use crate::chains::pangolin::PangolinChainConst;
-    use crate::chains::pangoro::PangoroChainConst;
-    use crate::traits::ChainConst;
-
-    pub const SOURCE_NAME: &str = "pangolin";
-    pub const TARGET_NAME: &str = "pangoro";
-
-    /// Source-to-Target message lane.
-    pub type MessageLanePangolinMessagesToPangoro = SubstrateMessageLaneToSubstrate<
-        PangolinChain,
-        <PangolinChainConst as ChainConst>::SigningParams,
-        PangoroChain,
-        <PangoroChainConst as ChainConst>::SigningParams,
-    >;
-
-    #[derive(Clone)]
-    pub struct PangolinMessagesToPangoro {
-        message_lane: MessageLanePangolinMessagesToPangoro,
-    }
-
-    #[async_trait::async_trait]
     impl SubstrateMessageLane for PangolinMessagesToPangoro {
-        type MessageLane = MessageLanePangolinMessagesToPangoro;
-
-        const OUTBOUND_LANE_MESSAGE_DETAILS_METHOD: &'static str =
-            PangoroChainConst::OUTBOUND_LANE_MESSAGE_DETAILS_METHOD;
-        const OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD: &'static str =
-            PangoroChainConst::OUTBOUND_LANE_LATEST_GENERATED_NONCE_METHOD;
-        const OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            PangoroChainConst::OUTBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD;
-
-        const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-            PangolinChainConst::INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD;
-        const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
-            PangolinChainConst::INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD;
-        const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str =
-            PangolinChainConst::INBOUND_LANE_UNREWARDED_RELAYERS_STATE;
-
-        const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str =
-            PangolinChainConst::BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET;
-        const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str =
-            PangoroChainConst::BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE;
-
-        const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str =
-            PangolinChainConst::MESSAGE_PALLET_NAME_AT_SOURCE;
-        const MESSAGE_PALLET_NAME_AT_TARGET: &'static str =
-            PangolinChainConst::MESSAGE_PALLET_NAME_AT_TARGET;
-        const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN: Weight =
-            PangolinChainConst::PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_TARGET_CHAIN;
+        const SOURCE_TO_TARGET_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
+        const TARGET_TO_SOURCE_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
 
         type SourceChain = PangolinChain;
         type TargetChain = PangoroChain;
 
-        fn source_transactions_author(&self) -> drml_common_primitives::AccountId {
-            (*self.message_lane.source_sign.public().as_array_ref()).into()
-        }
+        type SourceTransactionSignScheme = PangolinChain;
+        type TargetTransactionSignScheme = PangoroChain;
 
-        async fn make_messages_receiving_proof_transaction(
-            &self,
-            transaction_nonce: IndexOf<PangolinChain>,
-            _generated_at_block: client_pangoro::HeaderId,
-            proof: <Self::MessageLane as MessageLane>::MessagesReceivingProof,
-        ) -> relay_substrate_client::Result<Bytes> {
-            let (relayers_state, proof) = proof;
-            let call: pangolin_runtime::Call =
-                pangolin_runtime::BridgeMessagesCall::receive_messages_delivery_proof::<
-                    pangolin_runtime::Runtime,
-                    pangolin_runtime::WithPangoroMessages,
-                >(proof, relayers_state)
-                .into();
-            let call_weight = call.get_dispatch_info().weight;
-            let genesis_hash = *self.message_lane.source_client.genesis_hash();
-            let runtime_version = self.message_lane.source_client.runtime_version().await?;
-            let transaction = PangolinChain::sign_transaction(SignParam {
-                spec_version: runtime_version.spec_version,
-                transaction_version: runtime_version.transaction_version,
-                genesis_hash,
-                signer: self.message_lane.target_sign.clone(),
-                era: relay_substrate_client::TransactionEra::immortal(),
-                unsigned: UnsignedTransaction::new(call, transaction_nonce),
-            });
-            tracing::trace!(
-                target: "bridge",
-                "Prepared {} -> {} confirmation transaction. Weight: {}/{}, size: {}/{}",
-                TARGET_NAME,
-                SOURCE_NAME,
-                call_weight,
-                common_runtime::max_extrinsic_weight(),
-                transaction.encode().len(),
-                common_runtime::max_extrinsic_size(),
-            );
-            Ok(Bytes(transaction.encode()))
-        }
+        type ReceiveMessagesProofCallBuilder = DirectReceiveMessagesProofCallBuilder<
+            Self,
+            pangoro_runtime::Runtime,
+            pangoro_runtime::WithPangolinMessages,
+        >;
+        type ReceiveMessagesDeliveryProofCallBuilder =
+            DirectReceiveMessagesDeliveryProofCallBuilder<
+                Self,
+                pangolin_runtime::Runtime,
+                pangolin_runtime::WithPangoroMessages,
+            >;
 
-        fn target_transactions_author(&self) -> drml_common_primitives::AccountId {
-            (*self.message_lane.target_sign.public().as_array_ref()).into()
-        }
-
-        async fn make_messages_delivery_transaction(
-            &self,
-            transaction_nonce: IndexOf<PangoroChain>,
-            _generated_at_header: client_pangolin::HeaderId,
-            _nonces: RangeInclusive<MessageNonce>,
-            proof: <Self::MessageLane as MessageLane>::MessagesProof,
-        ) -> relay_substrate_client::Result<Bytes> {
-            let (dispatch_weight, proof) = proof;
-            let FromBridgedChainMessagesProof {
-                ref nonces_start,
-                ref nonces_end,
-                ..
-            } = proof;
-            let messages_count = nonces_end - nonces_start + 1;
-            let call: pangoro_runtime::Call =
-                pangoro_runtime::BridgeMessagesCall::receive_messages_proof::<
-                    pangoro_runtime::Runtime,
-                    pangoro_runtime::WithPangolinMessages,
-                >(
-                    self.message_lane.relayer_id_at_source.clone(),
-                    proof,
-                    messages_count as _,
-                    dispatch_weight,
-                )
-                .into();
-            let call_weight = call.get_dispatch_info().weight;
-            let genesis_hash = *self.message_lane.target_client.genesis_hash();
-            let runtime_version = self.message_lane.target_client.runtime_version().await?;
-            let transaction = PangoroChain::sign_transaction(SignParam {
-                spec_version: runtime_version.spec_version,
-                transaction_version: runtime_version.transaction_version,
-                genesis_hash,
-                signer: self.message_lane.target_sign.clone(),
-                era: relay_substrate_client::TransactionEra::immortal(),
-                unsigned: UnsignedTransaction::new(call, transaction_nonce),
-            });
-            tracing::trace!(
-                target: "bridge",
-                "Prepared {} -> {} delivery transaction. Weight: {}/{}, size: {}/{}",
-                SOURCE_NAME,
-                TARGET_NAME,
-                call_weight,
-                common_runtime::max_extrinsic_weight(),
-                transaction.encode().len(),
-                common_runtime::max_extrinsic_size(),
-            );
-            Ok(Bytes(transaction.encode()))
-        }
+        type RelayStrategy = PangolinRelayStrategy;
     }
 
     /// Source node as messages source.

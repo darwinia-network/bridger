@@ -2,11 +2,13 @@ use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
 use bp_messages::LaneId;
+use relay_substrate_client::ChainRuntimeVersion;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use sp_core::crypto::Pair;
 
 use support_common::error::BridgerError;
 
+use crate::bridge::RuntimeVersionMode;
 use crate::traits::CliChain;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, strum::EnumString)]
@@ -24,6 +26,9 @@ pub struct ChainInfo {
     pub secure: bool,
     pub signer_password: Option<String>,
     pub transactions_mortality: Option<u32>,
+    pub runtime_version_mode: Option<RuntimeVersionMode>,
+    pub spec_version: Option<u32>,
+    pub transaction_version: Option<u32>,
 }
 
 impl ChainInfo {
@@ -31,11 +36,28 @@ impl ChainInfo {
     pub async fn to_substrate_relay_chain<C: CliChain>(
         &self,
     ) -> color_eyre::Result<relay_substrate_client::Client<C>> {
+        let chain_runtime_version = match self.runtime_version_mode {
+            Some(RuntimeVersionMode::Auto) => ChainRuntimeVersion::Auto,
+            Some(RuntimeVersionMode::Custom) => {
+                let spec_version = self
+                    .spec_version
+                    .ok_or_else(|| BridgerError::Custom("Miss spec_version config".to_string()))?;
+                let transaction_version = self.transaction_version.ok_or_else(|| {
+                    BridgerError::Custom("Miss transaction_version config".to_string())
+                })?;
+                ChainRuntimeVersion::Custom(spec_version, transaction_version)
+            }
+            Some(RuntimeVersionMode::Bundle) | None => ChainRuntimeVersion::Custom(
+                C::RUNTIME_VERSION.spec_version,
+                C::RUNTIME_VERSION.transaction_version,
+            ),
+        };
         Ok(
             relay_substrate_client::Client::new(relay_substrate_client::ConnectionParams {
                 host: self.host.clone(),
                 port: self.port,
                 secure: self.secure,
+                chain_runtime_version,
             })
             .await,
         )
@@ -50,7 +72,7 @@ impl ChainInfo {
                     "The chain [{}:{}] not set signer",
                     self.host, self.port,
                 ))
-                .into())
+                .into());
             }
         };
         C::KeyPair::from_string(&signer, self.signer_password.as_deref())

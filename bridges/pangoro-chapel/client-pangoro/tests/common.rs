@@ -9,7 +9,6 @@ pub async fn client() -> color_eyre::Result<PangoroClient> {
         endpoint: "wss://pangoro-rpc.darwinia.network:443".to_string(),
         relayer_private_key: "//Alice".to_string(),
         relayer_real_account: None,
-        ecdsa_authority_private_key: None,
     };
     PangoroClientComponent::component(config).await
 }

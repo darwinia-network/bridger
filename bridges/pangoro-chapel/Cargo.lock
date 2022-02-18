@@ -246,8 +246,10 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 name = "bridge-pangoro-ropsten"
 version = "0.5.0"
 dependencies = [
+ "client-pangoro",
  "color-eyre",
  "component-http-client",
+ "futures",
  "lifeline",
  "postage",
  "serde 1.0.136",

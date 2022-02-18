@@ -3,6 +3,7 @@ use pangoro_subxt::api::runtime_types::bsc_primitives::BscHeader;
 use pangoro_subxt::api::runtime_types::ethbloom::Bloom;
 use pangoro_subxt::api::runtime_types::primitive_types::{H160, U256};
 use subxt::BasicError;
+use web3::futures::TryFutureExt;
 use web3::transports::Http;
 use web3::types::{BlockId, BlockNumber, U64};
 use web3::Web3;
@@ -86,15 +87,20 @@ async fn test_send_finalized_checkpoint() {
         println!("{:?}", header.number);
         bsc_headers.push(header);
     }
-
-    let runtime = client.runtime();
-    let progress = runtime
-        .tx()
-        .bsc()
+    let events = client
         .relay_finalized_epoch_header(bsc_headers)
-        .sign_and_submit_then_watch(client.account().signer())
         .await
         .unwrap();
 
-    assert!(progress.wait_for_finalized_success().await.is_ok());
+    // let runtime = client.runtime();
+    // let progress = runtime
+    //     .tx()
+    //     .bsc()
+    //     .relay_finalized_epoch_header(bsc_headers)
+    //     .sign_and_submit_then_watch(client.account().signer())
+    //     .await
+    //     .unwrap();
+    //
+    // let events = progress.wait_for_finalized_success().await.unwrap();
+    println!("{:?}", events);
 }

@@ -3,7 +3,7 @@ Bridge of pangolin-pangoro
 
 ## Prepare
 
-1. Read [Usage](../../../docs/Useage.md)
+1. Read [Usage](../../../docs/Usage.md)
 2. `cp .maintain/config/bridge-pangolin-pangoro.toml ~/.bridger`
 
    Copy config to default config path `~/.bridger` and fill the content.

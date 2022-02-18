@@ -1,24 +1,19 @@
 use support_lifeline::task::TaskStack;
 
 use crate::bridge::PangoroChapelBus;
-use crate::service::some::SomeService;
+use crate::service::header_relay::HeaderRelayService;
 
+#[allow(dead_code)]
 #[derive(Debug)]
-pub struct PangoroChapelTask {
+pub struct PangoroChapelServiceManager {
     stack: TaskStack<PangoroChapelBus>,
 }
 
-impl PangoroChapelTask {
-    pub fn new() -> color_eyre::Result<Self> {
+impl PangoroChapelServiceManager {
+    pub async fn new() -> color_eyre::Result<Self> {
         let bus = PangoroChapelBus::default();
         let mut stack = TaskStack::new(bus);
-        stack.spawn_service::<SomeService>()?;
+        stack.spawn_service::<HeaderRelayService>()?;
         Ok(Self { stack })
-    }
-}
-
-impl PangoroChapelTask {
-    pub fn stack(&self) -> &TaskStack<PangoroChapelBus> {
-        &self.stack
     }
 }

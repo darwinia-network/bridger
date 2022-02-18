@@ -20,6 +20,7 @@ fn init_log() -> color_eyre::Result<()> {
         "bridger=trace",
         "pangolin-pangoro=trace",
         "pangolin-ropsten=trace",
+        "pangoro-chapel=trace",
         "darwinia-ethereum=trace",
         "darwinia-crab=trace",
         "client-pangolin=trace",

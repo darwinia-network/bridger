@@ -25,11 +25,11 @@ async-trait = "0.1"
 
 codec                  = { package = "parity-scale-codec", version = "2.3.1" }
 
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
 
 ## Bridge dependencies
 pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.4", features = ["no-wasm"] }

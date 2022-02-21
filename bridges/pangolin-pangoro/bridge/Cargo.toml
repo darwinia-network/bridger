@@ -50,15 +50,15 @@ sp-version          = { git = "https://github.com/darwinia-network/substrate.git
 
 ## bridge common
 
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-substrate-relay-helper = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "patch-duplicate-relay" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+substrate-relay-helper = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
 
 
 ## component

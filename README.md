@@ -47,4 +47,4 @@ The currently darwinia-bridger supports these bridges, the config you can click 
 
 ## Usage
 
-The more usage you can click [Usage](./docs/Useage.md)
+The more usage you can click [Usage](./docs/Usage.md)

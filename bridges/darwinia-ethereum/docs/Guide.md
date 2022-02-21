@@ -3,7 +3,7 @@ darwinia-ethereum
 
 ## Prepare
 
-1. Read [Usage](../../../docs/Useage.md)
+1. Read [Usage](../../../docs/Usage.md)
 2. `cp .maintain/config/bridge-darwinia-ethereum.toml ~/.bridger`
    The dir can be any path you like, and fill the content.
 

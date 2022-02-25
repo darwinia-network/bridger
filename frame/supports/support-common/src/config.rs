@@ -153,17 +153,15 @@ impl Config {
         }
         match config_file {
             Some(v) => {
-                let extension = v
-                    .extension()
-                    .map(|v| v.to_str())
-                    .flatten()
-                    .map(|s| match &s.to_lowercase()[..] {
-                        "toml" => Some(ConfigFormat::Toml),
-                        "json" => Some(ConfigFormat::Json),
-                        "yml" => Some(ConfigFormat::Yml),
-                        _ => None,
-                    })
-                    .flatten();
+                let extension =
+                    v.extension().map(|v| v.to_str()).flatten().and_then(|s| {
+                        match &s.to_lowercase()[..] {
+                            "toml" => Some(ConfigFormat::Toml),
+                            "json" => Some(ConfigFormat::Json),
+                            "yml" => Some(ConfigFormat::Yml),
+                            _ => None,
+                        }
+                    });
                 match extension {
                     Some(e) => Ok(Some((v, e))),
                     None => Ok(None),

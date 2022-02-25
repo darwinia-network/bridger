@@ -30,7 +30,7 @@ pub fn list_externals(
         if &name == "bridger" || &name == "bridger.exe" {
             continue;
         }
-        if let Some(extension) = path.extension().map(|item| item.to_str()).flatten() {
+        if let Some(extension) = path.extension().and_then(|item| item.to_str()) {
             if cfg!(windows) {
                 match extension {
                     "exe" | "bat" | "cmd" => {}

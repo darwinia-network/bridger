@@ -235,7 +235,7 @@ impl PrecompiledBinaryExecutor {
         for i in 0..archive.len() {
             let mut zip_inner_file = archive.by_index(i)?;
             let outpath = match zip_inner_file.enclosed_name() {
-                Some(path) => path_binary_base.join(path.to_owned()),
+                Some(path) => path_binary_base.join(path),
                 None => continue,
             };
 

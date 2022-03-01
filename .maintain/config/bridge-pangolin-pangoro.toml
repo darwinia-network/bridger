@@ -1,12 +1,22 @@
 [pangolin]
 endpoint = "wss://pangolin-rpc.darwinia.network"
 signer = "//Alice"
-runtime_version_mode = "bundle"
+# Bundle/Auto/Custom
+runtime_version_mode = "Bundle"
+# If the runtime version mode is custom, you need to set this.
+#spec_version = 12345
+# If the runtime version mode is custom, you need to set this.
+#transaction_version = 0
 
 [pangoro]
 endpoint = "wss://pangoro-rpc.darwinia.network"
 signer = "//Alice"
-runtime_version_mode = "bundle"
+# Bundle/Auto/Custom
+runtime_version_mode = "Bundle"
+# If the runtime version mode is custom, you need to set this.
+#spec_version = 12345
+# If the runtime version mode is custom, you need to set this.
+#transaction_version = 0
 
 [relay]
 # substrate-substrate bridger message relay lanes, default use `00000000`

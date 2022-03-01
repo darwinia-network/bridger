@@ -4,8 +4,9 @@ use lifeline::{Lifeline, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
 use sp_core::Pair;
-use substrate_relay_helper::messages_lane::{MessagesRelayParams, SubstrateMessageLane};
+use substrate_relay_helper::messages_lane::MessagesRelayParams;
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
+use substrate_relay_helper::TransactionParams;
 
 use client_pangolin::{PangolinChain, PangolinRelayStrategy};
 use client_pangoro::{PangoroChain, PangoroRelayStrategy};
@@ -16,12 +17,8 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::PangolinPangoroTask;
 use crate::bridge::{ChainInfoConfig, RelayConfig};
 use crate::bridge::{PangolinPangoroBus, PangolinPangoroConfig};
-use crate::chains::pangolin::{
-    PangolinFinalityToPangoro, PangolinMessagesToPangoro, PangolinMessagesToPangoroRunner,
-};
-use crate::chains::pangoro::{
-    PangoroFinalityToPangolin, PangoroMessagesToPangolin, PangoroMessagesToPangolinRunner,
-};
+use crate::chains::pangolin::{PangolinFinalityToPangoro, PangolinMessagesToPangoro};
+use crate::chains::pangoro::{PangoroFinalityToPangolin, PangoroMessagesToPangolin};
 use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
 // /// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.
@@ -117,7 +114,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
     let lanes = relay_info.lanes;
 
     let metrics_params: MetricsParams = relay_info.prometheus_params.clone().into();
-    let metrics_params = relay_utils::relay_metrics(None, metrics_params).into_params();
+    let metrics_params = relay_utils::relay_metrics(metrics_params).into_params();
 
     // const METRIC_IS_SOME_PROOF: &str = "it is `None` when metric has been already registered; \
     // 			this is the command entrypoint, so nothing has been registered yet; \
@@ -163,77 +160,95 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         }
     }
 
-    let pangolin_to_pangoro_on_demand_headers = OnDemandHeadersRelay::new(
-        pangolin_client.clone(),
-        pangoro_client.clone(),
-        pangoro_transactions_mortality,
-        PangolinFinalityToPangoro::new(pangoro_client.clone(), pangoro_sign.clone()),
-        drml_common_primitives::PANGOLIN_BLOCKS_PER_SESSION,
-        relay_info.only_mandatory_headers,
-    );
-    let pangoro_to_pangolin_on_demand_headers = OnDemandHeadersRelay::new(
-        pangoro_client.clone(),
-        pangolin_client.clone(),
-        pangolin_transactions_mortality,
-        PangoroFinalityToPangolin::new(pangolin_client.clone(), pangolin_sign.clone()),
-        drml_common_primitives::PANGORO_BLOCKS_PER_SESSION,
-        relay_info.only_mandatory_headers,
-    );
+    // start on-demand header relays
+    let pangolin_to_pangoro_transaction_params = TransactionParams {
+        mortality: pangoro_transactions_mortality,
+        signer: pangoro_sign.clone(),
+    };
+    let pangoro_to_pangolin_transaction_params = TransactionParams {
+        mortality: pangolin_transactions_mortality,
+        signer: pangolin_sign.clone(),
+    };
+
+    let pangolin_to_pangoro_on_demand_headers =
+        OnDemandHeadersRelay::new::<PangolinFinalityToPangoro>(
+            pangolin_client.clone(),
+            pangoro_client.clone(),
+            pangolin_to_pangoro_transaction_params,
+            drml_common_primitives::PANGOLIN_BLOCKS_PER_SESSION,
+            relay_info.only_mandatory_headers,
+        );
+    let pangoro_to_pangolin_on_demand_headers =
+        OnDemandHeadersRelay::new::<PangoroFinalityToPangolin>(
+            pangoro_client.clone(),
+            pangolin_client.clone(),
+            pangoro_to_pangolin_transaction_params,
+            drml_common_primitives::PANGORO_BLOCKS_PER_SESSION,
+            relay_info.only_mandatory_headers,
+        );
 
     // Need 2x capacity since we consider both directions for each lane
     let mut message_relays = Vec::with_capacity(lanes.len() * 2);
     for lane in lanes {
         let lane = lane.into();
 
-        let pangolin_to_pangoro_messages =
-            PangolinMessagesToPangoroRunner::run(MessagesRelayParams {
-                source_client: pangolin_client.clone(),
-                source_sign: pangolin_sign.clone(),
-                target_client: pangoro_client.clone(),
-                target_sign: pangoro_sign.clone(),
-                source_to_target_headers_relay: Some(pangolin_to_pangoro_on_demand_headers.clone()),
-                target_to_source_headers_relay: Some(pangoro_to_pangolin_on_demand_headers.clone()),
-                lane_id: lane,
-                metrics_params: metrics_params.clone().disable().metrics_prefix(
-                    messages_relay::message_lane_loop::metrics_prefix::<
-                        <PangolinMessagesToPangoro as SubstrateMessageLane>::MessageLane,
-                    >(&lane),
-                ),
-                relay_strategy: PangolinRelayStrategy::new(
-                    pangolin_client.clone(),
-                    AccountId::from(pangolin_sign.public().0),
-                ),
-            })
-            .map_err(|e| format!("{}", e))
-            .boxed();
+        let pangolin_to_pangoro_messages = substrate_relay_helper::messages_lane::run::<
+            PangolinMessagesToPangoro,
+        >(MessagesRelayParams {
+            source_client: pangolin_client.clone(),
+            source_transaction_params: TransactionParams {
+                signer: pangolin_sign.clone(),
+                mortality: pangolin_transactions_mortality,
+            },
+            target_client: pangoro_client.clone(),
+            target_transaction_params: TransactionParams {
+                signer: pangoro_sign.clone(),
+                mortality: pangoro_transactions_mortality,
+            },
+            source_to_target_headers_relay: Some(pangolin_to_pangoro_on_demand_headers.clone()),
+            target_to_source_headers_relay: Some(pangoro_to_pangolin_on_demand_headers.clone()),
+            lane_id: lane,
+            metrics_params: metrics_params.clone().disable(),
+            standalone_metrics: None,
+            relay_strategy: PangolinRelayStrategy::new(
+                pangolin_client.clone(),
+                AccountId::from(pangolin_sign.public().0),
+            ),
+        })
+        .map_err(|e| format!("{}", e))
+        .boxed();
 
-        let pangoro_to_pangolin_messages =
-            PangoroMessagesToPangolinRunner::run(MessagesRelayParams {
-                source_client: pangoro_client.clone(),
-                source_sign: pangoro_sign.clone(),
-                target_client: pangolin_client.clone(),
-                target_sign: pangolin_sign.clone(),
-                source_to_target_headers_relay: Some(pangoro_to_pangolin_on_demand_headers.clone()),
-                target_to_source_headers_relay: Some(pangolin_to_pangoro_on_demand_headers.clone()),
-                lane_id: lane,
-                metrics_params: metrics_params.clone().disable().metrics_prefix(
-                    messages_relay::message_lane_loop::metrics_prefix::<
-                        <PangoroMessagesToPangolin as SubstrateMessageLane>::MessageLane,
-                    >(&lane),
-                ),
-                relay_strategy: PangoroRelayStrategy::new(
-                    pangoro_client.clone(),
-                    AccountId::from(pangoro_sign.public().0),
-                ),
-            })
-            .map_err(|e| format!("{}", e))
-            .boxed();
+        let pangoro_to_pangolin_messages = substrate_relay_helper::messages_lane::run::<
+            PangoroMessagesToPangolin,
+        >(MessagesRelayParams {
+            source_client: pangoro_client.clone(),
+            source_transaction_params: TransactionParams {
+                signer: pangoro_sign.clone(),
+                mortality: pangoro_transactions_mortality,
+            },
+            target_client: pangolin_client.clone(),
+            target_transaction_params: TransactionParams {
+                signer: pangolin_sign.clone(),
+                mortality: pangolin_transactions_mortality,
+            },
+            source_to_target_headers_relay: Some(pangoro_to_pangolin_on_demand_headers.clone()),
+            target_to_source_headers_relay: Some(pangolin_to_pangoro_on_demand_headers.clone()),
+            lane_id: lane,
+            metrics_params: metrics_params.clone().disable(),
+            standalone_metrics: None,
+            relay_strategy: PangoroRelayStrategy::new(
+                pangoro_client.clone(),
+                AccountId::from(pangoro_sign.public().0),
+            ),
+        })
+        .map_err(|e| format!("{}", e))
+        .boxed();
 
         message_relays.push(pangolin_to_pangoro_messages);
         message_relays.push(pangoro_to_pangolin_messages);
     }
 
-    relay_utils::relay_metrics(None, metrics_params)
+    relay_utils::relay_metrics(metrics_params)
         .expose()
         .await
         .map_err(|e| BridgerError::Custom(format!("{:?}", e)))?;

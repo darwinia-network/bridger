@@ -1,10 +1,12 @@
 [pangolin]
 endpoint = "wss://pangolin-rpc.darwinia.network"
 signer = "//Alice"
+runtime_version_mode = "bundle"
 
 [pangoro]
 endpoint = "wss://pangoro-rpc.darwinia.network"
 signer = "//Alice"
+runtime_version_mode = "bundle"
 
 [relay]
 # substrate-substrate bridger message relay lanes, default use `00000000`

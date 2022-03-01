@@ -45,7 +45,7 @@ impl Chain for PangolinChain {
     const NAME: &'static str = "Pangolin";
     const TOKEN_ID: Option<&'static str> = Some("polkadot");
     const BEST_FINALIZED_HEADER_ID_METHOD: &'static str =
-        drml_bridge_primitives::BEST_FINALIZED_PANGORO_HEADER_METHOD;
+        drml_bridge_primitives::BEST_FINALIZED_PANGOLIN_HEADER_METHOD;
     const AVERAGE_BLOCK_INTERVAL: Duration =
         Duration::from_millis(drml_common_primitives::MILLISECS_PER_BLOCK);
     const STORAGE_PROOF_OVERHEAD: u32 = drml_bridge_primitives::EXTRA_STORAGE_PROOF_SIZE;

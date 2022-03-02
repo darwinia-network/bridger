@@ -67,8 +67,9 @@ impl Subquery {
 
     pub async fn query_latest_schedule_mmr_root_event(
         &self,
+        include_outdated: bool,
     ) -> color_eyre::Result<Option<ScheduleMMRRootEvent>> {
-        let query = r#"
+        let basic_query = r#"
         query ScheduleMMRRootPage {
           scheduleMMRRootEvents(
             first: 1
@@ -84,10 +85,14 @@ impl Subquery {
           }
         }
         "#;
+        let mut query = basic_query.to_string();
+        if !include_outdated {
+            query = query.replace("outdated", "");
+        }
         let data = self
             .client
             .query_with_vars_unwrap::<HashMap<String, DataWrapper<ScheduleMMRRootEvent>>, EmptyQueryVar>(
-                query,
+                &query[..],
                 EmptyQueryVar,
             )
             .await

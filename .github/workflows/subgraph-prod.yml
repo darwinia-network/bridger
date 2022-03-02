@@ -6,12 +6,33 @@ on:
       - 'v*'
 
 jobs:
-  deploy-thegraph:
-    name: Deploy thegraph
+  thegraph-ethereum:
+    name: Deploy ethereum thegraph
     runs-on: ubuntu-latest
     strategy:
       matrix:
         chain: [ethereum, ropsten]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Deploy
+        working-directory: thegraph
+        run: |
+          npm i
+          npm run codegen -- subgraph-${{ matrix.chain }}.yaml
+          npm run build -- subgraph-${{ matrix.chain }}.yaml
+          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_PROD }} \
+            darwinia-network/bridge-${{ matrix.chain }} \
+            subgraph-${{ matrix.chain }}.yaml
+
+  thegraph-bsc:
+    name: Deploy bsc thegraph
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        chain: [chapel]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2

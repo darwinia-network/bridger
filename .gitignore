@@ -5,3 +5,9 @@ target
 /Cargo.lock
 
 scripts/*.local.sh
+
+thegraph/**/package-lock.json
+thegraph/**/yarn.lock
+subql/**/package-lock.json
+subql/**/yarn.lock
+node_modules

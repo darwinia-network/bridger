@@ -6,7 +6,7 @@
     "create-local": "graph create furoxr/bsc-info --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy furoxr/bsc-info --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/",
     "deploy-local": "graph deploy furoxr/bsc-info --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
   },
   "devDependencies": {

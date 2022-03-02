@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '16'
       - name: Deploy
-        working-directory: thegraph
+        working-directory: thegraph/ethereum
         run: |
           npm i
           npm run codegen -- subgraph-${{ matrix.chain }}.yaml
@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: '16'
       - name: Deploy
-        working-directory: thegraph
+        working-directory: thegraph/bsc
         run: |
           npm i
           npm run codegen -- subgraph-${{ matrix.chain }}.yaml

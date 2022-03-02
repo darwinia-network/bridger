@@ -1,6 +1,6 @@
 [package]
 name = "support-terminal"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"

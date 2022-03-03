@@ -57,3 +57,5 @@ component-subquery        = { path = "../../../frame/components/subquery" }
 component-thegraph-liketh = { path = "../../../frame/components/thegraph-liketh" }
 component-http-client     = { path = "../../../frame/components/http-client" }
 component-state           = { path = "../../../frame/components/state" }
+
+subquery-d2e  = { path = "../../../frame/assistants/subquery-d2e" }

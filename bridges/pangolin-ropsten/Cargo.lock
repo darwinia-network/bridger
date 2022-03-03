@@ -280,6 +280,7 @@ dependencies = [
  "serde_json",
  "structopt",
  "strum",
+ "subquery-d2e",
  "support-command-kv",
  "support-common",
  "support-lifeline",
@@ -3418,6 +3419,13 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "subquery-d2e"
+version = "0.5.1"
+dependencies = [
+ "component-subquery",
 ]
 
 [[package]]

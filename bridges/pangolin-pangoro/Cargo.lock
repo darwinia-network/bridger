@@ -652,7 +652,7 @@ dependencies = [
  "bp-runtime",
  "frame-support",
  "frame-system",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "parity-scale-codec",
  "scale-info",
  "serde 1.0.136",
@@ -1536,9 +1536,9 @@ dependencies = [
  "array-bytes",
  "darwinia-balances",
  "darwinia-support",
- "evm 0.33.1",
- "evm-gasometer 0.33.0",
- "evm-runtime 0.33.0",
+ "evm",
+ "evm-gasometer",
+ "evm-runtime",
  "fp-evm",
  "frame-benchmarking",
  "frame-support",
@@ -1567,7 +1567,7 @@ dependencies = [
  "darwinia-evm-precompile-utils",
  "dp-contract",
  "ethereum-primitives",
- "evm 0.33.1",
+ "evm",
  "fp-evm",
  "sp-std",
 ]
@@ -1650,7 +1650,7 @@ source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=mai
 dependencies = [
  "darwinia-evm-precompile-utils-macro",
  "darwinia-support",
- "evm 0.33.1",
+ "evm",
  "fp-evm",
 ]
 
@@ -1659,7 +1659,7 @@ name = "darwinia-evm-precompile-utils-macro"
 version = "2.8.5"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=main#58fdfc498c318ecb399896e36609896507949a5c"
 dependencies = [
- "evm 0.33.1",
+ "evm",
  "proc-macro2",
  "quote",
  "sha3 0.9.1",
@@ -1822,11 +1822,11 @@ source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=mai
 dependencies = [
  "bp-messages",
  "bp-runtime",
- "ethereum 0.10.0",
+ "ethereum",
  "ethereum-primitives",
  "frame-support",
  "frame-system",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "parity-scale-codec",
  "scale-info",
  "sha3 0.9.1",
@@ -1986,7 +1986,7 @@ version = "2.8.5"
 source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=main#58fdfc498c318ecb399896e36609896507949a5c"
 dependencies = [
  "environmental",
- "ethereum 0.10.0",
+ "ethereum",
  "ethereum-types",
  "hex",
  "parity-scale-codec",
@@ -2063,9 +2063,9 @@ source = "git+https://github.com/darwinia-network/darwinia-common.git?branch=mai
 dependencies = [
  "darwinia-evm",
  "darwinia-support",
- "ethereum 0.10.0",
+ "ethereum",
  "ethereum-types",
- "evm 0.33.1",
+ "evm",
  "fp-consensus",
  "fp-evm",
  "fp-rpc",
@@ -2267,24 +2267,6 @@ dependencies = [
 
 [[package]]
 name = "ethereum"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a67be3eaf296ef668733f54c637e84d0ca34eaf194f0077455135981ad464c3"
-dependencies = [
- "bytes 1.1.0",
- "ethereum-types",
- "hash-db",
- "hash256-std-hasher",
- "parity-scale-codec",
- "rlp",
- "rlp-derive",
- "serde 1.0.136",
- "sha3 0.9.1",
- "triehash",
-]
-
-[[package]]
-name = "ethereum"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81fb916554a4dba293ea69c69ad5653e21d770a9d0c2496b5fa0a1f5a3946d87"
@@ -2346,35 +2328,16 @@ checksum = "77f3309417938f28bf8228fcff79a4a37103981e3e186d2ccd19c74b38f4eb71"
 
 [[package]]
 name = "evm"
-version = "0.30.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3144301c57a81101003055c7cab61b58e68060f3bd1c54aa419f663e4f0e6347"
-dependencies = [
- "environmental",
- "ethereum 0.9.0",
- "evm-core 0.30.0",
- "evm-gasometer 0.30.0",
- "evm-runtime 0.30.0",
- "log",
- "parity-scale-codec",
- "primitive-types",
- "rlp",
- "serde 1.0.136",
- "sha3 0.8.2",
-]
-
-[[package]]
-name = "evm"
 version = "0.33.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "408ffdd509e16de15ea9b51f5333748f6086601f29d445d2ba53dd7e95565574"
 dependencies = [
  "auto_impl",
  "environmental",
- "ethereum 0.10.0",
- "evm-core 0.33.0",
- "evm-gasometer 0.33.0",
- "evm-runtime 0.33.0",
+ "ethereum",
+ "evm-core",
+ "evm-gasometer",
+ "evm-runtime",
  "log",
  "parity-scale-codec",
  "primitive-types",
@@ -2382,18 +2345,6 @@ dependencies = [
  "scale-info",
  "serde 1.0.136",
  "sha3 0.8.2",
-]
-
-[[package]]
-name = "evm-core"
-version = "0.30.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7bfa2dae9a2c6c0172d83c37eb406bfabf6a9d1af17b7ab4958e89853ddae97"
-dependencies = [
- "funty",
- "parity-scale-codec",
- "primitive-types",
- "serde 1.0.136",
 ]
 
 [[package]]
@@ -2411,38 +2362,14 @@ dependencies = [
 
 [[package]]
 name = "evm-gasometer"
-version = "0.30.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14d5b12117cb9a5a9b9f031296ea86416da2cd9d8c9a9e3a2fa10275ae55f3ea"
-dependencies = [
- "environmental",
- "evm-core 0.30.0",
- "evm-runtime 0.30.0",
- "primitive-types",
-]
-
-[[package]]
-name = "evm-gasometer"
 version = "0.33.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c446679607eacac4e8c8738e20c97ea9b3c86eddd8b43666744b05f416037bd9"
 dependencies = [
  "environmental",
- "evm-core 0.33.0",
- "evm-runtime 0.33.0",
+ "evm-core",
+ "evm-runtime",
  "primitive-types",
-]
-
-[[package]]
-name = "evm-runtime"
-version = "0.30.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3921ac8964cf13d12693392fef6686ef94470328ccd8eea384c6ff9ac0125b01"
-dependencies = [
- "environmental",
- "evm-core 0.30.0",
- "primitive-types",
- "sha3 0.8.2",
 ]
 
 [[package]]
@@ -2452,7 +2379,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "419e8434ac6e850a8a4bc09a19406264582d1940913b2920be2af948f4ffc49b"
 dependencies = [
  "environmental",
- "evm-core 0.33.0",
+ "evm-core",
  "primitive-types",
  "sha3 0.8.2",
 ]
@@ -2588,7 +2515,7 @@ name = "fp-consensus"
 version = "2.0.0-dev"
 source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#69947365bfafbd01dfd543b511fad67ffdf6198f"
 dependencies = [
- "ethereum 0.10.0",
+ "ethereum",
  "parity-scale-codec",
  "rlp",
  "sha3 0.8.2",
@@ -2600,10 +2527,9 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "3.0.0-dev"
-source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#a598b2480dbb7aaa15b60d9c71793f4a8ff958c3"
+source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#69947365bfafbd01dfd543b511fad67ffdf6198f"
 dependencies = [
- "evm 0.30.1",
- "impl-trait-for-tuples 0.1.3",
+ "evm",
  "parity-scale-codec",
  "serde 1.0.136",
  "sp-core",
@@ -2615,7 +2541,7 @@ name = "fp-rpc"
 version = "3.0.0-dev"
 source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#69947365bfafbd01dfd543b511fad67ffdf6198f"
 dependencies = [
- "ethereum 0.10.0",
+ "ethereum",
  "ethereum-types",
  "fp-evm",
  "parity-scale-codec",
@@ -2630,9 +2556,9 @@ dependencies = [
 [[package]]
 name = "fp-self-contained"
 version = "1.0.0-dev"
-source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#a598b2480dbb7aaa15b60d9c71793f4a8ff958c3"
+source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#69947365bfafbd01dfd543b511fad67ffdf6198f"
 dependencies = [
- "ethereum 0.9.0",
+ "ethereum",
  "frame-support",
  "parity-scale-codec",
  "parity-util-mem",
@@ -2647,7 +2573,7 @@ dependencies = [
 [[package]]
 name = "fp-storage"
 version = "2.0.0"
-source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#a598b2480dbb7aaa15b60d9c71793f4a8ff958c3"
+source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#69947365bfafbd01dfd543b511fad67ffdf6198f"
 
 [[package]]
 name = "frame-benchmarking"
@@ -2719,7 +2645,7 @@ dependencies = [
  "bitflags",
  "frame-metadata",
  "frame-support-procedural",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "log",
  "once_cell",
  "parity-scale-codec",
@@ -3403,17 +3329,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4551f042f3438e64dbd6226b20527fc84a6e1fe65688b58746a2f53623f25f5c"
 dependencies = [
  "serde 1.0.136",
-]
-
-[[package]]
-name = "impl-trait-for-tuples"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ef5550a42e3740a0e71f909d4c861056a284060af885ae7aa6242820f920d9d"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -4937,7 +4852,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-
 dependencies = [
  "frame-support",
  "frame-system",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "parity-scale-codec",
  "scale-info",
  "sp-authorship",
@@ -5160,9 +5075,9 @@ name = "pallet-evm"
 version = "6.0.0-dev"
 source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#69947365bfafbd01dfd543b511fad67ffdf6198f"
 dependencies = [
- "evm 0.33.1",
- "evm-gasometer 0.33.0",
- "evm-runtime 0.33.0",
+ "evm",
+ "evm-gasometer",
+ "evm-runtime",
  "fp-evm",
  "frame-benchmarking",
  "frame-support",
@@ -5186,7 +5101,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-simple"
 version = "2.0.0-dev"
-source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#a598b2480dbb7aaa15b60d9c71793f4a8ff958c3"
+source = "git+https://github.com/darwinia-network/frontier?branch=darwinia-v0.12.1#69947365bfafbd01dfd543b511fad67ffdf6198f"
 dependencies = [
  "fp-evm",
  "ripemd160",
@@ -5385,7 +5300,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-
 dependencies = [
  "frame-support",
  "frame-system",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "log",
  "pallet-timestamp",
  "parity-scale-codec",
@@ -5497,7 +5412,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-
 dependencies = [
  "frame-support",
  "frame-system",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "pallet-balances",
  "parity-scale-codec",
  "scale-info",
@@ -5744,7 +5659,7 @@ dependencies = [
  "arrayvec 0.7.2",
  "bitvec",
  "byte-slice-cast",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "parity-scale-codec-derive",
  "serde 1.0.136",
 ]
@@ -5776,7 +5691,7 @@ dependencies = [
  "cfg-if 1.0.0",
  "ethereum-types",
  "hashbrown",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "lru",
  "parity-util-mem-derive",
  "parking_lot 0.11.2",
@@ -6763,7 +6678,7 @@ name = "sc-chain-spec"
 version = "4.0.0-dev"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.1#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "parity-scale-codec",
  "sc-chain-spec-derive",
  "sc-network",
@@ -7824,7 +7739,7 @@ version = "4.0.0-dev"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.1#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "async-trait",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "parity-scale-codec",
  "sp-core",
  "sp-runtime",
@@ -7941,7 +7856,7 @@ source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-
 dependencies = [
  "either",
  "hash256-std-hasher",
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "log",
  "parity-scale-codec",
  "parity-util-mem",
@@ -7961,7 +7876,7 @@ name = "sp-runtime-interface"
 version = "4.0.0-dev"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.1#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "parity-scale-codec",
  "primitive-types",
  "sp-externalities",
@@ -8163,7 +8078,7 @@ name = "sp-wasm-interface"
 version = "4.0.0-dev"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.1#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
- "impl-trait-for-tuples 0.2.2",
+ "impl-trait-for-tuples",
  "parity-scale-codec",
  "sp-std",
  "wasmi",

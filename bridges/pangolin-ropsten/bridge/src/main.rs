@@ -7,7 +7,6 @@ mod cli;
 mod command;
 mod migrate;
 mod service;
-mod types;
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {

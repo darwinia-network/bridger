@@ -69,7 +69,7 @@ impl Subquery {
         let data = self
             .client
             .query_with_vars_unwrap::<HashMap<String, DataWrapper<ScheduleMMRRootEvent>>, EmptyQueryVar>(
-                &query[..],
+                query,
                 EmptyQueryVar,
             )
             .await

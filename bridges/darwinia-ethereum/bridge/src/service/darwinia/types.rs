@@ -3,7 +3,7 @@ use postage::broadcast;
 use client_darwinia::darwinia::client::Darwinia;
 use client_darwinia::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
 use component_ethereum::ethereum::client::EthereumClient;
-use component_subquery::Subquery;
+use subquery_d2e::Subquery;
 
 use crate::bridge::ToExtrinsicsMessage;
 

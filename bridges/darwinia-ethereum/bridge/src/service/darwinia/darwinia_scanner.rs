@@ -61,7 +61,7 @@ impl DarwiniaScanner {
 
         // subquery
         let subquery =
-            SubqueryComponent::component(bridge_config.subquery, BridgeName::DarwiniaEthereum)?;
+            SubqueryComponent::component(bridge_config.subquery, BridgeName::DarwiniaEthereum);
 
         // darwinia
         let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;

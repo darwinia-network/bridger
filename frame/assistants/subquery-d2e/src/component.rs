@@ -6,8 +6,8 @@ pub struct SubqueryComponent;
 
 impl SubqueryComponent {
     /// Get subquery instance
-    pub fn component(config: SubqueryConfig) -> color_eyre::Result<Subquery> {
+    pub fn component(config: SubqueryConfig) -> Subquery {
         let client = gql_client::Client::new(config.endpoint);
-        Ok(Subquery::new(client))
+        Subquery::new(client, config.bridge)
     }
 }

@@ -1,0 +1,13 @@
+query ScheduleMMRRootPage {
+  scheduleMMRRootEvents(
+    first: 1
+    orderBy: AT_BLOCK_NUMBER_DESC
+  ) {
+    nodes {
+      id
+      atBlockNumber
+      eventBlockNumber
+      emitted
+    }
+  }
+}

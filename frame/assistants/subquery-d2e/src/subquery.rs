@@ -1,22 +1,43 @@
-use gql_client::Client;
 use std::collections::HashMap;
 
-use crate::error::SubqueryComponentError;
+use gql_client::Client;
+use include_dir::{include_dir, Dir};
 
+use crate::error::SubqueryComponentError;
 use crate::types::{
-    AuthoritiesChangeSignedEvent, DataWrapper, EmptyQueryVar, MMRRootSignedEvent,
+    AuthoritiesChangeSignedEvent, BridgeName, DataWrapper, EmptyQueryVar, MMRRootSignedEvent,
     QueryTransactionsVars, ScheduleAuthoritiesChangeEvent, ScheduleMMRRootEvent,
 };
+use crate::SubqueryComponentResult;
+
+/// Graphql dir
+static GRAPHQL_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/graphql");
 
 /// Subquery client
 #[derive(Clone, Debug)]
 pub struct Subquery {
     client: Client,
+    bridge: BridgeName,
 }
 
 impl Subquery {
-    pub fn new(client: Client) -> Self {
-        Self { client }
+    /// Create subquery instance
+    pub fn new(client: Client, bridge: BridgeName) -> Self {
+        Self { client, bridge }
+    }
+}
+
+impl Subquery {
+    fn read_graphql(&self, file: impl AsRef<str>) -> SubqueryComponentResult<&str> {
+        let file = file.as_ref();
+        let dir = self.bridge.directory();
+        let graph = GRAPHQL_DIR
+            .get_file(format!("{}/{}", dir, file))
+            .or_else(|| GRAPHQL_DIR.get_file(format!("generic/{}", file)))
+            .ok_or_else(|| SubqueryComponentError::GraphQL("No graphql fround".to_string()))?;
+        graph.contents_utf8().ok_or_else(|| {
+            SubqueryComponentError::GraphQL("Failed to read graphql file".to_string())
+        })
     }
 }
 
@@ -25,32 +46,8 @@ impl Subquery {
         &self,
         from: u64,
         first: u32,
-    ) -> color_eyre::Result<Vec<MMRRootSignedEvent>> {
-        let query = r#"
-        query MMRRootPage($from: Int!, $first: Int!) {
-          mMRRootSignedEvents(
-            first: $first
-            orderBy: AT_BLOCK_NUMBER_ASC
-            filter: {
-              atBlockNumber: {
-                greaterThan: $from
-              }
-            }
-          ) {
-            nodes {
-              atBlockNumber,
-              eventBlockNumber,
-              mmrRoot,
-              signatures {
-                nodes {
-                  account,
-                  relayAuthoritySignature,
-                }
-              }
-            }
-          }
-        }
-        "#;
+    ) -> SubqueryComponentResult<Vec<MMRRootSignedEvent>> {
+        let query = self.read_graphql("mmr_root_signed_events.query.graphql")?;
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
@@ -67,28 +64,8 @@ impl Subquery {
 
     pub async fn query_latest_schedule_mmr_root_event(
         &self,
-        include_outdated: bool,
-    ) -> color_eyre::Result<Option<ScheduleMMRRootEvent>> {
-        let basic_query = r#"
-        query ScheduleMMRRootPage {
-          scheduleMMRRootEvents(
-            first: 1
-            orderBy: AT_BLOCK_NUMBER_DESC
-          ) {
-            nodes {
-              id
-              atBlockNumber
-              eventBlockNumber
-              emitted
-              outdated
-            }
-          }
-        }
-        "#;
-        let mut query = basic_query.to_string();
-        if !include_outdated {
-            query = query.replace("outdated", "");
-        }
+    ) -> SubqueryComponentResult<Option<ScheduleMMRRootEvent>> {
+        let query = self.read_graphql("latest_schedule_mmr_root_event.query.graphql")?;
         let data = self
             .client
             .query_with_vars_unwrap::<HashMap<String, DataWrapper<ScheduleMMRRootEvent>>, EmptyQueryVar>(
@@ -108,25 +85,8 @@ impl Subquery {
         &self,
         from: u64,
         first: u32,
-    ) -> color_eyre::Result<Vec<ScheduleAuthoritiesChangeEvent>> {
-        let query = r#"
-        query scheduleAuthoritiesChangePage($from: Int!, $first: Int!) {
-          scheduleAuthoritiesChangeEvents(
-            first: $first
-            orderBy: AT_BLOCK_NUMBER_ASC
-            filter: {
-              atBlockNumber: {
-                greaterThan: $from
-              }
-            }
-          ) {
-            nodes {
-              atBlockNumber
-              message
-            }
-          }
-        }
-        "#;
+    ) -> SubqueryComponentResult<Vec<ScheduleAuthoritiesChangeEvent>> {
+        let query = self.read_graphql("schedule_authorities_change_event.query.graphql")?;
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client
@@ -145,32 +105,8 @@ impl Subquery {
         &self,
         from: u64,
         first: u32,
-    ) -> color_eyre::Result<Vec<AuthoritiesChangeSignedEvent>> {
-        let query = r#"
-        query authoritiesChangeSignedPage($from: Int!, $first: Int!) {
-          authoritiesChangeSignedEvents(
-            first: $first
-            orderBy: AT_BLOCK_NUMBER_ASC
-            filter: {
-              atBlockNumber: {
-                greaterThan: $from
-              }
-            }
-          ) {
-            nodes {
-              atBlockNumber
-              term
-              newAuthorities
-              signatures {
-                nodes {
-                  account,
-                  relayAuthoritySignature
-                }
-              }
-            }
-          }
-        }
-        "#;
+    ) -> SubqueryComponentResult<Vec<AuthoritiesChangeSignedEvent>> {
+        let query = self.read_graphql("authorities_change_signed_event.query.graphql")?;
         let vars = QueryTransactionsVars { from, first };
         let data = self
             .client

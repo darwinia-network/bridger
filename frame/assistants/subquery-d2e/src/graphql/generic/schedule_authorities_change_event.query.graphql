@@ -1,0 +1,16 @@
+query scheduleAuthoritiesChangePage($from: Int!, $first: Int!) {
+  scheduleAuthoritiesChangeEvents(
+    first: $first
+    orderBy: AT_BLOCK_NUMBER_ASC
+    filter: {
+      atBlockNumber: {
+        greaterThan: $from
+      }
+    }
+  ) {
+    nodes {
+      atBlockNumber
+      message
+    }
+  }
+}

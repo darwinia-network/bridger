@@ -285,7 +285,6 @@ dependencies = [
  "component-http-client",
  "component-shadow",
  "component-state",
- "component-subquery",
  "component-thegraph-liketh",
  "lifeline",
  "microkv",
@@ -296,6 +295,7 @@ dependencies = [
  "serde_json",
  "structopt",
  "strum 0.21.0",
+ "subquery-d2e",
  "substrate-subxt",
  "support-command-kv",
  "support-common",
@@ -504,21 +504,6 @@ dependencies = [
  "microkv",
  "serde 1.0.136",
  "support-common",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "component-subquery"
-version = "0.5.1"
-dependencies = [
- "async-trait",
- "color-eyre",
- "gql_client",
- "hex",
- "serde 1.0.136",
- "serde-aux",
- "serde-hex",
  "thiserror",
  "tracing",
 ]
@@ -1499,6 +1484,25 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "include_dir"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "482a2e29200b7eed25d7fdbd14423326760b7f6658d21a4cf12d55a50713c69f"
+dependencies = [
+ "include_dir_macros",
+]
+
+[[package]]
+name = "include_dir_macros"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e074c19deab2501407c91ba1860fa3d6820bfde307db6d8cb851b55a10be89b"
+dependencies = [
+ "proc-macro2",
+ "quote",
 ]
 
 [[package]]
@@ -3876,6 +3880,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "subquery-d2e"
+version = "0.5.1"
+dependencies = [
+ "async-trait",
+ "gql_client",
+ "hex",
+ "include_dir",
+ "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
+ "strum 0.21.0",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
 name = "substrate-bip39"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4411,7 +4431,7 @@ version = "1.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ee73e6e4924fe940354b8d4d98cad5231175d615cd855b758adc658c0aac6a0"
 dependencies = [
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "rand 0.8.4",
  "static_assertions",
 ]

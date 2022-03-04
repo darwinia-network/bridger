@@ -2,7 +2,7 @@ use postage::broadcast;
 
 use client_pangolin::client::PangolinClient;
 use component_ethereum::ethereum::client::EthereumClient;
-use component_subquery::Subquery;
+use subquery_d2e::Subquery;
 
 use crate::bridge::ToExtrinsicsMessage;
 

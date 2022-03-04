@@ -1,0 +1,23 @@
+query MMRRootPage($from: Int!, $first: Int!) {
+  mMRRootSignedEvents(
+    first: $first
+    orderBy: AT_BLOCK_NUMBER_ASC
+    filter: {
+      atBlockNumber: {
+        greaterThan: $from
+      }
+    }
+  ) {
+    nodes {
+      atBlockNumber,
+      eventBlockNumber,
+      mmrRoot,
+      signatures {
+        nodes {
+          account,
+          relayAuthoritySignature,
+        }
+      }
+    }
+  }
+}

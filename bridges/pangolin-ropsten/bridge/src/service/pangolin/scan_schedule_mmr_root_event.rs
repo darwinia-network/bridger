@@ -20,7 +20,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         let event = self
             .data
             .subquery
-            .query_latest_schedule_mmr_root_event(true)
+            .query_latest_schedule_mmr_root_event()
             .await?;
         if event.is_none() {
             tracing::info!(

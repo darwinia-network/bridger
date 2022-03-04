@@ -269,7 +269,6 @@ dependencies = [
  "component-http-client",
  "component-shadow",
  "component-state",
- "component-subquery",
  "component-thegraph-liketh",
  "lifeline",
  "microkv",
@@ -485,21 +484,6 @@ dependencies = [
  "microkv",
  "serde 1.0.136",
  "support-common",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "component-subquery"
-version = "0.5.1"
-dependencies = [
- "async-trait",
- "color-eyre",
- "gql_client",
- "hex",
- "serde 1.0.136",
- "serde-aux",
- "serde-hex",
  "thiserror",
  "tracing",
 ]
@@ -3425,7 +3409,15 @@ dependencies = [
 name = "subquery-d2e"
 version = "0.5.1"
 dependencies = [
- "component-subquery",
+ "async-trait",
+ "color-eyre",
+ "gql_client",
+ "hex",
+ "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

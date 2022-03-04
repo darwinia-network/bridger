@@ -18,5 +18,18 @@ readme = 'README.md'
 edition = "2021"
 
 [dependencies]
+tracing = "0.1"
+color-eyre = "0.5"
+thiserror = "1.0"
 
-component-subquery        = { path = "../../components/subquery" }
+serde = { version = "1.0", features = ["derive"] }
+serde-aux = "0.6"
+serde-hex = "0.1"
+async-trait = "0.1"
+hex = "0.4"
+
+## folow:
+## https://crates.io/crates/gql_client
+## https://github.com/arthurkhlghatyan/gql-client-rs/pull/13
+## https://github.com/fewensa/gql-client-rs/pull/1
+gql_client = { git = "https://github.com/fewensa/gql-client-rs.git", branch = "master" }

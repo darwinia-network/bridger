@@ -1,13 +1,14 @@
 use crate::config::SubqueryConfig;
 use crate::subquery::Subquery;
+use crate::types::BridgeName;
 
 /// Subquery component
 pub struct SubqueryComponent;
 
 impl SubqueryComponent {
     /// Get subquery instance
-    pub fn component(config: SubqueryConfig) -> color_eyre::Result<Subquery> {
+    pub fn component(config: SubqueryConfig, bridge: BridgeName,) -> Subquery {
         let client = gql_client::Client::new(config.endpoint);
-        Ok(Subquery::new(client))
+        Subquery::new(client, bridge)
     }
 }

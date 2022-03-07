@@ -8,7 +8,8 @@ use client_darwinia::to_ethereum::Account as ToEthereumAccount;
 use client_darwinia::to_ethereum::Darwinia2Ethereum;
 use component_ethereum::ethereum::EthereumComponent;
 use component_ethereum::web3::Web3Config;
-use component_subquery::SubqueryComponent;
+use subquery_d2e::types::BridgeName;
+use subquery_d2e::SubqueryComponent;
 use support_common::config::{Config, Names};
 use support_tracker::Tracker;
 
@@ -59,7 +60,8 @@ impl DarwiniaScanner {
         let config_web3: Web3Config = bridge_config.web3;
 
         // subquery
-        let subquery = SubqueryComponent::component(bridge_config.subquery)?;
+        let subquery =
+            SubqueryComponent::component(bridge_config.subquery, BridgeName::DarwiniaEthereum);
 
         // darwinia
         let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;

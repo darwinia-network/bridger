@@ -259,7 +259,7 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
 name = "bridge-pangolin-ropsten"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "array-bytes",
  "client-pangolin",
@@ -269,7 +269,6 @@ dependencies = [
  "component-http-client",
  "component-shadow",
  "component-state",
- "component-subquery",
  "component-thegraph-liketh",
  "lifeline",
  "microkv",
@@ -280,6 +279,7 @@ dependencies = [
  "serde_json",
  "structopt",
  "strum",
+ "subquery-d2e",
  "support-command-kv",
  "support-common",
  "support-lifeline",
@@ -374,7 +374,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangolin"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "array-bytes",
  "color-eyre",
@@ -439,7 +439,7 @@ dependencies = [
 
 [[package]]
 name = "component-ethereum"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "array-bytes",
  "color-eyre",
@@ -453,7 +453,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -463,7 +463,7 @@ dependencies = [
 
 [[package]]
 name = "component-shadow"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "color-eyre",
  "component-ethereum",
@@ -477,7 +477,7 @@ dependencies = [
 
 [[package]]
 name = "component-state"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -489,23 +489,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "component-subquery"
-version = "0.5.0"
-dependencies = [
- "async-trait",
- "color-eyre",
- "gql_client",
- "hex",
- "serde 1.0.136",
- "serde-aux",
- "serde-hex",
- "thiserror",
- "tracing",
-]
-
-[[package]]
 name = "component-thegraph-liketh"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "async-trait",
  "color-eyre",
@@ -1383,6 +1368,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "include_dir"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "482a2e29200b7eed25d7fdbd14423326760b7f6658d21a4cf12d55a50713c69f"
+dependencies = [
+ "include_dir_macros",
+]
+
+[[package]]
+name = "include_dir_macros"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e074c19deab2501407c91ba1860fa3d6820bfde307db6d8cb851b55a10be89b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
 name = "indenter"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2004,7 +2008,7 @@ checksum = "2386b4ebe91c2f7f51082d4cefa145d030e33a1842a96b12e4885cc3c01f7a55"
 
 [[package]]
 name = "pangolin-subxt"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "array-bytes",
  "component-shadow",
@@ -3421,6 +3425,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "subquery-d2e"
+version = "0.5.1"
+dependencies = [
+ "async-trait",
+ "gql_client",
+ "hex",
+ "include_dir",
+ "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
+ "strum",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
 name = "substrate-bip39"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3505,7 +3525,7 @@ dependencies = [
 
 [[package]]
 name = "support-command-kv"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "color-eyre",
  "component-state",
@@ -3523,7 +3543,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "color-eyre",
  "config",
@@ -3542,7 +3562,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -3550,7 +3570,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "colored",
  "serde 1.0.136",
@@ -3560,7 +3580,7 @@ dependencies = [
 
 [[package]]
 name = "support-tracker"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "color-eyre",
  "microkv",

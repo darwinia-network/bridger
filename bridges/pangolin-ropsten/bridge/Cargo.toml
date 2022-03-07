@@ -1,6 +1,6 @@
 [package]
 name = "bridge-pangolin-ropsten"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -53,7 +53,8 @@ support-command-kv = { path = "../../../frame/supports/support-command-kv" }
 
 component-ethereum        = { path = "../../../frame/components/ethereum" }
 component-shadow          = { path = "../../../frame/components/shadow" }
-component-subquery        = { path = "../../../frame/components/subquery" }
 component-thegraph-liketh = { path = "../../../frame/components/thegraph-liketh" }
 component-http-client     = { path = "../../../frame/components/http-client" }
 component-state           = { path = "../../../frame/components/state" }
+
+subquery-d2e  = { path = "../../../frame/assistants/subquery-d2e" }

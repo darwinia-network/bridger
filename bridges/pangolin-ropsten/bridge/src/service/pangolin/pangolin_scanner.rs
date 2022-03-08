@@ -3,7 +3,8 @@ use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
 use component_ethereum::ethereum::EthereumComponent;
-use component_subquery::SubqueryComponent;
+use subquery_d2e::SubqueryComponent;
+use subquery_d2e::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_tracker::Tracker;
 
@@ -54,7 +55,7 @@ impl PangolinScanner {
         let config_web3 = bridge_config.web3;
 
         // subquery
-        let subquery = SubqueryComponent::component(bridge_config.subquery)?;
+        let subquery = SubqueryComponent::component(bridge_config.subquery, BridgeName::PangolinRopsten);
 
         // ethereum
         let ethereum = EthereumComponent::component(bridge_config.ethereum, config_web3.clone())?;

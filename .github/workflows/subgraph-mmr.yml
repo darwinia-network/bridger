@@ -1,0 +1,27 @@
+name: Subgraph MMR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  thegraph-ethereum:
+    name: Deploy MMR subgraph
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        chain: [ethereum, ropsten]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Deploy
+        working-directory: thegraph/mmr
+        run: |
+          npm i
+          npm run codegen -- subgraph-${{ matrix.chain }}.yaml
+          npm run build -- subgraph-${{ matrix.chain }}.yaml
+          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_PROD }} \
+            darwinia-network/bridge-${{ matrix.chain }} \
+            subgraph-${{ matrix.chain }}.yaml
+

@@ -1,4 +1,4 @@
-name: Deploy subquery develop
+name: Subquery develop
 
 ## IMPORTANT: Please you know, direct push code to master doesn't trigger this action
 #  push:

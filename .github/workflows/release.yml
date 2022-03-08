@@ -8,7 +8,7 @@ on:
 env:
   OPENSSL_DIR: /home/runner/openssl
   OPENSSL_STATIC: 1
-  RUST_TOOLCHAIN: nightly-2021-12-07
+  RUST_TOOLCHAIN: nightly
 
 jobs:
   build-linux:
@@ -18,7 +18,15 @@ jobs:
       image: ubuntu:16.04
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        package:
+          [
+            bridger,
+            pangolin-ropsten,
+            darwinia-ethereum,
+            pangolin-pangoro,
+            darwinia-crab,
+            # pangoro-chapel,
+          ]
     steps:
       - uses: actions/checkout@v2
 
@@ -89,7 +97,15 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        package:
+          [
+            bridger,
+            pangolin-ropsten,
+            darwinia-ethereum,
+            pangolin-pangoro,
+            darwinia-crab,
+            # pangoro-chapel,
+          ]
     steps:
       - uses: actions/checkout@v2
 
@@ -164,7 +180,15 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        package:
+          [
+            bridger,
+            pangolin-ropsten,
+            darwinia-ethereum,
+            pangolin-pangoro,
+            darwinia-crab,
+            # pangoro-chapel,
+          ]
     steps:
       - uses: actions/checkout@v2
 

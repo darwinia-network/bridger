@@ -1,4 +1,4 @@
-name: Deploy subgraph production
+name: Subgraph production
 
 on:
   push:

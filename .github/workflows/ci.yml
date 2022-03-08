@@ -40,11 +40,11 @@ jobs:
       matrix:
         bridge:
           [
-            template,
             pangolin-ropsten,
             darwinia-ethereum,
             pangolin-pangoro,
             darwinia-crab,
+            pangoro-chapel,
           ]
     steps:
       - uses: actions/checkout@v2

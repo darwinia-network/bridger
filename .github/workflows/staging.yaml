@@ -18,7 +18,15 @@ jobs:
       image: ubuntu:16.04
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        package:
+          [
+            bridger,
+            pangolin-ropsten,
+            darwinia-ethereum,
+            pangolin-pangoro,
+            darwinia-crab,
+            pangoro-chapel,
+          ]
     steps:
       - uses: actions/checkout@v2
 

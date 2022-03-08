@@ -25,7 +25,7 @@ jobs:
             darwinia-ethereum,
             pangolin-pangoro,
             darwinia-crab,
-            pangoro-chapel,
+            # pangoro-chapel,
           ]
     steps:
       - uses: actions/checkout@v2
@@ -104,7 +104,7 @@ jobs:
             darwinia-ethereum,
             pangolin-pangoro,
             darwinia-crab,
-            pangoro-chapel,
+            # pangoro-chapel,
           ]
     steps:
       - uses: actions/checkout@v2
@@ -187,7 +187,7 @@ jobs:
             darwinia-ethereum,
             pangolin-pangoro,
             darwinia-crab,
-            pangoro-chapel,
+            # pangoro-chapel,
           ]
     steps:
       - uses: actions/checkout@v2

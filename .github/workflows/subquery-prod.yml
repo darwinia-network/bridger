@@ -1,4 +1,4 @@
-name: Deploy subquery production
+name: Subquery production
 
 
 on:

@@ -27,7 +27,6 @@ impl Service for HeaderRelayService {
         tracing::trace!("Spawn service HeaderRelayService");
         let config: PangoroChapelConfig = Config::restore(Names::BridgePangoroChapel)?;
 
-        println!("{:?}", config);
         let _chapel2pangoro = Self::try_task("header-relay-service", async move {
             tracing::trace!("Start to relay chapel headers to pangoro ");
             start_relay(config).await;

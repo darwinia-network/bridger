@@ -1,9 +1,9 @@
 use structopt::StructOpt;
 
-/// Bridge template options
+/// Bridge pangoro-chapel options
 #[derive(Debug, StructOpt)]
-#[structopt(name = "bridge-template", about = "Bridge template")]
+#[structopt(name = "pangoro-chapel", about = "Bridge pangoro-chapel")]
 pub enum Opts {
-    /// Start bridge template
+    /// Start bridge pangoro-chapel
     Start,
 }

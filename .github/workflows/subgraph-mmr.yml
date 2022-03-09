@@ -22,6 +22,6 @@ jobs:
           npm run codegen -- subgraph-${{ matrix.chain }}.yaml
           npm run build -- subgraph-${{ matrix.chain }}.yaml
           npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_PROD }} \
-            darwinia-network/bridge-${{ matrix.chain }} \
+            darwinia-network/${{ matrix.chain }}-mmr \
             subgraph-${{ matrix.chain }}.yaml
 

@@ -96,7 +96,7 @@ impl DarwiniaScanner {
             let limit = 10u32;
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] Track pangolin scan block: {} and limit: {}",
+                "[darwinia] Track darwinia scan block: {} and limit: {}",
                 from,
                 limit
             );

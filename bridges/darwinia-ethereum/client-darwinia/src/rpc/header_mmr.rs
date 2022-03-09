@@ -192,7 +192,7 @@ fn convert(
     let peaks = get_peaks(mmr_size);
     let peaksize = peaks.len();
     let pos = leaf_index_to_mmr_size(block) - (block + 1).trailing_zeros() as u64 - 1;
-    tracing::info!(target: "client-pangolin", "leaf position is {}", pos);
+    tracing::info!(target: "client-darwinia", "leaf position is {}", pos);
     let mut mmr_proof_iter = mmr_proof.iter();
     for peak in &peaks {
         if peak < &pos {

@@ -18,6 +18,7 @@ jobs:
       - name: Deploy
         working-directory: thegraph/mmr
         run: |
+          echo '{"chain": "${{ matrix.chain }}"}' > src/chain.json
           npm i
           npm run codegen -- subgraph-${{ matrix.chain }}.yaml
           npm run build -- subgraph-${{ matrix.chain }}.yaml

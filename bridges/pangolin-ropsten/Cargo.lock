@@ -269,7 +269,6 @@ dependencies = [
  "component-http-client",
  "component-shadow",
  "component-state",
- "component-thegraph-liketh",
  "lifeline",
  "microkv",
  "parity-scale-codec",
@@ -285,6 +284,7 @@ dependencies = [
  "support-lifeline",
  "support-terminal",
  "support-tracker",
+ "thegraph-liketh",
  "tokio",
  "tracing",
  "web3",
@@ -484,19 +484,6 @@ dependencies = [
  "microkv",
  "serde 1.0.136",
  "support-common",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "component-thegraph-liketh"
-version = "0.5.1"
-dependencies = [
- "async-trait",
- "color-eyre",
- "gql_client",
- "serde 1.0.136",
- "serde-aux",
  "thiserror",
  "tracing",
 ]
@@ -3651,6 +3638,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 dependencies = [
  "unicode-width",
+]
+
+[[package]]
+name = "thegraph-liketh"
+version = "0.5.1"
+dependencies = [
+ "async-trait",
+ "color-eyre",
+ "gql_client",
+ "serde 1.0.136",
+ "serde-aux",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

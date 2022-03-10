@@ -53,8 +53,8 @@ support-command-kv = { path = "../../../frame/supports/support-command-kv" }
 
 component-ethereum        = { path = "../../../frame/components/ethereum" }
 component-shadow          = { path = "../../../frame/components/shadow" }
-component-thegraph-liketh = { path = "../../../frame/components/thegraph-liketh" }
 component-http-client     = { path = "../../../frame/components/http-client" }
 component-state           = { path = "../../../frame/components/state" }
 
-subquery-d2e  = { path = "../../../frame/assistants/subquery-d2e" }
+thegraph-liketh = { path = "../../../frame/assistants/thegraph-liketh" }
+subquery-d2e    = { path = "../../../frame/assistants/subquery-d2e" }

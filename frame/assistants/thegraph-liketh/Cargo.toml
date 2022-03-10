@@ -1,5 +1,5 @@
 [package]
-name = "component-thegraph-liketh"
+name = "thegraph-liketh"
 version = "0.5.1"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"

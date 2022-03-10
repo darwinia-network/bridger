@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use client_pangolin::types::{EcdsaMessage, EthereumReceiptProofThing};
-use component_thegraph_liketh::types::TransactionEntity;
+use thegraph_liketh::types::TransactionEntity;
 
 use crate::bridge::PangolinRopstenBus;
 

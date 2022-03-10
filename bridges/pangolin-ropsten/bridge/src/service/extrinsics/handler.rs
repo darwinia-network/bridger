@@ -12,9 +12,9 @@ use client_pangolin::types::runtime_types::to_ethereum_backing::pallet::RedeemFo
 use client_pangolin::types::{EcdsaMessage, EthereumAccount, EthereumReceiptProofThing};
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
-use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
+use thegraph_liketh::types::{TransactionEntity, TransactionType};
 
 use crate::bridge::Extrinsic;
 use crate::bridge::{PangolinRopstenConfig, PangolinRopstenTask};

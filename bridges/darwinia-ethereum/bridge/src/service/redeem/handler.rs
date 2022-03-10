@@ -7,8 +7,8 @@ use client_darwinia::component::DarwiniaSubxtComponent;
 use client_darwinia::from_ethereum::Ethereum2Darwinia;
 use component_shadow::component::ShadowComponent;
 use component_shadow::shadow::Shadow;
-use component_thegraph_liketh::types::TransactionEntity;
 use support_common::config::{Config, Names};
+use thegraph_liketh::types::TransactionEntity;
 
 use crate::bridge::{DarwiniaEthereumConfig, Extrinsic, ToExtrinsicsMessage};
 use crate::helpers;

@@ -1,8 +1,8 @@
 use substrate_subxt::sp_core::H256;
 
 use client_darwinia::darwinia::client::Darwinia;
-use component_thegraph_liketh::types::TransactionEntity;
 use support_common::error::BridgerError;
+use thegraph_liketh::types::TransactionEntity;
 
 pub async fn is_verified(client: &Darwinia, tx: &TransactionEntity) -> color_eyre::Result<bool> {
     let block_hash = hex_to_h256(&tx.block_hash)?;

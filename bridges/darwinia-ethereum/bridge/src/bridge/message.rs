@@ -4,11 +4,11 @@ use std::fmt::Debug;
 
 use lifeline::Message;
 use postage::broadcast;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use component_thegraph_liketh::types::TransactionEntity;
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
 use support_ethereum::receipt::EthereumReceiptProofThing;
+use thegraph_liketh::types::TransactionEntity;
 
 use crate::bridge::DarwiniaEthereumBus;
 

@@ -3,10 +3,10 @@ use lifeline::{Bus, Lifeline, Service, Task};
 use postage::broadcast;
 
 use component_state::state::BridgeState;
-use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
+use thegraph_liketh::component::TheGraphLikeEthComponent;
 
 use crate::bridge::DarwiniaEthereumBus;
 use crate::bridge::DarwiniaEthereumTask;
@@ -18,7 +18,7 @@ mod handler;
 
 #[derive(Debug)]
 pub struct RedeemService {
-    _greet_scan: Lifeline
+    _greet_scan: Lifeline,
 }
 
 impl BridgeService for RedeemService {}
@@ -40,31 +40,20 @@ impl Service for RedeemService {
         let _greet_scan = Self::try_task(
             &format!("{}-service-redeem-scan", DarwiniaEthereumTask::name()),
             async move {
-                start_scan(
-                    tracker.clone(),
-                    sender_to_extrinsics_scan.clone()
-                )
-                .await;
+                start_scan(tracker.clone(), sender_to_extrinsics_scan.clone()).await;
                 Ok(())
             },
         );
 
-        Ok(Self {
-            _greet_scan
-        })
+        Ok(Self { _greet_scan })
     }
 }
 
 async fn start_scan(
     tracker: Tracker,
-    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
 ) {
-    while let Err(err) = run_scan(
-        &tracker,
-        sender_to_extrinsics.clone()
-    )
-    .await
-    {
+    while let Err(err) = run_scan(&tracker, sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "darwinia-ethereum",
             "[ethereum] redeem err {:?}",
@@ -76,7 +65,7 @@ async fn start_scan(
 
 async fn run_scan(
     tracker: &Tracker,
-    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>
+    sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
 ) -> color_eyre::Result<()> {
     let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
 

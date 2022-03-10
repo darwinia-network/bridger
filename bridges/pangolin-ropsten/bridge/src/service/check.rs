@@ -5,11 +5,11 @@ use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
 use component_state::state::BridgeState;
-use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
+use thegraph_liketh::component::TheGraphLikeEthComponent;
 
 use crate::bridge::PangolinRopstenTask;
 use crate::bridge::TaskConfig;

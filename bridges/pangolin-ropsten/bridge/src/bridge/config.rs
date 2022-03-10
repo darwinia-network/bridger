@@ -5,8 +5,8 @@ use component_ethereum::ethereum::EthereumConfig;
 use component_ethereum::web3::Web3Config;
 use component_http_client::HttpClientConfig;
 use component_shadow::config::ShadowConfig;
-use component_thegraph_liketh::config::TheGraphLikeEthConfig;
 use subquery_d2e::SubqueryConfig;
+use thegraph_liketh::config::TheGraphLikeEthConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangolinRopstenConfig {

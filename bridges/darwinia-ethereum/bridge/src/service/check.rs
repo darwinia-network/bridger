@@ -5,10 +5,10 @@ use lifeline::{Lifeline, Service, Task};
 
 use client_darwinia::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
-use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
+use thegraph_liketh::component::TheGraphLikeEthComponent;
 
 use crate::bridge::DarwiniaEthereumTask;
 use crate::bridge::TaskConfig;

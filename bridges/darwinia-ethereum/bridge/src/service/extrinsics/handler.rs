@@ -12,10 +12,10 @@ use client_darwinia::{
 };
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
-use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 use support_common::config::{Config, Names};
 use support_ethereum::parcel::EthereumRelayHeaderParcel;
 use support_ethereum::receipt::{EthereumReceiptProofThing, RedeemFor};
+use thegraph_liketh::types::{TransactionEntity, TransactionType};
 
 use crate::bridge::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
 use crate::bridge::{EcdsaMessage, Extrinsic};
@@ -81,7 +81,8 @@ impl ExtrinsicsHandler {
         );
 
         let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::name());
-        let message_kv = state.microkv_with_namespace(format!("{}-messages", DarwiniaEthereumTask::name()));
+        let message_kv =
+            state.microkv_with_namespace(format!("{}-messages", DarwiniaEthereumTask::name()));
         Ok(ExtrinsicsHandler {
             ethereum2darwinia,
             darwinia2ethereum,
@@ -270,14 +271,16 @@ impl ExtrinsicsHandler {
             let extrinsics = self.message_kv.sorted_keys()?;
             if extrinsics.is_empty() {
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-                continue
+                continue;
             }
             for key in extrinsics.iter() {
                 let ex: Extrinsic = self.message_kv.get_as_unwrap(&key)?;
                 match self.send_extrinsic(ex.clone()).await {
                     Ok(_) => self.message_kv.delete(&key)?,
                     Err(err) => {
-                        if let Some(substrate_subxt::Error::Rpc(_)) = err.downcast_ref::<substrate_subxt::Error>() {
+                        if let Some(substrate_subxt::Error::Rpc(_)) =
+                            err.downcast_ref::<substrate_subxt::Error>()
+                        {
                             tracing::warn!(
                                 target: "darwinia-ethereum",
                                 "Connection Error. Try to resend later. extrinsic: {:?}",

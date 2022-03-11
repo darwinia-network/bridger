@@ -116,41 +116,47 @@ async fn run_scan(
         // send transactions to redeem
         for tx in &txs {
             let mut times = 0;
-            match handler.redeem(tx.clone()).await {
-                Ok(Some(latest)) => {
-                    tracing::trace!(
-                        target: "pangolin-ropsten",
-                        chain = "ropsten",
-                        action = "redeem",
-                        "[ropsten] [redeem] Change latest redeemed block number to: {}",
-                        latest
-                    );
-                    latest_redeem_block_number = Some(latest);
-                }
-                Ok(None) => {
-                    tracing::trace!(
-                        target: "pangolin-ropsten",
-                        chain = "ropsten",
-                        action = "redeem",
-                        "[ropsten] [redeem] Latest redeemed block number is: {:?}",
-                        latest_redeem_block_number
-                    );
-                    break;
-                }
-                Err(e) => {
-                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-                    times += 1;
-                    handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
-                    if times > 10 {
-                        tracing::error!(
+            loop {
+                match handler.redeem(tx.clone()).await {
+                    Ok(Some(latest)) => {
+                        tracing::trace!(
                             target: "pangolin-ropsten",
                             chain = "ropsten",
                             action = "redeem",
-                            "[ropsten] [redeem] Failed to send redeem message. tx: {:?}, err: {:?}",
-                            tx,
-                            e
+                            "[ropsten] [redeem] [{}] Change latest redeemed block number to: {}",
+                            times,
+                            latest,
+                        );
+                        latest_redeem_block_number = Some(latest);
+                        break;
+                    }
+                    Ok(None) => {
+                        tracing::trace!(
+                            target: "pangolin-ropsten",
+                            chain = "ropsten",
+                            action = "redeem",
+                            "[ropsten] [redeem] [{}] Latest redeemed block number is: {:?}",
+                            times,
+                            latest_redeem_block_number,
                         );
                         break;
+                    }
+                    Err(e) => {
+                        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                        times += 1;
+                        if times > 10 {
+                            tracing::error!(
+                                target: "pangolin-ropsten",
+                                chain = "ropsten",
+                                action = "redeem",
+                                "[ropsten] [redeem] [{}] Failed to send redeem message. tx: {:?}, err: {:?}",
+                                times,
+                                tx,
+                                e,
+                            );
+                            break;
+                        }
+                        handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
                     }
                 }
             }

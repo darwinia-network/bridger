@@ -48,18 +48,18 @@ impl Ethereum2Darwinia {
 
     /// Print Detail
     pub async fn account_detail(&self, block_number: Option<u32>, account: &Account) -> Result<()> {
-        tracing::info!(target: "client-pangolin", "🧔 ethereum => darwinia account");
+        tracing::info!(target: "client-darwinia", "🧔 ethereum => darwinia account");
         let mut roles = self.darwinia.account_role(&account.0).await?;
         if self.is_tech_comm_member(block_number, account).await? {
             roles.push("TechnicalCommittee".to_string());
         }
         match &account.0.real {
             None => {
-                tracing::info!(target: "client-pangolin", "🧔 Relayer({:?}): 0x{:?}", roles, &account.0.account_id);
+                tracing::info!(target: "client-darwinia", "🧔 Relayer({:?}): 0x{:?}", roles, &account.0.account_id);
             }
             Some(real_account_id) => {
-                tracing::info!(target: "client-pangolin", "🧔 Proxy Relayer: 0x{:?}", &account.0.account_id);
-                tracing::info!(target: "client-pangolin", "👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
+                tracing::info!(target: "client-darwinia", "🧔 Proxy Relayer: 0x{:?}", &account.0.account_id);
+                tracing::info!(target: "client-darwinia", "👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
             }
         }
         Ok(())
@@ -100,7 +100,7 @@ impl Ethereum2Darwinia {
             match &account.0.real {
                 Some(real) => {
                     // proxy
-                    tracing::trace!(target: "client-pangolin", "Proxy vote for {:?}", real);
+                    tracing::trace!(target: "client-darwinia", "Proxy vote for {:?}", real);
                     let vote = VotePendingRelayHeaderParcel {
                         block_number: pending,
                         aye,
@@ -222,7 +222,7 @@ impl Ethereum2Darwinia {
     ) -> Result<H256> {
         match &account.0.real {
             Some(real) => {
-                tracing::trace!(target: "client-pangolin", "Proxy call `affirm` for {:?}", real);
+                tracing::trace!(target: "client-darwinia", "Proxy call `affirm` for {:?}", real);
                 let affirm = Affirm {
                     _runtime: PhantomData::default(),
                     ethereum_relay_header_parcel: parcel,
@@ -263,7 +263,7 @@ impl Ethereum2Darwinia {
             .ok_or(Error::NoHeaderHashInEthereumReceiptProofOfThing)?;
         match &account.0.real {
             Some(real) => {
-                tracing::trace!(target: "client-pangolin",
+                tracing::trace!(target: "client-darwinia",
                     "Proxy redeem ethereum tx 0x{:?} for real account {:?}",
                     ethereum_tx_hash,
                     real
@@ -287,7 +287,7 @@ impl Ethereum2Darwinia {
                     .await?)
             }
             None => {
-                tracing::trace!(target: "client-pangolin",
+                tracing::trace!(target: "client-darwinia",
                     "Redeem ethereum tx {:?} with account {:?}",
                     ethereum_tx_hash,
                     &account.0.account_id

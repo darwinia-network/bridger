@@ -42,7 +42,7 @@ impl RedeemHandler {
     async fn build(
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> color_eyre::Result<Self> {
-        tracing::info!(target: "darwinia-ethereum", "SERVICE RESTARTING...");
+        tracing::info!(target: "darwinia-ethereum", "[ethereum] [redeem] RECREATE SCAN REDEEM HANDLER...");
 
         let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
 
@@ -60,7 +60,7 @@ impl RedeemHandler {
 
         tracing::info!(
             target: "darwinia-ethereum",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA REDEEM"
+            "[ethereum] [redeem] ✨ REDEEM HANDLER CREATED: ETHEREUM <> DARWINIA REDEEM"
         );
         Ok(RedeemHandler {
             sender_to_extrinsics,
@@ -74,7 +74,7 @@ impl RedeemHandler {
     pub async fn redeem(&mut self, tx: TransactionEntity) -> color_eyre::Result<Option<u64>> {
         tracing::trace!(
             target: "darwinia-ethereum",
-            "[ethereum] Try to redeem ethereum tx {:?}... in block {}",
+            "[ethereum] [redeem] Try to redeem ethereum tx {:?}... in block {}",
             tx.tx_hash,
             tx.block_number
         );
@@ -83,7 +83,7 @@ impl RedeemHandler {
         if helpers::is_verified(&self.darwinia.darwinia, &tx).await? {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "[ethereum] Ethereum tx {:?} redeemed",
+                "[ethereum] [redeem] Ethereum tx {:?} redeemed",
                 tx.tx_hash
             );
             return Ok(Some(tx.block_number));
@@ -93,7 +93,7 @@ impl RedeemHandler {
         if tx.block_number >= last_confirmed {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "[ethereum] Ethereum tx {:?}'s block {} is large than last confirmed block {}",
+                "[ethereum] [redeem] Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
                 tx.block_number,
                 last_confirmed,
@@ -107,7 +107,7 @@ impl RedeemHandler {
         let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(
             target: "darwinia-ethereum",
-            "[ethereum] Redeem extrinsic send to extrinsics service: {:?}. at ethereum block: {}",
+            "[ethereum] [redeem] Redeem extrinsic send to extrinsics service: {:?}. at ethereum block: {}",
             ex,
             tx.block_number
         );

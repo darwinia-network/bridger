@@ -67,7 +67,7 @@ impl Darwinia2Ethereum {
     ) -> Vec<u8> {
         let op_code: [u8; 4] = [71, 159, 189, 249];
         tracing::debug!(
-            target: "client-pangolin",
+            target: "client-darwinia",
             "Infos to construct mmr_root message: {}, {}, {}, {:?}",
             spec_name,
             array_bytes::bytes2hex("", &op_code),
@@ -93,7 +93,7 @@ impl Darwinia2Ethereum {
     ) -> Vec<u8> {
         let op_code: [u8; 4] = [180, 188, 244, 151];
         tracing::debug!(
-            target: "client-pangolin",
+            target: "client-darwinia",
             "Infos to construct eth authorities message: {}, {}, {}, {:?}",
             spec_name,
             array_bytes::bytes2hex("", &op_code),
@@ -168,7 +168,7 @@ impl Darwinia2Ethereum {
         match &account.0.real {
             // proxy
             Some(real) => {
-                tracing::trace!(target: "client-pangolin", "Proxyed ecdsa sign and submit authorities to darwinia");
+                tracing::trace!(target: "client-darwinia", "Proxyed ecdsa sign and submit authorities to darwinia");
                 let submit_signed_authorities = SubmitSignedAuthorities { signature };
 
                 let ex = self
@@ -189,7 +189,7 @@ impl Darwinia2Ethereum {
                 Ok(tx_hash)
             }
             None => {
-                tracing::trace!(target: "client-pangolin", "Ecdsa sign and submit authorities to darwinia");
+                tracing::trace!(target: "client-darwinia", "Ecdsa sign and submit authorities to darwinia");
                 let tx_hash = self
                     .darwinia
                     .subxt
@@ -219,7 +219,7 @@ impl Darwinia2Ethereum {
         match &account.0.real {
             // proxy
             Some(real) => {
-                tracing::trace!(target: "client-pangolin",
+                tracing::trace!(target: "client-darwinia",
                     "Proxyed ecdsa sign and submit mmr_root to darwinia, block_number: {}",
                     block_number
                 );
@@ -242,7 +242,7 @@ impl Darwinia2Ethereum {
                 Ok(tx_hash)
             }
             None => {
-                tracing::trace!(target: "client-pangolin",
+                tracing::trace!(target: "client-darwinia",
                     "Ecdsa sign and submit mmr_root to darwinia, block_number: {}, signature: {:?}",
                     block_number,
                     signature
@@ -328,18 +328,18 @@ impl Darwinia2Ethereum {
 
     /// Print Detail
     pub async fn account_detail(&self, block_number: Option<u32>, account: &Account) -> Result<()> {
-        tracing::info!(target: "client-pangolin", "🧔 darwinia => ethereum account");
+        tracing::info!(target: "client-darwinia", "🧔 darwinia => ethereum account");
         let mut roles = self.darwinia.account_role(&account.0).await?;
         if self.is_authority(block_number, account).await? {
             roles.push("Authority".to_string());
         }
         match &account.0.real {
             None => {
-                tracing::info!(target: "client-pangolin", "🧔 Relayer({:?}): 0x{:?}", roles, account.0.account_id);
+                tracing::info!(target: "client-darwinia", "🧔 Relayer({:?}): 0x{:?}", roles, account.0.account_id);
             }
             Some(real_account_id) => {
-                tracing::info!(target: "client-pangolin", "🧔 Proxy Relayer: 0x{:?}", account.0.account_id);
-                tracing::info!(target: "client-pangolin", "👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
+                tracing::info!(target: "client-darwinia", "🧔 Proxy Relayer: 0x{:?}", account.0.account_id);
+                tracing::info!(target: "client-darwinia", "👴 Real Account({:?}): 0x{:?}", roles, real_account_id);
             }
         }
         Ok(())

@@ -21,9 +21,8 @@
   "devDependencies": {
     "@polkadot/api": "^7",
     "@subql/types": "latest",
-    "typescript": "^4.1.3",
-    "@subql/cli": "latest",
-    "@darwinia/types": "latest"
+    "typescript": "^4.2.4",
+    "@subql/cli": "latest"
   },
   "exports": {
     "chaintypes": "src/chaintypes.ts"

@@ -1,4 +1,4 @@
-name: Deploy subgraph develop
+name: Subgraph develop
 
 on:
   push:

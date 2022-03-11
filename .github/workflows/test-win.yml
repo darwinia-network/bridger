@@ -19,9 +19,6 @@ jobs:
 
       - name: Setup scoop
         uses: MinoruSekine/setup-scoop@v1
-        with:
-          scoop_checkup: true
-          scoop_update: true
 
       - name: Install dependencies
         run: |

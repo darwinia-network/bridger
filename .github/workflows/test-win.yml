@@ -5,6 +5,10 @@ on:
     branches: [master]
 
 
+env:
+  OPENSSL_DIR: /home/runner/openssl
+  OPENSSL_STATIC: 1
+  RUST_TOOLCHAIN: nightly
 
 jobs:
 
@@ -17,18 +21,26 @@ jobs:
         with:
           vcpkgGitCommitId: 1085a57da0725c19e19586025438e8c16f34c890
 
-      - name: Setup scoop
-        uses: shovel-org/GithubActions@main
-        with:
-          scoop_checkup: true
-          scoop_update: true
+#      - name: Setup scoop
+#        uses: shovel-org/GithubActions@main
+#        with:
+#          scoop_checkup: true
+#          scoop_update: true
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
         run: |
           vcpkg install openssl:x64-windows-static
-          scoop install 7zip
-          scoop install busybox
-          scoop install make
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          target: x86_64-pc-windows-msvc
+
+      - name: Build bridger
+        run: |
+          cd frame
+          cargo build --release --target x86_64-pc-windows-msvc
 

@@ -44,3 +44,9 @@ jobs:
           cd frame
           cargo build --release --target x86_64-pc-windows-msvc
 
+      - name: Collect shared for bridger
+        run: |
+          mkdir -p shared
+          zip -jr \
+            shared/bridger-linux-x86_64.zip \
+            frame/target/x86_64-unknown-linux-gnu/release/bridger

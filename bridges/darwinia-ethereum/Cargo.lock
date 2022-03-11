@@ -1866,7 +1866,7 @@ checksum = "71d96e3f3c0b6325d8ccd83c33b28acb183edcb6c67938ba104ec546854b0882"
 [[package]]
 name = "merkle-mountain-range"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/shadow?branch=add-mmr-client#e60661c78078fedfccf26a799248d8e43b26dd7d"
+source = "git+https://github.com/darwinia-network/shadow.git?branch=add-mmr-client#e60661c78078fedfccf26a799248d8e43b26dd7d"
 dependencies = [
  "blake2-rfc",
  "ckb-merkle-mountain-range",

@@ -115,18 +115,9 @@ jobs:
         with:
           vcpkgGitCommitId: 1085a57da0725c19e19586025438e8c16f34c890
 
-      - name: Setup scoop
-        uses: MinoruSekine/setup-scoop@v1
-        with:
-          scoop_checkup: true
-          scoop_update: true
-
       - name: Install dependencies
         run: |
           vcpkg install openssl:x64-windows-static
-          scoop install 7zip
-          scoop install busybox
-          scoop install make
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1

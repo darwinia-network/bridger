@@ -77,6 +77,7 @@ export async function storeScheduleMMRRootEvent(event: FastEvent) {
   _event.atBlockNumber = event.blockNumber;
   _event.eventBlockNumber = Number(eventBlockNumber);
   _event.emitted = 0;
+  _event.outdated = 0;
 
   _event.timestamp = event.timestamp;
   await _event.save();

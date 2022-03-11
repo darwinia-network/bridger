@@ -19,6 +19,8 @@ jobs:
 
       - name: Setup scoop
         uses: shovel-org/GithubActions@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
         run: |

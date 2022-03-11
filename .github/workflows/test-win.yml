@@ -32,8 +32,13 @@ jobs:
       - name: Install dependencies
         run: |
           mkdir -p shared
-          touch a.txt
-          zip -jr shared/a.zip a.txt
+          echo 'test' > a.txt
+          7z a -tzip shared/a.zip a.txt
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: shared
+          path: shared
 
 #      - name: Install rust toolchain
 #        uses: actions-rs/toolchain@v1

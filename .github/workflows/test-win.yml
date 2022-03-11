@@ -31,7 +31,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          vcpkg install openssl:x64-windows-static
           mkdir -p shared
           touch a.txt
           zip -jr shared/a.zip a.txt

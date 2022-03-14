@@ -1,6 +1,5 @@
 {
   "name": "bridger.the-graph",
-  "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",

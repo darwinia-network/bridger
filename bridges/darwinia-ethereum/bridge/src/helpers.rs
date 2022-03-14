@@ -7,8 +7,7 @@ use thegraph_liketh::types::TransactionEntity;
 pub async fn is_verified(client: &Darwinia, tx: &TransactionEntity) -> color_eyre::Result<bool> {
     let block_hash = hex_to_h256(&tx.block_hash)?;
     let tx_index = tx.tx_index;
-    let verified = client.verified(block_hash, tx_index).await?
-        || client.verified_issuing(block_hash, tx_index).await?;
+    let verified = client.verified(block_hash, tx_index).await?;
     Ok(verified)
 }
 

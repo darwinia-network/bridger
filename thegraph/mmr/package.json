@@ -1,10 +1,9 @@
 {
   "name": "mmr",
-  "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ darwinia-network/ropsten-mmr",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/",
     "create-local": "graph create --node http://localhost:8020/ darwinia-network/ropsten-mmr",
     "remove-local": "graph remove --node http://localhost:8020/ darwinia-network/ropsten-mmr",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 darwinia-network/ropsten-mmr"

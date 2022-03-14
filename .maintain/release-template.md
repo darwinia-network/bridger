@@ -4,7 +4,9 @@
 
 ## Changed
 
-- The next generation bridger (https://github.com/darwinia-network/bridger/pull/364)
+- Add shadow mmr theGraph
+- Bump deps
+- Adjust log output
 
 ## Resources
 

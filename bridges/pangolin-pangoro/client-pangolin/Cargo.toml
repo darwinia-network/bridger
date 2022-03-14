@@ -1,6 +1,6 @@
 [package]
 name = "client-pangolin"
-version = "0.5.1"
+version = "0.5.2"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -32,11 +32,11 @@ bp-runtime             = { git = "https://github.com/darwinia-network/parity-bri
 messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
 
 ## Bridge dependencies
-pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main", features = ["no-wasm"] }
-drml-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main" }
-drml-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main" }
-darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main" }
-dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main" }
+pangolin-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6", features = ["no-wasm"] }
+drml-common-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
+drml-bridge-primitives   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
+darwinia-bridge-ethereum = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
+dp-fee                   = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
 
 ## Substrate Dependencies
 frame-system               = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }

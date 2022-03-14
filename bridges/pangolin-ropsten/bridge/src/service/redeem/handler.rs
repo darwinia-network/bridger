@@ -42,7 +42,7 @@ impl RedeemHandler {
     async fn build(
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> color_eyre::Result<Self> {
-        tracing::info!(target: "pangolin-ropsten", "SERVICE RESTARTING...");
+        tracing::info!(target: "pangolin-ropsten", "[ropsten] [redeem] RECREATE SCAN REDEEM HANDLER...");
 
         let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
@@ -59,7 +59,7 @@ impl RedeemHandler {
 
         tracing::info!(
             target: "pangolin-ropsten",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA REDEEM"
+            "[ropsten] [redeem] ✨ REDEEM HANDLER CREATED: ROPSTEN <> PANGOLIN REDEEM"
         );
         Ok(RedeemHandler {
             sender_to_extrinsics,

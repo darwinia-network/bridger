@@ -8,7 +8,7 @@ on:
 env:
   OPENSSL_DIR: /home/runner/openssl
   OPENSSL_STATIC: 1
-  RUST_TOOLCHAIN: nightly-2021-12-07
+  RUST_TOOLCHAIN: nightly
 
 jobs:
   build-linux:
@@ -18,7 +18,15 @@ jobs:
       image: ubuntu:16.04
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        package:
+          [
+            bridger,
+            pangolin-ropsten,
+            darwinia-ethereum,
+            pangolin-pangoro,
+            darwinia-crab,
+            # pangoro-chapel,
+          ]
     steps:
       - uses: actions/checkout@v2
 
@@ -89,7 +97,15 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        package:
+          [
+            bridger,
+            pangolin-ropsten,
+            darwinia-ethereum,
+            pangolin-pangoro,
+            darwinia-crab,
+            # pangoro-chapel,
+          ]
     steps:
       - uses: actions/checkout@v2
 
@@ -99,18 +115,9 @@ jobs:
         with:
           vcpkgGitCommitId: 1085a57da0725c19e19586025438e8c16f34c890
 
-      - name: Setup scoop
-        uses: MinoruSekine/setup-scoop@v1
-        with:
-          scoop_checkup: true
-          scoop_update: true
-
       - name: Install dependencies
         run: |
           vcpkg install openssl:x64-windows-static
-          scoop install 7zip
-          scoop install busybox
-          scoop install make
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
@@ -164,7 +171,15 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        package: [bridger, pangolin-ropsten, darwinia-ethereum, pangolin-pangoro, darwinia-crab]
+        package:
+          [
+            bridger,
+            pangolin-ropsten,
+            darwinia-ethereum,
+            pangolin-pangoro,
+            darwinia-crab,
+            # pangoro-chapel,
+          ]
     steps:
       - uses: actions/checkout@v2
 

@@ -56,7 +56,7 @@ async fn start_scan(
     while let Err(err) = run_scan(&tracker, sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "darwinia-ethereum",
-            "[ethereum] redeem err {:?}",
+            "[ethereum] [redeem] redeem err {:?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -82,7 +82,7 @@ async fn run_scan(
 
         tracing::trace!(
             target: "darwinia-ethereum",
-            "[ethereum] Track redeem block: {} and limit: {}",
+            "[ethereum] [redeem] Track redeem block: {} and limit: {}",
             from,
             limit
         );
@@ -92,7 +92,7 @@ async fn run_scan(
         if txs.is_empty() {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[ethereum] Not found any transactions to redeem"
+                "[ethereum] [redeem] Not found any transactions to redeem"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
@@ -102,7 +102,7 @@ async fn run_scan(
         }
         tracing::debug!(
             target: "darwinia-ethereum",
-            "[ethereum] Found {} transactions wait to redeem",
+            "[ethereum] [redeem] Found {} transactions wait to redeem",
             txs.len()
         );
 
@@ -110,35 +110,41 @@ async fn run_scan(
         // send transactions to redeem
         for tx in &txs {
             let mut times = 0;
-            match handler.redeem(tx.clone()).await {
-                Ok(Some(latest)) => {
-                    tracing::trace!(
-                        target: "darwinia-ethereum",
-                        "[ethereum] Change latest redeemed block number to: {}",
-                        latest
-                    );
-                    latest_redeem_block_number = Some(latest);
-                }
-                Ok(None) => {
-                    tracing::trace!(
-                        target: "darwinia-ethereum",
-                        "[ethereum] Latest redeemed block number is: {:?}",
-                        latest_redeem_block_number
-                    );
-                    break;
-                }
-                Err(e) => {
-                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-                    times += 1;
-                    handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
-                    if times > 10 {
-                        tracing::error!(
+            loop {
+                match handler.redeem(tx.clone()).await {
+                    Ok(Some(latest)) => {
+                        tracing::trace!(
                             target: "darwinia-ethereum",
-                            "[ethereum] Failed to send redeem message. tx: {:?}, err: {:?}",
-                            tx,
-                            e
+                            "[ethereum] [redeem] [{}] Change latest redeemed block number to: {}",
+                            times,
+                            latest,
+                        );
+                        latest_redeem_block_number = Some(latest);
+                        break;
+                    }
+                    Ok(None) => {
+                        tracing::trace!(
+                            target: "darwinia-ethereum",
+                            "[ethereum] [redeem] [{}] Latest redeemed block number is: {:?}",
+                            times,
+                            latest_redeem_block_number,
                         );
                         break;
+                    }
+                    Err(e) => {
+                        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                        times += 1;
+                        if times > 5 {
+                            tracing::error!(
+                                target: "darwinia-ethereum",
+                                "[ethereum] [redeem] [{}] Failed to send redeem message. tx: {:?}, err: {:?}",
+                                times,
+                                tx,
+                                e,
+                            );
+                            break;
+                        }
+                        handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
                     }
                 }
             }
@@ -147,7 +153,7 @@ async fn run_scan(
         if latest_redeem_block_number.is_none() {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[ethereum] Not have any block redeemed. please wait affirm"
+                "[ethereum] [redeem] Not have any block redeemed. please wait affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
@@ -159,7 +165,7 @@ async fn run_scan(
         let latest = latest_redeem_block_number.unwrap();
         tracing::info!(
             target: "darwinia-ethereum",
-            "[ethereum] Set scan redeem block number to: {}",
+            "[ethereum] [redeem] Set scan redeem block number to: {}",
             latest
         );
         tracker.finish(latest as usize)?;

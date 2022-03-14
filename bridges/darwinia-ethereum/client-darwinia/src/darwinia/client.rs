@@ -127,14 +127,14 @@ impl Darwinia {
                     let event = self.event.parse_event(module, variant, event_data);
                     if let EventInfo::Invalid(info) = event {
                         if module != "System" {
-                            tracing::trace!(target: "client-pangolin", ">> Event - {}", info);
+                            tracing::trace!(target: "client-darwinia", ">> Event - {}", info);
                         }
                     } else {
                         result.push(event);
                     }
                 }
                 Raw::Error(err) => {
-                    tracing::error!(target: "client-pangolin", "Error found in raw events: {:#?}", err);
+                    tracing::error!(target: "client-darwinia", "Error found in raw events: {:#?}", err);
                 }
             }
         }
@@ -150,7 +150,7 @@ impl Darwinia {
         match self.subxt.block_hash(Some(blockno)).await? {
             Some(hash) => return self.get_events_from_block_hash(hash).await,
             None => {
-                tracing::info!(target: "client-pangolin", "error");
+                tracing::info!(target: "client-darwinia", "error");
             }
         }
         Ok(vec![])

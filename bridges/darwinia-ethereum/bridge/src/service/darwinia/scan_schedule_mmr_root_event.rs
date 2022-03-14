@@ -33,7 +33,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         if latest.emitted == 1 {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. don't do this again.",
+                "[darwinia] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. not need to do this.",
                 latest.event_block_number,
                 latest.at_block_number
             );

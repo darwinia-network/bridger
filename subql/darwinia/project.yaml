@@ -12,26 +12,35 @@ dataSources:
     mapping:
       file: ./dist/index.js
       handlers:
-        - handler: handleBlock
-          kind: substrate/BlockHandler
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            - module: ethereumRelayAuthorities
-              method: MMRRootSigned
-            - module: ethereumRelayAuthorities
-              method: ScheduleMMRRoot
-            - module: ethereumRelayAuthorities
-              method: ScheduleAuthoritiesChange
-            - module: ethereumRelayAuthorities
-              method: AuthoritiesChangeSigned
-        - handler: handleCall
-          kind: substrate/CallHandler
+            module: ethereumRelayAuthorities
+            method: MMRRootSigned
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: ethereumRelayAuthorities
+            method: ScheduleMMRRoot
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: ethereumRelayAuthorities
+            method: ScheduleAuthoritiesChange
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: ethereumRelayAuthorities
+            method: AuthoritiesChangeSigned
 
 network:
   genesisHash: '0x729cb8f2cf428adcf81fe69610edda32c5711b2ff17de747e8604a3587021db8'
   endpoint: wss://rpc.darwinia.network/
   dictionary: https://api.subquery.network/sq/itering/darwinia-dictionary
+#  chaintypes:
+#    file: ./dist/chaintypes.js
   chaintypes:
-    file: ./dist/chaintypes.js
-
+    file: ./types.yaml

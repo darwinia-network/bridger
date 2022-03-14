@@ -1,6 +1,6 @@
 [package]
 name = "bridge-pangolin-pangoro"
-version = "0.5.1"
+version = "0.5.2"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -72,11 +72,11 @@ support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }
 
 ## darwinia common
-drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main" }
-drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main" }
+drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
+drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
 
 ## pangolin
-pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main", features = ["no-wasm"] }
+pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6", features = ["no-wasm"] }
 
 ## pangoro
-pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main", features = ["no-wasm"] }
+pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6", features = ["no-wasm"] }

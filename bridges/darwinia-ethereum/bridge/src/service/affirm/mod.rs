@@ -93,7 +93,7 @@ impl Service for AffirmService {
                                 block_number
                             );
                             if let Err(e) = handler.update_target(block_number) {
-                                tracing::error!(target: "pangolin-ropsten", "{:?}", e);
+                                tracing::error!(target: "darwinia-ethereum", "{:?}", e);
                             }
                         }
                     }

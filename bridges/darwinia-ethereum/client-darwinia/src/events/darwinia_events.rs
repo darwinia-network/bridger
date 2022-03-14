@@ -50,7 +50,7 @@ impl DarwiniaEvents {
                     events.push(event);
                 }
                 Raw::Error(err) => {
-                    tracing::error!(target: "client-pangolin", "Error found in raw events: {:#?}", err);
+                    tracing::error!(target: "client-darwinia", "Error found in raw events: {:#?}", err);
                 }
             }
         }

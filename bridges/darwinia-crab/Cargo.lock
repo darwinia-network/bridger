@@ -381,6 +381,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "auto_impl"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42cbf586c80ada5e5ccdecae80d3ef0854f224e2dd74435f8d87e6831b8d0a38"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1133,7 +1145,7 @@ dependencies = [
 [[package]]
 name = "crab-runtime"
 version = "0.11.8"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#59a3ebd5c0e950841a157778f142f68ee8ac2cf0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#8c00e43d2a77080f7c022fdf94b122872fbe7b5b"
 dependencies = [
  "array-bytes",
  "bp-message-dispatch",
@@ -1464,7 +1476,7 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-primitives"
 version = "0.11.8"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#59a3ebd5c0e950841a157778f142f68ee8ac2cf0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#8c00e43d2a77080f7c022fdf94b122872fbe7b5b"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -1502,7 +1514,7 @@ dependencies = [
 [[package]]
 name = "darwinia-common-primitives"
 version = "0.11.8"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#59a3ebd5c0e950841a157778f142f68ee8ac2cf0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#8c00e43d2a77080f7c022fdf94b122872fbe7b5b"
 dependencies = [
  "parity-scale-codec 2.3.1",
  "sp-core",
@@ -1512,7 +1524,7 @@ dependencies = [
 [[package]]
 name = "darwinia-common-runtime"
 version = "0.11.8"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#59a3ebd5c0e950841a157778f142f68ee8ac2cf0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#8c00e43d2a77080f7c022fdf94b122872fbe7b5b"
 dependencies = [
  "darwinia-balances",
  "darwinia-common-primitives",
@@ -1788,7 +1800,7 @@ dependencies = [
 [[package]]
 name = "darwinia-runtime"
 version = "0.11.8"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#59a3ebd5c0e950841a157778f142f68ee8ac2cf0"
+source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-v0.12.0#8c00e43d2a77080f7c022fdf94b122872fbe7b5b"
 dependencies = [
  "bp-message-dispatch",
  "bp-messages",
@@ -2491,11 +2503,11 @@ checksum = "77f3309417938f28bf8228fcff79a4a37103981e3e186d2ccd19c74b38f4eb71"
 [[package]]
 name = "evm"
 version = "0.30.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3144301c57a81101003055c7cab61b58e68060f3bd1c54aa419f663e4f0e6347"
+source = "git+https://github.com/darwinia-network/evm?branch=darwinia-v0.12.0#099ff79fb4a790570b0494b727f345142163b8f0"
 dependencies = [
+ "auto_impl",
  "environmental",
- "ethereum 0.9.0",
+ "ethereum 0.10.0",
  "evm-core",
  "evm-gasometer",
  "evm-runtime",
@@ -2503,6 +2515,7 @@ dependencies = [
  "parity-scale-codec 2.3.1",
  "primitive-types",
  "rlp",
+ "scale-info 1.0.0",
  "serde 1.0.136",
  "sha3 0.8.2",
 ]
@@ -2510,20 +2523,19 @@ dependencies = [
 [[package]]
 name = "evm-core"
 version = "0.30.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7bfa2dae9a2c6c0172d83c37eb406bfabf6a9d1af17b7ab4958e89853ddae97"
+source = "git+https://github.com/darwinia-network/evm?branch=darwinia-v0.12.0#099ff79fb4a790570b0494b727f345142163b8f0"
 dependencies = [
  "funty 1.1.0",
  "parity-scale-codec 2.3.1",
  "primitive-types",
+ "scale-info 1.0.0",
  "serde 1.0.136",
 ]
 
 [[package]]
 name = "evm-gasometer"
 version = "0.30.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14d5b12117cb9a5a9b9f031296ea86416da2cd9d8c9a9e3a2fa10275ae55f3ea"
+source = "git+https://github.com/darwinia-network/evm?branch=darwinia-v0.12.0#099ff79fb4a790570b0494b727f345142163b8f0"
 dependencies = [
  "environmental",
  "evm-core",
@@ -2534,8 +2546,7 @@ dependencies = [
 [[package]]
 name = "evm-runtime"
 version = "0.30.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3921ac8964cf13d12693392fef6686ef94470328ccd8eea384c6ff9ac0125b01"
+source = "git+https://github.com/darwinia-network/evm?branch=darwinia-v0.12.0#099ff79fb4a790570b0494b727f345142163b8f0"
 dependencies = [
  "environmental",
  "evm-core",

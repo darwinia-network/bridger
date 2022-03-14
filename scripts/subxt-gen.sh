@@ -40,6 +40,11 @@ if [ "${CHAIN}" == "pangoro" ]; then
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangoro-subxt
 fi
 
+if [ "${CHAIN}" == "darwinia" ]; then
+  ENDPOINT='https://rpc.darwinia.network'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/darwinia-subxt
+fi
+
 
 
 if [ -z "${ENDPOINT}" ]; then

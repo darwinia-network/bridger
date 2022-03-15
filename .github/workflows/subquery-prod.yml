@@ -7,7 +7,7 @@ on:
       - 'v*'
 
 env:
-  SUBQUERY_CLI_VERSION: 0.2.0
+  SUBQUERY_CLI_VERSION: 0.2.3
   SUBQUERY_ORG: darwinia-network
 
 jobs:

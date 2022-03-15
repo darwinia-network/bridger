@@ -10,7 +10,8 @@ WORK_PATH=${BIN_PATH}/../
 SUBXT=$(which subxt || echo '')
 
 if [ -z "${SUBXT}" ]; then
-  cargo install --branch parity-master  --git https://github.com/darwinia-network/subxt
+#  cargo install --branch parity-master --git https://github.com/darwinia-network/subxt
+  cargo install --tag v0.18.1 --git https://github.com/paritytech/subxt
 fi
 
 SUBXT=$(which subxt)
@@ -61,4 +62,4 @@ OUTPUT_FILE=${OUTPUT_PATH}/src/runtime.rs
 
 ${SUBXT} codegen --url ${ENDPOINT} ${DERIVE} > ${OUTPUT_FILE}
 
-cargo fmt --manifest-path ${OUTPUT_PATH}/Cargo.toml  -- ${OUTPUT_FILE} || true
+cargo fmt --manifest-path ${OUTPUT_PATH}/Cargo.toml -- ${OUTPUT_FILE} || true

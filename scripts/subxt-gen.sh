@@ -41,7 +41,8 @@ if [ "${CHAIN}" == "pangoro" ]; then
 fi
 
 if [ "${CHAIN}" == "darwinia" ]; then
-  ENDPOINT='https://rpc.darwinia.network'
+#  ENDPOINT='https://rpc.darwinia.network'
+  ENDPOINT='http://127.0.0.1:9936'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/darwinia-subxt
 fi
 

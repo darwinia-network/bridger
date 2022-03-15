@@ -1,25 +1,22 @@
-use std::sync::Arc;
 use std::time::Duration;
 
-use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Sender, Service, Task};
-use microkv::namespace::NamespaceMicroKV;
 use tokio::time::sleep;
 
-use client_darwinia::account::DarwiniaAccount;
-use client_darwinia::component::DarwiniaSubxtComponent;
-use client_darwinia::config::DarwiniaSubxtConfig;
-use client_darwinia::from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia};
+use client_darwinia::client::DarwiniaClient;
+use client_darwinia::component::DarwiniaClientComponent;
+use client_darwinia::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
 use component_shadow::component::ShadowComponent;
 use component_shadow::shadow::Shadow;
 use component_state::state::BridgeState;
+use lifeline::dyn_bus::DynBus;
+use microkv::namespace::NamespaceMicroKV;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::DarwiniaEthereumBus;
 use crate::bridge::DarwiniaEthereumTask;
-use crate::bridge::TaskConfig;
 use crate::bridge::{DarwiniaEthereumConfig, Extrinsic, ToExtrinsicsMessage, ToGuardMessage};
 
 #[derive(Debug)]
@@ -65,7 +62,7 @@ async fn start(
     microkv: &NamespaceMicroKV,
 ) {
     while let Err(err) = run(&mut sender_to_extrinsics, microkv).await {
-        tracing::error!(target: "darwinia-ethereum", "guard err {:#?}", err);
+        tracing::error!(target: "darwinia-ethereum", "[darwinia] [guard] guard err {:#?}", err);
         sleep(Duration::from_secs(10)).await;
     }
 }
@@ -79,76 +76,58 @@ async fn run(
     let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
 
     // Config
-    let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
-    let servce_config: TaskConfig = bridge_config.task;
+    let config_darwinia = bridge_config.darwinia;
+    let servce_config = bridge_config.task;
 
     // Darwinia client & account
-    let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
-    let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-
-    let account = DarwiniaAccount::new(
-        config_darwinia.relayer_private_key,
-        config_darwinia.relayer_real_account,
-    );
-    let guard_account = FromEthereumAccount::new(account);
-    let is_tech_comm_member = ethereum2darwinia
-        .is_tech_comm_member(None, &guard_account)
-        .await?;
-
-    if is_tech_comm_member {
-        // Shadow client
-        let shadow = ShadowComponent::component(
-            bridge_config.shadow,
-            bridge_config.ethereum,
-            bridge_config.web3,
-        )?;
-        let shadow = Arc::new(shadow);
-
-        tracing::info!(
-            target: "darwinia-ethereum",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
-        );
-
-        loop {
-            let ethereum2darwinia_clone = ethereum2darwinia.clone();
-            let guard_account_clone = guard_account.clone();
-            let shadow_clone = shadow.clone();
-
-            GuardService::guard(
-                ethereum2darwinia_clone,
-                guard_account_clone,
-                shadow_clone,
-                sender_to_extrinsics,
-                microkv,
-            )
-            .await?;
-
-            sleep(Duration::from_secs(servce_config.interval_guard)).await;
-        }
+    let client = DarwiniaClientComponent::component(config_darwinia).await?;
+    let is_tech_comm_member = client.is_tech_comm_member(None, None).await?;
+    if !is_tech_comm_member {
+        return Ok(());
     }
 
-    Ok(())
+    // Shadow client
+    let shadow = ShadowComponent::component(
+        bridge_config.shadow,
+        bridge_config.ethereum,
+        bridge_config.web3,
+    )?;
+
+    tracing::info!(
+        target: "darwinia-ethereum",
+        "✨ SERVICE STARTED: ETHEREUM <> DARWINIA GUARD"
+    );
+
+    loop {
+        GuardService::guard(&client, &shadow, sender_to_extrinsics, microkv).await?;
+        sleep(Duration::from_secs(servce_config.interval_guard)).await;
+    }
 }
 
 impl GuardService {
     pub async fn extrinsics(
-        ethereum2darwinia: Ethereum2Darwinia,
-        guard_account: FromEthereumAccount,
-        shadow: Arc<Shadow>,
+        client: &DarwiniaClient,
+        shadow: &Shadow,
     ) -> color_eyre::Result<Vec<Extrinsic>> {
         tracing::trace!(
             target: "darwinia-ethereum",
-            "Checking pending headers..."
+            "[darwinia] [guard] Checking pending headers..."
         );
 
         let mut extrinsics = Vec::new();
 
-        let last_confirmed = ethereum2darwinia.last_confirmed().await?;
-        let pending_headers = ethereum2darwinia.pending_headers().await?;
+        let last_confirmed = client.ethereum().last_confirmed().await?;
+        let pending_headers = client
+            .runtime()
+            .storage()
+            .ethereum_relay()
+            .pending_relay_header_parcels(None)
+            .await?;
+
         if !pending_headers.is_empty() {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "pending headers: {:?}",
+                "[darwinia] [guard] pending headers: {:?}",
                 pending_headers
                     .clone()
                     .iter()
@@ -165,33 +144,40 @@ impl GuardService {
             // high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
             // and,
             // have not voted
-            if pending_block_number > last_confirmed
-                && !ethereum2darwinia.has_voted(&guard_account, voting_state)
-            {
-                match shadow.parcel(pending_block_number as usize).await {
-                    Ok(parcel_from_shadow) => {
-                        let parcel_from_shadow = parcel_from_shadow.try_into()?;
-                        let ex = if pending_parcel.is_same_as(&parcel_from_shadow) {
-                            Extrinsic::GuardVote(pending_block_number, true)
-                        } else {
-                            Extrinsic::GuardVote(pending_block_number, false)
-                        };
-                        extrinsics.push(ex);
+            if last_confirmed <= pending_block_number {
+                continue;
+            }
+            let real_account = client.account().real_account();
+            let has_voted = voting_state.ayes.contains(real_account)
+                || voting_state.nays.contains(real_account);
+            if has_voted {
+                continue;
+            }
+
+            match shadow.parcel(pending_block_number as usize).await {
+                Ok(parcel_from_shadow) => {
+                    let parcel_from_shadow: EthereumRelayHeaderParcel =
+                        parcel_from_shadow.try_into()?;
+                    let ex = if is_same_as(&pending_parcel, &parcel_from_shadow) {
+                        Extrinsic::GuardVote(pending_block_number, true)
+                    } else {
+                        Extrinsic::GuardVote(pending_block_number, false)
+                    };
+                    extrinsics.push(ex);
+                }
+                Err(err) => {
+                    if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
+                        err.downcast_ref::<BizError>()
+                    {
+                        tracing::warn!(
+                            target: "darwinia-ethereum",
+                            "[darwinia] [guard] The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                            block,
+                            msg
+                        );
+                        return Ok(extrinsics);
                     }
-                    Err(err) => {
-                        if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
-                            err.downcast_ref::<BizError>()
-                        {
-                            tracing::warn!(
-                                target: "darwinia-ethereum",
-                                "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                                block,
-                                msg
-                            );
-                            return Ok(extrinsics);
-                        }
-                        return Err(err);
-                    }
+                    return Err(err);
                 }
             }
         }
@@ -200,13 +186,12 @@ impl GuardService {
     }
 
     async fn guard(
-        ethereum2darwinia: Ethereum2Darwinia,
-        guard_account: FromEthereumAccount,
-        shadow: Arc<Shadow>,
+        client: &DarwiniaClient,
+        shadow: &Shadow,
         sender_to_extrinsics: &mut impl Sender<ToExtrinsicsMessage>,
         microkv: &NamespaceMicroKV,
     ) -> color_eyre::Result<()> {
-        let extrinsics = Self::extrinsics(ethereum2darwinia, guard_account, shadow).await?;
+        let extrinsics = Self::extrinsics(client, shadow).await?;
 
         if extrinsics.is_empty() {
             return Ok(());
@@ -235,7 +220,7 @@ impl GuardService {
                 } else {
                     tracing::info!(
                         target: "darwinia-ethereum",
-                        "Skip guard vote for block: {}",
+                        "[darwinia] [guard] Skip guard vote for block: {}",
                         &block_num
                     );
                 }
@@ -244,6 +229,11 @@ impl GuardService {
         if max_block > latest {
             microkv.put("latest_guard_vote_block_num", &max_block)?;
         }
+
         Ok(())
     }
+}
+
+fn is_same_as(a: &EthereumRelayHeaderParcel, b: &EthereumRelayHeaderParcel) -> bool {
+    a.header.hash == b.header.hash && a.parent_mmr_root == b.parent_mmr_root
 }

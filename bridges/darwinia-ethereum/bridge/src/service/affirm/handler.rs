@@ -4,21 +4,20 @@ use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
-use client_darwinia::component::DarwiniaSubxtComponent;
-use client_darwinia::from_ethereum::Ethereum2Darwinia;
+use client_darwinia::client::DarwiniaClient;
+use client_darwinia::component::DarwiniaClientComponent;
+use client_darwinia::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
 use component_shadow::component::ShadowComponent;
 use component_shadow::shadow::Shadow;
 use support_common::config::{Config, Names};
-use support_ethereum::block::EthereumHeader;
-use support_ethereum::parcel::EthereumRelayHeaderParcel;
 
 use crate::bridge::{DarwiniaEthereumConfig, Extrinsic, ToExtrinsicsMessage};
 
 pub struct AffirmHandler {
     microkv: NamespaceMicroKV,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-    darwinia: Ethereum2Darwinia,
+    client: DarwiniaClient,
     shadow: Arc<Shadow>,
 }
 
@@ -33,7 +32,7 @@ impl AffirmHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "darwinia-ethereum",
-                        "Failed to init affirm handler. err: {:#?}",
+                        "[ethereum] [affirm] Failed to init affirm handler. err: {:#?}",
                         err
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -46,12 +45,11 @@ impl AffirmHandler {
         microkv: NamespaceMicroKV,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> color_eyre::Result<Self> {
-        tracing::info!(target: "darwinia-ethereum", "SERVICE RESTARTING...");
+        tracing::info!(target: "darwinia-ethereum", "[ethereum] [affirm] SERVICE RECRATEING...");
         let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
 
-        // Darwinia client
-        let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
-        let darwinia = Ethereum2Darwinia::new(darwinia);
+        // Subxt client
+        let client = DarwiniaClientComponent::component(bridge_config.darwinia).await?;
 
         // Shadow client
         let shadow = ShadowComponent::component(
@@ -63,12 +61,12 @@ impl AffirmHandler {
 
         tracing::info!(
             target: "darwinia-ethereum",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY"
+            "[ethereum] [affirm] ✨ AFFIRM RECRATED: ETHEREUM <> DARWINIA RELAY"
         );
         Ok(AffirmHandler {
             microkv,
             sender_to_extrinsics,
-            darwinia,
+            client,
             shadow,
         })
     }
@@ -76,13 +74,13 @@ impl AffirmHandler {
 
 impl AffirmHandler {
     pub async fn affirm(&mut self) -> color_eyre::Result<()> {
-        let last_confirmed = self.darwinia.last_confirmed().await?;
+        let last_confirmed = self.client.ethereum().last_confirmed().await?;
         let mut relayed = self.microkv.get_as("affirm.relayed")?.unwrap_or(0);
         let target = self.microkv.get_as("affirm.target")?.unwrap_or(0);
 
         tracing::trace!(
             target: "darwinia-ethereum",
-            "The last confirmed ethereum block is {}",
+            "[ethereum] [affirm] The last confirmed ethereum block is {}",
             last_confirmed
         );
 
@@ -92,7 +90,7 @@ impl AffirmHandler {
         } else {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "The last relayed ethereum block is {}",
+                "[ethereum] [affirm] The last relayed ethereum block is {}",
                 relayed
             );
         }
@@ -100,14 +98,14 @@ impl AffirmHandler {
         if target > relayed {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "Your are affirming ethereum block {}",
+                "[ethereum] [affirm] Your are affirming ethereum block {}",
                 target
             );
             self.do_affirm(target).await?
         } else {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "You do not need to affirm ethereum block {}",
+                "[ethereum] [affirm] You do not need to affirm ethereum block {}",
                 target
             );
         }
@@ -130,13 +128,19 @@ impl AffirmHandler {
         // checking before affirm
         // /////////////////////////
         // 1. pendings check
-        let pending_headers = self.darwinia.pending_headers().await?;
+        let pending_headers = self
+            .client
+            .runtime()
+            .storage()
+            .ethereum_relay()
+            .pending_relay_header_parcels(None)
+            .await?;
         for pending_header in pending_headers {
             let pending_block_number = pending_header.1.header.number;
             if pending_block_number >= target {
                 tracing::trace!(
                     target: "darwinia-ethereum",
-                    "The affirming target block {} is in pending",
+                    "[ethereum] [affirm] The affirming target block {} is in pending",
                     target
                 );
                 return Ok(());
@@ -144,12 +148,12 @@ impl AffirmHandler {
         }
 
         // 1. affirmations check
-        for (_game_id, game) in self.darwinia.affirmations().await?.iter() {
+        for (_game_id, game) in self.client.ethereum().affirmations().await?.iter() {
             for (_round_id, affirmations) in game.iter() {
-                if Ethereum2Darwinia::contains(affirmations, target) {
+                if client_darwinia::helpers::affirmations_contains_block(affirmations, target) {
                     tracing::trace!(
                         target: "darwinia-ethereum",
-                        "The affirming target block {} is in the relayer game",
+                        "[ethereum] [affirm] The affirming target block {} is in the relayer game",
                         target
                     );
                     return Ok(());
@@ -159,17 +163,17 @@ impl AffirmHandler {
 
         tracing::trace!(
             target: "darwinia-ethereum",
-            "Prepare to affirm ethereum block: {}",
+            "[ethereum] [affirm] Prepare to affirm ethereum block: {}",
             target
         );
 
         match self.shadow.parcel(target as usize).await {
             Ok(parcel) => {
                 let parcel: EthereumRelayHeaderParcel = parcel.try_into()?;
-                if parcel.header == EthereumHeader::default() || parcel.mmr_root == [0u8; 32] {
+                if parcel.parent_mmr_root.to_fixed_bytes() == [0u8; 32] {
                     tracing::trace!(
                         target: "darwinia-ethereum",
-                        "Shadow service failed to provide parcel for block {}",
+                        "[ethereum] [affirm] Shadow service failed to provide parcel for block {}",
                         target
                     );
                     return Ok(());
@@ -189,7 +193,7 @@ impl AffirmHandler {
                 {
                     tracing::trace!(
                         target: "darwinia-ethereum",
-                        "The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                        "[ethereum] [affirm] The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
                         block,
                         msg
                     );

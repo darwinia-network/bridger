@@ -3,29 +3,24 @@ use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use client_darwinia::account::DarwiniaAccount;
-use client_darwinia::component::DarwiniaSubxtComponent;
-use client_darwinia::config::DarwiniaSubxtConfig;
-use client_darwinia::{
-    from_ethereum::{Account as FromEthereumAccount, Ethereum2Darwinia},
-    to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum},
-};
+use client_darwinia::client::DarwiniaClient;
+use client_darwinia::component::DarwiniaClientComponent;
+use client_darwinia::config::ClientConfig;
+use client_darwinia::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use client_darwinia::types::runtime_types::to_ethereum_backing::pallet::RedeemFor;
+use client_darwinia::types::{EcdsaMessage, EthereumAccount, EthereumReceiptProofThing};
 use component_ethereum::web3::Web3Config;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::types::{TransactionEntity, TransactionType};
 use support_common::config::{Config, Names};
-use support_ethereum::parcel::EthereumRelayHeaderParcel;
-use support_ethereum::receipt::{EthereumReceiptProofThing, RedeemFor};
+use support_common::error::BridgerError;
 
+use crate::bridge::Extrinsic;
 use crate::bridge::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
-use crate::bridge::{EcdsaMessage, Extrinsic};
 
 pub struct ExtrinsicsHandler {
-    ethereum2darwinia: Ethereum2Darwinia,
-    darwinia2ethereum: Darwinia2Ethereum,
-    darwinia2ethereum_relayer: ToEthereumAccount,
-    ethereum2darwinia_relayer: FromEthereumAccount,
-    spec_name: String,
+    client: DarwiniaClient,
+    ethereum_account: EthereumAccount,
     microkv: NamespaceMicroKV,
     message_kv: NamespaceMicroKV,
 }
@@ -38,7 +33,7 @@ impl ExtrinsicsHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "darwinia-ethereum",
-                        "extrinsics init err: {:#?}",
+                        "[darwinia] [extrinsics] extrinsics init err: {:#?}",
                         err
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -50,44 +45,32 @@ impl ExtrinsicsHandler {
     async fn build(state: BridgeState) -> color_eyre::Result<Self> {
         tracing::info!(
             target: "darwinia-ethereum",
-            "EXTRINSICS SERVICE RESTARTING..."
+            "[darwinia] [extrinsics] EXTRINSICS SERVICE RESTARTING..."
         );
         let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
 
         // Config
-        let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
+        let config_darwinia: ClientConfig = bridge_config.darwinia;
         let config_web3: Web3Config = bridge_config.web3;
 
-        // Darwinia client & accounts
-        let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
-        let ethereum2darwinia = Ethereum2Darwinia::new(darwinia.clone());
-        let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
-        let account = DarwiniaAccount::new(
-            config_darwinia.relayer_private_key,
-            config_darwinia.relayer_real_account,
-        );
-        let darwinia2ethereum_relayer = ToEthereumAccount::new(
-            account.clone(),
-            config_darwinia.ecdsa_authority_private_key,
+        let ethereum_account = EthereumAccount::new(
             config_web3.endpoint,
+            config_darwinia.ecdsa_authority_private_key.clone(),
         );
-        let ethereum2darwinia_relayer = FromEthereumAccount::new(account);
 
-        let spec_name = darwinia.runtime_version().await?;
+        let client = DarwiniaClientComponent::component(config_darwinia).await?;
 
         tracing::info!(
             target: "darwinia-ethereum",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS"
+            "[darwinia] [extrinsics] ✨ SERVICE STARTED: ETHEREUM <> DARWINIA EXTRINSICS"
         );
 
         let microkv = state.microkv_with_namespace(DarwiniaEthereumTask::name());
-        let message_kv = state.microkv_with_namespace(format!("{}-messages", DarwiniaEthereumTask::name()));
+        let message_kv =
+            state.microkv_with_namespace(format!("{}-messages", DarwiniaEthereumTask::name()));
         Ok(ExtrinsicsHandler {
-            ethereum2darwinia,
-            darwinia2ethereum,
-            darwinia2ethereum_relayer,
-            ethereum2darwinia_relayer,
-            spec_name,
+            client,
+            ethereum_account,
             microkv,
             message_kv,
         })
@@ -116,13 +99,10 @@ impl ExtrinsicsHandler {
 
     async fn send_affirm(&self, parcel: EthereumRelayHeaderParcel) -> color_eyre::Result<()> {
         let block_number = parcel.header.number;
-        let ex_hash = self
-            .ethereum2darwinia
-            .affirm(&self.ethereum2darwinia_relayer, parcel)
-            .await?;
+        let ex_hash = self.client.ethereum().affirm(parcel).await?;
         tracing::info!(
             target: "darwinia-ethereum",
-            "Affirmed ethereum block {} in extrinsic {:?}",
+            "[darwinia] [extrinsics] Affirmed ethereum block {} in extrinsic {:?}",
             block_number,
             ex_hash
         );
@@ -138,12 +118,13 @@ impl ExtrinsicsHandler {
         match ethereum_tx.tx_type {
             TransactionType::SetAuthorities => {
                 let ex_hash = self
-                    .darwinia2ethereum
-                    .sync_authorities_change(&self.darwinia2ethereum_relayer, proof)
+                    .client
+                    .ethereum()
+                    .sync_authorities_change(proof)
                     .await?;
                 tracing::info!(
                     target: "darwinia-ethereum",
-                    "Sent ethereum tx {:?} with extrinsic {:?}",
+                    "[darwinia] [extrinsics] Sent ethereum tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
@@ -154,17 +135,15 @@ impl ExtrinsicsHandler {
                 let redeem_for = match ethereum_tx.tx_type {
                     TransactionType::Deposit => RedeemFor::Deposit,
                     TransactionType::Token => RedeemFor::Token,
-                    TransactionType::SetAuthorities => RedeemFor::SetAuthorities,
-                    TransactionType::RegisterErc20Token => RedeemFor::RegisterErc20Token,
-                    TransactionType::RedeemErc20Token => RedeemFor::RedeemErc20Token,
+                    // TransactionType::SetAuthorities => RedeemFor::SetAuthorities,
+                    // TransactionType::RegisterErc20Token => RedeemFor::RegisterErc20Token,
+                    // TransactionType::RedeemErc20Token => RedeemFor::RedeemErc20Token,
+                    _ => return Err(BridgerError::Custom("Unreachable".to_string()).into()),
                 };
-                let ex_hash = self
-                    .ethereum2darwinia
-                    .redeem(&self.ethereum2darwinia_relayer, redeem_for, proof)
-                    .await?;
+                let ex_hash = self.client.ethereum().redeem(redeem_for, proof).await?;
                 tracing::info!(
                     target: "darwinia-ethereum",
-                    "Redeemed ethereum tx {:?} with extrinsic {:?}", ethereum_tx.tx_hash, ex_hash
+                    "[darwinia] [extrinsics] Redeemed ethereum tx {:?} with extrinsic {:?}", ethereum_tx.tx_hash, ex_hash
                 );
             }
         }
@@ -177,24 +156,24 @@ impl ExtrinsicsHandler {
         aye: bool,
     ) -> color_eyre::Result<()> {
         let ex_hash = self
-            .ethereum2darwinia
-            .vote_pending_relay_header_parcel(
-                &self.ethereum2darwinia_relayer,
-                pending_block_number,
-                aye,
-            )
+            .client
+            .runtime()
+            .tx()
+            .ethereum_relay()
+            .vote_pending_relay_header_parcel(pending_block_number, aye)
+            .sign_and_submit(self.client.account().signer())
             .await?;
         if aye {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "Voted to approve: {}, ex hash: {:?}",
+                "[darwinia] [extrinsics] Voted to approve: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
             );
         } else {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "Voted to reject: {}, ex hash: {:?}",
+                "[darwinia] [extrinsics] Voted to reject: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
             );
@@ -205,19 +184,17 @@ impl ExtrinsicsHandler {
     async fn send_sign_and_send_mmr_root(&self, block_number: u32) -> color_eyre::Result<()> {
         tracing::trace!(
             target: "darwinia-ethereum",
-            "Start sign and send mmr_root..."
+            "[darwinia] [extrinsics] Start sign and send mmr_root..."
         );
+
         let ex_hash = self
-            .darwinia2ethereum
-            .ecdsa_sign_and_submit_signed_mmr_root(
-                &self.darwinia2ethereum_relayer,
-                self.spec_name.clone(),
-                block_number,
-            )
+            .client
+            .ethereum()
+            .ecdsa_sign_and_submit_signed_mmr_root(self.ethereum_account.clone(), block_number)
             .await?;
         tracing::info!(
             target: "darwinia-ethereum",
-            "Sign and send mmr root of block {} in extrinsic {:?}",
+            "[darwinia] [extrinsics] Sign and send mmr root of block {} in extrinsic {:?}",
             block_number,
             ex_hash
         );
@@ -230,15 +207,16 @@ impl ExtrinsicsHandler {
     ) -> color_eyre::Result<()> {
         tracing::trace!(
             target: "darwinia-ethereum",
-            "Start sign and send authorities..."
+            "[darwinia] [extrinsics] Start sign and send authorities..."
         );
         let ex_hash = self
-            .darwinia2ethereum
-            .ecdsa_sign_and_submit_signed_authorities(&self.darwinia2ethereum_relayer, message)
+            .client
+            .ethereum()
+            .ecdsa_sign_and_submit_signed_authorities(self.ethereum_account.clone(), message)
             .await?;
         tracing::info!(
             target: "darwinia-ethereum",
-            "Sign and send authorities in extrinsic {:?}",
+            "[darwinia] [extrinsics] Sign and send authorities in extrinsic {:?}",
             ex_hash
         );
         Ok(())
@@ -270,30 +248,21 @@ impl ExtrinsicsHandler {
             let extrinsics = self.message_kv.sorted_keys()?;
             if extrinsics.is_empty() {
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-                continue
+                continue;
             }
             for key in extrinsics.iter() {
                 let ex: Extrinsic = self.message_kv.get_as_unwrap(&key)?;
                 match self.send_extrinsic(ex.clone()).await {
                     Ok(_) => self.message_kv.delete(&key)?,
                     Err(err) => {
-                        if let Some(substrate_subxt::Error::Rpc(_)) = err.downcast_ref::<substrate_subxt::Error>() {
-                            tracing::warn!(
-                                target: "darwinia-ethereum",
-                                "Connection Error. Try to resend later. extrinsic: {:?}",
-                                ex,
-                            );
-                            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                            break;
-                        } else {
-                            self.message_kv.delete(&key)?;
-                            tracing::error!(
-                                target: "darwinia-ethereum",
-                                "Failed to send extrinsic {:?} err: {:?}",
-                                ex,
-                                err
-                            );
-                        }
+                        self.message_kv.delete(&key)?;
+                        tracing::error!(
+                            target: "darwinia-ethereum",
+                            "[darwinia] [extrinsics] Failed to send extrinsic {:?} err: {:?}",
+                            ex,
+                            err
+                        );
+                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     }
                 }
             }

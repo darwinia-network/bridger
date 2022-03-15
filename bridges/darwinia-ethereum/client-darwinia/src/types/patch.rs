@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use codec::Encode;
+use codec::{Decode, Encode};
 use darwinia_subxt::api::runtime_types::{darwinia_bridge_ethereum, darwinia_relay_primitives};
 use subxt::DefaultExtra;
 
@@ -40,3 +40,7 @@ where
     /// mmr_root or next authorities
     pub _4: _4,
 }
+
+/// EcdsaSignature
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
+pub struct EcdsaSignature(pub [u8; 65]);

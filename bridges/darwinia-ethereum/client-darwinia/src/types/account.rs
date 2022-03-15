@@ -1,4 +1,3 @@
-use darwinia_subxt::api::runtime_types::darwinia_claims::EcdsaSignature;
 use secp256k1::SecretKey;
 use std::fmt::{Debug, Formatter};
 
@@ -12,7 +11,7 @@ use web3::Web3;
 
 use crate::config::DarwiniaSubxtConfig;
 use crate::error::{ClientError, ClientResult};
-use crate::types::NodeRuntimeSignedExtra;
+use crate::types::{EcdsaSignature, NodeRuntimeSignedExtra};
 
 /// AccountId
 pub type AccountId = <DarwiniaSubxtConfig as subxt::Config>::AccountId;

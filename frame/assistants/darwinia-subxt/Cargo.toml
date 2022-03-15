@@ -25,7 +25,7 @@ serde       = { version = "1", features = ["derive"] }
 
 subxt       = "0.18.1"
 #subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
-codec       = { package = "parity-scale-codec", version = "2.3.1", default-features = false, features = ["derive", "full"] }
+codec       = { package = "parity-scale-codec", version = "3.1.0", default-features = false, features = ["derive", "full"] }
 
 web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master" }
 

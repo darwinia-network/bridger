@@ -2,15 +2,28 @@
 
 use thiserror::Error as ThisError;
 
+pub type ClientResult<T> = Result<T, ClientError>;
+
 /// Error enum.
 #[derive(ThisError, Debug)]
-pub enum Error {
+pub enum ClientError {
+    #[error(transparent)]
+    SubxtBasicError(#[from] subxt::BasicError),
+
+    #[error("No header hash in EthereumReceiptProofOfThing")]
+    NoHeaderHashInEthereumReceiptProofOfThing,
+
+    #[error("Wrong seed: {0}")]
+    Seed(String),
+
+    #[error("Other error: {0}")]
+    Other(String),
+
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
 
-    #[error("Rpc error: {0}")]
-    Rpc(#[from] jsonrpsee_types::error::Error),
-
+    // #[error("Rpc error: {0}")]
+    // Rpc(#[from] jsonrpsee_types::error::Error),
     #[error("Serde json error: {0}")]
     Serialization(#[from] serde_json::error::Error),
 
@@ -19,9 +32,6 @@ pub enum Error {
 
     #[error("Failed to connect ethereum rpc http endpoint")]
     CannotConnectToWeb3(#[from] web3::Error),
-
-    #[error(transparent)]
-    SubxtError(#[from] substrate_subxt::Error),
 
     #[error("No signer seed set for authority, please check your config.toml")]
     NoAuthoritySignerSeed,
@@ -46,12 +56,4 @@ pub enum Error {
 
     #[error("Not technical committee member")]
     NotTechnicalCommitteeMember,
-
-    #[error("No header hash in EthereumReceiptProofOfThing")]
-    NoHeaderHashInEthereumReceiptProofOfThing,
-
-    #[error("Other error: {0}")]
-    Other(String),
 }
-
-pub type Result<T> = color_eyre::Result<T, Error>;

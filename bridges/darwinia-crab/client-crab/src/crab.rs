@@ -135,11 +135,11 @@ impl TransactionSignScheme for CrabChain {
     }
 
     fn is_signed(tx: &Self::SignedTransaction) -> bool {
-        tx.signature.is_some()
+        tx.0.signature.is_some()
     }
 
     fn is_signed_by(signer: &Self::AccountKeyPair, tx: &Self::SignedTransaction) -> bool {
-        tx.signature
+        tx.0.signature
             .as_ref()
             .map(|(address, _, _)| {
                 let account_id: darwinia_common_primitives::AccountId =
@@ -150,9 +150,9 @@ impl TransactionSignScheme for CrabChain {
     }
 
     fn parse_transaction(tx: Self::SignedTransaction) -> Option<UnsignedTransaction<Self::Chain>> {
-        let extra = &tx.signature.as_ref()?.2;
+        let extra = &tx.0.signature.as_ref()?.2;
         Some(UnsignedTransaction {
-            call: tx.function,
+            call: tx.0.function,
             nonce: Compact::<IndexOf<Self::Chain>>::decode(&mut &extra.4.encode()[..])
                 .ok()?
                 .into(),

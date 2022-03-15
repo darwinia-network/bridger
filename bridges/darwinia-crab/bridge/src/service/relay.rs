@@ -157,14 +157,14 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         signer: darwinia_sign.clone(),
     };
 
-    let darwinia_to_crab_on_demand_headers = OnDemandHeadersRelay::new(
+    let darwinia_to_crab_on_demand_headers = OnDemandHeadersRelay::new::<DarwiniaFinalityToCrab>(
         darwinia_client.clone(),
         crab_client.clone(),
         darwinia_to_crab_transaction_params,
         darwinia_common_primitives::DARWINIA_BLOCKS_PER_SESSION,
         relay_info.only_mandatory_headers,
     );
-    let crab_to_darwinia_on_demand_headers = OnDemandHeadersRelay::new(
+    let crab_to_darwinia_on_demand_headers = OnDemandHeadersRelay::new::<CrabFinalityToDarwinia>(
         crab_client.clone(),
         darwinia_client.clone(),
         crab_to_darwinia_transaction_params,

@@ -3,18 +3,11 @@ pub use s2s_headers::*;
 pub use s2s_messages::*;
 
 mod s2s_const {
-    use std::time::Duration;
-
-    use bp_messages::MessageNonce;
-    use bp_runtime::ChainId;
-    use frame_support::weights::Weight;
-    use relay_substrate_client::Chain;
     use sp_version::RuntimeVersion;
 
     use client_crab::CrabChain;
-    use client_darwinia::DarwiniaChain;
 
-    use crate::traits::{ChainConst, CliChain};
+    use crate::traits::CliChain;
 
     // === start const
     impl CliChain for CrabChain {

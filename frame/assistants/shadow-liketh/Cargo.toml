@@ -26,3 +26,9 @@ serde      = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
 
 gql_client = "1"
+
+mmr_client = { package = "merkle-mountain-range", git = "https://github.com/darwinia-network/shadow.git", branch = "add-mmr-client" }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+

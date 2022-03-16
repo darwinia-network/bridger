@@ -267,7 +267,6 @@ dependencies = [
  "colored",
  "component-ethereum",
  "component-http-client",
- "component-shadow",
  "component-state",
  "lifeline",
  "microkv",
@@ -276,6 +275,7 @@ dependencies = [
  "rand 0.8.4",
  "serde 1.0.136",
  "serde_json",
+ "shadow-liketh",
  "structopt",
  "strum",
  "subquery-d2e",
@@ -355,15 +355,6 @@ dependencies = [
  "num-traits 0.2.14",
  "time",
  "winapi",
-]
-
-[[package]]
-name = "ckb-merkle-mountain-range"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f061f97d64fd1822664bdfb722f7ae5469a97b77567390f7442be5b5dc82a5b"
-dependencies = [
- "cfg-if 0.1.10",
 ]
 
 [[package]]
@@ -467,21 +458,6 @@ dependencies = [
  "color-eyre",
  "reqwest",
  "serde 1.0.136",
- "tracing",
-]
-
-[[package]]
-name = "component-shadow"
-version = "0.5.2"
-dependencies = [
- "color-eyre",
- "component-ethereum",
- "merkle-mountain-range",
- "parity-scale-codec",
- "reqwest",
- "serde 1.0.136",
- "serde_json",
- "thiserror",
  "tracing",
 ]
 
@@ -1770,15 +1746,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71d96e3f3c0b6325d8ccd83c33b28acb183edcb6c67938ba104ec546854b0882"
 
 [[package]]
-name = "merkle-mountain-range"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/shadow.git?branch=add-mmr-client#e60661c78078fedfccf26a799248d8e43b26dd7d"
-dependencies = [
- "blake2-rfc",
- "ckb-merkle-mountain-range",
-]
-
-[[package]]
 name = "merlin"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2018,9 +1985,9 @@ name = "pangolin-subxt"
 version = "0.5.2"
 dependencies = [
  "array-bytes",
- "component-shadow",
  "parity-scale-codec",
  "serde 1.0.136",
+ "shadow-liketh",
  "subxt",
  "thiserror",
  "web3",
@@ -2949,6 +2916,18 @@ dependencies = [
  "digest 0.9.0",
  "keccak",
  "opaque-debug 0.3.0",
+]
+
+[[package]]
+name = "shadow-liketh"
+version = "0.5.2"
+dependencies = [
+ "gql_client",
+ "include_dir",
+ "serde 1.0.136",
+ "serde_json",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

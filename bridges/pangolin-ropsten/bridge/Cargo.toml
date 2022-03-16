@@ -52,9 +52,9 @@ support-tracker    = { path = "../../../frame/supports/support-tracker" }
 support-command-kv = { path = "../../../frame/supports/support-command-kv" }
 
 component-ethereum        = { path = "../../../frame/components/ethereum" }
-component-shadow          = { path = "../../../frame/components/shadow" }
 component-http-client     = { path = "../../../frame/components/http-client" }
 component-state           = { path = "../../../frame/components/state" }
 
 thegraph-liketh = { path = "../../../frame/assistants/thegraph-liketh" }
 subquery-d2e    = { path = "../../../frame/assistants/subquery-d2e" }
+shadow-liketh   = { path = "../../../frame/assistants/shadow-liketh" }

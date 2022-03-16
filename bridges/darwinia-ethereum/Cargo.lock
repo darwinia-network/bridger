@@ -373,15 +373,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ckb-merkle-mountain-range"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f061f97d64fd1822664bdfb722f7ae5469a97b77567390f7442be5b5dc82a5b"
-dependencies = [
- "cfg-if 0.1.10",
-]
-
-[[package]]
 name = "clap"
 version = "2.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -496,7 +487,6 @@ version = "0.5.2"
 dependencies = [
  "color-eyre",
  "component-ethereum",
- "merkle-mountain-range",
  "parity-scale-codec",
  "reqwest",
  "serde 1.0.136",
@@ -1863,15 +1853,6 @@ name = "memory_units"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71d96e3f3c0b6325d8ccd83c33b28acb183edcb6c67938ba104ec546854b0882"
-
-[[package]]
-name = "merkle-mountain-range"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/shadow.git?branch=add-mmr-client#e60661c78078fedfccf26a799248d8e43b26dd7d"
-dependencies = [
- "blake2-rfc",
- "ckb-merkle-mountain-range",
-]
 
 [[package]]
 name = "merlin"

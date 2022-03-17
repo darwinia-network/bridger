@@ -2940,10 +2940,13 @@ dependencies = [
 name = "shadow-liketh"
 version = "0.5.2"
 dependencies = [
+ "arrayvec 0.7.2",
  "gql_client",
  "include_dir",
  "merkle-mountain-range",
  "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
  "serde_json",
  "thiserror",
  "tracing",

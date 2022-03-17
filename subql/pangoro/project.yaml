@@ -1,0 +1,25 @@
+specVersion: 0.2.0
+name: pangoro
+version: 0.0.1
+description: Test
+repository: 'https://github.com/darwinia-network/bridger'
+schema:
+  file: ./schema.graphql
+network:
+  endpoint: 'wss://pangoro-rpc.darwinia.network:443'
+  genesisHash: '0xf37f31c4481e3c937ad40b672c561d0c0b1fb70b40e51a0d56dad30d60e4db58'
+dataSources:
+  - kind: substrate/Runtime
+    startBlock: 1
+    mapping:
+      file: ./dist/index.js
+      handlers:
+        - handler: handleBlock
+          kind: substrate/BlockHandler
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: balances
+            method: Deposit
+        - handler: handleCall
+          kind: substrate/CallHandler

@@ -1,0 +1,6 @@
+[workspace]
+members = [
+	"bridge",
+	"client-pangolin",
+	"client-rococo",
+]

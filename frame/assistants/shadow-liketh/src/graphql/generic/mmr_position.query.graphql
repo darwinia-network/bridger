@@ -1,0 +1,14 @@
+
+query mmrPosition($positions: [Int]!) {
+  nodeEntities(
+    orderBy: id,
+    orderDirection: asc
+    where: {
+      id_in: $positions
+    }
+  ) {
+    id
+    position
+    hash
+  }
+}

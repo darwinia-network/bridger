@@ -41,43 +41,84 @@ impl Shadow {
 }
 
 impl Shadow {
-    //
-    pub async fn mmr_root(&self, leaf_index: u64) -> ShadowComponentReuslt<[u8; 32]> {
-        let position = mmr_client::mmr::leaf_index_to_pos(leaf_index);
-        let peak_positions = mmr_client::mmr::get_peaks(position);
+    fn calc_peaks(
+        &self,
+        positions: Vec<MMRPosition>,
+    ) -> ShadowComponentReuslt<Vec<(u64, [u8; 32])>> {
+        positions
+            .iter()
+            .map(|item| {
+                let array: arrayvec::ArrayVec<_, 32> = item.hash.clone().into_iter().collect();
+                match array
+                    .into_inner()
+                    .map_err(|e| ShadowComponentError::MMR(format!("{:?}", e)))
+                {
+                    Ok(v) => Ok((item.id, v)),
+                    Err(e) => Err(e),
+                }
+            })
+            .collect::<Vec<ShadowComponentReuslt<(u64, [u8; 32])>>>()
+            .into_iter()
+            .collect::<ShadowComponentReuslt<Vec<(u64, [u8; 32])>>>()
+    }
+
+    async fn query_position(&self, positions: Vec<u64>) -> ShadowComponentReuslt<Vec<MMRPosition>> {
         let query = self.read_graphql("mmr_position.query.graphql")?;
-        let vars = QueryPositionVars {
-            positions: peak_positions,
-        };
+
+        let vars = QueryPositionVars { positions };
         let response = self
             .gql
             .query_with_vars_unwrap::<TheGraphResponse, QueryPositionVars>(query, vars)
             .await
             .map_err(ShadowComponentError::from)?;
 
-        if let TheGraphResponse::NodeEntities(data) = response {
-            let peaks = data
-                .iter()
-                .map(|item| item.hash.clone())
-                .map(|item| {
-                    let array: arrayvec::ArrayVec<_, 32> = item.into_iter().collect();
-                    array
-                        .into_inner()
-                        .map_err(|e| ShadowComponentError::MMR(format!("{:?}", e)))
-                })
-                .collect::<Vec<ShadowComponentReuslt<[u8; 32]>>>()
-                .into_iter()
-                .collect::<ShadowComponentReuslt<Vec<[u8; 32]>>>()?;
-
-            let mmr_root = mmr_client::mmr::bag_rhs_peaks(peaks)
-                .map_err(|e| ShadowComponentError::MMR(format!("{:?}", e)))?;
-            return Ok(mmr_root);
+        match response {
+            TheGraphResponse::NodeEntities(data) => Ok(data),
+            _ => Err(ShadowComponentError::GraphQL(format!(
+                "Unknown response: {}",
+                query
+            ))),
         }
-        Err(ShadowComponentError::GraphQL(format!(
-            "Unknown response: {}",
-            query
-        )))
     }
 
-    // pub asycn fn mmr_proof()
+    //
+    pub async fn mmr_root(&self, leaf_index: u64) -> ShadowComponentReuslt<[u8; 32]> {
+        let position = mmr_client::mmr::leaf_index_to_pos(leaf_index);
+        let peak_positions = mmr_client::mmr::get_peaks(position);
+
+        let mmr_positions = self.query_position(peak_positions).await?;
+        let peaks = self
+            .calc_peaks(mmr_positions)?
+            .iter()
+            .map(|item| item.1)
+            .collect::<Vec<[u8; 32]>>();
+
+        let mmr_root = mmr_client::mmr::bag_rhs_peaks(peaks)
+            .map_err(|e| ShadowComponentError::MMR(format!("{:?}", e)))?;
+        Ok(mmr_root)
+    }
+
+    pub async fn mmr_proof(
+        &self,
+        tx_number: u64,
+        last_leaf: u64,
+    ) -> ShadowComponentReuslt<Vec<[u8; 32]>> {
+        let tx_position = mmr_client::mmr::leaf_index_to_pos(tx_number);
+        let leaf_pos = mmr_client::mmr::leaf_index_to_pos(last_leaf);
+        // 1. gen positions
+        let (merkle_proof_pos, peaks_pos, peak_pos) =
+            mmr_client::mmr::gen_proof_positions(tx_position, leaf_pos);
+
+        let merkle_proof_positions = self.query_position(merkle_proof_pos).await?;
+        let merkle_proof = self
+            .calc_peaks(merkle_proof_positions)?
+            .iter()
+            .map(|item| item.1)
+            .collect::<Vec<[u8; 32]>>();
+
+        let peaks_positions = self.query_position(peaks_pos).await?;
+        let peaks = self.calc_peaks(peaks_positions)?;
+        let mmr_proof = mmr_client::mmr::gen_proof(merkle_proof, peaks, peak_pos);
+        Ok(mmr_proof)
+    }
 }

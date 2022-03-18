@@ -1,5 +1,7 @@
 use client_pangolin::component::PangolinClientComponent;
-use component_shadow::component::ShadowComponent;
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::shadow::Shadow;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_terminal::output;
 
@@ -15,6 +17,7 @@ pub async fn handle_guard() -> color_eyre::Result<()> {
         bridge_config.shadow,
         bridge_config.ethereum,
         bridge_config.web3,
+        BridgeName::PangolinRopsten,
     )?;
 
     // Darwinia client

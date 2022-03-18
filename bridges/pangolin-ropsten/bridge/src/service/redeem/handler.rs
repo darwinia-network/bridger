@@ -5,8 +5,9 @@ use postage::broadcast;
 
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
-use component_shadow::component::ShadowComponent;
-use component_shadow::shadow::Shadow;
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::shadow::Shadow;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use thegraph_liketh::types::TransactionEntity;
@@ -16,7 +17,7 @@ use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage};
 pub struct RedeemHandler {
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     client: PangolinClient,
-    shadow: Arc<Shadow>,
+    shadow: Shadow,
 }
 
 impl RedeemHandler {
@@ -54,8 +55,8 @@ impl RedeemHandler {
             bridge_config.shadow,
             bridge_config.ethereum,
             bridge_config.web3,
+            BridgeName::PangolinRopsten,
         )?;
-        let shadow = Arc::new(shadow);
 
         tracing::info!(
             target: "pangolin-ropsten",

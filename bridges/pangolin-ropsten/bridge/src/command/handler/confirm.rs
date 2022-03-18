@@ -1,6 +1,8 @@
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::{darwinia_bridge_ethereum, pangolin_runtime};
-use component_shadow::component::ShadowComponent;
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::shadow::Shadow;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_terminal::output;
 
@@ -18,12 +20,13 @@ pub async fn handle_confirm(opts: ConfirmOpts) -> color_eyre::Result<()> {
         bridge_config.shadow,
         bridge_config.ethereum,
         bridge_config.web3,
+        BridgeName::PangolinRopsten,
     )?;
 
     // Darwinia client
     let client = PangolinClientComponent::component(config_darwinia).await?;
 
-    let parcel = shadow.parcel(block as usize).await?;
+    let parcel = shadow.parcel(block).await?;
 
     let tx = client
         .runtime()

@@ -3003,6 +3003,8 @@ dependencies = [
  "gql_client",
  "include_dir",
  "merkle-mountain-range",
+ "parity-scale-codec",
+ "reqwest",
  "serde 1.0.136",
  "serde-aux",
  "serde-hex",

@@ -4,35 +4,44 @@ use include_dir::{include_dir, Dir};
 
 use component_ethereum::ethereum::client::EthereumClient;
 
+use crate::config::ShadowConfig;
 use crate::error::{ShadowComponentError, ShadowComponentReuslt};
-use crate::types::{BridgeName, HeaderParcel, MMRPosition, QueryPositionVars, TheGraphResponse};
+use crate::types::{
+    BridgeName, EthereumReceiptJson, EthereumReceiptWithMMRProof, HeaderParcel, MMRPosition,
+    MMRProofJson, QueryPositionVars, TheGraphResponse,
+};
 
 /// Graphql dir
 static GRAPHQL_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/graphql");
 
 /// Shadow client
 pub struct Shadow {
-    /// Shadow endpoint
-    endpoint: String,
+    /// Shadow config
+    config: ShadowConfig,
     /// gql client
     gql: gql_client::Client,
     /// Ethereum RPC
     eth: EthereumClient,
+    /// HTTP Client
+    http: reqwest::Client,
+    /// Bridge name
     bridge: BridgeName,
 }
 
 impl Shadow {
     /// Create shadow instance
     pub fn new(
-        endpoint: String,
+        config: ShadowConfig,
         gql: gql_client::Client,
         eth: EthereumClient,
+        http: reqwest::Client,
         bridge: BridgeName,
     ) -> Self {
         Self {
-            endpoint,
+            config,
             gql,
             eth,
+            http,
             bridge,
         }
     }
@@ -61,6 +70,44 @@ impl Shadow {
             .map_err(|e| ShadowComponentError::Ethereum(format!("{:?}", e)))?;
         let mmr_root = self.mmr_root(block_number).await?;
         Ok(HeaderParcel { mmr_root, header })
+    }
+
+    pub async fn receipt(
+        &self,
+        tx: impl AsRef<str>,
+        last: u64,
+    ) -> ShadowComponentReuslt<EthereumReceiptWithMMRProof> {
+        let resp = self
+            .http
+            .get(&format!(
+                "{}/ethereum/receipt/{}/{}",
+                &self.config.endpoint,
+                tx.as_ref(),
+                last
+            ))
+            .send()
+            .await?;
+        if resp.status() == reqwest::StatusCode::INTERNAL_SERVER_ERROR {
+            return Err(ShadowComponentError::InternalServer(resp.text().await?));
+        }
+        let result: serde_json::Value = resp.json().await?;
+        if let Some(err) = result.get("error") {
+            let msg = err.as_str().ok_or_else(|| {
+                ShadowComponentError::Cusom("Failed parse error message".to_string())
+            })?;
+            return Err(ShadowComponentError::Cusom(msg.to_owned()));
+        }
+        let receipt: EthereumReceiptJson = serde_json::from_value(result)?;
+        let header = &receipt.header;
+
+        let (member_leaf_index, last_leaf_index) = (header.number, last - 1);
+        let proof = self.mmr_proof(member_leaf_index, last_leaf_index).await?;
+        let mmr_proof = MMRProofJson {
+            member_leaf_index,
+            last_leaf_index,
+            proof,
+        };
+        Ok(EthereumReceiptWithMMRProof { receipt, mmr_proof })
     }
 }
 

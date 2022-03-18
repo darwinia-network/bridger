@@ -15,10 +15,22 @@ pub enum ShadowComponentError {
     MMR(String),
     #[error("Ethereum: {0}")]
     Ethereum(String),
+    #[error("External component: {0}")]
+    External(String),
+    #[error("{0}")]
+    Cusom(String),
+    #[error(transparent)]
+    Serde(#[from] serde_json::Error),
 }
 
 impl From<GraphQLError> for ShadowComponentError {
     fn from(error: GraphQLError) -> Self {
         Self::GraphQL(format!("{:?}", error))
+    }
+}
+
+impl From<reqwest::Error> for ShadowComponentError {
+    fn from(error: reqwest::Error) -> Self {
+        Self::External(format!("[HTTP] {:?}", error))
     }
 }

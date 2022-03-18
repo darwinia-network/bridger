@@ -55,7 +55,12 @@ impl AffirmHandler {
         let client = PangolinClientComponent::component(bridge_config.darwinia).await?;
 
         // Shadow client
-        let shadow = ShadowComponent::component(bridge_config.shadow, BridgeName::PangolinRopsten)?;
+        let shadow = ShadowComponent::component(
+            bridge_config.shadow,
+            bridge_config.ethereum,
+            bridge_config.web3,
+            BridgeName::PangolinRopsten,
+        )?;
 
         tracing::info!(
             target: "pangolin-ropsten", chain = "ropsten", action = "affirm",

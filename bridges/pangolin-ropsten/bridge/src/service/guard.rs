@@ -7,11 +7,12 @@ use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
-use component_shadow::component::ShadowComponent;
-use component_shadow::shadow::Shadow;
 use component_state::state::BridgeState;
 use lifeline::dyn_bus::DynBus;
 use microkv::namespace::NamespaceMicroKV;
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::shadow::Shadow;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
@@ -91,6 +92,7 @@ async fn run(
         bridge_config.shadow,
         bridge_config.ethereum,
         bridge_config.web3,
+        BridgeName::PangolinRopsten,
     )?;
 
     tracing::info!(
@@ -154,7 +156,7 @@ impl GuardService {
                 continue;
             }
 
-            match shadow.parcel(pending_block_number as usize).await {
+            match shadow.parcel(pending_block_number).await {
                 Ok(parcel_from_shadow) => {
                     let parcel_from_shadow: EthereumRelayHeaderParcel =
                         parcel_from_shadow.try_into()?;
@@ -177,7 +179,7 @@ impl GuardService {
                         );
                         return Ok(extrinsics);
                     }
-                    return Err(err);
+                    return Err(err.into());
                 }
             }
         }

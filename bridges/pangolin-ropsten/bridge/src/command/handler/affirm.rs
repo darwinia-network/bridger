@@ -3,7 +3,9 @@ use colored::Colorize;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
-use component_shadow::component::ShadowComponent;
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::shadow::Shadow;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_terminal::output;
@@ -39,8 +41,9 @@ async fn handle_do(
                 bridge_config.shadow,
                 bridge_config.ethereum,
                 bridge_config.web3,
+                BridgeName::PangolinRopsten,
             )?;
-            shadow.parcel(block as usize + 1).await?.try_into()?
+            shadow.parcel(block + 1).await?.try_into()?
         }
         AffirmMode::Raw => {
             // let json = raw_json.ok_or_else(|| {

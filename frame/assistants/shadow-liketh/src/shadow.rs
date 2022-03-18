@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use include_dir::{include_dir, Dir};
 
 use component_ethereum::ethereum::client::EthereumClient;
@@ -145,10 +143,6 @@ impl Shadow {
 
         match response {
             TheGraphResponse::NodeEntities(data) => Ok(data),
-            _ => Err(ShadowComponentError::GraphQL(format!(
-                "Unknown response: {}",
-                query
-            ))),
         }
     }
 

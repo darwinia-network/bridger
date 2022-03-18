@@ -1,7 +1,6 @@
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::{darwinia_bridge_ethereum, pangolin_runtime};
 use shadow_liketh::component::ShadowComponent;
-use shadow_liketh::shadow::Shadow;
 use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_terminal::output;

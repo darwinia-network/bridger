@@ -6,7 +6,6 @@ use tokio::time::sleep;
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
-use component_ethereum::errors::BizError;
 use component_state::state::BridgeState;
 use lifeline::dyn_bus::DynBus;
 use microkv::namespace::NamespaceMicroKV;
@@ -168,17 +167,18 @@ impl GuardService {
                     extrinsics.push(ex);
                 }
                 Err(err) => {
-                    if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
-                        err.downcast_ref::<BizError>()
-                    {
-                        tracing::warn!(
-                            target: "pangolin-ropsten",
-                            "[pangolin] [guard] The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                            block,
-                            msg
-                        );
-                        return Ok(extrinsics);
-                    }
+                    // todo: the ethereum component not return color error
+                    // if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
+                    //     err.downcast_ref::<BizError>()
+                    // {
+                    //     tracing::warn!(
+                    //         target: "pangolin-ropsten",
+                    //         "[pangolin] [guard] The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                    //         block,
+                    //         msg
+                    //     );
+                    //     return Ok(extrinsics);
+                    // }
                     return Err(err.into());
                 }
             }

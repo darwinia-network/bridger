@@ -1,6 +1,5 @@
 use client_pangolin::component::PangolinClientComponent;
 use shadow_liketh::component::ShadowComponent;
-use shadow_liketh::shadow::Shadow;
 use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_terminal::output;

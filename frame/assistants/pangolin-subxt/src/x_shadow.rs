@@ -131,7 +131,7 @@ impl TryFrom<MMRProofJson> for darwinia_bridge_ethereum::MMRProof {
         let proof = that
             .proof
             .iter()
-            .map(|item| subxt::sp_core::H256(item))
+            .map(|item| subxt::sp_core::H256(*item))
             .collect();
         Ok(Self {
             member_leaf_index: that.member_leaf_index,

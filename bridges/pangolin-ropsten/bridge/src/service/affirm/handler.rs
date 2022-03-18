@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use lifeline::Sender;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
@@ -7,7 +5,6 @@ use postage::broadcast;
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
-use component_ethereum::errors::BizError;
 use shadow_liketh::component::ShadowComponent;
 use shadow_liketh::shadow::Shadow;
 use shadow_liketh::types::BridgeName;
@@ -207,20 +204,21 @@ impl AffirmHandler {
                     .await?
             }
             Err(err) => {
-                if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
-                    err.downcast_ref::<BizError>()
-                {
-                    tracing::warn!(
-                        target: "pangolin-ropsten",
-                        chain = "ropsten",
-                        action = "affirm",
-                        "[ropsten] [affirm] The parcel of ethereum block {} from Shadow service is blank, the err msg is: [[ {} ]]",
-                        block,
-                        msg
-                    );
-                    return Ok(());
-                }
-                return Err(err);
+                // todo: the ethereum component not return color error
+                // if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
+                //     err.downcast_ref::<BizError>()
+                // {
+                //     tracing::warn!(
+                //         target: "pangolin-ropsten",
+                //         chain = "ropsten",
+                //         action = "affirm",
+                //         "[ropsten] [affirm] The parcel of ethereum block {} from Shadow service is blank, the err msg is: [[ {} ]]",
+                //         block,
+                //         msg
+                //     );
+                //     return Ok(());
+                // }
+                return Err(err.into());
             }
         }
 

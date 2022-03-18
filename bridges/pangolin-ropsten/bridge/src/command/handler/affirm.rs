@@ -4,7 +4,6 @@ use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
 use shadow_liketh::component::ShadowComponent;
-use shadow_liketh::shadow::Shadow;
 use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;

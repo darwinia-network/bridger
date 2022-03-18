@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use lifeline::Sender;
 use postage::broadcast;
 

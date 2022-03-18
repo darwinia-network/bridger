@@ -1,13 +1,12 @@
-use bp_messages::MessageNonce;
 use std::time::Duration;
 
 use codec::{Compact, Decode, Encode};
 use frame_support::weights::Weight;
 use relay_substrate_client::{
-    BalanceOf, Chain, ChainBase, ChainWithBalances, ChainWithMessages, IndexOf, SignParam,
+    BalanceOf, Chain, ChainBase, IndexOf, SignParam,
     TransactionSignScheme, UnsignedTransaction,
 };
-use sp_core::{storage::StorageKey, Pair};
+use sp_core::Pair;
 use sp_runtime::{generic::SignedPayload, traits::IdentifyAccount};
 
 /// Pangolin header id.
@@ -57,38 +56,6 @@ impl Chain for PangolinChain {
     type WeightToFee = pangolin_runtime::WeightToFee;
 }
 
-impl ChainWithMessages for PangolinChain {
-    const WITH_CHAIN_MESSAGES_PALLET_NAME: &'static str =
-        drml_bridge_primitives::WITH_PANGOLIN_MESSAGES_PALLET_NAME;
-    const TO_CHAIN_MESSAGE_DETAILS_METHOD: &'static str =
-        drml_bridge_primitives::TO_PANGOLIN_MESSAGE_DETAILS_METHOD;
-    const TO_CHAIN_LATEST_GENERATED_NONCE_METHOD: &'static str =
-        drml_bridge_primitives::TO_PANGOLIN_LATEST_GENERATED_NONCE_METHOD;
-    const TO_CHAIN_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-        drml_bridge_primitives::TO_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
-    const FROM_CHAIN_LATEST_RECEIVED_NONCE_METHOD: &'static str =
-        drml_bridge_primitives::FROM_PANGOLIN_LATEST_RECEIVED_NONCE_METHOD;
-    const FROM_CHAIN_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
-        drml_bridge_primitives::FROM_PANGOLIN_LATEST_CONFIRMED_NONCE_METHOD;
-    const FROM_CHAIN_UNREWARDED_RELAYERS_STATE: &'static str =
-        drml_bridge_primitives::FROM_PANGOLIN_UNREWARDED_RELAYERS_STATE;
-    const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_CHAIN: Weight =
-        drml_bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
-    const MAX_UNREWARDED_RELAYERS_IN_CONFIRMATION_TX: MessageNonce =
-        drml_bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
-    const MAX_UNCONFIRMED_MESSAGES_IN_CONFIRMATION_TX: MessageNonce =
-        drml_bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
-    type WeightInfo = ();
-}
-
-impl ChainWithBalances for PangolinChain {
-    fn account_info_storage_key(account_id: &Self::AccountId) -> StorageKey {
-        use frame_support::storage::generator::StorageMap;
-        StorageKey(
-            frame_system::Account::<pangolin_runtime::Runtime>::storage_map_final_key(account_id),
-        )
-    }
-}
 
 impl TransactionSignScheme for PangolinChain {
     type Chain = PangolinChain;

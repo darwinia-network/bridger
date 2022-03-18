@@ -1,21 +1,10 @@
-//! Types used to connect to the Pangoro-Substrate chain.
+//! Types used to connect to the Rococo-Substrate chain.
 
-use bp_messages::MessageNonce;
-use codec::{Compact, Decode, Encode};
 use frame_support::weights::Weight;
-use relay_substrate_client::{
-    BalanceOf, Chain, ChainBase, ChainWithBalances, ChainWithMessages, IndexOf, SignParam,
-    TransactionSignScheme, UnsignedTransaction,
-};
-use sp_core::{storage::StorageKey, Pair};
-use sp_runtime::{generic::SignedPayload, traits::IdentifyAccount};
+use relay_substrate_client::{Chain, ChainBase};
 use std::time::Duration;
 
-/// Rococo header id.
-pub type HeaderId =
-    relay_utils::HeaderId<drml_common_primitives::Hash, drml_common_primitives::BlockNumber>;
 
-/// Rococo chain definition.
 #[derive(Debug, Clone, Copy)]
 pub struct RococoChain;
 
@@ -50,7 +39,7 @@ impl Chain for RococoChain {
     const MAXIMAL_ENCODED_ACCOUNT_ID_SIZE: u32 =
         drml_bridge_primitives::MAXIMAL_ENCODED_ACCOUNT_ID_SIZE;
 
-    type SignedBlock = pangoro_runtime::SignedBlock;
-    type Call = pangoro_runtime::Call;
-    type WeightToFee = pangoro_runtime::WeightToFee;
+    type SignedBlock = rococo_runtime::SignedBlock;
+    type Call = pangolin_runtime::Call;
+    type WeightToFee = pangolin_runtime::WeightToFee;
 }

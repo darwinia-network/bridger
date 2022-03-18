@@ -50,15 +50,15 @@ sp-version          = { git = "https://github.com/darwinia-network/substrate.git
 
 ## bridge common
 
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-substrate-relay-helper = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "nada-parachain-pallet" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "nada-parachain-pallet" }
+bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "nada-parachain-pallet" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "nada-parachain-pallet" }
+substrate-relay-helper = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "nada-parachain-pallet" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "nada-parachain-pallet" }
+bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "nada-parachain-pallet" }
+pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "nada-parachain-pallet" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "nada-parachain-pallet" }
 
 
 ## component
@@ -76,4 +76,4 @@ drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-
 drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main" }
 
 ## pangolin
-pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "main", features = ["no-wasm"] }
+pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "support-pangolin-parachain", features = ["no-wasm"] }

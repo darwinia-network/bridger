@@ -2,25 +2,37 @@ use std::collections::HashMap;
 
 use include_dir::{include_dir, Dir};
 
+use component_ethereum::ethereum::client::EthereumClient;
+
 use crate::error::{ShadowComponentError, ShadowComponentReuslt};
-use crate::types::{BridgeName, MMRPosition, QueryPositionVars, TheGraphResponse};
+use crate::types::{BridgeName, HeaderParcel, MMRPosition, QueryPositionVars, TheGraphResponse};
 
 /// Graphql dir
 static GRAPHQL_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/graphql");
 
 /// Shadow client
 pub struct Shadow {
+    /// Shadow endpoint
     endpoint: String,
+    /// gql client
     gql: gql_client::Client,
+    /// Ethereum RPC
+    eth: EthereumClient,
     bridge: BridgeName,
 }
 
 impl Shadow {
     /// Create shadow instance
-    pub fn new(endpoint: String, gql: gql_client::Client, bridge: BridgeName) -> Self {
+    pub fn new(
+        endpoint: String,
+        gql: gql_client::Client,
+        eth: EthereumClient,
+        bridge: BridgeName,
+    ) -> Self {
         Self {
             endpoint,
             gql,
+            eth,
             bridge,
         }
     }
@@ -37,6 +49,18 @@ impl Shadow {
         graph
             .contents_utf8()
             .ok_or_else(|| ShadowComponentError::GraphQL("Failed to read graphql file".to_string()))
+    }
+}
+
+impl Shadow {
+    pub async fn parcel(&self, block_number: u64) -> ShadowComponentReuslt<HeaderParcel> {
+        let header = self
+            .eth
+            .get_header_by_number(block_number)
+            .await
+            .map_err(|e| ShadowComponentError::Ethereum(format!("{:?}", e)))?;
+        let mmr_root = self.mmr_root(block_number).await?;
+        Ok(HeaderParcel { mmr_root, header })
     }
 }
 

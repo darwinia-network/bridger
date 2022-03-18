@@ -1,7 +1,9 @@
-use component_shadow::types::{
-    EthereumHeaderJson, EthereumReceiptProofJson, EthereumReceiptProofThingJson, HeaderParcel,
-    MMRProofJson,
-};
+// use component_shadow::types::{
+//     EthereumHeaderJson, EthereumReceiptProofJson, EthereumReceiptProofThingJson, HeaderParcel,
+//     MMRProofJson,
+// };
+
+use shadow_liketh::types::HeaderParcel;
 
 use crate::api::runtime_types;
 use crate::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
@@ -12,10 +14,9 @@ impl TryFrom<HeaderParcel> for EthereumRelayHeaderParcel {
     type Error = ConvertTypeError;
 
     fn try_from(value: HeaderParcel) -> Result<Self, Self::Error> {
-        let mmr_root = value.mmr_root.mmr_root;
         Ok(Self {
             header: value.header.try_into()?,
-            parent_mmr_root: subxt::sp_core::H256(array_bytes::hex2array(mmr_root.as_str())?),
+            parent_mmr_root: subxt::sp_core::H256(value.mmr_root),
         })
     }
 }

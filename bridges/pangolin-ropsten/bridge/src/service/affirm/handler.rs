@@ -8,8 +8,9 @@ use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use component_ethereum::errors::BizError;
-use component_shadow::component::ShadowComponent;
-use component_shadow::shadow::Shadow;
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::shadow::Shadow;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 
 use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage};
@@ -18,7 +19,7 @@ pub struct AffirmHandler {
     microkv: NamespaceMicroKV,
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     client: PangolinClient,
-    shadow: Arc<Shadow>,
+    shadow: Shadow,
 }
 
 impl AffirmHandler {
@@ -54,12 +55,7 @@ impl AffirmHandler {
         let client = PangolinClientComponent::component(bridge_config.darwinia).await?;
 
         // Shadow client
-        let shadow = ShadowComponent::component(
-            bridge_config.shadow,
-            bridge_config.ethereum,
-            bridge_config.web3,
-        )?;
-        let shadow = Arc::new(shadow);
+        let shadow = ShadowComponent::component(bridge_config.shadow, BridgeName::PangolinRopsten)?;
 
         tracing::info!(
             target: "pangolin-ropsten", chain = "ropsten", action = "affirm",
@@ -183,7 +179,7 @@ impl AffirmHandler {
             target
         );
 
-        match self.shadow.parcel(target as usize).await {
+        match self.shadow.parcel(target).await {
             Ok(parcel) => {
                 let parcel: EthereumRelayHeaderParcel = parcel.try_into()?;
                 if parcel.parent_mmr_root.to_fixed_bytes() == [0u8; 32] {

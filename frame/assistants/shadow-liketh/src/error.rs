@@ -13,6 +13,8 @@ pub enum ShadowComponentError {
     GraphQL(String),
     #[error("MMR: {0}")]
     MMR(String),
+    #[error("Ethereum: {0}")]
+    Ethereum(String),
 }
 
 impl From<GraphQLError> for ShadowComponentError {

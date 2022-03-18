@@ -32,6 +32,8 @@ gql_client = "1"
 
 mmr_client = { package = "merkle-mountain-range", git = "https://github.com/darwinia-network/shadow.git", branch = "add-mmr-client" }
 
+component-ethereum = { path = "../../components/ethereum" }
+
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 

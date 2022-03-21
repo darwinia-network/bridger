@@ -42,7 +42,7 @@ jobs:
             --org ${{ env.SUBQUERY_ORG }} \
             --key subql-bridge-${{ matrix.chain }} \
             --branch ${{ steps.branch-name.outputs.current_branch }} \
-            --sub-folder subql/${{ matrix.chain }} \
+            --sub-folder subql/ethereum-v1/${{ matrix.chain }} \
             --type stage \
             --indexer-image-version v0.28.2 \
             --query-image-version v0.12.0 \

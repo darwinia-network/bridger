@@ -1,7 +1,7 @@
 {
-  "name": "kusama-subql-starter",
+  "name": "rococo-subql-starter",
   "version": "0.0.4",
-  "description": "This SubQuery project can be use as a starting point for Kusama network",
+  "description": "This SubQuery project can be use as a starting point for Rococo network",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
@@ -9,14 +9,14 @@
     "test": "jest",
     "codegen": "./node_modules/.bin/subql codegen"
   },
-  "homepage": "https://github.com/subquery/kusama-subql-starter",
-  "repository": "github:subquery/kusama-subql-starter",
+  "homepage": "https://github.com/darwinia-network/bridger",
+  "repository": "github:darwinia-network/bridger",
   "files": [
     "dist",
     "schema.graphql",
     "project.yaml"
   ],
-  "author": "SubQuery Network",
+  "author": "Darwinia Network",
   "license": "MIT",
   "devDependencies": {
     "@polkadot/api": "^7",

@@ -4,9 +4,7 @@
 
 ## Changed
 
-- Add shadow mmr theGraph
-- Bump deps
-- Adjust log output
+- Update bridge darwinia-crab and darwinia-ethereum to support substrate metadata v14
 
 ## Resources
 

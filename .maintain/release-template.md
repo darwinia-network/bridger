@@ -4,7 +4,11 @@
 
 ## Changed
 
-- Update bridge darwinia-crab and darwinia-ethereum to support substrate metadata v14
+Update bridge darwinia-crab and darwinia-ethereum to support substrate metadata v14
+
+- https://github.com/darwinia-network/bridger/pull/430
+- https://github.com/darwinia-network/bridger/pull/433
+- https://github.com/darwinia-network/bridger/pull/434
 
 ## Resources
 

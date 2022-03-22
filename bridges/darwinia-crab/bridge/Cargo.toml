@@ -72,13 +72,13 @@ support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }
 
 ## darwinia common
-darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "main" }
-darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "main" }
-darwinia-common-runtime    = { git = "https://github.com/darwinia-network/darwinia.git", branch = "main" }
+darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-0.12.0" }
+darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-0.12.0" }
+darwinia-common-runtime    = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-0.12.0" }
 
 ## darwinia
-darwinia-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "main" }
+darwinia-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-0.12.0" }
 
 ## crab
-crab-runtime                   = { git = "https://github.com/darwinia-network/darwinia.git", branch = "main" }
+crab-runtime                   = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-0.12.0" }
 

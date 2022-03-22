@@ -32,9 +32,9 @@ bp-runtime             = { git = "https://github.com/darwinia-network/darwinia-b
 messages-relay         = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.0" }
 
 ## Bridge dependencies
-crab-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "main" }
-darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "main" }
-darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "main" }
+crab-runtime               = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-0.12.0" }
+darwinia-common-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-0.12.0" }
+darwinia-bridge-primitives = { git = "https://github.com/darwinia-network/darwinia.git", branch = "xavier-0.12.0" }
 dp-fee                     = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.12.0" }
 
 ## Substrate Dependencies

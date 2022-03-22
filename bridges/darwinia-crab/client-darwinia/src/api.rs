@@ -4,6 +4,7 @@ use darwinia_common_primitives::AccountId;
 use darwinia_common_primitives::Balance;
 use darwinia_common_primitives::BlockNumber;
 use dp_fee::{Order, Relayer};
+use frame_support::Blake2_128Concat;
 use relay_substrate_client::{
     ChainBase, Client, SignParam, TransactionSignScheme, UnsignedTransaction,
 };
@@ -47,7 +48,7 @@ impl DarwiniaApi {
         laned_id: LaneId,
         message_nonce: MessageNonce,
     ) -> color_eyre::Result<Option<Order<AccountId, BlockNumber, Balance>>> {
-        let storage_key = bp_runtime::storage_map_final_key_blake2_128concat(
+        let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
             "FeeMarket",
             "Orders",
             (laned_id, message_nonce).encode().as_slice(),
@@ -72,7 +73,7 @@ impl DarwiniaApi {
         &self,
         account: AccountId,
     ) -> color_eyre::Result<Option<Relayer<AccountId, Balance>>> {
-        let storage_key = bp_runtime::storage_map_final_key_blake2_128concat(
+        let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
             "FeeMarket",
             "RelayersMap",
             account.encode().as_slice(),
@@ -100,7 +101,7 @@ impl DarwiniaApi {
         let runtime_version = self.client.runtime_version().await?;
         self.client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
-                Ok(Bytes(
+                Bytes(
                     DarwiniaChain::sign_transaction(SignParam {
                         spec_version: runtime_version.spec_version,
                         transaction_version: runtime_version.transaction_version,
@@ -108,12 +109,13 @@ impl DarwiniaApi {
                         signer,
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            darwinia_runtime::FeeMarketCall::update_relay_fee(amount).into(),
+                            darwinia_runtime::FeeMarketCall::update_relay_fee { new_fee: amount }
+                                .into(),
                             transaction_nonce,
                         ),
                     })
                     .encode(),
-                ))
+                )
             })
             .await?;
         Ok(())
@@ -130,7 +132,7 @@ impl DarwiniaApi {
         let runtime_version = self.client.runtime_version().await?;
         self.client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
-                Ok(Bytes(
+                Bytes(
                     DarwiniaChain::sign_transaction(SignParam {
                         spec_version: runtime_version.spec_version,
                         transaction_version: runtime_version.transaction_version,
@@ -138,13 +140,15 @@ impl DarwiniaApi {
                         signer,
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            darwinia_runtime::FeeMarketCall::update_locked_collateral(amount)
-                                .into(),
+                            darwinia_runtime::FeeMarketCall::update_locked_collateral {
+                                new_collateral: amount,
+                            }
+                            .into(),
                             transaction_nonce,
                         ),
                     })
                     .encode(),
-                ))
+                )
             })
             .await?;
         Ok(())

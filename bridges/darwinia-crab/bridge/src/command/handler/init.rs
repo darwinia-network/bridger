@@ -56,7 +56,9 @@ macro_rules! select_bridge {
                     crab_runtime::BridgeGrandpaCall::<
                         crab_runtime::Runtime,
                         crab_runtime::WithDarwiniaGrandpa,
-                    >::initialize(init_data)
+                    >::initialize {
+                        init_data,
+                    }
                     .into()
                 }
 
@@ -72,7 +74,9 @@ macro_rules! select_bridge {
                     darwinia_runtime::BridgeGrandpaCall::<
                         darwinia_runtime::Runtime,
                         darwinia_runtime::WithCrabGrandpa,
-                    >::initialize(init_data)
+                    >::initialize {
+                        init_data,
+                    }
                     .into()
                 }
 
@@ -101,7 +105,7 @@ async fn init_bridge(init_bridge: InitBridge) -> color_eyre::Result<()> {
             target_client
         );
 
-        let runtime_version = target_client.runtime_version().await?;
+        let (spec_version, transaction_version) = target_client.simple_runtime_version().await?;
         substrate_relay_helper::headers_initialize::initialize(
             source_client,
             target_client.clone(),
@@ -109,8 +113,8 @@ async fn init_bridge(init_bridge: InitBridge) -> color_eyre::Result<()> {
             move |transaction_nonce, initialization_data| {
                 Bytes(
                     Target::sign_transaction(SignParam {
-                        spec_version: runtime_version.spec_version,
-                        transaction_version: runtime_version.transaction_version,
+                        spec_version,
+                        transaction_version,
                         genesis_hash: *target_client.genesis_hash(),
                         signer: target_sign.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),

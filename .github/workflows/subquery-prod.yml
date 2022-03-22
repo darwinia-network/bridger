@@ -1,13 +1,11 @@
 name: Subquery production
 
-
 on:
   push:
     tags:
       - 'v*'
 
 env:
-  SUBQUERY_CLI_VERSION: 0.2.3
   SUBQUERY_ORG: darwinia-network
 
 jobs:

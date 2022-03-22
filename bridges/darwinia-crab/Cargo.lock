@@ -1145,7 +1145,7 @@ dependencies = [
 [[package]]
 name = "crab-runtime"
 version = "0.12.0"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-0.12.0#286081a3766cd035738736ce3ba6d46b12980f03"
+source = "git+https://github.com/darwinia-network/darwinia.git?tag=v0.12.0#6c70369f6132a9ec22f31520f2ebb96e51b9fbc7"
 dependencies = [
  "array-bytes",
  "bp-message-dispatch",
@@ -1476,7 +1476,7 @@ dependencies = [
 [[package]]
 name = "darwinia-bridge-primitives"
 version = "0.12.0"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-0.12.0#286081a3766cd035738736ce3ba6d46b12980f03"
+source = "git+https://github.com/darwinia-network/darwinia.git?tag=v0.12.0#6c70369f6132a9ec22f31520f2ebb96e51b9fbc7"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -1514,7 +1514,7 @@ dependencies = [
 [[package]]
 name = "darwinia-common-primitives"
 version = "0.12.0"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-0.12.0#286081a3766cd035738736ce3ba6d46b12980f03"
+source = "git+https://github.com/darwinia-network/darwinia.git?tag=v0.12.0#6c70369f6132a9ec22f31520f2ebb96e51b9fbc7"
 dependencies = [
  "parity-scale-codec 2.3.1",
  "sp-core",
@@ -1524,7 +1524,7 @@ dependencies = [
 [[package]]
 name = "darwinia-common-runtime"
 version = "0.12.0"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-0.12.0#286081a3766cd035738736ce3ba6d46b12980f03"
+source = "git+https://github.com/darwinia-network/darwinia.git?tag=v0.12.0#6c70369f6132a9ec22f31520f2ebb96e51b9fbc7"
 dependencies = [
  "darwinia-balances",
  "darwinia-common-primitives",
@@ -1800,7 +1800,7 @@ dependencies = [
 [[package]]
 name = "darwinia-runtime"
 version = "0.12.0"
-source = "git+https://github.com/darwinia-network/darwinia.git?branch=xavier-0.12.0#286081a3766cd035738736ce3ba6d46b12980f03"
+source = "git+https://github.com/darwinia-network/darwinia.git?tag=v0.12.0#6c70369f6132a9ec22f31520f2ebb96e51b9fbc7"
 dependencies = [
  "bp-message-dispatch",
  "bp-messages",

@@ -1,6 +1,12 @@
 [darwinia]
 endpoint = "wss://rpc.darwinia.network"
 signer = "//Alice"
+# Bundle/Auto/Custom
+runtime_version_mode = "Bundle"
+# If the runtime version mode is custom, you need to set this.
+#spec_version = 12345
+# If the runtime version mode is custom, you need to set this.
+#transaction_version = 0
 
 [crab]
 endpoint = "wss://crab-rpc.darwinia.network"

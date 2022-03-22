@@ -1,9 +1,11 @@
+use bp_messages::MessageNonce;
 use std::time::Duration;
 
 use codec::{Compact, Decode, Encode};
+use frame_support::dispatch::Weight;
 use relay_substrate_client::{
-    BalanceOf, Chain, ChainBase, ChainWithBalances, IndexOf, SignParam, TransactionSignScheme,
-    UnsignedTransaction,
+    BalanceOf, Chain, ChainBase, ChainWithBalances, ChainWithMessages, IndexOf, SignParam,
+    TransactionSignScheme, UnsignedTransaction,
 };
 use sp_core::{storage::StorageKey, Pair};
 use sp_runtime::{generic::SignedPayload, traits::IdentifyAccount};
@@ -31,10 +33,21 @@ impl ChainBase for DarwiniaChain {
     type Balance = darwinia_common_primitives::Balance;
     type Index = darwinia_common_primitives::Nonce;
     type Signature = darwinia_common_primitives::Signature;
+
+    fn max_extrinsic_size() -> u32 {
+        darwinia_bridge_primitives::Darwinia::max_extrinsic_size()
+    }
+
+    fn max_extrinsic_weight() -> Weight {
+        darwinia_bridge_primitives::Darwinia::max_extrinsic_weight()
+    }
 }
 
 impl Chain for DarwiniaChain {
     const NAME: &'static str = "Darwinia";
+    const TOKEN_ID: Option<&'static str> = None;
+    const BEST_FINALIZED_HEADER_ID_METHOD: &'static str =
+        darwinia_bridge_primitives::BEST_FINALIZED_DARWINIA_HEADER_METHOD;
     const AVERAGE_BLOCK_INTERVAL: Duration =
         Duration::from_millis(darwinia_common_primitives::MILLISECS_PER_BLOCK);
     const STORAGE_PROOF_OVERHEAD: u32 = darwinia_bridge_primitives::EXTRA_STORAGE_PROOF_SIZE;
@@ -44,6 +57,30 @@ impl Chain for DarwiniaChain {
     type SignedBlock = darwinia_runtime::SignedBlock;
     type Call = darwinia_runtime::Call;
     type WeightToFee = darwinia_runtime::WeightToFee;
+}
+
+impl ChainWithMessages for DarwiniaChain {
+    const WITH_CHAIN_MESSAGES_PALLET_NAME: &'static str =
+        darwinia_bridge_primitives::WITH_DARWINIA_MESSAGES_PALLET_NAME;
+    const TO_CHAIN_MESSAGE_DETAILS_METHOD: &'static str =
+        darwinia_bridge_primitives::TO_DARWINIA_MESSAGE_DETAILS_METHOD;
+    const TO_CHAIN_LATEST_GENERATED_NONCE_METHOD: &'static str =
+        darwinia_bridge_primitives::TO_DARWINIA_LATEST_GENERATED_NONCE_METHOD;
+    const TO_CHAIN_LATEST_RECEIVED_NONCE_METHOD: &'static str =
+        darwinia_bridge_primitives::TO_DARWINIA_LATEST_RECEIVED_NONCE_METHOD;
+    const FROM_CHAIN_LATEST_RECEIVED_NONCE_METHOD: &'static str =
+        darwinia_bridge_primitives::FROM_DARWINIA_LATEST_RECEIVED_NONCE_METHOD;
+    const FROM_CHAIN_LATEST_CONFIRMED_NONCE_METHOD: &'static str =
+        darwinia_bridge_primitives::FROM_DARWINIA_LATEST_CONFIRMED_NONCE_METHOD;
+    const FROM_CHAIN_UNREWARDED_RELAYERS_STATE: &'static str =
+        darwinia_bridge_primitives::FROM_DARWINIA_UNREWARDED_RELAYERS_STATE;
+    const PAY_INBOUND_DISPATCH_FEE_WEIGHT_AT_CHAIN: Weight =
+        darwinia_bridge_primitives::PAY_INBOUND_DISPATCH_FEE_WEIGHT;
+    const MAX_UNREWARDED_RELAYERS_IN_CONFIRMATION_TX: MessageNonce =
+        darwinia_bridge_primitives::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
+    const MAX_UNCONFIRMED_MESSAGES_IN_CONFIRMATION_TX: MessageNonce =
+        darwinia_bridge_primitives::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+    type WeightInfo = ();
 }
 
 impl ChainWithBalances for DarwiniaChain {

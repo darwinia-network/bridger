@@ -61,4 +61,3 @@ jobs:
           subquery_org: ${{ env.SUBQUERY_ORG }}
           project_key: subql-parachain-${{ matrix.chain }}
           subql_path: subql/parachain/${{ matrix.chain }}
-

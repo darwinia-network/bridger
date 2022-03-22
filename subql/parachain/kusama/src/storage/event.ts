@@ -7,18 +7,19 @@ import {
 export async function storeCandidateIncluded(event: FastEvent) {
   const data = event.data;
   const [candidateReceipt, headData, coreIndex, groupIndex] = data;
-  const a = JSON.parse(JSON.stringify(candidateReceipt));
-  const {descriptor, commitmentsHash} = a;
+  const {descriptor} = candidateReceipt.toJSON() as unknown as CandidateReceipt;
   if (ALLOW_PARA_IDS.indexOf(descriptor.paraId) < 0) {
     return;
   }
 
   const eventId = event.id;
-  const atBlock = event.blockNumber;
+  const blockNumber = event.blockNumber;
 
   const _event = new CandidateIncludedEvent(eventId);
-  _event.atBlock = atBlock;
+  _event.includedRelayBlock = blockNumber;
   _event.paraId = descriptor.paraId;
+  _event.paraHead = descriptor.paraHead;
+  _event.relayParent = descriptor.relayParent;
   _event.signature = descriptor.signature;
 
   _event.timestamp = event.timestamp;

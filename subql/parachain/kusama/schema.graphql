@@ -11,9 +11,11 @@ type Block @entity {
 type CandidateIncludedEvent @entity {
   id: ID!
 
-  atBlock: Int!
+  includedRelayBlock: Int!
   paraId: Int!
   signature: String!
+  paraHead: String!
+  relayParent: String!
 
   timestamp: Date
 }

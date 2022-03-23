@@ -8,7 +8,10 @@ pub type ClientResult<T> = Result<T, ClientError>;
 #[derive(ThisError, Debug)]
 pub enum ClientError {
     #[error(transparent)]
-    SubxtBasicError(#[from] subxt::BasicError),
+    SubxtBasicError(subxt::BasicError),
+
+    #[error("Please reconnect to rpc server")]
+    ClientRestartNeed,
 
     #[error("No header hash in EthereumReceiptProofOfThing")]
     NoHeaderHashInEthereumReceiptProofOfThing,
@@ -56,4 +59,20 @@ pub enum ClientError {
 
     #[error("Not technical committee member")]
     NotTechnicalCommitteeMember,
+}
+
+impl ClientError {
+    /// Is restart need error
+    pub fn is_restart_need(&self) -> bool {
+        matches!(self, Self::ClientRestartNeed)
+    }
+}
+
+impl From<subxt::BasicError> for ClientError {
+    fn from(error: subxt::BasicError) -> Self {
+        if let subxt::BasicError::Rpc(_) = &error {
+            return Self::ClientRestartNeed;
+        }
+        Self::SubxtBasicError(error)
+    }
 }

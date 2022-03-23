@@ -14,7 +14,7 @@ mod handler;
 #[derive(Debug)]
 pub struct ExtrinsicsService {
     _greet: Lifeline,
-    _consume: Lifeline
+    _consume: Lifeline,
 }
 
 impl BridgeService for ExtrinsicsService {}
@@ -48,7 +48,7 @@ impl Service for ExtrinsicsService {
                     }
                 }
                 Ok(())
-            }
+            },
         );
 
         let _consume = Self::try_task(
@@ -63,11 +63,8 @@ impl Service for ExtrinsicsService {
                     handler = ExtrinsicsHandler::new(state.clone()).await;
                 }
                 Ok(())
-            }
+            },
         );
-        Ok(Self {
-            _greet,
-            _consume
-        })
+        Ok(Self { _greet, _consume })
     }
 }

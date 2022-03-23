@@ -4,11 +4,11 @@ use std::fmt::Debug;
 
 use lifeline::Message;
 use postage::broadcast;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
+use client_darwinia::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use client_darwinia::types::{EcdsaMessage, EthereumReceiptProofThing};
 use component_thegraph_liketh::types::TransactionEntity;
-use support_ethereum::parcel::EthereumRelayHeaderParcel;
-use support_ethereum::receipt::EthereumReceiptProofThing;
 
 use crate::bridge::DarwiniaEthereumBus;
 
@@ -49,8 +49,7 @@ pub enum ToExtrinsicsMessage {
     Extrinsic(Extrinsic),
 }
 
-pub type EcdsaMessage = [u8; 32];
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum Extrinsic {
     Affirm(EthereumRelayHeaderParcel),
     Redeem(EthereumReceiptProofThing, TransactionEntity),

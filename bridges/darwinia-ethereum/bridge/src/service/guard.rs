@@ -144,7 +144,7 @@ impl GuardService {
             // high than last_confirmed(https://github.com/darwinia-network/bridger/issues/33),
             // and,
             // have not voted
-            if last_confirmed <= pending_block_number {
+            if pending_block_number <= last_confirmed {
                 continue;
             }
             let real_account = client.account().real_account();

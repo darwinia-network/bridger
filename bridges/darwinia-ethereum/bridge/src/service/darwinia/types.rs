@@ -1,7 +1,6 @@
 use postage::broadcast;
 
-use client_darwinia::darwinia::client::Darwinia;
-use client_darwinia::to_ethereum::{Account as ToEthereumAccount, Darwinia2Ethereum};
+use client_darwinia::client::DarwiniaClient;
 use component_ethereum::ethereum::client::EthereumClient;
 use subquery_d2e::Subquery;
 
@@ -12,10 +11,8 @@ pub struct ScanDataWrapper {
     pub limit: u32,
     pub sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     pub subquery: Subquery,
-    pub darwinia: Darwinia,
     pub ethereum: EthereumClient,
-    pub darwinia2ethereum: Darwinia2Ethereum,
-    pub account: ToEthereumAccount,
+    pub darwinia: DarwiniaClient,
 }
 
 impl ScanDataWrapper {

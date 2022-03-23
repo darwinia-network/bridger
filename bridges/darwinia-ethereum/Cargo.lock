@@ -274,7 +274,7 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
 name = "bridge-darwinia-ethereum"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "array-bytes",
  "client-darwinia",
@@ -383,7 +383,7 @@ dependencies = [
 
 [[package]]
 name = "client-darwinia"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "array-bytes",
  "color-eyre",
@@ -439,7 +439,7 @@ dependencies = [
 
 [[package]]
 name = "component-ethereum"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "array-bytes",
  "color-eyre",
@@ -453,7 +453,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -463,7 +463,7 @@ dependencies = [
 
 [[package]]
 name = "component-shadow"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "color-eyre",
  "component-ethereum",
@@ -477,7 +477,7 @@ dependencies = [
 
 [[package]]
 name = "component-state"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -490,7 +490,7 @@ dependencies = [
 
 [[package]]
 name = "component-thegraph-liketh"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "async-trait",
  "color-eyre",
@@ -673,7 +673,7 @@ dependencies = [
 
 [[package]]
 name = "darwinia-subxt"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "array-bytes",
  "component-shadow",
@@ -3454,7 +3454,7 @@ dependencies = [
 
 [[package]]
 name = "subquery-d2e"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "async-trait",
  "gql_client",
@@ -3554,7 +3554,7 @@ dependencies = [
 
 [[package]]
 name = "support-command-kv"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "color-eyre",
  "component-state",
@@ -3572,7 +3572,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "color-eyre",
  "config",
@@ -3591,7 +3591,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -3599,7 +3599,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "colored",
  "serde 1.0.136",
@@ -3609,7 +3609,7 @@ dependencies = [
 
 [[package]]
 name = "support-tracker"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "color-eyre",
  "microkv",

@@ -73,6 +73,11 @@ impl From<subxt::BasicError> for ClientError {
         if let subxt::BasicError::Rpc(_) = &error {
             return Self::ClientRestartNeed;
         }
+        // todo: Check if the node needs to be restarted according to the `restart` keyword https://github.com/darwinia-network/bridger/issues/439
+        let msg = format!("{:?}", error);
+        if msg.contains("restart") {
+            return Self::ClientRestartNeed;
+        }
         Self::SubxtBasicError(error)
     }
 }

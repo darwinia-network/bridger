@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use client_darwinia::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
 use client_darwinia::types::{EcdsaMessage, EthereumReceiptProofThing};
-use component_thegraph_liketh::types::TransactionEntity;
+use thegraph_liketh::types::TransactionEntity;
 
 use crate::bridge::DarwiniaEthereumBus;
 

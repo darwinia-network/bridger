@@ -1,19 +1,19 @@
 use std::time::SystemTime;
 
+use client_darwinia::component::DarwiniaClientComponent;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
-use client_darwinia::component::DarwiniaSubxtComponent;
 use component_state::state::BridgeState;
 use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
+use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
 use crate::bridge::DarwiniaEthereumTask;
 use crate::bridge::TaskConfig;
 use crate::bridge::{DarwiniaEthereumBus, DarwiniaEthereumConfig};
-use crate::helpers;
 
 /// Check service
 #[derive(Debug)]
@@ -49,7 +49,7 @@ async fn start(tracker: Tracker) {
     while let Err(err) = run(&tracker).await {
         tracing::error!(
             target: "darwinia-ethereum",
-            "ethereum check err {:#?}",
+            "[ethereum] [check] ethereum check err {:#?}",
             err
         );
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -59,7 +59,7 @@ async fn start(tracker: Tracker) {
 async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
     tracing::info!(
         target: "darwinia-ethereum",
-        "ETHEREUM CHECK SERVICE RESTARTING..."
+        "ROPSTEN CHECK SERVICE RESTARTING..."
     );
     let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
     let task_config: TaskConfig = bridge_config.task;
@@ -67,7 +67,7 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
     let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
 
     // Darwinia client
-    let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
+    let client = DarwiniaClientComponent::component(bridge_config.darwinia).await?;
 
     let mut timing = SystemTime::now();
     loop {
@@ -76,7 +76,7 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
 
         tracing::trace!(
             target: "darwinia-ethereum",
-            "[ethereum] Track check block: {} and limit: {}",
+            "[ethereum] [check] Track check block: {} and limit: {}",
             from,
             limit
         );
@@ -86,29 +86,29 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
         if txs.is_empty() {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[ethereum] All transactions checked"
+                "[ethereum] [check] All transactions checked"
             );
             tokio::time::sleep(std::time::Duration::from_secs(task_config.interval_check)).await;
             continue;
         }
-
         let tx = txs.get(0).unwrap();
 
-        let verified = match helpers::is_verified(&darwinia, tx).await {
+        let tx_hash = array_bytes::hex2bytes(&tx.block_hash).map_err(|_e| {
+            BridgerError::Hex(format!(
+                "Failed to convert hex({}) to bytes.",
+                &tx.block_hash
+            ))
+        })?;
+        let tx_index = tx.tx_index;
+        let verified = match client.ethereum().is_verified(&tx_hash, tx_index).await {
             Ok(v) => v,
             Err(e) => {
-                if let Some(substrate_subxt::Error::Rpc(_)) =
-                    e.downcast_ref::<substrate_subxt::Error>()
-                {
-                    return Err(e);
-                }
-                let err_msg = format!("{:?}", e).to_lowercase();
-                if err_msg.contains("restart") {
-                    return Err(e);
+                if e.is_restart_need() {
+                    return Err(e.into());
                 }
                 tracing::error!(
                     target: "darwinia-ethereum",
-                    "Failed verified redeem. [{}]: {}. {:?}",
+                    "[ethereum] [check] Failed verified redeem. [{}]: {}. {:?}",
                     tx.block_number,
                     tx.block_hash,
                     e
@@ -126,7 +126,12 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
             let secs = elapsed.as_secs();
             if secs >= task_config.check_timeout {
                 tracker.finish(tx.block_number as usize)?;
-                // todo: check timeout, skip thi transaction, write log
+                tracing::warn!(
+                    target: "darwinia-ethereum",
+                    "[ethereum] [check] The transaction {:?}({}) check redeem long time, skipped",
+                    tx_hash,
+                    tx_index,
+                );
                 continue;
             }
         }

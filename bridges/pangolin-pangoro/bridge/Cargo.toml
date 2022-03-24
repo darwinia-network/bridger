@@ -1,6 +1,6 @@
 [package]
 name = "bridge-pangolin-pangoro"
-version = "0.5.2"
+version = "0.5.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"

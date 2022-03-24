@@ -3,19 +3,19 @@ use std::sync::Arc;
 use lifeline::Sender;
 use postage::broadcast;
 
-use client_darwinia::component::DarwiniaSubxtComponent;
-use client_darwinia::from_ethereum::Ethereum2Darwinia;
+use client_darwinia::client::DarwiniaClient;
+use client_darwinia::component::DarwiniaClientComponent;
 use component_shadow::component::ShadowComponent;
 use component_shadow::shadow::Shadow;
 use component_thegraph_liketh::types::TransactionEntity;
 use support_common::config::{Config, Names};
+use support_common::error::BridgerError;
 
 use crate::bridge::{DarwiniaEthereumConfig, Extrinsic, ToExtrinsicsMessage};
-use crate::helpers;
 
 pub struct RedeemHandler {
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
-    darwinia: Ethereum2Darwinia,
+    client: DarwiniaClient,
     shadow: Arc<Shadow>,
 }
 
@@ -29,7 +29,7 @@ impl RedeemHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "darwinia-ethereum",
-                        "[ethereum] Failed to create redeem handler, times: [{}] err: {:#?}",
+                        "[ethereum] [redeem] Failed to create redeem handler, times: [{}] err: {:#?}",
                         times,
                         err
                     );
@@ -47,8 +47,7 @@ impl RedeemHandler {
         let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
 
         // Darwinia client
-        let darwinia = DarwiniaSubxtComponent::component(bridge_config.darwinia).await?;
-        let darwinia = Ethereum2Darwinia::new(darwinia);
+        let client = DarwiniaClientComponent::component(bridge_config.darwinia).await?;
 
         // Shadow client
         let shadow = ShadowComponent::component(
@@ -64,7 +63,7 @@ impl RedeemHandler {
         );
         Ok(RedeemHandler {
             sender_to_extrinsics,
-            darwinia,
+            client,
             shadow,
         })
     }
@@ -80,7 +79,19 @@ impl RedeemHandler {
         );
 
         // 1. Checking before redeem
-        if helpers::is_verified(&self.darwinia.darwinia, &tx).await? {
+        let tx_hash = array_bytes::hex2bytes(&tx.block_hash).map_err(|_e| {
+            BridgerError::Hex(format!(
+                "Failed to convert hex({}) to bytes.",
+                &tx.block_hash
+            ))
+        })?;
+        let tx_index = tx.tx_index;
+        if self
+            .client
+            .ethereum()
+            .is_verified(&tx_hash, tx_index)
+            .await?
+        {
             tracing::trace!(
                 target: "darwinia-ethereum",
                 "[ethereum] [redeem] Ethereum tx {:?} redeemed",
@@ -89,7 +100,7 @@ impl RedeemHandler {
             return Ok(Some(tx.block_number));
         }
 
-        let last_confirmed = self.darwinia.last_confirmed().await?;
+        let last_confirmed = self.client.ethereum().last_confirmed().await?;
         if tx.block_number >= last_confirmed {
             tracing::trace!(
                 target: "darwinia-ethereum",

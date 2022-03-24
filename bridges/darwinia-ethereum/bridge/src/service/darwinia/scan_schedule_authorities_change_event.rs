@@ -39,21 +39,21 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
         for event in &events {
             let block_number = Some(event.at_block_number);
             let message = event.message.as_slice().try_into()?;
-            let need_to_sign = self
-                .data
-                .darwinia2ethereum
-                .is_authority(block_number, &self.data.account)
+            let client = &self.data.darwinia;
+            let real_account = client.account().real_account();
+            let need_to_sign = client
+                .ethereum()
+                .is_authority(block_number, real_account)
                 .await?
-                && self
-                    .data
-                    .darwinia2ethereum
-                    .need_to_sign_authorities(block_number, &self.data.account, message)
+                && client
+                    .ethereum()
+                    .need_to_sign_authorities(block_number, real_account, message)
                     .await?;
 
             if !need_to_sign {
                 tracing::trace!(
                     target: "darwinia-ethereum",
-                    "[darwinia] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {}",
+                    "[darwinia] [schedule-authorities-change] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {}",
                     array_bytes::bytes2hex("0x", message),
                     event.at_block_number
                 );
@@ -62,7 +62,7 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
 
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] Try sign and send authorities with message: {} at block: {}",
+                "[darwinia] [schedule-authorities-change] Try sign and send authorities with message: {} at block: {}",
                 array_bytes::bytes2hex("0x", message),
                 event.at_block_number
             );

@@ -1,7 +1,5 @@
 use std::convert::TryInto;
 
-use client_darwinia::to_ethereum::Darwinia2Ethereum;
-
 use crate::service::darwinia::types::ScanDataWrapper;
 
 pub struct ScanAuthoritiesChangeSignedEvent<'a> {
@@ -16,11 +14,18 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
 
 impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
     pub async fn handle(&mut self) -> color_eyre::Result<Option<u32>> {
-        let spec_name = self.data.darwinia.runtime_version().await?;
-        let current_term = self
-            .data
-            .darwinia2ethereum
-            .get_current_authority_term()
+        let client = &self.data.darwinia;
+
+        // let current_term: u32 = client
+        //     .runtime()
+        //     .storage()
+        //     .ethereum_relay_authorities()
+        //     .next_term(None)
+        //     .await?;
+        // fixme: It's not a good way, the best is update storage prefix with pallet name
+        let current_term = client
+            .ethereum()
+            .ethereum_relay_authorities_next_term()
             .await?;
 
         let events = self
@@ -31,14 +36,14 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
 
         tracing::debug!(
             target: "darwinia-ethereum",
-            "[darwinia] Track darwinia AuthoritiesChangeSignedEvent block: {} and limit: {}",
+            "[darwinia] [authorities-change] Track darwinia AuthoritiesChangeSignedEvent block: {} and limit: {}",
             self.data.from,
             self.data.limit
         );
         if events.is_empty() {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] Not have more AuthoritiesChangeSignedEvent"
+                "[darwinia] [authorities-change] Not have more AuthoritiesChangeSignedEvent"
             );
             return Ok(None);
         }
@@ -47,7 +52,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
             if event.term != current_term {
                 tracing::info!(
                     target: "darwinia-ethereum",
-                    "[darwinia] Queried AuthoritiesChangeSignedEvent but not in current term. the event term is {} and current term is {}. skip this.",
+                    "[darwinia] [authorities-change] Queried AuthoritiesChangeSignedEvent but not in current term. the event term is {} and current term is {}. skip this.",
                     event.term,
                     current_term
                 );
@@ -55,7 +60,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
             }
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "[darwinia] Processing authorities change signed event in block {}",
+                "[darwinia] [authorities-change] Processing authorities change signed event in block {}",
                 event.at_block_number
             );
 
@@ -64,8 +69,9 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
                 let message = item.as_slice().try_into()?;
                 new_authorities.push(message);
             }
-            let message = Darwinia2Ethereum::construct_authorities_message(
-                spec_name.clone(),
+            let spec_name = client.spec_name().await?;
+            let message = client_darwinia::helpers::encode_authorities_message(
+                spec_name,
                 event.term,
                 new_authorities,
             );
@@ -85,7 +91,7 @@ impl<'a> ScanAuthoritiesChangeSignedEvent<'a> {
 
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] Submit authorities to ethereum at block {} with tx: {}",
+                "[darwinia] [authorities-change] Submit authorities to ethereum at block {} with tx: {}",
                 event.at_block_number,
                 tx_hash
             );

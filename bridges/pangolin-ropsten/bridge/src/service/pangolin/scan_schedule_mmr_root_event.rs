@@ -58,9 +58,9 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
 
         let event_block_number = latest.event_block_number;
 
-        let pangolin = &self.data.pangolin;
-        let finalized_block_hash = pangolin.subxt().rpc().finalized_head().await?;
-        let block = pangolin
+        let client = &self.data.pangolin;
+        let finalized_block_hash = client.subxt().rpc().finalized_head().await?;
+        let block = client
             .subxt()
             .rpc()
             .block(Some(finalized_block_hash))
@@ -97,12 +97,12 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             return Ok(());
         }
 
-        if !pangolin
+        if !client
             .ethereum()
             .need_to_sign_mmr_root_of(
                 event_block_number,
                 Some(finalized_block_header_number),
-                pangolin.account().real_account(),
+                client.account().real_account(),
             )
             .await?
         {

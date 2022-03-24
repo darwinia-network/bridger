@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use client_darwinia::config::DarwiniaSubxtConfig;
+use client_darwinia::config::ClientConfig;
 use component_ethereum::ethereum::EthereumConfig;
 use component_ethereum::web3::Web3Config;
 use component_http_client::HttpClientConfig;
@@ -10,7 +10,7 @@ use thegraph_liketh::config::TheGraphLikeEthConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DarwiniaEthereumConfig {
-    pub darwinia: DarwiniaSubxtConfig,
+    pub darwinia: ClientConfig,
     pub web3: Web3Config,
     pub ethereum: EthereumConfig,
     pub shadow: ShadowConfig,

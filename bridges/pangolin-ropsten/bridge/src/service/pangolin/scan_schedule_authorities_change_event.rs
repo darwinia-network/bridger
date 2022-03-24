@@ -39,13 +39,13 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
         for event in &events {
             let block_number = Some(event.at_block_number);
             let message = event.message.as_slice().try_into()?;
-            let pangolin = &self.data.pangolin;
-            let real_account = pangolin.account().real_account();
-            let need_to_sign = pangolin
+            let client = &self.data.pangolin;
+            let real_account = client.account().real_account();
+            let need_to_sign = client
                 .ethereum()
                 .is_authority(block_number, real_account)
                 .await?
-                && pangolin
+                && client
                     .ethereum()
                     .need_to_sign_authorities(block_number, real_account, message)
                     .await?;

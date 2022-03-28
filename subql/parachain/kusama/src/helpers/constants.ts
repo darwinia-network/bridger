@@ -1,2 +1,2 @@
 
-export const ALLOW_PARA_IDS = [ 1000 ];
+export const ALLOW_PARA_IDS = [ 2015 ];

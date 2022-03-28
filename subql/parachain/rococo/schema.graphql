@@ -1,0 +1,22 @@
+
+type Block @entity {
+  id: ID!
+
+  number: Int
+  timestamp: Date
+  parentHash: String
+  specVersion: Int
+}
+
+type CandidateIncludedEvent @entity {
+  id: ID!
+
+  includedRelayBlock: Int!
+  paraId: Int!
+  signature: String!
+  paraHead: String!
+  relayParent: String!
+
+  timestamp: Date
+}
+

@@ -25,17 +25,17 @@ async-trait = "0.1"
 
 codec                  = { package = "parity-scale-codec", version = "2.3.1" }
 
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "darwinia-v0.12.1" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
+relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
+bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
+bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
+messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
 
 ## Bridge dependencies
-pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6", features = ["no-wasm"] }
-drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
-drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
-dp-fee                  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
+#pangoro-runtime         = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6", features = ["no-wasm"] }
+#drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
+#drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
+#dp-fee                  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
 
 ## Substrate Dependencies
 frame-system               = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }

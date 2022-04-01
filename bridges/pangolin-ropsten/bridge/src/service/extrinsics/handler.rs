@@ -182,11 +182,8 @@ impl ExtrinsicsHandler {
     ) -> color_eyre::Result<()> {
         let ex_hash = self
             .client
-            .runtime()
-            .tx()
-            .ethereum_relay()
+            .ethereum()
             .vote_pending_relay_header_parcel(pending_block_number, aye)
-            .sign_and_submit(self.client.account().signer())
             .await?;
         if aye {
             tracing::info!(

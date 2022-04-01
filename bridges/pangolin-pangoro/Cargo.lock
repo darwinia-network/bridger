@@ -695,7 +695,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangolin-pangoro"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "async-trait",
  "bp-header-chain",
@@ -990,7 +990,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangolin"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "async-trait",
  "bp-messages",
@@ -1017,7 +1017,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangoro"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "async-trait",
  "bp-messages",
@@ -1111,7 +1111,7 @@ dependencies = [
 
 [[package]]
 name = "component-subscan"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -8376,7 +8376,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "support-common"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "color-eyre",
  "config",
@@ -8395,7 +8395,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -8403,7 +8403,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "colored",
  "serde 1.0.136",

@@ -1,63 +1,63 @@
-name: Subquery production
-
-on:
-  push:
-    tags:
-      - 'v*'
-
-env:
-  SUBQUERY_ORG: darwinia-network
-
-jobs:
-  bridge-ethereum-like:
-    name: Deploy Bridge Ethereum like
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      matrix:
-        chain: [ pangolin, darwinia ]
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/checkout@v2
-        with:
-          repository: itering/actions
-          path: .github/actions
-          persist-credentials: false
-          ssh-key: "${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}"
-
-      - uses: ./.github/actions/smart-subquery
-        name: Deploy subql-bridge-${{ matrix.chain }}
-        with:
-          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
-          subquery_org: ${{ env.SUBQUERY_ORG }}
-          project_key: subql-bridge-${{ matrix.chain }}
-          subql_path: subql/ethereum-v1/${{ matrix.chain }}
-          prod_mode: true
-
-  crab-parachain:
-    name: Deploy Crab Parachain Subql
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      matrix:
-        chain: [ kusama, rococo ]
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/checkout@v2
-        with:
-          repository: itering/actions
-          path: .github/actions
-          persist-credentials: false
-          ssh-key: "${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}"
-
-      - uses: ./.github/actions/smart-subquery
-        name: Deploy subql-parachain-${{ matrix.chain }}
-        with:
-          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
-          subquery_org: ${{ env.SUBQUERY_ORG }}
-          project_key: subql-parachain-${{ matrix.chain }}
-          subql_path: subql/parachain/${{ matrix.chain }}
-          prod_mode: true
-
+#name: Subquery production
+#
+#on:
+#  push:
+#    tags:
+#      - 'v*'
+#
+#env:
+#  SUBQUERY_ORG: darwinia-network
+#
+#jobs:
+#  bridge-ethereum-like:
+#    name: Deploy Bridge Ethereum like
+#    runs-on: ubuntu-latest
+#    strategy:
+#      max-parallel: 1
+#      matrix:
+#        chain: [ pangolin, darwinia ]
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - uses: actions/checkout@v2
+#        with:
+#          repository: itering/actions
+#          path: .github/actions
+#          persist-credentials: false
+#          ssh-key: "${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}"
+#
+#      - uses: ./.github/actions/smart-subquery
+#        name: Deploy subql-bridge-${{ matrix.chain }}
+#        with:
+#          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
+#          subquery_org: ${{ env.SUBQUERY_ORG }}
+#          project_key: subql-bridge-${{ matrix.chain }}
+#          subql_path: subql/ethereum-v1/${{ matrix.chain }}
+#          prod_mode: true
+#
+#  crab-parachain:
+#    name: Deploy Crab Parachain Subql
+#    runs-on: ubuntu-latest
+#    strategy:
+#      max-parallel: 1
+#      matrix:
+#        chain: [ kusama, rococo ]
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - uses: actions/checkout@v2
+#        with:
+#          repository: itering/actions
+#          path: .github/actions
+#          persist-credentials: false
+#          ssh-key: "${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}"
+#
+#      - uses: ./.github/actions/smart-subquery
+#        name: Deploy subql-parachain-${{ matrix.chain }}
+#        with:
+#          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
+#          subquery_org: ${{ env.SUBQUERY_ORG }}
+#          project_key: subql-parachain-${{ matrix.chain }}
+#          subql_path: subql/parachain/${{ matrix.chain }}
+#          prod_mode: true
+#

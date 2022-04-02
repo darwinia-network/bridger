@@ -1,6 +1,7 @@
 use bp_header_chain::InitializationData;
 use bp_runtime::Chain as ChainBase;
 use codec::Encode;
+use relay_pangolin_client::runtime::{BridgePangoroGrandpaCall, Call};
 use relay_substrate_client::{
     Chain as RelaySubstrateClientChain, SignParam, TransactionSignScheme, UnsignedTransaction,
 };
@@ -43,19 +44,13 @@ macro_rules! select_bridge {
     ($bridge: expr, $generic: tt) => {
         match $bridge {
             BridgeName::RococoToPangolin => {
-                type Source = client_rococo::RococoChain;
-                type Target = client_pangolin::PangolinChain;
+                type Source = relay_rococo_client::Rococo;
+                type Target = relay_pangolin_client::PangolinChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    pangolin_runtime::BridgeGrandpaCall::<
-                        pangolin_runtime::Runtime,
-                        pangolin_runtime::WithPangoroGrandpa,
-                    >::initialize {
-                        init_data,
-                    }
-                    .into()
+                    Call::BridgePangoroGrandpa(BridgePangoroGrandpaCall::initialize(init_data))
                 }
 
                 $generic

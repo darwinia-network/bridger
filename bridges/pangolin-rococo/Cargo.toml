@@ -1,6 +1,2 @@
 [workspace]
-members = [
-	"bridge",
-	"client-pangolin",
-	"client-rococo",
-]
+members = ["bridge"]

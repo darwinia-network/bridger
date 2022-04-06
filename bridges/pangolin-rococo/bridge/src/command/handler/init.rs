@@ -1,7 +1,7 @@
 use bp_header_chain::InitializationData;
 use bp_runtime::Chain as ChainBase;
 use codec::Encode;
-use relay_pangolin_client::runtime::{BridgePangoroGrandpaCall, Call};
+use relay_pangolin_client::runtime::{BridgeRococoGrandpaCall, Call};
 use relay_substrate_client::{
     Chain as RelaySubstrateClientChain, SignParam, TransactionSignScheme, UnsignedTransaction,
 };
@@ -50,7 +50,7 @@ macro_rules! select_bridge {
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    Call::BridgePangoroGrandpa(BridgePangoroGrandpaCall::initialize(init_data))
+                    Call::BridgeRococoGrandpa(BridgeRococoGrandpaCall::initialize(init_data))
                 }
 
                 $generic

@@ -1,8 +1,7 @@
 use codec::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
-use serde_hex::SerHexSeq;
-use serde_hex::StrictPfx;
+use serde_hex::{SerHex, StrictPfx};
 
 /// MMR node
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -13,7 +12,7 @@ pub struct MMRNode {
     /// mmr position
     #[serde(deserialize_with = "serde_aux::field_attributes::deserialize_number_from_string")]
     pub position: u64,
-    #[serde(with = "SerHexSeq::<StrictPfx>")]
+    #[serde(with = "SerHex::<StrictPfx>")]
     pub hash: [u8; 32],
 }
 

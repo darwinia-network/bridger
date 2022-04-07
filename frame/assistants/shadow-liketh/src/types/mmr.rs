@@ -4,16 +4,17 @@ use serde::{Deserialize, Serialize};
 use serde_hex::SerHexSeq;
 use serde_hex::StrictPfx;
 
-/// MMR position
+/// MMR node
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct MMRPosition {
+pub struct MMRNode {
     /// id
     #[serde(deserialize_with = "serde_aux::field_attributes::deserialize_number_from_string")]
     pub id: u64,
-    /// position
-    pub position: String,
+    /// mmr position
+    #[serde(deserialize_with = "serde_aux::field_attributes::deserialize_number_from_string")]
+    pub position: u64,
     #[serde(with = "SerHexSeq::<StrictPfx>")]
-    pub hash: Vec<u8>,
+    pub hash: [u8; 32],
 }
 
 /// MMR Proof Json

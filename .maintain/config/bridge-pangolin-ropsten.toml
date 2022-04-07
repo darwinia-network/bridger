@@ -27,6 +27,7 @@ subscribe_relay_address = "0xd374292D512281b56198F0401b149370D680b89F"
 
 [shadow]
 endpoint = "https://ropsten.shadow.darwinia.network"
+thegraph = "https://api.thegraph.com/subgraphs/name/darwinia-network/ropsten-mmr"
 
 [task]
 interval_ethereum = 120

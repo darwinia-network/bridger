@@ -1788,15 +1788,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71d96e3f3c0b6325d8ccd83c33b28acb183edcb6c67938ba104ec546854b0882"
 
 [[package]]
-name = "merkle-mountain-range"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/shadow.git?branch=add-mmr-client#e60661c78078fedfccf26a799248d8e43b26dd7d"
-dependencies = [
- "blake2-rfc",
- "ckb-merkle-mountain-range",
-]
-
-[[package]]
 name = "merlin"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3008,11 +2999,11 @@ dependencies = [
 name = "shadow-liketh"
 version = "0.5.3"
 dependencies = [
- "arrayvec 0.7.2",
+ "blake2-rfc",
+ "ckb-merkle-mountain-range",
  "component-ethereum",
  "gql_client 1.0.4",
  "include_dir",
- "merkle-mountain-range",
  "parity-scale-codec",
  "reqwest",
  "serde 1.0.136",

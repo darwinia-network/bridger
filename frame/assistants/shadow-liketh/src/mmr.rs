@@ -16,7 +16,7 @@ pub fn merge(lhs: &[u8], rhs: &[u8]) -> Hash {
 pub fn bag_rhs_peaks(mut peaks: Vec<Hash>) -> ckb_merkle_mountain_range::Result<Hash> {
     let last = peaks
         .pop()
-        .ok_or_else(|| ckb_merkle_mountain_range::Error::GenProofForInvalidLeaves)?;
+        .ok_or(ckb_merkle_mountain_range::Error::GenProofForInvalidLeaves)?;
     peaks.reverse();
     Ok(peaks.iter().fold(last, |prev, &next| merge(&prev, &next)))
 }
@@ -53,7 +53,7 @@ pub fn gen_proof_positions(mut pos: u64, leaf_pos: u64) -> (Vec<u64>, Vec<u64>, 
         height += 1;
     }
     let peak_positions = helper::get_peaks(leaf_pos);
-    return (proof_index, peak_positions, pos);
+    (proof_index, peak_positions, pos)
 }
 
 // after get positions by gen_proof_positions, query the hash of the positions and then gen_proof
@@ -72,5 +72,5 @@ pub fn gen_proof(merkle_proof: Vec<Hash>, peaks: Vec<(u64, Hash)>, peak_pos: u64
     if let Ok(rhs_peak_hash) = bag_rhs_peaks(rhs_peaks) {
         proof.push(rhs_peak_hash);
     }
-    return proof;
+    proof
 }

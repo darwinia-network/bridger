@@ -6,5 +6,5 @@ use structopt::StructOpt;
 pub struct ConfirmOpts {
     /// The block number for ethereum
     #[structopt(long)]
-    pub block: u64,
+    pub block: u32,
 }

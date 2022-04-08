@@ -25,7 +25,8 @@ pub async fn handle_confirm(opts: ConfirmOpts) -> color_eyre::Result<()> {
     // Darwinia client
     let client = PangolinClientComponent::component(config_darwinia).await?;
 
-    let parcel = shadow.parcel(block).await?;
+    let mmr_root = client.get_mmr_root(block).await?;
+    let parcel = shadow.parcel(block as u64, mmr_root.0).await?;
 
     let tx = client
         .runtime()

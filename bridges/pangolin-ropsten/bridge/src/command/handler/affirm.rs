@@ -25,10 +25,15 @@ pub async fn handle_affirm(opts: AffirmOpts) -> color_eyre::Result<()> {
 
 async fn handle_do(
     mode: AffirmMode,
-    block: Option<u64>,
+    block: Option<u32>,
     _raw_json: Option<String>,
 ) -> color_eyre::Result<()> {
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
+
+    let config_darwinia = bridge_config.darwinia;
+
+    // Darwinia client
+    let client = PangolinClientComponent::component(config_darwinia.clone()).await?;
 
     let parcel: EthereumRelayHeaderParcel = match mode {
         AffirmMode::Block => {
@@ -42,7 +47,12 @@ async fn handle_do(
                 bridge_config.web3,
                 BridgeName::PangolinRopsten,
             )?;
-            shadow.parcel(block + 1).await?.try_into()?
+            let expected_block = block + 1;
+            let mmr_root = client.get_mmr_root(expected_block).await?;
+            shadow
+                .parcel(expected_block as u64, mmr_root.0)
+                .await?
+                .try_into()?
         }
         AffirmMode::Raw => {
             // let json = raw_json.ok_or_else(|| {
@@ -53,11 +63,6 @@ async fn handle_do(
             return Err(BridgerError::Custom("Not support this feature now".to_string()).into());
         }
     };
-
-    let config_darwinia = bridge_config.darwinia;
-
-    // Darwinia client
-    let client = PangolinClientComponent::component(config_darwinia.clone()).await?;
 
     match mode {
         AffirmMode::Block => {

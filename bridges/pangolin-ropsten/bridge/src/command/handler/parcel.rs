@@ -1,3 +1,4 @@
+use client_pangolin::component::PangolinClientComponent;
 use shadow_liketh::component::ShadowComponent;
 use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
@@ -20,8 +21,11 @@ pub async fn handle_parcel(opts: ParcelOpts, basic: BasicOptions) -> color_eyre:
         BridgeName::PangolinRopsten,
     )?;
 
+    // Darwinia client
+    let client = PangolinClientComponent::component(bridge_config.darwinia).await?;
+    let mmr_root = client.get_mmr_root(block).await?;
     // Get parcel
-    let parcel = shadow.parcel(block).await?;
+    let parcel = shadow.parcel(block as u64, mmr_root.0).await?;
     let text = match output_format {
         OutputFormat::Json => serde_json::to_string(&parcel)?,
         _ => format!("{:?}", parcel),

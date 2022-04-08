@@ -155,7 +155,8 @@ impl GuardService {
                 continue;
             }
 
-            match shadow.parcel(pending_block_number).await {
+            let mmr_root = client.get_mmr_root(pending_block_number as u32).await?;
+            match shadow.parcel(pending_block_number, mmr_root.0).await {
                 Ok(parcel_from_shadow) => {
                     let parcel_from_shadow: EthereumRelayHeaderParcel =
                         parcel_from_shadow.try_into()?;

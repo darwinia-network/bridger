@@ -61,13 +61,17 @@ impl Shadow {
 }
 
 impl Shadow {
-    pub async fn parcel(&self, block_number: u64) -> ShadowComponentReuslt<HeaderParcel> {
+    pub async fn parcel(
+        &self,
+        block_number: u64,
+        mmr_root: [u8; 32],
+    ) -> ShadowComponentReuslt<HeaderParcel> {
         let header = self
             .eth
             .get_header_by_number(block_number)
             .await
             .map_err(|e| ShadowComponentError::Ethereum(format!("{:?}", e)))?;
-        let mmr_root = self.mmr_root(block_number).await?;
+        // let mmr_root = self.mmr_root(block_number).await?;
         Ok(HeaderParcel { mmr_root, header })
     }
 
@@ -133,22 +137,21 @@ impl Shadow {
         }
     }
 
+    // pub async fn mmr_root(&self, leaf_index: u64) -> ShadowComponentReuslt<[u8; 32]> {
+    //     let position = ckb_merkle_mountain_range::leaf_index_to_pos(leaf_index);
+    //     let peak_positions = ckb_merkle_mountain_range::helper::get_peaks(position);
     //
-    pub async fn mmr_root(&self, leaf_index: u64) -> ShadowComponentReuslt<[u8; 32]> {
-        let position = ckb_merkle_mountain_range::leaf_index_to_pos(leaf_index);
-        let peak_positions = ckb_merkle_mountain_range::helper::get_peaks(position);
-
-        let mmr_nodes = self.query_nodes(peak_positions).await?;
-        let peaks = self
-            .extract_peaks(mmr_nodes)
-            .iter()
-            .map(|item| item.1)
-            .collect::<Vec<[u8; 32]>>();
-
-        let mmr_root =
-            mmr::bag_rhs_peaks(peaks).map_err(|e| ShadowComponentError::MMR(format!("{:?}", e)))?;
-        Ok(mmr_root)
-    }
+    //     let mmr_nodes = self.query_nodes(peak_positions).await?;
+    //     let peaks = self
+    //         .extract_peaks(mmr_nodes)
+    //         .iter()
+    //         .map(|item| item.1)
+    //         .collect::<Vec<[u8; 32]>>();
+    //
+    //     let mmr_root =
+    //         mmr::bag_rhs_peaks(peaks).map_err(|e| ShadowComponentError::MMR(format!("{:?}", e)))?;
+    //     Ok(mmr_root)
+    // }
 
     pub async fn mmr_proof(
         &self,

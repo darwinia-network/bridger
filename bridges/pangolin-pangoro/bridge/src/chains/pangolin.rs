@@ -10,7 +10,7 @@ mod s2s_const {
 
     // === start const
     impl CliChain for PangolinChain {
-        const RUNTIME_VERSION: RuntimeVersion = pangolin_runtime::VERSION;
+        const RUNTIME_VERSION: RuntimeVersion = bp_pangolin::VERSION;
 
         type KeyPair = sp_core::sr25519::Pair;
     }
@@ -21,23 +21,24 @@ mod s2s_const {
 mod s2s_headers {
     use relay_pangolin_client::PangolinChain;
     use relay_pangoro_client::PangoroChain;
-    use substrate_relay_helper::finality_pipeline::{
-        DirectSubmitFinalityProofCallBuilder, SubstrateFinalitySyncPipeline,
-    };
+    use substrate_relay_helper::finality_pipeline::SubstrateFinalitySyncPipeline;
 
     /// Description of Pangolin -> Pangoro finalized headers bridge.
     #[derive(Clone, Debug)]
     pub struct PangolinFinalityToPangoro;
 
+    substrate_relay_helper::generate_mocked_submit_finality_proof_call_builder!(
+        PangolinFinalityToPangoro,
+        PangolinFinalityToPangoroCallBuilder,
+        relay_pangoro_client::runtime::Call::BridgePangolinGrandpa,
+        relay_pangoro_client::runtime::BridgePangolinGrandpaCall::submit_finality_proof
+    );
+
     impl SubstrateFinalitySyncPipeline for PangolinFinalityToPangoro {
         type SourceChain = PangolinChain;
         type TargetChain = PangoroChain;
 
-        type SubmitFinalityProofCallBuilder = DirectSubmitFinalityProofCallBuilder<
-            Self,
-            pangoro_runtime::Runtime,
-            pangoro_runtime::WithPangolinGrandpa,
-        >;
+        type SubmitFinalityProofCallBuilder = PangolinFinalityToPangoroCallBuilder;
         type TransactionSignScheme = PangoroChain;
     }
 
@@ -45,15 +46,26 @@ mod s2s_headers {
 }
 
 mod s2s_messages {
+    use frame_support::weights::Weight;
     use relay_pangolin_client::PangolinChain;
     use relay_pangoro_client::PangoroChain;
-    use substrate_relay_helper::messages_lane::{
-        DirectReceiveMessagesDeliveryProofCallBuilder, DirectReceiveMessagesProofCallBuilder,
-        SubstrateMessageLane,
-    };
+    use substrate_relay_helper::messages_lane::SubstrateMessageLane;
 
     #[derive(Clone, Debug)]
     pub struct PangolinMessagesToPangoro;
+
+    substrate_relay_helper::generate_mocked_receive_message_proof_call_builder!(
+        PangolinMessagesToPangoro,
+        PangolinMessagesToPangoroReceiveMessagesProofCallBuilder,
+        relay_pangoro_client::runtime::Call::BridgePangolinMessages,
+        relay_pangoro_client::runtime::BridgePangolinMessagesCall::receive_messages_proof
+    );
+    substrate_relay_helper::generate_mocked_receive_message_delivery_proof_call_builder!(
+        PangolinMessagesToPangoro,
+        PangolinMessagesToPangoroReceiveMessagesDeliveryProofCallBuilder,
+        relay_pangolin_client::runtime::Call::BridgePangoroMessages,
+        relay_pangolin_client::runtime::BridgePangoroMessagesCall::receive_messages_delivery_proof
+    );
 
     impl SubstrateMessageLane for PangolinMessagesToPangoro {
         const SOURCE_TO_TARGET_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
@@ -65,17 +77,10 @@ mod s2s_messages {
         type SourceTransactionSignScheme = PangolinChain;
         type TargetTransactionSignScheme = PangoroChain;
 
-        type ReceiveMessagesProofCallBuilder = DirectReceiveMessagesProofCallBuilder<
-            Self,
-            pangoro_runtime::Runtime,
-            pangoro_runtime::WithPangolinMessages,
-        >;
+        type ReceiveMessagesProofCallBuilder =
+            PangolinMessagesToPangoroReceiveMessagesProofCallBuilder;
         type ReceiveMessagesDeliveryProofCallBuilder =
-            DirectReceiveMessagesDeliveryProofCallBuilder<
-                Self,
-                pangolin_runtime::Runtime,
-                pangolin_runtime::WithPangoroMessages,
-            >;
+            PangolinMessagesToPangoroReceiveMessagesDeliveryProofCallBuilder;
 
         // todo: common relay strategy
         type RelayStrategy = PangolinRelayStrategy;

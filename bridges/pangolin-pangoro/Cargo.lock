@@ -757,6 +757,8 @@ dependencies = [
  "async-trait",
  "bp-header-chain",
  "bp-messages",
+ "bp-pangolin",
+ "bp-pangoro",
  "bp-runtime",
  "bridge-runtime-common",
  "color-eyre",

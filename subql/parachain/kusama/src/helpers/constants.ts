@@ -1,2 +1,5 @@
 
-export const ALLOW_PARA_IDS = [ 2015 ];
+export const ALLOW_PARA_IDS = [
+  // crab parachain
+  2105,
+];

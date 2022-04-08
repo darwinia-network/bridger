@@ -205,7 +205,7 @@ jobs:
         run: |
           mkdir -p shared
           7z a -tzip \
-            shared/bridger-macos-x86_64.zip \
+            shared/bridger-darwin-x86_64.zip \
             ./frame/target/x86_64-apple-darwin/release/bridger
 
       - name: Build bridge-${{ matrix.package }}

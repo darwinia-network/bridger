@@ -1569,6 +1569,8 @@ name = "feemarket-s2s"
 version = "0.5.4"
 dependencies = [
  "component-subscan",
+ "relay-substrate-client",
+ "thiserror",
 ]
 
 [[package]]

@@ -19,4 +19,10 @@ edition = "2021"
 
 [dependencies]
 
+thiserror   = "1.0"
+
+
+relay-substrate-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+
+
 component-subscan = { path = "../../components/subscan" }

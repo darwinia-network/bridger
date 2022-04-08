@@ -24,7 +24,7 @@ pub async fn handle_affirm(opts: AffirmOpts) -> color_eyre::Result<()> {
 
 async fn handle_do(
     mode: AffirmMode,
-    block: Option<u64>,
+    block: Option<u32>,
     _raw_json: Option<String>,
 ) -> color_eyre::Result<()> {
     let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;

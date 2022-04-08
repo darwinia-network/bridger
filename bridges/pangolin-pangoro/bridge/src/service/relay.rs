@@ -1,4 +1,3 @@
-use drml_common_primitives::AccountId;
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Lifeline, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
@@ -8,8 +7,6 @@ use substrate_relay_helper::messages_lane::MessagesRelayParams;
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
 use substrate_relay_helper::TransactionParams;
 
-use client_pangolin::{PangolinChain, PangolinRelayStrategy};
-use client_pangoro::{PangoroChain, PangoroRelayStrategy};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;

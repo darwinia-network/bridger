@@ -67,7 +67,7 @@ relay-pangoro-client   = { git = "https://github.com/darwinia-network/darwinia-b
 
 
 ## component
-component-subscan      = { path = "../../../frame/components/subscan" }
+feemarket-s2s     = { path = "../../../frame/assistants/feemarket-s2s" }
 
 ## support
 support-common     = { path = "../../../frame/supports/support-common" }

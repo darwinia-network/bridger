@@ -1,6 +1,6 @@
 [workspace]
 members = [
 	"bridge",
-	"client-pangolin",
-	"client-pangoro",
+#	"client-pangolin",
+#	"client-pangoro",
 ]

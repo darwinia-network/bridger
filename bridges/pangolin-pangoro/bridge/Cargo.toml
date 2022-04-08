@@ -50,20 +50,20 @@ sp-version          = { git = "https://github.com/darwinia-network/substrate.git
 
 ## bridge common
 
-bp-runtime             = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
-bp-messages            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
-bp-header-chain        = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
-substrate-relay-helper = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
-relay-utils            = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
-bridge-runtime-common  = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
-pallet-bridge-messages = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
-messages-relay         = { git = "https://github.com/darwinia-network/parity-bridges-common.git", branch = "fewensa-adjust-deps" }
+bp-runtime             = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+bp-messages            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+bp-header-chain        = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+substrate-relay-helper = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+relay-utils            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+bridge-runtime-common  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+pallet-bridge-messages = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+messages-relay         = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+relay-pangolin-client  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+relay-pangoro-client   = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
 
 
 ## component
-client-pangolin        = { path = "../client-pangolin" }
-client-pangoro         = { path = "../client-pangoro" }
 component-subscan      = { path = "../../../frame/components/subscan" }
 
 ## support

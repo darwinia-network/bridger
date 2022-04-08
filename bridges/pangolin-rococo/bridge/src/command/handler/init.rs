@@ -2,6 +2,7 @@ use bp_header_chain::InitializationData;
 use bp_runtime::Chain as ChainBase;
 use codec::Encode;
 use relay_pangolin_client::runtime::{BridgeRococoGrandpaCall, Call};
+use relay_pangolin_parachain_client::runtime as pangolin_parachain_runtime;
 use relay_substrate_client::{
     Chain as RelaySubstrateClientChain, SignParam, TransactionSignScheme, UnsignedTransaction,
 };
@@ -19,11 +20,16 @@ pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
     let bridge_config: PangolinRococoConfig = Config::restore(Names::BridgePangolinRococo)?;
     let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
     let config_rococo: ChainInfoConfig = bridge_config.rococo;
+    let config_pangolin_parachain: ChainInfoConfig = bridge_config.pangolin_parachain;
 
     let (source_chain, target_chain) = match bridge {
         BridgeName::RococoToPangolin => (
             config_rococo.to_chain_info()?,
             config_pangolin.to_chain_info()?,
+        ),
+        BridgeName::PangolinToPangolinParachain => (
+            config_pangolin.to_chain_info()?,
+            config_pangolin_parachain.to_chain_info()?,
         ),
     };
     std::thread::spawn(move || {
@@ -51,6 +57,22 @@ macro_rules! select_bridge {
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
                     Call::BridgeRococoGrandpa(BridgeRococoGrandpaCall::initialize(init_data))
+                }
+
+                $generic
+            }
+            BridgeName::PangolinToPangolinParachain => {
+                type Source = relay_pangolin_client::PangolinChain;
+                type Target = relay_pangolin_parachain_client::PangolinParachainChain;
+
+                fn encode_init_bridge(
+                    init_data: InitializationData<<Source as ChainBase>::Header>,
+                ) -> <Target as RelaySubstrateClientChain>::Call {
+                    pangolin_parachain_runtime::Call::BridgePangolinGrandpa(
+                        pangolin_parachain_runtime::BridgePangolinGrandpaCall::initialize(
+                            init_data,
+                        ),
+                    )
                 }
 
                 $generic

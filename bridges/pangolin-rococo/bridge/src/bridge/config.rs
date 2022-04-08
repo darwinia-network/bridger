@@ -10,6 +10,7 @@ use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 pub struct PangolinRococoConfig {
     pub pangolin: ChainInfoConfig,
     pub rococo: ChainInfoConfig,
+    pub pangolin_parachain: ChainInfoConfig,
     pub relay: RelayConfig,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pangolin_subscan: Option<SubscanConfig>,

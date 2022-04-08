@@ -15,6 +15,7 @@ use crate::traits::CliChain;
 #[strum(serialize_all = "kebab_case")]
 pub enum BridgeName {
     RococoToPangolin,
+    PangolinToPangolinParachain,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

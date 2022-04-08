@@ -3,9 +3,8 @@ pub use s2s_headers::*;
 pub use s2s_messages::*;
 
 mod s2s_const {
+    use relay_pangolin_client::PangolinChain;
     use sp_version::RuntimeVersion;
-
-    use client_pangolin::PangolinChain;
 
     use crate::traits::CliChain;
 
@@ -20,8 +19,8 @@ mod s2s_const {
 }
 
 mod s2s_headers {
-    use client_pangolin::PangolinChain;
-    use client_pangoro::PangoroChain;
+    use relay_pangolin_client::PangolinChain;
+    use relay_pangoro_client::PangoroChain;
     use substrate_relay_helper::finality_pipeline::{
         DirectSubmitFinalityProofCallBuilder, SubstrateFinalitySyncPipeline,
     };
@@ -46,8 +45,8 @@ mod s2s_headers {
 }
 
 mod s2s_messages {
-    use client_pangolin::{PangolinChain, PangolinRelayStrategy};
-    use client_pangoro::PangoroChain;
+    use relay_pangolin_client::PangolinChain;
+    use relay_pangoro_client::PangoroChain;
     use substrate_relay_helper::messages_lane::{
         DirectReceiveMessagesDeliveryProofCallBuilder, DirectReceiveMessagesProofCallBuilder,
         SubstrateMessageLane,
@@ -78,6 +77,7 @@ mod s2s_messages {
                 pangolin_runtime::WithPangoroMessages,
             >;
 
+        // todo: common relay strategy
         type RelayStrategy = PangolinRelayStrategy;
     }
 }

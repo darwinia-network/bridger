@@ -1,5 +1,7 @@
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Lifeline, Service, Task};
+use relay_pangolin_client::PangolinChain;
+use relay_pangoro_client::PangoroChain;
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
 use relay_utils::metrics::MetricsParams;
 use sp_core::Pair;
@@ -120,7 +122,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
     if relay_info.create_relayers_fund_accounts {
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
             AccountIdOf<PangolinChain>,
-            drml_bridge_primitives::AccountIdConverter,
+            bp_darwinia_core::AccountIdConverter,
         >();
         let relayers_fund_account_balance = pangolin_client
             .free_native_balance(relayer_fund_acount_id.clone())
@@ -139,7 +141,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
 
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
             AccountIdOf<PangoroChain>,
-            drml_bridge_primitives::AccountIdConverter,
+            bp_darwinia_core::AccountIdConverter,
         >();
         let relayers_fund_account_balance = pangoro_client
             .free_native_balance(relayer_fund_acount_id.clone())
@@ -172,7 +174,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             pangolin_client.clone(),
             pangoro_client.clone(),
             pangolin_to_pangoro_transaction_params,
-            drml_common_primitives::PANGOLIN_BLOCKS_PER_SESSION,
+            bp_pangolin::SESSION_LENGTH,
             relay_info.only_mandatory_headers,
         );
     let pangoro_to_pangolin_on_demand_headers =
@@ -180,7 +182,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             pangoro_client.clone(),
             pangolin_client.clone(),
             pangoro_to_pangolin_transaction_params,
-            drml_common_primitives::PANGORO_BLOCKS_PER_SESSION,
+            bp_pangoro::SESSION_LENGTH,
             relay_info.only_mandatory_headers,
         );
 

@@ -86,3 +86,5 @@ mod s2s_messages {
         type RelayStrategy = PangolinRelayStrategy;
     }
 }
+
+mod s2s_feemarket {}

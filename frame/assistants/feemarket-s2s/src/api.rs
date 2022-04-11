@@ -1,12 +1,76 @@
-use relay_substrate_client::{Chain, Client};
+use std::marker::PhantomData;
 
-/// Feemarket api
-pub struct FeemarketApi<C: Chain> {
-    client: Client<C>,
-}
+use bp_messages::{LaneId, MessageNonce};
+use codec::Encode;
+use dp_fee::{Order, Relayer};
+use frame_support::Blake2_128Concat;
+use relay_substrate_client::{
+    Chain, ChainBase, Client, SignParam, TransactionSignScheme, UnsignedTransaction,
+};
+use relay_utils::relay_loop::Client as RelayLoopClient;
+use sp_core::storage::StorageKey;
+use sp_core::{Bytes, Pair, Public};
 
-impl<C: Chain> FeemarketApi<C> {
-    pub fn new(client: Client<C>) -> Self {
-        Self { client }
+use crate::error::FeemarketResult;
+use crate::patch;
+
+#[async_trait::async_trait]
+pub trait FeemarketApi: Clone {
+    type Chain: Chain;
+    type AccountKeyPair: Pair;
+
+    /// Query assigned relayers
+    async fn assigned_relayers(
+        &self,
+        client: &Client<Self::Chain>,
+    ) -> FeemarketResult<
+        Vec<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
+    >;
+
+    /// Query order
+    async fn order(
+        &self,
+        laned_id: LaneId,
+        message_nonce: MessageNonce,
+    ) -> FeemarketResult<
+        Option<
+            Order<
+                <Self::Chain as ChainBase>::AccountId,
+                <Self::Chain as ChainBase>::BlockNumber,
+                <Self::Chain as ChainBase>::Balance,
+            >,
+        >,
+    >;
+
+    /// Query all relayers
+    async fn relayers(&self) -> FeemarketResult<Vec<<Self::Chain as ChainBase>::AccountId>>;
+
+    /// Query relayer info by account id
+    async fn relayer(
+        &self,
+        account: <Self::Chain as ChainBase>::AccountId,
+    ) -> FeemarketResult<
+        Option<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
+    >;
+
+    async fn is_relayer(
+        &self,
+        account: <Self::Chain as ChainBase>::AccountId,
+    ) -> FeemarketResult<bool> {
+        self.relayer(account).await.map(|item| item.is_some())
     }
+
+    /// Update relay fee
+    async fn update_relay_fee(
+        &self,
+        signer: <Self::Chain as TransactionSignScheme>::AccountKeyPair,
+        amount: <Self::Chain as ChainBase>::Balance,
+    ) -> FeemarketResult<()>;
+
+    /// Update locked collateral
+    async fn update_locked_collateral(
+        &self,
+        signer: <Self::Chain as TransactionSignScheme>::AccountKeyPair,
+        amount: <Self::Chain as ChainBase>::Balance,
+    ) -> FeemarketResult<()>;
 }

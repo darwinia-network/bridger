@@ -1,14 +1,15 @@
-use relay_substrate_client::{Chain, Client};
+use std::ops::Range;
+
 use bp_darwinia_core::AccountId;
+use bp_darwinia_core::BlockNumber;
 use messages_relay::message_lane::MessageLane;
 use messages_relay::message_lane_loop::{
     SourceClient as MessageLaneSourceClient, TargetClient as MessageLaneTargetClient,
 };
 use messages_relay::relay_strategy::{RelayReference, RelayStrategy};
-use bp_darwinia_core::BlockNumber;
+use relay_substrate_client::{Chain, Client, TransactionSignScheme};
 
-use std::ops::Range;
-
+use crate::api::FeemarketApi;
 use crate::error::FeemarketResult;
 
 /// Basic relay strategy
@@ -16,20 +17,21 @@ use crate::error::FeemarketResult;
 /// 2. if you aren't assigned relayer, only participate in the part about time out, earn more rewards
 /// 3. if not have any assigned relayers, everyone participates in the relay.
 #[derive(Clone)]
-pub struct BasicRelayStrategy<C: Chain> {
-    client: Client<C>,
+pub struct BasicRelayStrategy<C: Chain, S: TransactionSignScheme<Chain = C>> {
+    api: FeemarketApi<C, S>,
     account: AccountId,
 }
 
-impl<C: Chain> BasicRelayStrategy<C> {
+impl<C: Chain, S: TransactionSignScheme<Chain = C>> BasicRelayStrategy<C, S> {
     pub fn new(client: Client<C>, account: AccountId) -> Self {
-        Self { client, account }
+        Self {
+            api: FeemarketApi::new(client),
+            account,
+        }
     }
 }
 
-
-impl<C: Chain> BasicRelayStrategy<C> {
-
+impl<C: Chain, S: TransactionSignScheme<Chain = C>> BasicRelayStrategy<C, S> {
     async fn handle<
         P: MessageLane,
         SourceClient: MessageLaneSourceClient<P>,
@@ -46,7 +48,8 @@ impl<C: Chain> BasicRelayStrategy<C> {
         );
         let order = self
             .api
-            .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
+            // .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
+            .order(1234.into(), *nonce)
             .await?;
 
         // If the order is not exists.
@@ -127,7 +130,7 @@ impl<C: Chain> BasicRelayStrategy<C> {
 }
 
 #[async_trait::async_trait]
-impl<C: Chain> RelayStrategy for BasicRelayStrategy<C> {
+impl<C: Chain, S: TransactionSignScheme<Chain = C>> RelayStrategy for BasicRelayStrategy<C, S> {
     async fn decide<
         P: MessageLane,
         SourceClient: MessageLaneSourceClient<P>,

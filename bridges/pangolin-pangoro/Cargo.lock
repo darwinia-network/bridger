@@ -1568,9 +1568,13 @@ dependencies = [
 name = "feemarket-s2s"
 version = "0.5.4"
 dependencies = [
+ "async-trait",
+ "bp-darwinia-core",
  "component-subscan",
+ "messages-relay",
  "relay-substrate-client",
  "thiserror",
+ "tracing",
 ]
 
 [[package]]

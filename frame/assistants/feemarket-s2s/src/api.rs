@@ -15,9 +15,17 @@ use crate::error::FeemarketResult;
 use crate::patch;
 
 #[async_trait::async_trait]
-pub trait FeemarketApi: Clone {
+pub trait FeemarketApi: 'static + Send + Sync + Clone {
     type Chain: Chain;
     type AccountKeyPair: Pair;
+
+    /// Lane id
+    const LaneId: LaneId;
+
+    /// Return number of the best finalized block.
+    async fn best_finalized_header_number(
+        &self,
+    ) -> FeemarketResult<<Self::Chain as ChainBase>::BlockNumber>;
 
     /// Query assigned relayers
     async fn assigned_relayers(
@@ -63,14 +71,14 @@ pub trait FeemarketApi: Clone {
     /// Update relay fee
     async fn update_relay_fee(
         &self,
-        signer: <Self::Chain as TransactionSignScheme>::AccountKeyPair,
+        // signer: <Self::Chain as TransactionSignScheme>::AccountKeyPair,
         amount: <Self::Chain as ChainBase>::Balance,
     ) -> FeemarketResult<()>;
 
     /// Update locked collateral
     async fn update_locked_collateral(
         &self,
-        signer: <Self::Chain as TransactionSignScheme>::AccountKeyPair,
+        // signer: <Self::Chain as TransactionSignScheme>::AccountKeyPair,
         amount: <Self::Chain as ChainBase>::Balance,
     ) -> FeemarketResult<()>;
 }

@@ -1,13 +1,11 @@
 use std::ops::Range;
 
-use bp_darwinia_core::AccountId;
-use bp_darwinia_core::BlockNumber;
 use messages_relay::message_lane::MessageLane;
 use messages_relay::message_lane_loop::{
     SourceClient as MessageLaneSourceClient, TargetClient as MessageLaneTargetClient,
 };
 use messages_relay::relay_strategy::{RelayReference, RelayStrategy};
-use relay_substrate_client::{Chain, Client, TransactionSignScheme};
+use relay_substrate_client::{Chain, ChainBase, TransactionSignScheme};
 
 use crate::api::FeemarketApi;
 use crate::error::FeemarketResult;
@@ -17,21 +15,18 @@ use crate::error::FeemarketResult;
 /// 2. if you aren't assigned relayer, only participate in the part about time out, earn more rewards
 /// 3. if not have any assigned relayers, everyone participates in the relay.
 #[derive(Clone)]
-pub struct BasicRelayStrategy<C: Chain, S: TransactionSignScheme<Chain = C>> {
-    api: FeemarketApi<C, S>,
-    account: AccountId,
+pub struct BasicRelayStrategy<A: FeemarketApi> {
+    api: A,
+    account: <A::Chain as ChainBase>::AccountId,
 }
 
-impl<C: Chain, S: TransactionSignScheme<Chain = C>> BasicRelayStrategy<C, S> {
-    pub fn new(client: Client<C>, account: AccountId) -> Self {
-        Self {
-            api: FeemarketApi::new(client),
-            account,
-        }
+impl<A: FeemarketApi> BasicRelayStrategy<A> {
+    pub fn new(api: A, account: <A::Chain as ChainBase>::AccountId) -> Self {
+        Self { api, account }
     }
 }
 
-impl<C: Chain, S: TransactionSignScheme<Chain = C>> BasicRelayStrategy<C, S> {
+impl<A: FeemarketApi> BasicRelayStrategy<A> {
     async fn handle<
         P: MessageLane,
         SourceClient: MessageLaneSourceClient<P>,
@@ -49,7 +44,7 @@ impl<C: Chain, S: TransactionSignScheme<Chain = C>> BasicRelayStrategy<C, S> {
         let order = self
             .api
             // .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
-            .order(1234.into(), *nonce)
+            .order(A::LaneId, *nonce)
             .await?;
 
         // If the order is not exists.
@@ -105,9 +100,9 @@ impl<C: Chain, S: TransactionSignScheme<Chain = C>> BasicRelayStrategy<C, S> {
         let ranges = relayers
             .iter()
             .map(|item| item.valid_range.clone())
-            .collect::<Vec<Range<BlockNumber>>>();
+            .collect::<Vec<Range<<A::Chain as ChainBase>::BlockNumber>>>();
 
-        let mut maximum_timeout = 0;
+        let mut maximum_timeout: <A::Chain as ChainBase>::BlockNumber = Default::default();
         for range in ranges {
             maximum_timeout = std::cmp::max(maximum_timeout, range.end);
         }
@@ -130,7 +125,7 @@ impl<C: Chain, S: TransactionSignScheme<Chain = C>> BasicRelayStrategy<C, S> {
 }
 
 #[async_trait::async_trait]
-impl<C: Chain, S: TransactionSignScheme<Chain = C>> RelayStrategy for BasicRelayStrategy<C, S> {
+impl<A: FeemarketApi> RelayStrategy for BasicRelayStrategy<A> {
     async fn decide<
         P: MessageLane,
         SourceClient: MessageLaneSourceClient<P>,
@@ -146,7 +141,7 @@ impl<C: Chain, S: TransactionSignScheme<Chain = C>> RelayStrategy for BasicRelay
                 tracing::error!(
                     target: "feemarket",
                     "[{}] Try decide failed many times ({}). so decide don't relay this nonce({}) at the moment",
-                    C::NAME,
+                    A::Chain::NAME,
                     times,
                     reference.nonce
                 );
@@ -156,19 +151,6 @@ impl<C: Chain, S: TransactionSignScheme<Chain = C>> RelayStrategy for BasicRelay
             let decide = match self.handle(reference).await {
                 Ok(v) => v,
                 Err(e) => {
-                    if let Some(client_error) = e.downcast_ref::<relay_substrate_client::Error>() {
-                        if client_error.is_connection_error() {
-                            tracing::debug!(target: "feemarket", "[pangolin] Try reconnect to chain");
-                            if let Err(re) = self.api.reconnect().await {
-                                tracing::error!(
-                                    "[pangolin] Failed to reconnect substrate client: {:?}",
-                                    re
-                                );
-                                continue;
-                            }
-                        }
-                    }
-
                     tracing::error!(target: "client-pangolin","[pangolin] Failed to decide relay: {:?}", e);
                     continue;
                 }

@@ -29,6 +29,7 @@ where
     <T::AccountKeyPair as Pair>::Public: Into<<A::Chain as ChainBase>::AccountId>,
 {
     async fn handle(&self) -> FeemarketResult<()> {
+        // todo: may don't need this
         let my_id = self.signer.public().into();
         if self.api.is_relayer(my_id.clone()).await? {
             tracing::warn!(

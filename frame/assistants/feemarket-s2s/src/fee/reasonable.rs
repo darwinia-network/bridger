@@ -1,8 +1,9 @@
 use std::marker::PhantomData;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use relay_substrate_client::{Chain, ChainBase, TransactionSignScheme};
-use sp_core::Pair;
+use relay_substrate_client::{Chain, ChainBase};
+use relay_utils::MaybeConnectionError;
+use sp_runtime::traits::Saturating;
 use sp_runtime::{FixedPointNumber, FixedU128};
 
 use component_subscan::Subscan;
@@ -12,30 +13,43 @@ use crate::error::{FeemarketError, FeemarketResult};
 use crate::fee::UpdateFeeStrategy;
 
 #[derive(Clone)]
-pub struct ReasonStrategy<
-    AS: FeemarketApi,
-    AT: FeemarketApi,
-    TS: TransactionSignScheme,
-    TT: TransactionSignScheme,
-> where
-    <TS::AccountKeyPair as Pair>::Public: Into<<AS::Chain as ChainBase>::AccountId>,
-    <TT::AccountKeyPair as Pair>::Public: Into<<AT::Chain as ChainBase>::AccountId>,
-{
+pub struct ReasonStrategy<AS: FeemarketApi, AT: FeemarketApi> {
     api_source: AS,
     api_target: AT,
-    signer_source: TS::AccountKeyPair,
-    signer_target: TT::AccountKeyPair,
     subscan_source: Subscan,
     subscan_target: Subscan,
+    min_relay_fee_source: <AS::Chain as ChainBase>::Balance,
+    min_relay_fee_target: <AT::Chain as ChainBase>::Balance,
+}
+
+impl<AS: FeemarketApi, AT: FeemarketApi> ReasonStrategy<AS, AT> {
+    pub fn new(
+        api_source: AS,
+        api_target: AT,
+        subscan_source: Subscan,
+        subscan_target: Subscan,
+        min_relay_fee_source: u128,
+        min_relay_fee_target: u128,
+    ) -> FeemarketResult<Self> {
+        let min_source = min_relay_fee_source
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
+        let min_target = min_relay_fee_target
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
+        Ok(Self {
+            api_source,
+            api_target,
+            subscan_source,
+            subscan_target,
+            min_relay_fee_source: min_source,
+            min_relay_fee_target: min_target,
+        })
+    }
 }
 
 #[async_trait::async_trait]
-impl<AS: FeemarketApi, AT: FeemarketApi, TS: TransactionSignScheme, TT: TransactionSignScheme>
-    UpdateFeeStrategy for ReasonStrategy<AS, AT, TS, TT>
-where
-    <TS::AccountKeyPair as Pair>::Public: Into<<AS::Chain as ChainBase>::AccountId>,
-    <TT::AccountKeyPair as Pair>::Public: Into<<AT::Chain as ChainBase>::AccountId>,
-{
+impl<AS: FeemarketApi, AT: FeemarketApi> UpdateFeeStrategy for ReasonStrategy<AS, AT> {
     async fn handle(&self) -> FeemarketResult<()> {
         let top100_source = self.subscan_source.extrinsics(1, 100).await?;
         let top100_target = self.subscan_target.extrinsics(1, 100).await?;
@@ -52,15 +66,124 @@ where
             .iter()
             .map(|item| item.fee)
             .max()
-            .unwrap_or(0);
+            .unwrap_or(0)
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
         let max_fee_target = top100_target
             .extrinsics
             .unwrap_or_default()
             .iter()
             .map(|item| item.fee)
             .max()
-            .unwrap_or(0);
+            .unwrap_or(0)
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
+
+        let conversion_balance = ConversionBalance::<AS::Chain, AT::Chain>::new(
+            &self.subscan_source,
+            &self.subscan_target,
+        );
+
+        let top100_max_cost_source = conversion_balance
+            .conversion_target_to_source(max_fee_target)
+            .await?
+            .saturating_add(max_fee_source);
+        let top100_max_cost_target = conversion_balance
+            .conversion_source_to_target(max_fee_source)
+            .await?
+            .saturating_add(max_fee_target);
+
+        // Nice (
+        let mul_source: <AS::Chain as ChainBase>::Balance = 15u64
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
+        let expected_fee_source = top100_max_cost_source
+            .saturating_mul(mul_source)
+            .saturating_add(self.min_relay_fee_source);
+        let mul_target: <AT::Chain as ChainBase>::Balance = 15u64
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
+        let expected_fee_target = top100_max_cost_target
+            .saturating_mul(mul_target)
+            .saturating_add(self.min_relay_fee_target);
+
+        match self.update_source_fee(expected_fee_source).await {
+            Err(FeemarketError::RelayClient(e)) => {
+                if e.is_connection_error() {
+                    tracing::debug!(
+                        target: "feemarket",
+                        "[feemarket] [reasonable] [{}] Lost rpc connection",
+                        AS::Chain::NAME,
+                    );
+                    // if let Err(re) = self.helper.reconnect_pangoro().await {
+                    //     tracing::error!(
+                    //         target: "pangolin-pangoro",
+                    //         "[pangoro] Failed to reconnect substrate client: {:?} (update fee strategy)",
+                    //         re
+                    //     );
+                    // }
+                }
+                return Err(e.into());
+            }
+            Err(e) => return Err(e),
+            _ => {}
+        }
+        match self.update_target_fee(expected_fee_target).await {
+            Err(FeemarketError::RelayClient(e)) => {
+                if e.is_connection_error() {
+                    tracing::debug!(
+                        target: "pangolin-pangoro",
+                        "[feemarket] [reasonable] [{}] Lost rpc connection",
+                        AT::Chain::NAME,
+                    );
+                    // if let Err(re) = self.helper.reconnect_pangoro().await {
+                    //     tracing::error!(
+                    //         target: "pangolin-pangoro",
+                    //         "[pangoro] Failed to reconnect substrate client: {:?} (update fee strategy)",
+                    //         re
+                    //     );
+                    // }
+                }
+                return Err(e.into());
+            }
+            Err(e) => return Err(e),
+            _ => {}
+        }
         Ok(())
+    }
+}
+
+impl<AS: FeemarketApi, AT: FeemarketApi> ReasonStrategy<AS, AT> {
+    async fn update_source_fee(
+        &self,
+        expected_fee_source: <AS::Chain as ChainBase>::Balance,
+    ) -> FeemarketResult<()> {
+        let efpu: u128 = expected_fee_source
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
+        tracing::info!(
+            target: "ffeemarket",
+            "[feemarket] [reasonable] [{}] Update pangolin fee: {}",
+            AS::Chain::NAME,
+            efpu,
+        );
+        self.api_source.update_relay_fee(expected_fee_source).await
+    }
+
+    async fn update_target_fee(
+        &self,
+        expected_fee_target: <AT::Chain as ChainBase>::Balance,
+    ) -> FeemarketResult<()> {
+        let efpu: u128 = expected_fee_target
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
+        tracing::info!(
+            target: "feemarket",
+            "[feemarket] [reasonable] [{}] Update pangoro fee: {}",
+            AT::Chain::NAME,
+            efpu,
+        );
+        self.api_target.update_relay_fee(expected_fee_target).await
     }
 }
 
@@ -90,8 +213,13 @@ impl<'a, SC: Chain, TC: Chain> ConversionBalance<'a, SC, TC> {
         let price_target = self.target_open_price().await?;
         let rate = price_source / price_target;
         let rate = FixedU128::from_float(rate);
-        let ret = rate.saturating_mul_int(source_currency);
-        Ok(ret.try_into())
+        let ret: u128 = rate
+            .saturating_mul_int(source_currency)
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
+        Ok(ret
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?)
     }
 
     /// conversion target chain balance to source chain balance
@@ -103,8 +231,13 @@ impl<'a, SC: Chain, TC: Chain> ConversionBalance<'a, SC, TC> {
         let price_target = self.target_open_price().await?;
         let rate = price_target / price_source;
         let rate = FixedU128::from_float(rate);
-        let ret = rate.saturating_mul_int(target_currency);
-        Ok(ret)
+        let ret: u128 = rate
+            .saturating_mul_int(target_currency)
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
+        Ok(ret
+            .try_into()
+            .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?)
     }
 
     async fn source_open_price(&self) -> FeemarketResult<f64> {

@@ -5,7 +5,7 @@ use messages_relay::message_lane_loop::{
     SourceClient as MessageLaneSourceClient, TargetClient as MessageLaneTargetClient,
 };
 use messages_relay::relay_strategy::{RelayReference, RelayStrategy};
-use relay_substrate_client::{Chain, ChainBase, TransactionSignScheme};
+use relay_substrate_client::{Chain, ChainBase};
 
 use crate::api::FeemarketApi;
 use crate::error::FeemarketResult;
@@ -44,7 +44,7 @@ impl<A: FeemarketApi> BasicRelayStrategy<A> {
         let order = self
             .api
             // .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
-            .order(A::LaneId, *nonce)
+            .order(A::LANE_ID, *nonce)
             .await?;
 
         // If the order is not exists.

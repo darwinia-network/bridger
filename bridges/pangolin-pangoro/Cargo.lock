@@ -1617,7 +1617,6 @@ name = "feemarket-s2s"
 version = "0.5.4"
 dependencies = [
  "async-trait",
- "bp-darwinia-core",
  "bp-messages 0.1.0 (git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.1)",
  "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.1)",
  "component-subscan",
@@ -1627,8 +1626,6 @@ dependencies = [
  "messages-relay",
  "pallet-transaction-payment",
  "parity-scale-codec",
- "relay-pangolin-client",
- "relay-pangoro-client",
  "relay-substrate-client",
  "relay-utils",
  "sp-core",

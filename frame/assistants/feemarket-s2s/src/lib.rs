@@ -1,7 +1,5 @@
-mod api;
-mod fee;
-mod patch;
-mod relay;
-
+pub mod api;
 pub mod error;
+pub mod fee;
+pub mod relay;
 pub mod types;

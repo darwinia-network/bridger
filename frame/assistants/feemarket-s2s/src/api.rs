@@ -1,26 +1,14 @@
-use std::marker::PhantomData;
-
 use bp_messages::{LaneId, MessageNonce};
-use codec::Encode;
 use dp_fee::{Order, Relayer};
-use frame_support::Blake2_128Concat;
-use relay_substrate_client::{
-    Chain, ChainBase, Client, SignParam, TransactionSignScheme, UnsignedTransaction,
-};
-use relay_utils::relay_loop::Client as RelayLoopClient;
-use sp_core::storage::StorageKey;
-use sp_core::{Bytes, Pair, Public};
+use relay_substrate_client::{Chain, ChainBase};
 
 use crate::error::FeemarketResult;
-use crate::patch;
 
 #[async_trait::async_trait]
 pub trait FeemarketApi: 'static + Send + Sync + Clone {
     type Chain: Chain;
-    type AccountKeyPair: Pair;
-
     /// Lane id
-    const LaneId: LaneId;
+    const LANE_ID: LaneId;
 
     /// Return number of the best finalized block.
     async fn best_finalized_header_number(
@@ -30,7 +18,6 @@ pub trait FeemarketApi: 'static + Send + Sync + Clone {
     /// Query assigned relayers
     async fn assigned_relayers(
         &self,
-        client: &Client<Self::Chain>,
     ) -> FeemarketResult<
         Vec<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     >;

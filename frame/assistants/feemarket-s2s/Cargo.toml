@@ -34,6 +34,7 @@ dp-fee                 = { git = "https://github.com/darwinia-network/darwinia-c
 
 ## Substrate Dependencies
 sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
+sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
 
 
 component-subscan = { path = "../../components/subscan" }

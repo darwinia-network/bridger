@@ -1,16 +1,12 @@
-use relay_substrate_client::Chain;
-
-use std::marker::PhantomData;
+use crate::error::FeemarketResult;
+use crate::fee::UpdateFeeStrategy;
 
 #[derive(Clone)]
-pub struct NothingStrategy<T: Chain> {
-    _marker: PhantomData<T>,
-}
+pub struct NothingStrategy;
 
-impl<T: Chain> NothingStrategy<T> {
-    pub fn new() -> Self {
-        Self {
-            _marker: Default::default(),
-        }
+#[async_trait::async_trait]
+impl UpdateFeeStrategy for NothingStrategy {
+    async fn handle(&self) -> FeemarketResult<()> {
+        Ok(())
     }
 }

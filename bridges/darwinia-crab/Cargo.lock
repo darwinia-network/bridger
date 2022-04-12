@@ -1055,7 +1055,6 @@ dependencies = [
 name = "component-subscan"
 version = "0.5.4"
 dependencies = [
- "color-eyre",
  "reqwest",
  "serde 1.0.136",
  "serde-aux",

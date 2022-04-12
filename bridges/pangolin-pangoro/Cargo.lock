@@ -1054,7 +1054,6 @@ dependencies = [
 name = "component-subscan"
 version = "0.5.4"
 dependencies = [
- "color-eyre",
  "reqwest",
  "serde 1.0.136",
  "serde-aux",
@@ -1618,16 +1617,11 @@ version = "0.5.4"
 dependencies = [
  "async-trait",
  "bp-messages 0.1.0 (git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.1)",
- "bp-runtime 0.1.0 (git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.1)",
  "component-subscan",
  "dp-fee",
- "frame-support",
- "frame-system",
  "messages-relay",
- "pallet-transaction-payment",
  "parity-scale-codec",
  "relay-substrate-client",
- "relay-utils",
  "sp-core",
  "sp-runtime",
  "thiserror",

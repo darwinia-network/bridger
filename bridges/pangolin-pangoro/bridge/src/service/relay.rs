@@ -1,3 +1,5 @@
+use bp_darwinia_core::AccountId;
+use bp_messages::LaneId;
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Lifeline, Service, Task};
 use relay_pangolin_client::PangolinChain;
@@ -9,6 +11,7 @@ use substrate_relay_helper::messages_lane::MessagesRelayParams;
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
 use substrate_relay_helper::TransactionParams;
 
+use feemarket_s2s::relay::BasicRelayStrategy;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
@@ -18,6 +21,7 @@ use crate::bridge::{ChainInfoConfig, RelayConfig};
 use crate::bridge::{PangolinPangoroBus, PangolinPangoroConfig};
 use crate::chains::pangolin::{PangolinFinalityToPangoro, PangolinMessagesToPangoro};
 use crate::chains::pangoro::{PangoroFinalityToPangolin, PangoroMessagesToPangolin};
+use crate::feemarket::{PangolinFeemarketApi, PangoroFeemarketApi};
 use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
 // /// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.
@@ -105,8 +109,8 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         .to_substrate_relay_chain::<PangoroChain>()
         .await?;
 
-    let pangolin_sign = pangolin_chain.to_keypair::<PangolinChain>()?;
-    let pangoro_sign = pangoro_chain.to_keypair::<PangoroChain>()?;
+    let pangolin_signer = pangolin_chain.to_keypair::<PangolinChain>()?;
+    let pangoro_signer = pangoro_chain.to_keypair::<PangoroChain>()?;
     let pangolin_transactions_mortality = pangolin_chain.transactions_mortality()?;
     let pangoro_transactions_mortality = pangoro_chain.transactions_mortality()?;
 
@@ -133,7 +137,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             tracing::info!(target: "bridge", "Going to create relayers fund account at {}.", PangolinChain::NAME);
             create_pangolin_account(
                 pangolin_client.clone(),
-                pangolin_sign.clone(),
+                pangolin_signer.clone(),
                 relayer_fund_acount_id,
             )
             .await?;
@@ -152,7 +156,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             tracing::info!(target: "bridge", "Going to create relayers fund account at {}.", PangoroChain::NAME);
             create_pangoro_account(
                 pangoro_client.clone(),
-                pangoro_sign.clone(),
+                pangoro_signer.clone(),
                 relayer_fund_acount_id,
             )
             .await?;
@@ -162,11 +166,11 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
     // start on-demand header relays
     let pangolin_to_pangoro_transaction_params = TransactionParams {
         mortality: pangoro_transactions_mortality,
-        signer: pangoro_sign.clone(),
+        signer: pangoro_signer.clone(),
     };
     let pangoro_to_pangolin_transaction_params = TransactionParams {
         mortality: pangolin_transactions_mortality,
-        signer: pangolin_sign.clone(),
+        signer: pangolin_signer.clone(),
     };
 
     let pangolin_to_pangoro_on_demand_headers =
@@ -189,19 +193,26 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
     // Need 2x capacity since we consider both directions for each lane
     let mut message_relays = Vec::with_capacity(lanes.len() * 2);
     for lane in lanes {
-        let lane = lane.into();
+        let lane: LaneId = lane.into();
+        let pangolin_feemarket_api = PangolinFeemarketApi::new(
+            pangolin_client.clone(),
+            lane.clone(),
+            pangolin_signer.clone(),
+        );
+        let pangoro_feemarket_api =
+            PangoroFeemarketApi::new(pangoro_client.clone(), lane.clone(), pangoro_signer.clone());
 
         let pangolin_to_pangoro_messages = substrate_relay_helper::messages_lane::run::<
             PangolinMessagesToPangoro,
         >(MessagesRelayParams {
             source_client: pangolin_client.clone(),
             source_transaction_params: TransactionParams {
-                signer: pangolin_sign.clone(),
+                signer: pangolin_signer.clone(),
                 mortality: pangolin_transactions_mortality,
             },
             target_client: pangoro_client.clone(),
             target_transaction_params: TransactionParams {
-                signer: pangoro_sign.clone(),
+                signer: pangoro_signer.clone(),
                 mortality: pangoro_transactions_mortality,
             },
             source_to_target_headers_relay: Some(pangolin_to_pangoro_on_demand_headers.clone()),
@@ -209,9 +220,9 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             lane_id: lane,
             metrics_params: metrics_params.clone().disable(),
             standalone_metrics: None,
-            relay_strategy: PangolinRelayStrategy::new(
-                pangolin_client.clone(),
-                AccountId::from(pangolin_sign.public().0),
+            relay_strategy: BasicRelayStrategy::new(
+                pangolin_feemarket_api,
+                AccountId::from(pangolin_signer.public().0),
             ),
         })
         .map_err(|e| format!("{}", e))
@@ -222,12 +233,12 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         >(MessagesRelayParams {
             source_client: pangoro_client.clone(),
             source_transaction_params: TransactionParams {
-                signer: pangoro_sign.clone(),
+                signer: pangoro_signer.clone(),
                 mortality: pangoro_transactions_mortality,
             },
             target_client: pangolin_client.clone(),
             target_transaction_params: TransactionParams {
-                signer: pangolin_sign.clone(),
+                signer: pangolin_signer.clone(),
                 mortality: pangolin_transactions_mortality,
             },
             source_to_target_headers_relay: Some(pangoro_to_pangolin_on_demand_headers.clone()),
@@ -235,9 +246,9 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             lane_id: lane,
             metrics_params: metrics_params.clone().disable(),
             standalone_metrics: None,
-            relay_strategy: PangoroRelayStrategy::new(
+            relay_strategy: BasicRelayStrategy::new(
                 pangoro_client.clone(),
-                AccountId::from(pangoro_sign.public().0),
+                AccountId::from(pangoro_signer.public().0),
             ),
         })
         .map_err(|e| format!("{}", e))

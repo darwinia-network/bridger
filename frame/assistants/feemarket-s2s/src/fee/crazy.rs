@@ -60,7 +60,7 @@ where
             .try_into()
             .map_err(|_e| FeemarketError::WrongConvert("Wrong balance".to_string()))?;
         tracing::info!(
-            target: "pangolin-pangoro",
+            target: "feemarket",
             "[femarket] [crazy] [{}] Update pangolin fee: {}",
             A::Chain::NAME,
             num_balance,

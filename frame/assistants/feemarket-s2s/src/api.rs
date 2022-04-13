@@ -7,8 +7,8 @@ use crate::error::FeemarketResult;
 #[async_trait::async_trait]
 pub trait FeemarketApi: 'static + Send + Sync + Clone {
     type Chain: Chain;
-    /// Lane id
-    const LANE_ID: LaneId;
+
+    fn lane_id(&self) -> LaneId;
 
     /// Return number of the best finalized block.
     async fn best_finalized_header_number(

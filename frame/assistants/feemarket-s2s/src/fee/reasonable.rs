@@ -13,7 +13,7 @@ use crate::error::{FeemarketError, FeemarketResult};
 use crate::fee::UpdateFeeStrategy;
 
 #[derive(Clone)]
-pub struct ReasonStrategy<AS: FeemarketApi, AT: FeemarketApi> {
+pub struct ReasonableStrategy<AS: FeemarketApi, AT: FeemarketApi> {
     api_source: AS,
     api_target: AT,
     subscan_source: Subscan,
@@ -22,7 +22,7 @@ pub struct ReasonStrategy<AS: FeemarketApi, AT: FeemarketApi> {
     min_relay_fee_target: <AT::Chain as ChainBase>::Balance,
 }
 
-impl<AS: FeemarketApi, AT: FeemarketApi> ReasonStrategy<AS, AT> {
+impl<AS: FeemarketApi, AT: FeemarketApi> ReasonableStrategy<AS, AT> {
     pub fn new(
         api_source: AS,
         api_target: AT,
@@ -49,7 +49,7 @@ impl<AS: FeemarketApi, AT: FeemarketApi> ReasonStrategy<AS, AT> {
 }
 
 #[async_trait::async_trait]
-impl<AS: FeemarketApi, AT: FeemarketApi> UpdateFeeStrategy for ReasonStrategy<AS, AT> {
+impl<AS: FeemarketApi, AT: FeemarketApi> UpdateFeeStrategy for ReasonableStrategy<AS, AT> {
     async fn handle(&self) -> FeemarketResult<()> {
         let top100_source = self.subscan_source.extrinsics(1, 100).await?;
         let top100_target = self.subscan_target.extrinsics(1, 100).await?;
@@ -117,7 +117,7 @@ impl<AS: FeemarketApi, AT: FeemarketApi> UpdateFeeStrategy for ReasonStrategy<AS
                     );
                     // if let Err(re) = self.helper.reconnect_pangoro().await {
                     //     tracing::error!(
-                    //         target: "pangolin-pangoro",
+                    //         target: "feemarket",
                     //         "[pangoro] Failed to reconnect substrate client: {:?} (update fee strategy)",
                     //         re
                     //     );
@@ -132,13 +132,13 @@ impl<AS: FeemarketApi, AT: FeemarketApi> UpdateFeeStrategy for ReasonStrategy<AS
             Err(FeemarketError::RelayClient(e)) => {
                 if e.is_connection_error() {
                     tracing::debug!(
-                        target: "pangolin-pangoro",
+                        target: "feemarket",
                         "[feemarket] [reasonable] [{}] Lost rpc connection",
                         AT::Chain::NAME,
                     );
                     // if let Err(re) = self.helper.reconnect_pangoro().await {
                     //     tracing::error!(
-                    //         target: "pangolin-pangoro",
+                    //         target: "feemarket",
                     //         "[pangoro] Failed to reconnect substrate client: {:?} (update fee strategy)",
                     //         re
                     //     );
@@ -153,7 +153,7 @@ impl<AS: FeemarketApi, AT: FeemarketApi> UpdateFeeStrategy for ReasonStrategy<AS
     }
 }
 
-impl<AS: FeemarketApi, AT: FeemarketApi> ReasonStrategy<AS, AT> {
+impl<AS: FeemarketApi, AT: FeemarketApi> ReasonableStrategy<AS, AT> {
     async fn update_source_fee(
         &self,
         expected_fee_source: <AS::Chain as ChainBase>::Balance,

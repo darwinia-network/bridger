@@ -37,15 +37,12 @@ impl<A: FeemarketApi> BasicRelayStrategy<A> {
     ) -> FeemarketResult<bool> {
         let nonce = &reference.nonce;
         tracing::trace!(
-            target: "client-pangolin",
-            "[pangolin] Determine whether to relay for nonce: {}",
-            nonce
+            target: "feemarket",
+            "[feemarket] [relay] [{}] Determine whether to relay for nonce: {}",
+            A::Chain::NAME,
+            nonce,
         );
-        let order = self
-            .api
-            // .order(drml_bridge_primitives::PANGORO_PANGOLIN_LANE, *nonce)
-            .order(A::LANE_ID, *nonce)
-            .await?;
+        let order = self.api.order(self.api.lane_id(), *nonce).await?;
 
         // If the order is not exists.
         // 1. You are too behind.
@@ -54,9 +51,10 @@ impl<A: FeemarketApi> BasicRelayStrategy<A> {
         // Related: https://github.com/darwinia-network/darwinia-common/blob/90add536ed320ec7e17898e695c65ee9d7ce79b0/frame/fee-market/src/lib.rs?#L177
         if order.is_none() {
             tracing::info!(
-                target: "client-pangolin",
-                "[pangolin] Not found order by nonce: {}, so decide don't relay this nonce",
-                nonce
+                target: "feemarket",
+                "[feemarket] [relay] [{}] Not found order by nonce: {}, so decide don't relay this nonce",
+                A::Chain::NAME,
+                nonce,
             );
             return Ok(false);
         }
@@ -68,9 +66,10 @@ impl<A: FeemarketApi> BasicRelayStrategy<A> {
         // If not have any assigned relayers, everyone participates in the relay.
         if relayers.is_empty() {
             tracing::info!(
-                target: "client-pangolin",
-                "[pangolin] Not found any assigned relayers so relay this nonce({}) anyway",
-                nonce
+                target: "feemarket",
+                "[feemarket] [relay] [{}] Not found any assigned relayers so relay this nonce({}) anyway",
+                A::Chain::NAME,
+                nonce,
             );
             return Ok(true);
         }
@@ -86,9 +85,10 @@ impl<A: FeemarketApi> BasicRelayStrategy<A> {
         // you can still get relay rewards.
         if is_assigned_relayer {
             tracing::info!(
-                target: "client-pangolin",
-                "[pangolin] You are assigned relayer, you must be relay this nonce({})",
-                nonce
+                target: "feemarket",
+                "[feemarket] [relay] [{}] You are assigned relayer, you must be relay this nonce({})",
+                A::Chain::NAME,
+                nonce,
             );
             return Ok(true);
         }
@@ -109,16 +109,18 @@ impl<A: FeemarketApi> BasicRelayStrategy<A> {
         // If this order has timed out, decide to relay
         if latest_block_number > maximum_timeout {
             tracing::info!(
-                target: "client-pangolin",
-                "[pangolin] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
-                nonce
+                target: "feemarket",
+                "[feemarket] [relay] [{}] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
+                A::Chain::NAME,
+                nonce,
             );
             return Ok(true);
         }
         tracing::info!(
-            target: "client-pangolin",
-            "[pangolin] You aren't assigned relay. and this nonce({}) is ontime. so don't relay this",
-            nonce
+            target: "feemarket",
+            "[feemarket] [relay] [{}] You aren't assigned relay. and this nonce({}) is ontime. so don't relay this",
+            A::Chain::NAME,
+            nonce,
         );
         Ok(false)
     }
@@ -140,7 +142,7 @@ impl<A: FeemarketApi> RelayStrategy for BasicRelayStrategy<A> {
             if times > 5 {
                 tracing::error!(
                     target: "feemarket",
-                    "[{}] Try decide failed many times ({}). so decide don't relay this nonce({}) at the moment",
+                    "[feemarket] [relay] [{}] Try decide failed many times ({}). so decide don't relay this nonce({}) at the moment",
                     A::Chain::NAME,
                     times,
                     reference.nonce
@@ -151,13 +153,19 @@ impl<A: FeemarketApi> RelayStrategy for BasicRelayStrategy<A> {
             let decide = match self.handle(reference).await {
                 Ok(v) => v,
                 Err(e) => {
-                    tracing::error!(target: "client-pangolin","[pangolin] Failed to decide relay: {:?}", e);
+                    tracing::error!(
+                        target: "feemarket",
+                        "[feemarket] [relay] [{}] Failed to decide relay: {:?}",
+                        A::Chain::NAME,
+                        e,
+                    );
                     continue;
                 }
             };
             tracing::info!(
-                target: "client-pangolin",
-                "[pangolin] About nonce {} decide is {}",
+                target: "feemarket",
+                "[feemarket] [relay] [{}] About nonce {} decide is {}",
+                A::Chain::NAME,
                 reference.nonce,
                 decide
             );

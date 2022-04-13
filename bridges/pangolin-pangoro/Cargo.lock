@@ -799,6 +799,7 @@ dependencies = [
  "bridge-runtime-common",
  "color-eyre",
  "colored",
+ "dp-fee",
  "feemarket-s2s",
  "frame-support",
  "futures 0.3.21",

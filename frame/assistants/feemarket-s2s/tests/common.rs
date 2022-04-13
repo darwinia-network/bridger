@@ -1,5 +1,3 @@
-use bp_darwinia_core::BlockNumber;
-
 use bp_messages::{LaneId, MessageNonce};
 use dp_fee::{Order, Relayer};
 use relay_substrate_client::{ChainBase, Client};
@@ -13,15 +11,17 @@ pub struct TestFeemarketApi;
 #[async_trait::async_trait]
 impl FeemarketApi for TestFeemarketApi {
     type Chain = relay_pangolin_client::PangolinChain;
-    const LANE_ID: LaneId = [0, 1, 2, 3];
+
+    fn lane_id(&self) -> LaneId {
+        [0, 1, 2, 3]
+    }
 
     async fn best_finalized_header_number(&self) -> FeemarketResult<BlockNumber> {
-        todo!()
+        Ok(1u32.into())
     }
 
     async fn assigned_relayers(
         &self,
-        _client: &Client<Self::Chain>,
     ) -> FeemarketResult<
         Vec<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {

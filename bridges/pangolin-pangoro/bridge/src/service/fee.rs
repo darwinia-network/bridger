@@ -1,6 +1,7 @@
 use lifeline::{Lifeline, Service, Task};
 
 use component_subscan::SubscanConfig;
+use feemarket_s2s::fee::{CrazyStrategy, NothingStrategy, ReasonableStrategy, UpdateFeeStrategy};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
@@ -8,8 +9,6 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::PangolinPangoroTask;
 use crate::bridge::{PangolinPangoroBus, PangolinPangoroConfig};
 use crate::bridge::{TaskConfig, UpdateFeeStrategyType};
-use crate::fee::strategy::{CrazyStrategy, ReasonableStrategy};
-use crate::fee::UpdateFeeStrategy;
 
 #[derive(Debug)]
 pub struct UpdateFeeService {
@@ -77,20 +76,25 @@ async fn run_update_fee(config_task: TaskConfig) -> color_eyre::Result<()> {
     let exists_subscan_config =
         subscan_config_pangolin.is_some() && subscan_config_pangoro.is_some();
     match config_task.update_fee_strategy {
-        UpdateFeeStrategyType::Nothing => Ok(()),
+        UpdateFeeStrategyType::Nothing => {
+            if !exists_subscan_config {
+                return Ok(());
+            }
+            Ok(NothingStrategy.handle().await?)
+        }
         UpdateFeeStrategyType::Crazy => {
             if !exists_subscan_config {
                 return Ok(());
             }
             let mut strategy = CrazyStrategy::new().await?;
-            strategy.handle().await
+            Ok(strategy.handle().await?)
         }
         UpdateFeeStrategyType::Reasonable => {
             if !exists_subscan_config {
                 return Ok(());
             }
             let mut strategy = ReasonableStrategy::new().await?;
-            strategy.handle().await
+            Ok(strategy.handle().await?)
         }
     }
 }

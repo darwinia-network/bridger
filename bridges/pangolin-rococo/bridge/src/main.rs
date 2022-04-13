@@ -3,11 +3,12 @@ use structopt::StructOpt;
 use crate::command::types::Opts;
 
 mod bridge;
+mod chains;
 mod cli;
 mod command;
+mod service;
 mod traits;
 mod types;
-mod chains;
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {

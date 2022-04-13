@@ -190,7 +190,7 @@ pub struct RelayHeadersAndMessagesInfo {
     pub only_mandatory_headers: bool,
 
     pub pangolin_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
-    pub pangoro_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
+    pub pangolin_parachain_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
 }
 
 #[derive(Debug, Clone)]

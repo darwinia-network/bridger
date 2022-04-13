@@ -15,7 +15,7 @@ pub struct PangolinRococoConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pangolin_subscan: Option<SubscanConfig>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangoro_subscan: Option<SubscanConfig>,
+    pub pangolin_parachain_subscan: Option<SubscanConfig>,
     pub task: TaskConfig,
 }
 
@@ -39,7 +39,7 @@ pub struct RelayConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signer_pangolin: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub signer_pangoro: Option<String>,
+    pub signer_pangolin_parachain: Option<String>,
     #[serde(default)]
     pub prometheus_params: PrometheusParamsInfo,
     /// If passed, only mandatory headers (headers that are changing the GRANDPA authorities set)
@@ -53,12 +53,12 @@ pub struct RelayConfig {
     /// The password for the SURI of secret key to use when transactions are submitted to the pangolin node.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pangolin_messages_pallet_owner_password: Option<String>,
-    /// The SURI of secret key to use when transactions are submitted to the pangoro node.
+    /// The SURI of secret key to use when transactions are submitted to the pangolin parachain node.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangoro_messages_pallet_owner: Option<String>,
-    /// The password for the SURI of secret key to use when transactions are submitted to the pangoro node.
+    pub pangolin_parachain_messages_pallet_owner: Option<String>,
+    /// The password for the SURI of secret key to use when transactions are submitted to the pangolin parachain node.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangoro_messages_pallet_owner_password: Option<String>,
+    pub pangolin_parachain_messages_pallet_owner_password: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

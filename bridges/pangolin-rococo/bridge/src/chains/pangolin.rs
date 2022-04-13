@@ -1,4 +1,5 @@
 pub use s2s_const::*;
+pub use s2s_messages::*;
 
 mod s2s_const {
     use sp_version::RuntimeVersion;
@@ -23,4 +24,46 @@ mod s2s_const {
     }
 
     // === end
+}
+
+mod s2s_messages {
+    use frame_support::weights::Weight;
+    use relay_pangolin_client::PangolinChain;
+    use relay_pangolin_parachain_client::PangolinParachainChain;
+    use substrate_relay_helper::messages_lane::SubstrateMessageLane;
+
+    #[derive(Clone, Debug)]
+    pub struct PangolinMessagesToPangolinParachain;
+
+    substrate_relay_helper::generate_mocked_receive_message_proof_call_builder!(
+        PangolinMessagesToPangolinParachain,
+        PangolinMessagesToPangolinParachainReceiveMessagesProofCallBuilder,
+        relay_pangolin_parachain_client::runtime::Call::BridgePangolinMessages,
+        relay_pangolin_parachain_client::runtime::BridgePangolinMessagesCall::receive_messages_proof
+    );
+
+    substrate_relay_helper::generate_mocked_receive_message_delivery_proof_call_builder!(
+        PangolinMessagesToPangolinParachain,
+        PangolinMessagesToPangolinParachainReceiveMessagesDeliveryProofCallBuilder,
+        relay_pangolin_client::runtime::Call::BridgePangolinParachainMessages,
+        relay_pangolin_client::runtime::BridgePangolinParachainMessagesCall::receive_messages_delivery_proof
+    );
+
+    impl SubstrateMessageLane for PangolinMessagesToPangolinParachain {
+        const SOURCE_TO_TARGET_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
+        const TARGET_TO_SOURCE_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
+
+        type SourceChain = PangolinChain;
+        type TargetChain = PangolinParachainChain;
+
+        type SourceTransactionSignScheme = PangolinChain;
+        type TargetTransactionSignScheme = PangolinParachainChain;
+
+        type ReceiveMessagesProofCallBuilder =
+            PangolinMessagesToPangolinParachainReceiveMessagesProofCallBuilder;
+        type ReceiveMessagesDeliveryProofCallBuilder =
+            PangolinMessagesToPangolinParachainReceiveMessagesDeliveryProofCallBuilder;
+
+        type RelayStrategy = PangolinRelayStrategy;
+    }
 }

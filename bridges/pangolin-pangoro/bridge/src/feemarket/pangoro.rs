@@ -73,6 +73,35 @@ impl FeemarketApi for PangoroFeemarketApi {
             .unwrap_or_default())
     }
 
+    async fn my_assigned_info(
+        &self,
+    ) -> FeemarketResult<
+        Option<(
+            u32,
+            dp_fee::Relayer<
+                <Self::Chain as ChainBase>::AccountId,
+                <Self::Chain as ChainBase>::Balance,
+            >,
+        )>,
+    > {
+        let signer_id = (*self.signer.public().as_array_ref()).into();
+        let assigned_relayers = self.assigned_relayers().await?;
+        let ret = assigned_relayers
+            .iter()
+            .position(|item| item.id == signer_id)
+            .map(|position| position as u32)
+            .map(|position| {
+                (
+                    position,
+                    assigned_relayers
+                        .get(position)
+                        .cloned()
+                        .expect("Unreachable"),
+                )
+            });
+        Ok(ret)
+    }
+
     async fn order(
         &self,
         laned_id: LaneId,

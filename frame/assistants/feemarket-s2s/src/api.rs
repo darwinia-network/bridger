@@ -22,6 +22,16 @@ pub trait FeemarketApi: 'static + Send + Sync + Clone {
         Vec<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     >;
 
+    /// The assigned relayer index where the current account is located
+    async fn my_assigned_info(
+        &self,
+    ) -> FeemarketResult<
+        Option<(
+            u32,
+            Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>,
+        )>,
+    >;
+
     /// Query order
     async fn order(
         &self,
@@ -48,12 +58,7 @@ pub trait FeemarketApi: 'static + Send + Sync + Clone {
         Option<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     >;
 
-    async fn is_relayer(
-        &self,
-        account: <Self::Chain as ChainBase>::AccountId,
-    ) -> FeemarketResult<bool> {
-        self.relayer(account).await.map(|item| item.is_some())
-    }
+    async fn is_relayer(&self) -> FeemarketResult<bool>;
 
     /// Update relay fee
     async fn update_relay_fee(

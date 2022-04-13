@@ -10,6 +10,7 @@ use scale_info::TypeInfo;
 use sp_core::storage::StorageKey;
 use sp_core::{Bytes, Pair};
 use sp_runtime::FixedU128;
+use std::ops::Index;
 
 use feemarket_s2s::api::FeemarketApi;
 use feemarket_s2s::error::FeemarketResult;
@@ -73,6 +74,35 @@ impl FeemarketApi for PangolinFeemarketApi {
             .unwrap_or_default())
     }
 
+    async fn my_assigned_info(
+        &self,
+    ) -> FeemarketResult<
+        Option<(
+            u32,
+            dp_fee::Relayer<
+                <Self::Chain as ChainBase>::AccountId,
+                <Self::Chain as ChainBase>::Balance,
+            >,
+        )>,
+    > {
+        let signer_id = (*self.signer.public().as_array_ref()).into();
+        let assigned_relayers = self.assigned_relayers().await?;
+        let ret = assigned_relayers
+            .iter()
+            .position(|item| item.id == signer_id)
+            .map(|position| position as u32)
+            .map(|position| {
+                (
+                    position,
+                    assigned_relayers
+                        .get(position)
+                        .cloned()
+                        .expect("Unreachable"),
+                )
+            });
+        Ok(ret)
+    }
+
     async fn order(
         &self,
         laned_id: LaneId,
@@ -123,6 +153,11 @@ impl FeemarketApi for PangolinFeemarketApi {
             account.encode().as_slice(),
         );
         Ok(self.client.storage_value(storage_key.clone(), None).await?)
+    }
+
+    async fn is_relayer(&self) -> FeemarketResult<bool> {
+        let signer_id = (*self.signer.public().as_array_ref()).into();
+        self.relayer(signer_id).await.map(|item| item.is_some())
     }
 
     async fn update_relay_fee(

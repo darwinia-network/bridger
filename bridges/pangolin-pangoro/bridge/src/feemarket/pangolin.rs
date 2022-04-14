@@ -41,7 +41,7 @@ impl FeemarketApi for PangolinFeemarketApi {
     }
 
     fn lane_id(&self) -> LaneId {
-        self.lane_id.clone()
+        self.lane_id
     }
 
     async fn best_finalized_header_number(

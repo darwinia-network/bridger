@@ -103,13 +103,10 @@ async fn run_update_fee(config_task: TaskConfig) -> color_eyre::Result<()> {
         .ok_or_else(|| BridgerError::Custom("Missing lane id".to_string()))?
         .into();
 
-    let pangolin_feemarket_api = PangolinFeemarketApi::new(
-        pangolin_client.clone(),
-        lane.clone(),
-        pangolin_signer.clone(),
-    );
+    let pangolin_feemarket_api =
+        PangolinFeemarketApi::new(pangolin_client.clone(), lane, pangolin_signer.clone());
     let pangoro_feemarket_api =
-        PangoroFeemarketApi::new(pangoro_client.clone(), lane.clone(), pangoro_signer.clone());
+        PangoroFeemarketApi::new(pangoro_client.clone(), lane, pangoro_signer.clone());
 
     match config_task.update_fee_strategy {
         UpdateFeeStrategyType::Nothing => Ok(NothingStrategy.handle().await?),

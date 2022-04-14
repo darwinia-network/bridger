@@ -194,13 +194,10 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
     let mut message_relays = Vec::with_capacity(lanes.len() * 2);
     for lane in lanes {
         let lane: LaneId = lane.into();
-        let pangolin_feemarket_api = PangolinFeemarketApi::new(
-            pangolin_client.clone(),
-            lane.clone(),
-            pangolin_signer.clone(),
-        );
+        let pangolin_feemarket_api =
+            PangolinFeemarketApi::new(pangolin_client.clone(), lane, pangolin_signer.clone());
         let pangoro_feemarket_api =
-            PangoroFeemarketApi::new(pangoro_client.clone(), lane.clone(), pangoro_signer.clone());
+            PangoroFeemarketApi::new(pangoro_client.clone(), lane, pangoro_signer.clone());
 
         let pangolin_to_pangoro_messages = substrate_relay_helper::messages_lane::run::<
             PangolinMessagesToPangoro,

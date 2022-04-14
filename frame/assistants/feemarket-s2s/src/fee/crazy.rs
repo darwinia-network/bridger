@@ -1,4 +1,4 @@
-use relay_substrate_client::{Chain, TransactionSignScheme};
+use relay_substrate_client::Chain;
 
 use crate::api::FeemarketApi;
 use crate::error::{FeemarketError, FeemarketResult};
@@ -44,7 +44,7 @@ impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
             Some((0, _)) => {
                 return Ok(());
             }
-            Some((i, relayer)) => relayer.fee,
+            Some((_i, relayer)) => relayer.fee,
             None => 51u32.into(),
         };
 
@@ -79,7 +79,7 @@ impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
             Some((0, _)) => {
                 return Ok(());
             }
-            Some((i, relayer)) => relayer.fee,
+            Some((_i, relayer)) => relayer.fee,
             None => 51u32.into(),
         };
 

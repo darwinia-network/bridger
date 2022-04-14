@@ -9,7 +9,7 @@ env:
 
 jobs:
   bridge-ethereum-like:
-    name: Subql ethereum like v1
+    name: Subql Ethereum like v1
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1

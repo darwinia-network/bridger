@@ -814,7 +814,6 @@ dependencies = [
  "relay-pangoro-client",
  "relay-substrate-client",
  "relay-utils",
- "scale-info",
  "serde 1.0.136",
  "serde_json",
  "sp-core",

@@ -11,7 +11,7 @@ env:
 
 jobs:
   bridge-ethereum-like:
-    name: Deploy Bridge Ethereum like
+    name: Subql ethereum like v1
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
@@ -45,7 +45,7 @@ jobs:
           subql_path: subql/ethereum-v1/${{ matrix.chain }}
 
   crab-parachain:
-    name: Deploy Crab Parachain Subql
+    name: Subql Crab Parachain
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1

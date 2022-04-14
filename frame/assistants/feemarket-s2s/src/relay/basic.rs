@@ -6,9 +6,10 @@ use messages_relay::message_lane_loop::{
 };
 use messages_relay::relay_strategy::{RelayReference, RelayStrategy};
 use relay_substrate_client::{Chain, ChainBase};
+use relay_utils::MaybeConnectionError;
 
 use crate::api::FeemarketApi;
-use crate::error::FeemarketResult;
+use crate::error::{FeemarketError, FeemarketResult};
 
 /// Basic relay strategy
 /// 1. if you are assigned relayer you will relay all order whether or not it times out
@@ -153,6 +154,18 @@ impl<A: FeemarketApi> RelayStrategy for BasicRelayStrategy<A> {
             let decide = match self.handle(reference).await {
                 Ok(v) => v,
                 Err(e) => {
+                    if let FeemarketError::RelayClient(rce) = &e {
+                        if rce.is_connection_error() {
+                            if let Err(fe) = self.api.reconnect() {
+                                tracing::error!(
+                                    target: "feemarket",
+                                    "[feemarket] [relay] [{}] Failed reconnect client: {:?}",
+                                    A::Chain::NAME,
+                                    fe,
+                                );
+                            }
+                        }
+                    }
                     tracing::error!(
                         target: "feemarket",
                         "[feemarket] [relay] [{}] Failed to decide relay: {:?}",

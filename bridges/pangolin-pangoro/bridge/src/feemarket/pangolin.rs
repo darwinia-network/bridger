@@ -3,9 +3,10 @@ use codec::{Decode, Encode};
 use frame_support::Blake2_128Concat;
 use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
+use relay_utils::relay_loop::Client as RelayLoopClient;
 use scale_info::TypeInfo;
 use sp_core::storage::StorageKey;
-use sp_core::{Bytes, Pair};
+use sp_core::Pair;
 
 use feemarket_s2s::api::FeemarketApi;
 use feemarket_s2s::error::FeemarketResult;
@@ -34,6 +35,10 @@ impl PangolinFeemarketApi {
 #[async_trait::async_trait]
 impl FeemarketApi for PangolinFeemarketApi {
     type Chain = PangolinChain;
+
+    fn reconnect(&mut self) -> FeemarketResult<()> {
+        Ok(self.client.reconnect()?)
+    }
 
     fn lane_id(&self) -> LaneId {
         self.lane_id.clone()

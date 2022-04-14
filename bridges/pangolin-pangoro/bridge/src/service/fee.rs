@@ -114,12 +114,12 @@ async fn run_update_fee(config_task: TaskConfig) -> color_eyre::Result<()> {
     match config_task.update_fee_strategy {
         UpdateFeeStrategyType::Nothing => Ok(NothingStrategy.handle().await?),
         UpdateFeeStrategyType::Crazy => {
-            let mut strategy = CrazyStrategy::new(pangolin_feemarket_api, pangoro_feemarket_api);
+            let strategy = CrazyStrategy::new(pangolin_feemarket_api, pangoro_feemarket_api);
             Ok(strategy.handle().await?)
         }
         UpdateFeeStrategyType::Reasonable => {
             let feemarket_config: FeemarketConfig = bridge_config.feemarket;
-            let mut strategy = ReasonableStrategy::new(
+            let strategy = ReasonableStrategy::new(
                 feemarket_config,
                 pangolin_feemarket_api,
                 pangoro_feemarket_api,

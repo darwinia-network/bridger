@@ -8,6 +8,9 @@ use crate::error::FeemarketResult;
 pub trait FeemarketApi: 'static + Send + Sync + Clone {
     type Chain: Chain;
 
+    /// Reconnect
+    fn reconnect(&mut self) -> FeemarketResult<()>;
+
     fn lane_id(&self) -> LaneId;
 
     /// Return number of the best finalized block.

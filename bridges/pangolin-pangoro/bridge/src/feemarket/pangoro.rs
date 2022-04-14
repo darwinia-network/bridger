@@ -77,7 +77,7 @@ impl FeemarketApi for PangoroFeemarketApi {
         &self,
     ) -> FeemarketResult<
         Option<(
-            u32,
+            usize,
             dp_fee::Relayer<
                 <Self::Chain as ChainBase>::AccountId,
                 <Self::Chain as ChainBase>::Balance,
@@ -89,7 +89,6 @@ impl FeemarketApi for PangoroFeemarketApi {
         let ret = assigned_relayers
             .iter()
             .position(|item| item.id == signer_id)
-            .map(|position| position as u32)
             .map(|position| {
                 (
                     position,
@@ -154,6 +153,11 @@ impl FeemarketApi for PangoroFeemarketApi {
         Ok(self.client.storage_value(storage_key.clone(), None).await?)
     }
 
+    async fn is_relayer(&self) -> FeemarketResult<bool> {
+        let signer_id = (*self.signer.public().as_array_ref()).into();
+        self.relayer(signer_id).await.map(|item| item.is_some())
+    }
+
     async fn update_relay_fee(
         &self,
         amount: <Self::Chain as ChainBase>::Balance,
@@ -168,7 +172,7 @@ impl FeemarketApi for PangoroFeemarketApi {
                         spec_version,
                         transaction_version,
                         genesis_hash,
-                        signer,
+                        signer: self.signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
                             Call::Feemarket(FeemarketCall::update_relay_fee(amount)),
@@ -196,7 +200,7 @@ impl FeemarketApi for PangoroFeemarketApi {
                         spec_version,
                         transaction_version,
                         genesis_hash,
-                        signer,
+                        signer: self.signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
                             Call::Feemarket(FeemarketCall::update_locked_collateral(amount)),

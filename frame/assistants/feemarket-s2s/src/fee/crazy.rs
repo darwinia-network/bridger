@@ -1,5 +1,4 @@
-use relay_substrate_client::{Chain, ChainBase, TransactionSignScheme};
-use sp_core::Pair;
+use relay_substrate_client::{Chain, TransactionSignScheme};
 
 use crate::api::FeemarketApi;
 use crate::error::{FeemarketError, FeemarketResult};
@@ -7,15 +6,15 @@ use crate::fee::UpdateFeeStrategy;
 
 #[derive(Clone)]
 pub struct CrazyStrategy<AS: FeemarketApi, AT: FeemarketApi> {
-    api_source: AS,
-    api_target: AT,
+    api_left: AS,
+    api_right: AT,
 }
 
 impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
-    pub fn new(api_source: AS, api_target: AT) -> Self {
+    pub fn new(api_left: AS, api_right: AT) -> Self {
         Self {
-            api_source,
-            api_target,
+            api_left,
+            api_right,
         }
     }
 }
@@ -31,7 +30,7 @@ impl<AS: FeemarketApi, AT: FeemarketApi> UpdateFeeStrategy for CrazyStrategy<AS,
 
 impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
     async fn handle_source(&self) -> FeemarketResult<()> {
-        if !self.api_source.is_relayer().await? {
+        if !self.api_left.is_relayer().await? {
             tracing::warn!(
                 target: "feemarket",
                 "[femarket] [crazy] [{}] You are not a relayer, please register first",
@@ -41,7 +40,7 @@ impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
         }
 
         // Query all assigned relayers
-        let min_fee = match self.api_source.my_assigned_info().await? {
+        let min_fee = match self.api_left.my_assigned_info().await? {
             Some((0, _)) => {
                 return Ok(());
             }
@@ -61,12 +60,12 @@ impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
             AS::Chain::NAME,
             num_balance,
         );
-        self.api_source.update_relay_fee(new_fee).await?;
+        self.api_left.update_relay_fee(new_fee).await?;
         Ok(())
     }
 
     async fn handle_target(&self) -> FeemarketResult<()> {
-        if !self.api_target.is_relayer().await? {
+        if !self.api_right.is_relayer().await? {
             tracing::warn!(
                 target: "feemarket",
                 "[femarket] [crazy] [{}] You are not a relayer, please register first",
@@ -76,7 +75,7 @@ impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
         }
 
         // Query all assigned relayers
-        let min_fee = match self.api_target.my_assigned_info().await? {
+        let min_fee = match self.api_right.my_assigned_info().await? {
             Some((0, _)) => {
                 return Ok(());
             }
@@ -96,7 +95,7 @@ impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
             AT::Chain::NAME,
             num_balance,
         );
-        self.api_target.update_relay_fee(new_fee).await?;
+        self.api_right.update_relay_fee(new_fee).await?;
         Ok(())
     }
 }

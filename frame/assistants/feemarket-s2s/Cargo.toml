@@ -22,6 +22,7 @@ edition = "2021"
 tracing     = "0.1"
 thiserror   = "1.0"
 async-trait = "0.1"
+serde       = { version = "1", features = ["derive"] }
 
 codec                  = { package = "parity-scale-codec", version = "2.3.1" }
 
@@ -33,6 +34,7 @@ bp-messages            = { git = "https://github.com/darwinia-network/darwinia-b
 dp-fee                 = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
 
 ## Substrate Dependencies
+frame-support              = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
 sp-core                    = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
 sp-runtime                 = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
 

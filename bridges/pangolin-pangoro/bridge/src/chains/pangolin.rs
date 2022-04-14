@@ -51,6 +51,10 @@ mod s2s_messages {
     use relay_pangoro_client::PangoroChain;
     use substrate_relay_helper::messages_lane::SubstrateMessageLane;
 
+    use feemarket_s2s::relay::BasicRelayStrategy;
+
+    use crate::feemarket::PangolinFeemarketApi;
+
     #[derive(Clone, Debug)]
     pub struct PangolinMessagesToPangoro;
 
@@ -82,9 +86,6 @@ mod s2s_messages {
         type ReceiveMessagesDeliveryProofCallBuilder =
             PangolinMessagesToPangoroReceiveMessagesDeliveryProofCallBuilder;
 
-        // todo: common relay strategy
-        type RelayStrategy = PangolinRelayStrategy;
+        type RelayStrategy = BasicRelayStrategy<PangolinFeemarketApi>;
     }
 }
-
-mod s2s_feemarket {}

@@ -27,7 +27,7 @@ pub trait FeemarketApi: 'static + Send + Sync + Clone {
         &self,
     ) -> FeemarketResult<
         Option<(
-            u32,
+            usize,
             Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>,
         )>,
     >;

@@ -1,7 +1,7 @@
+use feemarket_s2s::config::FeemarketConfig;
 use serde::{Deserialize, Serialize};
 use strum::{EnumString, EnumVariantNames};
 
-use component_subscan::SubscanConfig;
 use support_common::error::BridgerError;
 
 use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
@@ -11,10 +11,7 @@ pub struct PangolinPangoroConfig {
     pub pangolin: ChainInfoConfig,
     pub pangoro: ChainInfoConfig,
     pub relay: RelayConfig,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangolin_subscan: Option<SubscanConfig>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangoro_subscan: Option<SubscanConfig>,
+    pub feemarket: FeemarketConfig,
     pub task: TaskConfig,
 }
 

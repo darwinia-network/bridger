@@ -221,8 +221,8 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             metrics_params: metrics_params.clone().disable(),
             standalone_metrics: None,
             relay_strategy: BasicRelayStrategy::new(
-                pangoro_feemarket_api,
-                AccountId::from(pangoro_signer.public().0),
+                pangolin_feemarket_api,
+                AccountId::from(pangolin_signer.public().0),
             ),
         })
         .map_err(|e| format!("{}", e))
@@ -247,7 +247,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             metrics_params: metrics_params.clone().disable(),
             standalone_metrics: None,
             relay_strategy: BasicRelayStrategy::new(
-                pangoro_client.clone(),
+                pangoro_feemarket_api,
                 AccountId::from(pangoro_signer.public().0),
             ),
         })

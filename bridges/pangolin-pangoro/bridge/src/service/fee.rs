@@ -1,9 +1,9 @@
 use bp_messages::LaneId;
+use feemarket_s2s::config::FeemarketConfig;
 use lifeline::{Lifeline, Service, Task};
 use relay_pangolin_client::PangolinChain;
 use relay_pangoro_client::PangoroChain;
 
-use component_subscan::SubscanConfig;
 use feemarket_s2s::fee::{CrazyStrategy, NothingStrategy, ReasonableStrategy, UpdateFeeStrategy};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
@@ -75,10 +75,6 @@ async fn cron_update_fee(config_task: TaskConfig) -> color_eyre::Result<()> {
 
 async fn run_update_fee(config_task: TaskConfig) -> color_eyre::Result<()> {
     let bridge_config: PangolinPangoroConfig = Config::restore(Names::BridgePangolinPangoro)?;
-    let subscan_config_pangolin: Option<SubscanConfig> = bridge_config.pangolin_subscan;
-    let subscan_config_pangoro: Option<SubscanConfig> = bridge_config.pangoro_subscan;
-    let exists_subscan_config =
-        subscan_config_pangolin.is_some() && subscan_config_pangoro.is_some();
 
     let config_relay: RelayConfig = bridge_config.relay;
 
@@ -118,16 +114,18 @@ async fn run_update_fee(config_task: TaskConfig) -> color_eyre::Result<()> {
     match config_task.update_fee_strategy {
         UpdateFeeStrategyType::Nothing => Ok(NothingStrategy.handle().await?),
         UpdateFeeStrategyType::Crazy => {
-            let mut strategy =
-                CrazyStrategy::new(pangolin_feemarket_api, pangoro_feemarket_api).await?;
+            let mut strategy = CrazyStrategy::new(pangolin_feemarket_api, pangoro_feemarket_api);
             Ok(strategy.handle().await?)
         }
         UpdateFeeStrategyType::Reasonable => {
-            if !exists_subscan_config {
-                return Ok(());
-            }
-            let mut strategy =
-                ReasonableStrategy::new(pangolin_feemarket_api, pangoro_feemarket_api).await?;
+            let feemarket_config: FeemarketConfig = bridge_config.feemarket;
+            let mut strategy = ReasonableStrategy::new(
+                feemarket_config,
+                pangolin_feemarket_api,
+                pangoro_feemarket_api,
+                15 * 1000000000,
+                15 * 1000000000,
+            )?;
             Ok(strategy.handle().await?)
         }
     }

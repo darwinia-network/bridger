@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 env:
-  SUBQUERY_ORG: darwinia-network
+  SUBQUERY_ORG: fewensa
 
 jobs:
   bridge-ethereum-like:

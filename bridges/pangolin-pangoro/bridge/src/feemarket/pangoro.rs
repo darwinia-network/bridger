@@ -2,12 +2,10 @@ use bp_messages::{LaneId, MessageNonce};
 use codec::{Decode, Encode};
 use frame_support::Blake2_128Concat;
 use relay_pangoro_client::PangoroChain;
-use relay_substrate_client::{
-    ChainBase, Client, SignParam, TransactionSignScheme, UnsignedTransaction,
-};
+use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
 use scale_info::TypeInfo;
 use sp_core::storage::StorageKey;
-use sp_core::{Bytes, Pair};
+use sp_core::Pair;
 
 use feemarket_s2s::api::FeemarketApi;
 use feemarket_s2s::error::FeemarketResult;
@@ -160,56 +158,24 @@ impl FeemarketApi for PangoroFeemarketApi {
         &self,
         amount: <Self::Chain as ChainBase>::Balance,
     ) -> FeemarketResult<()> {
-        let signer_id = (*self.signer.public().as_array_ref()).into();
-        let genesis_hash = *self.client.genesis_hash();
-        let (spec_version, transaction_version) = self.client.simple_runtime_version().await?;
-        self.client
-            .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
-                Bytes(
-                    <Self::Chain as TransactionSignScheme>::sign_transaction(SignParam {
-                        spec_version,
-                        transaction_version,
-                        genesis_hash,
-                        signer: self.signer.clone(),
-                        era: relay_substrate_client::TransactionEra::immortal(),
-                        unsigned: UnsignedTransaction::new(
-                            Call::Feemarket(FeemarketCall::update_relay_fee(amount)),
-                            transaction_nonce,
-                        ),
-                    })
-                    .encode(),
-                )
-            })
-            .await?;
-        Ok(())
+        crate::chains::pangoro::s2s_feemarket::update_relay_fee(
+            &self.client,
+            self.signer.clone(),
+            amount,
+        )
+        .await
     }
 
     async fn update_locked_collateral(
         &self,
         amount: <Self::Chain as ChainBase>::Balance,
     ) -> FeemarketResult<()> {
-        let signer_id = (*self.signer.public().as_array_ref()).into();
-        let genesis_hash = *self.client.genesis_hash();
-        let (spec_version, transaction_version) = self.client.simple_runtime_version().await?;
-        self.client
-            .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
-                Bytes(
-                    <Self::Chain as TransactionSignScheme>::sign_transaction(SignParam {
-                        spec_version,
-                        transaction_version,
-                        genesis_hash,
-                        signer: self.signer.clone(),
-                        era: relay_substrate_client::TransactionEra::immortal(),
-                        unsigned: UnsignedTransaction::new(
-                            Call::Feemarket(FeemarketCall::update_locked_collateral(amount)),
-                            transaction_nonce,
-                        ),
-                    })
-                    .encode(),
-                )
-            })
-            .await?;
-        Ok(())
+        crate::chains::pangoro::s2s_feemarket::update_locked_collateral(
+            &self.client,
+            self.signer.clone(),
+            amount,
+        )
+        .await
     }
 }
 

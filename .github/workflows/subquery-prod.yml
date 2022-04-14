@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 env:
-  SUBQUERY_ORG_DEV: fefwensa
+  SUBQUERY_ORG_DEV: fewensa
   SUBQUERY_ORG_PRD: darwinia-network
 
 jobs:

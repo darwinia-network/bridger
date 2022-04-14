@@ -9,7 +9,7 @@ pub trait FeemarketApi: 'static + Send + Sync + Clone {
     type Chain: Chain;
 
     /// Reconnect
-    fn reconnect(&mut self) -> FeemarketResult<()>;
+    async fn reconnect(&mut self) -> FeemarketResult<()>;
 
     fn lane_id(&self) -> LaneId;
 

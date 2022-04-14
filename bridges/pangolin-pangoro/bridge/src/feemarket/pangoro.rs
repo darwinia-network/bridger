@@ -2,7 +2,7 @@ use bp_messages::{LaneId, MessageNonce};
 use codec::{Decode, Encode};
 use frame_support::Blake2_128Concat;
 use relay_pangoro_client::PangoroChain;
-use relay_substrate_client::{ChainBase, Client, TransactionSignScheme, UnsignedTransaction};
+use relay_substrate_client::{ChainBase, Client, TransactionSignScheme};
 use relay_utils::relay_loop::Client as RelayLoopClient;
 use scale_info::TypeInfo;
 use sp_core::storage::StorageKey;
@@ -36,8 +36,8 @@ impl PangoroFeemarketApi {
 impl FeemarketApi for PangoroFeemarketApi {
     type Chain = PangoroChain;
 
-    fn reconnect(&mut self) -> FeemarketResult<()> {
-        Ok(self.client.reconnect()?)
+    async fn reconnect(&mut self) -> FeemarketResult<()> {
+        Ok(self.client.reconnect().await?)
     }
 
     fn lane_id(&self) -> LaneId {

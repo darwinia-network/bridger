@@ -156,7 +156,7 @@ impl<A: FeemarketApi> RelayStrategy for BasicRelayStrategy<A> {
                 Err(e) => {
                     if let FeemarketError::RelayClient(rce) = &e {
                         if rce.is_connection_error() {
-                            if let Err(fe) = self.api.reconnect() {
+                            if let Err(fe) = self.api.reconnect().await {
                                 tracing::error!(
                                     target: "feemarket",
                                     "[feemarket] [relay] [{}] Failed reconnect client: {:?}",

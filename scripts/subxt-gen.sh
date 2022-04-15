@@ -40,7 +40,10 @@ if [ "${CHAIN}" == "pangoro" ]; then
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangoro-subxt
 fi
 
-
+if [ "${CHAIN}" == "rococo" ]; then
+  ENDPOINT='https://rococo-rpc.polkadot.io'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/rococo-subxt
+fi
 
 if [ -z "${ENDPOINT}" ]; then
   echo 'Not support chain:' ${CHAIN}

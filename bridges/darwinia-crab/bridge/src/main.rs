@@ -6,9 +6,8 @@ mod bridge;
 mod chains;
 mod cli;
 mod command;
-mod fee;
+mod feemarket;
 mod service;
-mod traits;
 mod types;
 
 #[tokio::main]

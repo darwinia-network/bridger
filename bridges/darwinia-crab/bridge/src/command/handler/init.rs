@@ -1,6 +1,10 @@
 use bp_header_chain::InitializationData;
 use bp_runtime::Chain as ChainBase;
 use codec::Encode;
+use relay_crab_client::runtime as crab_runtime;
+use relay_crab_client::CrabChain;
+use relay_darwinia_client::runtime as darwinia_runtime;
+use relay_darwinia_client::DarwiniaChain;
 use relay_substrate_client::{
     Chain as RelaySubstrateClientChain, SignParam, TransactionSignScheme, UnsignedTransaction,
 };
@@ -16,17 +20,17 @@ use crate::types::{BridgeName, InitBridge};
 pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
     tracing::info!(target: "darwinia-crab", "Init bridge {:?}", bridge);
     let bridge_config: DarwiniaCrabConfig = Config::restore(Names::BridgeDarwiniaCrab)?;
-    let config_darwinia: ChainInfoConfig = bridge_config.darwinia;
     let config_crab: ChainInfoConfig = bridge_config.crab;
+    let config_darwinia: ChainInfoConfig = bridge_config.darwinia;
 
     let (source_chain, target_chain) = match bridge {
-        BridgeName::DarwiniaToCrab => (
-            config_darwinia.to_chain_info()?,
-            config_crab.to_chain_info()?,
-        ),
         BridgeName::CrabToDarwinia => (
             config_crab.to_chain_info()?,
             config_darwinia.to_chain_info()?,
+        ),
+        BridgeName::DarwiniaToCrab => (
+            config_darwinia.to_chain_info()?,
+            config_crab.to_chain_info()?,
         ),
     };
     std::thread::spawn(move || {
@@ -46,38 +50,30 @@ pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
 macro_rules! select_bridge {
     ($bridge: expr, $generic: tt) => {
         match $bridge {
-            BridgeName::DarwiniaToCrab => {
-                type Source = client_darwinia::DarwiniaChain;
-                type Target = client_crab::CrabChain;
+            BridgeName::CrabToDarwinia => {
+                type Source = CrabChain;
+                type Target = DarwiniaChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    crab_runtime::BridgeGrandpaCall::<
-                        crab_runtime::Runtime,
-                        crab_runtime::WithDarwiniaGrandpa,
-                    >::initialize {
-                        init_data,
-                    }
-                    .into()
+                    darwinia_runtime::Call::BridgeCrabGrandpa(
+                        darwinia_runtime::BridgeCrabGrandpaCall::initialize(init_data),
+                    )
                 }
 
                 $generic
             }
-            BridgeName::CrabToDarwinia => {
-                type Source = client_crab::CrabChain;
-                type Target = client_darwinia::DarwiniaChain;
+            BridgeName::DarwiniaToCrab => {
+                type Source = DarwiniaChain;
+                type Target = CrabChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    darwinia_runtime::BridgeGrandpaCall::<
-                        darwinia_runtime::Runtime,
-                        darwinia_runtime::WithCrabGrandpa,
-                    >::initialize {
-                        init_data,
-                    }
-                    .into()
+                    crab_runtime::Call::BridgeDarwiniaGrandpa(
+                        crab_runtime::BridgeDarwiniaGrandpaCall::initialize(init_data),
+                    )
                 }
 
                 $generic

@@ -17204,7 +17204,7 @@ pub mod api {
             use super::runtime_types;
             pub struct Candidates;
             impl ::subxt::StorageEntry for Candidates {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "Candidates";
                 type Value = ::std::vec::Vec<
                     runtime_types::darwinia_relay_primitives::relay_authorities::RelayAuthority<
@@ -17220,7 +17220,7 @@ pub mod api {
             }
             pub struct Authorities;
             impl ::subxt::StorageEntry for Authorities {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "Authorities";
                 type Value = ::std::vec::Vec<
                     runtime_types::darwinia_relay_primitives::relay_authorities::RelayAuthority<
@@ -17236,7 +17236,7 @@ pub mod api {
             }
             pub struct NextAuthorities;
             impl ::subxt::StorageEntry for NextAuthorities {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "NextAuthorities";
                 type Value = runtime_types :: darwinia_relay_primitives :: relay_authorities :: ScheduledAuthoritiesChange < :: subxt :: sp_core :: crypto :: AccountId32 , runtime_types :: primitive_types :: H160 , :: core :: primitive :: u128 , :: core :: primitive :: u32 > ;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -17245,7 +17245,7 @@ pub mod api {
             }
             pub struct NextTerm;
             impl ::subxt::StorageEntry for NextTerm {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "NextTerm";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -17254,7 +17254,7 @@ pub mod api {
             }
             pub struct AuthoritiesToSign;
             impl ::subxt::StorageEntry for AuthoritiesToSign {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "AuthoritiesToSign";
                 type Value = (
                     [::core::primitive::u8; 32usize],
@@ -17269,7 +17269,7 @@ pub mod api {
             }
             pub struct MmrRootsToSignKeys;
             impl ::subxt::StorageEntry for MmrRootsToSignKeys {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "MmrRootsToSignKeys";
                 type Value = ::std::vec::Vec<::core::primitive::u32>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -17278,7 +17278,7 @@ pub mod api {
             }
             pub struct MmrRootsToSign<'a>(pub &'a ::core::primitive::u32);
             impl ::subxt::StorageEntry for MmrRootsToSign<'_> {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "MmrRootsToSign";
                 type Value =
                     runtime_types::darwinia_relay_primitives::relay_authorities::MmrRootToSign<
@@ -17295,7 +17295,7 @@ pub mod api {
             }
             pub struct SubmitDuration;
             impl ::subxt::StorageEntry for SubmitDuration {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "SubmitDuration";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {

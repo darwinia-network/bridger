@@ -15484,7 +15484,7 @@ pub mod api {
             use super::runtime_types;
             pub struct ConfirmedHeaderParcels<'a>(pub &'a ::core::primitive::u64);
             impl ::subxt::StorageEntry for ConfirmedHeaderParcels<'_> {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ConfirmedHeaderParcels";
                 type Value = runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15496,7 +15496,7 @@ pub mod api {
             }
             pub struct ConfirmedBlockNumbers;
             impl ::subxt::StorageEntry for ConfirmedBlockNumbers {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ConfirmedBlockNumbers";
                 type Value = ::std::vec::Vec<::core::primitive::u64>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15505,7 +15505,7 @@ pub mod api {
             }
             pub struct BestConfirmedBlockNumber;
             impl ::subxt::StorageEntry for BestConfirmedBlockNumber {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "BestConfirmedBlockNumber";
                 type Value = ::core::primitive::u64;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15514,7 +15514,7 @@ pub mod api {
             }
             pub struct ConfirmedDepth;
             impl ::subxt::StorageEntry for ConfirmedDepth {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ConfirmedDepth";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15523,7 +15523,7 @@ pub mod api {
             }
             pub struct DagsMerkleRoots<'a>(pub &'a ::core::primitive::u64);
             impl ::subxt::StorageEntry for DagsMerkleRoots<'_> {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "DagsMerkleRoots";
                 type Value = runtime_types::ethereum_types::hash::H128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15535,7 +15535,7 @@ pub mod api {
             }
             pub struct ReceiptVerifyFee;
             impl ::subxt::StorageEntry for ReceiptVerifyFee {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ReceiptVerifyFee";
                 type Value = ::core::primitive::u128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15544,7 +15544,7 @@ pub mod api {
             }
             pub struct PendingRelayHeaderParcels;
             impl ::subxt::StorageEntry for PendingRelayHeaderParcels {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "PendingRelayHeaderParcels";
                 type Value = ::std::vec::Vec<(
                     ::core::primitive::u32,

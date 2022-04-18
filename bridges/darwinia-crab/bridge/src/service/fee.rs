@@ -1,5 +1,4 @@
 use bp_messages::LaneId;
-use feemarket_s2s_transition::config::FeemarketConfig;
 use lifeline::{Lifeline, Service, Task};
 use relay_crab_client::CrabChain;
 use relay_darwinia_client::DarwiniaChain;

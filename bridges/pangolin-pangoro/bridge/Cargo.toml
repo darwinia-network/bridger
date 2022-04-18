@@ -74,13 +74,3 @@ feemarket-s2s     = { path = "../../../frame/assistants/feemarket-s2s" }
 support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }
-
-### darwinia common
-#drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
-#drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
-#
-### pangolin
-#pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6", features = ["no-wasm"] }
-#
-### pangoro
-#pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6", features = ["no-wasm"] }

@@ -1,10 +1,9 @@
 use bp_messages::{LaneId, MessageNonce};
-use codec::{Decode, Encode};
+use codec::Encode;
 use frame_support::Blake2_128Concat;
 use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme};
 use relay_utils::relay_loop::Client as RelayLoopClient;
-use scale_info::TypeInfo;
 use sp_core::storage::StorageKey;
 use sp_core::Pair;
 
@@ -183,29 +182,4 @@ impl FeemarketApi for PangolinFeemarketApi {
         )
         .await
     }
-}
-
-#[allow(clippy::large_enum_variant)]
-#[derive(Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
-enum Call {
-    #[codec(index = 53)]
-    Feemarket(FeemarketCall),
-}
-
-/// Feemarket call
-#[derive(Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
-#[allow(non_camel_case_types)]
-enum FeemarketCall {
-    #[codec(index = 0)]
-    enroll_and_lock_collateral(bp_pangolin::Balance, Option<bp_pangolin::Balance>),
-    #[codec(index = 1)]
-    update_locked_collateral(bp_pangolin::Balance),
-    #[codec(index = 2)]
-    update_relay_fee(bp_pangolin::Balance),
-    #[codec(index = 3)]
-    cancel_enrollment(),
-    #[codec(index = 4)]
-    set_slash_protect(bp_pangolin::Balance),
-    #[codec(index = 5)]
-    set_assigned_relayers_number(u32),
 }

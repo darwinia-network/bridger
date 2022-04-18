@@ -39,8 +39,6 @@ futures-timer = "3"
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage = "0.4"
 
-scale-info             = { version = "1.0", features = ["derive"] }
-
 ## Substrate Dependencies
 
 frame-support       = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
@@ -67,7 +65,7 @@ messages-relay         = { git = "https://github.com/darwinia-network/darwinia-b
 relay-pangolin-client  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
 relay-pangoro-client   = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
 
-dp-fee                 = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
+darwinia-fee-market    = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.7" }
 
 ## component
 feemarket-s2s     = { path = "../../../frame/assistants/feemarket-s2s" }
@@ -76,13 +74,3 @@ feemarket-s2s     = { path = "../../../frame/assistants/feemarket-s2s" }
 support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }
-
-### darwinia common
-#drml-common-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
-#drml-bridge-primitives  = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6" }
-#
-### pangolin
-#pangolin-runtime               = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6", features = ["no-wasm"] }
-#
-### pangoro
-#pangoro-runtime                = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.6", features = ["no-wasm"] }

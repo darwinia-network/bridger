@@ -1,10 +1,10 @@
 use bp_messages::{LaneId, MessageNonce};
-use codec::{Decode, Encode};
+use codec::Encode;
+use darwinia_fee_market::types::{Order, Relayer};
 use frame_support::Blake2_128Concat;
 use relay_pangoro_client::PangoroChain;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme};
 use relay_utils::relay_loop::Client as RelayLoopClient;
-use scale_info::TypeInfo;
 use sp_core::storage::StorageKey;
 use sp_core::Pair;
 
@@ -53,12 +53,7 @@ impl FeemarketApi for PangoroFeemarketApi {
     async fn assigned_relayers(
         &self,
     ) -> FeemarketResult<
-        Vec<
-            dp_fee::Relayer<
-                <Self::Chain as ChainBase>::AccountId,
-                <Self::Chain as ChainBase>::Balance,
-            >,
-        >,
+        Vec<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {
         let storage_key = StorageKey(
             feemarket_s2s::helpers::storage_prefix(
@@ -79,10 +74,7 @@ impl FeemarketApi for PangoroFeemarketApi {
     ) -> FeemarketResult<
         Option<(
             usize,
-            dp_fee::Relayer<
-                <Self::Chain as ChainBase>::AccountId,
-                <Self::Chain as ChainBase>::Balance,
-            >,
+            Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>,
         )>,
     > {
         let signer_id = (*self.signer.public().as_array_ref()).into();
@@ -108,7 +100,7 @@ impl FeemarketApi for PangoroFeemarketApi {
         message_nonce: MessageNonce,
     ) -> FeemarketResult<
         Option<
-            dp_fee::Order<
+            Order<
                 <Self::Chain as ChainBase>::AccountId,
                 <Self::Chain as ChainBase>::BlockNumber,
                 <Self::Chain as ChainBase>::Balance,
@@ -139,12 +131,7 @@ impl FeemarketApi for PangoroFeemarketApi {
         &self,
         account: <Self::Chain as ChainBase>::AccountId,
     ) -> FeemarketResult<
-        Option<
-            dp_fee::Relayer<
-                <Self::Chain as ChainBase>::AccountId,
-                <Self::Chain as ChainBase>::Balance,
-            >,
-        >,
+        Option<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {
         let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
             "FeeMarket",
@@ -182,29 +169,4 @@ impl FeemarketApi for PangoroFeemarketApi {
         )
         .await
     }
-}
-
-#[allow(clippy::large_enum_variant)]
-#[derive(Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
-enum Call {
-    #[codec(index = 22)]
-    Feemarket(FeemarketCall),
-}
-
-/// Feemarket call
-#[derive(Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
-#[allow(non_camel_case_types)]
-enum FeemarketCall {
-    #[codec(index = 0)]
-    enroll_and_lock_collateral(bp_pangoro::Balance, Option<bp_pangoro::Balance>),
-    #[codec(index = 1)]
-    update_locked_collateral(bp_pangoro::Balance),
-    #[codec(index = 2)]
-    update_relay_fee(bp_pangoro::Balance),
-    #[codec(index = 3)]
-    cancel_enrollment(),
-    #[codec(index = 4)]
-    set_slash_protect(bp_pangoro::Balance),
-    #[codec(index = 5)]
-    set_assigned_relayers_number(u32),
 }

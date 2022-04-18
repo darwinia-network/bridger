@@ -18,8 +18,8 @@ export class EventHandler {
     const eventKey = `${eventSection}:${eventMethod}`;
     logger.info(`[event] Received event: [${eventKey}] [${eventId}] in block ${blockNumber}`);
     switch (eventKey) {
-      case 'paraInclusion:CandidateIncluded': {
-        await storage.storeCandidateIncluded(this.event);
+      case 'bridgePangoroMessages:MessageAccepted': {
+        await storage.storeMessageAccepted(this.event);
         return;
       }
     }

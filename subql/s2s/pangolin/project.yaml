@@ -14,7 +14,7 @@ network:
 dataSources:
   - name: main
     kind: substrate/Runtime
-    startBlock: 1995245
+    startBlock: 1891869
     mapping:
       file: ./dist/index.js
       handlers:
@@ -25,7 +25,7 @@ dataSources:
           filter:
             - module: bridgePangoroMessages
               method: MessageAccepted
-            - module: bridgePangoroMessages
+            - module: bridgePangoroParachainMessages
               method: MessageAccepted
         - handler: handleCall
           kind: substrate/CallHandler

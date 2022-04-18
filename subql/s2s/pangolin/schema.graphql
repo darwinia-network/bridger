@@ -7,3 +7,13 @@ type Block @entity {
   parentHash: String
   specVersion: Int
 }
+
+type MessageAcceptedEvent @entity {
+  id: ID!
+
+  atBlock: Int
+  laneId: String
+  messageNonce: Int
+
+  timestamp: Date
+}

@@ -1,6 +1,7 @@
 import {SubstrateBlock} from '@subql/types';
 import {getBlockTimestamp} from '../helpers';
 import {Block} from '../types';
+import {ConsensusEngineId, EncodedJustification, Justifications} from "@polkadot/types/interfaces/runtime/types";
 
 export class BlockHandler {
   private block: SubstrateBlock;
@@ -39,6 +40,16 @@ export class BlockHandler {
 
   public async save() {
     const block = new Block(this.hash);
+
+    const _justifications = this.block.justifications;
+    if (_justifications.isSome) {
+      const justifications = _justifications.value as unknown as Justifications;
+      for (const justification of justifications) {
+        const [consensusEngineId, encodedJustification] = justification;
+        if (!consensusEngineId.isGrandpa) continue;
+        logger.info(`block: ${this.number} justification: ${JSON.stringify(encodedJustification)}`);
+      }
+    }
 
     block.number = this.number;
     block.timestamp = this.blockTimestamp;

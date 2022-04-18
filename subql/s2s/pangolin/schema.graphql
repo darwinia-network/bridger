@@ -17,3 +17,14 @@ type MessageAcceptedEvent @entity {
 
   timestamp: Date
 }
+
+type NeedRelayBlock @entity {
+  id: ID!
+
+  atBlock: Int!
+  origin: String!
+  laneId: String
+  messageNonce: Int
+
+  timestamp: Date
+}

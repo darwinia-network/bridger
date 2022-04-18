@@ -1,6 +1,8 @@
 use support_lifeline::task::TaskStack;
 
 use crate::bridge::PangolinRococoBus;
+use crate::service::header_relay::HeaderRelayService;
+use crate::service::relay::RelayService;
 
 #[derive(Debug)]
 pub struct PangolinRococoTask {
@@ -18,6 +20,8 @@ impl PangolinRococoTask {
         let bus = PangolinRococoBus::default();
 
         let mut stack = TaskStack::new(bus);
+        stack.spawn_service::<HeaderRelayService>()?;
+        stack.spawn_service::<RelayService>()?;
         Ok(Self { stack })
     }
 }

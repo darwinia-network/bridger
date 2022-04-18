@@ -23,6 +23,8 @@ dataSources:
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
+            - module: grandpa
+              method: NewAuthorities
             - module: bridgePangoroMessages
               method: MessageAccepted
             - module: bridgePangoroParachainMessages

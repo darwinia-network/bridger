@@ -1,5 +1,6 @@
 import {FastEvent} from '../helpers';
 import * as storage from '../storage';
+import {RelayBlockOrigin} from "../storage";
 
 export class EventHandler {
   private readonly event: FastEvent;
@@ -18,8 +19,16 @@ export class EventHandler {
     const eventKey = `${eventSection}:${eventMethod}`;
     logger.info(`[event] Received event: [${eventKey}] [${eventId}] in block ${blockNumber}`);
     switch (eventKey) {
+      case 'grandpa:NewAuthorities': {
+        await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.Mandatory);
+        return;
+      }
       case 'bridgePangoroMessages:MessageAccepted': {
-        await storage.storeMessageAccepted(this.event);
+        await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.BridgePangoro);
+        return;
+      }
+      case 'bridgePangoroParachainMessages:MessageAccepted': {
+        await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.BridgePangolinParachain);
         return;
       }
     }

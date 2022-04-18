@@ -7,16 +7,3 @@ type Block @entity {
   parentHash: String
   specVersion: Int
 }
-
-type CandidateIncludedEvent @entity {
-  id: ID!
-
-  includedRelayBlock: Int!
-  paraId: Int!
-  signature: String!
-  paraHead: String!
-  relayParent: String!
-
-  timestamp: Date
-}
-

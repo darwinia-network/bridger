@@ -11,9 +11,12 @@ export class EventHandler {
   public async save() {
     // await BlockHandler.ensureBlock(this.event.blockHash);
 
+    const eventId = this.event.id;
     const eventSection = this.event.section;
     const eventMethod = this.event.method;
+    const blockNumber = this.event.blockNumber;
     const eventKey = `${eventSection}:${eventMethod}`;
+    logger.info(`[event] Received event: [${eventKey}] [${eventId}] in block ${blockNumber}`);
     switch (eventKey) {
       case 'paraInclusion:CandidateIncluded': {
         await storage.storeCandidateIncluded(this.event);

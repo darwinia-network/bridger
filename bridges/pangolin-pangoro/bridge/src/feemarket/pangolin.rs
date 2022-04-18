@@ -1,5 +1,6 @@
 use bp_messages::{LaneId, MessageNonce};
 use codec::Encode;
+use darwinia_fee_market::types::{Order, Relayer};
 use frame_support::Blake2_128Concat;
 use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme};
@@ -52,12 +53,7 @@ impl FeemarketApi for PangolinFeemarketApi {
     async fn assigned_relayers(
         &self,
     ) -> FeemarketResult<
-        Vec<
-            dp_fee::Relayer<
-                <Self::Chain as ChainBase>::AccountId,
-                <Self::Chain as ChainBase>::Balance,
-            >,
-        >,
+        Vec<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {
         let storage_key = StorageKey(
             feemarket_s2s::helpers::storage_prefix(
@@ -78,10 +74,7 @@ impl FeemarketApi for PangolinFeemarketApi {
     ) -> FeemarketResult<
         Option<(
             usize,
-            dp_fee::Relayer<
-                <Self::Chain as ChainBase>::AccountId,
-                <Self::Chain as ChainBase>::Balance,
-            >,
+            Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>,
         )>,
     > {
         let signer_id = (*self.signer.public().as_array_ref()).into();
@@ -108,7 +101,7 @@ impl FeemarketApi for PangolinFeemarketApi {
         message_nonce: MessageNonce,
     ) -> FeemarketResult<
         Option<
-            dp_fee::Order<
+            Order<
                 <Self::Chain as ChainBase>::AccountId,
                 <Self::Chain as ChainBase>::BlockNumber,
                 <Self::Chain as ChainBase>::Balance,
@@ -139,12 +132,7 @@ impl FeemarketApi for PangolinFeemarketApi {
         &self,
         account: <Self::Chain as ChainBase>::AccountId,
     ) -> FeemarketResult<
-        Option<
-            dp_fee::Relayer<
-                <Self::Chain as ChainBase>::AccountId,
-                <Self::Chain as ChainBase>::Balance,
-            >,
-        >,
+        Option<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {
         let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
             "FeeMarket",

@@ -1,5 +1,4 @@
 use bp_messages::LaneId;
-use feemarket_s2s::config::FeemarketConfig;
 use lifeline::{Lifeline, Service, Task};
 use relay_pangolin_client::PangolinChain;
 use relay_pangoro_client::PangoroChain;

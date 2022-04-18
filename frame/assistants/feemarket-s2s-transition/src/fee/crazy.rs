@@ -22,8 +22,16 @@ impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
 #[async_trait::async_trait]
 impl<AS: FeemarketApi, AT: FeemarketApi> UpdateFeeStrategy for CrazyStrategy<AS, AT> {
     async fn handle(&self) -> FeemarketResult<()> {
+        tracing::trace!(
+            target: "feemarket",
+            "[femarket] [crazy] Start update fee",
+        );
         self.handle_source().await?;
         self.handle_target().await?;
+        tracing::trace!(
+            target: "feemarket",
+            "[femarket] [crazy] Fee updated",
+        );
         Ok(())
     }
 }
@@ -42,6 +50,11 @@ impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
         // Query all assigned relayers
         let min_fee = match self.api_left.my_assigned_info().await? {
             Some((0, _)) => {
+                tracing::info!(
+                    target: "feemarket",
+                    "[femarket] [crazy] [{}] You are first assigned relayer, nothing to do",
+                    AS::Chain::NAME,
+                );
                 return Ok(());
             }
             Some((_i, relayer)) => relayer.fee,
@@ -77,6 +90,11 @@ impl<AS: FeemarketApi, AT: FeemarketApi> CrazyStrategy<AS, AT> {
         // Query all assigned relayers
         let min_fee = match self.api_right.my_assigned_info().await? {
             Some((0, _)) => {
+                tracing::info!(
+                    target: "feemarket",
+                    "[femarket] [crazy] [{}] You are first assigned relayer, nothing to do",
+                    AT::Chain::NAME,
+                );
                 return Ok(());
             }
             Some((_i, relayer)) => relayer.fee,

@@ -67,7 +67,6 @@ async fn cron_update_fee(config_task: TaskConfig) -> color_eyre::Result<()> {
                 e
             );
         }
-
         futures_timer::Delay::new(std::time::Duration::from_secs(
             config_task.interval_update_fee,
         ))

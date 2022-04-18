@@ -11,6 +11,12 @@ runtime_version_mode = "Bundle"
 [crab]
 endpoint = "wss://crab-rpc.darwinia.network"
 signer = "//Alice"
+# Bundle/Auto/Custom
+runtime_version_mode = "Bundle"
+# If the runtime version mode is custom, you need to set this.
+#spec_version = 12345
+# If the runtime version mode is custom, you need to set this.
+#transaction_version = 0
 
 [relay]
 # substrate-substrate bridger message relay lanes, default use `00000000`
@@ -43,12 +49,13 @@ no_prometheus = false
 prometheus_host = "127.0.0.1"
 prometheus_port = 9616
 
-#[darwinia_subscan]
+#[feemarket]
+#[feemarket.subscan_left]
 #endpoint = "https://darwinia.api.subscan.io"
 #token = "12345abcde"
 #timeout = 30
 #
-#[crab_subscan]
+#[feemarket.subscan_right]
 #endpoint = "https://crab.api.subscan.io"
 #token = "12345abcde"
 #timeout = 30

@@ -1,0 +1,19 @@
+
+
+query queryNeedRelayBlockPage {
+  needRelayBlocks (
+    first: 5
+    orderBy: AT_BLOCK_ASC
+  ) {
+    nodes {
+      id
+      atBlock
+      mandatory
+      origin
+      laneId
+      messageNonce
+      timestamp
+    }
+  }
+}
+

@@ -51,6 +51,11 @@ if [ "${CHAIN}" == "rococo" ]; then
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/rococo-subxt
 fi
 
+if [ "${CHAIN}" == "pangolin-parachain" ]; then
+  ENDPOINT='http://127.0.0.1:40338'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangolin-parachain-subxt
+fi
+
 if [ -z "${ENDPOINT}" ]; then
   echo 'Not support chain:' ${CHAIN}
   exit 1

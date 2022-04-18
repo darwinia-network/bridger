@@ -1,6 +1,10 @@
 use bp_header_chain::InitializationData;
 use bp_runtime::Chain as ChainBase;
 use codec::Encode;
+use relay_pangolin_client::runtime as pangolin_runtime;
+use relay_pangolin_client::PangolinChain;
+use relay_pangoro_client::runtime as pangoro_runtime;
+use relay_pangoro_client::PangoroChain;
 use relay_substrate_client::{
     Chain as RelaySubstrateClientChain, SignParam, TransactionSignScheme, UnsignedTransaction,
 };
@@ -47,37 +51,29 @@ macro_rules! select_bridge {
     ($bridge: expr, $generic: tt) => {
         match $bridge {
             BridgeName::PangolinToPangoro => {
-                type Source = client_pangolin::PangolinChain;
-                type Target = client_pangoro::PangoroChain;
+                type Source = PangolinChain;
+                type Target = PangoroChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    pangoro_runtime::BridgeGrandpaCall::<
-                        pangoro_runtime::Runtime,
-                        pangoro_runtime::WithPangolinGrandpa,
-                    >::initialize {
-                        init_data,
-                    }
-                    .into()
+                    pangoro_runtime::Call::BridgePangolinGrandpa(
+                        pangoro_runtime::BridgePangolinGrandpaCall::initialize(init_data),
+                    )
                 }
 
                 $generic
             }
             BridgeName::PangoroToPangolin => {
-                type Source = client_pangoro::PangoroChain;
-                type Target = client_pangolin::PangolinChain;
+                type Source = PangoroChain;
+                type Target = PangolinChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    pangolin_runtime::BridgeGrandpaCall::<
-                        pangolin_runtime::Runtime,
-                        pangolin_runtime::WithPangoroGrandpa,
-                    >::initialize {
-                        init_data,
-                    }
-                    .into()
+                    pangolin_runtime::Call::BridgePangoroGrandpa(
+                        pangolin_runtime::BridgePangoroGrandpaCall::initialize(init_data),
+                    )
                 }
 
                 $generic

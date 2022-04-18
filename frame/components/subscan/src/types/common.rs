@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::SubscanComponentError;
+use crate::{SubscanComponentError, SubscanComponentResult};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SubscanResponse<T: Clone> {
@@ -14,11 +14,12 @@ impl<T: Clone> SubscanResponse<T> {
         self.code
     }
 
-    pub fn data(&self) -> color_eyre::Result<Option<T>> {
+    pub fn data(&self) -> SubscanComponentResult<Option<T>> {
         if self.code != 0 {
-            return Err(
-                SubscanComponentError::WrongResponse(self.code, self.message.clone()).into(),
-            );
+            return Err(SubscanComponentError::WrongResponse(
+                self.code,
+                self.message.clone(),
+            ));
         }
         Ok(self.data.clone())
     }

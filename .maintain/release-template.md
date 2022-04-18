@@ -4,7 +4,7 @@
 
 ## Changed
 
-- The next generation bridger (https://github.com/darwinia-network/bridger/pull/364)
+Fix send vote extrinsics bug
 
 ## Resources
 

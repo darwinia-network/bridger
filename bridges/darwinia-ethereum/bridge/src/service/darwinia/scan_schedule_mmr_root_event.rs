@@ -33,7 +33,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         if latest.emitted == 1 {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. don't do this again.",
+                "[darwinia] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. not need to do this.",
                 latest.event_block_number,
                 latest.at_block_number
             );
@@ -49,14 +49,15 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
 
         let event_block_number = latest.event_block_number;
 
-        let finalized_block_hash = self.data.darwinia.finalized_head().await?;
-        let finalized_block_header_number = match self
-            .data
-            .darwinia
-            .get_block_number_by_hash(finalized_block_hash)
-            .await?
-        {
-            Some(v) => v,
+        let client = &self.data.darwinia;
+        let finalized_block_hash = client.subxt().rpc().finalized_head().await?;
+        let block = client
+            .subxt()
+            .rpc()
+            .block(Some(finalized_block_hash))
+            .await?;
+        let finalized_block_header_number = match block {
+            Some(v) => v.block.header.number,
             None => {
                 tracing::warn!(
                     target: "darwinia-ethereum",
@@ -87,13 +88,12 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             return Ok(());
         }
 
-        if !self
-            .data
-            .darwinia2ethereum
+        if !client
+            .ethereum()
             .need_to_sign_mmr_root_of(
-                &self.data.account,
                 event_block_number,
                 Some(finalized_block_header_number),
+                client.account().real_account(),
             )
             .await?
         {

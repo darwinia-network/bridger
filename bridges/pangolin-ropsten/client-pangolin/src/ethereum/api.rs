@@ -281,7 +281,7 @@ impl<'a> EthereumApi<'a> {
             Some(real) => {
                 tracing::trace!(
                     target: "client-pangolin",
-                    "Proxyed ecdsa sign and submit mmr_root to darwinia, block_number: {}",
+                    "Proxied ecdsa sign and submit mmr_root to darwinia, block_number: {}",
                     block_number
                 );
                 let call = runtime_types::pangolin_runtime::Call::EthereumRelayAuthorities(
@@ -328,7 +328,7 @@ impl<'a> EthereumApi<'a> {
 
         let v = match darwinia_account.real() {
             Some(real) => {
-                tracing::trace!(target: "client-pangolin", "Proxyed ecdsa sign and submit authorities to darwinia");
+                tracing::trace!(target: "client-pangolin", "Proxied ecdsa sign and submit authorities to darwinia");
                 let call = runtime_types::pangolin_runtime::Call::EthereumRelayAuthorities(
                     runtime_types::darwinia_relay_authorities::Call::submit_signed_authorities {
                         signature: signature.0,
@@ -349,6 +349,45 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_relay_authorities()
                     .submit_signed_authorities(signature.0)
+                    .sign_and_submit(darwinia_account.signer())
+                    .await?
+            }
+        };
+        Ok(v)
+    }
+
+    /// vote pending relay header parcel
+    pub async fn vote_pending_relay_header_parcel(
+        &self,
+        ethereum_block_number: u64,
+        aye: bool,
+    ) -> ClientResult<subxt::sp_core::H256> {
+        let darwinia_account = self.client.account();
+
+        let v = match darwinia_account.real() {
+            Some(real) => {
+                tracing::trace!(target: "client-pangolin", "Proxied vote pending relay header parcel");
+                let call = runtime_types::pangolin_runtime::Call::EthereumRelay(
+                    runtime_types::darwinia_bridge_ethereum::Call::vote_pending_relay_header_parcel {
+                        ethereum_block_number,
+                        aye,
+                    },
+                );
+                self.client
+                    .runtime()
+                    .tx()
+                    .proxy()
+                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
+                    .sign_and_submit(darwinia_account.signer())
+                    .await?
+            }
+            None => {
+                tracing::trace!(target: "client-pangolin", "Vote pending relay header parcel");
+                self.client
+                    .runtime()
+                    .tx()
+                    .ethereum_relay()
+                    .vote_pending_relay_header_parcel(ethereum_block_number, aye)
                     .sign_and_submit(darwinia_account.signer())
                     .await?
             }

@@ -39,11 +39,11 @@ impl ChainInfo {
         let chain_runtime_version = match self.runtime_version_mode {
             Some(RuntimeVersionMode::Auto) => ChainRuntimeVersion::Auto,
             Some(RuntimeVersionMode::Custom) => {
-                let spec_version = self
-                    .spec_version
-                    .ok_or_else(|| BridgerError::Custom("Miss spec_version config".to_string()))?;
+                let spec_version = self.spec_version.ok_or_else(|| {
+                    BridgerError::Custom("Missing spec_version config".to_string())
+                })?;
                 let transaction_version = self.transaction_version.ok_or_else(|| {
-                    BridgerError::Custom("Miss transaction_version config".to_string())
+                    BridgerError::Custom("Missing transaction_version config".to_string())
                 })?;
                 ChainRuntimeVersion::Custom(spec_version, transaction_version)
             }

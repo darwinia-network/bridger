@@ -1,6 +1,6 @@
 [package]
 name = "component-shadow"
-version = "0.5.1"
+version = "0.5.4"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -29,3 +29,6 @@ codec      = { package = "parity-scale-codec", version = "2.3.1", features = ["d
 component-ethereum = { path = "../ethereum" }
 
 reqwest = { version = "0.11", features = ["rustls-tls", "json"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }

@@ -1,20 +1,15 @@
-name: Deploy subquery develop
-
-## IMPORTANT: Please you know, direct push code to master doesn't trigger this action
-#  push:
-#    branches: [ master ]
+name: Subquery develop
 
 on:
   pull_request:
     branches: [ master ]
 
 env:
-  SUBQUERY_CLI_VERSION: 0.2.0
-  SUBQUERY_ORG: darwinia-network
+  SUBQUERY_ORG: fewensa
 
 jobs:
-  deploy-subquery:
-    name: Deploy subquery
+  bridge-ethereum-like:
+    name: Subql Ethereum like v1
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
@@ -25,43 +20,44 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: |
-          mkdir -p $HOME/.local/bin
-          curl -LO https://github.com/fewensa/subquery-cli/releases/download/v${{ env.SUBQUERY_CLI_VERSION }}/subquery-linux-x86_64.zip
-          unzip subquery-linux-x86_64.zip -d $HOME/.local/bin/
-          rm -rf subquery-linux-x86_64.zip
-
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v5.1
-
-      - uses: benjlevesque/short-sha@v1.2
-        id: short-sha
+      - uses: actions/checkout@v2
         with:
-          length: 7
+          repository: itering/actions
+          path: .github/actions
+          persist-credentials: false
+          ssh-key: "${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}"
 
-      - name: Deploy
-        run: |
-          set -xe
+      - uses: ./.github/actions/smart-subquery
+        name: Deploy subql-bridge-${{ matrix.chain }}
+        with:
+          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
+          subquery_org: ${{ env.SUBQUERY_ORG }}
+          project_key: subql-bridge-${{ matrix.chain }}
+          subql_path: subql/ethereum-v1/${{ matrix.chain }}
 
-          subquery --token ${{ secrets.SUBQUERY_TOKEN }} project create \
-            --org ${{ env.SUBQUERY_ORG }} \
-            --key subql-bridge-${{ matrix.chain }} \
-            --repo https://github.com/darwinia-network/bridger \
-            --check
+  crab-parachain:
+    name: Subql Crab Parachain
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        chain: [ kusama, rococo ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-          DIFF_SCHEMA=$(git diff \
-            ${SHA} \
-            origin/master \
-            subql/${{ matrix.chain }}/schema.graphql || exit 1)
+      - uses: actions/checkout@v2
+        with:
+          repository: itering/actions
+          path: .github/actions
+          persist-credentials: false
+          ssh-key: "${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}"
 
-          echo 'Soft deploy subql/${{ matrix.chain }}'
-          subquery --token ${{ secrets.SUBQUERY_TOKEN }} deployment deploy ${DIFF_SCHEMA:+--force} \
-            --org ${{ env.SUBQUERY_ORG }} \
-            --key subql-bridge-${{ matrix.chain }} \
-            --branch ${{ steps.branch-name.outputs.current_branch }} \
-            --sub-folder subql/${{ matrix.chain }} \
-            --type stage \
-            --indexer-image-version v0.27.2-0 \
-            --query-image-version v0.10.1-0
+      - uses: ./.github/actions/smart-subquery
+        name: Deploy subql-parachain-${{ matrix.chain }}
+        with:
+          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
+          subquery_org: ${{ env.SUBQUERY_ORG }}
+          project_key: subql-parachain-${{ matrix.chain }}
+          subql_path: subql/parachain/${{ matrix.chain }}

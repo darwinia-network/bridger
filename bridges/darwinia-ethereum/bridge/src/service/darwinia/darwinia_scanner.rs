@@ -1,13 +1,8 @@
+use client_darwinia::component::DarwiniaClientComponent;
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
-use client_darwinia::account::DarwiniaAccount;
-use client_darwinia::component::DarwiniaSubxtComponent;
-use client_darwinia::config::DarwiniaSubxtConfig;
-use client_darwinia::to_ethereum::Account as ToEthereumAccount;
-use client_darwinia::to_ethereum::Darwinia2Ethereum;
 use component_ethereum::ethereum::EthereumComponent;
-use component_ethereum::web3::Web3Config;
 use subquery_d2e::types::BridgeName;
 use subquery_d2e::SubqueryComponent;
 use support_common::config::{Config, Names};
@@ -39,7 +34,7 @@ impl DarwiniaScanner {
         {
             tracing::error!(
                 target: "darwinia-ethereum",
-                "[darwinia] An error occurred while processing the extrinsics: {:?}",
+                "[darwinia] [scanner] An error occurred while processing the extrinsics: {:?}",
                 err
             );
             // Prevent too fast refresh errors
@@ -56,39 +51,26 @@ impl DarwiniaScanner {
         let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
 
         // config
-        let config_darwinia: DarwiniaSubxtConfig = bridge_config.darwinia;
-        let config_web3: Web3Config = bridge_config.web3;
+        let config_darwinia = bridge_config.darwinia;
+        let config_web3 = bridge_config.web3;
 
         // subquery
         let subquery =
             SubqueryComponent::component(bridge_config.subquery, BridgeName::DarwiniaEthereum);
 
-        // darwinia
-        let darwinia = DarwiniaSubxtComponent::component(config_darwinia.clone()).await?;
-
         // ethereum
         let ethereum = EthereumComponent::component(bridge_config.ethereum, config_web3.clone())?;
 
-        let darwinia2ethereum = Darwinia2Ethereum::new(darwinia.clone());
+        // pangolin client
+        let client = DarwiniaClientComponent::component(config_darwinia).await?;
 
-        let account = DarwiniaAccount::new(
-            config_darwinia.relayer_private_key,
-            config_darwinia.relayer_real_account,
-        );
-        let account = ToEthereumAccount::new(
-            account.clone(),
-            config_darwinia.ecdsa_authority_private_key,
-            config_web3.endpoint,
-        );
         let mut wrapper = ScanDataWrapper {
             from: 0,
             limit: 0,
             sender_to_extrinsics,
             subquery,
-            darwinia,
             ethereum,
-            darwinia2ethereum,
-            account,
+            darwinia: client,
         };
 
         loop {
@@ -96,7 +78,7 @@ impl DarwiniaScanner {
             let limit = 10u32;
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] Track pangolin scan block: {} and limit: {}",
+                "[darwinia] [scanner] Track darwinia scan block: {} and limit: {}",
                 from,
                 limit
             );

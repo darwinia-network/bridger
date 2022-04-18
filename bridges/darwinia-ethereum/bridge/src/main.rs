@@ -5,7 +5,6 @@ use crate::command::types::Opts;
 mod bridge;
 mod cli;
 mod command;
-mod helpers;
 mod migrate;
 mod service;
 

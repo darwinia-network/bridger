@@ -17,26 +17,13 @@ _clippy() {
 
 if [ "${PACKAGE}" == "bridger" ]; then
   _clippy ${WORK_PATH}/frame/Cargo.toml
+  exit 0
 fi
 
-if [ "${PACKAGE}" == "pangolin-ropsten" ]; then
-  _clippy ${WORK_PATH}/bridges/pangolin-ropsten/Cargo.toml \
-    --locked
-fi
+BRIDGE_CARGO_TOML=${WORK_PATH}/bridges/${PACKAGE}/Cargo.toml
 
-if [ "${PACKAGE}" == "darwinia-ethereum" ]; then
-  _clippy ${WORK_PATH}/bridges/darwinia-ethereum/Cargo.toml \
-    --locked
-fi
-
-if [ "${PACKAGE}" == "pangolin-pangoro" ]; then
-  _clippy ${WORK_PATH}/bridges/pangolin-pangoro/Cargo.toml \
-    --locked
-fi
-
-if [ "${PACKAGE}" == "darwinia-crab" ]; then
-  _clippy ${WORK_PATH}/bridges/darwinia-crab/Cargo.toml \
-    --locked
+if [ -f ${BRIDGE_CARGO_TOML} ]; then
+  _clippy ${BRIDGE_CARGO_TOML} --locked
 fi
 
 

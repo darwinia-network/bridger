@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 env:
-  RUST_TOOLCHAIN: nightly-2021-12-07
+  RUST_TOOLCHAIN: nightly
 
 jobs:
 

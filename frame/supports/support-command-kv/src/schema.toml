@@ -8,6 +8,7 @@
   "scan.ropsten.redeem.running" =	"bool"
   "scan.ropsten.affirm.running" =	"bool"
   "affirm.target" = "u64"
+  "affirm.relayed" = "u64"
 
 [darwinia-ethereum]
   "scan.darwinia.planned" = "u64"
@@ -19,3 +20,4 @@
   "scan.ethereum.redeem.running" = "bool"
   "scan.ethereum.affirm.running" = "bool"
   "affirm.target" = "u64"
+  "affirm.relayed" = "u64"

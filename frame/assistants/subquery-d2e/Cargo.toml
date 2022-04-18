@@ -1,6 +1,6 @@
 [package]
 name = "subquery-d2e"
-version = "0.5.1"
+version = "0.5.4"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -29,8 +29,4 @@ async-trait = "0.1"
 strum       = { version = "0.21", features = ["derive"] }
 hex         = "0.4"
 
-## folow:
-## https://crates.io/crates/gql_client
-## https://github.com/arthurkhlghatyan/gql-client-rs/pull/13
-## https://github.com/fewensa/gql-client-rs/pull/1
 gql_client = { git = "https://github.com/fewensa/gql-client-rs.git", branch = "master" }

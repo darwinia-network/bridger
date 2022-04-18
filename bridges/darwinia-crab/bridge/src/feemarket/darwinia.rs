@@ -1,15 +1,14 @@
 use bp_messages::{LaneId, MessageNonce};
-use codec::{Decode, Encode};
+use codec::Encode;
+use darwinia_fee_market::types::{Order, Relayer};
+use feemarket_s2s_transition::api::FeemarketApi;
+use feemarket_s2s_transition::error::FeemarketResult;
 use frame_support::Blake2_128Concat;
 use relay_darwinia_client::DarwiniaChain;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme};
 use relay_utils::relay_loop::Client as RelayLoopClient;
-use scale_info::TypeInfo;
 use sp_core::storage::StorageKey;
 use sp_core::Pair;
-
-use feemarket_s2s::api::FeemarketApi;
-use feemarket_s2s::error::FeemarketResult;
 
 #[derive(Clone)]
 pub struct DarwiniaFeemarketApi {
@@ -53,15 +52,10 @@ impl FeemarketApi for DarwiniaFeemarketApi {
     async fn assigned_relayers(
         &self,
     ) -> FeemarketResult<
-        Vec<
-            darwinia_fee_market::Relayer<
-                <Self::Chain as ChainBase>::AccountId,
-                <Self::Chain as ChainBase>::Balance,
-            >,
-        >,
+        Vec<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {
         let storage_key = StorageKey(
-            feemarket_s2s::helpers::storage_prefix(
+            feemarket_s2s_transition::helpers::storage_prefix(
                 "FeeMarket".as_bytes(),
                 "AssignedRelayers".as_bytes(),
             )
@@ -79,10 +73,7 @@ impl FeemarketApi for DarwiniaFeemarketApi {
     ) -> FeemarketResult<
         Option<(
             usize,
-            darwinia_fee_market::Relayer<
-                <Self::Chain as ChainBase>::AccountId,
-                <Self::Chain as ChainBase>::Balance,
-            >,
+            Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>,
         )>,
     > {
         let signer_id = (*self.signer.public().as_array_ref()).into();
@@ -108,7 +99,7 @@ impl FeemarketApi for DarwiniaFeemarketApi {
         message_nonce: MessageNonce,
     ) -> FeemarketResult<
         Option<
-            darwinia_fee_market::Order<
+            Order<
                 <Self::Chain as ChainBase>::AccountId,
                 <Self::Chain as ChainBase>::BlockNumber,
                 <Self::Chain as ChainBase>::Balance,
@@ -125,8 +116,11 @@ impl FeemarketApi for DarwiniaFeemarketApi {
 
     async fn relayers(&self) -> FeemarketResult<Vec<<Self::Chain as ChainBase>::AccountId>> {
         let storage_key = StorageKey(
-            feemarket_s2s::helpers::storage_prefix("FeeMarket".as_bytes(), "Relayers".as_bytes())
-                .to_vec(),
+            feemarket_s2s_transition::helpers::storage_prefix(
+                "FeeMarket".as_bytes(),
+                "Relayers".as_bytes(),
+            )
+            .to_vec(),
         );
         Ok(self
             .client
@@ -139,12 +133,7 @@ impl FeemarketApi for DarwiniaFeemarketApi {
         &self,
         account: <Self::Chain as ChainBase>::AccountId,
     ) -> FeemarketResult<
-        Option<
-            darwinia_fee_market::Relayer<
-                <Self::Chain as ChainBase>::AccountId,
-                <Self::Chain as ChainBase>::Balance,
-            >,
-        >,
+        Option<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {
         let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
             "FeeMarket",
@@ -182,29 +171,4 @@ impl FeemarketApi for DarwiniaFeemarketApi {
         )
         .await
     }
-}
-
-#[allow(clippy::large_enum_variant)]
-#[derive(Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
-enum Call {
-    #[codec(index = 22)]
-    Feemarket(FeemarketCall),
-}
-
-/// Feemarket call
-#[derive(Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
-#[allow(non_camel_case_types)]
-enum FeemarketCall {
-    #[codec(index = 0)]
-    enroll_and_lock_collateral(bp_darwinia::Balance, Option<bp_darwinia::Balance>),
-    #[codec(index = 1)]
-    update_locked_collateral(bp_darwinia::Balance),
-    #[codec(index = 2)]
-    update_relay_fee(bp_darwinia::Balance),
-    #[codec(index = 3)]
-    cancel_enrollment(),
-    #[codec(index = 4)]
-    set_slash_protect(bp_darwinia::Balance),
-    #[codec(index = 5)]
-    set_assigned_relayers_number(u32),
 }

@@ -8,6 +8,7 @@ mod cli;
 mod command;
 mod feemarket;
 mod service;
+mod traits;
 mod types;
 
 #[tokio::main]

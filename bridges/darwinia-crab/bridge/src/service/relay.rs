@@ -11,12 +11,12 @@ use substrate_relay_helper::messages_lane::MessagesRelayParams;
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
 use substrate_relay_helper::TransactionParams;
 
-use feemarket_s2s::relay::BasicRelayStrategy;
+use feemarket_s2s_transition::relay::BasicRelayStrategy;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 
-use crate::bridge::CrabDarwiniaTask;
+use crate::bridge::DarwiniaCrabTask;
 use crate::bridge::{ChainInfoConfig, RelayConfig};
 use crate::bridge::{DarwiniaCrabBus, DarwiniaCrabConfig};
 use crate::chains::crab::{CrabFinalityToDarwinia, CrabMessagesToDarwinia};
@@ -44,7 +44,7 @@ impl Service for RelayService {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task(&format!("{}-relay", CrabDarwiniaTask::name()), async move {
+        let _greet = Self::try_task(&format!("{}-relay", DarwiniaCrabTask::name()), async move {
             if let Err(e) = start() {
                 tracing::error!(target: "darwinia-crab", "{:?}", e);
                 return Err(

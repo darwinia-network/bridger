@@ -1,15 +1,17 @@
 use bp_messages::LaneId;
-use feemarket_s2s::config::FeemarketConfig;
+use feemarket_s2s_transition::config::FeemarketConfig;
 use lifeline::{Lifeline, Service, Task};
 use relay_crab_client::CrabChain;
 use relay_darwinia_client::DarwiniaChain;
 
-use feemarket_s2s::fee::{CrazyStrategy, NothingStrategy, ReasonableStrategy, UpdateFeeStrategy};
+use feemarket_s2s_transition::fee::{
+    CrazyStrategy, NothingStrategy, ReasonableStrategy, UpdateFeeStrategy,
+};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 
-use crate::bridge::{ChainInfoConfig, CrabDarwiniaTask, RelayConfig};
+use crate::bridge::{ChainInfoConfig, DarwiniaCrabTask, RelayConfig};
 use crate::bridge::{DarwiniaCrabBus, DarwiniaCrabConfig};
 use crate::bridge::{TaskConfig, UpdateFeeStrategyType};
 use crate::feemarket::{CrabFeemarketApi, DarwiniaFeemarketApi};
@@ -27,7 +29,7 @@ impl Service for UpdateFeeService {
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!("{}-update-fee", CrabDarwiniaTask::name()),
+            &format!("{}-update-fee", DarwiniaCrabTask::name()),
             async move {
                 if let Err(e) = start() {
                     tracing::error!(target: "darwinia-crab", "{:?}", e);

@@ -1,5 +1,5 @@
-pub use self::pangolin::*;
-pub use self::pangoro::*;
+pub use self::crab::*;
+pub use self::darwinia::*;
 
 mod crab;
 mod darwinia;

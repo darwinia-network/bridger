@@ -11,7 +11,7 @@ pub struct DarwiniaCrabConfig {
     pub darwinia: ChainInfoConfig,
     pub crab: ChainInfoConfig,
     pub relay: RelayConfig,
-    pub feemarket: FeemarketConfig,
+    pub feemarket: Option<FeemarketConfig>,
     pub task: TaskConfig,
 }
 

@@ -205,7 +205,7 @@ jobs:
         run: |
           mkdir -p shared
           7z a -tzip \
-            shared/bridger-macos-x86_64.zip \
+            shared/bridger-darwin-x86_64.zip \
             ./frame/target/x86_64-apple-darwin/release/bridger
 
       - name: Build bridge-${{ matrix.package }}
@@ -219,7 +219,7 @@ jobs:
         run: |
           mkdir -p shared
           7z a -tzip \
-            shared/bridge-${{ matrix.package }}-macos-x86_64.zip \
+            shared/bridge-${{ matrix.package }}-darwin-x86_64.zip \
             ./bridges/${{ matrix.package }}/target/x86_64-apple-darwin/release/bridge-${{ matrix.package }}
 
       - name: Upload shared

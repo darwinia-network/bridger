@@ -115,15 +115,17 @@ async fn run_update_fee(config_task: TaskConfig) -> color_eyre::Result<()> {
             Ok(strategy.handle().await?)
         }
         UpdateFeeStrategyType::Reasonable => {
-            let feemarket_config: FeemarketConfig = bridge_config.feemarket;
-            let strategy = ReasonableStrategy::new(
-                feemarket_config,
-                pangolin_feemarket_api,
-                pangoro_feemarket_api,
-                15 * 1000000000,
-                15 * 1000000000,
-            )?;
-            Ok(strategy.handle().await?)
+            if let Some(feemarket_config) = bridge_config.feemarket {
+                let strategy = ReasonableStrategy::new(
+                    feemarket_config,
+                    pangolin_feemarket_api,
+                    pangoro_feemarket_api,
+                    15 * 1000000000,
+                    15 * 1000000000,
+                )?;
+                return Ok(strategy.handle().await?);
+            }
+            Err(BridgerError::Custom("Missing feemarket config".to_string()).into())
         }
     }
 }

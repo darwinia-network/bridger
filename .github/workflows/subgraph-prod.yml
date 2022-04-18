@@ -7,7 +7,7 @@ on:
 
 jobs:
   thegraph-ethereum:
-    name: Deploy ethereum thegraph
+    name: Subgraph Ethereum like v1
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,7 +28,7 @@ jobs:
             subgraph-${{ matrix.chain }}.yaml
 
   thegraph-bsc:
-    name: Deploy bsc thegraph
+    name: Subgraph BSC
     runs-on: ubuntu-latest
     strategy:
       matrix:

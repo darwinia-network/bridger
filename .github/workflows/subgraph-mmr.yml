@@ -5,7 +5,7 @@ on:
 
 jobs:
   thegraph-ethereum:
-    name: Deploy MMR subgraph
+    name: Subgraph MMR
     runs-on: ubuntu-latest
     strategy:
       matrix:

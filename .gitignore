@@ -13,3 +13,5 @@ subql/**/yarn.lock
 node_modules
 
 generated
+
+metadata.scale

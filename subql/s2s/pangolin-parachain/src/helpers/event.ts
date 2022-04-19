@@ -15,6 +15,10 @@ export class FastEvent {
     return this.event.idx;
   }
 
+  get block() {
+    return this.event.block
+  }
+
   get blockNumber() {
     return this.event.block.block.header.number.toNumber();
   }

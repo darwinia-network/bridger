@@ -130,7 +130,7 @@ impl PrecompiledBinaryExecutor {
                     }
                     tracing::warn!(
                         target: "bridger",
-                        "The except version is [{}], but the binary's ({}) version is [{}].",
+                        "The expected version is [{}], but the binary's ({}) version is [{}].",
                         version,
                         command,
                         binary_version.unwrap_or(&"UNKNOWN")

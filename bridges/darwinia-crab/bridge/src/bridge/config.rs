@@ -1,7 +1,7 @@
+use feemarket_s2s_transition::config::FeemarketConfig;
 use serde::{Deserialize, Serialize};
 use strum::{EnumString, EnumVariantNames};
 
-use component_subscan::SubscanConfig;
 use support_common::error::BridgerError;
 
 use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
@@ -11,10 +11,7 @@ pub struct DarwiniaCrabConfig {
     pub darwinia: ChainInfoConfig,
     pub crab: ChainInfoConfig,
     pub relay: RelayConfig,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub darwinia_subscan: Option<SubscanConfig>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub crab_subscan: Option<SubscanConfig>,
+    pub feemarket: Option<FeemarketConfig>,
     pub task: TaskConfig,
 }
 

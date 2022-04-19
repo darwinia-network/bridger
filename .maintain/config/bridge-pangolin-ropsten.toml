@@ -1,6 +1,6 @@
 [darwinia]
 # a offchain-indexing opening pangolin node
-endpoint = "https://pangolin-rpc.darwinia.network"
+endpoint = "wss://pangolin-rpc.darwinia.network"
 
 # private key of relayer, or, private key of proxy
 relayer_private_key = "0x..."
@@ -9,8 +9,6 @@ relayer_real_account = "0x..."
 
 # private key to sign ecdsa messages
 ecdsa_authority_private_key = "0x..."
-
-strict = false
 
 [web3]
 endpoint = "https://ropsten.infura.io/v3/<YOUR_KEY>"

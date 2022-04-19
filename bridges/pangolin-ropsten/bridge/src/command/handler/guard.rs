@@ -28,7 +28,7 @@ pub async fn handle_guard() -> color_eyre::Result<()> {
                 .tx()
                 .ethereum_relay()
                 .vote_pending_relay_header_parcel(pending_block_number, aye)
-                .sign_and_submit(client.account().signer())
+                .sign_and_submit_default(client.account().signer())
                 .await?;
             if aye {
                 output::output_text(format!(

@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use codec::Encode;
 use pangolin_subxt::api::runtime_types::{darwinia_bridge_ethereum, darwinia_relay_primitives};
-use subxt::DefaultExtra;
 
 use crate::config::PangolinSubxtConfig;
 use crate::types::Balance;
@@ -17,9 +16,6 @@ pub type BetterRelayAffirmation = darwinia_relay_primitives::relayer_game::Relay
 
 /// Affirmations return data types
 pub type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<BetterRelayAffirmation>>>;
-
-/// Node runtime signed extra
-pub type NodeRuntimeSignedExtra = DefaultExtra<PangolinSubxtConfig>;
 
 /// Encode mmr root message
 #[derive(Encode)]

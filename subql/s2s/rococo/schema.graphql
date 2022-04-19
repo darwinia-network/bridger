@@ -1,0 +1,21 @@
+
+type Block @entity {
+  id: ID!
+
+  number: Int
+  timestamp: Date
+  parentHash: String
+  specVersion: Int
+}
+
+type NeedRelayBlock @entity {
+  id: ID!
+
+  atBlock: Int!
+  mandatory: Boolean!
+  origin: String!
+  laneId: String
+  messageNonce: Int
+
+  timestamp: Date
+}

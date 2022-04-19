@@ -4,7 +4,8 @@
 
 ## Changed
 
-Fix send vote extrinsics bug
+- Update bridge pangolin-pangoro #443
+- Update bridge darwinia-crab #448
 
 ## Resources
 

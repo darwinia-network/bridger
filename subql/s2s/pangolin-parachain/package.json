@@ -1,5 +1,5 @@
 {
-  "name": "subql-s2s-pangolin",
+  "name": "subql-s2s-pangolin-parachain",
   "version": "0.0.4",
   "description": "This SubQuery project can be use as a starting point for Rococo network",
   "main": "dist/index.js",

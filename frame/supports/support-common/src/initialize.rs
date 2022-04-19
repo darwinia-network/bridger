@@ -17,20 +17,21 @@ fn init_log() -> color_eyre::Result<()> {
 
     let def_log_filter = [
         "info",
+        "jsonrpsee_ws_client=error",
+        "hyper=error",
+        "isahc=error",
+        "messages_relay=trace",
+        "messages-relay=trace",
+        "lifeline=debug",
         "bridger=trace",
+        "bridge=info",
         "pangolin-pangoro=trace",
         "pangolin-ropsten=trace",
         "pangoro-chapel=trace",
         "darwinia-ethereum=trace",
         "darwinia-crab=trace",
         "client-pangolin=trace",
-        "lifeline=debug",
-        "bridge=info",
-        "messages_relay=trace",
-        "messages-relay=trace",
-        "jsonrpsee_ws_client=error",
-        "hyper=error",
-        "isahc=error",
+        "feemarket=trace",
     ]
     .join(",");
 

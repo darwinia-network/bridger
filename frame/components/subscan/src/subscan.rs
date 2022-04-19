@@ -1,3 +1,4 @@
+use crate::error::SubscanComponentResult;
 use crate::types::ExtrinsicsData;
 use crate::types::OpenPrice;
 use crate::types::SubscanResponse;
@@ -37,7 +38,7 @@ impl Subscan {
         &self,
         api: impl AsRef<str>,
         data_json_string: impl AsRef<str>,
-    ) -> color_eyre::Result<T> {
+    ) -> SubscanComponentResult<T> {
         let api = format!("{}{}", self.endpoint, api.as_ref());
         tracing::trace!(target: "component-subscan", "POST {} ---> {}", api, data_json_string.as_ref());
         let data = serde_json::from_str::<serde_json::Value>(data_json_string.as_ref())?;
@@ -62,13 +63,13 @@ impl Subscan {
         &self,
         page: u32,
         row: u32,
-    ) -> color_eyre::Result<SubscanResponse<ExtrinsicsData>> {
+    ) -> SubscanComponentResult<SubscanResponse<ExtrinsicsData>> {
         let data = format!(r#"{{"row": {},"page": {}, "signed": "signed"}}"#, row, page);
         self._post("/api/scan/extrinsics", data).await
     }
 
     // https://docs.api.subscan.io/#price
-    pub async fn price(&self, time: u64) -> color_eyre::Result<SubscanResponse<OpenPrice>> {
+    pub async fn price(&self, time: u64) -> SubscanComponentResult<SubscanResponse<OpenPrice>> {
         let data = format!(r#"{{"time": {}}}"#, time);
         self._post("/api/open/price", data).await
     }

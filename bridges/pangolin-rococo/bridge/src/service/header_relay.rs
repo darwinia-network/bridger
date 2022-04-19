@@ -15,7 +15,7 @@ impl Service for HeaderRelayService {
     type Bus = PangolinRococoBus;
     type Lifeline = color_eyre::Result<Self>;
 
-    fn spawn(bus: &Self::Bus) -> Self::Lifeline {
+    fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
             &format!("{}-header-relay", PangolinRococoTask::name()),
             async move {

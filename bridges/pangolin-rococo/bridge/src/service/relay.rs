@@ -1,5 +1,6 @@
 use bp_darwinia_core::AccountId;
 use bp_darwinia_core::AccountIdConverter;
+use feemarket_s2s::relay::BasicRelayStrategy;
 use futures::{FutureExt, TryFutureExt};
 use lifeline::{Lifeline, Service, Task};
 use relay_substrate_client::{AccountIdOf, Chain, Client, TransactionSignScheme};
@@ -19,6 +20,7 @@ use crate::bridge::{ChainInfoConfig, RelayConfig};
 use crate::bridge::{PangolinRococoBus, PangolinRococoConfig};
 use crate::chains::pangolin::PangolinMessagesToPangolinParachain;
 use crate::chains::pangolin_parachain::PangolinParachainMessagesToPangolin;
+use crate::feemarket::{PangolinFeemarketApi, PangolinParachainFeemarketApi};
 use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
 // /// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.
@@ -170,6 +172,13 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
     let mut message_relays = Vec::with_capacity(lanes.len() * 2);
     for lane in lanes {
         let lane = lane.into();
+        let pangolin_feemarket_api =
+            PangolinFeemarketApi::new(pangolin_client.clone(), lane, pangolin_sign.clone());
+        let pangolin_parachain_feemarket_api = PangolinParachainFeemarketApi::new(
+            pangolin_parachain_client.clone(),
+            lane,
+            pangolin_parachain_sign.clone(),
+        );
 
         let pangolin_to_pangolin_parachain_messages = substrate_relay_helper::messages_lane::run::<
             PangolinMessagesToPangolinParachain,
@@ -189,8 +198,8 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             lane_id: lane,
             metrics_params: metrics_params.clone().disable(),
             standalone_metrics: None,
-            relay_strategy: PangolinRelayStrategy::new(
-                pangolin_client.clone(),
+            relay_strategy: BasicRelayStrategy::new(
+                pangolin_feemarket_api,
                 AccountId::from(pangolin_sign.public().0),
             ),
         })
@@ -215,8 +224,8 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
             lane_id: lane,
             metrics_params: metrics_params.clone().disable(),
             standalone_metrics: None,
-            relay_strategy: PangoroRelayStrategy::new(
-                pangolin_parachain_client.clone(),
+            relay_strategy: BasicRelayStrategy::new(
+                pangolin_parachain_feemarket_api,
                 AccountId::from(pangolin_parachain_sign.public().0),
             ),
         })

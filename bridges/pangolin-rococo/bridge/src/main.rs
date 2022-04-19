@@ -6,6 +6,7 @@ mod bridge;
 mod chains;
 mod cli;
 mod command;
+mod feemarket;
 mod service;
 mod traits;
 mod types;

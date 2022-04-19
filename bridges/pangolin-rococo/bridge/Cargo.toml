@@ -50,6 +50,7 @@ bp-header-chain                 = { git = "https://github.com/darwinia-network/d
 bp-messages                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
 bp-runtime                      = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
 bridge-runtime-common           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
+darwinia-fee-market             = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.7" }
 messages-relay                  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
 pallet-bridge-messages          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
 relay-pangolin-client           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
@@ -58,9 +59,9 @@ relay-rococo-client             = { git = "https://github.com/darwinia-network/d
 relay-substrate-client          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
 relay-utils                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
 substrate-relay-helper          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
-
 ## component
 component-subscan = { path = "../../../frame/components/subscan" }
+feemarket-s2s     = { path = "../../../frame/assistants/feemarket-s2s" }
 
 ## support
 support-common   = { path = "../../../frame/supports/support-common" }

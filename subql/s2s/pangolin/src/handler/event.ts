@@ -1,6 +1,7 @@
 import {FastEvent} from '../helpers';
 import * as storage from '../storage';
 import {RelayBlockOrigin} from "../storage";
+import {BlockHandler} from "./block";
 
 export class EventHandler {
   private readonly event: FastEvent;
@@ -10,7 +11,7 @@ export class EventHandler {
   }
 
   public async save() {
-    // await BlockHandler.ensureBlock(this.event.blockHash);
+    await BlockHandler.ensureBlock(this.event.blockHash);
 
     const eventId = this.event.id;
     const eventSection = this.event.section;

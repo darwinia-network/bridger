@@ -12,6 +12,7 @@ type NeedRelayBlock @entity {
   id: ID!
 
   atBlock: Int!
+  hash: String!
   mandatory: Boolean!
   origin: String!
   laneId: String

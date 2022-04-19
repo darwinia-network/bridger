@@ -17,6 +17,7 @@ export async function storeNeedRelayBlock(
 ) {
   const _event = new NeedRelayBlock(event.id);
   _event.atBlock = event.blockNumber;
+  _event.hash = event.blockHash;
   _event.mandatory = origin == RelayBlockOrigin.Mandatory;
   _event.origin = origin;
 

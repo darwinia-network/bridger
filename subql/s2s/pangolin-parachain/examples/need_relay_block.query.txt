@@ -1,14 +1,27 @@
+
 query queryNeedRelayBlockPage {
-  needRelayBlocks (
+  justificationMappings (
     first: 5
-    orderBy: AT_BLOCK_ASC
+    orderBy: BLOCK_NUMBER_DESC
   ) {
     nodes {
       id
-      atBlock
+      blockNumber
+      blockHash
+      mandatory
+      justification
+    }
+  }
+  needRelayBlocks (
+    first: 5
+    orderBy: BLOCK_NUMBER_ASC
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
       type
       origin
-      justification
       laneId
       messageNonce
       timestamp

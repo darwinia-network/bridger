@@ -11,13 +11,22 @@ type Block @entity {
 type NeedRelayBlock @entity {
   id: ID!
 
-  atBlock: Int!
-  hash: String!
+  blockNumber: Int!
+  blockHash: String!
   type: String!
   origin: String!
-  justification: String
   laneId: String
   messageNonce: Int
 
   timestamp: Date
+}
+
+type JustificationMapping @entity {
+  id: ID!
+
+  blockNumber: Int!
+  blockHash: String!
+  mandatory: Boolean!
+  justification: String!
+
 }

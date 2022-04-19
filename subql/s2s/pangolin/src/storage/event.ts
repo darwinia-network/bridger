@@ -1,6 +1,6 @@
-import {FastEvent} from '../helpers';
-import {NeedRelayBlock} from '../types';
-import {Justifications} from "@polkadot/types/interfaces/runtime/types";
+import {FastBlock, FastEvent} from '../helpers';
+import {JustificationMapping, NeedRelayBlock} from '../types';
+import {storeJustification} from "./block";
 
 export enum RelayBlockType {
   Mandatory = 'mandatory',
@@ -19,8 +19,8 @@ export async function storeNeedRelayBlock(
   origin: RelayBlockOrigin
 ) {
   const _event = new NeedRelayBlock(event.id);
-  _event.atBlock = event.blockNumber;
-  _event.hash = event.blockHash;
+  _event.blockNumber = event.blockNumber;
+  _event.blockHash = event.blockHash;
   _event.type = origin == RelayBlockOrigin.Mandatory ? RelayBlockType.Mandatory : RelayBlockType.OnDemand;
   _event.origin = origin;
 
@@ -30,19 +30,15 @@ export async function storeNeedRelayBlock(
     _event.laneId = laneId;
     _event.messageNonce = messageNonce;
   }
-
-  const block = event.block;
-  if (block.justifications.isSome) {
-    const justifications = block.justifications.value as unknown as Justifications;
-    for (const justification of justifications) {
-      const [consensusEngineId, encodedJustification] = justification;
-      if (!consensusEngineId.isGrandpa) continue;
-      const engineId = consensusEngineId.toString();
-      if (engineId == 'FRNK') {
-        _event.justification = encodedJustification.toString();
-        break;
-      }
+  if (_event.type == RelayBlockType.Mandatory) {
+    const block = new FastBlock(event.block);
+    let justificationMapping = await JustificationMapping.get(block.number.toString());
+    if (!justificationMapping) {
+      await storeJustification(block);
     }
+    justificationMapping = await JustificationMapping.get(block.number.toString());
+    justificationMapping.mandatory = true;
+    await justificationMapping.save();
   }
 
   _event.timestamp = event.timestamp;

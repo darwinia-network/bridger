@@ -1,5 +1,3 @@
-
-
 query queryNeedRelayBlockPage {
   needRelayBlocks (
     first: 5
@@ -8,12 +6,12 @@ query queryNeedRelayBlockPage {
     nodes {
       id
       atBlock
-      mandatory
+      type
       origin
+      justification
       laneId
       messageNonce
       timestamp
     }
   }
 }
-

@@ -12,12 +12,11 @@ use web3::Web3;
 
 use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
-use crate::types::NodeRuntimeSignedExtra;
 
 /// AccountId
 pub type AccountId = <PangolinSubxtConfig as subxt::Config>::AccountId;
 /// Signer
-pub type Signer = PairSigner<PangolinSubxtConfig, NodeRuntimeSignedExtra, Pair>;
+pub type Signer = PairSigner<PangolinSubxtConfig, Pair>;
 
 /// Account
 #[derive(Clone)]

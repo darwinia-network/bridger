@@ -34,7 +34,7 @@ pub async fn handle_confirm(opts: ConfirmOpts) -> color_eyre::Result<()> {
                 ethereum_relay_header_parcel: parcel.try_into()?,
             },
         ))
-        .sign_and_submit(client.account().signer())
+        .sign_and_submit_default(client.account().signer())
         .await?;
 
     let msg = format!("Set confirmed block {} succeed! {:?}", block, tx);

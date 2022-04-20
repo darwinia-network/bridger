@@ -7,5 +7,7 @@ pub async fn handle_relay() -> color_eyre::Result<()> {
     // check config
     let _bridge_config: PangolinPangoroConfig = Config::restore(Names::BridgePangolinPangoro)?;
     let _task = PangolinPangoroTask::new().await?;
-    Ok(())
+    loop {
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    }
 }

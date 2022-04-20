@@ -1,6 +1,6 @@
 [package]
 name = "component-subscan"
-version = "0.5.4"
+version = "0.5.5"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -19,7 +19,6 @@ edition = "2021"
 
 [dependencies]
 tracing = "0.1"
-color-eyre = "0.5"
 thiserror = "1.0"
 
 serde = { version = "1.0", features = ["derive"] }

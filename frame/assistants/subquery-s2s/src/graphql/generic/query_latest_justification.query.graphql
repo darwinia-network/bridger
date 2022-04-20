@@ -1,0 +1,14 @@
+query queryLatestJustification {
+  justificationMappings (
+    first: 1
+    orderBy: BLOCK_NUMBER_DESC
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
+      mandatory
+      justification
+    }
+  }
+}

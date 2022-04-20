@@ -1,10 +1,10 @@
-query queryNextRelayBlock {
+query queryNextRelayBlock($from: Int!, $first: Int!) {
   needRelayBlocks (
-    first: 5
+    first: $first
     orderBy: BLOCK_NUMBER_ASC
     filter: {
       blockNumber: {
-        greaterThan: 1891870
+        greaterThan: $from
       }
     }
   ) {

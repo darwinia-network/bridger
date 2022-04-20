@@ -15,13 +15,15 @@ version       = "0.5.5"
 [dependencies]
 
 array-bytes = "1.4"
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
-  "derive",
-  "full",
-  "bit-vec",
-] }
+#codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
+#  "derive",
+#  "full",
+#  "bit-vec",
+#] }
+#codec       = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive", "full"] }
 component-shadow = { path = "../../components/shadow" }
-serde = { version = "1", features = ["derive"] }
-subxt = { git = "https://github.com/paritytech/subxt.git", branch = "master" }
+
+subxt     = "0.17"
 thiserror = "1"
-web3 = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master" }
+serde     = { version = "1", features = ["derive"] }
+web3      = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master" }

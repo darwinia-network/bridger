@@ -7,9 +7,9 @@ version = "0.1.0"
 
 [dependencies]
 
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
-    "derive",
-    "full",
-    "bit-vec",
-] }
-subxt = { git = "https://github.com/paritytech/subxt.git", branch = "master" }
+#codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
+#    "derive",
+#    "full",
+#    "bit-vec",
+#] }
+subxt     = "0.17"

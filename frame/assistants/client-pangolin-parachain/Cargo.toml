@@ -29,6 +29,6 @@ array-bytes = "1.4"
 codec       = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive", "full"] }
 web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 secp256k1   = { version = "0.20", features = ["recovery"] }
-subxt       = { git = "https://github.com/paritytech/subxt.git", branch = "master" }
+subxt       = "0.17"
 
 pangolin-parachain-subxt   = { path = "../pangolin-parachain-subxt" }

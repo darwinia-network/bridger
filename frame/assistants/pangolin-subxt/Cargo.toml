@@ -15,7 +15,7 @@ version       = "0.5.5"
 [dependencies]
 
 array-bytes = "1.4"
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
+codec = { package = "parity-scale-codec", version = "2", default-features = false, features = [
   "derive",
   "full",
   "bit-vec",

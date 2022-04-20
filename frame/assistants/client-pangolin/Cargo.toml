@@ -32,7 +32,7 @@ web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "mas
 secp256k1   = { version = "0.20", features = ["recovery"] }
 subxt       = { git = "https://github.com/paritytech/subxt.git", branch = "master" }
 
-pangolin-subxt   = { path = "../../../frame/assistants/pangolin-subxt" }
+pangolin-subxt   = { path = "../pangolin-subxt" }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

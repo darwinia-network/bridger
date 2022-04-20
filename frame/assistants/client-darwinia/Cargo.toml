@@ -30,10 +30,9 @@ array-bytes = "1.4"
 codec       = { package = "parity-scale-codec", version = "3.1.0", default-features = false, features = ["derive", "full"] }
 web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 secp256k1   = { version = "0.20", features = ["recovery"] }
-#subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
 subxt       = "0.18.1"
 
-darwinia-subxt   = { path = "../../../frame/assistants/darwinia-subxt" }
+darwinia-subxt   = { path = "../darwinia-subxt" }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

@@ -10,9 +10,9 @@ use crate::types::DarwiniaAccount;
 const MAX_ATTEMPTS: u32 = 6;
 
 /// Subxt component
-pub struct PangolinClientComponent;
+pub struct PangolinParachainClientComponent;
 
-impl PangolinClientComponent {
+impl PangolinParachainClientComponent {
     /// Get subxt client instance
     pub async fn component(config: ClientConfig) -> ClientResult<PangolinClient> {
         let mut attempts = 1;

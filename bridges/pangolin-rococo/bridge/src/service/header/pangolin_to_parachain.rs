@@ -25,7 +25,7 @@ impl Service for PangolinToParachainHeaderRelayService {
                 PangolinRococoTask::name()
             ),
             async move {
-                if let Err(e) = start() {
+                if let Err(e) = start().await {
                     tracing::error!(
                         target: "pangolin-rococo",
                         "{:?}",
@@ -43,7 +43,7 @@ impl Service for PangolinToParachainHeaderRelayService {
     }
 }
 
-fn start() -> color_eyre::Result<()> {
+async fn start() -> color_eyre::Result<()> {
     tracing::info!(
         target: "pangolin-rococo",
         "[header-relay-pangolin-to-parachain] SERVICE RESTARTING..."
@@ -72,8 +72,11 @@ fn start() -> color_eyre::Result<()> {
         .rpc()
         .block(Some(last_relayed_pangolin_hash_in_parachain))
         .await?
-        .ok_or_else(BridgerError::Custom(format!(
-            "Failed to query block by [{}] in pangolin",
-            last_relayed_pangolin_hash_in_parachain.to_string()
-        )))?;
+        .ok_or_else(|| {
+            BridgerError::Custom(format!(
+                "Failed to query block by [{}] in pangolin",
+                last_relayed_pangolin_hash_in_parachain.to_string()
+            ))
+        })?;
+    Ok(())
 }

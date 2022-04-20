@@ -11,6 +11,7 @@ pub struct ClientConfig {
     pub relayer_real_account: Option<String>,
 
     /// private key to sign ecdsa messages, the signature will be submitted to Darwinia by relayer
+    #[cfg(feature = "ethlike-v1")]
     pub ecdsa_authority_private_key: Option<String>,
 }
 

@@ -1,6 +1,8 @@
+#[cfg(feature = "ethlike-v1")]
 use client_pangolin::types::EthereumAccount;
 
 #[test]
+#[cfg(feature = "ethlike-v1")]
 fn test_ecdsa() {
     let hash =
         array_bytes::hex2bytes("71e2f60faf6c7264cca14fb1a01260a787b4d18039cd8cd680aaff1e118c711d")

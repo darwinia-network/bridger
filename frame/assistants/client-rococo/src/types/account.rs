@@ -1,22 +1,18 @@
-use rococo_subxt::api::runtime_types::darwinia_claims::EcdsaSignature;
-use secp256k1::SecretKey;
 use std::fmt::{Debug, Formatter};
 
 use subxt::{
     sp_core::{sr25519::Pair, Pair as PairTrait},
     PairSigner,
 };
-use web3::signing::SecretKeyRef;
-use web3::transports::Http;
-use web3::Web3;
 
 use crate::config::RococoSubxtConfig;
 use crate::error::{ClientError, ClientResult};
+use crate::types::NodeRuntimeSignedExtra;
 
 /// AccountId
 pub type AccountId = <RococoSubxtConfig as subxt::Config>::AccountId;
 /// Signer
-pub type Signer = PairSigner<RococoSubxtConfig, Pair>;
+pub type Signer = PairSigner<RococoSubxtConfig, NodeRuntimeSignedExtra, Pair>;
 
 /// Account
 #[derive(Clone)]

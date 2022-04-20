@@ -2,7 +2,7 @@ use std::{thread, time};
 
 use subxt::ClientBuilder;
 
-use crate::client::PangolinClient;
+use crate::client::PangolinParachainClient;
 use crate::config::ClientConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::types::DarwiniaAccount;
@@ -14,7 +14,7 @@ pub struct PangolinParachainClientComponent;
 
 impl PangolinParachainClientComponent {
     /// Get subxt client instance
-    pub async fn component(config: ClientConfig) -> ClientResult<PangolinClient> {
+    pub async fn component(config: ClientConfig) -> ClientResult<PangolinParachainClient> {
         let mut attempts = 1;
         let mut wait_secs = 1;
         let endpoint = Self::correct_url(&config.endpoint)?;
@@ -23,7 +23,7 @@ impl PangolinParachainClientComponent {
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
             return match ClientBuilder::new().set_url(&endpoint).build().await {
-                Ok(client) => Ok(PangolinClient::new(client, account.clone())),
+                Ok(client) => Ok(PangolinParachainClient::new(client, account.clone())),
                 Err(err) => {
                     if attempts < MAX_ATTEMPTS {
                         attempts += 1;

@@ -1,7 +1,7 @@
 use support_lifeline::task::TaskStack;
 
 use crate::bridge::PangolinRococoBus;
-use crate::service::header::HeaderRelayService;
+use crate::service::header::PangolinToParachainHeaderRelayService;
 use crate::service::message::MessageRelayService;
 
 #[derive(Debug)]

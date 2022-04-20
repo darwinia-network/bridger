@@ -61,8 +61,9 @@ relay-utils                     = { git = "https://github.com/darwinia-network/d
 substrate-relay-helper          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
 
 ## component
-#client-pangolin           = { path = "../../../frame/assistants/client-pangolin" }
-#client-pangolin-parachain = { path = "../../../frame/assistants/client-pangolin-parachain" }
+client-pangolin           = { path = "../../../frame/assistants/client-pangolin" }
+client-pangolin-parachain = { path = "../../../frame/assistants/client-pangolin-parachain" }
+client-rococo             = { path = "../../../frame/assistants/client-rococo" }
 component-subscan         = { path = "../../../frame/components/subscan" }
 feemarket-s2s             = { path = "../../../frame/assistants/feemarket-s2s" }
 subquery-s2s              = { path = "../../../frame/assistants/subquery-s2s" }
@@ -72,9 +73,3 @@ subquery-s2s              = { path = "../../../frame/assistants/subquery-s2s" }
 support-common   = { path = "../../../frame/supports/support-common" }
 support-lifeline = { path = "../../../frame/supports/support-lifeline" }
 support-terminal = { path = "../../../frame/supports/support-terminal" }
-
-## test
-#subxt            = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
-web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
-#secp256k1   = { version = "0.20", features = ["recovery"] }
-#array-bytes = "1.4"

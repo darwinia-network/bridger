@@ -738,15 +738,15 @@ pub mod api {
         pub mod calls {
             use super::runtime_types;
             type DispatchError = runtime_types::sp_runtime::DispatchError;
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct set_validation_data {
-                pub data:
-                    runtime_types::cumulus_primitives_parachain_inherent::ParachainInherentData,
-            }
-            impl ::subxt::Call for set_validation_data {
-                const PALLET: &'static str = "ParachainSystem";
-                const FUNCTION: &'static str = "set_validation_data";
-            }
+            // #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            // pub struct set_validation_data {
+            //     pub data:
+            //         runtime_types::cumulus_primitives_parachain_inherent::ParachainInherentData,
+            // }
+            // impl ::subxt::Call for set_validation_data {
+            //     const PALLET: &'static str = "ParachainSystem";
+            //     const FUNCTION: &'static str = "set_validation_data";
+            // }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct sudo_send_upward_message {
                 pub message: ::std::vec::Vec<::core::primitive::u8>,
@@ -787,14 +787,14 @@ pub mod api {
                         marker: ::core::marker::PhantomData,
                     }
                 }
-                pub fn set_validation_data(
-                    &self,
-                    data : runtime_types :: cumulus_primitives_parachain_inherent :: ParachainInherentData,
-                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, set_validation_data, DispatchError>
-                {
-                    let call = set_validation_data { data };
-                    ::subxt::SubmittableExtrinsic::new(self.client, call)
-                }
+                // pub fn set_validation_data(
+                //     &self,
+                //     data : runtime_types :: cumulus_primitives_parachain_inherent :: ParachainInherentData,
+                // ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, set_validation_data, DispatchError>
+                // {
+                //     let call = set_validation_data { data };
+                //     ::subxt::SubmittableExtrinsic::new(self.client, call)
+                // }
                 pub fn sudo_send_upward_message(
                     &self,
                     message: ::std::vec::Vec<::core::primitive::u8>,
@@ -968,18 +968,34 @@ pub mod api {
                     ::subxt::StorageEntryKey::Plain
                 }
             }
-            pub struct LastHrmpMqcHeads;
-            impl ::subxt::StorageEntry for LastHrmpMqcHeads {
-                const PALLET: &'static str = "ParachainSystem";
-                const STORAGE: &'static str = "LastHrmpMqcHeads";
-                type Value = ::std::collections::BTreeMap<
-                    runtime_types::polkadot_parachain::primitives::Id,
-                    runtime_types::cumulus_primitives_parachain_inherent::MessageQueueChain,
-                >;
-                fn key(&self) -> ::subxt::StorageEntryKey {
-                    ::subxt::StorageEntryKey::Plain
-                }
-            }
+            //# error[E0277]: the trait bound `BTreeMap<primitives::Id, MessageQueueChain>: Decode` is not satisfied
+            //# --> D:\dev\darwinia-network\bridger\frame\assistants\pangolin-parachain-subxt\src\runtime.rs:975:17
+            //# |
+            //# 975 | /                 type Value = ::std::collections::BTreeMap<
+            //# 976 | |                     runtime_types::polkadot_parachain::primitives::Id,
+            //#                             977 | |                     runtime_types::cumulus_primitives_parachain_inherent::MessageQueueChain,
+            //#                                                         978 | |                 >;
+            //# | |__________________^ the trait `Decode` is not implemented for `BTreeMap<primitives::Id, MessageQueueChain>`
+            //# |
+            //# = help: the following implementations were found:
+            //# <BTreeMap<K, V> as Decode>
+            //# note: required by a bound in `subxt::StorageEntry::Value`
+            //# --> d:\opt\scoop\persist\rustup\.cargo\git\checkouts\subxt-52715947a5b6313f\0dadaa5\subxt\src\storage.rs:50:17
+            //# |
+            //# 50  |     type Value: Decode;
+            //# |                 ^^^^^^ required by this bound in `subxt::StorageEntry::Value`
+            // pub struct LastHrmpMqcHeads;
+            // impl ::subxt::StorageEntry for LastHrmpMqcHeads {
+            //     const PALLET: &'static str = "ParachainSystem";
+            //     const STORAGE: &'static str = "LastHrmpMqcHeads";
+            //     type Value = ::std::collections::BTreeMap<
+            //         runtime_types::polkadot_parachain::primitives::Id,
+            //         runtime_types::cumulus_primitives_parachain_inherent::MessageQueueChain,
+            //     >;
+            //     fn key(&self) -> ::subxt::StorageEntryKey {
+            //         ::subxt::StorageEntryKey::Plain
+            //     }
+            // }
             pub struct ProcessedDownwardMessages;
             impl ::subxt::StorageEntry for ProcessedDownwardMessages {
                 const PALLET: &'static str = "ParachainSystem";
@@ -1161,19 +1177,19 @@ pub mod api {
                     let entry = LastDmqMqcHead;
                     self.client.storage().fetch_or_default(&entry, hash).await
                 }
-                pub async fn last_hrmp_mqc_heads(
-                    &self,
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<
-                    ::std::collections::BTreeMap<
-                        runtime_types::polkadot_parachain::primitives::Id,
-                        runtime_types::cumulus_primitives_parachain_inherent::MessageQueueChain,
-                    >,
-                    ::subxt::BasicError,
-                > {
-                    let entry = LastHrmpMqcHeads;
-                    self.client.storage().fetch_or_default(&entry, hash).await
-                }
+                // pub async fn last_hrmp_mqc_heads(
+                //     &self,
+                //     hash: ::core::option::Option<T::Hash>,
+                // ) -> ::core::result::Result<
+                //     ::std::collections::BTreeMap<
+                //         runtime_types::polkadot_parachain::primitives::Id,
+                //         runtime_types::cumulus_primitives_parachain_inherent::MessageQueueChain,
+                //     >,
+                //     ::subxt::BasicError,
+                // > {
+                //     let entry = LastHrmpMqcHeads;
+                //     self.client.storage().fetch_or_default(&entry, hash).await
+                // }
                 pub async fn processed_downward_messages(
                     &self,
                     hash: ::core::option::Option<T::Hash>,
@@ -6709,7 +6725,20 @@ pub mod api {
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
                 pub enum Call {
-                    # [codec (index = 0)] set_validation_data { data : runtime_types :: cumulus_primitives_parachain_inherent :: ParachainInherentData , } , # [codec (index = 1)] sudo_send_upward_message { message : :: std :: vec :: Vec < :: core :: primitive :: u8 > , } , # [codec (index = 2)] authorize_upgrade { code_hash : :: subxt :: sp_core :: H256 , } , # [codec (index = 3)] enact_authorized_upgrade { code : :: std :: vec :: Vec < :: core :: primitive :: u8 > , } , }
+                    // # [codec (index = 0)] set_validation_data {
+                    //     data : runtime_types :: cumulus_primitives_parachain_inherent :: ParachainInherentData ,
+                    // } ,
+                    #[codec(index = 1)]
+                    sudo_send_upward_message {
+                        message: ::std::vec::Vec<::core::primitive::u8>,
+                    },
+                    #[codec(index = 2)]
+                    authorize_upgrade { code_hash: ::subxt::sp_core::H256 },
+                    #[codec(index = 3)]
+                    enact_authorized_upgrade {
+                        code: ::std::vec::Vec<::core::primitive::u8>,
+                    },
+                }
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
@@ -6905,28 +6934,41 @@ pub mod api {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct MessageQueueChain(pub ::subxt::sp_core::H256);
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct ParachainInherentData {
-                pub validation_data:
-                    runtime_types::polkadot_primitives::v1::PersistedValidationData<
-                        ::subxt::sp_core::H256,
-                        ::core::primitive::u32,
-                    >,
-                pub relay_chain_state: runtime_types::sp_trie::storage_proof::StorageProof,
-                pub downward_messages: ::std::vec::Vec<
-                    runtime_types::polkadot_core_primitives::InboundDownwardMessage<
-                        ::core::primitive::u32,
-                    >,
-                >,
-                pub horizontal_messages: ::std::collections::BTreeMap<
-                    runtime_types::polkadot_parachain::primitives::Id,
-                    ::std::vec::Vec<
-                        runtime_types::polkadot_core_primitives::InboundHrmpMessage<
-                            ::core::primitive::u32,
-                        >,
-                    >,
-                >,
-            }
+            //# error[E0277]: the trait bound `BTreeMap<primitives::Id, Vec<InboundHrmpMessage<u32>>>: Decode` is not satisfied
+            //# --> D:\dev\darwinia-network\bridger\frame\assistants\pangolin-parachain-subxt\src\runtime.rs:6921:17
+            //# |
+            //# 6921 |                 pub horizontal_messages: ::std::collections::BTreeMap<
+            //# |                 ^^^ the trait `Decode` is not implemented for `BTreeMap<primitives::Id, Vec<InboundHrmpMessage<u32>>>`
+            //# |
+            //# = help: the following implementations were found:
+            //# <BTreeMap<K, V> as Decode>
+            //# note: required by a bound in `parity_scale_codec::Decode::decode`
+            //# --> d:/opt/scoop/persist/rustup/.cargo\registry\src\github.com-1ecc6299db9ec823\parity-scale-codec-2.3.1\src\codec.rs:284:15
+            //# |
+            //# 284  |     fn decode<I: Input>(input: &mut I) -> Result<Self, Error>;
+            //# |                  ^^^^^ required by this bound in `parity_scale_codec::Decode::decode`
+            // #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            // pub struct ParachainInherentData {
+            //     pub validation_data:
+            //         runtime_types::polkadot_primitives::v1::PersistedValidationData<
+            //             ::subxt::sp_core::H256,
+            //             ::core::primitive::u32,
+            //         >,
+            //     pub relay_chain_state: runtime_types::sp_trie::storage_proof::StorageProof,
+            //     pub downward_messages: ::std::vec::Vec<
+            //         runtime_types::polkadot_core_primitives::InboundDownwardMessage<
+            //             ::core::primitive::u32,
+            //         >,
+            //     >,
+            //     pub horizontal_messages: ::std::collections::BTreeMap<
+            //         runtime_types::polkadot_parachain::primitives::Id,
+            //         ::std::vec::Vec<
+            //             runtime_types::polkadot_core_primitives::InboundHrmpMessage<
+            //                 ::core::primitive::u32,
+            //             >,
+            //         >,
+            //     >,
+            // }
         }
         pub mod finality_grandpa {
             use super::runtime_types;

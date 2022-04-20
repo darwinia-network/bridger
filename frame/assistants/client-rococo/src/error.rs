@@ -12,6 +12,12 @@ pub enum ClientError {
 
     #[error("Please reconnect to rpc server")]
     ClientRestartNeed,
+
+    #[error("Wrong seed: {0}")]
+    Seed(String),
+
+    #[error("Other error: {0}")]
+    Other(String),
 }
 
 impl ClientError {

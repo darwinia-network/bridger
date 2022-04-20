@@ -150,7 +150,6 @@ impl ChainInfoConfig {
                 BridgerError::Custom(format!("Missing signer for chain: {}", self.endpoint))
             })?,
             relayer_real_account: None,
-            ecdsa_authority_private_key: None,
         })
     }
 

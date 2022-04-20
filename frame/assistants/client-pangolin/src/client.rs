@@ -4,6 +4,7 @@ use subxt::Client;
 
 use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
+#[cfg(feature = "ethlike-v1")]
 use crate::ethereum::EthereumApi;
 use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
 
@@ -43,6 +44,7 @@ impl PangolinClient {
     }
 
     /// Ethereum api
+    #[cfg(feature = "ethlike-v1")]
     pub fn ethereum(&self) -> EthereumApi {
         EthereumApi::new(self)
     }

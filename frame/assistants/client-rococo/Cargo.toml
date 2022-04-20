@@ -13,17 +13,11 @@ repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.5.5"
 
 [dependencies]
-thiserror = "1"
-tracing   = "0.1"
-
-serde      = { version = "1", features = ["derive"] }
-serde_json = "1"
-
+tracing     = "0.1"
+thiserror   = "1"
 array-bytes = "1.4"
 
-codec     = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
-secp256k1 = { version = "0.20", features = ["recovery"] }
-web3      = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+serde       = { version = "1", features = ["derive"] }
 
 subxt        = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
 rococo-subxt = { path = "../rococo-subxt" }

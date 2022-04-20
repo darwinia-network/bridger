@@ -7,4 +7,6 @@ pub use self::runtime::*;
 mod runtime;
 mod error;
 mod patch;
+
+#[cfg(feature = "with-shadow")]
 mod x_shadow;

@@ -9,6 +9,11 @@ pub(crate) struct QueryTransactionsVars {
     pub(crate) first: u32,
 }
 
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct QueryBlockVars {
+    pub(crate) block_number: u32,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DataWrapper<T> {
     pub nodes: Vec<T>,

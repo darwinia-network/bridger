@@ -14400,7 +14400,7 @@ pub mod api {
             use super::runtime_types;
             pub struct ConfirmedHeaderParcels(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for ConfirmedHeaderParcels {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ConfirmedHeaderParcels";
                 type Value = runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14412,7 +14412,7 @@ pub mod api {
             }
             pub struct ConfirmedBlockNumbers;
             impl ::subxt::StorageEntry for ConfirmedBlockNumbers {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ConfirmedBlockNumbers";
                 type Value = ::std::vec::Vec<::core::primitive::u64>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14421,7 +14421,7 @@ pub mod api {
             }
             pub struct BestConfirmedBlockNumber;
             impl ::subxt::StorageEntry for BestConfirmedBlockNumber {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "BestConfirmedBlockNumber";
                 type Value = ::core::primitive::u64;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14430,7 +14430,7 @@ pub mod api {
             }
             pub struct ConfirmedDepth;
             impl ::subxt::StorageEntry for ConfirmedDepth {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ConfirmedDepth";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14439,7 +14439,7 @@ pub mod api {
             }
             pub struct DagsMerkleRoots(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for DagsMerkleRoots {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "DagsMerkleRoots";
                 type Value = runtime_types::ethereum_types::hash::H128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14451,7 +14451,7 @@ pub mod api {
             }
             pub struct ReceiptVerifyFee;
             impl ::subxt::StorageEntry for ReceiptVerifyFee {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "ReceiptVerifyFee";
                 type Value = ::core::primitive::u128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14460,7 +14460,7 @@ pub mod api {
             }
             pub struct PendingRelayHeaderParcels;
             impl ::subxt::StorageEntry for PendingRelayHeaderParcels {
-                const PALLET: &'static str = "EthereumRelay";
+                const PALLET: &'static str = "DarwiniaEthereumRelay";
                 const STORAGE: &'static str = "PendingRelayHeaderParcels";
                 type Value = ::std::vec::Vec<(
                     ::core::primitive::u32,
@@ -15471,7 +15471,7 @@ pub mod api {
             use super::runtime_types;
             pub struct RelayHeaderParcelToResolve;
             impl ::subxt::StorageEntry for RelayHeaderParcelToResolve {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "RelayHeaderParcelToResolve";
                 type Value = ::std::vec::Vec<::core::primitive::u64>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15480,7 +15480,7 @@ pub mod api {
             }
             pub struct Affirmations(pub ::core::primitive::u64, pub ::core::primitive::u32);
             impl ::subxt::StorageEntry for Affirmations {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "Affirmations";
                 type Value = ::std::vec::Vec<
                     runtime_types::darwinia_relay_primitives::relayer_game::RelayAffirmation<
@@ -15499,7 +15499,7 @@ pub mod api {
             }
             pub struct BestConfirmedHeaderId(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for BestConfirmedHeaderId {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "BestConfirmedHeaderId";
                 type Value = ::core::primitive::u64;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15511,7 +15511,7 @@ pub mod api {
             }
             pub struct RoundCounts(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for RoundCounts {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "RoundCounts";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15523,7 +15523,7 @@ pub mod api {
             }
             pub struct AffirmTime(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for AffirmTime {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "AffirmTime";
                 type Value = (::core::primitive::u32, ::core::primitive::u32);
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15535,7 +15535,7 @@ pub mod api {
             }
             pub struct GamesToUpdate(pub ::core::primitive::u32);
             impl ::subxt::StorageEntry for GamesToUpdate {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "GamesToUpdate";
                 type Value = ::std::vec::Vec<::core::primitive::u64>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15547,7 +15547,7 @@ pub mod api {
             }
             pub struct Stakes(pub ::subxt::sp_core::crypto::AccountId32);
             impl ::subxt::StorageEntry for Stakes {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "Stakes";
                 type Value = ::core::primitive::u128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15559,7 +15559,7 @@ pub mod api {
             }
             pub struct GameSamplePoints(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for GameSamplePoints {
-                const PALLET: &'static str = "EthereumRelayerGame";
+                const PALLET: &'static str = "Instance1DarwiniaRelayerGame";
                 const STORAGE: &'static str = "GameSamplePoints";
                 type Value = ::std::vec::Vec<::std::vec::Vec<::core::primitive::u64>>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -15996,7 +15996,7 @@ pub mod api {
             use super::runtime_types;
             pub struct Candidates;
             impl ::subxt::StorageEntry for Candidates {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "Candidates";
                 type Value = ::std::vec::Vec<
                     runtime_types::darwinia_relay_primitives::relay_authorities::RelayAuthority<
@@ -16012,7 +16012,7 @@ pub mod api {
             }
             pub struct Authorities;
             impl ::subxt::StorageEntry for Authorities {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "Authorities";
                 type Value = ::std::vec::Vec<
                     runtime_types::darwinia_relay_primitives::relay_authorities::RelayAuthority<
@@ -16028,7 +16028,7 @@ pub mod api {
             }
             pub struct NextAuthorities;
             impl ::subxt::StorageEntry for NextAuthorities {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "NextAuthorities";
                 type Value = runtime_types :: darwinia_relay_primitives :: relay_authorities :: ScheduledAuthoritiesChange < :: subxt :: sp_core :: crypto :: AccountId32 , runtime_types :: primitive_types :: H160 , :: core :: primitive :: u128 , :: core :: primitive :: u32 > ;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -16037,7 +16037,7 @@ pub mod api {
             }
             pub struct NextTerm;
             impl ::subxt::StorageEntry for NextTerm {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "NextTerm";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -16046,7 +16046,7 @@ pub mod api {
             }
             pub struct AuthoritiesToSign;
             impl ::subxt::StorageEntry for AuthoritiesToSign {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "AuthoritiesToSign";
                 type Value = (
                     [::core::primitive::u8; 32usize],
@@ -16061,7 +16061,7 @@ pub mod api {
             }
             pub struct MmrRootsToSignKeys;
             impl ::subxt::StorageEntry for MmrRootsToSignKeys {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "MmrRootsToSignKeys";
                 type Value = ::std::vec::Vec<::core::primitive::u32>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -16070,7 +16070,7 @@ pub mod api {
             }
             pub struct MmrRootsToSign(pub ::core::primitive::u32);
             impl ::subxt::StorageEntry for MmrRootsToSign {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "MmrRootsToSign";
                 type Value =
                     runtime_types::darwinia_relay_primitives::relay_authorities::MmrRootToSign<
@@ -16087,7 +16087,7 @@ pub mod api {
             }
             pub struct SubmitDuration;
             impl ::subxt::StorageEntry for SubmitDuration {
-                const PALLET: &'static str = "EthereumRelayAuthorities";
+                const PALLET: &'static str = "Instance1DarwiniaRelayAuthorities";
                 const STORAGE: &'static str = "SubmitDuration";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -21922,7 +21922,7 @@ pub mod api {
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
                 pub struct UncheckedExtrinsic<_0, _1, _2, _3>(
-                    pub 
+                    pub
                         runtime_types::sp_runtime::generic::unchecked_extrinsic::UncheckedExtrinsic<
                             _0,
                             _1,

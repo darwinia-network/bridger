@@ -1,40 +1,40 @@
-use pangolin_parachain_subxt::api::RuntimeApi;
+use rococo_subxt::api::RuntimeApi;
 use subxt::extrinsic::SubstrateExtrinsicParams;
 use subxt::sp_runtime::traits::Header;
 use subxt::Client;
 
-use crate::config::PangolinParachainSubxtConfig;
+use crate::config::RococoSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::ethereum::EthereumApi;
-use crate::types::DarwiniaAccount;
+use crate::types::RococoAccount;
 
-/// Pangolin client
+/// Rococo client
 #[derive(Clone)]
-pub struct PangolinParachainClient {
+pub struct RococoClient {
     /// Runtime api
-    client: Client<PangolinParachainSubxtConfig>,
+    client: Client<RococoSubxtConfig>,
     /// Darwinia Account
-    account: DarwiniaAccount,
+    account: RococoAccount,
 }
 
-impl PangolinParachainClient {
-    /// Create a new pangolin client
-    pub fn new(client: Client<PangolinParachainSubxtConfig>, account: DarwiniaAccount) -> Self {
+impl RococoClient {
+    /// Create a new rococo client
+    pub fn new(client: Client<RococoSubxtConfig>, account: RococoAccount) -> Self {
         Self { client, account }
     }
 }
 
-impl PangolinParachainClient {
+impl RococoClient {
     /// Get darwinia account
-    pub fn account(&self) -> &DarwiniaAccount {
+    pub fn account(&self) -> &RococoAccount {
         &self.account
     }
 }
 
 /// patch rpc api
-impl PangolinParachainClient {
+impl RococoClient {
     /// Get original subxt client
-    pub fn subxt(&self) -> &Client<PangolinParachainSubxtConfig> {
+    pub fn subxt(&self) -> &Client<RococoSubxtConfig> {
         &self.client
     }
 
@@ -42,8 +42,8 @@ impl PangolinParachainClient {
     pub fn runtime(
         &self,
     ) -> RuntimeApi<
-        PangolinParachainSubxtConfig,
-        SubstrateExtrinsicParams<PangolinParachainSubxtConfig>,
+        RococoSubxtConfig,
+        SubstrateExtrinsicParams<RococoSubxtConfig>,
     > {
         self.client.clone().to_runtime_api()
     }
@@ -54,7 +54,7 @@ impl PangolinParachainClient {
     }
 }
 
-impl PangolinParachainClient {
+impl RococoClient {
     /// get mmr root
     pub async fn get_mmr_root(&self, leaf_index: u32) -> ClientResult<subxt::sp_core::H256> {
         let block_number = leaf_index + 1;
@@ -107,7 +107,7 @@ impl PangolinParachainClient {
     pub async fn is_tech_comm_member(
         &self,
         block_number: Option<u32>,
-        account: Option<DarwiniaAccount>,
+        account: Option<RococoAccount>,
     ) -> ClientResult<bool> {
         let block_hash = self
             .subxt()
@@ -128,7 +128,7 @@ impl PangolinParachainClient {
     pub async fn header_by_number(
         &self,
         number: u32,
-    ) -> ClientResult<Option<<PangolinParachainSubxtConfig as subxt::Config>::Header>> {
+    ) -> ClientResult<Option<<RococoSubxtConfig as subxt::Config>::Header>> {
         match self.subxt().rpc().block_hash(Some(number.into())).await? {
             Some(hash) => Ok(self.subxt().rpc().header(Some(hash)).await?),
             None => Ok(None),

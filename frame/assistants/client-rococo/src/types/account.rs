@@ -1,4 +1,4 @@
-use pangolin_parachain_subxt::api::runtime_types::darwinia_claims::EcdsaSignature;
+use rococo_subxt::api::runtime_types::darwinia_claims::EcdsaSignature;
 use secp256k1::SecretKey;
 use std::fmt::{Debug, Formatter};
 
@@ -10,17 +10,17 @@ use web3::signing::SecretKeyRef;
 use web3::transports::Http;
 use web3::Web3;
 
-use crate::config::PangolinParachainSubxtConfig;
+use crate::config::RococoSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 
 /// AccountId
-pub type AccountId = <PangolinParachainSubxtConfig as subxt::Config>::AccountId;
+pub type AccountId = <RococoSubxtConfig as subxt::Config>::AccountId;
 /// Signer
-pub type Signer = PairSigner<PangolinParachainSubxtConfig, Pair>;
+pub type Signer = PairSigner<RococoSubxtConfig, Pair>;
 
 /// Account
 #[derive(Clone)]
-pub struct DarwiniaAccount {
+pub struct RococoAccount {
     /// Account Id
     account_id: AccountId,
     /// signer of the account
@@ -29,7 +29,7 @@ pub struct DarwiniaAccount {
     real: Option<AccountId>,
 }
 
-impl Debug for DarwiniaAccount {
+impl Debug for RococoAccount {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(&format!("account: {},", self.account_id))?;
         f.write_str(" signer: <..>,")?;
@@ -38,7 +38,7 @@ impl Debug for DarwiniaAccount {
     }
 }
 
-impl DarwiniaAccount {
+impl RococoAccount {
     /// Create a new Account
     pub fn new(seed: String, real: Option<String>) -> ClientResult<Self> {
         // signer to sign darwinia extrinsic
@@ -59,7 +59,7 @@ impl DarwiniaAccount {
     }
 }
 
-impl DarwiniaAccount {
+impl RococoAccount {
     /// get account id
     pub fn account_id(&self) -> &AccountId {
         &self.account_id
@@ -81,49 +81,6 @@ impl DarwiniaAccount {
             real_account_id
         } else {
             &self.account_id
-        }
-    }
-}
-
-/// ethereum account
-#[derive(Clone)]
-pub struct EthereumAccount {
-    url: String,
-    seed: Option<String>,
-}
-
-impl Debug for EthereumAccount {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("url: {},", self.url))?;
-        f.write_str(" seed: <..>")?;
-        Ok(())
-    }
-}
-
-impl EthereumAccount {
-    /// Create new ethereum account
-    pub fn new(url: String, seed: Option<String>) -> Self {
-        Self { url, seed }
-    }
-}
-
-impl EthereumAccount {
-    /// sign
-    pub fn ecdsa_sign(&self, message: &[u8]) -> ClientResult<EcdsaSignature> {
-        let web3 = Web3::new(Http::new(&self.url)?);
-        if let Some(ethereum_seed) = &self.seed {
-            let private_key = array_bytes::hex2bytes(&ethereum_seed[2..])
-                .map_err(|_| ClientError::Hex2Bytes("ethereum_seed[2..]".into()))?;
-            let secret_key = SecretKey::from_slice(&private_key)?;
-            let signature = web3
-                .accounts()
-                .sign(message, SecretKeyRef::new(&secret_key))
-                .signature;
-            let mut buffer = [0u8; 65];
-            buffer.copy_from_slice(signature.0.as_slice());
-            Ok(EcdsaSignature(buffer))
-        } else {
-            Err(ClientError::NoAuthoritySignerSeed)
         }
     }
 }

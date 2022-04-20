@@ -91,7 +91,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
             None => {
@@ -100,7 +100,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_relay()
                     .affirm(parcel, None)
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
         };
@@ -125,7 +125,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
             None => {
@@ -134,7 +134,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_issuing()
                     .register_erc20((proof.header, proof.receipt_proof, proof.mmr_proof))
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
         };
@@ -159,7 +159,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
             None => {
@@ -168,7 +168,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_issuing()
                     .redeem_erc20((proof.header, proof.receipt_proof, proof.mmr_proof))
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
         };
@@ -206,7 +206,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
             None => {
@@ -221,7 +221,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_backing()
                     .redeem(act, (proof.header, proof.receipt_proof, proof.mmr_proof))
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
         };
@@ -246,7 +246,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
             None => {
@@ -255,7 +255,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_backing()
                     .sync_authorities_change((proof.header, proof.receipt_proof, proof.mmr_proof))
-                    .sign_and_submit_default(account.signer())
+                    .sign_and_submit(account.signer())
                     .await?
             }
         };
@@ -295,7 +295,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit_default(darwinia_account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
             None => {
@@ -310,7 +310,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_relay_authorities()
                     .submit_signed_mmr_root(block_number, signature.0)
-                    .sign_and_submit_default(darwinia_account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
         };
@@ -339,7 +339,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit_default(darwinia_account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
             None => {
@@ -349,7 +349,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_relay_authorities()
                     .submit_signed_authorities(signature.0)
-                    .sign_and_submit_default(darwinia_account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
         };
@@ -378,7 +378,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .proxy()
                     .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit_default(darwinia_account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
             None => {
@@ -388,7 +388,7 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_relay()
                     .vote_pending_relay_header_parcel(ethereum_block_number, aye)
-                    .sign_and_submit_default(darwinia_account.signer())
+                    .sign_and_submit(darwinia_account.signer())
                     .await?
             }
         };
@@ -403,14 +403,14 @@ impl<'a> EthereumApi<'a> {
             .runtime()
             .storage()
             .ethereum_backing()
-            .verified_proof(&hash, &tx_index, None)
+            .verified_proof(hash, tx_index, None)
             .await?;
         let v1: bool = self
             .client
             .runtime()
             .storage()
             .ethereum_issuing()
-            .verified_issuing_proof(&hash, &tx_index, None)
+            .verified_issuing_proof(hash, tx_index, None)
             .await?;
         Ok(v0 || v1)
     }
@@ -488,7 +488,7 @@ impl<'a> EthereumApi<'a> {
             .runtime()
             .storage()
             .ethereum_relay_authorities()
-            .mmr_roots_to_sign(&block_number, exec_block_hash)
+            .mmr_roots_to_sign(block_number, exec_block_hash)
             .await?;
         match mmr_roots_to_sign {
             None => {

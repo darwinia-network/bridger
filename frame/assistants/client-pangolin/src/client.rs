@@ -1,12 +1,11 @@
 use pangolin_subxt::api::RuntimeApi;
-use subxt::extrinsic::SubstrateExtrinsicParams;
 use subxt::sp_runtime::traits::Header;
 use subxt::Client;
 
 use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::ethereum::EthereumApi;
-use crate::types::DarwiniaAccount;
+use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
 
 /// Pangolin client
 #[derive(Clone)]
@@ -39,9 +38,7 @@ impl PangolinClient {
     }
 
     /// Runtime api
-    pub fn runtime(
-        &self,
-    ) -> RuntimeApi<PangolinSubxtConfig, SubstrateExtrinsicParams<PangolinSubxtConfig>> {
+    pub fn runtime(&self) -> RuntimeApi<PangolinSubxtConfig, NodeRuntimeSignedExtra> {
         self.client.clone().to_runtime_api()
     }
 

@@ -48,11 +48,7 @@ async fn handle_do(
                 BridgeName::PangolinRopsten,
             )?;
             let expected_block = block + 1;
-            let mmr_root = client.get_mmr_root(expected_block).await?;
-            shadow
-                .parcel(expected_block as u64, mmr_root.0)
-                .await?
-                .try_into()?
+            shadow.parcel(expected_block as u64).await?.try_into()?
         }
         AffirmMode::Raw => {
             // let json = raw_json.ok_or_else(|| {

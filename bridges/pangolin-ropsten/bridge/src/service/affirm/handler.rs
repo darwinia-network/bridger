@@ -181,8 +181,7 @@ impl AffirmHandler {
             target
         );
 
-        let mmr_root = self.client.get_mmr_root(target as u32).await?;
-        match self.shadow.parcel(target, mmr_root.0).await {
+        match self.shadow.parcel(target).await {
             Ok(parcel) => {
                 let parcel: EthereumRelayHeaderParcel = parcel.try_into()?;
                 if parcel.parent_mmr_root.to_fixed_bytes() == [0u8; 32] {

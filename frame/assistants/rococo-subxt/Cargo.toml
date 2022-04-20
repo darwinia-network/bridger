@@ -20,5 +20,5 @@ version       = "0.5.5"
 #  "bit-vec",
 #] }
 
-codec       = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive", "full"] }
-subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
+codec = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive", "full"] }
+subxt = "0.17"

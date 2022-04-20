@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 use strum::{EnumString, EnumVariantNames};
 
 use component_subscan::SubscanConfig;
-use support_common::error::BridgerError;
 use subquery_s2s::SubqueryConfig;
+use support_common::error::BridgerError;
 
 use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
@@ -140,11 +140,36 @@ impl ChainInfoConfig {
             transaction_version: self.transaction_version,
         })
     }
+
+    pub fn to_pangolin_client_config(
+        &self,
+    ) -> color_eyre::Result<client_pangolin::config::ClientConfig> {
+        Ok(client_pangolin::config::ClientConfig {
+            endpoint: self.endpoint.clone(),
+            relayer_private_key: self.signer.clone().ok_or_else(|| {
+                BridgerError::Custom(format!("Missing signer for chain: {}", self.endpoint))
+            })?,
+            relayer_real_account: None,
+            ecdsa_authority_private_key: None,
+        })
+    }
+
+    pub fn to_pangolin_parachain_client_config(
+        &self,
+    ) -> color_eyre::Result<client_pangolin_parachain::config::ClientConfig> {
+        Ok(client_pangolin_parachain::config::ClientConfig {
+            endpoint: self.endpoint.clone(),
+            relayer_private_key: self.signer.clone().ok_or_else(|| {
+                BridgerError::Custom(format!("Missing signer for chain: {}", self.endpoint))
+            })?,
+            relayer_real_account: None,
+        })
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IndexConfig {
-    pub pangolin: SubqueryConfig;
-    pub pangolin_parachain: SubqueryConfig;
-    pub rococo: SubqueryConfig;
+    pub pangolin: SubqueryConfig,
+    pub pangolin_parachain: SubqueryConfig,
+    pub rococo: SubqueryConfig,
 }

@@ -1,3 +1,5 @@
+use client_pangolin::component::PangolinClientComponent;
+use client_pangolin_parachain::component::PangolinParachainClientComponent;
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
@@ -52,8 +54,12 @@ fn start() -> color_eyre::Result<()> {
     let config_pangolin = bridge_config.pangolin;
     let config_parachain = bridge_config.pangolin_parachain;
 
-    let client_pangolin = PangolinClientComponent::component(config_pangolin).await?;
-    let client_parachain = PangolinParachainClientComponent::component(config_parachain).await?;
+    let client_pangolin =
+        PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?).await?;
+    let client_parachain = PangolinParachainClientComponent::component(
+        config_parachain.to_pangolin_parachain_client_config()?,
+    )
+    .await?;
 
     let last_relayed_pangolin_hash_in_parachain = client_parachain
         .runtime()

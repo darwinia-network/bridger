@@ -99,7 +99,7 @@ pub mod s2s_feemarket {
                         signer: signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            pangolin_parachain_runtime::Call::Feemarket(
+                            pangolin_parachain_runtime::Call::PangolinFeemarket(
                                 pangolin_parachain_runtime::FeemarketCall::update_relay_fee(amount),
                             ),
                             transaction_nonce,
@@ -130,7 +130,7 @@ pub mod s2s_feemarket {
                         signer: signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            pangolin_parachain_runtime::Call::Feemarket(
+                            pangolin_parachain_runtime::Call::PangolinFeemarket(
                                 pangolin_parachain_runtime::FeemarketCall::update_locked_collateral(
                                     amount,
                                 ),

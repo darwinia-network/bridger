@@ -23,7 +23,7 @@ array-bytes = "1.4"
 
 codec     = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
 secp256k1 = { version = "0.20", features = ["recovery"] }
-subxt     = { git = "https://github.com/paritytech/subxt.git", branch = "master" }
 web3      = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 
+subxt        = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
 rococo-subxt = { path = "../rococo-subxt" }

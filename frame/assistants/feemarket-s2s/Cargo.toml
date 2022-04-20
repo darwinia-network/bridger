@@ -21,10 +21,10 @@ tracing     = "0.1"
 
 codec = { package = "parity-scale-codec", version = "2.3.1" }
 
-bp-messages            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
-messages-relay         = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
-relay-utils            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
+bp-messages            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+messages-relay         = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+relay-substrate-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+relay-utils            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
 
 darwinia-fee-market = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.7" }
 
@@ -42,4 +42,4 @@ component-subscan = { path = "../../components/subscan" }
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 
-relay-pangolin-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
+relay-pangolin-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }

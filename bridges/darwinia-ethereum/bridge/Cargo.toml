@@ -43,7 +43,7 @@ web3    = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master"
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
 
-client-darwinia    = { path = "../client-darwinia" }
+client-darwinia    = { path = "../../../frame/assistants/client-darwinia" }
 
 support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }

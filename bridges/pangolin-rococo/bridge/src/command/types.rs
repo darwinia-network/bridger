@@ -12,4 +12,5 @@ pub enum Opts {
         #[structopt()]
         bridge: BridgeName,
     },
+    Relay,
 }

@@ -21,7 +21,7 @@ impl PangolinRococoTask {
 
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<HeaderRelayService>()?;
-        stack.spawn_service::<RelayService>()?;
+        // stack.spawn_service::<RelayService>()?;
         Ok(Self { stack })
     }
 }

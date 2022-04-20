@@ -5,5 +5,6 @@ use crate::command::types::Opts;
 pub async fn execute(opts: Opts) -> color_eyre::Result<()> {
     match opts {
         Opts::Init { bridge } => handler::handle_init(bridge).await,
+        Opts::Relay => handler::handle_relay().await,
     }
 }

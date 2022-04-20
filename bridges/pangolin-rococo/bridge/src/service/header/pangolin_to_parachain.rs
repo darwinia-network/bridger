@@ -5,22 +5,29 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::{PangolinRococoBus, PangolinRococoTask};
 
 #[derive(Debug)]
-pub struct HeaderRelayService {
+pub struct PangolinToParachainHeaderRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for HeaderRelayService {}
+impl BridgeService for PangolinToParachainHeaderRelayService {}
 
-impl Service for HeaderRelayService {
+impl Service for PangolinToParachainHeaderRelayService {
     type Bus = PangolinRococoBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!("{}-header-relay", PangolinRococoTask::name()),
+            &format!(
+                "{}-pangolin-parachain-header-relay",
+                PangolinRococoTask::name()
+            ),
             async move {
                 if let Err(e) = start() {
-                    tracing::error!(target: "pangolin-rococo", "{:?}", e);
+                    tracing::error!(
+                        target: "pangolin-rococo",
+                        "{:?}",
+                        e,
+                    );
                     return Err(BridgerError::Custom(
                         "Failed to start header relay service".to_string(),
                     )

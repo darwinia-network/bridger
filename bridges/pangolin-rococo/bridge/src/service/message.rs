@@ -32,13 +32,13 @@ use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo
 // const CONVERSION_RATE_ALLOWED_DIFFERENCE_RATIO: f64 = 0.05;
 
 #[derive(Debug)]
-pub struct RelayService {
+pub struct MessageRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for RelayService {}
+impl BridgeService for MessageRelayService {}
 
-impl Service for RelayService {
+impl Service for MessageRelayService {
     type Bus = PangolinRococoBus;
     type Lifeline = color_eyre::Result<Self>;
 

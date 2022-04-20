@@ -59,9 +59,11 @@ relay-rococo-client             = { git = "https://github.com/darwinia-network/d
 relay-substrate-client          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
 relay-utils                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
 substrate-relay-helper          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "nada-darwinia-v0.12.1" }
+
 ## component
 component-subscan = { path = "../../../frame/components/subscan" }
 feemarket-s2s     = { path = "../../../frame/assistants/feemarket-s2s" }
+client-pangolin   = { path = "../../../frame/assistants/client-pangolin" }
 
 ## support
 support-common   = { path = "../../../frame/supports/support-common" }

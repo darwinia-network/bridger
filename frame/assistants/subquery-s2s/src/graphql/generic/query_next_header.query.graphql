@@ -1,0 +1,22 @@
+query queryNextRelayBlock {
+  needRelayBlocks (
+    first: 5
+    orderBy: BLOCK_NUMBER_ASC
+    filter: {
+      blockNumber: {
+        greaterThan: 1891870
+      }
+    }
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
+      type
+      origin
+      laneId
+      messageNonce
+      timestamp
+    }
+  }
+}

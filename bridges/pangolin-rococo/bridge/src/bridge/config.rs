@@ -3,6 +3,7 @@ use strum::{EnumString, EnumVariantNames};
 
 use component_subscan::SubscanConfig;
 use support_common::error::BridgerError;
+use subquery_s2s::SubqueryConfig;
 
 use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
@@ -17,6 +18,7 @@ pub struct PangolinRococoConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pangolin_parachain_subscan: Option<SubscanConfig>,
     pub task: TaskConfig,
+    pub index: IndexConfig,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -138,4 +140,11 @@ impl ChainInfoConfig {
             transaction_version: self.transaction_version,
         })
     }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct IndexConfig {
+    pub pangolin: SubqueryConfig;
+    pub pangolin_parachain: SubqueryConfig;
+    pub rococo: SubqueryConfig;
 }

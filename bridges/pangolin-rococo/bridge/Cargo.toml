@@ -64,6 +64,8 @@ substrate-relay-helper          = { git = "https://github.com/darwinia-network/d
 component-subscan = { path = "../../../frame/components/subscan" }
 feemarket-s2s     = { path = "../../../frame/assistants/feemarket-s2s" }
 client-pangolin   = { path = "../../../frame/assistants/client-pangolin" }
+subquery-s2s      = { path = "../../../frame/assistants/subquery-s2s" }
+
 
 ## support
 support-common   = { path = "../../../frame/supports/support-common" }

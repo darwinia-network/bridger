@@ -1,5 +1,5 @@
 [package]
-name = "client-pangolin"
+name = "client-pangolin-parachain"
 version = "0.5.5"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -31,7 +31,4 @@ web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "mas
 secp256k1   = { version = "0.20", features = ["recovery"] }
 subxt       = { git = "https://github.com/paritytech/subxt.git", branch = "master" }
 
-pangolin-subxt   = { path = "../pangolin-subxt" }
-
-[dev-dependencies]
-tokio = { version = "1", features = ["full"] }
+pangolin-parachain-subxt   = { path = "../pangolin-parachain-subxt" }

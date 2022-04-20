@@ -4,7 +4,7 @@ use subxt::ClientBuilder;
 
 use crate::client::DarwiniaClient;
 use crate::config::ClientConfig;
-use crate::error::ClientError;
+use crate::error::{ClientError, ClientResult};
 use crate::types::DarwiniaAccount;
 
 const MAX_ATTEMPTS: u32 = 6;
@@ -14,7 +14,7 @@ pub struct DarwiniaClientComponent;
 
 impl DarwiniaClientComponent {
     /// Get subxt client instance
-    pub async fn component(config: ClientConfig) -> color_eyre::Result<DarwiniaClient> {
+    pub async fn component(config: ClientConfig) -> ClientResult<DarwiniaClient> {
         let mut attempts = 1;
         let mut wait_secs = 1;
         let endpoint = Self::correct_url(&config.endpoint)?;
@@ -36,7 +36,7 @@ impl DarwiniaClientComponent {
         }
     }
 
-    fn correct_url(url: impl AsRef<str>) -> color_eyre::Result<String> {
+    fn correct_url(url: impl AsRef<str>) -> ClientResult<String> {
         let url = url.as_ref();
         if url.starts_with("ws://") || url.starts_with("wss://") {
             return Ok(url.to_string());

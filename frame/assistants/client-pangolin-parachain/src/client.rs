@@ -1,4 +1,4 @@
-use pangolin_subxt::api::RuntimeApi;
+use pangolin_parachain_subxt::api::RuntimeApi;
 use subxt::extrinsic::SubstrateExtrinsicParams;
 use subxt::sp_runtime::traits::Header;
 use subxt::Client;

@@ -1,4 +1,4 @@
-use pangolin_subxt::api::runtime_types::darwinia_claims::EcdsaSignature;
+use pangolin_parachain_subxt::api::runtime_types::darwinia_claims::EcdsaSignature;
 use secp256k1::SecretKey;
 use std::fmt::{Debug, Formatter};
 

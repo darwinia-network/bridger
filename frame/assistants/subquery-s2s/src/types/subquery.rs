@@ -13,6 +13,11 @@ pub(crate) struct FindJustificationVars {
     pub(crate) hash: String,
 }
 
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct QueryBlockVars {
+    pub(crate) block_number: u32,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DataWrapper<T> {
     pub nodes: Vec<T>,

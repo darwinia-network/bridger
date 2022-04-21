@@ -796,6 +796,7 @@ dependencies = [
  "sp-version",
  "structopt",
  "strum",
+ "subquery-s2s",
  "substrate-relay-helper",
  "support-common",
  "support-lifeline",
@@ -2100,6 +2101,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "gql_client"
+version = "1.0.1"
+source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#220c345c8e570fa2b28ceb2d869331d014b2f324"
+dependencies = [
+ "reqwest",
+ "serde 1.0.136",
+ "serde_json",
+]
+
+[[package]]
 name = "h2"
 version = "0.3.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2414,6 +2425,25 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "include_dir"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "482a2e29200b7eed25d7fdbd14423326760b7f6658d21a4cf12d55a50713c69f"
+dependencies = [
+ "include_dir_macros",
+]
+
+[[package]]
+name = "include_dir_macros"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e074c19deab2501407c91ba1860fa3d6820bfde307db6d8cb851b55a10be89b"
+dependencies = [
+ "proc-macro2",
+ "quote",
 ]
 
 [[package]]
@@ -6511,6 +6541,22 @@ dependencies = [
  "sha2 0.9.9",
  "tiny-keccak",
  "twox-hash",
+]
+
+[[package]]
+name = "subquery-s2s"
+version = "0.5.5"
+dependencies = [
+ "async-trait",
+ "gql_client",
+ "hex",
+ "include_dir",
+ "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
+ "strum",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

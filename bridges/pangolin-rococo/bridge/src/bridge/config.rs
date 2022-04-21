@@ -164,6 +164,18 @@ impl ChainInfoConfig {
             relayer_real_account: None,
         })
     }
+
+    pub fn to_rococo_client_config(
+        &self,
+    ) -> color_eyre::Result<client_rococo::config::ClientConfig> {
+        Ok(client_rococo::config::ClientConfig {
+            endpoint: self.endpoint.clone(),
+            relayer_private_key: self.signer.clone().ok_or_else(|| {
+                BridgerError::Custom(format!("Missing signer for chain: {}", self.endpoint))
+            })?,
+            relayer_real_account: None,
+        })
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

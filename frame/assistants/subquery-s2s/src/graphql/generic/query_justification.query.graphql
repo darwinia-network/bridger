@@ -1,0 +1,18 @@
+query queryJustification($block_number: Int!) {
+  justificationMappings (
+    first: 1
+    filter: {
+        blockNumber: {
+            equalTo: $block_number
+        }
+    }
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
+      mandatory
+      justification
+    }
+  }
+}

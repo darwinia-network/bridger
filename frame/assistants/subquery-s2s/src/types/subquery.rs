@@ -4,9 +4,13 @@ use serde::{Deserialize, Serialize};
 pub(crate) struct EmptyQueryVar;
 
 #[derive(Clone, Debug, Serialize)]
-pub(crate) struct QueryTransactionsVars {
-    pub(crate) from: u64,
-    pub(crate) first: u32,
+pub(crate) struct QueryNextRelayBlockVars {
+    pub(crate) block: u32,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct FindJustificationVars {
+    pub(crate) hash: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

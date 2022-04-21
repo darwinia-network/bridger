@@ -21,6 +21,13 @@ pub struct NeedRelayBlock {
     pub message_nonce: Option<u64>,
 }
 
+impl NeedRelayBlock {
+    /// is mandatory block
+    pub fn is_mandatory(&self) -> bool {
+        self.type_ == RelayBlockType::Mandatory
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize, strum::EnumString, strum::EnumVariantNames)]
 #[strum(serialize_all = "kebab_case")]
 pub enum RelayBlockType {

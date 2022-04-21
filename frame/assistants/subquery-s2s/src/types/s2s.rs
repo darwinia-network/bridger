@@ -34,7 +34,11 @@ pub struct NeedRelayBlock {
 impl NeedRelayBlock {
     /// is mandatory block
     pub fn is_mandatory(&self) -> bool {
-        self.type_ == RelayBlockType::Mandatory
+        if let RelayBlockType::Mandatory = self.type_ {
+            true
+        } else {
+            false
+        }
     }
 }
 

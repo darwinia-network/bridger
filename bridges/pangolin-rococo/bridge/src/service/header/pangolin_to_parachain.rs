@@ -4,6 +4,7 @@ use lifeline::{Lifeline, Service, Task};
 
 use client_pangolin_parachain::client::PangolinParachainClient;
 use client_pangolin_parachain::component::PangolinParachainClientComponent;
+use client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header as ParachainHeader;
 use subquery_s2s::types::BridgeName;
 use subquery_s2s::{Subquery, SubqueryComponent};
 use support_common::config::{Config, Names};
@@ -164,15 +165,14 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
 
     let raw_digest = next_block.digest;
     let digest = codec::Decode::decode(&mut raw_digest.as_slice())?;
-    let finality_target =
-        client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header {
-            parent_hash: sp_core::H256(next_block.parent_hash),
-            number: next_block.block_number,
-            state_root: sp_core::H256(next_block.state_root),
-            extrinsics_root: sp_core::H256(next_block.extrinsics_root),
-            digest,
-            __subxt_unused_type_params: Default::default(),
-        };
+    let finality_target = ParachainHeader {
+        parent_hash: sp_core::H256(next_block.parent_hash),
+        number: next_block.block_number,
+        state_root: sp_core::H256(next_block.state_root),
+        extrinsics_root: sp_core::H256(next_block.extrinsics_root),
+        digest,
+        __subxt_unused_type_params: Default::default(),
+    };
     let grandpa_justification = codec::Decode::decode(&mut justification.as_slice())?;
     let hash = header_relay
         .client_parachain

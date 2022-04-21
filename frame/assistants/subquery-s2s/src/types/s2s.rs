@@ -34,11 +34,7 @@ pub struct NeedRelayBlock {
 impl NeedRelayBlock {
     /// is mandatory block
     pub fn is_mandatory(&self) -> bool {
-        if let RelayBlockType::Mandatory = self.type_ {
-            true
-        } else {
-            false
-        }
+        matches!(self.type_, RelayBlockType::Mandatory)
     }
 }
 
@@ -46,6 +42,7 @@ impl NeedRelayBlock {
     Clone, Debug, Deserialize, Serialize, Eq, PartialEq, strum::EnumString, strum::EnumVariantNames,
 )]
 #[strum(serialize_all = "kebab_case")]
+#[serde(rename_all = "kebab-case")]
 pub enum RelayBlockType {
     Mandatory,
     OnDemand,
@@ -55,6 +52,7 @@ pub enum RelayBlockType {
     Clone, Debug, Deserialize, Serialize, Eq, PartialEq, strum::EnumString, strum::EnumVariantNames,
 )]
 #[strum(serialize_all = "kebab_case")]
+#[serde(rename_all = "kebab-case")]
 pub enum RelayBlockOrigin {
     Mandatory,
     BridgePanglin,           // from pangolin parachain send message to pangolin

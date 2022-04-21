@@ -1,4 +1,4 @@
-use client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header as ParachainHeader;
+use client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
 use subquery_s2s::types::NeedRelayBlock;
 
 #[test]
@@ -23,7 +23,7 @@ fn test_finality_target() {
 
     let raw_digest = next_block.digest;
     let digest = codec::Decode::decode(&mut raw_digest.as_slice()).unwrap();
-    let _finality_target: ParachainHeader<u32, u32> = ParachainHeader {
+    let _finality_target: FinalityTarget<u32, u32> = FinalityTarget {
         parent_hash: sp_core::H256(next_block.parent_hash),
         number: next_block.block_number,
         state_root: sp_core::H256(next_block.state_root),

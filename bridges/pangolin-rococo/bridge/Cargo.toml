@@ -59,6 +59,7 @@ relay-rococo-client             = { git = "https://github.com/darwinia-network/d
 relay-substrate-client          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
 relay-utils                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
 substrate-relay-helper          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
+bp-pangolin                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
 
 ## component
 client-pangolin           = { path = "../../../frame/assistants/client-pangolin" }
@@ -73,3 +74,5 @@ subquery-s2s              = { path = "../../../frame/assistants/subquery-s2s" }
 support-common   = { path = "../../../frame/supports/support-common" }
 support-lifeline = { path = "../../../frame/supports/support-lifeline" }
 support-terminal = { path = "../../../frame/supports/support-terminal" }
+
+[dev-dependencies]

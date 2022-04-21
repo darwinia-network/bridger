@@ -1,5 +1,8 @@
+use codec::Decode;
+
+use client_pangolin_parachain::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
 use client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
-use subquery_s2s::types::NeedRelayBlock;
+use subquery_s2s::types::{JustificationMapping, NeedRelayBlock};
 
 #[test]
 fn test_finality_target() {
@@ -31,4 +34,23 @@ fn test_finality_target() {
         digest,
         __subxt_unused_type_params: Default::default(),
     };
+}
+
+#[test]
+fn test_justification() {
+    let json = r#"
+        {
+          "id": "1903104",
+          "blockNumber": 1903104,
+          "blockHash": "0xb489c25c4d67986f1bc32e624be820bcabb92c8c61542ba58e3ea857242dfbb8",
+          "mandatory": false,
+          "justification": "0xf901000000000000b489c25c4d67986f1bc32e624be820bcabb92c8c61542ba58e3ea857242dfbb8000a1d000cb489c25c4d67986f1bc32e624be820bcabb92c8c61542ba58e3ea857242dfbb8000a1d009b6bca4b854bb513191b3578eaed0ec628d3a111b9b2b88b690ee5d0f744b84ae40fb7cf288e9844acf2ac8b695af513cfcd94e9434b566ef95713cbba9c5f0a63e122d962a835020bef656ad5a80dbcc994bb48a659f1af955552f4b3c27b09b489c25c4d67986f1bc32e624be820bcabb92c8c61542ba58e3ea857242dfbb8000a1d00a096166b1325d4cc017f72d587e6b4fa5f0740ef812ecf0aeece4af563431cbed8325efb2c2cf55f547e1a8c943c39e6dc82f114debfc80c5adc4f08b824740e8a50704f41448fca63f608575debb626639ac00ad151a1db08af1368be9ccb1db489c25c4d67986f1bc32e624be820bcabb92c8c61542ba58e3ea857242dfbb8000a1d0068aa02b8863eaf3f153d6a46ce9654c41b3a91d6423a20fe556cf060b165baa5fce81f9082f0a0d45ed3c359c8f303c0a5e471b51189692b284c9f2761f2b602b28fade2d023f08c0d5a131eac7d64a107a2660f22a0aca09b37a3f321259ef600"
+        }
+    "#;
+    let justification_mapping: JustificationMapping = serde_json::from_str(json).unwrap();
+    let raw_justification = justification_mapping.justification;
+    let _justification = GrandpaJustification::<
+        sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>,
+    >::decode(&mut raw_justification.as_slice())
+    .unwrap();
 }

@@ -781,6 +781,7 @@ dependencies = [
  "bp-darwinia-core",
  "bp-header-chain",
  "bp-messages",
+ "bp-pangolin",
  "bp-runtime",
  "bridge-runtime-common",
  "client-pangolin",

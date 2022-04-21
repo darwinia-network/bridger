@@ -16,6 +16,10 @@ query queryNextRelayBlock($block: Int!) {
       origin
       laneId
       messageNonce
+      parentHash
+      stateRoot
+      extrinsicsRoot
+      digest
       timestamp
     }
   }

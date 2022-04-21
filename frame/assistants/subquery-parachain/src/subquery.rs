@@ -4,7 +4,9 @@ use gql_client::Client;
 use include_dir::{include_dir, Dir};
 
 use crate::error::SubqueryComponentError;
-use crate::types::BridgeName;
+use crate::types::{
+    BridgeName, CandidateIncludedEvent, DataWrapper, QueryNextCandidateIncludedEventVars,
+};
 use crate::SubqueryComponentResult;
 
 /// Graphql dir
@@ -38,4 +40,28 @@ impl Subquery {
     }
 }
 
-impl Subquery {}
+impl Subquery {
+    pub async fn next_candidate_included_event(
+        &self,
+        block_number: u32,
+        para_id: u32,
+    ) -> SubqueryComponentResult<Option<CandidateIncludedEvent>> {
+        let query = self.read_graphql("next_candiate_included_event.query.graphql")?;
+        let vars = QueryNextCandidateIncludedEventVars {
+            para_id,
+            block_number,
+        };
+        let data = self
+            .client
+            .query_with_vars_unwrap::<HashMap<String, DataWrapper<CandidateIncludedEvent>>, QueryNextCandidateIncludedEventVars>(
+                query, vars,
+            )
+            .await
+            .map_err(SubqueryComponentError::from)?;
+        let event = data
+            .get("nextCandidateIncludedEvents")
+            .map(|item| item.nodes.clone())
+            .unwrap_or_default();
+        Ok(event.get(0).cloned())
+    }
+}

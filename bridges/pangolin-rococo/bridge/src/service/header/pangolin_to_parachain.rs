@@ -1,5 +1,7 @@
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
+use client_pangolin_parachain::types::runtime_types::sp_runtime::generic::digest::Digest as ParachainDigest;
+use codec::Decode;
 use lifeline::{Lifeline, Service, Task};
 
 use client_pangolin_parachain::client::PangolinParachainClient;
@@ -149,7 +151,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
     let next_block = next_block.unwrap();
     let justification = header_relay
         .subquery_pangolin
-        .find_justification(next_block.block_hash, next_block.is_mandatory())
+        .find_justification(next_block.block_hash.clone(), next_block.is_mandatory())
         .await?;
     if justification.is_none() {
         tracing::error!(
@@ -160,7 +162,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         );
         return Ok(());
     }
-    let justification = justification.unwrap();
+    let justification = justification.unwrap().justification;
 
     let finality_target =
         client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header {
@@ -168,14 +170,16 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             number: next_block.block_number,
             state_root: Default::default(),
             extrinsics_root: Default::default(),
-            digest: Digest {},
+            digest: ParachainDigest { logs: vec![] },
             __subxt_unused_type_params: Default::default(),
         };
-    let grandpa_justification = client_pangolin_parachain::types::runtime_types::bp_header_chain::justification::GrandpaJustification {
-        round: (),
-        commit: Commit {},
-        votes_ancestries: vec![]
-    };
+
+    let grandpa_justification = client_pangolin_parachain::types::runtime_types::bp_header_chain::justification::GrandpaJustification::decode(&mut justification.as_slice())?;
+    // let grandpa_justification = client_pangolin_parachain::types::runtime_types::bp_header_chain::justification::GrandpaJustification {
+    // round: (),
+    //     commit: Commit {},
+    //     votes_ancestries: vec![]
+    // };
     let hash = header_relay
         .client_parachain
         .runtime()

@@ -253,7 +253,5 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         }
     }
 
-    // let event_block_number = next_para_included_event.included_relay_block;
-
     Ok(())
 }

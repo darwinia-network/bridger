@@ -183,4 +183,5 @@ pub struct IndexConfig {
     pub pangolin: SubqueryConfig,
     pub pangolin_parachain: SubqueryConfig,
     pub rococo: SubqueryConfig,
+    pub parachain_rococo: subquery_parachain::SubqueryConfig,
 }

@@ -66,6 +66,7 @@ client-pangolin-parachain = { path = "../../../frame/assistants/client-pangolin-
 client-rococo             = { path = "../../../frame/assistants/client-rococo" }
 component-subscan         = { path = "../../../frame/components/subscan" }
 feemarket-s2s             = { path = "../../../frame/assistants/feemarket-s2s" }
+subquery-parachain        = { path = "../../../frame/assistants/subquery-parachain" }
 subquery-s2s              = { path = "../../../frame/assistants/subquery-s2s" }
 
 

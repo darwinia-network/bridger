@@ -814,6 +814,7 @@ dependencies = [
  "sp-version",
  "structopt",
  "strum",
+ "subquery-parachain",
  "subquery-s2s",
  "substrate-relay-helper",
  "support-common",
@@ -6714,6 +6715,22 @@ dependencies = [
  "sha2 0.9.9",
  "tiny-keccak",
  "twox-hash",
+]
+
+[[package]]
+name = "subquery-parachain"
+version = "0.5.5"
+dependencies = [
+ "async-trait",
+ "gql_client",
+ "hex",
+ "include_dir",
+ "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
+ "strum",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

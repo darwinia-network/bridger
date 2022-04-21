@@ -48,7 +48,6 @@ struct HeaderRelay {
     client_pangolin: PangolinClient,
     client_parachain: PangolinParachainClient,
     subquery_pangolin: Subquery,
-    subquery_parachain: Subquery,
 }
 
 impl HeaderRelay {
@@ -69,15 +68,10 @@ impl HeaderRelay {
         let config_index = bridge_config.index;
         let subquery_pangolin =
             SubqueryComponent::component(config_index.pangolin, BridgeName::PangolinParachain);
-        let subquery_parachain = SubqueryComponent::component(
-            config_index.pangolin_parachain,
-            BridgeName::PangolinParachain,
-        );
         Ok(Self {
             client_pangolin,
             client_parachain,
             subquery_pangolin,
-            subquery_parachain,
         })
     }
 }

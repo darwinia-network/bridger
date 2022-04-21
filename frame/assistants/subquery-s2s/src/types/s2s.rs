@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
-use serde_hex::SerHexSeq;
-use serde_hex::StrictPfx;
+use serde_hex::{SerHex, SerHexSeq, StrictPfx};
 
 /// need relay block
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -19,6 +18,17 @@ pub struct NeedRelayBlock {
     pub lane_id: Option<String>,
     #[serde(rename = "messageNonce")]
     pub message_nonce: Option<u64>,
+    #[serde(rename = "parentHash")]
+    #[serde(with = "SerHex::<StrictPfx>")]
+    pub parent_hash: [u8; 32],
+    #[serde(rename = "stateRoot")]
+    #[serde(with = "SerHex::<StrictPfx>")]
+    pub state_root: [u8; 32],
+    #[serde(rename = "extrinsicsRoot")]
+    #[serde(with = "SerHex::<StrictPfx>")]
+    pub extrinsics_root: [u8; 32],
+    #[serde(with = "SerHexSeq::<StrictPfx>")]
+    pub digest: Vec<u8>,
 }
 
 impl NeedRelayBlock {
@@ -28,14 +38,18 @@ impl NeedRelayBlock {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, strum::EnumString, strum::EnumVariantNames)]
+#[derive(
+    Clone, Debug, Deserialize, Serialize, Eq, PartialEq, strum::EnumString, strum::EnumVariantNames,
+)]
 #[strum(serialize_all = "kebab_case")]
 pub enum RelayBlockType {
     Mandatory,
     OnDemand,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, strum::EnumString, strum::EnumVariantNames)]
+#[derive(
+    Clone, Debug, Deserialize, Serialize, Eq, PartialEq, strum::EnumString, strum::EnumVariantNames,
+)]
 #[strum(serialize_all = "kebab_case")]
 pub enum RelayBlockOrigin {
     Mandatory,

@@ -66,12 +66,14 @@ impl Subquery {
 
     pub async fn find_justification(
         &self,
-        block_hash: String,
+        block_hash: impl AsRef<str>,
         is_mandatory: bool,
     ) -> SubqueryComponentResult<Option<JustificationMapping>> {
         let query_by_hash = self.read_graphql("justification_mapping_by_hash.query.graphql")?;
         let query_latest = self.read_graphql("justification_mapping_latest.query.graphql")?;
-        let vars = FindJustificationVars { hash: block_hash };
+        let vars = FindJustificationVars {
+            hash: block_hash.as_ref().to_string(),
+        };
         let data = self
             .client
             .query_with_vars_unwrap::<HashMap<String, DataWrapper<JustificationMapping>>, FindJustificationVars>(

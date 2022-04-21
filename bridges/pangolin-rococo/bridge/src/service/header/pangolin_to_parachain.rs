@@ -149,7 +149,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
     let next_block = next_block.unwrap();
     let justification = header_relay
         .subquery_pangolin
-        .find_justification(next_block.block_hash, next_block.is_mandatory())
+        .find_justification(&next_block.block_hash, next_block.is_mandatory())
         .await?;
     if justification.is_none() {
         tracing::error!(
@@ -160,22 +160,20 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         );
         return Ok(());
     }
-    let justification = justification.unwrap();
+    let justification = justification.unwrap().justification;
 
+    let raw_digest = next_block.digest;
+    let digest = codec::Decode::decode(&mut raw_digest.as_slice())?;
     let finality_target =
         client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header {
-            parent_hash: Default::default(),
+            parent_hash: sp_core::H256(next_block.parent_hash),
             number: next_block.block_number,
-            state_root: Default::default(),
-            extrinsics_root: Default::default(),
-            digest: Digest {},
+            state_root: sp_core::H256(next_block.state_root),
+            extrinsics_root: sp_core::H256(next_block.extrinsics_root),
+            digest,
             __subxt_unused_type_params: Default::default(),
         };
-    let grandpa_justification = client_pangolin_parachain::types::runtime_types::bp_header_chain::justification::GrandpaJustification {
-        round: (),
-        commit: Commit {},
-        votes_ancestries: vec![]
-    };
+    let grandpa_justification = codec::Decode::decode(&mut justification.as_slice())?;
     let hash = header_relay
         .client_parachain
         .runtime()

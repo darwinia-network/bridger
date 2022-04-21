@@ -17,6 +17,10 @@ type NeedRelayBlock @entity {
   origin: String!
   laneId: String
   messageNonce: Int
+  parentHash: String!
+  stateRoot: String!
+  extrinsicsRoot: String!
+  digest: String!
 
   timestamp: Date
 }

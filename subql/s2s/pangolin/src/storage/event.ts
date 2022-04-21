@@ -19,19 +19,17 @@ export async function storeNeedRelayBlock(
   origin: RelayBlockOrigin
 ) {
   const _event = new NeedRelayBlock(event.id);
-
   _event.blockNumber = event.blockNumber;
   _event.blockHash = event.blockHash;
   _event.type = origin == RelayBlockOrigin.Mandatory ? RelayBlockType.Mandatory : RelayBlockType.OnDemand;
   _event.origin = origin;
-
 
   const block = new FastBlock(event.block);
   const header = block.raw.block.header;
   _event.parentHash = header.parentHash.toString();
   _event.stateRoot = header.stateRoot.toString();
   _event.extrinsicsRoot = header.extrinsicsRoot.toString();
-  _event.digest = header.digest.hash.toString();
+  _event.digest = header.digest.toHex();
 
   if (_event.type == RelayBlockType.OnDemand) {
     const data = event.data;

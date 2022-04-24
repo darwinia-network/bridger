@@ -156,7 +156,7 @@ async fn try_to_relay_mandatory(
 ) -> color_eyre::Result<Option<u32>> {
     let next_mandatory_block = header_relay
         .subquery_rococo
-        .next_header(last_block_number)
+        .next_mandatory_header(last_block_number)
         .await?;
     if let Some(block_to_relay) = next_mandatory_block {
         let justification = header_relay

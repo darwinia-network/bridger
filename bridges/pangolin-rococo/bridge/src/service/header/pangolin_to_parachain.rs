@@ -1,5 +1,8 @@
+use std::str::FromStr;
+
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
+use codec::{Decode, Encode};
 use lifeline::{Lifeline, Service, Task};
 
 use client_pangolin_parachain::client::PangolinParachainClient;
@@ -129,42 +132,81 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             ))
         })?;
     let block_number = last_relayed_pangolin_block_in_parachain.block.header.number;
-    let next_block = header_relay
-        .subquery_pangolin
-        .next_header(block_number)
-        .await?;
-    if next_block.is_none() {
-        tracing::info!(
-            target: "pangolin-rococo",
-            "[header-pangolin-to-parachain] No more header to relay after block: {}",
-            block_number,
-        );
-        return Ok(());
-    }
-    let next_block = next_block.unwrap();
-    let justification = header_relay
-        .subquery_pangolin
-        .find_justification(&next_block.block_hash, next_block.is_mandatory())
-        .await?;
-    if justification.is_none() {
-        tracing::error!(
-            target: "pangolin-rococo",
-            "[header-pangolin-to-parachain] No more header to relay after block: {}, block info: {:?}",
-            block_number,
-            next_block,
-        );
-        return Ok(());
-    }
-    let justification = justification.unwrap().justification;
 
-    let raw_digest = next_block.digest;
-    let digest = codec::Decode::decode(&mut raw_digest.as_slice())?;
+    if let None = try_to_relay_mandatory(&header_relay, block_number).await? {
+        try_to_relay_non_mandatory(&header_relay, block_number).await?;
+    }
+
+    Ok(())
+}
+
+/// Try to relay mandatory headers, return Ok(Some(block_number)) if success, else Ok(None)
+async fn try_to_relay_mandatory(
+    header_relay: &HeaderRelay,
+    last_block_number: u32,
+) -> color_eyre::Result<Option<u32>> {
+    let next_mandatory_block = header_relay
+        .subquery_pangolin
+        .next_mandatory_header(last_block_number)
+        .await?;
+    if let Some(block_to_relay) = next_mandatory_block {
+        let justification = header_relay
+            .subquery_pangolin
+            .find_justification(block_to_relay.block_hash.clone(), true)
+            .await?;
+        submit_finality(
+            &header_relay,
+            block_to_relay.block_hash,
+            justification.unwrap().justification,
+        )
+        .await?;
+
+        Ok(Some(block_to_relay.block_number))
+    } else {
+        Ok(None)
+    }
+}
+
+async fn try_to_relay_non_mandatory(
+    header_relay: &HeaderRelay,
+    last_block_number: u32,
+) -> color_eyre::Result<()> {
+    let latest_justification = header_relay
+        .subquery_pangolin
+        .find_justification("", false)
+        .await?
+        .ok_or_else(|| {
+            BridgerError::Custom(format!("Failed to query latest justification in pangolin",))
+        })?;
+    if latest_justification.block_number > last_block_number {
+        submit_finality(
+            &header_relay,
+            latest_justification.block_hash,
+            latest_justification.justification,
+        )
+        .await?;
+    }
+    Ok(())
+}
+
+async fn submit_finality(
+    header_relay: &HeaderRelay,
+    block_hash: impl AsRef<str>,
+    justification: Vec<u8>,
+) -> color_eyre::Result<()> {
+    let header = header_relay
+        .client_pangolin
+        .subxt()
+        .rpc()
+        .header(Some(sp_core::H256::from_str(block_hash.as_ref()).unwrap()))
+        .await?
+        .unwrap();
     let finality_target = FinalityTarget {
-        parent_hash: sp_core::H256(next_block.parent_hash),
-        number: next_block.block_number,
-        state_root: sp_core::H256(next_block.state_root),
-        extrinsics_root: sp_core::H256(next_block.extrinsics_root),
-        digest,
+        parent_hash: header.parent_hash,
+        number: header.number,
+        state_root: header.state_root,
+        extrinsics_root: header.extrinsics_root,
+        digest: Decode::decode(&mut header.digest.encode().as_slice())?,
         __subxt_unused_type_params: Default::default(),
     };
     let grandpa_justification = codec::Decode::decode(&mut justification.as_slice())?;

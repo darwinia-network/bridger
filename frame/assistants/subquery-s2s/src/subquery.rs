@@ -42,7 +42,7 @@ impl Subquery {
 }
 
 impl Subquery {
-    pub async fn next_header(
+    pub async fn next_mandatory_header(
         &self,
         block_number: u32,
     ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {

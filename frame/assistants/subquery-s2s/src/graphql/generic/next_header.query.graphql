@@ -6,6 +6,9 @@ query queryNextRelayBlock($block: Int!) {
       blockNumber: {
         greaterThan: $block
       }
+      type: {
+        equalTo: "mandatory"
+      }
     }
   ) {
     nodes {

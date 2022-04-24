@@ -1,7 +1,10 @@
 use support_lifeline::task::TaskStack;
 
 use crate::bridge::PangolinRococoBus;
-use crate::service::header::PangolinToParachainHeaderRelayService;
+use crate::service::header::{
+    PangolinToParachainHeaderRelayService, RococoToPangolinHeaderRelayService,
+    RococoToPangolinParaHeaderRelayService,
+};
 use crate::service::message::MessageRelayService;
 
 #[derive(Debug)]
@@ -21,7 +24,9 @@ impl PangolinRococoTask {
 
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<PangolinToParachainHeaderRelayService>()?;
-        // stack.spawn_service::<MessageRelayService>()?;
+        stack.spawn_service::<RococoToPangolinHeaderRelayService>()?;
+        stack.spawn_service::<RococoToPangolinParaHeaderRelayService>()?;
+        stack.spawn_service::<MessageRelayService>()?;
         Ok(Self { stack })
     }
 }

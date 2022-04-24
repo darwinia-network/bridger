@@ -11,8 +11,6 @@ use support_lifeline::service::BridgeService;
 
 use codec::{Decode, Encode};
 
-use subquery_parachain::types::BridgeName as ParaBridgeName;
-use subquery_parachain::{Subquery as ParaSubquery, SubqueryComponent as ParaSubqueryComponent};
 use subquery_s2s::types::BridgeName;
 use subquery_s2s::{Subquery, SubqueryComponent};
 
@@ -58,7 +56,6 @@ struct HeaderRelay {
     client_pangolin: PangolinClient,
     client_rococo: RococoClient,
     subquery_rococo: Subquery,
-    subquery_parachain_rococo: ParaSubquery,
 }
 
 impl HeaderRelay {
@@ -77,16 +74,11 @@ impl HeaderRelay {
         let config_index = bridge_config.index;
         let subquery_rococo =
             SubqueryComponent::component(config_index.rococo, BridgeName::PangolinParachain);
-        let subquery_parachain_rococo = ParaSubqueryComponent::component(
-            config_index.parachain_rococo,
-            ParaBridgeName::PangolinParachain,
-        );
 
         Ok(Self {
             client_pangolin,
             client_rococo,
             subquery_rococo,
-            subquery_parachain_rococo,
         })
     }
 }
@@ -150,108 +142,95 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         })?;
 
     let block_number = last_relayed_rococo_block_in_pangolin.block.header.number;
-    let next_mandatory_block = header_relay
-        .subquery_rococo
-        .next_header(block_number)
-        .await?;
-    let next_para_included_event = header_relay
-        .subquery_parachain_rococo
-        .next_candidate_included_event(block_number, 2105u32)
-        .await?;
-
-    let to_relay = match (next_mandatory_block, next_para_included_event) {
-        (Some(mandatory_block), Some(included_event)) => {
-            let relay_chain_block_hash = header_relay
-                .client_rococo
-                .subxt()
-                .rpc()
-                .block_hash(Some(included_event.included_relay_block.into()))
-                .await?
-                .unwrap()
-                .to_string();
-            if mandatory_block.block_number < included_event.included_relay_block {
-                [
-                    (Some(mandatory_block.block_hash), true),
-                    (Some(relay_chain_block_hash), false),
-                ]
-            } else if mandatory_block.block_number == included_event.included_relay_block {
-                [(Some(mandatory_block.block_hash), true), (None, true)]
-            } else {
-                [
-                    (Some(relay_chain_block_hash), false),
-                    (Some(mandatory_block.block_hash), true),
-                ]
-            }
-        }
-        (None, None) => {
-            tracing::info!(
-                target: "pangolin-rococo",
-                "[header-rococo-to-pangolin] No more header to relay after block: {}",
-                block_number,
-            );
-            return Ok(());
-        }
-        (None, Some(included_event)) => {
-            let relay_chain_block_hash = header_relay
-                .client_rococo
-                .subxt()
-                .rpc()
-                .block_hash(Some(included_event.included_relay_block.into()))
-                .await?
-                .unwrap()
-                .to_string();
-            [(Some(relay_chain_block_hash), false), (None, true)]
-        }
-        (Some(mandatory_block), None) => [(Some(mandatory_block.block_hash), true), (None, true)],
-    };
-
-    for (some_block_hash, is_mandatory) in to_relay.into_iter() {
-        if let Some(block_hash) = some_block_hash {
-            let justification = header_relay
-                .subquery_rococo
-                .find_justification(block_hash.clone(), is_mandatory)
-                .await?;
-            if justification.is_none() {
-                tracing::error!(
-                    target: "pangolin-rococo",
-                    "[header-rococo-to-pangolni] No more header to relay after block: {}",
-                    block_number,
-                );
-                return Ok(());
-            }
-
-            let justification = justification.unwrap().justification;
-            let header = header_relay
-                .client_rococo
-                .subxt()
-                .rpc()
-                .header(Some(sp_core::H256::from_str(&block_hash).unwrap()))
-                .await?
-                .unwrap();
-            let finality_target = FinalityTarget {
-                parent_hash: header.parent_hash,
-                number: header.number,
-                state_root: header.state_root,
-                extrinsics_root: header.extrinsics_root,
-                digest: Decode::decode(&mut header.digest.encode().as_slice())?,
-                __subxt_unused_type_params: Default::default(),
-            };
-            let grandpa_justification = codec::Decode::decode(&mut justification.as_slice())?;
-            let hash = header_relay
-                .client_pangolin
-                .runtime()
-                .tx()
-                .bridge_rococo_grandpa()
-                .submit_finality_proof(finality_target, grandpa_justification)
-                .sign_and_submit(header_relay.client_pangolin.account().signer())
-                .await?;
-            tracing::info!(
-                target: "pangolin-rococo",
-                "[header-rococo-to-pangolin] The block {} relay emitted",
-                hash
-            );
-        }
+    if let None = try_to_relay_mandatory(&header_relay, block_number).await? {
+        try_to_relay_non_mandatory(&header_relay, block_number).await?;
     }
 
+    Ok(())
+}
+
+/// Try to relay mandatory headers, return Ok(Some(block_number)) if success, else Ok(None)
+async fn try_to_relay_mandatory(
+    header_relay: &HeaderRelay,
+    last_block_number: u32,
+) -> color_eyre::Result<Option<u32>> {
+    let next_mandatory_block = header_relay
+        .subquery_rococo
+        .next_header(last_block_number)
+        .await?;
+    if let Some(block_to_relay) = next_mandatory_block {
+        let justification = header_relay
+            .subquery_rococo
+            .find_justification(block_to_relay.block_hash.clone(), true)
+            .await?;
+        submit_finality(
+            &header_relay,
+            block_to_relay.block_hash,
+            justification.unwrap().justification,
+        )
+        .await?;
+
+        Ok(Some(block_to_relay.block_number))
+    } else {
+        Ok(None)
+    }
+}
+
+async fn try_to_relay_non_mandatory(
+    header_relay: &HeaderRelay,
+    last_block_number: u32,
+) -> color_eyre::Result<()> {
+    let latest_justification = header_relay
+        .subquery_rococo
+        .find_justification("", false)
+        .await?
+        .ok_or_else(|| {
+            BridgerError::Custom(format!("Failed to query latest justification in rococo",))
+        })?;
+    if latest_justification.block_number > last_block_number {
+        submit_finality(
+            &header_relay,
+            latest_justification.block_hash,
+            latest_justification.justification,
+        )
+        .await?;
+    }
+    Ok(())
+}
+
+async fn submit_finality(
+    header_relay: &HeaderRelay,
+    block_hash: impl AsRef<str>,
+    justification: Vec<u8>,
+) -> color_eyre::Result<()> {
+    let header = header_relay
+        .client_rococo
+        .subxt()
+        .rpc()
+        .header(Some(sp_core::H256::from_str(block_hash.as_ref()).unwrap()))
+        .await?
+        .unwrap();
+    let finality_target = FinalityTarget {
+        parent_hash: header.parent_hash,
+        number: header.number,
+        state_root: header.state_root,
+        extrinsics_root: header.extrinsics_root,
+        digest: Decode::decode(&mut header.digest.encode().as_slice())?,
+        __subxt_unused_type_params: Default::default(),
+    };
+    let grandpa_justification = codec::Decode::decode(&mut justification.as_slice())?;
+    let hash = header_relay
+        .client_pangolin
+        .runtime()
+        .tx()
+        .bridge_rococo_grandpa()
+        .submit_finality_proof(finality_target, grandpa_justification)
+        .sign_and_submit(header_relay.client_pangolin.account().signer())
+        .await?;
+    tracing::info!(
+        target: "pangolin-rococo",
+        "[header-rococo-to-pangolin] The block {} relay emitted",
+        hash
+    );
     Ok(())
 }

@@ -137,13 +137,13 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .ok_or_else(|| {
             BridgerError::Custom(format!(
                 "Failed to query block by [{}] in rococo",
-                last_relayed_rococo_hash_in_pangolin.to_string()
+                last_relayed_rococo_hash_in_pangolin
             ))
         })?;
 
     let block_number = last_relayed_rococo_block_in_pangolin.block.header.number;
-    if let None = try_to_relay_mandatory(&header_relay, block_number).await? {
-        try_to_relay_non_mandatory(&header_relay, block_number).await?;
+    if try_to_relay_mandatory(header_relay, block_number).await?.is_none() {
+        try_to_relay_non_mandatory(header_relay, block_number).await?;
     }
 
     Ok(())
@@ -164,7 +164,7 @@ async fn try_to_relay_mandatory(
             .find_justification(block_to_relay.block_hash.clone(), true)
             .await?;
         submit_finality(
-            &header_relay,
+            header_relay,
             block_to_relay.block_hash,
             justification.unwrap().justification,
         )
@@ -185,11 +185,11 @@ async fn try_to_relay_non_mandatory(
         .find_justification("", false)
         .await?
         .ok_or_else(|| {
-            BridgerError::Custom(format!("Failed to query latest justification in rococo",))
+            BridgerError::Custom("Failed to query latest justification in rococo".to_string())
         })?;
     if latest_justification.block_number > last_block_number {
         submit_finality(
-            &header_relay,
+            header_relay,
             latest_justification.block_hash,
             latest_justification.justification,
         )

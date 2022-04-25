@@ -145,7 +145,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .rpc()
         .block(Some(best_finalized_source_block_hash))
         .await?
-        .ok_or_else(|| BridgerError::Custom(format!("Failed to get Rococo block",)))?;
+        .ok_or_else(|| BridgerError::Custom("Failed to get Rococo block".to_string()))?;
 
     // TODO Hardcode ParaId
     let para_head_at_source = header_relay

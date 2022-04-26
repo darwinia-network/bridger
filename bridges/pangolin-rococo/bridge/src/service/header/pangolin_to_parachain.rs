@@ -227,18 +227,19 @@ async fn submit_finality(
         __subxt_unused_type_params: Default::default(),
     };
     let grandpa_justification = codec::Decode::decode(&mut justification.as_slice())?;
-    let hash = header_relay
-        .client_parachain
-        .runtime()
+    let runtime = header_relay.client_parachain.runtime();
+    let track = runtime
         .tx()
         .bridge_pangolin_grandpa()
         .submit_finality_proof(finality_target, grandpa_justification)
-        .sign_and_submit(header_relay.client_parachain.account().signer())
+        .sign_and_submit_then_watch(header_relay.client_parachain.account().signer())
         .await?;
+
+    let events = track.wait_for_finalized_success().await?;
     tracing::info!(
-        target: "pangolin-rococo",
-        "[header-pangolin-to-parachain] The block {:?} relay emitted",
-        hash
+         target: "pangolin-rococo",
+          "[header-pangolin-to-parachain] The extrinsic hash: {:?}",
+           events.extrinsic_hash()
     );
     Ok(())
 }

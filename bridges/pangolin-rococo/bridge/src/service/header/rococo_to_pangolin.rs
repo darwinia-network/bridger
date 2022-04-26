@@ -120,10 +120,6 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         target: "pangolin-rococo",
         "[header-relay-pangolin-to-parachain] SERVICE RESTARTING..."
     );
-    tracing::info!(
-        target: "pangolin-rococo",
-        "[header-relay-pangolin-to-parachain] Begin",
-    );
 
     let last_relayed_rococo_hash_in_pangolin = header_relay
         .client_pangolin
@@ -247,18 +243,19 @@ async fn submit_finality(
         __subxt_unused_type_params: Default::default(),
     };
     let grandpa_justification = codec::Decode::decode(&mut justification.as_slice())?;
-    let hash = header_relay
-        .client_pangolin
-        .runtime()
+    let runtime = header_relay.client_pangolin.runtime();
+    let track = runtime
         .tx()
         .bridge_rococo_grandpa()
         .submit_finality_proof(finality_target, grandpa_justification)
-        .sign_and_submit(header_relay.client_pangolin.account().signer())
+        .sign_and_submit_then_watch(header_relay.client_pangolin.account().signer())
         .await?;
+
+    let events = track.wait_for_finalized_success().await?;
     tracing::info!(
         target: "pangolin-rococo",
-        "[header-rococo-to-pangolin] The block {} relay emitted",
-        hash
+        "[header-rococo-to-pangolin] The extrinsic hash: {:?}",
+        events.extrinsic_hash()
     );
     Ok(())
 }

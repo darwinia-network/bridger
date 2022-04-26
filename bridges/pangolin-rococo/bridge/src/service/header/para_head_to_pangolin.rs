@@ -1,6 +1,6 @@
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
-use client_pangolin::types::runtime_types as pangolin_runtime_types;
+use client_pangolin::types::runtime_types::{self as pangolin_runtime_types};
 use client_rococo::client::RococoClient;
 use client_rococo::component::RococoClientComponent;
 use client_rococo::types::runtime_types as rococo_runtime_types;
@@ -111,7 +111,6 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         "[para-head-relay-rococo-to-pangolin] SERVICE RESTARTING..."
     );
 
-    // TODO Why not using best finalized header?
     let best_target_header = header_relay
         .client_pangolin
         .subxt()
@@ -119,6 +118,11 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .header(None)
         .await?
         .ok_or_else(|| BridgerError::Custom(String::from("Failed to get pangolin header")))?;
+    tracing::info!(
+        target: "pangolin-rococo",
+        "[para-head-relay-rococo-to-pangolin] Current pangolin block: {:?}",
+        &best_target_header.number,
+    );
 
     // TODO Hardcode ParaId
     let para_head_at_target = header_relay
@@ -131,6 +135,11 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             Some(best_target_header.hash()),
         )
         .await?;
+    tracing::info!(
+        target: "pangolin-rococo",
+        "[para-head-relay-rococo-to-pangolin] The latest para-head on pangolin: {:?}",
+        &para_head_at_target,
+    );
 
     let best_finalized_source_block_hash = header_relay
         .client_pangolin
@@ -139,6 +148,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .bridge_rococo_grandpa()
         .best_finalized(Some(best_target_header.hash()))
         .await?;
+
     let best_finalized_source_block_at_target = header_relay
         .client_rococo
         .subxt()
@@ -146,6 +156,11 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .block(Some(best_finalized_source_block_hash))
         .await?
         .ok_or_else(|| BridgerError::Custom("Failed to get Rococo block".to_string()))?;
+    tracing::info!(
+        target: "pangolin-rococo",
+        "[para-head-relay-rococo-to-pangolin] The latest rococo block on pangolin: {:?}",
+        &best_finalized_source_block_at_target.block.header.number,
+    );
 
     // TODO Hardcode ParaId
     let para_head_at_source = header_relay
@@ -158,6 +173,12 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             Some(best_finalized_source_block_hash),
         )
         .await?;
+    tracing::info!(
+        target: "pangolin-rococo",
+        "[para-head-relay-rococo-to-pangolin] The latest para-head on rococo {:?} : {:?}",
+        &best_finalized_source_block_at_target.block.header.number,
+        &para_head_at_source,
+    );
 
     let need_relay = match (para_head_at_source, para_head_at_target) {
         (Some(head_at_source), Some(head_at_target))
@@ -223,8 +244,8 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             .await?;
         tracing::info!(
             target: "pangolin-rococo",
-            "[para-head-relay-rococo-to-pangolin] The para head {} relay emitted",
-            hash
+            "[para-head-relay-rococo-to-pangolin] The tx hash {:?} emitted",
+            &hash
         );
     }
 

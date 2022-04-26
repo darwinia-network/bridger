@@ -132,8 +132,16 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             ))
         })?;
     let block_number = last_relayed_pangolin_block_in_parachain.block.header.number;
+    tracing::info!(
+        target: "pangolin-rococo",
+        "[header-pangolin-to-parachain] The latest relayed pangolin block is: {:?}",
+        block_number
+    );
 
-    if try_to_relay_mandatory(header_relay, block_number).await?.is_none() {
+    if try_to_relay_mandatory(header_relay, block_number)
+        .await?
+        .is_none()
+    {
         try_to_relay_non_mandatory(header_relay, block_number).await?;
     }
 
@@ -150,6 +158,11 @@ async fn try_to_relay_mandatory(
         .next_mandatory_header(last_block_number)
         .await?;
     if let Some(block_to_relay) = next_mandatory_block {
+        tracing::info!(
+            target: "pangolin-rococo",
+            "[header-pangolin-to-parachain] Next mandatory block: {:?} ",
+            &block_to_relay.block_number
+        );
         let justification = header_relay
             .subquery_pangolin
             .find_justification(block_to_relay.block_hash.clone(), true)
@@ -163,6 +176,10 @@ async fn try_to_relay_mandatory(
 
         Ok(Some(block_to_relay.block_number))
     } else {
+        tracing::info!(
+            target: "pangolin-rococo",
+            "[header-pangolin-to-parachain] Next mandatory block not found",
+        );
         Ok(None)
     }
 }
@@ -220,7 +237,7 @@ async fn submit_finality(
         .await?;
     tracing::info!(
         target: "pangolin-rococo",
-        "[header-pangolin-to-parachain] The block {} relay emitted",
+        "[header-pangolin-to-parachain] The block {:?} relay emitted",
         hash
     );
     Ok(())

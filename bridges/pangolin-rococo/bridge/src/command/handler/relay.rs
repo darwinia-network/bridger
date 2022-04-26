@@ -5,7 +5,7 @@ use crate::bridge::{PangolinRococoConfig, PangolinRococoTask};
 pub async fn handle_relay() -> color_eyre::Result<()> {
     tracing::info!(target: "pangolin-pangoro", "Start bridge pangolin-pangoro");
     // check config
-    let _bridge_config: PangolinRococoConfig = Config::restore(Names::BridgePangolinPangoro)?;
+    let _bridge_config: PangolinRococoConfig = Config::restore(Names::BridgePangolinRococo)?;
     let _task = PangolinRococoTask::new().await?;
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;

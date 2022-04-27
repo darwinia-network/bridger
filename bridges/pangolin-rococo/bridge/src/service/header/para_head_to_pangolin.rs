@@ -215,7 +215,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             .rpc()
             .read_proof(
                 vec![bp_parachains::parachain_head_storage_key_at_source(
-                    "paras",
+                    "Paras",
                     2105.into(),
                 )],
                 Some(best_finalized_source_block_hash),

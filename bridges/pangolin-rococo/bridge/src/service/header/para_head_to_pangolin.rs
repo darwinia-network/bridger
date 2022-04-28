@@ -83,17 +83,16 @@ async fn start() -> color_eyre::Result<()> {
         match run(&header_relay).await {
             Ok(_) => continue,
             Err(err) => {
-                if let Some(client_error) =
-                    err.downcast_ref::<client_pangolin::error::ClientError>()
+                if let Some(subxt::BasicError::Rpc(request_error)) =
+                    err.downcast_ref::<subxt::BasicError>()
                 {
-                    if client_error.is_restart_need() {
-                        tracing::error!(
-                            target: "pangolin-rococo",
-                            "[para-header-rococo-to-pangolin] Connection Error. Try to resend later",
-                        );
-                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                        header_relay = HeaderRelay::new().await?;
-                    }
+                    tracing::error!(
+                        target: "pangolin-rococo",
+                        "[para-header-rococo-to-pangolin] Connection Error. Try to resend later: {:?}",
+                        request_error
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    header_relay = HeaderRelay::new().await?;
                 }
                 tracing::error!(
                     target: "pangolin-rococo",
@@ -226,9 +225,8 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             "[para-head-relay-rococo-to-pangolin] Submitting parachain heads update transaction to pangolin",
         );
 
-        let hash = header_relay
-            .client_pangolin
-            .runtime()
+        let runtime = header_relay.client_pangolin.runtime();
+        let track = runtime
             .tx()
             .bridge_rococo_parachains()
             .submit_parachain_heads(
@@ -240,12 +238,13 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
                     .map(|bytes| bytes.0)
                     .collect(),
             )
-            .sign_and_submit(header_relay.client_pangolin.account().signer())
+            .sign_and_submit_then_watch(header_relay.client_pangolin.account().signer())
             .await?;
+        let events = track.wait_for_finalized_success().await?;
         tracing::info!(
             target: "pangolin-rococo",
             "[para-head-relay-rococo-to-pangolin] The tx hash {:?} emitted",
-            &hash
+            events.extrinsic_hash()
         );
     }
 

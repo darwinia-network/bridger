@@ -819,6 +819,7 @@ dependencies = [
  "subquery-parachain",
  "subquery-s2s",
  "substrate-relay-helper",
+ "subxt",
  "support-common",
  "support-lifeline",
  "support-terminal",

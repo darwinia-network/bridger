@@ -276,9 +276,7 @@ dependencies = [
  "colored",
  "component-ethereum",
  "component-http-client",
- "component-shadow",
  "component-state",
- "component-thegraph-liketh",
  "lifeline",
  "microkv",
  "parity-scale-codec",
@@ -286,6 +284,7 @@ dependencies = [
  "rand 0.8.5",
  "serde 1.0.136",
  "serde_json",
+ "shadow-liketh",
  "structopt",
  "strum",
  "subquery-d2e",
@@ -294,6 +293,7 @@ dependencies = [
  "support-lifeline",
  "support-terminal",
  "support-tracker",
+ "thegraph-liketh",
  "tokio",
  "tracing",
  "web3",
@@ -364,6 +364,15 @@ dependencies = [
  "num-traits 0.2.14",
  "time",
  "winapi",
+]
+
+[[package]]
+name = "ckb-merkle-mountain-range"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f061f97d64fd1822664bdfb722f7ae5469a97b77567390f7442be5b5dc82a5b"
+dependencies = [
+ "cfg-if 0.1.10",
 ]
 
 [[package]]
@@ -469,20 +478,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "component-shadow"
-version = "0.5.5"
-dependencies = [
- "color-eyre",
- "component-ethereum",
- "parity-scale-codec",
- "reqwest",
- "serde 1.0.136",
- "serde_json",
- "thiserror",
- "tracing",
-]
-
-[[package]]
 name = "component-state"
 version = "0.5.5"
 dependencies = [
@@ -491,19 +486,6 @@ dependencies = [
  "microkv",
  "serde 1.0.136",
  "support-common",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "component-thegraph-liketh"
-version = "0.5.5"
-dependencies = [
- "async-trait",
- "color-eyre",
- "gql_client",
- "serde 1.0.136",
- "serde-aux",
  "thiserror",
  "tracing",
 ]
@@ -1123,6 +1105,17 @@ checksum = "78cc372d058dcf6d5ecd98510e7fbc9e5aec4d21de70f65fea8fecebcd881bd4"
 name = "gql_client"
 version = "1.0.1"
 source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#220c345c8e570fa2b28ceb2d869331d014b2f324"
+dependencies = [
+ "reqwest",
+ "serde 1.0.136",
+ "serde_json",
+]
+
+[[package]]
+name = "gql_client"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d817a5d0b2a4948deae8550e12ae5eff3a874f8b66090b5863a2dcc917a59a61"
 dependencies = [
  "reqwest",
  "serde 1.0.136",
@@ -1984,9 +1977,9 @@ name = "pangolin-subxt"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "component-shadow",
  "parity-scale-codec",
  "serde 1.0.136",
+ "shadow-liketh",
  "subxt",
  "thiserror",
  "web3",
@@ -2952,6 +2945,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "shadow-liketh"
+version = "0.5.3"
+dependencies = [
+ "blake2-rfc",
+ "ckb-merkle-mountain-range",
+ "component-ethereum",
+ "gql_client 1.0.4",
+ "include_dir",
+ "parity-scale-codec",
+ "reqwest",
+ "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
+ "serde_json",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
 name = "sharded-slab"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3436,7 +3448,7 @@ name = "subquery-d2e"
 version = "0.5.5"
 dependencies = [
  "async-trait",
- "gql_client",
+ "gql_client 1.0.4",
  "hex",
  "include_dir",
  "serde 1.0.136",
@@ -3657,6 +3669,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 dependencies = [
  "unicode-width",
+]
+
+[[package]]
+name = "thegraph-liketh"
+version = "0.5.5"
+dependencies = [
+ "async-trait",
+ "color-eyre",
+ "gql_client 1.0.1",
+ "serde 1.0.136",
+ "serde-aux",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

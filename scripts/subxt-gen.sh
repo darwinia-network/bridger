@@ -10,7 +10,6 @@ WORK_PATH=${BIN_PATH}/../
 SUBXT=$(which subxt || echo '')
 
 if [ -z "${SUBXT}" ]; then
-#  cargo install --branch parity-master --git https://github.com/darwinia-network/subxt
   cargo install --tag v0.18.1 --git https://github.com/paritytech/subxt
 fi
 
@@ -32,7 +31,8 @@ OUTPUT_FILE=
 
 
 if [ "${CHAIN}" == "pangolin" ]; then
-  ENDPOINT='https://pangolin-rpc.darwinia.network'
+  #ENDPOINT='https://pangolin-rpc.darwinia.network'
+  ENDPOINT='http://127.0.0.1:9966'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangolin-subxt
 fi
 
@@ -47,7 +47,15 @@ if [ "${CHAIN}" == "darwinia" ]; then
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/darwinia-subxt
 fi
 
+if [ "${CHAIN}" == "rococo" ]; then
+  ENDPOINT='https://rococo-rpc.polkadot.io'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/rococo-subxt
+fi
 
+if [ "${CHAIN}" == "pangolin-parachain" ]; then
+  ENDPOINT='http://127.0.0.1:40338'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangolin-parachain-subxt
+fi
 
 if [ -z "${ENDPOINT}" ]; then
   echo 'Not support chain:' ${CHAIN}

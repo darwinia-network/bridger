@@ -287,7 +287,7 @@ dependencies = [
  "component-thegraph-liketh",
  "lifeline",
  "microkv",
- "parity-scale-codec 3.1.2",
+ "parity-scale-codec 2.3.1",
  "postage",
  "rand 0.8.5",
  "serde 1.0.136",
@@ -386,7 +386,6 @@ name = "client-darwinia"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "color-eyre",
  "darwinia-subxt",
  "parity-scale-codec 3.1.2",
  "secp256k1 0.20.3",
@@ -394,7 +393,6 @@ dependencies = [
  "serde_json",
  "subxt",
  "thiserror",
- "tokio",
  "tracing",
  "web3",
 ]

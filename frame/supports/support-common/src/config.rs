@@ -23,6 +23,8 @@ pub enum Names {
     BridgeDarwiniaCrab,
     /// bridge pangoro-chapel
     BridgePangoroChapel,
+    /// bridge pangolin-rococo
+    BridgePangolinRococo,
 }
 
 impl Names {
@@ -35,6 +37,7 @@ impl Names {
             Self::BridgePangolinPangoro => "bridge-pangolin-pangoro",
             Self::BridgeDarwiniaCrab => "bridge-darwinia-crab",
             Self::BridgePangoroChapel => "bridge-pangoro-chapel",
+            Self::BridgePangolinRococo => "bridge-pangolin-rococo",
         }
     }
 }

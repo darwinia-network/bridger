@@ -1,31 +1,30 @@
 [package]
-name = "pangolin-subxt"
-version = "0.5.5"
-authors = ["Darwinia Network <hello@darwinia.network>"]
-description = "Darwinia bridger"
-repository = "https://github.com/darwinia-network/bridger"
-license = "MIT"
+authors       = ["Darwinia Network <hello@darwinia.network>"]
+description   = "Darwinia bridger"
 documentation = "https://rust-docs.darwinia.network/bridger"
-homepage = "https://github.com/darwinia-network/bridger"
-include = [
-  "Cargo.toml",
-  "**/*.rs",
-  "README.md",
-  "LICENSE"
-]
-keywords = ["substrate", "darwinia"]
-readme = 'README.md'
-edition = "2021"
+edition       = "2021"
+homepage      = "https://github.com/darwinia-network/bridger"
+include       = ["Cargo.toml", "**/*.rs", "README.md", "LICENSE"]
+keywords      = ["substrate", "darwinia"]
+license       = "MIT"
+name          = "pangolin-subxt"
+readme        = 'README.md'
+repository    = "https://github.com/darwinia-network/bridger"
+version       = "0.5.5"
 
 [dependencies]
 
-thiserror   = "1"
+thiserror = "1"
 array-bytes = "1.4"
-serde       = { version = "1", features = ["derive"] }
 
-subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
-codec       = { package = "parity-scale-codec", version = "2.3.1", default-features = false, features = ["derive", "full"] }
+codec = { package = "parity-scale-codec", version = "2" }
+serde = { version = "1", features = ["derive"] }
 
-web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master" }
+web3  = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", optional = true }
+subxt = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
 
-shadow-liketh   = { path = "../../../frame/assistants/shadow-liketh" }
+shadow-liketh = { path = "../../../frame/assistants/shadow-liketh", optional = true }
+
+[features]
+default = []
+with-shadow = ["web3", "shadow-liketh"]

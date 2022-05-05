@@ -67,7 +67,7 @@ impl ExtrinsicsHandler {
         );
 
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
-        let message_kv: NamespaceMicroKV =
+        let message_kv =
             state.microkv_with_namespace(format!("{}-messages", PangolinRopstenTask::name()));
         Ok(ExtrinsicsHandler {
             client,
@@ -273,21 +273,49 @@ impl ExtrinsicsHandler {
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
                 continue;
             }
-            for key in extrinsics.iter() {
+            let mut times = 0;
+            let mut index = 0;
+            loop {
+                times += 1;
+                let key = match extrinsics.get(index) {
+                    Some(v) => v,
+                    None => break,
+                };
                 let ex: Extrinsic = self.message_kv.get_as_unwrap(&key)?;
                 match self.send_extrinsic(ex.clone()).await {
                     Ok(_) => self.message_kv.delete(&key)?,
                     Err(err) => {
-                        self.message_kv.delete(&key)?;
+                        if let Some(client_error) =
+                            err.downcast_ref::<client_pangolin::error::ClientError>()
+                        {
+                            if client_error.is_restart_need() {
+                                tracing::error!(
+                                    target: "pangolin-pangoro",
+                                    "[pangolin] [extrinsics] [{}] Connection Error. Try to resend later. extrinsic: {:?}",
+                                    times,
+                                    ex,
+                                );
+                                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                                return Err(err);
+                            }
+                        }
                         tracing::error!(
-                            target: "pangolin-ropsten",
-                            "[pangolin] [extrinsics] Failed to send extrinsic {:?} err: {:?}",
+                            target: "pangolin-pangoro",
+                            "[pangolin] [extrinsics] [{}] Failed to send extrinsic {:?} err: {:?}",
+                            times,
                             ex,
                             err
                         );
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                        if times > 5 {
+                            self.message_kv.delete(&key)?;
+                        } else {
+                            continue;
+                        }
                     }
                 }
+                index += 1;
+                times = 0;
             }
         }
     }

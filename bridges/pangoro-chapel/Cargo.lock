@@ -351,7 +351,6 @@ dependencies = [
  "serde_json",
  "subxt",
  "thiserror",
- "tokio",
  "tracing",
  "web3",
 ]

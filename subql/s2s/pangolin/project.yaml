@@ -1,0 +1,33 @@
+specVersion: 0.2.0
+name: bridge-s2s-pangolin
+version: 0.0.4
+description: S2S bridge pangolin subql
+repository: https://github.com/darwinia-network/bridger
+schema:
+  file: ./schema.graphql
+
+network:
+  genesisHash: '0xce44bd16fc276f9e457b452577b6c2678e57768260012af127479fed806da7e7'
+  endpoint: wss://pangolin-rpc.darwinia.network
+  dictionary: https://api.subquery.network/sq/darwinia-network/pangolin-dictionary
+
+dataSources:
+  - name: main
+    kind: substrate/Runtime
+    startBlock: 2094800
+    mapping:
+      file: ./dist/index.js
+      handlers:
+        - handler: handleBlock
+          kind: substrate/BlockHandler
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            - module: grandpa
+              method: NewAuthorities
+            - module: bridgePangoroMessages
+              method: MessageAccepted
+            - module: bridgePangoroParachainMessages
+              method: MessageAccepted
+        - handler: handleCall
+          kind: substrate/CallHandler

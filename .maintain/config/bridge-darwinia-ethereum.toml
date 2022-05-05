@@ -15,8 +15,6 @@ relayer_real_account = "0x..."
 # private key to sign ecdsa messages
 ecdsa_authority_private_key = "0x..."
 
-strict = false
-
 [web3]
 endpoint = "https://mainnet.infura.io/v3/<YOUR_KEY>"
 

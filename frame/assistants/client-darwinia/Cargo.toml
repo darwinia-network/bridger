@@ -1,0 +1,37 @@
+[package]
+name = "client-darwinia"
+version = "0.5.5"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://rust-docs.darwinia.network/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2021"
+
+[dependencies]
+tracing = "0.1"
+thiserror = "1"
+
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
+
+array-bytes = "1.4"
+
+codec       = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive", "full"] }
+web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+secp256k1   = { version = "0.20", features = ["recovery"] }
+subxt       = "0.18.1"
+
+darwinia-subxt   = { path = "../darwinia-subxt" }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }

@@ -1,0 +1,28 @@
+[package]
+name = "client-pangolin-parachain"
+version = "0.5.5"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://rust-docs.darwinia.network/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2021"
+
+[dependencies]
+tracing     = "0.1"
+thiserror   = "1"
+array-bytes = "1.4"
+
+serde       = { version = "1", features = ["derive"] }
+
+subxt        = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
+pangolin-parachain-subxt   = { path = "../pangolin-parachain-subxt" }

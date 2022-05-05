@@ -7,11 +7,11 @@ schema:
   file: ./schema.graphql
 network:
   endpoint: wss://rococo-rpc.polkadot.io/
-  genesisHash: '0x27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184'
+  genesisHash: '0x6408de7737c59c238890533af25896a2c20608d8b380bb01029acb392781063e'
   # dictionary: https://api.subquery.network/sq/subquery/kusama-dictionary
 dataSources:
   - kind: substrate/Runtime
-    startBlock: 99652
+    startBlock: 0
     mapping:
       file: ./dist/index.js
       handlers:

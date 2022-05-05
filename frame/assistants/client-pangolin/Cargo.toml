@@ -33,6 +33,7 @@ secp256k1   = { version = "0.20", features = ["recovery"], optional = true }
 
 subxt            = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
 pangolin-subxt   = { path = "../pangolin-subxt" }
+support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

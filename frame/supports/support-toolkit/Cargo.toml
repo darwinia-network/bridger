@@ -1,5 +1,5 @@
 [package]
-name = "support-primitives"
+name = "support-toolkit"
 version = "0.5.5"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -18,8 +18,4 @@ readme = 'README.md'
 edition = "2021"
 
 [dependencies]
-uint = "0.8.5"
-rlp = "0.4.4"
-
-serde = { version = "1", features = ["derive"] }
-codec = { package = "parity-scale-codec", version = "2", features = ["derive", "full"] }
+thiserror = "1"

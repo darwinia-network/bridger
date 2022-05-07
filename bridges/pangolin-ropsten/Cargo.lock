@@ -2961,6 +2961,7 @@ dependencies = [
 name = "shadow-liketh"
 version = "0.5.3"
 dependencies = [
+ "array-bytes",
  "blake2-rfc",
  "ckb-merkle-mountain-range",
  "component-ethereum",

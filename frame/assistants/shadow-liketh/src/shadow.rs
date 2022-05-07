@@ -139,8 +139,9 @@ impl Shadow {
     }
 
     pub async fn mmr_root(&self, leaf_index: u64) -> ShadowComponentReuslt<[u8; 32]> {
-        let position = ckb_merkle_mountain_range::leaf_index_to_pos(leaf_index);
+        let position = ckb_merkle_mountain_range::leaf_index_to_mmr_size(leaf_index);
         let peak_positions = ckb_merkle_mountain_range::helper::get_peaks(position);
+        println!("{:?}", peak_positions);
 
         let mmr_nodes = self.query_nodes(peak_positions).await?;
         let peaks = self
@@ -148,6 +149,9 @@ impl Shadow {
             .iter()
             .map(|item| item.1)
             .collect::<Vec<[u8; 32]>>();
+        for item in &peaks {
+            println!("{:?}", array_bytes::bytes2hex("", item));
+        }
 
         let mmr_root =
             mmr::bag_rhs_peaks(peaks).map_err(|e| ShadowComponentError::MMR(format!("{:?}", e)))?;

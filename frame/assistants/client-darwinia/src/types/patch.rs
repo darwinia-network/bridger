@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+#[cfg(feature = "ethlike-v1")]
 use codec::{Decode, Encode};
 use darwinia_subxt::api::runtime_types::{darwinia_bridge_ethereum, darwinia_relay_primitives};
 use subxt::DefaultExtra;
@@ -22,6 +23,7 @@ pub type AffirmationsReturn = HashMap<u64, HashMap<u32, Vec<BetterRelayAffirmati
 pub type NodeRuntimeSignedExtra = DefaultExtra<DarwiniaSubxtConfig>;
 
 /// Encode mmr root message
+#[cfg(feature = "ethlike-v1")]
 #[derive(Encode)]
 pub struct _S<_1, _2, _3, _4>
 where

@@ -61,7 +61,7 @@ impl DarwiniaScanner {
         // ethereum
         let ethereum = EthereumComponent::component(bridge_config.ethereum, config_web3.clone())?;
 
-        // pangolin client
+        // darwinia client
         let client = DarwiniaClientComponent::component(config_darwinia).await?;
 
         let mut wrapper = ScanDataWrapper {

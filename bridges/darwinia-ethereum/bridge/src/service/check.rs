@@ -3,13 +3,13 @@ use std::time::SystemTime;
 use client_darwinia::component::DarwiniaClientComponent;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
+use thegraph_liketh::component::TheGraphLikeEthComponent;
 
 use component_state::state::BridgeState;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
-use thegraph_liketh::component::TheGraphLikeEthComponent;
 
 use crate::bridge::DarwiniaEthereumTask;
 use crate::bridge::TaskConfig;

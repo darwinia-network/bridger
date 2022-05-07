@@ -1,5 +1,5 @@
-use component_shadow::types::{
-    EthereumHeaderJson, EthereumReceiptProofJson, EthereumReceiptProofThingJson, HeaderParcel,
+use shadow_liketh::types::{
+    EthereumHeaderJson, EthereumReceiptProofJson, EthereumReceiptWithMMRProof, HeaderParcel,
     MMRProofJson,
 };
 
@@ -12,10 +12,9 @@ impl TryFrom<HeaderParcel> for EthereumRelayHeaderParcel {
     type Error = ConvertTypeError;
 
     fn try_from(value: HeaderParcel) -> Result<Self, Self::Error> {
-        let mmr_root = value.mmr_root.mmr_root;
         Ok(Self {
             header: value.header.try_into()?,
-            parent_mmr_root: subxt::sp_core::H256(array_bytes::hex2array(mmr_root.as_str())?),
+            parent_mmr_root: subxt::sp_core::H256(value.mmr_root),
         })
     }
 }
@@ -129,11 +128,11 @@ impl TryFrom<MMRProofJson> for darwinia_bridge_ethereum::MMRProof {
     type Error = ConvertTypeError;
 
     fn try_from(that: MMRProofJson) -> Result<Self, Self::Error> {
-        let mut proof = Vec::with_capacity(that.proof.len());
-        for item in that.proof {
-            let bytes = array_bytes::hex2array(item)?;
-            proof.push(subxt::sp_core::H256(bytes));
-        }
+        let proof = that
+            .proof
+            .iter()
+            .map(|item| subxt::sp_core::H256(*item))
+            .collect();
         Ok(Self {
             member_leaf_index: that.member_leaf_index,
             last_leaf_index: that.last_leaf_index,
@@ -142,13 +141,14 @@ impl TryFrom<MMRProofJson> for darwinia_bridge_ethereum::MMRProof {
     }
 }
 
-impl TryFrom<EthereumReceiptProofThingJson> for EthereumReceiptProofThing {
+impl TryFrom<EthereumReceiptWithMMRProof> for EthereumReceiptProofThing {
     type Error = ConvertTypeError;
 
-    fn try_from(value: EthereumReceiptProofThingJson) -> Result<Self, Self::Error> {
+    fn try_from(value: EthereumReceiptWithMMRProof) -> Result<Self, Self::Error> {
+        let receipt = value.receipt;
         Ok(Self {
-            header: value.header.try_into()?,
-            receipt_proof: value.receipt_proof.try_into()?,
+            header: receipt.header.try_into()?,
+            receipt_proof: receipt.receipt_proof.try_into()?,
             mmr_proof: value.mmr_proof.try_into()?,
         })
     }

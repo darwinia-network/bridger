@@ -1,22 +1,21 @@
-use std::sync::Arc;
-
-use lifeline::Sender;
-use postage::broadcast;
-
 use client_darwinia::client::DarwiniaClient;
 use client_darwinia::component::DarwiniaClientComponent;
-use component_shadow::component::ShadowComponent;
-use component_shadow::shadow::Shadow;
+use lifeline::Sender;
+use postage::broadcast;
+use thegraph_liketh::types::TransactionEntity;
+
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::shadow::Shadow;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
-use thegraph_liketh::types::TransactionEntity;
 
 use crate::bridge::{DarwiniaEthereumConfig, Extrinsic, ToExtrinsicsMessage};
 
 pub struct RedeemHandler {
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     client: DarwiniaClient,
-    shadow: Arc<Shadow>,
+    shadow: Shadow,
 }
 
 impl RedeemHandler {
@@ -29,7 +28,7 @@ impl RedeemHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "darwinia-ethereum",
-                        "[ethereum] [redeem] Failed to create redeem handler, times: [{}] err: {:#?}",
+                        "[ethereum] Failed to create redeem handler, times: [{}] err: {:#?}",
                         times,
                         err
                     );
@@ -54,12 +53,12 @@ impl RedeemHandler {
             bridge_config.shadow,
             bridge_config.ethereum,
             bridge_config.web3,
+            BridgeName::DarwiniaEthereum,
         )?;
-        let shadow = Arc::new(shadow);
 
         tracing::info!(
             target: "darwinia-ethereum",
-            "[ethereum] [redeem] ✨ REDEEM HANDLER CREATED: ETHEREUM <> DARWINIA REDEEM"
+            "[ethereum] [redeem] ✨ REDEEM HANDLER CREATED: ROPSTEN <> PANGOLIN REDEEM"
         );
         Ok(RedeemHandler {
             sender_to_extrinsics,
@@ -73,6 +72,8 @@ impl RedeemHandler {
     pub async fn redeem(&mut self, tx: TransactionEntity) -> color_eyre::Result<Option<u64>> {
         tracing::trace!(
             target: "darwinia-ethereum",
+            chain = "ethereum",
+            action = "redeem",
             "[ethereum] [redeem] Try to redeem ethereum tx {:?}... in block {}",
             tx.tx_hash,
             tx.block_number
@@ -94,6 +95,8 @@ impl RedeemHandler {
         {
             tracing::trace!(
                 target: "darwinia-ethereum",
+                chain = "ethereum",
+                action = "redeem",
                 "[ethereum] [redeem] Ethereum tx {:?} redeemed",
                 tx.tx_hash
             );
@@ -104,6 +107,8 @@ impl RedeemHandler {
         if tx.block_number >= last_confirmed {
             tracing::trace!(
                 target: "darwinia-ethereum",
+                chain = "ethereum",
+                action = "redeem",
                 "[ethereum] [redeem] Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
                 tx.block_number,
@@ -118,6 +123,8 @@ impl RedeemHandler {
         let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(
             target: "darwinia-ethereum",
+            chain = "ethereum",
+            action = "redeem",
             "[ethereum] [redeem] Redeem extrinsic send to extrinsics service: {:?}. at ethereum block: {}",
             ex,
             tx.block_number

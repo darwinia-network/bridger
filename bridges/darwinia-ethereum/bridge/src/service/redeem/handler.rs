@@ -28,7 +28,7 @@ impl RedeemHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "darwinia-ethereum",
-                        "[ethereum] Failed to create redeem handler, times: [{}] err: {:#?}",
+                        "[ethereum] [redeem] Failed to create redeem handler, times: [{}] err: {:#?}",
                         times,
                         err
                     );
@@ -72,8 +72,6 @@ impl RedeemHandler {
     pub async fn redeem(&mut self, tx: TransactionEntity) -> color_eyre::Result<Option<u64>> {
         tracing::trace!(
             target: "darwinia-ethereum",
-            chain = "ethereum",
-            action = "redeem",
             "[ethereum] [redeem] Try to redeem ethereum tx {:?}... in block {}",
             tx.tx_hash,
             tx.block_number
@@ -95,8 +93,6 @@ impl RedeemHandler {
         {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                chain = "ethereum",
-                action = "redeem",
                 "[ethereum] [redeem] Ethereum tx {:?} redeemed",
                 tx.tx_hash
             );
@@ -107,8 +103,6 @@ impl RedeemHandler {
         if tx.block_number >= last_confirmed {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                chain = "ethereum",
-                action = "redeem",
                 "[ethereum] [redeem] Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
                 tx.block_number,
@@ -123,8 +117,6 @@ impl RedeemHandler {
         let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(
             target: "darwinia-ethereum",
-            chain = "ethereum",
-            action = "redeem",
             "[ethereum] [redeem] Redeem extrinsic send to extrinsics service: {:?}. at ethereum block: {}",
             ex,
             tx.block_number

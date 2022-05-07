@@ -33,7 +33,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         if latest.emitted == 1 {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] [schedule-mmr-root] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. not need to do this.",
+                "[pangolin] [schedule-mmr-root] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. nothing to do.",
                 latest.event_block_number,
                 latest.at_block_number
             );
@@ -42,7 +42,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         if latest.outdated == 1 {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] [schedule-mmr-root]The latest ScheduleMMRRootEvent is outdated. event block is: {} and at block: {}. don't do this.",
+                "[pangolin] [schedule-mmr-root]The latest ScheduleMMRRootEvent is outdated. event block is: {} and at block: {}. nothing to do.",
                 latest.event_block_number,
                 latest.at_block_number
             );

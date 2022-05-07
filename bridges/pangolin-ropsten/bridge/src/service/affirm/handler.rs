@@ -61,7 +61,7 @@ impl AffirmHandler {
 
         tracing::info!(
             target: "pangolin-ropsten", chain = "ropsten", action = "affirm",
-            "✨ SERVICE STARTED: ROPSTEN <> PANGOLIN RELAY"
+            "[ropsten] [affirm] ✨ SERVICE STARTED: ROPSTEN <> PANGOLIN RELAY"
         );
         Ok(AffirmHandler {
             microkv,
@@ -80,8 +80,6 @@ impl AffirmHandler {
 
         tracing::info!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "affirm",
             "[ropsten] [affirm] The last confirmed ethereum block is {}",
             last_confirmed
         );
@@ -92,8 +90,6 @@ impl AffirmHandler {
         } else {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                chain = "ropsten",
-                action = "affirm",
                 "[ropsten] [affirm] The last relayed ethereum block is {}",
                 relayed
             );
@@ -102,8 +98,6 @@ impl AffirmHandler {
         if target > relayed {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                chain = "ropsten",
-                action = "affirm",
                 "[ropsten] [affirm] You are affirming ethereum block {}",
                 target
             );
@@ -111,8 +105,6 @@ impl AffirmHandler {
         } else {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                chain = "ropsten",
-                action = "affirm",
                 "[ropsten] [affirm] You do not need to affirm ethereum block {}",
                 target
             );
@@ -148,8 +140,6 @@ impl AffirmHandler {
             if pending_block_number >= target {
                 tracing::trace!(
                     target: "pangolin-ropsten",
-                    chain = "ropsten",
-                    action = "affirm",
                     "[ropsten] [affirm] The affirming target block {} is in pending",
                     target
                 );
@@ -163,8 +153,6 @@ impl AffirmHandler {
                 if client_pangolin::helpers::affirmations_contains_block(affirmations, target) {
                     tracing::trace!(
                         target: "pangolin-ropsten",
-                        chain = "ropsten",
-                        action = "affirm",
                         "[ropsten] [affirm] The affirming target block {} is in the relayer game",
                         target
                     );
@@ -175,8 +163,6 @@ impl AffirmHandler {
 
         tracing::trace!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "affirm",
             "[ropsten] [affirm] Prepare to affirm ethereum block: {}",
             target
         );
@@ -187,8 +173,6 @@ impl AffirmHandler {
                 if parcel.parent_mmr_root.to_fixed_bytes() == [0u8; 32] {
                     tracing::trace!(
                         target: "pangolin-ropsten",
-                        chain = "ropsten",
-                        action = "affirm",
                         "[ropsten] [affirm] Shadow service failed to provide parcel for block {}",
                         target
                     );

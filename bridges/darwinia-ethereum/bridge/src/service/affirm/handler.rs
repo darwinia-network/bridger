@@ -30,8 +30,6 @@ impl AffirmHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "darwinia-ethereum",
-                        chain = "ethereum",
-                        action = "affirm",
                         "[ethereum] [affirm] Failed to init affirm handler. err: {:#?}",
                         err
                     );
@@ -61,7 +59,7 @@ impl AffirmHandler {
 
         tracing::info!(
             target: "darwinia-ethereum", chain = "ethereum", action = "affirm",
-            "✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY"
+            "[ethereum] [affirm] ✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY"
         );
         Ok(AffirmHandler {
             microkv,
@@ -80,8 +78,6 @@ impl AffirmHandler {
 
         tracing::info!(
             target: "darwinia-ethereum",
-            chain = "ethereum",
-            action = "affirm",
             "[ethereum] [affirm] The last confirmed ethereum block is {}",
             last_confirmed
         );
@@ -92,8 +88,6 @@ impl AffirmHandler {
         } else {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                chain = "ethereum",
-                action = "affirm",
                 "[ethereum] [affirm] The last relayed ethereum block is {}",
                 relayed
             );
@@ -102,8 +96,6 @@ impl AffirmHandler {
         if target > relayed {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                chain = "ethereum",
-                action = "affirm",
                 "[ethereum] [affirm] You are affirming ethereum block {}",
                 target
             );
@@ -111,8 +103,6 @@ impl AffirmHandler {
         } else {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                chain = "ethereum",
-                action = "affirm",
                 "[ethereum] [affirm] You do not need to affirm ethereum block {}",
                 target
             );
@@ -148,8 +138,6 @@ impl AffirmHandler {
             if pending_block_number >= target {
                 tracing::trace!(
                     target: "darwinia-ethereum",
-                    chain = "ethereum",
-                    action = "affirm",
                     "[ethereum] [affirm] The affirming target block {} is in pending",
                     target
                 );
@@ -163,8 +151,6 @@ impl AffirmHandler {
                 if client_darwinia::helpers::affirmations_contains_block(affirmations, target) {
                     tracing::trace!(
                         target: "darwinia-ethereum",
-                        chain = "ethereum",
-                        action = "affirm",
                         "[ethereum] [affirm] The affirming target block {} is in the relayer game",
                         target
                     );
@@ -175,8 +161,6 @@ impl AffirmHandler {
 
         tracing::trace!(
             target: "darwinia-ethereum",
-            chain = "ethereum",
-            action = "affirm",
             "[ethereum] [affirm] Prepare to affirm ethereum block: {}",
             target
         );
@@ -187,8 +171,6 @@ impl AffirmHandler {
                 if parcel.parent_mmr_root.to_fixed_bytes() == [0u8; 32] {
                     tracing::trace!(
                         target: "darwinia-ethereum",
-                        chain = "ethereum",
-                        action = "affirm",
                         "[ethereum] [affirm] Shadow service failed to provide parcel for block {}",
                         target
                     );

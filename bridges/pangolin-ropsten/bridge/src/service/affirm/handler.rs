@@ -105,8 +105,9 @@ impl AffirmHandler {
         } else {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                "[ropsten] [affirm] You do not need to affirm ethereum block {}",
-                target
+                "[ropsten] [affirm] You do not need to affirm ethereum block {}, because this block is less or equal with relayed {}",
+                target,
+                relayed,
             );
         }
 

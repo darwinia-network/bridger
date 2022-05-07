@@ -98,6 +98,11 @@ impl RedeemHandler {
             );
             return Ok(Some(tx.block_number));
         }
+        tracing::trace!(
+            target: "pangolin-ropsten",
+            "[ropsten] [redeem] Ethereum tx {:?} is not verified, will be redeem",
+            tx.tx_hash
+        );
 
         let last_confirmed = self.client.ethereum().last_confirmed().await?;
         if tx.block_number >= last_confirmed {

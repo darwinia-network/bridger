@@ -103,8 +103,9 @@ impl AffirmHandler {
         } else {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "[ethereum] [affirm] You do not need to affirm ethereum block {}",
-                target
+                "[ethereum] [affirm] You do not need to affirm ethereum block {}, because this block is less or equal with relayed {}",
+                target,
+                relayed,
             );
         }
 

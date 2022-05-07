@@ -56,8 +56,6 @@ async fn start_scan(
     while let Err(err) = run_scan(&tracker, sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] redeem err {:?}",
             err
         );
@@ -84,8 +82,6 @@ async fn run_scan(
 
         tracing::trace!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] Track redeem block: {} and limit: {}",
             from,
             limit
@@ -95,7 +91,7 @@ async fn run_scan(
             .await?;
         if txs.is_empty() {
             tracing::info!(
-                target: "pangolin-ropsten", chain = "ropsten", action = "redeem",
+                target: "pangolin-ropsten",
                 "[ropsten] [redeem] Not found any transactions to redeem"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
@@ -106,8 +102,6 @@ async fn run_scan(
         }
         tracing::debug!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] Found {} transactions wait to redeem",
             txs.len()
         );
@@ -121,8 +115,6 @@ async fn run_scan(
                     Ok(Some(latest)) => {
                         tracing::trace!(
                             target: "pangolin-ropsten",
-                            chain = "ropsten",
-                            action = "redeem",
                             "[ropsten] [redeem] [{}] Change latest redeemed block number to: {}",
                             times,
                             latest,
@@ -133,8 +125,6 @@ async fn run_scan(
                     Ok(None) => {
                         tracing::trace!(
                             target: "pangolin-ropsten",
-                            chain = "ropsten",
-                            action = "redeem",
                             "[ropsten] [redeem] [{}] Latest redeemed block number is: {:?}",
                             times,
                             latest_redeem_block_number,
@@ -147,8 +137,6 @@ async fn run_scan(
                         if times > 10 {
                             tracing::error!(
                                 target: "pangolin-ropsten",
-                                chain = "ropsten",
-                                action = "redeem",
                                 "[ropsten] [redeem] [{}] Failed to send redeem message. tx: {:?}, err: {:?}",
                                 times,
                                 tx,
@@ -165,8 +153,6 @@ async fn run_scan(
         if latest_redeem_block_number.is_none() {
             tracing::warn!(
                 target: "pangolin-ropsten",
-                chain = "ropsten",
-                action = "redeem",
                 "[ropsten] [redeem] Not have any block redeemed. please wait affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
@@ -179,8 +165,6 @@ async fn run_scan(
         let latest = latest_redeem_block_number.unwrap();
         tracing::info!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] Set scan redeem block number to: {}",
             latest
         );

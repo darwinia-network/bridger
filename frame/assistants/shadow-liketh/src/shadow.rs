@@ -91,6 +91,11 @@ impl Shadow {
         }
         let result: serde_json::Value = resp.json().await?;
         if let Some(err) = result.get("error") {
+            tracing::error!(
+                target: "shadow",
+                "Error response by shadow: {:?}",
+                result,
+            );
             let msg = err.as_str().ok_or_else(|| {
                 ShadowComponentError::Cusom("Failed parse error message".to_string())
             })?;

@@ -32,6 +32,7 @@ fn init_log() -> color_eyre::Result<()> {
         "darwinia-crab=trace",
         "client-pangolin=trace",
         "feemarket=trace",
+        "shadow=trace",
     ]
     .join(",");
 

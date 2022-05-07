@@ -132,7 +132,14 @@ async fn run_scan(
                         break;
                     }
                     Err(e) => {
-                        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                        tracing::warn!(
+                            target: "pangolin-ropsten",
+                            "[ropsten] [redeem] [{}] Redeem failed will be try again. tx: {:?}, err: {:?} ",
+                            times,
+                            tx,
+                            e,
+                        );
                         times += 1;
                         if times > 10 {
                             tracing::error!(

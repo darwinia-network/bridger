@@ -115,9 +115,20 @@ impl RedeemHandler {
             );
             return Ok(None);
         }
+        tracing::trace!(
+            target: "pangolin-ropsten",
+            "[ropsten] [redeem] Ethereum tx {:?} all check passed, let's ready to redeem",
+            tx.tx_hash
+        );
 
         // 2. Do redeem
         let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
+        tracing::trace!(
+            target: "pangolin-ropsten",
+            "[ropsten] [redeem] Queried ethereum tx {:?} proof: {:?}",
+            tx.tx_hash,
+            proof,
+        );
 
         let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(

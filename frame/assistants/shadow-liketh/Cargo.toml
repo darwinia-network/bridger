@@ -40,4 +40,5 @@ component-ethereum = { path = "../../components/ethereum" }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
+array-bytes = "1.4"
 

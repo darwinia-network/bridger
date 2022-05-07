@@ -119,7 +119,7 @@ impl Shadow {
     fn extract_peaks(&self, positions: Vec<MMRNode>) -> Vec<(u64, [u8; 32])> {
         positions
             .iter()
-            .map(|item| (item.position, item.hash.clone()))
+            .map(|item| (item.position, item.hash))
             .collect::<Vec<(u64, [u8; 32])>>()
     }
 
@@ -161,6 +161,7 @@ impl Shadow {
     ) -> ShadowComponentReuslt<Vec<[u8; 32]>> {
         let tx_position = ckb_merkle_mountain_range::leaf_index_to_pos(tx_number);
         let leaf_pos = ckb_merkle_mountain_range::leaf_index_to_pos(last_leaf);
+        tracing::trace!(target: "shadow", "mmr proof tx_position: {}, leaf_pos: {}", tx_position, leaf_pos);
         // 1. gen positions
         let (merkle_proof_pos, peaks_pos, peak_pos) =
             mmr::gen_proof_positions(tx_position, leaf_pos);

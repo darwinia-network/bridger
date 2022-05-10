@@ -149,9 +149,6 @@ impl Shadow {
             .iter()
             .map(|item| item.1)
             .collect::<Vec<[u8; 32]>>();
-        for item in &peaks {
-            println!("{:?}", array_bytes::bytes2hex("", item));
-        }
 
         let mmr_root =
             mmr::bag_rhs_peaks(peaks).map_err(|e| ShadowComponentError::MMR(format!("{:?}", e)))?;

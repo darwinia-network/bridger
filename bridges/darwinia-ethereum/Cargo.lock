@@ -842,7 +842,7 @@ dependencies = [
  "serde_json",
  "sha3",
  "thiserror",
- "uint",
+ "uint 0.9.3",
 ]
 
 [[package]]
@@ -869,7 +869,7 @@ dependencies = [
  "impl-rlp",
  "impl-serde",
  "primitive-types 0.9.1",
- "uint",
+ "uint 0.9.3",
 ]
 
 [[package]]
@@ -1390,7 +1390,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f28220f89297a075ddc7245cd538076ee98b01f2a9c23a53a4f1105d5a322808"
 dependencies = [
- "rlp",
+ "rlp 0.5.1",
 ]
 
 [[package]]
@@ -2277,7 +2277,7 @@ dependencies = [
  "impl-codec 0.5.1",
  "impl-rlp",
  "impl-serde",
- "uint",
+ "uint 0.9.3",
 ]
 
 [[package]]
@@ -2290,7 +2290,7 @@ dependencies = [
  "impl-codec 0.6.0",
  "impl-serde",
  "scale-info",
- "uint",
+ "uint 0.9.3",
 ]
 
 [[package]]
@@ -2576,6 +2576,15 @@ dependencies = [
  "untrusted",
  "web-sys",
  "winapi",
+]
+
+[[package]]
+name = "rlp"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1190dcc8c3a512f1eef5d09bb8c84c7f39e1054e174d1795482e18f5272f2e73"
+dependencies = [
+ "rustc-hex",
 ]
 
 [[package]]
@@ -2994,7 +3003,6 @@ dependencies = [
 name = "shadow-liketh"
 version = "0.5.3"
 dependencies = [
- "array-bytes",
  "blake2-rfc",
  "component-ethereum",
  "gql_client 1.0.4",
@@ -3005,9 +3013,22 @@ dependencies = [
  "serde-aux",
  "serde-hex",
  "serde_json",
+ "shadow-types",
  "support-mmr",
  "thiserror",
  "tracing",
+]
+
+[[package]]
+name = "shadow-types"
+version = "0.7.0"
+source = "git+https://github.com/darwinia-network/shadow.git?branch=fewensa-receipt#372412a00a381d11d8af27a2749216c4d903fd01"
+dependencies = [
+ "parity-scale-codec 2.3.1",
+ "rlp 0.4.6",
+ "serde 1.0.137",
+ "thiserror",
+ "uint 0.8.5",
 ]
 
 [[package]]
@@ -4079,6 +4100,18 @@ checksum = "dcf81ac59edc17cc8697ff311e8f5ef2d99fcbd9817b34cec66f90b6c3dfd987"
 
 [[package]]
 name = "uint"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9db035e67dfaf7edd9aebfe8676afcd63eed53c8a4044fed514c8cccf1835177"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "rustc-hex",
+ "static_assertions",
+]
+
+[[package]]
+name = "uint"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "12f03af7ccf01dd611cc450a0d10dbc9b745770d096473e2faf0ca6e2d66d1e0"
@@ -4323,7 +4356,7 @@ dependencies = [
  "parking_lot 0.11.2",
  "pin-project 1.0.10",
  "reqwest",
- "rlp",
+ "rlp 0.5.1",
  "secp256k1 0.20.3",
  "serde 1.0.137",
  "serde_json",

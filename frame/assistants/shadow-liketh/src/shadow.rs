@@ -80,10 +80,9 @@ impl Shadow {
         let resp = self
             .http
             .get(&format!(
-                "{}/ethereum/receipt/{}/{}",
+                "{}/ethereum/receipt/{}",
                 &self.config.endpoint,
                 tx.as_ref(),
-                last
             ))
             .send()
             .await?;

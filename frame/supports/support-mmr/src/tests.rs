@@ -65,7 +65,7 @@ fn test_mmr_proof() {
     let _positions: Vec<u64> = (0u64..leaf_index + 1)
         .map(|i| mmr.push(hash(&i.to_le_bytes())).unwrap())
         .collect();
-    let mmrsize_fromindex = leaf_index_to_mmr_size(leaf_index.into());
+    let mmrsize_fromindex = leaf_index_to_mmr_size(leaf_index);
     let mmrsize = mmr.mmr_size();
     assert_eq!(mmrsize_fromindex, mmrsize);
     let root = mmr.get_root().unwrap();

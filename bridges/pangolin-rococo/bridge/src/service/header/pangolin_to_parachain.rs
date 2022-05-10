@@ -89,17 +89,16 @@ async fn start() -> color_eyre::Result<()> {
         match run(&header_relay).await {
             Ok(_) => continue,
             Err(err) => {
-                if let Some(client_error) =
-                    err.downcast_ref::<client_pangolin::error::ClientError>()
+                if let Some(subxt::BasicError::Rpc(request_error)) =
+                    err.downcast_ref::<subxt::BasicError>()
                 {
-                    if client_error.is_restart_need() {
-                        tracing::error!(
-                            target: "pangolin-rococo",
-                            "[header-pangolin-to-parachain] Connection Error. Try to resend later",
-                        );
-                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                        header_relay = HeaderRelay::new().await?;
-                    }
+                    tracing::error!(
+                        target: "pangolin-rococo",
+                        "[header-pangolin-to-parachain] Connection Error. Try to resend later: {:?}",
+                        &request_error
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    header_relay = HeaderRelay::new().await?;
                 }
                 tracing::error!(
                     target: "pangolin-rococo",

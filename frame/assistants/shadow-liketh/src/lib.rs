@@ -5,5 +5,3 @@ pub mod config;
 pub mod error;
 pub mod shadow;
 pub mod types;
-
-mod mmr;

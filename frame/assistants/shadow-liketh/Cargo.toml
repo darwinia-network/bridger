@@ -34,9 +34,8 @@ gql_client = "1"
 reqwest    = { version = "0.11", features = ["rustls-tls", "json"] }
 blake2-rfc = "0.2.18"
 
-ckb-merkle-mountain-range = "0.3.2"
-
 component-ethereum = { path = "../../components/ethereum" }
+support-mmr        = { path = "../../supports/support-mmr" }
 
 array-bytes = "1.4"
 

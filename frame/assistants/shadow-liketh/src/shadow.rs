@@ -1,10 +1,10 @@
 use include_dir::{include_dir, Dir};
 
 use component_ethereum::ethereum::client::EthereumClient;
+use support_mmr::mmr;
 
 use crate::config::ShadowConfig;
 use crate::error::{ShadowComponentError, ShadowComponentReuslt};
-use crate::mmr;
 use crate::types::{
     BridgeName, EthereumReceiptJson, EthereumReceiptWithMMRProof, HeaderParcel, MMRNode,
     MMRProofJson, QueryPositionVars, TheGraphResponse,
@@ -105,7 +105,7 @@ impl Shadow {
         let receipt: EthereumReceiptJson = serde_json::from_value(result)?;
         let header = &receipt.header;
 
-        let (member_leaf_index, last_leaf_index) = (header.number, last - 1);
+        let (member_leaf_index, last_leaf_index) = (header.number, last);
         let proof = self.mmr_proof(member_leaf_index, last_leaf_index).await?;
         let mmr_proof = MMRProofJson {
             member_leaf_index,
@@ -140,8 +140,8 @@ impl Shadow {
     }
 
     pub async fn mmr_root(&self, leaf_index: u64) -> ShadowComponentReuslt<[u8; 32]> {
-        let position = ckb_merkle_mountain_range::leaf_index_to_mmr_size(leaf_index);
-        let peak_positions = ckb_merkle_mountain_range::helper::get_peaks(position);
+        let mmr_size = mmr::leaf_index_to_mmr_size(leaf_index);
+        let peak_positions = mmr::get_peaks(mmr_size);
         println!("{:?}", peak_positions);
 
         let mmr_nodes = self.query_nodes(peak_positions).await?;
@@ -164,12 +164,17 @@ impl Shadow {
         tx_number: u64,
         last_leaf: u64,
     ) -> ShadowComponentReuslt<Vec<[u8; 32]>> {
-        let tx_position = ckb_merkle_mountain_range::leaf_index_to_pos(tx_number);
-        let leaf_pos = ckb_merkle_mountain_range::leaf_index_to_pos(last_leaf);
-        tracing::trace!(target: "shadow", "mmr proof tx_position: {}, leaf_pos: {}", tx_position, leaf_pos);
+        let verified_leaf_position = mmr::leaf_index_to_pos(tx_number);
+        let mmr_size = mmr::leaf_index_to_mmr_size(last_leaf);
+        tracing::trace!(
+            target: "shadow",
+            "mmr proof verified_leaf_position: {}, mmr_size: {}",
+            verified_leaf_position,
+            mmr_size
+        );
         // 1. gen positions
-        let (merkle_proof_pos, peaks_pos, peak_pos) =
-            mmr::gen_proof_positions(tx_position, leaf_pos);
+        let (merkle_proof_pos, peak_positions, peak_pos_of_leaf_index) =
+            mmr::gen_proof_positions(verified_leaf_position, mmr_size);
 
         let merkle_proof_positions = self.query_nodes(merkle_proof_pos).await?;
         let merkle_proof = self
@@ -178,9 +183,9 @@ impl Shadow {
             .map(|item| item.1)
             .collect::<Vec<[u8; 32]>>();
 
-        let peaks_positions = self.query_nodes(peaks_pos).await?;
+        let peaks_positions = self.query_nodes(peak_positions).await?;
         let peaks = self.extract_peaks(peaks_positions);
-        let mmr_proof = mmr::gen_proof(merkle_proof, peaks, peak_pos);
+        let mmr_proof = mmr::gen_proof(merkle_proof, peaks, peak_pos_of_leaf_index);
         Ok(mmr_proof)
     }
 }

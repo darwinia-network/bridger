@@ -2963,7 +2963,6 @@ version = "0.5.3"
 dependencies = [
  "array-bytes",
  "blake2-rfc",
- "ckb-merkle-mountain-range",
  "component-ethereum",
  "gql_client 1.0.4",
  "include_dir",
@@ -2973,6 +2972,7 @@ dependencies = [
  "serde-aux",
  "serde-hex",
  "serde_json",
+ "support-mmr",
  "thiserror",
  "tracing",
 ]
@@ -3598,6 +3598,14 @@ version = "0.5.5"
 dependencies = [
  "color-eyre",
  "lifeline",
+]
+
+[[package]]
+name = "support-mmr"
+version = "0.1.0"
+dependencies = [
+ "blake2-rfc",
+ "ckb-merkle-mountain-range",
 ]
 
 [[package]]

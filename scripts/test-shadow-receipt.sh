@@ -14,3 +14,6 @@ LAST_CONFIRMED='12244903'
 curl https://ropsten.shadow.darwinia.network/ethereum/receipt/${TX}/${LAST_CONFIRMED} \
  | jq '.' | tee ${BIN_PATH}/logs/shadow-receipt.json
 
+
+
+curl https://ropsten.shadow.darwinia.network/ethereum/parent_mmr_root/12245652

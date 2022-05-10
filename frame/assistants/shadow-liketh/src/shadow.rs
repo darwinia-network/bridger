@@ -62,6 +62,7 @@ impl Shadow {
 
 impl Shadow {
     pub async fn parcel(&self, block_number: u64) -> ShadowComponentReuslt<HeaderParcel> {
+        tracing::debug!(target: "shadow", "Shadow parcel fo block: {}", block_number);
         let header = self
             .eth
             .get_header_by_number(block_number)

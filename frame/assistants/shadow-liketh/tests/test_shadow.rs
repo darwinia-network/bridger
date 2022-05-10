@@ -3,14 +3,10 @@ mod common;
 #[tokio::test]
 async fn test_mmr_root() {
     let shadow = common::shadow();
-    let data = shadow.mmr_root(12244902).await.unwrap();
-    let hex = array_bytes::bytes2hex("", data);
-    let r =
-        reqwest::get("https://ropsten.shadow.darwinia.network/ethereum/parent_mmr_root/12244903")
-            .await
-            .unwrap();
+    let leaf_index = 12244903;
+    let data = shadow.mmr_root(leaf_index - 1).await.unwrap();
+    let hex = array_bytes::bytes2hex("0x", data);
     println!("{}", hex);
-    println!("{}", r.text().await.unwrap());
 }
 
 #[tokio::test]

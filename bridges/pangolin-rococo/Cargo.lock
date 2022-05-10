@@ -2215,8 +2215,9 @@ dependencies = [
 
 [[package]]
 name = "gql_client"
-version = "1.0.1"
-source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#220c345c8e570fa2b28ceb2d869331d014b2f324"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d817a5d0b2a4948deae8550e12ae5eff3a874f8b66090b5863a2dcc917a59a61"
 dependencies = [
  "reqwest",
  "serde 1.0.136",

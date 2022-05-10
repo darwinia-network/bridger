@@ -1,4 +1,7 @@
-pub use shadow_types::chain::ethereum::receipt::EthereumReceiptJson;
+pub use shadow_types::chain::ethereum::{
+    block::EthereumHeaderJson,
+    receipt::{EthereumReceiptJson, ReceiptProof},
+};
 
 pub use self::mark::*;
 pub use self::mmr::*;

@@ -1,6 +1,5 @@
 use shadow_liketh::types::{
-    EthereumHeaderJson, EthereumReceiptProofJson, EthereumReceiptWithMMRProof, HeaderParcel,
-    MMRProofJson,
+    EthereumHeaderJson, EthereumReceiptWithMMRProof, HeaderParcel, MMRProofJson, ReceiptProof,
 };
 
 use crate::api::runtime_types;
@@ -63,7 +62,7 @@ impl TryFrom<EthereumHeaderJson> for ethereum_primitives::header::Header {
 
     fn try_from(that: EthereumHeaderJson) -> Result<Self, Self::Error> {
         Ok(Self {
-            parent_hash: subxt::sp_core::H256(array_bytes::hex2array(that.parent_hash)?),
+            parent_hash: subxt::sp_core::H256(array_bytes::hex2array(&that.parent_hash)?),
             timestamp: that.timestamp,
             number: that.number,
             author: runtime_types::primitive_types::H160(array_bytes::hex2array(that.author)?), // bytes!(that.author.as_str(), 20),
@@ -100,10 +99,10 @@ impl TryFrom<EthereumHeaderJson> for ethereum_primitives::header::Header {
     }
 }
 
-impl TryFrom<EthereumReceiptProofJson> for ethereum_primitives::receipt::ReceiptProof {
+impl TryFrom<ReceiptProof> for ethereum_primitives::receipt::ReceiptProof {
     type Error = ConvertTypeError;
 
-    fn try_from(that: EthereumReceiptProofJson) -> Result<Self, Self::Error> {
+    fn try_from(that: ReceiptProof) -> Result<Self, Self::Error> {
         let index = if that.index.starts_with("0x") {
             &that.index[2..]
         } else {

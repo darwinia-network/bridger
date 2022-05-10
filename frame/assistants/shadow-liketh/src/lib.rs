@@ -1,5 +1,3 @@
-extern crate core;
-
 pub mod component;
 pub mod config;
 pub mod error;

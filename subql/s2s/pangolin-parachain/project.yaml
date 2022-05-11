@@ -7,13 +7,13 @@ schema:
   file: ./schema.graphql
 
 network:
-  endpoint: wss://pangolin-parachain.darwinia.network/
+  endpoint: wss://pangolin-parachain-rpc.darwinia.network/
   # todo: please correct right genesis hash
-  genesisHash: '0x27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184'
+  genesisHash: '0x9426ba4cc73993fc77e77221f797573dc5c63d418d0478a0a01fab9798fdcceb'
 
 dataSources:
   - kind: substrate/Runtime
-    startBlock: 99652
+    startBlock: 1
     mapping:
       file: ./dist/index.js
       handlers:

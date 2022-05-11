@@ -31,7 +31,7 @@ codec       = { package = "parity-scale-codec", version = "2", default-features 
 web3        = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"], optional = true }
 secp256k1   = { version = "0.20", features = ["recovery"], optional = true }
 
-subxt            = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
+subxt            = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 pangolin-subxt   = { path = "../pangolin-subxt" }
 
 [dev-dependencies]

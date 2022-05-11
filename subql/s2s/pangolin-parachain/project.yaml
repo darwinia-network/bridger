@@ -8,7 +8,6 @@ schema:
 
 network:
   endpoint: wss://pangolin-parachain-rpc.darwinia.network/
-  # todo: please correct right genesis hash
   genesisHash: '0x9426ba4cc73993fc77e77221f797573dc5c63d418d0478a0a01fab9798fdcceb'
 
 dataSources:

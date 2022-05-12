@@ -32,8 +32,9 @@ services:
     command:
       - -f=/app
       - --db-schema=app
+      - -p=3001
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://subquery-node:3000/ready"]
+      test: ["CMD", "curl", "-f", "http://subquery-node:3001/ready"]
       interval: 3s
       timeout: 5s
       retries: 10
@@ -41,7 +42,7 @@ services:
   graphql-engine:
     image: onfinality/subql-query:v0.12.0
     ports:
-      - 3000:3000
+      - 3001:3000
     depends_on:
       "postgres":
         condition: service_healthy
@@ -57,4 +58,4 @@ services:
     command:
       - --name=app
       - --playground
-      - --indexer=http://subquery-node:3000
+      - --indexer=http://subquery-node:3001

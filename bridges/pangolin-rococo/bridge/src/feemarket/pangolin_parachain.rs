@@ -1,6 +1,6 @@
 use bp_messages::{LaneId, MessageNonce};
 use codec::Encode;
-use darwinia_fee_market::types::{Order, Relayer};
+use pallet_fee_market::types::{Order, Relayer};
 use frame_support::Blake2_128Concat;
 use relay_pangolin_parachain_client::PangolinParachainChain;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme};
@@ -57,7 +57,7 @@ impl FeemarketApi for PangolinParachainFeemarketApi {
     > {
         let storage_key = StorageKey(
             feemarket_s2s::helpers::storage_prefix(
-                "PangolinFeeMarket".as_bytes(),
+                "FeeMarket".as_bytes(),
                 "AssignedRelayers".as_bytes(),
             )
             .to_vec(),
@@ -108,7 +108,7 @@ impl FeemarketApi for PangolinParachainFeemarketApi {
         >,
     > {
         let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
-            "PangolinFeeMarket",
+            "FeeMarket",
             "Orders",
             (laned_id, message_nonce).encode().as_slice(),
         );
@@ -117,11 +117,8 @@ impl FeemarketApi for PangolinParachainFeemarketApi {
 
     async fn relayers(&self) -> FeemarketResult<Vec<<Self::Chain as ChainBase>::AccountId>> {
         let storage_key = StorageKey(
-            feemarket_s2s::helpers::storage_prefix(
-                "PangolinFeeMarket".as_bytes(),
-                "Relayers".as_bytes(),
-            )
-            .to_vec(),
+            feemarket_s2s::helpers::storage_prefix("FeeMarket".as_bytes(), "Relayers".as_bytes())
+                .to_vec(),
         );
         Ok(self
             .client
@@ -137,7 +134,7 @@ impl FeemarketApi for PangolinParachainFeemarketApi {
         Option<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {
         let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
-            "PangolinFeeMarket",
+            "FeeMarket",
             "RelayersMap",
             account.encode().as_slice(),
         );

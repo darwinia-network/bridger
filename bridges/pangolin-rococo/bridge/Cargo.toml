@@ -36,32 +36,32 @@ postage  = "0.4"
 
 ## Substrate Dependencies
 
-frame-support       = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
-sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
-sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
-sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
-sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
-sp-version          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.1" }
+frame-support       = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-trie             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-version          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 
 ## bridge common
 
-bp-darwinia-core                = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-bp-header-chain                 = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-bp-messages                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-bp-parachains                   = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-bp-polkadot-core                = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-bp-runtime                      = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-bridge-runtime-common           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-darwinia-fee-market             = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.7" }
-messages-relay                  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-pallet-bridge-messages          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-relay-pangolin-client           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-relay-pangolin-parachain-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-relay-rococo-client             = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-relay-substrate-client          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-relay-utils                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-substrate-relay-helper          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.1" }
-subxt                           = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
+bp-darwinia-core                = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-header-chain                 = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-messages                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-parachains                   = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-polkadot-core                = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-runtime                      = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bridge-runtime-common           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+messages-relay                  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+pallet-bridge-messages          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+pallet-fee-market               = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+relay-pangolin-client           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+relay-pangolin-parachain-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+relay-rococo-client             = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+relay-substrate-client          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+relay-utils                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+substrate-relay-helper          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+subxt                           = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 ## component
 client-pangolin           = { path = "../../../frame/assistants/client-pangolin" }
 client-pangolin-parachain = { path = "../../../frame/assistants/client-pangolin-parachain" }

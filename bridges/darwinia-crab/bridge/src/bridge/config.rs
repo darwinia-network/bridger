@@ -1,4 +1,4 @@
-use feemarket_s2s_transition::config::FeemarketConfig;
+use feemarket_s2s::config::FeemarketConfig;
 use serde::{Deserialize, Serialize};
 use strum::{EnumString, EnumVariantNames};
 

@@ -117,7 +117,7 @@ async fn start() -> color_eyre::Result<()> {
 async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
     tracing::info!(
         target: "pangolin-rococo",
-        "[header-relay-pangolin-to-parachain] SERVICE RESTARTING..."
+        "[header-relay-rococo-to-pangolin] SERVICE RESTARTING..."
     );
 
     let last_relayed_rococo_hash_in_pangolin = header_relay
@@ -129,7 +129,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .await?;
     tracing::info!(
         target: "pangolin-rococo",
-        "[header-relay-pangolin-to-parachain] Get last relayed rococo block hash: {:?}",
+        "[header-relay-rococo-to-pangolin] Get last relayed rococo block hash: {:?}",
         &last_relayed_rococo_hash_in_pangolin
     );
 
@@ -149,7 +149,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
     let block_number = last_relayed_rococo_block_in_pangolin.block.header.number;
     tracing::info!(
         target: "pangolin-rococo",
-        "[header-relay-pangolin-to-parachain] Get last relayed rococo block number: {:?}",
+        "[header-relay-rococo-to-pangolin] Get last relayed rococo block number: {:?}",
         block_number
     );
     if try_to_relay_mandatory(header_relay, block_number)
@@ -175,7 +175,7 @@ async fn try_to_relay_mandatory(
     if let Some(block_to_relay) = next_mandatory_block {
         tracing::info!(
             target: "pangolin-rococo",
-            "[header-relay-pangolin-to-parachain] Next mandatory block: {:?}",
+            "[header-relay-rococo-to-pangolin] Next mandatory block: {:?}",
             &block_to_relay.block_number,
         );
         let justification = header_relay
@@ -193,7 +193,7 @@ async fn try_to_relay_mandatory(
     } else {
         tracing::info!(
             target: "pangolin-rococo",
-            "[header-relay-pangolin-to-parachain] Next mandatory block not found",
+            "[header-relay-rococo-to-pangolin] Next mandatory block not found",
         );
         Ok(None)
     }

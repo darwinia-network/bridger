@@ -11,7 +11,7 @@ use substrate_relay_helper::messages_lane::MessagesRelayParams;
 use substrate_relay_helper::on_demand_headers::OnDemandHeadersRelay;
 use substrate_relay_helper::TransactionParams;
 
-use feemarket_s2s_transition::relay::BasicRelayStrategy;
+use feemarket_s2s::relay::BasicRelayStrategy;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;

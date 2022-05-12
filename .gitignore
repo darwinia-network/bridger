@@ -16,3 +16,4 @@ generated
 
 metadata.scale
 *.dep.txt
+*.log

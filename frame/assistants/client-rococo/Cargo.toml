@@ -19,5 +19,5 @@ array-bytes = "1.4"
 
 serde       = { version = "1", features = ["derive"] }
 
-subxt        = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
+subxt        = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 rococo-subxt = { path = "../rococo-subxt" }

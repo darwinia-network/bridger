@@ -1,6 +1,6 @@
-use pangoro_subxt::api::runtime_types::bsc_primitives::BscHeader;
-use pangoro_subxt::api::runtime_types::primitive_types::H160;
-use pangoro_subxt::api::RuntimeApi;
+use crate::subxt_runtime::api::runtime_types::bsc_primitives::BscHeader;
+use crate::subxt_runtime::api::runtime_types::primitive_types::H160;
+use crate::subxt_runtime::api::RuntimeApi;
 use subxt::{Client, TransactionEvents};
 
 use crate::config::PangoroSubxtConfig;

@@ -14,7 +14,7 @@ use codec::{Decode, Encode};
 use subquery_s2s::types::BridgeName;
 use subquery_s2s::{Subquery, SubqueryComponent};
 
-use crate::bridge::{PangolinRococoBus, PangolinRococoConfig, PangolinRococoTask};
+use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
 
 #[derive(Debug)]
 pub struct RococoToPangolinHeaderRelayService {
@@ -24,19 +24,19 @@ pub struct RococoToPangolinHeaderRelayService {
 impl BridgeService for RococoToPangolinHeaderRelayService {}
 
 impl Service for RococoToPangolinHeaderRelayService {
-    type Bus = PangolinRococoBus;
+    type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
             &format!(
                 "{}-rococo-pangolin-header-relay",
-                PangolinRococoTask::name()
+                BridgeTask::name()
             ),
             async move {
                 if let Err(e) = start().await {
                     tracing::error!(
-                        target: "pangolin-rococo",
+                        target: "pangolin-pangolinparachain",
                         "{:?}",
                         e,
                     );
@@ -60,7 +60,7 @@ struct HeaderRelay {
 
 impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
-        let bridge_config: PangolinRococoConfig = Config::restore(Names::BridgePangolinRococo)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
 
         let config_pangolin = bridge_config.pangolin;
         let config_rococo = bridge_config.rococo;
@@ -85,7 +85,7 @@ impl HeaderRelay {
 
 async fn start() -> color_eyre::Result<()> {
     tracing::info!(
-        target: "pangolin-rococo",
+        target: "pangolin-pangolinparachain",
         "[header-rococo-to-pangolin] SERVICE RESTARTING..."
     );
     let mut header_relay = HeaderRelay::new().await?;
@@ -97,7 +97,7 @@ async fn start() -> color_eyre::Result<()> {
                     err.downcast_ref::<subxt::BasicError>()
                 {
                     tracing::error!(
-                        target: "pangolin-rococo",
+                        target: "pangolin-pangolinparachain",
                         "[header-rococo-to-pangolin] Connection Error. Try to resend later: {:?}",
                         &request_error
                     );
@@ -105,7 +105,7 @@ async fn start() -> color_eyre::Result<()> {
                     header_relay = HeaderRelay::new().await?;
                 }
                 tracing::error!(
-                    target: "pangolin-rococo",
+                    target: "pangolin-pangolinparachain",
                     "[header-rococo-to-pangolin] Failed to relay header: {:?}",
                     err
                 );
@@ -116,7 +116,7 @@ async fn start() -> color_eyre::Result<()> {
 
 async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
     tracing::info!(
-        target: "pangolin-rococo",
+        target: "pangolin-pangolinparachain",
         "[header-relay-rococo-to-pangolin] SERVICE RESTARTING..."
     );
 
@@ -128,7 +128,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .best_finalized(None)
         .await?;
     tracing::info!(
-        target: "pangolin-rococo",
+        target: "pangolin-pangolinparachain",
         "[header-relay-rococo-to-pangolin] Get last relayed rococo block hash: {:?}",
         &last_relayed_rococo_hash_in_pangolin
     );
@@ -148,7 +148,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
 
     let block_number = last_relayed_rococo_block_in_pangolin.block.header.number;
     tracing::info!(
-        target: "pangolin-rococo",
+        target: "pangolin-pangolinparachain",
         "[header-relay-rococo-to-pangolin] Get last relayed rococo block number: {:?}",
         block_number
     );
@@ -174,7 +174,7 @@ async fn try_to_relay_mandatory(
 
     if let Some(block_to_relay) = next_mandatory_block {
         tracing::info!(
-            target: "pangolin-rococo",
+            target: "pangolin-pangolinparachain",
             "[header-relay-rococo-to-pangolin] Next mandatory block: {:?}",
             &block_to_relay.block_number,
         );
@@ -192,7 +192,7 @@ async fn try_to_relay_mandatory(
         Ok(Some(block_to_relay.block_number))
     } else {
         tracing::info!(
-            target: "pangolin-rococo",
+            target: "pangolin-pangolinparachain",
             "[header-relay-rococo-to-pangolin] Next mandatory block not found",
         );
         Ok(None)
@@ -252,7 +252,7 @@ async fn submit_finality(
 
     let events = track.wait_for_finalized_success().await?;
     tracing::info!(
-        target: "pangolin-rococo",
+        target: "pangolin-pangolinparachain",
         "[header-rococo-to-pangolin] The extrinsic hash: {:?}",
         events.extrinsic_hash()
     );

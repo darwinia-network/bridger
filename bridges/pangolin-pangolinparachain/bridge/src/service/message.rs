@@ -15,9 +15,9 @@ use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 
-use crate::bridge::PangolinRococoTask;
+use crate::bridge::BridgeTask;
 use crate::bridge::{ChainInfoConfig, RelayConfig};
-use crate::bridge::{PangolinRococoBus, PangolinRococoConfig};
+use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::chains::pangolin::PangolinMessagesToPangolinParachain;
 use crate::chains::pangolin_parachain::PangolinParachainMessagesToPangolin;
 use crate::feemarket::{PangolinFeemarketApi, PangolinParachainFeemarketApi};
@@ -39,15 +39,15 @@ pub struct MessageRelayService {
 impl BridgeService for MessageRelayService {}
 
 impl Service for MessageRelayService {
-    type Bus = PangolinRococoBus;
+    type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!("{}-relay", PangolinRococoTask::name()),
+            &format!("{}-relay", BridgeTask::name()),
             async move {
                 if let Err(e) = start() {
-                    tracing::error!(target: "pangolin-rococo", "{:?}", e);
+                    tracing::error!(target: "pangolin-pangolinparachain", "{:?}", e);
                     return Err(
                         BridgerError::Custom("Failed to start relay service".to_string()).into(),
                     );
@@ -60,7 +60,7 @@ impl Service for MessageRelayService {
 }
 
 fn start() -> color_eyre::Result<()> {
-    let bridge_config: PangolinRococoConfig = Config::restore(Names::BridgePangolinRococo)?;
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
     let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
     let config_pangolin_parachain: ChainInfoConfig = bridge_config.pangolin_parachain;
     let config_relay: RelayConfig = bridge_config.relay;
@@ -242,7 +242,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         .map_err(|e| BridgerError::Custom(format!("{:?}", e)))?;
 
     if let Err(e) = futures::future::select_all(message_relays).await.0 {
-        tracing::error!(target: "pangolin-rococo", "{:?}", e);
+        tracing::error!(target: "pangolin-pangolinparachain", "{:?}", e);
         return Err(BridgerError::Custom("Failed to start relay".to_string()).into());
     }
     Ok(())

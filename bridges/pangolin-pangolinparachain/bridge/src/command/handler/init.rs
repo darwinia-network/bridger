@@ -12,12 +12,12 @@ use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_terminal::output;
 
-use crate::bridge::{ChainInfoConfig, PangolinRococoConfig};
+use crate::bridge::{ChainInfoConfig, BridgeConfig};
 use crate::types::{BridgeName, InitBridge};
 
 pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
-    tracing::info!(target: "pangolin-rococo", "Init bridge {:?}", bridge);
-    let bridge_config: PangolinRococoConfig = Config::restore(Names::BridgePangolinRococo)?;
+    tracing::info!(target: "pangolin-pangolinparachain", "Init bridge {:?}", bridge);
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
     let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
     let config_rococo: ChainInfoConfig = bridge_config.rococo;
     let config_pangolin_parachain: ChainInfoConfig = bridge_config.pangolin_parachain;
@@ -90,12 +90,12 @@ async fn init_bridge(init_bridge: InitBridge) -> color_eyre::Result<()> {
         let target_client = target_chain.to_substrate_relay_chain::<Target>().await?;
         let target_sign = target_chain.to_keypair::<Target>()?;
         tracing::debug!(
-            target: "pangolin-rococo",
+            target: "pangolin-pangolinparachain",
             "source client -> {:?}",
             source_client
         );
         tracing::debug!(
-            target: "pangolin-rococo",
+            target: "pangolin-pangolinparachain",
             "target client -> {:?}",
             target_client
         );

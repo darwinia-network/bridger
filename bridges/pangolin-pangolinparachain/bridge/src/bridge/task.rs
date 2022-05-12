@@ -1,6 +1,6 @@
 use support_lifeline::task::TaskStack;
 
-use crate::bridge::PangolinRococoBus;
+use crate::bridge::BridgeBus;
 use crate::service::header::{
     PangolinToParachainHeaderRelayService, RococoToPangolinHeaderRelayService,
     RococoToPangolinParaHeaderRelayService,
@@ -8,19 +8,19 @@ use crate::service::header::{
 use crate::service::message::MessageRelayService;
 
 #[derive(Debug)]
-pub struct PangolinRococoTask {
-    stack: TaskStack<PangolinRococoBus>,
+pub struct BridgeTask {
+    stack: TaskStack<BridgeBus>,
 }
 
-impl PangolinRococoTask {
+impl BridgeTask {
     pub fn name() -> &'static str {
-        "task-pangolin-rococo"
+        "task-pangolin-pangolinparachain"
     }
 }
 
-impl PangolinRococoTask {
+impl BridgeTask {
     pub async fn new() -> color_eyre::Result<Self> {
-        let bus = PangolinRococoBus::default();
+        let bus = BridgeBus::default();
 
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<PangolinToParachainHeaderRelayService>()?;
@@ -31,9 +31,9 @@ impl PangolinRococoTask {
     }
 }
 
-impl PangolinRococoTask {
+impl BridgeTask {
     #[allow(dead_code)]
-    pub fn stack(&self) -> &TaskStack<PangolinRococoBus> {
+    pub fn stack(&self) -> &TaskStack<BridgeBus> {
         &self.stack
     }
 }

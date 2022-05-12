@@ -8,7 +8,7 @@ use support_common::error::BridgerError;
 use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct PangolinRococoConfig {
+pub struct BridgeConfig {
     pub pangolin: ChainInfoConfig,
     pub rococo: ChainInfoConfig,
     pub pangolin_parachain: ChainInfoConfig,

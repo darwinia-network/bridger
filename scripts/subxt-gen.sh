@@ -33,7 +33,7 @@ OUTPUT_FILE=
 if [ "${CHAIN}" == "pangolin" ]; then
   #ENDPOINT='https://pangolin-rpc.darwinia.network'
   ENDPOINT='http://127.0.0.1:9966'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangolin-subxt
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin/
 fi
 
 if [ "${CHAIN}" == "pangoro" ]; then
@@ -66,7 +66,7 @@ fi
 
 mkdir -p ${OUTPUT_PATH}
 
-OUTPUT_FILE=${OUTPUT_PATH}/src/runtime.rs
+OUTPUT_FILE=${OUTPUT_PATH}/subxt_runtime/runtime.rs
 
 ${SUBXT} codegen --url ${ENDPOINT} ${DERIVE} > ${OUTPUT_FILE}
 

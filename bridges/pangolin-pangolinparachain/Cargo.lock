@@ -1024,7 +1024,7 @@ name = "client-pangolin-parachain"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "pangolin-parachain-subxt",
+ "parity-scale-codec",
  "serde 1.0.136",
  "subxt",
  "thiserror",
@@ -4078,14 +4078,6 @@ dependencies = [
  "parity-scale-codec",
  "sp-api",
  "sp-runtime",
-]
-
-[[package]]
-name = "pangolin-parachain-subxt"
-version = "0.5.5"
-dependencies = [
- "parity-scale-codec",
- "subxt",
 ]
 
 [[package]]

@@ -54,7 +54,7 @@ fi
 
 if [ "${CHAIN}" == "pangolin-parachain" ]; then
   ENDPOINT='http://127.0.0.1:40338'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangolin-parachain-subxt
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachain
 fi
 
 if [ -z "${ENDPOINT}" ]; then

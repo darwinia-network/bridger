@@ -3,10 +3,10 @@ use component_shadow::types::{
     MMRProofJson,
 };
 
-use crate::api::runtime_types;
-use crate::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
-use crate::api::runtime_types::{darwinia_bridge_ethereum, ethereum_primitives};
-use crate::{ConvertTypeError, EthereumReceiptProofThing};
+use crate::subxt_runtime::api::runtime_types;
+use crate::subxt_runtime::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use crate::subxt_runtime::api::runtime_types::{darwinia_bridge_ethereum, ethereum_primitives};
+use crate::subxt_runtime::{ConvertTypeError, EthereumReceiptProofThing};
 
 impl TryFrom<HeaderParcel> for EthereumRelayHeaderParcel {
     type Error = ConvertTypeError;

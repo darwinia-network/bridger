@@ -5,3 +5,4 @@ pub mod error;
 pub mod ethereum;
 pub mod helpers;
 pub mod types;
+pub mod subxt_runtime;

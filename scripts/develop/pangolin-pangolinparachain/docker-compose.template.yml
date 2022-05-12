@@ -1,0 +1,215 @@
+
+version: "3"
+services:
+
+  postgres:
+    container_name: pp-postgres
+    image: postgres:12-alpine
+    volumes:
+      - ${DATA_DIR}/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ##
+  # s2s pangolin
+  ##
+
+  subquery-node-pangolin:
+    container_name: pp-subquery-node-pangolin
+    image: onfinality/subql-node:${SUBQL_NODE_VERSION}
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      - ${SUBQL_PANGOLIN_DIR}:/app
+    command:
+      - -f=/app
+      - --db-schema=app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://subquery-node-pangolin:3000/ready"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  graphql-engine-pangolin:
+    container_name: pp-graphql-engine-pangolin
+    image: onfinality/subql-query:${SUBQL_QUERY_VERSION}
+    ports:
+      - "${SUBQL_PANGOLIN_PORT}:3000"
+    depends_on:
+      - postgres
+      - subquery-node-pangolin
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+    command:
+      - --name=app
+      - --playground
+      - --indexer=http://subquery-node-pangolin:3000
+
+  ##
+  # s2s pangolin parachain
+  ##
+
+  subquery-node-pangolin-parachain:
+    container_name: pp-subquery-node-pangolin-parachain
+    image: onfinality/subql-node:${SUBQL_NODE_VERSION}
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      - ${SUBQL_PANGOLIN_PARACHAIN_DIR}:/app
+    command:
+      - -f=/app
+      - --db-schema=app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://subquery-node-pangolin-parachain:3000/ready"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  graphql-engine-pangolin-parachain:
+    container_name: pp-graphql-engine-pangolin-parachain
+    image: onfinality/subql-query:${SUBQL_QUERY_VERSION}
+    ports:
+      - "${SUBQL_PANGOLIN_PARACHAIN_PORT}:3000"
+    depends_on:
+      - postgres
+      - subquery-node-pangolin-parachain
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+    command:
+      - --name=app
+      - --playground
+      - --indexer=http://subquery-node-pangolin-parachain:3000
+
+  ##
+  # s2s rococo
+  ##
+
+  subquery-node-rococo:
+    container_name: pp-subquery-node-rococo
+    image: onfinality/subql-node:${SUBQL_NODE_VERSION}
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      - ${SUBQL_ROCOCO_DIR}:/app
+    command:
+      - -f=/app
+      - --db-schema=app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://subquery-node-rococo:3000/ready"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  graphql-engine-rococo:
+    container_name: pp-graphql-engine-rococo
+    image: onfinality/subql-query:${SUBQL_QUERY_VERSION}
+    ports:
+      - "${SUBQL_ROCOCO_PORT}:3000"
+    depends_on:
+      - postgres
+      - subquery-node-rococo
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+    command:
+      - --name=app
+      - --playground
+      - --indexer=http://subquery-node-rococo:3000
+
+  ##
+  # rococo node
+  ##
+  rococo-alice:
+    container_name: pp-rococo-alice
+    image: parity/polkadot:${ROCOCO_VERSION}
+    volumes:
+      - ${DATA_DIR}:/data/node-data
+      - ${BIN_PATH}/entrypoint:/entrypoint
+    ports:
+      - "${ROCOCO_ALICE_PORT_WS}:9944"
+    entrypoint: /entrypoint/run-rococo.sh
+    command:
+      - alice
+
+#  rococo-bob:
+#    container_name: pp-rococo-bob
+#    image: parity/polkadot:${ROCOCO_VERSION}
+#    volumes:
+#      - ${DATA_DIR}/rococo-bob:/data/node-data
+#      - ${BIN_PATH}/entrypoint:/entrypoint
+#    ports:
+#      - "${ROCOCO_BOB_PORT_WS}:9944"
+#    entrypoint: /entrypoint/run-rococo.sh
+#    command:
+#      - bob
+
+  ##
+  # pangolin parachain node
+  ##
+  pangolin-parachain:
+    container_name: pp-pangolin-parachain
+    image: rust:1
+    volumes:
+      - ${PANGOLIN_PARACHAIN_SOURCE}:/data/source
+      - ${DATA_DIR}:/data/node-data
+      - ${BIN_PATH}/entrypoint:/entrypoint
+    ports:
+      - "${PANGOLIN_PARACHAIN_PORT_WS}:9944"
+    entrypoint: /entrypoint/run-pangolin-parachain.sh
+    depends_on:
+      - rococo-alice
+
+  ##
+  # pangolin node
+  ##
+  pangolin:
+    container_name: pp-pangolin
+    image: rust:1
+    volumes:
+      - ${PANGOLIN_SOURCE}:/data/source
+      - ${DATA_DIR}:/data/node-data
+      - ${BIN_PATH}/entrypoint:/entrypoint
+    ports:
+      - "${PANGOLIN_PORT_WS}:9944"
+    entrypoint: /entrypoint/run-pangolin.sh
+

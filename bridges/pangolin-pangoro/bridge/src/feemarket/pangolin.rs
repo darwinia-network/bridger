@@ -1,6 +1,6 @@
 use bp_messages::{LaneId, MessageNonce};
 use codec::Encode;
-use darwinia_fee_market::types::{Order, Relayer};
+use pallet_fee_market::types::{Order, Relayer};
 use frame_support::Blake2_128Concat;
 use relay_pangolin_client::PangolinChain;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme};

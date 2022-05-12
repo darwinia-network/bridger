@@ -1,5 +1,5 @@
 use bp_messages::{LaneId, MessageNonce};
-use darwinia_fee_market::types::{Order, Relayer};
+use pallet_fee_market::types::{Order, Relayer};
 use relay_substrate_client::{Chain, ChainBase};
 
 use crate::error::FeemarketResult;

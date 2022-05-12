@@ -60,7 +60,7 @@ relay-substrate-client = { git = "https://github.com/darwinia-network/darwinia-b
 relay-utils            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 substrate-relay-helper = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
-darwinia-fee-market = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.7" }
+pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
 ## component
 feemarket-s2s = { path = "../../../frame/assistants/feemarket-s2s" }

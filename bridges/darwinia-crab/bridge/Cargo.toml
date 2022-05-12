@@ -65,10 +65,10 @@ messages-relay         = { git = "https://github.com/darwinia-network/darwinia-b
 relay-darwinia-client  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 relay-crab-client      = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
-darwinia-fee-market    = { git = "https://github.com/darwinia-network/darwinia-common.git", branch = "darwinia-v0.12.1" }
+pallet-fee-market    = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
 ## component
-feemarket-s2s-transition = { path = "../../../frame/assistants/feemarket-s2s-transition" }
+feemarket-s2s = { path = "../../../frame/assistants/feemarket-s2s" }
 
 ## support
 support-common     = { path = "../../../frame/supports/support-common" }

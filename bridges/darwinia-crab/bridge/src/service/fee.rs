@@ -3,7 +3,7 @@ use lifeline::{Lifeline, Service, Task};
 use relay_crab_client::CrabChain;
 use relay_darwinia_client::DarwiniaChain;
 
-use feemarket_s2s_transition::fee::{
+use feemarket_s2s::fee::{
     CrazyStrategy, NothingStrategy, ReasonableStrategy, UpdateFeeStrategy,
 };
 use support_common::config::{Config, Names};

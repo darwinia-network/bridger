@@ -26,7 +26,7 @@ messages-relay         = { git = "https://github.com/darwinia-network/darwinia-b
 relay-substrate-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 relay-utils            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
-darwinia-fee-market = { git = "https://github.com/darwinia-network/darwinia-common.git", tag = "v2.8.7" }
+pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
 ## Substrate Dependencies
 frame-support = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }

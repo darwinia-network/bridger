@@ -1,4 +1,4 @@
-use rococo_subxt::api::RuntimeApi;
+use crate::subxt_runtime::api::RuntimeApi;
 use subxt::Client;
 
 use crate::config::RococoSubxtConfig;

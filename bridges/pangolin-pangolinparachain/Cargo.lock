@@ -1036,7 +1036,7 @@ name = "client-rococo"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "rococo-subxt",
+ "parity-scale-codec",
  "serde 1.0.136",
  "subxt",
  "thiserror",
@@ -5018,14 +5018,6 @@ checksum = "999508abb0ae792aabed2460c45b89106d97fe4adac593bdaef433c2605847b5"
 dependencies = [
  "bytes 1.1.0",
  "rustc-hex",
-]
-
-[[package]]
-name = "rococo-subxt"
-version = "0.5.5"
-dependencies = [
- "parity-scale-codec",
- "subxt",
 ]
 
 [[package]]

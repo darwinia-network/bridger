@@ -49,7 +49,7 @@ fi
 
 if [ "${CHAIN}" == "rococo" ]; then
   ENDPOINT='https://rococo-rpc.polkadot.io'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/rococo-subxt
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-rococo
 fi
 
 if [ "${CHAIN}" == "pangolin-parachain" ]; then

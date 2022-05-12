@@ -2,8 +2,8 @@ use codec::Encode;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
 
-use crate::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
-use crate::api::runtime_types::{darwinia_bridge_ethereum, ethereum_primitives};
+use crate::subxt_runtime::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use crate::subxt_runtime::api::runtime_types::{darwinia_bridge_ethereum, ethereum_primitives};
 
 /// Ethereum receipt proof
 #[derive(Clone, Debug, codec::Encode, codec::Decode)]

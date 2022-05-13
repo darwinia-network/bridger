@@ -5,6 +5,7 @@ BIN_PATH=$(cd "$(dirname "$0")"; pwd -P)
 
 ACCOUNT=$1
 DATA_PATH=/data/node-data/rococo-${ACCOUNT}
+mkdir -p ${DATA_PATH}
 
 polkadot \
   build-spec \

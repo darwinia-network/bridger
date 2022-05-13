@@ -23,8 +23,11 @@ export ROCOCO_BOB_PORT_WS=19902
 
 export PANGOLIN_PARACHAIN_PORT_WS=19701
 export PANGOLIN_PORT_WS=19801
+FORCE=$1
+if [ "${FORCE}" == "true" ]; then 
+  rm -rf ${DATA_DIR}
+fi
 
 sh -f ${BIN_PATH}/generate.sh
 
-docker-compose up -f ${BIN_PATH}/docker-compose.yml
-
+docker-compose -f ${BIN_PATH}/docker-compose.yml up 

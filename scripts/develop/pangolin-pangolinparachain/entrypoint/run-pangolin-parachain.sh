@@ -5,6 +5,7 @@
 BIN_PATH=$(cd "$(dirname "$0")"; pwd -P)
 SOURCE_PATH=/data/source
 DATA_PATH=/data/node-data/pangolin-parachain
+mkdir -p ${DATA_PATH}
 
 cargo build --release --manifest-path ${SOURCE_PATH}/Cargo.toml
 

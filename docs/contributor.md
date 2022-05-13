@@ -1,8 +1,41 @@
 Contributor Guide
 ===
 
-## How to develop bridge
+## How to run bridger
 
 The first, please read [Usage](./usage.md) to known how to compile bridger and
 set to local mode.
+
+## How to run bridge pangolin-pangolinparachain in local
+
+We bundle a develop tools in bridger
+project ([pangolin-pangolinparachain](../scripts/develop/pangolin-pangolinparachain))
+.
+
+The first, you can
+copy [bootstrap.template.sh](../scripts/develop/pangolin-pangolinparachain/bootstrap.template.sh)
+to [bootstrap.local.sh](../scripts/develop/pangolin-pangolinparachain/bootstrap.template.sh)
+and then change your environments
+
+```bash
+export CARGO_HOME=/tmp/cargo
+export RUSTUP_HOME=/tmp/rustup
+# Data path, include pangolin/pangolin-parachain/rococo/bridger/subql data
+export DATA_DIR=/path/to/data-path
+# Pangolin parachain source code path
+export PANGOLIN_PARACHAIN_SOURCE=/path/to/darwinia-parachain
+# Pangolin source code path
+export PANGOLIN_SOURCE=/path/to/darwinia-common
+```
+
+Then you can run
+
+```bash
+./bootstrap.local.sh force
+```
+
+to start all nodes/subqls
+
+> About of `force` argument, if you set this argument, will bee clean data of ${DATA_DIR}.
+> But, the first time, you must use this to init all subql project.
 

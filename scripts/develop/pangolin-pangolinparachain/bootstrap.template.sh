@@ -38,6 +38,6 @@ if [ "${FORCE}" == "true" ]; then
   done
 fi
 
-sh -f ${BIN_PATH}/generate.sh
+${BIN_PATH}/generate.sh
 
 docker-compose -f ${BIN_PATH}/docker-compose.yml up

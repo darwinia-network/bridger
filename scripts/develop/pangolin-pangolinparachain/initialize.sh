@@ -16,10 +16,9 @@ DATABASES='subql_s2s_pangolin subql_s2s_pangolin_parachain subql_s2s_rococo subq
 
 
 for DB in ${DATABASES}; do
-  ${EXEC_PG} \
-    psql -U postgres \
-      -tc "select 1 from pg_database where datname = '${DB}'" | grep -q 1 || \
-    psql -U postgres -c "create database ${DB}"
+  ${EXEC_PG} bash -c "
+  psql -U postgres -tc \"select 1 from pg_database where datname = '${DB}'\" | grep -q 1 || psql -U postgres -c \"create database ${DB}\"
+  "
 done
 
 docker stop ${CONTAINER_SUBQL_BUILD} || true

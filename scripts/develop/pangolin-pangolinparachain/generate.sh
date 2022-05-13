@@ -11,14 +11,13 @@ _abs_path() {
   echo $OUTPUT
 }
 
-CARGO_HOME=${CARGO_HOME}
+CARGO_HOME=${CARGO_HOME:/tmp/cargo}
 
 COMPOSE_FILE_TEMPLATE=${BIN_PATH}/docker-compose.template.yml
 COMPOSE_FILE_RUN=${BIN_PATH}/docker-compose.yml
 
 
 DATA_DIR=${DATA_DIR:-/tmp/bridger/pangolin-pangolinparachain}
-BRIDGER_HOME=${DATA_DIR}
 
 SUBQL_NODE_VERSION=${SUBQL_NODE_VERSION:-v0.28.2}
 SUBQL_QUERY_VERSION=${SUBQL_QUERY_VERSION:-v0.12.0}

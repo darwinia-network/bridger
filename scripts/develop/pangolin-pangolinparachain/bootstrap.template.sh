@@ -23,11 +23,19 @@ export ROCOCO_BOB_PORT_WS=19902
 
 export PANGOLIN_PARACHAIN_PORT_WS=19701
 export PANGOLIN_PORT_WS=19801
+
+export BRIDGER_HOME=${BRIDGER_HOME:-${DATA_DIR}/bridger}
+
 FORCE=$1
-if [ "${FORCE}" == "true" ]; then 
-  rm -rf ${DATA_DIR}
+if [ "${FORCE}" == "true" ]; then
+  for FOLDER in $(ls); do
+    if [ "$FOLDER" == "bridger" ]; then
+      continue
+    fi
+    rm -rf ${FOLDER}
+  done
 fi
 
 sh -f ${BIN_PATH}/generate.sh
 
-docker-compose -f ${BIN_PATH}/docker-compose.yml up 
+docker-compose -f ${BIN_PATH}/docker-compose.yml up

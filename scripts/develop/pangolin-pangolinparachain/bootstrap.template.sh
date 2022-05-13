@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Please copy this file to bootstrap.local.sh and modify your variables
+
+set -e
 
 BIN_PATH=$(cd "$(dirname "$0")"; pwd -P)
 

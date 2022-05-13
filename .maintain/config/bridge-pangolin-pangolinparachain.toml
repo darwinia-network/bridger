@@ -1,0 +1,46 @@
+[pangolin]
+endpoint = "wss://pangolin-rpc.darwinia.network:443"
+signer = "//Alice"
+runtime_version_mode = "Auto"
+
+[rococo]
+endpoint = "wss://rococo-rpc.polkadot.io:443"
+signer = "//Alice"
+runtime_version_mode = "Auto"
+
+[pangolin_parachain]
+endpoint = "wss://pangolin-parachain-rpc.darwinia.network:443"
+signer = "//Alice"
+runtime_version_mode = "Auto"
+
+[relay]
+# substrate-substrate bridger message relay lanes
+lanes = ["70616c69"]
+auto_start = true
+only_mandatory_headers = false
+create_relayers_fund_accounts = false
+
+[relay.prometheus_params]
+no_prometheus = false
+prometheus_host = "127.0.0.1"
+prometheus_port = 9616
+
+[task]
+interval_update_fee = 3600
+update_fee_strategy = "Nothing"
+
+[index.pangolin]
+# Subquery pangolin indexer queries url
+endpoint = "http://localhost:3000"
+
+[index.pangolin_parachain]
+# Subquery pangolin-parachain indexer queries url
+endpoint = "https://api.subquery.network/sq/fewensa/subql-bridge-s2s-pangolin-parachain__ZmV3Z"
+
+[index.rococo]
+# Subquery rococo indexer queries url
+endpoint = "http://localhost:3001"
+
+[index.parachain_rococo]
+# Subquery parachain_rococo indexer queries url
+endpoint = "https://api.subquery.network/sq/darwinia-network/subql-parachain-rococo"

@@ -26,6 +26,7 @@ jobs:
             pangolin-pangoro,
             darwinia-crab,
             pangoro-chapel,
+            pangolin-pangolinparachain
           ]
     steps:
       - uses: actions/checkout@v2

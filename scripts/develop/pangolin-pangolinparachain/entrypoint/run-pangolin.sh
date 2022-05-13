@@ -13,7 +13,8 @@ if [ ! -f ${DRML} ]; then
   apt install -y libclang-dev
 fi
 
-cargo build --release --manifest-path ${SOURCE_PATH}/Cargo.toml
+cd ${SOURCE_PATH}
+cargo build --release
 
 ${DRML} \
    --chain pangolin-dev \

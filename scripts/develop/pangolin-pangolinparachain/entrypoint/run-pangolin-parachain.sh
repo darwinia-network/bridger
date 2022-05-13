@@ -13,7 +13,8 @@ if [ ! -f ${DARWINIA_COLLATOR} ]; then
   apt install -y libclang-dev
 fi
 
-cargo build --release --manifest-path ${SOURCE_PATH}/Cargo.toml
+cd ${SOURCE_PATH}
+cargo build --release
 
 CHAIN=pangolin-parachain-dev
 

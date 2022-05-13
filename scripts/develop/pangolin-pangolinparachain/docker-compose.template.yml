@@ -200,6 +200,8 @@ services:
       - ${PANGOLIN_PARACHAIN_SOURCE}:/data/source
       - ${DATA_DIR}:/data/node-data
       - ${BIN_PATH}/entrypoint:/entrypoint
+    environment:
+      CARGO_TERM_COLOR: always
     ports:
       - "${PANGOLIN_PARACHAIN_PORT_WS}:9944"
     entrypoint: /entrypoint/run-pangolin-parachain.sh
@@ -218,6 +220,8 @@ services:
       - ${PANGOLIN_SOURCE}:/data/source
       - ${DATA_DIR}:/data/node-data
       - ${BIN_PATH}/entrypoint:/entrypoint
+    environment:
+      CARGO_TERM_COLOR: always
     ports:
       - "${PANGOLIN_PORT_WS}:9944"
     entrypoint: /entrypoint/run-pangolin.sh

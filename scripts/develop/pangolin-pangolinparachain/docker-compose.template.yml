@@ -51,7 +51,7 @@ services:
     depends_on:
       "postgres":
         condition: service_healthy
-      "subquery-node-pangolin":
+      "subquery-node-s2s-pangolin":
         condition: service_healthy
     restart: always
     environment:
@@ -99,7 +99,7 @@ services:
       - "${SUBQL_S2S_PANGOLIN_PARACHAIN_PORT}:3000"
     depends_on:
       - postgres
-      - subquery-node-pangolin-parachain
+      - subquery-node-s2s-pangolin-parachain
     restart: always
     environment:
       DB_USER: postgres
@@ -146,7 +146,7 @@ services:
       - "${SUBQL_S2S_ROCOCO_PORT}:3000"
     depends_on:
       - postgres
-      - subquery-node-rococo
+      - subquery-node-s2s-rococo
     restart: always
     environment:
       DB_USER: postgres
@@ -193,7 +193,7 @@ services:
       - "${SUBQL_PARACHAIN_ROCOCO_PORT}:3000"
     depends_on:
       - postgres
-      - subquery-node-rococo
+      - subquery-node-parachain-rococo
     restart: always
     environment:
       DB_USER: postgres

@@ -219,3 +219,16 @@ services:
       - "${PANGOLIN_PORT_WS}:9944"
     entrypoint: /entrypoint/run-pangolin.sh
 
+  ##
+  # bridger
+  ##
+#  bridger:
+#    container_name: pp-bridger
+#    image: quay.io/darwinia-network/bridger:sha-e636082
+#    environment:
+#      BRIDGER_HOME: /data/bridger
+#    volumes:
+#      - ${BRIDGER_HOME}:/data/bridger
+#    command:
+#      - pangolin-rococo
+#      - start

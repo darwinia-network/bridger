@@ -18,6 +18,7 @@ COMPOSE_FILE_RUN=${BIN_PATH}/docker-compose.yml
 
 
 DATA_DIR=${DATA_DIR:-/tmp/bridger/pangolin-pangolinparachain}
+BRIDGER_HOME=${BRIDGER_HOME:-${DATA_DIR}/bridger}
 
 SUBQL_NODE_VERSION=${SUBQL_NODE_VERSION:-v0.28.2}
 SUBQL_QUERY_VERSION=${SUBQL_QUERY_VERSION:-v0.12.0}
@@ -52,6 +53,7 @@ _gen_compose_content() {
   _CARGO_HOME=$(echo ${CARGO_HOME} | sed "${REGEX_SLASH}")
   _BIN_PATH=$(echo ${BIN_PATH} | sed "${REGEX_SLASH}")
   _DATA_DIR=$(echo ${DATA_DIR} | sed "${REGEX_SLASH}")
+  _BRIDGER_HOME=$(echo ${BRIDGER_HOME} | sed "${REGEX_SLASH}")
   _SUBQL_PANGOLIN_DIR=$(echo ${SUBQL_PANGOLIN_DIR} | sed "${REGEX_SLASH}")
   _SUBQL_PANGOLIN_PARACHAIN_DIR=$(echo ${SUBQL_PANGOLIN_PARACHAIN_DIR} | sed "${REGEX_SLASH}")
   _SUBQL_ROCOCO_DIR=$(echo ${SUBQL_ROCOCO_DIR} | sed "${REGEX_SLASH}")
@@ -59,6 +61,7 @@ _gen_compose_content() {
   _PANGOLIN_SOURCE=$(echo ${PANGOLIN_SOURCE} | sed "${REGEX_SLASH}")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${CARGO_HOME}/${_CARGO_HOME}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${BIN_PATH}/${_BIN_PATH}/g")
+  CONTENT=$(echo "${CONTENT}" | sed "s/\${BRIDGER_HOME}/${BRIDGER_HOME}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${DATA_DIR}/${_DATA_DIR}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${SUBQL_NODE_VERSION}/${SUBQL_NODE_VERSION}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${SUBQL_QUERY_VERSION}/${SUBQL_QUERY_VERSION}/g")

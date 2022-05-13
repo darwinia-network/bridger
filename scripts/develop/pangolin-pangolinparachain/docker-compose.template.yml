@@ -23,7 +23,8 @@ services:
     container_name: pp-subquery-node-pangolin
     image: onfinality/subql-node:${SUBQL_NODE_VERSION}
     depends_on:
-      - postgres
+      "postgres":
+        condition: service_healthy
     restart: always
     environment:
       DB_USER: postgres
@@ -48,8 +49,10 @@ services:
     ports:
       - "${SUBQL_PANGOLIN_PORT}:3000"
     depends_on:
-      - postgres
-      - subquery-node-pangolin
+      "postgres":
+        condition: service_healthy
+      "subquery-node-pangolin":
+        condition: service_healthy
     restart: always
     environment:
       DB_USER: postgres

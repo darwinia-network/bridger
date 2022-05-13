@@ -12,8 +12,21 @@ We bundle a develop tools in bridger
 project ([pangolin-pangolinparachain](../scripts/develop/pangolin-pangolinparachain))
 .
 
-The first, you can
-copy [bootstrap.template.sh](../scripts/develop/pangolin-pangolinparachain/bootstrap.template.sh)
+### First
+
+Override develop subql project.yml file, You do not need to make any changes for
+the first execution. Let the node start successfully first.
+
+| template                              | path                                      |
+|---------------------------------------|-------------------------------------------|
+| parachain-rococo.project.yaml         | subql/parachain/rococo/project.yaml       |
+| s2s-pangolin.project.yaml             | subql/s2s/pangolin/project.yaml           |
+| s2s-pangolin-parachain.project.yaml   | subql/s2s/pangolin-parachain/project.yaml |
+| s2s-rococo.project.yaml               | subql/s2s/rococo/project.yaml             |
+
+### Second
+
+Copy [bootstrap.template.sh](../scripts/develop/pangolin-pangolinparachain/bootstrap.template.sh)
 to [bootstrap.local.sh](../scripts/develop/pangolin-pangolinparachain/bootstrap.template.sh)
 and then change your environments
 
@@ -38,4 +51,8 @@ to start all nodes/subqls
 
 > About of `force` argument, if you set this argument, will bee clean data of ${DATA_DIR}.
 > But, the first time, you must use this to init all subql project.
+
+
+When all nodes are started successfully. Please modify the subql's `endpoint`
+/`genesisHash`/`startBlock`. and run `docker-compose restart`
 

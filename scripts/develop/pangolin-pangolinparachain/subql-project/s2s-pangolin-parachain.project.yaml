@@ -1,0 +1,27 @@
+specVersion: 0.2.0
+name: bridge-s2s-pangolin-parachain
+version: 0.0.4
+description: S2S bridge pangolin parachain subql
+repository: https://github.com/darwinia-network/bridger
+schema:
+  file: ./schema.graphql
+
+network:
+  genesisHash: '<PLEASE CHANGE TO REAL GENESIS HASH>'
+  endpoint: ws://pangolin-parachain:9944
+
+dataSources:
+  - kind: substrate/Runtime
+    startBlock: 1
+    mapping:
+      file: ./dist/index.js
+      handlers:
+        - handler: handleBlock
+          kind: substrate/BlockHandler
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            - module: bridgePangolinMessages
+              method: MessageAccepted
+        - handler: handleCall
+          kind: substrate/CallHandler

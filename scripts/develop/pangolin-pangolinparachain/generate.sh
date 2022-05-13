@@ -11,7 +11,7 @@ _abs_path() {
   echo $OUTPUT
 }
 
-CARGO_HOME=${CARGO_HOME:/tmp/cargo}
+CARGO_HOME=${CARGO_HOME:-/tmp/cargo}
 
 COMPOSE_FILE_TEMPLATE=${BIN_PATH}/docker-compose.template.yml
 COMPOSE_FILE_RUN=${BIN_PATH}/docker-compose.yml

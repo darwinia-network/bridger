@@ -61,7 +61,7 @@ _gen_compose_content() {
   _PANGOLIN_SOURCE=$(echo ${PANGOLIN_SOURCE} | sed "${REGEX_SLASH}")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${CARGO_HOME}/${_CARGO_HOME}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${BIN_PATH}/${_BIN_PATH}/g")
-  CONTENT=$(echo "${CONTENT}" | sed "s/\${BRIDGER_HOME}/${BRIDGER_HOME}/g")
+  CONTENT=$(echo "${CONTENT}" | sed "s/\${BRIDGER_HOME}/${_BRIDGER_HOME}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${DATA_DIR}/${_DATA_DIR}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${SUBQL_NODE_VERSION}/${SUBQL_NODE_VERSION}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${SUBQL_QUERY_VERSION}/${SUBQL_QUERY_VERSION}/g")

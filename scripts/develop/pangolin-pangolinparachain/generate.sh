@@ -5,33 +5,41 @@
 BIN_PATH=$(cd "$(dirname "$0")"; pwd -P)
 WORKSPACE=${BIN_PATH}/../../../
 
+_abs_path() {
+  INPUT=$1
+  OUTPUT=$(cd ${INPUT}; pwd -P)
+  echo $OUTPUT
+}
+
+CARGO_HOME=${CARGO_HOME}
+
 COMPOSE_FILE_TEMPLATE=${BIN_PATH}/docker-compose.template.yml
 COMPOSE_FILE_RUN=${BIN_PATH}/docker-compose.yml
 
 
-#DATA_DIR=${DATA_DIR:-/tmp/bridger/pangolin-pangolinparachain}
-DATA_DIR=${DATA_DIR:-D:/dev/darwinia-network/_data/bridger/pangolin-pangolinparachain}
+DATA_DIR=${DATA_DIR:-/tmp/bridger/pangolin-pangolinparachain}
+BRIDGER_HOME=${DATA_DIR}
 
 SUBQL_NODE_VERSION=v0.28.2
 SUBQL_QUERY_VERSION=v0.12.0
 
-SUBQL_PANGOLIN_DIR=${WORKSPACE}/subql/s2s/pangolin
+SUBQL_PANGOLIN_DIR=$(_abs_path ${WORKSPACE}/subql/s2s/pangolin)
 SUBQL_PANGOLIN_PORT=13000
 
-SUBQL_PANGOLIN_PARACHAIN_DIR=${WORKSPACE}/subql/s2s/pangolin-parachain
+SUBQL_PANGOLIN_PARACHAIN_DIR=$(_abs_path ${WORKSPACE}/subql/s2s/pangolin-parachain)
 SUBQL_PANGOLIN_PARACHAIN_PORT=13001
 
-SUBQL_ROCOCO_DIR=${WORKSPACE}/subql/s2s/rococo
+SUBQL_ROCOCO_DIR=$(_abs_path ${WORKSPACE}/subql/s2s/rococo)
 SUBQL_ROCOCO_PORT=12002
 
 ROCOCO_VERSION=v0.9.16
 ROCOCO_ALICE_PORT_WS=19901
 ROCOCO_BOB_PORT_WS=19902
 
-PANGOLIN_PARACHAIN_SOURCE=D:/dev/darwinia-network/darwinia-common
+PANGOLIN_PARACHAIN_SOURCE=${PANGOLIN_PARACHAIN_SOURCE}
 PANGOLIN_PARACHAIN_PORT_WS=19701
 
-PANGOLIN_SOURCE=D:/dev/darwinia-network/darwinia-common
+PANGOLIN_SOURCE=${PANGOLIN_SOURCE}
 PANGOLIN_PORT_WS=19801
 
 _generate_docker_compose() {
@@ -42,6 +50,7 @@ _generate_docker_compose() {
 _gen_compose_content() {
   CONTENT=$(cat $COMPOSE_FILE_TEMPLATE)
   REGEX_SLASH='s/\//\\\//g'
+  _CARGO_HOME=$(echo ${CARGO_HOME} | sed "${REGEX_SLASH}")
   _BIN_PATH=$(echo ${BIN_PATH} | sed "${REGEX_SLASH}")
   _DATA_DIR=$(echo ${DATA_DIR} | sed "${REGEX_SLASH}")
   _SUBQL_PANGOLIN_DIR=$(echo ${SUBQL_PANGOLIN_DIR} | sed "${REGEX_SLASH}")
@@ -49,6 +58,7 @@ _gen_compose_content() {
   _SUBQL_ROCOCO_DIR=$(echo ${SUBQL_ROCOCO_DIR} | sed "${REGEX_SLASH}")
   _PANGOLIN_PARACHAIN_SOURCE=$(echo ${PANGOLIN_PARACHAIN_SOURCE} | sed "${REGEX_SLASH}")
   _PANGOLIN_SOURCE=$(echo ${PANGOLIN_SOURCE} | sed "${REGEX_SLASH}")
+  CONTENT=$(echo "${CONTENT}" | sed "s/\${CARGO_HOME}/${_CARGO_HOME}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${BIN_PATH}/${_BIN_PATH}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${DATA_DIR}/${_DATA_DIR}/g")
   CONTENT=$(echo "${CONTENT}" | sed "s/\${SUBQL_NODE_VERSION}/${SUBQL_NODE_VERSION}/g")
@@ -71,6 +81,7 @@ _gen_compose_content() {
 
 main() {
   _generate_docker_compose
+  echo "Generated -> ${BIN_PATH}/docker-compose.yml"
 }
 
 main

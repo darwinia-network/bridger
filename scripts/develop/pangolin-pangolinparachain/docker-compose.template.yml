@@ -190,6 +190,8 @@ services:
     container_name: pp-pangolin-parachain
     image: rust:1
     volumes:
+      - ${CARGO_HOME}/git:/usr/local/cargo/git
+      - ${CARGO_HOME}/registry:/usr/local/cargo/registry
       - ${PANGOLIN_PARACHAIN_SOURCE}:/data/source
       - ${DATA_DIR}:/data/node-data
       - ${BIN_PATH}/entrypoint:/entrypoint
@@ -206,6 +208,8 @@ services:
     container_name: pp-pangolin
     image: rust:1
     volumes:
+      - ${CARGO_HOME}/git:/usr/local/cargo/git
+      - ${CARGO_HOME}/registry:/usr/local/cargo/registry
       - ${PANGOLIN_SOURCE}:/data/source
       - ${DATA_DIR}:/data/node-data
       - ${BIN_PATH}/entrypoint:/entrypoint

@@ -37,5 +37,4 @@ for PROJ in ${SUBQL_PROJECTS}; do
   ${EXEC_SUBQL_BUILD} sh -c "cd /data/${PROJ} && npm i && npm run codegen && npm run build"
 done
 
-docker stop ${CONTAINER_SUBQL_BUILD}
-docker rm ${CONTAINER_SUBQL_BUILD}
+docker stop ${CONTAINER_SUBQL_BUILD} || true

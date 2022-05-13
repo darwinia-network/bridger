@@ -39,14 +39,14 @@ if [ "${FORCE}" == "true" ]; then
     fi
     rm -rf ${FOLDER}
   done
+
+  ${DOCKER_COMPOSE} up -d postgres
+
+  ${BIN_PATH}/initialize.sh
 fi
 
 ${BIN_PATH}/generate.sh
 
 DOCKER_COMPOSE="docker-compose -f ${BIN_PATH}/docker-compose.yml"
-
-${DOCKER_COMPOSE} up -d postgres
-
-${BIN_PATH}/initialize.sh
 
 ${DOCKER_COMPOSE} up

@@ -19,8 +19,8 @@ services:
   # s2s pangolin
   ##
 
-  subquery-node-pangolin:
-    container_name: pp-subquery-node-pangolin
+  subquery-node-s2s-pangolin:
+    container_name: pp-subquery-node-s2s-pangolin
     image: onfinality/subql-node:${SUBQL_NODE_VERSION}
     depends_on:
       "postgres":
@@ -29,25 +29,25 @@ services:
     environment:
       DB_USER: postgres
       DB_PASS: postgres
-      DB_DATABASE: postgres
+      DB_DATABASE: subql_s2s_pangolin
       DB_HOST: postgres
       DB_PORT: 5432
     volumes:
-      - ${SUBQL_PANGOLIN_DIR}:/app
+      - ${SUBQL_S2S_PANGOLIN_DIR}:/app
     command:
       - -f=/app
       - --db-schema=app
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://subquery-node-pangolin:3000/ready"]
+      test: ["CMD", "curl", "-f", "http://subquery-node-s2s-pangolin:3000/ready"]
       interval: 3s
       timeout: 5s
       retries: 10
 
-  graphql-engine-pangolin:
+  graphql-engine-s2s-pangolin:
     container_name: pp-graphql-engine-pangolin
     image: onfinality/subql-query:${SUBQL_QUERY_VERSION}
     ports:
-      - "${SUBQL_PANGOLIN_PORT}:3000"
+      - "${SUBQL_S2S_PANGOLIN_PORT}:3000"
     depends_on:
       "postgres":
         condition: service_healthy
@@ -57,20 +57,20 @@ services:
     environment:
       DB_USER: postgres
       DB_PASS: postgres
-      DB_DATABASE: postgres
+      DB_DATABASE: subql_s2s_pangolin
       DB_HOST: postgres
       DB_PORT: 5432
     command:
       - --name=app
       - --playground
-      - --indexer=http://subquery-node-pangolin:3000
+      - --indexer=http://subquery-node-s2s-pangolin:3000
 
   ##
   # s2s pangolin parachain
   ##
 
-  subquery-node-pangolin-parachain:
-    container_name: pp-subquery-node-pangolin-parachain
+  subquery-node-s2s-pangolin-parachain:
+    container_name: pp-subquery-node-s2s-pangolin-parachain
     image: onfinality/subql-node:${SUBQL_NODE_VERSION}
     depends_on:
       - postgres
@@ -78,25 +78,25 @@ services:
     environment:
       DB_USER: postgres
       DB_PASS: postgres
-      DB_DATABASE: postgres
+      DB_DATABASE: subql_s2s_pangolin_parachain
       DB_HOST: postgres
       DB_PORT: 5432
     volumes:
-      - ${SUBQL_PANGOLIN_PARACHAIN_DIR}:/app
+      - ${SUBQL_S2S_PANGOLIN_PARACHAIN_DIR}:/app
     command:
       - -f=/app
       - --db-schema=app
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://subquery-node-pangolin-parachain:3000/ready"]
+      test: ["CMD", "curl", "-f", "http://subquery-node-s2s-pangolin-parachain:3000/ready"]
       interval: 3s
       timeout: 5s
       retries: 10
 
-  graphql-engine-pangolin-parachain:
-    container_name: pp-graphql-engine-pangolin-parachain
+  graphql-engine-s2s-pangolin-parachain:
+    container_name: pp-graphql-engine-s2s-pangolin-parachain
     image: onfinality/subql-query:${SUBQL_QUERY_VERSION}
     ports:
-      - "${SUBQL_PANGOLIN_PARACHAIN_PORT}:3000"
+      - "${SUBQL_S2S_PANGOLIN_PARACHAIN_PORT}:3000"
     depends_on:
       - postgres
       - subquery-node-pangolin-parachain
@@ -104,7 +104,7 @@ services:
     environment:
       DB_USER: postgres
       DB_PASS: postgres
-      DB_DATABASE: postgres
+      DB_DATABASE: subql_s2s_pangolin_parachain
       DB_HOST: postgres
       DB_PORT: 5432
     command:
@@ -116,8 +116,8 @@ services:
   # s2s rococo
   ##
 
-  subquery-node-rococo:
-    container_name: pp-subquery-node-rococo
+  subquery-node-s2s-rococo:
+    container_name: pp-subquery-node-s2s-rococo
     image: onfinality/subql-node:${SUBQL_NODE_VERSION}
     depends_on:
       - postgres
@@ -125,11 +125,11 @@ services:
     environment:
       DB_USER: postgres
       DB_PASS: postgres
-      DB_DATABASE: postgres
+      DB_DATABASE: subql_s2s_rococo
       DB_HOST: postgres
       DB_PORT: 5432
     volumes:
-      - ${SUBQL_ROCOCO_DIR}:/app
+      - ${SUBQL_S2S_ROCOCO_DIR}:/app
     command:
       - -f=/app
       - --db-schema=app
@@ -139,11 +139,11 @@ services:
       timeout: 5s
       retries: 10
 
-  graphql-engine-rococo:
-    container_name: pp-graphql-engine-rococo
+  graphql-engine-s2s-rococo:
+    container_name: pp-graphql-engine-s2s-rococo
     image: onfinality/subql-query:${SUBQL_QUERY_VERSION}
     ports:
-      - "${SUBQL_ROCOCO_PORT}:3000"
+      - "${SUBQL_S2S_ROCOCO_PORT}:3000"
     depends_on:
       - postgres
       - subquery-node-rococo
@@ -151,13 +151,60 @@ services:
     environment:
       DB_USER: postgres
       DB_PASS: postgres
-      DB_DATABASE: postgres
+      DB_DATABASE: subql_s2s_rococo
       DB_HOST: postgres
       DB_PORT: 5432
     command:
       - --name=app
       - --playground
-      - --indexer=http://subquery-node-rococo:3000
+      - --indexer=http://subquery-node-s2s-rococo:3000
+
+  ##
+  # parachain rococo
+  ##
+
+  subquery-node-parachain-rococo:
+    container_name: pp-subquery-node-parachain-rococo
+    image: onfinality/subql-node:${SUBQL_NODE_VERSION}
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: subql_parachain_rococo
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      - ${SUBQL_PARACHAIN_ROCOCO_DIR}:/app
+    command:
+      - -f=/app
+      - --db-schema=app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://subquery-node-parachain-rococo:3000/ready"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  graphql-engine-parachain-rococo:
+    container_name: pp-graphql-engine-parachain-rococo
+    image: onfinality/subql-query:${SUBQL_QUERY_VERSION}
+    ports:
+      - "${SUBQL_PARACHAIN_ROCOCO_PORT}:3000"
+    depends_on:
+      - postgres
+      - subquery-node-rococo
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: subql_parachain_rococo
+      DB_HOST: postgres
+      DB_PORT: 5432
+    command:
+      - --name=app
+      - --playground
+      - --indexer=http://subquery-node-parachain-rococo:3000
 
   ##
   # rococo node
@@ -195,6 +242,7 @@ services:
     container_name: pp-pangolin-parachain
     image: rust:1
     volumes:
+      - ${RUSTUP_HOME}:/usr/local/rustup
       - ${CARGO_HOME}/git:/usr/local/cargo/git
       - ${CARGO_HOME}/registry:/usr/local/cargo/registry
       - ${PANGOLIN_PARACHAIN_SOURCE}:/data/source
@@ -215,6 +263,7 @@ services:
     container_name: pp-pangolin
     image: rust:1
     volumes:
+      - ${RUSTUP_HOME}:/usr/local/rustup
       - ${CARGO_HOME}/git:/usr/local/cargo/git
       - ${CARGO_HOME}/registry:/usr/local/cargo/registry
       - ${PANGOLIN_SOURCE}:/data/source

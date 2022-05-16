@@ -2953,7 +2953,7 @@ dependencies = [
 [[package]]
 name = "shadow-types"
 version = "0.7.0"
-source = "git+https://github.com/darwinia-network/shadow.git?branch=fewensa-receipt#8deb889d7d53639eae6a7ecc60716bc6c3adcc43"
+source = "git+https://github.com/darwinia-network/shadow.git#4c59aa4b10ef004c551ec0460d34b47ac6e7785c"
 dependencies = [
  "parity-scale-codec",
  "rlp 0.4.6",

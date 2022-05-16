@@ -32,7 +32,7 @@ export BRIDGER_HOME=${BRIDGER_HOME:-${DATA_DIR}/bridger}
 
 FORCE=$1
 
-if [ "${FORCE}" == "true" ]; then
+if [ "${FORCE}" == "force" ]; then
   for FOLDER in $(ls ${DATA_DIR}); do
     if [ "$FOLDER" == "bridger" ]; then
       continue

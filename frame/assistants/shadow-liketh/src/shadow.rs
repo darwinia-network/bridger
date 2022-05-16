@@ -104,7 +104,7 @@ impl Shadow {
         let receipt: EthereumReceiptJson = serde_json::from_value(result)?;
         let header = &receipt.header;
 
-        let (member_leaf_index, last_leaf_index) = (header.number, last);
+        let (member_leaf_index, last_leaf_index) = (header.number, last - 1);
         let proof = self.mmr_proof(member_leaf_index, last_leaf_index).await?;
         let mmr_proof = MMRProofJson {
             member_leaf_index,
@@ -141,7 +141,7 @@ impl Shadow {
     pub async fn mmr_root(&self, leaf_index: u64) -> ShadowComponentReuslt<[u8; 32]> {
         let mmr_size = mmr::leaf_index_to_mmr_size(leaf_index);
         let peak_positions = mmr::get_peaks(mmr_size);
-        println!("{:?}", peak_positions);
+        tracing::debug!(target: "shadow", "mmr root peak positions: {:?}", peak_positions);
 
         let mmr_nodes = self.query_nodes(peak_positions).await?;
         let peaks = self

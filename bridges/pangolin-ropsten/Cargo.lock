@@ -276,9 +276,7 @@ dependencies = [
  "colored",
  "component-ethereum",
  "component-http-client",
- "component-shadow",
  "component-state",
- "component-thegraph-liketh",
  "lifeline",
  "microkv",
  "parity-scale-codec",
@@ -286,6 +284,7 @@ dependencies = [
  "rand 0.8.5",
  "serde 1.0.136",
  "serde_json",
+ "shadow-liketh",
  "structopt",
  "strum",
  "subquery-d2e",
@@ -294,6 +293,7 @@ dependencies = [
  "support-lifeline",
  "support-terminal",
  "support-tracker",
+ "thegraph-liketh",
  "tokio",
  "tracing",
  "web3",
@@ -367,6 +367,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ckb-merkle-mountain-range"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f061f97d64fd1822664bdfb722f7ae5469a97b77567390f7442be5b5dc82a5b"
+dependencies = [
+ "cfg-if 0.1.10",
+]
+
+[[package]]
 name = "clap"
 version = "2.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -386,11 +395,11 @@ name = "client-pangolin"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "component-shadow",
  "parity-scale-codec",
  "secp256k1",
  "serde 1.0.136",
  "serde_json",
+ "shadow-liketh",
  "subxt",
  "thiserror",
  "tracing",
@@ -469,20 +478,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "component-shadow"
-version = "0.5.5"
-dependencies = [
- "color-eyre",
- "component-ethereum",
- "parity-scale-codec",
- "reqwest",
- "serde 1.0.136",
- "serde_json",
- "thiserror",
- "tracing",
-]
-
-[[package]]
 name = "component-state"
 version = "0.5.5"
 dependencies = [
@@ -491,19 +486,6 @@ dependencies = [
  "microkv",
  "serde 1.0.136",
  "support-common",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "component-thegraph-liketh"
-version = "0.5.5"
-dependencies = [
- "async-trait",
- "color-eyre",
- "gql_client",
- "serde 1.0.136",
- "serde-aux",
  "thiserror",
  "tracing",
 ]
@@ -858,7 +840,7 @@ dependencies = [
  "serde_json",
  "sha3",
  "thiserror",
- "uint",
+ "uint 0.9.3",
 ]
 
 [[package]]
@@ -885,7 +867,7 @@ dependencies = [
  "impl-rlp",
  "impl-serde",
  "primitive-types 0.9.1",
- "uint",
+ "uint 0.9.3",
 ]
 
 [[package]]
@@ -1121,8 +1103,9 @@ checksum = "78cc372d058dcf6d5ecd98510e7fbc9e5aec4d21de70f65fea8fecebcd881bd4"
 
 [[package]]
 name = "gql_client"
-version = "1.0.1"
-source = "git+https://github.com/fewensa/gql-client-rs.git?branch=master#220c345c8e570fa2b28ceb2d869331d014b2f324"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d817a5d0b2a4948deae8550e12ae5eff3a874f8b66090b5863a2dcc917a59a61"
 dependencies = [
  "reqwest",
  "serde 1.0.136",
@@ -1368,7 +1351,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f28220f89297a075ddc7245cd538076ee98b01f2a9c23a53a4f1105d5a322808"
 dependencies = [
- "rlp",
+ "rlp 0.5.1",
 ]
 
 [[package]]
@@ -2234,7 +2217,7 @@ dependencies = [
  "impl-codec",
  "impl-rlp",
  "impl-serde",
- "uint",
+ "uint 0.9.3",
 ]
 
 [[package]]
@@ -2247,7 +2230,7 @@ dependencies = [
  "impl-codec",
  "impl-serde",
  "scale-info",
- "uint",
+ "uint 0.9.3",
 ]
 
 [[package]]
@@ -2533,6 +2516,15 @@ dependencies = [
  "untrusted",
  "web-sys",
  "winapi",
+]
+
+[[package]]
+name = "rlp"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1190dcc8c3a512f1eef5d09bb8c84c7f39e1054e174d1795482e18f5272f2e73"
+dependencies = [
+ "rustc-hex",
 ]
 
 [[package]]
@@ -2936,6 +2928,38 @@ dependencies = [
  "digest 0.9.0",
  "keccak",
  "opaque-debug 0.3.0",
+]
+
+[[package]]
+name = "shadow-liketh"
+version = "0.5.3"
+dependencies = [
+ "blake2-rfc",
+ "component-ethereum",
+ "gql_client",
+ "include_dir",
+ "parity-scale-codec",
+ "reqwest",
+ "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
+ "serde_json",
+ "shadow-types",
+ "support-mmr",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "shadow-types"
+version = "0.7.0"
+source = "git+https://github.com/darwinia-network/shadow.git?branch=fewensa-receipt#8deb889d7d53639eae6a7ecc60716bc6c3adcc43"
+dependencies = [
+ "parity-scale-codec",
+ "rlp 0.4.6",
+ "serde 1.0.136",
+ "thiserror",
+ "uint 0.8.5",
 ]
 
 [[package]]
@@ -3562,6 +3586,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "support-mmr"
+version = "0.1.0"
+dependencies = [
+ "blake2-rfc",
+ "ckb-merkle-mountain-range",
+]
+
+[[package]]
 name = "support-terminal"
 version = "0.5.5"
 dependencies = [
@@ -3644,6 +3676,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 dependencies = [
  "unicode-width",
+]
+
+[[package]]
+name = "thegraph-liketh"
+version = "0.5.5"
+dependencies = [
+ "async-trait",
+ "color-eyre",
+ "gql_client",
+ "serde 1.0.136",
+ "serde-aux",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]
@@ -3968,6 +4013,18 @@ checksum = "dcf81ac59edc17cc8697ff311e8f5ef2d99fcbd9817b34cec66f90b6c3dfd987"
 
 [[package]]
 name = "uint"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9db035e67dfaf7edd9aebfe8676afcd63eed53c8a4044fed514c8cccf1835177"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "rustc-hex",
+ "static_assertions",
+]
+
+[[package]]
+name = "uint"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "12f03af7ccf01dd611cc450a0d10dbc9b745770d096473e2faf0ca6e2d66d1e0"
@@ -4212,7 +4269,7 @@ dependencies = [
  "parking_lot 0.11.2",
  "pin-project 1.0.10",
  "reqwest",
- "rlp",
+ "rlp 0.5.1",
  "secp256k1",
  "serde 1.0.136",
  "serde_json",

@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use pangolin_subxt::api::runtime_types;
-use pangolin_subxt::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
-use pangolin_subxt::api::runtime_types::pangolin_runtime::pallets::proxy::ProxyType;
-use pangolin_subxt::api::runtime_types::to_ethereum_backing::pallet::RedeemFor;
+use crate::subxt_runtime::api::runtime_types;
+use crate::subxt_runtime::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use crate::subxt_runtime::api::runtime_types::pangolin_runtime::pallets::proxy::ProxyType;
+use crate::subxt_runtime::api::runtime_types::to_ethereum_backing::pallet::RedeemFor;
 use subxt::{BasicError, MetadataError};
 
 use crate::client::PangolinClient;

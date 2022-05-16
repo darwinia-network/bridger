@@ -97,7 +97,7 @@ mod darwinia {
 mod ethlike_v1 {
     use std::fmt::{Debug, Formatter};
 
-    use pangolin_subxt::api::runtime_types::darwinia_claims::EcdsaSignature;
+    use crate::subxt_runtime::api::runtime_types::darwinia_claims::EcdsaSignature;
 
     use secp256k1::SecretKey;
     use web3::signing::SecretKeyRef;

@@ -13,11 +13,11 @@ repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.5.5"
 
 [dependencies]
-tracing     = "0.1"
-thiserror   = "1"
 array-bytes = "1.4"
+thiserror   = "1"
+tracing     = "0.1"
 
-serde       = { version = "1", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
 
-subxt        = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.1" }
-rococo-subxt = { path = "../rococo-subxt" }
+codec = { package = "parity-scale-codec", version = "2" }
+subxt = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }

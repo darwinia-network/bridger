@@ -51,7 +51,7 @@ mod s2s_messages {
     use relay_darwinia_client::DarwiniaChain;
     use substrate_relay_helper::messages_lane::SubstrateMessageLane;
 
-    use feemarket_s2s_transition::relay::BasicRelayStrategy;
+    use feemarket_s2s::relay::BasicRelayStrategy;
 
     use crate::feemarket::DarwiniaFeemarketApi;
 
@@ -99,7 +99,7 @@ pub mod s2s_feemarket {
     };
     use sp_core::{Bytes, Pair};
 
-    use feemarket_s2s_transition::error::FeemarketResult;
+    use feemarket_s2s::error::FeemarketResult;
 
     pub(crate) async fn update_relay_fee(
         client: &Client<DarwiniaChain>,

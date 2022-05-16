@@ -33,28 +33,28 @@ OUTPUT_FILE=
 if [ "${CHAIN}" == "pangolin" ]; then
   #ENDPOINT='https://pangolin-rpc.darwinia.network'
   ENDPOINT='http://127.0.0.1:9966'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangolin-subxt
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin
 fi
 
 if [ "${CHAIN}" == "pangoro" ]; then
   ENDPOINT='https://pangoro-rpc.darwinia.network'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangoro-subxt
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangoro
 fi
 
 if [ "${CHAIN}" == "darwinia" ]; then
 #  ENDPOINT='https://rpc.darwinia.network'
   ENDPOINT='http://127.0.0.1:9936'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/darwinia-subxt
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-darwinia
 fi
 
 if [ "${CHAIN}" == "rococo" ]; then
   ENDPOINT='https://rococo-rpc.polkadot.io'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/rococo-subxt
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-rococo
 fi
 
 if [ "${CHAIN}" == "pangolin-parachain" ]; then
   ENDPOINT='http://127.0.0.1:40338'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/pangolin-parachain-subxt
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachain
 fi
 
 if [ -z "${ENDPOINT}" ]; then
@@ -66,7 +66,7 @@ fi
 
 mkdir -p ${OUTPUT_PATH}
 
-OUTPUT_FILE=${OUTPUT_PATH}/src/runtime.rs
+OUTPUT_FILE=${OUTPUT_PATH}/src/subxt_runtime/runtime.rs
 
 ${SUBXT} codegen --url ${ENDPOINT} ${DERIVE} > ${OUTPUT_FILE}
 

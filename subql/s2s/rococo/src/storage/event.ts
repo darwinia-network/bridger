@@ -31,7 +31,7 @@ export async function storeNeedRelayBlock(
   if (_event.type == RelayBlockType.OnDemand) {
     const data = event.data;
     const [laneId, messageNonce] = data as unknown as [string, number];
-    _event.laneId = laneId;
+    _event.laneId = laneId.toString().replace('0x', '');
     _event.messageNonce = messageNonce;
   }
   if (_event.type == RelayBlockType.Mandatory) {

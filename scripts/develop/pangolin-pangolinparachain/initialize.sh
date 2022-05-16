@@ -37,3 +37,7 @@ for PROJ in ${SUBQL_PROJECTS}; do
 done
 
 docker stop ${CONTAINER_SUBQL_BUILD} || true
+
+mkdir -p ${BRIDGER_HOME}
+
+mv ${BIN_PATH}/template/bridge-pangolin-pangolinparachain.toml ${BRIDGER_HOME}

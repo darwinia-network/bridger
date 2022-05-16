@@ -1,4 +1,4 @@
-use pangolin_parachain_subxt::api::RuntimeApi;
+use crate::subxt_runtime::api::RuntimeApi;
 use subxt::Client;
 
 use crate::config::PangolinParachainSubxtConfig;

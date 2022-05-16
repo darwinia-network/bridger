@@ -1,4 +1,4 @@
-use pangolin_subxt::api::RuntimeApi;
+use crate::subxt_runtime::api::RuntimeApi;
 use subxt::sp_runtime::traits::Header;
 use subxt::Client;
 

@@ -29,10 +29,8 @@ array-bytes = "1.4"
 
 codec       = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
 secp256k1   = { version = "0.20", features = ["recovery"] }
-subxt       = { git = "https://github.com/paritytech/subxt.git" }
+subxt = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 web3 = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }
-
-pangoro-subxt   = { path = "../pangoro-subxt" }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

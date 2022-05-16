@@ -21,7 +21,7 @@ if [ "${PACKAGE}" == "bridger" ]; then
 fi
 
 if [ "${PACKAGE}" == "all" ]; then 
-  BRIDGES=(darwinia-crab darwinia-ethereum pangolin-pangoro pangolin-rococo pangolin-ropsten pangoro-chapel)
+  BRIDGES=(darwinia-crab darwinia-ethereum pangolin-pangoro pangolin-pangolinparachain pangolin-ropsten pangoro-chapel)
   for BRIDGE in "${BRIDGES[@]}"
   do
     BRIDGE_CARGO_TOML=${WORK_PATH}/bridges/${BRIDGE}/Cargo.toml

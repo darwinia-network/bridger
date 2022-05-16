@@ -34,6 +34,8 @@ FORCE=$1
 
 DOCKER_COMPOSE="docker-compose -f ${BIN_PATH}/docker-compose.yml"
 
+${BIN_PATH}/generate.sh
+
 if [ "${FORCE}" == "force" ]; then
   for FOLDER in $(ls ${DATA_DIR}); do
     if [ "$FOLDER" == "bridger" ]; then
@@ -46,7 +48,5 @@ if [ "${FORCE}" == "force" ]; then
 
   ${BIN_PATH}/initialize.sh
 fi
-
-${BIN_PATH}/generate.sh
 
 ${DOCKER_COMPOSE} up

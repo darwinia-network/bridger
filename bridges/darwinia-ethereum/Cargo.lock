@@ -386,7 +386,7 @@ name = "client-darwinia"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "darwinia-subxt",
+ "component-shadow",
  "parity-scale-codec 3.1.2",
  "secp256k1 0.20.3",
  "serde 1.0.136",
@@ -667,19 +667,6 @@ dependencies = [
  "darling_core",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "darwinia-subxt"
-version = "0.5.5"
-dependencies = [
- "array-bytes",
- "component-shadow",
- "parity-scale-codec 3.1.2",
- "serde 1.0.136",
- "subxt",
- "thiserror",
- "web3",
 ]
 
 [[package]]

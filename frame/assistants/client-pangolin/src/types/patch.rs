@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 #[cfg(feature = "ethlike-v1")]
 use codec::Encode;
-use pangolin_subxt::api::runtime_types::{darwinia_bridge_ethereum, darwinia_relay_primitives};
+use crate::subxt_runtime::api::runtime_types::{darwinia_bridge_ethereum, darwinia_relay_primitives};
 use subxt::DefaultExtra;
 
 use crate::config::PangolinSubxtConfig;

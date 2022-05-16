@@ -32,6 +32,8 @@ export BRIDGER_HOME=${BRIDGER_HOME:-${DATA_DIR}/bridger}
 
 FORCE=$1
 
+DOCKER_COMPOSE="docker-compose -f ${BIN_PATH}/docker-compose.yml"
+
 if [ "${FORCE}" == "force" ]; then
   for FOLDER in $(ls ${DATA_DIR}); do
     if [ "$FOLDER" == "bridger" ]; then
@@ -46,7 +48,5 @@ if [ "${FORCE}" == "force" ]; then
 fi
 
 ${BIN_PATH}/generate.sh
-
-DOCKER_COMPOSE="docker-compose -f ${BIN_PATH}/docker-compose.yml"
 
 ${DOCKER_COMPOSE} up

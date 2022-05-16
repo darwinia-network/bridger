@@ -25,3 +25,5 @@ array-bytes = "1.4"
 serde       = { version = "1", features = ["derive"] }
 codec = { package = "parity-scale-codec", version = "2" }
 subxt        = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
+
+support-toolkit  = { path = "../../../frame/supports/support-toolkit" }

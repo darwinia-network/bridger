@@ -104,11 +104,11 @@ impl Shadow {
         let receipt: EthereumReceiptJson = serde_json::from_value(result)?;
         let header = &receipt.header;
 
-        let (member_leaf_index, last_leaf_index) = (header.number, last - 1);
+        let (member_leaf_index, last_leaf_index) = (header.number, last);
         let proof = self.mmr_proof(member_leaf_index, last_leaf_index).await?;
         let mmr_proof = MMRProofJson {
             member_leaf_index,
-            last_leaf_index,
+            last_leaf_index: last_leaf_index - 1,
             proof,
         };
         Ok(EthereumReceiptWithMMRProof { receipt, mmr_proof })
@@ -160,8 +160,9 @@ impl Shadow {
         tx_number: u64,
         last_leaf: u64,
     ) -> ShadowComponentReuslt<Vec<[u8; 32]>> {
+        tracing::debug!(target: "shadow", "Calculate mmr proof tx_number: {} - last_leaf: {}", tx_number, last_leaf);
         let verified_leaf_position = mmr::leaf_index_to_pos(tx_number);
-        let mmr_size = mmr::leaf_index_to_mmr_size(last_leaf);
+        let mmr_size = mmr::leaf_index_to_mmr_size(last_leaf - 1);
         tracing::trace!(
             target: "shadow",
             "mmr proof verified_leaf_position: {}, mmr_size: {}",
@@ -180,8 +181,11 @@ impl Shadow {
             .collect::<Vec<[u8; 32]>>();
 
         let peaks_positions = self.query_nodes(peak_positions).await?;
-        let peaks = self.extract_peaks(peaks_positions);
-        let mmr_proof = mmr::gen_proof(merkle_proof, peaks, peak_pos_of_leaf_index);
+        let proof_peaks = self.extract_peaks(peaks_positions);
+        proof_peaks
+            .iter()
+            .for_each(|item| tracing::debug!(target: "shadow", "proof_peaks: {}", item.0));
+        let mmr_proof = mmr::gen_proof(merkle_proof, proof_peaks, peak_pos_of_leaf_index);
         Ok(mmr_proof)
     }
 }

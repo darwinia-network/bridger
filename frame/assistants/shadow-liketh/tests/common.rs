@@ -5,12 +5,36 @@ use shadow_liketh::config::ShadowConfig;
 use shadow_liketh::shadow::Shadow;
 use shadow_liketh::types::BridgeName;
 
+pub enum Network {
+    Ropsten,
+    Ethereum,
+}
+
+impl Network {
+    pub fn endpoint(&self) -> &str {
+        match self {
+            Network::Ropsten => "https://shadow-ropsten.darwinia.network",
+            Network::Ethereum => "https://shadow-ethereum.darwinia.network",
+        }
+    }
+
+    pub fn thegraph(&self) -> &str {
+        match self {
+            Network::Ropsten => {
+                "https://api.thegraph.com/subgraphs/name/darwinia-network/ropsten-mmr"
+            }
+            Network::Ethereum => {
+                "https://api.thegraph.com/subgraphs/name/darwinia-network/ethereum-mmr"
+            }
+        }
+    }
+}
+
 /// Get shadow client
-pub fn shadow() -> Shadow {
+pub fn shadow(network: Network) -> Shadow {
     let shadow_config = ShadowConfig {
-        endpoint: "https://shadow.darwinia.network".to_string(),
-        thegraph: "https://api.thegraph.com/subgraphs/name/darwinia-network/ropsten-mmr"
-            .to_string(),
+        endpoint: network.endpoint().to_string(),
+        thegraph: network.thegraph().to_string(),
         timeout: 30,
     };
     let ethereum_config = EthereumConfig::default();

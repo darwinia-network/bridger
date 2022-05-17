@@ -30,8 +30,6 @@ impl AffirmHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "pangolin-ropsten",
-                        chain = "ropsten",
-                        action = "affirm",
                         "[ropsten] [affirm] Failed to init affirm handler. err: {:#?}",
                         err
                     );
@@ -45,7 +43,7 @@ impl AffirmHandler {
         microkv: NamespaceMicroKV,
         sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     ) -> color_eyre::Result<Self> {
-        tracing::info!(target: "pangolin-ropsten", chain = "ropsten", action = "affirm", "SERVICE RESTARTING...");
+        tracing::info!(target: "pangolin-ropsten", "SERVICE RESTARTING...");
         let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
         // Subxt client
@@ -60,7 +58,7 @@ impl AffirmHandler {
         )?;
 
         tracing::info!(
-            target: "pangolin-ropsten", chain = "ropsten", action = "affirm",
+            target: "pangolin-ropsten",
             "[ropsten] [affirm] ✨ SERVICE STARTED: ROPSTEN <> PANGOLIN RELAY"
         );
         Ok(AffirmHandler {

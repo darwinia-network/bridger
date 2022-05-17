@@ -8,5 +8,5 @@ mod runtime;
 mod error;
 mod patch;
 
-#[cfg(feature = "with-shadow")]
+#[cfg(feature = "ethlike-v1")]
 mod x_shadow;

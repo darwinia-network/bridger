@@ -2,6 +2,10 @@ use crate::common::Network;
 
 mod common;
 
+/*
+WARNING: Maybe these test will be panic in future
+ */
+
 #[tokio::test]
 async fn test_mmr_root_with_proof_about_ropsten() {
     let block = 12271421;

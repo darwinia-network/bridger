@@ -3,6 +3,7 @@ use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
+use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
@@ -157,6 +158,7 @@ async fn run_scan(
 
     // the graph
     let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
+    let web3 = Web3Component::component(bridge_config.web3)?;
 
     let handler = AffirmHandler::new(microkv, sender_to_extrinsics).await;
 
@@ -185,9 +187,23 @@ async fn run_scan(
             continue;
         }
 
+        let last_eth_block_number = web3.eth().block_number().await?.as_u64();
+
         // Update affirm target
         for tx in &txs {
             let next_block_number = tx.block_number + 1;
+            // Waiting for some blocks, to offset the reorg risk
+            if last_eth_block_number - next_block_number < 12 {
+                tracing::info!(
+                    target: "darwinia-ethereum",
+                    "[ethereum] [affirm] Waiting for some blocks, to offset the reorg risk",
+                );
+                tokio::time::sleep(std::time::Duration::from_secs(
+                    task_config.interval_ethereum,
+                ))
+                .await;
+                break;
+            }
             handler.update_target(next_block_number)?;
         }
 

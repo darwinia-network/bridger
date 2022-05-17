@@ -3,6 +3,7 @@ use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
+use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
@@ -123,8 +124,6 @@ async fn handle_affirm_relay(
         if let Err(err) = handler.affirm().await {
             tracing::error!(
                 target: "pangolin-ropsten",
-                chain = "ropsten",
-                action = "affirm",
                 "[ropsten] [affirm] affirm err: {:#?}", err
             );
             // TODO: Consider the errors more carefully
@@ -146,8 +145,6 @@ async fn start_scan(
     while let Err(err) = run_scan(&tracker, microkv.clone(), sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "affirm",
             "[ropsten] [affirm] Failed to run scan ropsten transaction. err: {:?}",
             err
         );
@@ -164,6 +161,7 @@ async fn run_scan(
 
     // the graph
     let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
+    let web3 = Web3Component::component(bridge_config.web3)?;
 
     let handler = AffirmHandler::new(microkv, sender_to_extrinsics).await;
 
@@ -173,8 +171,6 @@ async fn run_scan(
 
         tracing::trace!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "affirm",
             "[ropsten] [affirm] Track affirm block: {} and limit: {}",
             from,
             limit
@@ -185,8 +181,6 @@ async fn run_scan(
         if txs.is_empty() {
             tracing::info!(
                 target: "pangolin-ropsten",
-                chain = "ropsten",
-                action = "affirm",
                 "[ropsten] [affirm] Not found any transactions to affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
@@ -196,9 +190,23 @@ async fn run_scan(
             continue;
         }
 
+        let last_eth_block_number = web3.eth().block_number().await?.as_u64();
+
         // Update affirm target
         for tx in &txs {
             let next_block_number = tx.block_number + 1;
+            // Waiting for some blocks, to offset the reorg risk
+            if last_eth_block_number - next_block_number < 20 {
+                tracing::info!(
+                    target: "pangolin-ropsten",
+                    "[ropsten] [affirm] Waiting for some blocks, to offset the reorg risk",
+                );
+                tokio::time::sleep(std::time::Duration::from_secs(
+                    task_config.interval_ethereum,
+                ))
+                .await;
+                break;
+            }
             handler.update_target(next_block_number)?;
         }
 

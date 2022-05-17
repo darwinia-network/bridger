@@ -108,9 +108,9 @@ async fn run_scan(
 
         let mut latest_redeem_block_number = None;
         // send transactions to redeem
-        for tx in &txs {
+        'fortx: for tx in &txs {
             let mut times = 0;
-            loop {
+            'loop_redeem: loop {
                 match handler.redeem(tx.clone()).await {
                     Ok(Some(latest)) => {
                         tracing::trace!(
@@ -120,7 +120,7 @@ async fn run_scan(
                             latest,
                         );
                         latest_redeem_block_number = Some(latest);
-                        break;
+                        break 'loop_redeem;
                     }
                     Ok(None) => {
                         tracing::trace!(
@@ -129,7 +129,7 @@ async fn run_scan(
                             times,
                             latest_redeem_block_number,
                         );
-                        break;
+                        break 'loop_redeem;
                     }
                     Err(e) => {
                         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
@@ -149,7 +149,7 @@ async fn run_scan(
                                 tx,
                                 e,
                             );
-                            break;
+                            break 'fortx;
                         }
                         handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
                     }

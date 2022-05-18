@@ -110,9 +110,19 @@ impl RedeemHandler {
             );
             return Ok(None);
         }
+        tracing::trace!(
+            target: "darwinia-ethereum",
+            "[ethereum] [redeem] Ethereum tx {:?} ({}) all check passed, let's ready to redeem, and last confirmed is {}",
+            tx.tx_hash,
+            tx.block_number,
+            last_confirmed,
+        );
 
         // 2. Do redeem
-        let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
+        let proof = self
+            .shadow
+            .receipt(&tx.tx_hash, tx.block_number + 1)
+            .await?;
 
         let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(

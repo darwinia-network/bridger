@@ -117,12 +117,17 @@ impl RedeemHandler {
         }
         tracing::trace!(
             target: "pangolin-ropsten",
-            "[ropsten] [redeem] Ethereum tx {:?} all check passed, let's ready to redeem",
-            tx.tx_hash
+            "[ropsten] [redeem] Ethereum tx {:?} ({}) all check passed, let's ready to redeem, and last confirmed is {}",
+            tx.tx_hash,
+            tx.block_number,
+            last_confirmed,
         );
 
         // 2. Do redeem
-        let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
+        let proof = self
+            .shadow
+            .receipt(&tx.tx_hash, tx.block_number + 1)
+            .await?;
         tracing::trace!(
             target: "pangolin-ropsten",
             "[ropsten] [redeem] Queried ethereum tx {:?} proof: {:?}",

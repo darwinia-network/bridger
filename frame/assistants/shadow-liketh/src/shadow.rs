@@ -174,17 +174,15 @@ impl Shadow {
             mmr::gen_proof_positions(verified_leaf_position, mmr_size);
 
         let merkle_proof_positions = self.query_nodes(merkle_proof_pos).await?;
-        let merkle_proof = self
+        let mut merkle_proof = self
             .extract_peaks(merkle_proof_positions)
             .iter()
             .map(|item| item.1)
             .collect::<Vec<[u8; 32]>>();
+        merkle_proof.reverse();
 
         let peaks_positions = self.query_nodes(peak_positions).await?;
         let proof_peaks = self.extract_peaks(peaks_positions);
-        proof_peaks
-            .iter()
-            .for_each(|item| tracing::debug!(target: "shadow", "proof_peaks: {}", item.0));
         let mmr_proof = mmr::gen_proof(merkle_proof, proof_peaks, peak_pos_of_leaf_index);
         Ok(mmr_proof)
     }

@@ -193,7 +193,9 @@ async fn run_scan(
         for tx in &txs {
             let next_block_number = tx.block_number + 1;
             // Waiting for some blocks, to offset the reorg risk
-            if last_eth_block_number - next_block_number < 12 {
+            if last_eth_block_number < next_block_number
+                || last_eth_block_number - next_block_number < 20
+            {
                 tracing::info!(
                     target: "darwinia-ethereum",
                     "[ethereum] [affirm] [scan] Waiting for some blocks, to offset the reorg risk",

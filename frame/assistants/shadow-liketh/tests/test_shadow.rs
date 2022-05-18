@@ -33,8 +33,8 @@ async fn test_mmr_root_with_proof_about_ropsten() {
 
 #[tokio::test]
 async fn test_receipt_about_ropsten() {
-    let tx_hash = "0x233c17e001ab9ec0440b9fd4229f52e738ea5c5ce47c7676412d40f41b9383aa";
-    let last = 12276828;
+    let tx_hash = "0xe7bdd43b707f6fd68b928e780ebaca42c0dae89b7032dcc06ec8eb2dbaa80601";
+    let last = 12276878;
     let shadow = common::shadow(Network::Ropsten);
     let receipt = shadow.receipt(tx_hash, last).await.unwrap();
     let mmr_proof = receipt.mmr_proof;

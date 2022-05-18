@@ -124,10 +124,7 @@ impl RedeemHandler {
         );
 
         // 2. Do redeem
-        let proof = self
-            .shadow
-            .receipt(&tx.tx_hash, tx.block_number + 1)
-            .await?;
+        let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
         tracing::trace!(
             target: "pangolin-ropsten",
             "[ropsten] [redeem] Queried ethereum tx {:?} proof: {:?}",

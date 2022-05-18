@@ -119,10 +119,7 @@ impl RedeemHandler {
         );
 
         // 2. Do redeem
-        let proof = self
-            .shadow
-            .receipt(&tx.tx_hash, tx.block_number + 1)
-            .await?;
+        let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
 
         let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(

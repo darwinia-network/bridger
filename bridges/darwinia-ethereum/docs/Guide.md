@@ -31,7 +31,6 @@ darwinia-ethereum
      scan.ethereum.affirm.running true
    ```
 
-
 ### Query state
 
 

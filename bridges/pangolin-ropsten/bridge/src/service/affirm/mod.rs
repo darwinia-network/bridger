@@ -2,13 +2,13 @@ use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
+use thegraph_liketh::component::TheGraphLikeEthComponent;
 
 use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
-use thegraph_liketh::component::TheGraphLikeEthComponent;
 
 use crate::bridge::PangolinRopstenTask;
 use crate::bridge::{PangolinRopstenBus, PangolinRopstenConfig};
@@ -64,7 +64,7 @@ impl Service for AffirmService {
                 {
                     tracing::error!(
                         target: "pangolin-ropsten",
-                        "Failed to handle affirm relay, err: {:?}",
+                        "[ropsten] [affirm] [handle] Failed to handle affirm relay, err: {:?}",
                         e
                     );
                 }
@@ -90,7 +90,7 @@ impl Service for AffirmService {
                         ToRelayMessage::EthereumBlockNumber(block_number) => {
                             tracing::trace!(
                                 target: "pangolin-ropsten",
-                                "Received new ethereum block number to affirm: {}",
+                                "[ropsten] [affirm] [command] Received new ethereum block number to affirm: {}",
                                 block_number
                             );
                             if let Err(e) = handler.update_target(block_number) {
@@ -124,7 +124,7 @@ async fn handle_affirm_relay(
         if let Err(err) = handler.affirm().await {
             tracing::error!(
                 target: "pangolin-ropsten",
-                "[ropsten] [affirm] affirm err: {:#?}", err
+                "[ropsten] [affirm] [handle] affirm err: {:#?}", err
             );
             // TODO: Consider the errors more carefully
             // Maybe a websocket err, so wait 10 secs to reconnect.
@@ -145,7 +145,7 @@ async fn start_scan(
     while let Err(err) = run_scan(&tracker, microkv.clone(), sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "pangolin-ropsten",
-            "[ropsten] [affirm] Failed to run scan ropsten transaction. err: {:?}",
+            "[ropsten] [affirm] [scan] Failed to run scan ropsten transaction. err: {:?}",
             err
         );
     }
@@ -171,7 +171,7 @@ async fn run_scan(
 
         tracing::trace!(
             target: "pangolin-ropsten",
-            "[ropsten] [affirm] Track affirm block: {} and limit: {}",
+            "[ropsten] [affirm] [scan] Track affirm block: {} and limit: {}",
             from,
             limit
         );
@@ -181,7 +181,7 @@ async fn run_scan(
         if txs.is_empty() {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[ropsten] [affirm] Not found any transactions to affirm"
+                "[ropsten] [affirm] [scan] Not found any transactions to affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
@@ -199,7 +199,9 @@ async fn run_scan(
             if last_eth_block_number - next_block_number < 20 {
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "[ropsten] [affirm] Waiting for some blocks, to offset the reorg risk",
+                    "[ropsten] [affirm] [scan] Waiting for some blocks, to offset the reorg risk. the last block is: {}, and will affirm block is: {}",
+                    last_eth_block_number,
+                    next_block_number,
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(
                     task_config.interval_ethereum,

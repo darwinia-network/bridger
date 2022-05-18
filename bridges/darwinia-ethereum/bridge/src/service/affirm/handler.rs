@@ -30,7 +30,7 @@ impl AffirmHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "darwinia-ethereum",
-                        "[ethereum] [affirm] Failed to init affirm handler. err: {:#?}",
+                        "[ethereum] [affirm] [handle] Failed to init affirm handler. err: {:#?}",
                         err
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -59,7 +59,7 @@ impl AffirmHandler {
 
         tracing::info!(
             target: "darwinia-ethereum", chain = "ethereum", action = "affirm",
-            "[ethereum] [affirm] ✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY"
+            "[ethereum] [affirm] [handle] ✨ SERVICE STARTED: ETHEREUM <> DARWINIA RELAY"
         );
         Ok(AffirmHandler {
             microkv,
@@ -78,7 +78,7 @@ impl AffirmHandler {
 
         tracing::info!(
             target: "darwinia-ethereum",
-            "[ethereum] [affirm] The last confirmed ethereum block is {}",
+            "[ethereum] [affirm] [handle] The last confirmed ethereum block is {}",
             last_confirmed
         );
 
@@ -88,7 +88,7 @@ impl AffirmHandler {
         } else {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "[ethereum] [affirm] The last relayed ethereum block is {}",
+                "[ethereum] [affirm] [handle] The last relayed ethereum block is {}",
                 relayed
             );
         }
@@ -96,14 +96,14 @@ impl AffirmHandler {
         if target > relayed {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "[ethereum] [affirm] You are affirming ethereum block {}",
+                "[ethereum] [affirm] [handle] You are affirming ethereum block {}",
                 target
             );
             self.do_affirm(target).await?
         } else {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "[ethereum] [affirm] You do not need to affirm ethereum block {}, because this block is less or equal with relayed {}",
+                "[ethereum] [affirm] [handle] You do not need to affirm ethereum block {}, because this block is less or equal with relayed {}",
                 target,
                 relayed,
             );
@@ -139,7 +139,7 @@ impl AffirmHandler {
             if pending_block_number >= target {
                 tracing::trace!(
                     target: "darwinia-ethereum",
-                    "[ethereum] [affirm] The affirming target block {} is in pending",
+                    "[ethereum] [affirm] [handle] The affirming target block {} is in pending",
                     target
                 );
                 return Ok(());
@@ -152,7 +152,7 @@ impl AffirmHandler {
                 if client_darwinia::helpers::affirmations_contains_block(affirmations, target) {
                     tracing::trace!(
                         target: "darwinia-ethereum",
-                        "[ethereum] [affirm] The affirming target block {} is in the relayer game",
+                        "[ethereum] [affirm] [handle] The affirming target block {} is in the relayer game",
                         target
                     );
                     return Ok(());
@@ -162,7 +162,7 @@ impl AffirmHandler {
 
         tracing::trace!(
             target: "darwinia-ethereum",
-            "[ethereum] [affirm] Prepare to affirm ethereum block: {}",
+            "[ethereum] [affirm] [handle] Prepare to affirm ethereum block: {}",
             target
         );
 
@@ -172,7 +172,7 @@ impl AffirmHandler {
                 if parcel.parent_mmr_root.to_fixed_bytes() == [0u8; 32] {
                     tracing::trace!(
                         target: "darwinia-ethereum",
-                        "[ethereum] [affirm] Shadow service failed to provide parcel for block {}",
+                        "[ethereum] [affirm] [handle] Shadow service failed to provide parcel for block {}",
                         target
                     );
                     return Ok(());

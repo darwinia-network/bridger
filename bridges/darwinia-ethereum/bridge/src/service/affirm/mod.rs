@@ -64,7 +64,7 @@ impl Service for AffirmService {
                 {
                     tracing::error!(
                         target: "darwinia-ethereum",
-                        "Failed to handle affirm relay, err: {:?}",
+                        "[ethereum] [affirm] [handle] Failed to handle affirm relay, err: {:?}",
                         e
                     );
                 }
@@ -90,7 +90,7 @@ impl Service for AffirmService {
                         ToRelayMessage::EthereumBlockNumber(block_number) => {
                             tracing::trace!(
                                 target: "darwinia-ethereum",
-                                "Received new ethereum block number to affirm: {}",
+                                "[ethereum] [affirm] [command] Received new ethereum block number to affirm: {}",
                                 block_number
                             );
                             if let Err(e) = handler.update_target(block_number) {
@@ -142,7 +142,7 @@ async fn start_scan(
     while let Err(err) = run_scan(&tracker, microkv.clone(), sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "darwinia-ethereum",
-            "Failed to run scan ethereum transaction. err: {:?}",
+            "[ethereum] [affirm] [scan] Failed to run scan ethereum transaction. err: {:?}",
             err
         );
     }
@@ -168,7 +168,7 @@ async fn run_scan(
 
         tracing::trace!(
             target: "darwinia-ethereum",
-            "[ethereum] Track affirm block: {} and limit: {}",
+            "[ethereum] [affirm] [scan] Track affirm block: {} and limit: {}",
             from,
             limit
         );
@@ -178,7 +178,7 @@ async fn run_scan(
         if txs.is_empty() {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[ethereum] Not found any transactions to affirm"
+                "[ethereum] [affirm] [scan] Not found any transactions to affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
@@ -196,7 +196,7 @@ async fn run_scan(
             if last_eth_block_number - next_block_number < 12 {
                 tracing::info!(
                     target: "darwinia-ethereum",
-                    "[ethereum] [affirm] Waiting for some blocks, to offset the reorg risk",
+                    "[ethereum] [affirm] [scan] Waiting for some blocks, to offset the reorg risk",
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(
                     task_config.interval_ethereum,

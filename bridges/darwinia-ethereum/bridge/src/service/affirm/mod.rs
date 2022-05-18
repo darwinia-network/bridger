@@ -189,7 +189,7 @@ async fn run_scan(
 
         let last_eth_block_number = web3.eth().block_number().await?.as_u64();
 
-        let mut updated = false;
+        let mut finished_block_number = None;
         // Update affirm target
         for tx in &txs {
             let next_block_number = tx.block_number + 1;
@@ -208,14 +208,13 @@ async fn run_scan(
                 break;
             }
             handler.update_target(next_block_number)?;
-            updated = true;
+            finished_block_number = Some(tx.block_number);
         }
 
-        if !updated {
+        if finished_block_number.is_none() {
             continue;
         }
-        let latest = txs.last().unwrap();
-        tracker.finish(latest.block_number as usize)?;
+        tracker.finish(finished_block_number.unwrap() as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,
         ))

@@ -170,19 +170,30 @@ impl Shadow {
             mmr_size
         );
         // 1. gen positions
-        let (merkle_proof_pos, peak_positions, peak_pos_of_leaf_index) =
+        let (merkle_proof_positions, peak_positions, peak_pos_of_leaf_index) =
             mmr::gen_proof_positions(verified_leaf_position, mmr_size);
 
-        let merkle_proof_positions = self.query_nodes(merkle_proof_pos).await?;
-        let mut merkle_proof = self
-            .extract_peaks(merkle_proof_positions)
+        let mut merkle_proof_nodes = self.query_nodes(merkle_proof_positions.clone()).await?;
+        merkle_proof_nodes.sort_by(|cur, nxt| {
+            merkle_proof_positions
+                .iter()
+                .position(|r| cur.position == *r)
+                .expect("Unreachable")
+                .cmp(
+                    &merkle_proof_positions
+                        .iter()
+                        .position(|r| nxt.position == *r)
+                        .expect("Unreachable"),
+                )
+        });
+        let merkle_proof = self
+            .extract_peaks(merkle_proof_nodes)
             .iter()
             .map(|item| item.1)
             .collect::<Vec<[u8; 32]>>();
-        merkle_proof.reverse();
 
-        let peaks_positions = self.query_nodes(peak_positions).await?;
-        let proof_peaks = self.extract_peaks(peaks_positions);
+        let peaks_nodes = self.query_nodes(peak_positions).await?;
+        let proof_peaks = self.extract_peaks(peaks_nodes);
         let mmr_proof = mmr::gen_proof(merkle_proof, proof_peaks, peak_pos_of_leaf_index);
         Ok(mmr_proof)
     }

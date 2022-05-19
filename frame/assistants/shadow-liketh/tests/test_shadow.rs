@@ -33,7 +33,7 @@ async fn test_mmr_root_with_proof_about_ropsten() {
 
 #[tokio::test]
 async fn test_receipt_about_ropsten() {
-    let tx_hash = "0xd52d63494a18feb8a218e57d892dc0b0050e06ec40ca4e83c45f52af4ceb8af0";
+    let tx_hash = "0xe9f348a0e02e3be414d692a541240d544c19c3595f6497c349def15e10c86365";
     // let tx_hash = "0x1df2f90123e4ab59cf0c99961c13b5ff4d7b702157bde928b9974068bca7f40a";
     let last = 12277086;
     let shadow = common::shadow(Network::Ropsten);
@@ -123,4 +123,17 @@ async fn test_receipt_about_ethereum() {
         let hex = array_bytes::bytes2hex("", item);
         println!("{}", hex);
     }
+}
+
+#[test]
+fn test_sort_by_refs() {
+    let arr0 = [1, 2, 6, 7, 8, 9, 3, 4, 5, 0];
+    let mut arr1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    arr1.sort_by(|a, b| {
+        arr0.iter()
+            .position(|r| r == a)
+            .unwrap()
+            .cmp(&arr0.iter().position(|r| r == b).unwrap())
+    });
+    assert_eq!(arr0, arr1);
 }

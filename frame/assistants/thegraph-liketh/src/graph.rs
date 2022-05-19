@@ -26,7 +26,7 @@ impl TheGraphLikeEth {
         query TransactionPage($from: Int!, $first: Int!) {
           transactionEntities(
             where: {
-              blockNumber_gt: $from
+              blockNumber_gte: $from
             }
             first: $first
             orderBy: blockNumber

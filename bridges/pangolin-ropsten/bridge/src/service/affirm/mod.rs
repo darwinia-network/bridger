@@ -167,7 +167,7 @@ async fn run_scan(
 
     loop {
         let from = tracker.current().await?;
-        let limit = 10usize;
+        let limit = 30usize;
 
         tracing::trace!(
             target: "pangolin-ropsten",

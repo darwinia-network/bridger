@@ -51,6 +51,7 @@ impl Service for RococoToPangolinParaHeaderRelayService {
 struct HeaderRelay {
     client_pangolin: PangolinClient,
     client_rococo: RococoClient,
+    para_id: u32,
 }
 
 impl HeaderRelay {
@@ -69,6 +70,7 @@ impl HeaderRelay {
         Ok(Self {
             client_pangolin,
             client_rococo,
+            para_id: bridge_config.pangolin_parachain.para_id.expect("ParaId not found"),
         })
     }
 }
@@ -125,7 +127,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .storage()
         .bridge_rococo_parachains()
         .best_para_heads(
-            pangolin_runtime_types::bp_polkadot_core::parachains::ParaId(2105),
+            pangolin_runtime_types::bp_polkadot_core::parachains::ParaId(header_relay.para_id),
             Some(best_target_header.hash()),
         )
         .await?;
@@ -163,7 +165,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .storage()
         .paras()
         .heads(
-            rococo_runtime_types::polkadot_parachain::primitives::Id(2105),
+            rococo_runtime_types::polkadot_parachain::primitives::Id(header_relay.para_id),
             Some(best_finalized_source_block_hash),
         )
         .await?;
@@ -209,7 +211,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             .read_proof(
                 vec![bp_parachains::parachain_head_storage_key_at_source(
                     "Paras",
-                    2105.into(),
+                    header_relay.para_id.into(),
                 )],
                 Some(best_finalized_source_block_hash),
             )
@@ -225,7 +227,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             .bridge_rococo_parachains()
             .submit_parachain_heads(
                 best_finalized_source_block_hash,
-                vec![pangolin_runtime_types::bp_polkadot_core::parachains::ParaId(2105)],
+                vec![pangolin_runtime_types::bp_polkadot_core::parachains::ParaId(header_relay.para_id)],
                 heads_proofs
                     .proof
                     .into_iter()

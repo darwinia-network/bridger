@@ -189,32 +189,26 @@ async fn run_scan(
 
         let last_eth_block_number = web3.eth().block_number().await?.as_u64();
 
-        let mut finished_block_number = None;
-        // Update affirm target
-        for tx in &txs {
-            let next_block_number = tx.block_number + 1;
-            // Waiting for some blocks, to offset the reorg risk
-            if last_eth_block_number < next_block_number
-                || last_eth_block_number - next_block_number < 12
-            {
-                tracing::info!(
-                    target: "darwinia-ethereum",
-                    "[ethereum] [affirm] [scan] Waiting for some blocks, to offset the reorg risk",
-                );
-                tokio::time::sleep(std::time::Duration::from_secs(
-                    task_config.interval_ethereum,
-                ))
-                .await;
-                break;
-            }
-            handler.update_target(next_block_number)?;
-            finished_block_number = Some(tx.block_number);
-        }
+        let latest = txs.last().unwrap();
+        let next_block_number = latest.block_number + 1;
 
-        if finished_block_number.is_none() {
+        // Waiting for some blocks, to offset the reorg risk
+        if last_eth_block_number < next_block_number
+            || last_eth_block_number - next_block_number < 12
+        {
+            tracing::info!(
+                target: "darwinia-ethereum",
+                "[ethereum] [affirm] [scan] Waiting for some blocks, to offset the reorg risk",
+            );
+            tokio::time::sleep(std::time::Duration::from_secs(
+                task_config.interval_ethereum,
+            ))
+            .await;
             continue;
         }
-        tracker.finish(finished_block_number.unwrap() as usize)?;
+
+        handler.update_target(next_block_number)?;
+        tracker.finish(latest.block_number as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,
         ))

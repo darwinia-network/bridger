@@ -40,5 +40,6 @@ component-ethereum = { path = "../../components/ethereum" }
 support-mmr        = { path = "../../supports/support-mmr" }
 
 [dev-dependencies]
-tokio = { version = "1", features = ["full"] }
+tokio       = { version = "1", features = ["full"] }
 array-bytes = "1.4"
+cmmr         = { version = "0.3", package = "ckb-merkle-mountain-range"}

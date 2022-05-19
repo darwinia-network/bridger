@@ -33,8 +33,9 @@ async fn test_mmr_root_with_proof_about_ropsten() {
 
 #[tokio::test]
 async fn test_receipt_about_ropsten() {
-    let tx_hash = "0xe7bdd43b707f6fd68b928e780ebaca42c0dae89b7032dcc06ec8eb2dbaa80601";
-    let last = 12276878;
+    let tx_hash = "0xd52d63494a18feb8a218e57d892dc0b0050e06ec40ca4e83c45f52af4ceb8af0";
+    // let tx_hash = "0x1df2f90123e4ab59cf0c99961c13b5ff4d7b702157bde928b9974068bca7f40a";
+    let last = 12277086;
     let shadow = common::shadow(Network::Ropsten);
     let receipt = shadow.receipt(tx_hash, last).await.unwrap();
     let mmr_proof = receipt.mmr_proof;
@@ -44,9 +45,39 @@ async fn test_receipt_about_ropsten() {
         "MMR PROOF FOR MEMBER_LEAF_INDEX: {} AND LEAST_LEAF_INDEX: {}",
         mmr_proof.member_leaf_index, mmr_proof.last_leaf_index,
     );
-    for item in mmr_proof.proof {
+    for item in &mmr_proof.proof {
         let hex = array_bytes::bytes2hex("", item);
         println!("{}", hex);
+    }
+
+    let mmr_root = shadow.mmr_root(last - 1).await.unwrap();
+    let verified_leaf_position = support_mmr::mmr::leaf_index_to_pos(receipt.receipt.header.number);
+    let mmr_size = support_mmr::mmr::leaf_index_to_mmr_size(last - 1);
+    let proof = cmmr::MerkleProof::<[u8; 32], MergeHash>::new(mmr_size, mmr_proof.proof);
+
+    let nodes = shadow
+        .query_nodes(vec![verified_leaf_position])
+        .await
+        .unwrap();
+    for item in nodes {
+        let check_hash = item.hash;
+        let result = proof
+            .verify(mmr_root, vec![(verified_leaf_position, check_hash)])
+            .unwrap();
+        println!(
+            "check: [{}], {}",
+            array_bytes::bytes2hex("", check_hash),
+            result,
+        );
+    }
+}
+
+struct MergeHash;
+
+impl cmmr::Merge for MergeHash {
+    type Item = [u8; 32];
+    fn merge(lhs: &Self::Item, rhs: &Self::Item) -> Self::Item {
+        support_mmr::mmr::merge(lhs, rhs)
     }
 }
 

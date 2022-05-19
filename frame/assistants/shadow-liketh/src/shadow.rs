@@ -123,7 +123,7 @@ impl Shadow {
             .collect::<Vec<(u64, [u8; 32])>>()
     }
 
-    async fn query_nodes(&self, positions: Vec<u64>) -> ShadowComponentReuslt<Vec<MMRNode>> {
+    pub async fn query_nodes(&self, positions: Vec<u64>) -> ShadowComponentReuslt<Vec<MMRNode>> {
         let query = self.read_graphql("mmr_position.query.graphql")?;
 
         let vars = QueryPositionVars { positions };

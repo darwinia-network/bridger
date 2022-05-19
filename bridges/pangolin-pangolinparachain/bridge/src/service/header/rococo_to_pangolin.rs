@@ -91,7 +91,7 @@ async fn start() -> color_eyre::Result<()> {
     let mut header_relay = HeaderRelay::new().await?;
     loop {
         match run(&header_relay).await {
-            Ok(_) => continue,
+            Ok(_) => {},
             Err(err) => {
                 if let Some(subxt::BasicError::Rpc(request_error)) =
                     err.downcast_ref::<subxt::BasicError>()
@@ -101,7 +101,6 @@ async fn start() -> color_eyre::Result<()> {
                         "[header-rococo-to-pangolin] Connection Error. Try to resend later: {:?}",
                         &request_error
                     );
-                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     header_relay = HeaderRelay::new().await?;
                 }
                 tracing::error!(
@@ -111,15 +110,11 @@ async fn start() -> color_eyre::Result<()> {
                 );
             }
         }
+        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
     }
 }
 
 async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
-    tracing::info!(
-        target: "pangolin-pangolinparachain",
-        "[header-relay-rococo-to-pangolin] SERVICE RESTARTING..."
-    );
-
     let last_relayed_rococo_hash_in_pangolin = header_relay
         .client_pangolin
         .runtime()

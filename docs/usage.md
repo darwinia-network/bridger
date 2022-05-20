@@ -6,7 +6,7 @@ Darwinia bridger
 The bridger program will read some environments.
 
 | Name             | Description                                                                                                                       |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+|------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | `BRIDGER_HOME`   | All data of bridger and bridges will be store in this path. If not set this value, the default will be store in `$HOME/.bridger`. |
 | `LOG_ADAPTER`    | Custom log adapter, you can use `json` value. after do this, all logs will output use json format.                                |
 | `LOG_MAX_LEVEL`  | Max log level, default is `trace`                                                                                                 |

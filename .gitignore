@@ -4,8 +4,10 @@ target
 
 /Cargo.lock
 
-scripts/*.local.sh
 scripts/logs
+scripts/*.local.sh
+scripts/**/*.local.sh
+scripts/**/package-lock.json
 
 thegraph/**/package-lock.json
 thegraph/**/yarn.lock

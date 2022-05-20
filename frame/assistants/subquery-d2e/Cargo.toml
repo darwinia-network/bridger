@@ -29,4 +29,4 @@ async-trait = "0.1"
 strum       = { version = "0.21", features = ["derive"] }
 hex         = "0.4"
 
-gql_client = { git = "https://github.com/fewensa/gql-client-rs.git", branch = "master" }
+gql_client = "1"

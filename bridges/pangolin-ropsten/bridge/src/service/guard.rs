@@ -6,12 +6,12 @@ use tokio::time::sleep;
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
-use component_ethereum::errors::BizError;
-use component_shadow::component::ShadowComponent;
-use component_shadow::shadow::Shadow;
 use component_state::state::BridgeState;
 use lifeline::dyn_bus::DynBus;
 use microkv::namespace::NamespaceMicroKV;
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::shadow::Shadow;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
@@ -91,6 +91,7 @@ async fn run(
         bridge_config.shadow,
         bridge_config.ethereum,
         bridge_config.web3,
+        BridgeName::PangolinRopsten,
     )?;
 
     tracing::info!(
@@ -154,7 +155,7 @@ impl GuardService {
                 continue;
             }
 
-            match shadow.parcel(pending_block_number as usize).await {
+            match shadow.parcel(pending_block_number).await {
                 Ok(parcel_from_shadow) => {
                     let parcel_from_shadow: EthereumRelayHeaderParcel =
                         parcel_from_shadow.try_into()?;
@@ -166,18 +167,19 @@ impl GuardService {
                     extrinsics.push(ex);
                 }
                 Err(err) => {
-                    if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
-                        err.downcast_ref::<BizError>()
-                    {
-                        tracing::warn!(
-                            target: "pangolin-ropsten",
-                            "[pangolin] [guard] The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
-                            block,
-                            msg
-                        );
-                        return Ok(extrinsics);
-                    }
-                    return Err(err);
+                    // todo: the ethereum component not return color error
+                    // if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
+                    //     err.downcast_ref::<BizError>()
+                    // {
+                    //     tracing::warn!(
+                    //         target: "pangolin-ropsten",
+                    //         "[pangolin] [guard] The parcel of ethereum block {} from Shadow service is blank, the err msg is {}",
+                    //         block,
+                    //         msg
+                    //     );
+                    //     return Ok(extrinsics);
+                    // }
+                    return Err(err.into());
                 }
             }
         }

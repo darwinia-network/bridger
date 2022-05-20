@@ -25,7 +25,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         if event.is_none() {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] Not have more ScheduleMMRRootEvent"
+                "[darwinia] [schedule-mmr-root] Not have more ScheduleMMRRootEvent"
             );
             return Ok(());
         }
@@ -33,19 +33,27 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         if latest.emitted == 1 {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. not need to do this.",
+                "[darwinia] [schedule-mmr-root] The latest ScheduleMMRRootEvent is emitted. event block is: {} and at block: {}. nothing to do.",
                 latest.event_block_number,
                 latest.at_block_number
             );
             return Ok(());
-        } else {
+        }
+        if latest.outdated == 1 {
             tracing::info!(
-                target: "darwinia-ethereum",
-                "[darwinia] Queried latest ScheduleMMRRootEvent event block is: {} and at block: {}",
+                target: "pangolin-ropsten",
+                "[darwinia] [schedule-mmr-root] The latest ScheduleMMRRootEvent is outdated. event block is: {} and at block: {}. nothing to do.",
                 latest.event_block_number,
                 latest.at_block_number
             );
+            return Ok(());
         }
+        tracing::info!(
+            target: "darwinia-ethereum",
+            "[darwinia] [schedule-mmr-root] Queried latest ScheduleMMRRootEvent event block is: {} and at block: {}",
+            latest.event_block_number,
+            latest.at_block_number
+        );
 
         let event_block_number = latest.event_block_number;
 
@@ -61,7 +69,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
             None => {
                 tracing::warn!(
                     target: "darwinia-ethereum",
-                    "[darwinia] Can not get last block header by finalized block hash: {}",
+                    "[darwinia] [schedule-mmr-root] Can not get last block header by finalized block hash: {}",
                     finalized_block_hash
                 );
                 return Ok(());
@@ -71,7 +79,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         if finalized_block_header_number < event_block_number {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] The finalized block number ({}) less than event block number ({}). do nothing.",
+                "[darwinia] [schedule-mmr-root] The finalized block number ({}) less than event block number ({}). do nothing.",
                 finalized_block_header_number,
                 event_block_number
             );
@@ -82,7 +90,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         if Some(event_block_number) == saved_latest {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] This event block number ({}) is already submitted. Don't submit again.",
+                "[darwinia] [schedule-mmr-root] This event block number ({}) is already submitted. Don't submit again.",
                 event_block_number
             );
             return Ok(());
@@ -99,7 +107,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
         {
             tracing::warn!(
                 target: "darwinia-ethereum",
-                "[darwinia] Don't need to sign mmr root for this event block: {} and at block: {}",
+                "[darwinia] [schedule-mmr-root] Don't need to sign mmr root for this event block: {} and at block: {}",
                 latest.event_block_number,
                 latest.at_block_number
             );
@@ -108,7 +116,7 @@ impl<'a> ScanScheduleMMRRootEvent<'a> {
 
         tracing::info!(
             target: "darwinia-ethereum",
-            "[darwinia] Send sign mmr root for event block: {} and at block: {}",
+            "[darwinia] [schedule-mmr-root] Send sign mmr root for event block: {} and at block: {}",
             latest.event_block_number,
             latest.at_block_number
         );

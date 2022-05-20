@@ -1,9 +1,10 @@
-use colored::Colorize;
-
 use client_darwinia::component::DarwiniaClientComponent;
 use client_darwinia::types::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use colored::Colorize;
+
 use component_ethereum::errors::BizError;
-use component_shadow::component::ShadowComponent;
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_terminal::output;
@@ -24,10 +25,15 @@ pub async fn handle_affirm(opts: AffirmOpts) -> color_eyre::Result<()> {
 
 async fn handle_do(
     mode: AffirmMode,
-    block: Option<u64>,
+    block: Option<u32>,
     _raw_json: Option<String>,
 ) -> color_eyre::Result<()> {
     let bridge_config: DarwiniaEthereumConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
+
+    let config_darwinia = bridge_config.darwinia;
+
+    // Darwinia client
+    let client = DarwiniaClientComponent::component(config_darwinia.clone()).await?;
 
     let parcel: EthereumRelayHeaderParcel = match mode {
         AffirmMode::Block => {
@@ -39,8 +45,10 @@ async fn handle_do(
                 bridge_config.shadow,
                 bridge_config.ethereum,
                 bridge_config.web3,
+                BridgeName::DarwiniaEthereum,
             )?;
-            shadow.parcel(block as usize + 1).await?.try_into()?
+            let expected_block = block + 1;
+            shadow.parcel(expected_block as u64).await?.try_into()?
         }
         AffirmMode::Raw => {
             // let json = raw_json.ok_or_else(|| {
@@ -51,11 +59,6 @@ async fn handle_do(
             return Err(BridgerError::Custom("Not support this feature now".to_string()).into());
         }
     };
-
-    let config_darwinia = bridge_config.darwinia;
-
-    // Darwinia client
-    let client = DarwiniaClientComponent::component(config_darwinia.clone()).await?;
 
     match mode {
         AffirmMode::Block => {

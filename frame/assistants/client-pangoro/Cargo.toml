@@ -32,6 +32,8 @@ secp256k1   = { version = "0.20", features = ["recovery"] }
 subxt = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 web3 = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }
 
+support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
+
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 

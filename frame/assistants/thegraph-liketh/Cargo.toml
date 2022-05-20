@@ -1,0 +1,29 @@
+[package]
+name = "thegraph-liketh"
+version = "0.5.5"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://rust-docs.darwinia.network/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2021"
+
+[dependencies]
+tracing     = "0.1"
+thiserror   = "1.0"
+include_dir = "0.7.2"
+
+serde       = { version = "1.0", features = ["derive"] }
+serde-aux   = "0.6"
+async-trait = "0.1"
+
+gql_client = "1"

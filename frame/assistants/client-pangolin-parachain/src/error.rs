@@ -1,5 +1,6 @@
 #![allow(missing_docs)]
 
+use support_toolkit::error::TkError;
 use thiserror::Error as ThisError;
 
 pub type ClientResult<T> = Result<T, ClientError>;
@@ -15,6 +16,9 @@ pub enum ClientError {
 
     #[error("Wrong seed: {0}")]
     Seed(String),
+
+    #[error(transparent)]
+    Tk(#[from] TkError),
 
     #[error("Other error: {0}")]
     Other(String),

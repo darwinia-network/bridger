@@ -1,5 +1,6 @@
 #![allow(missing_docs)]
 
+use support_toolkit::error::TkError;
 use thiserror::Error as ThisError;
 
 pub type ClientResult<T> = Result<T, ClientError>;
@@ -30,9 +31,11 @@ pub enum ClientError {
     #[error("Serde json error: {0}")]
     Serialization(#[from] serde_json::error::Error),
 
+    #[cfg(feature = "ethlike-v1")]
     #[error("Failed to build SecretKey from authority's private key")]
     FailedToBuildSecretKey(#[from] secp256k1::Error),
 
+    #[cfg(feature = "ethlike-v1")]
     #[error("Failed to connect ethereum rpc http endpoint")]
     CannotConnectToWeb3(#[from] web3::Error),
 
@@ -59,6 +62,9 @@ pub enum ClientError {
 
     #[error("Not technical committee member")]
     NotTechnicalCommitteeMember,
+
+    #[error(transparent)]
+    Tk(#[from] TkError),
 }
 
 impl ClientError {

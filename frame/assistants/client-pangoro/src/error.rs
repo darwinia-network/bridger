@@ -1,5 +1,6 @@
 #![allow(missing_docs)]
 
+use support_toolkit::error::TkError;
 use thiserror::Error as ThisError;
 
 pub type ClientResult<T> = Result<T, ClientError>;
@@ -56,4 +57,7 @@ pub enum ClientError {
 
     #[error("Not technical committee member")]
     NotTechnicalCommitteeMember,
+
+    #[error(transparent)]
+    Tk(#[from] TkError),
 }

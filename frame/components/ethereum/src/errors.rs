@@ -31,7 +31,7 @@ pub enum BizError {
     AffirmingBlockInGame(u64),
 
     #[error("Shadow service failed to provide parcel for block {0}")]
-    ParcelFromShadowIsEmpty(u64),
+    ParcelFromShadowIsEmpty(u32),
 
     #[error("Mmr root for ethereum block {0} may be not filled yet, the error from shadow: {1}")]
     BlankEthereumMmrRoot(usize, String),

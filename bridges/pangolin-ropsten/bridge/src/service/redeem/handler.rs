@@ -1,22 +1,21 @@
-use std::sync::Arc;
-
 use lifeline::Sender;
 use postage::broadcast;
 
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
-use component_shadow::component::ShadowComponent;
-use component_shadow::shadow::Shadow;
-use component_thegraph_liketh::types::TransactionEntity;
+use shadow_liketh::component::ShadowComponent;
+use shadow_liketh::shadow::Shadow;
+use shadow_liketh::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
+use thegraph_liketh::types::TransactionEntity;
 
 use crate::bridge::{Extrinsic, PangolinRopstenConfig, ToExtrinsicsMessage};
 
 pub struct RedeemHandler {
     sender_to_extrinsics: broadcast::Sender<ToExtrinsicsMessage>,
     client: PangolinClient,
-    shadow: Arc<Shadow>,
+    shadow: Shadow,
 }
 
 impl RedeemHandler {
@@ -29,7 +28,7 @@ impl RedeemHandler {
                 Err(err) => {
                     tracing::error!(
                         target: "pangolin-ropsten",
-                        "[ropsten] Failed to create redeem handler, times: [{}] err: {:#?}",
+                        "[ropsten] [redeem] Failed to create redeem handler, times: [{}] err: {:#?}",
                         times,
                         err
                     );
@@ -54,8 +53,8 @@ impl RedeemHandler {
             bridge_config.shadow,
             bridge_config.ethereum,
             bridge_config.web3,
+            BridgeName::PangolinRopsten,
         )?;
-        let shadow = Arc::new(shadow);
 
         tracing::info!(
             target: "pangolin-ropsten",
@@ -73,15 +72,13 @@ impl RedeemHandler {
     pub async fn redeem(&mut self, tx: TransactionEntity) -> color_eyre::Result<Option<u64>> {
         tracing::trace!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] Try to redeem ethereum tx {:?}... in block {}",
             tx.tx_hash,
             tx.block_number
         );
 
         // 1. Checking before redeem
-        let tx_hash = array_bytes::hex2bytes(&tx.block_hash).map_err(|_e| {
+        let block_hash = array_bytes::hex2bytes(&tx.block_hash).map_err(|_e| {
             BridgerError::Hex(format!(
                 "Failed to convert hex({}) to bytes.",
                 &tx.block_hash
@@ -91,25 +88,26 @@ impl RedeemHandler {
         if self
             .client
             .ethereum()
-            .is_verified(&tx_hash, tx_index)
+            .is_verified(&block_hash, tx_index)
             .await?
         {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                chain = "ropsten",
-                action = "redeem",
                 "[ropsten] [redeem] Ethereum tx {:?} redeemed",
                 tx.tx_hash
             );
             return Ok(Some(tx.block_number));
         }
+        tracing::trace!(
+            target: "pangolin-ropsten",
+            "[ropsten] [redeem] Ethereum tx {:?} is not verified, will be redeem",
+            tx.tx_hash
+        );
 
         let last_confirmed = self.client.ethereum().last_confirmed().await?;
         if tx.block_number >= last_confirmed {
             tracing::trace!(
                 target: "pangolin-ropsten",
-                chain = "ropsten",
-                action = "redeem",
                 "[ropsten] [redeem] Ethereum tx {:?}'s block {} is large than last confirmed block {}",
                 tx.tx_hash,
                 tx.block_number,
@@ -117,15 +115,26 @@ impl RedeemHandler {
             );
             return Ok(None);
         }
+        tracing::trace!(
+            target: "pangolin-ropsten",
+            "[ropsten] [redeem] Ethereum tx {:?} ({}) all check passed, let's ready to redeem, and last confirmed is {}",
+            tx.tx_hash,
+            tx.block_number,
+            last_confirmed,
+        );
 
         // 2. Do redeem
         let proof = self.shadow.receipt(&tx.tx_hash, last_confirmed).await?;
+        tracing::trace!(
+            target: "pangolin-ropsten",
+            "[ropsten] [redeem] Queried ethereum tx {:?} proof: {:?}",
+            tx.tx_hash,
+            proof,
+        );
 
         let ex = Extrinsic::Redeem(proof.try_into()?, tx.clone());
         tracing::info!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] Redeem extrinsic send to extrinsics service: {:?}. at ropsten block: {}",
             ex,
             tx.block_number

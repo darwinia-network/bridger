@@ -1,0 +1,15 @@
+query LastTransaction {
+  transactionEntities(
+    first: 1
+    orderBy: blockNumber
+    orderDirection: desc
+  ) {
+    id
+    origin
+    blockNumber
+    blockHash
+    txHash
+    txIndex
+    txType
+  }
+}

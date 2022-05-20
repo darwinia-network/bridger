@@ -28,10 +28,10 @@ relayer_beneficiary_darwinia_account = "0x..."
 # listen to set authorities
 subscribe_relay_address = "0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49"
 
-
 [shadow]
 # The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS. For example using the official service:
-endpoint = "https://shadow.darwinia.network"
+endpoint = "https://shadow-ethereum.darwinia.network"
+thegraph = "https://api.thegraph.com/subgraphs/name/darwinia-network/ethereum-mmr"
 
 [task]
 interval_ethereum = 120

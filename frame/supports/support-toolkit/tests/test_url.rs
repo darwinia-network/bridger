@@ -1,0 +1,19 @@
+#[test]
+fn test_corrent_endpoint() {
+    assert_eq!(
+        support_toolkit::url::correct_endpoint("http://pangolin-rpc.darwinia.network").unwrap(),
+        "http://pangolin-rpc.darwinia.network:80"
+    );
+    assert_eq!(
+        support_toolkit::url::correct_endpoint("https://pangolin-rpc.darwinia.network").unwrap(),
+        "https://pangolin-rpc.darwinia.network:443"
+    );
+    assert_eq!(
+        support_toolkit::url::correct_endpoint("ws://pangolin-rpc.darwinia.network").unwrap(),
+        "ws://pangolin-rpc.darwinia.network:80"
+    );
+    assert_eq!(
+        support_toolkit::url::correct_endpoint("wss://pangolin-rpc.darwinia.network").unwrap(),
+        "wss://pangolin-rpc.darwinia.network:443"
+    );
+}

@@ -1,9 +1,10 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Service, Task};
 use postage::broadcast;
+use thegraph_liketh::component::TheGraphLikeEthComponent;
+use thegraph_liketh::types::LikethChain;
 
 use component_state::state::BridgeState;
-use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
@@ -56,8 +57,6 @@ async fn start_scan(
     while let Err(err) = run_scan(&tracker, sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] redeem err {:?}",
             err
         );
@@ -75,7 +74,8 @@ async fn run_scan(
     let task_config: TaskConfig = bridge_config.task;
 
     // the graph
-    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
+    let thegraph_liketh =
+        TheGraphLikeEthComponent::component(bridge_config.thegraph, LikethChain::Ropsten)?;
 
     let mut handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
     loop {
@@ -84,18 +84,16 @@ async fn run_scan(
 
         tracing::trace!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] Track redeem block: {} and limit: {}",
             from,
             limit
         );
         let txs = thegraph_liketh
-            .query_transactions(from as u64, limit as u32)
+            .query_transactions(from as u64, limit as u32, true)
             .await?;
         if txs.is_empty() {
             tracing::info!(
-                target: "pangolin-ropsten", chain = "ropsten", action = "redeem",
+                target: "pangolin-ropsten",
                 "[ropsten] [redeem] Not found any transactions to redeem"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
@@ -106,55 +104,54 @@ async fn run_scan(
         }
         tracing::debug!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] Found {} transactions wait to redeem",
             txs.len()
         );
 
         let mut latest_redeem_block_number = None;
         // send transactions to redeem
-        for tx in &txs {
+        'for_tx: for tx in &txs {
             let mut times = 0;
-            loop {
+            'loop_redeem: loop {
                 match handler.redeem(tx.clone()).await {
                     Ok(Some(latest)) => {
                         tracing::trace!(
                             target: "pangolin-ropsten",
-                            chain = "ropsten",
-                            action = "redeem",
                             "[ropsten] [redeem] [{}] Change latest redeemed block number to: {}",
                             times,
                             latest,
                         );
                         latest_redeem_block_number = Some(latest);
-                        break;
+                        break 'loop_redeem;
                     }
                     Ok(None) => {
                         tracing::trace!(
                             target: "pangolin-ropsten",
-                            chain = "ropsten",
-                            action = "redeem",
                             "[ropsten] [redeem] [{}] Latest redeemed block number is: {:?}",
                             times,
                             latest_redeem_block_number,
                         );
-                        break;
+                        break 'for_tx;
                     }
                     Err(e) => {
-                        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                        tracing::warn!(
+                            target: "pangolin-ropsten",
+                            "[ropsten] [redeem] [{}] Redeem failed will be try again. tx: {:?}, err: {:?} ",
+                            times,
+                            tx,
+                            e,
+                        );
                         times += 1;
                         if times > 10 {
                             tracing::error!(
                                 target: "pangolin-ropsten",
-                                chain = "ropsten",
-                                action = "redeem",
                                 "[ropsten] [redeem] [{}] Failed to send redeem message. tx: {:?}, err: {:?}",
                                 times,
                                 tx,
                                 e,
                             );
-                            break;
+                            break 'for_tx;
                         }
                         handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
                     }
@@ -165,8 +162,6 @@ async fn run_scan(
         if latest_redeem_block_number.is_none() {
             tracing::warn!(
                 target: "pangolin-ropsten",
-                chain = "ropsten",
-                action = "redeem",
                 "[ropsten] [redeem] Not have any block redeemed. please wait affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
@@ -179,8 +174,6 @@ async fn run_scan(
         let latest = latest_redeem_block_number.unwrap();
         tracing::info!(
             target: "pangolin-ropsten",
-            chain = "ropsten",
-            action = "redeem",
             "[ropsten] [redeem] Set scan redeem block number to: {}",
             latest
         );

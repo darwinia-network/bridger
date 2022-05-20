@@ -17,5 +17,17 @@ the same. There are mapping table to describe relationship.
 | Darwinia | EthereumRelayerGame      | Instance1DarwiniaRelayerGame      |
 | Darwinia | EthereumRelayAuthorities | Instance1DarwiniaRelayAuthorities |
 
+WARNING:
+For [subxt@darwinia-v0.12.2](https://github.com/darwinia-network/subxt/tree/darwinia-v0.12.2)
+have a bug, whe the argument is a tuple, only first parameter is used.
 
+Please note the following storage keys
+
+- EthereumBacking::VerifiedProof
+
+Currently, these chains use this version
+
+- pangolin
+- pangoro
+- pangolin-parachain
 

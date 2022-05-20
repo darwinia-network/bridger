@@ -6,5 +6,5 @@ use structopt::StructOpt;
 pub struct ParcelOpts {
     /// block
     #[structopt(long)]
-    pub block: u64,
+    pub block: u32,
 }

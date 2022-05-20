@@ -3,11 +3,13 @@ use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
+use component_ethereum::web3::Web3Component;
 use component_state::state::BridgeState;
-use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
+use thegraph_liketh::component::TheGraphLikeEthComponent;
+use thegraph_liketh::types::LikethChain;
 
 use crate::bridge::DarwiniaEthereumBus;
 use crate::bridge::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
@@ -63,7 +65,7 @@ impl Service for AffirmService {
                 {
                     tracing::error!(
                         target: "darwinia-ethereum",
-                        "Failed to handle affirm relay, err: {:?}",
+                        "[ethereum] [affirm] [handle] Failed to handle affirm relay, err: {:?}",
                         e
                     );
                 }
@@ -89,7 +91,7 @@ impl Service for AffirmService {
                         ToRelayMessage::EthereumBlockNumber(block_number) => {
                             tracing::trace!(
                                 target: "darwinia-ethereum",
-                                "Received new ethereum block number to affirm: {}",
+                                "[ethereum] [affirm] [command] Received new ethereum block number to affirm: {}",
                                 block_number
                             );
                             if let Err(e) = handler.update_target(block_number) {
@@ -141,7 +143,7 @@ async fn start_scan(
     while let Err(err) = run_scan(&tracker, microkv.clone(), sender_to_extrinsics.clone()).await {
         tracing::error!(
             target: "darwinia-ethereum",
-            "Failed to run scan ethereum transaction. err: {:?}",
+            "[ethereum] [affirm] [scan] Failed to run scan ethereum transaction. err: {:?}",
             err
         );
     }
@@ -156,7 +158,9 @@ async fn run_scan(
     let task_config = bridge_config.task;
 
     // the graph
-    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
+    let thegraph_liketh =
+        TheGraphLikeEthComponent::component(bridge_config.thegraph, LikethChain::Ethereum)?;
+    let web3 = Web3Component::component(bridge_config.web3)?;
 
     let handler = AffirmHandler::new(microkv, sender_to_extrinsics).await;
 
@@ -166,17 +170,18 @@ async fn run_scan(
 
         tracing::trace!(
             target: "darwinia-ethereum",
-            "[ethereum] Track affirm block: {} and limit: {}",
+            "[ethereum] [affirm] [scan] Track affirm block: {} and limit: {}",
             from,
             limit
         );
-        let txs = thegraph_liketh
-            .query_transactions(from as u64, limit as u32)
-            .await?;
-        if txs.is_empty() {
+        // let txs = thegraph_liketh
+        //     .query_transactions(from as u64, limit as u32)
+        //     .await?;
+        let tx = thegraph_liketh.last_transaction().await?;
+        if tx.is_none() {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[ethereum] Not found any transactions to affirm"
+                "[ethereum] [affirm] [scan] Not found any transactions to affirm"
             );
             tokio::time::sleep(std::time::Duration::from_secs(
                 task_config.interval_ethereum,
@@ -185,13 +190,27 @@ async fn run_scan(
             continue;
         }
 
-        // Update affirm target
-        for tx in &txs {
-            let next_block_number = tx.block_number + 1;
-            handler.update_target(next_block_number)?;
+        let last_eth_block_number = web3.eth().block_number().await?.as_u64();
+
+        let latest = tx.unwrap();
+        let next_block_number = latest.block_number + 1;
+
+        // Waiting for some blocks, to offset the reorg risk
+        if last_eth_block_number < next_block_number
+            || last_eth_block_number - next_block_number < 12
+        {
+            tracing::info!(
+                target: "darwinia-ethereum",
+                "[ethereum] [affirm] [scan] Waiting for some blocks, to offset the reorg risk",
+            );
+            tokio::time::sleep(std::time::Duration::from_secs(
+                task_config.interval_ethereum,
+            ))
+            .await;
+            continue;
         }
 
-        let latest = txs.last().unwrap();
+        handler.update_target(next_block_number)?;
         tracker.finish(latest.block_number as usize)?;
         tokio::time::sleep(std::time::Duration::from_secs(
             task_config.interval_ethereum,

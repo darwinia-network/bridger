@@ -361,6 +361,7 @@ dependencies = [
  "serde 1.0.136",
  "serde_json",
  "subxt",
+ "support-toolkit",
  "thiserror",
  "tracing",
  "web3",
@@ -3295,6 +3296,13 @@ dependencies = [
  "serde 1.0.136",
  "structopt",
  "strum",
+]
+
+[[package]]
+name = "support-toolkit"
+version = "0.5.5"
+dependencies = [
+ "thiserror",
 ]
 
 [[package]]

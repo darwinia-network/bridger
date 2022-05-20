@@ -3,10 +3,11 @@ use lifeline::{Bus, Lifeline, Service, Task};
 use postage::broadcast;
 
 use component_state::state::BridgeState;
-use component_thegraph_liketh::component::TheGraphLikeEthComponent;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
+use thegraph_liketh::component::TheGraphLikeEthComponent;
+use thegraph_liketh::types::LikethChain;
 
 use crate::bridge::DarwiniaEthereumBus;
 use crate::bridge::DarwiniaEthereumTask;
@@ -73,7 +74,8 @@ async fn run_scan(
     let task_config: TaskConfig = bridge_config.task;
 
     // the graph
-    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
+    let thegraph_liketh =
+        TheGraphLikeEthComponent::component(bridge_config.thegraph, LikethChain::Ethereum)?;
 
     let mut handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
     loop {
@@ -87,7 +89,7 @@ async fn run_scan(
             limit
         );
         let txs = thegraph_liketh
-            .query_transactions(from as u64, limit as u32)
+            .query_transactions(from as u64, limit as u32, true)
             .await?;
         if txs.is_empty() {
             tracing::info!(
@@ -108,9 +110,9 @@ async fn run_scan(
 
         let mut latest_redeem_block_number = None;
         // send transactions to redeem
-        for tx in &txs {
+        'for_tx: for tx in &txs {
             let mut times = 0;
-            loop {
+            'loop_redeem: loop {
                 match handler.redeem(tx.clone()).await {
                     Ok(Some(latest)) => {
                         tracing::trace!(
@@ -120,7 +122,7 @@ async fn run_scan(
                             latest,
                         );
                         latest_redeem_block_number = Some(latest);
-                        break;
+                        break 'loop_redeem;
                     }
                     Ok(None) => {
                         tracing::trace!(
@@ -129,7 +131,7 @@ async fn run_scan(
                             times,
                             latest_redeem_block_number,
                         );
-                        break;
+                        break 'for_tx;
                     }
                     Err(e) => {
                         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -142,7 +144,7 @@ async fn run_scan(
                                 tx,
                                 e,
                             );
-                            break;
+                            break 'for_tx;
                         }
                         handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
                     }

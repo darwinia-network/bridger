@@ -145,7 +145,7 @@ impl Shadow {
 
         let mmr_nodes = self.query_nodes(peak_positions).await?;
         let peaks = self
-            .extract_peaks(mmr_nodes)
+            .extract_positions_and_hashs(mmr_nodes)
             .iter()
             .map(|item| item.1)
             .collect::<Vec<[u8; 32]>>();
@@ -187,13 +187,13 @@ impl Shadow {
                 )
         });
         let merkle_proof = self
-            .extract_peaks(merkle_proof_nodes)
+            .extract_positions_and_hashs(merkle_proof_nodes)
             .iter()
             .map(|item| item.1)
             .collect::<Vec<[u8; 32]>>();
 
         let peaks_nodes = self.query_nodes(peak_positions).await?;
-        let proof_peaks = self.extract_peaks(peaks_nodes);
+        let proof_peaks = self.extract_positions_and_hashs(peaks_nodes);
         let mmr_proof = mmr::gen_proof(merkle_proof, proof_peaks, peak_pos_of_leaf_index);
         Ok(mmr_proof)
     }

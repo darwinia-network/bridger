@@ -7,9 +7,8 @@ schema:
   file: ./schema.graphql
 
 network:
-  endpoint: wss://rococo-rpc.polkadot.io/
-  genesisHash: '0x6408de7737c59c238890533af25896a2c20608d8b380bb01029acb392781063e'
-  # dictionary: https://api.subquery.network/sq/subquery/kusama-dictionary
+  genesisHash: '<PLEASE CHANGE TO REAL GENESIS HASH>'
+  endpoint: ws://rococo-alice:9944
 
 dataSources:
   - kind: substrate/Runtime

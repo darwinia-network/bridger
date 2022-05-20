@@ -1,19 +1,18 @@
 specVersion: 0.2.0
-name: bridge-s2s-rococo
+name: bridge-s2s-pangolin-parachain
 version: 0.0.4
-description: S2S bridge rococo subql
+description: S2S bridge pangolin parachain subql
 repository: https://github.com/darwinia-network/bridger
 schema:
   file: ./schema.graphql
 
 network:
-  endpoint: wss://rococo-rpc.polkadot.io/
-  genesisHash: '0x6408de7737c59c238890533af25896a2c20608d8b380bb01029acb392781063e'
-  # dictionary: https://api.subquery.network/sq/subquery/kusama-dictionary
+  genesisHash: '<PLEASE CHANGE TO REAL GENESIS HASH>'
+  endpoint: ws://pangolin-parachain:9944
 
 dataSources:
   - kind: substrate/Runtime
-    startBlock: 108700
+    startBlock: 1
     mapping:
       file: ./dist/index.js
       handlers:
@@ -22,7 +21,7 @@ dataSources:
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            - module: grandpa
-              method: NewAuthorities
+            - module: bridgePangolinMessages
+              method: MessageAccepted
         - handler: handleCall
           kind: substrate/CallHandler

@@ -1,0 +1,46 @@
+[pangolin]
+endpoint             = "ws://pangolin:9944"
+runtime_version_mode = "Auto"
+signer               = "//Alice"
+
+[rococo]
+endpoint             = "ws://rococo-alice:9944"
+runtime_version_mode = "Auto"
+signer               = "//Alice"
+
+[pangolin_parachain]
+endpoint             = "ws://pangolin-parachain:9944"
+runtime_version_mode = "Auto"
+signer               = "//Alice"
+
+[relay]
+# substrate-substrate bridger message relay lanes
+auto_start                    = true
+create_relayers_fund_accounts = false
+lanes                         = ["70616c69"]
+only_mandatory_headers        = false
+
+[relay.prometheus_params]
+no_prometheus   = false
+prometheus_host = "127.0.0.1"
+prometheus_port = 9616
+
+[task]
+interval_update_fee = 3600
+update_fee_strategy = "Nothing"
+
+[index.pangolin]
+# Subquery pangolin indexer queries url
+endpoint = "http://graphql-engine-s2s-pangolin:3000"
+
+[index.pangolin_parachain]
+# Subquery pangolin-parachain indexer queries url
+endpoint = "http://graphql-engine-s2s-pangolin-parachain:3000"
+
+[index.rococo]
+# Subquery rococo indexer queries url
+endpoint = "http://graphql-engine-s2s-rococo:3000"
+
+[index.parachain_rococo]
+# Subquery parachain_rococo indexer queries url
+endpoint = "http://graphql-engine-parachain-rococo:3000"

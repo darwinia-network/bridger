@@ -53,7 +53,7 @@ impl CompileSourceExecutor {
         let mut exists = false;
         for prefix in support_common::constants::ALLOW_BINARY_PREFIX {
             let mut path_bridge = path_exe.join("../../../bridges").join(&self.command);
-            tracing::trace!(target: "bridger", "Try detect binary fo path: {}", path_bridge.display());
+            tracing::trace!(target: "bridger", "Try detect binary for path: {}", path_bridge.display());
             let full_command = format!("{}{}", prefix, self.command);
             if !path_bridge.exists() {
                 path_bridge = path_exe.join("../../../bridges").join(&full_command);

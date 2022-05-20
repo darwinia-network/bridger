@@ -1,0 +1,18 @@
+query TransactionPage($from: Int!, $first: Int!) {
+  transactionEntities(
+    where: {
+      blockNumber_gte: $from
+    }
+    first: $first
+    orderBy: blockNumber
+    orderDirection: asc
+  ) {
+    id
+    origin
+    blockNumber
+    blockHash
+    txHash
+    txIndex
+    txType
+  }
+}

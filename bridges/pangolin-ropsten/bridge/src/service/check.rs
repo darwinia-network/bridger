@@ -3,13 +3,14 @@ use std::time::SystemTime;
 use client_pangolin::component::PangolinClientComponent;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
+use thegraph_liketh::component::TheGraphLikeEthComponent;
+use thegraph_liketh::types::LikethChain;
 
 use component_state::state::BridgeState;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
-use thegraph_liketh::component::TheGraphLikeEthComponent;
 
 use crate::bridge::PangolinRopstenTask;
 use crate::bridge::TaskConfig;
@@ -64,7 +65,8 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
     let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
     let task_config: TaskConfig = bridge_config.task;
 
-    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
+    let thegraph_liketh =
+        TheGraphLikeEthComponent::component(bridge_config.thegraph, LikethChain::Ropsten)?;
 
     // Pangolin client
     let client = PangolinClientComponent::component(bridge_config.darwinia).await?;
@@ -81,7 +83,7 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
             limit
         );
         let txs = thegraph_liketh
-            .query_transactions(from as u64, limit as u32)
+            .query_transactions(from as u64, limit as u32, false)
             .await?;
         if txs.is_empty() {
             tracing::info!(

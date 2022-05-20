@@ -1,5 +1,6 @@
-use crate::types::MMRNode;
 use serde::{Deserialize, Serialize};
+
+use crate::types::MMRNode;
 
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct EmptyQueryVar;

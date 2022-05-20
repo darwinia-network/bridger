@@ -1,12 +1,13 @@
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Bus, Lifeline, Service, Task};
 use postage::broadcast;
+use thegraph_liketh::component::TheGraphLikeEthComponent;
+use thegraph_liketh::types::LikethChain;
 
 use component_state::state::BridgeState;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
-use thegraph_liketh::component::TheGraphLikeEthComponent;
 
 use crate::bridge::PangolinRopstenBus;
 use crate::bridge::PangolinRopstenTask;
@@ -73,7 +74,8 @@ async fn run_scan(
     let task_config: TaskConfig = bridge_config.task;
 
     // the graph
-    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
+    let thegraph_liketh =
+        TheGraphLikeEthComponent::component(bridge_config.thegraph, LikethChain::Ropsten)?;
 
     let mut handler = RedeemHandler::new(sender_to_extrinsics.clone()).await;
     loop {
@@ -87,7 +89,7 @@ async fn run_scan(
             limit
         );
         let txs = thegraph_liketh
-            .query_transactions(from as u64, limit as u32)
+            .query_transactions(from as u64, limit as u32, true)
             .await?;
         if txs.is_empty() {
             tracing::info!(

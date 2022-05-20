@@ -9,6 +9,7 @@ use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 use thegraph_liketh::component::TheGraphLikeEthComponent;
+use thegraph_liketh::types::LikethChain;
 
 use crate::bridge::DarwiniaEthereumBus;
 use crate::bridge::{DarwiniaEthereumConfig, DarwiniaEthereumTask};
@@ -157,7 +158,8 @@ async fn run_scan(
     let task_config = bridge_config.task;
 
     // the graph
-    let thegraph_liketh = TheGraphLikeEthComponent::component(bridge_config.thegraph)?;
+    let thegraph_liketh =
+        TheGraphLikeEthComponent::component(bridge_config.thegraph, LikethChain::Ethereum)?;
     let web3 = Web3Component::component(bridge_config.web3)?;
 
     let handler = AffirmHandler::new(microkv, sender_to_extrinsics).await;
@@ -172,10 +174,11 @@ async fn run_scan(
             from,
             limit
         );
-        let txs = thegraph_liketh
-            .query_transactions(from as u64, limit as u32)
-            .await?;
-        if txs.is_empty() {
+        // let txs = thegraph_liketh
+        //     .query_transactions(from as u64, limit as u32)
+        //     .await?;
+        let tx = thegraph_liketh.last_transaction().await?;
+        if tx.is_none() {
             tracing::info!(
                 target: "darwinia-ethereum",
                 "[ethereum] [affirm] [scan] Not found any transactions to affirm"
@@ -189,7 +192,7 @@ async fn run_scan(
 
         let last_eth_block_number = web3.eth().block_number().await?.as_u64();
 
-        let latest = txs.last().unwrap();
+        let latest = tx.unwrap();
         let next_block_number = latest.block_number + 1;
 
         // Waiting for some blocks, to offset the reorg risk

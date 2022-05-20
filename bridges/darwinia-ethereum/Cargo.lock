@@ -3718,8 +3718,8 @@ name = "thegraph-liketh"
 version = "0.5.5"
 dependencies = [
  "async-trait",
- "color-eyre",
  "gql_client",
+ "include_dir",
  "serde 1.0.136",
  "serde-aux",
  "thiserror",

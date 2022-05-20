@@ -78,7 +78,7 @@ impl RedeemHandler {
         );
 
         // 1. Checking before redeem
-        let tx_hash = array_bytes::hex2bytes(&tx.block_hash).map_err(|_e| {
+        let block_hash = array_bytes::hex2bytes(&tx.block_hash).map_err(|_e| {
             BridgerError::Hex(format!(
                 "Failed to convert hex({}) to bytes.",
                 &tx.block_hash
@@ -88,7 +88,7 @@ impl RedeemHandler {
         if self
             .client
             .ethereum()
-            .is_verified(&tx_hash, tx_index)
+            .is_verified(&block_hash, tx_index)
             .await?
         {
             tracing::trace!(

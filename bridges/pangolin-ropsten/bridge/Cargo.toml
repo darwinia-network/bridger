@@ -20,6 +20,7 @@ edition = "2021"
 [dependencies]
 tracing    = "0.1"
 color-eyre = "0.5"
+rand       = "0.8"
 
 tokio = { version = "1", features = ["full"] }
 
@@ -34,9 +35,6 @@ array-bytes = "1.4"
 serde       = { version = "1", features = ["derive"] }
 serde_json  = "1"
 codec       = { package = "parity-scale-codec", version = "2" }
-
-rand        = "0.8"
-
 
 web3    = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }

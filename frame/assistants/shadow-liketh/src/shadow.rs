@@ -116,7 +116,7 @@ impl Shadow {
 }
 
 impl Shadow {
-    fn extract_peaks(&self, positions: Vec<MMRNode>) -> Vec<(u64, [u8; 32])> {
+    fn extract_positions_and_hashs(&self, positions: Vec<MMRNode>) -> Vec<(u64, [u8; 32])> {
         positions
             .iter()
             .map(|item| (item.position, item.hash))

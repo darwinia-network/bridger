@@ -5,6 +5,11 @@ repository: https://github.com/darwinia-network/bridger
 schema:
   file: ./schema.graphql
 
+network:
+  genesisHash: '0xce44bd16fc276f9e457b452577b6c2678e57768260012af127479fed806da7e7'
+  endpoint: wss://pangolin-rpc.darwinia.network
+  dictionary: https://api.subquery.network/sq/darwinia-network/pangolin-dictionary
+
 dataSources:
   - name: main
     kind: substrate/Runtime
@@ -27,10 +32,3 @@ dataSources:
               method: AuthoritiesChangeSigned
         - handler: handleCall
           kind: substrate/CallHandler
-
-network:
-  genesisHash: '0xce44bd16fc276f9e457b452577b6c2678e57768260012af127479fed806da7e7'
-  endpoint: wss://pangolin-rpc.darwinia.network
-  dictionary: https://api.subquery.network/sq/darwinia-network/pangolin-dictionary
-  chaintypes:
-    file: ./dist/chaintypes.js

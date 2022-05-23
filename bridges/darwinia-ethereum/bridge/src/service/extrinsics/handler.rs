@@ -103,7 +103,7 @@ impl ExtrinsicsHandler {
         let ex_hash = self.client.ethereum().affirm(parcel).await?;
         tracing::info!(
             target: "darwinia-ethereum",
-            "[darwinia] [extrinsics] Affirmed ethereum block {} in extrinsic {:?}",
+            "[darwinia] [extrinsics] [affirm] Affirmed ethereum block {} in extrinsic {:?}",
             block_number,
             ex_hash
         );
@@ -125,7 +125,7 @@ impl ExtrinsicsHandler {
                     .await?;
                 tracing::info!(
                     target: "darwinia-ethereum",
-                    "[darwinia] [extrinsics] Sent ethereum tx {:?} with extrinsic {:?}",
+                    "[darwinia] [extrinsics] [redeem] Sent ethereum tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
@@ -144,7 +144,7 @@ impl ExtrinsicsHandler {
                 let ex_hash = self.client.ethereum().redeem(redeem_for, proof).await?;
                 tracing::info!(
                     target: "darwinia-ethereum",
-                    "[darwinia] [extrinsics] Redeemed ethereum tx {:?} with extrinsic {:?}", ethereum_tx.tx_hash, ex_hash
+                    "[darwinia] [extrinsics] [redeem] Redeemed ethereum tx {:?} with extrinsic {:?}", ethereum_tx.tx_hash, ex_hash
                 );
             }
         }
@@ -164,14 +164,14 @@ impl ExtrinsicsHandler {
         if aye {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] [extrinsics] Voted to approve: {}, ex hash: {:?}",
+                "[darwinia] [extrinsics] [guard] Voted to approve: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
             );
         } else {
             tracing::info!(
                 target: "darwinia-ethereum",
-                "[darwinia] [extrinsics] Voted to reject: {}, ex hash: {:?}",
+                "[darwinia] [extrinsics] [guard] Voted to reject: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
             );
@@ -182,7 +182,7 @@ impl ExtrinsicsHandler {
     async fn send_sign_and_send_mmr_root(&self, block_number: u32) -> color_eyre::Result<()> {
         tracing::trace!(
             target: "darwinia-ethereum",
-            "[darwinia] [extrinsics] Start sign and send mmr_root..."
+            "[darwinia] [extrinsics] [mmr-root] Start sign and send mmr_root..."
         );
 
         let ex_hash = self
@@ -192,7 +192,7 @@ impl ExtrinsicsHandler {
             .await?;
         tracing::info!(
             target: "darwinia-ethereum",
-            "[darwinia] [extrinsics] Sign and send mmr root of block {} in extrinsic {:?}",
+            "[darwinia] [extrinsics] [mmr-root] Sign and send mmr root of block {} in extrinsic {:?}",
             block_number,
             ex_hash
         );
@@ -205,7 +205,7 @@ impl ExtrinsicsHandler {
     ) -> color_eyre::Result<()> {
         tracing::trace!(
             target: "darwinia-ethereum",
-            "[darwinia] [extrinsics] Start sign and send authorities..."
+            "[darwinia] [extrinsics] [signed-authorities] Start sign and send authorities..."
         );
         let ex_hash = self
             .client
@@ -214,7 +214,7 @@ impl ExtrinsicsHandler {
             .await?;
         tracing::info!(
             target: "darwinia-ethereum",
-            "[darwinia] [extrinsics] Sign and send authorities in extrinsic {:?}",
+            "[darwinia] [extrinsics] [signed-authorities] Sign and send authorities in extrinsic {:?}",
             ex_hash
         );
         Ok(())

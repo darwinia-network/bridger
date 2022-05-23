@@ -82,6 +82,8 @@ pub struct ChainInfoConfig {
     pub spec_version: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transaction_version: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub para_id: Option<u32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, EnumString, EnumVariantNames)]

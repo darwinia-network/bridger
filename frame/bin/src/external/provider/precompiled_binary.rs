@@ -36,7 +36,7 @@ impl ISubcommandExecutor for PrecompiledBinaryExecutor {
         let (command, path_binary) = self.download_and_extract_binary(path, false)?;
 
         let cwd = path_binary.parent().map(|v| v.join("")).ok_or_else(|| {
-            BridgerError::Subcommand("Can not get current binary path".to_string())
+            BridgerError::Subcommand("Can not get current binary's path".to_string())
         })?;
         external::provider::common::execute_binary(command, path_binary, self.args.clone(), cwd)
     }
@@ -150,7 +150,7 @@ impl PrecompiledBinaryExecutor {
                         } else {
                             tracing::warn!(
                                 target: "bridger",
-                                "The binary ({}) will updated to {}, after done, please restart your running progress.",
+                                "The binary ({}) will updated to {}, when finished, please restart your running progress.",
                                 command,
                                 version
                             );
@@ -288,9 +288,10 @@ impl PrecompiledBinaryExecutor {
         } else if cfg!(target_arch = "x86_64") {
             "x86_64"
         } else {
-            return Err(
-                BridgerError::Subcommand("Can not support current arch".to_string()).into(),
-            );
+            return Err(BridgerError::Subcommand(
+                "Can not support current architecture".to_string(),
+            )
+            .into());
         };
         let package_name = format!(
             "{}-{}-{}.{}",

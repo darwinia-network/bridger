@@ -46,7 +46,7 @@ impl ExtrinsicsHandler {
     async fn build(state: BridgeState) -> color_eyre::Result<Self> {
         tracing::info!(
             target: "pangolin-ropsten",
-            "EXTRINSICS SERVICE RESTARTING..."
+            "[pangolin] [extrinsics] EXTRINSICS SERVICE RESTARTING..."
         );
         let bridge_config: PangolinRopstenConfig = Config::restore(Names::BridgePangolinRopsten)?;
 
@@ -63,7 +63,7 @@ impl ExtrinsicsHandler {
 
         tracing::info!(
             target: "pangolin-ropsten",
-            "✨ SERVICE STARTED: ROPSTEN <> PANGOLIN EXTRINSICS"
+            "[pangolin] [extrinsics] ✨ SERVICE STARTED: ROPSTEN <> PANGOLIN EXTRINSICS"
         );
 
         let microkv = state.microkv_with_namespace(PangolinRopstenTask::name());
@@ -103,7 +103,7 @@ impl ExtrinsicsHandler {
         let ex_hash = self.client.ethereum().affirm(parcel).await?;
         tracing::info!(
             target: "pangolin-ropsten",
-            "[pangolin] [extrinsics] Affirmed ethereum block {} in extrinsic {:?}",
+            "[pangolin] [extrinsics] [affirm] Affirmed ethereum block {} in extrinsic {:?}",
             block_number,
             ex_hash
         );
@@ -118,7 +118,7 @@ impl ExtrinsicsHandler {
     ) -> color_eyre::Result<()> {
         tracing::info!(
             target: "pangolin-ropsten",
-            "[pangolin] [extrinsics] Ready to send redeem. type is [{:?}] and tx is [{:?}]",
+            "[pangolin] [extrinsics] [redeem] Ready to send redeem. type is [{:?}] and tx is [{:?}]",
             ethereum_tx.tx_type,
             ethereum_tx.tx_hash
         );
@@ -131,7 +131,7 @@ impl ExtrinsicsHandler {
                     .await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "[pangolin] [extrinsics] Sent ethereum tx {:?} with extrinsic {:?}",
+                    "[pangolin] [extrinsics] [redeem] Sent ethereum tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
@@ -140,7 +140,7 @@ impl ExtrinsicsHandler {
                 let ex_hash = self.client.ethereum().register_erc20(proof).await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "[pangolin] [extrinsics] register erc20 token tx {:?} with extrinsic {:?}",
+                    "[pangolin] [extrinsics] [redeem] register erc20 token tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
@@ -149,7 +149,7 @@ impl ExtrinsicsHandler {
                 let ex_hash = self.client.ethereum().redeem_erc20(proof).await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "[pangolin] [extrinsics] redeem erc20 token tx {:?} with extrinsic {:?}",
+                    "[pangolin] [extrinsics] [redeem] redeem erc20 token tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
@@ -166,7 +166,7 @@ impl ExtrinsicsHandler {
                 let ex_hash = self.client.ethereum().redeem(redeem_for, proof).await?;
                 tracing::info!(
                     target: "pangolin-ropsten",
-                    "[pangolin] [extrinsics] Redeemed ethereum tx {:?} with extrinsic {:?}",
+                    "[pangolin] [extrinsics] [redeem] Redeemed ethereum tx {:?} with extrinsic {:?}",
                     ethereum_tx.tx_hash,
                     ex_hash
                 );
@@ -188,14 +188,14 @@ impl ExtrinsicsHandler {
         if aye {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] [extrinsics] Voted to approve: {}, ex hash: {:?}",
+                "[pangolin] [extrinsics] [guard] Voted to approve: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
             );
         } else {
             tracing::info!(
                 target: "pangolin-ropsten",
-                "[pangolin] [extrinsics] Voted to reject: {}, ex hash: {:?}",
+                "[pangolin] [extrinsics] [guard] Voted to reject: {}, ex hash: {:?}",
                 pending_block_number,
                 ex_hash
             );
@@ -206,7 +206,7 @@ impl ExtrinsicsHandler {
     async fn send_sign_and_send_mmr_root(&self, block_number: u32) -> color_eyre::Result<()> {
         tracing::trace!(
             target: "pangolin-ropsten",
-            "[pangolin] [extrinsics] Start sign and send mmr_root for block: {}",
+            "[pangolin] [extrinsics] [mmr-root] Start sign and send mmr_root for block: {}",
             block_number,
         );
 
@@ -217,7 +217,7 @@ impl ExtrinsicsHandler {
             .await?;
         tracing::info!(
             target: "pangolin-ropsten",
-            "[pangolin] [extrinsics] Sign and send mmr root of block {} in extrinsic {:?}",
+            "[pangolin] [extrinsics] [mmr-root] Sign and send mmr root of block {} in extrinsic {:?}",
             block_number,
             ex_hash
         );
@@ -230,7 +230,7 @@ impl ExtrinsicsHandler {
     ) -> color_eyre::Result<()> {
         tracing::trace!(
             target: "pangolin-ropsten",
-            "[pangolin] [extrinsics] Start sign and send authorities..."
+            "[pangolin] [extrinsics] [signed-authorities] Start sign and send authorities..."
         );
         let ex_hash = self
             .client
@@ -239,7 +239,7 @@ impl ExtrinsicsHandler {
             .await?;
         tracing::info!(
             target: "pangolin-ropsten",
-            "[pangolin] [extrinsics] Sign and send authorities in extrinsic {:?}",
+            "[pangolin] [extrinsics] [signed-authorities] Sign and send authorities in extrinsic {:?}",
             ex_hash
         );
         Ok(())

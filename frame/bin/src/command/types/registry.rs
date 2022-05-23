@@ -31,7 +31,7 @@ pub enum RegistryOpt {
         #[structopt(short, long, default_value = "raw")]
         output: OutputFormat,
     },
-    /// Set registry version, If the value is set, this version of the bridge will be downloaded
+    /// Set registry version, will be download by your set value
     Version {
         /// The version
         #[structopt()]

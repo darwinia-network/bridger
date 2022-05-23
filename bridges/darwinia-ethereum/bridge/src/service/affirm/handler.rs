@@ -103,7 +103,7 @@ impl AffirmHandler {
         } else {
             tracing::trace!(
                 target: "darwinia-ethereum",
-                "[ethereum] [affirm] [handle] You do not need to affirm ethereum block {}, because this block is less or equal with relayed {}",
+                "[ethereum] [affirm] [handle] The block ({}) is less or equal with relayed {}, so nothing to do",
                 target,
                 relayed,
             );
@@ -187,20 +187,6 @@ impl AffirmHandler {
                     .await?
             }
             Err(err) => {
-                // todo: the ethereum component not return color error
-                // if let Some(BizError::BlankEthereumMmrRoot(block, msg)) =
-                //     err.downcast_ref::<BizError>()
-                // {
-                //     tracing::warn!(
-                //         target: "darwinia-ethereum",
-                //         chain = "ethereum",
-                //         action = "affirm",
-                //         "[ethereum] [affirm] The parcel of ethereum block {} from Shadow service is blank, the err msg is: [[ {} ]]",
-                //         block,
-                //         msg
-                //     );
-                //     return Ok(());
-                // }
                 return Err(err.into());
             }
         }

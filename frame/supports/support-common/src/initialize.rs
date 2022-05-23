@@ -23,7 +23,7 @@ fn init_log() -> color_eyre::Result<()> {
         "messages_relay=trace",
         "messages-relay=trace",
         "lifeline=debug",
-        "bridger=trace",
+        "bridger=error",
         "bridge=info",
         "pangolin-pangoro=trace",
         "pangolin-ropsten=trace",

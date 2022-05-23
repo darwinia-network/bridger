@@ -68,7 +68,11 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        chain: [ pangolin, pangolin-parachain, rococo ]
+        chain:
+          - pangolin
+          - pangolin-parachain
+          - pangoro
+          - rococo
     steps:
       - uses: actions/checkout@v2
         with:

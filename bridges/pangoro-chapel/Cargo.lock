@@ -355,6 +355,8 @@ name = "client-pangoro"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
+ "async-trait",
+ "client-traits",
  "parity-scale-codec",
  "serde 1.0.136",
  "serde_json",
@@ -362,6 +364,13 @@ dependencies = [
  "support-toolkit",
  "thiserror",
  "tracing",
+]
+
+[[package]]
+name = "client-traits"
+version = "0.5.5"
+dependencies = [
+ "async-trait",
 ]
 
 [[package]]

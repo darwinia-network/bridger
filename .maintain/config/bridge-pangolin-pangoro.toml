@@ -1,53 +1,14 @@
 [pangolin]
 endpoint = "wss://pangolin-rpc.darwinia.network"
 signer = "//Alice"
-# Bundle/Auto/Custom
-runtime_version_mode = "Bundle"
-# If the runtime version mode is custom, you need to set this.
-#spec_version = 12345
-# If the runtime version mode is custom, you need to set this.
-#transaction_version = 0
 
 [pangoro]
 endpoint = "wss://pangoro-rpc.darwinia.network"
 signer = "//Alice"
-# Bundle/Auto/Custom
-runtime_version_mode = "Bundle"
-# If the runtime version mode is custom, you need to set this.
-#spec_version = 12345
-# If the runtime version mode is custom, you need to set this.
-#transaction_version = 0
 
 [relay]
 # substrate-substrate bridger message relay lanes, default use `00000000`
 lanes = ["726f6c69"]
-# (optional) The relay message signer, if not set will use [panglin.signer]
-signer_pangolin = "//Alice"
-# (optional) the relay message signer, if not set will use [pangoro.signer]
-signer_pangoro = "//Alice"
-# If passed, only mandatory headers (headers that are changing the GRANDPA authorities set) are relayed.
-only_mandatory_headers = false
-# Create relayers fund accounts on both chains, if it does not exists yet.
-create_relayers_fund_accounts = false
-
-# The SURI of secret key to use when transactions are submitted to the pangolin node.
-#pangolin_messages_pallet_owner = "//PangoroMessagesOwner"
-# The password for the SURI of secret key to use when transactions are submitted to the pangolin node.
-#pangolin_messages_pallet_owner_password = "123456"
-# The SURI of secret key to use when transactions are submitted to the pangoro node.
-#pangoro_messages_pallet_owner = "//PangolinMessagesOwner"
-# The password for the SURI of secret key to use when transactions are submitted to the pangoro node.
-#pangoro_messages_pallet_owner_password = "123456"
-
-# Transactions mortality period, in blocks. MUST be a power of two in [4; 65536] range.
-# MAY NOT be larger than `BlockHashCount` parameter of the chain system module.
-# Discuss: https://github.com/darwinia-network/bridger/pull/266#discussion_r705943606
-#transactions_mortality = 256
-
-[relay.prometheus_params]
-no_prometheus = false
-prometheus_host = "127.0.0.1"
-prometheus_port = 9616
 
 #[feemarket]
 #[feemarket.subscan_left]

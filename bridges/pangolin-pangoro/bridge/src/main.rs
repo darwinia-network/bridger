@@ -6,6 +6,7 @@ mod bridge;
 mod cli;
 mod command;
 mod service;
+mod types;
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {

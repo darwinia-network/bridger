@@ -31,7 +31,10 @@ subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = 
 
 support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
 
-client-traits = { path = "../client-traits" }
+[features]
+default      = []
+s2s          = []
+s2s-pangolin = []
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

@@ -396,7 +396,6 @@ version = "0.5.5"
 dependencies = [
  "array-bytes",
  "async-trait",
- "client-traits",
  "parity-scale-codec",
  "secp256k1",
  "serde 1.0.136",
@@ -407,13 +406,6 @@ dependencies = [
  "thiserror",
  "tracing",
  "web3",
-]
-
-[[package]]
-name = "client-traits"
-version = "0.5.5"
-dependencies = [
- "async-trait",
 ]
 
 [[package]]

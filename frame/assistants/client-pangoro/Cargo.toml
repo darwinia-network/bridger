@@ -19,7 +19,6 @@ edition = "2021"
 
 [dependencies]
 tracing = "0.1"
-color-eyre = "0.5"
 thiserror = "1"
 
 serde       = { version = "1", features = ["derive"] }
@@ -27,10 +26,8 @@ serde_json  = "1"
 
 array-bytes = "1.4"
 
-codec       = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
-secp256k1   = { version = "0.20", features = ["recovery"] }
-subxt = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
-web3 = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }
+codec     = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
+subxt     = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 
 support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
 

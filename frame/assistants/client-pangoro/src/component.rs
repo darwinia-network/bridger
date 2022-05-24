@@ -4,7 +4,7 @@ use subxt::ClientBuilder;
 
 use crate::client::PangoroClient;
 use crate::config::ClientConfig;
-use crate::error::ClientError;
+use crate::error::ClientResult;
 use crate::types::DarwiniaAccount;
 
 const MAX_ATTEMPTS: u32 = 1;
@@ -14,7 +14,7 @@ pub struct PangoroClientComponent;
 
 impl PangoroClientComponent {
     /// Get subxt client instance
-    pub async fn component(config: ClientConfig) -> color_eyre::Result<PangoroClient> {
+    pub async fn component(config: ClientConfig) -> ClientResult<PangoroClient> {
         let mut attempts = 1;
         let mut wait_secs = 1;
         let endpoint = support_toolkit::url::correct_endpoint(&config.endpoint)?;

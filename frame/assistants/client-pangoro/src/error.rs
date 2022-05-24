@@ -45,3 +45,9 @@ impl From<subxt::BasicError> for ClientError {
         Self::SubxtBasicError(error)
     }
 }
+
+impl From<subxt::rpc::RpcError> for ClientError {
+    fn from(error: subxt::rpc::RpcError) -> Self {
+        Self::SubxtBasicError(subxt::BasicError::Rpc(error))
+    }
+}

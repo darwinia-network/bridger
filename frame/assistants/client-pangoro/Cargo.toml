@@ -34,7 +34,7 @@ support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
 [features]
 default      = []
 s2s          = []
-s2s-pangolin = []
+s2s-pangolin = ["s2s"]
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

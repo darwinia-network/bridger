@@ -14,12 +14,12 @@ pub enum BridgeName {
     PangoroToPangolin,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InitBridge {
-    pub bridge: BridgeName,
-    pub source: ChainInfoConfig,
-    pub target: ChainInfoConfig,
-}
+// #[derive(Debug, Clone, Serialize, Deserialize)]
+// pub struct InitBridge {
+//     pub bridge: BridgeName,
+//     pub source: ChainInfoConfig,
+//     pub target: ChainInfoConfig,
+// }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct HexLaneId([u8; 4]);

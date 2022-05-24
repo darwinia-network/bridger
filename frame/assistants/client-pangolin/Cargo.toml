@@ -42,4 +42,4 @@ tokio = { version = "1", features = ["full"] }
 default     = []
 ethlike-v1  = ["web3", "secp256k1", "shadow-liketh"]
 s2s         = []
-s2s-pangoro = []
+s2s-pangoro = ["s2s"]

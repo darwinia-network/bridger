@@ -28,6 +28,22 @@ pub struct RelayConfig {
     pub lanes: Vec<HexLaneId>,
 }
 
-impl ChainInfoConfig {}
+impl From<ChainInfoConfig> for client_pangolin::config::ClientConfig {
+    fn from(config: ChainInfoConfig) -> Self {
+        client_pangolin::config::ClientConfig {
+            endpoint: config.endpoint,
+            relayer_private_key: config.signer,
+            relayer_real_account: None,
+        }
+    }
+}
 
-pub trait Abcd {}
+impl From<ChainInfoConfig> for client_pangoro::config::ClientConfig {
+    fn from(config: ChainInfoConfig) -> Self {
+        client_pangoro::config::ClientConfig {
+            endpoint: config.endpoint,
+            relayer_private_key: config.signer,
+            relayer_real_account: None,
+        }
+    }
+}

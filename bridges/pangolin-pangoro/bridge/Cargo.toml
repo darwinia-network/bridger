@@ -22,6 +22,7 @@ tokio       = { version = "1", features = ["full"] }
 structopt = "0.3"
 strum     = { version = "0.21", features = ["derive"] }
 serde     = { version = "1", features = ["derive"] }
+codec     = { package = "parity-scale-codec", version = "2", default-features = false }
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage  = "0.4"
@@ -34,3 +35,8 @@ component-http-client = { path = "../../../frame/components/http-client" }
 
 client-pangolin = { path = "../../../frame/assistants/client-pangolin", features = [ "s2s-pangoro" ]}
 client-pangoro  = { path = "../../../frame/assistants/client-pangoro", features = [ "s2s-pangolin" ]}
+
+bp-header-chain  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-runtime       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-pangolin      = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-pangoro       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }

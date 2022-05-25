@@ -37,6 +37,15 @@ async fn init_bridge(
                 .next()
                 .await
                 .ok_or_else(|| BridgerError::Custom("The subscribe is closed".to_string()))??;
+            let justification: bp_header_chain::justification::GrandpaJustification<
+                <bp_pangolin::Pangolin as bp_runtime::Chain>::Header,
+            > = codec::Decode::decode(&mut &justification.0[..])
+                .map_err(|err| BridgerError::Custom(format!("Wrong justification: {:?}", err)))?;
+
+            let (initial_header_hash, initial_header_number) = (
+                justification.commit.target_hash,
+                justification.commit.target_number,
+            );
             println!("{:?}", justification);
         }
         BridgeName::PangolinToPangoro => {}

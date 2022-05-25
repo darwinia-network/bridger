@@ -20,8 +20,11 @@ pub enum ClientError {
     #[error("Wrong seed: {0}")]
     Seed(String),
 
-    #[error("Other error: {0}")]
-    Other(String),
+    #[error("Bytes error: {0}")]
+    Bytes(String),
+
+    #[error("Custom error: {0}")]
+    Custom(String),
 
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
@@ -49,5 +52,11 @@ impl From<subxt::BasicError> for ClientError {
 impl From<subxt::rpc::RpcError> for ClientError {
     fn from(error: subxt::rpc::RpcError) -> Self {
         Self::SubxtBasicError(subxt::BasicError::Rpc(error))
+    }
+}
+
+impl From<array_bytes::Error> for ClientError {
+    fn from(error: array_bytes::Error) -> Self {
+        Self::Bytes(format!("{:?}", error))
     }
 }

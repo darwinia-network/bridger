@@ -31,6 +31,7 @@ fn init_log() -> color_eyre::Result<()> {
         "darwinia-ethereum=trace",
         "darwinia-crab=trace",
         "client-pangolin=trace",
+        "client-pangoro=trace",
         "feemarket=trace",
         "shadow=trace",
     ]

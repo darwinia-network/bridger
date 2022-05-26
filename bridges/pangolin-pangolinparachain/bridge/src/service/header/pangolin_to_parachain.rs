@@ -190,33 +190,37 @@ async fn try_to_relay_header_on_demand(
 ) -> color_eyre::Result<()> {
     let next_header = header_relay
         .subquery_pangolin
-        .next_needed_header(last_block_number, OriginType::BridgePangolinParachain)
+        .next_needed_header(OriginType::BridgePangolinParachain)
         .await?
-        .ok_or_else(|| {
-            BridgerError::Custom("Failed to query next header needed to be relayed".to_string())
+        .filter(|header| {
+            header.block_number > last_block_number
+        });
+
+    if let None = next_header {
+        return Ok(())
+    }
+
+    let pangolin_justification_queue = PANGOLIN_JUSTIFICATIONS.lock().await;
+    if let Some(justification) = pangolin_justification_queue.back().cloned() {
+        let grandpa_justification = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(
+            &mut justification.as_ref(),
+        )
+        .map_err(|err| {
+            BridgerError::Custom(format!(
+                "Failed to decode justification of pangolin: {:?}",
+                err
+            ))
         })?;
-    if next_header.block_number > last_block_number {
-        let pangolin_justification_queue = PANGOLIN_JUSTIFICATIONS.lock().await;
-        if let Some(justification) = pangolin_justification_queue.back().cloned() {
-            let grandpa_justification = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(
-                &mut justification.as_ref(),
+        if grandpa_justification.commit.target_number > last_block_number {
+            submit_finality(
+                header_relay,
+                format!("{:#x}", grandpa_justification.commit.target_hash),
+                justification.to_vec(),
             )
-            .map_err(|err| {
-                BridgerError::Custom(format!(
-                    "Failed to decode justification of pangolin: {:?}",
-                    err
-                ))
-            })?;
-            if grandpa_justification.commit.target_number > last_block_number {
-                submit_finality(
-                    header_relay,
-                    grandpa_justification.commit.target_hash.to_string(),
-                    justification.to_vec(),
-                )
-                .await?;
-            }
+            .await?;
         }
     }
+    
 
     Ok(())
 }

@@ -135,7 +135,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .bridge_rococo_grandpa()
         .best_finalized(None)
         .await?;
-    tracing::info!(
+    tracing::debug!(
         target: "pangolin-pangolinparachain",
         "[header-relay-rococo-to-pangolin] Get last relayed rococo block hash: {:?}",
         &last_relayed_rococo_hash_in_pangolin
@@ -213,23 +213,35 @@ async fn try_to_relay_header_on_demand(
 ) -> color_eyre::Result<()> {
     let next_para_header = header_relay
         .subquery_pangolin_parachain
-        .next_needed_header(last_block_number, OriginType::BridgePangolin)
-        .await?
-        .ok_or_else(|| {
-            BridgerError::Custom("Failed to query next para head needed to be relayed".to_string())
-        })?;
+        .next_needed_header(OriginType::BridgePangolin)
+        .await?;
+    
+    if let None = next_para_header {
+        return Ok(())
+    }
 
-    let next_header = header_relay
-        .subquery_parachain_rococo
-        .get_block_with_para_head(next_para_header.block_hash)
-        .await?
-        .ok_or_else(|| {
-            BridgerError::Custom(
-                "Failed to query relay chain block where a para head inclueded".to_string(),
-            )
-        })?;
+    if let Some(next_para_header) = next_para_header {
+        let next_header = header_relay
+            .subquery_parachain_rococo
+            .get_block_with_para_head(next_para_header.block_hash)
+            .await?
+            .filter(|header| {
+                tracing::debug!(
+                    target: "pangolin-pangolinparachain",
+                    "[header-relay-rococo-to-pangolin] Get related realy chain header: {:?}",
+                    header.included_relay_block
+                );
+                header.included_relay_block > last_block_number
+            });
 
-    if next_header.included_relay_block > last_block_number {
+        if let None = next_header {
+            tracing::debug!(
+                target: "pangolin-pangolinparachain",
+                "[header-relay-rococo-to-pangolin] Para head has not been finalized"
+            );
+            return Ok(())
+        }
+
         let pangolin_justification_queue = ROCOCO_JUSTIFICATIONS.lock().await;
         if let Some(justification) = pangolin_justification_queue.back().cloned() {
             let grandpa_justification = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(
@@ -241,10 +253,15 @@ async fn try_to_relay_header_on_demand(
                     err
                 ))
             })?;
+            tracing::debug!(
+                target: "pangolin-pangolinparachain",
+                "[header-relay-rococo-to-pangolin] Test justification: {:?}",
+                grandpa_justification.commit.target_number
+            );
             if grandpa_justification.commit.target_number > last_block_number {
                 submit_finality(
                     header_relay,
-                    grandpa_justification.commit.target_hash.to_string(),
+                    format!("{:#x}", grandpa_justification.commit.target_hash),
                     justification.to_vec(),
                 )
                 .await?;

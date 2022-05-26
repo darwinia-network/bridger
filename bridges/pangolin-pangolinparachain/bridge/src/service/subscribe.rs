@@ -91,7 +91,6 @@ async fn subscribe_pangolin(client: &PangolinClient) -> color_eyre::Result<()> {
     while let Some(justification) = subscribe.next().await {
         let mut data = PANGOLIN_JUSTIFICATIONS.lock().await;
         data.push_back(justification.unwrap());
-        println!("Get a new justification from Pangolin");
         if data.len() >= 100 {
             data.pop_front();
         }
@@ -104,7 +103,6 @@ async fn subscribe_rococo(client: &RococoClient) -> color_eyre::Result<()> {
     while let Some(justification) = subscribe.next().await {
         let mut data = ROCOCO_JUSTIFICATIONS.lock().await;
         data.push_back(justification.unwrap());
-        println!("Get a new justification from Rococo");
         if data.len() >= 100 {
             data.pop_front();
         }

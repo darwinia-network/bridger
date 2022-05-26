@@ -192,25 +192,22 @@ async fn try_to_relay_header_on_demand(
         .subquery_pangolin
         .next_needed_header(OriginType::BridgePangolinParachain)
         .await?
-        .filter(|header| {
-            header.block_number > last_block_number
-        });
+        .filter(|header| header.block_number > last_block_number);
 
     if let None = next_header {
-        return Ok(())
+        return Ok(());
     }
 
     let pangolin_justification_queue = PANGOLIN_JUSTIFICATIONS.lock().await;
     if let Some(justification) = pangolin_justification_queue.back().cloned() {
-        let grandpa_justification = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(
-            &mut justification.as_ref(),
-        )
-        .map_err(|err| {
-            BridgerError::Custom(format!(
-                "Failed to decode justification of pangolin: {:?}",
-                err
-            ))
-        })?;
+        let grandpa_justification =
+            GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(&mut justification.as_ref())
+                .map_err(|err| {
+                BridgerError::Custom(format!(
+                    "Failed to decode justification of pangolin: {:?}",
+                    err
+                ))
+            })?;
         if grandpa_justification.commit.target_number > last_block_number {
             submit_finality(
                 header_relay,
@@ -220,7 +217,6 @@ async fn try_to_relay_header_on_demand(
             .await?;
         }
     }
-    
 
     Ok(())
 }

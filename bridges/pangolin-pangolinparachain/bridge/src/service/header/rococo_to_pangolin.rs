@@ -215,9 +215,9 @@ async fn try_to_relay_header_on_demand(
         .subquery_pangolin_parachain
         .next_needed_header(OriginType::BridgePangolin)
         .await?;
-    
+
     if let None = next_para_header {
-        return Ok(())
+        return Ok(());
     }
 
     if let Some(next_para_header) = next_para_header {
@@ -239,7 +239,7 @@ async fn try_to_relay_header_on_demand(
                 target: "pangolin-pangolinparachain",
                 "[header-relay-rococo-to-pangolin] Para head has not been finalized"
             );
-            return Ok(())
+            return Ok(());
         }
 
         let pangolin_justification_queue = ROCOCO_JUSTIFICATIONS.lock().await;

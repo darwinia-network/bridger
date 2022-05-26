@@ -25,10 +25,7 @@ impl Service for RococoToPangolinParaHeaderRelayService {
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!(
-                "{}-rococo-pangolin-header-relay",
-                BridgeTask::name()
-            ),
+            &format!("{}-rococo-pangolin-header-relay", BridgeTask::name()),
             async move {
                 if let Err(e) = start().await {
                     tracing::error!(
@@ -70,7 +67,10 @@ impl HeaderRelay {
         Ok(Self {
             client_pangolin,
             client_rococo,
-            para_id: bridge_config.pangolin_parachain.para_id.expect("ParaId not found"),
+            para_id: bridge_config
+                .pangolin_parachain
+                .para_id
+                .expect("ParaId not found"),
         })
     }
 }
@@ -83,7 +83,7 @@ async fn start() -> color_eyre::Result<()> {
     let mut header_relay = HeaderRelay::new().await?;
     loop {
         match run(&header_relay).await {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(err) => {
                 if let Some(subxt::BasicError::Rpc(request_error)) =
                     err.downcast_ref::<subxt::BasicError>()
@@ -227,7 +227,11 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             .bridge_rococo_parachains()
             .submit_parachain_heads(
                 best_finalized_source_block_hash,
-                vec![pangolin_runtime_types::bp_polkadot_core::parachains::ParaId(header_relay.para_id)],
+                vec![
+                    pangolin_runtime_types::bp_polkadot_core::parachains::ParaId(
+                        header_relay.para_id,
+                    ),
+                ],
                 heads_proofs
                     .proof
                     .into_iter()

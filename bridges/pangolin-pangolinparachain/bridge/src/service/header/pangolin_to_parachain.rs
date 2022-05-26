@@ -194,7 +194,7 @@ async fn try_to_relay_header_on_demand(
         .await?
         .filter(|header| header.block_number > last_block_number);
 
-    if let None = next_header {
+    if next_header.is_none() {
         return Ok(());
     }
 

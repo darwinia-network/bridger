@@ -216,7 +216,7 @@ async fn try_to_relay_header_on_demand(
         .next_needed_header(OriginType::BridgePangolin)
         .await?;
 
-    if let None = next_para_header {
+    if next_para_header.is_none() {
         return Ok(());
     }
 
@@ -234,7 +234,7 @@ async fn try_to_relay_header_on_demand(
                 header.included_relay_block > last_block_number
             });
 
-        if let None = next_header {
+        if next_header.is_none() {
             tracing::debug!(
                 target: "pangolin-pangolinparachain",
                 "[header-relay-rococo-to-pangolin] Para head has not been finalized"

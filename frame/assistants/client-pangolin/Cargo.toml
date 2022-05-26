@@ -1,38 +1,34 @@
 [package]
-name = "client-pangolin"
-version = "0.5.5"
-authors = ["Darwinia Network <hello@darwinia.network>"]
-description = "Darwinia bridger"
-repository = "https://github.com/darwinia-network/bridger"
-license = "MIT"
+authors       = ["Darwinia Network <hello@darwinia.network>"]
+description   = "Darwinia bridger"
 documentation = "https://rust-docs.darwinia.network/bridger"
-homepage = "https://github.com/darwinia-network/bridger"
-include = [
-  "Cargo.toml",
-  "**/*.rs",
-  "README.md",
-  "LICENSE"
-]
-keywords = ["substrate", "darwinia"]
-readme = 'README.md'
-edition = "2021"
+edition       = "2021"
+homepage      = "https://github.com/darwinia-network/bridger"
+include       = ["Cargo.toml", "**/*.rs", "README.md", "LICENSE"]
+keywords      = ["substrate", "darwinia"]
+license       = "MIT"
+name          = "client-pangolin"
+readme        = 'README.md'
+repository    = "https://github.com/darwinia-network/bridger"
+version       = "0.5.5"
 
 [dependencies]
-tracing = "0.1"
 thiserror = "1"
+tracing   = "0.1"
 
-serde       = { version = "1", features = ["derive"] }
-serde_json  = "1"
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
 
-array-bytes = "1.4"
-codec       = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
-subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
-
-web3          = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"], optional = true }
-secp256k1     = { version = "0.20", features = ["recovery"], optional = true }
-shadow-liketh = { path = "../shadow-liketh", optional = true }
-
-support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
+array-bytes     = "1.4"
+codec           = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
+futures-util    = "0.3.14"
+jsonrpsee       = { version = "0.8.0", features = ["async-client", "client-ws-transport"] }
+secp256k1       = { version = "0.20", features = ["recovery"], optional = true }
+shadow-liketh   = { path = "../shadow-liketh", optional = true }
+sp-core         = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+subxt           = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
+support-toolkit = { path = "../../../frame/supports/support-toolkit" }
+web3            = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"], optional = true }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

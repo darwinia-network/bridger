@@ -78,16 +78,18 @@ async fn test_query_ethereum_relay_confirmed_block_numbers() {
 //         .unwrap();
 // }
 
-#[tokio::test]
-async fn test_next_term() {
-    let client = common::client().await.unwrap();
-    let current_term = client
-        .ethereum()
-        .ethereum_relay_authorities_next_term()
-        .await
-        .unwrap();
-    println!("{}", current_term);
-}
+// #[tokio::test]
+// async fn test_next_term() {
+//     let client = common::client().await.unwrap();
+//     let current_term = client
+//         .ethereum()
+//         .ethereum_relay_authorities_next_term()
+//         .await
+//         .unwrap();
+//     println!("{}", current_term);
+// }
+
+
 
 #[tokio::test]
 async fn authorities_to_sign() {
@@ -113,4 +115,19 @@ async fn authorities() {
         .await
         .unwrap();
     println!("{:?}", atd);
+}
+
+#[tokio::test]
+async fn test_subscribe() {
+    use futures_util::stream::StreamExt;
+    use client_pangolin::types::runtime_types::{bp_header_chain::justification::GrandpaJustification, sp_runtime::generic::header::Header};
+    use codec::Decode;
+    use subxt::sp_runtime::traits::BlakeTwo256;
+
+    let client = common::client().await.unwrap();
+    let mut it = client.subscribe_grandpa_justifications().await.unwrap().take(1);
+    if let Some(item) = it.next().await {
+        let i = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(&mut item.unwrap().as_ref()).unwrap();
+        println!("{:?}", i);
+    }
 }

@@ -1,4 +1,5 @@
 use crate::subxt_runtime::api::RuntimeApi;
+use subxt::rpc::{Subscription, SubscriptionClientT};
 use subxt::sp_runtime::traits::Header;
 use subxt::Client;
 
@@ -129,6 +130,15 @@ impl PangolinClient {
             Some(hash) => Ok(self.subxt().rpc().header(Some(hash)).await?),
             None => Ok(None),
         }
+    }
+
+    pub async fn subscribe_grandpa_justifications(&self) -> ClientResult<Subscription<sp_core::Bytes>> {
+        let sub = self.client.rpc().client.subscribe(
+            "grandpa_subscribeJustifications",
+            None,
+            "grandpa_unsubscribeJustifications",
+        ).await.unwrap();
+        Ok(sub)
     }
 
     // /// get mmr root of darwinia

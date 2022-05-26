@@ -4,7 +4,6 @@ use subxt::ClientBuilder;
 
 use crate::client::PangoroClient;
 use crate::config::ClientConfig;
-use crate::error::ClientError;
 use crate::types::DarwiniaAccount;
 
 const MAX_ATTEMPTS: u32 = 1;

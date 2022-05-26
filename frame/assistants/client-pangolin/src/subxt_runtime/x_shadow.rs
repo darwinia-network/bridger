@@ -27,7 +27,7 @@ impl TryFrom<web3::types::Block<web3::types::H256>> for ethereum_primitives::hea
             timestamp: value.timestamp.as_u64(),
             number: value
                 .number
-                .ok_or_else(|| Self::Error::Other(format!("Missing ethereum block number")))?
+                .ok_or_else(|| Self::Error::Custom(format!("Missing ethereum block number")))?
                 .as_u64(),
             author: runtime_types::primitive_types::H160(value.author.to_fixed_bytes()),
             transactions_root: subxt::sp_core::H256(value.transactions_root.to_fixed_bytes()),
@@ -38,7 +38,7 @@ impl TryFrom<web3::types::Block<web3::types::H256>> for ethereum_primitives::hea
             log_bloom: runtime_types::ethbloom::Bloom(
                 value
                     .logs_bloom
-                    .ok_or_else(|| Self::Error::Other("The `logs_bloom` is required".to_string()))?
+                    .ok_or_else(|| Self::Error::Custom("The `logs_bloom` is required".to_string()))?
                     .to_fixed_bytes(),
             ),
             gas_used: runtime_types::primitive_types::U256(value.gas_used.0),

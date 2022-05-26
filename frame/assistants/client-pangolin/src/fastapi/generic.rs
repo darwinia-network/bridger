@@ -46,10 +46,10 @@ impl PangolinClient {
         let spec_name = runtime_version
             .other
             .get("specName")
-            .ok_or_else(|| ClientError::Other("Failed to query spec name".to_string()))?
+            .ok_or_else(|| ClientError::Custom("Failed to query spec name".to_string()))?
             .as_str()
             .ok_or_else(|| {
-                ClientError::Other("The spec name not found in runtime version".to_string())
+                ClientError::Custom("The spec name not found in runtime version".to_string())
             })?;
         Ok(spec_name.to_string())
     }

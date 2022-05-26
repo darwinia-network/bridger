@@ -34,6 +34,8 @@ async fn init_bridge(
         BridgeName::PangoroToPangolin => {
             let initialization_data = client_pangoro.prepare_initialization_data().await?;
             println!("{:?}", initialization_data);
+            let initialization_data = client_pangolin.prepare_initialization_data().await?;
+            println!("{:?}", initialization_data);
         }
         BridgeName::PangolinToPangoro => {}
     }

@@ -441,10 +441,13 @@ name = "client-pangolin"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "async-trait",
+ "bp-header-chain",
+ "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.136",
  "serde_json",
+ "sp-finality-grandpa",
+ "sp-runtime",
  "subxt",
  "support-toolkit",
  "thiserror",
@@ -456,7 +459,6 @@ name = "client-pangoro"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "async-trait",
  "bp-header-chain",
  "finality-grandpa",
  "parity-scale-codec",

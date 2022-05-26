@@ -1011,7 +1011,6 @@ name = "client-pangolin"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "async-trait",
  "parity-scale-codec",
  "serde 1.0.137",
  "serde_json",

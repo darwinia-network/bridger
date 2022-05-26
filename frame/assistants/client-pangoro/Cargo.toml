@@ -29,13 +29,17 @@ array-bytes = "1.4"
 codec       = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
 subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 
-sp-finality-grandpa   = { git = "https://github.com/darwinia-network/substrate", branch = "darwinia-v0.12.2", optional = true }
+sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate", branch = "darwinia-v0.12.2", optional = true }
+sp-runtime          = { git = "https://github.com/darwinia-network/substrate", branch = "darwinia-v0.12.2", optional = true }
 
 support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
 
 [features]
 default      = []
-s2s          = ["sp-finality-grandpa"]
+s2s          = [
+  "sp-finality-grandpa",
+  "sp-runtime"
+]
 s2s-pangolin = ["s2s"]
 
 [dev-dependencies]

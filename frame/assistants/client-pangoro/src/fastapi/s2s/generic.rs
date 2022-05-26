@@ -1,4 +1,5 @@
-use sp_finality_grandpa::AuthorityList;
+use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
+use sp_runtime::{generic::OpaqueDigestItemId, ConsensusEngineId, DigestItem};
 use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
 
@@ -7,10 +8,13 @@ use crate::error::{ClientError, ClientResult};
 use crate::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
 use crate::types::runtime_types::bp_header_chain::InitializationData;
 
-type Header = crate::types::runtime_types::sp_runtime::generic::header::Header<
+const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
+
+type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
     u32,
     sp_runtime::traits::BlakeTwo256,
 >;
+type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 
 impl PangoroClient {
     pub async fn subscribe_justification(&self) -> ClientResult<Subscription<sp_core::Bytes>> {
@@ -26,13 +30,15 @@ impl PangoroClient {
             .await?)
     }
 
-    pub async fn prepare_initialization_data(&self) -> ClientResult<InitializationData<Header>> {
+    pub async fn prepare_initialization_data(
+        &self,
+    ) -> ClientResult<InitializationData<BundleHeader>> {
         let mut subscription = self.subscribe_justification().await?;
         let justification = subscription
             .next()
             .await
             .ok_or_else(|| ClientError::Custom("The subscribe is closed".to_string()))??;
-        let justification: GrandpaJustification<Header> =
+        let justification: GrandpaJustification<BundleHeader> =
             codec::Decode::decode(&mut &justification.0[..])
                 .map_err(|err| ClientError::Custom(format!("Wrong justification: {:?}", err)))?;
 
@@ -56,7 +62,15 @@ impl PangoroClient {
             initial_header_hash,
         );
         let initial_authorities_set = self.grandpa_authorities(initial_header_hash).await?;
-        println!("-----> {:?}", initial_authorities_set);
+        tracing::trace!(target: "client-pangoro", "Selected initial authorities set: {:?}",
+            initial_authorities_set,
+        );
+
+        // If initial header changes the GRANDPA authorities set, then we need previous authorities
+        // to verify justification.
+        let mut authorities_for_verification = initial_authorities_set.clone();
+        let scheduled_change = self.find_grandpa_authorities_scheduled_change(&initial_header);
+        tracing::trace!("{:?}", scheduled_change);
         Err(ClientError::Custom("NONE".to_string()))
     }
 }
@@ -82,5 +96,37 @@ impl PangoroClient {
             ))
         })?;
         Ok(authorities)
+    }
+
+    /// Find header digest that schedules next GRANDPA authorities set.
+    fn find_grandpa_authorities_scheduled_change(
+        &self,
+        header: &SpHeader,
+    ) -> Option<ScheduledChange<u32>> {
+        let filter_log = |log: ConsensusLog<u32>| match log {
+            ConsensusLog::ScheduledChange(change) => Some(change),
+            _ => None,
+        };
+
+        // find the first consensus digest with the right ID which converts to
+        // the right kind of consensus log.
+        header
+            .digest
+            .logs
+            .iter()
+            .filter_map(|item| match item {
+                DigestItem::Consensus(engine, logs) => {
+                    if engine == &GRANDPA_ENGINE_ID {
+                        Some(&logs[..])
+                    } else {
+                        None
+                    }
+                }
+                _ => None,
+            })
+            .find_map(|mut l| {
+                let a = codec::Decode::decode(&mut l).ok();
+                a.and_then(filter_log)
+            })
     }
 }

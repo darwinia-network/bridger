@@ -461,6 +461,7 @@ dependencies = [
  "serde 1.0.136",
  "serde_json",
  "sp-finality-grandpa",
+ "sp-runtime",
  "subxt",
  "support-toolkit",
  "thiserror",

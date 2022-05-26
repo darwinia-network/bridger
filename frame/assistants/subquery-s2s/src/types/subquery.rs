@@ -23,7 +23,6 @@ pub enum OriginType {
 
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct QueryNextOnDemandBlockVars {
-    pub(crate) block: u32,
     pub(crate) origin: OriginType,
 }
 

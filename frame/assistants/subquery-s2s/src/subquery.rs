@@ -66,12 +66,10 @@ impl Subquery {
 
     pub async fn next_needed_header(
         &self,
-        block_number: u32,
         origin: OriginType,
     ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {
         let query = self.read_graphql("next_needed_header.query.graphql")?;
         let vars = QueryNextOnDemandBlockVars {
-            block: block_number,
             origin,
         };
         let data = self

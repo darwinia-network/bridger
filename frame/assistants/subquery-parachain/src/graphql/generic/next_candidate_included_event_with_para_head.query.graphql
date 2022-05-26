@@ -1,5 +1,5 @@
 query queryNextCandidateIncludedEvent($para_head: String!) {
-  nextCandidateIncludedEvents (
+  candidateIncludedEvents (
     first: 1
     orderBy: INCLUDED_RELAY_BLOCK_ASC
     filter: {

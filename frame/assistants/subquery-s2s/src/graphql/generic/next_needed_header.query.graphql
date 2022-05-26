@@ -1,11 +1,8 @@
-query queryNextRelayBlock($block: Int!, $origin: String!) {
+query queryNextRelayBlock($origin: String!) {
   needRelayBlocks (
     first: 1
-    orderBy: BLOCK_NUMBER_ASC
+    orderBy: BLOCK_NUMBER_DESC
     filter: {
-      blockNumber: {
-        greaterThan: $block
-      }
       type: {
         equalTo: "on-demand"
       }

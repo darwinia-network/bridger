@@ -70,7 +70,7 @@ impl Subquery {
         &self,
         para_head_hash: impl AsRef<str>,
     ) -> SubqueryComponentResult<Option<CandidateIncludedEvent>> {
-        let query = self.read_graphql("next_candiate_included_event.query.graphql")?;
+        let query = self.read_graphql("next_candidate_included_event_with_para_head.query.graphql")?;
         let vars = QueryNextCandidateIncludedEventWithParaHeadVars {
             para_head: String::from(para_head_hash.as_ref()),
         };
@@ -82,7 +82,7 @@ impl Subquery {
             .await
             .map_err(SubqueryComponentError::from)?;
         let event = data
-            .get("nextCandidateIncludedEvents")
+            .get("candidateIncludedEvents")
             .map(|item| item.nodes.clone())
             .unwrap_or_default();
         Ok(event.get(0).cloned())

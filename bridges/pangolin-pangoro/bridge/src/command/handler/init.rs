@@ -32,22 +32,8 @@ async fn init_bridge(
     let client_pangoro = PangoroClientComponent::component(config_pangoro.into()).await?;
     match bridge {
         BridgeName::PangoroToPangolin => {
-            // let mut subscription = client_pangoro.subscribe_justification().await?;
-            // let justification = subscription
-            //     .next()
-            //     .await
-            //     .ok_or_else(|| BridgerError::Custom("The subscribe is closed".to_string()))??;
-            // let justification: bp_header_chain::justification::GrandpaJustification<
-            //     <bp_pangolin::Pangolin as bp_runtime::Chain>::Header,
-            // > = codec::Decode::decode(&mut &justification.0[..])
-            //     .map_err(|err| BridgerError::Custom(format!("Wrong justification: {:?}", err)))?;
-            //
-            // let (initial_header_hash, initial_header_number) = (
-            //     justification.commit.target_hash,
-            //     justification.commit.target_number,
-            // );
-            // println!("{:?}", justification);
-            let a = client_pangoro.prepare_initialization_data().await?;
+            let initialization_data = client_pangoro.prepare_initialization_data().await?;
+            println!("{:?}", initialization_data);
         }
         BridgeName::PangolinToPangoro => {}
     }

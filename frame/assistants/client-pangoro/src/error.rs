@@ -17,6 +17,9 @@ pub enum ClientError {
     #[error("Please reconnect to rpc server")]
     ClientRestartNeed,
 
+    #[error(transparent)]
+    Codec(#[from] codec::Error),
+
     #[error("Wrong seed: {0}")]
     Seed(String),
 

@@ -2797,7 +2797,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "parity-scale-codec",
  "scale-info",
@@ -2810,7 +2810,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.14",
@@ -2825,7 +2825,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -2870,7 +2870,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2880,7 +2880,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.10.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -2891,7 +2891,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "futures",
  "hash-db",
@@ -2915,7 +2915,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.10.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2931,7 +2931,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "backtrace",
 ]
@@ -2939,7 +2939,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -2961,7 +2961,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -2978,7 +2978,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "Inflector",
  "proc-macro-crate 1.1.0",
@@ -2990,7 +2990,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.10.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "hash-db",
  "log",
@@ -3013,12 +3013,12 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 
 [[package]]
 name = "sp-storage"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -3031,7 +3031,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "erased-serde",
  "log",
@@ -3049,7 +3049,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -3064,7 +3064,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -3080,7 +3080,7 @@ dependencies = [
 [[package]]
 name = "sp-version-proc-macro"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "parity-scale-codec",
  "proc-macro2",
@@ -3091,7 +3091,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",

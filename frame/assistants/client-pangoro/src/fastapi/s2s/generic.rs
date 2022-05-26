@@ -1,3 +1,4 @@
+use finality_grandpa::voter_set::VoterSet;
 use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
 use sp_runtime::{generic::OpaqueDigestItemId, ConsensusEngineId, DigestItem};
 use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
@@ -5,7 +6,6 @@ use subxt::{sp_core, sp_runtime};
 
 use crate::client::PangoroClient;
 use crate::error::{ClientError, ClientResult};
-use crate::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
 use crate::types::runtime_types::bp_header_chain::InitializationData;
 
 const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
@@ -38,7 +38,7 @@ impl PangoroClient {
             .next()
             .await
             .ok_or_else(|| ClientError::Custom("The subscribe is closed".to_string()))??;
-        let justification: GrandpaJustification<BundleHeader> =
+        let justification: bp_header_chain::justification::GrandpaJustification<SpHeader> =
             codec::Decode::decode(&mut &justification.0[..])
                 .map_err(|err| ClientError::Custom(format!("Wrong justification: {:?}", err)))?;
 
@@ -70,8 +70,83 @@ impl PangoroClient {
         // to verify justification.
         let mut authorities_for_verification = initial_authorities_set.clone();
         let scheduled_change = self.find_grandpa_authorities_scheduled_change(&initial_header);
-        tracing::trace!("{:?}", scheduled_change);
-        Err(ClientError::Custom("NONE".to_string()))
+        if scheduled_change
+            .as_ref()
+            .map(|c| c.delay == 0)
+            .unwrap_or(false)
+        {
+            return Err(ClientError::Custom(format!(
+                "GRANDPA authorities change at {} scheduled to happen in {:?} blocks. \
+                We expect regular hange to have zero delay",
+                initial_header_hash,
+                scheduled_change.as_ref().map(|c| c.delay),
+            )));
+        }
+        let schedules_change = scheduled_change.is_some();
+        if schedules_change {
+            authorities_for_verification =
+                self.grandpa_authorities(initial_header.parent_hash).await?;
+            tracing::trace!(
+                target: "client-pangoro",
+                "Selected header is scheduling GRANDPA authorities set changes. Using previous set: {:?}",
+                authorities_for_verification,
+            );
+        }
+
+        // Now let's try to guess authorities set id by verifying justification.
+        let mut initial_authorities_set_id = 0;
+        let mut min_possible_block_number = 0;
+        let authorities_for_verification = VoterSet::new(authorities_for_verification.clone())
+            .ok_or(ClientError::Custom(format!(
+                "[ReadInvalidAuthorities]: {:?}",
+                authorities_for_verification,
+            )))?;
+        loop {
+            tracing::trace!(
+                target: "client-pangoro",
+                "Trying GRANDPA authorities set id: {}",
+                initial_authorities_set_id,
+            );
+
+            let is_valid_set_id = bp_header_chain::justification::verify_justification::<SpHeader>(
+                (initial_header_hash, initial_header_number),
+                initial_authorities_set_id,
+                &authorities_for_verification,
+                &justification,
+            )
+            .is_ok();
+
+            if is_valid_set_id {
+                break;
+            }
+
+            initial_authorities_set_id += 1;
+            min_possible_block_number += 1;
+            if min_possible_block_number > initial_header_number {
+                // there can't be more authorities set changes than headers => if we have reached
+                // `initial_block_number` and still have not found correct value of
+                // `initial_authorities_set_id`, then something else is broken => fail
+                return Err(ClientError::Custom(format!(
+                    "[GuessInitialAuthorities]: {}",
+                    initial_header_number
+                )));
+            }
+        }
+
+        let initialization_data = bp_header_chain::InitializationData {
+            header: Box::new(initial_header),
+            authority_list: initial_authorities_set,
+            set_id: if schedules_change {
+                initial_authorities_set_id + 1
+            } else {
+                initial_authorities_set_id
+            },
+            is_halted: false,
+        };
+        let bytes = codec::Encode::encode(&initialization_data);
+        Ok(codec::Decode::decode(&mut &bytes[..]).map_err(|e| {
+            ClientError::Custom(format!("Failed to decode initialization data: {:?}", e))
+        })?)
     }
 }
 
@@ -125,8 +200,8 @@ impl PangoroClient {
                 _ => None,
             })
             .find_map(|mut l| {
-                let a = codec::Decode::decode(&mut l).ok();
-                a.and_then(filter_log)
+                let log = codec::Decode::decode(&mut l).ok();
+                log.and_then(filter_log)
             })
     }
 }

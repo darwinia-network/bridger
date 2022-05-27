@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+use subquery_s2s::SubqueryConfig;
+use support_common::error::BridgerError;
 
 use crate::types::HexLaneId;
 
@@ -11,6 +13,8 @@ pub struct BridgeConfig {
     pub pangoro: ChainInfoConfig,
     /// Relay config
     pub relay: RelayConfig,
+    /// Index config
+    pub index: IndexConfig,
 }
 
 /// Chain info
@@ -26,6 +30,12 @@ pub struct ChainInfoConfig {
 pub struct RelayConfig {
     /// Hex-encoded lane identifiers that should be served by the complex relay.
     pub lanes: Vec<HexLaneId>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct IndexConfig {
+    pub pangolin: SubqueryConfig,
+    pub pangoro: SubqueryConfig,
 }
 
 impl From<ChainInfoConfig> for client_pangolin::config::ClientConfig {
@@ -45,5 +55,27 @@ impl From<ChainInfoConfig> for client_pangoro::config::ClientConfig {
             relayer_private_key: config.signer,
             relayer_real_account: None,
         }
+    }
+}
+
+impl ChainInfoConfig {
+    pub fn to_pangolin_client_config(
+        &self,
+    ) -> color_eyre::Result<client_pangolin::config::ClientConfig> {
+        Ok(client_pangolin::config::ClientConfig {
+            endpoint: self.endpoint.clone(),
+            relayer_private_key: self.signer.clone(),
+            relayer_real_account: None,
+        })
+    }
+
+    pub fn to_pangoro_client_config(
+        &self,
+    ) -> color_eyre::Result<client_pangoro::config::ClientConfig> {
+        Ok(client_pangoro::config::ClientConfig {
+            endpoint: self.endpoint.clone(),
+            relayer_private_key: self.signer.clone(),
+            relayer_real_account: None,
+        })
     }
 }

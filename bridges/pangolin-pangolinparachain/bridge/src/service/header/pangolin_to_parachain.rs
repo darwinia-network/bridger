@@ -29,10 +29,7 @@ impl Service for PangolinToParachainHeaderRelayService {
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!(
-                "{}-pangolin-parachain-header-relay",
-                BridgeTask::name()
-            ),
+            &format!("{}-pangolin-parachain-header-relay", BridgeTask::name()),
             async move {
                 start().await.map_err(|e| {
                     BridgerError::Custom(format!(
@@ -87,7 +84,7 @@ async fn start() -> color_eyre::Result<()> {
     let mut header_relay = HeaderRelay::new().await?;
     loop {
         match run(&header_relay).await {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(err) => {
                 if let Some(subxt::BasicError::Rpc(request_error)) =
                     err.downcast_ref::<subxt::BasicError>()

@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 pub enum BridgeName {
     /// bridge pangolin<>pangolin-parachain
     PangolinParachain,
+    /// bridge pangolin<>pangoro
+    PangolinPangoro,
 }
 
 impl BridgeName {
@@ -12,6 +14,7 @@ impl BridgeName {
     pub(crate) fn directory(&self) -> &str {
         match self {
             Self::PangolinParachain => "pangolin-parachain",
+            Self::PangolinPangoro => "pangolin-pangoro",
         }
     }
 }

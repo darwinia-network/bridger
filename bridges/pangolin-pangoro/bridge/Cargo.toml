@@ -36,7 +36,4 @@ component-http-client = { path = "../../../frame/components/http-client" }
 client-pangolin = { path = "../../../frame/assistants/client-pangolin", features = [ "s2s-pangoro" ]}
 client-pangoro  = { path = "../../../frame/assistants/client-pangoro", features = [ "s2s-pangolin" ]}
 
-bp-header-chain  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-bp-runtime       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-bp-pangolin      = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-bp-pangoro       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+subquery-s2s    = { path = "../../../frame/assistants/subquery-s2s" }

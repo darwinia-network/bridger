@@ -69,6 +69,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b48bc78d3fa4a9a0925d5009f731cbf7e5613d2a4f1a937208f6dde89a287bab"
 
 [[package]]
+name = "array-init"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23589ecb866b460d3a0f1278834750268c607e8e28a1b982c907219f3178cd72"
+dependencies = [
+ "nodrop",
+]
+
+[[package]]
 name = "arrayref"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -233,22 +242,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-darwinia-core"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#734a60313dd32e77574d8c72298660c291440151"
-dependencies = [
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "bp-header-chain"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#734a60313dd32e77574d8c72298660c291440151"
@@ -265,79 +258,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-messages"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#734a60313dd32e77574d8c72298660c291440151"
-dependencies = [
- "bitvec",
- "bp-runtime",
- "frame-support",
- "frame-system",
- "impl-trait-for-tuples",
- "parity-scale-codec",
- "scale-info",
- "serde 1.0.136",
- "sp-core",
- "sp-std",
-]
-
-[[package]]
-name = "bp-pangolin"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#734a60313dd32e77574d8c72298660c291440151"
-dependencies = [
- "bp-darwinia-core",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "sp-api",
- "sp-runtime",
- "sp-std",
- "sp-version",
-]
-
-[[package]]
-name = "bp-pangoro"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#734a60313dd32e77574d8c72298660c291440151"
-dependencies = [
- "bp-darwinia-core",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "sp-api",
- "sp-runtime",
- "sp-std",
- "sp-version",
-]
-
-[[package]]
-name = "bp-runtime"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#734a60313dd32e77574d8c72298660c291440151"
-dependencies = [
- "frame-support",
- "hash-db",
- "num-traits 0.2.14",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-state-machine",
- "sp-std",
- "sp-trie",
-]
-
-[[package]]
 name = "bridge-pangolin-pangoro"
 version = "0.5.5"
 dependencies = [
  "array-bytes",
- "bp-header-chain",
- "bp-pangolin",
- "bp-pangoro",
- "bp-runtime",
  "client-pangolin",
  "client-pangoro",
  "color-eyre",
@@ -348,6 +272,7 @@ dependencies = [
  "serde 1.0.136",
  "structopt",
  "strum",
+ "subquery-s2s",
  "support-common",
  "support-lifeline",
  "support-terminal",
@@ -418,6 +343,7 @@ dependencies = [
  "libc",
  "num-integer",
  "num-traits 0.2.14",
+ "time",
  "winapi",
 ]
 
@@ -948,7 +874,7 @@ dependencies = [
  "paste",
  "scale-info",
  "serde 1.0.136",
- "smallvec",
+ "smallvec 1.8.0",
  "sp-arithmetic",
  "sp-core",
  "sp-inherents",
@@ -992,23 +918,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "frame-system"
-version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
-dependencies = [
- "frame-support",
- "log",
- "parity-scale-codec",
- "scale-info",
- "serde 1.0.136",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
- "sp-version",
 ]
 
 [[package]]
@@ -1161,6 +1070,17 @@ name = "gimli"
 version = "0.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78cc372d058dcf6d5ecd98510e7fbc9e5aec4d21de70f65fea8fecebcd881bd4"
+
+[[package]]
+name = "gql_client"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d817a5d0b2a4948deae8550e12ae5eff3a874f8b66090b5863a2dcc917a59a61"
+dependencies = [
+ "reqwest",
+ "serde 1.0.136",
+ "serde_json",
+]
 
 [[package]]
 name = "h2"
@@ -1388,6 +1308,25 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "include_dir"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "482a2e29200b7eed25d7fdbd14423326760b7f6658d21a4cf12d55a50713c69f"
+dependencies = [
+ "include_dir_macros",
+]
+
+[[package]]
+name = "include_dir_macros"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e074c19deab2501407c91ba1860fa3d6820bfde307db6d8cb851b55a10be89b"
+dependencies = [
+ "proc-macro2",
+ "quote",
 ]
 
 [[package]]
@@ -1666,6 +1605,12 @@ name = "matches"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3e378b66a060d48947b590737b30a1be76706c8dd7b8ba0f2fe3989c68a853f"
+
+[[package]]
+name = "maybe-uninit"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 
 [[package]]
 name = "memchr"
@@ -2010,7 +1955,7 @@ dependencies = [
  "cloudabi",
  "libc",
  "redox_syscall 0.1.57",
- "smallvec",
+ "smallvec 1.8.0",
  "winapi",
 ]
 
@@ -2024,7 +1969,7 @@ dependencies = [
  "instant",
  "libc",
  "redox_syscall 0.2.13",
- "smallvec",
+ "smallvec 1.8.0",
  "winapi",
 ]
 
@@ -2037,7 +1982,7 @@ dependencies = [
  "cfg-if 1.0.0",
  "libc",
  "redox_syscall 0.2.13",
- "smallvec",
+ "smallvec 1.8.0",
  "windows-sys",
 ]
 
@@ -2659,6 +2604,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde-aux"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae50f53d4b01e854319c1f5b854cd59471f054ea7e554988850d3f36ca1dc852"
+dependencies = [
+ "chrono",
+ "serde 1.0.136",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
+name = "serde-hex"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca37e3e4d1b39afd7ff11ee4e947efae85adfddf4841787bfa47c470e96dc26d"
+dependencies = [
+ "array-init",
+ "serde 1.0.136",
+ "smallvec 0.6.14",
+]
+
+[[package]]
 name = "serde-hjson"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2801,6 +2769,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8347046d4ebd943127157b94d63abb990fcf729dc4e9978927fdf4ac3c998d06"
 dependencies = [
  "erased-serde",
+]
+
+[[package]]
+name = "smallvec"
+version = "0.6.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b97fcaeba89edba30f044a10c6a3cc39df9c3f17d7cd829dd1446cab35f890e0"
+dependencies = [
+ "maybe-uninit",
 ]
 
 [[package]]
@@ -3110,7 +3087,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.2",
  "rand 0.7.3",
- "smallvec",
+ "smallvec 1.8.0",
  "sp-core",
  "sp-externalities",
  "sp-panic-handler",
@@ -3278,6 +3255,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "subquery-s2s"
+version = "0.5.5"
+dependencies = [
+ "async-trait",
+ "gql_client",
+ "hex",
+ "include_dir",
+ "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
+ "strum",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]
@@ -3485,6 +3478,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5516c27b78311c50bf42c071425c560ac799b11c30b31f87e3081965fe5e0180"
 dependencies = [
  "once_cell",
+]
+
+[[package]]
+name = "time"
+version = "0.1.44"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6db9e6914ab8b1ae1c260a4ae7a49b6c5611b40328a735b21862567685e73255"
+dependencies = [
+ "libc",
+ "wasi 0.10.0+wasi-snapshot-preview1",
+ "winapi",
 ]
 
 [[package]]
@@ -3704,7 +3708,7 @@ dependencies = [
  "serde 1.0.136",
  "serde_json",
  "sharded-slab",
- "smallvec",
+ "smallvec 1.8.0",
  "thread_local",
  "tracing",
  "tracing-core",
@@ -3722,7 +3726,7 @@ dependencies = [
  "hashbrown",
  "log",
  "rustc-hex",
- "smallvec",
+ "smallvec 1.8.0",
 ]
 
 [[package]]

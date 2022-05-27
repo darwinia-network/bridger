@@ -14,13 +14,8 @@ pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
     let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
     let config_pangoro: ChainInfoConfig = bridge_config.pangoro;
 
-    // let (source_chain, target_chain) = match bridge {
-    //     BridgeName::PangolinToPangoro => (config_pangolin, config_pangoro),
-    //     BridgeName::PangoroToPangolin => (config_pangoro, config_pangolin),
-    // };
-
     init_bridge(bridge, config_pangolin, config_pangoro).await?;
-    loop {}
+    Ok(())
 }
 
 async fn init_bridge(

@@ -1,7 +1,9 @@
 use support_lifeline::task::TaskStack;
 
 use crate::bridge::BridgeTaskBus;
-use crate::service::some::SomeService;
+use crate::service::feemarket::FeemarketService;
+use crate::service::header::HeaderRelayService;
+use crate::service::message::MessageRelayService;
 
 #[derive(Debug)]
 pub struct BridgeTask {
@@ -9,15 +11,19 @@ pub struct BridgeTask {
 }
 
 impl BridgeTask {
-    pub fn new() -> color_eyre::Result<Self> {
+    pub async fn new() -> color_eyre::Result<Self> {
         let bus = BridgeTaskBus::default();
         let mut stack = TaskStack::new(bus);
-        stack.spawn_service::<SomeService>()?;
+        stack.spawn_service::<HeaderRelayService>()?;
+        stack.spawn_service::<MessageRelayService>()?;
+        stack.spawn_service::<FeemarketService>()?;
+
         Ok(Self { stack })
     }
 }
 
 impl BridgeTask {
+    #[allow(dead_code)]
     pub fn stack(&self) -> &TaskStack<BridgeTaskBus> {
         &self.stack
     }

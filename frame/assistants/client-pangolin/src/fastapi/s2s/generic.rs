@@ -12,7 +12,7 @@ const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
 
 type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
     u32,
-    sp_runtime::traits::BlakeTwo256,
+    crate::types::runtime_types::sp_runtime::traits::BlakeTwo256,
 >;
 type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 

@@ -82,7 +82,7 @@ impl HeaderRelay {
 
 async fn start() -> color_eyre::Result<()> {
     tracing::info!(
-        target: "pangolin-pangolinparachain",
+        target: "pangolin-crabparachain",
         "[header-pangolin-to-parachain] SERVICE RESTARTING..."
     );
     let mut header_relay = HeaderRelay::new().await?;
@@ -94,14 +94,14 @@ async fn start() -> color_eyre::Result<()> {
                     err.downcast_ref::<subxt::BasicError>()
                 {
                     tracing::error!(
-                        target: "pangolin-pangolinparachain",
+                        target: "pangolin-crabparachain",
                         "[header-pangolin-to-parachain] Connection Error. Try to resend later: {:?}",
                         &request_error
                     );
                     header_relay = HeaderRelay::new().await?;
                 }
                 tracing::error!(
-                    target: "pangolin-pangolinparachain",
+                    target: "pangolin-crabparachain",
                     "[header-pangolin-to-parachain] Failed to relay header: {:?}",
                     err
                 );
@@ -133,7 +133,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         })?;
     let block_number = last_relayed_pangolin_block_in_parachain.block.header.number;
     tracing::trace!(
-        target: "pangolin-pangolinparachain",
+        target: "pangolin-crabparachain",
         "[header-pangolin-to-parachain] The latest relayed pangolin block is: {:?}",
         block_number
     );
@@ -159,7 +159,7 @@ async fn try_to_relay_mandatory(
         .await?;
     if let Some(block_to_relay) = next_mandatory_block {
         tracing::info!(
-            target: "pangolin-pangolinparachain",
+            target: "pangolin-crabparachain",
             "[header-pangolin-to-parachain] Next mandatory block: {:?} ",
             &block_to_relay.block_number
         );
@@ -177,7 +177,7 @@ async fn try_to_relay_mandatory(
         Ok(Some(block_to_relay.block_number))
     } else {
         tracing::info!(
-            target: "pangolin-pangolinparachain",
+            target: "pangolin-crabparachain",
             "[header-pangolin-to-parachain] Next mandatory block not found",
         );
         Ok(None)
@@ -252,7 +252,7 @@ async fn submit_finality(
 
     let events = track.wait_for_finalized_success().await?;
     tracing::info!(
-         target: "pangolin-pangolinparachain",
+         target: "pangolin-crabparachain",
           "[header-pangolin-to-parachain] The extrinsic hash: {:?}",
            events.extrinsic_hash()
     );

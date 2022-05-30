@@ -15,7 +15,7 @@ pub struct BridgeTask {
 
 impl BridgeTask {
     pub fn name() -> &'static str {
-        "task-pangolin-pangolinparachain"
+        "task-pangolin-crabparachain"
     }
 }
 

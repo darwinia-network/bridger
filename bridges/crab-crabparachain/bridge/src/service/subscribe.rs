@@ -36,9 +36,9 @@ impl Service for SubscribeService {
         let _greet = Self::try_task(&format!("{}-relay", BridgeTask::name()), async move {
             let mut execution = start().await;
             while let Err(e) = execution {
-                tracing::error!(target: "pangolin-pangolinparachain", "{:?}", e);
+                tracing::error!(target: "pangolin-crabparachain", "{:?}", e);
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                tracing::info!(target: "pangolin-pangolinparachain", "Try to restart subscribtion service.");
+                tracing::info!(target: "pangolin-crabparachain", "Try to restart subscribtion service.");
                 execution = start().await;
             }
             Ok(())
@@ -64,7 +64,7 @@ async fn start() -> color_eyre::Result<()> {
 
 async fn run_until_pangolin_connection_lost(mut client: PangolinClient) -> color_eyre::Result<()> {
     while let Err(err) = subscribe_pangolin(&client).await {
-        tracing::error!(target: "pangolin-pangolinparachain", "Failed to get justification from pangolin: {:?}", err);
+        tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from pangolin: {:?}", err);
         let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
         let client_pangolin =
             PangolinClientComponent::component(bridge_config.pangolin.to_pangolin_client_config()?)
@@ -76,7 +76,7 @@ async fn run_until_pangolin_connection_lost(mut client: PangolinClient) -> color
 
 async fn run_until_rococo_connection_lost(mut client: RococoClient) -> color_eyre::Result<()> {
     while let Err(err) = subscribe_rococo(&client).await {
-        tracing::error!(target: "pangolin-pangolinparachain", "Failed to get justification from rococo: {:?}", err);
+        tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from rococo: {:?}", err);
         let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
         let client_rococo =
             RococoClientComponent::component(bridge_config.rococo.to_rococo_client_config()?)

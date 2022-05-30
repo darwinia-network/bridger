@@ -45,7 +45,7 @@ impl Service for MessageRelayService {
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(&format!("{}-relay", BridgeTask::name()), async move {
             if let Err(e) = start() {
-                tracing::error!(target: "pangolin-pangolinparachain", "{:?}", e);
+                tracing::error!(target: "pangolin-crabparachain", "{:?}", e);
                 return Err(
                     BridgerError::Custom("Failed to start relay service".to_string()).into(),
                 );
@@ -239,7 +239,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         .map_err(|e| BridgerError::Custom(format!("{:?}", e)))?;
 
     if let Err(e) = futures::future::select_all(message_relays).await.0 {
-        tracing::error!(target: "pangolin-pangolinparachain", "{:?}", e);
+        tracing::error!(target: "pangolin-crabparachain", "{:?}", e);
         return Err(BridgerError::Custom("Failed to start relay".to_string()).into());
     }
     Ok(())

@@ -1,7 +1,7 @@
 use bp_header_chain::InitializationData;
 use bp_runtime::Chain as ChainBase;
 use codec::Encode;
-use relay_pangolin_client::runtime::{BridgeKusamaGrandpaCall, Call};
+use relay_crab_client::runtime::{BridgeKusamaGrandpaCall, Call};
 use relay_crab_parachain_client::runtime as crab_parachain_runtime;
 use relay_substrate_client::{
     Chain as RelaySubstrateClientChain, SignParam, TransactionSignScheme, UnsignedTransaction,
@@ -16,19 +16,19 @@ use crate::bridge::{ChainInfoConfig, BridgeConfig};
 use crate::types::{BridgeName, InitBridge};
 
 pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
-    tracing::info!(target: "pangolin-crabparachain", "Init bridge {:?}", bridge);
+    tracing::info!(target: "crab-crabparachain", "Init bridge {:?}", bridge);
     let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
-    let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
+    let config_crab: ChainInfoConfig = bridge_config.crab;
     let config_kusama: ChainInfoConfig = bridge_config.kusama;
     let config_crab_parachain: ChainInfoConfig = bridge_config.crab_parachain;
 
     let (source_chain, target_chain) = match bridge {
         BridgeName::KusamaToCrab => (
             config_kusama.to_chain_info()?,
-            config_pangolin.to_chain_info()?,
+            config_crab.to_chain_info()?,
         ),
         BridgeName::CrabToCrabParachain => (
-            config_pangolin.to_chain_info()?,
+            config_crab.to_chain_info()?,
             config_crab_parachain.to_chain_info()?,
         ),
     };
@@ -51,7 +51,7 @@ macro_rules! select_bridge {
         match $bridge {
             BridgeName::KusamaToCrab => {
                 type Source = relay_kusama_client::Kusama;
-                type Target = relay_pangolin_client::CrabChain;
+                type Target = relay_crab_client::CrabChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
@@ -62,7 +62,7 @@ macro_rules! select_bridge {
                 $generic
             }
             BridgeName::CrabToCrabParachain => {
-                type Source = relay_pangolin_client::CrabChain;
+                type Source = relay_crab_client::CrabChain;
                 type Target = relay_crab_parachain_client::CrabParachainChain;
 
                 fn encode_init_bridge(
@@ -90,12 +90,12 @@ async fn init_bridge(init_bridge: InitBridge) -> color_eyre::Result<()> {
         let target_client = target_chain.to_substrate_relay_chain::<Target>().await?;
         let target_sign = target_chain.to_keypair::<Target>()?;
         tracing::debug!(
-            target: "pangolin-crabparachain",
+            target: "crab-crabparachain",
             "source client -> {:?}",
             source_client
         );
         tracing::debug!(
-            target: "pangolin-crabparachain",
+            target: "crab-crabparachain",
             "target client -> {:?}",
             target_client
         );

@@ -1,6 +1,6 @@
-use client_pangolin::client::CrabClient;
-use client_pangolin::component::CrabClientComponent;
-use client_pangolin::types::runtime_types::{self as pangolin_runtime_types};
+use client_crab::client::CrabClient;
+use client_crab::component::CrabClientComponent;
+use client_crab::types::runtime_types::{self as crab_runtime_types};
 use client_kusama::client::KusamaClient;
 use client_kusama::component::KusamaClientComponent;
 use client_kusama::types::runtime_types as kusama_runtime_types;
@@ -25,11 +25,11 @@ impl Service for KusamaToCrabParaHeaderRelayService {
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!("{}-kusama-pangolin-header-relay", BridgeTask::name()),
+            &format!("{}-kusama-crab-header-relay", BridgeTask::name()),
             async move {
                 if let Err(e) = start().await {
                     tracing::error!(
-                        target: "pangolin-crabparachain",
+                        target: "crab-crabparachain",
                         "{:?}",
                         e,
                     );
@@ -46,7 +46,7 @@ impl Service for KusamaToCrabParaHeaderRelayService {
 }
 
 struct HeaderRelay {
-    client_pangolin: CrabClient,
+    client_crab: CrabClient,
     client_kusama: KusamaClient,
     para_id: u32,
 }
@@ -55,17 +55,17 @@ impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
         let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
 
-        let config_pangolin = bridge_config.pangolin;
+        let config_crab = bridge_config.crab;
         let config_kusama = bridge_config.kusama;
 
-        let client_pangolin =
-            CrabClientComponent::component(config_pangolin.to_pangolin_client_config()?)
+        let client_crab =
+            CrabClientComponent::component(config_crab.to_crab_client_config()?)
                 .await?;
         let client_kusama =
             KusamaClientComponent::component(config_kusama.to_kusama_client_config()?).await?;
 
         Ok(Self {
-            client_pangolin,
+            client_crab,
             client_kusama,
             para_id: bridge_config
                 .crab_parachain
@@ -77,8 +77,8 @@ impl HeaderRelay {
 
 async fn start() -> color_eyre::Result<()> {
     tracing::info!(
-        target: "pangolin-crabparachain",
-        "[para-header-kusama-to-pangolin] SERVICE RESTARTING..."
+        target: "crab-crabparachain",
+        "[para-header-kusama-to-crab] SERVICE RESTARTING..."
     );
     let mut header_relay = HeaderRelay::new().await?;
     loop {
@@ -89,15 +89,15 @@ async fn start() -> color_eyre::Result<()> {
                     err.downcast_ref::<subxt::BasicError>()
                 {
                     tracing::error!(
-                        target: "pangolin-crabparachain",
-                        "[para-header-kusama-to-pangolin] Connection Error. Try to resend later: {:?}",
+                        target: "crab-crabparachain",
+                        "[para-header-kusama-to-crab] Connection Error. Try to resend later: {:?}",
                         request_error
                     );
                     header_relay = HeaderRelay::new().await?;
                 }
                 tracing::error!(
-                    target: "pangolin-crabparachain",
-                    "[para-header-kusama-to-pangolin] Failed to relay header: {:?}",
+                    target: "crab-crabparachain",
+                    "[para-header-kusama-to-crab] Failed to relay header: {:?}",
                     err
                 );
             }
@@ -108,37 +108,37 @@ async fn start() -> color_eyre::Result<()> {
 
 async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
     let best_target_header = header_relay
-        .client_pangolin
+        .client_crab
         .subxt()
         .rpc()
         .header(None)
         .await?
-        .ok_or_else(|| BridgerError::Custom(String::from("Failed to get pangolin header")))?;
+        .ok_or_else(|| BridgerError::Custom(String::from("Failed to get crab header")))?;
     tracing::trace!(
-        target: "pangolin-crabparachain",
-        "[para-head-relay-kusama-to-pangolin] Current pangolin block: {:?}",
+        target: "crab-crabparachain",
+        "[para-head-relay-kusama-to-crab] Current crab block: {:?}",
         &best_target_header.number,
     );
 
     // TODO Hardcode ParaId
     let para_head_at_target = header_relay
-        .client_pangolin
+        .client_crab
         .runtime()
         .storage()
         .bridge_kusama_parachains()
         .best_para_heads(
-            pangolin_runtime_types::bp_polkadot_core::parachains::ParaId(header_relay.para_id),
+            crab_runtime_types::bp_polkadot_core::parachains::ParaId(header_relay.para_id),
             Some(best_target_header.hash()),
         )
         .await?;
     tracing::trace!(
-        target: "pangolin-crabparachain",
-        "[para-head-relay-kusama-to-pangolin] The latest para-head on pangolin: {:?}",
+        target: "crab-crabparachain",
+        "[para-head-relay-kusama-to-crab] The latest para-head on crab: {:?}",
         &para_head_at_target,
     );
 
     let best_finalized_source_block_hash = header_relay
-        .client_pangolin
+        .client_crab
         .runtime()
         .storage()
         .bridge_kusama_grandpa()
@@ -153,8 +153,8 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .await?
         .ok_or_else(|| BridgerError::Custom("Failed to get Kusama block".to_string()))?;
     tracing::trace!(
-        target: "pangolin-crabparachain",
-        "[para-head-relay-kusama-to-pangolin] The latest kusama block on pangolin: {:?}",
+        target: "crab-crabparachain",
+        "[para-head-relay-kusama-to-crab] The latest kusama block on crab: {:?}",
         &best_finalized_source_block_at_target.block.header.number,
     );
 
@@ -170,8 +170,8 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         )
         .await?;
     tracing::trace!(
-        target: "pangolin-crabparachain",
-        "[para-head-relay-kusama-to-pangolin] The latest para-head on kusama {:?}",
+        target: "crab-crabparachain",
+        "[para-head-relay-kusama-to-crab] The latest para-head on kusama {:?}",
         &best_finalized_source_block_at_target.block.header.number,
     );
 
@@ -189,15 +189,15 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
 
         (None, None) => {
             tracing::info!(
-                target: "pangolin-crabparachain",
-                "[para-head-relay-kusama-to-pangolin] Parachain is unknown to both clients"
+                target: "crab-crabparachain",
+                "[para-head-relay-kusama-to-crab] Parachain is unknown to both clients"
             );
             false
         }
         (Some(_), Some(_)) => {
             tracing::info!(
-                target: "pangolin-crabparachain",
-                "[para-head-relay-kusama-to-pangolin] It doesn't need to relay"
+                target: "crab-crabparachain",
+                "[para-head-relay-kusama-to-crab] It doesn't need to relay"
             );
             false
         }
@@ -217,18 +217,18 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             )
             .await?;
         tracing::info!(
-            target: "pangolin-crabparachain",
-            "[para-head-relay-kusama-to-pangolin] Submitting parachain heads update transaction to pangolin",
+            target: "crab-crabparachain",
+            "[para-head-relay-kusama-to-crab] Submitting parachain heads update transaction to crab",
         );
 
-        let runtime = header_relay.client_pangolin.runtime();
+        let runtime = header_relay.client_crab.runtime();
         let track = runtime
             .tx()
             .bridge_kusama_parachains()
             .submit_parachain_heads(
                 best_finalized_source_block_hash,
                 vec![
-                    pangolin_runtime_types::bp_polkadot_core::parachains::ParaId(
+                    crab_runtime_types::bp_polkadot_core::parachains::ParaId(
                         header_relay.para_id,
                     ),
                 ],
@@ -238,12 +238,12 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
                     .map(|bytes| bytes.0)
                     .collect(),
             )
-            .sign_and_submit_then_watch(header_relay.client_pangolin.account().signer())
+            .sign_and_submit_then_watch(header_relay.client_crab.account().signer())
             .await?;
         let events = track.wait_for_finalized_success().await?;
         tracing::info!(
-            target: "pangolin-crabparachain",
-            "[para-head-relay-kusama-to-pangolin] The tx hash {:?} emitted",
+            target: "crab-crabparachain",
+            "[para-head-relay-kusama-to-crab] The tx hash {:?} emitted",
             events.extrinsic_hash()
         );
     }

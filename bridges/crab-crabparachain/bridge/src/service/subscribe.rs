@@ -1,4 +1,4 @@
-use client_pangolin::{client::CrabClient, component::CrabClientComponent};
+use client_crab::{client::CrabClient, component::CrabClientComponent};
 use client_kusama::{client::KusamaClient, component::KusamaClientComponent};
 use lifeline::{Lifeline, Service, Task};
 use once_cell::sync::Lazy;
@@ -36,9 +36,9 @@ impl Service for SubscribeService {
         let _greet = Self::try_task(&format!("{}-relay", BridgeTask::name()), async move {
             let mut execution = start().await;
             while let Err(e) = execution {
-                tracing::error!(target: "pangolin-crabparachain", "{:?}", e);
+                tracing::error!(target: "crab-crabparachain", "{:?}", e);
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                tracing::info!(target: "pangolin-crabparachain", "Try to restart subscribtion service.");
+                tracing::info!(target: "crab-crabparachain", "Try to restart subscribtion service.");
                 execution = start().await;
             }
             Ok(())
@@ -49,34 +49,34 @@ impl Service for SubscribeService {
 
 async fn start() -> color_eyre::Result<()> {
     let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
-    let config_pangolin = bridge_config.pangolin;
+    let config_crab = bridge_config.crab;
 
-    let client_pangolin =
-        CrabClientComponent::component(config_pangolin.to_pangolin_client_config()?).await?;
+    let client_crab =
+        CrabClientComponent::component(config_crab.to_crab_client_config()?).await?;
     let client_kusama =
         KusamaClientComponent::component(bridge_config.kusama.to_kusama_client_config()?).await?;
 
-    let pangolin_handle = tokio::spawn(run_until_pangolin_connection_lost(client_pangolin));
+    let crab_handle = tokio::spawn(run_until_crab_connection_lost(client_crab));
     let kusama_handle = tokio::spawn(run_until_kusama_connection_lost(client_kusama));
-    let (_result_p, _result_r) = (pangolin_handle.await, kusama_handle.await);
+    let (_result_p, _result_r) = (crab_handle.await, kusama_handle.await);
     Ok(())
 }
 
-async fn run_until_pangolin_connection_lost(mut client: CrabClient) -> color_eyre::Result<()> {
-    while let Err(err) = subscribe_pangolin(&client).await {
-        tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from pangolin: {:?}", err);
+async fn run_until_crab_connection_lost(mut client: CrabClient) -> color_eyre::Result<()> {
+    while let Err(err) = subscribe_crab(&client).await {
+        tracing::error!(target: "crab-crabparachain", "Failed to get justification from crab: {:?}", err);
         let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
-        let client_pangolin =
-            CrabClientComponent::component(bridge_config.pangolin.to_pangolin_client_config()?)
+        let client_crab =
+            CrabClientComponent::component(bridge_config.crab.to_crab_client_config()?)
                 .await?;
-        client = client_pangolin;
+        client = client_crab;
     }
     Ok(())
 }
 
 async fn run_until_kusama_connection_lost(mut client: KusamaClient) -> color_eyre::Result<()> {
     while let Err(err) = subscribe_kusama(&client).await {
-        tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from kusama: {:?}", err);
+        tracing::error!(target: "crab-crabparachain", "Failed to get justification from kusama: {:?}", err);
         let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
         let client_kusama =
             KusamaClientComponent::component(bridge_config.kusama.to_kusama_client_config()?)
@@ -86,7 +86,7 @@ async fn run_until_kusama_connection_lost(mut client: KusamaClient) -> color_eyr
     Ok(())
 }
 
-async fn subscribe_pangolin(client: &CrabClient) -> color_eyre::Result<()> {
+async fn subscribe_crab(client: &CrabClient) -> color_eyre::Result<()> {
     let mut subscribe = client.subscribe_grandpa_justifications().await?;
     while let Some(justification) = subscribe.next().await {
         let mut data = PANGOLIN_JUSTIFICATIONS.lock().await;

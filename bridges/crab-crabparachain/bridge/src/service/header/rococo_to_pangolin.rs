@@ -1,6 +1,6 @@
-use client_pangolin::client::CrabClient;
-use client_pangolin::component::CrabClientComponent;
-use client_pangolin::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
+use client_crab::client::CrabClient;
+use client_crab::component::CrabClientComponent;
+use client_crab::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
 use client_kusama::client::KusamaClient;
 use client_kusama::component::KusamaClientComponent;
 use client_kusama::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
@@ -33,11 +33,11 @@ impl Service for KusamaToCrabHeaderRelayService {
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!("{}-kusama-pangolin-header-relay", BridgeTask::name()),
+            &format!("{}-kusama-crab-header-relay", BridgeTask::name()),
             async move {
                 if let Err(e) = start().await {
                     tracing::error!(
-                        target: "pangolin-crabparachain",
+                        target: "crab-crabparachain",
                         "{:?}",
                         e,
                     );
@@ -54,7 +54,7 @@ impl Service for KusamaToCrabHeaderRelayService {
 }
 
 struct HeaderRelay {
-    client_pangolin: CrabClient,
+    client_crab: CrabClient,
     client_kusama: KusamaClient,
     subquery_kusama: Subquery,
     subquery_crab_parachain: Subquery,
@@ -65,11 +65,11 @@ impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
         let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
 
-        let config_pangolin = bridge_config.pangolin;
+        let config_crab = bridge_config.crab;
         let config_kusama = bridge_config.kusama;
 
-        let client_pangolin =
-            CrabClientComponent::component(config_pangolin.to_pangolin_client_config()?)
+        let client_crab =
+            CrabClientComponent::component(config_crab.to_crab_client_config()?)
                 .await?;
         let client_kusama =
             KusamaClientComponent::component(config_kusama.to_kusama_client_config()?).await?;
@@ -87,7 +87,7 @@ impl HeaderRelay {
         );
 
         Ok(Self {
-            client_pangolin,
+            client_crab,
             client_kusama,
             subquery_kusama,
             subquery_crab_parachain,
@@ -98,8 +98,8 @@ impl HeaderRelay {
 
 async fn start() -> color_eyre::Result<()> {
     tracing::info!(
-        target: "pangolin-crabparachain",
-        "[header-kusama-to-pangolin] SERVICE RESTARTING..."
+        target: "crab-crabparachain",
+        "[header-kusama-to-crab] SERVICE RESTARTING..."
     );
     let mut header_relay = HeaderRelay::new().await?;
     loop {
@@ -110,15 +110,15 @@ async fn start() -> color_eyre::Result<()> {
                     err.downcast_ref::<subxt::BasicError>()
                 {
                     tracing::error!(
-                        target: "pangolin-crabparachain",
-                        "[header-kusama-to-pangolin] Connection Error. Try to resend later: {:?}",
+                        target: "crab-crabparachain",
+                        "[header-kusama-to-crab] Connection Error. Try to resend later: {:?}",
                         &request_error
                     );
                     header_relay = HeaderRelay::new().await?;
                 }
                 tracing::error!(
-                    target: "pangolin-crabparachain",
-                    "[header-kusama-to-pangolin] Failed to relay header: {:?}",
+                    target: "crab-crabparachain",
+                    "[header-kusama-to-crab] Failed to relay header: {:?}",
                     err
                 );
             }
@@ -128,36 +128,36 @@ async fn start() -> color_eyre::Result<()> {
 }
 
 async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
-    let last_relayed_kusama_hash_in_pangolin = header_relay
-        .client_pangolin
+    let last_relayed_kusama_hash_in_crab = header_relay
+        .client_crab
         .runtime()
         .storage()
         .bridge_kusama_grandpa()
         .best_finalized(None)
         .await?;
     tracing::debug!(
-        target: "pangolin-crabparachain",
-        "[header-relay-kusama-to-pangolin] Get last relayed kusama block hash: {:?}",
-        &last_relayed_kusama_hash_in_pangolin
+        target: "crab-crabparachain",
+        "[header-relay-kusama-to-crab] Get last relayed kusama block hash: {:?}",
+        &last_relayed_kusama_hash_in_crab
     );
 
-    let last_relayed_kusama_block_in_pangolin = header_relay
+    let last_relayed_kusama_block_in_crab = header_relay
         .client_kusama
         .subxt()
         .rpc()
-        .block(Some(last_relayed_kusama_hash_in_pangolin))
+        .block(Some(last_relayed_kusama_hash_in_crab))
         .await?
         .ok_or_else(|| {
             BridgerError::Custom(format!(
                 "Failed to query block by [{}] in kusama",
-                last_relayed_kusama_hash_in_pangolin
+                last_relayed_kusama_hash_in_crab
             ))
         })?;
 
-    let block_number = last_relayed_kusama_block_in_pangolin.block.header.number;
+    let block_number = last_relayed_kusama_block_in_crab.block.header.number;
     tracing::info!(
-        target: "pangolin-crabparachain",
-        "[header-relay-kusama-to-pangolin] Get last relayed kusama block number: {:?}",
+        target: "crab-crabparachain",
+        "[header-relay-kusama-to-crab] Get last relayed kusama block number: {:?}",
         block_number
     );
     if try_to_relay_mandatory(header_relay, block_number)
@@ -182,8 +182,8 @@ async fn try_to_relay_mandatory(
 
     if let Some(block_to_relay) = next_mandatory_block {
         tracing::info!(
-            target: "pangolin-crabparachain",
-            "[header-relay-kusama-to-pangolin] Next mandatory block: {:?}",
+            target: "crab-crabparachain",
+            "[header-relay-kusama-to-crab] Next mandatory block: {:?}",
             &block_to_relay.block_number,
         );
         let justification = header_relay
@@ -200,8 +200,8 @@ async fn try_to_relay_mandatory(
         Ok(Some(block_to_relay.block_number))
     } else {
         tracing::info!(
-            target: "pangolin-crabparachain",
-            "[header-relay-kusama-to-pangolin] Next mandatory block not found",
+            target: "crab-crabparachain",
+            "[header-relay-kusama-to-crab] Next mandatory block not found",
         );
         Ok(None)
     }
@@ -227,8 +227,8 @@ async fn try_to_relay_header_on_demand(
             .await?
             .filter(|header| {
                 tracing::debug!(
-                    target: "pangolin-crabparachain",
-                    "[header-relay-kusama-to-pangolin] Get related realy chain header: {:?}",
+                    target: "crab-crabparachain",
+                    "[header-relay-kusama-to-crab] Get related realy chain header: {:?}",
                     header.included_relay_block
                 );
                 header.included_relay_block > last_block_number
@@ -236,14 +236,14 @@ async fn try_to_relay_header_on_demand(
 
         if next_header.is_none() {
             tracing::debug!(
-                target: "pangolin-crabparachain",
-                "[header-relay-kusama-to-pangolin] Para head has not been finalized"
+                target: "crab-crabparachain",
+                "[header-relay-kusama-to-crab] Para head has not been finalized"
             );
             return Ok(());
         }
 
-        let pangolin_justification_queue = ROCOCO_JUSTIFICATIONS.lock().await;
-        if let Some(justification) = pangolin_justification_queue.back().cloned() {
+        let crab_justification_queue = ROCOCO_JUSTIFICATIONS.lock().await;
+        if let Some(justification) = crab_justification_queue.back().cloned() {
             let grandpa_justification = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(
                 &mut justification.as_ref(),
             )
@@ -254,8 +254,8 @@ async fn try_to_relay_header_on_demand(
                 ))
             })?;
             tracing::debug!(
-                target: "pangolin-crabparachain",
-                "[header-relay-kusama-to-pangolin] Test justification: {:?}",
+                target: "crab-crabparachain",
+                "[header-relay-kusama-to-crab] Test justification: {:?}",
                 grandpa_justification.commit.target_number
             );
             if grandpa_justification.commit.target_number > last_block_number {
@@ -293,18 +293,18 @@ async fn submit_finality(
         __subxt_unused_type_params: Default::default(),
     };
     let grandpa_justification = codec::Decode::decode(&mut justification.as_slice())?;
-    let runtime = header_relay.client_pangolin.runtime();
+    let runtime = header_relay.client_crab.runtime();
     let track = runtime
         .tx()
         .bridge_kusama_grandpa()
         .submit_finality_proof(finality_target, grandpa_justification)
-        .sign_and_submit_then_watch(header_relay.client_pangolin.account().signer())
+        .sign_and_submit_then_watch(header_relay.client_crab.account().signer())
         .await?;
 
     let events = track.wait_for_finalized_success().await?;
     tracing::info!(
-        target: "pangolin-crabparachain",
-        "[header-kusama-to-pangolin] The extrinsic hash: {:?}",
+        target: "crab-crabparachain",
+        "[header-kusama-to-crab] The extrinsic hash: {:?}",
         events.extrinsic_hash()
     );
     Ok(())

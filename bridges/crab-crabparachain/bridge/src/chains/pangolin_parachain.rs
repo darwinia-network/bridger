@@ -30,7 +30,7 @@ mod s2s_messages {
     use crate::feemarket::CrabParachainFeemarketApi;
     use feemarket_s2s::relay::BasicRelayStrategy;
     use frame_support::weights::Weight;
-    use relay_pangolin_client::CrabChain;
+    use relay_crab_client::CrabChain;
     use relay_crab_parachain_client::CrabParachainChain;
     use substrate_relay_helper::messages_lane::SubstrateMessageLane;
 
@@ -40,8 +40,8 @@ mod s2s_messages {
     substrate_relay_helper::generate_mocked_receive_message_proof_call_builder!(
         CrabParachainMessagesToCrab,
         CrabParachainMessagesToCrabReceiveMessagesProofCallBuilder,
-        relay_pangolin_client::runtime::Call::BridgeCrabParachainMessages,
-        relay_pangolin_client::runtime::BridgeCrabParachainMessagesCall::receive_messages_proof
+        relay_crab_client::runtime::Call::BridgeCrabParachainMessages,
+        relay_crab_client::runtime::BridgeCrabParachainMessagesCall::receive_messages_proof
     );
 
     substrate_relay_helper::generate_mocked_receive_message_delivery_proof_call_builder!(

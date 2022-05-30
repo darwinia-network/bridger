@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
-use client_pangolin::client::CrabClient;
-use client_pangolin::component::CrabClientComponent;
-use client_pangolin::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
-use client_pangolin::types::runtime_types::sp_runtime::generic::header::Header;
-use client_pangolin::types::runtime_types::sp_runtime::traits::BlakeTwo256;
+use client_crab::client::CrabClient;
+use client_crab::component::CrabClientComponent;
+use client_crab::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
+use client_crab::types::runtime_types::sp_runtime::generic::header::Header;
+use client_crab::types::runtime_types::sp_runtime::traits::BlakeTwo256;
 use codec::{Decode, Encode};
 use lifeline::{Lifeline, Service, Task};
 
@@ -33,11 +33,11 @@ impl Service for CrabToParachainHeaderRelayService {
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!("{}-pangolin-parachain-header-relay", BridgeTask::name()),
+            &format!("{}-crab-parachain-header-relay", BridgeTask::name()),
             async move {
                 start().await.map_err(|e| {
                     BridgerError::Custom(format!(
-                        "Failed to start pangolin-to-parachain header relay: {:?}",
+                        "Failed to start crab-to-parachain header relay: {:?}",
                         e
                     ))
                 })?;
@@ -49,20 +49,20 @@ impl Service for CrabToParachainHeaderRelayService {
 }
 
 struct HeaderRelay {
-    client_pangolin: CrabClient,
+    client_crab: CrabClient,
     client_parachain: CrabParachainClient,
-    subquery_pangolin: Subquery,
+    subquery_crab: Subquery,
 }
 
 impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
         let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
 
-        let config_pangolin = bridge_config.pangolin;
+        let config_crab = bridge_config.crab;
         let config_parachain = bridge_config.crab_parachain;
 
-        let client_pangolin =
-            CrabClientComponent::component(config_pangolin.to_pangolin_client_config()?)
+        let client_crab =
+            CrabClientComponent::component(config_crab.to_crab_client_config()?)
                 .await?;
         let client_parachain = CrabParachainClientComponent::component(
             config_parachain.to_crab_parachain_client_config()?,
@@ -70,20 +70,20 @@ impl HeaderRelay {
         .await?;
 
         let config_index = bridge_config.index;
-        let subquery_pangolin =
-            SubqueryComponent::component(config_index.pangolin, BridgeName::CrabParachain);
+        let subquery_crab =
+            SubqueryComponent::component(config_index.crab, BridgeName::CrabParachain);
         Ok(Self {
-            client_pangolin,
+            client_crab,
             client_parachain,
-            subquery_pangolin,
+            subquery_crab,
         })
     }
 }
 
 async fn start() -> color_eyre::Result<()> {
     tracing::info!(
-        target: "pangolin-crabparachain",
-        "[header-pangolin-to-parachain] SERVICE RESTARTING..."
+        target: "crab-crabparachain",
+        "[header-crab-to-parachain] SERVICE RESTARTING..."
     );
     let mut header_relay = HeaderRelay::new().await?;
     loop {
@@ -94,15 +94,15 @@ async fn start() -> color_eyre::Result<()> {
                     err.downcast_ref::<subxt::BasicError>()
                 {
                     tracing::error!(
-                        target: "pangolin-crabparachain",
-                        "[header-pangolin-to-parachain] Connection Error. Try to resend later: {:?}",
+                        target: "crab-crabparachain",
+                        "[header-crab-to-parachain] Connection Error. Try to resend later: {:?}",
                         &request_error
                     );
                     header_relay = HeaderRelay::new().await?;
                 }
                 tracing::error!(
-                    target: "pangolin-crabparachain",
-                    "[header-pangolin-to-parachain] Failed to relay header: {:?}",
+                    target: "crab-crabparachain",
+                    "[header-crab-to-parachain] Failed to relay header: {:?}",
                     err
                 );
             }
@@ -112,29 +112,29 @@ async fn start() -> color_eyre::Result<()> {
 }
 
 async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
-    let last_relayed_pangolin_hash_in_parachain = header_relay
+    let last_relayed_crab_hash_in_parachain = header_relay
         .client_parachain
         .runtime()
         .storage()
-        .bridge_pangolin_grandpa()
+        .bridge_crab_grandpa()
         .best_finalized(None)
         .await?;
-    let last_relayed_pangolin_block_in_parachain = header_relay
-        .client_pangolin
+    let last_relayed_crab_block_in_parachain = header_relay
+        .client_crab
         .subxt()
         .rpc()
-        .block(Some(last_relayed_pangolin_hash_in_parachain))
+        .block(Some(last_relayed_crab_hash_in_parachain))
         .await?
         .ok_or_else(|| {
             BridgerError::Custom(format!(
-                "Failed to query block by [{}] in pangolin",
-                last_relayed_pangolin_hash_in_parachain
+                "Failed to query block by [{}] in crab",
+                last_relayed_crab_hash_in_parachain
             ))
         })?;
-    let block_number = last_relayed_pangolin_block_in_parachain.block.header.number;
+    let block_number = last_relayed_crab_block_in_parachain.block.header.number;
     tracing::trace!(
-        target: "pangolin-crabparachain",
-        "[header-pangolin-to-parachain] The latest relayed pangolin block is: {:?}",
+        target: "crab-crabparachain",
+        "[header-crab-to-parachain] The latest relayed crab block is: {:?}",
         block_number
     );
 
@@ -154,17 +154,17 @@ async fn try_to_relay_mandatory(
     last_block_number: u32,
 ) -> color_eyre::Result<Option<u32>> {
     let next_mandatory_block = header_relay
-        .subquery_pangolin
+        .subquery_crab
         .next_mandatory_header(last_block_number)
         .await?;
     if let Some(block_to_relay) = next_mandatory_block {
         tracing::info!(
-            target: "pangolin-crabparachain",
-            "[header-pangolin-to-parachain] Next mandatory block: {:?} ",
+            target: "crab-crabparachain",
+            "[header-crab-to-parachain] Next mandatory block: {:?} ",
             &block_to_relay.block_number
         );
         let justification = header_relay
-            .subquery_pangolin
+            .subquery_crab
             .find_justification(block_to_relay.block_hash.clone(), true)
             .await?;
         submit_finality(
@@ -177,8 +177,8 @@ async fn try_to_relay_mandatory(
         Ok(Some(block_to_relay.block_number))
     } else {
         tracing::info!(
-            target: "pangolin-crabparachain",
-            "[header-pangolin-to-parachain] Next mandatory block not found",
+            target: "crab-crabparachain",
+            "[header-crab-to-parachain] Next mandatory block not found",
         );
         Ok(None)
     }
@@ -189,7 +189,7 @@ async fn try_to_relay_header_on_demand(
     last_block_number: u32,
 ) -> color_eyre::Result<()> {
     let next_header = header_relay
-        .subquery_pangolin
+        .subquery_crab
         .next_needed_header(OriginType::BridgeCrabParachain)
         .await?
         .filter(|header| header.block_number > last_block_number);
@@ -198,13 +198,13 @@ async fn try_to_relay_header_on_demand(
         return Ok(());
     }
 
-    let pangolin_justification_queue = PANGOLIN_JUSTIFICATIONS.lock().await;
-    if let Some(justification) = pangolin_justification_queue.back().cloned() {
+    let crab_justification_queue = PANGOLIN_JUSTIFICATIONS.lock().await;
+    if let Some(justification) = crab_justification_queue.back().cloned() {
         let grandpa_justification =
             GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(&mut justification.as_ref())
                 .map_err(|err| {
                 BridgerError::Custom(format!(
-                    "Failed to decode justification of pangolin: {:?}",
+                    "Failed to decode justification of crab: {:?}",
                     err
                 ))
             })?;
@@ -227,7 +227,7 @@ async fn submit_finality(
     justification: Vec<u8>,
 ) -> color_eyre::Result<()> {
     let header = header_relay
-        .client_pangolin
+        .client_crab
         .subxt()
         .rpc()
         .header(Some(sp_core::H256::from_str(block_hash.as_ref()).unwrap()))
@@ -245,15 +245,15 @@ async fn submit_finality(
     let runtime = header_relay.client_parachain.runtime();
     let track = runtime
         .tx()
-        .bridge_pangolin_grandpa()
+        .bridge_crab_grandpa()
         .submit_finality_proof(finality_target, grandpa_justification)
         .sign_and_submit_then_watch(header_relay.client_parachain.account().signer())
         .await?;
 
     let events = track.wait_for_finalized_success().await?;
     tracing::info!(
-         target: "pangolin-crabparachain",
-          "[header-pangolin-to-parachain] The extrinsic hash: {:?}",
+         target: "crab-crabparachain",
+          "[header-crab-to-parachain] The extrinsic hash: {:?}",
            events.extrinsic_hash()
     );
     Ok(())

@@ -189,7 +189,7 @@ pub struct RelayHeadersAndMessagesInfo {
     pub create_relayers_fund_accounts: bool,
     pub only_mandatory_headers: bool,
 
-    pub pangolin_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
+    pub crab_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
     pub crab_parachain_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams,
 }
 

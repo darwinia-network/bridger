@@ -9,12 +9,12 @@ use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
-    pub pangolin: ChainInfoConfig,
+    pub crab: ChainInfoConfig,
     pub kusama: ChainInfoConfig,
     pub crab_parachain: ChainInfoConfig,
     pub relay: RelayConfig,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangolin_subscan: Option<SubscanConfig>,
+    pub crab_subscan: Option<SubscanConfig>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub crab_parachain_subscan: Option<SubscanConfig>,
     pub task: TaskConfig,
@@ -39,7 +39,7 @@ pub struct RelayConfig {
     /// Hex-encoded lane identifiers that should be served by the complex relay.
     pub lanes: Vec<HexLaneId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub signer_pangolin: Option<String>,
+    pub signer_crab: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signer_crab_parachain: Option<String>,
     #[serde(default)]
@@ -49,16 +49,16 @@ pub struct RelayConfig {
     pub only_mandatory_headers: bool,
     /// Create relayers fund accounts on both chains, if it does not exists yet.
     pub create_relayers_fund_accounts: bool,
-    /// The SURI of secret key to use when transactions are submitted to the pangolin node.
+    /// The SURI of secret key to use when transactions are submitted to the crab node.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangolin_messages_pallet_owner: Option<String>,
-    /// The password for the SURI of secret key to use when transactions are submitted to the pangolin node.
+    pub crab_messages_pallet_owner: Option<String>,
+    /// The password for the SURI of secret key to use when transactions are submitted to the crab node.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pangolin_messages_pallet_owner_password: Option<String>,
-    /// The SURI of secret key to use when transactions are submitted to the pangolin parachain node.
+    pub crab_messages_pallet_owner_password: Option<String>,
+    /// The SURI of secret key to use when transactions are submitted to the crab parachain node.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub crab_parachain_messages_pallet_owner: Option<String>,
-    /// The password for the SURI of secret key to use when transactions are submitted to the pangolin parachain node.
+    /// The password for the SURI of secret key to use when transactions are submitted to the crab parachain node.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub crab_parachain_messages_pallet_owner_password: Option<String>,
 }
@@ -143,10 +143,10 @@ impl ChainInfoConfig {
         })
     }
 
-    pub fn to_pangolin_client_config(
+    pub fn to_crab_client_config(
         &self,
-    ) -> color_eyre::Result<client_pangolin::config::ClientConfig> {
-        Ok(client_pangolin::config::ClientConfig {
+    ) -> color_eyre::Result<client_crab::config::ClientConfig> {
+        Ok(client_crab::config::ClientConfig {
             endpoint: self.endpoint.clone(),
             relayer_private_key: self.signer.clone().ok_or_else(|| {
                 BridgerError::Custom(format!("Missing signer for chain: {}", self.endpoint))
@@ -182,7 +182,7 @@ impl ChainInfoConfig {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IndexConfig {
-    pub pangolin: SubqueryConfig,
+    pub crab: SubqueryConfig,
     pub crab_parachain: SubqueryConfig,
     pub kusama: SubqueryConfig,
     pub parachain_kusama: subquery_parachain::SubqueryConfig,

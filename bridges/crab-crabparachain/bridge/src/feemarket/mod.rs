@@ -1,5 +1,5 @@
-pub use self::pangolin::*;
+pub use self::crab::*;
 pub use self::crab_parachain::*;
 
-mod pangolin;
+mod crab;
 mod crab_parachain;

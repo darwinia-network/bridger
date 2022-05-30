@@ -7,7 +7,7 @@ homepage      = "https://github.com/darwinia-network/bridger"
 include       = ["Cargo.toml", "**/*.rs", "README.md", "LICENSE"]
 keywords      = ["substrate", "darwinia"]
 license       = "MIT"
-name          = "bridge-pangolin-crabparachain"
+name          = "bridge-crab-crabparachain"
 readme        = 'README.md'
 repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.5.5"
@@ -56,16 +56,16 @@ bridge-runtime-common           = { git = "https://github.com/darwinia-network/d
 messages-relay                  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 pallet-bridge-messages          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 pallet-fee-market               = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-relay-pangolin-client           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-relay-pangolin-parachain-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+relay-crab-client           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+relay-crab-parachain-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 relay-kusama-client             = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 relay-substrate-client          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 relay-utils                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 substrate-relay-helper          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 subxt                           = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 ## component
-client-pangolin           = { path = "../../../frame/assistants/client-pangolin" }
-client-pangolin-parachain = { path = "../../../frame/assistants/client-pangolin-parachain" }
+client-crab           = { path = "../../../frame/assistants/client-crab" }
+client-crab-parachain = { path = "../../../frame/assistants/client-crab-parachain" }
 client-kusama             = { path = "../../../frame/assistants/client-kusama" }
 component-subscan         = { path = "../../../frame/components/subscan" }
 feemarket-s2s             = { path = "../../../frame/assistants/feemarket-s2s" }

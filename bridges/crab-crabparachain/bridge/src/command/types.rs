@@ -2,13 +2,13 @@ use structopt::StructOpt;
 
 use crate::types::BridgeName;
 
-/// Bridge pangolin-crabparachain options
+/// Bridge crab-crabparachain options
 #[derive(Debug, StructOpt)]
-#[structopt(name = "pangolin-crabparachain", about = "Bridge pangolin-crabparachain")]
+#[structopt(name = "crab-crabparachain", about = "Bridge crab-crabparachain")]
 pub enum Opts {
-    /// Init bridge pangolin-crabparachain
+    /// Init bridge crab-crabparachain
     Init {
-        /// Bridge, support kusama-to-pangolin
+        /// Bridge, support kusama-to-crab
         #[structopt()]
         bridge: BridgeName,
     },

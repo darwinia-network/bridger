@@ -10,7 +10,7 @@ use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
     pub pangolin: ChainInfoConfig,
-    pub rococo: ChainInfoConfig,
+    pub kusama: ChainInfoConfig,
     pub crab_parachain: ChainInfoConfig,
     pub relay: RelayConfig,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -167,10 +167,10 @@ impl ChainInfoConfig {
         })
     }
 
-    pub fn to_rococo_client_config(
+    pub fn to_kusama_client_config(
         &self,
-    ) -> color_eyre::Result<client_rococo::config::ClientConfig> {
-        Ok(client_rococo::config::ClientConfig {
+    ) -> color_eyre::Result<client_kusama::config::ClientConfig> {
+        Ok(client_kusama::config::ClientConfig {
             endpoint: self.endpoint.clone(),
             relayer_private_key: self.signer.clone().ok_or_else(|| {
                 BridgerError::Custom(format!("Missing signer for chain: {}", self.endpoint))
@@ -184,6 +184,6 @@ impl ChainInfoConfig {
 pub struct IndexConfig {
     pub pangolin: SubqueryConfig,
     pub crab_parachain: SubqueryConfig,
-    pub rococo: SubqueryConfig,
-    pub parachain_rococo: subquery_parachain::SubqueryConfig,
+    pub kusama: SubqueryConfig,
+    pub parachain_kusama: subquery_parachain::SubqueryConfig,
 }

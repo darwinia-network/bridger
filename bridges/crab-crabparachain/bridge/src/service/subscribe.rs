@@ -1,5 +1,5 @@
 use client_pangolin::{client::PangolinClient, component::PangolinClientComponent};
-use client_rococo::{client::RococoClient, component::RococoClientComponent};
+use client_kusama::{client::KusamaClient, component::KusamaClientComponent};
 use lifeline::{Lifeline, Service, Task};
 use once_cell::sync::Lazy;
 use std::collections::VecDeque;
@@ -53,12 +53,12 @@ async fn start() -> color_eyre::Result<()> {
 
     let client_pangolin =
         PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?).await?;
-    let client_rococo =
-        RococoClientComponent::component(bridge_config.rococo.to_rococo_client_config()?).await?;
+    let client_kusama =
+        KusamaClientComponent::component(bridge_config.kusama.to_kusama_client_config()?).await?;
 
     let pangolin_handle = tokio::spawn(run_until_pangolin_connection_lost(client_pangolin));
-    let rococo_handle = tokio::spawn(run_until_rococo_connection_lost(client_rococo));
-    let (_result_p, _result_r) = (pangolin_handle.await, rococo_handle.await);
+    let kusama_handle = tokio::spawn(run_until_kusama_connection_lost(client_kusama));
+    let (_result_p, _result_r) = (pangolin_handle.await, kusama_handle.await);
     Ok(())
 }
 
@@ -74,14 +74,14 @@ async fn run_until_pangolin_connection_lost(mut client: PangolinClient) -> color
     Ok(())
 }
 
-async fn run_until_rococo_connection_lost(mut client: RococoClient) -> color_eyre::Result<()> {
-    while let Err(err) = subscribe_rococo(&client).await {
-        tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from rococo: {:?}", err);
+async fn run_until_kusama_connection_lost(mut client: KusamaClient) -> color_eyre::Result<()> {
+    while let Err(err) = subscribe_kusama(&client).await {
+        tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from kusama: {:?}", err);
         let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
-        let client_rococo =
-            RococoClientComponent::component(bridge_config.rococo.to_rococo_client_config()?)
+        let client_kusama =
+            KusamaClientComponent::component(bridge_config.kusama.to_kusama_client_config()?)
                 .await?;
-        client = client_rococo;
+        client = client_kusama;
     }
     Ok(())
 }
@@ -98,7 +98,7 @@ async fn subscribe_pangolin(client: &PangolinClient) -> color_eyre::Result<()> {
     Ok(())
 }
 
-async fn subscribe_rococo(client: &RococoClient) -> color_eyre::Result<()> {
+async fn subscribe_kusama(client: &KusamaClient) -> color_eyre::Result<()> {
     let mut subscribe = client.subscribe_grandpa_justifications().await?;
     while let Some(justification) = subscribe.next().await {
         let mut data = ROCOCO_JUSTIFICATIONS.lock().await;

@@ -1,7 +1,7 @@
 use bp_header_chain::InitializationData;
 use bp_runtime::Chain as ChainBase;
 use codec::Encode;
-use relay_pangolin_client::runtime::{BridgeRococoGrandpaCall, Call};
+use relay_pangolin_client::runtime::{BridgeKusamaGrandpaCall, Call};
 use relay_crab_parachain_client::runtime as crab_parachain_runtime;
 use relay_substrate_client::{
     Chain as RelaySubstrateClientChain, SignParam, TransactionSignScheme, UnsignedTransaction,
@@ -19,12 +19,12 @@ pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
     tracing::info!(target: "pangolin-crabparachain", "Init bridge {:?}", bridge);
     let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
     let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
-    let config_rococo: ChainInfoConfig = bridge_config.rococo;
+    let config_kusama: ChainInfoConfig = bridge_config.kusama;
     let config_crab_parachain: ChainInfoConfig = bridge_config.crab_parachain;
 
     let (source_chain, target_chain) = match bridge {
-        BridgeName::RococoToPangolin => (
-            config_rococo.to_chain_info()?,
+        BridgeName::KusamaToPangolin => (
+            config_kusama.to_chain_info()?,
             config_pangolin.to_chain_info()?,
         ),
         BridgeName::PangolinToCrabParachain => (
@@ -49,14 +49,14 @@ pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
 macro_rules! select_bridge {
     ($bridge: expr, $generic: tt) => {
         match $bridge {
-            BridgeName::RococoToPangolin => {
-                type Source = relay_rococo_client::Rococo;
+            BridgeName::KusamaToPangolin => {
+                type Source = relay_kusama_client::Kusama;
                 type Target = relay_pangolin_client::PangolinChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    Call::BridgeRococoGrandpa(BridgeRococoGrandpaCall::initialize(init_data))
+                    Call::BridgeKusamaGrandpa(BridgeKusamaGrandpaCall::initialize(init_data))
                 }
 
                 $generic

@@ -8,7 +8,7 @@ use crate::types::BridgeName;
 pub enum Opts {
     /// Init bridge pangolin-crabparachain
     Init {
-        /// Bridge, support rococo-to-pangolin
+        /// Bridge, support kusama-to-pangolin
         #[structopt()]
         bridge: BridgeName,
     },

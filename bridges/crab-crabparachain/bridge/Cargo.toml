@@ -58,7 +58,7 @@ pallet-bridge-messages          = { git = "https://github.com/darwinia-network/d
 pallet-fee-market               = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 relay-pangolin-client           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 relay-pangolin-parachain-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-relay-rococo-client             = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+relay-kusama-client             = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 relay-substrate-client          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 relay-utils                     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 substrate-relay-helper          = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
@@ -66,7 +66,7 @@ subxt                           = { git = "https://github.com/darwinia-network/s
 ## component
 client-pangolin           = { path = "../../../frame/assistants/client-pangolin" }
 client-pangolin-parachain = { path = "../../../frame/assistants/client-pangolin-parachain" }
-client-rococo             = { path = "../../../frame/assistants/client-rococo" }
+client-kusama             = { path = "../../../frame/assistants/client-kusama" }
 component-subscan         = { path = "../../../frame/components/subscan" }
 feemarket-s2s             = { path = "../../../frame/assistants/feemarket-s2s" }
 subquery-parachain        = { path = "../../../frame/assistants/subquery-parachain" }

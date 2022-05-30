@@ -1,11 +1,11 @@
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
-use client_rococo::client::RococoClient;
-use client_rococo::component::RococoClientComponent;
-use client_rococo::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
-use client_rococo::types::runtime_types::sp_runtime::generic::header::Header;
-use client_rococo::types::runtime_types::sp_runtime::traits::BlakeTwo256;
+use client_kusama::client::KusamaClient;
+use client_kusama::component::KusamaClientComponent;
+use client_kusama::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
+use client_kusama::types::runtime_types::sp_runtime::generic::header::Header;
+use client_kusama::types::runtime_types::sp_runtime::traits::BlakeTwo256;
 use lifeline::{Lifeline, Service, Task};
 use std::str::FromStr;
 use support_common::config::{Config, Names};
@@ -21,19 +21,19 @@ use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
 use crate::service::subscribe::ROCOCO_JUSTIFICATIONS;
 
 #[derive(Debug)]
-pub struct RococoToPangolinHeaderRelayService {
+pub struct KusamaToPangolinHeaderRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for RococoToPangolinHeaderRelayService {}
+impl BridgeService for KusamaToPangolinHeaderRelayService {}
 
-impl Service for RococoToPangolinHeaderRelayService {
+impl Service for KusamaToPangolinHeaderRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!("{}-rococo-pangolin-header-relay", BridgeTask::name()),
+            &format!("{}-kusama-pangolin-header-relay", BridgeTask::name()),
             async move {
                 if let Err(e) = start().await {
                     tracing::error!(
@@ -55,10 +55,10 @@ impl Service for RococoToPangolinHeaderRelayService {
 
 struct HeaderRelay {
     client_pangolin: PangolinClient,
-    client_rococo: RococoClient,
-    subquery_rococo: Subquery,
+    client_kusama: KusamaClient,
+    subquery_kusama: Subquery,
     subquery_crab_parachain: Subquery,
-    subquery_parachain_rococo: subquery_parachain::Subquery,
+    subquery_parachain_kusama: subquery_parachain::Subquery,
 }
 
 impl HeaderRelay {
@@ -66,32 +66,32 @@ impl HeaderRelay {
         let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
 
         let config_pangolin = bridge_config.pangolin;
-        let config_rococo = bridge_config.rococo;
+        let config_kusama = bridge_config.kusama;
 
         let client_pangolin =
             PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?)
                 .await?;
-        let client_rococo =
-            RococoClientComponent::component(config_rococo.to_rococo_client_config()?).await?;
+        let client_kusama =
+            KusamaClientComponent::component(config_kusama.to_kusama_client_config()?).await?;
 
         let config_index = bridge_config.index;
-        let subquery_rococo =
-            SubqueryComponent::component(config_index.rococo, BridgeName::CrabParachain);
+        let subquery_kusama =
+            SubqueryComponent::component(config_index.kusama, BridgeName::CrabParachain);
         let subquery_crab_parachain = SubqueryComponent::component(
             config_index.crab_parachain,
             BridgeName::CrabParachain,
         );
-        let subquery_parachain_rococo = subquery_parachain::SubqueryComponent::component(
-            config_index.parachain_rococo,
+        let subquery_parachain_kusama = subquery_parachain::SubqueryComponent::component(
+            config_index.parachain_kusama,
             subquery_parachain::types::BridgeName::CrabParachain,
         );
 
         Ok(Self {
             client_pangolin,
-            client_rococo,
-            subquery_rococo,
+            client_kusama,
+            subquery_kusama,
             subquery_crab_parachain,
-            subquery_parachain_rococo,
+            subquery_parachain_kusama,
         })
     }
 }
@@ -99,7 +99,7 @@ impl HeaderRelay {
 async fn start() -> color_eyre::Result<()> {
     tracing::info!(
         target: "pangolin-crabparachain",
-        "[header-rococo-to-pangolin] SERVICE RESTARTING..."
+        "[header-kusama-to-pangolin] SERVICE RESTARTING..."
     );
     let mut header_relay = HeaderRelay::new().await?;
     loop {
@@ -111,14 +111,14 @@ async fn start() -> color_eyre::Result<()> {
                 {
                     tracing::error!(
                         target: "pangolin-crabparachain",
-                        "[header-rococo-to-pangolin] Connection Error. Try to resend later: {:?}",
+                        "[header-kusama-to-pangolin] Connection Error. Try to resend later: {:?}",
                         &request_error
                     );
                     header_relay = HeaderRelay::new().await?;
                 }
                 tracing::error!(
                     target: "pangolin-crabparachain",
-                    "[header-rococo-to-pangolin] Failed to relay header: {:?}",
+                    "[header-kusama-to-pangolin] Failed to relay header: {:?}",
                     err
                 );
             }
@@ -128,36 +128,36 @@ async fn start() -> color_eyre::Result<()> {
 }
 
 async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
-    let last_relayed_rococo_hash_in_pangolin = header_relay
+    let last_relayed_kusama_hash_in_pangolin = header_relay
         .client_pangolin
         .runtime()
         .storage()
-        .bridge_rococo_grandpa()
+        .bridge_kusama_grandpa()
         .best_finalized(None)
         .await?;
     tracing::debug!(
         target: "pangolin-crabparachain",
-        "[header-relay-rococo-to-pangolin] Get last relayed rococo block hash: {:?}",
-        &last_relayed_rococo_hash_in_pangolin
+        "[header-relay-kusama-to-pangolin] Get last relayed kusama block hash: {:?}",
+        &last_relayed_kusama_hash_in_pangolin
     );
 
-    let last_relayed_rococo_block_in_pangolin = header_relay
-        .client_rococo
+    let last_relayed_kusama_block_in_pangolin = header_relay
+        .client_kusama
         .subxt()
         .rpc()
-        .block(Some(last_relayed_rococo_hash_in_pangolin))
+        .block(Some(last_relayed_kusama_hash_in_pangolin))
         .await?
         .ok_or_else(|| {
             BridgerError::Custom(format!(
-                "Failed to query block by [{}] in rococo",
-                last_relayed_rococo_hash_in_pangolin
+                "Failed to query block by [{}] in kusama",
+                last_relayed_kusama_hash_in_pangolin
             ))
         })?;
 
-    let block_number = last_relayed_rococo_block_in_pangolin.block.header.number;
+    let block_number = last_relayed_kusama_block_in_pangolin.block.header.number;
     tracing::info!(
         target: "pangolin-crabparachain",
-        "[header-relay-rococo-to-pangolin] Get last relayed rococo block number: {:?}",
+        "[header-relay-kusama-to-pangolin] Get last relayed kusama block number: {:?}",
         block_number
     );
     if try_to_relay_mandatory(header_relay, block_number)
@@ -176,18 +176,18 @@ async fn try_to_relay_mandatory(
     last_block_number: u32,
 ) -> color_eyre::Result<Option<u32>> {
     let next_mandatory_block = header_relay
-        .subquery_rococo
+        .subquery_kusama
         .next_mandatory_header(last_block_number)
         .await?;
 
     if let Some(block_to_relay) = next_mandatory_block {
         tracing::info!(
             target: "pangolin-crabparachain",
-            "[header-relay-rococo-to-pangolin] Next mandatory block: {:?}",
+            "[header-relay-kusama-to-pangolin] Next mandatory block: {:?}",
             &block_to_relay.block_number,
         );
         let justification = header_relay
-            .subquery_rococo
+            .subquery_kusama
             .find_justification(block_to_relay.block_hash.clone(), true)
             .await?;
         submit_finality(
@@ -201,7 +201,7 @@ async fn try_to_relay_mandatory(
     } else {
         tracing::info!(
             target: "pangolin-crabparachain",
-            "[header-relay-rococo-to-pangolin] Next mandatory block not found",
+            "[header-relay-kusama-to-pangolin] Next mandatory block not found",
         );
         Ok(None)
     }
@@ -222,13 +222,13 @@ async fn try_to_relay_header_on_demand(
 
     if let Some(next_para_header) = next_para_header {
         let next_header = header_relay
-            .subquery_parachain_rococo
+            .subquery_parachain_kusama
             .get_block_with_para_head(next_para_header.block_hash)
             .await?
             .filter(|header| {
                 tracing::debug!(
                     target: "pangolin-crabparachain",
-                    "[header-relay-rococo-to-pangolin] Get related realy chain header: {:?}",
+                    "[header-relay-kusama-to-pangolin] Get related realy chain header: {:?}",
                     header.included_relay_block
                 );
                 header.included_relay_block > last_block_number
@@ -237,7 +237,7 @@ async fn try_to_relay_header_on_demand(
         if next_header.is_none() {
             tracing::debug!(
                 target: "pangolin-crabparachain",
-                "[header-relay-rococo-to-pangolin] Para head has not been finalized"
+                "[header-relay-kusama-to-pangolin] Para head has not been finalized"
             );
             return Ok(());
         }
@@ -249,13 +249,13 @@ async fn try_to_relay_header_on_demand(
             )
             .map_err(|err| {
                 BridgerError::Custom(format!(
-                    "Failed to decode justification of rococo: {:?}",
+                    "Failed to decode justification of kusama: {:?}",
                     err
                 ))
             })?;
             tracing::debug!(
                 target: "pangolin-crabparachain",
-                "[header-relay-rococo-to-pangolin] Test justification: {:?}",
+                "[header-relay-kusama-to-pangolin] Test justification: {:?}",
                 grandpa_justification.commit.target_number
             );
             if grandpa_justification.commit.target_number > last_block_number {
@@ -278,7 +278,7 @@ async fn submit_finality(
     justification: Vec<u8>,
 ) -> color_eyre::Result<()> {
     let header = header_relay
-        .client_rococo
+        .client_kusama
         .subxt()
         .rpc()
         .header(Some(sp_core::H256::from_str(block_hash.as_ref()).unwrap()))
@@ -296,7 +296,7 @@ async fn submit_finality(
     let runtime = header_relay.client_pangolin.runtime();
     let track = runtime
         .tx()
-        .bridge_rococo_grandpa()
+        .bridge_kusama_grandpa()
         .submit_finality_proof(finality_target, grandpa_justification)
         .sign_and_submit_then_watch(header_relay.client_pangolin.account().signer())
         .await?;
@@ -304,7 +304,7 @@ async fn submit_finality(
     let events = track.wait_for_finalized_success().await?;
     tracing::info!(
         target: "pangolin-crabparachain",
-        "[header-rococo-to-pangolin] The extrinsic hash: {:?}",
+        "[header-kusama-to-pangolin] The extrinsic hash: {:?}",
         events.extrinsic_hash()
     );
     Ok(())

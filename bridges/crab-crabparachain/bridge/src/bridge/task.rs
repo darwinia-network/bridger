@@ -2,8 +2,8 @@ use support_lifeline::task::TaskStack;
 
 use crate::bridge::BridgeBus;
 use crate::service::header::{
-    PangolinToParachainHeaderRelayService, RococoToPangolinHeaderRelayService,
-    RococoToPangolinParaHeaderRelayService,
+    PangolinToParachainHeaderRelayService, KusamaToPangolinHeaderRelayService,
+    KusamaToPangolinParaHeaderRelayService,
 };
 use crate::service::message::MessageRelayService;
 use crate::service::subscribe::SubscribeService;
@@ -25,8 +25,8 @@ impl BridgeTask {
 
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<PangolinToParachainHeaderRelayService>()?;
-        stack.spawn_service::<RococoToPangolinHeaderRelayService>()?;
-        stack.spawn_service::<RococoToPangolinParaHeaderRelayService>()?;
+        stack.spawn_service::<KusamaToPangolinHeaderRelayService>()?;
+        stack.spawn_service::<KusamaToPangolinParaHeaderRelayService>()?;
         stack.spawn_service::<MessageRelayService>()?;
         stack.spawn_service::<SubscribeService>()?;
         Ok(Self { stack })

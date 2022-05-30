@@ -3,15 +3,15 @@ pub use s2s_const::*;
 mod s2s_const {
     use sp_version::RuntimeVersion;
 
-    use relay_rococo_client::Rococo;
+    use relay_kusama_client::Kusama;
 
     use crate::traits::CliChain;
 
     // === start const
-    impl CliChain for Rococo {
+    impl CliChain for Kusama {
         const RUNTIME_VERSION: RuntimeVersion = RuntimeVersion {
-            spec_name: sp_version::create_runtime_str!("rococo"),
-            impl_name: sp_version::create_runtime_str!("parity-rococo-v2.0"),
+            spec_name: sp_version::create_runtime_str!("kusama"),
+            impl_name: sp_version::create_runtime_str!("parity-kusama-v2.0"),
             authoring_version: 0,
             spec_version: 9142,
             impl_version: 0,

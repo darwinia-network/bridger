@@ -68,7 +68,7 @@ impl HeaderRelay {
             client_pangolin,
             client_rococo,
             para_id: bridge_config
-                .pangolin_parachain
+                .crab_parachain
                 .para_id
                 .expect("ParaId not found"),
         })

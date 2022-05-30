@@ -4,7 +4,7 @@ pub use s2s_messages::*;
 mod s2s_const {
     use sp_version::RuntimeVersion;
 
-    use relay_pangolin_parachain_client::CrabParachainChain;
+    use relay_crab_parachain_client::CrabParachainChain;
 
     use crate::traits::CliChain;
 
@@ -31,7 +31,7 @@ mod s2s_messages {
     use feemarket_s2s::relay::BasicRelayStrategy;
     use frame_support::weights::Weight;
     use relay_pangolin_client::PangolinChain;
-    use relay_pangolin_parachain_client::CrabParachainChain;
+    use relay_crab_parachain_client::CrabParachainChain;
     use substrate_relay_helper::messages_lane::SubstrateMessageLane;
 
     #[derive(Clone, Debug)]
@@ -47,8 +47,8 @@ mod s2s_messages {
     substrate_relay_helper::generate_mocked_receive_message_delivery_proof_call_builder!(
         CrabParachainMessagesToPangolin,
         CrabParachainMessagesToPangolinReceiveMessagesDeliveryProofCallBuilder,
-        relay_pangolin_parachain_client::runtime::Call::BridgePangolinMessages,
-        relay_pangolin_parachain_client::runtime::BridgePangolinMessagesCall::receive_messages_delivery_proof
+        relay_crab_parachain_client::runtime::Call::BridgePangolinMessages,
+        relay_crab_parachain_client::runtime::BridgePangolinMessagesCall::receive_messages_delivery_proof
     );
 
     impl SubstrateMessageLane for CrabParachainMessagesToPangolin {
@@ -72,8 +72,8 @@ mod s2s_messages {
 
 pub mod s2s_feemarket {
     use codec::Encode;
-    use relay_pangolin_parachain_client::runtime as pangolin_parachain_runtime;
-    use relay_pangolin_parachain_client::CrabParachainChain;
+    use relay_crab_parachain_client::runtime as crab_parachain_runtime;
+    use relay_crab_parachain_client::CrabParachainChain;
     use relay_substrate_client::{
         ChainBase, Client, SignParam, TransactionSignScheme, UnsignedTransaction,
     };
@@ -99,8 +99,8 @@ pub mod s2s_feemarket {
                         signer: signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            pangolin_parachain_runtime::Call::PangolinFeemarket(
-                                pangolin_parachain_runtime::FeemarketCall::update_relay_fee(amount),
+                            crab_parachain_runtime::Call::PangolinFeemarket(
+                                crab_parachain_runtime::FeemarketCall::update_relay_fee(amount),
                             ),
                             transaction_nonce,
                         ),
@@ -130,8 +130,8 @@ pub mod s2s_feemarket {
                         signer: signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            pangolin_parachain_runtime::Call::PangolinFeemarket(
-                                pangolin_parachain_runtime::FeemarketCall::update_locked_collateral(
+                            crab_parachain_runtime::Call::PangolinFeemarket(
+                                crab_parachain_runtime::FeemarketCall::update_locked_collateral(
                                     amount,
                                 ),
                             ),

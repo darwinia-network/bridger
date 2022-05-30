@@ -57,7 +57,7 @@ struct HeaderRelay {
     client_pangolin: PangolinClient,
     client_rococo: RococoClient,
     subquery_rococo: Subquery,
-    subquery_pangolin_parachain: Subquery,
+    subquery_crab_parachain: Subquery,
     subquery_parachain_rococo: subquery_parachain::Subquery,
 }
 
@@ -77,8 +77,8 @@ impl HeaderRelay {
         let config_index = bridge_config.index;
         let subquery_rococo =
             SubqueryComponent::component(config_index.rococo, BridgeName::CrabParachain);
-        let subquery_pangolin_parachain = SubqueryComponent::component(
-            config_index.pangolin_parachain,
+        let subquery_crab_parachain = SubqueryComponent::component(
+            config_index.crab_parachain,
             BridgeName::CrabParachain,
         );
         let subquery_parachain_rococo = subquery_parachain::SubqueryComponent::component(
@@ -90,7 +90,7 @@ impl HeaderRelay {
             client_pangolin,
             client_rococo,
             subquery_rococo,
-            subquery_pangolin_parachain,
+            subquery_crab_parachain,
             subquery_parachain_rococo,
         })
     }
@@ -212,7 +212,7 @@ async fn try_to_relay_header_on_demand(
     last_block_number: u32,
 ) -> color_eyre::Result<()> {
     let next_para_header = header_relay
-        .subquery_pangolin_parachain
+        .subquery_crab_parachain
         .next_needed_header(OriginType::BridgePangolin)
         .await?;
 

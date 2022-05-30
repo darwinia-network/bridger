@@ -8,9 +8,9 @@ use client_pangolin::types::runtime_types::sp_runtime::traits::BlakeTwo256;
 use codec::{Decode, Encode};
 use lifeline::{Lifeline, Service, Task};
 
-use client_pangolin_parachain::client::CrabParachainClient;
-use client_pangolin_parachain::component::CrabParachainClientComponent;
-use client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
+use client_crab_parachain::client::CrabParachainClient;
+use client_crab_parachain::component::CrabParachainClientComponent;
+use client_crab_parachain::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
 use subquery_s2s::types::{BridgeName, OriginType};
 use subquery_s2s::{Subquery, SubqueryComponent};
 use support_common::config::{Config, Names};
@@ -59,13 +59,13 @@ impl HeaderRelay {
         let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
 
         let config_pangolin = bridge_config.pangolin;
-        let config_parachain = bridge_config.pangolin_parachain;
+        let config_parachain = bridge_config.crab_parachain;
 
         let client_pangolin =
             PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?)
                 .await?;
         let client_parachain = CrabParachainClientComponent::component(
-            config_parachain.to_pangolin_parachain_client_config()?,
+            config_parachain.to_crab_parachain_client_config()?,
         )
         .await?;
 

@@ -2,7 +2,7 @@ use bp_messages::{LaneId, MessageNonce};
 use codec::Encode;
 use pallet_fee_market::types::{Order, Relayer};
 use frame_support::Blake2_128Concat;
-use relay_pangolin_parachain_client::CrabParachainChain;
+use relay_crab_parachain_client::CrabParachainChain;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme};
 use relay_utils::relay_loop::Client as RelayLoopClient;
 use sp_core::storage::StorageKey;
@@ -150,7 +150,7 @@ impl FeemarketApi for CrabParachainFeemarketApi {
         &self,
         amount: <Self::Chain as ChainBase>::Balance,
     ) -> FeemarketResult<()> {
-        crate::chains::pangolin_parachain::s2s_feemarket::update_relay_fee(
+        crate::chains::crab_parachain::s2s_feemarket::update_relay_fee(
             &self.client,
             self.signer.clone(),
             amount,
@@ -162,7 +162,7 @@ impl FeemarketApi for CrabParachainFeemarketApi {
         &self,
         amount: <Self::Chain as ChainBase>::Balance,
     ) -> FeemarketResult<()> {
-        crate::chains::pangolin_parachain::s2s_feemarket::update_locked_collateral(
+        crate::chains::crab_parachain::s2s_feemarket::update_locked_collateral(
             &self.client,
             self.signer.clone(),
             amount,

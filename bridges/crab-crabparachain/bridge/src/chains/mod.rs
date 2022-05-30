@@ -1,3 +1,3 @@
 pub mod pangolin;
-pub mod pangolin_parachain;
+pub mod crab_parachain;
 pub mod rococo;

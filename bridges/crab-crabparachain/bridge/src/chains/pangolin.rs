@@ -31,7 +31,7 @@ mod s2s_messages {
     use feemarket_s2s::relay::BasicRelayStrategy;
     use frame_support::weights::Weight;
     use relay_pangolin_client::PangolinChain;
-    use relay_pangolin_parachain_client::CrabParachainChain;
+    use relay_crab_parachain_client::CrabParachainChain;
     use substrate_relay_helper::messages_lane::SubstrateMessageLane;
 
     #[derive(Clone, Debug)]
@@ -40,8 +40,8 @@ mod s2s_messages {
     substrate_relay_helper::generate_mocked_receive_message_proof_call_builder!(
         PangolinMessagesToCrabParachain,
         PangolinMessagesToCrabParachainReceiveMessagesProofCallBuilder,
-        relay_pangolin_parachain_client::runtime::Call::BridgePangolinMessages,
-        relay_pangolin_parachain_client::runtime::BridgePangolinMessagesCall::receive_messages_proof
+        relay_crab_parachain_client::runtime::Call::BridgePangolinMessages,
+        relay_crab_parachain_client::runtime::BridgePangolinMessagesCall::receive_messages_proof
     );
 
     substrate_relay_helper::generate_mocked_receive_message_delivery_proof_call_builder!(

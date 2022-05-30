@@ -17,17 +17,17 @@ use crate::types::{BridgeName, InitBridge};
 
 pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
     tracing::info!(target: "pangolin-crabparachain", "Init bridge {:?}", bridge);
-    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
     let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
     let config_kusama: ChainInfoConfig = bridge_config.kusama;
     let config_crab_parachain: ChainInfoConfig = bridge_config.crab_parachain;
 
     let (source_chain, target_chain) = match bridge {
-        BridgeName::KusamaToPangolin => (
+        BridgeName::KusamaToCrab => (
             config_kusama.to_chain_info()?,
             config_pangolin.to_chain_info()?,
         ),
-        BridgeName::PangolinToCrabParachain => (
+        BridgeName::CrabToCrabParachain => (
             config_pangolin.to_chain_info()?,
             config_crab_parachain.to_chain_info()?,
         ),
@@ -49,9 +49,9 @@ pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
 macro_rules! select_bridge {
     ($bridge: expr, $generic: tt) => {
         match $bridge {
-            BridgeName::KusamaToPangolin => {
+            BridgeName::KusamaToCrab => {
                 type Source = relay_kusama_client::Kusama;
-                type Target = relay_pangolin_client::PangolinChain;
+                type Target = relay_pangolin_client::CrabChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
@@ -61,15 +61,15 @@ macro_rules! select_bridge {
 
                 $generic
             }
-            BridgeName::PangolinToCrabParachain => {
-                type Source = relay_pangolin_client::PangolinChain;
+            BridgeName::CrabToCrabParachain => {
+                type Source = relay_pangolin_client::CrabChain;
                 type Target = relay_crab_parachain_client::CrabParachainChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
-                    crab_parachain_runtime::Call::BridgePangolinGrandpa(
-                        crab_parachain_runtime::BridgePangolinGrandpaCall::initialize(
+                    crab_parachain_runtime::Call::BridgeCrabGrandpa(
+                        crab_parachain_runtime::BridgeCrabGrandpaCall::initialize(
                             init_data,
                         ),
                     )

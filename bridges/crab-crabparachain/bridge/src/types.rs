@@ -14,8 +14,8 @@ use crate::traits::CliChain;
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, strum::EnumString)]
 #[strum(serialize_all = "kebab_case")]
 pub enum BridgeName {
-    KusamaToPangolin,
-    PangolinToCrabParachain,
+    KusamaToCrab,
+    CrabToCrabParachain,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

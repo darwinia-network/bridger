@@ -11,8 +11,8 @@ mod s2s_const {
     // === start const
     impl CliChain for CrabParachainChain {
         const RUNTIME_VERSION: RuntimeVersion = RuntimeVersion {
-            spec_name: sp_runtime::create_runtime_str!("Pangolin Parachain"),
-            impl_name: sp_runtime::create_runtime_str!("Pangolin Parachain"),
+            spec_name: sp_runtime::create_runtime_str!("Crab Parachain"),
+            impl_name: sp_runtime::create_runtime_str!("Crab Parachain"),
             authoring_version: 1,
             spec_version: 3,
             impl_version: 1,
@@ -30,41 +30,41 @@ mod s2s_messages {
     use crate::feemarket::CrabParachainFeemarketApi;
     use feemarket_s2s::relay::BasicRelayStrategy;
     use frame_support::weights::Weight;
-    use relay_pangolin_client::PangolinChain;
+    use relay_pangolin_client::CrabChain;
     use relay_crab_parachain_client::CrabParachainChain;
     use substrate_relay_helper::messages_lane::SubstrateMessageLane;
 
     #[derive(Clone, Debug)]
-    pub struct CrabParachainMessagesToPangolin;
+    pub struct CrabParachainMessagesToCrab;
 
     substrate_relay_helper::generate_mocked_receive_message_proof_call_builder!(
-        CrabParachainMessagesToPangolin,
-        CrabParachainMessagesToPangolinReceiveMessagesProofCallBuilder,
+        CrabParachainMessagesToCrab,
+        CrabParachainMessagesToCrabReceiveMessagesProofCallBuilder,
         relay_pangolin_client::runtime::Call::BridgeCrabParachainMessages,
         relay_pangolin_client::runtime::BridgeCrabParachainMessagesCall::receive_messages_proof
     );
 
     substrate_relay_helper::generate_mocked_receive_message_delivery_proof_call_builder!(
-        CrabParachainMessagesToPangolin,
-        CrabParachainMessagesToPangolinReceiveMessagesDeliveryProofCallBuilder,
-        relay_crab_parachain_client::runtime::Call::BridgePangolinMessages,
-        relay_crab_parachain_client::runtime::BridgePangolinMessagesCall::receive_messages_delivery_proof
+        CrabParachainMessagesToCrab,
+        CrabParachainMessagesToCrabReceiveMessagesDeliveryProofCallBuilder,
+        relay_crab_parachain_client::runtime::Call::BridgeCrabMessages,
+        relay_crab_parachain_client::runtime::BridgeCrabMessagesCall::receive_messages_delivery_proof
     );
 
-    impl SubstrateMessageLane for CrabParachainMessagesToPangolin {
+    impl SubstrateMessageLane for CrabParachainMessagesToCrab {
         const SOURCE_TO_TARGET_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
         const TARGET_TO_SOURCE_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
 
         type SourceChain = CrabParachainChain;
-        type TargetChain = PangolinChain;
+        type TargetChain = CrabChain;
 
         type SourceTransactionSignScheme = CrabParachainChain;
-        type TargetTransactionSignScheme = PangolinChain;
+        type TargetTransactionSignScheme = CrabChain;
 
         type ReceiveMessagesProofCallBuilder =
-            CrabParachainMessagesToPangolinReceiveMessagesProofCallBuilder;
+            CrabParachainMessagesToCrabReceiveMessagesProofCallBuilder;
         type ReceiveMessagesDeliveryProofCallBuilder =
-            CrabParachainMessagesToPangolinReceiveMessagesDeliveryProofCallBuilder;
+            CrabParachainMessagesToCrabReceiveMessagesDeliveryProofCallBuilder;
 
         type RelayStrategy = BasicRelayStrategy<CrabParachainFeemarketApi>;
     }
@@ -99,7 +99,7 @@ pub mod s2s_feemarket {
                         signer: signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            crab_parachain_runtime::Call::PangolinFeemarket(
+                            crab_parachain_runtime::Call::CrabFeemarket(
                                 crab_parachain_runtime::FeemarketCall::update_relay_fee(amount),
                             ),
                             transaction_nonce,
@@ -130,7 +130,7 @@ pub mod s2s_feemarket {
                         signer: signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            crab_parachain_runtime::Call::PangolinFeemarket(
+                            crab_parachain_runtime::Call::CrabFeemarket(
                                 crab_parachain_runtime::FeemarketCall::update_locked_collateral(
                                     amount,
                                 ),

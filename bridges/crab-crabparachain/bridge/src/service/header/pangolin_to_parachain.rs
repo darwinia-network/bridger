@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use client_pangolin::client::PangolinClient;
-use client_pangolin::component::PangolinClientComponent;
+use client_pangolin::client::CrabClient;
+use client_pangolin::component::CrabClientComponent;
 use client_pangolin::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
 use client_pangolin::types::runtime_types::sp_runtime::generic::header::Header;
 use client_pangolin::types::runtime_types::sp_runtime::traits::BlakeTwo256;
@@ -21,13 +21,13 @@ use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
 use crate::service::subscribe::PANGOLIN_JUSTIFICATIONS;
 
 #[derive(Debug)]
-pub struct PangolinToParachainHeaderRelayService {
+pub struct CrabToParachainHeaderRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for PangolinToParachainHeaderRelayService {}
+impl BridgeService for CrabToParachainHeaderRelayService {}
 
-impl Service for PangolinToParachainHeaderRelayService {
+impl Service for CrabToParachainHeaderRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
@@ -49,20 +49,20 @@ impl Service for PangolinToParachainHeaderRelayService {
 }
 
 struct HeaderRelay {
-    client_pangolin: PangolinClient,
+    client_pangolin: CrabClient,
     client_parachain: CrabParachainClient,
     subquery_pangolin: Subquery,
 }
 
 impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
 
         let config_pangolin = bridge_config.pangolin;
         let config_parachain = bridge_config.crab_parachain;
 
         let client_pangolin =
-            PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?)
+            CrabClientComponent::component(config_pangolin.to_pangolin_client_config()?)
                 .await?;
         let client_parachain = CrabParachainClientComponent::component(
             config_parachain.to_crab_parachain_client_config()?,

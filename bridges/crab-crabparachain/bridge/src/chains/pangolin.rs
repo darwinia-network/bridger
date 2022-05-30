@@ -4,15 +4,15 @@ pub use s2s_messages::*;
 mod s2s_const {
     use sp_version::RuntimeVersion;
 
-    use relay_pangolin_client::PangolinChain;
+    use relay_pangolin_client::CrabChain;
 
     use crate::traits::CliChain;
 
     // === start const
-    impl CliChain for PangolinChain {
+    impl CliChain for CrabChain {
         const RUNTIME_VERSION: RuntimeVersion = RuntimeVersion {
-            spec_name: sp_runtime::create_runtime_str!("Pangolin"),
-            impl_name: sp_runtime::create_runtime_str!("Pangolin"),
+            spec_name: sp_runtime::create_runtime_str!("Crab"),
+            impl_name: sp_runtime::create_runtime_str!("Crab"),
             authoring_version: 0,
             spec_version: 28_100,
             impl_version: 0,
@@ -27,53 +27,53 @@ mod s2s_const {
 }
 
 mod s2s_messages {
-    use crate::feemarket::PangolinFeemarketApi;
+    use crate::feemarket::CrabFeemarketApi;
     use feemarket_s2s::relay::BasicRelayStrategy;
     use frame_support::weights::Weight;
-    use relay_pangolin_client::PangolinChain;
+    use relay_pangolin_client::CrabChain;
     use relay_crab_parachain_client::CrabParachainChain;
     use substrate_relay_helper::messages_lane::SubstrateMessageLane;
 
     #[derive(Clone, Debug)]
-    pub struct PangolinMessagesToCrabParachain;
+    pub struct CrabMessagesToCrabParachain;
 
     substrate_relay_helper::generate_mocked_receive_message_proof_call_builder!(
-        PangolinMessagesToCrabParachain,
-        PangolinMessagesToCrabParachainReceiveMessagesProofCallBuilder,
-        relay_crab_parachain_client::runtime::Call::BridgePangolinMessages,
-        relay_crab_parachain_client::runtime::BridgePangolinMessagesCall::receive_messages_proof
+        CrabMessagesToCrabParachain,
+        CrabMessagesToCrabParachainReceiveMessagesProofCallBuilder,
+        relay_crab_parachain_client::runtime::Call::BridgeCrabMessages,
+        relay_crab_parachain_client::runtime::BridgeCrabMessagesCall::receive_messages_proof
     );
 
     substrate_relay_helper::generate_mocked_receive_message_delivery_proof_call_builder!(
-        PangolinMessagesToCrabParachain,
-        PangolinMessagesToCrabParachainReceiveMessagesDeliveryProofCallBuilder,
+        CrabMessagesToCrabParachain,
+        CrabMessagesToCrabParachainReceiveMessagesDeliveryProofCallBuilder,
         relay_pangolin_client::runtime::Call::BridgeCrabParachainMessages,
         relay_pangolin_client::runtime::BridgeCrabParachainMessagesCall::receive_messages_delivery_proof
     );
 
-    impl SubstrateMessageLane for PangolinMessagesToCrabParachain {
+    impl SubstrateMessageLane for CrabMessagesToCrabParachain {
         const SOURCE_TO_TARGET_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
         const TARGET_TO_SOURCE_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
 
-        type SourceChain = PangolinChain;
+        type SourceChain = CrabChain;
         type TargetChain = CrabParachainChain;
 
-        type SourceTransactionSignScheme = PangolinChain;
+        type SourceTransactionSignScheme = CrabChain;
         type TargetTransactionSignScheme = CrabParachainChain;
 
         type ReceiveMessagesProofCallBuilder =
-            PangolinMessagesToCrabParachainReceiveMessagesProofCallBuilder;
+            CrabMessagesToCrabParachainReceiveMessagesProofCallBuilder;
         type ReceiveMessagesDeliveryProofCallBuilder =
-            PangolinMessagesToCrabParachainReceiveMessagesDeliveryProofCallBuilder;
+            CrabMessagesToCrabParachainReceiveMessagesDeliveryProofCallBuilder;
 
-        type RelayStrategy = BasicRelayStrategy<PangolinFeemarketApi>;
+        type RelayStrategy = BasicRelayStrategy<CrabFeemarketApi>;
     }
 }
 
 pub mod s2s_feemarket {
     use codec::Encode;
     use relay_pangolin_client::runtime as pangolin_runtime;
-    use relay_pangolin_client::PangolinChain;
+    use relay_pangolin_client::CrabChain;
     use relay_substrate_client::{
         ChainBase, Client, SignParam, TransactionSignScheme, UnsignedTransaction,
     };
@@ -82,9 +82,9 @@ pub mod s2s_feemarket {
     use feemarket_s2s::error::FeemarketResult;
 
     pub(crate) async fn update_relay_fee(
-        client: &Client<PangolinChain>,
-        signer: <PangolinChain as TransactionSignScheme>::AccountKeyPair,
-        amount: <PangolinChain as ChainBase>::Balance,
+        client: &Client<CrabChain>,
+        signer: <CrabChain as TransactionSignScheme>::AccountKeyPair,
+        amount: <CrabChain as ChainBase>::Balance,
     ) -> FeemarketResult<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
         let genesis_hash = *client.genesis_hash();
@@ -92,7 +92,7 @@ pub mod s2s_feemarket {
         client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
                 Bytes(
-                    PangolinChain::sign_transaction(SignParam {
+                    CrabChain::sign_transaction(SignParam {
                         spec_version,
                         transaction_version,
                         genesis_hash,
@@ -113,9 +113,9 @@ pub mod s2s_feemarket {
     }
 
     pub(crate) async fn update_locked_collateral(
-        client: &Client<PangolinChain>,
-        signer: <PangolinChain as TransactionSignScheme>::AccountKeyPair,
-        amount: <PangolinChain as ChainBase>::Balance,
+        client: &Client<CrabChain>,
+        signer: <CrabChain as TransactionSignScheme>::AccountKeyPair,
+        amount: <CrabChain as ChainBase>::Balance,
     ) -> FeemarketResult<()> {
         let signer_id = (*signer.public().as_array_ref()).into();
         let genesis_hash = *client.genesis_hash();
@@ -123,7 +123,7 @@ pub mod s2s_feemarket {
         client
             .submit_signed_extrinsic(signer_id, move |_, transaction_nonce| {
                 Bytes(
-                    PangolinChain::sign_transaction(SignParam {
+                    CrabChain::sign_transaction(SignParam {
                         spec_version,
                         transaction_version,
                         genesis_hash,

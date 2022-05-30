@@ -1,5 +1,5 @@
-use client_pangolin::client::PangolinClient;
-use client_pangolin::component::PangolinClientComponent;
+use client_pangolin::client::CrabClient;
+use client_pangolin::component::CrabClientComponent;
 use client_pangolin::types::runtime_types::{self as pangolin_runtime_types};
 use client_kusama::client::KusamaClient;
 use client_kusama::component::KusamaClientComponent;
@@ -13,13 +13,13 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
 
 #[derive(Debug)]
-pub struct KusamaToPangolinParaHeaderRelayService {
+pub struct KusamaToCrabParaHeaderRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for KusamaToPangolinParaHeaderRelayService {}
+impl BridgeService for KusamaToCrabParaHeaderRelayService {}
 
-impl Service for KusamaToPangolinParaHeaderRelayService {
+impl Service for KusamaToCrabParaHeaderRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
@@ -46,20 +46,20 @@ impl Service for KusamaToPangolinParaHeaderRelayService {
 }
 
 struct HeaderRelay {
-    client_pangolin: PangolinClient,
+    client_pangolin: CrabClient,
     client_kusama: KusamaClient,
     para_id: u32,
 }
 
 impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
 
         let config_pangolin = bridge_config.pangolin;
         let config_kusama = bridge_config.kusama;
 
         let client_pangolin =
-            PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?)
+            CrabClientComponent::component(config_pangolin.to_pangolin_client_config()?)
                 .await?;
         let client_kusama =
             KusamaClientComponent::component(config_kusama.to_kusama_client_config()?).await?;

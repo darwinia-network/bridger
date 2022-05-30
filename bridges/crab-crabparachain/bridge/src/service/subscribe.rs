@@ -1,4 +1,4 @@
-use client_pangolin::{client::PangolinClient, component::PangolinClientComponent};
+use client_pangolin::{client::CrabClient, component::CrabClientComponent};
 use client_kusama::{client::KusamaClient, component::KusamaClientComponent};
 use lifeline::{Lifeline, Service, Task};
 use once_cell::sync::Lazy;
@@ -48,11 +48,11 @@ impl Service for SubscribeService {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
     let config_pangolin = bridge_config.pangolin;
 
     let client_pangolin =
-        PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?).await?;
+        CrabClientComponent::component(config_pangolin.to_pangolin_client_config()?).await?;
     let client_kusama =
         KusamaClientComponent::component(bridge_config.kusama.to_kusama_client_config()?).await?;
 
@@ -62,12 +62,12 @@ async fn start() -> color_eyre::Result<()> {
     Ok(())
 }
 
-async fn run_until_pangolin_connection_lost(mut client: PangolinClient) -> color_eyre::Result<()> {
+async fn run_until_pangolin_connection_lost(mut client: CrabClient) -> color_eyre::Result<()> {
     while let Err(err) = subscribe_pangolin(&client).await {
         tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from pangolin: {:?}", err);
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
         let client_pangolin =
-            PangolinClientComponent::component(bridge_config.pangolin.to_pangolin_client_config()?)
+            CrabClientComponent::component(bridge_config.pangolin.to_pangolin_client_config()?)
                 .await?;
         client = client_pangolin;
     }
@@ -77,7 +77,7 @@ async fn run_until_pangolin_connection_lost(mut client: PangolinClient) -> color
 async fn run_until_kusama_connection_lost(mut client: KusamaClient) -> color_eyre::Result<()> {
     while let Err(err) = subscribe_kusama(&client).await {
         tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from kusama: {:?}", err);
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
         let client_kusama =
             KusamaClientComponent::component(bridge_config.kusama.to_kusama_client_config()?)
                 .await?;
@@ -86,7 +86,7 @@ async fn run_until_kusama_connection_lost(mut client: KusamaClient) -> color_eyr
     Ok(())
 }
 
-async fn subscribe_pangolin(client: &PangolinClient) -> color_eyre::Result<()> {
+async fn subscribe_pangolin(client: &CrabClient) -> color_eyre::Result<()> {
     let mut subscribe = client.subscribe_grandpa_justifications().await?;
     while let Some(justification) = subscribe.next().await {
         let mut data = PANGOLIN_JUSTIFICATIONS.lock().await;

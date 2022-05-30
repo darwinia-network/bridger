@@ -1,5 +1,5 @@
-use client_pangolin::client::PangolinClient;
-use client_pangolin::component::PangolinClientComponent;
+use client_pangolin::client::CrabClient;
+use client_pangolin::component::CrabClientComponent;
 use client_pangolin::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
 use client_kusama::client::KusamaClient;
 use client_kusama::component::KusamaClientComponent;
@@ -21,13 +21,13 @@ use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
 use crate::service::subscribe::ROCOCO_JUSTIFICATIONS;
 
 #[derive(Debug)]
-pub struct KusamaToPangolinHeaderRelayService {
+pub struct KusamaToCrabHeaderRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for KusamaToPangolinHeaderRelayService {}
+impl BridgeService for KusamaToCrabHeaderRelayService {}
 
-impl Service for KusamaToPangolinHeaderRelayService {
+impl Service for KusamaToCrabHeaderRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
@@ -54,7 +54,7 @@ impl Service for KusamaToPangolinHeaderRelayService {
 }
 
 struct HeaderRelay {
-    client_pangolin: PangolinClient,
+    client_pangolin: CrabClient,
     client_kusama: KusamaClient,
     subquery_kusama: Subquery,
     subquery_crab_parachain: Subquery,
@@ -63,13 +63,13 @@ struct HeaderRelay {
 
 impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
 
         let config_pangolin = bridge_config.pangolin;
         let config_kusama = bridge_config.kusama;
 
         let client_pangolin =
-            PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?)
+            CrabClientComponent::component(config_pangolin.to_pangolin_client_config()?)
                 .await?;
         let client_kusama =
             KusamaClientComponent::component(config_kusama.to_kusama_client_config()?).await?;
@@ -213,7 +213,7 @@ async fn try_to_relay_header_on_demand(
 ) -> color_eyre::Result<()> {
     let next_para_header = header_relay
         .subquery_crab_parachain
-        .next_needed_header(OriginType::BridgePangolin)
+        .next_needed_header(OriginType::BridgeCrab)
         .await?;
 
     if next_para_header.is_none() {

@@ -19,6 +19,11 @@ pub(crate) struct QueryNextCandidateIncludedEventVars {
     pub(crate) block_number: u32,
 }
 
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct QueryNextCandidateIncludedEventWithParaHeadVars {
+    pub(crate) para_head: String,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DataWrapper<T> {
     pub nodes: Vec<T>,

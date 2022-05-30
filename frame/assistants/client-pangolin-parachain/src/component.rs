@@ -4,7 +4,7 @@ use subxt::ClientBuilder;
 
 use crate::client::PangolinParachainClient;
 use crate::config::ClientConfig;
-use crate::error::{ClientError, ClientResult};
+use crate::error::ClientResult;
 use crate::types::DarwiniaAccount;
 
 const MAX_ATTEMPTS: u32 = 6;

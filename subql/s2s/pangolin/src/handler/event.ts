@@ -28,7 +28,7 @@ export class EventHandler {
         await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.BridgePangoro);
         return;
       }
-      case 'bridgePangoroParachainMessages:MessageAccepted': {
+      case 'bridgePangolinParachainMessages:MessageAccepted': {
         await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.BridgePangolinParachain);
         return;
       }

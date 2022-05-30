@@ -55,7 +55,7 @@ pub enum RelayBlockType {
 #[serde(rename_all = "kebab-case")]
 pub enum RelayBlockOrigin {
     Mandatory,
-    BridgePanglin,           // from pangolin parachain send message to pangolin
+    BridgePangolin,           // from pangolin parachain send message to pangolin
     BridgePangoro,           // from pangolin send message to pangoro
     BridgePangolinParachain, // from pangolin send message to pangolin parachain
 }

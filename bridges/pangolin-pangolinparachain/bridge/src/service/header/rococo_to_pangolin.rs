@@ -3,6 +3,9 @@ use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
 use client_rococo::client::RococoClient;
 use client_rococo::component::RococoClientComponent;
+use client_rococo::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
+use client_rococo::types::runtime_types::sp_runtime::generic::header::Header;
+use client_rococo::types::runtime_types::sp_runtime::traits::BlakeTwo256;
 use lifeline::{Lifeline, Service, Task};
 use std::str::FromStr;
 use support_common::config::{Config, Names};
@@ -11,10 +14,11 @@ use support_lifeline::service::BridgeService;
 
 use codec::{Decode, Encode};
 
-use subquery_s2s::types::BridgeName;
+use subquery_s2s::types::{BridgeName, OriginType};
 use subquery_s2s::{Subquery, SubqueryComponent};
 
 use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
+use crate::service::subscribe::ROCOCO_JUSTIFICATIONS;
 
 #[derive(Debug)]
 pub struct RococoToPangolinHeaderRelayService {
@@ -29,10 +33,7 @@ impl Service for RococoToPangolinHeaderRelayService {
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(
-            &format!(
-                "{}-rococo-pangolin-header-relay",
-                BridgeTask::name()
-            ),
+            &format!("{}-rococo-pangolin-header-relay", BridgeTask::name()),
             async move {
                 if let Err(e) = start().await {
                     tracing::error!(
@@ -56,6 +57,8 @@ struct HeaderRelay {
     client_pangolin: PangolinClient,
     client_rococo: RococoClient,
     subquery_rococo: Subquery,
+    subquery_pangolin_parachain: Subquery,
+    subquery_parachain_rococo: subquery_parachain::Subquery,
 }
 
 impl HeaderRelay {
@@ -74,11 +77,21 @@ impl HeaderRelay {
         let config_index = bridge_config.index;
         let subquery_rococo =
             SubqueryComponent::component(config_index.rococo, BridgeName::PangolinParachain);
+        let subquery_pangolin_parachain = SubqueryComponent::component(
+            config_index.pangolin_parachain,
+            BridgeName::PangolinParachain,
+        );
+        let subquery_parachain_rococo = subquery_parachain::SubqueryComponent::component(
+            config_index.parachain_rococo,
+            subquery_parachain::types::BridgeName::PangolinParachain,
+        );
 
         Ok(Self {
             client_pangolin,
             client_rococo,
             subquery_rococo,
+            subquery_pangolin_parachain,
+            subquery_parachain_rococo,
         })
     }
 }
@@ -91,7 +104,7 @@ async fn start() -> color_eyre::Result<()> {
     let mut header_relay = HeaderRelay::new().await?;
     loop {
         match run(&header_relay).await {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(err) => {
                 if let Some(subxt::BasicError::Rpc(request_error)) =
                     err.downcast_ref::<subxt::BasicError>()
@@ -122,7 +135,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .bridge_rococo_grandpa()
         .best_finalized(None)
         .await?;
-    tracing::info!(
+    tracing::debug!(
         target: "pangolin-pangolinparachain",
         "[header-relay-rococo-to-pangolin] Get last relayed rococo block hash: {:?}",
         &last_relayed_rococo_hash_in_pangolin
@@ -151,7 +164,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .await?
         .is_none()
     {
-        try_to_relay_non_mandatory(header_relay, block_number).await?;
+        try_to_relay_header_on_demand(header_relay, block_number).await?;
     }
 
     Ok(())
@@ -194,25 +207,68 @@ async fn try_to_relay_mandatory(
     }
 }
 
-async fn try_to_relay_non_mandatory(
+async fn try_to_relay_header_on_demand(
     header_relay: &HeaderRelay,
     last_block_number: u32,
 ) -> color_eyre::Result<()> {
-    let latest_justification = header_relay
-        .subquery_rococo
-        .find_justification("", false)
-        .await?
-        .ok_or_else(|| {
-            BridgerError::Custom("Failed to query latest justification in rococo".to_string())
-        })?;
-    if latest_justification.block_number > last_block_number {
-        submit_finality(
-            header_relay,
-            latest_justification.block_hash,
-            latest_justification.justification,
-        )
+    let next_para_header = header_relay
+        .subquery_pangolin_parachain
+        .next_needed_header(OriginType::BridgePangolin)
         .await?;
+
+    if next_para_header.is_none() {
+        return Ok(());
     }
+
+    if let Some(next_para_header) = next_para_header {
+        let next_header = header_relay
+            .subquery_parachain_rococo
+            .get_block_with_para_head(next_para_header.block_hash)
+            .await?
+            .filter(|header| {
+                tracing::debug!(
+                    target: "pangolin-pangolinparachain",
+                    "[header-relay-rococo-to-pangolin] Get related realy chain header: {:?}",
+                    header.included_relay_block
+                );
+                header.included_relay_block > last_block_number
+            });
+
+        if next_header.is_none() {
+            tracing::debug!(
+                target: "pangolin-pangolinparachain",
+                "[header-relay-rococo-to-pangolin] Para head has not been finalized"
+            );
+            return Ok(());
+        }
+
+        let pangolin_justification_queue = ROCOCO_JUSTIFICATIONS.lock().await;
+        if let Some(justification) = pangolin_justification_queue.back().cloned() {
+            let grandpa_justification = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(
+                &mut justification.as_ref(),
+            )
+            .map_err(|err| {
+                BridgerError::Custom(format!(
+                    "Failed to decode justification of rococo: {:?}",
+                    err
+                ))
+            })?;
+            tracing::debug!(
+                target: "pangolin-pangolinparachain",
+                "[header-relay-rococo-to-pangolin] Test justification: {:?}",
+                grandpa_justification.commit.target_number
+            );
+            if grandpa_justification.commit.target_number > last_block_number {
+                submit_finality(
+                    header_relay,
+                    format!("{:#x}", grandpa_justification.commit.target_hash),
+                    justification.to_vec(),
+                )
+                .await?;
+            }
+        }
+    }
+
     Ok(())
 }
 

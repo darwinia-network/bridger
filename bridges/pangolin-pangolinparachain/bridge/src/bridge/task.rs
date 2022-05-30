@@ -6,6 +6,7 @@ use crate::service::header::{
     RococoToPangolinParaHeaderRelayService,
 };
 use crate::service::message::MessageRelayService;
+use crate::service::subscribe::SubscribeService;
 
 #[derive(Debug)]
 pub struct BridgeTask {
@@ -27,6 +28,7 @@ impl BridgeTask {
         stack.spawn_service::<RococoToPangolinHeaderRelayService>()?;
         stack.spawn_service::<RococoToPangolinParaHeaderRelayService>()?;
         stack.spawn_service::<MessageRelayService>()?;
+        stack.spawn_service::<SubscribeService>()?;
         Ok(Self { stack })
     }
 }

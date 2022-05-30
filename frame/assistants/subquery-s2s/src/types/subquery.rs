@@ -8,6 +8,24 @@ pub(crate) struct QueryNextRelayBlockVars {
     pub(crate) block: u32,
 }
 
+
+#[derive(Clone, Debug, Serialize)]
+pub enum OriginType {
+    #[serde(rename = "mandatory")]
+    Mandatory,
+    #[serde(rename = "bridge-pangoro")]
+    BridgePangoro,
+    #[serde(rename = "bridge-pangolin-parachain")]
+    BridgePangolinParachain,
+    #[serde(rename = "bridge-pangolin")]
+    BridgePangolin,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct QueryNextOnDemandBlockVars {
+    pub(crate) origin: OriginType,
+}
+
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct FindJustificationVars {
     pub(crate) hash: String,

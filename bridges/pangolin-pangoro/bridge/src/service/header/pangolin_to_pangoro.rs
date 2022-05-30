@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
-use client_pangolin::config::PangolinSubxtConfig;
 use client_pangolin::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
 use client_pangolin::types::runtime_types::sp_runtime::generic::header::Header;
 use client_pangolin::types::runtime_types::sp_runtime::traits::BlakeTwo256;
@@ -10,7 +9,7 @@ use client_pangoro::client::PangoroClient;
 use client_pangoro::component::PangoroClientComponent;
 use client_pangoro::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
 use codec::{Decode, Encode};
-use lifeline::{Bus, Lifeline, Receiver, Service, Task};
+use lifeline::{Lifeline, Service, Task};
 use subquery_s2s::types::{BridgeName, OriginType};
 use subquery_s2s::{Subquery, SubqueryComponent};
 

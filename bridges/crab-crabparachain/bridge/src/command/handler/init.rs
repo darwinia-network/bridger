@@ -17,7 +17,7 @@ use crate::types::{BridgeName, InitBridge};
 
 pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
     tracing::info!(target: "pangolin-crabparachain", "Init bridge {:?}", bridge);
-    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
     let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
     let config_rococo: ChainInfoConfig = bridge_config.rococo;
     let config_pangolin_parachain: ChainInfoConfig = bridge_config.pangolin_parachain;
@@ -27,7 +27,7 @@ pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
             config_rococo.to_chain_info()?,
             config_pangolin.to_chain_info()?,
         ),
-        BridgeName::PangolinToPangolinParachain => (
+        BridgeName::PangolinToCrabParachain => (
             config_pangolin.to_chain_info()?,
             config_pangolin_parachain.to_chain_info()?,
         ),
@@ -61,9 +61,9 @@ macro_rules! select_bridge {
 
                 $generic
             }
-            BridgeName::PangolinToPangolinParachain => {
+            BridgeName::PangolinToCrabParachain => {
                 type Source = relay_pangolin_client::PangolinChain;
-                type Target = relay_pangolin_parachain_client::PangolinParachainChain;
+                type Target = relay_pangolin_parachain_client::CrabParachainChain;
 
                 fn encode_init_bridge(
                     init_data: InitializationData<<Source as ChainBase>::Header>,

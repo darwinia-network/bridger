@@ -57,7 +57,7 @@ impl FeemarketApi for PangolinFeemarketApi {
     > {
         let storage_key = StorageKey(
             feemarket_s2s::helpers::storage_prefix(
-                "PangolinParachainFeeMarket".as_bytes(),
+                "CrabParachainFeeMarket".as_bytes(),
                 "AssignedRelayers".as_bytes(),
             )
             .to_vec(),
@@ -109,7 +109,7 @@ impl FeemarketApi for PangolinFeemarketApi {
         >,
     > {
         let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
-            "PangolinParachainFeeMarket",
+            "CrabParachainFeeMarket",
             "Orders",
             (laned_id, message_nonce).encode().as_slice(),
         );
@@ -119,7 +119,7 @@ impl FeemarketApi for PangolinFeemarketApi {
     async fn relayers(&self) -> FeemarketResult<Vec<<Self::Chain as ChainBase>::AccountId>> {
         let storage_key = StorageKey(
             feemarket_s2s::helpers::storage_prefix(
-                "PangolinParachainFeeMarket".as_bytes(),
+                "CrabParachainFeeMarket".as_bytes(),
                 "Relayers".as_bytes(),
             )
             .to_vec(),
@@ -138,7 +138,7 @@ impl FeemarketApi for PangolinFeemarketApi {
         Option<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {
         let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
-            "PangolinParachainFeeMarket",
+            "CrabParachainFeeMarket",
             "RelayersMap",
             account.encode().as_slice(),
         );

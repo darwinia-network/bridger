@@ -10,7 +10,7 @@ use substrate_relay_helper::messages_lane::MessagesRelayParams;
 use substrate_relay_helper::TransactionParams;
 
 use relay_pangolin_client::PangolinChain;
-use relay_pangolin_parachain_client::PangolinParachainChain;
+use relay_pangolin_parachain_client::CrabParachainChain;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
@@ -18,9 +18,9 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::BridgeTask;
 use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::bridge::{ChainInfoConfig, RelayConfig};
-use crate::chains::pangolin::PangolinMessagesToPangolinParachain;
-use crate::chains::pangolin_parachain::PangolinParachainMessagesToPangolin;
-use crate::feemarket::{PangolinFeemarketApi, PangolinParachainFeemarketApi};
+use crate::chains::pangolin::PangolinMessagesToCrabParachain;
+use crate::chains::pangolin_parachain::CrabParachainMessagesToPangolin;
+use crate::feemarket::{PangolinFeemarketApi, CrabParachainFeemarketApi};
 use crate::types::{MessagesPalletOwnerSigningParams, RelayHeadersAndMessagesInfo};
 
 // /// Maximal allowed conversion rate error ratio (abs(real - stored) / stored) that we allow.
@@ -57,7 +57,7 @@ impl Service for MessageRelayService {
 }
 
 fn start() -> color_eyre::Result<()> {
-    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
     let config_pangolin: ChainInfoConfig = bridge_config.pangolin;
     let config_pangolin_parachain: ChainInfoConfig = bridge_config.pangolin_parachain;
     let config_relay: RelayConfig = bridge_config.relay;
@@ -106,12 +106,12 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         .to_substrate_relay_chain::<PangolinChain>()
         .await?;
     let pangolin_parachain_client = pangolin_parachain_chain
-        .to_substrate_relay_chain::<PangolinParachainChain>()
+        .to_substrate_relay_chain::<CrabParachainChain>()
         .await?;
 
     let pangolin_sign = pangolin_chain.to_keypair::<PangolinChain>()?;
     let pangolin_parachain_sign =
-        pangolin_parachain_chain.to_keypair::<PangolinParachainChain>()?;
+        pangolin_parachain_chain.to_keypair::<CrabParachainChain>()?;
     let pangolin_transactions_mortality = pangolin_chain.transactions_mortality()?;
     let pangolin_parachain_transactions_mortality =
         pangolin_parachain_chain.transactions_mortality()?;
@@ -146,7 +146,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         }
 
         let relayer_fund_acount_id = pallet_bridge_messages::relayer_fund_account_id::<
-            AccountIdOf<PangolinParachainChain>,
+            AccountIdOf<CrabParachainChain>,
             AccountIdConverter,
         >();
         let relayers_fund_account_balance = pangolin_parachain_client
@@ -155,7 +155,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         if let Err(relay_substrate_client::Error::AccountDoesNotExist) =
             relayers_fund_account_balance
         {
-            tracing::info!(target: "bridge", "Going to create relayers fund account at {}.", PangolinParachainChain::NAME);
+            tracing::info!(target: "bridge", "Going to create relayers fund account at {}.", CrabParachainChain::NAME);
             create_pangolin_parachain_account(
                 pangolin_parachain_client.clone(),
                 pangolin_parachain_sign.clone(),
@@ -171,14 +171,14 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         let lane = lane.into();
         let pangolin_feemarket_api =
             PangolinFeemarketApi::new(pangolin_client.clone(), lane, pangolin_sign.clone());
-        let pangolin_parachain_feemarket_api = PangolinParachainFeemarketApi::new(
+        let pangolin_parachain_feemarket_api = CrabParachainFeemarketApi::new(
             pangolin_parachain_client.clone(),
             lane,
             pangolin_parachain_sign.clone(),
         );
 
         let pangolin_to_pangolin_parachain_messages = substrate_relay_helper::messages_lane::run::<
-            PangolinMessagesToPangolinParachain,
+            PangolinMessagesToCrabParachain,
         >(MessagesRelayParams {
             source_client: pangolin_client.clone(),
             source_transaction_params: TransactionParams {
@@ -204,7 +204,7 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
         .boxed();
 
         let pangolin_parachain_to_pangolin_messages = substrate_relay_helper::messages_lane::run::<
-            PangolinParachainMessagesToPangolin,
+            CrabParachainMessagesToPangolin,
         >(MessagesRelayParams {
             source_client: pangolin_parachain_client.clone(),
             source_transaction_params: TransactionParams {
@@ -254,9 +254,9 @@ async fn create_pangolin_account(
 }
 
 async fn create_pangolin_parachain_account(
-    _left_client: Client<PangolinParachainChain>,
-    _left_sign: <PangolinParachainChain as TransactionSignScheme>::AccountKeyPair,
-    _account_id: AccountIdOf<PangolinParachainChain>,
+    _left_client: Client<CrabParachainChain>,
+    _left_sign: <CrabParachainChain as TransactionSignScheme>::AccountKeyPair,
+    _account_id: AccountIdOf<CrabParachainChain>,
 ) -> color_eyre::Result<()> {
     Err(BridgerError::Custom("Account creation is not supported by this bridge".to_string()).into())
 }

@@ -31,40 +31,40 @@ mod s2s_messages {
     use feemarket_s2s::relay::BasicRelayStrategy;
     use frame_support::weights::Weight;
     use relay_pangolin_client::PangolinChain;
-    use relay_pangolin_parachain_client::PangolinParachainChain;
+    use relay_pangolin_parachain_client::CrabParachainChain;
     use substrate_relay_helper::messages_lane::SubstrateMessageLane;
 
     #[derive(Clone, Debug)]
-    pub struct PangolinMessagesToPangolinParachain;
+    pub struct PangolinMessagesToCrabParachain;
 
     substrate_relay_helper::generate_mocked_receive_message_proof_call_builder!(
-        PangolinMessagesToPangolinParachain,
-        PangolinMessagesToPangolinParachainReceiveMessagesProofCallBuilder,
+        PangolinMessagesToCrabParachain,
+        PangolinMessagesToCrabParachainReceiveMessagesProofCallBuilder,
         relay_pangolin_parachain_client::runtime::Call::BridgePangolinMessages,
         relay_pangolin_parachain_client::runtime::BridgePangolinMessagesCall::receive_messages_proof
     );
 
     substrate_relay_helper::generate_mocked_receive_message_delivery_proof_call_builder!(
-        PangolinMessagesToPangolinParachain,
-        PangolinMessagesToPangolinParachainReceiveMessagesDeliveryProofCallBuilder,
-        relay_pangolin_client::runtime::Call::BridgePangolinParachainMessages,
-        relay_pangolin_client::runtime::BridgePangolinParachainMessagesCall::receive_messages_delivery_proof
+        PangolinMessagesToCrabParachain,
+        PangolinMessagesToCrabParachainReceiveMessagesDeliveryProofCallBuilder,
+        relay_pangolin_client::runtime::Call::BridgeCrabParachainMessages,
+        relay_pangolin_client::runtime::BridgeCrabParachainMessagesCall::receive_messages_delivery_proof
     );
 
-    impl SubstrateMessageLane for PangolinMessagesToPangolinParachain {
+    impl SubstrateMessageLane for PangolinMessagesToCrabParachain {
         const SOURCE_TO_TARGET_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
         const TARGET_TO_SOURCE_CONVERSION_RATE_PARAMETER_NAME: Option<&'static str> = None;
 
         type SourceChain = PangolinChain;
-        type TargetChain = PangolinParachainChain;
+        type TargetChain = CrabParachainChain;
 
         type SourceTransactionSignScheme = PangolinChain;
-        type TargetTransactionSignScheme = PangolinParachainChain;
+        type TargetTransactionSignScheme = CrabParachainChain;
 
         type ReceiveMessagesProofCallBuilder =
-            PangolinMessagesToPangolinParachainReceiveMessagesProofCallBuilder;
+            PangolinMessagesToCrabParachainReceiveMessagesProofCallBuilder;
         type ReceiveMessagesDeliveryProofCallBuilder =
-            PangolinMessagesToPangolinParachainReceiveMessagesDeliveryProofCallBuilder;
+            PangolinMessagesToCrabParachainReceiveMessagesDeliveryProofCallBuilder;
 
         type RelayStrategy = BasicRelayStrategy<PangolinFeemarketApi>;
     }
@@ -99,7 +99,7 @@ pub mod s2s_feemarket {
                         signer: signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            pangolin_runtime::Call::PangolinParachainFeemarket(
+                            pangolin_runtime::Call::CrabParachainFeemarket(
                                 pangolin_runtime::FeemarketCall::update_relay_fee(amount),
                             ),
                             transaction_nonce,
@@ -130,7 +130,7 @@ pub mod s2s_feemarket {
                         signer: signer.clone(),
                         era: relay_substrate_client::TransactionEra::immortal(),
                         unsigned: UnsignedTransaction::new(
-                            pangolin_runtime::Call::PangolinParachainFeemarket(
+                            pangolin_runtime::Call::CrabParachainFeemarket(
                                 pangolin_runtime::FeemarketCall::update_locked_collateral(amount),
                             ),
                             transaction_nonce,

@@ -63,7 +63,7 @@ struct HeaderRelay {
 
 impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
 
         let config_pangolin = bridge_config.pangolin;
         let config_rococo = bridge_config.rococo;
@@ -76,14 +76,14 @@ impl HeaderRelay {
 
         let config_index = bridge_config.index;
         let subquery_rococo =
-            SubqueryComponent::component(config_index.rococo, BridgeName::PangolinParachain);
+            SubqueryComponent::component(config_index.rococo, BridgeName::CrabParachain);
         let subquery_pangolin_parachain = SubqueryComponent::component(
             config_index.pangolin_parachain,
-            BridgeName::PangolinParachain,
+            BridgeName::CrabParachain,
         );
         let subquery_parachain_rococo = subquery_parachain::SubqueryComponent::component(
             config_index.parachain_rococo,
-            subquery_parachain::types::BridgeName::PangolinParachain,
+            subquery_parachain::types::BridgeName::CrabParachain,
         );
 
         Ok(Self {

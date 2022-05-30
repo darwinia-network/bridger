@@ -48,7 +48,7 @@ impl Service for SubscribeService {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
     let config_pangolin = bridge_config.pangolin;
 
     let client_pangolin =
@@ -65,7 +65,7 @@ async fn start() -> color_eyre::Result<()> {
 async fn run_until_pangolin_connection_lost(mut client: PangolinClient) -> color_eyre::Result<()> {
     while let Err(err) = subscribe_pangolin(&client).await {
         tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from pangolin: {:?}", err);
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
         let client_pangolin =
             PangolinClientComponent::component(bridge_config.pangolin.to_pangolin_client_config()?)
                 .await?;
@@ -77,7 +77,7 @@ async fn run_until_pangolin_connection_lost(mut client: PangolinClient) -> color
 async fn run_until_rococo_connection_lost(mut client: RococoClient) -> color_eyre::Result<()> {
     while let Err(err) = subscribe_rococo(&client).await {
         tracing::error!(target: "pangolin-crabparachain", "Failed to get justification from rococo: {:?}", err);
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
         let client_rococo =
             RococoClientComponent::component(bridge_config.rococo.to_rococo_client_config()?)
                 .await?;

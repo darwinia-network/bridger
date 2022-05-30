@@ -8,8 +8,8 @@ use client_pangolin::types::runtime_types::sp_runtime::traits::BlakeTwo256;
 use codec::{Decode, Encode};
 use lifeline::{Lifeline, Service, Task};
 
-use client_pangolin_parachain::client::PangolinParachainClient;
-use client_pangolin_parachain::component::PangolinParachainClientComponent;
+use client_pangolin_parachain::client::CrabParachainClient;
+use client_pangolin_parachain::component::CrabParachainClientComponent;
 use client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
 use subquery_s2s::types::{BridgeName, OriginType};
 use subquery_s2s::{Subquery, SubqueryComponent};
@@ -50,13 +50,13 @@ impl Service for PangolinToParachainHeaderRelayService {
 
 struct HeaderRelay {
     client_pangolin: PangolinClient,
-    client_parachain: PangolinParachainClient,
+    client_parachain: CrabParachainClient,
     subquery_pangolin: Subquery,
 }
 
 impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
 
         let config_pangolin = bridge_config.pangolin;
         let config_parachain = bridge_config.pangolin_parachain;
@@ -64,14 +64,14 @@ impl HeaderRelay {
         let client_pangolin =
             PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?)
                 .await?;
-        let client_parachain = PangolinParachainClientComponent::component(
+        let client_parachain = CrabParachainClientComponent::component(
             config_parachain.to_pangolin_parachain_client_config()?,
         )
         .await?;
 
         let config_index = bridge_config.index;
         let subquery_pangolin =
-            SubqueryComponent::component(config_index.pangolin, BridgeName::PangolinParachain);
+            SubqueryComponent::component(config_index.pangolin, BridgeName::CrabParachain);
         Ok(Self {
             client_pangolin,
             client_parachain,
@@ -190,7 +190,7 @@ async fn try_to_relay_header_on_demand(
 ) -> color_eyre::Result<()> {
     let next_header = header_relay
         .subquery_pangolin
-        .next_needed_header(OriginType::BridgePangolinParachain)
+        .next_needed_header(OriginType::BridgeCrabParachain)
         .await?
         .filter(|header| header.block_number > last_block_number);
 

@@ -2,7 +2,7 @@ use bp_messages::{LaneId, MessageNonce};
 use codec::Encode;
 use pallet_fee_market::types::{Order, Relayer};
 use frame_support::Blake2_128Concat;
-use relay_pangolin_parachain_client::PangolinParachainChain;
+use relay_pangolin_parachain_client::CrabParachainChain;
 use relay_substrate_client::{ChainBase, Client, TransactionSignScheme};
 use relay_utils::relay_loop::Client as RelayLoopClient;
 use sp_core::storage::StorageKey;
@@ -12,17 +12,17 @@ use feemarket_s2s::api::FeemarketApi;
 use feemarket_s2s::error::FeemarketResult;
 
 #[derive(Clone)]
-pub struct PangolinParachainFeemarketApi {
-    client: Client<PangolinParachainChain>,
+pub struct CrabParachainFeemarketApi {
+    client: Client<CrabParachainChain>,
     lane_id: LaneId,
-    signer: <PangolinParachainChain as TransactionSignScheme>::AccountKeyPair,
+    signer: <CrabParachainChain as TransactionSignScheme>::AccountKeyPair,
 }
 
-impl PangolinParachainFeemarketApi {
+impl CrabParachainFeemarketApi {
     pub fn new(
-        client: Client<PangolinParachainChain>,
+        client: Client<CrabParachainChain>,
         lane_id: LaneId,
-        signer: <PangolinParachainChain as TransactionSignScheme>::AccountKeyPair,
+        signer: <CrabParachainChain as TransactionSignScheme>::AccountKeyPair,
     ) -> Self {
         Self {
             client,
@@ -33,8 +33,8 @@ impl PangolinParachainFeemarketApi {
 }
 
 #[async_trait::async_trait]
-impl FeemarketApi for PangolinParachainFeemarketApi {
-    type Chain = PangolinParachainChain;
+impl FeemarketApi for CrabParachainFeemarketApi {
+    type Chain = CrabParachainChain;
 
     async fn reconnect(&mut self) -> FeemarketResult<()> {
         Ok(self.client.reconnect().await?)

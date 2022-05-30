@@ -53,7 +53,7 @@ struct HeaderRelay {
 
 impl HeaderRelay {
     async fn new() -> color_eyre::Result<Self> {
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinCrabParachain)?;
 
         let config_pangolin = bridge_config.pangolin;
         let config_rococo = bridge_config.rococo;

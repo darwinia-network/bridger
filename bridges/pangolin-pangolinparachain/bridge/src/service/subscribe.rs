@@ -64,7 +64,7 @@ async fn start() -> color_eyre::Result<()> {
 
 async fn run_until_pangolin_connection_lost(mut client: PangolinClient) -> color_eyre::Result<()> {
     while let Err(err) = subscribe_pangolin(&client).await {
-        tracing::error!(target: "pangolin-pangolinparachain", "Failed to get get justification from pangolin: {:?}", err);
+        tracing::error!(target: "pangolin-pangolinparachain", "Failed to get justification from pangolin: {:?}", err);
         let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
         let client_pangolin =
             PangolinClientComponent::component(bridge_config.pangolin.to_pangolin_client_config()?)

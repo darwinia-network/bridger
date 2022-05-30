@@ -49,7 +49,7 @@ impl RococoClient {
             "grandpa_subscribeJustifications",
             None,
             "grandpa_unsubscribeJustifications",
-        ).await.unwrap();
+        ).await?;
         Ok(sub)
     }
 

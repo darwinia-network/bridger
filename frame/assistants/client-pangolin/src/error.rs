@@ -2,6 +2,7 @@
 
 use support_toolkit::error::TkError;
 use thiserror::Error as ThisError;
+use jsonrpsee::core::error::Error as RpcError;
 
 pub type ClientResult<T> = Result<T, ClientError>;
 
@@ -10,6 +11,9 @@ pub type ClientResult<T> = Result<T, ClientError>;
 pub enum ClientError {
     #[error(transparent)]
     SubxtBasicError(subxt::BasicError),
+
+    #[error(transparent)]
+    RpcBasicError(RpcError),
 
     #[error("Please reconnect to rpc server")]
     ClientRestartNeed,
@@ -80,5 +84,15 @@ impl From<subxt::BasicError> for ClientError {
             return Self::ClientRestartNeed;
         }
         Self::SubxtBasicError(error)
+    }
+}
+
+
+impl From<RpcError> for ClientError {
+    fn from(error: RpcError) -> Self {
+        if let RpcError::RestartNeeded(_) = &error {
+            return Self::ClientRestartNeed;
+        }
+        Self::RpcBasicError(error)
     }
 }

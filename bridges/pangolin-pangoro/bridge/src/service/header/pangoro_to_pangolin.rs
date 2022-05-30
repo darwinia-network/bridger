@@ -3,7 +3,7 @@ use lifeline::{Bus, Lifeline, Receiver, Service, Task};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
-use crate::bridge::{BridgeConfig, BridgeTaskBus};
+use crate::bridge::{BridgeBus, BridgeConfig};
 
 #[derive(Debug)]
 pub struct PangoroToPangolinHeaderRelayService {
@@ -13,7 +13,7 @@ pub struct PangoroToPangolinHeaderRelayService {
 impl BridgeService for PangoroToPangolinHeaderRelayService {}
 
 impl Service for PangoroToPangolinHeaderRelayService {
-    type Bus = BridgeTaskBus;
+    type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {

@@ -16,8 +16,8 @@ use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::BridgeTask;
-use crate::bridge::{ChainInfoConfig, RelayConfig};
 use crate::bridge::{BridgeBus, BridgeConfig};
+use crate::bridge::{ChainInfoConfig, RelayConfig};
 use crate::chains::pangolin::PangolinMessagesToPangolinParachain;
 use crate::chains::pangolin_parachain::PangolinParachainMessagesToPangolin;
 use crate::feemarket::{PangolinFeemarketApi, PangolinParachainFeemarketApi};
@@ -43,18 +43,15 @@ impl Service for MessageRelayService {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task(
-            &format!("{}-relay", BridgeTask::name()),
-            async move {
-                if let Err(e) = start() {
-                    tracing::error!(target: "pangolin-pangolinparachain", "{:?}", e);
-                    return Err(
-                        BridgerError::Custom("Failed to start relay service".to_string()).into(),
-                    );
-                }
-                Ok(())
-            },
-        );
+        let _greet = Self::try_task(&format!("{}-relay", BridgeTask::name()), async move {
+            if let Err(e) = start() {
+                tracing::error!(target: "pangolin-pangolinparachain", "{:?}", e);
+                return Err(
+                    BridgerError::Custom("Failed to start relay service".to_string()).into(),
+                );
+            }
+            Ok(())
+        });
         Ok(Self { _greet })
     }
 }

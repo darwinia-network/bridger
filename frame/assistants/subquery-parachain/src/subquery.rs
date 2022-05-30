@@ -6,6 +6,7 @@ use include_dir::{include_dir, Dir};
 use crate::error::SubqueryComponentError;
 use crate::types::{
     BridgeName, CandidateIncludedEvent, DataWrapper, QueryNextCandidateIncludedEventVars,
+    QueryNextCandidateIncludedEventWithParaHeadVars,
 };
 use crate::SubqueryComponentResult;
 
@@ -60,6 +61,28 @@ impl Subquery {
             .map_err(SubqueryComponentError::from)?;
         let event = data
             .get("nextCandidateIncludedEvents")
+            .map(|item| item.nodes.clone())
+            .unwrap_or_default();
+        Ok(event.get(0).cloned())
+    }
+
+    pub async fn get_block_with_para_head(
+        &self,
+        para_head_hash: impl AsRef<str>,
+    ) -> SubqueryComponentResult<Option<CandidateIncludedEvent>> {
+        let query = self.read_graphql("next_candidate_included_event_with_para_head.query.graphql")?;
+        let vars = QueryNextCandidateIncludedEventWithParaHeadVars {
+            para_head: String::from(para_head_hash.as_ref()),
+        };
+        let data = self
+            .client
+            .query_with_vars_unwrap::<HashMap<String, DataWrapper<CandidateIncludedEvent>>, QueryNextCandidateIncludedEventWithParaHeadVars>(
+                query, vars,
+            )
+            .await
+            .map_err(SubqueryComponentError::from)?;
+        let event = data
+            .get("candidateIncludedEvents")
             .map(|item| item.nodes.clone())
             .unwrap_or_default();
         Ok(event.get(0).cloned())

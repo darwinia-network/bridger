@@ -6,7 +6,7 @@ use include_dir::{include_dir, Dir};
 use crate::error::SubqueryComponentError;
 use crate::types::{
     BridgeName, DataWrapper, FindJustificationVars, JustificationMapping, NeedRelayBlock,
-    QueryNextRelayBlockVars,
+    OriginType, QueryNextOnDemandBlockVars, QueryNextRelayBlockVars,
 };
 use crate::SubqueryComponentResult;
 
@@ -55,6 +55,26 @@ impl Subquery {
             .query_with_vars_unwrap::<HashMap<String, DataWrapper<NeedRelayBlock>>, QueryNextRelayBlockVars>(
                 query, vars,
             )
+            .await
+            .map_err(SubqueryComponentError::from)?;
+        let blocks = data
+            .get("needRelayBlocks")
+            .map(|item| item.nodes.clone())
+            .unwrap_or_default();
+        Ok(blocks.get(0).cloned())
+    }
+
+    pub async fn next_needed_header(
+        &self,
+        origin: OriginType,
+    ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {
+        let query = self.read_graphql("next_needed_header.query.graphql")?;
+        let vars = QueryNextOnDemandBlockVars {
+            origin,
+        };
+        let data = self
+            .client
+            .query_with_vars_unwrap::<HashMap<String, DataWrapper<NeedRelayBlock>>, QueryNextOnDemandBlockVars>(query, vars)
             .await
             .map_err(SubqueryComponentError::from)?;
         let blocks = data

@@ -144,6 +144,13 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         block_number
     );
 
+    if try_to_relay_mandatory(header_relay, block_number)
+        .await?
+        .is_none()
+    {
+        try_to_relay_header_on_demand(header_relay, block_number).await?;
+    }
+
     Ok(())
 }
 

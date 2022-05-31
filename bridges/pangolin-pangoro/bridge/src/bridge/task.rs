@@ -4,7 +4,8 @@ use crate::bridge::BridgeBus;
 use crate::service::feemarket::FeemarketService;
 use crate::service::header::pangolin_to_pangoro::PangolinToPangoroHeaderRelayService;
 use crate::service::header::pangoro_to_pangolin::PangoroToPangolinHeaderRelayService;
-use crate::service::message::MessageRelayService;
+use crate::service::message::pangolin_to_pangoro::PangolinToPangoroMessageRelayService;
+use crate::service::message::pangoro_to_pangolin::PangoroToPangolinMessageRelayService;
 
 #[derive(Debug)]
 pub struct BridgeTask {
@@ -23,7 +24,8 @@ impl BridgeTask {
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<PangolinToPangoroHeaderRelayService>()?;
         stack.spawn_service::<PangoroToPangolinHeaderRelayService>()?;
-        stack.spawn_service::<MessageRelayService>()?;
+        stack.spawn_service::<PangolinToPangoroMessageRelayService>()?;
+        stack.spawn_service::<PangoroToPangolinMessageRelayService>()?;
         stack.spawn_service::<FeemarketService>()?;
 
         Ok(Self { stack })

@@ -57,6 +57,21 @@ if [ "${CHAIN}" == "pangolin-parachain" ]; then
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachain
 fi
 
+if [ "${CHAIN}" == "crab" ]; then
+  ENDPOINT='https://crab-rpc.darwinia.network'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-crab
+fi
+
+if [ "${CHAIN}" == "crab-parachain" ]; then
+  ENDPOINT='https://crab-parachain-rpc.darwinia.network'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-crab-parachain
+fi
+
+if [ "${CHAIN}" == "kusama" ]; then
+  ENDPOINT='http://kusama-rpc.dwellir.com'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-kusama
+fi
+
 if [ -z "${ENDPOINT}" ]; then
   echo 'Not support chain:' ${CHAIN}
   exit 1

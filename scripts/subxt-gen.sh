@@ -68,7 +68,7 @@ if [ "${CHAIN}" == "crab-parachain" ]; then
 fi
 
 if [ "${CHAIN}" == "kusama" ]; then
-  ENDPOINT='http://kusama-rpc.dwellir.com'
+  ENDPOINT='https://kusama-rpc.dwellir.com'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-kusama
 fi
 

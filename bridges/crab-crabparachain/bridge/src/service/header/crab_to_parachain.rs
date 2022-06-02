@@ -35,12 +35,14 @@ impl Service for CrabToParachainHeaderRelayService {
         let _greet = Self::try_task(
             &format!("{}-crab-parachain-header-relay", BridgeTask::name()),
             async move {
-                start().await.map_err(|e| {
-                    BridgerError::Custom(format!(
+                while let Err(e) = start().await {
+                    tracing::error!(
+                        target: "crab-crabparachain",
                         "Failed to start crab-to-parachain header relay: {:?}",
-                        e
-                    ))
-                })?;
+                        e,
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                }
                 Ok(())
             },
         );
@@ -89,21 +91,12 @@ async fn start() -> color_eyre::Result<()> {
         match run(&header_relay).await {
             Ok(_) => {}
             Err(err) => {
-                if let Some(subxt::BasicError::Rpc(request_error)) =
-                    err.downcast_ref::<subxt::BasicError>()
-                {
-                    tracing::error!(
-                        target: "crab-crabparachain",
-                        "[header-crab-to-parachain] Connection Error. Try to resend later: {:?}",
-                        &request_error
-                    );
-                    header_relay = HeaderRelay::new().await?;
-                }
                 tracing::error!(
                     target: "crab-crabparachain",
                     "[header-crab-to-parachain] Failed to relay header: {:?}",
                     err
                 );
+                header_relay = HeaderRelay::new().await?;
             }
         }
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;

@@ -27,16 +27,13 @@ impl Service for KusamaToCrabParaHeaderRelayService {
         let _greet = Self::try_task(
             &format!("{}-kusama-crab-header-relay", BridgeTask::name()),
             async move {
-                if let Err(e) = start().await {
+                while let Err(e) = start().await {
                     tracing::error!(
                         target: "crab-crabparachain",
-                        "{:?}",
+                        "Failed to start para-head-to-crab header relay service, restart after some seconds: {:?}",
                         e,
                     );
-                    return Err(BridgerError::Custom(
-                        "Failed to start header relay service".to_string(),
-                    )
-                    .into());
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 }
                 Ok(())
             },
@@ -84,21 +81,12 @@ async fn start() -> color_eyre::Result<()> {
         match run(&header_relay).await {
             Ok(_) => {}
             Err(err) => {
-                if let Some(subxt::BasicError::Rpc(request_error)) =
-                    err.downcast_ref::<subxt::BasicError>()
-                {
-                    tracing::error!(
-                        target: "crab-crabparachain",
-                        "[para-header-kusama-to-crab] Connection Error. Try to resend later: {:?}",
-                        request_error
-                    );
-                    header_relay = HeaderRelay::new().await?;
-                }
                 tracing::error!(
                     target: "crab-crabparachain",
                     "[para-header-kusama-to-crab] Failed to relay header: {:?}",
                     err
                 );
+                header_relay = HeaderRelay::new().await?;
             }
         }
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;

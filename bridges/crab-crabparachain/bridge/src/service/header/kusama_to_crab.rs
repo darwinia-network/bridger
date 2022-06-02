@@ -1,9 +1,9 @@
 use client_crab::client::CrabClient;
 use client_crab::component::CrabClientComponent;
+use client_crab::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
 use client_crab::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
 use client_kusama::client::KusamaClient;
 use client_kusama::component::KusamaClientComponent;
-use client_crab::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
 use client_kusama::types::runtime_types::sp_runtime::generic::header::Header;
 use client_kusama::types::runtime_types::sp_runtime::traits::BlakeTwo256;
 use lifeline::{Lifeline, Service, Task};
@@ -69,18 +69,15 @@ impl HeaderRelay {
         let config_kusama = bridge_config.kusama;
 
         let client_crab =
-            CrabClientComponent::component(config_crab.to_crab_client_config()?)
-                .await?;
+            CrabClientComponent::component(config_crab.to_crab_client_config()?).await?;
         let client_kusama =
             KusamaClientComponent::component(config_kusama.to_kusama_client_config()?).await?;
 
         let config_index = bridge_config.index;
         let subquery_kusama =
             SubqueryComponent::component(config_index.kusama, BridgeName::CrabParachain);
-        let subquery_crab_parachain = SubqueryComponent::component(
-            config_index.crab_parachain,
-            BridgeName::CrabParachain,
-        );
+        let subquery_crab_parachain =
+            SubqueryComponent::component(config_index.crab_parachain, BridgeName::CrabParachain);
         let subquery_parachain_kusama = subquery_parachain::SubqueryComponent::component(
             config_index.parachain_kusama,
             subquery_parachain::types::BridgeName::CrabParachain,

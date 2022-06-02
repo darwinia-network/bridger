@@ -12,7 +12,7 @@ use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_terminal::output;
 
-use crate::bridge::{ChainInfoConfig, BridgeConfig};
+use crate::bridge::{BridgeConfig, ChainInfoConfig};
 use crate::types::{BridgeName, InitBridge};
 
 pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
@@ -23,10 +23,7 @@ pub async fn handle_init(bridge: BridgeName) -> color_eyre::Result<()> {
     let config_crab_parachain: ChainInfoConfig = bridge_config.crab_parachain;
 
     let (source_chain, target_chain) = match bridge {
-        BridgeName::KusamaToCrab => (
-            config_kusama.to_chain_info()?,
-            config_crab.to_chain_info()?,
-        ),
+        BridgeName::KusamaToCrab => (config_kusama.to_chain_info()?, config_crab.to_chain_info()?),
         BridgeName::CrabToCrabParachain => (
             config_crab.to_chain_info()?,
             config_crab_parachain.to_chain_info()?,
@@ -69,9 +66,7 @@ macro_rules! select_bridge {
                     init_data: InitializationData<<Source as ChainBase>::Header>,
                 ) -> <Target as RelaySubstrateClientChain>::Call {
                     crab_parachain_runtime::Call::BridgeCrabGrandpa(
-                        crab_parachain_runtime::BridgeCrabGrandpaCall::initialize(
-                            init_data,
-                        ),
+                        crab_parachain_runtime::BridgeCrabGrandpaCall::initialize(init_data),
                     )
                 }
 

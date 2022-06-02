@@ -82,9 +82,7 @@ fn start() -> color_eyre::Result<()> {
                 .clone(),
         },
         crab_parachain_messages_pallet_owner_signing: MessagesPalletOwnerSigningParams {
-            messages_pallet_owner: config_relay
-                .crab_parachain_messages_pallet_owner
-                .clone(),
+            messages_pallet_owner: config_relay.crab_parachain_messages_pallet_owner.clone(),
             messages_pallet_owner_password: config_relay
                 .crab_parachain_messages_pallet_owner_password,
         },
@@ -102,19 +100,15 @@ async fn bridge_relay(relay_info: RelayHeadersAndMessagesInfo) -> color_eyre::Re
     let crab_chain = relay_info.source;
     let crab_parachain_chain = relay_info.target;
 
-    let crab_client = crab_chain
-        .to_substrate_relay_chain::<CrabChain>()
-        .await?;
+    let crab_client = crab_chain.to_substrate_relay_chain::<CrabChain>().await?;
     let crab_parachain_client = crab_parachain_chain
         .to_substrate_relay_chain::<CrabParachainChain>()
         .await?;
 
     let crab_sign = crab_chain.to_keypair::<CrabChain>()?;
-    let crab_parachain_sign =
-        crab_parachain_chain.to_keypair::<CrabParachainChain>()?;
+    let crab_parachain_sign = crab_parachain_chain.to_keypair::<CrabParachainChain>()?;
     let crab_transactions_mortality = crab_chain.transactions_mortality()?;
-    let crab_parachain_transactions_mortality =
-        crab_parachain_chain.transactions_mortality()?;
+    let crab_parachain_transactions_mortality = crab_parachain_chain.transactions_mortality()?;
 
     let lanes = relay_info.lanes;
 

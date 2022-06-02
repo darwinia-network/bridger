@@ -62,8 +62,7 @@ impl HeaderRelay {
         let config_parachain = bridge_config.crab_parachain;
 
         let client_crab =
-            CrabClientComponent::component(config_crab.to_crab_client_config()?)
-                .await?;
+            CrabClientComponent::component(config_crab.to_crab_client_config()?).await?;
         let client_parachain = CrabParachainClientComponent::component(
             config_parachain.to_crab_parachain_client_config()?,
         )
@@ -203,10 +202,7 @@ async fn try_to_relay_header_on_demand(
         let grandpa_justification =
             GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(&mut justification.as_ref())
                 .map_err(|err| {
-                BridgerError::Custom(format!(
-                    "Failed to decode justification of crab: {:?}",
-                    err
-                ))
+                BridgerError::Custom(format!("Failed to decode justification of crab: {:?}", err))
             })?;
         if grandpa_justification.commit.target_number > last_block_number {
             submit_finality(

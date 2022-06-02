@@ -59,8 +59,7 @@ impl HeaderRelay {
         let config_kusama = bridge_config.kusama;
 
         let client_crab =
-            CrabClientComponent::component(config_crab.to_crab_client_config()?)
-                .await?;
+            CrabClientComponent::component(config_crab.to_crab_client_config()?).await?;
         let client_kusama =
             KusamaClientComponent::component(config_kusama.to_kusama_client_config()?).await?;
 
@@ -227,11 +226,9 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
             .bridge_kusama_parachain()
             .submit_parachain_heads(
                 best_finalized_source_block_hash,
-                vec![
-                    crab_runtime_types::bp_polkadot_core::parachains::ParaId(
-                        header_relay.para_id,
-                    ),
-                ],
+                vec![crab_runtime_types::bp_polkadot_core::parachains::ParaId(
+                    header_relay.para_id,
+                )],
                 heads_proofs
                     .proof
                     .into_iter()

@@ -143,9 +143,7 @@ impl ChainInfoConfig {
         })
     }
 
-    pub fn to_crab_client_config(
-        &self,
-    ) -> color_eyre::Result<client_crab::config::ClientConfig> {
+    pub fn to_crab_client_config(&self) -> color_eyre::Result<client_crab::config::ClientConfig> {
         Ok(client_crab::config::ClientConfig {
             endpoint: self.endpoint.clone(),
             relayer_private_key: self.signer.clone().ok_or_else(|| {

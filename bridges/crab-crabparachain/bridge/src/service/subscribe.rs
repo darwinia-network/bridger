@@ -51,8 +51,7 @@ async fn start() -> color_eyre::Result<()> {
     let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
     let config_crab = bridge_config.crab;
 
-    let client_crab =
-        CrabClientComponent::component(config_crab.to_crab_client_config()?).await?;
+    let client_crab = CrabClientComponent::component(config_crab.to_crab_client_config()?).await?;
     let client_kusama =
         KusamaClientComponent::component(bridge_config.kusama.to_kusama_client_config()?).await?;
 
@@ -67,8 +66,7 @@ async fn run_until_crab_connection_lost(mut client: CrabClient) -> color_eyre::R
         tracing::error!(target: "crab-crabparachain", "Failed to get justification from crab: {:?}", err);
         let bridge_config: BridgeConfig = Config::restore(Names::BridgeCrabCrabParachain)?;
         let client_crab =
-            CrabClientComponent::component(bridge_config.crab.to_crab_client_config()?)
-                .await?;
+            CrabClientComponent::component(bridge_config.crab.to_crab_client_config()?).await?;
         client = client_crab;
     }
     Ok(())

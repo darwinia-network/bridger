@@ -11,12 +11,12 @@ use support_lifeline::service::BridgeService;
 
 use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
 
-pub static PANGOLIN_JUSTIFICATIONS: Lazy<Mutex<VecDeque<sp_core::Bytes>>> = Lazy::new(|| {
+pub static CRAB_JUSTIFICATIONS: Lazy<Mutex<VecDeque<sp_core::Bytes>>> = Lazy::new(|| {
     let d = VecDeque::with_capacity(100);
     Mutex::new(d)
 });
 
-pub static ROCOCO_JUSTIFICATIONS: Lazy<Mutex<VecDeque<sp_core::Bytes>>> = Lazy::new(|| {
+pub static KUSAMA_JUSTIFICATIONS: Lazy<Mutex<VecDeque<sp_core::Bytes>>> = Lazy::new(|| {
     let d = VecDeque::with_capacity(100);
     Mutex::new(d)
 });
@@ -89,7 +89,7 @@ async fn run_until_kusama_connection_lost(mut client: KusamaClient) -> color_eyr
 async fn subscribe_crab(client: &CrabClient) -> color_eyre::Result<()> {
     let mut subscribe = client.subscribe_grandpa_justifications().await?;
     while let Some(justification) = subscribe.next().await {
-        let mut data = PANGOLIN_JUSTIFICATIONS.lock().await;
+        let mut data = CRAB_JUSTIFICATIONS.lock().await;
         data.push_back(justification.unwrap());
         if data.len() >= 100 {
             data.pop_front();
@@ -101,7 +101,7 @@ async fn subscribe_crab(client: &CrabClient) -> color_eyre::Result<()> {
 async fn subscribe_kusama(client: &KusamaClient) -> color_eyre::Result<()> {
     let mut subscribe = client.subscribe_grandpa_justifications().await?;
     while let Some(justification) = subscribe.next().await {
-        let mut data = ROCOCO_JUSTIFICATIONS.lock().await;
+        let mut data = KUSAMA_JUSTIFICATIONS.lock().await;
         data.push_back(justification.unwrap());
         if data.len() >= 100 {
             data.pop_front();

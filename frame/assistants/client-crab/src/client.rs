@@ -43,7 +43,6 @@ impl CrabClient {
 }
 
 impl CrabClient {
-
     /// Query spec name
     pub async fn spec_name(&self) -> ClientResult<String> {
         let runtime_version = self.subxt().rpc().runtime_version(None).await?;
@@ -69,12 +68,19 @@ impl CrabClient {
         }
     }
 
-    pub async fn subscribe_grandpa_justifications(&self) -> ClientResult<Subscription<sp_core::Bytes>> {
-        let sub = self.client.rpc().client.subscribe(
-            "grandpa_subscribeJustifications",
-            None,
-            "grandpa_unsubscribeJustifications",
-        ).await?;
+    pub async fn subscribe_grandpa_justifications(
+        &self,
+    ) -> ClientResult<Subscription<sp_core::Bytes>> {
+        let sub = self
+            .client
+            .rpc()
+            .client
+            .subscribe(
+                "grandpa_subscribeJustifications",
+                None,
+                "grandpa_unsubscribeJustifications",
+            )
+            .await?;
         Ok(sub)
     }
 }

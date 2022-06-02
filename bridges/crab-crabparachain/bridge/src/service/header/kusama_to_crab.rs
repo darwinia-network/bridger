@@ -3,7 +3,7 @@ use client_crab::component::CrabClientComponent;
 use client_crab::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
 use client_kusama::client::KusamaClient;
 use client_kusama::component::KusamaClientComponent;
-use client_kusama::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
+use client_crab::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
 use client_kusama::types::runtime_types::sp_runtime::generic::header::Header;
 use client_kusama::types::runtime_types::sp_runtime::traits::BlakeTwo256;
 use lifeline::{Lifeline, Service, Task};
@@ -18,7 +18,7 @@ use subquery_s2s::types::{BridgeName, OriginType};
 use subquery_s2s::{Subquery, SubqueryComponent};
 
 use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
-use crate::service::subscribe::ROCOCO_JUSTIFICATIONS;
+use crate::service::subscribe::KUSAMA_JUSTIFICATIONS;
 
 #[derive(Debug)]
 pub struct KusamaToCrabHeaderRelayService {
@@ -242,7 +242,7 @@ async fn try_to_relay_header_on_demand(
             return Ok(());
         }
 
-        let crab_justification_queue = ROCOCO_JUSTIFICATIONS.lock().await;
+        let crab_justification_queue = KUSAMA_JUSTIFICATIONS.lock().await;
         if let Some(justification) = crab_justification_queue.back().cloned() {
             let grandpa_justification = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(
                 &mut justification.as_ref(),

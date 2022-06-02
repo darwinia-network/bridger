@@ -18,7 +18,7 @@ use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
-use crate::service::subscribe::PANGOLIN_JUSTIFICATIONS;
+use crate::service::subscribe::CRAB_JUSTIFICATIONS;
 
 #[derive(Debug)]
 pub struct CrabToParachainHeaderRelayService {
@@ -198,7 +198,7 @@ async fn try_to_relay_header_on_demand(
         return Ok(());
     }
 
-    let crab_justification_queue = PANGOLIN_JUSTIFICATIONS.lock().await;
+    let crab_justification_queue = CRAB_JUSTIFICATIONS.lock().await;
     if let Some(justification) = crab_justification_queue.back().cloned() {
         let grandpa_justification =
             GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(&mut justification.as_ref())

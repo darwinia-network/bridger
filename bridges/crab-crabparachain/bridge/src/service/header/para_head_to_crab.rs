@@ -125,7 +125,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         .client_crab
         .runtime()
         .storage()
-        .bridge_kusama_parachains()
+        .bridge_kusama_parachain()
         .best_para_heads(
             crab_runtime_types::bp_polkadot_core::parachains::ParaId(header_relay.para_id),
             Some(best_target_header.hash()),
@@ -224,7 +224,7 @@ async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
         let runtime = header_relay.client_crab.runtime();
         let track = runtime
             .tx()
-            .bridge_kusama_parachains()
+            .bridge_kusama_parachain()
             .submit_parachain_heads(
                 best_finalized_source_block_hash,
                 vec![

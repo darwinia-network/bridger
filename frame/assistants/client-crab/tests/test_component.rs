@@ -68,15 +68,23 @@ async fn authorities_to_sign() {
 
 #[tokio::test]
 async fn test_subscribe() {
-    use futures_util::stream::StreamExt;
-    use client_crab::types::runtime_types::{bp_header_chain::justification::GrandpaJustification, sp_runtime::generic::header::Header};
+    use client_crab::types::runtime_types::{
+        bp_header_chain::justification::GrandpaJustification, sp_runtime::generic::header::Header,
+    };
     use codec::Decode;
+    use futures_util::stream::StreamExt;
     use subxt::sp_runtime::traits::BlakeTwo256;
 
     let client = common::client().await.unwrap();
-    let mut it = client.subscribe_grandpa_justifications().await.unwrap().take(1);
+    let mut it = client
+        .subscribe_grandpa_justifications()
+        .await
+        .unwrap()
+        .take(1);
     if let Some(item) = it.next().await {
-        let i = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(&mut item.unwrap().as_ref()).unwrap();
+        let i =
+            GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(&mut item.unwrap().as_ref())
+                .unwrap();
         println!("{:?}", i);
     }
 }

@@ -1,8 +1,8 @@
 #![allow(missing_docs)]
 
+use jsonrpsee::core::error::Error as RpcError;
 use support_toolkit::error::TkError;
 use thiserror::Error as ThisError;
-use jsonrpsee::core::error::Error as RpcError;
 
 pub type ClientResult<T> = Result<T, ClientError>;
 
@@ -78,7 +78,6 @@ impl From<subxt::BasicError> for ClientError {
         Self::SubxtBasicError(error)
     }
 }
-
 
 impl From<RpcError> for ClientError {
     fn from(error: RpcError) -> Self {

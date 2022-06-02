@@ -27,16 +27,13 @@ impl Service for RococoToPangolinParaHeaderRelayService {
         let _greet = Self::try_task(
             &format!("{}-rococo-pangolin-header-relay", BridgeTask::name()),
             async move {
-                if let Err(e) = start().await {
+                while let Err(e) = start().await {
                     tracing::error!(
                         target: "pangolin-pangolinparachain",
-                        "{:?}",
+                        "Failed to start para-head-to-pangolin header relay service, restart after some seconds: {:?}",
                         e,
                     );
-                    return Err(BridgerError::Custom(
-                        "Failed to start header relay service".to_string(),
-                    )
-                    .into());
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 }
                 Ok(())
             },
@@ -85,21 +82,12 @@ async fn start() -> color_eyre::Result<()> {
         match run(&header_relay).await {
             Ok(_) => {}
             Err(err) => {
-                if let Some(subxt::BasicError::Rpc(request_error)) =
-                    err.downcast_ref::<subxt::BasicError>()
-                {
-                    tracing::error!(
-                        target: "pangolin-pangolinparachain",
-                        "[para-header-rococo-to-pangolin] Connection Error. Try to resend later: {:?}",
-                        request_error
-                    );
-                    header_relay = HeaderRelay::new().await?;
-                }
                 tracing::error!(
                     target: "pangolin-pangolinparachain",
                     "[para-header-rococo-to-pangolin] Failed to relay header: {:?}",
                     err
                 );
+                header_relay = HeaderRelay::new().await?;
             }
         }
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;

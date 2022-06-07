@@ -13,7 +13,6 @@ use subxt::StorageEntry;
 use support_common::error::BridgerError;
 
 use crate::service::message::types::MessageRelay;
-use crate::types::HexLaneId;
 
 /// Message payload for This -> Bridged chain messages.
 type FromThisChainMessagePayload = pangoro_runtime_types::bp_message_dispatch::MessagePayload<
@@ -36,18 +35,8 @@ impl DeliveryRunner {
 
 // defined
 impl DeliveryRunner {
-    fn lane(&self) -> color_eyre::Result<HexLaneId> {
-        Ok(self
-            .message_relay
-            .relay_config
-            .lanes
-            .clone()
-            .get(0)
-            .cloned()
-            .ok_or_else(|| BridgerError::Custom("Missing lane id".to_string()))?)
-    }
-    async fn outbound_lane_data(&self) -> color_eyre::Result<OutboundLaneData> {
-        let lane = self.lane()?;
+    async fn source_outbound_lane_data(&self) -> color_eyre::Result<OutboundLaneData> {
+        let lane = self.message_relay.lane()?;
         let outbound_lane_data = self
             .message_relay
             .client_pangoro
@@ -63,8 +52,9 @@ impl DeliveryRunner {
         );
         Ok(outbound_lane_data)
     }
+
     async fn assemble_nonces(&self, limit: u64) -> color_eyre::Result<RangeInclusive<u64>> {
-        let outbound_lane_data = self.outbound_lane_data().await?;
+        let outbound_lane_data = self.source_outbound_lane_data().await?;
         let (latest_confirmed_nonce, latest_generated_nonce) = (
             outbound_lane_data.latest_received_nonce,
             outbound_lane_data.latest_generated_nonce,
@@ -95,7 +85,7 @@ impl DeliveryRunner {
                 Err(err) => {
                     tracing::error!(
                         target: "pangolin-pangoro",
-                        "[delivery-pangoro-to-pangolin] Failed to relay message: {:?}",
+                        "[delivery-pangoro-to-pangolin] Failed to delivery message: {:?}",
                         err
                     );
                     self.message_relay = MessageRelay::new().await?;
@@ -106,7 +96,7 @@ impl DeliveryRunner {
     }
 
     async fn run(&self, limit: u64) -> color_eyre::Result<()> {
-        let lane = self.lane()?;
+        let lane = self.message_relay.lane()?;
 
         // alias
         let client_pangoro = &self.message_relay.client_pangoro;

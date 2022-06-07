@@ -6,8 +6,10 @@ use subquery_s2s::types::BridgeName;
 use subquery_s2s::{Subquery, SubqueryComponent};
 
 use support_common::config::{Config, Names};
+use support_common::error::BridgerError;
 
 use crate::bridge::{BridgeConfig, RelayConfig};
+use crate::types::HexLaneId;
 
 pub(crate) struct MessageRelay {
     pub relay_config: RelayConfig,
@@ -37,5 +39,16 @@ impl MessageRelay {
             client_pangoro,
             subquery_pangoro,
         })
+    }
+}
+
+impl MessageRelay {
+    pub fn lane(&self) -> Result<HexLaneId, BridgerError> {
+        self.relay_config
+            .lanes
+            .clone()
+            .get(0)
+            .cloned()
+            .ok_or_else(|| BridgerError::Custom("Missing lane id".to_string()))
     }
 }

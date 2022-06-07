@@ -224,7 +224,7 @@ impl ExtrinsicsHandler {
 impl ExtrinsicsHandler {
     pub fn collect_message(&self, message: &Extrinsic) -> color_eyre::Result<()> {
         // If there is a same message already, skip it and return Ok(()).
-        let duplicates: Vec<String> = self
+        let mut duplicates = self
             .message_kv
             .keys()?
             .into_iter()
@@ -233,8 +233,8 @@ impl ExtrinsicsHandler {
                     .get_as_unwrap(&key)
                     .map_or(false, |value: Extrinsic| &value == message)
             })
-            .collect();
-        if !duplicates.is_empty() {
+            .peekable();
+        if duplicates.peek().is_some() {
             return Ok(());
         }
         let mut key: String = SystemTime::now()

@@ -58,6 +58,31 @@ pub enum Extrinsic {
     SignAndSendAuthorities(EcdsaMessage),
 }
 
+impl PartialEq for Extrinsic {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Extrinsic::Affirm(left), Extrinsic::Affirm(right)) => {
+                left.header.number == right.header.number
+            }
+            (Extrinsic::Redeem(_, l_entity), Extrinsic::Redeem(_, r_entity)) => {
+                l_entity.tx_hash == r_entity.tx_hash
+            }
+            (Extrinsic::GuardVote(l_u, l_b), Extrinsic::GuardVote(r_u, r_b)) => {
+                l_u == r_u && l_b == r_b
+            }
+            (Extrinsic::SignAndSendMmrRoot(left), Extrinsic::SignAndSendMmrRoot(right)) => {
+                left == right
+            }
+            (Extrinsic::SignAndSendAuthorities(left), Extrinsic::SignAndSendAuthorities(right)) => {
+                left == right
+            }
+            (_, _) => false,
+        }
+    }
+}
+
+impl Eq for Extrinsic {}
+
 impl Message<DarwiniaEthereumBus> for ToExtrinsicsMessage {
     type Channel = broadcast::Sender<Self>;
 }

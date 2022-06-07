@@ -81,8 +81,6 @@ impl PartialEq for Extrinsic {
     }
 }
 
-impl Eq for Extrinsic {}
-
 impl Message<DarwiniaEthereumBus> for ToExtrinsicsMessage {
     type Channel = broadcast::Sender<Self>;
 }

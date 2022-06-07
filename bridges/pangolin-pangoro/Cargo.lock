@@ -259,7 +259,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangolin-pangoro"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "array-bytes",
  "client-pangolin",
@@ -368,7 +368,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangolin"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "array-bytes",
  "bp-header-chain",
@@ -386,7 +386,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangoro"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "array-bytes",
  "bp-header-chain",
@@ -451,7 +451,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -3263,7 +3263,7 @@ dependencies = [
 
 [[package]]
 name = "subquery-s2s"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -3362,7 +3362,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "color-eyre",
  "config",
@@ -3381,7 +3381,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -3389,7 +3389,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "colored",
  "serde 1.0.136",
@@ -3399,7 +3399,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "thiserror",
 ]

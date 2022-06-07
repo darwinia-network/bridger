@@ -1,3 +1,3 @@
-impl PangoroClient {
-    pub async fn prove_messages(&self) {}
-}
+use crate::client::PangoroClient;
+
+impl PangoroClient {}

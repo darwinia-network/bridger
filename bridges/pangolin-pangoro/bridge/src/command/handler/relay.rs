@@ -1,4 +1,3 @@
-use lifeline::{Bus, Sender};
 use support_common::config::{Config, Names};
 
 use crate::bridge::{BridgeConfig, BridgeTask};

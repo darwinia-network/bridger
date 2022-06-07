@@ -19,7 +19,7 @@ impl From<GraphQLError> for SubqueryComponentError {
     }
 }
 
-impl From<array_bytes::Error> for ClientError {
+impl From<array_bytes::Error> for SubqueryComponentError {
     fn from(error: array_bytes::Error) -> Self {
         Self::Bytes(format!("{:?}", error))
     }

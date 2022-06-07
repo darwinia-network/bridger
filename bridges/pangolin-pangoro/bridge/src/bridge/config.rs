@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use subquery_s2s::SubqueryConfig;
-use support_common::error::BridgerError;
 
 use crate::types::HexLaneId;
 

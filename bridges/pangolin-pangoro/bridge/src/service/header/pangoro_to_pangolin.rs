@@ -31,7 +31,7 @@ impl Service for PangoroToPangolinHeaderRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
-    fn spawn(bus: &Self::Bus) -> Self::Lifeline {
+    fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task("pangoro-to-pangolin-header-relay-service", async move {
             start().await.map_err(|e| {
                 BridgerError::Custom(format!(

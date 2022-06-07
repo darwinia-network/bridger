@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_hex::{SerHex, SerHexSeq, StrictPfx};
 
+use crate::SubqueryComponentResult;
+
 /// need relay block
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct NeedRelayBlock {

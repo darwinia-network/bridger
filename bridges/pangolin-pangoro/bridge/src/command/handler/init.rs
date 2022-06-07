@@ -1,9 +1,7 @@
 use client_pangolin::component::PangolinClientComponent;
 use client_pangoro::component::PangoroClientComponent;
-use lifeline::{Bus, Sender};
 
 use support_common::config::{Config, Names};
-use support_common::error::BridgerError;
 
 use crate::bridge::{BridgeConfig, ChainInfoConfig};
 use crate::types::BridgeName;

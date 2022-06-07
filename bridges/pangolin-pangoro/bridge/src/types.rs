@@ -5,8 +5,6 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use support_common::error::BridgerError;
 
-use crate::bridge::ChainInfoConfig;
-
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, strum::EnumString)]
 #[strum(serialize_all = "kebab_case")]
 pub enum BridgeName {

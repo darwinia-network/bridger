@@ -25,7 +25,7 @@ jobs:
           - pangolin-pangoro
           - darwinia-crab
           # - pangoro-chapel
-          # - pangolin-pangolinparachain
+          - pangolin-pangolinparachain
     steps:
       - uses: actions/checkout@v2
 
@@ -103,7 +103,7 @@ jobs:
           - pangolin-pangoro
           - darwinia-crab
           # - pangoro-chapel
-          # - pangolin-pangolinparachain
+          - pangolin-pangolinparachain
     steps:
       - uses: actions/checkout@v2
 
@@ -170,14 +170,13 @@ jobs:
     strategy:
       matrix:
         package:
-          [
-            bridger,
-            pangolin-ropsten,
-            darwinia-ethereum,
-            pangolin-pangoro,
-            darwinia-crab,
-            # pangoro-chapel,
-          ]
+          - bridger
+          - pangolin-ropsten
+          - darwinia-ethereum
+          - pangolin-pangoro
+          - darwinia-crab
+          # - pangoro-chapel
+          - pangolin-pangolinparachain
     steps:
       - uses: actions/checkout@v2
 

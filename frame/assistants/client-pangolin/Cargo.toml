@@ -1,25 +1,20 @@
 [package]
-name = "client-pangolin"
-version = "0.5.5"
-authors = ["Darwinia Network <hello@darwinia.network>"]
-description = "Darwinia bridger"
-repository = "https://github.com/darwinia-network/bridger"
-license = "MIT"
+authors       = ["Darwinia Network <hello@darwinia.network>"]
+description   = "Darwinia bridger"
 documentation = "https://rust-docs.darwinia.network/bridger"
-homepage = "https://github.com/darwinia-network/bridger"
-include = [
-  "Cargo.toml",
-  "**/*.rs",
-  "README.md",
-  "LICENSE"
-]
-keywords = ["substrate", "darwinia"]
-readme = 'README.md'
-edition = "2021"
+edition       = "2021"
+homepage      = "https://github.com/darwinia-network/bridger"
+include       = ["Cargo.toml", "**/*.rs", "README.md", "LICENSE"]
+keywords      = ["substrate", "darwinia"]
+license       = "MIT"
+name          = "client-pangolin"
+readme        = 'README.md'
+repository    = "https://github.com/darwinia-network/bridger"
+version       = "0.5.6"
 
 [dependencies]
-tracing = "0.1"
 thiserror = "1"
+tracing   = "0.1"
 
 serde       = { version = "1", features = ["derive"] }
 serde_json  = "1"

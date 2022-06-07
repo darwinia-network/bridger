@@ -70,13 +70,13 @@ jobs:
           subql_path: subql/ethereum-v1/${{ matrix.chain }}
           prod_mode: true
 
-      - uses: ./.github/actions/smart-subquery
-        name: Deploy subql-parachain-${{ matrix.chain }}
-        with:
-          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
-          subquery_org: ${{ env.SUBQUERY_ORG_PRD }}
-          project_key: subql-parachain-${{ matrix.chain }}
-          subql_path: subql/parachain/${{ matrix.chain }}
+      # - uses: ./.github/actions/smart-subquery
+      #   name: Deploy subql-parachain-${{ matrix.chain }}
+      #   with:
+      #     subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
+      #     subquery_org: ${{ env.SUBQUERY_ORG_PRD }}
+      #     project_key: subql-parachain-${{ matrix.chain }}
+      #     subql_path: subql/parachain/${{ matrix.chain }}
 
   bridge-s2s:
     name: Subql Parachain
@@ -106,11 +106,11 @@ jobs:
           subql_path: subql/s2s/${{ matrix.chain }}
           prod_mode: true
 
-      - uses: ./.github/actions/smart-subquery
-        name: Deploy subql-bridge-s2s-${{ matrix.chain }}
-        with:
-          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
-          subquery_org: ${{ env.SUBQUERY_ORG_PRD }}
-          project_key: subql-bridge-s2s-${{ matrix.chain }}
-          subql_path: subql/s2s/${{ matrix.chain }}
+      # - uses: ./.github/actions/smart-subquery
+      #   name: Deploy subql-bridge-s2s-${{ matrix.chain }}
+      #   with:
+      #     subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
+      #     subquery_org: ${{ env.SUBQUERY_ORG_PRD }}
+      #     project_key: subql-bridge-s2s-${{ matrix.chain }}
+      #     subql_path: subql/s2s/${{ matrix.chain }}
 

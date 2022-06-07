@@ -22,8 +22,8 @@ impl BridgeTask {
     pub async fn new() -> color_eyre::Result<Self> {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
-        stack.spawn_service::<PangolinToPangoroHeaderRelayService>()?;
-        stack.spawn_service::<PangoroToPangolinHeaderRelayService>()?;
+        // stack.spawn_service::<PangolinToPangoroHeaderRelayService>()?;
+        // stack.spawn_service::<PangoroToPangolinHeaderRelayService>()?;
         stack.spawn_service::<PangolinToPangoroMessageRelayService>()?;
         stack.spawn_service::<PangoroToPangolinMessageRelayService>()?;
         stack.spawn_service::<FeemarketService>()?;

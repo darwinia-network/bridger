@@ -3,8 +3,8 @@ use thiserror::Error as ThisError;
 /// Bridge ethereum error
 #[derive(ThisError, Debug)]
 pub enum ConvertTypeError {
-    #[error("Other error: {0}")]
-    Other(String),
+    #[error("Custom error: {0}")]
+    Custom(String),
 
     #[error("Array bytes error: {0}")]
     ArrayBytes(String),

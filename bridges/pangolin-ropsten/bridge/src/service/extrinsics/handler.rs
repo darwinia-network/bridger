@@ -285,27 +285,26 @@ impl ExtrinsicsHandler {
                 match self.send_extrinsic(ex.clone()).await {
                     Ok(_) => self.message_kv.delete(&key)?,
                     Err(err) => {
+                        tracing::error!(
+                            target: "pangolin-pangoro",
+                            "[pangolin] [extrinsics] [{}] Failed to send extrinsic {:?} err: {:?}",
+                            times,
+                            ex,
+                            err,
+                        );
                         if let Some(client_error) =
                             err.downcast_ref::<client_pangolin::error::ClientError>()
                         {
                             if client_error.is_restart_need() {
                                 tracing::error!(
                                     target: "pangolin-pangoro",
-                                    "[pangolin] [extrinsics] [{}] Connection Error. Try to resend later. extrinsic: {:?}",
+                                    "[pangolin] [extrinsics] [{}] Connection Error. Try to resend later.",
                                     times,
-                                    ex,
                                 );
                                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                                 return Err(err);
                             }
                         }
-                        tracing::error!(
-                            target: "pangolin-pangoro",
-                            "[pangolin] [extrinsics] [{}] Failed to send extrinsic {:?} err: {:?}",
-                            times,
-                            ex,
-                            err
-                        );
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                         if times > 5 {
                             self.message_kv.delete(&key)?;

@@ -29,8 +29,9 @@ futures   = "0.3"
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage  = "0.4"
 
+sp-core     = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 
-sp-core            = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 
 support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }

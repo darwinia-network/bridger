@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::types::RelayBlockOrigin;
+
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct EmptyQueryVar;
 
@@ -7,7 +9,6 @@ pub(crate) struct EmptyQueryVar;
 pub(crate) struct QueryNextRelayBlockVars {
     pub(crate) block: u32,
 }
-
 
 #[derive(Clone, Debug, Serialize)]
 pub enum OriginType {
@@ -34,6 +35,13 @@ pub(crate) struct FindJustificationVars {
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct QueryBlockVars {
     pub(crate) block_number: u32,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct QueryNeedRelay {
+    pub origin: RelayBlockOrigin,
+    pub lane: String,
+    pub nonce: u64,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

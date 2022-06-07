@@ -276,6 +276,7 @@ dependencies = [
  "structopt",
  "strum",
  "subquery-s2s",
+ "subxt",
  "support-common",
  "support-lifeline",
  "support-terminal",
@@ -3264,6 +3265,7 @@ dependencies = [
 name = "subquery-s2s"
 version = "0.5.5"
 dependencies = [
+ "array-bytes",
  "async-trait",
  "gql_client",
  "hex",

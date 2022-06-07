@@ -22,7 +22,7 @@ pub enum BridgeName {
 // }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct HexLaneId([u8; 4]);
+pub struct HexLaneId(pub [u8; 4]);
 
 impl FromStr for HexLaneId {
     type Err = BridgerError;

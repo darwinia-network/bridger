@@ -36,6 +36,10 @@ impl NeedRelayBlock {
     pub fn is_mandatory(&self) -> bool {
         matches!(self.type_, RelayBlockType::Mandatory)
     }
+
+    pub fn block_hash_bytes(&self) -> SubqueryComponentResult<Vec<u8>> {
+        Ok(array_bytes::hex2bytes(&self.block_hash)?)
+    }
 }
 
 #[derive(
@@ -55,8 +59,10 @@ pub enum RelayBlockType {
 #[serde(rename_all = "kebab-case")]
 pub enum RelayBlockOrigin {
     Mandatory,
-    BridgePangolin,           // from pangolin parachain send message to pangolin
-    BridgePangoro,           // from pangolin send message to pangoro
+    BridgePangolin,
+    // from pangolin parachain send message to pangolin
+    BridgePangoro,
+    // from pangolin send message to pangoro
     BridgePangolinParachain, // from pangolin send message to pangolin parachain
 }
 

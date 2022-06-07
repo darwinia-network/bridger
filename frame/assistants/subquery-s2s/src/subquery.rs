@@ -6,7 +6,8 @@ use include_dir::{include_dir, Dir};
 use crate::error::SubqueryComponentError;
 use crate::types::{
     BridgeName, DataWrapper, FindJustificationVars, JustificationMapping, NeedRelayBlock,
-    OriginType, QueryNextOnDemandBlockVars, QueryNextRelayBlockVars,
+    OriginType, QueryNeedRelay, QueryNextOnDemandBlockVars, QueryNextRelayBlockVars,
+    RelayBlockOrigin,
 };
 use crate::SubqueryComponentResult;
 
@@ -42,6 +43,7 @@ impl Subquery {
 }
 
 impl Subquery {
+    /// Query next mandatory header
     pub async fn next_mandatory_header(
         &self,
         block_number: u32,
@@ -64,14 +66,13 @@ impl Subquery {
         Ok(blocks.get(0).cloned())
     }
 
+    /// Query next needed header (on-demand)
     pub async fn next_needed_header(
         &self,
         origin: OriginType,
     ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {
         let query = self.read_graphql("next_needed_header.query.graphql")?;
-        let vars = QueryNextOnDemandBlockVars {
-            origin,
-        };
+        let vars = QueryNextOnDemandBlockVars { origin };
         let data = self
             .client
             .query_with_vars_unwrap::<HashMap<String, DataWrapper<NeedRelayBlock>>, QueryNextOnDemandBlockVars>(query, vars)
@@ -84,6 +85,7 @@ impl Subquery {
         Ok(blocks.get(0).cloned())
     }
 
+    /// Find justification
     pub async fn find_justification(
         &self,
         block_hash: impl AsRef<str>,
@@ -106,5 +108,33 @@ impl Subquery {
             .map(|item| item.nodes.clone())
             .unwrap_or_default();
         Ok(justifications.get(0).cloned())
+    }
+
+    /// Query relay info by nonce
+    pub async fn query_need_relay(
+        &self,
+        origin: RelayBlockOrigin,
+        lane: [u8; 4],
+        nonce: u64,
+    ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {
+        let query = self.read_graphql("query_need_relay.graphql")?;
+        let hex = array_bytes::bytes2hex("", lane);
+        let vars = QueryNeedRelay {
+            origin,
+            lane,
+            nonce,
+        };
+        let data = self
+            .client
+            .query_with_vars_unwrap::<HashMap<String, DataWrapper<NeedRelayBlock>>, QueryNeedRelay>(
+                query, vars,
+            )
+            .await
+            .map_err(SubqueryComponentError::from)?;
+        let blocks = data
+            .get("needRelayBlocks")
+            .map(|item| item.nodes.clone())
+            .unwrap_or_default();
+        Ok(blocks.get(0).cloned())
     }
 }

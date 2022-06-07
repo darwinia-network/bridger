@@ -223,6 +223,15 @@ impl ExtrinsicsHandler {
 
 impl ExtrinsicsHandler {
     pub fn collect_message(&self, message: &Extrinsic) -> color_eyre::Result<()> {
+        // If there is a same message already, skip it and return Ok(()).
+        if self.message_kv.keys()?.into_iter().any(|key| {
+            self.message_kv
+                .get_as_unwrap(&key)
+                .map_or(false, |value: Extrinsic| &value == message)
+        }) {
+            return Ok(());
+        }
+
         let mut key: String = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()

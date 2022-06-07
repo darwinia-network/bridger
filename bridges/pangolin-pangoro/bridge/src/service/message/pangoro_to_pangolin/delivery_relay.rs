@@ -58,7 +58,7 @@ impl DeliveryRunner {
             .await?;
         tracing::debug!(
             target: "pangolin-pangoro",
-            "[message-pangoro-to-pangolin] outbound_lane_data: {:?}",
+            "[delivery-pangoro-to-pangolin] outbound_lane_data: {:?}",
             outbound_lane_data,
         );
         Ok(outbound_lane_data)
@@ -87,7 +87,7 @@ impl DeliveryRunner {
     pub async fn start(&mut self) -> color_eyre::Result<()> {
         tracing::info!(
             target: "pangolin-pangoro",
-            "[message-pangoro-to-pangolin] SERVICE RESTARTING..."
+            "[delivery-pangoro-to-pangolin] SERVICE RESTARTING..."
         );
         loop {
             match self.run(10).await {
@@ -95,7 +95,7 @@ impl DeliveryRunner {
                 Err(err) => {
                     tracing::error!(
                         target: "pangolin-pangoro",
-                        "[message-pangoro-to-pangolin] Failed to relay message: {:?}",
+                        "[delivery-pangoro-to-pangolin] Failed to relay message: {:?}",
                         err
                     );
                     self.message_relay = MessageRelay::new().await?;
@@ -124,7 +124,7 @@ impl DeliveryRunner {
             None => {
                 tracing::warn!(
                     target: "pangolin-pangoro",
-                    "[message-pangoro-to-pangolin] The last nonce({}) isn't storage by indexer",
+                    "[delivery-pangoro-to-pangolin] The last nonce({}) isn't storage by indexer",
                     nonces.end(),
                 );
                 return Ok(());
@@ -155,7 +155,7 @@ impl DeliveryRunner {
         if relayed_block_number < last_relay.block_number {
             tracing::warn!(
                 target: "pangolin-pangoro",
-                "[message-pangoro-to-pangolin] The last nonce({}) at block {} is less then last relayed header {}, \
+                "[delivery-pangoro-to-pangolin] The last nonce({}) at block {} is less then last relayed header {}, \
                 please wait header relay.",
                 nonces.end(),
                 last_relay.block_number,
@@ -241,7 +241,7 @@ impl DeliveryRunner {
 
         tracing::debug!(
             target: "pangolin-pangoro",
-            "[message-pangoro-to-pangolin] The nonces {:?} in pangoro delivered to pangolin -> {:?}",
+            "[delivery-pangoro-to-pangolin] The nonces {:?} in pangoro delivered to pangolin -> {:?}",
             nonces,
             array_bytes::bytes2hex("0x", hash.0),
         );

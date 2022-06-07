@@ -5,6 +5,7 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::BridgeBus;
 use crate::service::message::pangoro_to_pangolin::delivery_relay::DeliveryRunner;
 
+mod confirm_relay;
 mod delivery_relay;
 
 #[derive(Debug)]
@@ -23,7 +24,7 @@ impl Service for PangoroToPangolinMessageRelayService {
             while let Err(e) = start_delivery_runner().await {
                 tracing::error!(
                     target: "pangolin-pangoro",
-                    "[message-pangoro-to-pangolin] Failed to start pangolin-to-pangoro message relay, \
+                    "[delivery-pangoro-to-pangolin] Failed to start pangolin-to-pangoro message relay, \
                     wait some seconds try again: {:?}",
                     e,
                 );

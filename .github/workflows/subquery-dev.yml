@@ -41,7 +41,9 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        chain: [ kusama, rococo ]
+        chain: 
+          - kusama
+          - rococo
     steps:
       - uses: actions/checkout@v2
         with:
@@ -68,7 +70,13 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        chain: [ pangolin, pangolin-parachain, rococo ]
+        chain: 
+          - pangolin
+          - pangolin-parachain
+          - rococo
+          - crab
+          - crab-parachain
+          - kusama
     steps:
       - uses: actions/checkout@v2
         with:

@@ -35,12 +35,14 @@ impl Service for PangolinToParachainHeaderRelayService {
         let _greet = Self::try_task(
             &format!("{}-pangolin-parachain-header-relay", BridgeTask::name()),
             async move {
-                start().await.map_err(|e| {
-                    BridgerError::Custom(format!(
-                        "Failed to start pangolin-to-parachain header relay: {:?}",
-                        e
-                    ))
-                })?;
+                while let Err(e) = start().await {
+                    tracing::error!(
+                        target: "pangolin-pangolinparachain",
+                        "Failed to start pangolin-to-parachain header relay service, restart after some seconds: {:?}",
+                        e,
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                }
                 Ok(())
             },
         );
@@ -90,21 +92,13 @@ async fn start() -> color_eyre::Result<()> {
         match run(&header_relay).await {
             Ok(_) => {}
             Err(err) => {
-                if let Some(subxt::BasicError::Rpc(request_error)) =
-                    err.downcast_ref::<subxt::BasicError>()
-                {
-                    tracing::error!(
-                        target: "pangolin-pangolinparachain",
-                        "[header-pangolin-to-parachain] Connection Error. Try to resend later: {:?}",
-                        &request_error
-                    );
-                    header_relay = HeaderRelay::new().await?;
-                }
                 tracing::error!(
                     target: "pangolin-pangolinparachain",
                     "[header-pangolin-to-parachain] Failed to relay header: {:?}",
                     err
                 );
+                header_relay = HeaderRelay::new().await?;
+                
             }
         }
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;

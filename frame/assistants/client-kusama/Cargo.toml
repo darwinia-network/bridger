@@ -1,0 +1,27 @@
+[package]
+authors       = ["Darwinia Network <hello@darwinia.network>"]
+description   = "Darwinia bridger"
+documentation = "https://rust-docs.darwinia.network/bridger"
+edition       = "2021"
+homepage      = "https://github.com/darwinia-network/bridger"
+include       = ["Cargo.toml", "**/*.rs", "README.md", "LICENSE"]
+keywords      = ["substrate", "darwinia"]
+license       = "MIT"
+name          = "client-kusama"
+readme        = 'README.md'
+repository    = "https://github.com/darwinia-network/bridger"
+version       = "0.5.5"
+
+[dependencies]
+array-bytes = "1.4"
+thiserror   = "1"
+tracing     = "0.1"
+
+serde = { version = "1", features = ["derive"] }
+
+codec     = { package = "parity-scale-codec", version = "2" }
+jsonrpsee = { version = "0.8.0", features = ["async-client", "client-ws-transport"] }
+sp-core   = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+subxt     = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
+
+support-toolkit = { path = "../../../frame/supports/support-toolkit" }

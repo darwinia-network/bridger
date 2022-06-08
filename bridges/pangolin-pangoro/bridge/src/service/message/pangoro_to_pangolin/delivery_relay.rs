@@ -163,22 +163,21 @@ impl DeliveryRunner {
             storage_keys.push(message_key);
             message_nonce += 1;
         }
-        storage_keys.push(
-            OutboundLanes(lane.0)
-                .key()
-                .final_key(StorageKeyPrefix::new::<OutboundLanes>()),
-        );
+        // storage_keys.push(
+        //     OutboundLanes(lane.0)
+        //         .key()
+        //         .final_key(StorageKeyPrefix::new::<OutboundLanes>()),
+        // );
 
-        let bridged_header_hash =
-            sp_core::H256::from_slice(last_relay.block_hash_bytes()?.as_slice());
+        // query last relayed header
         let read_proof = client_pangoro
             .subxt()
             .rpc()
-            .read_proof(storage_keys, Some(bridged_header_hash))
+            .read_proof(storage_keys, Some(last_relayed_pangoro_hash_in_pangolin))
             .await?;
         let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
         let proof = FromBridgedChainMessagesProof {
-            bridged_header_hash,
+            bridged_header_hash: last_relayed_pangoro_hash_in_pangolin,
             storage_proof: proof,
             lane: lane.0,
             nonces_start: *nonces.start(),

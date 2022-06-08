@@ -117,7 +117,10 @@ impl ReceivingRunner {
         let read_proof = client_pangolin
             .subxt()
             .rpc()
-            .read_proof(vec![inbound_data_key], None)
+            .read_proof(
+                vec![inbound_data_key],
+                Some(last_relayed_pangolin_hash_in_pangoro),
+            )
             .await?;
         let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
         let proof = FromBridgedChainMessagesDeliveryProof {

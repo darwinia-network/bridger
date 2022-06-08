@@ -11,7 +11,7 @@ query queryNeedRelay($origin: String!, $lane: String!, $nonce: Int!) {
       laneId: {
         equalTo: $lane
       }
-      nonce: {
+      messageNonce: {
         equalTo: $nonce
       }
     }
@@ -27,6 +27,7 @@ query queryNeedRelay($origin: String!, $lane: String!, $nonce: Int!) {
       parentHash
       stateRoot
       extrinsicsRoot
+      digest
       timestamp
     }
   }

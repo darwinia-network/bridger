@@ -45,11 +45,6 @@ impl DeliveryRunner {
             .bridge_pangolin_messages()
             .outbound_lanes(lane.0, None)
             .await?;
-        tracing::debug!(
-            target: "pangolin-pangoro",
-            "[delivery-pangoro-to-pangolin] outbound_lane_data: {:?}",
-            outbound_lane_data,
-        );
         Ok(outbound_lane_data)
     }
 
@@ -231,7 +226,7 @@ impl DeliveryRunner {
 
         tracing::debug!(
             target: "pangolin-pangoro",
-            "[delivery-pangoro-to-pangolin] The nonces {:?} in pangoro delivered to pangolin -> {:?}",
+            "[delivery-pangoro-to-pangolin] The nonces {:?} in pangoro delivered to pangolin -> {}",
             nonces,
             array_bytes::bytes2hex("0x", hash.0),
         );

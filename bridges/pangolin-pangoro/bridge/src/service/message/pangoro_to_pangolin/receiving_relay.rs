@@ -21,6 +21,7 @@ impl ReceivingRunner {
 impl ReceivingRunner {
     async fn target_unrewarded_relayers_state(
         &self,
+        at_block: sp_core::H256,
     ) -> color_eyre::Result<Option<UnrewardedRelayersState>> {
         let lane = self.message_relay.lane()?;
         let inbound_lane_data = self
@@ -29,7 +30,7 @@ impl ReceivingRunner {
             .runtime()
             .storage()
             .bridge_pangoro_messages()
-            .inbound_lanes(lane.0, None)
+            .inbound_lanes(lane.0, Some(at_block))
             .await?;
         let relayers = VecDeque::from_iter(inbound_lane_data.relayers.as_slice());
         let total_unrewarded_messages = match (relayers.front(), relayers.back()) {
@@ -86,10 +87,19 @@ impl ReceivingRunner {
         let client_pangoro = &self.message_relay.client_pangoro;
         let client_pangolin = &self.message_relay.client_pangolin;
 
+        // query last relayed header
+        let last_relayed_pangolin_hash_in_pangoro = client_pangoro
+            .runtime()
+            .storage()
+            .bridge_pangolin_grandpa()
+            .best_finalized(None)
+            .await?;
+
         // assemble nonce
-        // let outbound_lane_data = self.source_outbound_lane_data().await?;
-        // let latest_confirmed_nonce: u64 = outbound_lane_data.latest_received_nonce;
-        let relayers_state = match self.target_unrewarded_relayers_state().await? {
+        let relayers_state = match self
+            .target_unrewarded_relayers_state(last_relayed_pangolin_hash_in_pangoro)
+            .await?
+        {
             Some(v) => v,
             None => {
                 tracing::warn!(
@@ -109,10 +119,9 @@ impl ReceivingRunner {
             .rpc()
             .read_proof(vec![inbound_data_key], None)
             .await?;
-        let finalized_head = client_pangolin.subxt().rpc().finalized_head().await?;
         let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
         let proof = FromBridgedChainMessagesDeliveryProof {
-            bridged_header_hash: finalized_head,
+            bridged_header_hash: last_relayed_pangolin_hash_in_pangoro,
             storage_proof: proof,
             lane: lane.0,
         };

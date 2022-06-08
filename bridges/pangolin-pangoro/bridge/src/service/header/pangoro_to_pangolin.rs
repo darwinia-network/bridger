@@ -85,26 +85,7 @@ async fn start() -> color_eyre::Result<()> {
         match run(&header_relay).await {
             Ok(_) => {}
             Err(err) => {
-                if let Some(e) = err.downcast_ref::<client_pangoro::error::ClientError>() {
-                    if e.is_restart_need() {
-                        tracing::error!(
-                            target: "pangolin-pangoro",
-                            "[header-pangoro-to-pangolin] Connection Error. Try to resend later: {:?}",
-                            e
-                        );
-                        header_relay = HeaderRelay::new().await?;
-                    }
-                }
-                if let Some(e) = err.downcast_ref::<client_pangolin::error::ClientError>() {
-                    if e.is_restart_need() {
-                        tracing::error!(
-                            target: "pangolin-pangoro",
-                            "[header-pangoro-to-pangolin] Connection Error. Try to resend later: {:?}",
-                            e
-                        );
-                        header_relay = HeaderRelay::new().await?;
-                    }
-                }
+                header_relay = HeaderRelay::new().await?;
                 tracing::error!(
                     target: "pangolin-pangoro",
                     "[header-pangoro-to-pangolin] Failed to relay header: {:?}",

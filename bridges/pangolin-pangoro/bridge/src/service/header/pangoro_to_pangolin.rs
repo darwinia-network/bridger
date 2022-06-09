@@ -244,7 +244,7 @@ async fn submit_finality(
     let events = track.wait_for_finalized_success().await?;
     tracing::info!(
          target: "pangolin-pangoro",
-          "[header-pangoro-to-pangolin] The extrinsic hash: {:?}",
+          "[header-pangoro-to-pangolin] Header relayed: {:?}",
            events.extrinsic_hash()
     );
     Ok(())

@@ -1,5 +1,7 @@
 use client_pangolin::subxt_runtime::api::bridge_pangoro_messages::storage::InboundLanes;
-use client_pangoro::types::runtime_types::bp_messages::UnrewardedRelayersState;
+use client_pangoro::types::runtime_types::bp_messages::{
+    OutboundLaneData, UnrewardedRelayersState,
+};
 use client_pangoro::types::runtime_types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
 use std::collections::VecDeque;
 use subxt::storage::StorageKeyPrefix;
@@ -19,6 +21,19 @@ impl ReceivingRunner {
 }
 
 impl ReceivingRunner {
+    async fn source_outbound_lane_data(&self) -> color_eyre::Result<OutboundLaneData> {
+        let lane = self.message_relay.lane()?;
+        let outbound_lane_data = self
+            .message_relay
+            .client_pangoro
+            .runtime()
+            .storage()
+            .bridge_pangolin_messages()
+            .outbound_lanes(lane.0, None)
+            .await?;
+        Ok(outbound_lane_data)
+    }
+
     async fn target_unrewarded_relayers_state(
         &self,
         at_block: sp_core::H256,
@@ -86,6 +101,17 @@ impl ReceivingRunner {
         // alias
         let client_pangoro = &self.message_relay.client_pangoro;
         let client_pangolin = &self.message_relay.client_pangolin;
+
+        let source_outbound_lane_data = self.source_outbound_lane_data().await?;
+        if source_outbound_lane_data.latest_received_nonce
+            == source_outbound_lane_data.latest_generated_nonce
+        {
+            tracing::info!(
+                target: "pangolin-pangoro",
+                "[receiving-pangoro-to-pangolin] All nonces received, nothing to do.",
+            );
+            return Ok(());
+        }
 
         // query last relayed header
         let last_relayed_pangolin_hash_in_pangoro = client_pangoro

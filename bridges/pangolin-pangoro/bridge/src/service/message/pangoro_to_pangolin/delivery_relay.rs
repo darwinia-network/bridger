@@ -48,23 +48,35 @@ impl DeliveryRunner {
         Ok(outbound_lane_data)
     }
 
-    async fn assemble_nonces(&self, limit: u64) -> color_eyre::Result<RangeInclusive<u64>> {
-        let outbound_lane_data = self.source_outbound_lane_data().await?;
+    async fn assemble_nonces(
+        &self,
+        limit: u64,
+        outbound_lane_data: &OutboundLaneData,
+    ) -> color_eyre::Result<Option<RangeInclusive<u64>>> {
         let (latest_confirmed_nonce, latest_generated_nonce) = (
             outbound_lane_data.latest_received_nonce,
             outbound_lane_data.latest_generated_nonce,
         );
+        if latest_confirmed_nonce == latest_generated_nonce {
+            return Ok(None);
+        }
 
         // assemble nonce range
         let start: u64 = latest_confirmed_nonce + 1;
         let inclusive_limit = limit - 1;
+        tracing::info!(
+            target: "pangolin-pangoro",
+            "[delivery-pangoro-to-pangolin] assemble nonces, start from {} and last generated is {}",
+            start,
+            latest_generated_nonce,
+        );
         let end: u64 = if latest_generated_nonce - start > inclusive_limit {
             start + inclusive_limit
         } else {
             latest_generated_nonce
         };
         let nonces = start..=end;
-        Ok(nonces)
+        Ok(Some(nonces))
     }
 }
 
@@ -92,13 +104,26 @@ impl DeliveryRunner {
 
     async fn run(&self, limit: u64) -> color_eyre::Result<()> {
         let lane = self.message_relay.lane()?;
+        let source_outbound_lane_data = self.source_outbound_lane_data().await?;
 
         // alias
         let client_pangoro = &self.message_relay.client_pangoro;
         let client_pangolin = &self.message_relay.client_pangolin;
         let subquery_pangoro = &self.message_relay.subquery_pangoro;
 
-        let nonces = self.assemble_nonces(limit).await?;
+        let nonces = match self
+            .assemble_nonces(limit, &source_outbound_lane_data)
+            .await?
+        {
+            Some(v) => v,
+            None => {
+                tracing::info!(
+                    target: "pangolin-pangoro",
+                    "[delivery-pangoro-to-pangolin] All nonces delivered, nothing to do."
+                );
+                return Ok(());
+            }
+        };
 
         // query last nonce block information
         let last_relay = match subquery_pangoro
@@ -163,11 +188,23 @@ impl DeliveryRunner {
             storage_keys.push(message_key);
             message_nonce += 1;
         }
-        // storage_keys.push(
-        //     OutboundLanes(lane.0)
-        //         .key()
-        //         .final_key(StorageKeyPrefix::new::<OutboundLanes>()),
-        // );
+
+        //- query inbound land data
+        let target_inbound_lane_data = client_pangolin
+            .runtime()
+            .storage()
+            .bridge_pangoro_messages()
+            .inbound_lanes(lane.0, None)
+            .await?;
+        let outbound_state_proof_required = target_inbound_lane_data.last_confirmed_nonce
+            < source_outbound_lane_data.latest_received_nonce;
+        if outbound_state_proof_required {
+            storage_keys.push(
+                OutboundLanes(lane.0)
+                    .key()
+                    .final_key(StorageKeyPrefix::new::<OutboundLanes>()),
+            );
+        }
 
         // query last relayed header
         let read_proof = client_pangoro

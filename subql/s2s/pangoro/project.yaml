@@ -27,5 +27,6 @@ dataSources:
               method: NewAuthorities
             - module: bridgePangolinMessages
               method: MessageAccepted
+            - module: bridgePangolinDispatch
         - handler: handleCall
           kind: substrate/CallHandler

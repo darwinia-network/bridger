@@ -29,5 +29,7 @@ dataSources:
               method: MessageAccepted
             - module: bridgePangoroParachainMessages
               method: MessageAccepted
+            - module: bridgePangoroDispatch
+            - module: bridgePangoroParachainDispatch
         - handler: handleCall
           kind: substrate/CallHandler

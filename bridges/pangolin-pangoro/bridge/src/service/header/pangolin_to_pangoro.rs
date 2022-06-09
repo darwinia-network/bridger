@@ -186,26 +186,51 @@ async fn try_to_relay_header_on_demand(
         .filter(|header| header.block_number > last_block_number);
 
     if next_header.is_none() {
+        tracing::debug!(
+            target: "pangolin-pangoro",
+            "[header-pangolin-to-pangoro] Try relay header on-demand, bu not found any on-demand block",
+        );
         return Ok(());
     }
+    let next_header = next_header.expect("Unreachable");
+    tracing::debug!(
+        target: "pangolin-pangoro",
+        "[header-pangolin-to-pangoro] Try relay header on-demand, the on-demand block is {}",
+        next_header.block_number,
+    );
 
     let pangolin_justification_queue = PANGOLIN_JUSTIFICATIONS.lock().await;
-    if let Some(justification) = pangolin_justification_queue.back().cloned() {
-        let grandpa_justification =
-            GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(&mut justification.as_ref())
-                .map_err(|err| {
+    match pangolin_justification_queue.back().cloned() {
+        Some(justification) => {
+            tracing::trace!(
+                target: "pangolin-pangoro",
+                "[header-pangoro-to-pangolin] Found on-demand block {}, and found new justification, ready to relay header",
+                next_header.block_number,
+            );
+            let grandpa_justification = GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(
+                &mut justification.as_ref(),
+            )
+            .map_err(|err| {
                 BridgerError::Custom(format!(
                     "Failed to decode justification of pangolin: {:?}",
                     err
                 ))
             })?;
-        if grandpa_justification.commit.target_number > last_block_number {
-            submit_finality(
-                header_relay,
-                array_bytes::bytes2hex("", grandpa_justification.commit.target_hash.0),
-                justification.to_vec(),
-            )
-            .await?;
+            if grandpa_justification.commit.target_number > last_block_number {
+                submit_finality(
+                    header_relay,
+                    array_bytes::bytes2hex("", grandpa_justification.commit.target_hash.0),
+                    justification.to_vec(),
+                )
+                .await?;
+            }
+        }
+        None => {
+            tracing::warn!(
+                target: "pangolin-pangoro",
+                "[header-pangoro-to-pangolin] Found on-demand block {}, but not have justification to relay.",
+                next_header.block_number,
+            );
         }
     }
 

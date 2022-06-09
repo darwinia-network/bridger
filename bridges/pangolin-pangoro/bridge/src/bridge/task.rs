@@ -6,6 +6,7 @@ use crate::service::header::pangolin_to_pangoro::PangolinToPangoroHeaderRelaySer
 use crate::service::header::pangoro_to_pangolin::PangoroToPangolinHeaderRelayService;
 use crate::service::message::pangolin_to_pangoro::PangolinToPangoroMessageRelayService;
 use crate::service::message::pangoro_to_pangolin::PangoroToPangolinMessageRelayService;
+use crate::service::subscribe::SubscribeService;
 
 #[derive(Debug)]
 pub struct BridgeTask {
@@ -22,6 +23,7 @@ impl BridgeTask {
     pub async fn new() -> color_eyre::Result<Self> {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
+        stack.spawn_service::<SubscribeService>()?;
         stack.spawn_service::<PangolinToPangoroHeaderRelayService>()?;
         stack.spawn_service::<PangoroToPangolinHeaderRelayService>()?;
         stack.spawn_service::<PangolinToPangoroMessageRelayService>()?;

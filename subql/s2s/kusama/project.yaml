@@ -1,0 +1,28 @@
+specVersion: 0.2.0
+name: bridge-s2s-kusama
+version: 0.0.4
+description: S2S bridge kusama subql
+repository: https://github.com/darwinia-network/bridger
+schema:
+  file: ./schema.graphql
+
+network:
+  endpoint: wss://kusama-rpc.polkadot.io/
+  genesisHash: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'
+  # dictionary: https://api.subquery.network/sq/subquery/kusama-dictionary
+
+dataSources:
+  - kind: substrate/Runtime
+    startBlock: 13006000
+    mapping:
+      file: ./dist/index.js
+      handlers:
+        - handler: handleBlock
+          kind: substrate/BlockHandler
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            - module: grandpa
+              method: NewAuthorities
+        - handler: handleCall
+          kind: substrate/CallHandler

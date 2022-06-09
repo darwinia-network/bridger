@@ -37,6 +37,7 @@ impl ReceivingRunner {
     async fn target_unrewarded_relayers_state(
         &self,
         at_block: sp_core::H256,
+        source_outbound_lane_data: &OutboundLaneData,
     ) -> color_eyre::Result<Option<UnrewardedRelayersState>> {
         let lane = self.message_relay.lane()?;
         let inbound_lane_data = self
@@ -47,6 +48,15 @@ impl ReceivingRunner {
             .bridge_pangoro_messages()
             .inbound_lanes(lane.0, Some(at_block))
             .await?;
+        let max_confirm_end_at_target = inbound_lane_data
+            .relayers
+            .iter()
+            .map(|item| item.messages.end)
+            .max()
+            .unwrap_or(0u64);
+        if max_confirm_end_at_target == source_outbound_lane_data.latest_received_nonce {
+            return Ok(None);
+        }
         let relayers = VecDeque::from_iter(inbound_lane_data.relayers.as_slice());
         let total_unrewarded_messages = match (relayers.front(), relayers.back()) {
             (Some(front), Some(back)) => {
@@ -121,9 +131,12 @@ impl ReceivingRunner {
             .best_finalized(None)
             .await?;
 
-        // assemble nonce
+        // assemble unrewarded relayers state
         let relayers_state = match self
-            .target_unrewarded_relayers_state(last_relayed_pangolin_hash_in_pangoro)
+            .target_unrewarded_relayers_state(
+                last_relayed_pangolin_hash_in_pangoro,
+                &source_outbound_lane_data,
+            )
             .await?
         {
             Some(v) => v,

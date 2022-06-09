@@ -24,12 +24,16 @@ type FromThisChainMessagePayload = pangoro_runtime_types::bp_message_dispatch::M
 
 pub struct DeliveryRunner {
     message_relay: MessageRelay,
+    last_relayed_nonce: Option<u64>,
 }
 
 impl DeliveryRunner {
     pub async fn new() -> color_eyre::Result<Self> {
         let message_relay = MessageRelay::new().await?;
-        Ok(Self { message_relay })
+        Ok(Self {
+            message_relay,
+            last_relayed_nonce: None,
+        })
     }
 }
 
@@ -60,13 +64,18 @@ impl DeliveryRunner {
         if latest_confirmed_nonce == latest_generated_nonce {
             return Ok(None);
         }
+        if let Some(last_relayed_nonce) = self.last_relayed_nonce {
+            if last_relayed_nonce == latest_generated_nonce {
+                return Ok(None);
+            }
+        }
 
         // assemble nonce range
         let start: u64 = latest_confirmed_nonce + 1;
         let inclusive_limit = limit - 1;
         tracing::info!(
             target: "pangolin-pangoro",
-            "[delivery-pangoro-to-pangolin] assemble nonces, start from {} and last generated is {}",
+            "[delivery-pangoro-to-pangolin] Assemble nonces, start from {} and last generated is {}",
             start,
             latest_generated_nonce,
         );
@@ -88,7 +97,9 @@ impl DeliveryRunner {
         );
         loop {
             match self.run(10).await {
-                Ok(_) => {}
+                Ok(last_relayed_nonce) => {
+                    self.last_relayed_nonce = last_relayed_nonce;
+                }
                 Err(err) => {
                     tracing::error!(
                         target: "pangolin-pangoro",
@@ -102,7 +113,7 @@ impl DeliveryRunner {
         }
     }
 
-    async fn run(&self, limit: u64) -> color_eyre::Result<()> {
+    async fn run(&self, limit: u64) -> color_eyre::Result<Option<u64>> {
         let lane = self.message_relay.lane()?;
         let source_outbound_lane_data = self.source_outbound_lane_data().await?;
 
@@ -121,7 +132,7 @@ impl DeliveryRunner {
                     target: "pangolin-pangoro",
                     "[delivery-pangoro-to-pangolin] All nonces delivered, nothing to do."
                 );
-                return Ok(());
+                return Ok(None);
             }
         };
 
@@ -137,7 +148,7 @@ impl DeliveryRunner {
                     "[delivery-pangoro-to-pangolin] The last nonce({}) isn't storage by indexer",
                     nonces.end(),
                 );
-                return Ok(());
+                return Ok(None);
             }
         };
 
@@ -171,7 +182,7 @@ impl DeliveryRunner {
                 last_relay.block_number,
                 relayed_block_number,
             );
-            return Ok(());
+            return Ok(None);
         }
 
         // read proof
@@ -266,6 +277,6 @@ impl DeliveryRunner {
             nonces,
             array_bytes::bytes2hex("0x", hash.0),
         );
-        Ok(())
+        Ok(Some(*nonces.end()))
     }
 }

@@ -18,7 +18,7 @@ use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
-use crate::service::subscribe::PANGOLIN_JUSTIFICATIONS;
+use crate::service::subscribe::PANGORO_JUSTIFICATIONS;
 
 #[derive(Debug)]
 pub struct PangoroToPangolinHeaderRelayService {
@@ -188,7 +188,7 @@ async fn try_to_relay_header_on_demand(
     if next_header.is_none() {
         tracing::debug!(
             target: "pangolin-pangoro",
-            "[header-pangoro-to-pangolin] Try relay header on-demand, bu not found any on-demand block",
+            "[header-pangoro-to-pangolin] Try relay header on-demand, but not found any on-demand block",
         );
         return Ok(());
     }
@@ -199,7 +199,7 @@ async fn try_to_relay_header_on_demand(
         next_header.block_number,
     );
 
-    let pangoro_justification_queue = PANGOLIN_JUSTIFICATIONS.lock().await;
+    let pangoro_justification_queue = PANGORO_JUSTIFICATIONS.lock().await;
     match pangoro_justification_queue.back().cloned() {
         Some(justification) => {
             tracing::trace!(

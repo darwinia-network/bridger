@@ -64,14 +64,22 @@ impl DeliveryRunner {
         if latest_confirmed_nonce == latest_generated_nonce {
             return Ok(None);
         }
+
+        // assemble nonce range
+        let start: u64 = latest_confirmed_nonce + 1;
         if let Some(last_relayed_nonce) = self.last_relayed_nonce {
-            if last_relayed_nonce == latest_generated_nonce {
+            if last_relayed_nonce >= start {
+                tracing::warn!(
+                    target: "pangolin-pangoro",
+                    "[delivery-pangoro-to-pangolin] There is already a batch of transactions in progress. \
+                    Will wait for the previous batch to complete. last relayed noce is {} and expect to start with {}",
+                    last_relayed_nonce,
+                    start,
+                );
                 return Ok(None);
             }
         }
 
-        // assemble nonce range
-        let start: u64 = latest_confirmed_nonce + 1;
         let inclusive_limit = limit - 1;
         tracing::info!(
             target: "pangolin-pangoro",
@@ -98,7 +106,9 @@ impl DeliveryRunner {
         loop {
             match self.run(10).await {
                 Ok(last_relayed_nonce) => {
-                    self.last_relayed_nonce = last_relayed_nonce;
+                    if last_relayed_nonce.is_some() {
+                        self.last_relayed_nonce = last_relayed_nonce;
+                    }
                 }
                 Err(err) => {
                     tracing::error!(
@@ -135,6 +145,11 @@ impl DeliveryRunner {
                 return Ok(None);
             }
         };
+        tracing::info!(
+            target: "pangolin-pangoro",
+            "[delivery-pangoro-to-pangolin] Assembled nonces {:?}",
+            nonces,
+        );
 
         // query last nonce block information
         let last_relay = match subquery_pangoro

@@ -1,9 +1,10 @@
+use std::collections::VecDeque;
+
 use client_pangolin::subxt_runtime::api::bridge_pangoro_messages::storage::InboundLanes;
 use client_pangoro::types::runtime_types::bp_messages::{
     OutboundLaneData, UnrewardedRelayersState,
 };
 use client_pangoro::types::runtime_types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
-use std::collections::VecDeque;
 use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;
 
@@ -11,12 +12,16 @@ use crate::service::message::types::MessageRelay;
 
 pub struct ReceivingRunner {
     message_relay: MessageRelay,
+    last_relayed_nonce: Option<u64>,
 }
 
 impl ReceivingRunner {
     pub async fn new() -> color_eyre::Result<Self> {
         let message_relay = MessageRelay::new().await?;
-        Ok(Self { message_relay })
+        Ok(Self {
+            message_relay,
+            last_relayed_nonce: None,
+        })
     }
 }
 
@@ -38,7 +43,7 @@ impl ReceivingRunner {
         &self,
         at_block: sp_core::H256,
         source_outbound_lane_data: &OutboundLaneData,
-    ) -> color_eyre::Result<Option<UnrewardedRelayersState>> {
+    ) -> color_eyre::Result<Option<(u64, UnrewardedRelayersState)>> {
         let lane = self.message_relay.lane()?;
         let inbound_lane_data = self
             .message_relay
@@ -54,8 +59,30 @@ impl ReceivingRunner {
             .map(|item| item.messages.end)
             .max()
             .unwrap_or(0u64);
+        tracing::trace!(
+            target: "pangolin-pangoro",
+            "[receiving-pangoro-to-pangolin] max dispatch nonce at target is {} and last received nonce from source is {}",
+            max_confirm_end_at_target,
+            source_outbound_lane_data.latest_received_nonce,
+        );
         if max_confirm_end_at_target == source_outbound_lane_data.latest_received_nonce {
+            tracing::info!(
+                target: "pangolin-pangoro",
+                "[receiving-pangoro-to-pangolin] max dispatch nonce({}) at target is same with last received nonce({}) at source. so nothing to do.",
+                max_confirm_end_at_target,
+                source_outbound_lane_data.latest_received_nonce,
+            );
             return Ok(None);
+        }
+        if let Some(last_relayed_nonce) = self.last_relayed_nonce {
+            if last_relayed_nonce >= max_confirm_end_at_target {
+                tracing::warn!(
+                    target: "pangolin-pangoro",
+                    "[receiving-pangoro-to-pangolin] This nonce({}) is being processed. Please waiting for the processing to finish.",
+                    max_confirm_end_at_target,
+                );
+                return Ok(None);
+            }
         }
         let relayers = VecDeque::from_iter(inbound_lane_data.relayers.as_slice());
         let total_unrewarded_messages = match (relayers.front(), relayers.back()) {
@@ -70,16 +97,23 @@ impl ReceivingRunner {
             _ => Some(0),
         };
         if total_unrewarded_messages.is_none() {
+            tracing::info!(
+                target: "pangolin-pangoro",
+                "[receiving-pangoro-to-pangolin] Not have unrewarded message. nothing to do.",
+            );
             return Ok(None);
         }
-        Ok(Some(UnrewardedRelayersState {
-            unrewarded_relayer_entries: relayers.len() as _,
-            messages_in_oldest_entry: relayers
-                .front()
-                .map(|entry| 1 + entry.messages.end - entry.messages.begin)
-                .unwrap_or(0),
-            total_messages: total_unrewarded_messages.expect("Unreachable"),
-        }))
+        Ok(Some((
+            max_confirm_end_at_target,
+            UnrewardedRelayersState {
+                unrewarded_relayer_entries: relayers.len() as _,
+                messages_in_oldest_entry: relayers
+                    .front()
+                    .map(|entry| 1 + entry.messages.end - entry.messages.begin)
+                    .unwrap_or(u64::MAX),
+                total_messages: total_unrewarded_messages.expect("Unreachable"),
+            },
+        )))
     }
 }
 
@@ -91,7 +125,11 @@ impl ReceivingRunner {
         );
         loop {
             match self.run().await {
-                Ok(_) => {}
+                Ok(last_relayed_nonce) => {
+                    if last_relayed_nonce.is_some() {
+                        self.last_relayed_nonce = last_relayed_nonce;
+                    }
+                }
                 Err(err) => {
                     tracing::error!(
                         target: "pangolin-pangoro",
@@ -101,11 +139,11 @@ impl ReceivingRunner {
                     self.message_relay = MessageRelay::new().await?;
                 }
             }
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            tokio::time::sleep(std::time::Duration::from_secs(15)).await;
         }
     }
 
-    async fn run(&self) -> color_eyre::Result<()> {
+    async fn run(&self) -> color_eyre::Result<Option<u64>> {
         let lane = self.message_relay.lane()?;
 
         // alias
@@ -120,7 +158,7 @@ impl ReceivingRunner {
                 target: "pangolin-pangoro",
                 "[receiving-pangoro-to-pangolin] All nonces received, nothing to do.",
             );
-            return Ok(());
+            return Ok(None);
         }
 
         // query last relayed header
@@ -132,7 +170,7 @@ impl ReceivingRunner {
             .await?;
 
         // assemble unrewarded relayers state
-        let relayers_state = match self
+        let (max_confirmed_nonce_at_target, relayers_state) = match self
             .target_unrewarded_relayers_state(
                 last_relayed_pangolin_hash_in_pangoro,
                 &source_outbound_lane_data,
@@ -145,7 +183,7 @@ impl ReceivingRunner {
                     target: "pangolin-pangoro",
                     "[receiving-pangoro-to-pangolin] No unrewarded relayers state found by pangolin",
                 );
-                return Ok(());
+                return Ok(None);
             }
         };
 
@@ -182,6 +220,6 @@ impl ReceivingRunner {
             "[receiving-pangoro-to-pangolin] receiving extensics sent successful: {}",
             array_bytes::bytes2hex("0x", hash.0),
         );
-        Ok(())
+        Ok(Some(max_confirmed_nonce_at_target))
     }
 }

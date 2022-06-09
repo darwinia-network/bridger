@@ -72,7 +72,8 @@ impl DeliveryRunner {
                 tracing::warn!(
                     target: "pangolin-pangoro",
                     "[delivery-pangoro-to-pangolin] There is already a batch of transactions in progress. \
-                    Will wait for the previous batch to complete. last relayed noce is {} and expect to start with {}",
+                    Will wait for the previous batch to complete. last relayed noce is {} and expect to start with {}. \
+                    please wait receiving.",
                     last_relayed_nonce,
                     start,
                 );
@@ -119,7 +120,7 @@ impl DeliveryRunner {
                     self.message_relay = MessageRelay::new().await?;
                 }
             }
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            tokio::time::sleep(std::time::Duration::from_secs(15)).await;
         }
     }
 

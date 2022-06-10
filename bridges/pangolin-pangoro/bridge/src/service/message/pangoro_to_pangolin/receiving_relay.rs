@@ -44,6 +44,7 @@ impl ReceivingRunner {
         at_block: sp_core::H256,
         source_outbound_lane_data: &OutboundLaneData,
     ) -> color_eyre::Result<Option<(u64, UnrewardedRelayersState)>> {
+        let block_hex = array_bytes::bytes2hex("0x", at_block.0);
         let lane = self.message_relay.lane()?;
         let inbound_lane_data = self
             .message_relay
@@ -65,16 +66,16 @@ impl ReceivingRunner {
             queried by relayed block {}",
             max_confirm_end_at_target,
             source_outbound_lane_data.latest_received_nonce,
-            at_block,
+            block_hex,
         );
         if max_confirm_end_at_target == source_outbound_lane_data.latest_received_nonce {
             tracing::info!(
                 target: "pangolin-pangoro",
                 "[receiving-pangoro-to-pangolin] max dispatch nonce({}) at target is same with last received nonce({}) at source. \
-                queried by relayed block {}. so nothing to do.",
+                queried by relayed block {}. nothing to do.",
                 max_confirm_end_at_target,
                 source_outbound_lane_data.latest_received_nonce,
-                at_block,
+                block_hex,
             );
             return Ok(None);
         }

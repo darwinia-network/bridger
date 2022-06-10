@@ -34,7 +34,7 @@ jobs:
           subquery_org: ${{ env.SUBQUERY_ORG_DEV }}
           project_key: subql-bridge-${{ matrix.chain }}
           subql_path: subql/ethereum-v1/${{ matrix.chain }}
-          prod_mode: true
+          # prod_mode: true
 
       - uses: ./.github/actions/smart-subquery
         name: Deploy subql-bridge-${{ matrix.chain }}
@@ -68,7 +68,7 @@ jobs:
           subquery_org: ${{ env.SUBQUERY_ORG_DEV }}
           project_key: subql-bridge-${{ matrix.chain }}
           subql_path: subql/ethereum-v1/${{ matrix.chain }}
-          prod_mode: true
+          # prod_mode: true
 
       # - uses: ./.github/actions/smart-subquery
       #   name: Deploy subql-parachain-${{ matrix.chain }}
@@ -104,7 +104,7 @@ jobs:
           subquery_org: ${{ env.SUBQUERY_ORG_DEV }}
           project_key: subql-bridge-s2s-${{ matrix.chain }}
           subql_path: subql/s2s/${{ matrix.chain }}
-          prod_mode: true
+          # prod_mode: true
 
       # - uses: ./.github/actions/smart-subquery
       #   name: Deploy subql-bridge-s2s-${{ matrix.chain }}

@@ -57,7 +57,7 @@ impl FeemarketApi for CrabParachainFeemarketApi {
     > {
         let storage_key = StorageKey(
             feemarket_s2s::helpers::storage_prefix(
-                "FeeMarket".as_bytes(),
+                "CrabFeeMarket".as_bytes(),
                 "AssignedRelayers".as_bytes(),
             )
             .to_vec(),
@@ -108,7 +108,7 @@ impl FeemarketApi for CrabParachainFeemarketApi {
         >,
     > {
         let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
-            "FeeMarket",
+            "CrabFeeMarket",
             "Orders",
             (laned_id, message_nonce).encode().as_slice(),
         );
@@ -117,7 +117,7 @@ impl FeemarketApi for CrabParachainFeemarketApi {
 
     async fn relayers(&self) -> FeemarketResult<Vec<<Self::Chain as ChainBase>::AccountId>> {
         let storage_key = StorageKey(
-            feemarket_s2s::helpers::storage_prefix("FeeMarket".as_bytes(), "Relayers".as_bytes())
+            feemarket_s2s::helpers::storage_prefix("CrabFeeMarket".as_bytes(), "Relayers".as_bytes())
                 .to_vec(),
         );
         Ok(self
@@ -134,7 +134,7 @@ impl FeemarketApi for CrabParachainFeemarketApi {
         Option<Relayer<<Self::Chain as ChainBase>::AccountId, <Self::Chain as ChainBase>::Balance>>,
     > {
         let storage_key = bp_runtime::storage_map_final_key::<Blake2_128Concat>(
-            "FeeMarket",
+            "CrabFeeMarket",
             "RelayersMap",
             account.encode().as_slice(),
         );

@@ -233,21 +233,6 @@ impl DeliveryRunner {
             );
         }
 
-        // query last relayed header
-        let read_proof = client_pangoro
-            .subxt()
-            .rpc()
-            .read_proof(storage_keys, Some(last_relayed_pangoro_hash_in_pangolin))
-            .await?;
-        let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
-        let proof = FromBridgedChainMessagesProof {
-            bridged_header_hash: last_relayed_pangoro_hash_in_pangolin,
-            storage_proof: proof,
-            lane: lane.0,
-            nonces_start: *nonces.start(),
-            nonces_end: *nonces.end(),
-        };
-
         // fill delivery data
         let mut total_weight = 0u64;
         for message_nonce in nonces.clone() {
@@ -273,6 +258,21 @@ impl DeliveryRunner {
                 codec::Decode::decode(&mut &message_data.payload[..])?;
             total_weight += decoded_payload.weight;
         }
+
+        // query last relayed header
+        let read_proof = client_pangoro
+            .subxt()
+            .rpc()
+            .read_proof(storage_keys, Some(last_relayed_pangoro_hash_in_pangolin))
+            .await?;
+        let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
+        let proof = FromBridgedChainMessagesProof {
+            bridged_header_hash: last_relayed_pangoro_hash_in_pangolin,
+            storage_proof: proof,
+            lane: lane.0,
+            nonces_start: *nonces.start(),
+            nonces_end: *nonces.end(),
+        };
 
         let hash = client_pangolin
             .runtime()

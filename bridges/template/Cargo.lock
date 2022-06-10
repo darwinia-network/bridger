@@ -113,7 +113,7 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bridge-template"
-version = "0.5.5"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "component-http-client",
@@ -220,7 +220,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.5.5"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -1401,7 +1401,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.5.5"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "config",
@@ -1420,7 +1420,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.5.5"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -1428,7 +1428,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.5.5"
+version = "0.5.7"
 dependencies = [
  "colored",
  "serde 1.0.136",

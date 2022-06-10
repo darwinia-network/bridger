@@ -1,0 +1,42 @@
+[crab]
+endpoint = "wss://crab-rpc.darwinia.network:443"
+signer = "//Alice"
+runtime_version_mode = "Auto"
+
+[kusama]
+endpoint = "wss://kusama-rpc.polkadot.io:443"
+signer = "//Alice"
+runtime_version_mode = "Auto"
+
+[crab_parachain]
+endpoint = "wss://crab-parachain-rpc.darwinia.network:443"
+para_id = 2105
+signer = "//Alice"
+runtime_version_mode = "Auto"
+
+[relay]
+lanes = ["70616372"]
+auto_start = true
+only_mandatory_headers = false
+create_relayers_fund_accounts = false
+
+[relay.prometheus_params]
+no_prometheus = false
+prometheus_host = "127.0.0.1"
+prometheus_port = 9616
+
+[task]
+interval_update_fee = 3600
+update_fee_strategy = "Nothing"
+
+[index.crab]
+endpoint = "https://api.subquery.network/sq/fewensa/subql-bridge-s2s-crab__ZmV3Z"
+
+[index.crab_parachain]
+endpoint = "https://api.subquery.network/sq/fewensa/subql-bridge-s2s-crab-parachain__ZmV3Z"
+
+[index.kusama]
+endpoint = "https://api.subquery.network/sq/fewensa/subql-bridge-s2s-kusama__ZmV3Z"
+
+[index.parachain_kusama]
+endpoint = "https://api.subquery.network/sq/fewensa/subql-parachain-kusama"

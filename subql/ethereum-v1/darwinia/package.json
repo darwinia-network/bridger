@@ -1,6 +1,6 @@
 {
   "name": "subql-bridge-darwinia",
-  "version": "0.5.5",
+  "version": "0.5.7",
   "description": "Darwinia network",
   "main": "dist/index.js",
   "scripts": {

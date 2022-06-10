@@ -754,7 +754,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangolin-pangoro"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "bp-darwinia-core",
@@ -1021,7 +1021,7 @@ dependencies = [
 
 [[package]]
 name = "component-subscan"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "reqwest",
  "serde 1.0.136",
@@ -1569,7 +1569,7 @@ dependencies = [
 
 [[package]]
 name = "feemarket-s2s"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "bp-messages",
@@ -6414,7 +6414,7 @@ dependencies = [
 
 [[package]]
 name = "subquery-s2s"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "gql_client",
@@ -6497,7 +6497,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "support-common"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "config",
@@ -6516,7 +6516,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -6524,7 +6524,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "colored",
  "serde 1.0.136",

@@ -765,7 +765,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-crab-crabparachain"
-version = "0.5.5"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "bp-darwinia-core",
@@ -999,7 +999,7 @@ dependencies = [
 
 [[package]]
 name = "client-crab"
-version = "0.5.5"
+version = "0.5.7"
 dependencies = [
  "array-bytes",
  "futures-util",
@@ -1016,7 +1016,7 @@ dependencies = [
 
 [[package]]
 name = "client-crab-parachain"
-version = "0.5.5"
+version = "0.5.7"
 dependencies = [
  "array-bytes",
  "parity-scale-codec",
@@ -1029,7 +1029,7 @@ dependencies = [
 
 [[package]]
 name = "client-kusama"
-version = "0.5.5"
+version = "0.5.7"
 dependencies = [
  "array-bytes",
  "jsonrpsee",
@@ -1091,7 +1091,7 @@ dependencies = [
 
 [[package]]
 name = "component-subscan"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "reqwest",
  "serde 1.0.137",
@@ -1685,7 +1685,7 @@ dependencies = [
 
 [[package]]
 name = "feemarket-s2s"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "bp-messages",
@@ -6565,7 +6565,7 @@ dependencies = [
 
 [[package]]
 name = "subquery-parachain"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "gql_client",
@@ -6581,7 +6581,7 @@ dependencies = [
 
 [[package]]
 name = "subquery-s2s"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "gql_client",
@@ -6727,7 +6727,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "config",
@@ -6746,7 +6746,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -6754,7 +6754,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "colored",
  "serde 1.0.137",
@@ -6764,7 +6764,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "thiserror",
 ]

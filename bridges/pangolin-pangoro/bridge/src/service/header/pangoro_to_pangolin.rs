@@ -188,8 +188,7 @@ async fn try_to_relay_header_on_demand(
             if v.block_number <= last_block_number {
                 tracing::debug!(
                     target: "pangolin-pangoro",
-                    "[header-pangoro-to-pangolin] Try relay header on-demand, \
-                    but last storage block ({}) is less or equal last relayed block ({}).",
+                    "[header-pangoro-to-pangolin] The last storage block ({}) is less or equal last relayed block ({}). nothing to do.",
                     v.block_number,
                     last_block_number,
                 );

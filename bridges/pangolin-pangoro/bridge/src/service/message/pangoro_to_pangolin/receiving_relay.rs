@@ -143,7 +143,7 @@ impl ReceivingRunner {
                     self.message_relay = MessageRelay::new().await?;
                 }
             }
-            tokio::time::sleep(std::time::Duration::from_secs(15)).await;
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
     }
 

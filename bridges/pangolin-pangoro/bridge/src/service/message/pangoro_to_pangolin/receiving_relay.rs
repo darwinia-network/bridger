@@ -61,16 +61,20 @@ impl ReceivingRunner {
             .unwrap_or(0u64);
         tracing::trace!(
             target: "pangolin-pangoro",
-            "[receiving-pangoro-to-pangolin] max dispatch nonce at target is {} and last received nonce from source is {}",
+            "[receiving-pangoro-to-pangolin] max dispatch nonce({}) at target and last received nonce from source is {}. \
+            queried by relayed block {}",
             max_confirm_end_at_target,
             source_outbound_lane_data.latest_received_nonce,
+            at_block,
         );
         if max_confirm_end_at_target == source_outbound_lane_data.latest_received_nonce {
             tracing::info!(
                 target: "pangolin-pangoro",
-                "[receiving-pangoro-to-pangolin] max dispatch nonce({}) at target is same with last received nonce({}) at source. so nothing to do.",
+                "[receiving-pangoro-to-pangolin] max dispatch nonce({}) at target is same with last received nonce({}) at source. \
+                queried by relayed block {}. so nothing to do.",
                 max_confirm_end_at_target,
                 source_outbound_lane_data.latest_received_nonce,
+                at_block,
             );
             return Ok(None);
         }

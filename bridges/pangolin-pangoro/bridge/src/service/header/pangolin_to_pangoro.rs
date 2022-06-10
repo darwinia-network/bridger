@@ -179,20 +179,32 @@ async fn try_to_relay_header_on_demand(
     header_relay: &HeaderRelay,
     last_block_number: u32,
 ) -> color_eyre::Result<()> {
-    let next_header = header_relay
+    let next_header = match header_relay
         .subquery_pangolin
         .next_needed_header(OriginType::BridgePangoro)
         .await?
-        .filter(|header| header.block_number > last_block_number);
-
-    if next_header.is_none() {
-        tracing::debug!(
-            target: "pangolin-pangoro",
-            "[header-pangolin-to-pangoro] Try relay header on-demand, bu not found any on-demand block",
-        );
-        return Ok(());
-    }
-    let next_header = next_header.expect("Unreachable");
+    {
+        Some(v) => {
+            if v.block_number <= last_block_number {
+                tracing::debug!(
+                    target: "pangolin-pangoro",
+                    "[header-pangolin-to-pangoro] Try relay header on-demand, \
+                    but last storage block ({}) is less or equal last relayed block ({}).",
+                    v.block_number,
+                    last_block_number,
+                );
+                return Ok(());
+            }
+            v
+        }
+        None => {
+            tracing::debug!(
+                target: "pangolin-pangoro",
+                "[header-pangolin-to-pangoro] Try relay header on-demand, but not found any on-demand block",
+            );
+            return Ok(());
+        }
+    };
     tracing::debug!(
         target: "pangolin-pangoro",
         "[header-pangolin-to-pangoro] Try relay header on-demand, the on-demand block is {}",

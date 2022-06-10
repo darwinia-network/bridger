@@ -28,6 +28,8 @@ query queryNeedRelay($origin: String!, $lane: String!, $nonce: Int!) {
       stateRoot
       extrinsicsRoot
       digest
+      onDemandType
+      additional
       timestamp
     }
   }

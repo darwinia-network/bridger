@@ -259,7 +259,7 @@ impl DeliveryRunner {
             total_weight += decoded_payload.weight;
         }
 
-        // query last relayed header
+        // query last relayed  header
         let read_proof = client_pangoro
             .subxt()
             .rpc()

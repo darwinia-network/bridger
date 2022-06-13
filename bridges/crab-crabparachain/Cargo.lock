@@ -6583,6 +6583,7 @@ dependencies = [
 name = "subquery-s2s"
 version = "0.5.7"
 dependencies = [
+ "array-bytes",
  "async-trait",
  "gql_client",
  "hex",

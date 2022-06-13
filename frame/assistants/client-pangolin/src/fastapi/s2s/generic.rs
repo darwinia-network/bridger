@@ -17,7 +17,7 @@ type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::He
 type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 
 impl PangolinClient {
-    pub async fn subscribe_justification(&self) -> ClientResult<Subscription<sp_core::Bytes>> {
+    pub async fn subscribe_grandpa_justifications(&self) -> ClientResult<Subscription<sp_core::Bytes>> {
         Ok(self
             .subxt()
             .rpc()
@@ -33,7 +33,7 @@ impl PangolinClient {
     pub async fn prepare_initialization_data(
         &self,
     ) -> ClientResult<InitializationData<BundleHeader>> {
-        let mut subscription = self.subscribe_justification().await?;
+        let mut subscription = self.subscribe_grandpa_justifications().await?;
         let justification = subscription
             .next()
             .await

@@ -1012,9 +1012,13 @@ name = "client-pangolin"
 version = "0.5.7"
 dependencies = [
  "array-bytes",
+ "bp-header-chain",
+ "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.137",
  "serde_json",
+ "sp-finality-grandpa",
+ "sp-runtime",
  "subxt",
  "support-toolkit",
  "thiserror",

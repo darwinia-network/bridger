@@ -86,7 +86,7 @@ async fn run_until_pangoro_connection_lost(mut client: PangoroClient) -> color_e
 }
 
 async fn subscribe_pangolin(client: &PangolinClient) -> color_eyre::Result<()> {
-    let mut subscribe = client.subscribe_justification().await?;
+    let mut subscribe = client.subscribe_grandpa_justifications().await?;
     while let Some(justification) = subscribe.next().await {
         let mut data = PANGOLIN_JUSTIFICATIONS.lock().await;
         data.push_back(justification?);
@@ -98,7 +98,7 @@ async fn subscribe_pangolin(client: &PangolinClient) -> color_eyre::Result<()> {
 }
 
 async fn subscribe_pangoro(client: &PangoroClient) -> color_eyre::Result<()> {
-    let mut subscribe = client.subscribe_justification().await?;
+    let mut subscribe = client.subscribe_grandpa_justifications().await?;
     while let Some(justification) = subscribe.next().await {
         let mut data = PANGORO_JUSTIFICATIONS.lock().await;
         data.push_back(justification?);

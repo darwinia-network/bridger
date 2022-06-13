@@ -4,8 +4,7 @@
 
 ## Changed
 
-- Update bridge pangolin-pangoro #443
-- Update bridge darwinia-crab #448
+- Add crab-crabparachain bridge (#471)
 
 ## Resources
 

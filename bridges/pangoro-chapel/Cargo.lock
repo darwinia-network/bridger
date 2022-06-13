@@ -250,7 +250,7 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
 name = "bridge-pangoro-ropsten"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "client-pangoro",
  "color-eyre",
@@ -352,7 +352,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangoro"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "array-bytes",
  "parity-scale-codec",
@@ -413,7 +413,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -3251,7 +3251,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "config",
@@ -3270,7 +3270,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -3278,7 +3278,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "colored",
  "serde 1.0.136",
@@ -3288,7 +3288,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "thiserror",
 ]

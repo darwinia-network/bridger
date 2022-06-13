@@ -1,6 +1,6 @@
 {
   "name": "subql-bridge-pangolin",
-  "version": "0.5.5",
+  "version": "0.5.7",
   "description": "Pangolin network",
   "main": "dist/index.js",
   "scripts": {

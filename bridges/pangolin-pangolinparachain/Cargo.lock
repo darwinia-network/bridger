@@ -775,7 +775,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangolin-pangolinparachain"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "bp-darwinia-core",
@@ -1009,7 +1009,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangolin"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "array-bytes",
  "parity-scale-codec",
@@ -1023,7 +1023,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangolin-parachain"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "array-bytes",
  "parity-scale-codec",
@@ -1036,7 +1036,7 @@ dependencies = [
 
 [[package]]
 name = "client-rococo"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "array-bytes",
  "jsonrpsee",
@@ -1098,7 +1098,7 @@ dependencies = [
 
 [[package]]
 name = "component-subscan"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "reqwest",
  "serde 1.0.137",
@@ -1692,7 +1692,7 @@ dependencies = [
 
 [[package]]
 name = "feemarket-s2s"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "bp-messages",
@@ -6576,7 +6576,7 @@ dependencies = [
 
 [[package]]
 name = "subquery-parachain"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "async-trait",
  "gql_client",
@@ -6592,7 +6592,7 @@ dependencies = [
 
 [[package]]
 name = "subquery-s2s"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -6739,7 +6739,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "config",
@@ -6758,7 +6758,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -6766,7 +6766,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "colored",
  "serde 1.0.137",
@@ -6776,7 +6776,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "thiserror",
 ]

@@ -61,11 +61,11 @@ pub enum RelayBlockType {
 #[serde(rename_all = "kebab-case")]
 pub enum RelayBlockOrigin {
     Mandatory,
-    BridgePangolin,
-    // from pangolin parachain send message to pangolin
-    BridgePangoro,
-    // from pangolin send message to pangoro
+    BridgePangolin,          // from pangolin parachain send message to pangolin
+    BridgePangoro,           // from pangolin send message to pangoro
     BridgePangolinParachain, // from pangolin send message to pangolin parachain
+    BridgeCrabParachain,     // from crab send messages to crab parachain
+    BridgeCrab,              // from crab parachain send messages to crab
 }
 
 /// justification mapping

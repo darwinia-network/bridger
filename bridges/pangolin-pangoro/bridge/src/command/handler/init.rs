@@ -24,7 +24,7 @@ async fn init_bridge(
     let client_pangolin = PangolinClientComponent::component(config_pangolin.into()).await?;
     let client_pangoro = PangoroClientComponent::component(config_pangoro.into()).await?;
     let hash = match bridge {
-        BridgeName::PangoroToPangolin => {
+        BridgeName::PangolinToPangoro => {
             let initialization_data = client_pangolin.prepare_initialization_data().await?;
             let encoded = codec::Encode::encode(&initialization_data);
             client_pangoro
@@ -35,7 +35,7 @@ async fn init_bridge(
                 .sign_and_submit(client_pangoro.account().signer())
                 .await?
         }
-        BridgeName::PangolinToPangoro => {
+        BridgeName::PangoroToPangolin => {
             let initialization_data = client_pangoro.prepare_initialization_data().await?;
             let encoded = codec::Encode::encode(&initialization_data);
             client_pangolin

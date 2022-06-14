@@ -7,6 +7,11 @@ export enum RelayBlockType {
   OnDemand = 'on-demand',
 }
 
+export enum OnDemandType {
+  SendMessage = 'send-message',
+  Dispatch = 'dispatch',
+}
+
 export enum RelayBlockOrigin {
   Mandatory = 'mandatory',
   BridgePangoro = 'bridge-pangoro',
@@ -16,13 +21,17 @@ export enum RelayBlockOrigin {
 
 export async function storeNeedRelayBlock(
   event: FastEvent,
-  origin: RelayBlockOrigin
+  origin: RelayBlockOrigin,
+  onDemandType?: OnDemandType,
+  additional?: string,
 ) {
   const _event = new NeedRelayBlock(event.id);
   _event.blockNumber = event.blockNumber;
   _event.blockHash = event.blockHash;
   _event.type = origin == RelayBlockOrigin.Mandatory ? RelayBlockType.Mandatory : RelayBlockType.OnDemand;
   _event.origin = origin;
+  _event.onDemandType = onDemandType;
+  _event.additional = additional;
 
   const block = new FastBlock(event.block);
   const header = block.raw.block.header;
@@ -31,9 +40,16 @@ export async function storeNeedRelayBlock(
   _event.extrinsicsRoot = header.extrinsicsRoot.toString();
   _event.digest = header.digest.toHex();
 
-  if (_event.type == RelayBlockType.OnDemand) {
+  if (_event.type == RelayBlockType.OnDemand && onDemandType == OnDemandType.SendMessage) {
     const data = event.data;
     const [laneId, messageNonce] = data as unknown as [string, number];
+    _event.laneId = laneId.toString().replace('0x', '');
+    _event.messageNonce = messageNonce;
+  }
+  if (_event.type == RelayBlockType.OnDemand && onDemandType == OnDemandType.Dispatch) {
+    const data = event.data;
+    const [chainId, bridgeMessageIdOf] = data as unknown as [string, any];
+    const [laneId, messageNonce] = bridgeMessageIdOf as unknown as [string, number];
     _event.laneId = laneId.toString().replace('0x', '');
     _event.messageNonce = messageNonce;
   }

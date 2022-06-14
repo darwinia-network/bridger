@@ -23,6 +23,8 @@ query queryNextRelayBlock($block: Int!) {
       stateRoot
       extrinsicsRoot
       digest
+      onDemandType
+      additional
       timestamp
     }
   }

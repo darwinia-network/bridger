@@ -41,7 +41,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        chain: 
+        chain:
           - kusama
           - rococo
     steps:
@@ -65,14 +65,15 @@ jobs:
           subql_path: subql/parachain/${{ matrix.chain }}
 
   bridge-s2s:
-    name: Subql Parachain
+    name: Subql s2s
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
       matrix:
-        chain: 
+        chain:
           - pangolin
           - pangolin-parachain
+          - pangoro
           - rococo
           - crab
           - crab-parachain

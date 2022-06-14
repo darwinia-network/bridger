@@ -1,6 +1,6 @@
 import {FastEvent} from '../helpers';
 import * as storage from '../storage';
-import {RelayBlockOrigin} from "../storage";
+import {OnDemandType, RelayBlockOrigin} from '../storage';
 import {BlockHandler} from "./block";
 
 export class EventHandler {
@@ -21,17 +21,49 @@ export class EventHandler {
     logger.info(`[event] Received event: [${eventKey}] [${eventId}] in block ${blockNumber}`);
     switch (eventKey) {
       case 'grandpa:NewAuthorities': {
-        await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.Mandatory);
+        await storage.storeNeedRelayBlock(
+          this.event,
+          RelayBlockOrigin.Mandatory,
+        );
         return;
       }
       case 'bridgePangoroMessages:MessageAccepted': {
-        await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.BridgePangoro);
+        await storage.storeNeedRelayBlock(
+          this.event,
+          RelayBlockOrigin.BridgePangoro,
+          OnDemandType.SendMessage,
+        );
         return;
       }
       case 'bridgePangolinParachainMessages:MessageAccepted': {
-        await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.BridgePangolinParachain);
+        await storage.storeNeedRelayBlock(
+          this.event,
+          RelayBlockOrigin.BridgePangolinParachain,
+          OnDemandType.SendMessage,
+        );
         return;
       }
+    }
+
+    // dispatch
+
+    if (eventSection === 'bridgePangoroDispatch') {
+      await storage.storeNeedRelayBlock(
+        this.event,
+        RelayBlockOrigin.BridgePangoro,
+        OnDemandType.Dispatch,
+        eventMethod,
+      );
+      return;
+    }
+    if (eventSection === 'bridgePangoroParachainDispatch') {
+      await storage.storeNeedRelayBlock(
+        this.event,
+        RelayBlockOrigin.BridgePangolinParachain,
+        OnDemandType.Dispatch,
+        eventMethod,
+      );
+      return;
     }
 
   }

@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_hex::{SerHex, SerHexSeq, StrictPfx};
 
+use crate::SubqueryComponentResult;
+
 /// need relay block
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct NeedRelayBlock {
@@ -35,6 +37,10 @@ impl NeedRelayBlock {
     /// is mandatory block
     pub fn is_mandatory(&self) -> bool {
         matches!(self.type_, RelayBlockType::Mandatory)
+    }
+
+    pub fn block_hash_bytes(&self) -> SubqueryComponentResult<Vec<u8>> {
+        Ok(array_bytes::hex2bytes(&self.block_hash)?)
     }
 }
 

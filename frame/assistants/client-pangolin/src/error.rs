@@ -2,7 +2,6 @@
 
 use support_toolkit::error::TkError;
 use thiserror::Error as ThisError;
-use jsonrpsee::core::error::Error as RpcError;
 
 pub type ClientResult<T> = Result<T, ClientError>;
 
@@ -12,11 +11,11 @@ pub enum ClientError {
     #[error(transparent)]
     SubxtBasicError(subxt::BasicError),
 
-    #[error(transparent)]
-    RpcBasicError(RpcError),
-
     #[error("Please reconnect to rpc server")]
     ClientRestartNeed,
+
+    #[error(transparent)]
+    Codec(#[from] codec::Error),
 
     #[error("No header hash in EthereumReceiptProofOfThing")]
     NoHeaderHashInEthereumReceiptProofOfThing,
@@ -24,8 +23,11 @@ pub enum ClientError {
     #[error("Wrong seed: {0}")]
     Seed(String),
 
-    #[error("Other error: {0}")]
-    Other(String),
+    #[error("Bytes error: {0}")]
+    Bytes(String),
+
+    #[error("Custom error: {0}")]
+    Custom(String),
 
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
@@ -87,12 +89,14 @@ impl From<subxt::BasicError> for ClientError {
     }
 }
 
+impl From<subxt::rpc::RpcError> for ClientError {
+    fn from(error: subxt::rpc::RpcError) -> Self {
+        Self::SubxtBasicError(subxt::BasicError::Rpc(error))
+    }
+}
 
-impl From<RpcError> for ClientError {
-    fn from(error: RpcError) -> Self {
-        if let RpcError::RestartNeeded(_) = &error {
-            return Self::ClientRestartNeed;
-        }
-        Self::RpcBasicError(error)
+impl From<array_bytes::Error> for ClientError {
+    fn from(error: array_bytes::Error) -> Self {
+        Self::Bytes(format!("{:?}", error))
     }
 }

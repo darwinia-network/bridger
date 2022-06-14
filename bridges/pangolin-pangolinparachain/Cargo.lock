@@ -1012,12 +1012,13 @@ name = "client-pangolin"
 version = "0.5.7"
 dependencies = [
  "array-bytes",
- "futures-util",
- "jsonrpsee",
+ "bp-header-chain",
+ "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.137",
  "serde_json",
- "sp-core",
+ "sp-finality-grandpa",
+ "sp-runtime",
  "subxt",
  "support-toolkit",
  "thiserror",
@@ -6597,6 +6598,7 @@ dependencies = [
 name = "subquery-s2s"
 version = "0.5.7"
 dependencies = [
+ "array-bytes",
  "async-trait",
  "gql_client",
  "hex",

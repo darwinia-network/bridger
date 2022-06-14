@@ -104,7 +104,7 @@ impl EthereumClient {
         beneficiary_buffer.copy_from_slice(&beneficiary);
 
         // debug
-        tracing::debug!(target: "component-ethereum", "message: {}", array_bytes::bytes2hex("0x", message.clone()));
+        tracing::debug!(target: "component-ethereum", "message: {}", array_bytes::bytes2hex("0x", &message.clone()));
         for (i, signature) in signature_list.clone().iter().enumerate() {
             tracing::debug!(
                 target: "component-ethereum",
@@ -116,7 +116,7 @@ impl EthereumClient {
         tracing::debug!(
             target: "component-ethereum",
             "beneficiary: {}",
-            array_bytes::bytes2hex("0x", beneficiary_buffer)
+            array_bytes::bytes2hex("0x", &beneficiary_buffer)
         );
 
         // gas price
@@ -129,7 +129,7 @@ impl EthereumClient {
                 "updateRelayer",
                 input,
                 Options::with(|options| {
-                    options.gas = Some(150_000.into());
+                    options.gas = Some(150_000u64.into());
                     options.gas_price = gas_price;
                 }),
                 key_ref,

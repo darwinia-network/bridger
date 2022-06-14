@@ -395,14 +395,11 @@ name = "client-pangolin"
 version = "0.5.7"
 dependencies = [
  "array-bytes",
- "futures-util",
- "jsonrpsee",
  "parity-scale-codec",
  "secp256k1",
  "serde 1.0.136",
  "serde_json",
  "shadow-liketh",
- "sp-core",
  "subxt",
  "support-toolkit",
  "thiserror",

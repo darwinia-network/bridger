@@ -1,3 +1,3 @@
 use lifeline::prelude::*;
 
-lifeline_bus!(pub struct PangolinPangoroBus);
+lifeline_bus!(pub struct BridgeBus);

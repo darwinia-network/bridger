@@ -14,20 +14,41 @@ network:
 dataSources:
   - name: main
     kind: substrate/Runtime
-    startBlock: 2304500
+    startBlock: 2719453
     mapping:
       file: ./dist/index.js
       handlers:
         - handler: handleBlock
           kind: substrate/BlockHandler
+
+        - handler: handleCall
+          kind: substrate/CallHandler
+
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            - module: grandpa
-              method: NewAuthorities
-            - module: bridgePangoroMessages
-              method: MessageAccepted
-            - module: bridgePangoroParachainMessages
-              method: MessageAccepted
-        - handler: handleCall
-          kind: substrate/CallHandler
+            module: grandpa
+            method: NewAuthorities
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgePangoroMessages
+            method: MessageAccepted
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgePangoroParachainMessages
+            method: MessageAccepted
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgePangoroDispatch
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgePangoroParachainDispatch
+

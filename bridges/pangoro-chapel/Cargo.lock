@@ -355,16 +355,13 @@ name = "client-pangoro"
 version = "0.5.7"
 dependencies = [
  "array-bytes",
- "color-eyre",
  "parity-scale-codec",
- "secp256k1 0.20.3",
  "serde 1.0.136",
  "serde_json",
  "subxt",
  "support-toolkit",
  "thiserror",
  "tracing",
- "web3",
 ]
 
 [[package]]
@@ -2528,15 +2525,6 @@ dependencies = [
 
 [[package]]
 name = "secp256k1"
-version = "0.20.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97d03ceae636d0fed5bae6a7f4f664354c5f4fcedf6eef053fef17e49f837d0a"
-dependencies = [
- "secp256k1-sys",
-]
-
-[[package]]
-name = "secp256k1"
 version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab7883017d5b21f011ef8040ea9c6c7ac90834c0df26a69e4c0b06276151f125"
@@ -3642,7 +3630,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ee73e6e4924fe940354b8d4d98cad5231175d615cd855b758adc658c0aac6a0"
 dependencies = [
  "cfg-if 1.0.0",
- "rand 0.7.3",
+ "rand 0.8.4",
  "static_assertions",
 ]
 
@@ -3884,7 +3872,7 @@ dependencies = [
  "pin-project 1.0.10",
  "reqwest",
  "rlp",
- "secp256k1 0.21.2",
+ "secp256k1",
  "serde 1.0.136",
  "serde_json",
  "soketto",

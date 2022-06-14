@@ -1,0 +1,36 @@
+query queryNeedRelay($origin: String!, $lane: String!, $nonce: Int!) {
+  needRelayBlocks(
+    first: 1
+    filter: {
+      type: {
+        equalTo: "on-demand"
+      }
+      origin: {
+        equalTo: $origin
+      }
+      laneId: {
+        equalTo: $lane
+      }
+      messageNonce: {
+        equalTo: $nonce
+      }
+    }
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
+      type
+      origin
+      laneId
+      messageNonce
+      parentHash
+      stateRoot
+      extrinsicsRoot
+      digest
+      onDemandType
+      additional
+      timestamp
+    }
+  }
+}

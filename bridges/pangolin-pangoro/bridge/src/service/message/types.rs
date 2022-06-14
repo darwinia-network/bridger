@@ -16,6 +16,7 @@ pub(crate) struct MessageRelay {
     pub client_pangolin: PangolinClient,
     pub client_pangoro: PangoroClient,
     pub subquery_pangoro: Subquery,
+    pub subquery_pangolin: Subquery,
 }
 
 impl MessageRelay {
@@ -33,11 +34,14 @@ impl MessageRelay {
             PangoroClientComponent::component(config_pangoro.to_pangoro_client_config()?).await?;
         let subquery_pangoro =
             SubqueryComponent::component(index_config.pangoro, BridgeName::PangolinPangoro);
+        let subquery_pangolin =
+            SubqueryComponent::component(index_config.pangolin, BridgeName::PangolinPangoro);
         Ok(Self {
             relay_config: bridge_config.relay,
             client_pangolin,
             client_pangoro,
             subquery_pangoro,
+            subquery_pangolin,
         })
     }
 }

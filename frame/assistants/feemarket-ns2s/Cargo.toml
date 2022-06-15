@@ -21,6 +21,9 @@ tracing     = "0.1"
 
 codec = { package = "parity-scale-codec", version = "2" }
 
+bp-messages       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
 component-subscan = { path = "../../components/subscan" }
 

@@ -28,3 +28,4 @@ dataSources:
           filter:
             module: grandpa
             method: NewAuthorities
+

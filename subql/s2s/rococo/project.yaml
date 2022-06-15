@@ -13,16 +13,11 @@ network:
 
 dataSources:
   - kind: substrate/Runtime
-    startBlock: 108700
+    startBlock: 544069
     mapping:
       file: ./dist/index.js
       handlers:
         - handler: handleBlock
           kind: substrate/BlockHandler
-        - handler: handleEvent
-          kind: substrate/EventHandler
-          filter:
-            - module: grandpa
-              method: NewAuthorities
         - handler: handleCall
           kind: substrate/CallHandler

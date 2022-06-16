@@ -400,7 +400,9 @@ dependencies = [
 name = "client-pangoro"
 version = "0.5.7"
 dependencies = [
+ "abstract-client-s2s",
  "array-bytes",
+ "async-trait",
  "bp-header-chain",
  "finality-grandpa",
  "parity-scale-codec",

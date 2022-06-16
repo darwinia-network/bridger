@@ -39,7 +39,7 @@ dataSources:
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            module: bridgePangoroParachainMessages
+            module: bridgePangolinParachainMessages
             method: MessageAccepted
 
         - handler: handleEvent
@@ -50,5 +50,4 @@ dataSources:
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            module: bridgePangoroParachainDispatch
-
+            module: bridgePangolinParachainDispatch

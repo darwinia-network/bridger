@@ -21,7 +21,10 @@ type NeedRelayBlock @entity {
   stateRoot: String!
   extrinsicsRoot: String!
   digest: String!
-
+ 
+  onDemandType: String,
+  additional: String
+ 
   timestamp: Date
 }
 

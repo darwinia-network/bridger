@@ -7,6 +7,7 @@ use subxt::{sp_core, sp_runtime};
 use abstract_client_s2s::client::{S2SClientBase, S2SClientGeneric};
 
 use crate::client::PangoroClient;
+use crate::config::PangoroSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::types::runtime_types::bp_header_chain::InitializationData;
 
@@ -94,6 +95,7 @@ impl PangoroClient {
 impl S2SClientBase for PangoroClient {
     type Error = ClientError;
     type Header = BundleHeader;
+    type Hash = <PangoroSubxtConfig as subxt::Config>::Hash;
     type InitializationData = InitializationData<BundleHeader>;
 }
 

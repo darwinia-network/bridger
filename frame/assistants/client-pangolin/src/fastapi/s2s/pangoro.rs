@@ -2,13 +2,13 @@ use subxt::rpc::ChainBlock;
 
 use abstract_client_s2s::client::S2SClientRelay;
 
-use crate::client::PangoroClient;
-use crate::config::PangoroSubxtConfig;
+use crate::client::PangolinClient;
+use crate::config::PangolinSubxtConfig;
 use crate::error::ClientResult;
 
 #[async_trait::async_trait]
-impl S2SClientRelay for PangoroClient {
-    type ChainBlock = ChainBlock<PangoroSubxtConfig>;
+impl S2SClientRelay for PangolinClient {
+    type ChainBlock = ChainBlock<PangolinSubxtConfig>;
 
     async fn block(
         &self,
@@ -24,7 +24,7 @@ impl S2SClientRelay for PangoroClient {
         Ok(self
             .runtime()
             .storage()
-            .bridge_pangolin_grandpa()
+            .bridge_pangoro_grandpa()
             .best_finalized(at_block)
             .await?)
     }

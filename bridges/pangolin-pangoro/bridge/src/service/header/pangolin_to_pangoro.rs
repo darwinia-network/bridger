@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use abstract_client_s2s::client::S2SClientRelay;
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
@@ -100,15 +101,10 @@ async fn start() -> color_eyre::Result<()> {
 async fn run(header_relay: &HeaderRelay) -> color_eyre::Result<()> {
     let last_relayed_pangolin_hash_in_pangoro = header_relay
         .client_pangoro
-        .runtime()
-        .storage()
-        .bridge_pangolin_grandpa()
-        .best_finalized(None)
+        .best_target_finalized(None)
         .await?;
     let last_relayed_pangolin_block_in_pangoro = header_relay
         .client_pangolin
-        .subxt()
-        .rpc()
         .block(Some(last_relayed_pangolin_hash_in_pangoro))
         .await?
         .ok_or_else(|| {

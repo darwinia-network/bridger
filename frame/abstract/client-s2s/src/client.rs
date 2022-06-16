@@ -6,6 +6,8 @@ pub trait S2SClientBase {
     type Error;
     /// header
     type Header;
+    /// hash
+    type Hash;
     /// initialization data
     type InitializationData: Encode + Decode;
 }
@@ -19,4 +21,19 @@ pub trait S2SClientGeneric: S2SClientBase {
 
 /// S2S bridge header/message api
 #[async_trait::async_trait]
-pub trait S2sClientRelay: S2SClientGeneric {}
+pub trait S2SClientRelay: S2SClientGeneric {
+    /// Chain block
+    type ChainBlock;
+
+    /// query block by hash
+    async fn block(
+        &self,
+        hash: Option<Self::Hash>,
+    ) -> Result<Option<Self::ChainBlock>, Self::Error>;
+
+    /// query best target finalized at source
+    async fn best_target_finalized(
+        &self,
+        at_block: Option<Self::Hash>,
+    ) -> Result<sp_core::H256, Self::Error>;
+}

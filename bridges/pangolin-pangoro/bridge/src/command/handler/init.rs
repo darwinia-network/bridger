@@ -1,7 +1,7 @@
 use client_pangolin::component::PangolinClientComponent;
 use client_pangoro::component::PangoroClientComponent;
 
-use abstract_client_s2s::client::S2SClient;
+use abstract_client_s2s::client::S2SClientGeneric;
 use support_common::config::{Config, Names};
 
 use crate::bridge::{BridgeConfig, ChainInfoConfig};

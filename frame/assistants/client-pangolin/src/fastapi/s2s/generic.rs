@@ -4,7 +4,7 @@ use sp_runtime::{ConsensusEngineId, DigestItem};
 use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
 
-use abstract_client_s2s::client::S2SClient;
+use abstract_client_s2s::client::{S2SClientBase, S2SClientGeneric};
 
 use crate::client::PangolinClient;
 use crate::error::{ClientError, ClientResult};
@@ -91,12 +91,14 @@ impl PangolinClient {
     }
 }
 
-#[async_trait::async_trait]
-impl S2SClient for PangolinClient {
+impl S2SClientBase for PangolinClient {
     type Error = ClientError;
     type Header = BundleHeader;
     type InitializationData = InitializationData<BundleHeader>;
+}
 
+#[async_trait::async_trait]
+impl S2SClientGeneric for PangolinClient {
     async fn prepare_initialization_data(&self) -> ClientResult<Self::InitializationData> {
         let mut subscription = self.subscribe_grandpa_justifications().await?;
         let justification = subscription

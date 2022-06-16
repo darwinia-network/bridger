@@ -16,3 +16,5 @@ version       = "0.5.7"
 [dependencies]
 thiserror   = "1"
 async-trait = "0.1"
+
+codec       = { package = "parity-scale-codec", version = "2" }

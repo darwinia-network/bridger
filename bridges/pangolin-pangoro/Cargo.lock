@@ -13,6 +13,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "abstract-client-s2s"
+version = "0.5.7"
+dependencies = [
+ "async-trait",
+ "parity-scale-codec",
+ "thiserror",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -261,6 +270,7 @@ dependencies = [
 name = "bridge-pangolin-pangoro"
 version = "0.5.7"
 dependencies = [
+ "abstract-client-s2s",
  "array-bytes",
  "client-pangolin",
  "client-pangoro",
@@ -370,7 +380,9 @@ dependencies = [
 name = "client-pangolin"
 version = "0.5.7"
 dependencies = [
+ "abstract-client-s2s",
  "array-bytes",
+ "async-trait",
  "bp-header-chain",
  "finality-grandpa",
  "parity-scale-codec",

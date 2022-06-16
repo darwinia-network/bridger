@@ -39,7 +39,7 @@ support-terminal   = { path = "../../../frame/supports/support-terminal" }
 
 component-http-client = { path = "../../../frame/components/http-client" }
 
-client-pangolin = { path = "../../../frame/assistants/client-pangolin", features = [ "s2s-pangoro" ]}
-client-pangoro  = { path = "../../../frame/assistants/client-pangoro", features = [ "s2s-pangolin" ]}
-
-subquery-s2s    = { path = "../../../frame/assistants/subquery-s2s" }
+abstract-client-s2s = { path = "../../../frame/abstract/client-s2s" }
+client-pangolin     = { path = "../../../frame/assistants/client-pangolin", features = [ "s2s-pangoro" ]}
+client-pangoro      = { path = "../../../frame/assistants/client-pangoro", features = [ "s2s-pangolin" ]}
+subquery-s2s        = { path = "../../../frame/assistants/subquery-s2s" }

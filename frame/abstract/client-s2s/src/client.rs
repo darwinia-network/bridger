@@ -6,8 +6,6 @@ pub trait S2SClientBase {
     type Error;
     /// header
     type Header;
-    /// Justification
-    type Justification;
     /// hash
     type Hash;
     /// initialization data
@@ -24,6 +22,8 @@ pub trait S2SClientGeneric: S2SClientBase {
 /// S2S bridge header/message api
 #[async_trait::async_trait]
 pub trait S2SClientRelay: S2SClientGeneric {
+    /// Justification
+    type Justification;
     /// Chain block
     type ChainBlock;
 

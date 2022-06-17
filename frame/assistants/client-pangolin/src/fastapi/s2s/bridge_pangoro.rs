@@ -5,8 +5,14 @@ use crate::client::PangolinClient;
 use crate::config::PangolinSubxtConfig;
 use crate::error::ClientResult;
 
+type BundleJustification =
+    crate::types::runtime_types::bp_header_chain::justification::GrandpaJustification<
+        crate::fastapi::s2s::generic::BundleHeader,
+    >;
+
 #[async_trait::async_trait]
 impl S2SClientRelay for PangolinClient {
+    type Justification = BundleJustification;
     type ChainBlock = ChainBlock<PangolinSubxtConfig>;
 
     async fn header(&self, hash: Option<Self::Hash>) -> ClientResult<Option<Self::Header>> {

@@ -13,12 +13,10 @@ use crate::types::runtime_types::bp_header_chain::InitializationData;
 
 const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
 
-type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
+pub(crate) type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
     u32,
     crate::types::runtime_types::sp_runtime::traits::BlakeTwo256,
 >;
-type BundleJustification =
-    crate::types::runtime_types::bp_header_chain::justification::GrandpaJustification<BundleHeader>;
 type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 
 impl PangolinClient {
@@ -97,7 +95,6 @@ impl PangolinClient {
 impl S2SClientBase for PangolinClient {
     type Error = ClientError;
     type Header = BundleHeader;
-    type Justification = BundleJustification;
     type Hash = <PangolinSubxtConfig as subxt::Config>::Hash;
     type InitializationData = InitializationData<BundleHeader>;
 }

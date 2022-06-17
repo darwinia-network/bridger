@@ -1,10 +1,9 @@
+use abstract_client_s2s::client::{S2SClientBase, S2SClientGeneric};
 use finality_grandpa::voter_set::VoterSet;
 use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
 use sp_runtime::{ConsensusEngineId, DigestItem};
 use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
-
-use abstract_client_s2s::client::{S2SClientBase, S2SClientGeneric};
 
 use crate::client::PangoroClient;
 use crate::config::PangoroSubxtConfig;
@@ -13,12 +12,10 @@ use crate::types::runtime_types::bp_header_chain::InitializationData;
 
 const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
 
-type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
+pub(crate) type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
     u32,
     crate::types::runtime_types::sp_runtime::traits::BlakeTwo256,
 >;
-type BundleJustification =
-    crate::types::runtime_types::bp_header_chain::justification::GrandpaJustification<BundleHeader>;
 type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 
 impl PangoroClient {
@@ -97,7 +94,6 @@ impl PangoroClient {
 impl S2SClientBase for PangoroClient {
     type Error = ClientError;
     type Header = BundleHeader;
-    type Justification = BundleJustification;
     type Hash = <PangoroSubxtConfig as subxt::Config>::Hash;
     type InitializationData = InitializationData<BundleHeader>;
 }

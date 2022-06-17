@@ -96,11 +96,12 @@ impl S2SClientBase for PangolinClient {
     type Error = ClientError;
     type Header = BundleHeader;
     type Hash = <PangolinSubxtConfig as subxt::Config>::Hash;
-    type InitializationData = InitializationData<BundleHeader>;
 }
 
 #[async_trait::async_trait]
 impl S2SClientGeneric for PangolinClient {
+    type InitializationData = InitializationData<BundleHeader>;
+
     async fn prepare_initialization_data(&self) -> ClientResult<Self::InitializationData> {
         let mut subscription = self.subscribe_grandpa_justifications().await?;
         let justification = subscription

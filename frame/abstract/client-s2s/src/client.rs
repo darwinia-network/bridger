@@ -8,13 +8,14 @@ pub trait S2SClientBase {
     type Header;
     /// hash
     type Hash;
-    /// initialization data
-    type InitializationData: Encode + Decode;
 }
 
 /// S2S bridge client generic trait
 #[async_trait::async_trait]
 pub trait S2SClientGeneric: S2SClientBase {
+    /// initialization data
+    type InitializationData: Encode + Decode;
+
     /// prepare initialization data
     async fn prepare_initialization_data(&self) -> Result<Self::InitializationData, Self::Error>;
 }

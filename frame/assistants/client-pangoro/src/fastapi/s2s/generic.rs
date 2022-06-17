@@ -95,11 +95,12 @@ impl S2SClientBase for PangoroClient {
     type Error = ClientError;
     type Header = BundleHeader;
     type Hash = <PangoroSubxtConfig as subxt::Config>::Hash;
-    type InitializationData = InitializationData<BundleHeader>;
 }
 
 #[async_trait::async_trait]
 impl S2SClientGeneric for PangoroClient {
+    type InitializationData = InitializationData<BundleHeader>;
+
     async fn prepare_initialization_data(&self) -> ClientResult<Self::InitializationData> {
         let mut subscription = self.subscribe_grandpa_justifications().await?;
         let justification = subscription

@@ -14,6 +14,10 @@ type BundleJustification =
 impl S2SClientRelay for PangolinClient {
     type Justification = BundleJustification;
     type ChainBlock = ChainBlock<PangolinSubxtConfig>;
+    type OutboundLaneData = crate::types::runtime_types::bp_messages::OutboundLaneData;
+    type InboundLaneData = crate::types::runtime_types::bp_messages::InboundLaneData<
+        subxt::sp_core::crypto::AccountId32,
+    >;
 
     async fn header(&self, hash: Option<Self::Hash>) -> ClientResult<Option<Self::Header>> {
         match self.subxt().rpc().header(hash).await? {

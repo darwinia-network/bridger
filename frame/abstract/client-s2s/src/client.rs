@@ -27,6 +27,10 @@ pub trait S2SClientRelay: S2SClientGeneric {
     type Justification;
     /// Chain block
     type ChainBlock;
+    /// outbound lane data
+    type OutboundLaneData;
+    /// inbound lane data
+    type InboundLaneData;
 
     /// query header by hash
     async fn header(&self, hash: Option<Self::Hash>) -> Result<Option<Self::Header>, Self::Error>;

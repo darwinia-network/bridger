@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use abstract_client_s2s::client::S2SClientRelay;
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangolin::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
@@ -14,6 +13,7 @@ use lifeline::{Lifeline, Service, Task};
 use subquery_s2s::types::{BridgeName, OriginType};
 use subquery_s2s::{Subquery, SubqueryComponent};
 
+use abstract_client_s2s::client::S2SClientRelay;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
@@ -249,13 +249,12 @@ async fn submit_finality(
     block_hash: impl AsRef<str>,
     justification: Vec<u8>,
 ) -> color_eyre::Result<()> {
+    let block_hash = block_hash.as_ref();
     let header = header_relay
         .client_pangolin
-        .subxt()
-        .rpc()
-        .header(Some(sp_core::H256::from_str(block_hash.as_ref()).unwrap()))
+        .header(Some(sp_core::H256::from_str(block_hash)?))
         .await?
-        .unwrap();
+        .ok_or_else(|| BridgerError::Custom(format!("Not found header by hash: {}", block_hash)))?;
     let finality_target = FinalityTarget {
         parent_hash: header.parent_hash,
         number: header.number,
@@ -265,19 +264,14 @@ async fn submit_finality(
         __subxt_unused_type_params: Default::default(),
     };
     let grandpa_justification = Decode::decode(&mut justification.as_slice())?;
-    let runtime = header_relay.client_pangoro.runtime();
-    let track = runtime
-        .tx()
-        .bridge_pangolin_grandpa()
+    let hash = header_relay
+        .client_pangoro
         .submit_finality_proof(finality_target, grandpa_justification)
-        .sign_and_submit_then_watch(header_relay.client_pangoro.account().signer())
         .await?;
-
-    let events = track.wait_for_finalized_success().await?;
     tracing::info!(
-         target: "pangolin-pangoro",
-          "[header-pangolin-to-pangoro] Header relayed: {:?}",
-           events.extrinsic_hash()
+        target: "pangolin-pangoro",
+        "[header-pangolin-to-pangoro] Header relayed: {:?}",
+        hash,
     );
     Ok(())
 }

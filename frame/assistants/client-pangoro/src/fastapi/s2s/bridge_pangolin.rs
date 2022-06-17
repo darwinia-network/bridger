@@ -10,6 +10,10 @@ use crate::error::ClientResult;
 impl S2SClientRelay for PangoroClient {
     type ChainBlock = ChainBlock<PangoroSubxtConfig>;
 
+    async fn header(&self, hash: Option<Self::Hash>) -> ClientResult<Option<Self::Header>> {
+        Ok(self.subxt().rpc().header(hash).await?)
+    }
+
     async fn block(
         &self,
         hash: Option<Self::Hash>,

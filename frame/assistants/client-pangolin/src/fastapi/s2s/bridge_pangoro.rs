@@ -10,10 +10,11 @@ use crate::error::ClientResult;
 impl S2SClientRelay for PangolinClient {
     type ChainBlock = ChainBlock<PangolinSubxtConfig>;
 
-    async fn block(
-        &self,
-        hash: Option<Self::Hash>,
-    ) -> Result<Option<Self::ChainBlock>, Self::Error> {
+    async fn header(&self, hash: Option<Self::Hash>) -> ClientResult<Option<Self::Header>> {
+        Ok(self.subxt().rpc().header(hash).await?)
+    }
+
+    async fn block(&self, hash: Option<Self::Hash>) -> ClientResult<Option<Self::ChainBlock>> {
         Ok(self.subxt().rpc().block(hash).await?)
     }
 

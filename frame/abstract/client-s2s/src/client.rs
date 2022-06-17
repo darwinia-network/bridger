@@ -6,6 +6,8 @@ pub trait S2SClientBase {
     type Error;
     /// header
     type Header;
+    /// Justification
+    type Justification;
     /// hash
     type Hash;
     /// initialization data
@@ -36,4 +38,11 @@ pub trait S2SClientRelay: S2SClientGeneric {
         &self,
         at_block: Option<Self::Hash>,
     ) -> Result<sp_core::H256, Self::Error>;
+
+    /// submit finality proof
+    async fn submit_finality_proof(
+        &self,
+        finality_target: Self::Header,
+        justification: Self::Justification,
+    ) -> Result<Self::Hash, Self::Error>;
 }

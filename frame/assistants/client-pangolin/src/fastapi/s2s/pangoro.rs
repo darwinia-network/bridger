@@ -28,4 +28,18 @@ impl S2SClientRelay for PangolinClient {
             .best_finalized(at_block)
             .await?)
     }
+
+    async fn submit_finality_proof(
+        &self,
+        finality_target: Self::Header,
+        justification: Self::Justification,
+    ) -> ClientResult<Self::Hash> {
+        Ok(self
+            .runtime()
+            .tx()
+            .bridge_pangoro_grandpa()
+            .submit_finality_proof(finality_target, justification)
+            .sign_and_submit(self.account().signer())
+            .await?)
+    }
 }

@@ -11,7 +11,13 @@ impl S2SClientRelay for PangoroClient {
     type ChainBlock = ChainBlock<PangoroSubxtConfig>;
 
     async fn header(&self, hash: Option<Self::Hash>) -> ClientResult<Option<Self::Header>> {
-        Ok(self.subxt().rpc().header(hash).await?)
+        match self.subxt().rpc().header(hash).await? {
+            Some(v) => {
+                let v = codec::Encode::encode(&v);
+                Ok(Some(codec::Decode::decode(&mut v.as_slice())?))
+            }
+            None => Ok(None),
+        }
     }
 
     async fn block(

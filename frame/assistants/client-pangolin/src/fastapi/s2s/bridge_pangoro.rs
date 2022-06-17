@@ -1,6 +1,5 @@
-use subxt::rpc::ChainBlock;
-
 use abstract_client_s2s::client::S2SClientRelay;
+use subxt::rpc::ChainBlock;
 
 use crate::client::PangolinClient;
 use crate::config::PangolinSubxtConfig;
@@ -11,7 +10,13 @@ impl S2SClientRelay for PangolinClient {
     type ChainBlock = ChainBlock<PangolinSubxtConfig>;
 
     async fn header(&self, hash: Option<Self::Hash>) -> ClientResult<Option<Self::Header>> {
-        Ok(self.subxt().rpc().header(hash).await?)
+        match self.subxt().rpc().header(hash).await? {
+            Some(v) => {
+                let v = codec::Encode::encode(&v);
+                Ok(Some(codec::Decode::decode(&mut v.as_slice())?))
+            }
+            None => Ok(None),
+        }
     }
 
     async fn block(&self, hash: Option<Self::Hash>) -> ClientResult<Option<Self::ChainBlock>> {

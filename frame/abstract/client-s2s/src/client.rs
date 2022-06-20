@@ -85,14 +85,14 @@ pub trait S2SClientRelay: S2SClientGeneric {
         &self,
         message_key: Self::MessageKey,
         hash: Option<Self::Hash>,
-    ) -> Result<Self::MessageData, Self::Error>;
+    ) -> Result<Option<Self::MessageData>, Self::Error>;
 
     /// read proof
     async fn read_proof(
         &self,
         storage_keys: Vec<Self::StorageKey>,
         hash: Option<Self::Hash>,
-    ) -> Result<Self::BridgedChainMessagesProof, Self::Error>;
+    ) -> Result<Vec<Vec<u8>>, Self::Error>;
 
     /// send receive messages proof extrinsics
     async fn receive_messages_proof(

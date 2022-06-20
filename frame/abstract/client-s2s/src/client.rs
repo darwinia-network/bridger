@@ -31,6 +31,18 @@ pub trait S2SClientRelay: S2SClientGeneric {
     type OutboundLaneData;
     /// inbound lane data
     type InboundLaneData;
+    /// message data
+    type MessageData;
+    /// message key
+    type MessageKey;
+    /// storage key
+    type StorageKey;
+    /// bridged chain messages proof
+    type BridgedChainMessagesProof;
+    /// bridged chain message delivery proof
+    type BridgedChainMessagesDeliveryProof;
+    /// unrewarded relayers state
+    type UnrewardedRelayersState;
 
     /// query header by hash
     async fn header(&self, hash: Option<Self::Hash>) -> Result<Option<Self::Header>, Self::Error>;
@@ -52,5 +64,49 @@ pub trait S2SClientRelay: S2SClientGeneric {
         &self,
         finality_target: Self::Header,
         justification: Self::Justification,
+    ) -> Result<Self::Hash, Self::Error>;
+
+    /// query outbound lane
+    async fn outbound_lanes(
+        &self,
+        lane: [u8; 4],
+        hash: Option<Self::Hash>,
+    ) -> Result<Self::OutboundLaneData, Self::Error>;
+
+    /// query inbound lane
+    async fn inbound_lanes(
+        &self,
+        lane: [u8; 4],
+        hash: Option<Self::Hash>,
+    ) -> Result<Self::InboundLaneData, Self::Error>;
+
+    /// query oubound message data
+    async fn outbound_messages(
+        &self,
+        message_key: Self::MessageKey,
+        hash: Option<Self::Hash>,
+    ) -> Result<Self::MessageData, Self::Error>;
+
+    /// read proof
+    async fn read_proof(
+        &self,
+        storage_keys: Vec<Self::StorageKey>,
+        hash: Option<Self::Hash>,
+    ) -> Result<Self::BridgedChainMessagesProof, Self::Error>;
+
+    /// send receive messages proof extrinsics
+    async fn receive_messages_proof(
+        &self,
+        relayer_id_at_bridged_chain: sp_core::crypto::AccountId32,
+        proof: Self::BridgedChainMessagesProof,
+        messages_count: u32,
+        dispatch_weight: u64,
+    ) -> Result<Self::Hash, Self::Error>;
+
+    /// receive messages delivery proof
+    async fn receive_messages_delivery_proof(
+        &self,
+        proof: Self::BridgedChainMessagesDeliveryProof,
+        relayers_state: Self::UnrewardedRelayersState,
     ) -> Result<Self::Hash, Self::Error>;
 }

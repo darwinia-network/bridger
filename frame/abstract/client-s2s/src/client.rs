@@ -42,7 +42,7 @@ pub trait S2SClientRelay: S2SClientGeneric {
     fn gen_inbound_lanes_storage_key(&self, lane: [u8; 4]) -> sp_core::storage::StorageKey;
 
     /// calculate dispatchh width by message nonces
-    async fn calculate_dispatch_width(
+    async fn calculate_dispatch_weight(
         &self,
         nonces: RangeInclusive<u64>,
     ) -> Result<u64, Self::Error>;

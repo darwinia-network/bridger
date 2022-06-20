@@ -198,7 +198,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
         }
 
         // fill delivery data
-        let total_weight = client_source.calculate_dispatch_width(nonces).await?;
+        let total_weight = client_source.calculate_dispatch_weight(nonces).await?;
 
         // query last relayed  header
         let read_proof = client_source

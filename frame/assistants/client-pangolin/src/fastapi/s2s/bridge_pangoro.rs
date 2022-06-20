@@ -56,7 +56,7 @@ impl S2SClientRelay for PangolinClient {
             .final_key(StorageKeyPrefix::new::<InboundLanes>())
     }
 
-    async fn calculate_dispatch_width(
+    async fn calculate_dispatch_weight(
         &self,
         nonces: RangeInclusive<u64>,
     ) -> Result<u64, Self::Error> {

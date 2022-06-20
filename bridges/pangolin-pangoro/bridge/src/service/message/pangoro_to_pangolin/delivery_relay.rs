@@ -1,3 +1,4 @@
+use abstract_client_s2s::client::S2SClientRelay;
 use std::ops::RangeInclusive;
 
 use client_pangolin::types::runtime_types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
@@ -44,9 +45,6 @@ impl DeliveryRunner {
         let outbound_lane_data = self
             .message_relay
             .client_pangoro
-            .runtime()
-            .storage()
-            .bridge_pangolin_messages()
             .outbound_lanes(lane.0, None)
             .await?;
         Ok(outbound_lane_data)
@@ -169,15 +167,9 @@ impl DeliveryRunner {
         };
 
         // query last relayed header
-        let last_relayed_pangoro_hash_in_pangolin = client_pangolin
-            .runtime()
-            .storage()
-            .bridge_pangoro_grandpa()
-            .best_finalized(None)
-            .await?;
+        let last_relayed_pangoro_hash_in_pangolin =
+            client_pangolin.best_target_finalized(None).await?;
         let last_relayed_pangoro_block_in_pangolin = client_pangoro
-            .subxt()
-            .rpc()
             .block(Some(last_relayed_pangoro_hash_in_pangolin))
             .await?
             .ok_or_else(|| {
@@ -217,12 +209,7 @@ impl DeliveryRunner {
         }
 
         //- query inbound land data
-        let target_inbound_lane_data = client_pangolin
-            .runtime()
-            .storage()
-            .bridge_pangoro_messages()
-            .inbound_lanes(lane.0, None)
-            .await?;
+        let target_inbound_lane_data = client_pangolin.inbound_lanes(lane.0, None).await?;
         let outbound_state_proof_required = target_inbound_lane_data.last_confirmed_nonce
             < source_outbound_lane_data.latest_received_nonce;
         if outbound_state_proof_required {
@@ -237,9 +224,6 @@ impl DeliveryRunner {
         let mut total_weight = 0u64;
         for message_nonce in nonces.clone() {
             let message_data = client_pangoro
-                .runtime()
-                .storage()
-                .bridge_pangolin_messages()
                 .outbound_messages(
                     MessageKey {
                         lane_id: lane.0,
@@ -260,12 +244,9 @@ impl DeliveryRunner {
         }
 
         // query last relayed  header
-        let read_proof = client_pangoro
-            .subxt()
-            .rpc()
+        let proof = client_pangoro
             .read_proof(storage_keys, Some(last_relayed_pangoro_hash_in_pangolin))
             .await?;
-        let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
         let proof = FromBridgedChainMessagesProof {
             bridged_header_hash: last_relayed_pangoro_hash_in_pangolin,
             storage_proof: proof,
@@ -275,16 +256,12 @@ impl DeliveryRunner {
         };
 
         let hash = client_pangolin
-            .runtime()
-            .tx()
-            .bridge_pangoro_messages()
             .receive_messages_proof(
                 client_pangolin.account().account_id().clone(),
                 proof,
                 (nonces.end() - nonces.start() + 1) as _,
                 total_weight,
             )
-            .sign_and_submit(client_pangolin.account().signer())
             .await?;
 
         tracing::debug!(

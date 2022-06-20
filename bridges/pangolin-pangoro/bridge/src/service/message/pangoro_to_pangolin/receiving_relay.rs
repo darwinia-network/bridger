@@ -1,3 +1,4 @@
+use abstract_client_s2s::client::S2SClientRelay;
 use std::collections::VecDeque;
 
 use client_pangolin::subxt_runtime::api::bridge_pangoro_messages::storage::InboundLanes;
@@ -31,9 +32,6 @@ impl ReceivingRunner {
         let outbound_lane_data = self
             .message_relay
             .client_pangoro
-            .runtime()
-            .storage()
-            .bridge_pangolin_messages()
             .outbound_lanes(lane.0, None)
             .await?;
         Ok(outbound_lane_data)
@@ -49,9 +47,6 @@ impl ReceivingRunner {
         let inbound_lane_data = self
             .message_relay
             .client_pangolin
-            .runtime()
-            .storage()
-            .bridge_pangoro_messages()
             .inbound_lanes(lane.0, Some(at_block))
             .await?;
         let max_confirm_end_at_target = inbound_lane_data
@@ -167,12 +162,8 @@ impl ReceivingRunner {
         }
 
         // query last relayed header
-        let last_relayed_pangolin_hash_in_pangoro = client_pangoro
-            .runtime()
-            .storage()
-            .bridge_pangolin_grandpa()
-            .best_finalized(None)
-            .await?;
+        let last_relayed_pangolin_hash_in_pangoro =
+            client_pangoro.best_target_finalized(None).await?;
 
         // assemble unrewarded relayers state
         let (max_confirmed_nonce_at_target, relayers_state) = match self
@@ -196,15 +187,12 @@ impl ReceivingRunner {
         let inbound_data_key = InboundLanes(lane.0)
             .key()
             .final_key(StorageKeyPrefix::new::<InboundLanes>());
-        let read_proof = client_pangolin
-            .subxt()
-            .rpc()
+        let proof = client_pangolin
             .read_proof(
                 vec![inbound_data_key],
                 Some(last_relayed_pangolin_hash_in_pangoro),
             )
             .await?;
-        let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
         let proof = FromBridgedChainMessagesDeliveryProof {
             bridged_header_hash: last_relayed_pangolin_hash_in_pangoro,
             storage_proof: proof,
@@ -213,11 +201,7 @@ impl ReceivingRunner {
 
         // send proof
         let hash = client_pangoro
-            .runtime()
-            .tx()
-            .bridge_pangolin_messages()
             .receive_messages_delivery_proof(proof, relayers_state)
-            .sign_and_submit(client_pangoro.account().signer())
             .await?;
 
         tracing::debug!(

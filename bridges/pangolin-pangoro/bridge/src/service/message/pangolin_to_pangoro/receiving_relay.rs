@@ -1,23 +1,20 @@
 use std::collections::VecDeque;
 
-use client_pangolin::types::runtime_types::bp_messages::{
-    OutboundLaneData, UnrewardedRelayersState,
-};
-use client_pangolin::types::runtime_types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
-use client_pangoro::subxt_runtime::api::bridge_pangolin_messages::storage::InboundLanes;
+use abstract_client_s2s::client::S2SClientRelay;
+use abstract_client_s2s::types::bp_messages::{OutboundLaneData, UnrewardedRelayersState};
+use abstract_client_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
 use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;
 
 use crate::service::message::types::MessageRelay;
 
-pub struct ReceivingRunner {
-    message_relay: MessageRelay,
+pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
+    message_relay: MessageRelay<SC, TC>,
     last_relayed_nonce: Option<u64>,
 }
 
-impl ReceivingRunner {
-    pub async fn new() -> color_eyre::Result<Self> {
-        let message_relay = MessageRelay::new().await?;
+impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
+    pub async fn new(message_relay: MessageRelay<SC, TC>) -> color_eyre::Result<Self> {
         Ok(Self {
             message_relay,
             last_relayed_nonce: None,
@@ -25,15 +22,12 @@ impl ReceivingRunner {
     }
 }
 
-impl ReceivingRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     async fn source_outbound_lane_data(&self) -> color_eyre::Result<OutboundLaneData> {
         let lane = self.message_relay.lane()?;
         let outbound_lane_data = self
             .message_relay
-            .client_pangolin
-            .runtime()
-            .storage()
-            .bridge_pangoro_messages()
+            .client_source
             .outbound_lanes(lane.0, None)
             .await?;
         Ok(outbound_lane_data)
@@ -48,10 +42,7 @@ impl ReceivingRunner {
         let lane = self.message_relay.lane()?;
         let inbound_lane_data = self
             .message_relay
-            .client_pangoro
-            .runtime()
-            .storage()
-            .bridge_pangolin_messages()
+            .client_target
             .inbound_lanes(lane.0, Some(at_block))
             .await?;
         let max_confirm_end_at_target = inbound_lane_data
@@ -122,7 +113,7 @@ impl ReceivingRunner {
     }
 }
 
-impl ReceivingRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     pub async fn start(&mut self) -> color_eyre::Result<()> {
         tracing::info!(
             target: "pangolin-pangoro",
@@ -152,8 +143,8 @@ impl ReceivingRunner {
         let lane = self.message_relay.lane()?;
 
         // alias
-        let client_pangolin = &self.message_relay.client_pangolin;
-        let client_pangoro = &self.message_relay.client_pangoro;
+        let client_source = &self.message_relay.client_source;
+        let client_target = &self.message_relay.client_target;
 
         let source_outbound_lane_data = self.source_outbound_lane_data().await?;
         if source_outbound_lane_data.latest_received_nonce
@@ -167,12 +158,8 @@ impl ReceivingRunner {
         }
 
         // query last relayed header
-        let last_relayed_pangoro_hash_in_pangolin = client_pangolin
-            .runtime()
-            .storage()
-            .bridge_pangoro_grandpa()
-            .best_finalized(None)
-            .await?;
+        let last_relayed_pangoro_hash_in_pangolin =
+            client_source.best_target_finalized(None).await?;
 
         // assemble unrewarded relayers state
         let (max_confirmed_nonce_at_target, relayers_state) = match self
@@ -193,12 +180,8 @@ impl ReceivingRunner {
         };
 
         // read proof
-        let inbound_data_key = InboundLanes(lane.0)
-            .key()
-            .final_key(StorageKeyPrefix::new::<InboundLanes>());
-        let read_proof = client_pangoro
-            .subxt()
-            .rpc()
+        let inbound_data_key = client_target.gen_inbound_lanes_storage_key(lane.0);
+        let read_proof = client_target
             .read_proof(
                 vec![inbound_data_key],
                 Some(last_relayed_pangoro_hash_in_pangolin),
@@ -212,12 +195,8 @@ impl ReceivingRunner {
         };
 
         // send proof
-        let hash = client_pangolin
-            .runtime()
-            .tx()
-            .bridge_pangoro_messages()
+        let hash = client_source
             .receive_messages_delivery_proof(proof, relayers_state)
-            .sign_and_submit(client_pangolin.account().signer())
             .await?;
 
         tracing::debug!(

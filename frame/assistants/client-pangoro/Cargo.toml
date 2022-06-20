@@ -28,24 +28,29 @@ array-bytes = "1.4"
 codec       = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
 subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 
+## substrate
+sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+
 ## s2s client
-async-trait         = { version = "0.1", optional = true }
-finality-grandpa    = { version = "0.14.0", optional = true }
-bp-header-chain     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2", optional = true }
-sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2", optional = true }
-sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2", optional = true }
-abstract-client-s2s = { path = "../../../frame/abstract/client-s2s", optional = true }
+async-trait           = { optional = true, version = "0.1" }
+finality-grandpa      = { optional = true, version = "0.14" }
+abstract-client-s2s   = { optional = true, path = "../../../frame/abstract/client-s2s" }
 
 support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
 
 [features]
-default      = []
-s2s          = [
-  "async-trait",
-  "finality-grandpa",
-  "bp-header-chain",
+default     = []
+substrate   = [
   "sp-finality-grandpa",
   "sp-runtime",
+  "sp-core",
+]
+s2s         = [
+  "substrate",
+  "async-trait",
+  "finality-grandpa",
   "abstract-client-s2s",
 ]
 s2s-pangolin = ["s2s"]

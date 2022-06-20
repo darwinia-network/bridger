@@ -1,3 +1,4 @@
+use abstract_client_s2s::client::S2SClientRelay;
 use client_pangolin::client::PangolinClient;
 use client_pangolin::component::PangolinClientComponent;
 use client_pangoro::client::PangoroClient;
@@ -11,42 +12,41 @@ use support_common::error::BridgerError;
 use crate::bridge::{BridgeConfig, RelayConfig};
 use crate::types::HexLaneId;
 
-pub(crate) struct MessageRelay {
+pub(crate) struct MessageRelay<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub relay_config: RelayConfig,
-    pub client_pangolin: PangolinClient,
-    pub client_pangoro: PangoroClient,
-    pub subquery_pangoro: Subquery,
-    pub subquery_pangolin: Subquery,
+    pub client_source: SC,
+    pub client_target: TC,
+    pub subquery_source: Subquery,
+    pub subquery_target: Subquery,
 }
 
-impl MessageRelay {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> MessageRelay<SC, TC> {
     pub async fn new() -> color_eyre::Result<Self> {
         let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangoro)?;
 
         let index_config = bridge_config.index;
-        let config_pangolin = bridge_config.pangolin;
-        let config_pangoro = bridge_config.pangoro;
+        let config_source = bridge_config.pangolin;
+        let config_target = bridge_config.pangoro;
 
-        let client_pangolin =
-            PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?)
-                .await?;
-        let client_pangoro =
-            PangoroClientComponent::component(config_pangoro.to_pangoro_client_config()?).await?;
-        let subquery_pangoro =
+        let client_source =
+            PangolinClientComponent::component(config_source.to_pangolin_client_config()?).await?;
+        let client_target =
+            PangoroClientComponent::component(config_target.to_pangoro_client_config()?).await?;
+        let subquery_target =
             SubqueryComponent::component(index_config.pangoro, BridgeName::PangolinPangoro);
-        let subquery_pangolin =
+        let subquery_source =
             SubqueryComponent::component(index_config.pangolin, BridgeName::PangolinPangoro);
         Ok(Self {
             relay_config: bridge_config.relay,
-            client_pangolin,
-            client_pangoro,
-            subquery_pangoro,
-            subquery_pangolin,
+            client_source,
+            client_target,
+            subquery_source,
+            subquery_target,
         })
     }
 }
 
-impl MessageRelay {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> MessageRelay<SC, TC> {
     pub fn lane(&self) -> Result<HexLaneId, BridgerError> {
         self.relay_config
             .lanes

@@ -94,7 +94,7 @@ impl PangolinClient {
 
 impl S2SClientBase for PangolinClient {
     type Error = ClientError;
-    type Header = BundleHeader;
+    type Header = <PangolinSubxtConfig as subxt::Config>::Header;
     type Hash = <PangolinSubxtConfig as subxt::Config>::Hash;
 }
 

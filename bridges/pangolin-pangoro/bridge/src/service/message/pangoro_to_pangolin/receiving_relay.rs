@@ -11,12 +11,12 @@ use subxt::StorageEntry;
 
 use crate::service::message::types::MessageRelay;
 
-pub struct ReceivingRunner {
-    message_relay: MessageRelay,
+pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
+    message_relay: MessageRelay<SC, TC>,
     last_relayed_nonce: Option<u64>,
 }
 
-impl ReceivingRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     pub async fn new() -> color_eyre::Result<Self> {
         let message_relay = MessageRelay::new().await?;
         Ok(Self {
@@ -26,12 +26,12 @@ impl ReceivingRunner {
     }
 }
 
-impl ReceivingRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     async fn source_outbound_lane_data(&self) -> color_eyre::Result<OutboundLaneData> {
         let lane = self.message_relay.lane()?;
         let outbound_lane_data = self
             .message_relay
-            .client_pangoro
+            .client_target
             .outbound_lanes(lane.0, None)
             .await?;
         Ok(outbound_lane_data)
@@ -46,7 +46,7 @@ impl ReceivingRunner {
         let lane = self.message_relay.lane()?;
         let inbound_lane_data = self
             .message_relay
-            .client_pangolin
+            .client_source
             .inbound_lanes(lane.0, Some(at_block))
             .await?;
         let max_confirm_end_at_target = inbound_lane_data
@@ -117,7 +117,7 @@ impl ReceivingRunner {
     }
 }
 
-impl ReceivingRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     pub async fn start(&mut self) -> color_eyre::Result<()> {
         tracing::info!(
             target: "pangolin-pangoro",
@@ -147,8 +147,8 @@ impl ReceivingRunner {
         let lane = self.message_relay.lane()?;
 
         // alias
-        let client_pangoro = &self.message_relay.client_pangoro;
-        let client_pangolin = &self.message_relay.client_pangolin;
+        let client_pangoro = &self.message_relay.client_target;
+        let client_pangolin = &self.message_relay.client_source;
 
         let source_outbound_lane_data = self.source_outbound_lane_data().await?;
         if source_outbound_lane_data.latest_received_nonce

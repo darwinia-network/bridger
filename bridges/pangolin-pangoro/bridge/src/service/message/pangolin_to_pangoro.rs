@@ -60,11 +60,13 @@ impl Service for PangolinToPangoroMessageRelayService {
 }
 
 async fn start_delivery_runner() -> color_eyre::Result<()> {
+    // todo: restart when error happened
     let mut runner = DeliveryRunner::new().await?;
     runner.start().await
 }
 
 async fn start_receiving_runner() -> color_eyre::Result<()> {
+    // todo: restart when error happened
     let mut runner = ReceivingRunner::new().await?;
     runner.start().await
 }

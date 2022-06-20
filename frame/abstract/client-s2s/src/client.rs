@@ -1,3 +1,5 @@
+use std::ops::RangeInclusive;
+
 use codec::{Decode, Encode};
 
 /// S2S bridge client types defined
@@ -23,26 +25,27 @@ pub trait S2SClientGeneric: S2SClientBase {
 /// S2S bridge header/message api
 #[async_trait::async_trait]
 pub trait S2SClientRelay: S2SClientGeneric {
-    /// Justification
-    type Justification;
     /// Chain block
     type ChainBlock;
-    /// outbound lane data
-    type OutboundLaneData;
-    /// inbound lane data
-    type InboundLaneData;
-    /// message data
-    type MessageData;
-    /// message key
-    type MessageKey;
-    /// storage key
-    type StorageKey;
-    /// bridged chain messages proof
-    type BridgedChainMessagesProof;
-    /// bridged chain message delivery proof
-    type BridgedChainMessagesDeliveryProof;
-    /// unrewarded relayers state
-    type UnrewardedRelayersState;
+
+    /// generate outbound messages storage key
+    fn gen_outbound_messages_storage_key(
+        &self,
+        lane: [u8; 4],
+        message_nonce: u64,
+    ) -> sp_core::storage::StorageKey;
+
+    /// generate outbound lanes storage key
+    fn gen_outbound_lanes_storage_key(&self, lane: [u8; 4]) -> sp_core::storage::StorageKey;
+
+    /// generate inbound lanes storage key
+    fn gen_inbound_lanes_storage_key(&self, lane: [u8; 4]) -> sp_core::storage::StorageKey;
+
+    /// calculate dispatchh width by message nonces
+    async fn calculate_dispatch_width(
+        &self,
+        nonces: RangeInclusive<u64>,
+    ) -> Result<u64, Self::Error>;
 
     /// query header by hash
     async fn header(&self, hash: Option<Self::Hash>) -> Result<Option<Self::Header>, Self::Error>;
@@ -57,13 +60,13 @@ pub trait S2SClientRelay: S2SClientGeneric {
     async fn best_target_finalized(
         &self,
         at_block: Option<Self::Hash>,
-    ) -> Result<sp_core::H256, Self::Error>;
+    ) -> Result<Self::Hash, Self::Error>;
 
     /// submit finality proof
     async fn submit_finality_proof(
         &self,
         finality_target: Self::Header,
-        justification: Self::Justification,
+        justification: bp_header_chain::justification::GrandpaJustification<Self::Header>,
     ) -> Result<Self::Hash, Self::Error>;
 
     /// query outbound lane
@@ -71,26 +74,26 @@ pub trait S2SClientRelay: S2SClientGeneric {
         &self,
         lane: [u8; 4],
         hash: Option<Self::Hash>,
-    ) -> Result<Self::OutboundLaneData, Self::Error>;
+    ) -> Result<bp_messages::OutboundLaneData, Self::Error>;
 
     /// query inbound lane
     async fn inbound_lanes(
         &self,
         lane: [u8; 4],
         hash: Option<Self::Hash>,
-    ) -> Result<Self::InboundLaneData, Self::Error>;
+    ) -> Result<bp_messages::InboundLaneData<sp_core::crypto::AccountId32>, Self::Error>;
 
     /// query oubound message data
     async fn outbound_messages(
         &self,
-        message_key: Self::MessageKey,
+        message_key: bp_messages::MessageKey,
         hash: Option<Self::Hash>,
-    ) -> Result<Option<Self::MessageData>, Self::Error>;
+    ) -> Result<Option<bp_messages::MessageData<u128>>, Self::Error>;
 
     /// read proof
     async fn read_proof(
         &self,
-        storage_keys: Vec<Self::StorageKey>,
+        storage_keys: Vec<sp_core::storage::StorageKey>,
         hash: Option<Self::Hash>,
     ) -> Result<Vec<Vec<u8>>, Self::Error>;
 
@@ -98,7 +101,7 @@ pub trait S2SClientRelay: S2SClientGeneric {
     async fn receive_messages_proof(
         &self,
         relayer_id_at_bridged_chain: sp_core::crypto::AccountId32,
-        proof: Self::BridgedChainMessagesProof,
+        proof: bridge_runtime_common::messages::target::FromBridgedChainMessagesProof<Self::Hash>,
         messages_count: u32,
         dispatch_weight: u64,
     ) -> Result<Self::Hash, Self::Error>;
@@ -106,7 +109,9 @@ pub trait S2SClientRelay: S2SClientGeneric {
     /// receive messages delivery proof
     async fn receive_messages_delivery_proof(
         &self,
-        proof: Self::BridgedChainMessagesDeliveryProof,
-        relayers_state: Self::UnrewardedRelayersState,
+        proof: bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof<
+            Self::Hash,
+        >,
+        relayers_state: bp_messages::UnrewardedRelayersState,
     ) -> Result<Self::Hash, Self::Error>;
 }

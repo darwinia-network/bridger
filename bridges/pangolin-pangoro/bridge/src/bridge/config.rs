@@ -1,5 +1,10 @@
+use client_pangolin::client::PangolinClient;
+use client_pangolin::component::PangolinClientComponent;
+use client_pangoro::client::PangoroClient;
+use client_pangoro::component::PangoroClientComponent;
 use serde::{Deserialize, Serialize};
-use subquery_s2s::SubqueryConfig;
+use subquery_s2s::types::BridgeName;
+use subquery_s2s::{Subquery, SubqueryComponent, SubqueryConfig};
 
 use crate::types::HexLaneId;
 
@@ -58,23 +63,37 @@ impl From<ChainInfoConfig> for client_pangoro::config::ClientConfig {
 }
 
 impl ChainInfoConfig {
-    pub fn to_pangolin_client_config(
-        &self,
-    ) -> color_eyre::Result<client_pangolin::config::ClientConfig> {
-        Ok(client_pangolin::config::ClientConfig {
+    pub async fn to_pangolin_client(&self) -> color_eyre::Result<PangolinClient> {
+        let config = client_pangolin::config::ClientConfig {
             endpoint: self.endpoint.clone(),
             relayer_private_key: self.signer.clone(),
             relayer_real_account: None,
-        })
+        };
+        Ok(PangolinClientComponent::component(config.to_pangolin_client_config()?).await?)
     }
 
-    pub fn to_pangoro_client_config(
-        &self,
-    ) -> color_eyre::Result<client_pangoro::config::ClientConfig> {
-        Ok(client_pangoro::config::ClientConfig {
+    pub async fn to_pangoro_client(&self) -> color_eyre::Result<PangoroClient> {
+        let config = client_pangoro::config::ClientConfig {
             endpoint: self.endpoint.clone(),
             relayer_private_key: self.signer.clone(),
             relayer_real_account: None,
-        })
+        };
+        Ok(PangoroClientComponent::component(config.to_pangoro_client_config()?).await?)
+    }
+}
+
+impl IndexConfig {
+    pub fn to_pangolin_subquery(&self) -> color_eyre::Result<Subquery> {
+        Ok(SubqueryComponent::component(
+            self.pangolin.clone(),
+            BridgeName::PangolinPangoro,
+        ))
+    }
+
+    pub fn to_pangoro_subquery(&self) -> color_eyre::Result<Subquery> {
+        Ok(SubqueryComponent::component(
+            self.pangoro.clone(),
+            BridgeName::PangolinPangoro,
+        ))
     }
 }

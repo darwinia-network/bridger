@@ -17,6 +17,9 @@ name = "abstract-client-s2s"
 version = "0.5.7"
 dependencies = [
  "async-trait",
+ "bp-header-chain",
+ "bp-messages",
+ "bridge-runtime-common",
  "parity-scale-codec",
  "sp-core",
  "thiserror",
@@ -1024,11 +1027,11 @@ dependencies = [
  "abstract-client-s2s",
  "array-bytes",
  "async-trait",
- "bp-header-chain",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.137",
  "serde_json",
+ "sp-core",
  "sp-finality-grandpa",
  "sp-runtime",
  "subxt",

@@ -1,11 +1,8 @@
 use std::ops::RangeInclusive;
 
-use client_pangolin::subxt_runtime::api::bridge_pangoro_messages::storage::{
-    OutboundLanes, OutboundMessages,
-};
-use client_pangolin::types::runtime_types as pangolin_runtime_types;
-use client_pangolin::types::runtime_types::bp_messages::{MessageKey, OutboundLaneData};
-use client_pangoro::types::runtime_types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
+use abstract_client_s2s::client::S2SClientRelay;
+use abstract_client_s2s::types::bp_messages::{MessageKey, OutboundLaneData};
+use abstract_client_s2s::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use subquery_s2s::types::RelayBlockOrigin;
 use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;
@@ -14,22 +11,13 @@ use support_common::error::BridgerError;
 
 use crate::service::message::types::MessageRelay;
 
-/// Message payload for This -> Bridged chain messages.
-type FromThisChainMessagePayload = pangolin_runtime_types::bp_message_dispatch::MessagePayload<
-    sp_core::crypto::AccountId32,
-    pangolin_runtime_types::sp_runtime::MultiSigner,
-    pangolin_runtime_types::sp_runtime::MultiSignature,
-    Vec<u8>,
->;
-
-pub struct DeliveryRunner {
-    message_relay: MessageRelay,
+pub struct DeliveryRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
+    message_relay: MessageRelay<SC, TC>,
     last_relayed_nonce: Option<u64>,
 }
 
-impl DeliveryRunner {
-    pub async fn new() -> color_eyre::Result<Self> {
-        let message_relay = MessageRelay::new().await?;
+impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
+    pub async fn new(message_relay: MessageRelay<SC, TC>) -> color_eyre::Result<Self> {
         Ok(Self {
             message_relay,
             last_relayed_nonce: None,
@@ -38,15 +26,12 @@ impl DeliveryRunner {
 }
 
 // defined
-impl DeliveryRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
     async fn source_outbound_lane_data(&self) -> color_eyre::Result<OutboundLaneData> {
         let lane = self.message_relay.lane()?;
         let outbound_lane_data = self
             .message_relay
-            .client_pangolin
-            .runtime()
-            .storage()
-            .bridge_pangoro_messages()
+            .client_source
             .outbound_lanes(lane.0, None)
             .await?;
         Ok(outbound_lane_data)
@@ -98,7 +83,7 @@ impl DeliveryRunner {
     }
 }
 
-impl DeliveryRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
     pub async fn start(&mut self) -> color_eyre::Result<()> {
         tracing::info!(
             target: "pangolin-pangoro",
@@ -117,7 +102,7 @@ impl DeliveryRunner {
                         "[delivery-pangolin-to-pangoro] Failed to delivery message: {:?}",
                         err
                     );
-                    self.message_relay = MessageRelay::new().await?;
+                    // todo: the last_relayed_nonce need return when error happened
                 }
             }
             tokio::time::sleep(std::time::Duration::from_secs(5)).await;
@@ -129,9 +114,9 @@ impl DeliveryRunner {
         let source_outbound_lane_data = self.source_outbound_lane_data().await?;
 
         // alias
-        let client_pangolin = &self.message_relay.client_pangolin;
-        let client_pangoro = &self.message_relay.client_pangoro;
-        let subquery_pangolin = &self.message_relay.subquery_pangolin;
+        let client_source = &self.message_relay.client_source;
+        let client_target = &self.message_relay.client_target;
+        let subquery_pangolin = &self.message_relay.subquery_source;
 
         let nonces = match self
             .assemble_nonces(limit, &source_outbound_lane_data)
@@ -169,15 +154,8 @@ impl DeliveryRunner {
         };
 
         // query last relayed header
-        let last_relayed_pangolin_hash_in_pangoro = client_pangoro
-            .runtime()
-            .storage()
-            .bridge_pangolin_grandpa()
-            .best_finalized(None)
-            .await?;
-        let last_relayed_pangolin_block_in_pangoro = client_pangolin
-            .subxt()
-            .rpc()
+        let last_relayed_pangolin_hash_in_pangoro = client_target.best_finalized(None).await?;
+        let last_relayed_pangolin_block_in_pangoro = client_source
             .block(Some(last_relayed_pangolin_hash_in_pangoro))
             .await?
             .ok_or_else(|| {
@@ -205,64 +183,25 @@ impl DeliveryRunner {
         let mut storage_keys = Vec::with_capacity((nonces.end() - nonces.start()) as usize + 1);
         let mut message_nonce = *nonces.start();
         while message_nonce <= *nonces.end() {
-            let prefix = StorageKeyPrefix::new::<OutboundMessages>();
-            let message_key = OutboundMessages(MessageKey {
-                lane_id: lane.0,
-                nonce: message_nonce,
-            })
-            .key()
-            .final_key(prefix);
+            let message_key =
+                client_source.gen_outbound_messages_storage_key(lane.0, message_nonce);
             storage_keys.push(message_key);
             message_nonce += 1;
         }
 
         //- query inbound land data
-        let target_inbound_lane_data = client_pangoro
-            .runtime()
-            .storage()
-            .bridge_pangolin_messages()
-            .inbound_lanes(lane.0, None)
-            .await?;
+        let target_inbound_lane_data = client_target.inbound_lanes(lane.0, None).await?;
         let outbound_state_proof_required = target_inbound_lane_data.last_confirmed_nonce
             < source_outbound_lane_data.latest_received_nonce;
         if outbound_state_proof_required {
-            storage_keys.push(
-                OutboundLanes(lane.0)
-                    .key()
-                    .final_key(StorageKeyPrefix::new::<OutboundLanes>()),
-            );
+            storage_keys.push(client_source.gen_outbound_lanes_storage_key(lane.0));
         }
 
         // fill delivery data
-        let mut total_weight = 0u64;
-        for message_nonce in nonces.clone() {
-            let message_data = client_pangolin
-                .runtime()
-                .storage()
-                .bridge_pangoro_messages()
-                .outbound_messages(
-                    MessageKey {
-                        lane_id: lane.0,
-                        nonce: message_nonce,
-                    },
-                    None,
-                )
-                .await?
-                .ok_or_else(|| {
-                    BridgerError::Custom(format!(
-                        "Can not read message data by nonce {} in pangolin",
-                        message_nonce
-                    ))
-                })?;
-            let decoded_payload: FromThisChainMessagePayload =
-                codec::Decode::decode(&mut &message_data.payload[..])?;
-            total_weight += decoded_payload.weight;
-        }
+        let total_weight = client_source.calculate_dispatch_width(nonces).await?;
 
         // query last relayed  header
-        let read_proof = client_pangolin
-            .subxt()
-            .rpc()
+        let read_proof = client_source
             .read_proof(storage_keys, Some(last_relayed_pangolin_hash_in_pangoro))
             .await?;
         let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
@@ -274,17 +213,13 @@ impl DeliveryRunner {
             nonces_end: *nonces.end(),
         };
 
-        let hash = client_pangoro
-            .runtime()
-            .tx()
-            .bridge_pangolin_messages()
+        let hash = client_target
             .receive_messages_proof(
-                client_pangoro.account().account_id().clone(),
+                client_target.account().account_id().clone(),
                 proof,
                 (nonces.end() - nonces.start() + 1) as _,
                 total_weight,
             )
-            .sign_and_submit(client_pangoro.account().signer())
             .await?;
 
         tracing::debug!(

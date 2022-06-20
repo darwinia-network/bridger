@@ -23,12 +23,12 @@ type FromThisChainMessagePayload = pangoro_runtime_types::bp_message_dispatch::M
     Vec<u8>,
 >;
 
-pub struct DeliveryRunner {
-    message_relay: MessageRelay,
+pub struct DeliveryRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
+    message_relay: MessageRelay<SC, TC>,
     last_relayed_nonce: Option<u64>,
 }
 
-impl DeliveryRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
     pub async fn new() -> color_eyre::Result<Self> {
         let message_relay = MessageRelay::new().await?;
         Ok(Self {
@@ -39,12 +39,12 @@ impl DeliveryRunner {
 }
 
 // defined
-impl DeliveryRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
     async fn source_outbound_lane_data(&self) -> color_eyre::Result<OutboundLaneData> {
         let lane = self.message_relay.lane()?;
         let outbound_lane_data = self
             .message_relay
-            .client_pangoro
+            .client_target
             .outbound_lanes(lane.0, None)
             .await?;
         Ok(outbound_lane_data)
@@ -96,7 +96,7 @@ impl DeliveryRunner {
     }
 }
 
-impl DeliveryRunner {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
     pub async fn start(&mut self) -> color_eyre::Result<()> {
         tracing::info!(
             target: "pangolin-pangoro",
@@ -127,9 +127,9 @@ impl DeliveryRunner {
         let source_outbound_lane_data = self.source_outbound_lane_data().await?;
 
         // alias
-        let client_pangoro = &self.message_relay.client_pangoro;
-        let client_pangolin = &self.message_relay.client_pangolin;
-        let subquery_pangoro = &self.message_relay.subquery_pangoro;
+        let client_pangoro = &self.message_relay.client_target;
+        let client_pangolin = &self.message_relay.client_source;
+        let subquery_pangoro = &self.message_relay.subquery_target;
 
         let nonces = match self
             .assemble_nonces(limit, &source_outbound_lane_data)

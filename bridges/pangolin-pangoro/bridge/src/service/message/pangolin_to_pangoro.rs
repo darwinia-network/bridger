@@ -6,9 +6,6 @@ use crate::bridge::BridgeBus;
 use crate::service::message::pangolin_to_pangoro::delivery_relay::DeliveryRunner;
 use crate::service::message::pangolin_to_pangoro::receiving_relay::ReceivingRunner;
 
-mod delivery_relay;
-mod receiving_relay;
-
 #[derive(Debug)]
 pub struct PangolinToPangoroMessageRelayService {
     _greet_delivery: Lifeline,
@@ -60,13 +57,13 @@ impl Service for PangolinToPangoroMessageRelayService {
 }
 
 async fn start_delivery_runner() -> color_eyre::Result<()> {
-    // todo: restart when error happened
-    let mut runner = DeliveryRunner::new().await?;
-    runner.start().await
+    // // todo: restart when error happened
+    // let mut runner = DeliveryRunner::new().await?;
+    // runner.start().await
 }
 
 async fn start_receiving_runner() -> color_eyre::Result<()> {
-    // todo: restart when error happened
-    let mut runner = ReceivingRunner::new().await?;
-    runner.start().await
+    // // todo: restart when error happened
+    // let mut runner = ReceivingRunner::new().await?;
+    // runner.start().await
 }

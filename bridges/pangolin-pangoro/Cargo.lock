@@ -21,6 +21,8 @@ dependencies = [
  "bp-messages",
  "bridge-runtime-common",
  "parity-scale-codec",
+ "scale-info",
+ "serde 1.0.136",
  "sp-core",
  "sp-runtime",
  "thiserror",
@@ -379,6 +381,7 @@ dependencies = [
  "once_cell",
  "parity-scale-codec",
  "postage",
+ "relay-s2s",
  "serde 1.0.136",
  "sp-core",
  "structopt",
@@ -2588,6 +2591,19 @@ name = "regex-syntax"
 version = "0.6.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
+
+[[package]]
+name = "relay-s2s"
+version = "0.5.7"
+dependencies = [
+ "abstract-client-s2s",
+ "array-bytes",
+ "sp-core",
+ "subquery-s2s",
+ "thiserror",
+ "tokio",
+ "tracing",
+]
 
 [[package]]
 name = "remove_dir_all"

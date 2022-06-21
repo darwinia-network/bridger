@@ -1,5 +1,6 @@
 #![allow(missing_docs)]
 
+use abstract_client_s2s::error::S2SClientError;
 use support_toolkit::error::TkError;
 use thiserror::Error as ThisError;
 
@@ -98,5 +99,15 @@ impl From<subxt::rpc::RpcError> for ClientError {
 impl From<array_bytes::Error> for ClientError {
     fn from(error: array_bytes::Error) -> Self {
         Self::Bytes(format!("{:?}", error))
+    }
+}
+
+impl From<ClientError> for S2SClientError {
+    fn from(error: ClientError) -> Self {
+        match error {
+            ClientError::SubxtBasicError(e) => Self::RPC(format!("{:?}", e)),
+            ClientError::ClientRestartNeed => Self::RPC(format!("Client restart need")),
+            _ => Self::Custom(format!("{:?}", error)),
+        }
     }
 }

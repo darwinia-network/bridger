@@ -21,6 +21,8 @@ dependencies = [
  "bp-messages",
  "bridge-runtime-common",
  "parity-scale-codec",
+ "scale-info",
+ "serde 1.0.137",
  "sp-core",
  "sp-runtime",
  "thiserror",

@@ -43,3 +43,4 @@ abstract-client-s2s = { path = "../../../frame/abstract/client-s2s" }
 client-pangolin     = { path = "../../../frame/assistants/client-pangolin", features = [ "s2s-pangoro" ]}
 client-pangoro      = { path = "../../../frame/assistants/client-pangoro", features = [ "s2s-pangolin" ]}
 subquery-s2s        = { path = "../../../frame/assistants/subquery-s2s" }
+relay-s2s           = { path = "../../../frame/assistants/relay-s2s" }

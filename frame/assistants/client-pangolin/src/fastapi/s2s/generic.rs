@@ -1,3 +1,4 @@
+use abstract_client_s2s::error::S2SClientResult;
 use abstract_client_s2s::{
     client::{S2SClientBase, S2SClientGeneric},
     types::bp_header_chain,
@@ -94,17 +95,29 @@ impl PangolinClient {
     }
 }
 
-impl S2SClientBase for PangolinClient {
-    type Error = ClientError;
-    type Header = <PangolinSubxtConfig as subxt::Config>::Header;
+pub struct PangolinS2SConfig;
+
+impl abstract_client_s2s::client::Config for PangolinS2SConfig {
+    type Index = <PangolinSubxtConfig as subxt::Config>::Index;
+    type BlockNumber = <PangolinSubxtConfig as subxt::Config>::BlockNumber;
     type Hash = <PangolinSubxtConfig as subxt::Config>::Hash;
+    type Hashing = <PangolinSubxtConfig as subxt::Config>::Hashing;
+    type AccountId = <PangolinSubxtConfig as subxt::Config>::AccountId;
+    type Address = <PangolinSubxtConfig as subxt::Config>::Address;
+    type Header = <PangolinSubxtConfig as subxt::Config>::Header;
+    type Signature = <PangolinSubxtConfig as subxt::Config>::Signature;
+    type Extrinsic = <PangolinSubxtConfig as subxt::Config>::Extrinsic;
+}
+
+impl S2SClientBase for PangolinClient {
+    type Config = PangolinS2SConfig;
 }
 
 #[async_trait::async_trait]
 impl S2SClientGeneric for PangolinClient {
     type InitializationData = InitializationData<BundleHeader>;
 
-    async fn prepare_initialization_data(&self) -> ClientResult<Self::InitializationData> {
+    async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData> {
         let mut subscription = self.subscribe_grandpa_justifications().await?;
         let justification = subscription
             .next()

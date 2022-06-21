@@ -1,15 +1,66 @@
 use std::ops::RangeInclusive;
 
-use codec::{Decode, Encode};
+use codec::{Codec, Decode, Encode, EncodeLike};
+use core::fmt::Debug;
+use sp_runtime::traits::{
+    AtLeast32Bit, Extrinsic, Hash, Header, MaybeSerializeDeserialize, Member, Verify,
+};
+
+use sp_runtime::generic::{Block, SignedBlock};
+
+use crate::error::S2SClientResult;
+
+/// Runtime types.
+pub trait Config: 'static {
+    /// Account index (aka nonce) type. This stores the number of previous
+    /// transactions associated with a sender account.
+    type Index: Parameter + Member + Default + AtLeast32Bit + Copy + scale_info::TypeInfo;
+
+    /// The block number type used by the runtime.
+    type BlockNumber: Parameter + Member + Default + Copy + core::hash::Hash + core::str::FromStr;
+
+    /// The output of the `Hashing` function.
+    type Hash: Parameter
+        + Member
+        + MaybeSerializeDeserialize
+        + Ord
+        + Default
+        + Copy
+        + std::hash::Hash
+        + AsRef<[u8]>
+        + AsMut<[u8]>
+        + scale_info::TypeInfo;
+
+    /// The hashing system (algorithm) being used in the runtime (e.g. Blake2).
+    type Hashing: Hash<Output = Self::Hash>;
+
+    /// The user account identifier type for the runtime.
+    type AccountId: Parameter + Member;
+
+    /// The address type. This instead of `<frame_system::Trait::Lookup as StaticLookup>::Source`.
+    type Address: Codec + Clone + PartialEq;
+
+    /// The block header.
+    type Header: Parameter
+        + Header<Number = Self::BlockNumber, Hash = Self::Hash>
+        + serde::de::DeserializeOwned;
+
+    /// Signature type.
+    type Signature: Verify + Encode + Send + Sync + 'static;
+
+    /// Extrinsic type within blocks.
+    type Extrinsic: Parameter + Extrinsic + Debug + MaybeSerializeDeserialize;
+}
+
+/// Parameter trait copied from `substrate::frame_support`
+pub trait Parameter: Codec + EncodeLike + Clone + Eq + Debug {}
+impl<T> Parameter for T where T: Codec + EncodeLike + Clone + Eq + Debug {}
+
+pub type ChainBlock<T> = SignedBlock<Block<<T as Config>::Header, <T as Config>::Extrinsic>>;
 
 /// S2S bridge client types defined
 pub trait S2SClientBase {
-    /// error type
-    type Error;
-    /// header
-    type Header: sp_runtime::traits::Header;
-    /// hash
-    type Hash;
+    type Config: Config;
 }
 
 /// S2S bridge client generic trait
@@ -19,15 +70,12 @@ pub trait S2SClientGeneric: S2SClientBase {
     type InitializationData: Encode + Decode;
 
     /// prepare initialization data
-    async fn prepare_initialization_data(&self) -> Result<Self::InitializationData, Self::Error>;
+    async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData>;
 }
 
 /// S2S bridge header/message api
 #[async_trait::async_trait]
 pub trait S2SClientRelay: S2SClientGeneric {
-    /// Chain block
-    type ChainBlock;
-
     /// generate outbound messages storage key
     fn gen_outbound_messages_storage_key(
         &self,
@@ -46,73 +94,80 @@ pub trait S2SClientRelay: S2SClientGeneric {
         &self,
         lane: [u8; 4],
         nonces: RangeInclusive<u64>,
-    ) -> Result<u64, Self::Error>;
+    ) -> S2SClientResult<u64>;
 
     /// query header by hash
-    async fn header(&self, hash: Option<Self::Hash>) -> Result<Option<Self::Header>, Self::Error>;
+    async fn header(
+        &self,
+        hash: Option<<Self::Config as Config>::Hash>,
+    ) -> S2SClientResult<Option<<Self::Config as Config>::Header>>;
 
     /// query block by hash
     async fn block(
         &self,
-        hash: Option<Self::Hash>,
-    ) -> Result<Option<Self::ChainBlock>, Self::Error>;
+        hash: Option<<Self::Config as Config>::Hash>,
+    ) -> S2SClientResult<Option<ChainBlock<Self::Config>>>;
 
     /// query best target finalized at source
     async fn best_target_finalized(
         &self,
-        at_block: Option<Self::Hash>,
-    ) -> Result<Self::Hash, Self::Error>;
+        at_block: Option<<Self::Config as Config>::Hash>,
+    ) -> S2SClientResult<<Self::Config as Config>::Hash>;
 
     /// submit finality proof
     async fn submit_finality_proof(
         &self,
-        finality_target: Self::Header,
-        justification: bp_header_chain::justification::GrandpaJustification<Self::Header>,
-    ) -> Result<Self::Hash, Self::Error>;
+        finality_target: <Self::Config as Config>::Header,
+        justification: bp_header_chain::justification::GrandpaJustification<
+            <Self::Config as Config>::Header,
+        >,
+    ) -> S2SClientResult<<Self::Config as Config>::Hash>;
 
     /// query outbound lane
     async fn outbound_lanes(
         &self,
         lane: [u8; 4],
-        hash: Option<Self::Hash>,
-    ) -> Result<bp_messages::OutboundLaneData, Self::Error>;
+        hash: Option<<Self::Config as Config>::Hash>,
+    ) -> S2SClientResult<bp_messages::OutboundLaneData>;
 
     /// query inbound lane
     async fn inbound_lanes(
         &self,
         lane: [u8; 4],
-        hash: Option<Self::Hash>,
-    ) -> Result<bp_messages::InboundLaneData<sp_core::crypto::AccountId32>, Self::Error>;
+        hash: Option<<Self::Config as Config>::Hash>,
+    ) -> S2SClientResult<bp_messages::InboundLaneData<sp_core::crypto::AccountId32>>;
 
     /// query oubound message data
     async fn outbound_messages(
         &self,
         message_key: bp_messages::MessageKey,
-        hash: Option<Self::Hash>,
-    ) -> Result<Option<bp_messages::MessageData<u128>>, Self::Error>;
+        hash: Option<<Self::Config as Config>::Hash>,
+    ) -> S2SClientResult<Option<bp_messages::MessageData<u128>>>;
 
     /// read proof
     async fn read_proof(
         &self,
         storage_keys: Vec<sp_core::storage::StorageKey>,
-        hash: Option<Self::Hash>,
-    ) -> Result<Vec<Vec<u8>>, Self::Error>;
+        hash: Option<<Self::Config as Config>::Hash>,
+    ) -> S2SClientResult<Vec<Vec<u8>>>;
 
     /// send receive messages proof extrinsics
     async fn receive_messages_proof(
         &self,
         relayer_id_at_bridged_chain: sp_core::crypto::AccountId32,
-        proof: bridge_runtime_common::messages::target::FromBridgedChainMessagesProof<Self::Hash>,
+        proof: bridge_runtime_common::messages::target::FromBridgedChainMessagesProof<
+            <Self::Config as Config>::Hash,
+        >,
         messages_count: u32,
         dispatch_weight: u64,
-    ) -> Result<Self::Hash, Self::Error>;
+    ) -> S2SClientResult<<Self::Config as Config>::Hash>;
 
     /// receive messages delivery proof
     async fn receive_messages_delivery_proof(
         &self,
         proof: bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof<
-            Self::Hash,
+            <Self::Config as Config>::Hash,
         >,
         relayers_state: bp_messages::UnrewardedRelayersState,
-    ) -> Result<Self::Hash, Self::Error>;
+    ) -> S2SClientResult<<Self::Config as Config>::Hash>;
 }

@@ -16,6 +16,7 @@ dependencies = [
 name = "abstract-client-s2s"
 version = "0.5.7"
 dependencies = [
+ "array-bytes",
  "async-trait",
  "bp-header-chain",
  "bp-messages",
@@ -25,6 +26,7 @@ dependencies = [
  "serde 1.0.136",
  "sp-core",
  "sp-runtime",
+ "subxt",
  "thiserror",
 ]
 
@@ -2599,6 +2601,7 @@ dependencies = [
  "abstract-client-s2s",
  "array-bytes",
  "sp-core",
+ "sp-runtime",
  "subquery-s2s",
  "thiserror",
  "tokio",

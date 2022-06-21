@@ -1,4 +1,5 @@
 use abstract_client_s2s::error::S2SClientError;
+use sp_runtime::codec;
 use subquery_s2s::SubqueryComponentError;
 use thiserror::Error as ThisError;
 
@@ -10,6 +11,8 @@ pub enum RelayError {
     Subquery(#[from] SubqueryComponentError),
     #[error(transparent)]
     Client(#[from] S2SClientError),
+    #[error(transparent)]
+    Codec(#[from] codec::Error),
     #[error("Custom: {0}")]
     Custom(String),
 }

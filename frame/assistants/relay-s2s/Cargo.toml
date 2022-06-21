@@ -25,6 +25,7 @@ tokio       = { version = "1", features = ["time"] }
 
 
 sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 
 abstract-client-s2s = { path = "../../abstract/client-s2s" }
 subquery-s2s        = { path = "../subquery-s2s" }

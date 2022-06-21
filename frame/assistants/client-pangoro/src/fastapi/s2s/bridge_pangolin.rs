@@ -2,7 +2,7 @@ use std::ops::RangeInclusive;
 
 use abstract_client_s2s::error::S2SClientResult;
 use abstract_client_s2s::{
-    client::{Config, S2SClientBase, S2SClientRelay},
+    client::{Config, S2SClientRelay},
     convert::SmartCodecMapper,
     types::{bp_header_chain, bp_messages, bridge_runtime_common},
 };
@@ -12,9 +12,7 @@ use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;
 
 use crate::client::PangoroClient;
-use crate::config::PangoroSubxtConfig;
 use crate::error::ClientError;
-use crate::error::ClientResult;
 use crate::subxt_runtime::api::bridge_pangolin_messages::storage::{
     InboundLanes, OutboundLanes, OutboundMessages,
 };

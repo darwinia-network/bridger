@@ -1,11 +1,9 @@
-use std::collections::VecDeque;
-
-use abstract_client_s2s::client::S2SClientRelay;
+use abstract_client_s2s::client::{Config, S2SClientRelay};
+use abstract_client_s2s::convert::SmartCodecMapper;
 use abstract_client_s2s::types::bp_messages::{OutboundLaneData, UnrewardedRelayersState};
 use abstract_client_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
 
 use crate::error::RelayResult;
-
 use crate::types::MessageRelay;
 
 pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
@@ -35,10 +33,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
 
     async fn target_unrewarded_relayers_state(
         &self,
-        at_block: sp_core::H256,
+        at_block: <TC::Config as Config>::Hash,
         source_outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<(u64, UnrewardedRelayersState)>> {
-        let block_hex = array_bytes::bytes2hex("0x", at_block.0);
+        let block_hex = array_bytes::bytes2hex("0x", at_block);
         let lane = self.message_relay.lane()?;
         let inbound_lane_data = self
             .message_relay
@@ -158,15 +156,12 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
         }
 
         // query last relayed header
-        let last_relayed_pangoro_hash_in_pangolin =
-            client_source.best_target_finalized(None).await?;
+        let last_relayed_target_hash_in_source = client_source.best_target_finalized(None).await?;
+        let expected_target_hash = SmartCodecMapper::map_to(&last_relayed_target_hash_in_source)?;
 
         // assemble unrewarded relayers state
         let (max_confirmed_nonce_at_target, relayers_state) = match self
-            .target_unrewarded_relayers_state(
-                last_relayed_pangoro_hash_in_pangolin,
-                &source_outbound_lane_data,
-            )
+            .target_unrewarded_relayers_state(expected_target_hash, &source_outbound_lane_data)
             .await?
         {
             Some(v) => v,
@@ -182,13 +177,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
         // read proof
         let inbound_data_key = client_target.gen_inbound_lanes_storage_key(lane);
         let proof = client_target
-            .read_proof(
-                vec![inbound_data_key],
-                Some(last_relayed_pangoro_hash_in_pangolin),
-            )
+            .read_proof(vec![inbound_data_key], Some(expected_target_hash))
             .await?;
         let proof = FromBridgedChainMessagesDeliveryProof {
-            bridged_header_hash: last_relayed_pangoro_hash_in_pangolin,
+            bridged_header_hash: last_relayed_target_hash_in_source,
             storage_proof: proof,
             lane,
         };

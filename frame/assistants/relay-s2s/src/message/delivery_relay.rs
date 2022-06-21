@@ -2,8 +2,9 @@ use std::ops::RangeInclusive;
 
 use abstract_client_s2s::client::S2SClientRelay;
 use abstract_client_s2s::convert::SmartCodecMapper;
-use abstract_client_s2s::types::bp_messages::{MessageKey, OutboundLaneData};
+use abstract_client_s2s::types::bp_messages::OutboundLaneData;
 use abstract_client_s2s::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
+use sp_runtime::traits::Header;
 use subquery_s2s::types::RelayBlockOrigin;
 
 use crate::error::{RelayError, RelayResult};
@@ -153,18 +154,20 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
 
         // query last relayed header
         let last_relayed_source_hash_in_target = client_target.best_target_finalized(None).await?;
+        let expected_source_hash = SmartCodecMapper::map_to(&last_relayed_source_hash_in_target)?;
         let last_relayed_pangolin_block_in_pangoro = client_source
-            .block(Some(last_relayed_source_hash_in_target))
+            .block(Some(expected_source_hash))
             .await?
             .ok_or_else(|| {
                 RelayError::Custom(format!(
                     "Failed to query block by [{}] in pangolin",
-                    last_relayed_source_hash_in_target
+                    array_bytes::bytes2hex("0x", expected_source_hash),
                 ))
             })?;
 
         // compare last nonce block with last relayed header
         let relayed_block_number = last_relayed_pangolin_block_in_pangoro.block.header.number();
+        let relayed_block_number: u32 = SmartCodecMapper::map_to(relayed_block_number)?;
         if relayed_block_number < last_relay.block_number {
             tracing::warn!(
                 target: "relay-s2s",
@@ -196,25 +199,28 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
 
         // fill delivery data
         let total_weight = client_source
-            .calculate_dispatch_weight(lane, nonces)
+            .calculate_dispatch_weight(lane, nonces.clone())
             .await?;
 
         // query last relayed  header
         let proof = client_source
-            .read_proof(storage_keys, Some(last_relayed_source_hash_in_target))
+            .read_proof(storage_keys, Some(expected_source_hash))
             .await?;
         let proof = FromBridgedChainMessagesProof {
-            bridged_header_hash: last_relayed_source_hash_in_target,
+            bridged_header_hash: expected_source_hash,
             storage_proof: proof,
             lane,
             nonces_start: *nonces.start(),
             nonces_end: *nonces.end(),
         };
 
+        let expected_proof = SmartCodecMapper::map_to(&proof)?;
+        let relayer_account_source_chain = self.message_relay.relayer_account.clone();
+        let expected_relayer_id = SmartCodecMapper::map_to(&relayer_account_source_chain)?;
         let hash = client_target
             .receive_messages_proof(
-                client_target.account().account_id().clone(),
-                proof,
+                expected_relayer_id,
+                expected_proof,
                 (nonces.end() - nonces.start() + 1) as _,
                 total_weight,
             )
@@ -224,7 +230,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
             target: "relay-s2s",
             "[delivery-pangolin-to-pangoro] The nonces {:?} in pangolin delivered to pangoro -> {}",
             nonces,
-            array_bytes::bytes2hex("0x", hash.0),
+            array_bytes::bytes2hex("0x", hash),
         );
         Ok(Some(*nonces.end()))
     }

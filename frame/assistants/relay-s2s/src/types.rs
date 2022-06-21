@@ -1,5 +1,5 @@
-use abstract_client_s2s::client::S2SClientRelay;
-use subquery_s2s::{Subquery, SubqueryComponent};
+use abstract_client_s2s::client::{Config, S2SClientRelay};
+use subquery_s2s::Subquery;
 
 use crate::error::{RelayError, RelayResult};
 
@@ -7,6 +7,7 @@ pub type LaneId = [u8; 4];
 
 pub struct MessageRelay<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub lanes: Vec<LaneId>,
+    pub relayer_account: <SC::Config as Config>::AccountId,
     pub client_source: SC,
     pub client_target: TC,
     pub subquery_source: Subquery,

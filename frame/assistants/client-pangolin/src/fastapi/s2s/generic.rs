@@ -1,4 +1,4 @@
-use abstract_client_s2s::error::S2SClientResult;
+use abstract_client_s2s::error::{S2SClientError, S2SClientResult};
 use abstract_client_s2s::{
     client::{S2SClientBase, S2SClientGeneric},
     types::bp_header_chain,
@@ -122,10 +122,10 @@ impl S2SClientGeneric for PangolinClient {
         let justification = subscription
             .next()
             .await
-            .ok_or_else(|| ClientError::Custom("The subscribe is closed".to_string()))??;
+            .ok_or_else(|| S2SClientError::Custom("The subscribe is closed".to_string()))??;
         let justification: bp_header_chain::justification::GrandpaJustification<SpHeader> =
             codec::Decode::decode(&mut &justification.0[..])
-                .map_err(|err| ClientError::Custom(format!("Wrong justification: {:?}", err)))?;
+                .map_err(|err| S2SClientError::Custom(format!("Wrong justification: {:?}", err)))?;
 
         let (initial_header_hash, initial_header_number) = (
             justification.commit.target_hash,
@@ -137,7 +137,7 @@ impl S2SClientGeneric for PangolinClient {
             .header(Some(initial_header_hash))
             .await?
             .ok_or_else(|| {
-                ClientError::Custom(format!(
+                S2SClientError::Custom(format!(
                     "Can not get initial header by hash: {:?}",
                     initial_header_hash
                 ))
@@ -160,7 +160,7 @@ impl S2SClientGeneric for PangolinClient {
             .map(|c| c.delay == 0)
             .unwrap_or(false)
         {
-            return Err(ClientError::Custom(format!(
+            return Err(S2SClientError::Custom(format!(
                 "GRANDPA authorities change at {} scheduled to happen in {:?} blocks. \
                 We expect regular hange to have zero delay",
                 initial_header_hash,
@@ -182,7 +182,7 @@ impl S2SClientGeneric for PangolinClient {
         let mut initial_authorities_set_id = 0;
         let mut min_possible_block_number = 0;
         let authorities_for_verification = VoterSet::new(authorities_for_verification.clone())
-            .ok_or(ClientError::Custom(format!(
+            .ok_or(S2SClientError::Custom(format!(
                 "[ReadInvalidAuthorities]: {:?}",
                 authorities_for_verification,
             )))?;
@@ -211,7 +211,7 @@ impl S2SClientGeneric for PangolinClient {
                 // there can't be more authorities set changes than headers => if we have reached
                 // `initial_block_number` and still have not found correct value of
                 // `initial_authorities_set_id`, then something else is broken => fail
-                return Err(ClientError::Custom(format!(
+                return Err(S2SClientError::Custom(format!(
                     "[GuessInitialAuthorities]: {}",
                     initial_header_number
                 )));
@@ -230,7 +230,7 @@ impl S2SClientGeneric for PangolinClient {
         };
         let bytes = codec::Encode::encode(&initialization_data);
         Ok(codec::Decode::decode(&mut &bytes[..]).map_err(|e| {
-            ClientError::Custom(format!("Failed to decode initialization data: {:?}", e))
+            S2SClientError::Custom(format!("Failed to decode initialization data: {:?}", e))
         })?)
     }
 }

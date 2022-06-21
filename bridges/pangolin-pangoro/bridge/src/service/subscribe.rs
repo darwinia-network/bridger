@@ -48,12 +48,8 @@ impl Service for SubscribeService {
 async fn start() -> color_eyre::Result<()> {
     let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangoro)?;
 
-    let client_pangolin =
-        PangolinClientComponent::component(bridge_config.pangolin.to_pangolin_client_config()?)
-            .await?;
-    let client_pangoro =
-        PangoroClientComponent::component(bridge_config.pangoro.to_pangoro_client_config()?)
-            .await?;
+    let client_pangolin = bridge_config.pangolin.to_pangolin_client().await?;
+    let client_pangoro = bridge_config.pangoro.to_pangoro_client().await?;
 
     let pangolin_handle = tokio::spawn(run_until_pangolin_connection_lost(client_pangolin));
     let pangoro_handle = tokio::spawn(run_until_pangoro_connection_lost(client_pangoro));
@@ -65,10 +61,7 @@ async fn run_until_pangolin_connection_lost(mut client: PangolinClient) -> color
     while let Err(err) = subscribe_pangolin(&client).await {
         tracing::error!(target: "pangolin-pangoro", "[subscribe] [pangolin] Failed to get justification from pangolin: {:?}", err);
         let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangoro)?;
-        let client_pangolin =
-            PangolinClientComponent::component(bridge_config.pangolin.to_pangolin_client_config()?)
-                .await?;
-        client = client_pangolin;
+        client = bridge_config.pangolin.to_pangolin_client().await?;
     }
     Ok(())
 }
@@ -77,10 +70,7 @@ async fn run_until_pangoro_connection_lost(mut client: PangoroClient) -> color_e
     while let Err(err) = subscribe_pangoro(&client).await {
         tracing::error!(target: "pangolin-pangoro", "[subscribe] [pangoro] Failed to get justification from pangoro: {:?}", err);
         let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangoro)?;
-        let client_pangoro =
-            PangoroClientComponent::component(bridge_config.pangoro.to_pangoro_client_config()?)
-                .await?;
-        client = client_pangoro;
+        client = bridge_config.pangoro.to_pangoro_client().await?;
     }
     Ok(())
 }

@@ -28,14 +28,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> MessageRelay<SC, TC> {
         let config_source = bridge_config.pangolin;
         let config_target = bridge_config.pangoro;
 
-        let client_source =
-            PangolinClientComponent::component(config_source.to_pangolin_client_config()?).await?;
-        let client_target =
-            PangoroClientComponent::component(config_target.to_pangoro_client_config()?).await?;
-        let subquery_target =
-            SubqueryComponent::component(index_config.pangoro, BridgeName::PangolinPangoro);
-        let subquery_source =
-            SubqueryComponent::component(index_config.pangolin, BridgeName::PangolinPangoro);
+        let client_source = config_source.to_pangolin_client().await?;
+        let client_target = config_target.to_pangoro_client().await?;
+        let subquery_source = index_config.to_pangolin_subquery()?;
+        let subquery_target = index_config.to_pangoro_subquery()?;
         Ok(Self {
             relay_config: bridge_config.relay,
             client_source,

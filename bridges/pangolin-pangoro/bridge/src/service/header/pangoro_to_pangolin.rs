@@ -59,11 +59,8 @@ impl HeaderRelay {
         let config_pangoro = bridge_config.pangoro;
         let config_pangolin = bridge_config.pangolin;
 
-        let client_pangoro =
-            PangoroClientComponent::component(config_pangoro.to_pangoro_client_config()?).await?;
-        let client_pangolin =
-            PangolinClientComponent::component(config_pangolin.to_pangolin_client_config()?)
-                .await?;
+        let client_pangoro = config_pangoro.to_pangoro_client().await?;
+        let client_pangolin = config_pangolin.to_pangolin_client().await?;
 
         let config_index = bridge_config.index;
         let subquery_pangoro =
@@ -256,18 +253,10 @@ async fn submit_finality(
         .header(Some(sp_core::H256::from_str(block_hash)?))
         .await?
         .ok_or_else(|| BridgerError::Custom(format!("Not found header by hash: {}", block_hash)))?;
-    let finality_target = FinalityTarget {
-        parent_hash: header.parent_hash,
-        number: header.number,
-        state_root: header.state_root,
-        extrinsics_root: header.extrinsics_root,
-        digest: Decode::decode(&mut header.digest.encode().as_slice())?,
-        __subxt_unused_type_params: Default::default(),
-    };
     let grandpa_justification = Decode::decode(&mut justification.as_slice())?;
     let hash = header_relay
         .client_pangolin
-        .submit_finality_proof(finality_target, grandpa_justification)
+        .submit_finality_proof(header, grandpa_justification)
         .await?;
     tracing::info!(
         target: "pangolin-pangoro",

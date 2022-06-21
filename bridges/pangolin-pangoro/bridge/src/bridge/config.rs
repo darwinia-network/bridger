@@ -69,7 +69,7 @@ impl ChainInfoConfig {
             relayer_private_key: self.signer.clone(),
             relayer_real_account: None,
         };
-        Ok(PangolinClientComponent::component(config.to_pangolin_client_config()?).await?)
+        Ok(PangolinClientComponent::component(config).await?)
     }
 
     pub async fn to_pangoro_client(&self) -> color_eyre::Result<PangoroClient> {
@@ -78,7 +78,7 @@ impl ChainInfoConfig {
             relayer_private_key: self.signer.clone(),
             relayer_real_account: None,
         };
-        Ok(PangoroClientComponent::component(config.to_pangoro_client_config()?).await?)
+        Ok(PangoroClientComponent::component(config).await?)
     }
 }
 

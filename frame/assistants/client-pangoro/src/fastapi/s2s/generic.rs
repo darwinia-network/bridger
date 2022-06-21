@@ -96,7 +96,7 @@ impl PangoroClient {
 
 impl S2SClientBase for PangoroClient {
     type Error = ClientError;
-    type Header = BundleHeader;
+    type Header = <PangoroSubxtConfig as subxt::Config>::Header;
     type Hash = <PangoroSubxtConfig as subxt::Config>::Hash;
 }
 

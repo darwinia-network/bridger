@@ -2,6 +2,7 @@ use std::ops::RangeInclusive;
 
 use abstract_client_s2s::{
     client::S2SClientRelay,
+    convert::SmartCodecMapper,
     types::{bp_header_chain, bp_messages, bridge_runtime_common},
 };
 use sp_runtime::AccountId32;
@@ -19,10 +20,6 @@ use crate::subxt_runtime::api::bridge_pangolin_messages::storage::{
 };
 
 type BundleMessageKey = crate::types::runtime_types::bp_messages::MessageKey;
-type BundleJustification =
-    crate::types::runtime_types::bp_header_chain::justification::GrandpaJustification<
-        crate::fastapi::s2s::generic::BundleHeader,
-    >;
 
 /// Message payload for This -> Bridged chain messages.
 type FromThisChainMessagePayload = crate::types::runtime_types::bp_message_dispatch::MessagePayload<
@@ -118,11 +115,13 @@ impl S2SClientRelay for PangoroClient {
         finality_target: Self::Header,
         justification: bp_header_chain::justification::GrandpaJustification<Self::Header>,
     ) -> ClientResult<Self::Hash> {
+        let expected_target = SmartCodecMapper::map_to(&finality_target)?;
+        let expected_justification = SmartCodecMapper::map_to(&justification)?;
         Ok(self
             .runtime()
             .tx()
             .bridge_pangolin_grandpa()
-            .submit_finality_proof(finality_target, justification)
+            .submit_finality_proof(expected_target, expected_justification)
             .sign_and_submit(self.account().signer())
             .await?)
     }
@@ -132,12 +131,14 @@ impl S2SClientRelay for PangoroClient {
         lane: [u8; 4],
         hash: Option<Self::Hash>,
     ) -> ClientResult<bp_messages::OutboundLaneData> {
-        Ok(self
+        let outbound_lane_data = self
             .runtime()
             .storage()
             .bridge_pangolin_messages()
             .outbound_lanes(lane, hash)
-            .await?)
+            .await?;
+        let expected = SmartCodecMapper::map_to(&outbound_lane_data)?;
+        Ok(expected)
     }
 
     async fn inbound_lanes(
@@ -145,12 +146,14 @@ impl S2SClientRelay for PangoroClient {
         lane: [u8; 4],
         hash: Option<Self::Hash>,
     ) -> ClientResult<bp_messages::InboundLaneData<sp_core::crypto::AccountId32>> {
-        Ok(self
+        let inbound_lane_data = self
             .runtime()
             .storage()
             .bridge_pangolin_messages()
             .inbound_lanes(lane, hash)
-            .await?)
+            .await?;
+        let expected = SmartCodecMapper::map_to(&inbound_lane_data)?;
+        Ok(expected)
     }
 
     async fn outbound_messages(
@@ -158,12 +161,17 @@ impl S2SClientRelay for PangoroClient {
         message_key: bp_messages::MessageKey,
         hash: Option<Self::Hash>,
     ) -> ClientResult<Option<bp_messages::MessageData<u128>>> {
-        Ok(self
+        let expected_message_key = SmartCodecMapper::map_to(&message_key)?;
+        match self
             .runtime()
             .storage()
             .bridge_pangolin_messages()
-            .outbound_messages(message_key, hash)
-            .await?)
+            .outbound_messages(expected_message_key, hash)
+            .await?
+        {
+            Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
+            None => Ok(None),
+        }
     }
 
     async fn read_proof(
@@ -183,13 +191,14 @@ impl S2SClientRelay for PangoroClient {
         messages_count: u32,
         dispatch_weight: u64,
     ) -> ClientResult<Self::Hash> {
+        let expected_proof = SmartCodecMapper::map_to(&proof)?;
         Ok(self
             .runtime()
             .tx()
             .bridge_pangolin_messages()
             .receive_messages_proof(
                 relayer_id_at_bridged_chain,
-                proof,
+                expected_proof,
                 messages_count,
                 dispatch_weight,
             )
@@ -204,11 +213,13 @@ impl S2SClientRelay for PangoroClient {
         >,
         relayers_state: bp_messages::UnrewardedRelayersState,
     ) -> ClientResult<Self::Hash> {
+        let expected_proof = SmartCodecMapper::map_to(&proof)?;
+        let expected_relayers_state = SmartCodecMapper::map_to(&relayers_state)?;
         Ok(self
             .runtime()
             .tx()
             .bridge_pangolin_messages()
-            .receive_messages_delivery_proof(proof, relayers_state)
+            .receive_messages_delivery_proof(expected_proof, expected_relayers_state)
             .sign_and_submit(self.account().signer())
             .await?)
     }

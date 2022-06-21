@@ -22,6 +22,7 @@ dependencies = [
  "bridge-runtime-common",
  "parity-scale-codec",
  "sp-core",
+ "sp-runtime",
  "thiserror",
 ]
 

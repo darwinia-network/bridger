@@ -1,4 +1,7 @@
-use abstract_client_s2s::client::{S2SClientBase, S2SClientGeneric};
+use abstract_client_s2s::{
+    client::{S2SClientBase, S2SClientGeneric},
+    types::bp_header_chain,
+};
 use finality_grandpa::voter_set::VoterSet;
 use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
 use sp_runtime::{ConsensusEngineId, DigestItem};

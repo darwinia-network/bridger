@@ -7,7 +7,7 @@ pub trait S2SClientBase {
     /// error type
     type Error;
     /// header
-    type Header;
+    type Header: sp_runtime::traits::Header;
     /// hash
     type Hash;
 }
@@ -44,6 +44,7 @@ pub trait S2SClientRelay: S2SClientGeneric {
     /// calculate dispatchh width by message nonces
     async fn calculate_dispatch_weight(
         &self,
+        lane: [u8; 4],
         nonces: RangeInclusive<u64>,
     ) -> Result<u64, Self::Error>;
 

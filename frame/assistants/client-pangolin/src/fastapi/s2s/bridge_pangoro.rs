@@ -8,6 +8,7 @@ use sp_runtime::AccountId32;
 use subxt::rpc::ChainBlock;
 use subxt::sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;
+use subxt::StorageEntry;
 
 use crate::client::PangolinClient;
 use crate::config::PangolinSubxtConfig;
@@ -15,8 +16,8 @@ use crate::error::{ClientError, ClientResult};
 use crate::subxt_runtime::api::bridge_pangoro_messages::storage::{
     InboundLanes, OutboundLanes, OutboundMessages,
 };
-use crate::types::runtime_types::bp_messages::MessageKey;
 
+type BundleMessageKey = crate::types::runtime_types::bp_messages::MessageKey;
 type BundleJustification =
     crate::types::runtime_types::bp_header_chain::justification::GrandpaJustification<
         crate::fastapi::s2s::generic::BundleHeader,
@@ -36,7 +37,7 @@ impl S2SClientRelay for PangolinClient {
 
     fn gen_outbound_messages_storage_key(&self, lane: [u8; 4], message_nonce: u64) -> StorageKey {
         let prefix = StorageKeyPrefix::new::<OutboundMessages>();
-        OutboundMessages(MessageKey {
+        OutboundMessages(BundleMessageKey {
             lane_id: lane,
             nonce: message_nonce,
         })
@@ -58,14 +59,15 @@ impl S2SClientRelay for PangolinClient {
 
     async fn calculate_dispatch_weight(
         &self,
+        lane: [u8; 4],
         nonces: RangeInclusive<u64>,
     ) -> Result<u64, Self::Error> {
         let mut total_weight = 0u64;
         for message_nonce in nonces {
             let message_data = self
                 .outbound_messages(
-                    MessageKey {
-                        lane_id: lane.0,
+                    bp_messages::MessageKey {
+                        lane_id: lane,
                         nonce: message_nonce,
                     },
                     None,

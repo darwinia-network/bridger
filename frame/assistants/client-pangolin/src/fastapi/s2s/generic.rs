@@ -1,10 +1,12 @@
+use abstract_client_s2s::{
+    client::{S2SClientBase, S2SClientGeneric},
+    types::bp_header_chain,
+};
 use finality_grandpa::voter_set::VoterSet;
 use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
 use sp_runtime::{ConsensusEngineId, DigestItem};
 use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
-
-use abstract_client_s2s::client::{S2SClientBase, S2SClientGeneric};
 
 use crate::client::PangolinClient;
 use crate::config::PangolinSubxtConfig;

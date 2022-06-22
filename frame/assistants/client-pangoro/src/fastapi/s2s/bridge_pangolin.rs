@@ -2,7 +2,8 @@ use std::ops::RangeInclusive;
 
 use abstract_client_s2s::error::S2SClientResult;
 use abstract_client_s2s::{
-    client::{Config, S2SClientRelay},
+    client::S2SClientRelay,
+    config::Config,
     convert::SmartCodecMapper,
     types::{bp_header_chain, bp_messages, bridge_runtime_common},
 };

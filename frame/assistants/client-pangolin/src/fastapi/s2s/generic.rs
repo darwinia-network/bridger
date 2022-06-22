@@ -80,7 +80,7 @@ impl PangolinClient {
 
 pub struct PangolinS2SConfig;
 
-impl abstract_client_s2s::client::Config for PangolinS2SConfig {
+impl abstract_client_s2s::config::Config for PangolinS2SConfig {
     type Index = <PangolinSubxtConfig as subxt::Config>::Index;
     type BlockNumber = <PangolinSubxtConfig as subxt::Config>::BlockNumber;
     type Hash = <PangolinSubxtConfig as subxt::Config>::Hash;

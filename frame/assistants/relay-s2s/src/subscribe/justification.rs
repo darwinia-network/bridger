@@ -2,11 +2,11 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::sync::Mutex;
 
-use abstract_client_s2s::client::{Config, S2SClientRelay};
+use abstract_client_s2s::client::S2SClientRelay;
 use abstract_client_s2s::error::S2SClientError;
 use once_cell::sync::Lazy;
 
-use crate::error::{RelayError, RelayResult};
+use crate::error::RelayResult;
 use crate::types::JustificationInput;
 
 static RECENTLY_JUSTIFICATIONS: Lazy<Mutex<HashMap<&str, VecDeque<sp_core::Bytes>>>> =

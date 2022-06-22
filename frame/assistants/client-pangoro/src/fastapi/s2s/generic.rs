@@ -80,7 +80,7 @@ impl PangoroClient {
 
 pub struct PangoroS2SConfig;
 
-impl abstract_client_s2s::client::Config for PangoroS2SConfig {
+impl abstract_client_s2s::config::Config for PangoroS2SConfig {
     type Index = <PangoroSubxtConfig as subxt::Config>::Index;
     type BlockNumber = <PangoroSubxtConfig as subxt::Config>::BlockNumber;
     type Hash = <PangoroSubxtConfig as subxt::Config>::Hash;

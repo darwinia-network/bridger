@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-use abstract_client_s2s::client::{Config, S2SClientRelay};
+use abstract_client_s2s::client::S2SClientRelay;
+use abstract_client_s2s::config::Config;
 use abstract_client_s2s::convert::SmartCodecMapper;
 use abstract_client_s2s::types::bp_header_chain;
 use sp_runtime::codec;
@@ -39,6 +40,11 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> 
             "[header-pangolin-to-pangoro] The latest relayed pangolin block is: {:?}",
             block_number
         );
+
+        if self.try_to_relay_mandatory(block_number).await?.is_none() {
+            self.try_to_relay_header_on_demand(block_number).await?;
+        }
+
         Ok(())
     }
 

@@ -1,6 +1,7 @@
-use abstract_client_s2s::client::{Config, S2SClientRelay};
+use abstract_client_s2s::client::S2SClientRelay;
+use abstract_client_s2s::config::Config;
+use subquery_s2s::types::OriginType;
 use subquery_s2s::Subquery;
-use subquery_s2s::types::{BridgeName, OriginType};
 
 use crate::error::{RelayError, RelayResult};
 

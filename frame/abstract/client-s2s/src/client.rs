@@ -6,7 +6,6 @@ use sp_runtime::generic::{Block, SignedBlock};
 
 use crate::config::Config;
 use crate::error::S2SClientResult;
-use crate::types::HeadData;
 
 pub type ChainBlock<T> = SignedBlock<Block<<T as Config>::Header, <T as Config>::Extrinsic>>;
 
@@ -131,6 +130,7 @@ pub trait S2SClientRelay: S2SClientGeneric {
 }
 
 /// S2S with parachain bridge api for solo chain
+#[cfg(feature = "bridge-parachain")]
 #[async_trait::async_trait]
 pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
     /// beat para heads
@@ -150,6 +150,7 @@ pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
 }
 
 /// S2S with parachain bridge api for relay chain
+#[cfg(feature = "bridge-parachain")]
 #[async_trait::async_trait]
 pub trait S2SParaBridgeClientRelaychain: S2SClientRelay {
     /// generate parachain head storage key
@@ -160,5 +161,5 @@ pub trait S2SParaBridgeClientRelaychain: S2SClientRelay {
         &self,
         para_id: crate::types::ParaId,
         hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<Option<HeadData>>;
+    ) -> S2SClientResult<Option<crate::types::HeadData>>;
 }

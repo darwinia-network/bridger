@@ -36,7 +36,7 @@ sp-core             = { optional = true, git = "https://github.com/darwinia-netw
 ## s2s client
 async-trait           = { optional = true, version = "0.1" }
 finality-grandpa      = { optional = true, version = "0.14" }
-abstract-client-s2s   = { optional = true, path = "../../../frame/abstract/client-s2s", features = ["advanced"] }
+abstract-client-s2s   = { optional = true, path = "../../../frame/abstract/client-s2s", features = ["advanced-types"] }
 
 support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
 

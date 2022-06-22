@@ -34,7 +34,8 @@ subxt       = { optional = true, git = "https://github.com/darwinia-network/subx
 
 [features]
 default  = []
-advanced = [
+bridge-parachain = []
+advanced-types = [
   "array-bytes",
   "subxt",
 ]

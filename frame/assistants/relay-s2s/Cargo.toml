@@ -31,4 +31,8 @@ abstract-client-s2s = { path = "../../abstract/client-s2s" }
 subquery-s2s        = { path = "../subquery-s2s" }
 subquery-parachain  = { path = "../subquery-parachain" }
 
-
+[features]
+default = []
+bridge-parachain = [
+  "abstract-client-s2s/bridge-parachain",
+]

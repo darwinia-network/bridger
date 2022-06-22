@@ -1,6 +1,6 @@
-use abstract_client_s2s::client::{
-    S2SClientRelay, S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain,
-};
+use abstract_client_s2s::client::S2SClientRelay;
+#[cfg(feature = "bridge-parachain")]
+use abstract_client_s2s::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
 use abstract_client_s2s::config::Config;
 use subquery_s2s::types::OriginType;
 use subquery_s2s::Subquery;
@@ -17,6 +17,7 @@ pub struct SolochainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub index_origin_type: OriginType,
 }
 
+#[cfg(feature = "bridge-parachain")]
 pub struct RelaychainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub client_relaychain: SC,
     pub client_solochain: TC,
@@ -27,6 +28,7 @@ pub struct RelaychainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub subquery_candidate: subquery_parachain::Subquery,
 }
 
+#[cfg(feature = "bridge-parachain")]
 pub struct ParaHeaderInput<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> {
     pub client_relaychain: SC,
     pub client_solochain: TC,

@@ -2659,6 +2659,7 @@ dependencies = [
  "once_cell",
  "sp-core",
  "sp-runtime",
+ "subquery-parachain",
  "subquery-s2s",
  "thiserror",
  "tokio",
@@ -3596,6 +3597,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "subquery-parachain"
+version = "0.5.7"
+dependencies = [
+ "async-trait",
+ "gql_client",
+ "hex",
+ "include_dir",
+ "serde 1.0.136",
+ "serde-aux",
+ "serde-hex",
+ "strum",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

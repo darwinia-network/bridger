@@ -11,11 +11,11 @@ use crate::error::{RelayError, RelayResult};
 use crate::types::SolochainHeaderInput;
 
 /// solo chain to solo chain header relay runner
-pub struct SolochainToSolochainRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct SolochainHeaderRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
     input: SolochainHeaderInput<SC, TC>,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
     /// start header relay
     pub async fn start(&self) -> RelayResult<()> {
         let client_source = &self.input.client_source;

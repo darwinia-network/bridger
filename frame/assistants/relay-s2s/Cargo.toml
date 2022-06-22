@@ -29,5 +29,6 @@ sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git
 
 abstract-client-s2s = { path = "../../abstract/client-s2s" }
 subquery-s2s        = { path = "../subquery-s2s" }
+subquery-parachain  = { path = "../subquery-parachain" }
 
 

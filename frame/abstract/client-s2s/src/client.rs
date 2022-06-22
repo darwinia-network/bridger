@@ -6,6 +6,7 @@ use sp_runtime::generic::{Block, SignedBlock};
 
 use crate::config::Config;
 use crate::error::S2SClientResult;
+use crate::types::HeadData;
 
 pub type ChainBlock<T> = SignedBlock<Block<<T as Config>::Header, <T as Config>::Extrinsic>>;
 
@@ -129,11 +130,35 @@ pub trait S2SClientRelay: S2SClientGeneric {
     ) -> S2SClientResult<<Self::Config as Config>::Hash>;
 }
 
-/// S2S with parachain bridge api
-pub trait S2SClientPara: S2SClientRelay {
+/// S2S with parachain bridge api for solo chain
+#[async_trait::async_trait]
+pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
+    /// beat para heads
     async fn best_para_heads(
         &self,
         para_id: bp_polkadot_core::parachains::ParaId,
         hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<pallet_bridge_parachains::BestParaHead>;
+    ) -> S2SClientResult<Option<pallet_bridge_parachains::BestParaHead>>;
+
+    /// submit parachain heads
+    async fn submit_parachain_heads(
+        &self,
+        relay_block_hash: <Self::Config as Config>::Hash,
+        parachains: Vec<bp_polkadot_core::parachains::ParaId>,
+        parachain_heads_proof: Vec<Vec<u8>>,
+    ) -> S2SClientResult<<Self::Config as Config>::Hash>;
+}
+
+/// S2S with parachain bridge api for relay chain
+#[async_trait::async_trait]
+pub trait S2SParaBridgeClientRelaychain: S2SClientRelay {
+    /// generate parachain head storage key
+    fn gen_parachain_head_storage_key(&self, para_id: u32) -> sp_core::storage::StorageKey;
+
+    /// query head data
+    async fn para_head_data(
+        &self,
+        para_id: bp_polkadot_core::parachains::ParaId,
+        hash: Option<<Self::Config as Config>::Hash>,
+    ) -> S2SClientResult<Option<HeadData>>;
 }

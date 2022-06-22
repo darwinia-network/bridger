@@ -112,7 +112,7 @@ use subxt::rpc::{Subscription, SubscriptionClientT};
 impl PangolinClient {
     pub async fn subscribe_grandpa_justifications(
         &self,
-    ) -> ClientResult<Subscription<sp_core::Bytes>> {
+    ) -> ClientResult<Subscription<subxt::sp_core::Bytes>> {
         Ok(self
             .subxt()
             .rpc()

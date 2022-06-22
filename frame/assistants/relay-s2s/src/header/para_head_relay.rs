@@ -1,12 +1,6 @@
-use std::str::FromStr;
-
-use abstract_client_s2s::client::{
-    S2SClientRelay, S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain,
-};
-use abstract_client_s2s::config::Config;
+use abstract_client_s2s::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
 use abstract_client_s2s::convert::SmartCodecMapper;
-use abstract_client_s2s::types::{bp_header_chain, bp_polkadot_core};
-use sp_runtime::codec;
+use abstract_client_s2s::types::ParaId;
 use sp_runtime::traits::Hash;
 use sp_runtime::traits::Header;
 
@@ -33,10 +27,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             best_target_header.number(),
         );
         let para_head_at_target = client_solochain
-            .best_para_heads(
-                bp_polkadot_core::parachains::ParaId(self.input.para_id),
-                Some(best_target_header.hash()),
-            )
+            .best_para_heads(ParaId(self.input.para_id), Some(best_target_header.hash()))
             .await?;
         tracing::trace!(
             target: "pangolin-pangolinparachain",
@@ -63,10 +54,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             best_finalized_source_block_at_target_number,
         );
         let para_head_at_source = client_relaychain
-            .para_head_data(
-                bp_polkadot_core::parachains::ParaId(self.input.para_id),
-                Some(expected_source_block_hash),
-            )
+            .para_head_data(ParaId(self.input.para_id), Some(expected_source_block_hash))
             .await?;
         tracing::trace!(
             target: "pangolin-pangolinparachain",
@@ -119,7 +107,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
         let hash = client_solochain
             .submit_parachain_heads(
                 best_finalized_source_block_hash,
-                vec![bp_polkadot_core::parachains::ParaId(self.input.para_id)],
+                vec![ParaId(self.input.para_id)],
                 heads_proofs,
             )
             .await?;

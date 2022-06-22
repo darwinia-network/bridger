@@ -134,17 +134,18 @@ pub trait S2SClientRelay: S2SClientGeneric {
 #[async_trait::async_trait]
 pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
     /// beat para heads
+    /// todo: disscuss, maybe we can defined pallet_bridge_parachains::BestParaHead at this project
     async fn best_para_heads(
         &self,
-        para_id: bp_polkadot_core::parachains::ParaId,
+        para_id: crate::types::ParaId,
         hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<Option<pallet_bridge_parachains::BestParaHead>>;
+    ) -> S2SClientResult<Option<crate::types::BestParaHead>>;
 
     /// submit parachain heads
     async fn submit_parachain_heads(
         &self,
         relay_block_hash: <Self::Config as Config>::Hash,
-        parachains: Vec<bp_polkadot_core::parachains::ParaId>,
+        parachains: Vec<crate::types::ParaId>,
         parachain_heads_proof: Vec<Vec<u8>>,
     ) -> S2SClientResult<<Self::Config as Config>::Hash>;
 }
@@ -158,7 +159,7 @@ pub trait S2SParaBridgeClientRelaychain: S2SClientRelay {
     /// query head data
     async fn para_head_data(
         &self,
-        para_id: bp_polkadot_core::parachains::ParaId,
+        para_id: crate::types::ParaId,
         hash: Option<<Self::Config as Config>::Hash>,
     ) -> S2SClientResult<Option<HeadData>>;
 }

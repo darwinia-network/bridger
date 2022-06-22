@@ -24,9 +24,11 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         let expected_relaychain_hash =
             SmartCodecMapper::map_to(&last_relayed_rococo_hash_in_pangolin)?;
         tracing::debug!(
-            target: "pangolin-pangolinparachain",
-            "[header-relay-rococo-to-pangolin] Get last relayed rococo block hash: {:?}",
-            array_bytes::bytes2hex("0x", expected_relaychain_hash)
+            target: "relay-s2s",
+            "[header] [{}>{}] Get last relayed rococo block hash: {:?}",
+            SC::CHAIN,
+            TC::CHAIN,
+            array_bytes::bytes2hex("0x", expected_relaychain_hash),
         );
         let last_relayed_rococo_block_in_pangolin = client_relaychain
             .block(Some(expected_relaychain_hash))
@@ -41,9 +43,11 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         let block_number = last_relayed_rococo_block_in_pangolin.block.header.number();
         let block_number: u32 = SmartCodecMapper::map_to(block_number)?;
         tracing::info!(
-            target: "pangolin-pangolinparachain",
-            "[header-relay-rococo-to-pangolin] Get last relayed rococo block number: {:?}",
-            block_number
+            target: "relay-s2s",
+            "[header] [{}>{}] Get last relayed rococo block number: {:?}",
+            SC::CHAIN,
+            TC::CHAIN,
+            block_number,
         );
 
         if self.try_to_relay_mandatory(block_number).await?.is_none() {
@@ -79,7 +83,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             .await?;
         tracing::info!(
             target: "relay-s2s",
-            "[header-rococo-to-pangolin] Header relayed: {:?}",
+            "[header] [{}>{}] Header relayed: {:?}",
+            SC::CHAIN,
+            TC::CHAIN,
             array_bytes::bytes2hex("0x", hash),
         );
         Ok(())
@@ -95,8 +101,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
 
         if let Some(block_to_relay) = next_mandatory_block {
             tracing::info!(
-                target: "pangolin-pangolinparachain",
-                "[header-relay-rococo-to-pangolin] Next mandatory block: {:?}",
+                target: "relay-s2s",
+                "[header] [{}>{}] Next mandatory block: {:?}",
+                SC::CHAIN,
+                TC::CHAIN,
                 &block_to_relay.block_number,
             );
             let justification = subquery_relaychain
@@ -114,8 +122,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             Ok(Some(block_to_relay.block_number))
         } else {
             tracing::info!(
-                target: "pangolin-pangolinparachain",
-                "[header-relay-rococo-to-pangolin] Next mandatory block not found",
+                target: "relay-s2s",
+                "[header] [{}>{}] Next mandatory block not found",
+                SC::CHAIN,
+                TC::CHAIN,
             );
             Ok(None)
         }
@@ -137,17 +147,21 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             .await?
             .filter(|header| {
                 tracing::debug!(
-                    target: "pangolin-pangolinparachain",
-                    "[header-relay-rococo-to-pangolin] Get related realy chain header: {:?}",
-                    header.included_relay_block
+                    target: "relay-s2s",
+                    "[header] [{}>{}] Get related realy chain header: {:?}",
+                    SC::CHAIN,
+                    TC::CHAIN,
+                    header.included_relay_block,
                 );
                 header.included_relay_block > last_block_number
             });
 
         if next_header.is_none() {
             tracing::debug!(
-                target: "pangolin-pangolinparachain",
-                "[header-relay-rococo-to-pangolin] Para head has not been finalized"
+                target: "relay-s2s",
+                "[header] [{}>{}] Para head has not been finalized",
+                SC::CHAIN,
+                TC::CHAIN,
             );
             return Ok(());
         }
@@ -164,9 +178,11 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
                     ))
                 })?;
                 tracing::debug!(
-                    target: "pangolin-pangolinparachain",
-                    "[header-relay-rococo-to-pangolin] Test justification: {:?}",
-                    grandpa_justification.commit.target_number
+                    target: "relay-s2s",
+                    "[header] [{}>{}] Test justification: {:?}",
+                    SC::CHAIN,
+                    TC::CHAIN,
+                    grandpa_justification.commit.target_number,
                 );
 
                 let target_number: u32 =
@@ -182,7 +198,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             None => {
                 tracing::warn!(
                     target: "relay-s2s",
-                    "[header-relay-rococo-to-pangolin] Found on-demand block {}, but not have justification to relay.",
+                    "[header] [{}>{}] Found on-demand block {}, but not have justification to relay.",
+                    SC::CHAIN,
+                    TC::CHAIN,
                     next_header.para_head,
                 );
             }

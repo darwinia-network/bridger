@@ -22,16 +22,20 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .await?
             .ok_or_else(|| RelayError::Custom(String::from("Failed to get pangolin header")))?;
         tracing::trace!(
-            target: "pangolin-pangolinparachain",
-            "[para-head-relay-rococo-to-pangolin] Current pangolin block: {:?}",
+            target: "relay-s2s",
+            "[para-head] [{}>{}] Current pangolin block: {:?}",
+            SC::CHAIN,
+            TC::CHAIN,
             best_target_header.number(),
         );
         let para_head_at_target = client_solochain
             .best_para_heads(ParaId(self.input.para_id), Some(best_target_header.hash()))
             .await?;
         tracing::trace!(
-            target: "pangolin-pangolinparachain",
-            "[para-head-relay-rococo-to-pangolin] The latest para-head on pangolin: {:?}",
+            target: "relay-s2s",
+            "[para-head] [{}>{}] The latest para-head on pangolin: {:?}",
+            SC::CHAIN,
+            TC::CHAIN,
             &para_head_at_target,
         );
 
@@ -49,16 +53,20 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
         let best_finalized_source_block_at_target_number: u32 =
             SmartCodecMapper::map_to(best_finalized_source_block_at_target.block.header.number())?;
         tracing::trace!(
-            target: "pangolin-pangolinparachain",
-            "[para-head-relay-rococo-to-pangolin] The latest rococo block on pangolin: {:?}",
+            target: "relay-s2s",
+            "[para-head] [{}>{}] The latest rococo block on pangolin: {:?}",
+            SC::CHAIN,
+            TC::CHAIN,
             best_finalized_source_block_at_target_number,
         );
         let para_head_at_source = client_relaychain
             .para_head_data(ParaId(self.input.para_id), Some(expected_source_block_hash))
             .await?;
         tracing::trace!(
-            target: "pangolin-pangolinparachain",
-            "[para-head-relay-rococo-to-pangolin] The latest para-head on rococo {:?}",
+            target: "relay-s2s",
+            "[para-head] [{}>{}] The latest para-head on rococo {:?}",
+            SC::CHAIN,
+            TC::CHAIN,
             best_finalized_source_block_at_target_number,
         );
 
@@ -75,15 +83,19 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             (None, Some(_)) => true,
             (None, None) => {
                 tracing::info!(
-                    target: "pangolin-pangolinparachain",
-                    "[para-head-relay-rococo-to-pangolin] Parachain is unknown to both clients"
+                    target: "relay-s2s",
+                    "[para-head] [{}>{}] Parachain is unknown to both clients",
+                    SC::CHAIN,
+                    TC::CHAIN,
                 );
                 false
             }
             (Some(_), Some(_)) => {
                 tracing::info!(
-                    target: "pangolin-pangolinparachain",
-                    "[para-head-relay-rococo-to-pangolin] It doesn't need to relay"
+                    target: "relay-s2s",
+                    "[para-head] [{}>{}] It doesn't need to relay",
+                    SC::CHAIN,
+                    TC::CHAIN,
                 );
                 false
             }
@@ -100,8 +112,10 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             )
             .await?;
         tracing::info!(
-            target: "pangolin-pangolinparachain",
-            "[para-head-relay-rococo-to-pangolin] Submitting parachain heads update transaction to pangolin",
+            target: "relay-s2s",
+            "[para-head] [{}>{}] Submitting parachain heads update transaction to pangolin",
+            SC::CHAIN,
+            TC::CHAIN,
         );
 
         let hash = client_solochain
@@ -112,8 +126,10 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             )
             .await?;
         tracing::info!(
-            target: "pangolin-pangolinparachain",
-            "[para-head-relay-rococo-to-pangolin] The tx hash {} emitted",
+            target: "relay-s2s",
+            "[para-head] [{}>{}] The tx hash {} emitted",
+            SC::CHAIN,
+            TC::CHAIN,
             array_bytes::bytes2hex("0x", hash),
         );
         Ok(())

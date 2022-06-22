@@ -43,7 +43,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         let block_number: u32 = SmartCodecMapper::map_to(block_number)?;
         tracing::trace!(
             target: "relay-s2s",
-            "[header-pangolin-to-pangoro] The latest relayed pangolin block is: {:?}",
+            "[header] [{}>{}] The latest relayed pangolin block is: {:?}",
+            SC::CHAIN,
+            TC::CHAIN,
             block_number
         );
 
@@ -80,7 +82,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             .await?;
         tracing::info!(
             target: "relay-s2s",
-            "[header-pangolin-to-pangoro] Header relayed: {:?}",
+            "[header] [{}>{}] Header relayed: {:?}",
+            SC::CHAIN,
+            TC::CHAIN,
             array_bytes::bytes2hex("0x", hash),
         );
         Ok(())
@@ -95,7 +99,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         if let Some(block_to_relay) = next_mandatory_block {
             tracing::info!(
                 target: "relay-s2s",
-                "[header-pangolin-to-pangoro] Next mandatory block: {:?} ",
+                "[header] [{}>{}] Next mandatory block: {:?} ",
+                SC::CHAIN,
+                TC::CHAIN,
                 &block_to_relay.block_number
             );
             let justification = subquery_source
@@ -114,7 +120,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         }
         tracing::info!(
             target: "relay-s2s",
-            "[header-pangolin-to-pangoro] Next mandatory block not found",
+            "[header] [{}>{}] Next mandatory block not found",
+            SC::CHAIN,
+            TC::CHAIN,
         );
         Ok(None)
     }
@@ -129,7 +137,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
                 if v.block_number <= last_block_number {
                     tracing::debug!(
                         target: "relay-s2s",
-                        "[header-pangolin-to-pangoro] The last storage block ({}) is less or equal last relayed block ({}). nothing to do.",
+                        "[header] [{}>{}] The last storage block ({}) is less or equal last relayed block ({}). nothing to do.",
+                        SC::CHAIN,
+                        TC::CHAIN,
                         v.block_number,
                         last_block_number,
                     );
@@ -140,14 +150,18 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             None => {
                 tracing::debug!(
                     target: "relay-s2s",
-                    "[header-pangolin-to-pangoro] Try relay header on-demand, but not found any on-demand block",
+                    "[header] [{}>{}] Try relay header on-demand, but not found any on-demand block",
+                    SC::CHAIN,
+                    TC::CHAIN,
                 );
                 return Ok(());
             }
         };
         tracing::debug!(
             target: "relay-s2s",
-            "[header-pangolin-to-pangoro] Try relay header on-demand, the on-demand block is {}",
+            "[header] [{}>{}] Try relay header on-demand, the on-demand block is {}",
+            SC::CHAIN,
+            TC::CHAIN,
             next_header.block_number,
         );
 
@@ -155,7 +169,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             Some(justification) => {
                 tracing::trace!(
                     target: "relay-s2s",
-                    "[header-pangoro-to-pangolin] Found on-demand block {}, and found new justification, ready to relay header",
+                    "[header] [{}>{}] Found on-demand block {}, and found new justification, ready to relay header",
+                    SC::CHAIN,
+                    TC::CHAIN,
                     next_header.block_number,
                 );
                 let grandpa_justification: bp_header_chain::justification::GrandpaJustification<
@@ -179,7 +195,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             None => {
                 tracing::warn!(
                     target: "relay-s2s",
-                    "[header-pangoro-to-pangolin] Found on-demand block {}, but not have justification to relay.",
+                    "[header] [{}>{}] Found on-demand block {}, but not have justification to relay.",
+                    SC::CHAIN,
+                    TC::CHAIN,
                     next_header.block_number,
                 );
             }

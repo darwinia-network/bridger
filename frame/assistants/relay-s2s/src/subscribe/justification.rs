@@ -67,7 +67,12 @@ where
     F: Send + Sync + Fn(sp_core::Bytes),
 {
     if let Err(err) = subscribe_justification(&client, callback).await {
-        tracing::error!(target: "relay-s2s", "[subscribe] [pangolin] Failed to get justification from pangolin: {:?}", err);
+        tracing::error!(
+            target: "relay-s2s", "[subscribe] [{}] Failed to get justification from {}: {:?}",
+            T::CHAIN,
+            T::CHAIN,
+            err
+        );
     }
     Ok(())
 }

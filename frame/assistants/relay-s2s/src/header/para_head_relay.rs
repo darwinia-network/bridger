@@ -5,14 +5,14 @@ use sp_runtime::traits::Hash;
 use sp_runtime::traits::Header;
 
 use crate::error::{RelayError, RelayResult};
-use crate::types::ParaHeadInput;
+use crate::types::ParaHeaderInput;
 
 /// solo chain to solo chain header relay runner
-pub struct ParaHeadRunner<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> {
-    input: ParaHeadInput<SC, TC>,
+pub struct ParaHeaderRunner<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> {
+    input: ParaHeaderInput<SC, TC>,
 }
 
-impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHeadRunner<SC, TC> {
+impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHeaderRunner<SC, TC> {
     pub async fn start(&self) -> RelayResult<()> {
         let client_solochain = &self.input.client_solochain;
         let client_relaychain = &self.input.client_relaychain;

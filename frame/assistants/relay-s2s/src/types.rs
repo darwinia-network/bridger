@@ -27,7 +27,7 @@ pub struct RelaychainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub subquery_candidate: subquery_parachain::Subquery,
 }
 
-pub struct ParaHeadInput<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> {
+pub struct ParaHeaderInput<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> {
     pub client_relaychain: SC,
     pub client_solochain: TC,
     pub para_id: u32,

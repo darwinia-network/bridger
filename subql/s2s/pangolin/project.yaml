@@ -14,7 +14,7 @@ network:
 dataSources:
   - name: main
     kind: substrate/Runtime
-    startBlock: 2719453
+    startBlock: 2597115
     mapping:
       file: ./dist/index.js
       handlers:
@@ -39,7 +39,7 @@ dataSources:
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            module: bridgePangoroParachainMessages
+            module: bridgePangolinParachainMessages
             method: MessageAccepted
 
         - handler: handleEvent
@@ -50,5 +50,4 @@ dataSources:
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            module: bridgePangoroParachainDispatch
-
+            module: bridgePangolinParachainDispatch

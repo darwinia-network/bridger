@@ -18,7 +18,6 @@ export enum RelayBlockOrigin {
   BridgePangolinParachain = 'bridge-pangolin-parachain',
 }
 
-
 export async function storeNeedRelayBlock(
   event: FastEvent,
   origin: RelayBlockOrigin,

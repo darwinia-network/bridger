@@ -1980,6 +1980,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2386b4ebe91c2f7f51082d4cefa145d030e33a1842a96b12e4885cc3c01f7a55"
 
 [[package]]
+name = "pad"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2ad9b889f1b12e0b9ee24db044b5129150d5eada288edc800f789928dc8c0e3"
+dependencies = [
+ "unicode-width",
+]
+
+[[package]]
 name = "pallet-bridge-dispatch"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#9cbc639462552e6c770bffdb02c2fd9d937b9eee"
@@ -2561,6 +2570,7 @@ dependencies = [
  "abstract-client-s2s",
  "array-bytes",
  "once_cell",
+ "pad",
  "sp-core",
  "sp-runtime",
  "subquery-parachain",

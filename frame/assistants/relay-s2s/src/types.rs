@@ -7,6 +7,11 @@ use subquery_s2s::Subquery;
 
 use crate::error::{RelayError, RelayResult};
 
+pub(crate) static M_HEADER: &str = "header";
+pub(crate) static M_PARA_HEAD: &str = "para-head";
+pub(crate) static M_DELIVERY: &str = "delivery";
+pub(crate) static M_RECEIVING: &str = "receiving";
+
 pub type LaneId = [u8; 4];
 
 pub struct SolochainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {

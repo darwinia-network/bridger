@@ -8,7 +8,7 @@ use sp_runtime::codec;
 use sp_runtime::traits::Header;
 
 use crate::error::{RelayError, RelayResult};
-use crate::types::RelaychainHeaderInput;
+use crate::types::{RelaychainHeaderInput, M_HEADER};
 
 /// relay chain to solo chain header relay runner
 pub struct RelaychainHeaderRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
@@ -25,9 +25,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             SmartCodecMapper::map_to(&last_relayed_rococo_hash_in_pangolin)?;
         tracing::debug!(
             target: "relay-s2s",
-            "[header] [{}>{}] Get last relayed rococo block hash: {:?}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} get last relayed rococo block hash: {:?}",
+            helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
             array_bytes::bytes2hex("0x", expected_relaychain_hash),
         );
         let last_relayed_rococo_block_in_pangolin = client_relaychain
@@ -44,9 +43,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         let block_number: u32 = SmartCodecMapper::map_to(block_number)?;
         tracing::info!(
             target: "relay-s2s",
-            "[header] [{}>{}] Get last relayed rococo block number: {:?}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} get last relayed rococo block number: {:?}",
+            helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
             block_number,
         );
 
@@ -83,9 +81,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             .await?;
         tracing::info!(
             target: "relay-s2s",
-            "[header] [{}>{}] Header relayed: {:?}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} header relayed: {:?}",
+            helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
             array_bytes::bytes2hex("0x", hash),
         );
         Ok(())
@@ -102,9 +99,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         if let Some(block_to_relay) = next_mandatory_block {
             tracing::info!(
                 target: "relay-s2s",
-                "[header] [{}>{}] Next mandatory block: {:?}",
-                SC::CHAIN,
-                TC::CHAIN,
+                "{} the next mandatory block: {:?}",
+                helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
                 &block_to_relay.block_number,
             );
             let justification = subquery_relaychain
@@ -123,9 +119,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         } else {
             tracing::info!(
                 target: "relay-s2s",
-                "[header] [{}>{}] Next mandatory block not found",
-                SC::CHAIN,
-                TC::CHAIN,
+                "{} the next mandatory block not found",
+                helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
             );
             Ok(None)
         }
@@ -148,9 +143,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             .filter(|header| {
                 tracing::debug!(
                     target: "relay-s2s",
-                    "[header] [{}>{}] Get related realy chain header: {:?}",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    "{} get related realy chain header: {:?}",
+                    helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
                     header.included_relay_block,
                 );
                 header.included_relay_block > last_block_number
@@ -159,9 +153,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         if next_header.is_none() {
             tracing::debug!(
                 target: "relay-s2s",
-                "[header] [{}>{}] Para head has not been finalized",
-                SC::CHAIN,
-                TC::CHAIN,
+                "{} para head has not been finalized",
+                helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
             );
             return Ok(());
         }
@@ -179,9 +172,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
                 })?;
                 tracing::debug!(
                     target: "relay-s2s",
-                    "[header] [{}>{}] Test justification: {:?}",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    "{} test justification: {:?}",
+                    helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
                     grandpa_justification.commit.target_number,
                 );
 
@@ -198,9 +190,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             None => {
                 tracing::warn!(
                     target: "relay-s2s",
-                    "[header] [{}>{}] Found on-demand block {}, but not have justification to relay.",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    "{} found on-demand block {}, but not have justification to relay.",
+                    helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
                     next_header.para_head,
                 );
             }

@@ -5,7 +5,8 @@ use abstract_client_s2s::types::bp_messages::{OutboundLaneData, UnrewardedRelaye
 use abstract_client_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
 
 use crate::error::RelayResult;
-use crate::types::MessageInput;
+use crate::helpers;
+use crate::types::{MessageInput, M_RECEIVING};
 
 pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
     input: MessageInput<SC, TC>,
@@ -33,7 +34,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
         at_block: <TC::Config as Config>::Hash,
         source_outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<(u64, UnrewardedRelayersState)>> {
-        let block_hex = array_bytes::bytes2hex("0x", at_block);
+        // let block_hex = array_bytes::bytes2hex("0x", at_block);
         let lane = self.input.lane()?;
         let inbound_lane_data = self
             .input
@@ -46,36 +47,22 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             .map(|item| item.messages.end)
             .max()
             .unwrap_or(0u64);
-        tracing::trace!(
-            target: "pangolin-pangoro",
-            "[receiving] [{}>{}] max dispatch nonce({}) at target and last received nonce from source is {}. \
-            queried by relayed block {}",
-            SC::CHAIN,
-            TC::CHAIN,
-            max_confirm_end_at_target,
-            source_outbound_lane_data.latest_received_nonce,
-            block_hex,
-        );
         if max_confirm_end_at_target == source_outbound_lane_data.latest_received_nonce {
             tracing::info!(
-                target: "pangolin-pangoro",
-                "[receiving] [{}>{}] max dispatch nonce({}) at target is same with last received nonce({}) at source. \
-                queried by relayed block {}. nothing to do.",
-                SC::CHAIN,
-                TC::CHAIN,
+                target: "relay-s2s",
+                "{} max dispatch nonce({}) at target is same with last received nonce({}) at source. nothing to do.",
+                helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
                 max_confirm_end_at_target,
                 source_outbound_lane_data.latest_received_nonce,
-                block_hex,
             );
             return Ok(None);
         }
         if let Some(last_relayed_nonce) = self.last_relayed_nonce {
             if last_relayed_nonce >= max_confirm_end_at_target {
                 tracing::warn!(
-                    target: "pangolin-pangoro",
-                    "[receiving] [{}>{}] This nonce({}) is being processed. Please waiting for the processing to finish.",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    target: "relay-s2s",
+                    "{} the nonce({}) is being processed. please waiting for the processing to finish.",
+                    helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
                     max_confirm_end_at_target,
                 );
                 return Ok(None);
@@ -95,10 +82,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
         };
         if total_unrewarded_messages.is_none() {
             tracing::info!(
-                target: "pangolin-pangoro",
-                "[receiving] [{}>{}] Not have unrewarded message. nothing to do.",
-                SC::CHAIN,
-                TC::CHAIN,
+                target: "relay-s2s",
+                "{} not have unrewarded message. nothing to do.",
+                helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
             );
             return Ok(None);
         }
@@ -119,30 +105,17 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
 impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     pub async fn start(&mut self) -> RelayResult<()> {
         tracing::info!(
-            target: "pangolin-pangoro",
-            "[receiving] [{}>{}] SERVICE RESTARTING...",
-            SC::CHAIN,
-            TC::CHAIN,
+            target: "relay-s2s",
+            "{} SERVICE RESTARTING...",
+            helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            match self.run().await {
-                Ok(last_relayed_nonce) => {
-                    if last_relayed_nonce.is_some() {
-                        self.last_relayed_nonce = last_relayed_nonce;
-                    }
+            if let Ok(last_relayed_nonce) = self.run().await {
+                if last_relayed_nonce.is_some() {
+                    self.last_relayed_nonce = last_relayed_nonce;
                 }
-                Err(err) => {
-                    tracing::error!(
-                        target: "pangolin-pangoro",
-                        "[receiving] [{}>{}] Failed to receiving message: {:?}",
-                        SC::CHAIN,
-                        TC::CHAIN,
-                        err,
-                    );
-                    // self.message_relay = MessageRelay::new().await?;
-                }
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
     }
 
@@ -158,10 +131,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             == source_outbound_lane_data.latest_generated_nonce
         {
             tracing::info!(
-                target: "pangolin-pangoro",
-                "[receiving] [{}>{}] All nonces received, nothing to do.",
-                SC::CHAIN,
-                TC::CHAIN,
+                target: "relay-s2s",
+                "{} all nonces received, nothing to do.",
+                helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
             );
             return Ok(None);
         }
@@ -178,10 +150,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             Some(v) => v,
             None => {
                 tracing::warn!(
-                    target: "pangolin-pangoro",
-                    "[receiving] [{}>{}] No unrewarded relayers state found by pangoro",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    target: "relay-s2s",
+                    "{} no unrewarded relayers state found by pangoro",
+                    helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
                 );
                 return Ok(None);
             }
@@ -204,10 +175,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             .await?;
 
         tracing::debug!(
-            target: "pangolin-pangoro",
-            "[receiving] [{}>{}] receiving extensics sent successful: {}",
-            SC::CHAIN,
-            TC::CHAIN,
+            target: "relay-s2s",
+            "{} receiving extensics sent successful: {}",
+            helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
             array_bytes::bytes2hex("0x", hash),
         );
         Ok(Some(max_confirmed_nonce_at_target))

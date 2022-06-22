@@ -5,7 +5,8 @@ use sp_runtime::traits::Hash;
 use sp_runtime::traits::Header;
 
 use crate::error::{RelayError, RelayResult};
-use crate::types::ParaHeaderInput;
+use crate::helpers;
+use crate::types::{ParaHeaderInput, M_PARA_HEAD};
 
 /// para head to solo chain header relay runner
 pub struct ParaHeaderRunner<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> {
@@ -23,9 +24,8 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .ok_or_else(|| RelayError::Custom(String::from("Failed to get pangolin header")))?;
         tracing::trace!(
             target: "relay-s2s",
-            "[para-head] [{}>{}] Current pangolin block: {:?}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} current pangolin block: {:?}",
+            helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
             best_target_header.number(),
         );
         let para_head_at_target = client_solochain
@@ -33,9 +33,8 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .await?;
         tracing::trace!(
             target: "relay-s2s",
-            "[para-head] [{}>{}] The latest para-head on pangolin: {:?}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} the last para-head on pangolin: {:?}",
+            helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
             &para_head_at_target,
         );
 
@@ -54,9 +53,8 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             SmartCodecMapper::map_to(best_finalized_source_block_at_target.block.header.number())?;
         tracing::trace!(
             target: "relay-s2s",
-            "[para-head] [{}>{}] The latest rococo block on pangolin: {:?}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} the last relaychain block on solochain: {:?}",
+            helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
             best_finalized_source_block_at_target_number,
         );
         let para_head_at_source = client_relaychain
@@ -64,9 +62,8 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .await?;
         tracing::trace!(
             target: "relay-s2s",
-            "[para-head] [{}>{}] The latest para-head on rococo {:?}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} the last para-head on relaychain {:?}",
+            helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
             best_finalized_source_block_at_target_number,
         );
 
@@ -84,18 +81,16 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             (None, None) => {
                 tracing::info!(
                     target: "relay-s2s",
-                    "[para-head] [{}>{}] Parachain is unknown to both clients",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    "{} parachain is unknown to both clients",
+                    helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
                 );
                 false
             }
             (Some(_), Some(_)) => {
                 tracing::info!(
                     target: "relay-s2s",
-                    "[para-head] [{}>{}] It doesn't need to relay",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    "{} not need need to relay",
+                    helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
                 );
                 false
             }
@@ -113,9 +108,8 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .await?;
         tracing::info!(
             target: "relay-s2s",
-            "[para-head] [{}>{}] Submitting parachain heads update transaction to pangolin",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} submitting parachain heads update transaction to pangolin",
+            helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
         );
 
         let hash = client_solochain
@@ -127,9 +121,8 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .await?;
         tracing::info!(
             target: "relay-s2s",
-            "[para-head] [{}>{}] The tx hash {} emitted",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} the tx hash {} emitted",
+            helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
             array_bytes::bytes2hex("0x", hash),
         );
         Ok(())

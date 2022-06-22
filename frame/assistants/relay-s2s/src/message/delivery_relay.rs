@@ -8,7 +8,8 @@ use sp_runtime::traits::Header;
 use subquery_s2s::types::RelayBlockOrigin;
 
 use crate::error::{RelayError, RelayResult};
-use crate::types::MessageInput;
+use crate::helpers;
+use crate::types::{MessageInput, M_DELIVERY};
 
 pub struct DeliveryRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
     input: MessageInput<SC, TC>,
@@ -51,11 +52,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
             if last_relayed_nonce >= start {
                 tracing::warn!(
                     target: "relay-s2s",
-                    "[delivery] [{}>{}] There is already a batch of transactions in progress. \
-                    Will wait for the previous batch to complete. last relayed noce is {} and expect to start with {}. \
+                    "{} have a batches of transactions in progress. \
+                    waiting for this batches to complete. last relayed noce is {} and expect to start with {}. \
                     please wait receiving.",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                     last_relayed_nonce,
                     start,
                 );
@@ -64,11 +64,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
         }
 
         let inclusive_limit = limit - 1;
-        tracing::info!(
+        tracing::trace!(
             target: "relay-s2s",
-            "[delivery] [{}>{}] Assemble nonces, start from {} and last generated is {}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} assemble nonces, start from {} and last generated is {}",
+            helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
             start,
             latest_generated_nonce,
         );
@@ -86,29 +85,16 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
     pub async fn start(&mut self) -> RelayResult<()> {
         tracing::info!(
             target: "relay-s2s",
-            "[delivery] [{}>{}] SERVICE RESTARTING...",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} SERVICE RESTARTING...",
+            helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            match self.run(10).await {
-                Ok(last_relayed_nonce) => {
-                    if last_relayed_nonce.is_some() {
-                        self.last_relayed_nonce = last_relayed_nonce;
-                    }
+            if let Ok(last_relayed_nonce) = self.run(10).await {
+                if last_relayed_nonce.is_some() {
+                    self.last_relayed_nonce = last_relayed_nonce;
                 }
-                Err(err) => {
-                    tracing::error!(
-                        target: "relay-s2s",
-                        "[delivery] [{}>{}] Failed to delivery message: {:?}",
-                        SC::CHAIN,
-                        TC::CHAIN,
-                        err
-                    );
-                    // todo: the last_relayed_nonce need return when error happened
-                }
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
     }
 
@@ -129,18 +115,16 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
             None => {
                 tracing::info!(
                     target: "relay-s2s",
-                    "[delivery] [{}>{}] All nonces delivered, nothing to do.",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    "{} all nonces delivered, nothing to do.",
+                    helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                 );
                 return Ok(None);
             }
         };
         tracing::info!(
             target: "relay-s2s",
-            "[delivery] [{}>{}] Assembled nonces {:?}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} assembled nonces {:?}",
+            helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
             nonces,
         );
 
@@ -153,9 +137,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
             None => {
                 tracing::warn!(
                     target: "relay-s2s",
-                    "[delivery] [{}>{}] The last nonce({}) isn't storage by indexer",
-                    SC::CHAIN,
-                    TC::CHAIN,
+                    "{} the last nonce({}) isn't storage by indexer",
+                    helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                     nonces.end(),
                 );
                 return Ok(None);
@@ -181,10 +164,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
         if relayed_block_number < last_relay.block_number {
             tracing::warn!(
                 target: "relay-s2s",
-                "[delivery] [{}>{}] The last nonce({}) at block {} is less then last relayed header {}, \
-                please wait header relay.",
-                SC::CHAIN,
-                TC::CHAIN,
+                "{} the last nonce({}) at block {} is less then last relayed header {}, please wait header relay.",
+                helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                 nonces.end(),
                 last_relay.block_number,
                 relayed_block_number,
@@ -240,9 +221,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
 
         tracing::debug!(
             target: "relay-s2s",
-            "[delivery] [{}>{}] The nonces {:?} in pangolin delivered to pangoro -> {}",
-            SC::CHAIN,
-            TC::CHAIN,
+            "{} the nonces {:?} in pangolin delivered to pangoro -> {}",
+            helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
             nonces,
             array_bytes::bytes2hex("0x", hash),
         );

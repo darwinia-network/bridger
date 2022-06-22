@@ -118,7 +118,7 @@ impl Subquery {
         nonce: u64,
     ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {
         let query = self.read_graphql("query_need_relay.graphql")?;
-        let lane_hex = array_bytes::bytes2hex("", lane);
+        let lane_hex = array_bytes::bytes2hex("", &lane);
         let vars = QueryNeedRelay {
             origin,
             lane: lane_hex,

@@ -1,6 +1,6 @@
 import {FastEvent} from '../helpers';
 import * as storage from '../storage';
-import {RelayBlockOrigin} from "../storage";
+import {OnDemandType, RelayBlockOrigin} from "../storage";
 import {BlockHandler} from "./block";
 
 export class EventHandler {
@@ -21,9 +21,24 @@ export class EventHandler {
     logger.info(`[event] Received event: [${eventKey}] [${eventId}] in block ${blockNumber}`);
     switch (eventKey) {
       case 'bridgePangolinMessages:MessageAccepted': {
-        await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.BridgePangolin);
+        await storage.storeNeedRelayBlock(
+          this.event,
+          RelayBlockOrigin.BridgePangolin,
+          OnDemandType.SendMessage,
+          eventMethod,
+        );
         return;
       }
+    }
+
+    if (eventSection === 'bridgePangolinDispatch') {
+      await storage.storeNeedRelayBlock(
+        this.event,
+        RelayBlockOrigin.BridgePangolin,
+        OnDemandType.Dispatch,
+        eventMethod,
+      );
+      return;
     }
 
   }

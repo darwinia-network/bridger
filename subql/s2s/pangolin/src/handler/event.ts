@@ -56,7 +56,7 @@ export class EventHandler {
       );
       return;
     }
-    if (eventSection === 'bridgePangoroParachainDispatch') {
+    if (eventSection === 'bridgePangolinParachainDispatch') {
       await storage.storeNeedRelayBlock(
         this.event,
         RelayBlockOrigin.BridgePangolinParachain,

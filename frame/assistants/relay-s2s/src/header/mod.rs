@@ -1,5 +1,5 @@
-pub use self::relaychain_to_solochain::*;
-pub use self::solochain_to_solochain::*;
+pub use self::para_head_relay::*;
+pub use self::solo_head_relay::*;
 
-mod relaychain_to_solochain;
-mod solochain_to_solochain;
+mod para_head_relay;
+mod solo_head_relay;

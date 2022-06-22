@@ -82,7 +82,8 @@ where
 pub(crate) fn recently_justification(
     chain: impl AsRef<str>,
 ) -> RelayResult<Option<sp_core::Bytes>> {
-    let justification_queue = RECENTLY_JUSTIFICATIONS.lock().unwrap().get(chain.as_ref());
+    let recently_justifications = RECENTLY_JUSTIFICATIONS.lock().unwrap();
+    let justification_queue = recently_justifications.get(chain.as_ref());
     match justification_queue {
         Some(v) => Ok(v.back().cloned()),
         None => Ok(None),

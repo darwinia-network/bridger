@@ -1,5 +1,9 @@
+use std::str::FromStr;
+
 use abstract_client_s2s::client::{Config, S2SClientRelay};
 use abstract_client_s2s::convert::SmartCodecMapper;
+use abstract_client_s2s::types::bp_header_chain;
+use sp_runtime::codec;
 use sp_runtime::traits::Header;
 
 use crate::error::{RelayError, RelayResult};
@@ -35,6 +39,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> 
             "[header-pangolin-to-pangoro] The latest relayed pangolin block is: {:?}",
             block_number
         );
+        Ok(())
     }
 
     async fn submit_finality(
@@ -45,8 +50,12 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> 
         let client_source = &self.header_relay.client_source;
         let client_target = &self.header_relay.client_target;
         let block_hash = block_hash.as_ref();
+        let block_hash = sp_core::H256::from_str(block_hash).map_err(|e| {
+            RelayError::Custom(format!("Wrong block hash [{}] {:?}", block_hash, e))
+        })?;
+        let expected_block_hash = SmartCodecMapper::map_to(&block_hash)?;
         let header = client_source
-            .header(Some(<SC::Config as Config>::Hash::from_str(block_hash)?))
+            .header(Some(expected_block_hash))
             .await?
             .ok_or_else(|| {
                 RelayError::Custom(format!("Not found header by hash: {}", block_hash))
@@ -101,7 +110,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> 
     async fn try_to_relay_header_on_demand(&self, last_block_number: u32) -> RelayResult<()> {
         let subquery_source = &self.header_relay.subquery_source;
         let next_header = match subquery_source
-            .next_needed_header(self.header_relay.index_origin_type)
+            .next_needed_header(self.header_relay.index_origin_type.clone())
             .await?
         {
             Some(v) => {
@@ -137,19 +146,19 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> 
                     "[header-pangoro-to-pangolin] Found on-demand block {}, and found new justification, ready to relay header",
                     next_header.block_number,
                 );
-                let grandpa_justification =
-                    GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(
-                        &mut justification.as_ref(),
-                    )
-                    .map_err(|err| {
-                        RelayError::Custom(format!(
-                            "Failed to decode justification of pangolin: {:?}",
-                            err
-                        ))
-                    })?;
-                if grandpa_justification.commit.target_number > last_block_number {
+                let grandpa_justification: bp_header_chain::justification::GrandpaJustification<
+                    <SC::Config as Config>::Header,
+                > = codec::Decode::decode(&mut justification.as_ref()).map_err(|err| {
+                    RelayError::Custom(format!(
+                        "Failed to decode justification of pangolin: {:?}",
+                        err
+                    ))
+                })?;
+                let target_number: u32 =
+                    SmartCodecMapper::map_to(&grandpa_justification.commit.target_number)?;
+                if target_number > last_block_number {
                     self.submit_finality(
-                        array_bytes::bytes2hex("", grandpa_justification.commit.target_hash.0),
+                        array_bytes::bytes2hex("", grandpa_justification.commit.target_hash),
                         justification.to_vec(),
                     )
                     .await?;

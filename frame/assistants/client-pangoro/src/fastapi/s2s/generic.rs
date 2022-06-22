@@ -1,6 +1,6 @@
-use abstract_client_s2s::config::Config;
-use abstract_client_s2s::error::{S2SClientError, S2SClientResult};
-use abstract_client_s2s::{
+use abstract_bridge_s2s::config::Config;
+use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
+use abstract_bridge_s2s::{
     client::{S2SClientBase, S2SClientGeneric},
     types::bp_header_chain,
 };
@@ -81,7 +81,7 @@ impl PangoroClient {
 
 pub struct PangoroS2SConfig;
 
-impl abstract_client_s2s::config::Config for PangoroS2SConfig {
+impl abstract_bridge_s2s::config::Config for PangoroS2SConfig {
     type Index = <PangoroSubxtConfig as subxt::Config>::Index;
     type BlockNumber = <PangoroSubxtConfig as subxt::Config>::BlockNumber;
     type Hash = <PangoroSubxtConfig as subxt::Config>::Hash;

@@ -1,7 +1,7 @@
 use std::ops::RangeInclusive;
 
-use abstract_client_s2s::error::S2SClientResult;
-use abstract_client_s2s::{
+use abstract_bridge_s2s::error::S2SClientResult;
+use abstract_bridge_s2s::{
     client::S2SClientRelay,
     config::Config,
     convert::SmartCodecMapper,
@@ -97,7 +97,7 @@ impl S2SClientRelay for PangoroClient {
     async fn block(
         &self,
         hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<Option<abstract_client_s2s::client::ChainBlock<Self::Config>>> {
+    ) -> S2SClientResult<Option<abstract_bridge_s2s::client::ChainBlock<Self::Config>>> {
         Ok(self.subxt().rpc().block(hash).await?)
     }
 

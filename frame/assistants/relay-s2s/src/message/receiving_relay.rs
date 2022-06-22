@@ -1,8 +1,8 @@
-use abstract_client_s2s::client::S2SClientRelay;
-use abstract_client_s2s::config::Config;
-use abstract_client_s2s::convert::SmartCodecMapper;
-use abstract_client_s2s::types::bp_messages::{OutboundLaneData, UnrewardedRelayersState};
-use abstract_client_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
+use abstract_bridge_s2s::client::S2SClientRelay;
+use abstract_bridge_s2s::config::Config;
+use abstract_bridge_s2s::convert::SmartCodecMapper;
+use abstract_bridge_s2s::types::bp_messages::{OutboundLaneData, UnrewardedRelayersState};
+use abstract_bridge_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
 
 use crate::error::RelayResult;
 use crate::helpers;

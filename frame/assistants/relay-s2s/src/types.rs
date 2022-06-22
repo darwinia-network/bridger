@@ -1,7 +1,7 @@
-use abstract_client_s2s::client::S2SClientRelay;
+use abstract_bridge_s2s::client::S2SClientRelay;
 #[cfg(feature = "bridge-parachain")]
-use abstract_client_s2s::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
-use abstract_client_s2s::config::Config;
+use abstract_bridge_s2s::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
+use abstract_bridge_s2s::config::Config;
 use subquery_s2s::types::OriginType;
 use subquery_s2s::Subquery;
 

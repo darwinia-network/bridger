@@ -28,12 +28,12 @@ pad         = "0.1"
 sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 
-abstract-client-s2s = { path = "../../abstract/client-s2s" }
+abstract-bridge-s2s = { path = "../../abstract/bridge-s2s" }
 subquery-s2s        = { path = "../subquery-s2s" }
 subquery-parachain  = { path = "../subquery-parachain" }
 
 [features]
 default = []
 bridge-parachain = [
-  "abstract-client-s2s/bridge-parachain",
+  "abstract-bridge-s2s/bridge-parachain",
 ]

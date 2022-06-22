@@ -1,5 +1,5 @@
 [package]
-name          = "abstract-client-s2s"
+name          = "abstract-bridge-s2s"
 authors       = ["Darwinia Network <hello@darwinia.network>"]
 description   = "Darwinia bridger"
 documentation = "https://rust-docs.darwinia.network/bridger"

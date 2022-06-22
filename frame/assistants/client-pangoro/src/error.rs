@@ -66,7 +66,7 @@ impl From<array_bytes::Error> for ClientError {
 }
 
 #[cfg(feature = "s2s")]
-impl From<ClientError> for abstract_client_s2s::error::S2SClientError {
+impl From<ClientError> for abstract_bridge_s2s::error::S2SClientError {
     fn from(error: ClientError) -> Self {
         match error {
             ClientError::SubxtBasicError(e) => Self::RPC(format!("{:?}", e)),

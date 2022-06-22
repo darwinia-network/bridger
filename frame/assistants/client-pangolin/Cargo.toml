@@ -36,7 +36,7 @@ shadow-liketh = { optional = true, path = "../shadow-liketh" }
 ## s2s client
 async-trait           = { optional = true, version = "0.1" }
 finality-grandpa      = { optional = true, version = "0.14" }
-abstract-client-s2s   = { optional = true, path = "../../../frame/abstract/client-s2s", features = ["advanced-types"] }
+abstract-bridge-s2s   = { optional = true, path = "../../../frame/abstract/bridge-s2s", features = ["advanced-types"] }
 
 support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
 
@@ -55,6 +55,6 @@ s2s         = [
   "substrate",
   "async-trait",
   "finality-grandpa",
-  "abstract-client-s2s",
+  "abstract-bridge-s2s",
 ]
 s2s-pangoro = ["s2s"]

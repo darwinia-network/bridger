@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::sync::Mutex;
 
-use abstract_client_s2s::client::S2SClientRelay;
-use abstract_client_s2s::error::S2SClientError;
+use abstract_bridge_s2s::client::S2SClientRelay;
+use abstract_bridge_s2s::error::S2SClientError;
 use once_cell::sync::Lazy;
 
 use crate::error::RelayResult;

@@ -20,6 +20,12 @@ pub struct SubscribeJustification<SC: S2SClientRelay, TC: S2SClientRelay> {
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> SubscribeJustification<SC, TC> {
+    pub fn new(input: JustificationInput<SC, TC>) -> Self {
+        Self { input }
+    }
+}
+
+impl<SC: S2SClientRelay, TC: S2SClientRelay> SubscribeJustification<SC, TC> {
     pub async fn start(self) -> RelayResult<()> {
         let client_source = self.input.client_source;
         let client_target = self.input.client_target;

@@ -13,11 +13,11 @@ pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
-    pub async fn new(message_relay: MessageInput<SC, TC>) -> RelayResult<Self> {
-        Ok(Self {
+    pub fn new(message_relay: MessageInput<SC, TC>) -> Self {
+        Self {
             input: message_relay,
             last_relayed_nonce: None,
-        })
+        }
     }
 }
 

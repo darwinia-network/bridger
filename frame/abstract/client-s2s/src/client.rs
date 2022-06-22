@@ -134,7 +134,6 @@ pub trait S2SClientRelay: S2SClientGeneric {
 #[async_trait::async_trait]
 pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
     /// beat para heads
-    /// todo: disscuss, maybe we can defined pallet_bridge_parachains::BestParaHead at this project
     async fn best_para_heads(
         &self,
         para_id: crate::types::ParaId,

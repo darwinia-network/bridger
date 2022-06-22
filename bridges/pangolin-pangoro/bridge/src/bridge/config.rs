@@ -97,3 +97,9 @@ impl IndexConfig {
         ))
     }
 }
+
+impl RelayConfig {
+    pub fn raw_lanes(&self) -> Vec<[u8; 4]> {
+        self.lanes.iter().map(|item| item.0).collect()
+    }
+}

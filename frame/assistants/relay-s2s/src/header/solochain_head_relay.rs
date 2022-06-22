@@ -16,6 +16,12 @@ pub struct SolochainHeaderRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
+    pub fn new(input: SolochainHeaderInput<SC, TC>) -> Self {
+        Self { input }
+    }
+}
+
+impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
     /// start header relay
     pub async fn start(&self) -> RelayResult<()> {
         let client_source = &self.input.client_source;

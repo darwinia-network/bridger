@@ -1,13 +1,13 @@
+use client_pangolin::client::PangolinClient;
+use client_pangoro::client::PangoroClient;
 use lifeline::{Lifeline, Service, Task};
 
+use relay_s2s::message::{DeliveryRunner, ReceivingRunner};
+use relay_s2s::types::MessageInput;
+use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
-use crate::bridge::BridgeBus;
-use crate::service::message::pangoro_to_pangolin::delivery_relay::DeliveryRunner;
-use crate::service::message::pangoro_to_pangolin::receiving_relay::ReceivingRunner;
-
-mod delivery_relay;
-mod receiving_relay;
+use crate::bridge::{BridgeBus, BridgeConfig};
 
 #[derive(Debug)]
 pub struct PangoroToPangolinMessageRelayService {
@@ -25,14 +25,17 @@ impl Service for PangoroToPangolinMessageRelayService {
         let _greet_delivery = Self::try_task(
             "pangoro-to-pangolin-message-delivery-service",
             async move {
-                while let Err(e) = start_delivery_runner().await {
+                while let Err(e) = start_delivery().await {
                     tracing::error!(
                         target: "pangolin-pangoro",
-                        "[delivery-pangoro-to-pangolin] Failed to start pangoro-to-pangolin message delivery relay, \
-                        wait some seconds try again: {:?}",
+                        "[message-relay] [pangoro-to-pangolin] An error occurred for message delivery relay {:?}",
                         e,
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    tracing::info!(
+                        target: "pangolin-pangoro",
+                        "[message-relay] [pangoro-to-pangolin] Try to restart message delivery relay service.",
+                    );
                 }
                 Ok(())
             },
@@ -40,14 +43,17 @@ impl Service for PangoroToPangolinMessageRelayService {
         let _greet_receiving = Self::try_task(
             "pangoro-to-pangolin-message-receiving-service",
             async move {
-                while let Err(e) = start_receiving_runner().await {
+                while let Err(e) = start_receiving().await {
                     tracing::error!(
                         target: "pangolin-pangoro",
-                        "[receiving-pangoro-to-pangolin] Failed to start pangoro-to-pangolin message confirm relay, \
-                        wait some seconds try again: {:?}",
+                        "[message-relay] [pangoro-to-pangolin] An error occurred for message receiving relay {:?}",
                         e,
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    tracing::info!(
+                        target: "pangolin-pangoro",
+                        "[message-relay] [pangoro-to-pangolin] Try to restart message receiving relay service.",
+                    );
                 }
                 Ok(())
             },
@@ -59,12 +65,46 @@ impl Service for PangoroToPangolinMessageRelayService {
     }
 }
 
-async fn start_delivery_runner() -> color_eyre::Result<()> {
-    let mut runner = DeliveryRunner::new().await?;
-    runner.start().await
+async fn message_input() -> color_eyre::Result<MessageInput<PangoroClient, PangolinClient>> {
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangoro)?;
+    let relay_config = bridge_config.relay;
+
+    let client_pangoro = bridge_config.pangoro.to_pangoro_client().await?;
+    let client_pangolin = bridge_config.pangolin.to_pangolin_client().await?;
+
+    let config_index = bridge_config.index;
+    let subquery_pangolin = config_index.to_pangolin_subquery()?;
+    let subquery_pangoro = config_index.to_pangoro_subquery()?;
+
+    let lanes = relay_config.raw_lanes();
+
+    let input = MessageInput {
+        lanes,
+        relayer_account: client_pangoro.account().account_id().clone(),
+        client_source: client_pangoro,
+        client_target: client_pangolin,
+        subquery_source: subquery_pangoro,
+        subquery_target: subquery_pangolin,
+    };
+    Ok(input)
 }
 
-async fn start_receiving_runner() -> color_eyre::Result<()> {
-    let mut runner = ReceivingRunner::new().await?;
-    runner.start().await
+async fn start_delivery() -> color_eyre::Result<()> {
+    tracing::info!(
+        target: "pangolin-pangoro",
+        "[message-delivery] [delivery-pangoro-to-pangolin] SERVICE RESTARTING..."
+    );
+    let input = message_input().await?;
+    let mut runner = DeliveryRunner::new(input);
+    Ok(runner.start().await?)
+}
+
+async fn start_receiving() -> color_eyre::Result<()> {
+    tracing::info!(
+        target: "pangolin-pangoro",
+        "[message-receiving] [receiving-pangoro-to-pangolin] SERVICE RESTARTING..."
+    );
+    let input = message_input().await?;
+    let mut runner = ReceivingRunner::new(input);
+    Ok(runner.start().await?)
 }

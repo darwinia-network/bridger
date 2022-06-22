@@ -51,7 +51,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         let block_number: u32 = SmartCodecMapper::map_to(block_number)?;
         tracing::trace!(
             target: "relay-s2s",
-            "{} the latest relayed pangolin block is: {:?}",
+            "{} the last relayed pangolin block is: {:?}",
             helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
             block_number
         );

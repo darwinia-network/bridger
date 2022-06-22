@@ -7,7 +7,7 @@ use crate::error::{RelayError, RelayResult};
 
 pub type LaneId = [u8; 4];
 
-pub struct SoloHeaderRelay<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct SolochainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub lanes: Vec<LaneId>,
     pub client_source: SC,
     pub client_target: TC,
@@ -20,7 +20,7 @@ pub struct JustificationInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub client_target: TC,
 }
 
-pub struct MessageRelay<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct MessageInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub lanes: Vec<LaneId>,
     pub relayer_account: <SC::Config as Config>::AccountId,
     pub client_source: SC,
@@ -29,7 +29,7 @@ pub struct MessageRelay<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub subquery_target: Subquery,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> MessageRelay<SC, TC> {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> MessageInput<SC, TC> {
     pub fn lane(&self) -> RelayResult<LaneId> {
         self.lanes
             .clone()

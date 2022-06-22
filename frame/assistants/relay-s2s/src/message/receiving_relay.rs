@@ -5,17 +5,17 @@ use abstract_client_s2s::types::bp_messages::{OutboundLaneData, UnrewardedRelaye
 use abstract_client_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
 
 use crate::error::RelayResult;
-use crate::types::MessageRelay;
+use crate::types::MessageInput;
 
 pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
-    message_relay: MessageRelay<SC, TC>,
+    input: MessageInput<SC, TC>,
     last_relayed_nonce: Option<u64>,
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
-    pub async fn new(message_relay: MessageRelay<SC, TC>) -> RelayResult<Self> {
+    pub async fn new(message_relay: MessageInput<SC, TC>) -> RelayResult<Self> {
         Ok(Self {
-            message_relay,
+            input: message_relay,
             last_relayed_nonce: None,
         })
     }
@@ -23,12 +23,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     async fn source_outbound_lane_data(&self) -> RelayResult<OutboundLaneData> {
-        let lane = self.message_relay.lane()?;
-        let outbound_lane_data = self
-            .message_relay
-            .client_source
-            .outbound_lanes(lane, None)
-            .await?;
+        let lane = self.input.lane()?;
+        let outbound_lane_data = self.input.client_source.outbound_lanes(lane, None).await?;
         Ok(outbound_lane_data)
     }
 
@@ -38,9 +34,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
         source_outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<(u64, UnrewardedRelayersState)>> {
         let block_hex = array_bytes::bytes2hex("0x", at_block);
-        let lane = self.message_relay.lane()?;
+        let lane = self.input.lane()?;
         let inbound_lane_data = self
-            .message_relay
+            .input
             .client_target
             .inbound_lanes(lane, Some(at_block))
             .await?;
@@ -139,11 +135,11 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     }
 
     async fn run(&self) -> RelayResult<Option<u64>> {
-        let lane = self.message_relay.lane()?;
+        let lane = self.input.lane()?;
 
         // alias
-        let client_source = &self.message_relay.client_source;
-        let client_target = &self.message_relay.client_target;
+        let client_source = &self.input.client_source;
+        let client_target = &self.input.client_target;
 
         let source_outbound_lane_data = self.source_outbound_lane_data().await?;
         if source_outbound_lane_data.latest_received_nonce

@@ -8,17 +8,17 @@ use sp_runtime::traits::Header;
 use subquery_s2s::types::RelayBlockOrigin;
 
 use crate::error::{RelayError, RelayResult};
-use crate::types::MessageRelay;
+use crate::types::MessageInput;
 
 pub struct DeliveryRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
-    message_relay: MessageRelay<SC, TC>,
+    input: MessageInput<SC, TC>,
     last_relayed_nonce: Option<u64>,
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
-    pub async fn new(message_relay: MessageRelay<SC, TC>) -> RelayResult<Self> {
+    pub async fn new(message_relay: MessageInput<SC, TC>) -> RelayResult<Self> {
         Ok(Self {
-            message_relay,
+            input: message_relay,
             last_relayed_nonce: None,
         })
     }
@@ -27,12 +27,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
 // defined
 impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
     async fn source_outbound_lane_data(&self) -> RelayResult<OutboundLaneData> {
-        let lane = self.message_relay.lane()?;
-        let outbound_lane_data = self
-            .message_relay
-            .client_source
-            .outbound_lanes(lane, None)
-            .await?;
+        let lane = self.input.lane()?;
+        let outbound_lane_data = self.input.client_source.outbound_lanes(lane, None).await?;
         Ok(outbound_lane_data)
     }
 
@@ -109,13 +105,13 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
     }
 
     async fn run(&self, limit: u64) -> RelayResult<Option<u64>> {
-        let lane = self.message_relay.lane()?;
+        let lane = self.input.lane()?;
         let source_outbound_lane_data = self.source_outbound_lane_data().await?;
 
         // alias
-        let client_source = &self.message_relay.client_source;
-        let client_target = &self.message_relay.client_target;
-        let subquery_pangolin = &self.message_relay.subquery_source;
+        let client_source = &self.input.client_source;
+        let client_target = &self.input.client_target;
+        let subquery_pangolin = &self.input.subquery_source;
 
         let nonces = match self
             .assemble_nonces(limit, &source_outbound_lane_data)
@@ -215,7 +211,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
         };
 
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
-        let relayer_account_source_chain = self.message_relay.relayer_account.clone();
+        let relayer_account_source_chain = self.input.relayer_account.clone();
         let expected_relayer_id = SmartCodecMapper::map_to(&relayer_account_source_chain)?;
         let hash = client_target
             .receive_messages_proof(

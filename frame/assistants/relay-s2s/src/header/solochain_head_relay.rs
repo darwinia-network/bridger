@@ -8,18 +8,18 @@ use sp_runtime::codec;
 use sp_runtime::traits::Header;
 
 use crate::error::{RelayError, RelayResult};
-use crate::types::SoloHeaderRelay;
+use crate::types::SolochainHeaderInput;
 
 /// solo chain to solo chain header relay runner
 pub struct SolochainToSolochainRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
-    header_relay: SoloHeaderRelay<SC, TC>,
+    input: SolochainHeaderInput<SC, TC>,
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> {
     /// start header relay
     pub async fn start(&self) -> RelayResult<()> {
-        let client_source = &self.header_relay.client_source;
-        let client_target = &self.header_relay.client_target;
+        let client_source = &self.input.client_source;
+        let client_target = &self.input.client_target;
 
         let last_relayed_source_hash_in_target = client_target.best_target_finalized(None).await?;
         let expected_source_hash = SmartCodecMapper::map_to(&last_relayed_source_hash_in_target)?;
@@ -53,8 +53,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> 
         block_hash: impl AsRef<str>,
         justification: Vec<u8>,
     ) -> RelayResult<()> {
-        let client_source = &self.header_relay.client_source;
-        let client_target = &self.header_relay.client_target;
+        let client_source = &self.input.client_source;
+        let client_target = &self.input.client_target;
         let block_hash = block_hash.as_ref();
         let block_hash = sp_core::H256::from_str(block_hash).map_err(|e| {
             RelayError::Custom(format!("Wrong block hash [{}] {:?}", block_hash, e))
@@ -82,7 +82,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> 
 
     /// Try to relay mandatory headers, return Ok(Some(block_number)) if success, else Ok(None)
     async fn try_to_relay_mandatory(&self, last_block_number: u32) -> RelayResult<Option<u32>> {
-        let subquery_source = &self.header_relay.subquery_source;
+        let subquery_source = &self.input.subquery_source;
         let next_mandatory_block = subquery_source
             .next_mandatory_header(last_block_number)
             .await?;
@@ -114,9 +114,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainToSolochainRunner<SC, TC> 
     }
 
     async fn try_to_relay_header_on_demand(&self, last_block_number: u32) -> RelayResult<()> {
-        let subquery_source = &self.header_relay.subquery_source;
+        let subquery_source = &self.input.subquery_source;
         let next_header = match subquery_source
-            .next_needed_header(self.header_relay.index_origin_type.clone())
+            .next_needed_header(self.input.index_origin_type.clone())
             .await?
         {
             Some(v) => {

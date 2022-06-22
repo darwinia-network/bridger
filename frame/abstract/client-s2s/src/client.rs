@@ -128,3 +128,12 @@ pub trait S2SClientRelay: S2SClientGeneric {
         relayers_state: bp_messages::UnrewardedRelayersState,
     ) -> S2SClientResult<<Self::Config as Config>::Hash>;
 }
+
+/// S2S with parachain bridge api
+pub trait S2SClientPara: S2SClientRelay {
+    async fn best_para_heads(
+        &self,
+        para_id: bp_polkadot_core::parachains::ParaId,
+        hash: Option<<Self::Config as Config>::Hash>,
+    ) -> S2SClientResult<pallet_bridge_parachains::BestParaHead>;
+}

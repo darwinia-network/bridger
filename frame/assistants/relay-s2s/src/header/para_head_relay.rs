@@ -7,7 +7,7 @@ use sp_runtime::traits::Header;
 use crate::error::{RelayError, RelayResult};
 use crate::types::ParaHeaderInput;
 
-/// solo chain to solo chain header relay runner
+/// para head to solo chain header relay runner
 pub struct ParaHeaderRunner<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> {
     input: ParaHeaderInput<SC, TC>,
 }

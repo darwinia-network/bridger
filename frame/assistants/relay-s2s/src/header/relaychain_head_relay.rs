@@ -10,7 +10,7 @@ use sp_runtime::traits::Header;
 use crate::error::{RelayError, RelayResult};
 use crate::types::RelaychainHeaderInput;
 
-/// solo chain to solo chain header relay runner
+/// relay chain to solo chain header relay runner
 pub struct RelaychainHeaderRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
     input: RelaychainHeaderInput<SC, TC>,
 }

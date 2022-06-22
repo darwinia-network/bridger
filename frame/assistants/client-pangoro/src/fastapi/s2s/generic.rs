@@ -1,3 +1,4 @@
+use abstract_client_s2s::config::Config;
 use abstract_client_s2s::error::{S2SClientError, S2SClientResult};
 use abstract_client_s2s::{
     client::{S2SClientBase, S2SClientGeneric},
@@ -232,5 +233,19 @@ impl S2SClientGeneric for PangoroClient {
         Ok(codec::Decode::decode(&mut &bytes[..]).map_err(|e| {
             S2SClientError::Custom(format!("Failed to decode initialization data: {:?}", e))
         })?)
+    }
+
+    async fn initialize(
+        &self,
+        initialization_data: Self::InitializationData,
+    ) -> S2SClientResult<<Self::Config as Config>::Hash> {
+        let hash = self
+            .runtime()
+            .tx()
+            .bridge_pangolin_grandpa()
+            .initialize(initialization_data)
+            .sign_and_submit(self.account().signer())
+            .await?;
+        Ok(hash)
     }
 }

@@ -28,6 +28,12 @@ pub trait S2SClientGeneric: S2SClientBase {
 
     /// prepare initialization data
     async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData>;
+
+    /// initialize bridge
+    async fn initialize(
+        &self,
+        initialization_data: Self::InitializationData,
+    ) -> S2SClientResult<<Self::Config as Config>::Hash>;
 }
 
 /// S2S bridge header/message api

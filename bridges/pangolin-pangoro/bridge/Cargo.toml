@@ -22,20 +22,12 @@ tokio       = { version = "1", features = ["full"] }
 structopt = "0.3"
 strum     = { version = "0.21", features = ["derive"] }
 serde     = { version = "1", features = ["derive"] }
-codec     = { package = "parity-scale-codec", version = "2", default-features = false }
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage  = "0.4"
 
-sp-core     = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-
-subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
-
 support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
-support-terminal   = { path = "../../../frame/supports/support-terminal" }
-
-component-http-client = { path = "../../../frame/components/http-client" }
 
 abstract-client-s2s = { path = "../../../frame/abstract/client-s2s" }
 client-pangolin     = { path = "../../../frame/assistants/client-pangolin", features = [ "s2s-pangoro" ]}

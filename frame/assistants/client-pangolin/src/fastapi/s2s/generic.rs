@@ -23,23 +23,6 @@ pub(crate) type BundleHeader = crate::types::runtime_types::sp_runtime::generic:
 type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 
 impl PangolinClient {
-    pub async fn subscribe_grandpa_justifications(
-        &self,
-    ) -> ClientResult<Subscription<sp_core::Bytes>> {
-        Ok(self
-            .subxt()
-            .rpc()
-            .client
-            .subscribe(
-                "grandpa_subscribeJustifications",
-                None,
-                "grandpa_unsubscribeJustifications",
-            )
-            .await?)
-    }
-}
-
-impl PangolinClient {
     async fn grandpa_authorities(&self, at: sp_core::H256) -> ClientResult<AuthorityList> {
         let params = subxt::rpc::rpc_params![
             "GrandpaApi_grandpa_authorities",
@@ -110,12 +93,29 @@ impl abstract_client_s2s::client::Config for PangolinS2SConfig {
 }
 
 impl S2SClientBase for PangolinClient {
+    const CHAIN: &'static str = "pangolin";
+
     type Config = PangolinS2SConfig;
 }
 
 #[async_trait::async_trait]
 impl S2SClientGeneric for PangolinClient {
     type InitializationData = InitializationData<BundleHeader>;
+
+    async fn subscribe_grandpa_justifications(
+        &self,
+    ) -> S2SClientResult<Subscription<sp_core::Bytes>> {
+        Ok(self
+            .subxt()
+            .rpc()
+            .client
+            .subscribe(
+                "grandpa_subscribeJustifications",
+                None,
+                "grandpa_unsubscribeJustifications",
+            )
+            .await?)
+    }
 
     async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData> {
         let mut subscription = self.subscribe_grandpa_justifications().await?;

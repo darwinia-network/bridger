@@ -1,12 +1,12 @@
+use core::fmt::Debug;
 use std::ops::RangeInclusive;
 
 use codec::{Codec, Decode, Encode, EncodeLike};
-use core::fmt::Debug;
+use jsonrpsee_core::client::Subscription;
+use sp_runtime::generic::{Block, SignedBlock};
 use sp_runtime::traits::{
     AtLeast32Bit, Extrinsic, Hash, Header, MaybeSerializeDeserialize, Member, Verify,
 };
-
-use sp_runtime::generic::{Block, SignedBlock};
 
 use crate::error::S2SClientResult;
 
@@ -54,12 +54,14 @@ pub trait Config: 'static {
 
 /// Parameter trait copied from `substrate::frame_support`
 pub trait Parameter: Codec + EncodeLike + Clone + Eq + Debug {}
+
 impl<T> Parameter for T where T: Codec + EncodeLike + Clone + Eq + Debug {}
 
 pub type ChainBlock<T> = SignedBlock<Block<<T as Config>::Header, <T as Config>::Extrinsic>>;
 
 /// S2S bridge client types defined
-pub trait S2SClientBase {
+pub trait S2SClientBase: Send + Sync + 'static {
+    const CHAIN: &'static str;
     type Config: Config;
 }
 
@@ -68,6 +70,11 @@ pub trait S2SClientBase {
 pub trait S2SClientGeneric: S2SClientBase {
     /// initialization data
     type InitializationData: Encode + Decode;
+
+    /// subscribe grandpa justifications
+    async fn subscribe_grandpa_justifications(
+        &self,
+    ) -> S2SClientResult<Subscription<sp_core::Bytes>>;
 
     /// prepare initialization data
     async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData>;

@@ -21,6 +21,7 @@ dependencies = [
  "bp-header-chain",
  "bp-messages",
  "bridge-runtime-common",
+ "jsonrpsee-core",
  "parity-scale-codec",
  "scale-info",
  "serde 1.0.136",
@@ -2600,6 +2601,7 @@ version = "0.5.7"
 dependencies = [
  "abstract-client-s2s",
  "array-bytes",
+ "once_cell",
  "sp-core",
  "sp-runtime",
  "subquery-s2s",

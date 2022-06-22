@@ -1,6 +1,5 @@
 #![allow(missing_docs)]
 
-use abstract_client_s2s::error::S2SClientError;
 use thiserror::Error as ThisError;
 
 use support_toolkit::error::TkError;
@@ -66,7 +65,8 @@ impl From<array_bytes::Error> for ClientError {
     }
 }
 
-impl From<ClientError> for S2SClientError {
+#[cfg(feature = "s2s")]
+impl From<ClientError> for abstract_client_s2s::error::S2SClientError {
     fn from(error: ClientError) -> Self {
         match error {
             ClientError::SubxtBasicError(e) => Self::RPC(format!("{:?}", e)),

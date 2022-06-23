@@ -3,9 +3,14 @@ use crate::error::S2SClientResult;
 
 /// relay decide
 #[async_trait::async_trait]
-pub trait RelayStrategy<SC: S2SClientRelay, TC: S2SClientRelay>: Clone {
+pub trait RelayStrategy<SC: S2SClientRelay, TC: S2SClientRelay>:
+    'static + Clone + Send + Sync
+{
     /// decide to relay
-    async fn decide(&mut self, reference: RelayReference<SC, TC>) -> S2SClientResult<bool>;
+    async fn decide(
+        &mut self,
+        reference: RelayReference<'async_trait, SC, TC>,
+    ) -> S2SClientResult<bool>;
 }
 
 /// decide reference
@@ -21,7 +26,10 @@ pub struct AlwaysPassRelayStrategy;
 
 #[async_trait::async_trait]
 impl<SC: S2SClientRelay, TC: S2SClientRelay> RelayStrategy<SC, TC> for AlwaysPassRelayStrategy {
-    async fn decide(&mut self, reference: RelayReference<SC, TC>) -> S2SClientResult<bool> {
+    async fn decide(
+        &mut self,
+        _reference: RelayReference<'async_trait, SC, TC>,
+    ) -> S2SClientResult<bool> {
         Ok(true)
     }
 }

@@ -68,7 +68,8 @@ where
 {
     if let Err(err) = subscribe_justification(&client, callback).await {
         tracing::error!(
-            target: "relay-s2s", "[subscribe] [{}] Failed to get justification from {}: {:?}",
+            target: "relay-s2s",
+            "[subscribe] [{}] Failed to get justification from {}: {:?}",
             T::CHAIN,
             T::CHAIN,
             err
@@ -85,6 +86,11 @@ where
     let mut subscribe = client.subscribe_grandpa_justifications().await?;
     while let Some(justification) = subscribe.next().await {
         let justification = justification.map_err(|e| S2SClientError::RPC(format!("{:?}", e)))?;
+        tracing::info!(
+            target: "relay-s2s",
+            "[subscribe] subscribed new justification for {}",
+            T::CHAIN,
+        );
         callback(justification);
     }
     Ok(())

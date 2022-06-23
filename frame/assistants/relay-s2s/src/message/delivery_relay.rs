@@ -119,7 +119,7 @@ where
         }
     }
 
-    async fn run(&self, limit: u32) -> RelayResult<Option<u64>> {
+    async fn run(&self, limit: u64) -> RelayResult<Option<u64>> {
         let lane = self.input.lane()?;
         let source_outbound_lane_data = self.source_outbound_lane_data().await?;
 

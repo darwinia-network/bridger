@@ -49,7 +49,7 @@ pub struct JustificationInput<SC: S2SClientRelay, TC: S2SClientRelay> {
 
 pub struct MessageDeliveryInput<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy> {
     pub lanes: Vec<LaneId>,
-    pub nonces_limit: u32,
+    pub nonces_limit: u64,
     pub relayer_account: <SC::Config as Config>::AccountId,
     pub client_source: SC,
     pub client_target: TC,

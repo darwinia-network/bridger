@@ -5,7 +5,6 @@ use abstract_bridge_s2s::strategy::RelayStrategy;
 use abstract_bridge_s2s::types::bp_messages::OutboundLaneData;
 use abstract_bridge_s2s::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use sp_runtime::traits::Header;
-use subquery_s2s::types::RelayBlockOrigin;
 use support_toolkit::convert::SmartCodecMapper;
 
 use crate::error::{RelayError, RelayResult};

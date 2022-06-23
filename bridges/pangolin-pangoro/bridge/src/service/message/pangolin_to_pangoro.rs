@@ -104,6 +104,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
     );
     let input = MessageDeliveryInput {
         lanes: input.lanes,
+        nonces_limit: 11,
         relayer_account: input.relayer_account,
         client_source: input.client_source,
         client_target: input.client_target,

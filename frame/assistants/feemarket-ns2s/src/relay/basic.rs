@@ -38,7 +38,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         let nonce = reference.nonce;
         tracing::trace!(
             target: "feemarket",
-            "[feemarket] [relay] [{}] Determine whether to relay for nonce: {}",
+            "[feemarket] [relay] [{}] determine whether to relay for nonce: {}",
             A::CHAIN,
             nonce,
         );
@@ -56,7 +56,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         if order.is_none() {
             tracing::info!(
                 target: "feemarket",
-                "[feemarket] [relay] [{}] Not found order by nonce: {}, so decide don't relay this nonce",
+                "[feemarket] [relay] [{}] not found order by nonce: {}, so decide don't relay this nonce",
                 A::CHAIN,
                 nonce,
             );
@@ -71,7 +71,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         if relayers.is_empty() {
             tracing::info!(
                 target: "feemarket",
-                "[feemarket] [relay] [{}] Not found any assigned relayers so relay this nonce({}) anyway",
+                "[feemarket] [relay] [{}] not found any assigned relayers so relay this nonce({}) anyway",
                 A::CHAIN,
                 nonce,
             );
@@ -90,7 +90,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         if is_assigned_relayer {
             tracing::info!(
                 target: "feemarket",
-                "[feemarket] [relay] [{}] You are assigned relayer, you must be relay this nonce({})",
+                "[feemarket] [relay] [{}] you are assigned relayer, you must be relay this nonce({})",
                 A::CHAIN,
                 nonce,
             );
@@ -118,7 +118,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         if latest_block_number > maximum_timeout {
             tracing::info!(
                 target: "feemarket",
-                "[feemarket] [relay] [{}] You aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
+                "[feemarket] [relay] [{}] you aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
                 A::CHAIN,
                 nonce,
             );
@@ -126,7 +126,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         }
         tracing::info!(
             target: "feemarket",
-            "[feemarket] [relay] [{}] You aren't assigned relay. and this nonce({}) is on-time. so don't relay this",
+            "[feemarket] [relay] [{}] you aren't assigned relay. and this nonce({}) is on-time. so don't relay this",
             A::CHAIN,
             nonce,
         );

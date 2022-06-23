@@ -110,7 +110,7 @@ where
             helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            if let Ok(last_relayed_nonce) = self.run(10).await {
+            if let Ok(last_relayed_nonce) = self.run(self.input.nonces_limit).await {
                 if last_relayed_nonce.is_some() {
                     self.last_relayed_nonce = last_relayed_nonce;
                 }
@@ -119,7 +119,7 @@ where
         }
     }
 
-    async fn run(&self, limit: u64) -> RelayResult<Option<u64>> {
+    async fn run(&self, limit: u32) -> RelayResult<Option<u64>> {
         let lane = self.input.lane()?;
         let source_outbound_lane_data = self.source_outbound_lane_data().await?;
 

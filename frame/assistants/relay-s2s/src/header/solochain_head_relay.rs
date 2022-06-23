@@ -5,10 +5,9 @@ use abstract_bridge_s2s::config::Config;
 use abstract_bridge_s2s::types::bp_header_chain;
 use sp_runtime::codec;
 use sp_runtime::traits::Header;
-use support_toolkit::convert::SmartCodecMapper;
+use support_toolkit::{convert::SmartCodecMapper, logk};
 
 use crate::error::{RelayError, RelayResult};
-use crate::helpers;
 use crate::types::{SolochainHeaderInput, M_HEADER};
 
 /// solo chain to solo chain header relay runner
@@ -53,7 +52,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         tracing::trace!(
             target: "relay-s2s",
             "{} the last relayed {} block is: {:?}",
-            helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
             SC::CHAIN,
             block_number,
         );
@@ -92,7 +91,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         tracing::info!(
             target: "relay-s2s",
             "{} header relayed: {:?}",
-            helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
             array_bytes::bytes2hex("0x", hash),
         );
         Ok(())
@@ -108,7 +107,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             tracing::info!(
                 target: "relay-s2s",
                 "{} the next mandatory block: {:?} ",
-                helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                 &block_to_relay.block_number
             );
             let justification = subquery_source
@@ -128,7 +127,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         tracing::info!(
             target: "relay-s2s",
             "{} the next mandatory block not found",
-            helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
         );
         Ok(None)
     }
@@ -144,7 +143,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
                     tracing::debug!(
                         target: "relay-s2s",
                         "{} the last storage block ({}) is less or equal last relayed block ({}). nothing to do.",
-                        helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
+                        logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                         v.block_number,
                         last_block_number,
                     );
@@ -156,7 +155,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
                 tracing::debug!(
                     target: "relay-s2s",
                     "{} try relay header on-demand, but not found any on-demand block",
-                    helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                 );
                 return Ok(());
             }
@@ -164,7 +163,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         tracing::debug!(
             target: "relay-s2s",
             "{} try relay header on-demand, the on-demand block is {}",
-            helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
             next_header.block_number,
         );
 
@@ -173,7 +172,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
                 tracing::trace!(
                     target: "relay-s2s",
                     "{} found on-demand block {}, and found new justification, ready to relay header",
-                    helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                     next_header.block_number,
                 );
                 let grandpa_justification: bp_header_chain::justification::GrandpaJustification<
@@ -199,7 +198,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
                 tracing::warn!(
                     target: "relay-s2s",
                     "{} found on-demand block {}, but not have justification to relay.",
-                    helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                     next_header.block_number,
                 );
             }

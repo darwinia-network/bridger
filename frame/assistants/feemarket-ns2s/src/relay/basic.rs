@@ -5,6 +5,7 @@ use abstract_bridge_s2s::strategy::{RelayReference, RelayStrategy};
 
 use abstract_feemarket_s2s::api::FeemarketApiRelay;
 use abstract_feemarket_s2s::types::Chain;
+use support_toolkit::logk;
 
 /// Basic relay strategy
 /// 1. if you are assigned relayer you will relay all order whether or not it times out
@@ -38,8 +39,8 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         let nonce = reference.nonce;
         tracing::trace!(
             target: "feemarket",
-            "[feemarket] [relay] [{}] determine whether to relay for nonce: {}",
-            A::CHAIN,
+            "{} determine whether to relay for nonce: {}",
+            logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
             nonce,
         );
         let order = self
@@ -56,8 +57,8 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         if order.is_none() {
             tracing::info!(
                 target: "feemarket",
-                "[feemarket] [relay] [{}] not found order by nonce: {}, so decide don't relay this nonce",
-                A::CHAIN,
+                "{} not found order by nonce: {}, so decide don't relay this nonce",
+                logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
                 nonce,
             );
             return Ok(false);
@@ -71,8 +72,8 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         if relayers.is_empty() {
             tracing::info!(
                 target: "feemarket",
-                "[feemarket] [relay] [{}] not found any assigned relayers so relay this nonce({}) anyway",
-                A::CHAIN,
+                "{} not found any assigned relayers so relay this nonce({}) anyway",
+                logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
                 nonce,
             );
             return Ok(true);
@@ -90,8 +91,8 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         if is_assigned_relayer {
             tracing::info!(
                 target: "feemarket",
-                "[feemarket] [relay] [{}] you are assigned relayer, you must be relay this nonce({})",
-                A::CHAIN,
+                "{} you are assigned relayer, you must be relay this nonce({})",
+                logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
                 nonce,
             );
             return Ok(true);
@@ -118,16 +119,16 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         if latest_block_number > maximum_timeout {
             tracing::info!(
                 target: "feemarket",
-                "[feemarket] [relay] [{}] you aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
-                A::CHAIN,
+                "{} you aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
+                logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
                 nonce,
             );
             return Ok(true);
         }
         tracing::info!(
             target: "feemarket",
-            "[feemarket] [relay] [{}] you aren't assigned relay. and this nonce({}) is on-time. so don't relay this",
-            A::CHAIN,
+            "{} you aren't assigned relay. and this nonce({}) is on-time. so don't relay this",
+            logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
             nonce,
         );
         Ok(false)

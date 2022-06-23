@@ -2,11 +2,11 @@ use abstract_bridge_s2s::client::S2SClientRelay;
 use abstract_bridge_s2s::config::Config;
 use abstract_bridge_s2s::types::bp_messages::{OutboundLaneData, UnrewardedRelayersState};
 use abstract_bridge_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
-use support_toolkit::convert::SmartCodecMapper;
+use support_toolkit::{convert::SmartCodecMapper, logk};
 
 use crate::error::RelayResult;
+use crate::keepstate;
 use crate::types::{MessageReceivingInput, M_RECEIVING};
-use crate::{helpers, keepstate};
 
 pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
     input: MessageReceivingInput<SC, TC>,
@@ -49,7 +49,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             tracing::info!(
                 target: "relay-s2s",
                 "{} max dispatch nonce({}) at target is same with last received nonce({}) at source. nothing to do.",
-                helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
                 max_confirm_end_at_target,
                 source_outbound_lane_data.latest_received_nonce,
             );
@@ -60,7 +60,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
                 tracing::warn!(
                     target: "relay-s2s",
                     "{} the nonce({}) is being processed. please waiting for the processing to finish.",
-                    helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
                     max_confirm_end_at_target,
                 );
                 return Ok(None);
@@ -82,7 +82,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             tracing::info!(
                 target: "relay-s2s",
                 "{} not have unrewarded message. nothing to do.",
-                helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
             );
             return Ok(None);
         }
@@ -105,7 +105,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
         tracing::info!(
             target: "relay-s2s",
             "{} SERVICE RESTARTING...",
-            helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
         );
         loop {
             if let Ok(last_relayed_nonce) = self.run().await {
@@ -133,7 +133,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             tracing::info!(
                 target: "relay-s2s",
                 "{} all nonces received, nothing to do.",
-                helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
             );
             return Ok(None);
         }
@@ -152,7 +152,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
                 tracing::warn!(
                     target: "relay-s2s",
                     "{} no unrewarded relayers state found by {}",
-                    helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
                     TC::CHAIN,
                 );
                 return Ok(None);
@@ -178,7 +178,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
         tracing::debug!(
             target: "relay-s2s",
             "{} receiving extensics sent successful: {}",
-            helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
             array_bytes::bytes2hex("0x", hash),
         );
         Ok(Some(max_confirmed_nonce_at_target))

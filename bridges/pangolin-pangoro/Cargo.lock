@@ -1004,6 +1004,7 @@ dependencies = [
  "async-trait",
  "component-subscan",
  "serde 1.0.136",
+ "support-toolkit",
  "thiserror",
  "tracing",
 ]
@@ -2832,7 +2833,6 @@ dependencies = [
  "abstract-bridge-s2s",
  "array-bytes",
  "once_cell",
- "pad",
  "sp-core",
  "sp-runtime",
  "subquery-parachain",
@@ -3953,6 +3953,8 @@ dependencies = [
 name = "support-toolkit"
 version = "0.5.7"
 dependencies = [
+ "once_cell",
+ "pad",
  "parity-scale-codec",
  "thiserror",
 ]

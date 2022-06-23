@@ -1,6 +1,8 @@
 use abstract_bridge_s2s::client::S2SClientRelay;
 use abstract_bridge_s2s::error::S2SClientError;
 
+use support_toolkit::logk;
+
 use crate::error::RelayResult;
 use crate::keepstate;
 use crate::types::JustificationInput;
@@ -45,8 +47,8 @@ where
     if let Err(err) = subscribe_justification(&client, callback).await {
         tracing::error!(
             target: "relay-s2s",
-            "[subscribe] [{}] Failed to get justification from {}: {:?}",
-            T::CHAIN,
+            "{} Failed to get justification from {}: {:?}",
+            logk::prefix_multi("subscribe", vec![T::CHAIN]),
             T::CHAIN,
             err
         );
@@ -64,7 +66,8 @@ where
         let justification = justification.map_err(|e| S2SClientError::RPC(format!("{:?}", e)))?;
         tracing::info!(
             target: "relay-s2s",
-            "[subscribe] subscribed new justification for {}",
+            "{} subscribed new justification for {}",
+            logk::prefix_multi("subscribe", vec![T::CHAIN]),
             T::CHAIN,
         );
         callback(justification);

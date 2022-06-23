@@ -23,12 +23,11 @@ thiserror   = "1.0"
 array-bytes = "1.4"
 tokio       = { version = "1", features = ["time"] }
 once_cell   = "1"
-pad         = "0.1"
 
 sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 
-support-toolkit     = { path = "../../supports/support-toolkit", features = ["convert"] }
+support-toolkit     = { path = "../../supports/support-toolkit", features = ["convert", "log"] }
 
 abstract-bridge-s2s = { path = "../../abstract/bridge-s2s" }
 subquery-s2s        = { path = "../subquery-s2s" }

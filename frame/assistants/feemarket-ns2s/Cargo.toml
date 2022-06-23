@@ -23,3 +23,4 @@ component-subscan   = { path = "../../components/subscan" }
 
 abstract-bridge-s2s    = { path = "../../abstract/bridge-s2s" }
 abstract-feemarket-s2s = { path = "../../abstract/feemarket-s2s" }
+support-toolkit        = { path = "../../supports/support-toolkit", features = ["log"] }

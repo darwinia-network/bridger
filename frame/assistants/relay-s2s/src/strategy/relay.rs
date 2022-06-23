@@ -37,12 +37,6 @@ impl<Strategy: RelayStrategy> EnforcementRelayStrategy<Strategy> {
             };
             let result = self.strategy.decide(decide_reference).await?;
             if !result {
-                // tracing::warn!(
-                //     target: "relay-s2s",
-                //     "{} the nonce({}) relay strategy decide is false",
-                //     helpers::log_prefix("strategy", SC::CHAIN, TC::CHAIN),
-                //     message_nonce,
-                // );
                 return Ok(false);
             }
             message_nonce += 1;

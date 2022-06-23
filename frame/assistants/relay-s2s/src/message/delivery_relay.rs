@@ -5,10 +5,9 @@ use abstract_bridge_s2s::strategy::RelayStrategy;
 use abstract_bridge_s2s::types::bp_messages::OutboundLaneData;
 use abstract_bridge_s2s::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use sp_runtime::traits::Header;
-use support_toolkit::convert::SmartCodecMapper;
+use support_toolkit::{convert::SmartCodecMapper, logk};
 
 use crate::error::{RelayError, RelayResult};
-use crate::helpers;
 use crate::keepstate;
 use crate::strategy::{EnforcementDecideReference, EnforcementRelayStrategy};
 use crate::types::{MessageDeliveryInput, M_DELIVERY};
@@ -68,7 +67,7 @@ where
                     "{} have a batches of transactions in progress. \
                     waiting for this batches to complete. last relayed noce is {} and expect to start with {}. \
                     please wait receiving.",
-                    helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                     last_relayed_nonce,
                     start,
                 );
@@ -80,7 +79,7 @@ where
         tracing::trace!(
             target: "relay-s2s",
             "{} assemble nonces, start from {} and last generated is {}",
-            helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
             start,
             latest_generated_nonce,
         );
@@ -104,7 +103,7 @@ where
         tracing::info!(
             target: "relay-s2s",
             "{} SERVICE RESTARTING...",
-            helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
         );
         loop {
             if let Ok(last_relayed_nonce) = self.run(self.input.nonces_limit).await {
@@ -136,7 +135,7 @@ where
                 tracing::info!(
                     target: "relay-s2s",
                     "{} all nonces delivered, nothing to do.",
-                    helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                 );
                 return Ok(None);
             }
@@ -144,7 +143,7 @@ where
         tracing::info!(
             target: "relay-s2s",
             "{} assembled nonces {:?}",
-            helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
             nonces,
         );
 
@@ -158,7 +157,7 @@ where
                 tracing::warn!(
                     target: "relay-s2s",
                     "{} the last nonce({}) isn't storage by indexer for {} chain",
-                    helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                     nonces.end(),
                     SC::CHAIN,
                 );
@@ -187,7 +186,7 @@ where
             tracing::warn!(
                 target: "relay-s2s",
                 "{} the last nonce({}) at block {} is less then last relayed header {}, please wait header relay.",
-                helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                 nonces.end(),
                 last_relay.block_number,
                 relayed_block_number,
@@ -242,7 +241,7 @@ where
             tracing::warn!(
                 target: "relay-s2s",
                 "{} the relay strategy decide not relay these nonces({:?})",
-                helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                 nonces,
             );
             return Ok(None);
@@ -264,7 +263,7 @@ where
         tracing::debug!(
             target: "relay-s2s",
             "{} the nonces {:?} in delivered to target chain -> {}",
-            helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
             nonces,
             array_bytes::bytes2hex("0x", hash),
         );

@@ -22,6 +22,7 @@ serde_json  = "1"
 array-bytes = "1.4"
 codec       = { package = "parity-scale-codec", version = "2" }
 subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
+bp-pangolin = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
 ## substrate
 sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }

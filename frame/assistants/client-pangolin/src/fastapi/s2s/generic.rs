@@ -13,7 +13,6 @@ use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
 
 use crate::client::PangolinClient;
-use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::types::runtime_types::bp_header_chain::InitializationData;
 
@@ -81,25 +80,11 @@ impl PangolinClient {
     }
 }
 
-pub struct PangolinS2SConfig;
-
-impl abstract_bridge_s2s::config::Config for PangolinS2SConfig {
-    type Index = <PangolinSubxtConfig as subxt::Config>::Index;
-    type BlockNumber = <PangolinSubxtConfig as subxt::Config>::BlockNumber;
-    type Hash = <PangolinSubxtConfig as subxt::Config>::Hash;
-    type Balance = u128;
-    type Hashing = <PangolinSubxtConfig as subxt::Config>::Hashing;
-    type AccountId = <PangolinSubxtConfig as subxt::Config>::AccountId;
-    type Address = <PangolinSubxtConfig as subxt::Config>::Address;
-    type Header = <PangolinSubxtConfig as subxt::Config>::Header;
-    type Signature = <PangolinSubxtConfig as subxt::Config>::Signature;
-    type Extrinsic = <PangolinSubxtConfig as subxt::Config>::Extrinsic;
-}
-
 impl S2SClientBase for PangolinClient {
     const CHAIN: &'static str = "pangolin";
 
-    type Config = PangolinS2SConfig;
+    type Config = bp_pangolin::Pangolin;
+    type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 
 #[async_trait::async_trait]

@@ -17,7 +17,7 @@ version       = "0.5.7"
 thiserror   = "1"
 async-trait = "0.1"
 
-num-traits     = "0.2"
+#num-traits     = "0.2"
 serde          = { version = "1.0.124", features = ["derive"] }
 codec          = { package = "parity-scale-codec", version = "2" }
 scale-info     = { version = "1.0.0", features = ["bit-vec"] }
@@ -26,6 +26,7 @@ jsonrpsee-core = "0.8"
 sp-core               = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 sp-runtime            = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 
+bp-runtime            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 bp-messages           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 bridge-runtime-common = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 bp-header-chain       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }

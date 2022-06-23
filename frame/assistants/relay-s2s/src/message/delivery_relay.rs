@@ -17,7 +17,7 @@ pub struct DeliveryRunner<SC, TC, Strategy>
 where
     SC: S2SClientRelay,
     TC: S2SClientRelay,
-    Strategy: RelayStrategy<SC, TC>,
+    Strategy: RelayStrategy,
 {
     input: MessageDeliveryInput<SC, TC, Strategy>,
     last_relayed_nonce: Option<u64>,
@@ -27,7 +27,7 @@ impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
 where
     SC: S2SClientRelay,
     TC: S2SClientRelay,
-    Strategy: RelayStrategy<SC, TC>,
+    Strategy: RelayStrategy,
 {
     pub fn new(input: MessageDeliveryInput<SC, TC, Strategy>) -> Self {
         Self {
@@ -42,7 +42,7 @@ impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
 where
     SC: S2SClientRelay,
     TC: S2SClientRelay,
-    Strategy: RelayStrategy<SC, TC>,
+    Strategy: RelayStrategy,
 {
     async fn source_outbound_lane_data(&self) -> RelayResult<OutboundLaneData> {
         let lane = self.input.lane()?;
@@ -102,7 +102,7 @@ impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
 where
     SC: S2SClientRelay,
     TC: S2SClientRelay,
-    Strategy: RelayStrategy<SC, TC>,
+    Strategy: RelayStrategy,
 {
     pub async fn start(&mut self) -> RelayResult<()> {
         tracing::info!(
@@ -232,8 +232,6 @@ where
 
         // relay strategy
         let reference = EnforcementDecideReference {
-            client_source,
-            client_target,
             lane,
             nonces: nonces.clone(),
             message_size,

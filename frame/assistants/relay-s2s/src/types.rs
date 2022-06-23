@@ -47,11 +47,7 @@ pub struct JustificationInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub client_target: TC,
 }
 
-pub struct MessageDeliveryInput<
-    SC: S2SClientRelay,
-    TC: S2SClientRelay,
-    Strategy: RelayStrategy<SC, TC>,
-> {
+pub struct MessageDeliveryInput<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy> {
     pub lanes: Vec<LaneId>,
     pub relayer_account: <SC::Config as Config>::AccountId,
     pub client_source: SC,
@@ -61,7 +57,7 @@ pub struct MessageDeliveryInput<
     pub relay_strategy: Strategy,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy<SC, TC>>
+impl<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy>
     MessageDeliveryInput<SC, TC, Strategy>
 {
     // todo: support multiple lanes

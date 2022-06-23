@@ -1,19 +1,20 @@
+use core::fmt::Debug;
 use std::ops::RangeInclusive;
 
-use codec::{Decode, Encode};
+use codec::{Codec, Decode, Encode, EncodeLike};
 use jsonrpsee_core::client::Subscription;
 use sp_core::storage::StorageKey;
 use sp_runtime::generic::{Block, SignedBlock};
+use sp_runtime::traits::{Extrinsic, MaybeSerializeDeserialize};
 
 use crate::config::Config;
 use crate::error::S2SClientResult;
-
-pub type ChainBlock<T> = SignedBlock<Block<<T as Config>::Header, <T as Config>::Extrinsic>>;
 
 /// S2S bridge client types defined
 pub trait S2SClientBase: Send + Sync + 'static {
     const CHAIN: &'static str;
     type Config: Config;
+    type Extrinsic: Codec + EncodeLike + Clone + Eq + Extrinsic + Debug + MaybeSerializeDeserialize;
 }
 
 /// S2S bridge client generic trait
@@ -82,7 +83,9 @@ pub trait S2SClientRelay: S2SClientGeneric {
     async fn block(
         &self,
         hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<Option<ChainBlock<Self::Config>>>;
+    ) -> S2SClientResult<
+        Option<SignedBlock<Block<<Self::Config as Config>::Header, Self::Extrinsic>>>,
+    >;
 
     /// query best target finalized at source
     async fn best_target_finalized(

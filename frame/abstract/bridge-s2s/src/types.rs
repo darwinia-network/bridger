@@ -1,5 +1,6 @@
 pub use bp_header_chain;
 pub use bp_messages;
+pub use bp_runtime;
 pub use bridge_runtime_common;
 
 #[cfg(feature = "bridge-parachain")]

@@ -1,7 +1,6 @@
 use abstract_bridge_s2s::strategy::AlwaysRelayStrategy;
 use client_pangolin::client::PangolinClient;
 use client_pangoro::client::PangoroClient;
-use feemarket_ns2s::relay::basic::BasicRelayStrategy;
 use lifeline::{Lifeline, Service, Task};
 
 use relay_s2s::message::{DeliveryRunner, ReceivingRunner};
@@ -98,7 +97,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         target: "pangolin-pangoro",
         "[message-delivery] [delivery-pangolin-to-pangoro] SERVICE RESTARTING..."
     );
-    let relay_strategy = BasicRelayStrategy::new(PangolinFeemarketApi);
+    // let relay_strategy = BasicRelayStrategy::new(PangolinFeemarketApi);
     let input = message_input().await?;
     let input = MessageDeliveryInput {
         lanes: input.lanes,

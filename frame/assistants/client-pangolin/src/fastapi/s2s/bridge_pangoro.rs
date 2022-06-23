@@ -7,6 +7,7 @@ use abstract_bridge_s2s::{
     convert::SmartCodecMapper,
     types::{bp_header_chain, bp_messages, bridge_runtime_common},
 };
+use sp_runtime::generic::{Block, SignedBlock};
 use sp_runtime::AccountId32;
 use subxt::sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;
@@ -97,7 +98,9 @@ impl S2SClientRelay for PangolinClient {
     async fn block(
         &self,
         hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<Option<abstract_bridge_s2s::client::ChainBlock<Self::Config>>> {
+    ) -> S2SClientResult<
+        Option<SignedBlock<Block<<Self::Config as Config>::Header, Self::Extrinsic>>>,
+    > {
         Ok(self.subxt().rpc().block(hash).await?)
     }
 

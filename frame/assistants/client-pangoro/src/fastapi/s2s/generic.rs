@@ -13,7 +13,6 @@ use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
 
 use crate::client::PangoroClient;
-use crate::config::PangoroSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::types::runtime_types::bp_header_chain::InitializationData;
 
@@ -81,25 +80,26 @@ impl PangoroClient {
     }
 }
 
-pub struct PangoroS2SConfig;
-
-impl abstract_bridge_s2s::config::Config for PangoroS2SConfig {
-    type Index = <PangoroSubxtConfig as subxt::Config>::Index;
-    type BlockNumber = <PangoroSubxtConfig as subxt::Config>::BlockNumber;
-    type Hash = <PangoroSubxtConfig as subxt::Config>::Hash;
-    type Balance = u128;
-    type Hashing = <PangoroSubxtConfig as subxt::Config>::Hashing;
-    type AccountId = <PangoroSubxtConfig as subxt::Config>::AccountId;
-    type Address = <PangoroSubxtConfig as subxt::Config>::Address;
-    type Header = <PangoroSubxtConfig as subxt::Config>::Header;
-    type Signature = <PangoroSubxtConfig as subxt::Config>::Signature;
-    type Extrinsic = <PangoroSubxtConfig as subxt::Config>::Extrinsic;
-}
+// pub struct PangoroS2SConfig;
+//
+// impl abstract_bridge_s2s::config::Config for PangoroS2SConfig {
+//     type Index = <PangoroSubxtConfig as subxt::Config>::Index;
+//     type BlockNumber = <PangoroSubxtConfig as subxt::Config>::BlockNumber;
+//     type Hash = <PangoroSubxtConfig as subxt::Config>::Hash;
+//     type Balance = u128;
+//     type Hashing = <PangoroSubxtConfig as subxt::Config>::Hashing;
+//     type AccountId = <PangoroSubxtConfig as subxt::Config>::AccountId;
+//     type Address = <PangoroSubxtConfig as subxt::Config>::Address;
+//     type Header = <PangoroSubxtConfig as subxt::Config>::Header;
+//     type Signature = <PangoroSubxtConfig as subxt::Config>::Signature;
+//     type Extrinsic = <PangoroSubxtConfig as subxt::Config>::Extrinsic;
+// }
 
 impl S2SClientBase for PangoroClient {
     const CHAIN: &'static str = "pangoro";
 
-    type Config = PangoroS2SConfig;
+    type Config = bp_pangoro::Pangoro;
+    type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 
 #[async_trait::async_trait]

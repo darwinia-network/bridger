@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use subxt::{sp_core, sp_runtime};
+use subxt::sp_runtime;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientConfig {
@@ -15,13 +15,13 @@ pub struct ClientConfig {
 pub enum PangoroSubxtConfig {}
 
 impl subxt::Config for PangoroSubxtConfig {
-    type Index = u32;
-    type BlockNumber = u32;
-    type Hash = sp_core::H256;
-    type Hashing = sp_runtime::traits::BlakeTwo256;
-    type AccountId = sp_runtime::AccountId32;
-    type Address = sp_runtime::MultiAddress<Self::AccountId, u32>;
-    type Header = sp_runtime::generic::Header<Self::BlockNumber, sp_runtime::traits::BlakeTwo256>;
-    type Signature = sp_runtime::MultiSignature;
+    type Index = bp_pangoro::Nonce;
+    type BlockNumber = bp_pangoro::BlockNumber;
+    type Hash = bp_pangoro::Hash;
+    type Hashing = bp_pangoro::Hashing;
+    type AccountId = bp_pangoro::AccountId;
+    type Address = bp_pangoro::Address;
+    type Header = bp_pangoro::Header;
+    type Signature = bp_pangoro::Signature;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }

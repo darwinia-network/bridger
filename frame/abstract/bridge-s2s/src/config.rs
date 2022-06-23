@@ -1,8 +1,13 @@
 use core::fmt::Debug;
 
 use codec::{Codec, Encode, EncodeLike};
-use sp_runtime::traits::{
-    AtLeast32Bit, Extrinsic, Hash, Header, MaybeSerializeDeserialize, Member, Verify,
+use num_traits::{Bounded, CheckedSub, SaturatingAdd, Zero};
+use sp_runtime::{
+    traits::{
+        AtLeast32Bit, AtLeast32BitUnsigned, Extrinsic, Hash, Header, MaybeSerializeDeserialize,
+        Member, Verify,
+    },
+    FixedPointOperand,
 };
 
 /// Runtime types.
@@ -25,6 +30,20 @@ pub trait Config: 'static {
         + AsRef<[u8]>
         + AsMut<[u8]>
         + scale_info::TypeInfo;
+
+    type Balance: AtLeast32BitUnsigned
+        + FixedPointOperand
+        + Parameter
+        + Member
+        + MaybeSerializeDeserialize
+        + Clone
+        + Copy
+        + Bounded
+        + CheckedSub
+        + PartialOrd
+        + SaturatingAdd
+        + Zero
+        + TryFrom<sp_core::U256>;
 
     /// The hashing system (algorithm) being used in the runtime (e.g. Blake2).
     type Hashing: Hash<Output = Self::Hash>;

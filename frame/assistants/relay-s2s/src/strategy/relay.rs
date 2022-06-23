@@ -6,11 +6,13 @@ use abstract_bridge_s2s::error::S2SClientResult;
 use abstract_bridge_s2s::strategy::{RelayReference, RelayStrategy};
 
 use crate::helpers;
+use crate::types::LaneId;
 
 /// enforcement decide reference
 pub struct EnforcementDecideReference<'a, SC: S2SClientRelay, TC: S2SClientRelay> {
     pub client_source: &'a SC,
     pub client_target: &'a TC,
+    pub lane: LaneId,
     /// nonces
     pub nonces: RangeInclusive<u64>,
     /// message size
@@ -54,6 +56,7 @@ impl<'a, SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy<SC, TC>
             let decide_reference = RelayReference {
                 client_source: reference.client_source,
                 client_target: reference.client_target,
+                lane: reference.lane,
                 nonce: message_nonce,
             };
             let result = self.strategy.decide(decide_reference).await?;

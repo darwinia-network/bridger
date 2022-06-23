@@ -234,6 +234,7 @@ where
         let reference = EnforcementDecideReference {
             client_source,
             client_target,
+            lane,
             nonces: nonces.clone(),
             message_size,
             total_weight,

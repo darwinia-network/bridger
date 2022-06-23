@@ -22,6 +22,7 @@ dependencies = [
  "bp-messages",
  "bridge-runtime-common",
  "jsonrpsee-core",
+ "num-traits 0.2.15",
  "parity-scale-codec",
  "scale-info",
  "serde 1.0.137",

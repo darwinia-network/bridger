@@ -1,4 +1,4 @@
-use abstract_bridge_s2s::strategy::AlwaysPassRelayStrategy;
+use abstract_bridge_s2s::strategy::AlwaysRelayStrategy;
 use client_pangolin::client::PangolinClient;
 use client_pangoro::client::PangoroClient;
 use lifeline::{Lifeline, Service, Task};
@@ -104,7 +104,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         client_target: input.client_target,
         subquery_source: input.subquery_source,
         subquery_target: input.subquery_target,
-        relay_strategy: AlwaysPassRelayStrategy,
+        relay_strategy: AlwaysRelayStrategy,
     };
     let mut runner = DeliveryRunner::new(input);
     Ok(runner.start().await?)

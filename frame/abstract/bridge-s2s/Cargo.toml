@@ -17,6 +17,7 @@ version       = "0.5.7"
 thiserror   = "1"
 async-trait = "0.1"
 
+num-traits     = "0.2"
 serde          = { version = "1.0.124", features = ["derive"] }
 codec          = { package = "parity-scale-codec", version = "2" }
 scale-info     = { version = "1.0.0", features = ["bit-vec"] }

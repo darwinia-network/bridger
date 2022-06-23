@@ -13,8 +13,9 @@ repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.5.7"
 
 [dependencies]
-tracing    = "0.1"
-color-eyre = "0.5"
+tracing     = "0.1"
+color-eyre  = "0.5"
+async-trait = "0.1"
 
 array-bytes = "1.4"
 tokio       = { version = "1", features = ["full"] }
@@ -34,3 +35,4 @@ client-pangolin     = { path = "../../../frame/assistants/client-pangolin", feat
 client-pangoro      = { path = "../../../frame/assistants/client-pangoro", features = [ "s2s-pangolin" ]}
 subquery-s2s        = { path = "../../../frame/assistants/subquery-s2s" }
 relay-s2s           = { path = "../../../frame/assistants/relay-s2s" }
+feemarket-ns2s      = { path = "../../../frame/assistants/feemarket-ns2s" }

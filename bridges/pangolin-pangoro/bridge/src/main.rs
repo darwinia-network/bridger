@@ -7,6 +7,7 @@ mod cli;
 mod command;
 mod service;
 mod types;
+mod feemarket;
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {

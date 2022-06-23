@@ -27,7 +27,7 @@ impl FeemarketApiRelay for PangolinClient {
             .orders(laned_id, message_nonce, None)
             .await?
         {
-            Some(v) => Ok(SmartCodecMapper::map_to(&v)?),
+            Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
             None => Ok(None),
         }
     }

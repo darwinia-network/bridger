@@ -87,10 +87,7 @@ impl S2SClientRelay for PangoroClient {
         hash: Option<<Self::Config as Config>::Hash>,
     ) -> S2SClientResult<Option<<Self::Config as Config>::Header>> {
         match self.subxt().rpc().header(hash).await? {
-            Some(v) => {
-                let v = codec::Encode::encode(&v);
-                Ok(Some(codec::Decode::decode(&mut v.as_slice())?))
-            }
+            Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
             None => Ok(None),
         }
     }

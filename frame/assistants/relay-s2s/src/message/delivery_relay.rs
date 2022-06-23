@@ -9,6 +9,7 @@ use support_toolkit::convert::SmartCodecMapper;
 
 use crate::error::{RelayError, RelayResult};
 use crate::helpers;
+use crate::keepstate;
 use crate::strategy::{EnforcementDecideReference, EnforcementRelayStrategy};
 use crate::types::{MessageDeliveryInput, M_DELIVERY};
 
@@ -19,7 +20,6 @@ where
     Strategy: RelayStrategy,
 {
     input: MessageDeliveryInput<SC, TC, Strategy>,
-    last_relayed_nonce: Option<u64>,
 }
 
 impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
@@ -29,10 +29,7 @@ where
     Strategy: RelayStrategy,
 {
     pub fn new(input: MessageDeliveryInput<SC, TC, Strategy>) -> Self {
-        Self {
-            input,
-            last_relayed_nonce: None,
-        }
+        Self { input }
     }
 }
 
@@ -64,7 +61,7 @@ where
 
         // assemble nonce range
         let start: u64 = latest_confirmed_nonce + 1;
-        if let Some(last_relayed_nonce) = self.last_relayed_nonce {
+        if let Some(last_relayed_nonce) = keepstate::get_last_delivery_relayed_nonce() {
             if last_relayed_nonce >= start {
                 tracing::warn!(
                     target: "relay-s2s",
@@ -103,7 +100,7 @@ where
     TC: S2SClientRelay,
     Strategy: RelayStrategy,
 {
-    pub async fn start(&mut self) -> RelayResult<()> {
+    pub async fn start(&self) -> RelayResult<()> {
         tracing::info!(
             target: "relay-s2s",
             "{} SERVICE RESTARTING...",
@@ -112,7 +109,9 @@ where
         loop {
             if let Ok(last_relayed_nonce) = self.run(self.input.nonces_limit).await {
                 if last_relayed_nonce.is_some() {
-                    self.last_relayed_nonce = last_relayed_nonce;
+                    keepstate::set_last_delivery_relayed_nonce(
+                        last_relayed_nonce.expect("Unreachable"),
+                    )?;
                 }
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }

@@ -113,7 +113,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         relay_block_origin: RelayBlockOrigin::BridgePangolin,
         relay_strategy,
     };
-    let mut runner = DeliveryRunner::new(input);
+    let runner = DeliveryRunner::new(input);
     Ok(runner.start().await?)
 }
 
@@ -123,6 +123,6 @@ async fn start_receiving() -> color_eyre::Result<()> {
         "[message-receiving] [receiving-pangoro-to-pangolin] SERVICE RESTARTING..."
     );
     let input = message_input().await?;
-    let mut runner = ReceivingRunner::new(input);
+    let runner = ReceivingRunner::new(input);
     Ok(runner.start().await?)
 }

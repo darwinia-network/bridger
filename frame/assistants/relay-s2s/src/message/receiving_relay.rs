@@ -5,19 +5,17 @@ use abstract_bridge_s2s::types::bridge_runtime_common::messages::source::FromBri
 use support_toolkit::convert::SmartCodecMapper;
 
 use crate::error::RelayResult;
-use crate::helpers;
 use crate::types::{MessageReceivingInput, M_RECEIVING};
+use crate::{helpers, keepstate};
 
 pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
     input: MessageReceivingInput<SC, TC>,
-    last_relayed_nonce: Option<u64>,
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     pub fn new(message_relay: MessageReceivingInput<SC, TC>) -> Self {
         Self {
             input: message_relay,
-            last_relayed_nonce: None,
         }
     }
 }
@@ -57,7 +55,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             );
             return Ok(None);
         }
-        if let Some(last_relayed_nonce) = self.last_relayed_nonce {
+        if let Some(last_relayed_nonce) = keepstate::get_last_receiving_relayed_nonce() {
             if last_relayed_nonce >= max_confirm_end_at_target {
                 tracing::warn!(
                     target: "relay-s2s",
@@ -103,7 +101,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
-    pub async fn start(&mut self) -> RelayResult<()> {
+    pub async fn start(&self) -> RelayResult<()> {
         tracing::info!(
             target: "relay-s2s",
             "{} SERVICE RESTARTING...",
@@ -112,7 +110,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
         loop {
             if let Ok(last_relayed_nonce) = self.run().await {
                 if last_relayed_nonce.is_some() {
-                    self.last_relayed_nonce = last_relayed_nonce;
+                    keepstate::set_last_receiving_relayed_nonce(
+                        last_relayed_nonce.expect("Unreachable"),
+                    )?;
                 }
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }

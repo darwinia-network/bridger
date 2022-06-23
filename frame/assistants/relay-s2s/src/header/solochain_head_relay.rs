@@ -168,7 +168,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             next_header.block_number,
         );
 
-        match crate::subscribe::recently_justification(SC::CHAIN)? {
+        match crate::keepstate::get_recently_justification(SC::CHAIN) {
             Some(justification) => {
                 tracing::trace!(
                     target: "relay-s2s",

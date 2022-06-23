@@ -163,7 +163,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         }
         let next_header = next_header.expect("Unreachable");
 
-        match crate::subscribe::recently_justification(SC::CHAIN)? {
+        match crate::keepstate::get_recently_justification(SC::CHAIN) {
             Some(justification) => {
                 let grandpa_justification: bp_header_chain::justification::GrandpaJustification<
                     <SC::Config as Config>::Header,

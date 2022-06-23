@@ -19,9 +19,7 @@ serde       = { version = "1", features = ["derive"] }
 thiserror   = "1.0"
 tracing     = "0.1"
 
-codec = { package = "parity-scale-codec", version = "2" }
-
-pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-
 component-subscan   = { path = "../../components/subscan" }
-abstract-bridge-s2s = { path = "../../abstract/bridge-s2s" }
+
+abstract-bridge-s2s    = { path = "../../abstract/bridge-s2s" }
+abstract-feemarket-s2s = { path = "../../abstract/feemarket-s2s" }

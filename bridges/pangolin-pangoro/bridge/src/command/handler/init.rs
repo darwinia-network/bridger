@@ -1,5 +1,5 @@
 use abstract_bridge_s2s::client::S2SClientGeneric;
-use abstract_bridge_s2s::convert::SmartCodecMapper;
+use support_toolkit::convert::SmartCodecMapper;
 
 use support_common::config::{Config, Names};
 

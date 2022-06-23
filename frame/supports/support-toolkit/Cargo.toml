@@ -19,3 +19,10 @@ edition = "2021"
 
 [dependencies]
 thiserror = "1"
+
+codec     = { optional = true, package = "parity-scale-codec", version = "2" }
+
+[features]
+convert = [
+  "codec"
+]

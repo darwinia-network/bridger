@@ -65,7 +65,7 @@ impl From<array_bytes::Error> for ClientError {
     }
 }
 
-#[cfg(feature = "s2s")]
+#[cfg(feature = "bridge-s2s")]
 impl From<ClientError> for abstract_bridge_s2s::error::S2SClientError {
     fn from(error: ClientError) -> Self {
         match error {

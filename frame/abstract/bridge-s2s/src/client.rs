@@ -3,7 +3,6 @@ use std::ops::RangeInclusive;
 
 use codec::{Codec, Decode, Encode, EncodeLike};
 use jsonrpsee_core::client::Subscription;
-use sp_core::storage::StorageKey;
 use sp_runtime::generic::{Block, SignedBlock};
 use sp_runtime::traits::{Extrinsic, MaybeSerializeDeserialize};
 
@@ -22,18 +21,6 @@ pub trait S2SClientBase: Send + Sync + 'static {
 pub trait S2SClientGeneric: S2SClientBase {
     /// initialization data
     type InitializationData: Encode + Decode;
-
-    /// fetch storage
-    async fn fetch_storage<T: Send + Decode + 'static>(
-        &self,
-        key: StorageKey,
-        hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<Option<T>>;
-
-    /// best finalized block number
-    async fn best_finalized_block_number(
-        &self,
-    ) -> S2SClientResult<<Self::Config as Config>::BlockNumber>;
 
     /// subscribe grandpa justifications
     async fn subscribe_grandpa_justifications(

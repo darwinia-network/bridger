@@ -2,10 +2,10 @@ use std::str::FromStr;
 
 use abstract_bridge_s2s::client::S2SClientRelay;
 use abstract_bridge_s2s::config::Config;
-use abstract_bridge_s2s::convert::SmartCodecMapper;
 use abstract_bridge_s2s::types::bp_header_chain;
 use sp_runtime::codec;
 use sp_runtime::traits::Header;
+use support_toolkit::convert::SmartCodecMapper;
 
 use crate::error::{RelayError, RelayResult};
 use crate::helpers;

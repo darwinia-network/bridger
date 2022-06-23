@@ -4,9 +4,7 @@ use abstract_bridge_s2s::{
     client::{S2SClientBase, S2SClientGeneric},
     types::bp_header_chain,
 };
-use codec::Decode;
 use finality_grandpa::voter_set::VoterSet;
-use sp_core::storage::StorageKey;
 use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
 use sp_runtime::{ConsensusEngineId, DigestItem};
 use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
@@ -90,29 +88,6 @@ impl S2SClientBase for PangolinClient {
 #[async_trait::async_trait]
 impl S2SClientGeneric for PangolinClient {
     type InitializationData = InitializationData<BundleHeader>;
-
-    async fn fetch_storage<T: Send + Decode + 'static>(
-        &self,
-        key: StorageKey,
-        hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<Option<T>> {
-        Ok(self.subxt().storage().fetch_unhashed(key, hash).await?)
-    }
-
-    async fn best_finalized_block_number(
-        &self,
-    ) -> S2SClientResult<<Self::Config as Config>::BlockNumber> {
-        let head_hash = self.subxt().rpc().finalized_head().await?;
-        let header = self
-            .subxt()
-            .rpc()
-            .header(Some(head_hash))
-            .await?
-            .ok_or_else(|| {
-                S2SClientError::Custom("Can not query best finalized header".to_string())
-            })?;
-        Ok(header.number)
-    }
 
     async fn subscribe_grandpa_justifications(
         &self,

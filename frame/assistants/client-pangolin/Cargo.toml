@@ -24,6 +24,9 @@ codec       = { package = "parity-scale-codec", version = "2" }
 subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 bp-pangolin = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
+## maybe common
+async-trait = { optional = true, version = "0.1" }
+
 ## substrate
 sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
@@ -35,11 +38,13 @@ secp256k1     = { optional = true, version = "0.20", features = ["recovery"] }
 shadow-liketh = { optional = true, path = "../shadow-liketh" }
 
 ## s2s client
-async-trait           = { optional = true, version = "0.1" }
 finality-grandpa      = { optional = true, version = "0.14" }
 abstract-bridge-s2s   = { optional = true, path = "../../../frame/abstract/bridge-s2s", features = ["advanced-types"] }
 
-support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
+## feemarket s2s
+abstract-feemarket-s2s = { optional = true, path = "../../../frame/abstract/feemarket-s2s", features = ["advanced-types"] }
+
+support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
@@ -52,10 +57,15 @@ substrate   = [
   "sp-core",
 ]
 ethlike-v1  = ["web3", "secp256k1", "shadow-liketh"]
-s2s         = [
+bridge-s2s         = [
   "substrate",
   "async-trait",
   "finality-grandpa",
   "abstract-bridge-s2s",
 ]
-s2s-pangoro = ["s2s"]
+bridge-s2s-pangoro = ["bridge-s2s"]
+feemarket-s2s   = [
+  "async-trait",
+  "abstract-feemarket-s2s",
+]
+feemarket-s2s-pangoro = ["feemarket-s2s"]

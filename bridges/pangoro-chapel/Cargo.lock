@@ -3489,6 +3489,7 @@ dependencies = [
 name = "support-toolkit"
 version = "0.5.7"
 dependencies = [
+ "parity-scale-codec",
  "thiserror",
 ]
 

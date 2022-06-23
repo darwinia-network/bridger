@@ -4,7 +4,6 @@ use abstract_bridge_s2s::error::S2SClientResult;
 use abstract_bridge_s2s::{
     client::S2SClientRelay,
     config::Config,
-    convert::SmartCodecMapper,
     types::{bp_header_chain, bp_messages, bridge_runtime_common},
 };
 use sp_runtime::generic::{Block, SignedBlock};
@@ -12,10 +11,11 @@ use sp_runtime::AccountId32;
 use subxt::sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;
+use support_toolkit::convert::SmartCodecMapper;
 
-use crate::client::PangolinClient;
+use crate::client::PangoroClient;
 use crate::error::ClientError;
-use crate::subxt_runtime::api::bridge_pangoro_messages::storage::{
+use crate::subxt_runtime::api::bridge_pangolin_messages::storage::{
     InboundLanes, OutboundLanes, OutboundMessages,
 };
 
@@ -30,7 +30,7 @@ type FromThisChainMessagePayload = crate::types::runtime_types::bp_message_dispa
 >;
 
 #[async_trait::async_trait]
-impl S2SClientRelay for PangolinClient {
+impl S2SClientRelay for PangoroClient {
     fn gen_outbound_messages_storage_key(&self, lane: [u8; 4], message_nonce: u64) -> StorageKey {
         let prefix = StorageKeyPrefix::new::<OutboundMessages>();
         OutboundMessages(BundleMessageKey {
@@ -111,7 +111,7 @@ impl S2SClientRelay for PangolinClient {
         Ok(self
             .runtime()
             .storage()
-            .bridge_pangoro_grandpa()
+            .bridge_pangolin_grandpa()
             .best_finalized(at_block)
             .await?)
     }
@@ -128,7 +128,7 @@ impl S2SClientRelay for PangolinClient {
         Ok(self
             .runtime()
             .tx()
-            .bridge_pangoro_grandpa()
+            .bridge_pangolin_grandpa()
             .submit_finality_proof(expected_target, expected_justification)
             .sign_and_submit(self.account().signer())
             .await?)
@@ -142,7 +142,7 @@ impl S2SClientRelay for PangolinClient {
         let outbound_lane_data = self
             .runtime()
             .storage()
-            .bridge_pangoro_messages()
+            .bridge_pangolin_messages()
             .outbound_lanes(lane, hash)
             .await?;
         let expected = SmartCodecMapper::map_to(&outbound_lane_data)?;
@@ -157,7 +157,7 @@ impl S2SClientRelay for PangolinClient {
         let inbound_lane_data = self
             .runtime()
             .storage()
-            .bridge_pangoro_messages()
+            .bridge_pangolin_messages()
             .inbound_lanes(lane, hash)
             .await?;
         let expected = SmartCodecMapper::map_to(&inbound_lane_data)?;
@@ -173,7 +173,7 @@ impl S2SClientRelay for PangolinClient {
         match self
             .runtime()
             .storage()
-            .bridge_pangoro_messages()
+            .bridge_pangolin_messages()
             .outbound_messages(expected_message_key, hash)
             .await?
         {
@@ -205,7 +205,7 @@ impl S2SClientRelay for PangolinClient {
         Ok(self
             .runtime()
             .tx()
-            .bridge_pangoro_messages()
+            .bridge_pangolin_messages()
             .receive_messages_proof(
                 relayer_id_at_bridged_chain,
                 expected_proof,
@@ -228,7 +228,7 @@ impl S2SClientRelay for PangolinClient {
         Ok(self
             .runtime()
             .tx()
-            .bridge_pangoro_messages()
+            .bridge_pangolin_messages()
             .receive_messages_delivery_proof(expected_proof, expected_relayers_state)
             .sign_and_submit(self.account().signer())
             .await?)

@@ -1,6 +1,6 @@
-use abstract_bridge_s2s::strategy::AlwaysRelayStrategy;
 use client_pangolin::client::PangolinClient;
 use client_pangoro::client::PangoroClient;
+use feemarket_ns2s::relay::basic::BasicRelayStrategy;
 use lifeline::{Lifeline, Service, Task};
 
 use relay_s2s::message::{DeliveryRunner, ReceivingRunner};
@@ -9,7 +9,6 @@ use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
-use crate::feemarket::PangolinFeemarketApi;
 
 #[derive(Debug)]
 pub struct PangolinToPangoroMessageRelayService {
@@ -97,8 +96,11 @@ async fn start_delivery() -> color_eyre::Result<()> {
         target: "pangolin-pangoro",
         "[message-delivery] [delivery-pangolin-to-pangoro] SERVICE RESTARTING..."
     );
-    // let relay_strategy = BasicRelayStrategy::new(PangolinFeemarketApi);
     let input = message_input().await?;
+    let relay_strategy = BasicRelayStrategy::new(
+        input.client_source.clone(),
+        input.client_source.account().account_id().clone(),
+    );
     let input = MessageDeliveryInput {
         lanes: input.lanes,
         relayer_account: input.relayer_account,
@@ -106,7 +108,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         client_target: input.client_target,
         subquery_source: input.subquery_source,
         subquery_target: input.subquery_target,
-        relay_strategy: AlwaysRelayStrategy,
+        relay_strategy,
     };
     let mut runner = DeliveryRunner::new(input);
     Ok(runner.start().await?)

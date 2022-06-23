@@ -1,9 +1,10 @@
+use abstract_bridge_s2s::strategy::AlwaysPassRelayStrategy;
 use client_pangolin::client::PangolinClient;
 use client_pangoro::client::PangoroClient;
 use lifeline::{Lifeline, Service, Task};
 
 use relay_s2s::message::{DeliveryRunner, ReceivingRunner};
-use relay_s2s::types::MessageInput;
+use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
@@ -65,7 +66,8 @@ impl Service for PangolinToPangoroMessageRelayService {
     }
 }
 
-async fn message_input() -> color_eyre::Result<MessageInput<PangolinClient, PangoroClient>> {
+async fn message_input() -> color_eyre::Result<MessageReceivingInput<PangolinClient, PangoroClient>>
+{
     let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangoro)?;
     let relay_config = bridge_config.relay;
 
@@ -78,7 +80,7 @@ async fn message_input() -> color_eyre::Result<MessageInput<PangolinClient, Pang
 
     let lanes = relay_config.raw_lanes();
 
-    let input = MessageInput {
+    let input = MessageReceivingInput {
         lanes,
         relayer_account: client_pangolin.account().account_id().clone(),
         client_source: client_pangolin,
@@ -95,6 +97,15 @@ async fn start_delivery() -> color_eyre::Result<()> {
         "[message-delivery] [delivery-pangolin-to-pangoro] SERVICE RESTARTING..."
     );
     let input = message_input().await?;
+    let input = MessageDeliveryInput {
+        lanes: input.lanes,
+        relayer_account: input.relayer_account,
+        client_source: input.client_source,
+        client_target: input.client_target,
+        subquery_source: input.subquery_source,
+        subquery_target: input.subquery_target,
+        relay_strategy: AlwaysPassRelayStrategy,
+    };
     let mut runner = DeliveryRunner::new(input);
     Ok(runner.start().await?)
 }

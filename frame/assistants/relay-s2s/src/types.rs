@@ -2,12 +2,14 @@ use abstract_bridge_s2s::client::S2SClientRelay;
 #[cfg(feature = "bridge-parachain")]
 use abstract_bridge_s2s::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
 use abstract_bridge_s2s::config::Config;
+use abstract_bridge_s2s::strategy::RelayStrategy;
 use subquery_s2s::types::OriginType;
 use subquery_s2s::Subquery;
 
 use crate::error::{RelayError, RelayResult};
 
 pub(crate) static M_HEADER: &str = "header";
+#[cfg(feature = "bridge-parachain")]
 pub(crate) static M_PARA_HEAD: &str = "para-head";
 pub(crate) static M_DELIVERY: &str = "delivery";
 pub(crate) static M_RECEIVING: &str = "receiving";
@@ -45,7 +47,34 @@ pub struct JustificationInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub client_target: TC,
 }
 
-pub struct MessageInput<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct MessageDeliveryInput<
+    SC: S2SClientRelay,
+    TC: S2SClientRelay,
+    Strategy: RelayStrategy<SC, TC>,
+> {
+    pub lanes: Vec<LaneId>,
+    pub relayer_account: <SC::Config as Config>::AccountId,
+    pub client_source: SC,
+    pub client_target: TC,
+    pub subquery_source: Subquery,
+    pub subquery_target: Subquery,
+    pub relay_strategy: Strategy,
+}
+
+impl<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy<SC, TC>>
+    MessageDeliveryInput<SC, TC, Strategy>
+{
+    // todo: support multiple lanes
+    pub fn lane(&self) -> RelayResult<LaneId> {
+        self.lanes
+            .clone()
+            .get(0)
+            .cloned()
+            .ok_or_else(|| RelayError::Custom("Missing lane id".to_string()))
+    }
+}
+
+pub struct MessageReceivingInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub lanes: Vec<LaneId>,
     pub relayer_account: <SC::Config as Config>::AccountId,
     pub client_source: SC,
@@ -54,7 +83,8 @@ pub struct MessageInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub subquery_target: Subquery,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> MessageInput<SC, TC> {
+impl<SC: S2SClientRelay, TC: S2SClientRelay> MessageReceivingInput<SC, TC> {
+    // todo: support multiple lanes
     pub fn lane(&self) -> RelayResult<LaneId> {
         self.lanes
             .clone()

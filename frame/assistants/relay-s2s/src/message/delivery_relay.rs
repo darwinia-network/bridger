@@ -2,6 +2,7 @@ use std::ops::RangeInclusive;
 
 use abstract_bridge_s2s::client::S2SClientRelay;
 use abstract_bridge_s2s::convert::SmartCodecMapper;
+use abstract_bridge_s2s::strategy::RelayStrategy;
 use abstract_bridge_s2s::types::bp_messages::OutboundLaneData;
 use abstract_bridge_s2s::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use sp_runtime::traits::Header;
@@ -9,15 +10,26 @@ use subquery_s2s::types::RelayBlockOrigin;
 
 use crate::error::{RelayError, RelayResult};
 use crate::helpers;
-use crate::types::{MessageInput, M_DELIVERY};
+use crate::strategy::{EnforcementDecideReference, EnforcementRelayStrategy};
+use crate::types::{MessageDeliveryInput, M_DELIVERY};
 
-pub struct DeliveryRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
-    input: MessageInput<SC, TC>,
+pub struct DeliveryRunner<SC, TC, Strategy>
+where
+    SC: S2SClientRelay,
+    TC: S2SClientRelay,
+    Strategy: RelayStrategy<SC, TC>,
+{
+    input: MessageDeliveryInput<SC, TC, Strategy>,
     last_relayed_nonce: Option<u64>,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
-    pub fn new(input: MessageInput<SC, TC>) -> Self {
+impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
+where
+    SC: S2SClientRelay,
+    TC: S2SClientRelay,
+    Strategy: RelayStrategy<SC, TC>,
+{
+    pub fn new(input: MessageDeliveryInput<SC, TC, Strategy>) -> Self {
         Self {
             input,
             last_relayed_nonce: None,
@@ -26,7 +38,12 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
 }
 
 // defined
-impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
+impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
+where
+    SC: S2SClientRelay,
+    TC: S2SClientRelay,
+    Strategy: RelayStrategy<SC, TC>,
+{
     async fn source_outbound_lane_data(&self) -> RelayResult<OutboundLaneData> {
         let lane = self.input.lane()?;
         let outbound_lane_data = self.input.client_source.outbound_lanes(lane, None).await?;
@@ -81,7 +98,12 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
     }
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
+impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
+where
+    SC: S2SClientRelay,
+    TC: S2SClientRelay,
+    Strategy: RelayStrategy<SC, TC>,
+{
     pub async fn start(&mut self) -> RelayResult<()> {
         tracing::info!(
             target: "relay-s2s",
@@ -199,6 +221,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
         let proof = client_source
             .read_proof(storage_keys, Some(expected_source_hash))
             .await?;
+        let message_size = proof.len();
         let proof = FromBridgedChainMessagesProof {
             bridged_header_hash: expected_source_hash,
             storage_proof: proof,
@@ -207,6 +230,26 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> DeliveryRunner<SC, TC> {
             nonces_end: *nonces.end(),
         };
 
+        // relay strategy
+        let reference = EnforcementDecideReference {
+            client_source,
+            client_target,
+            nonces: nonces.clone(),
+            message_size,
+            total_weight,
+        };
+        let mut relay_strategy = EnforcementRelayStrategy::new(self.input.relay_strategy.clone());
+        if !relay_strategy.decide(reference).await? {
+            tracing::warn!(
+                target: "relay-s2s",
+                "{} the relay strategy decide not relay these nonces({:?})",
+                helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                nonces,
+            );
+            return Ok(None);
+        }
+
+        // submit messages proof to target chain
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
         let relayer_account_source_chain = self.input.relayer_account.clone();
         let expected_relayer_id = SmartCodecMapper::map_to(&relayer_account_source_chain)?;

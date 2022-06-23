@@ -6,15 +6,15 @@ use abstract_bridge_s2s::types::bridge_runtime_common::messages::source::FromBri
 
 use crate::error::RelayResult;
 use crate::helpers;
-use crate::types::{MessageInput, M_RECEIVING};
+use crate::types::{MessageReceivingInput, M_RECEIVING};
 
 pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
-    input: MessageInput<SC, TC>,
+    input: MessageReceivingInput<SC, TC>,
     last_relayed_nonce: Option<u64>,
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
-    pub fn new(message_relay: MessageInput<SC, TC>) -> Self {
+    pub fn new(message_relay: MessageReceivingInput<SC, TC>) -> Self {
         Self {
             input: message_relay,
             last_relayed_nonce: None,

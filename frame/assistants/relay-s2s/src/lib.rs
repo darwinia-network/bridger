@@ -5,3 +5,4 @@ pub mod subscribe;
 pub mod types;
 
 mod helpers;
+mod strategy;

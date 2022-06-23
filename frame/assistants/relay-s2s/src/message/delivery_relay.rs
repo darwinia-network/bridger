@@ -127,7 +127,7 @@ where
         // alias
         let client_source = &self.input.client_source;
         let client_target = &self.input.client_target;
-        let subquery_pangolin = &self.input.subquery_source;
+        let subquery_source = &self.input.subquery_source;
 
         let nonces = match self
             .assemble_nonces(limit, &source_outbound_lane_data)
@@ -151,17 +151,18 @@ where
         );
 
         // query last nonce block information
-        let last_relay = match subquery_pangolin
-            .query_need_relay(RelayBlockOrigin::BridgePangoro, lane, *nonces.end())
+        let last_relay = match subquery_source
+            .query_need_relay(self.input.relay_block_origin.clone(), lane, *nonces.end())
             .await?
         {
             Some(v) => v,
             None => {
                 tracing::warn!(
                     target: "relay-s2s",
-                    "{} the last nonce({}) isn't storage by indexer",
+                    "{} the last nonce({}) isn't storage by indexer for {} chain",
                     helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                     nonces.end(),
+                    SC::CHAIN,
                 );
                 return Ok(None);
             }
@@ -170,18 +171,19 @@ where
         // query last relayed header
         let last_relayed_source_hash_in_target = client_target.best_target_finalized(None).await?;
         let expected_source_hash = SmartCodecMapper::map_to(&last_relayed_source_hash_in_target)?;
-        let last_relayed_pangolin_block_in_pangoro = client_source
+        let last_relayed_source_block_in_target = client_source
             .block(Some(expected_source_hash))
             .await?
             .ok_or_else(|| {
                 RelayError::Custom(format!(
-                    "Failed to query block by [{}] in pangolin",
+                    "Failed to query block by [{}] in {}",
                     array_bytes::bytes2hex("0x", expected_source_hash),
+                    SC::CHAIN,
                 ))
             })?;
 
         // compare last nonce block with last relayed header
-        let relayed_block_number = last_relayed_pangolin_block_in_pangoro.block.header.number();
+        let relayed_block_number = last_relayed_source_block_in_target.block.header.number();
         let relayed_block_number: u32 = SmartCodecMapper::map_to(relayed_block_number)?;
         if relayed_block_number < last_relay.block_number {
             tracing::warn!(
@@ -263,7 +265,7 @@ where
 
         tracing::debug!(
             target: "relay-s2s",
-            "{} the nonces {:?} in pangolin delivered to pangoro -> {}",
+            "{} the nonces {:?} in delivered to target chain -> {}",
             helpers::log_prefix(M_DELIVERY, SC::CHAIN, TC::CHAIN),
             nonces,
             array_bytes::bytes2hex("0x", hash),

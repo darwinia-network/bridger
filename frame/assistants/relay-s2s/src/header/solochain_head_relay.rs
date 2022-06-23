@@ -42,8 +42,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             .await?
             .ok_or_else(|| {
                 RelayError::Custom(format!(
-                    "Failed to query block by [{}] in pangolin",
+                    "Failed to query block by [{}] in {}",
                     array_bytes::bytes2hex("0x", expected_source_hash),
+                    SC::CHAIN,
                 ))
             })?;
 
@@ -51,9 +52,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         let block_number: u32 = SmartCodecMapper::map_to(block_number)?;
         tracing::trace!(
             target: "relay-s2s",
-            "{} the last relayed pangolin block is: {:?}",
+            "{} the last relayed {} block is: {:?}",
             helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
-            block_number
+            SC::CHAIN,
+            block_number,
         );
 
         if self.try_to_relay_mandatory(block_number).await?.is_none() {
@@ -178,8 +180,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
                     <SC::Config as Config>::Header,
                 > = codec::Decode::decode(&mut justification.as_ref()).map_err(|err| {
                     RelayError::Custom(format!(
-                        "Failed to decode justification of pangolin: {:?}",
-                        err
+                        "Failed to decode justification of {}: {:?}",
+                        SC::CHAIN,
+                        err,
                     ))
                 })?;
                 let target_number: u32 =

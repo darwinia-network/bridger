@@ -21,11 +21,12 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
         let best_target_header = client_solochain
             .header(None)
             .await?
-            .ok_or_else(|| RelayError::Custom(String::from("Failed to get pangolin header")))?;
+            .ok_or_else(|| RelayError::Custom(format!("Failed to get {} header", SC::CHAIN)))?;
         tracing::trace!(
             target: "relay-s2s",
-            "{} current pangolin block: {:?}",
+            "{} current {} block: {:?}",
             helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
+            SC::CHAIN,
             best_target_header.number(),
         );
         let para_head_at_target = client_solochain
@@ -33,8 +34,9 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .await?;
         tracing::trace!(
             target: "relay-s2s",
-            "{} the last para-head on pangolin: {:?}",
+            "{} the last para-head on {}: {:?}",
             helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
+            SC::CHAIN,
             &para_head_at_target,
         );
 
@@ -108,8 +110,9 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .await?;
         tracing::info!(
             target: "relay-s2s",
-            "{} submitting parachain heads update transaction to pangolin",
+            "{} submitting parachain heads update transaction to {}",
             helpers::log_prefix(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
+            SC::CHAIN,
         );
 
         let hash = client_solochain

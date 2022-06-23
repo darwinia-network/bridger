@@ -1,8 +1,9 @@
 use client_pangolin::client::PangolinClient;
 use client_pangoro::client::PangoroClient;
-use feemarket_ns2s::relay::basic::BasicRelayStrategy;
 use lifeline::{Lifeline, Service, Task};
+use subquery_s2s::types::RelayBlockOrigin;
 
+use feemarket_ns2s::relay::basic::BasicRelayStrategy;
 use relay_s2s::message::{DeliveryRunner, ReceivingRunner};
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
 use support_common::config::{Config, Names};
@@ -108,6 +109,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         client_target: input.client_target,
         subquery_source: input.subquery_source,
         subquery_target: input.subquery_target,
+        relay_block_origin: RelayBlockOrigin::BridgePangolin,
         relay_strategy,
     };
     let mut runner = DeliveryRunner::new(input);

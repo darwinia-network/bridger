@@ -151,8 +151,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             None => {
                 tracing::warn!(
                     target: "relay-s2s",
-                    "{} no unrewarded relayers state found by pangoro",
+                    "{} no unrewarded relayers state found by {}",
                     helpers::log_prefix(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+                    TC::CHAIN,
                 );
                 return Ok(None);
             }

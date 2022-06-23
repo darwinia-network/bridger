@@ -19,17 +19,17 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
     pub async fn start(&self) -> RelayResult<()> {
         let client_relaychain = &self.input.client_relaychain;
         let client_solochain = &self.input.client_solochain;
-        let last_relayed_rococo_hash_in_pangolin =
+        let last_relayed_relaychain_hash_in_solochain =
             client_solochain.best_target_finalized(None).await?;
         let expected_relaychain_hash =
-            SmartCodecMapper::map_to(&last_relayed_rococo_hash_in_pangolin)?;
+            SmartCodecMapper::map_to(&last_relayed_relaychain_hash_in_solochain)?;
         tracing::debug!(
             target: "relay-s2s",
             "{} get last relayed rococo block hash: {:?}",
             helpers::log_prefix(M_HEADER, SC::CHAIN, TC::CHAIN),
             array_bytes::bytes2hex("0x", expected_relaychain_hash),
         );
-        let last_relayed_rococo_block_in_pangolin = client_relaychain
+        let last_relayed_relaychain_block_in_solochain = client_relaychain
             .block(Some(expected_relaychain_hash))
             .await?
             .ok_or_else(|| {
@@ -39,7 +39,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
                 ))
             })?;
 
-        let block_number = last_relayed_rococo_block_in_pangolin.block.header.number();
+        let block_number = last_relayed_relaychain_block_in_solochain
+            .block
+            .header
+            .number();
         let block_number: u32 = SmartCodecMapper::map_to(block_number)?;
         tracing::info!(
             target: "relay-s2s",

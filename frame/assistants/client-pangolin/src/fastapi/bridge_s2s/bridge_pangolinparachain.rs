@@ -1,6 +1,6 @@
 use std::ops::RangeInclusive;
 
-use abstract_bridge_s2s::error::S2SClientResult;
+use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
 use abstract_bridge_s2s::{
     client::S2SParaBridgeClientSolochain,
     config::Config,
@@ -105,7 +105,7 @@ impl S2SParaBridgeClientSolochain for PangolinClient {
         &self,
         at_block: Option<<Self::Config as Config>::Hash>,
     ) -> S2SClientResult<<Self::Config as Config>::Hash> {
-        Err("not needed")
+        Err(S2SClientError::Custom("not needed".to_string()))
     }
 
     async fn submit_finality_proof(
@@ -115,7 +115,7 @@ impl S2SParaBridgeClientSolochain for PangolinClient {
             <Self::Config as Config>::Header,
         >,
     ) -> S2SClientResult<<Self::Config as Config>::Hash> {
-        Err("not needed")
+        Err(S2SClientError::Custom("not needed".to_string()))
     }
 
     async fn outbound_lanes(
@@ -241,11 +241,7 @@ impl S2SParaBridgeClientSolochain for PangolinClient {
             .runtime()
             .tx()
             .bridge_rococo_parachains()
-            .submit_parachain_heads(
-                relay_block_hash,
-                parachains,
-                parachain_heads_proof
-            )
+            .submit_parachain_heads(relay_block_hash, parachains, parachain_heads_proof)
             .sign_and_submit(self.account().signer())
             .await?)
     }

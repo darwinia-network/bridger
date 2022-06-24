@@ -10,19 +10,13 @@ use sp_runtime::{ConsensusEngineId, DigestItem};
 use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
 
-use crate::client::PangolinClient;
+use crate::client::RococoClient;
 use crate::error::{ClientError, ClientResult};
 use crate::types::runtime_types::bp_header_chain::InitializationData;
 
 const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
 
-pub(crate) type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
-    u32,
-    crate::types::runtime_types::sp_runtime::traits::BlakeTwo256,
->;
-type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
-
-impl PangolinClient {
+impl RococoClient {
     async fn grandpa_authorities(&self, at: sp_core::H256) -> ClientResult<AuthorityList> {
         let params = subxt::rpc::rpc_params![
             "GrandpaApi_grandpa_authorities",
@@ -78,15 +72,15 @@ impl PangolinClient {
     }
 }
 
-impl S2SClientBase for PangolinClient {
-    const CHAIN: &'static str = "pangolinparachain";
+impl S2SClientBase for RococoClient {
+    const CHAIN: &'static str = "rococo";
 
-    type Config = bp_pangolin::Pangolin;
+    type Config = bp_pangolin_parachain::PangolinParachain;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 
 #[async_trait::async_trait]
-impl S2SClientGeneric for PangolinClient {
+impl S2SClientGeneric for RococoClient {
     type InitializationData = InitializationData<BundleHeader>;
 
     async fn subscribe_grandpa_justifications(

@@ -23,6 +23,7 @@ array-bytes = "1.4"
 codec       = { package = "parity-scale-codec", version = "2" }
 subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 bp-pangolin = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-pangolin-parachain = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
 ## maybe common
 async-trait = { optional = true, version = "0.1" }
@@ -63,7 +64,15 @@ bridge-s2s         = [
   "finality-grandpa",
   "abstract-bridge-s2s",
 ]
+bridge-parachain   = [
+  "substrate",
+  "async-trait",
+  "finality-grandpa",
+  "abstract-bridge-s2s/bridge-parachain",
+  "abstract-bridge-s2s/advanced-types",
+]
 bridge-s2s-pangoro = ["bridge-s2s"]
+bridge-s2s-pangolinparachain = ["bridge-parachain"]
 feemarket-s2s   = [
   "async-trait",
   "abstract-feemarket-s2s",

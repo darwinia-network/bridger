@@ -1035,6 +1035,7 @@ dependencies = [
  "array-bytes",
  "async-trait",
  "bp-pangolin",
+ "bp-pangolin-parachain",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.137",

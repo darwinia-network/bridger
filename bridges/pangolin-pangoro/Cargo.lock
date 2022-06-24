@@ -359,6 +359,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "bp-pangolin-parachain"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#9cbc639462552e6c770bffdb02c2fd9d937b9eee"
+dependencies = [
+ "bp-darwinia-core",
+ "bp-messages",
+ "bp-runtime",
+ "frame-support",
+ "sp-api",
+ "sp-runtime",
+ "sp-std",
+ "sp-version",
+]
+
+[[package]]
 name = "bp-pangoro"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#9cbc639462552e6c770bffdb02c2fd9d937b9eee"
@@ -578,6 +593,7 @@ dependencies = [
  "array-bytes",
  "async-trait",
  "bp-pangolin",
+ "bp-pangolin-parachain",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.136",

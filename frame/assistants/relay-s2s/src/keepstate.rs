@@ -2,13 +2,12 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::sync::Mutex;
 
-use once_cell::sync::{Lazy, OnceCell};
+use once_cell::sync::Lazy;
 
-use crate::error::{RelayError, RelayResult};
-
-static LAST_DELIVERY_RELAYED_NONCE: OnceCell<u64> = OnceCell::new();
-
-static LAST_RECEIVING_RELAYED_NONCE: OnceCell<u64> = OnceCell::new();
+static LAST_RELAYED_NONCE: Lazy<Mutex<HashMap<&str, u64>>> = Lazy::new(|| {
+    let map = HashMap::new();
+    Mutex::new(map)
+});
 
 static RECENTLY_JUSTIFICATIONS: Lazy<Mutex<HashMap<&str, VecDeque<sp_core::Bytes>>>> =
     Lazy::new(|| {
@@ -17,23 +16,23 @@ static RECENTLY_JUSTIFICATIONS: Lazy<Mutex<HashMap<&str, VecDeque<sp_core::Bytes
     });
 
 pub fn get_last_delivery_relayed_nonce() -> Option<u64> {
-    LAST_DELIVERY_RELAYED_NONCE.get().cloned()
+    let data = LAST_RELAYED_NONCE.lock().unwrap();
+    data.get("delivery").cloned()
 }
 
-pub fn set_last_delivery_relayed_nonce(nonce: u64) -> RelayResult<()> {
-    LAST_DELIVERY_RELAYED_NONCE.set(nonce).map_err(|e| {
-        RelayError::Custom(format!("Failed to set last delivery relayed nonce: {}", e))
-    })
+pub fn set_last_delivery_relayed_nonce(nonce: u64) {
+    let mut data = LAST_RELAYED_NONCE.lock().unwrap();
+    data.insert("delivery", nonce);
 }
 
 pub fn get_last_receiving_relayed_nonce() -> Option<u64> {
-    LAST_RECEIVING_RELAYED_NONCE.get().cloned()
+    let data = LAST_RELAYED_NONCE.lock().unwrap();
+    data.get("receiving").cloned()
 }
 
-pub fn set_last_receiving_relayed_nonce(nonce: u64) -> RelayResult<()> {
-    LAST_RECEIVING_RELAYED_NONCE.set(nonce).map_err(|e| {
-        RelayError::Custom(format!("Failed to set last delivery relayed nonce: {}", e))
-    })
+pub fn set_last_receiving_relayed_nonce(nonce: u64) {
+    let mut data = LAST_RELAYED_NONCE.lock().unwrap();
+    data.insert("receiving", nonce);
 }
 
 pub fn set_recently_justification(chain: &'static str, justification: sp_core::Bytes) {

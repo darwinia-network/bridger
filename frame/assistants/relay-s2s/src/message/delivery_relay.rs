@@ -110,7 +110,7 @@ where
             if last_relayed_nonce.is_some() {
                 keepstate::set_last_delivery_relayed_nonce(
                     last_relayed_nonce.expect("Unreachable"),
-                )?;
+                );
             }
             tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }

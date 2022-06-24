@@ -112,7 +112,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             if last_relayed_nonce.is_some() {
                 keepstate::set_last_receiving_relayed_nonce(
                     last_relayed_nonce.expect("Unreachable"),
-                )?;
+                );
             }
             tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }

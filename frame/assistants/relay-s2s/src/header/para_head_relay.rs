@@ -13,6 +13,12 @@ pub struct ParaHeaderRunner<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridge
 }
 
 impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHeaderRunner<SC, TC> {
+    pub fn new(input: ParaHeaderInput<SC, TC>) -> Self {
+        Self { input }
+    }
+}
+
+impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHeaderRunner<SC, TC> {
     pub async fn start(&self) -> RelayResult<()> {
         loop {
             self.run().await?;

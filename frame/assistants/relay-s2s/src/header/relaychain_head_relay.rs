@@ -5,6 +5,7 @@ use abstract_bridge_s2s::config::Config;
 use abstract_bridge_s2s::types::bp_header_chain;
 use sp_runtime::codec;
 use sp_runtime::traits::Header;
+
 use support_toolkit::{convert::SmartCodecMapper, logk};
 
 use crate::error::{RelayError, RelayResult};
@@ -13,6 +14,12 @@ use crate::types::{RelaychainHeaderInput, M_HEADER};
 /// relay chain to solo chain header relay runner
 pub struct RelaychainHeaderRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
     input: RelaychainHeaderInput<SC, TC>,
+}
+
+impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
+    pub fn new(input: RelaychainHeaderInput<SC, TC>) -> Self {
+        Self { input }
+    }
 }
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {

@@ -64,37 +64,23 @@ impl From<ChainInfoConfig> for client_pangoro::config::ClientConfig {
 
 impl ChainInfoConfig {
     pub async fn to_pangolin_client(&self) -> color_eyre::Result<PangolinClient> {
-        let config = client_pangolin::config::ClientConfig {
-            endpoint: self.endpoint.clone(),
-            relayer_private_key: self.signer.clone(),
-            relayer_real_account: None,
-        };
+        let config = self.into();
         Ok(PangolinClientComponent::component(config).await?)
     }
 
     pub async fn to_pangoro_client(&self) -> color_eyre::Result<PangoroClient> {
-        let config = client_pangoro::config::ClientConfig {
-            endpoint: self.endpoint.clone(),
-            relayer_private_key: self.signer.clone(),
-            relayer_real_account: None,
-        };
+        let config = self.into();
         Ok(PangoroClientComponent::component(config).await?)
     }
 }
 
 impl IndexConfig {
-    pub fn to_pangolin_subquery(&self) -> color_eyre::Result<Subquery> {
-        Ok(SubqueryComponent::component(
-            self.pangolin.clone(),
-            BridgeName::PangolinPangoro,
-        ))
+    pub fn to_pangolin_subquery(&self) -> Subquery {
+        SubqueryComponent::component(self.pangolin.clone(), BridgeName::PangolinPangoro)
     }
 
-    pub fn to_pangoro_subquery(&self) -> color_eyre::Result<Subquery> {
-        Ok(SubqueryComponent::component(
-            self.pangoro.clone(),
-            BridgeName::PangolinPangoro,
-        ))
+    pub fn to_pangoro_subquery(&self) -> Subquery {
+        SubqueryComponent::component(self.pangoro.clone(), BridgeName::PangolinPangoro)
     }
 }
 

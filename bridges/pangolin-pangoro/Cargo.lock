@@ -458,7 +458,6 @@ version = "0.5.7"
 dependencies = [
  "abstract-bridge-s2s",
  "array-bytes",
- "async-trait",
  "client-pangolin",
  "client-pangoro",
  "color-eyre",
@@ -597,7 +596,6 @@ dependencies = [
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.136",
- "serde_json",
  "sp-core",
  "sp-finality-grandpa",
  "sp-runtime",

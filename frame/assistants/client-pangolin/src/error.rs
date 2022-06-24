@@ -32,11 +32,6 @@ pub enum ClientError {
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
 
-    // #[error("Rpc error: {0}")]
-    // Rpc(#[from] jsonrpsee_types::error::Error),
-    #[error("Serde json error: {0}")]
-    Serialization(#[from] serde_json::error::Error),
-
     #[cfg(feature = "ethlike-v1")]
     #[error("Failed to build SecretKey from authority's private key")]
     FailedToBuildSecretKey(#[from] secp256k1::Error),

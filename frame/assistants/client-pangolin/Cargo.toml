@@ -17,13 +17,11 @@ thiserror = "1"
 tracing   = "0.1"
 
 serde       = { version = "1", features = ["derive"] }
-serde_json  = "1"
 
 array-bytes = "1.4"
 codec       = { package = "parity-scale-codec", version = "2" }
 subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 bp-pangolin = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-bp-pangolin-parachain = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
 ## maybe common
 async-trait = { optional = true, version = "0.1" }
@@ -48,7 +46,8 @@ abstract-feemarket-s2s = { optional = true, path = "../../../frame/abstract/feem
 support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
 
 [dev-dependencies]
-tokio = { version = "1", features = ["full"] }
+tokio      = { version = "1", features = ["full"] }
+serde_json = "1"
 
 [features]
 default     = []
@@ -64,17 +63,11 @@ bridge-s2s         = [
   "finality-grandpa",
   "abstract-bridge-s2s",
 ]
-bridge-parachain   = [
-  "substrate",
-  "async-trait",
-  "finality-grandpa",
-  "abstract-bridge-s2s/bridge-parachain",
-  "abstract-bridge-s2s/advanced-types",
-]
 bridge-s2s-pangoro = ["bridge-s2s"]
-bridge-s2s-pangolinparachain = ["bridge-parachain"]
+bridge-s2s-pangolin-parachain = ["bridge-s2s"]
 feemarket-s2s   = [
   "async-trait",
   "abstract-feemarket-s2s",
 ]
 feemarket-s2s-pangoro = ["feemarket-s2s"]
+feemarket-s2s-pangolin-parachain = ["feemarket-s2s"]

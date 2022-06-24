@@ -481,7 +481,6 @@ dependencies = [
  "parity-scale-codec",
  "secp256k1",
  "serde 1.0.136",
- "serde_json",
  "shadow-liketh",
  "subxt",
  "support-toolkit",

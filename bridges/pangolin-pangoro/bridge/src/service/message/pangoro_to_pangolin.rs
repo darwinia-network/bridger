@@ -77,8 +77,8 @@ async fn message_input() -> color_eyre::Result<MessageReceivingInput<PangoroClie
     let client_pangolin = bridge_config.pangolin.to_pangolin_client().await?;
 
     let config_index = bridge_config.index;
-    let subquery_pangolin = config_index.to_pangolin_subquery()?;
-    let subquery_pangoro = config_index.to_pangoro_subquery()?;
+    let subquery_pangolin = config_index.to_pangolin_subquery();
+    let subquery_pangoro = config_index.to_pangoro_subquery();
 
     let lanes = relay_config.raw_lanes();
 

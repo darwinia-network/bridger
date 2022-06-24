@@ -13,6 +13,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "abstract-bridge-s2s"
+version = "0.5.7"
+dependencies = [
+ "array-bytes",
+ "async-trait",
+ "bp-header-chain",
+ "bp-messages",
+ "bp-runtime",
+ "bridge-runtime-common",
+ "jsonrpsee-core",
+ "parity-scale-codec",
+ "scale-info",
+ "serde 1.0.137",
+ "sp-core",
+ "sp-runtime",
+ "subxt",
+ "thiserror",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1011,12 +1031,15 @@ dependencies = [
 name = "client-pangolin"
 version = "0.5.7"
 dependencies = [
+ "abstract-bridge-s2s",
  "array-bytes",
- "bp-header-chain",
+ "async-trait",
+ "bp-pangolin",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.137",
  "serde_json",
+ "sp-core",
  "sp-finality-grandpa",
  "sp-runtime",
  "subxt",
@@ -6782,6 +6805,7 @@ dependencies = [
 name = "support-toolkit"
 version = "0.5.7"
 dependencies = [
+ "parity-scale-codec",
  "thiserror",
 ]
 

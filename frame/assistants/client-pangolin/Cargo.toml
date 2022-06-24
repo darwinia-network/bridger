@@ -20,30 +20,52 @@ serde       = { version = "1", features = ["derive"] }
 serde_json  = "1"
 
 array-bytes = "1.4"
-codec       = { package = "parity-scale-codec", version = "2", default-features = false, features = ["derive", "full"] }
+codec       = { package = "parity-scale-codec", version = "2" }
 subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
+bp-pangolin = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
-web3          = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"], optional = true }
-secp256k1     = { version = "0.20", features = ["recovery"], optional = true }
-shadow-liketh = { path = "../shadow-liketh", optional = true }
+## maybe common
+async-trait = { optional = true, version = "0.1" }
 
-finality-grandpa    = { version = "0.14.0", optional = true }
-bp-header-chain     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2", optional = true }
-sp-finality-grandpa = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2", optional = true }
-sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2", optional = true }
+## substrate
+sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 
-support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
+## eth-v1
+web3          = { optional = true, git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+secp256k1     = { optional = true, version = "0.20", features = ["recovery"] }
+shadow-liketh = { optional = true, path = "../shadow-liketh" }
+
+## s2s client
+finality-grandpa      = { optional = true, version = "0.14" }
+abstract-bridge-s2s   = { optional = true, path = "../../../frame/abstract/bridge-s2s", features = ["advanced-types"] }
+
+## feemarket s2s
+abstract-feemarket-s2s = { optional = true, path = "../../../frame/abstract/feemarket-s2s", features = ["advanced-types"] }
+
+support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 
 [features]
 default     = []
-ethlike-v1  = ["web3", "secp256k1", "shadow-liketh"]
-s2s         = [
-  "finality-grandpa",
-  "bp-header-chain",
+substrate   = [
   "sp-finality-grandpa",
-  "sp-runtime"
+  "sp-runtime",
+  "sp-core",
 ]
-s2s-pangoro = ["s2s"]
+ethlike-v1  = ["web3", "secp256k1", "shadow-liketh"]
+bridge-s2s         = [
+  "substrate",
+  "async-trait",
+  "finality-grandpa",
+  "abstract-bridge-s2s",
+]
+bridge-s2s-pangoro = ["bridge-s2s"]
+feemarket-s2s   = [
+  "async-trait",
+  "abstract-feemarket-s2s",
+]
+feemarket-s2s-pangoro = ["feemarket-s2s"]

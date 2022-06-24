@@ -100,3 +100,14 @@ impl From<array_bytes::Error> for ClientError {
         Self::Bytes(format!("{:?}", error))
     }
 }
+
+#[cfg(feature = "bridge-s2s")]
+impl From<ClientError> for abstract_bridge_s2s::error::S2SClientError {
+    fn from(error: ClientError) -> Self {
+        match error {
+            ClientError::SubxtBasicError(e) => Self::RPC(format!("{:?}", e)),
+            ClientError::ClientRestartNeed => Self::RPC(format!("Client restart need")),
+            _ => Self::Custom(format!("{:?}", error)),
+        }
+    }
+}

@@ -1,5 +1,5 @@
-use client_pangolin::component::PangolinClientComponent;
-use client_pangoro::component::PangoroClientComponent;
+use abstract_bridge_s2s::client::S2SClientGeneric;
+use support_toolkit::convert::SmartCodecMapper;
 
 use support_common::config::{Config, Names};
 
@@ -21,30 +21,18 @@ async fn init_bridge(
     config_pangolin: ChainInfoConfig,
     config_pangoro: ChainInfoConfig,
 ) -> color_eyre::Result<()> {
-    let client_pangolin = PangolinClientComponent::component(config_pangolin.into()).await?;
-    let client_pangoro = PangoroClientComponent::component(config_pangoro.into()).await?;
+    let client_pangolin = config_pangolin.to_pangolin_client().await?;
+    let client_pangoro = config_pangoro.to_pangoro_client().await?;
     let hash = match bridge {
         BridgeName::PangolinToPangoro => {
             let initialization_data = client_pangolin.prepare_initialization_data().await?;
-            let encoded = codec::Encode::encode(&initialization_data);
-            client_pangoro
-                .runtime()
-                .tx()
-                .bridge_pangolin_grandpa()
-                .initialize(codec::Decode::decode(&mut &encoded[..])?)
-                .sign_and_submit(client_pangoro.account().signer())
-                .await?
+            let expected_data = SmartCodecMapper::map_to(&initialization_data)?;
+            client_pangoro.initialize(expected_data).await?
         }
         BridgeName::PangoroToPangolin => {
             let initialization_data = client_pangoro.prepare_initialization_data().await?;
-            let encoded = codec::Encode::encode(&initialization_data);
-            client_pangolin
-                .runtime()
-                .tx()
-                .bridge_pangoro_grandpa()
-                .initialize(codec::Decode::decode(&mut &encoded[..])?)
-                .sign_and_submit(client_pangolin.account().signer())
-                .await?
+            let expected_data = SmartCodecMapper::map_to(&initialization_data)?;
+            client_pangolin.initialize(expected_data).await?
         }
     };
     tracing::info!(

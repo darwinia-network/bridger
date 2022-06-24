@@ -3,7 +3,7 @@ use abstract_bridge_s2s::error::S2SClientError;
 
 use support_toolkit::logk;
 
-use crate::error::RelayResult;
+use crate::error::{RelayError, RelayResult};
 use crate::keepstate;
 use crate::types::JustificationInput;
 
@@ -52,6 +52,7 @@ where
             T::CHAIN,
             err
         );
+        return Err(err);
     }
     Ok(())
 }
@@ -62,15 +63,29 @@ where
     F: Send + Sync + Fn(sp_core::Bytes),
 {
     let mut subscribe = client.subscribe_grandpa_justifications().await?;
-    while let Some(justification) = subscribe.next().await {
-        let justification = justification.map_err(|e| S2SClientError::RPC(format!("{:?}", e)))?;
-        tracing::info!(
-            target: "relay-s2s",
-            "{} subscribed new justification for {}",
-            logk::prefix_multi("subscribe", vec![T::CHAIN]),
-            T::CHAIN,
-        );
-        callback(justification);
+    loop {
+        match subscribe.next().await {
+            Some(justification) => {
+                let justification =
+                    justification.map_err(|e| S2SClientError::RPC(format!("{:?}", e)))?;
+                tracing::info!(
+                    target: "relay-s2s",
+                    "{} subscribed new justification for {}",
+                    logk::prefix_multi("subscribe", vec![T::CHAIN]),
+                    T::CHAIN,
+                );
+                callback(justification);
+            }
+            None => {
+                tracing::error!(
+                    target: "relay-s2s",
+                    "{} the subscription has been terminated",
+                    logk::prefix_multi("subscribe", vec![T::CHAIN]),
+                );
+                return Err(RelayError::Custom(
+                    "the subscription has been terminated".to_string(),
+                ));
+            }
+        }
     }
-    Ok(())
 }

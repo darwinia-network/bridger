@@ -106,14 +106,13 @@ where
             logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            if let Ok(last_relayed_nonce) = self.run(self.input.nonces_limit).await {
-                if last_relayed_nonce.is_some() {
-                    keepstate::set_last_delivery_relayed_nonce(
-                        last_relayed_nonce.expect("Unreachable"),
-                    )?;
-                }
-                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            let last_relayed_nonce = self.run(self.input.nonces_limit).await?;
+            if last_relayed_nonce.is_some() {
+                keepstate::set_last_delivery_relayed_nonce(
+                    last_relayed_nonce.expect("Unreachable"),
+                )?;
             }
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
     }
 

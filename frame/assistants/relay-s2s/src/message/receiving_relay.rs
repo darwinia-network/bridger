@@ -108,14 +108,13 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
             logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            if let Ok(last_relayed_nonce) = self.run().await {
-                if last_relayed_nonce.is_some() {
-                    keepstate::set_last_receiving_relayed_nonce(
-                        last_relayed_nonce.expect("Unreachable"),
-                    )?;
-                }
-                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            let last_relayed_nonce = self.run().await?;
+            if last_relayed_nonce.is_some() {
+                keepstate::set_last_receiving_relayed_nonce(
+                    last_relayed_nonce.expect("Unreachable"),
+                )?;
             }
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
     }
 

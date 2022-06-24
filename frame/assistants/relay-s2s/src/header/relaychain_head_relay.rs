@@ -17,6 +17,13 @@ pub struct RelaychainHeaderRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
 
 impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
     pub async fn start(&self) -> RelayResult<()> {
+        loop {
+            self.run().await?;
+            tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+        }
+    }
+
+    async fn run(&self) -> RelayResult<()> {
         let client_relaychain = &self.input.client_relaychain;
         let client_solochain = &self.input.client_solochain;
         let last_relayed_relaychain_hash_in_solochain =

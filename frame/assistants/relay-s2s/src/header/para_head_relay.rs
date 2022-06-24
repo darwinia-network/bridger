@@ -14,6 +14,13 @@ pub struct ParaHeaderRunner<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridge
 
 impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHeaderRunner<SC, TC> {
     pub async fn start(&self) -> RelayResult<()> {
+        loop {
+            self.run().await?;
+            tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+        }
+    }
+
+    async fn run(&self) -> RelayResult<()> {
         let client_solochain = &self.input.client_solochain;
         let client_relaychain = &self.input.client_relaychain;
 

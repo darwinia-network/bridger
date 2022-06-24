@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use subxt::{sp_core, sp_runtime};
+use subxt::sp_runtime;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientConfig {

@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
 use abstract_bridge_s2s::client::S2SClientRelay;
-use abstract_bridge_s2s::config::Config;
 use abstract_bridge_s2s::types::bp_header_chain;
+use abstract_bridge_s2s::types::bp_runtime::Chain;
 use sp_runtime::codec;
 use sp_runtime::traits::Header;
 use support_toolkit::{convert::SmartCodecMapper, logk};
@@ -176,7 +176,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
                     next_header.block_number,
                 );
                 let grandpa_justification: bp_header_chain::justification::GrandpaJustification<
-                    <SC::Config as Config>::Header,
+                    <SC::Chain as Chain>::Header,
                 > = codec::Decode::decode(&mut justification.as_ref()).map_err(|err| {
                     RelayError::Custom(format!(
                         "Failed to decode justification of {}: {:?}",

@@ -1,4 +1,4 @@
-use abstract_bridge_s2s::client::S2SClientRelay;
+use abstract_bridge_s2s::client::S2SClientGeneric;
 use abstract_bridge_s2s::error::S2SClientError;
 
 use support_toolkit::logk;
@@ -7,17 +7,17 @@ use crate::error::{RelayError, RelayResult};
 use crate::keepstate;
 use crate::types::JustificationInput;
 
-pub struct SubscribeJustification<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct SubscribeJustification<SC: S2SClientGeneric, TC: S2SClientGeneric> {
     input: JustificationInput<SC, TC>,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> SubscribeJustification<SC, TC> {
+impl<SC: S2SClientGeneric, TC: S2SClientGeneric> SubscribeJustification<SC, TC> {
     pub fn new(input: JustificationInput<SC, TC>) -> Self {
         Self { input }
     }
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> SubscribeJustification<SC, TC> {
+impl<SC: S2SClientGeneric, TC: S2SClientGeneric> SubscribeJustification<SC, TC> {
     pub async fn start(self) -> RelayResult<()> {
         let client_source = self.input.client_source;
         let client_target = self.input.client_target;
@@ -41,7 +41,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SubscribeJustification<SC, TC> {
 
 async fn run_until_connection_lost<T, F>(client: T, callback: F) -> RelayResult<()>
 where
-    T: S2SClientRelay,
+    T: S2SClientGeneric,
     F: Send + Sync + Fn(sp_core::Bytes),
 {
     if let Err(err) = subscribe_justification(&client, callback).await {
@@ -59,7 +59,7 @@ where
 
 async fn subscribe_justification<T, F>(client: &T, callback: F) -> RelayResult<()>
 where
-    T: S2SClientRelay,
+    T: S2SClientGeneric,
     F: Send + Sync + Fn(sp_core::Bytes),
 {
     let mut subscribe = client.subscribe_grandpa_justifications().await?;

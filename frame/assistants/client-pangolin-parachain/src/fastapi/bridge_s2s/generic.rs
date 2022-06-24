@@ -1,25 +1,23 @@
-use abstract_bridge_s2s::config::Config;
+use abstract_bridge_s2s::client::{S2SClientBase, S2SClientGeneric};
 use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
-use abstract_bridge_s2s::{
-    client::{S2SClientBase, S2SClientGeneric},
-    types::bp_header_chain,
-};
-use finality_grandpa::voter_set::VoterSet;
-use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
-use sp_runtime::{ConsensusEngineId, DigestItem};
-use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
+use abstract_bridge_s2s::types::bp_runtime::Chain;
+use sp_runtime::generic::{Block, SignedBlock};
+use subxt::rpc::{Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
+use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::PangolinParachainClient;
-use crate::error::{ClientError, ClientResult};
 use crate::types::runtime_types::bp_header_chain::InitializationData;
 
-const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
+type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
+    u32,
+    crate::types::runtime_types::sp_runtime::traits::BlakeTwo256,
+>;
 
 impl S2SClientBase for PangolinParachainClient {
     const CHAIN: &'static str = "pangolin";
 
-    type Config = bp_pangolin_parachain::PangolinParachain;
+    type Chain = bp_pangolin_parachain::PangolinParachain;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 
@@ -42,14 +40,42 @@ impl S2SClientGeneric for PangolinParachainClient {
             .await?)
     }
 
+    async fn header(
+        &self,
+        hash: Option<<Self::Chain as Chain>::Hash>,
+    ) -> S2SClientResult<Option<<Self::Chain as Chain>::Header>> {
+        match self.subxt().rpc().header(hash).await? {
+            Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
+            None => Ok(None),
+        }
+    }
+
+    async fn block(
+        &self,
+        hash: Option<<Self::Chain as Chain>::Hash>,
+    ) -> S2SClientResult<Option<SignedBlock<Block<<Self::Chain as Chain>::Header, Self::Extrinsic>>>>
+    {
+        Ok(self.subxt().rpc().block(hash).await?)
+    }
+
+    async fn read_proof(
+        &self,
+        storage_keys: Vec<sp_core::storage::StorageKey>,
+        hash: Option<<Self::Chain as Chain>::Hash>,
+    ) -> S2SClientResult<Vec<Vec<u8>>> {
+        let read_proof = self.subxt().rpc().read_proof(storage_keys, hash).await?;
+        let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
+        Ok(proof)
+    }
+
     async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData> {
         Err(S2SClientError::Custom("Not need".to_string()))
     }
 
     async fn initialize(
         &self,
-        initialization_data: Self::InitializationData,
-    ) -> S2SClientResult<<Self::Config as Config>::Hash> {
+        _initialization_data: Self::InitializationData,
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         Err(S2SClientError::Custom("Not need".to_string()))
     }
 }

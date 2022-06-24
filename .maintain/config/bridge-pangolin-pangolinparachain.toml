@@ -1,47 +1,22 @@
 [pangolin]
-endpoint             = "wss://pangolin-rpc.darwinia.network:443"
+endpoint             = "wss://pangolin-rpc.darwinia.network"
 runtime_version_mode = "Auto"
 signer               = "//Alice"
 
 [rococo]
-endpoint             = "wss://rococo-rpc.polkadot.io:443"
+endpoint             = "wss://rococo-rpc.polkadot.io"
 runtime_version_mode = "Auto"
-signer               = "//Alice"
 
 [pangolin_parachain]
-para_id              = 2105
-endpoint             = "wss://pangolin-parachain-rpc.darwinia.network:443"
+endpoint             = "wss://pangolin-parachain-rpc.darwinia.network"
 runtime_version_mode = "Auto"
 signer               = "//Alice"
 
 [relay]
-# substrate-substrate bridger message relay lanes
-auto_start                    = true
-create_relayers_fund_accounts = false
-lanes                         = ["70616c69"]
-only_mandatory_headers        = false
+lanes   = ["70616c69"]
+para_id = 2105
 
-[relay.prometheus_params]
-no_prometheus   = false
-prometheus_host = "127.0.0.1"
-prometheus_port = 9616
-
-[task]
-interval_update_fee = 3600
-update_fee_strategy = "Nothing"
-
-[index.pangolin]
-# Subquery pangolin indexer queries url
-endpoint = "http://localhost:3000"
-
-[index.pangolin_parachain]
-# Subquery pangolin-parachain indexer queries url
-endpoint = "https://api.subquery.network/sq/fewensa/subql-bridge-s2s-pangolin-parachain__ZmV3Z"
-
-[index.rococo]
-# Subquery rococo indexer queries url
-endpoint = "http://localhost:3001"
-
-[index.parachain_rococo]
-# Subquery parachain_rococo indexer queries url
-endpoint = "https://api.subquery.network/sq/darwinia-network/subql-parachain-rococo"
+[index]
+pangolin           = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-pangolin" }
+pangolin_parachain = { endpoint = "https://api.subquery.network/sq/fewensa/subql-bridge-s2s-pangolin-parachain" }
+parachain_rococo   = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-parachain-rococo" }

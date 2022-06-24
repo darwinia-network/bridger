@@ -1,8 +1,8 @@
-use abstract_bridge_s2s::client::S2SClientRelay;
+use abstract_bridge_s2s::client::{S2SClientGeneric, S2SClientRelay};
 #[cfg(feature = "bridge-parachain")]
 use abstract_bridge_s2s::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
-use abstract_bridge_s2s::config::Config;
 use abstract_bridge_s2s::strategy::RelayStrategy;
+use abstract_bridge_s2s::types::bp_runtime::Chain;
 use subquery_s2s::types::{OriginType, RelayBlockOrigin};
 use subquery_s2s::Subquery;
 
@@ -25,7 +25,7 @@ pub struct SolochainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {
 }
 
 #[cfg(feature = "bridge-parachain")]
-pub struct RelaychainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct RelaychainHeaderInput<SC: S2SClientGeneric, TC: S2SClientRelay> {
     pub client_relaychain: SC,
     pub client_solochain: TC,
     pub subquery_relaychain: Subquery,
@@ -42,7 +42,7 @@ pub struct ParaHeaderInput<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeC
     pub para_id: u32,
 }
 
-pub struct JustificationInput<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct JustificationInput<SC: S2SClientGeneric, TC: S2SClientGeneric> {
     pub client_source: SC,
     pub client_target: TC,
 }
@@ -50,7 +50,7 @@ pub struct JustificationInput<SC: S2SClientRelay, TC: S2SClientRelay> {
 pub struct MessageDeliveryInput<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy> {
     pub lanes: Vec<LaneId>,
     pub nonces_limit: u64,
-    pub relayer_account: <SC::Config as Config>::AccountId,
+    pub relayer_account: <SC::Chain as Chain>::AccountId,
     pub client_source: SC,
     pub client_target: TC,
     pub subquery_source: Subquery,
@@ -74,7 +74,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy>
 
 pub struct MessageReceivingInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub lanes: Vec<LaneId>,
-    pub relayer_account: <SC::Config as Config>::AccountId,
+    pub relayer_account: <SC::Chain as Chain>::AccountId,
     pub client_source: SC,
     pub client_target: TC,
     pub subquery_source: Subquery,

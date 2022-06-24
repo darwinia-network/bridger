@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use abstract_bridge_s2s::client::S2SClientRelay;
-use abstract_bridge_s2s::config::Config;
+use abstract_bridge_s2s::client::{S2SClientGeneric, S2SClientRelay};
 use abstract_bridge_s2s::types::bp_header_chain;
+use abstract_bridge_s2s::types::bp_runtime::Chain;
 use sp_runtime::codec;
 use sp_runtime::traits::Header;
 
@@ -12,17 +12,17 @@ use crate::error::{RelayError, RelayResult};
 use crate::types::{RelaychainHeaderInput, M_HEADER};
 
 /// relay chain to solo chain header relay runner
-pub struct RelaychainHeaderRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct RelaychainHeaderRunner<SC: S2SClientGeneric, TC: S2SClientRelay> {
     input: RelaychainHeaderInput<SC, TC>,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
+impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
     pub fn new(input: RelaychainHeaderInput<SC, TC>) -> Self {
         Self { input }
     }
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
+impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
     pub async fn start(&self) -> RelayResult<()> {
         loop {
             self.run().await?;
@@ -180,7 +180,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         match crate::keepstate::get_recently_justification(SC::CHAIN) {
             Some(justification) => {
                 let grandpa_justification: bp_header_chain::justification::GrandpaJustification<
-                    <SC::Config as Config>::Header,
+                    <SC::Chain as Chain>::Header,
                 > = codec::Decode::decode(&mut justification.as_ref()).map_err(|err| {
                     RelayError::Custom(format!(
                         "Failed to decode justification of rococo: {:?}",

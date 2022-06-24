@@ -1,14 +1,16 @@
-use abstract_bridge_s2s::config::Config;
 use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
 use abstract_bridge_s2s::{
     client::{S2SClientBase, S2SClientGeneric},
     types::bp_header_chain,
+    types::bp_runtime::Chain,
 };
 use finality_grandpa::voter_set::VoterSet;
 use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
+use sp_runtime::generic::{Block, SignedBlock};
 use sp_runtime::{ConsensusEngineId, DigestItem};
 use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
+use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::PangoroClient;
 use crate::error::{ClientError, ClientResult};
@@ -81,7 +83,7 @@ impl PangoroClient {
 impl S2SClientBase for PangoroClient {
     const CHAIN: &'static str = "pangoro";
 
-    type Config = bp_pangoro::Pangoro;
+    type Chain = bp_pangoro::Pangoro;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 
@@ -102,6 +104,34 @@ impl S2SClientGeneric for PangoroClient {
                 "grandpa_unsubscribeJustifications",
             )
             .await?)
+    }
+
+    async fn header(
+        &self,
+        hash: Option<<Self::Chain as Chain>::Hash>,
+    ) -> S2SClientResult<Option<<Self::Chain as Chain>::Header>> {
+        match self.subxt().rpc().header(hash).await? {
+            Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
+            None => Ok(None),
+        }
+    }
+
+    async fn block(
+        &self,
+        hash: Option<<Self::Chain as Chain>::Hash>,
+    ) -> S2SClientResult<Option<SignedBlock<Block<<Self::Chain as Chain>::Header, Self::Extrinsic>>>>
+    {
+        Ok(self.subxt().rpc().block(hash).await?)
+    }
+
+    async fn read_proof(
+        &self,
+        storage_keys: Vec<sp_core::storage::StorageKey>,
+        hash: Option<<Self::Chain as Chain>::Hash>,
+    ) -> S2SClientResult<Vec<Vec<u8>>> {
+        let read_proof = self.subxt().rpc().read_proof(storage_keys, hash).await?;
+        let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
+        Ok(proof)
     }
 
     async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData> {
@@ -224,7 +254,7 @@ impl S2SClientGeneric for PangoroClient {
     async fn initialize(
         &self,
         initialization_data: Self::InitializationData,
-    ) -> S2SClientResult<<Self::Config as Config>::Hash> {
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let hash = self
             .runtime()
             .tx()

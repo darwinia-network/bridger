@@ -5,14 +5,12 @@ use client_pangolin_parachain::component::PangolinParachainClientComponent;
 use client_rococo::client::RococoClient;
 use client_rococo::component::RococoClientComponent;
 use serde::{Deserialize, Serialize};
-use strum::{EnumString, EnumVariantNames};
 use subquery_s2s::types::BridgeName;
 use subquery_s2s::{Subquery, SubqueryComponent, SubqueryConfig};
 
-use component_subscan::SubscanConfig;
 use support_common::error::BridgerError;
 
-use crate::types::{ChainInfo, HexLaneId, PrometheusParamsInfo};
+use crate::types::HexLaneId;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
@@ -83,19 +81,19 @@ impl TryFrom<ChainInfoConfig> for client_rococo::config::ClientConfig {
 
 impl ChainInfoConfig {
     pub async fn to_pangolin_client(&self) -> color_eyre::Result<PangolinClient> {
-        let config = self.try_into()?;
+        let config = self.clone().try_into()?;
         Ok(PangolinClientComponent::component(config).await?)
     }
 
     pub async fn to_pangolin_parachain_client(
         &self,
     ) -> color_eyre::Result<PangolinParachainClient> {
-        let config = self.try_into()?;
+        let config = self.clone().try_into()?;
         Ok(PangolinParachainClientComponent::component(config).await?)
     }
 
     pub async fn to_rococo_client(&self) -> color_eyre::Result<RococoClient> {
-        let config = self.try_into()?;
+        let config = self.clone().try_into()?;
         Ok(RococoClientComponent::component(config).await?)
     }
 }

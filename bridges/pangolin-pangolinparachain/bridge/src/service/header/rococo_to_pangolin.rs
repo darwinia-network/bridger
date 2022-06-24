@@ -1,8 +1,8 @@
 use lifeline::{Lifeline, Service, Task};
 use subquery_s2s::types::OriginType;
 
-use relay_s2s::header::{RelaychainHeaderRunner, SolochainHeaderRunner};
-use relay_s2s::types::{RelaychainHeaderInput, SolochainHeaderInput};
+use relay_s2s::header::RelaychainHeaderRunner;
+use relay_s2s::types::RelaychainHeaderInput;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 

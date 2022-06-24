@@ -4,13 +4,13 @@ use abstract_bridge_s2s::error::S2SClientResult;
 use abstract_bridge_s2s::{
     client::S2SClientRelay,
     config::Config,
-    types::{bp_header_chain, bp_messages, bridge_runtime_common},
+    types::{bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common},
 };
-use sp_runtime::generic::{Block, SignedBlock};
 use sp_runtime::AccountId32;
 use subxt::sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;
+
 use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::PangolinClient;
@@ -82,29 +82,10 @@ impl S2SClientRelay for PangolinClient {
         Ok(total_weight)
     }
 
-    async fn header(
-        &self,
-        hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<Option<<Self::Config as Config>::Header>> {
-        match self.subxt().rpc().header(hash).await? {
-            Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
-            None => Ok(None),
-        }
-    }
-
-    async fn block(
-        &self,
-        hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<
-        Option<SignedBlock<Block<<Self::Config as Config>::Header, Self::Extrinsic>>>,
-    > {
-        Ok(self.subxt().rpc().block(hash).await?)
-    }
-
     async fn best_target_finalized(
         &self,
-        at_block: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<<Self::Config as Config>::Hash> {
+        at_block: Option<<Self::Chain as Chain>::Hash>,
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         Ok(self
             .runtime()
             .storage()
@@ -115,11 +96,11 @@ impl S2SClientRelay for PangolinClient {
 
     async fn submit_finality_proof(
         &self,
-        finality_target: <Self::Config as Config>::Header,
+        finality_target: <Self::Chain as Chain>::Header,
         justification: bp_header_chain::justification::GrandpaJustification<
-            <Self::Config as Config>::Header,
+            <Self::Chain as Chain>::Header,
         >,
-    ) -> S2SClientResult<<Self::Config as Config>::Hash> {
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_target = SmartCodecMapper::map_to(&finality_target)?;
         let expected_justification = SmartCodecMapper::map_to(&justification)?;
         Ok(self
@@ -134,7 +115,7 @@ impl S2SClientRelay for PangolinClient {
     async fn outbound_lanes(
         &self,
         lane: [u8; 4],
-        hash: Option<<Self::Config as Config>::Hash>,
+        hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<bp_messages::OutboundLaneData> {
         let outbound_lane_data = self
             .runtime()
@@ -149,7 +130,7 @@ impl S2SClientRelay for PangolinClient {
     async fn inbound_lanes(
         &self,
         lane: [u8; 4],
-        hash: Option<<Self::Config as Config>::Hash>,
+        hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<bp_messages::InboundLaneData<sp_core::crypto::AccountId32>> {
         let inbound_lane_data = self
             .runtime()
@@ -164,7 +145,7 @@ impl S2SClientRelay for PangolinClient {
     async fn outbound_messages(
         &self,
         message_key: bp_messages::MessageKey,
-        hash: Option<<Self::Config as Config>::Hash>,
+        hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<Option<bp_messages::MessageData<u128>>> {
         let expected_message_key = SmartCodecMapper::map_to(&message_key)?;
         match self
@@ -179,25 +160,15 @@ impl S2SClientRelay for PangolinClient {
         }
     }
 
-    async fn read_proof(
-        &self,
-        storage_keys: Vec<sp_core::storage::StorageKey>,
-        hash: Option<<Self::Config as Config>::Hash>,
-    ) -> S2SClientResult<Vec<Vec<u8>>> {
-        let read_proof = self.subxt().rpc().read_proof(storage_keys, hash).await?;
-        let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
-        Ok(proof)
-    }
-
     async fn receive_messages_proof(
         &self,
         relayer_id_at_bridged_chain: AccountId32,
         proof: bridge_runtime_common::messages::target::FromBridgedChainMessagesProof<
-            <Self::Config as Config>::Hash,
+            <Self::Chain as Chain>::Hash,
         >,
         messages_count: u32,
         dispatch_weight: u64,
-    ) -> S2SClientResult<<Self::Config as Config>::Hash> {
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
         Ok(self
             .runtime()
@@ -216,10 +187,10 @@ impl S2SClientRelay for PangolinClient {
     async fn receive_messages_delivery_proof(
         &self,
         proof: bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof<
-            <Self::Config as Config>::Hash,
+            <Self::Chain as Chain>::Hash,
         >,
         relayers_state: bp_messages::UnrewardedRelayersState,
-    ) -> S2SClientResult<<Self::Config as Config>::Hash> {
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
         let expected_relayers_state = SmartCodecMapper::map_to(&relayers_state)?;
         Ok(self

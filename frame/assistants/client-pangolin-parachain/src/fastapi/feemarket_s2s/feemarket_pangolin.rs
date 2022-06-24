@@ -3,10 +3,10 @@ use abstract_feemarket_s2s::error::AbstractFeemarketResult;
 use abstract_feemarket_s2s::types::{Chain, Order};
 use support_toolkit::convert::SmartCodecMapper;
 
-use crate::client::PangolinClient;
+use crate::client::PangolinParachainClient;
 
 #[async_trait::async_trait]
-impl FeemarketApiRelay for PangolinClient {
+impl FeemarketApiRelay for PangolinParachainClient {
     async fn order(
         &self,
         laned_id: abstract_feemarket_s2s::types::LaneId,
@@ -23,7 +23,7 @@ impl FeemarketApiRelay for PangolinClient {
         match self
             .runtime()
             .storage()
-            .pangoro_fee_market()
+            .fee_market()
             .orders(laned_id, message_nonce, None)
             .await?
         {

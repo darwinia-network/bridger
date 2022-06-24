@@ -64,7 +64,8 @@ bridge-s2s         = [
   "abstract-bridge-s2s",
 ]
 bridge-s2s-pangoro = ["bridge-s2s"]
-bridge-s2s-pangolin-parachain = ["bridge-s2s"]
+bridge-s2s-pangolin-parachain = ["bridge-s2s", "abstract-bridge-s2s/bridge-parachain"]
+
 feemarket-s2s   = [
   "async-trait",
   "abstract-feemarket-s2s",

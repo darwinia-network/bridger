@@ -30,7 +30,7 @@ type FromThisChainMessagePayload = crate::types::runtime_types::bp_message_dispa
 >;
 
 #[async_trait::async_trait]
-impl S2SParaBridgeClientSolochain for PangolinClient {
+impl S2SClientRelay for PangolinClient {
     fn gen_outbound_messages_storage_key(&self, lane: [u8; 4], message_nonce: u64) -> StorageKey {
         let prefix = StorageKeyPrefix::new::<OutboundMessages>();
         OutboundMessages(BundleMessageKey {
@@ -217,7 +217,10 @@ impl S2SParaBridgeClientSolochain for PangolinClient {
             .sign_and_submit(self.account().signer())
             .await?)
     }
+}
 
+#[async_trait::async_trait]
+impl S2SParaBridgeClientSolochain for PangolinClient {
     async fn best_para_heads(
         &self,
         para_id: crate::types::ParaId,

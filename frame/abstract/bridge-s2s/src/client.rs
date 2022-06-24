@@ -161,7 +161,7 @@ pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
 /// S2S with parachain bridge api for relay chain
 #[cfg(feature = "bridge-parachain")]
 #[async_trait::async_trait]
-pub trait S2SParaBridgeClientRelaychain: S2SClientRelay {
+pub trait S2SParaBridgeClientRelaychain: S2SClientGeneric {
     /// generate parachain head storage key
     fn gen_parachain_head_storage_key(&self, para_id: u32) -> sp_core::storage::StorageKey;
 

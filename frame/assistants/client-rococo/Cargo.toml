@@ -50,3 +50,4 @@ bridge-s2s         = [
   "finality-grandpa",
   "abstract-bridge-s2s",
 ]
+bridge-s2s-pangolin = ["bridge-s2s", "abstract-bridge-s2s/bridge-parachain"]

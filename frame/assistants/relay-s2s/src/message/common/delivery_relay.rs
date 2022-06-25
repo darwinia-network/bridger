@@ -5,38 +5,44 @@ use abstract_bridge_s2s::strategy::RelayStrategy;
 use abstract_bridge_s2s::types::bp_messages::OutboundLaneData;
 use abstract_bridge_s2s::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use sp_runtime::traits::Header;
+
 use support_toolkit::{convert::SmartCodecMapper, logk};
 
 use crate::error::{RelayError, RelayResult};
 use crate::keepstate;
+use crate::special::DifferentClientApi;
 use crate::strategy::{EnforcementDecideReference, EnforcementRelayStrategy};
 use crate::types::{MessageDeliveryInput, M_DELIVERY};
 
-pub struct DeliveryRunner<SC, TC, Strategy>
+pub struct CommonDeliveryRunner<SC, TC, DC, Strategy>
 where
     SC: S2SClientRelay,
     TC: S2SClientRelay,
+    DC: DifferentClientApi<TC>,
     Strategy: RelayStrategy,
 {
+    different: DC,
     input: MessageDeliveryInput<SC, TC, Strategy>,
 }
 
-impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
+impl<SC, TC, DC, Strategy> CommonDeliveryRunner<SC, TC, DC, Strategy>
 where
     SC: S2SClientRelay,
     TC: S2SClientRelay,
+    DC: DifferentClientApi<TC>,
     Strategy: RelayStrategy,
 {
-    pub fn new(input: MessageDeliveryInput<SC, TC, Strategy>) -> Self {
-        Self { input }
+    pub fn new(input: MessageDeliveryInput<SC, TC, Strategy>, different: DC) -> Self {
+        Self { input, different }
     }
 }
 
 // defined
-impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
+impl<SC, TC, DC, Strategy> CommonDeliveryRunner<SC, TC, DC, Strategy>
 where
     SC: S2SClientRelay,
     TC: S2SClientRelay,
+    DC: DifferentClientApi<TC>,
     Strategy: RelayStrategy,
 {
     async fn source_outbound_lane_data(&self) -> RelayResult<OutboundLaneData> {
@@ -93,10 +99,11 @@ where
     }
 }
 
-impl<SC, TC, Strategy> DeliveryRunner<SC, TC, Strategy>
+impl<SC, TC, DC, Strategy> CommonDeliveryRunner<SC, TC, DC, Strategy>
 where
     SC: S2SClientRelay,
     TC: S2SClientRelay,
+    DC: DifferentClientApi<TC>,
     Strategy: RelayStrategy,
 {
     pub async fn start(&self) -> RelayResult<()> {
@@ -165,7 +172,8 @@ where
         };
 
         // query last relayed header
-        let last_relayed_source_hash_in_target = client_target.best_target_finalized(None).await?;
+        // let last_relayed_source_hash_in_target = client_target.best_target_finalized(None).await?;
+        let last_relayed_source_hash_in_target = self.different.best_target_finalized(None).await?;
         let expected_source_hash = SmartCodecMapper::map_to(&last_relayed_source_hash_in_target)?;
         let last_relayed_source_block_in_target = client_source
             .block(Some(expected_source_hash))

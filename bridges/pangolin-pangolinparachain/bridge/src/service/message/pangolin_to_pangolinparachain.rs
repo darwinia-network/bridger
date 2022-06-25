@@ -5,7 +5,7 @@ use feemarket_ns2s::relay::basic::BasicRelayStrategy;
 use lifeline::{Lifeline, Service, Task};
 use subquery_s2s::types::RelayBlockOrigin;
 
-use relay_s2s::message::{DeliveryRunner, ReceivingRunner};
+use relay_s2s::message::{BridgeParachainReceivingRunner, BridgeSolochainDeliveryRunner};
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
@@ -68,13 +68,16 @@ impl Service for PangolinToPangolinParachainMessageRelayService {
     }
 }
 
-async fn message_input() -> color_eyre::Result<MessageReceivingInput<PangolinClient, PangolinParachainClient>>
-{
+async fn message_input(
+) -> color_eyre::Result<MessageReceivingInput<PangolinClient, PangolinParachainClient>> {
     let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
     let relay_config = bridge_config.relay;
 
     let client_pangolin = bridge_config.pangolin.to_pangolin_client().await?;
-    let client_pangolin_parachain = bridge_config.pangolin_parachain.to_pangolin_parachain_client().await?;
+    let client_pangolin_parachain = bridge_config
+        .pangolin_parachain
+        .to_pangolin_parachain_client()
+        .await?;
 
     let config_index = bridge_config.index;
     let subquery_pangolin = config_index.to_pangolin_subquery();
@@ -115,7 +118,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         relay_block_origin: RelayBlockOrigin::BridgePangolinParachain,
         relay_strategy,
     };
-    let runner = DeliveryRunner::new(input);
+    let runner = BridgeSolochainDeliveryRunner::new(input);
     Ok(runner.start().await?)
 }
 
@@ -124,7 +127,9 @@ async fn start_receiving() -> color_eyre::Result<()> {
         target: "pangolin-pangolinparachain",
         "[message-receiving] [receiving-pangolin-to-pangolinparachain] SERVICE RESTARTING..."
     );
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+    let relay_config = bridge_config.relay;
     let input = message_input().await?;
-    let runner = ReceivingRunner::new(input);
+    let runner = BridgeParachainReceivingRunner::new(input, relay_config.para_id);
     Ok(runner.start().await?)
 }

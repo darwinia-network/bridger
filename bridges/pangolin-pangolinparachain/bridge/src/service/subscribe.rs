@@ -32,7 +32,7 @@ impl Service for SubscribeService {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangoro)?;
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
 
     let client_pangolin = bridge_config.pangolin.to_pangolin_client().await?;
     let client_rococo = bridge_config.rococo.to_rococo_client().await?;

@@ -69,13 +69,19 @@ impl S2SClientGeneric for PangolinParachainClient {
     }
 
     async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData> {
-        Err(S2SClientError::Custom("Not need".to_string()))
+        Err(S2SClientError::Custom(format!(
+            "[{}] not needed prepare_initialization_data",
+            <Self as S2SClientBase>::CHAIN
+        )))
     }
 
     async fn initialize(
         &self,
         _initialization_data: Self::InitializationData,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
-        Err(S2SClientError::Custom("Not need".to_string()))
+        Err(S2SClientError::Custom(format!(
+            "[{}] not needed initialize",
+            <Self as S2SClientBase>::CHAIN
+        )))
     }
 }

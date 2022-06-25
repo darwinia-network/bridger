@@ -18,5 +18,6 @@ para_id = 2105
 
 [index]
 pangolin           = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-pangolin" }
+rococo             = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-rococo" }
 pangolin_parachain = { endpoint = "https://api.subquery.network/sq/fewensa/subql-bridge-s2s-pangolin-parachain" }
 parachain_rococo   = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-parachain-rococo" }

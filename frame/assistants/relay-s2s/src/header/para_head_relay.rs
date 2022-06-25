@@ -46,10 +46,10 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .await?;
         tracing::trace!(
             target: "relay-s2s",
-            "{} the last para-head on {}: {:?}",
+            "{} the last para-head on {}: {}",
             logk::prefix_with_bridge(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
             SC::CHAIN,
-            &para_head_at_target,
+            para_head_at_target.clone().map(|v| v.at_relay_block_number.to_string()).unwrap_or("None".to_string()),
         );
 
         let best_finalized_source_block_hash = client_solochain

@@ -2,25 +2,34 @@ use abstract_bridge_s2s::client::S2SClientRelay;
 use abstract_bridge_s2s::types::bp_messages::{OutboundLaneData, UnrewardedRelayersState};
 use abstract_bridge_s2s::types::bp_runtime::Chain;
 use abstract_bridge_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
+
 use support_toolkit::{convert::SmartCodecMapper, logk};
 
 use crate::error::RelayResult;
 use crate::keepstate;
+use crate::special::DifferentClientApi;
 use crate::types::{MessageReceivingInput, M_RECEIVING};
 
-pub struct ReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct CommonReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
+{
+    different: DC,
     input: MessageReceivingInput<SC, TC>,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
-    pub fn new(message_relay: MessageReceivingInput<SC, TC>) -> Self {
+impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
+    CommonReceivingRunner<SC, TC, DC>
+{
+    pub fn new(message_relay: MessageReceivingInput<SC, TC>, different: DC) -> Self {
         Self {
+            different,
             input: message_relay,
         }
     }
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
+impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
+    CommonReceivingRunner<SC, TC, DC>
+{
     async fn source_outbound_lane_data(&self) -> RelayResult<OutboundLaneData> {
         let lane = self.input.lane()?;
         let outbound_lane_data = self.input.client_source.outbound_lanes(lane, None).await?;
@@ -100,7 +109,9 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
     }
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
+impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
+    CommonReceivingRunner<SC, TC, DC>
+{
     pub async fn start(&self) -> RelayResult<()> {
         tracing::info!(
             target: "relay-s2s",
@@ -138,7 +149,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> ReceivingRunner<SC, TC> {
         }
 
         // query last relayed header
-        let last_relayed_target_hash_in_source = client_source.best_target_finalized(None).await?;
+        let last_relayed_target_hash_in_source = self.different.best_target_finalized(None).await?;
         let expected_target_hash = SmartCodecMapper::map_to(&last_relayed_target_hash_in_source)?;
 
         // assemble unrewarded relayers state

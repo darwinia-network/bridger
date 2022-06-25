@@ -2830,6 +2830,7 @@ version = "0.5.7"
 dependencies = [
  "abstract-bridge-s2s",
  "array-bytes",
+ "async-trait",
  "once_cell",
  "sp-core",
  "sp-runtime",

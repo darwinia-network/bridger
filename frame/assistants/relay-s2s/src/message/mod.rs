@@ -1,5 +1,6 @@
-pub use delivery_relay::*;
-pub use receiving_relay::*;
+pub use self::bridge_parachain::*;
+pub use self::bridge_solochain::*;
 
-mod delivery_relay;
-mod receiving_relay;
+mod bridge_parachain;
+mod bridge_solochain;
+mod common;

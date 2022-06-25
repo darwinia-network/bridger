@@ -1,9 +1,9 @@
 use std::ops::RangeInclusive;
 
+use abstract_bridge_s2s::client::{S2SClientBase, S2SClientRelay, S2SParaBridgeClientSolochain};
 use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
-use abstract_bridge_s2s::{
-    client::S2SParaBridgeClientSolochain,
-    types::{bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common},
+use abstract_bridge_s2s::types::{
+    bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,
 };
 use sp_runtime::AccountId32;
 use subxt::sp_core::storage::StorageKey;
@@ -29,7 +29,7 @@ type FromThisChainMessagePayload = crate::types::runtime_types::bp_message_dispa
 >;
 
 #[async_trait::async_trait]
-impl abstract_bridge_s2s::client::S2SClientRelay for PangolinClient {
+impl S2SClientRelay for PangolinClient {
     fn gen_outbound_messages_storage_key(&self, lane: [u8; 4], message_nonce: u64) -> StorageKey {
         let prefix = StorageKeyPrefix::new::<OutboundMessages>();
         OutboundMessages(BundleMessageKey {
@@ -83,9 +83,14 @@ impl abstract_bridge_s2s::client::S2SClientRelay for PangolinClient {
 
     async fn best_target_finalized(
         &self,
-        _at_block: Option<<Self::Chain as Chain>::Hash>,
+        at_block: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
-        Err(S2SClientError::Custom("not needed".to_string()))
+        Ok(self
+            .runtime()
+            .storage()
+            .bridge_rococo_grandpa()
+            .best_finalized(at_block)
+            .await?)
     }
 
     async fn submit_finality_proof(
@@ -95,7 +100,10 @@ impl abstract_bridge_s2s::client::S2SClientRelay for PangolinClient {
             <Self::Chain as Chain>::Header,
         >,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
-        Err(S2SClientError::Custom("not needed".to_string()))
+        Err(S2SClientError::Custom(format!(
+            "[{}] not needed submit_finality_proof",
+            <Self as S2SClientBase>::CHAIN
+        )))
     }
 
     async fn outbound_lanes(

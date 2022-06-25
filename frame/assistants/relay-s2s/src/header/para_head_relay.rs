@@ -103,7 +103,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             (Some(_), Some(_)) => {
                 tracing::info!(
                     target: "relay-s2s",
-                    "{} not need need to relay",
+                    "{} not need to relay",
                     logk::prefix_with_bridge(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
                 );
                 false

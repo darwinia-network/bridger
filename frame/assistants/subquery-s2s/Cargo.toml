@@ -25,4 +25,8 @@ serde-hex   = "0.1"
 strum       = { version = "0.21", features = ["derive"] }
 array-bytes = "1.4"
 
-gql_client = "1"
+#gql_client = "1"
+gql_client = { git = "https://github.com/fewensa/gql-client-rs.git" }
+
+[dev-dependencies]
+tokio       = { version = "1", features = ["full"] }

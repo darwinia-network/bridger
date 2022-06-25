@@ -15,7 +15,7 @@ type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::He
 >;
 
 impl S2SClientBase for PangolinParachainClient {
-    const CHAIN: &'static str = "pangolin";
+    const CHAIN: &'static str = "pangolinparachain";
 
     type Chain = bp_pangolin_parachain::PangolinParachain;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;

@@ -41,7 +41,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
         at_block: <TC::Chain as Chain>::Hash,
         source_outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<(u64, UnrewardedRelayersState)>> {
-        // let block_hex = array_bytes::bytes2hex("0x", at_block);
+        let block_hex = array_bytes::bytes2hex("0x", at_block);
         let lane = self.input.lane()?;
         let inbound_lane_data = self
             .input
@@ -57,9 +57,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
         if max_confirm_end_at_target == source_outbound_lane_data.latest_received_nonce {
             tracing::info!(
                 target: "relay-s2s",
-                "{} max dispatch nonce({}) at target is same with last received nonce({}) at source. nothing to do.",
+                "{} the last dispatched nonce({}) at target({}) is same with last received nonce({}) at source. nothing to do.",
                 logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
                 max_confirm_end_at_target,
+                block_hex,
                 source_outbound_lane_data.latest_received_nonce,
             );
             return Ok(None);

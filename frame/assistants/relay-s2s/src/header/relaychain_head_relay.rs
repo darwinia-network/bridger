@@ -39,7 +39,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             SmartCodecMapper::map_to(&last_relayed_relaychain_hash_in_solochain)?;
         tracing::debug!(
             target: "relay-s2s",
-            "{} get last relayed rococo block hash: {:?}",
+            "{} get last relayed relaychain block hash: {:?}",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
             array_bytes::bytes2hex("0x", expected_relaychain_hash),
         );
@@ -48,7 +48,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             .await?
             .ok_or_else(|| {
                 RelayError::Custom(format!(
-                    "Failed to query block by [{}] in rococo",
+                    "Failed to query block by [{}] in relaychain",
                     array_bytes::bytes2hex("0x", expected_relaychain_hash)
                 ))
             })?;
@@ -60,7 +60,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         let block_number: u32 = SmartCodecMapper::map_to(block_number)?;
         tracing::info!(
             target: "relay-s2s",
-            "{} get last relayed rococo block number: {:?}",
+            "{} get last relayed relaychain block number: {:?}",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
             block_number,
         );
@@ -152,6 +152,12 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             return Ok(());
         }
         let next_para_header = next_para_header.expect("Unreachable");
+        tracing::trace!(
+            target: "relay-s2s",
+            "{} queryied last need relay parachain header is {}",
+            logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
+            next_para_header.block_number,
+        );
 
         let subquery_candidate = &self.input.subquery_candidate;
         let next_header = subquery_candidate
@@ -160,9 +166,10 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             .filter(|header| {
                 tracing::debug!(
                     target: "relay-s2s",
-                    "{} get related realy chain header: {:?}",
+                    "{} get related realy chain header: {}, last relayed header at solochain is {}",
                     logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                     header.included_relay_block,
+                    last_block_number,
                 );
                 header.included_relay_block > last_block_number
             });
@@ -183,7 +190,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
                     <SC::Chain as Chain>::Header,
                 > = codec::Decode::decode(&mut justification.as_ref()).map_err(|err| {
                     RelayError::Custom(format!(
-                        "Failed to decode justification of rococo: {:?}",
+                        "Failed to decode justification of relaychain: {:?}",
                         err
                     ))
                 })?;

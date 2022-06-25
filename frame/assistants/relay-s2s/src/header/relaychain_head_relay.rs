@@ -196,9 +196,10 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
                 })?;
                 tracing::debug!(
                     target: "relay-s2s",
-                    "{} test justification: {:?}",
+                    "{} found justification at block {} and last block number is {}",
                     logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                     grandpa_justification.commit.target_number,
+                    last_block_number,
                 );
 
                 let target_number: u32 =

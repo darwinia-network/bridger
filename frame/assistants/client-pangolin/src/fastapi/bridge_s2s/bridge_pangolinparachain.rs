@@ -1,7 +1,7 @@
 use std::ops::RangeInclusive;
 
-use abstract_bridge_s2s::client::{S2SClientBase, S2SClientRelay, S2SParaBridgeClientSolochain};
-use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
+use abstract_bridge_s2s::client::{S2SClientRelay, S2SParaBridgeClientSolochain};
+use abstract_bridge_s2s::error::S2SClientResult;
 use abstract_bridge_s2s::types::{
     bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,
 };
@@ -95,15 +95,20 @@ impl S2SClientRelay for PangolinClient {
 
     async fn submit_finality_proof(
         &self,
-        _finality_target: <Self::Chain as Chain>::Header,
-        _justification: bp_header_chain::justification::GrandpaJustification<
+        finality_target: <Self::Chain as Chain>::Header,
+        justification: bp_header_chain::justification::GrandpaJustification<
             <Self::Chain as Chain>::Header,
         >,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
-        Err(S2SClientError::Custom(format!(
-            "[{}] not needed submit_finality_proof",
-            <Self as S2SClientBase>::CHAIN
-        )))
+        let expected_target = SmartCodecMapper::map_to(&finality_target)?;
+        let expected_justification = SmartCodecMapper::map_to(&justification)?;
+        Ok(self
+            .runtime()
+            .tx()
+            .bridge_rococo_grandpa()
+            .submit_finality_proof(expected_target, expected_justification)
+            .sign_and_submit(self.account().signer())
+            .await?)
     }
 
     async fn outbound_lanes(

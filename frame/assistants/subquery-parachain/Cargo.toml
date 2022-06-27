@@ -24,4 +24,4 @@ serde-aux   = "0.6"
 serde-hex   = "0.1"
 strum       = { version = "0.21", features = ["derive"] }
 
-gql_client = { git = "https://github.com/fewensa/gql-client-rs.git" }
+gql_client = "1"

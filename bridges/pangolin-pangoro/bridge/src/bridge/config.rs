@@ -64,12 +64,12 @@ impl From<ChainInfoConfig> for client_pangoro::config::ClientConfig {
 
 impl ChainInfoConfig {
     pub async fn to_pangolin_client(&self) -> color_eyre::Result<PangolinClient> {
-        let config = self.into();
+        let config = self.clone().into();
         Ok(PangolinClientComponent::component(config).await?)
     }
 
     pub async fn to_pangoro_client(&self) -> color_eyre::Result<PangoroClient> {
-        let config = self.into();
+        let config = self.clone().into();
         Ok(PangoroClientComponent::component(config).await?)
     }
 }

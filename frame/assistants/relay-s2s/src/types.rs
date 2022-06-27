@@ -72,14 +72,6 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy>
     }
 }
 
-pub struct BridgeParachainMessageDeliveryInput<
-    SC: S2SClientRelay,
-    TC: S2SParaBridgeClientSolochain,
-    Strategy: RelayStrategy,
-> {
-    pub raw: MessageDeliveryInput<SC, TC, Strategy>,
-}
-
 pub struct MessageReceivingInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub lanes: Vec<LaneId>,
     pub relayer_account: <SC::Chain as Chain>::AccountId,

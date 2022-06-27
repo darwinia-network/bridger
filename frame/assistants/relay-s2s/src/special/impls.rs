@@ -1,16 +1,21 @@
-use abstract_bridge_s2s::client::{S2SClientRelay, S2SParaBridgeClientSolochain};
+use abstract_bridge_s2s::client::S2SClientRelay;
 use abstract_bridge_s2s::error::S2SClientResult;
 use abstract_bridge_s2s::types::bp_runtime::Chain;
-use abstract_bridge_s2s::types::ParaId;
+#[cfg(feature = "bridge-parachain")]
+use abstract_bridge_s2s::{client::S2SParaBridgeClientSolochain, types::ParaId};
+
+#[cfg(feature = "bridge-parachain")]
 use support_toolkit::convert::SmartCodecMapper;
 
 use crate::special::traits::DifferentClientApi;
 
+#[cfg(feature = "bridge-parachain")]
 pub struct ParachainSpecialClientApi<T: S2SParaBridgeClientSolochain> {
     pub para_id: u32,
     pub client: T,
 }
 
+#[cfg(feature = "bridge-parachain")]
 #[async_trait::async_trait]
 impl<T: S2SParaBridgeClientSolochain> DifferentClientApi<T> for ParachainSpecialClientApi<T> {
     async fn best_target_finalized(
@@ -30,7 +35,6 @@ impl<T: S2SParaBridgeClientSolochain> DifferentClientApi<T> for ParachainSpecial
         }
     }
 }
-
 
 pub struct SolochainSpecialClientApi<T: S2SClientRelay> {
     pub client: T,

@@ -5,7 +5,7 @@ use lifeline::{Lifeline, Service, Task};
 use subquery_s2s::types::RelayBlockOrigin;
 
 use feemarket_ns2s::relay::basic::BasicRelayStrategy;
-use relay_s2s::message::{DeliveryRunner, ReceivingRunner};
+use relay_s2s::message::{BridgeSolochainDeliveryRunner, BridgeSolochainReceivingRunner};
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
@@ -115,7 +115,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         relay_block_origin: RelayBlockOrigin::BridgePangolin,
         relay_strategy,
     };
-    let runner = DeliveryRunner::new(input);
+    let runner = BridgeSolochainDeliveryRunner::new(input);
     Ok(runner.start().await?)
 }
 
@@ -125,6 +125,6 @@ async fn start_receiving() -> color_eyre::Result<()> {
         "[message-receiving] [receiving-pangoro-to-pangolin] SERVICE RESTARTING..."
     );
     let input = message_input().await?;
-    let runner = ReceivingRunner::new(input);
+    let runner = BridgeSolochainReceivingRunner::new(input);
     Ok(runner.start().await?)
 }

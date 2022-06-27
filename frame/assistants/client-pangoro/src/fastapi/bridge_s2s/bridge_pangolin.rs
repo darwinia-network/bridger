@@ -3,7 +3,6 @@ use std::ops::RangeInclusive;
 use abstract_bridge_s2s::error::S2SClientResult;
 use abstract_bridge_s2s::{
     client::S2SClientRelay,
-    config::Config,
     types::{bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common},
 };
 use sp_runtime::AccountId32;

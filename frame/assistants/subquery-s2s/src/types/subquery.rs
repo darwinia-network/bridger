@@ -24,6 +24,8 @@ pub enum OriginType {
     BridgeCrabParachain,
     #[serde(rename = "bridge-crab")]
     BridgeCrab,
+    #[serde(rename = "bridge-darwinia")]
+    BridgeDarwinia,
 }
 
 #[derive(Clone, Debug, Serialize)]

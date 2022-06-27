@@ -42,7 +42,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             .ok_or_else(|| {
                 RelayError::Custom(format!(
                     "Failed to query block by [{}] in {}",
-                    array_bytes::bytes2hex("0x", expected_source_hash),
+                    array_bytes::bytes2hex("0x", expected_source_hash.as_ref()),
                     SC::CHAIN,
                 ))
             })?;
@@ -92,7 +92,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             target: "relay-s2s",
             "{} header relayed: {:?}",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", hash),
+            array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(())
     }
@@ -188,7 +188,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
                     SmartCodecMapper::map_to(&grandpa_justification.commit.target_number)?;
                 if target_number > last_block_number {
                     self.submit_finality(
-                        array_bytes::bytes2hex("", grandpa_justification.commit.target_hash),
+                        array_bytes::bytes2hex(
+                            "",
+                            grandpa_justification.commit.target_hash.as_ref(),
+                        ),
                         justification.to_vec(),
                     )
                     .await?;

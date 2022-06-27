@@ -13,7 +13,7 @@ repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.5.7"
 
 [dependencies]
-array-bytes = "1.4"
+array-bytes = "2"
 thiserror   = "1"
 tracing     = "0.1"
 

@@ -23,7 +23,7 @@ tracing   = "0.1"
 
 serde       = { version = "1", features = ["derive"] }
 
-array-bytes           = "1.4"
+array-bytes           = "2"
 codec                 = { package = "parity-scale-codec", version = "2" }
 subxt                 = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 bp-pangolin-parachain = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }

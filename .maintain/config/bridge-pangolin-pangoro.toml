@@ -7,7 +7,6 @@ endpoint = "wss://pangoro-rpc.darwinia.network"
 signer = "//Alice"
 
 [relay]
-# substrate-substrate bridger message relay lanes, default use `00000000`
 lanes = ["726f6c69"]
 
 [index]

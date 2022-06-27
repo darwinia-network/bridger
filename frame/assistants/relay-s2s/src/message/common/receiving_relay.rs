@@ -41,7 +41,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
         at_block: <TC::Chain as Chain>::Hash,
         source_outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<(u64, UnrewardedRelayersState)>> {
-        let block_hex = array_bytes::bytes2hex("0x", at_block);
+        let block_hex = array_bytes::bytes2hex("0x", at_block.as_ref());
         let lane = self.input.lane()?;
         let inbound_lane_data = self
             .input
@@ -190,7 +190,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
             target: "relay-s2s",
             "{} receiving extensics sent successful: {}",
             logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", hash),
+            array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(Some(max_confirmed_nonce_at_target))
     }

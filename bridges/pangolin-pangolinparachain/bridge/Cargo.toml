@@ -16,7 +16,7 @@ version       = "0.5.7"
 tracing     = "0.1"
 color-eyre  = "0.5"
 
-array-bytes = "1.4"
+array-bytes = "2"
 tokio       = { version = "1", features = ["full"] }
 
 structopt = "0.3"

@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-use crate::subxt_runtime::api::runtime_types::{
-    darwinia_bridge_ethereum, darwinia_relay_primitives,
-};
 #[cfg(feature = "ethlike-v1")]
 use codec::Encode;
 use subxt::DefaultExtra;
 
 use crate::config::PangolinSubxtConfig;
+use crate::subxt_runtime::api::runtime_types::{
+    darwinia_bridge_ethereum, darwinia_relay_primitives,
+};
 use crate::types::Balance;
 
 /// Real relay affirmation types

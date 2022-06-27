@@ -138,7 +138,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             target: "relay-s2s",
             "{} the tx hash {} emitted",
             logk::prefix_with_bridge(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", hash),
+            array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(())
     }

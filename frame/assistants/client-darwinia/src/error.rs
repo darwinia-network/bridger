@@ -20,16 +20,14 @@ pub enum ClientError {
     #[error("Wrong seed: {0}")]
     Seed(String),
 
+    #[error("Bytes error: {0}")]
+    Bytes(String),
+
     #[error("Other error: {0}")]
-    Other(String),
+    Custom(String),
 
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
-
-    // #[error("Rpc error: {0}")]
-    // Rpc(#[from] jsonrpsee_types::error::Error),
-    #[error("Serde json error: {0}")]
-    Serialization(#[from] serde_json::error::Error),
 
     #[cfg(feature = "ethlike-v1")]
     #[error("Failed to build SecretKey from authority's private key")]
@@ -80,5 +78,28 @@ impl From<subxt::BasicError> for ClientError {
             return Self::ClientRestartNeed;
         }
         Self::SubxtBasicError(error)
+    }
+}
+
+impl From<subxt::rpc::RpcError> for ClientError {
+    fn from(error: subxt::rpc::RpcError) -> Self {
+        Self::SubxtBasicError(subxt::BasicError::Rpc(error))
+    }
+}
+
+impl From<array_bytes::Error> for ClientError {
+    fn from(error: array_bytes::Error) -> Self {
+        Self::Bytes(format!("{:?}", error))
+    }
+}
+
+#[cfg(feature = "bridge-s2s")]
+impl From<ClientError> for abstract_bridge_s2s::error::S2SClientError {
+    fn from(error: ClientError) -> Self {
+        match error {
+            ClientError::SubxtBasicError(e) => Self::RPC(format!("{:?}", e)),
+            ClientError::ClientRestartNeed => Self::RPC(format!("Client restart need")),
+            _ => Self::Custom(format!("{:?}", error)),
+        }
     }
 }

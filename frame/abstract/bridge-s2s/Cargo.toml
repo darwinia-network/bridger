@@ -31,7 +31,7 @@ bp-messages           = { git = "https://github.com/darwinia-network/darwinia-br
 bridge-runtime-common = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 bp-header-chain       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
 
-array-bytes = { optional = true, version = "1.4" }
+array-bytes = { optional = true, version = "2" }
 subxt       = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
 
 [features]

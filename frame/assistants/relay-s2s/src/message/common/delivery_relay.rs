@@ -181,7 +181,7 @@ where
             .ok_or_else(|| {
                 RelayError::Custom(format!(
                     "Failed to query block by [{}] in {}",
-                    array_bytes::bytes2hex("0x", expected_source_hash),
+                    array_bytes::bytes2hex("0x", expected_source_hash.as_ref()),
                     SC::CHAIN,
                 ))
             })?;
@@ -272,7 +272,7 @@ where
             "{} the nonces {:?} in delivered to target chain -> {}",
             logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
             nonces,
-            array_bytes::bytes2hex("0x", hash),
+            array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(Some(*nonces.end()))
     }

@@ -23,7 +23,7 @@ serde       = { version = "1.0", features = ["derive"] }
 serde-aux   = "0.6"
 serde-hex   = "0.1"
 strum       = { version = "0.21", features = ["derive"] }
-array-bytes = "1.4"
+array-bytes = "2"
 
 gql_client = "1"
 

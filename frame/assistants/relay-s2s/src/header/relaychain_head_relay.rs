@@ -41,7 +41,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             target: "relay-s2s",
             "{} get last relayed relaychain block hash: {:?}",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", expected_relaychain_hash),
+            array_bytes::bytes2hex("0x", expected_relaychain_hash.as_ref()),
         );
         let last_relayed_relaychain_block_in_solochain = client_relaychain
             .block(Some(expected_relaychain_hash))
@@ -49,7 +49,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             .ok_or_else(|| {
                 RelayError::Custom(format!(
                     "Failed to query block by [{}] in relaychain",
-                    array_bytes::bytes2hex("0x", expected_relaychain_hash)
+                    array_bytes::bytes2hex("0x", expected_relaychain_hash.as_ref())
                 ))
             })?;
 
@@ -100,7 +100,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             target: "relay-s2s",
             "{} header relayed: {:?}",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", hash),
+            array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(())
     }
@@ -206,7 +206,10 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
                     SmartCodecMapper::map_to(&grandpa_justification.commit.target_number)?;
                 if target_number > last_block_number {
                     self.submit_finality(
-                        array_bytes::bytes2hex("", grandpa_justification.commit.target_hash),
+                        array_bytes::bytes2hex(
+                            "",
+                            grandpa_justification.commit.target_hash.as_ref(),
+                        ),
                         justification.to_vec(),
                     )
                     .await?;

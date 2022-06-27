@@ -4,7 +4,7 @@ use crate::types::BridgeName;
 
 /// Bridge template options
 #[derive(Debug, StructOpt)]
-#[structopt(name = "bridge-template", about = "Bridge template")]
+#[structopt(name = "bridge-pangolin-pangoro", about = "Bridge pangolin")]
 pub enum Opts {
     /// Init bridge pangolin-pangoro
     Init {

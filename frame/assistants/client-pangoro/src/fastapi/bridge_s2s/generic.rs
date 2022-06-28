@@ -250,18 +250,4 @@ impl S2SClientGeneric for PangoroClient {
             S2SClientError::Custom(format!("Failed to decode initialization data: {:?}", e))
         })?)
     }
-
-    async fn initialize(
-        &self,
-        initialization_data: Self::InitializationData,
-    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
-        let hash = self
-            .runtime()
-            .tx()
-            .bridge_pangolin_grandpa()
-            .initialize(initialization_data)
-            .sign_and_submit(self.account().signer())
-            .await?;
-        Ok(hash)
-    }
 }

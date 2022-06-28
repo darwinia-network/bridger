@@ -48,12 +48,6 @@ pub trait S2SClientGeneric: S2SClientBase {
 
     /// prepare initialization data
     async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData>;
-
-    /// initialize bridge
-    async fn initialize(
-        &self,
-        initialization_data: Self::InitializationData,
-    ) -> S2SClientResult<<Self::Chain as Chain>::Hash>;
 }
 
 /// S2S bridge header/message api
@@ -83,6 +77,12 @@ pub trait S2SClientRelay: S2SClientGeneric {
     async fn best_target_finalized(
         &self,
         at_block: Option<<Self::Chain as Chain>::Hash>,
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash>;
+
+    /// initialize bridge
+    async fn initialize(
+        &self,
+        initialization_data: <Self as S2SClientGeneric>::InitializationData,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash>;
 
     /// submit finality proof

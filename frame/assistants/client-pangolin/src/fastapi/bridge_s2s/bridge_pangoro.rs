@@ -1,5 +1,6 @@
 use std::ops::RangeInclusive;
 
+use abstract_bridge_s2s::client::S2SClientGeneric;
 use abstract_bridge_s2s::error::S2SClientResult;
 use abstract_bridge_s2s::{
     client::S2SClientRelay,
@@ -91,6 +92,20 @@ impl S2SClientRelay for PangolinClient {
             .bridge_pangoro_grandpa()
             .best_finalized(at_block)
             .await?)
+    }
+
+    async fn initialize(
+        &self,
+        initialization_data: <Self as S2SClientGeneric>::InitializationData,
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
+        let hash = self
+            .runtime()
+            .tx()
+            .bridge_pangoro_grandpa()
+            .initialize(initialization_data)
+            .sign_and_submit(self.account().signer())
+            .await?;
+        Ok(hash)
     }
 
     async fn submit_finality_proof(

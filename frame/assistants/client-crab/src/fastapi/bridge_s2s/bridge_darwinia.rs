@@ -93,6 +93,20 @@ impl S2SClientRelay for CrabClient {
             .await?)
     }
 
+    async fn initialize(
+        &self,
+        initialization_data: <Self as S2SClientGeneric>::InitializationData,
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
+        let hash = self
+            .runtime()
+            .tx()
+            .bridge_darwinia_grandpa()
+            .initialize(initialization_data)
+            .sign_and_submit(self.account().signer())
+            .await?;
+        Ok(hash)
+    }
+
     async fn submit_finality_proof(
         &self,
         finality_target: <Self::Chain as Chain>::Header,

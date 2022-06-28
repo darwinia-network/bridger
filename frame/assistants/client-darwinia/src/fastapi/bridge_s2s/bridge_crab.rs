@@ -1,14 +1,15 @@
 use std::ops::RangeInclusive;
 
-use abstract_bridge_s2s::error::S2SClientResult;
-use abstract_bridge_s2s::{
-    client::S2SClientRelay,
-    types::{bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common},
-};
-use sp_runtime::AccountId32;
 use subxt::sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;
+
+use abstract_bridge_s2s::error::S2SClientResult;
+use abstract_bridge_s2s::{
+    client::{S2SClientGeneric, S2SClientRelay},
+    types::{bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common},
+};
+use sp_runtime::AccountId32;
 use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::DarwiniaClient;
@@ -90,6 +91,20 @@ impl S2SClientRelay for DarwiniaClient {
             .bridge_crab_grandpa()
             .best_finalized(at_block)
             .await?)
+    }
+
+    async fn initialize(
+        &self,
+        initialization_data: <Self as S2SClientGeneric>::InitializationData,
+    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
+        let hash = self
+            .runtime()
+            .tx()
+            .bridge_crab_grandpa()
+            .initialize(initialization_data)
+            .sign_and_submit(self.account().signer())
+            .await?;
+        Ok(hash)
     }
 
     async fn submit_finality_proof(

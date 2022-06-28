@@ -1,8 +1,7 @@
 use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
 use abstract_bridge_s2s::{
     client::{S2SClientBase, S2SClientGeneric},
-    types::bp_header_chain,
-    types::bp_runtime::Chain,
+    types::{bp_header_chain, bp_runtime::Chain},
 };
 use finality_grandpa::voter_set::VoterSet;
 use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
@@ -249,19 +248,5 @@ impl S2SClientGeneric for CrabClient {
         Ok(codec::Decode::decode(&mut &bytes[..]).map_err(|e| {
             S2SClientError::Custom(format!("Failed to decode initialization data: {:?}", e))
         })?)
-    }
-
-    async fn initialize(
-        &self,
-        initialization_data: Self::InitializationData,
-    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
-        let hash = self
-            .runtime()
-            .tx()
-            .bridge_darwinia_grandpa()
-            .initialize(initialization_data)
-            .sign_and_submit(self.account().signer())
-            .await?;
-        Ok(hash)
     }
 }

@@ -10,12 +10,6 @@ use subxt::{sp_core, sp_runtime};
 use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::KusamaClient;
-// use crate::types::runtime_types::bp_header_chain::InitializationData;
-
-// type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
-//     u32,
-//     crate::types::runtime_types::sp_runtime::traits::BlakeTwo256,
-// >;
 
 impl S2SClientBase for KusamaClient {
     const CHAIN: &'static str = "kusama";
@@ -26,7 +20,6 @@ impl S2SClientBase for KusamaClient {
 
 #[async_trait::async_trait]
 impl S2SClientGeneric for KusamaClient {
-    // type InitializationData = InitializationData<BundleHeader>;
     type InitializationData = bp_header_chain::InitializationData<<Self::Chain as Chain>::Header>;
 
     async fn subscribe_grandpa_justifications(
@@ -75,16 +68,6 @@ impl S2SClientGeneric for KusamaClient {
     async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData> {
         Err(S2SClientError::Custom(format!(
             "[{}] not needed prepare_initialization_data",
-            <Self as S2SClientBase>::CHAIN
-        )))
-    }
-
-    async fn initialize(
-        &self,
-        _initialization_data: Self::InitializationData,
-    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
-        Err(S2SClientError::Custom(format!(
-            "[{}] not needed initialize",
             <Self as S2SClientBase>::CHAIN
         )))
     }

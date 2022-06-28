@@ -3,7 +3,7 @@ use client_darwinia::client::DarwiniaClient;
 use lifeline::{Lifeline, Service, Task};
 use subquery_s2s::types::RelayBlockOrigin;
 
-use feemarket_ns2s::relay::basic::BasicRelayStrategy;
+use feemarket_s2s::relay::basic::BasicRelayStrategy;
 use relay_s2s::message::{BridgeSolochainDeliveryRunner, BridgeSolochainReceivingRunner};
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
 use support_common::config::{Config, Names};

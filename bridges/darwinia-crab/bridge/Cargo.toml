@@ -40,4 +40,4 @@ client-darwinia     = { path = "../../../frame/assistants/client-darwinia", feat
 client-crab         = { path = "../../../frame/assistants/client-crab", features = [ "bridge-s2s-darwinia", "feemarket-s2s-darwinia" ]}
 subquery-s2s        = { path = "../../../frame/assistants/subquery-s2s" }
 relay-s2s           = { path = "../../../frame/assistants/relay-s2s" }
-feemarket-ns2s      = { path = "../../../frame/assistants/feemarket-ns2s" }
+feemarket-s2s       = { path = "../../../frame/assistants/feemarket-s2s" }

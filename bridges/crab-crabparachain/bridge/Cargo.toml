@@ -37,4 +37,4 @@ client-crab-parachain = { path = "../../../frame/assistants/client-crab-parachai
 subquery-s2s          = { path = "../../../frame/assistants/subquery-s2s" }
 subquery-parachain    = { path = "../../../frame/assistants/subquery-parachain" }
 relay-s2s             = { path = "../../../frame/assistants/relay-s2s", features = [ "bridge-parachain" ] }
-feemarket-ns2s        = { path = "../../../frame/assistants/feemarket-ns2s" }
+feemarket-s2s         = { path = "../../../frame/assistants/feemarket-s2s" }

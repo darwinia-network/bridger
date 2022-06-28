@@ -465,7 +465,7 @@ dependencies = [
  "client-crab-parachain",
  "client-kusama",
  "color-eyre",
- "feemarket-ns2s",
+ "feemarket-s2s",
  "lifeline",
  "postage",
  "relay-s2s",
@@ -1060,7 +1060,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "feemarket-ns2s"
+name = "feemarket-s2s"
 version = "0.5.7"
 dependencies = [
  "abstract-bridge-s2s",

@@ -19,27 +19,8 @@ serde       = { version = "1", features = ["derive"] }
 thiserror   = "1.0"
 tracing     = "0.1"
 
-codec = { package = "parity-scale-codec", version = "2" }
+component-subscan   = { path = "../../components/subscan" }
 
-bp-messages            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-messages-relay         = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-relay-substrate-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-relay-utils            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-
-pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-
-## Substrate Dependencies
-frame-support = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-sp-core       = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-sp-runtime    = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-
-
-component-subscan = { path = "../../components/subscan" }
-
-
-# Substrate Dependencies
-
-[dev-dependencies]
-tokio = { version = "1", features = ["full"] }
-
-relay-pangolin-client = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+abstract-bridge-s2s    = { path = "../../abstract/bridge-s2s" }
+abstract-feemarket-s2s = { path = "../../abstract/feemarket-s2s" }
+support-toolkit        = { path = "../../supports/support-toolkit", features = ["log"] }

@@ -1,6 +1,6 @@
 use client_crab::client::CrabClient;
 use client_crab_parachain::client::CrabParachainClient;
-use feemarket_ns2s::relay::basic::BasicRelayStrategy;
+use feemarket_s2s::relay::basic::BasicRelayStrategy;
 use lifeline::{Lifeline, Service, Task};
 use subquery_s2s::types::RelayBlockOrigin;
 

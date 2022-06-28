@@ -1,7 +1,6 @@
-use abstract_bridge_s2s::strategy::AlwaysRelayStrategy;
 use client_pangolin::client::PangolinClient;
 use client_pangolin_parachain::client::PangolinParachainClient;
-use feemarket_ns2s::relay::basic::BasicRelayStrategy;
+use feemarket_s2s::relay::basic::BasicRelayStrategy;
 use lifeline::{Lifeline, Service, Task};
 use subquery_s2s::types::RelayBlockOrigin;
 
@@ -106,7 +105,6 @@ async fn start_delivery() -> color_eyre::Result<()> {
         input.client_source.clone(),
         input.client_source.account().account_id().clone(),
     );
-    let relay_strategy = AlwaysRelayStrategy;
     let input = MessageDeliveryInput {
         lanes: input.lanes,
         nonces_limit: 11,

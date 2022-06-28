@@ -1,20 +1,24 @@
 use std::ops::RangeInclusive;
 
-use abstract_bridge_s2s::client::{S2SClientRelay, S2SParaBridgeClientSolochain};
+use abstract_bridge_s2s::client::S2SClientRelay;
 use abstract_bridge_s2s::error::S2SClientResult;
-use abstract_bridge_s2s::types::{
-    bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,
+use abstract_bridge_s2s::types::bp_header_chain::justification::GrandpaJustification;
+use abstract_bridge_s2s::types::bp_messages::{
+    InboundLaneData, MessageData, MessageKey, OutboundLaneData, UnrewardedRelayersState,
 };
-use sp_runtime::AccountId32;
-use subxt::sp_core::storage::StorageKey;
+use abstract_bridge_s2s::types::bp_runtime::Chain;
+use abstract_bridge_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
+use abstract_bridge_s2s::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
+use sp_core::crypto::AccountId32;
+use sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;
 
 use support_toolkit::convert::SmartCodecMapper;
 
-use crate::client::CrabClient;
+use crate::client::CrabParachainClient;
 use crate::error::ClientError;
-use crate::subxt_runtime::api::bridge_crab_parachain_messages::storage::{
+use crate::subxt_runtime::api::bridge_crab_messages::storage::{
     InboundLanes, OutboundLanes, OutboundMessages,
 };
 
@@ -29,7 +33,7 @@ type FromThisChainMessagePayload = crate::types::runtime_types::bp_message_dispa
 >;
 
 #[async_trait::async_trait]
-impl S2SClientRelay for CrabClient {
+impl S2SClientRelay for CrabParachainClient {
     fn gen_outbound_messages_storage_key(&self, lane: [u8; 4], message_nonce: u64) -> StorageKey {
         let prefix = StorageKeyPrefix::new::<OutboundMessages>();
         OutboundMessages(BundleMessageKey {
@@ -61,7 +65,7 @@ impl S2SClientRelay for CrabClient {
         for message_nonce in nonces {
             let message_data = self
                 .outbound_messages(
-                    bp_messages::MessageKey {
+                    MessageKey {
                         lane_id: lane,
                         nonce: message_nonce,
                     },
@@ -70,7 +74,7 @@ impl S2SClientRelay for CrabClient {
                 .await?
                 .ok_or_else(|| {
                     ClientError::Custom(format!(
-                        "Can not read message data by nonce {} in darwinia",
+                        "Can not read message data by nonce {} in pangolin",
                         message_nonce
                     ))
                 })?;
@@ -88,7 +92,7 @@ impl S2SClientRelay for CrabClient {
         Ok(self
             .runtime()
             .storage()
-            .bridge_kusama_grandpa()
+            .bridge_crab_grandpa()
             .best_finalized(at_block)
             .await?)
     }
@@ -96,16 +100,14 @@ impl S2SClientRelay for CrabClient {
     async fn submit_finality_proof(
         &self,
         finality_target: <Self::Chain as Chain>::Header,
-        justification: bp_header_chain::justification::GrandpaJustification<
-            <Self::Chain as Chain>::Header,
-        >,
+        justification: GrandpaJustification<<Self::Chain as Chain>::Header>,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_target = SmartCodecMapper::map_to(&finality_target)?;
         let expected_justification = SmartCodecMapper::map_to(&justification)?;
         Ok(self
             .runtime()
             .tx()
-            .bridge_kusama_grandpa()
+            .bridge_crab_grandpa()
             .submit_finality_proof(expected_target, expected_justification)
             .sign_and_submit(self.account().signer())
             .await?)
@@ -115,11 +117,11 @@ impl S2SClientRelay for CrabClient {
         &self,
         lane: [u8; 4],
         hash: Option<<Self::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<bp_messages::OutboundLaneData> {
+    ) -> S2SClientResult<OutboundLaneData> {
         let outbound_lane_data = self
             .runtime()
             .storage()
-            .bridge_crab_parachain_messages()
+            .bridge_crab_messages()
             .outbound_lanes(lane, hash)
             .await?;
         let expected = SmartCodecMapper::map_to(&outbound_lane_data)?;
@@ -130,11 +132,11 @@ impl S2SClientRelay for CrabClient {
         &self,
         lane: [u8; 4],
         hash: Option<<Self::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<bp_messages::InboundLaneData<sp_core::crypto::AccountId32>> {
+    ) -> S2SClientResult<InboundLaneData<AccountId32>> {
         let inbound_lane_data = self
             .runtime()
             .storage()
-            .bridge_crab_parachain_messages()
+            .bridge_crab_messages()
             .inbound_lanes(lane, hash)
             .await?;
         let expected = SmartCodecMapper::map_to(&inbound_lane_data)?;
@@ -143,14 +145,14 @@ impl S2SClientRelay for CrabClient {
 
     async fn outbound_messages(
         &self,
-        message_key: bp_messages::MessageKey,
+        message_key: MessageKey,
         hash: Option<<Self::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<Option<bp_messages::MessageData<u128>>> {
+    ) -> S2SClientResult<Option<MessageData<u128>>> {
         let expected_message_key = SmartCodecMapper::map_to(&message_key)?;
         match self
             .runtime()
             .storage()
-            .bridge_crab_parachain_messages()
+            .bridge_crab_messages()
             .outbound_messages(expected_message_key, hash)
             .await?
         {
@@ -162,9 +164,7 @@ impl S2SClientRelay for CrabClient {
     async fn receive_messages_proof(
         &self,
         relayer_id_at_bridged_chain: AccountId32,
-        proof: bridge_runtime_common::messages::target::FromBridgedChainMessagesProof<
-            <Self::Chain as Chain>::Hash,
-        >,
+        proof: FromBridgedChainMessagesProof<<Self::Chain as Chain>::Hash>,
         messages_count: u32,
         dispatch_weight: u64,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
@@ -172,7 +172,7 @@ impl S2SClientRelay for CrabClient {
         Ok(self
             .runtime()
             .tx()
-            .bridge_crab_parachain_messages()
+            .bridge_crab_messages()
             .receive_messages_proof(
                 relayer_id_at_bridged_chain,
                 expected_proof,
@@ -185,55 +185,16 @@ impl S2SClientRelay for CrabClient {
 
     async fn receive_messages_delivery_proof(
         &self,
-        proof: bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof<
-            <Self::Chain as Chain>::Hash,
-        >,
-        relayers_state: bp_messages::UnrewardedRelayersState,
+        proof: FromBridgedChainMessagesDeliveryProof<<Self::Chain as Chain>::Hash>,
+        relayers_state: UnrewardedRelayersState,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
         let expected_relayers_state = SmartCodecMapper::map_to(&relayers_state)?;
         Ok(self
             .runtime()
             .tx()
-            .bridge_crab_parachain_messages()
+            .bridge_crab_messages()
             .receive_messages_delivery_proof(expected_proof, expected_relayers_state)
-            .sign_and_submit(self.account().signer())
-            .await?)
-    }
-}
-
-#[async_trait::async_trait]
-impl S2SParaBridgeClientSolochain for CrabClient {
-    async fn best_para_heads(
-        &self,
-        para_id: abstract_bridge_s2s::types::ParaId,
-        hash: Option<<Self::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<Option<abstract_bridge_s2s::types::BestParaHead>> {
-        let expected_para_id = SmartCodecMapper::map_to(&para_id)?;
-        match self
-            .runtime()
-            .storage()
-            .bridge_kusama_parachain()
-            .best_para_heads(expected_para_id, hash)
-            .await?
-        {
-            Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
-            None => Ok(None),
-        }
-    }
-
-    async fn submit_parachain_heads(
-        &self,
-        relay_block_hash: <Self::Chain as Chain>::Hash,
-        parachains: Vec<abstract_bridge_s2s::types::ParaId>,
-        parachain_heads_proof: Vec<Vec<u8>>,
-    ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
-        let expected_parachains = SmartCodecMapper::map_to(&parachains)?;
-        Ok(self
-            .runtime()
-            .tx()
-            .bridge_kusama_parachain()
-            .submit_parachain_heads(relay_block_hash, expected_parachains, parachain_heads_proof)
             .sign_and_submit(self.account().signer())
             .await?)
     }

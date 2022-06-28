@@ -1,9 +1,7 @@
-use crate::error::ClientResult;
-use crate::subxt_runtime::api::RuntimeApi;
-use subxt::rpc::{Subscription, SubscriptionClientT};
 use subxt::Client;
 
 use crate::config::KusamaSubxtConfig;
+use crate::subxt_runtime::api::RuntimeApi;
 use crate::types::{KusamaAccount, NodeRuntimeSignedExtra};
 
 /// Kusama client
@@ -39,23 +37,5 @@ impl KusamaClient {
     /// Runtime api
     pub fn runtime(&self) -> RuntimeApi<KusamaSubxtConfig, NodeRuntimeSignedExtra> {
         self.client.clone().to_runtime_api()
-    }
-}
-
-impl KusamaClient {
-    pub async fn subscribe_grandpa_justifications(
-        &self,
-    ) -> ClientResult<Subscription<sp_core::Bytes>> {
-        let sub = self
-            .client
-            .rpc()
-            .client
-            .subscribe(
-                "grandpa_subscribeJustifications",
-                None,
-                "grandpa_unsubscribeJustifications",
-            )
-            .await?;
-        Ok(sub)
     }
 }

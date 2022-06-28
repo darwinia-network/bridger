@@ -1,7 +1,7 @@
-use crate::subxt_runtime::api::RuntimeApi;
 use subxt::Client;
 
 use crate::config::PangolinParachainSubxtConfig;
+use crate::subxt_runtime::api::RuntimeApi;
 use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
 
 /// Pangolin client

@@ -37,12 +37,12 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             client_solochain.best_target_finalized(None).await?;
         let expected_relaychain_hash =
             SmartCodecMapper::map_to(&last_relayed_relaychain_hash_in_solochain)?;
-        tracing::debug!(
-            target: "relay-s2s",
-            "{} get last relayed relaychain block hash: {:?}",
-            logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", expected_relaychain_hash.as_ref()),
-        );
+        // tracing::debug!(
+        //     target: "relay-s2s",
+        //     "{} get last relayed relaychain block hash: {:?}",
+        //     logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
+        //     array_bytes::bytes2hex("0x", expected_relaychain_hash.as_ref()),
+        // );
         let last_relayed_relaychain_block_in_solochain = client_relaychain
             .block(Some(expected_relaychain_hash))
             .await?

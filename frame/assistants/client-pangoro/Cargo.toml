@@ -65,6 +65,7 @@ feemarket-s2s   = [
   "abstract-feemarket-s2s",
 ]
 feemarket-s2s-pangolin = ["feemarket-s2s"]
+bridge-chapel = []
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

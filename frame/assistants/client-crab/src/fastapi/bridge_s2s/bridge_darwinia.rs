@@ -1,5 +1,6 @@
 use std::ops::RangeInclusive;
 
+use abstract_bridge_s2s::client::S2SClientGeneric;
 use abstract_bridge_s2s::error::S2SClientResult;
 use abstract_bridge_s2s::{
     client::S2SClientRelay,

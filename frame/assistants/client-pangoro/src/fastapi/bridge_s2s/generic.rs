@@ -37,7 +37,7 @@ impl PangoroClient {
             .client
             .request("state_call", params)
             .await?;
-        let raw_authorities_set = array_bytes::hex2bytes(hex)?;
+        let raw_authorities_set = array_bytes::hex2bytes(hex.as_ref())?;
         let authorities = codec::Decode::decode(&mut &raw_authorities_set[..]).map_err(|err| {
             ClientError::Custom(format!(
                 "[DecodeAuthorities] Can not decode authorities: {:?}",

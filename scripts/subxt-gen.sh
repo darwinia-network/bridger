@@ -53,7 +53,8 @@ if [ "${CHAIN}" == "rococo" ]; then
 fi
 
 if [ "${CHAIN}" == "pangolin-parachain" ]; then
-  ENDPOINT='http://127.0.0.1:40338'
+  ENDPOINT='https://pangolin-parachain-rpc.darwinia.network'
+#  ENDPOINT='http://127.0.0.1:40338'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachain
 fi
 

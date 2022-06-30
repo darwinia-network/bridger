@@ -27,9 +27,9 @@ bp-pangolin = { git = "https://github.com/darwinia-network/darwinia-bridges-subs
 async-trait = { optional = true, version = "0.1" }
 
 ## substrate
-sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
 
 ## eth-v1
 web3          = { optional = true, git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }

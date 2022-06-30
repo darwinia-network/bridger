@@ -32,9 +32,9 @@ bp-pangolin-parachain = { git = "https://github.com/darwinia-network/darwinia-br
 async-trait = { optional = true, version = "0.1" }
 
 ## substrate
-sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
 
 ## s2s client
 finality-grandpa      = { optional = true, version = "0.14" }

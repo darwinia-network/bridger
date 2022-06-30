@@ -12,4 +12,3 @@ lanes = ["00000000"]
 [index]
 darwinia = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-darwinia" }
 crab     = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-crab" }
-

@@ -38,3 +38,8 @@ subquery-s2s              = { path = "../../../frame/assistants/subquery-s2s" }
 subquery-parachain        = { path = "../../../frame/assistants/subquery-parachain" }
 relay-s2s                 = { path = "../../../frame/assistants/relay-s2s", features = [ "bridge-parachain" ] }
 feemarket-s2s             = { path = "../../../frame/assistants/feemarket-s2s" }
+
+[dev-dependencies]
+sp-runtime = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-core    = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+serde_json = "1"

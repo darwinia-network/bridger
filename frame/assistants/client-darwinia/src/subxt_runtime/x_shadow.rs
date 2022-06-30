@@ -62,18 +62,24 @@ impl TryFrom<EthereumHeaderJson> for ethereum_primitives::header::Header {
 
     fn try_from(that: EthereumHeaderJson) -> Result<Self, Self::Error> {
         Ok(Self {
-            parent_hash: subxt::sp_core::H256(array_bytes::hex2array(&that.parent_hash)?),
+            parent_hash: subxt::sp_core::H256(array_bytes::hex2array(that.parent_hash.as_ref())?),
             timestamp: that.timestamp,
             number: that.number,
-            author: runtime_types::primitive_types::H160(array_bytes::hex2array(that.author)?), // bytes!(that.author.as_str(), 20),
+            author: runtime_types::primitive_types::H160(array_bytes::hex2array(
+                that.author.as_ref(),
+            )?), // bytes!(that.author.as_str(), 20),
             transactions_root: subxt::sp_core::H256(array_bytes::hex2array(
-                that.transactions_root,
+                that.transactions_root.as_ref(),
             )?),
-            uncles_hash: subxt::sp_core::H256(array_bytes::hex2array(that.uncles_hash)?),
-            extra_data: array_bytes::hex2bytes(that.extra_data)?, // no length
-            state_root: subxt::sp_core::H256(array_bytes::hex2array(that.state_root)?),
-            receipts_root: subxt::sp_core::H256(array_bytes::hex2array(that.receipts_root)?),
-            log_bloom: runtime_types::ethbloom::Bloom(array_bytes::hex2array(that.log_bloom)?), // Bloom(bytes!(that.log_bloom.as_str(), 256)),
+            uncles_hash: subxt::sp_core::H256(array_bytes::hex2array(that.uncles_hash.as_ref())?),
+            extra_data: array_bytes::hex2bytes(that.extra_data.as_ref())?, // no length
+            state_root: subxt::sp_core::H256(array_bytes::hex2array(that.state_root.as_ref())?),
+            receipts_root: subxt::sp_core::H256(array_bytes::hex2array(
+                that.receipts_root.as_ref(),
+            )?),
+            log_bloom: runtime_types::ethbloom::Bloom(array_bytes::hex2array(
+                that.log_bloom.as_ref(),
+            )?), // Bloom(bytes!(that.log_bloom.as_str(), 256)),
             gas_used: runtime_types::primitive_types::U256(
                 subxt::sp_core::U256::from(that.gas_used).0,
             ),
@@ -86,7 +92,7 @@ impl TryFrom<EthereumHeaderJson> for ethereum_primitives::header::Header {
             seal: {
                 let mut rets = Vec::with_capacity(that.seal.len());
                 for item in that.seal {
-                    let bytes = array_bytes::hex2bytes(item)?;
+                    let bytes = array_bytes::hex2bytes(item.as_ref())?;
                     rets.push(bytes);
                 }
                 rets
@@ -94,7 +100,9 @@ impl TryFrom<EthereumHeaderJson> for ethereum_primitives::header::Header {
             base_fee_per_gas: that
                 .base_fee_per_gas
                 .map(|v| runtime_types::primitive_types::U256(subxt::sp_core::U256::from(v).0)),
-            hash: Some(subxt::sp_core::H256(array_bytes::hex2array(that.hash)?)), //Some(bytes!(that.hash.as_str(), 32)),
+            hash: Some(subxt::sp_core::H256(array_bytes::hex2array(
+                that.hash.as_ref(),
+            )?)), //Some(bytes!(that.hash.as_str(), 32)),
         })
     }
 }
@@ -117,7 +125,7 @@ impl TryFrom<ReceiptProof> for ethereum_primitives::receipt::ReceiptProof {
 
         Ok(Self {
             index: u64::from_str_radix(index, 16).unwrap_or(0),
-            proof: array_bytes::hex2bytes(that.proof)?,
+            proof: array_bytes::hex2bytes(that.proof.as_ref())?,
             header_hash: subxt::sp_core::H256(hash),
         })
     }

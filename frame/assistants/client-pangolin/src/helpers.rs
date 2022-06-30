@@ -73,7 +73,7 @@ mod ethlike_v1 {
             term,
             next_authorities
                 .iter()
-                .map(|a| array_bytes::bytes2hex("", &a))
+                .map(|a| array_bytes::bytes2hex("", a.as_ref()))
                 .collect::<Vec<_>>()
                 .join(", ")
         );

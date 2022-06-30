@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 #[cfg(feature = "ethlike-v1")]
-use codec::Encode;
+use codec::{Decode, Encode};
 use subxt::DefaultExtra;
 
 use crate::config::DarwiniaSubxtConfig;
@@ -45,6 +45,7 @@ where
     pub _4: _4,
 }
 
-// /// EcdsaSignature
-// #[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
-// pub struct EcdsaSignature(pub [u8; 65]);
+/// EcdsaSignature
+#[cfg(feature = "ethlike-v1")]
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
+pub struct EcdsaSignature(pub [u8; 65]);

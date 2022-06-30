@@ -26,13 +26,13 @@ jsonrpsee-core = "0.8"
 sp-core               = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 sp-runtime            = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
 
-bp-runtime            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-bp-messages           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-bridge-runtime-common = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
-bp-header-chain       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+bp-runtime            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
+bp-messages           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
+bridge-runtime-common = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
+bp-header-chain       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
 
 array-bytes = { optional = true, version = "2" }
-subxt       = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
+subxt       = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.3" }
 
 [features]
 default  = []

@@ -23,7 +23,7 @@ impl FeemarketApiRelay for PangoroClient {
         match self
             .runtime()
             .storage()
-            .fee_market()
+            .pangolin_fee_market()
             .orders(laned_id, message_nonce, None)
             .await?
         {

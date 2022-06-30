@@ -26,8 +26,8 @@ serde_json  = "1"
 
 array-bytes = "2"
 codec       = { package = "parity-scale-codec", version = "2" }
-subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
-bp-pangoro  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.3" }
+bp-pangoro  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
 
 ## maybe common
 async-trait           = { optional = true, version = "0.1" }

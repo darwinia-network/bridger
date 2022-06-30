@@ -16608,7 +16608,7 @@ pub mod api {
                 >;
                 fn key(&self) -> ::subxt::StorageEntryKey {
                     ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
-                        &self.0,
+                        &(&self.0, &self.1),
                         ::subxt::StorageHasher::Blake2_128Concat,
                     )])
                 }

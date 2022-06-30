@@ -7887,7 +7887,7 @@ pub mod api {
                 >;
                 fn key(&self) -> ::subxt::StorageEntryKey {
                     ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
-                        &self.0,
+                        &(&self.0, &self.1),
                         ::subxt::StorageHasher::Blake2_128Concat,
                     )])
                 }
@@ -11041,7 +11041,7 @@ pub mod api {
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
                 pub struct UncheckedExtrinsic<_0, _1, _2, _3>(
-                    pub 
+                    pub
                         runtime_types::sp_runtime::generic::unchecked_extrinsic::UncheckedExtrinsic<
                             _0,
                             _1,

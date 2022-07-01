@@ -41,7 +41,7 @@ pub fn set_recently_justification(chain: &'static str, justification: sp_core::B
         .entry(chain)
         .or_insert_with(|| VecDeque::with_capacity(100));
     queue.push_back(justification);
-    if queue.len() >= 100 {
+    if queue.len() >= 10 {
         queue.pop_front();
     }
 }

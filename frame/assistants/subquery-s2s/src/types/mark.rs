@@ -9,6 +9,8 @@ pub enum BridgeName {
     PangolinPangoro,
     /// bridge pangolin<>pangolin-parachain
     CrabParachain,
+    /// bridge darwinia<>crab
+    DarwiniaCrab,
 }
 
 impl BridgeName {
@@ -18,6 +20,7 @@ impl BridgeName {
             Self::PangolinParachain => "pangolin-parachain",
             Self::PangolinPangoro => "pangolin-pangoro",
             Self::CrabParachain => "crab-parachain",
+            Self::DarwiniaCrab => "darwinia-crab",
         }
     }
 }

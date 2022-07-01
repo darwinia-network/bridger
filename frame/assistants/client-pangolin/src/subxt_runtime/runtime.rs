@@ -40,8 +40,6 @@ pub mod api {
         Bounties(bounties::Event),
         #[codec(index = 23)]
         Sudo(sudo::Event),
-        #[codec(index = 24)]
-        Claims(claims::Event),
         #[codec(index = 25)]
         Vesting(vesting::Event),
         #[codec(index = 26)]
@@ -76,12 +74,20 @@ pub mod api {
         BridgePangoroDispatch(bridge_pangoro_dispatch::Event),
         #[codec(index = 43)]
         BridgePangoroMessages(bridge_pangoro_messages::Event),
+        #[codec(index = 62)]
+        BridgePangolinParachainDispatch(bridge_pangolin_parachain_dispatch::Event),
+        #[codec(index = 63)]
+        BridgePangolinParachainMessages(bridge_pangolin_parachain_messages::Event),
         #[codec(index = 53)]
-        FeeMarket(fee_market::Event),
+        PangoroFeeMarket(pangoro_fee_market::Event),
+        #[codec(index = 64)]
+        PangolinParachainFeeMarket(pangolin_parachain_fee_market::Event),
         #[codec(index = 54)]
         TransactionPause(transaction_pause::Event),
         #[codec(index = 49)]
         Substrate2SubstrateIssuing(substrate2_substrate_issuing::Event),
+        #[codec(index = 65)]
+        ToPangolinParachainBacking(to_pangolin_parachain_backing::Event),
     }
     pub mod system {
         use super::runtime_types;
@@ -779,29 +785,28 @@ pub mod api {
                         &mut &[
                             32u8, 80u8, 97u8, 110u8, 103u8, 111u8, 108u8, 105u8, 110u8, 32u8, 80u8,
                             97u8, 110u8, 103u8, 111u8, 108u8, 105u8, 110u8, 0u8, 0u8, 0u8, 0u8,
-                            166u8, 109u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 84u8, 223u8, 106u8, 203u8,
+                            226u8, 109u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 80u8, 223u8, 106u8, 203u8,
                             104u8, 153u8, 7u8, 96u8, 155u8, 3u8, 0u8, 0u8, 0u8, 55u8, 227u8, 151u8,
                             252u8, 124u8, 145u8, 245u8, 228u8, 1u8, 0u8, 0u8, 0u8, 64u8, 254u8,
                             58u8, 212u8, 1u8, 248u8, 149u8, 154u8, 5u8, 0u8, 0u8, 0u8, 171u8, 60u8,
                             5u8, 114u8, 41u8, 31u8, 235u8, 139u8, 1u8, 0u8, 0u8, 0u8, 203u8, 202u8,
                             37u8, 227u8, 159u8, 20u8, 35u8, 135u8, 2u8, 0u8, 0u8, 0u8, 237u8,
                             153u8, 197u8, 172u8, 178u8, 94u8, 237u8, 245u8, 3u8, 0u8, 0u8, 0u8,
-                            73u8, 234u8, 175u8, 27u8, 84u8, 138u8, 12u8, 176u8, 1u8, 0u8, 0u8, 0u8,
                             104u8, 122u8, 212u8, 74u8, 211u8, 127u8, 3u8, 194u8, 1u8, 0u8, 0u8,
                             0u8, 188u8, 157u8, 137u8, 144u8, 79u8, 91u8, 146u8, 63u8, 1u8, 0u8,
                             0u8, 0u8, 210u8, 188u8, 152u8, 151u8, 238u8, 208u8, 143u8, 21u8, 3u8,
                             0u8, 0u8, 0u8, 247u8, 139u8, 39u8, 139u8, 229u8, 63u8, 69u8, 76u8, 2u8,
                             0u8, 0u8, 0u8, 55u8, 200u8, 187u8, 19u8, 80u8, 169u8, 162u8, 168u8,
-                            1u8, 0u8, 0u8, 0u8, 25u8, 154u8, 244u8, 135u8, 216u8, 77u8, 152u8,
-                            71u8, 1u8, 0u8, 0u8, 0u8, 24u8, 239u8, 88u8, 163u8, 182u8, 123u8,
-                            167u8, 112u8, 1u8, 0u8, 0u8, 0u8, 45u8, 6u8, 198u8, 53u8, 50u8, 185u8,
-                            56u8, 227u8, 1u8, 0u8, 0u8, 0u8, 88u8, 34u8, 17u8, 246u8, 91u8, 177u8,
-                            75u8, 137u8, 4u8, 0u8, 0u8, 0u8, 230u8, 91u8, 0u8, 228u8, 108u8, 237u8,
-                            208u8, 170u8, 2u8, 0u8, 0u8, 0u8, 189u8, 120u8, 37u8, 93u8, 79u8,
-                            238u8, 234u8, 31u8, 4u8, 0u8, 0u8, 0u8, 210u8, 173u8, 105u8, 227u8,
-                            231u8, 140u8, 231u8, 118u8, 1u8, 0u8, 0u8, 0u8, 168u8, 165u8, 144u8,
-                            75u8, 51u8, 245u8, 176u8, 103u8, 1u8, 0u8, 0u8, 0u8, 197u8, 69u8,
-                            229u8, 34u8, 98u8, 154u8, 213u8, 20u8, 1u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+                            1u8, 0u8, 0u8, 0u8, 88u8, 34u8, 17u8, 246u8, 91u8, 177u8, 75u8, 137u8,
+                            4u8, 0u8, 0u8, 0u8, 230u8, 91u8, 0u8, 228u8, 108u8, 237u8, 208u8,
+                            170u8, 2u8, 0u8, 0u8, 0u8, 189u8, 120u8, 37u8, 93u8, 79u8, 238u8,
+                            234u8, 31u8, 4u8, 0u8, 0u8, 0u8, 210u8, 173u8, 105u8, 227u8, 231u8,
+                            140u8, 231u8, 118u8, 1u8, 0u8, 0u8, 0u8, 168u8, 165u8, 144u8, 75u8,
+                            51u8, 245u8, 176u8, 103u8, 1u8, 0u8, 0u8, 0u8, 197u8, 69u8, 229u8,
+                            34u8, 98u8, 154u8, 213u8, 20u8, 1u8, 0u8, 0u8, 0u8, 49u8, 193u8, 201u8,
+                            166u8, 223u8, 228u8, 75u8, 117u8, 1u8, 0u8, 0u8, 0u8, 60u8, 177u8,
+                            33u8, 10u8, 171u8, 77u8, 74u8, 172u8, 1u8, 0u8, 0u8, 0u8, 200u8, 128u8,
+                            105u8, 169u8, 84u8, 132u8, 148u8, 129u8, 1u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                             0u8, 0u8,
                         ][..],
                     )?)
@@ -1623,15 +1628,6 @@ pub mod api {
                 const EVENT: &'static str = "BalanceSet";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Deposit(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
-            impl ::subxt::Event for Deposit {
-                const PALLET: &'static str = "Balances";
-                const EVENT: &'static str = "Deposit";
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct Reserved(
                 pub ::subxt::sp_core::crypto::AccountId32,
                 pub ::core::primitive::u128,
@@ -1659,6 +1655,33 @@ pub mod api {
             impl ::subxt::Event for ReserveRepatriated {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "ReserveRepatriated";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Deposit(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for Deposit {
+                const PALLET: &'static str = "Balances";
+                const EVENT: &'static str = "Deposit";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Withdraw(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for Withdraw {
+                const PALLET: &'static str = "Balances";
+                const EVENT: &'static str = "Withdraw";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Slashed(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for Slashed {
+                const PALLET: &'static str = "Balances";
+                const EVENT: &'static str = "Slashed";
             }
         }
         pub mod storage {
@@ -1691,9 +1714,8 @@ pub mod api {
                 const STORAGE: &'static str = "Locks";
                 type Value =
                     runtime_types::frame_support::storage::weak_bounded_vec::WeakBoundedVec<
-                        runtime_types::darwinia_support::structs::BalanceLock<
+                        runtime_types::darwinia_balances::pallet::BalanceLock<
                             ::core::primitive::u128,
-                            ::core::primitive::u32,
                         >,
                     >;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -1768,9 +1790,8 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     runtime_types::frame_support::storage::weak_bounded_vec::WeakBoundedVec<
-                        runtime_types::darwinia_support::structs::BalanceLock<
+                        runtime_types::darwinia_balances::pallet::BalanceLock<
                             ::core::primitive::u128,
-                            ::core::primitive::u32,
                         >,
                     >,
                     ::subxt::BasicError,
@@ -2072,15 +2093,6 @@ pub mod api {
                 const EVENT: &'static str = "BalanceSet";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Deposit(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
-            impl ::subxt::Event for Deposit {
-                const PALLET: &'static str = "Kton";
-                const EVENT: &'static str = "Deposit";
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct Reserved(
                 pub ::subxt::sp_core::crypto::AccountId32,
                 pub ::core::primitive::u128,
@@ -2108,6 +2120,33 @@ pub mod api {
             impl ::subxt::Event for ReserveRepatriated {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "ReserveRepatriated";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Deposit(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for Deposit {
+                const PALLET: &'static str = "Kton";
+                const EVENT: &'static str = "Deposit";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Withdraw(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for Withdraw {
+                const PALLET: &'static str = "Kton";
+                const EVENT: &'static str = "Withdraw";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Slashed(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for Slashed {
+                const PALLET: &'static str = "Kton";
+                const EVENT: &'static str = "Slashed";
             }
         }
         pub mod storage {
@@ -2140,9 +2179,8 @@ pub mod api {
                 const STORAGE: &'static str = "Locks";
                 type Value =
                     runtime_types::frame_support::storage::weak_bounded_vec::WeakBoundedVec<
-                        runtime_types::darwinia_support::structs::BalanceLock<
+                        runtime_types::darwinia_balances::pallet::BalanceLock<
                             ::core::primitive::u128,
-                            ::core::primitive::u32,
                         >,
                     >;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -2217,9 +2255,8 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     runtime_types::frame_support::storage::weak_bounded_vec::WeakBoundedVec<
-                        runtime_types::darwinia_support::structs::BalanceLock<
+                        runtime_types::darwinia_balances::pallet::BalanceLock<
                             ::core::primitive::u128,
-                            ::core::primitive::u32,
                         >,
                     >,
                     ::subxt::BasicError,
@@ -3130,6 +3167,20 @@ pub mod api {
                 const PALLET: &'static str = "Staking";
                 const FUNCTION: &'static str = "unbond";
             }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct withdraw_unbonded {
+                pub num_slashing_spans: ::core::primitive::u32,
+            }
+            impl ::subxt::Call for withdraw_unbonded {
+                const PALLET: &'static str = "Staking";
+                const FUNCTION: &'static str = "withdraw_unbonded";
+            }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct claim_mature_deposits;
             impl ::subxt::Call for claim_mature_deposits {
@@ -3410,6 +3461,14 @@ pub mod api {
                 ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, unbond, DispatchError>
                 {
                     let call = unbond { value };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn withdraw_unbonded(
+                    &self,
+                    num_slashing_spans: ::core::primitive::u32,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, withdraw_unbonded, DispatchError>
+                {
+                    let call = withdraw_unbonded { num_slashing_spans };
                     ::subxt::SubmittableExtrinsic::new(self.client, call)
                 }
                 pub fn claim_mature_deposits(
@@ -4210,6 +4269,15 @@ pub mod api {
                     ::subxt::StorageEntryKey::Plain
                 }
             }
+            pub struct OffendingValidators;
+            impl ::subxt::StorageEntry for OffendingValidators {
+                const PALLET: &'static str = "Staking";
+                const STORAGE: &'static str = "OffendingValidators";
+                type Value = ::std::vec::Vec<(::core::primitive::u32, ::core::primitive::bool)>;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
             pub struct StorageVersion;
             impl ::subxt::StorageEntry for StorageVersion {
                 const PALLET: &'static str = "Staking";
@@ -4806,6 +4874,16 @@ pub mod api {
                 ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
                 {
                     let entry = CurrentPlannedSession;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn offending_validators(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::std::vec::Vec<(::core::primitive::u32, ::core::primitive::bool)>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = OffendingValidators;
                     self.client.storage().fetch_or_default(&entry, hash).await
                 }
                 pub async fn storage_version(
@@ -5691,197 +5769,6 @@ pub mod api {
             }
         }
     }
-    pub mod beefy_gadget {
-        use super::runtime_types;
-        pub mod calls {
-            use super::runtime_types;
-            type DispatchError = runtime_types::sp_runtime::DispatchError;
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct set_commitment_contract {
-                pub commitment_contract: runtime_types::primitive_types::H160,
-            }
-            impl ::subxt::Call for set_commitment_contract {
-                const PALLET: &'static str = "BeefyGadget";
-                const FUNCTION: &'static str = "set_commitment_contract";
-            }
-            pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
-                client: &'a ::subxt::Client<T>,
-                marker: ::core::marker::PhantomData<(X, A)>,
-            }
-            impl<'a, T, X, A> TransactionApi<'a, T, X, A>
-            where
-                T: ::subxt::Config,
-                X: ::subxt::SignedExtra<T>,
-                A: ::subxt::AccountData,
-            {
-                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
-                    Self {
-                        client,
-                        marker: ::core::marker::PhantomData,
-                    }
-                }
-                pub fn set_commitment_contract(
-                    &self,
-                    commitment_contract: runtime_types::primitive_types::H160,
-                ) -> ::subxt::SubmittableExtrinsic<
-                    'a,
-                    T,
-                    X,
-                    A,
-                    set_commitment_contract,
-                    DispatchError,
-                > {
-                    let call = set_commitment_contract {
-                        commitment_contract,
-                    };
-                    ::subxt::SubmittableExtrinsic::new(self.client, call)
-                }
-            }
-        }
-        pub mod storage {
-            use super::runtime_types;
-            pub struct CommitmentContract;
-            impl ::subxt::StorageEntry for CommitmentContract {
-                const PALLET: &'static str = "BeefyGadget";
-                const STORAGE: &'static str = "CommitmentContract";
-                type Value = runtime_types::primitive_types::H160;
-                fn key(&self) -> ::subxt::StorageEntryKey {
-                    ::subxt::StorageEntryKey::Plain
-                }
-            }
-            pub struct StorageApi<'a, T: ::subxt::Config> {
-                client: &'a ::subxt::Client<T>,
-            }
-            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
-                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
-                    Self { client }
-                }
-                pub async fn commitment_contract(
-                    &self,
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<runtime_types::primitive_types::H160, ::subxt::BasicError>
-                {
-                    let entry = CommitmentContract;
-                    self.client.storage().fetch_or_default(&entry, hash).await
-                }
-            }
-        }
-    }
-    pub mod mmr {
-        use super::runtime_types;
-        pub mod storage {
-            use super::runtime_types;
-            pub struct RootHash;
-            impl ::subxt::StorageEntry for RootHash {
-                const PALLET: &'static str = "Mmr";
-                const STORAGE: &'static str = "RootHash";
-                type Value = ::subxt::sp_core::H256;
-                fn key(&self) -> ::subxt::StorageEntryKey {
-                    ::subxt::StorageEntryKey::Plain
-                }
-            }
-            pub struct NumberOfLeaves;
-            impl ::subxt::StorageEntry for NumberOfLeaves {
-                const PALLET: &'static str = "Mmr";
-                const STORAGE: &'static str = "NumberOfLeaves";
-                type Value = ::core::primitive::u64;
-                fn key(&self) -> ::subxt::StorageEntryKey {
-                    ::subxt::StorageEntryKey::Plain
-                }
-            }
-            pub struct Nodes(pub ::core::primitive::u64);
-            impl ::subxt::StorageEntry for Nodes {
-                const PALLET: &'static str = "Mmr";
-                const STORAGE: &'static str = "Nodes";
-                type Value = ::subxt::sp_core::H256;
-                fn key(&self) -> ::subxt::StorageEntryKey {
-                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
-                        &self.0,
-                        ::subxt::StorageHasher::Identity,
-                    )])
-                }
-            }
-            pub struct StorageApi<'a, T: ::subxt::Config> {
-                client: &'a ::subxt::Client<T>,
-            }
-            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
-                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
-                    Self { client }
-                }
-                pub async fn root_hash(
-                    &self,
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<::subxt::sp_core::H256, ::subxt::BasicError>
-                {
-                    let entry = RootHash;
-                    self.client.storage().fetch_or_default(&entry, hash).await
-                }
-                pub async fn number_of_leaves(
-                    &self,
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<::core::primitive::u64, ::subxt::BasicError>
-                {
-                    let entry = NumberOfLeaves;
-                    self.client.storage().fetch_or_default(&entry, hash).await
-                }
-                pub async fn nodes(
-                    &self,
-                    _0: ::core::primitive::u64,
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<
-                    ::core::option::Option<::subxt::sp_core::H256>,
-                    ::subxt::BasicError,
-                > {
-                    let entry = Nodes(_0);
-                    self.client.storage().fetch(&entry, hash).await
-                }
-                pub async fn nodes_iter(
-                    &self,
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<::subxt::KeyIter<'a, T, Nodes>, ::subxt::BasicError>
-                {
-                    self.client.storage().iter(hash).await
-                }
-            }
-        }
-    }
-    pub mod mmr_leaf {
-        use super::runtime_types;
-        pub mod storage {
-            use super::runtime_types;
-            pub struct BeefyNextAuthorities;
-            impl ::subxt::StorageEntry for BeefyNextAuthorities {
-                const PALLET: &'static str = "MmrLeaf";
-                const STORAGE: &'static str = "BeefyNextAuthorities";
-                type Value = runtime_types::beefy_primitives::mmr::BeefyNextAuthoritySet<
-                    ::subxt::sp_core::H256,
-                >;
-                fn key(&self) -> ::subxt::StorageEntryKey {
-                    ::subxt::StorageEntryKey::Plain
-                }
-            }
-            pub struct StorageApi<'a, T: ::subxt::Config> {
-                client: &'a ::subxt::Client<T>,
-            }
-            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
-                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
-                    Self { client }
-                }
-                pub async fn beefy_next_authorities(
-                    &self,
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<
-                    runtime_types::beefy_primitives::mmr::BeefyNextAuthoritySet<
-                        ::subxt::sp_core::H256,
-                    >,
-                    ::subxt::BasicError,
-                > {
-                    let entry = BeefyNextAuthorities;
-                    self.client.storage().fetch_or_default(&entry, hash).await
-                }
-            }
-        }
-    }
     pub mod im_online {
         use super::runtime_types;
         pub mod calls {
@@ -6194,7 +6081,7 @@ pub mod api {
                 #[codec(compact)]
                 pub ref_index: ::core::primitive::u32,
                 pub vote:
-                    runtime_types::darwinia_democracy::vote::AccountVote<::core::primitive::u128>,
+                    runtime_types::pallet_democracy::vote::AccountVote<::core::primitive::u128>,
             }
             impl ::subxt::Call for vote {
                 const PALLET: &'static str = "Democracy";
@@ -6282,7 +6169,7 @@ pub mod api {
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct delegate {
                 pub to: ::subxt::sp_core::crypto::AccountId32,
-                pub conviction: runtime_types::darwinia_democracy::conviction::Conviction,
+                pub conviction: runtime_types::pallet_democracy::conviction::Conviction,
                 pub balance: ::core::primitive::u128,
             }
             impl ::subxt::Call for delegate {
@@ -6444,7 +6331,7 @@ pub mod api {
                 pub fn vote(
                     &self,
                     ref_index: ::core::primitive::u32,
-                    vote: runtime_types::darwinia_democracy::vote::AccountVote<
+                    vote: runtime_types::pallet_democracy::vote::AccountVote<
                         ::core::primitive::u128,
                     >,
                 ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, vote, DispatchError>
@@ -6537,7 +6424,7 @@ pub mod api {
                 pub fn delegate(
                     &self,
                     to: ::subxt::sp_core::crypto::AccountId32,
-                    conviction: runtime_types::darwinia_democracy::conviction::Conviction,
+                    conviction: runtime_types::pallet_democracy::conviction::Conviction,
                     balance: ::core::primitive::u128,
                 ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, delegate, DispatchError>
                 {
@@ -6677,7 +6564,7 @@ pub mod api {
                 }
             }
         }
-        pub type Event = runtime_types::darwinia_democracy::pallet::Event;
+        pub type Event = runtime_types::pallet_democracy::pallet::Event;
         pub mod events {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -6705,7 +6592,7 @@ pub mod api {
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct Started(
                 pub ::core::primitive::u32,
-                pub runtime_types::darwinia_democracy::vote_threshold::VoteThreshold,
+                pub runtime_types::pallet_democracy::vote_threshold::VoteThreshold,
             );
             impl ::subxt::Event for Started {
                 const PALLET: &'static str = "Democracy";
@@ -6874,7 +6761,7 @@ pub mod api {
             impl ::subxt::StorageEntry for Preimages {
                 const PALLET: &'static str = "Democracy";
                 const STORAGE: &'static str = "Preimages";
-                type Value = runtime_types::darwinia_democracy::PreimageStatus<
+                type Value = runtime_types::pallet_democracy::PreimageStatus<
                     ::subxt::sp_core::crypto::AccountId32,
                     ::core::primitive::u128,
                     ::core::primitive::u32,
@@ -6908,7 +6795,7 @@ pub mod api {
             impl ::subxt::StorageEntry for ReferendumInfoOf {
                 const PALLET: &'static str = "Democracy";
                 const STORAGE: &'static str = "ReferendumInfoOf";
-                type Value = runtime_types::darwinia_democracy::types::ReferendumInfo<
+                type Value = runtime_types::pallet_democracy::types::ReferendumInfo<
                     ::core::primitive::u32,
                     ::subxt::sp_core::H256,
                     ::core::primitive::u128,
@@ -6924,7 +6811,7 @@ pub mod api {
             impl ::subxt::StorageEntry for VotingOf {
                 const PALLET: &'static str = "Democracy";
                 const STORAGE: &'static str = "VotingOf";
-                type Value = runtime_types::darwinia_democracy::vote::Voting<
+                type Value = runtime_types::pallet_democracy::vote::Voting<
                     ::core::primitive::u128,
                     ::subxt::sp_core::crypto::AccountId32,
                     ::core::primitive::u32,
@@ -6963,7 +6850,7 @@ pub mod api {
                 const STORAGE: &'static str = "NextExternal";
                 type Value = (
                     ::subxt::sp_core::H256,
-                    runtime_types::darwinia_democracy::vote_threshold::VoteThreshold,
+                    runtime_types::pallet_democracy::vote_threshold::VoteThreshold,
                 );
                 fn key(&self) -> ::subxt::StorageEntryKey {
                     ::subxt::StorageEntryKey::Plain
@@ -7000,7 +6887,7 @@ pub mod api {
             impl ::subxt::StorageEntry for StorageVersion {
                 const PALLET: &'static str = "Democracy";
                 const STORAGE: &'static str = "StorageVersion";
-                type Value = runtime_types::darwinia_democracy::Releases;
+                type Value = runtime_types::pallet_democracy::Releases;
                 fn key(&self) -> ::subxt::StorageEntryKey {
                     ::subxt::StorageEntryKey::Plain
                 }
@@ -7061,7 +6948,7 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     ::core::option::Option<
-                        runtime_types::darwinia_democracy::PreimageStatus<
+                        runtime_types::pallet_democracy::PreimageStatus<
                             ::subxt::sp_core::crypto::AccountId32,
                             ::core::primitive::u128,
                             ::core::primitive::u32,
@@ -7101,7 +6988,7 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     ::core::option::Option<
-                        runtime_types::darwinia_democracy::types::ReferendumInfo<
+                        runtime_types::pallet_democracy::types::ReferendumInfo<
                             ::core::primitive::u32,
                             ::subxt::sp_core::H256,
                             ::core::primitive::u128,
@@ -7126,7 +7013,7 @@ pub mod api {
                     _0: ::subxt::sp_core::crypto::AccountId32,
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
-                    runtime_types::darwinia_democracy::vote::Voting<
+                    runtime_types::pallet_democracy::vote::Voting<
                         ::core::primitive::u128,
                         ::subxt::sp_core::crypto::AccountId32,
                         ::core::primitive::u32,
@@ -7175,7 +7062,7 @@ pub mod api {
                 ) -> ::core::result::Result<
                     ::core::option::Option<(
                         ::subxt::sp_core::H256,
-                        runtime_types::darwinia_democracy::vote_threshold::VoteThreshold,
+                        runtime_types::pallet_democracy::vote_threshold::VoteThreshold,
                     )>,
                     ::subxt::BasicError,
                 > {
@@ -7225,7 +7112,7 @@ pub mod api {
                     &self,
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
-                    ::core::option::Option<runtime_types::darwinia_democracy::Releases>,
+                    ::core::option::Option<runtime_types::pallet_democracy::Releases>,
                     ::subxt::BasicError,
                 > {
                     let entry = StorageVersion;
@@ -8146,7 +8033,7 @@ pub mod api {
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct renounce_candidacy {
-                pub renouncing: runtime_types::darwinia_elections_phragmen::Renouncing,
+                pub renouncing: runtime_types::pallet_elections_phragmen::Renouncing,
             }
             impl ::subxt::Call for renounce_candidacy {
                 const PALLET: &'static str = "PhragmenElection";
@@ -8213,7 +8100,7 @@ pub mod api {
                 }
                 pub fn renounce_candidacy(
                     &self,
-                    renouncing: runtime_types::darwinia_elections_phragmen::Renouncing,
+                    renouncing: runtime_types::pallet_elections_phragmen::Renouncing,
                 ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, renounce_candidacy, DispatchError>
                 {
                     let call = renounce_candidacy { renouncing };
@@ -8248,7 +8135,7 @@ pub mod api {
                 }
             }
         }
-        pub type Event = runtime_types::darwinia_elections_phragmen::pallet::Event;
+        pub type Event = runtime_types::pallet_elections_phragmen::pallet::Event;
         pub mod events {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -8312,7 +8199,7 @@ pub mod api {
                 const PALLET: &'static str = "PhragmenElection";
                 const STORAGE: &'static str = "Members";
                 type Value = ::std::vec::Vec<
-                    runtime_types::darwinia_elections_phragmen::SeatHolder<
+                    runtime_types::pallet_elections_phragmen::SeatHolder<
                         ::subxt::sp_core::crypto::AccountId32,
                         ::core::primitive::u128,
                     >,
@@ -8326,7 +8213,7 @@ pub mod api {
                 const PALLET: &'static str = "PhragmenElection";
                 const STORAGE: &'static str = "RunnersUp";
                 type Value = ::std::vec::Vec<
-                    runtime_types::darwinia_elections_phragmen::SeatHolder<
+                    runtime_types::pallet_elections_phragmen::SeatHolder<
                         ::subxt::sp_core::crypto::AccountId32,
                         ::core::primitive::u128,
                     >,
@@ -8360,7 +8247,7 @@ pub mod api {
             impl ::subxt::StorageEntry for Voting {
                 const PALLET: &'static str = "PhragmenElection";
                 const STORAGE: &'static str = "Voting";
-                type Value = runtime_types::darwinia_elections_phragmen::Voter<
+                type Value = runtime_types::pallet_elections_phragmen::Voter<
                     ::subxt::sp_core::crypto::AccountId32,
                     ::core::primitive::u128,
                 >;
@@ -8383,7 +8270,7 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     ::std::vec::Vec<
-                        runtime_types::darwinia_elections_phragmen::SeatHolder<
+                        runtime_types::pallet_elections_phragmen::SeatHolder<
                             ::subxt::sp_core::crypto::AccountId32,
                             ::core::primitive::u128,
                         >,
@@ -8398,7 +8285,7 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     ::std::vec::Vec<
-                        runtime_types::darwinia_elections_phragmen::SeatHolder<
+                        runtime_types::pallet_elections_phragmen::SeatHolder<
                             ::subxt::sp_core::crypto::AccountId32,
                             ::core::primitive::u128,
                         >,
@@ -8434,7 +8321,7 @@ pub mod api {
                     _0: ::subxt::sp_core::crypto::AccountId32,
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
-                    runtime_types::darwinia_elections_phragmen::Voter<
+                    runtime_types::pallet_elections_phragmen::Voter<
                         ::subxt::sp_core::crypto::AccountId32,
                         ::core::primitive::u128,
                     >,
@@ -10321,207 +10208,6 @@ pub mod api {
             }
         }
     }
-    pub mod claims {
-        use super::runtime_types;
-        pub mod calls {
-            use super::runtime_types;
-            type DispatchError = runtime_types::sp_runtime::DispatchError;
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct claim {
-                pub dest: ::subxt::sp_core::crypto::AccountId32,
-                pub signature: runtime_types::darwinia_claims::OtherSignature,
-            }
-            impl ::subxt::Call for claim {
-                const PALLET: &'static str = "Claims";
-                const FUNCTION: &'static str = "claim";
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct mint_claim {
-                pub who: runtime_types::darwinia_claims::OtherAddress,
-                pub value: ::core::primitive::u128,
-            }
-            impl ::subxt::Call for mint_claim {
-                const PALLET: &'static str = "Claims";
-                const FUNCTION: &'static str = "mint_claim";
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct move_claim {
-                pub old: runtime_types::darwinia_claims::OtherAddress,
-                pub new: runtime_types::darwinia_claims::OtherAddress,
-            }
-            impl ::subxt::Call for move_claim {
-                const PALLET: &'static str = "Claims";
-                const FUNCTION: &'static str = "move_claim";
-            }
-            pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
-                client: &'a ::subxt::Client<T>,
-                marker: ::core::marker::PhantomData<(X, A)>,
-            }
-            impl<'a, T, X, A> TransactionApi<'a, T, X, A>
-            where
-                T: ::subxt::Config,
-                X: ::subxt::SignedExtra<T>,
-                A: ::subxt::AccountData,
-            {
-                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
-                    Self {
-                        client,
-                        marker: ::core::marker::PhantomData,
-                    }
-                }
-                pub fn claim(
-                    &self,
-                    dest: ::subxt::sp_core::crypto::AccountId32,
-                    signature: runtime_types::darwinia_claims::OtherSignature,
-                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, claim, DispatchError>
-                {
-                    let call = claim { dest, signature };
-                    ::subxt::SubmittableExtrinsic::new(self.client, call)
-                }
-                pub fn mint_claim(
-                    &self,
-                    who: runtime_types::darwinia_claims::OtherAddress,
-                    value: ::core::primitive::u128,
-                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, mint_claim, DispatchError>
-                {
-                    let call = mint_claim { who, value };
-                    ::subxt::SubmittableExtrinsic::new(self.client, call)
-                }
-                pub fn move_claim(
-                    &self,
-                    old: runtime_types::darwinia_claims::OtherAddress,
-                    new: runtime_types::darwinia_claims::OtherAddress,
-                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, move_claim, DispatchError>
-                {
-                    let call = move_claim { old, new };
-                    ::subxt::SubmittableExtrinsic::new(self.client, call)
-                }
-            }
-        }
-        pub type Event = runtime_types::darwinia_claims::RawEvent<
-            ::subxt::sp_core::crypto::AccountId32,
-            ::core::primitive::u128,
-        >;
-        pub mod events {
-            use super::runtime_types;
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Claimed(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub [::core::primitive::u8; 20usize],
-                pub ::core::primitive::u128,
-            );
-            impl ::subxt::Event for Claimed {
-                const PALLET: &'static str = "Claims";
-                const EVENT: &'static str = "Claimed";
-            }
-        }
-        pub mod storage {
-            use super::runtime_types;
-            pub struct ClaimsFromEth(pub [::core::primitive::u8; 20usize]);
-            impl ::subxt::StorageEntry for ClaimsFromEth {
-                const PALLET: &'static str = "Claims";
-                const STORAGE: &'static str = "ClaimsFromEth";
-                type Value = ::core::primitive::u128;
-                fn key(&self) -> ::subxt::StorageEntryKey {
-                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
-                        &self.0,
-                        ::subxt::StorageHasher::Identity,
-                    )])
-                }
-            }
-            pub struct ClaimsFromTron(pub [::core::primitive::u8; 20usize]);
-            impl ::subxt::StorageEntry for ClaimsFromTron {
-                const PALLET: &'static str = "Claims";
-                const STORAGE: &'static str = "ClaimsFromTron";
-                type Value = ::core::primitive::u128;
-                fn key(&self) -> ::subxt::StorageEntryKey {
-                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
-                        &self.0,
-                        ::subxt::StorageHasher::Identity,
-                    )])
-                }
-            }
-            pub struct StorageApi<'a, T: ::subxt::Config> {
-                client: &'a ::subxt::Client<T>,
-            }
-            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
-                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
-                    Self { client }
-                }
-                pub async fn claims_from_eth(
-                    &self,
-                    _0: [::core::primitive::u8; 20usize],
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<
-                    ::core::option::Option<::core::primitive::u128>,
-                    ::subxt::BasicError,
-                > {
-                    let entry = ClaimsFromEth(_0);
-                    self.client.storage().fetch(&entry, hash).await
-                }
-                pub async fn claims_from_eth_iter(
-                    &self,
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<
-                    ::subxt::KeyIter<'a, T, ClaimsFromEth>,
-                    ::subxt::BasicError,
-                > {
-                    self.client.storage().iter(hash).await
-                }
-                pub async fn claims_from_tron(
-                    &self,
-                    _0: [::core::primitive::u8; 20usize],
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<
-                    ::core::option::Option<::core::primitive::u128>,
-                    ::subxt::BasicError,
-                > {
-                    let entry = ClaimsFromTron(_0);
-                    self.client.storage().fetch(&entry, hash).await
-                }
-                pub async fn claims_from_tron_iter(
-                    &self,
-                    hash: ::core::option::Option<T::Hash>,
-                ) -> ::core::result::Result<
-                    ::subxt::KeyIter<'a, T, ClaimsFromTron>,
-                    ::subxt::BasicError,
-                > {
-                    self.client.storage().iter(hash).await
-                }
-            }
-        }
-        pub mod constants {
-            use super::runtime_types;
-            pub struct ConstantsApi;
-            impl ConstantsApi {
-                pub fn pallet_id(
-                    &self,
-                ) -> ::core::result::Result<
-                    runtime_types::frame_support::PalletId,
-                    ::subxt::BasicError,
-                > {
-                    Ok(::subxt::codec::Decode::decode(
-                        &mut &[100u8, 97u8, 47u8, 99u8, 108u8, 97u8, 105u8, 109u8][..],
-                    )?)
-                }
-                pub fn prefix(
-                    &self,
-                ) -> ::core::result::Result<
-                    ::std::vec::Vec<::core::primitive::u8>,
-                    ::subxt::BasicError,
-                > {
-                    Ok(::subxt::codec::Decode::decode(
-                        &mut &[
-                            140u8, 80u8, 97u8, 121u8, 32u8, 80u8, 82u8, 73u8, 78u8, 71u8, 115u8,
-                            32u8, 116u8, 111u8, 32u8, 116u8, 104u8, 101u8, 32u8, 80u8, 97u8, 110u8,
-                            103u8, 111u8, 108u8, 105u8, 110u8, 32u8, 97u8, 99u8, 99u8, 111u8,
-                            117u8, 110u8, 116u8, 58u8,
-                        ][..],
-                    )?)
-                }
-            }
-        }
-    }
     pub mod vesting {
         use super::runtime_types;
         pub mod calls {
@@ -10546,7 +10232,7 @@ pub mod api {
             pub struct vested_transfer {
                 pub target:
                     ::subxt::sp_runtime::MultiAddress<::subxt::sp_core::crypto::AccountId32, ()>,
-                pub schedule: runtime_types::darwinia_vesting::vesting_info::VestingInfo<
+                pub schedule: runtime_types::pallet_vesting::vesting_info::VestingInfo<
                     ::core::primitive::u128,
                     ::core::primitive::u32,
                 >,
@@ -10561,7 +10247,7 @@ pub mod api {
                     ::subxt::sp_runtime::MultiAddress<::subxt::sp_core::crypto::AccountId32, ()>,
                 pub target:
                     ::subxt::sp_runtime::MultiAddress<::subxt::sp_core::crypto::AccountId32, ()>,
-                pub schedule: runtime_types::darwinia_vesting::vesting_info::VestingInfo<
+                pub schedule: runtime_types::pallet_vesting::vesting_info::VestingInfo<
                     ::core::primitive::u128,
                     ::core::primitive::u32,
                 >,
@@ -10619,7 +10305,7 @@ pub mod api {
                         ::subxt::sp_core::crypto::AccountId32,
                         (),
                     >,
-                    schedule: runtime_types::darwinia_vesting::vesting_info::VestingInfo<
+                    schedule: runtime_types::pallet_vesting::vesting_info::VestingInfo<
                         ::core::primitive::u128,
                         ::core::primitive::u32,
                     >,
@@ -10638,7 +10324,7 @@ pub mod api {
                         ::subxt::sp_core::crypto::AccountId32,
                         (),
                     >,
-                    schedule: runtime_types::darwinia_vesting::vesting_info::VestingInfo<
+                    schedule: runtime_types::pallet_vesting::vesting_info::VestingInfo<
                         ::core::primitive::u128,
                         ::core::primitive::u32,
                     >,
@@ -10665,7 +10351,7 @@ pub mod api {
                 }
             }
         }
-        pub type Event = runtime_types::darwinia_vesting::pallet::Event;
+        pub type Event = runtime_types::pallet_vesting::pallet::Event;
         pub mod events {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -10691,7 +10377,7 @@ pub mod api {
                 const PALLET: &'static str = "Vesting";
                 const STORAGE: &'static str = "Vesting";
                 type Value = runtime_types::frame_support::storage::bounded_vec::BoundedVec<
-                    runtime_types::darwinia_vesting::vesting_info::VestingInfo<
+                    runtime_types::pallet_vesting::vesting_info::VestingInfo<
                         ::core::primitive::u128,
                         ::core::primitive::u32,
                     >,
@@ -10707,7 +10393,7 @@ pub mod api {
             impl ::subxt::StorageEntry for StorageVersion {
                 const PALLET: &'static str = "Vesting";
                 const STORAGE: &'static str = "StorageVersion";
-                type Value = runtime_types::darwinia_vesting::Releases;
+                type Value = runtime_types::pallet_vesting::Releases;
                 fn key(&self) -> ::subxt::StorageEntryKey {
                     ::subxt::StorageEntryKey::Plain
                 }
@@ -10726,7 +10412,7 @@ pub mod api {
                 ) -> ::core::result::Result<
                     ::core::option::Option<
                         runtime_types::frame_support::storage::bounded_vec::BoundedVec<
-                            runtime_types::darwinia_vesting::vesting_info::VestingInfo<
+                            runtime_types::pallet_vesting::vesting_info::VestingInfo<
                                 ::core::primitive::u128,
                                 ::core::primitive::u32,
                             >,
@@ -10748,7 +10434,7 @@ pub mod api {
                     &self,
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
-                    runtime_types::darwinia_vesting::Releases,
+                    runtime_types::pallet_vesting::Releases,
                     ::subxt::BasicError,
                 > {
                     let entry = StorageVersion;
@@ -10892,7 +10578,7 @@ pub mod api {
                 ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
                 {
                     Ok(::subxt::codec::Decode::decode(
-                        &mut &[157u8, 54u8, 0u8, 0u8][..],
+                        &mut &[42u8, 55u8, 0u8, 0u8][..],
                     )?)
                 }
             }
@@ -16601,6 +16287,14 @@ pub mod api {
                 const FUNCTION: &'static str = "transact";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct message_transact {
+                pub transaction: runtime_types::ethereum::transaction::TransactionV2,
+            }
+            impl ::subxt::Call for message_transact {
+                const PALLET: &'static str = "Ethereum";
+                const FUNCTION: &'static str = "message_transact";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct root_transact {
                 pub target: runtime_types::primitive_types::H160,
                 pub input: ::std::vec::Vec<::core::primitive::u8>,
@@ -16631,6 +16325,14 @@ pub mod api {
                 ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, transact, DispatchError>
                 {
                     let call = transact { transaction };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn message_transact(
+                    &self,
+                    transaction: runtime_types::ethereum::transaction::TransactionV2,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, message_transact, DispatchError>
+                {
+                    let call = message_transact { transaction };
                     ::subxt::SubmittableExtrinsic::new(self.client, call)
                 }
                 pub fn root_transact(
@@ -17108,13 +16810,14 @@ pub mod api {
                 const EVENT: &'static str = "MessageCallDecodeFailed";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct MessageCallRejected(
+            pub struct MessageCallValidateFailed(
                 pub [::core::primitive::u8; 4usize],
                 pub ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+                pub runtime_types::sp_runtime::transaction_validity::TransactionValidityError,
             );
-            impl ::subxt::Event for MessageCallRejected {
+            impl ::subxt::Event for MessageCallValidateFailed {
                 const PALLET: &'static str = "BridgePangoroDispatch";
-                const EVENT: &'static str = "MessageCallRejected";
+                const EVENT: &'static str = "MessageCallValidateFailed";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct MessageDispatchPaymentFailed(
@@ -17512,7 +17215,7 @@ pub mod api {
                 const FUNCTION: &'static str = "set_operating_mode";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct update_pallet_parameter { pub parameter : runtime_types :: pangolin_runtime :: bridges :: substrate :: pangoro_messages :: PangolinToPangoroMessagesParameter , }
+            pub struct update_pallet_parameter { pub parameter : runtime_types :: pangolin_runtime :: bridges_message :: pangoro :: PangolinToPangoroMessagesParameter , }
             impl ::subxt::Call for update_pallet_parameter {
                 const PALLET: &'static str = "BridgePangoroMessages";
                 const FUNCTION: &'static str = "update_pallet_parameter";
@@ -17588,7 +17291,7 @@ pub mod api {
                 }
                 pub fn update_pallet_parameter(
                     &self,
-                    parameter : runtime_types :: pangolin_runtime :: bridges :: substrate :: pangoro_messages :: PangolinToPangoroMessagesParameter,
+                    parameter : runtime_types :: pangolin_runtime :: bridges_message :: pangoro :: PangolinToPangoroMessagesParameter,
                 ) -> ::subxt::SubmittableExtrinsic<
                     'a,
                     T,
@@ -17673,7 +17376,7 @@ pub mod api {
         pub mod events {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct ParameterUpdated (pub runtime_types :: pangolin_runtime :: bridges :: substrate :: pangoro_messages :: PangolinToPangoroMessagesParameter ,) ;
+            pub struct ParameterUpdated (pub runtime_types :: pangolin_runtime :: bridges_message :: pangoro :: PangolinToPangoroMessagesParameter ,) ;
             impl ::subxt::Event for ParameterUpdated {
                 const PALLET: &'static str = "BridgePangoroMessages";
                 const EVENT: &'static str = "ParameterUpdated";
@@ -18391,11 +18094,7 @@ pub mod api {
                 ) -> ::core::result::Result<::std::string::String, ::subxt::BasicError>
                 {
                     Ok(::subxt::codec::Decode::decode(
-                        &mut &[
-                            96u8, 66u8, 114u8, 105u8, 100u8, 103u8, 101u8, 80u8, 97u8, 110u8,
-                            103u8, 111u8, 108u8, 105u8, 110u8, 80u8, 97u8, 114u8, 97u8, 99u8,
-                            104u8, 97u8, 105u8, 110u8, 115u8,
-                        ][..],
+                        &mut &[20u8, 80u8, 97u8, 114u8, 97u8, 115u8][..],
                     )?)
                 }
                 pub fn heads_to_keep(
@@ -18409,7 +18108,473 @@ pub mod api {
             }
         }
     }
-    pub mod fee_market {
+    pub mod bridge_pangolin_parachain_dispatch {
+        use super::runtime_types;
+        pub type Event = runtime_types::pallet_bridge_dispatch::pallet::Event;
+        pub mod events {
+            use super::runtime_types;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessageRejected(
+                pub [::core::primitive::u8; 4usize],
+                pub ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+            );
+            impl ::subxt::Event for MessageRejected {
+                const PALLET: &'static str = "BridgePangolinParachainDispatch";
+                const EVENT: &'static str = "MessageRejected";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessageVersionSpecMismatch(
+                pub [::core::primitive::u8; 4usize],
+                pub ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+                pub ::core::primitive::u32,
+                pub ::core::primitive::u32,
+            );
+            impl ::subxt::Event for MessageVersionSpecMismatch {
+                const PALLET: &'static str = "BridgePangolinParachainDispatch";
+                const EVENT: &'static str = "MessageVersionSpecMismatch";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessageWeightMismatch(
+                pub [::core::primitive::u8; 4usize],
+                pub ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+                pub ::core::primitive::u64,
+                pub ::core::primitive::u64,
+            );
+            impl ::subxt::Event for MessageWeightMismatch {
+                const PALLET: &'static str = "BridgePangolinParachainDispatch";
+                const EVENT: &'static str = "MessageWeightMismatch";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessageSignatureMismatch(
+                pub [::core::primitive::u8; 4usize],
+                pub ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+            );
+            impl ::subxt::Event for MessageSignatureMismatch {
+                const PALLET: &'static str = "BridgePangolinParachainDispatch";
+                const EVENT: &'static str = "MessageSignatureMismatch";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessageCallDecodeFailed(
+                pub [::core::primitive::u8; 4usize],
+                pub ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+            );
+            impl ::subxt::Event for MessageCallDecodeFailed {
+                const PALLET: &'static str = "BridgePangolinParachainDispatch";
+                const EVENT: &'static str = "MessageCallDecodeFailed";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessageCallValidateFailed(
+                pub [::core::primitive::u8; 4usize],
+                pub ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+                pub runtime_types::sp_runtime::transaction_validity::TransactionValidityError,
+            );
+            impl ::subxt::Event for MessageCallValidateFailed {
+                const PALLET: &'static str = "BridgePangolinParachainDispatch";
+                const EVENT: &'static str = "MessageCallValidateFailed";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessageDispatchPaymentFailed(
+                pub [::core::primitive::u8; 4usize],
+                pub ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u64,
+            );
+            impl ::subxt::Event for MessageDispatchPaymentFailed {
+                const PALLET: &'static str = "BridgePangolinParachainDispatch";
+                const EVENT: &'static str = "MessageDispatchPaymentFailed";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessageDispatched(
+                pub [::core::primitive::u8; 4usize],
+                pub ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+                pub ::core::result::Result<(), runtime_types::sp_runtime::DispatchError>,
+            );
+            impl ::subxt::Event for MessageDispatched {
+                const PALLET: &'static str = "BridgePangolinParachainDispatch";
+                const EVENT: &'static str = "MessageDispatched";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct _Dummy;
+            impl ::subxt::Event for _Dummy {
+                const PALLET: &'static str = "BridgePangolinParachainDispatch";
+                const EVENT: &'static str = "_Dummy";
+            }
+        }
+    }
+    pub mod bridge_pangolin_parachain_messages {
+        use super::runtime_types;
+        pub mod calls {
+            use super::runtime_types;
+            type DispatchError = runtime_types::sp_runtime::DispatchError;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct set_owner {
+                pub new_owner: ::core::option::Option<::subxt::sp_core::crypto::AccountId32>,
+            }
+            impl ::subxt::Call for set_owner {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const FUNCTION: &'static str = "set_owner";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct set_operating_mode {
+                pub operating_mode: runtime_types::bp_messages::OperatingMode,
+            }
+            impl ::subxt::Call for set_operating_mode {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const FUNCTION: &'static str = "set_operating_mode";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct update_pallet_parameter { pub parameter : runtime_types :: pangolin_runtime :: bridges_message :: pangolin_parachain :: PangolinToPangolinParachainParameter , }
+            impl ::subxt::Call for update_pallet_parameter {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const FUNCTION: &'static str = "update_pallet_parameter";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct send_message {
+                pub lane_id: [::core::primitive::u8; 4usize],
+                pub payload: runtime_types::bp_message_dispatch::MessagePayload<
+                    ::subxt::sp_core::crypto::AccountId32,
+                    runtime_types::sp_runtime::MultiSigner,
+                    runtime_types::sp_runtime::MultiSignature,
+                    ::std::vec::Vec<::core::primitive::u8>,
+                >,
+                pub delivery_and_dispatch_fee: ::core::primitive::u128,
+            }
+            impl ::subxt::Call for send_message {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const FUNCTION: &'static str = "send_message";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct increase_message_fee {
+                pub lane_id: [::core::primitive::u8; 4usize],
+                pub nonce: ::core::primitive::u64,
+                pub additional_fee: ::core::primitive::u128,
+            }
+            impl ::subxt::Call for increase_message_fee {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const FUNCTION: &'static str = "increase_message_fee";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct receive_messages_proof { pub relayer_id_at_bridged_chain : :: subxt :: sp_core :: crypto :: AccountId32 , pub proof : runtime_types :: bridge_runtime_common :: messages :: target :: FromBridgedChainMessagesProof < :: subxt :: sp_core :: H256 > , pub messages_count : :: core :: primitive :: u32 , pub dispatch_weight : :: core :: primitive :: u64 , }
+            impl ::subxt::Call for receive_messages_proof {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const FUNCTION: &'static str = "receive_messages_proof";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct receive_messages_delivery_proof { pub proof : runtime_types :: bridge_runtime_common :: messages :: source :: FromBridgedChainMessagesDeliveryProof < :: subxt :: sp_core :: H256 > , pub relayers_state : runtime_types :: bp_messages :: UnrewardedRelayersState , }
+            impl ::subxt::Call for receive_messages_delivery_proof {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const FUNCTION: &'static str = "receive_messages_delivery_proof";
+            }
+            pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
+                client: &'a ::subxt::Client<T>,
+                marker: ::core::marker::PhantomData<(X, A)>,
+            }
+            impl<'a, T, X, A> TransactionApi<'a, T, X, A>
+            where
+                T: ::subxt::Config,
+                X: ::subxt::SignedExtra<T>,
+                A: ::subxt::AccountData,
+            {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self {
+                        client,
+                        marker: ::core::marker::PhantomData,
+                    }
+                }
+                pub fn set_owner(
+                    &self,
+                    new_owner: ::core::option::Option<::subxt::sp_core::crypto::AccountId32>,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, set_owner, DispatchError>
+                {
+                    let call = set_owner { new_owner };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn set_operating_mode(
+                    &self,
+                    operating_mode: runtime_types::bp_messages::OperatingMode,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, set_operating_mode, DispatchError>
+                {
+                    let call = set_operating_mode { operating_mode };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn update_pallet_parameter(
+                    &self,
+                    parameter : runtime_types :: pangolin_runtime :: bridges_message :: pangolin_parachain :: PangolinToPangolinParachainParameter,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    update_pallet_parameter,
+                    DispatchError,
+                > {
+                    let call = update_pallet_parameter { parameter };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn send_message(
+                    &self,
+                    lane_id: [::core::primitive::u8; 4usize],
+                    payload: runtime_types::bp_message_dispatch::MessagePayload<
+                        ::subxt::sp_core::crypto::AccountId32,
+                        runtime_types::sp_runtime::MultiSigner,
+                        runtime_types::sp_runtime::MultiSignature,
+                        ::std::vec::Vec<::core::primitive::u8>,
+                    >,
+                    delivery_and_dispatch_fee: ::core::primitive::u128,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, send_message, DispatchError>
+                {
+                    let call = send_message {
+                        lane_id,
+                        payload,
+                        delivery_and_dispatch_fee,
+                    };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn increase_message_fee(
+                    &self,
+                    lane_id: [::core::primitive::u8; 4usize],
+                    nonce: ::core::primitive::u64,
+                    additional_fee: ::core::primitive::u128,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, increase_message_fee, DispatchError>
+                {
+                    let call = increase_message_fee {
+                        lane_id,
+                        nonce,
+                        additional_fee,
+                    };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn receive_messages_proof(
+                    &self,
+                    relayer_id_at_bridged_chain: ::subxt::sp_core::crypto::AccountId32,
+                    proof : runtime_types :: bridge_runtime_common :: messages :: target :: FromBridgedChainMessagesProof < :: subxt :: sp_core :: H256 >,
+                    messages_count: ::core::primitive::u32,
+                    dispatch_weight: ::core::primitive::u64,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, receive_messages_proof, DispatchError>
+                {
+                    let call = receive_messages_proof {
+                        relayer_id_at_bridged_chain,
+                        proof,
+                        messages_count,
+                        dispatch_weight,
+                    };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn receive_messages_delivery_proof(
+                    &self,
+                    proof : runtime_types :: bridge_runtime_common :: messages :: source :: FromBridgedChainMessagesDeliveryProof < :: subxt :: sp_core :: H256 >,
+                    relayers_state: runtime_types::bp_messages::UnrewardedRelayersState,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    receive_messages_delivery_proof,
+                    DispatchError,
+                > {
+                    let call = receive_messages_delivery_proof {
+                        proof,
+                        relayers_state,
+                    };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+            }
+        }
+        pub type Event = runtime_types::pallet_bridge_messages::pallet::Event;
+        pub mod events {
+            use super::runtime_types;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct ParameterUpdated (pub runtime_types :: pangolin_runtime :: bridges_message :: pangolin_parachain :: PangolinToPangolinParachainParameter ,) ;
+            impl ::subxt::Event for ParameterUpdated {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const EVENT: &'static str = "ParameterUpdated";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessageAccepted(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+            );
+            impl ::subxt::Event for MessageAccepted {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const EVENT: &'static str = "MessageAccepted";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct MessagesDelivered(
+                pub [::core::primitive::u8; 4usize],
+                pub runtime_types::bp_messages::DeliveredMessages,
+            );
+            impl ::subxt::Event for MessagesDelivered {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const EVENT: &'static str = "MessagesDelivered";
+            }
+        }
+        pub mod storage {
+            use super::runtime_types;
+            pub struct PalletOwner;
+            impl ::subxt::StorageEntry for PalletOwner {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const STORAGE: &'static str = "PalletOwner";
+                type Value = ::subxt::sp_core::crypto::AccountId32;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct PalletOperatingMode;
+            impl ::subxt::StorageEntry for PalletOperatingMode {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const STORAGE: &'static str = "PalletOperatingMode";
+                type Value = runtime_types::bp_messages::OperatingMode;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct InboundLanes(pub [::core::primitive::u8; 4usize]);
+            impl ::subxt::StorageEntry for InboundLanes {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const STORAGE: &'static str = "InboundLanes";
+                type Value = runtime_types::bp_messages::InboundLaneData<
+                    ::subxt::sp_core::crypto::AccountId32,
+                >;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
+                        &self.0,
+                        ::subxt::StorageHasher::Blake2_128Concat,
+                    )])
+                }
+            }
+            pub struct OutboundLanes(pub [::core::primitive::u8; 4usize]);
+            impl ::subxt::StorageEntry for OutboundLanes {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const STORAGE: &'static str = "OutboundLanes";
+                type Value = runtime_types::bp_messages::OutboundLaneData;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
+                        &self.0,
+                        ::subxt::StorageHasher::Blake2_128Concat,
+                    )])
+                }
+            }
+            pub struct OutboundMessages(pub runtime_types::bp_messages::MessageKey);
+            impl ::subxt::StorageEntry for OutboundMessages {
+                const PALLET: &'static str = "BridgePangolinParachainMessages";
+                const STORAGE: &'static str = "OutboundMessages";
+                type Value = runtime_types::bp_messages::MessageData<::core::primitive::u128>;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
+                        &self.0,
+                        ::subxt::StorageHasher::Blake2_128Concat,
+                    )])
+                }
+            }
+            pub struct StorageApi<'a, T: ::subxt::Config> {
+                client: &'a ::subxt::Client<T>,
+            }
+            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self { client }
+                }
+                pub async fn pallet_owner(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<::subxt::sp_core::crypto::AccountId32>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = PalletOwner;
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn pallet_operating_mode(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    runtime_types::bp_messages::OperatingMode,
+                    ::subxt::BasicError,
+                > {
+                    let entry = PalletOperatingMode;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn inbound_lanes(
+                    &self,
+                    _0: [::core::primitive::u8; 4usize],
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    runtime_types::bp_messages::InboundLaneData<
+                        ::subxt::sp_core::crypto::AccountId32,
+                    >,
+                    ::subxt::BasicError,
+                > {
+                    let entry = InboundLanes(_0);
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn inbound_lanes_iter(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::subxt::KeyIter<'a, T, InboundLanes>,
+                    ::subxt::BasicError,
+                > {
+                    self.client.storage().iter(hash).await
+                }
+                pub async fn outbound_lanes(
+                    &self,
+                    _0: [::core::primitive::u8; 4usize],
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    runtime_types::bp_messages::OutboundLaneData,
+                    ::subxt::BasicError,
+                > {
+                    let entry = OutboundLanes(_0);
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn outbound_lanes_iter(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::subxt::KeyIter<'a, T, OutboundLanes>,
+                    ::subxt::BasicError,
+                > {
+                    self.client.storage().iter(hash).await
+                }
+                pub async fn outbound_messages(
+                    &self,
+                    _0: runtime_types::bp_messages::MessageKey,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<
+                        runtime_types::bp_messages::MessageData<::core::primitive::u128>,
+                    >,
+                    ::subxt::BasicError,
+                > {
+                    let entry = OutboundMessages(_0);
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn outbound_messages_iter(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::subxt::KeyIter<'a, T, OutboundMessages>,
+                    ::subxt::BasicError,
+                > {
+                    self.client.storage().iter(hash).await
+                }
+            }
+        }
+        pub mod constants {
+            use super::runtime_types;
+            pub struct ConstantsApi;
+            impl ConstantsApi {
+                pub fn bridged_chain_id(
+                    &self,
+                ) -> ::core::result::Result<[::core::primitive::u8; 4usize], ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[112u8, 103u8, 108u8, 112u8][..],
+                    )?)
+                }
+            }
+        }
+    }
+    pub mod pangoro_fee_market {
         use super::runtime_types;
         pub mod calls {
             use super::runtime_types;
@@ -18420,7 +18585,7 @@ pub mod api {
                 pub relay_fee: ::core::option::Option<::core::primitive::u128>,
             }
             impl ::subxt::Call for enroll_and_lock_collateral {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const FUNCTION: &'static str = "enroll_and_lock_collateral";
             }
             #[derive(
@@ -18434,7 +18599,7 @@ pub mod api {
                 pub new_collateral: ::core::primitive::u128,
             }
             impl ::subxt::Call for update_locked_collateral {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const FUNCTION: &'static str = "update_locked_collateral";
             }
             #[derive(
@@ -18448,13 +18613,13 @@ pub mod api {
                 pub new_fee: ::core::primitive::u128,
             }
             impl ::subxt::Call for update_relay_fee {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const FUNCTION: &'static str = "update_relay_fee";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct cancel_enrollment;
             impl ::subxt::Call for cancel_enrollment {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const FUNCTION: &'static str = "cancel_enrollment";
             }
             #[derive(
@@ -18468,7 +18633,7 @@ pub mod api {
                 pub slash_protect: ::core::primitive::u128,
             }
             impl ::subxt::Call for set_slash_protect {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const FUNCTION: &'static str = "set_slash_protect";
             }
             #[derive(
@@ -18482,7 +18647,7 @@ pub mod api {
                 pub number: ::core::primitive::u32,
             }
             impl ::subxt::Call for set_assigned_relayers_number {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const FUNCTION: &'static str = "set_assigned_relayers_number";
             }
             pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
@@ -18572,7 +18737,7 @@ pub mod api {
                 }
             }
         }
-        pub type Event = runtime_types::darwinia_fee_market::pallet::Event;
+        pub type Event = runtime_types::pallet_fee_market::pallet::Event;
         pub mod events {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -18582,7 +18747,7 @@ pub mod api {
                 pub ::core::primitive::u128,
             );
             impl ::subxt::Event for Enroll {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const EVENT: &'static str = "Enroll";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -18591,7 +18756,7 @@ pub mod api {
                 pub ::core::primitive::u128,
             );
             impl ::subxt::Event for UpdateLockedCollateral {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const EVENT: &'static str = "UpdateLockedCollateral";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -18600,13 +18765,13 @@ pub mod api {
                 pub ::core::primitive::u128,
             );
             impl ::subxt::Event for UpdateRelayFee {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const EVENT: &'static str = "UpdateRelayFee";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct CancelEnrollment(pub ::subxt::sp_core::crypto::AccountId32);
             impl ::subxt::Event for CancelEnrollment {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const EVENT: &'static str = "CancelEnrollment";
             }
             #[derive(
@@ -18618,7 +18783,7 @@ pub mod api {
             )]
             pub struct UpdateCollateralSlashProtect(pub ::core::primitive::u128);
             impl ::subxt::Event for UpdateCollateralSlashProtect {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const EVENT: &'static str = "UpdateCollateralSlashProtect";
             }
             #[derive(
@@ -18630,29 +18795,54 @@ pub mod api {
             )]
             pub struct UpdateAssignedRelayersNumber(pub ::core::primitive::u32);
             impl ::subxt::Event for UpdateAssignedRelayersNumber {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const EVENT: &'static str = "UpdateAssignedRelayersNumber";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct FeeMarketSlash(
-                pub  runtime_types::darwinia_fee_market::types::SlashReport<
+                pub  runtime_types::pallet_fee_market::types::SlashReport<
                     ::subxt::sp_core::crypto::AccountId32,
                     ::core::primitive::u32,
                     ::core::primitive::u128,
                 >,
             );
             impl ::subxt::Event for FeeMarketSlash {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const EVENT: &'static str = "FeeMarketSlash";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct OrderCreated(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+                pub ::core::primitive::u128,
+                pub ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>,
+                pub ::core::option::Option<::core::primitive::u32>,
+            );
+            impl ::subxt::Event for OrderCreated {
+                const PALLET: &'static str = "PangoroFeeMarket";
+                const EVENT: &'static str = "OrderCreated";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct OrderReward(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+                pub  runtime_types::pallet_fee_market::s2s::payment::RewardItem<
+                    ::subxt::sp_core::crypto::AccountId32,
+                    ::core::primitive::u128,
+                >,
+            );
+            impl ::subxt::Event for OrderReward {
+                const PALLET: &'static str = "PangoroFeeMarket";
+                const EVENT: &'static str = "OrderReward";
             }
         }
         pub mod storage {
             use super::runtime_types;
             pub struct RelayersMap(pub ::subxt::sp_core::crypto::AccountId32);
             impl ::subxt::StorageEntry for RelayersMap {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const STORAGE: &'static str = "RelayersMap";
-                type Value = runtime_types::darwinia_fee_market::types::Relayer<
+                type Value = runtime_types::pallet_fee_market::types::Relayer<
                     ::subxt::sp_core::crypto::AccountId32,
                     ::core::primitive::u128,
                 >;
@@ -18665,7 +18855,7 @@ pub mod api {
             }
             pub struct Relayers;
             impl ::subxt::StorageEntry for Relayers {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const STORAGE: &'static str = "Relayers";
                 type Value = ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -18674,10 +18864,10 @@ pub mod api {
             }
             pub struct AssignedRelayers;
             impl ::subxt::StorageEntry for AssignedRelayers {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const STORAGE: &'static str = "AssignedRelayers";
                 type Value = ::std::vec::Vec<
-                    runtime_types::darwinia_fee_market::types::Relayer<
+                    runtime_types::pallet_fee_market::types::Relayer<
                         ::subxt::sp_core::crypto::AccountId32,
                         ::core::primitive::u128,
                     >,
@@ -18691,23 +18881,23 @@ pub mod api {
                 pub ::core::primitive::u64,
             );
             impl ::subxt::StorageEntry for Orders {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const STORAGE: &'static str = "Orders";
-                type Value = runtime_types::darwinia_fee_market::types::Order<
+                type Value = runtime_types::pallet_fee_market::types::Order<
                     ::subxt::sp_core::crypto::AccountId32,
                     ::core::primitive::u32,
                     ::core::primitive::u128,
                 >;
                 fn key(&self) -> ::subxt::StorageEntryKey {
                     ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
-                        &self.0,
+                        &(&self.0, &self.1),
                         ::subxt::StorageHasher::Blake2_128Concat,
                     )])
                 }
             }
             pub struct CollateralSlashProtect;
             impl ::subxt::StorageEntry for CollateralSlashProtect {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const STORAGE: &'static str = "CollateralSlashProtect";
                 type Value = ::core::primitive::u128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -18716,7 +18906,7 @@ pub mod api {
             }
             pub struct AssignedRelayersNumber;
             impl ::subxt::StorageEntry for AssignedRelayersNumber {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangoroFeeMarket";
                 const STORAGE: &'static str = "AssignedRelayersNumber";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -18735,7 +18925,7 @@ pub mod api {
                     _0: ::subxt::sp_core::crypto::AccountId32,
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
-                    runtime_types::darwinia_fee_market::types::Relayer<
+                    runtime_types::pallet_fee_market::types::Relayer<
                         ::subxt::sp_core::crypto::AccountId32,
                         ::core::primitive::u128,
                     >,
@@ -18767,7 +18957,7 @@ pub mod api {
                 ) -> ::core::result::Result<
                     ::core::option::Option<
                         ::std::vec::Vec<
-                            runtime_types::darwinia_fee_market::types::Relayer<
+                            runtime_types::pallet_fee_market::types::Relayer<
                                 ::subxt::sp_core::crypto::AccountId32,
                                 ::core::primitive::u128,
                             >,
@@ -18785,7 +18975,7 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     ::core::option::Option<
-                        runtime_types::darwinia_fee_market::types::Order<
+                        runtime_types::pallet_fee_market::types::Order<
                             ::subxt::sp_core::crypto::AccountId32,
                             ::core::primitive::u32,
                             ::core::primitive::u128,
@@ -18827,16 +19017,6 @@ pub mod api {
             use super::runtime_types;
             pub struct ConstantsApi;
             impl ConstantsApi {
-                pub fn pallet_id(
-                    &self,
-                ) -> ::core::result::Result<
-                    runtime_types::frame_support::PalletId,
-                    ::subxt::BasicError,
-                > {
-                    Ok(::subxt::codec::Decode::decode(
-                        &mut &[100u8, 97u8, 47u8, 102u8, 101u8, 101u8, 109u8, 107u8][..],
-                    )?)
-                }
                 pub fn treasury_pallet_id(
                     &self,
                 ) -> ::core::result::Result<
@@ -18882,7 +19062,531 @@ pub mod api {
                 ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
                 {
                     Ok(::subxt::codec::Decode::decode(
-                        &mut &[88u8, 2u8, 0u8, 0u8][..],
+                        &mut &[44u8, 1u8, 0u8, 0u8][..],
+                    )?)
+                }
+                pub fn assigned_relayers_reward_ratio(
+                    &self,
+                ) -> ::core::result::Result<
+                    runtime_types::sp_arithmetic::per_things::Permill,
+                    ::subxt::BasicError,
+                > {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[192u8, 39u8, 9u8, 0u8][..],
+                    )?)
+                }
+                pub fn message_relayers_reward_ratio(
+                    &self,
+                ) -> ::core::result::Result<
+                    runtime_types::sp_arithmetic::per_things::Permill,
+                    ::subxt::BasicError,
+                > {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[0u8, 53u8, 12u8, 0u8][..],
+                    )?)
+                }
+                pub fn confirm_relayers_reward_ratio(
+                    &self,
+                ) -> ::core::result::Result<
+                    runtime_types::sp_arithmetic::per_things::Permill,
+                    ::subxt::BasicError,
+                > {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[64u8, 13u8, 3u8, 0u8][..],
+                    )?)
+                }
+            }
+        }
+    }
+    pub mod pangolin_parachain_fee_market {
+        use super::runtime_types;
+        pub mod calls {
+            use super::runtime_types;
+            type DispatchError = runtime_types::sp_runtime::DispatchError;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct enroll_and_lock_collateral {
+                pub lock_collateral: ::core::primitive::u128,
+                pub relay_fee: ::core::option::Option<::core::primitive::u128>,
+            }
+            impl ::subxt::Call for enroll_and_lock_collateral {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const FUNCTION: &'static str = "enroll_and_lock_collateral";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct update_locked_collateral {
+                pub new_collateral: ::core::primitive::u128,
+            }
+            impl ::subxt::Call for update_locked_collateral {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const FUNCTION: &'static str = "update_locked_collateral";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct update_relay_fee {
+                pub new_fee: ::core::primitive::u128,
+            }
+            impl ::subxt::Call for update_relay_fee {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const FUNCTION: &'static str = "update_relay_fee";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct cancel_enrollment;
+            impl ::subxt::Call for cancel_enrollment {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const FUNCTION: &'static str = "cancel_enrollment";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct set_slash_protect {
+                pub slash_protect: ::core::primitive::u128,
+            }
+            impl ::subxt::Call for set_slash_protect {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const FUNCTION: &'static str = "set_slash_protect";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct set_assigned_relayers_number {
+                pub number: ::core::primitive::u32,
+            }
+            impl ::subxt::Call for set_assigned_relayers_number {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const FUNCTION: &'static str = "set_assigned_relayers_number";
+            }
+            pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
+                client: &'a ::subxt::Client<T>,
+                marker: ::core::marker::PhantomData<(X, A)>,
+            }
+            impl<'a, T, X, A> TransactionApi<'a, T, X, A>
+            where
+                T: ::subxt::Config,
+                X: ::subxt::SignedExtra<T>,
+                A: ::subxt::AccountData,
+            {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self {
+                        client,
+                        marker: ::core::marker::PhantomData,
+                    }
+                }
+                pub fn enroll_and_lock_collateral(
+                    &self,
+                    lock_collateral: ::core::primitive::u128,
+                    relay_fee: ::core::option::Option<::core::primitive::u128>,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    enroll_and_lock_collateral,
+                    DispatchError,
+                > {
+                    let call = enroll_and_lock_collateral {
+                        lock_collateral,
+                        relay_fee,
+                    };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn update_locked_collateral(
+                    &self,
+                    new_collateral: ::core::primitive::u128,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    update_locked_collateral,
+                    DispatchError,
+                > {
+                    let call = update_locked_collateral { new_collateral };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn update_relay_fee(
+                    &self,
+                    new_fee: ::core::primitive::u128,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, update_relay_fee, DispatchError>
+                {
+                    let call = update_relay_fee { new_fee };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn cancel_enrollment(
+                    &self,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, cancel_enrollment, DispatchError>
+                {
+                    let call = cancel_enrollment {};
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn set_slash_protect(
+                    &self,
+                    slash_protect: ::core::primitive::u128,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, set_slash_protect, DispatchError>
+                {
+                    let call = set_slash_protect { slash_protect };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn set_assigned_relayers_number(
+                    &self,
+                    number: ::core::primitive::u32,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    set_assigned_relayers_number,
+                    DispatchError,
+                > {
+                    let call = set_assigned_relayers_number { number };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+            }
+        }
+        pub type Event = runtime_types::pallet_fee_market::pallet::Event;
+        pub mod events {
+            use super::runtime_types;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Enroll(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for Enroll {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const EVENT: &'static str = "Enroll";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct UpdateLockedCollateral(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for UpdateLockedCollateral {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const EVENT: &'static str = "UpdateLockedCollateral";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct UpdateRelayFee(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for UpdateRelayFee {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const EVENT: &'static str = "UpdateRelayFee";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct CancelEnrollment(pub ::subxt::sp_core::crypto::AccountId32);
+            impl ::subxt::Event for CancelEnrollment {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const EVENT: &'static str = "CancelEnrollment";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct UpdateCollateralSlashProtect(pub ::core::primitive::u128);
+            impl ::subxt::Event for UpdateCollateralSlashProtect {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const EVENT: &'static str = "UpdateCollateralSlashProtect";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct UpdateAssignedRelayersNumber(pub ::core::primitive::u32);
+            impl ::subxt::Event for UpdateAssignedRelayersNumber {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const EVENT: &'static str = "UpdateAssignedRelayersNumber";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct FeeMarketSlash(
+                pub  runtime_types::pallet_fee_market::types::SlashReport<
+                    ::subxt::sp_core::crypto::AccountId32,
+                    ::core::primitive::u32,
+                    ::core::primitive::u128,
+                >,
+            );
+            impl ::subxt::Event for FeeMarketSlash {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const EVENT: &'static str = "FeeMarketSlash";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct OrderCreated(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+                pub ::core::primitive::u128,
+                pub ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>,
+                pub ::core::option::Option<::core::primitive::u32>,
+            );
+            impl ::subxt::Event for OrderCreated {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const EVENT: &'static str = "OrderCreated";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct OrderReward(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+                pub  runtime_types::pallet_fee_market::s2s::payment::RewardItem<
+                    ::subxt::sp_core::crypto::AccountId32,
+                    ::core::primitive::u128,
+                >,
+            );
+            impl ::subxt::Event for OrderReward {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const EVENT: &'static str = "OrderReward";
+            }
+        }
+        pub mod storage {
+            use super::runtime_types;
+            pub struct RelayersMap(pub ::subxt::sp_core::crypto::AccountId32);
+            impl ::subxt::StorageEntry for RelayersMap {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const STORAGE: &'static str = "RelayersMap";
+                type Value = runtime_types::pallet_fee_market::types::Relayer<
+                    ::subxt::sp_core::crypto::AccountId32,
+                    ::core::primitive::u128,
+                >;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
+                        &self.0,
+                        ::subxt::StorageHasher::Blake2_128Concat,
+                    )])
+                }
+            }
+            pub struct Relayers;
+            impl ::subxt::StorageEntry for Relayers {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const STORAGE: &'static str = "Relayers";
+                type Value = ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct AssignedRelayers;
+            impl ::subxt::StorageEntry for AssignedRelayers {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const STORAGE: &'static str = "AssignedRelayers";
+                type Value = ::std::vec::Vec<
+                    runtime_types::pallet_fee_market::types::Relayer<
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    >,
+                >;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct Orders(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+            );
+            impl ::subxt::StorageEntry for Orders {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const STORAGE: &'static str = "Orders";
+                type Value = runtime_types::pallet_fee_market::types::Order<
+                    ::subxt::sp_core::crypto::AccountId32,
+                    ::core::primitive::u32,
+                    ::core::primitive::u128,
+                >;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
+                        &(&self.0, &self.1),
+                        ::subxt::StorageHasher::Blake2_128Concat,
+                    )])
+                }
+            }
+            pub struct CollateralSlashProtect;
+            impl ::subxt::StorageEntry for CollateralSlashProtect {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const STORAGE: &'static str = "CollateralSlashProtect";
+                type Value = ::core::primitive::u128;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct AssignedRelayersNumber;
+            impl ::subxt::StorageEntry for AssignedRelayersNumber {
+                const PALLET: &'static str = "PangolinParachainFeeMarket";
+                const STORAGE: &'static str = "AssignedRelayersNumber";
+                type Value = ::core::primitive::u32;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct StorageApi<'a, T: ::subxt::Config> {
+                client: &'a ::subxt::Client<T>,
+            }
+            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self { client }
+                }
+                pub async fn relayers_map(
+                    &self,
+                    _0: ::subxt::sp_core::crypto::AccountId32,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    runtime_types::pallet_fee_market::types::Relayer<
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    >,
+                    ::subxt::BasicError,
+                > {
+                    let entry = RelayersMap(_0);
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn relayers_map_iter(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<::subxt::KeyIter<'a, T, RelayersMap>, ::subxt::BasicError>
+                {
+                    self.client.storage().iter(hash).await
+                }
+                pub async fn relayers(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = Relayers;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn assigned_relayers(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<
+                        ::std::vec::Vec<
+                            runtime_types::pallet_fee_market::types::Relayer<
+                                ::subxt::sp_core::crypto::AccountId32,
+                                ::core::primitive::u128,
+                            >,
+                        >,
+                    >,
+                    ::subxt::BasicError,
+                > {
+                    let entry = AssignedRelayers;
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn orders(
+                    &self,
+                    _0: [::core::primitive::u8; 4usize],
+                    _1: ::core::primitive::u64,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<
+                        runtime_types::pallet_fee_market::types::Order<
+                            ::subxt::sp_core::crypto::AccountId32,
+                            ::core::primitive::u32,
+                            ::core::primitive::u128,
+                        >,
+                    >,
+                    ::subxt::BasicError,
+                > {
+                    let entry = Orders(_0, _1);
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn orders_iter(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<::subxt::KeyIter<'a, T, Orders>, ::subxt::BasicError>
+                {
+                    self.client.storage().iter(hash).await
+                }
+                pub async fn collateral_slash_protect(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<::core::primitive::u128>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = CollateralSlashProtect;
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn assigned_relayers_number(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
+                {
+                    let entry = AssignedRelayersNumber;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+            }
+        }
+        pub mod constants {
+            use super::runtime_types;
+            pub struct ConstantsApi;
+            impl ConstantsApi {
+                pub fn treasury_pallet_id(
+                    &self,
+                ) -> ::core::result::Result<
+                    runtime_types::frame_support::PalletId,
+                    ::subxt::BasicError,
+                > {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[100u8, 97u8, 47u8, 116u8, 114u8, 115u8, 114u8, 121u8][..],
+                    )?)
+                }
+                pub fn lock_id(
+                    &self,
+                ) -> ::core::result::Result<[::core::primitive::u8; 8usize], ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[100u8, 97u8, 47u8, 102u8, 101u8, 101u8, 112u8, 97u8][..],
+                    )?)
+                }
+                pub fn minimum_relay_fee(
+                    &self,
+                ) -> ::core::result::Result<::core::primitive::u128, ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[
+                            0u8, 214u8, 17u8, 126u8, 3u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+                            0u8, 0u8, 0u8,
+                        ][..],
+                    )?)
+                }
+                pub fn collateral_per_order(
+                    &self,
+                ) -> ::core::result::Result<::core::primitive::u128, ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[
+                            0u8, 116u8, 59u8, 164u8, 11u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+                            0u8, 0u8, 0u8,
+                        ][..],
+                    )?)
+                }
+                pub fn slot(
+                    &self,
+                ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[44u8, 1u8, 0u8, 0u8][..],
                     )?)
                 }
                 pub fn assigned_relayers_reward_ratio(
@@ -19263,6 +19967,340 @@ pub mod api {
             }
         }
     }
+    pub mod to_pangolin_parachain_backing {
+        use super::runtime_types;
+        pub mod calls {
+            use super::runtime_types;
+            type DispatchError = runtime_types::sp_runtime::DispatchError;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct lock_and_remote_issue {
+                pub spec_version: ::core::primitive::u32,
+                pub weight: ::core::primitive::u64,
+                #[codec(compact)]
+                pub value: ::core::primitive::u128,
+                #[codec(compact)]
+                pub fee: ::core::primitive::u128,
+                pub recipient: ::subxt::sp_core::crypto::AccountId32,
+            }
+            impl ::subxt::Call for lock_and_remote_issue {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const FUNCTION: &'static str = "lock_and_remote_issue";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct unlock_from_remote {
+                pub amount: ::core::primitive::u128,
+                pub recipient: ::subxt::sp_core::crypto::AccountId32,
+            }
+            impl ::subxt::Call for unlock_from_remote {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const FUNCTION: &'static str = "unlock_from_remote";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct set_secure_limited_period {
+                pub period: ::core::primitive::u32,
+            }
+            impl ::subxt::Call for set_secure_limited_period {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const FUNCTION: &'static str = "set_secure_limited_period";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct set_security_limitation_ring_amount {
+                pub limitation: ::core::primitive::u128,
+            }
+            impl ::subxt::Call for set_security_limitation_ring_amount {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const FUNCTION: &'static str = "set_security_limitation_ring_amount";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct set_remote_mapping_token_factory_account {
+                pub account: ::subxt::sp_core::crypto::AccountId32,
+            }
+            impl ::subxt::Call for set_remote_mapping_token_factory_account {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const FUNCTION: &'static str = "set_remote_mapping_token_factory_account";
+            }
+            pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
+                client: &'a ::subxt::Client<T>,
+                marker: ::core::marker::PhantomData<(X, A)>,
+            }
+            impl<'a, T, X, A> TransactionApi<'a, T, X, A>
+            where
+                T: ::subxt::Config,
+                X: ::subxt::SignedExtra<T>,
+                A: ::subxt::AccountData,
+            {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self {
+                        client,
+                        marker: ::core::marker::PhantomData,
+                    }
+                }
+                pub fn lock_and_remote_issue(
+                    &self,
+                    spec_version: ::core::primitive::u32,
+                    weight: ::core::primitive::u64,
+                    value: ::core::primitive::u128,
+                    fee: ::core::primitive::u128,
+                    recipient: ::subxt::sp_core::crypto::AccountId32,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, lock_and_remote_issue, DispatchError>
+                {
+                    let call = lock_and_remote_issue {
+                        spec_version,
+                        weight,
+                        value,
+                        fee,
+                        recipient,
+                    };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn unlock_from_remote(
+                    &self,
+                    amount: ::core::primitive::u128,
+                    recipient: ::subxt::sp_core::crypto::AccountId32,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, unlock_from_remote, DispatchError>
+                {
+                    let call = unlock_from_remote { amount, recipient };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn set_secure_limited_period(
+                    &self,
+                    period: ::core::primitive::u32,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    set_secure_limited_period,
+                    DispatchError,
+                > {
+                    let call = set_secure_limited_period { period };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn set_security_limitation_ring_amount(
+                    &self,
+                    limitation: ::core::primitive::u128,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    set_security_limitation_ring_amount,
+                    DispatchError,
+                > {
+                    let call = set_security_limitation_ring_amount { limitation };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn set_remote_mapping_token_factory_account(
+                    &self,
+                    account: ::subxt::sp_core::crypto::AccountId32,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    set_remote_mapping_token_factory_account,
+                    DispatchError,
+                > {
+                    let call = set_remote_mapping_token_factory_account { account };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+            }
+        }
+        pub type Event = runtime_types::to_parachain_backing::pallet::Event;
+        pub mod events {
+            use super::runtime_types;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct TokenLocked(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for TokenLocked {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const EVENT: &'static str = "TokenLocked";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct TokenUnlocked(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for TokenUnlocked {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const EVENT: &'static str = "TokenUnlocked";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct TokenLockedConfirmed(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+                pub ::core::primitive::bool,
+            );
+            impl ::subxt::Event for TokenLockedConfirmed {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const EVENT: &'static str = "TokenLockedConfirmed";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct RemoteMappingFactoryAddressUpdated(
+                pub ::subxt::sp_core::crypto::AccountId32,
+            );
+            impl ::subxt::Event for RemoteMappingFactoryAddressUpdated {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const EVENT: &'static str = "RemoteMappingFactoryAddressUpdated";
+            }
+        }
+        pub mod storage {
+            use super::runtime_types;
+            pub struct SecureLimitedPeriod;
+            impl ::subxt::StorageEntry for SecureLimitedPeriod {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const STORAGE: &'static str = "SecureLimitedPeriod";
+                type Value = ::core::primitive::u32;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct SecureLimitedRingAmount;
+            impl ::subxt::StorageEntry for SecureLimitedRingAmount {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const STORAGE: &'static str = "SecureLimitedRingAmount";
+                type Value = (::core::primitive::u128, ::core::primitive::u128);
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct TransactionInfos(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+            );
+            impl ::subxt::StorageEntry for TransactionInfos {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const STORAGE: &'static str = "TransactionInfos";
+                type Value = (
+                    ::subxt::sp_core::crypto::AccountId32,
+                    ::core::primitive::u128,
+                );
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
+                        &self.0,
+                        ::subxt::StorageHasher::Blake2_128Concat,
+                    )])
+                }
+            }
+            pub struct RemoteMappingTokenFactoryAccount;
+            impl ::subxt::StorageEntry for RemoteMappingTokenFactoryAccount {
+                const PALLET: &'static str = "ToPangolinParachainBacking";
+                const STORAGE: &'static str = "RemoteMappingTokenFactoryAccount";
+                type Value = ::subxt::sp_core::crypto::AccountId32;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct StorageApi<'a, T: ::subxt::Config> {
+                client: &'a ::subxt::Client<T>,
+            }
+            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self { client }
+                }
+                pub async fn secure_limited_period(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
+                {
+                    let entry = SecureLimitedPeriod;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn secure_limited_ring_amount(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    (::core::primitive::u128, ::core::primitive::u128),
+                    ::subxt::BasicError,
+                > {
+                    let entry = SecureLimitedRingAmount;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn transaction_infos(
+                    &self,
+                    _0: [::core::primitive::u8; 4usize],
+                    _1: ::core::primitive::u64,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    )>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = TransactionInfos(_0, _1);
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn transaction_infos_iter(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::subxt::KeyIter<'a, T, TransactionInfos>,
+                    ::subxt::BasicError,
+                > {
+                    self.client.storage().iter(hash).await
+                }
+                pub async fn remote_mapping_token_factory_account(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::subxt::sp_core::crypto::AccountId32,
+                    ::subxt::BasicError,
+                > {
+                    let entry = RemoteMappingTokenFactoryAccount;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+            }
+        }
+        pub mod constants {
+            use super::runtime_types;
+            pub struct ConstantsApi;
+            impl ConstantsApi {
+                pub fn pallet_id(
+                    &self,
+                ) -> ::core::result::Result<
+                    runtime_types::frame_support::PalletId,
+                    ::subxt::BasicError,
+                > {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[112u8, 108u8, 47u8, 115u8, 50u8, 115u8, 98u8, 97u8][..],
+                    )?)
+                }
+                pub fn max_lock_ring_amount_per_tx(
+                    &self,
+                ) -> ::core::result::Result<::core::primitive::u128, ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[
+                            0u8, 160u8, 114u8, 78u8, 24u8, 9u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+                            0u8, 0u8, 0u8,
+                        ][..],
+                    )?)
+                }
+            }
+        }
+    }
     pub mod runtime_types {
         use super::runtime_types;
         pub mod beefy_primitives {
@@ -19273,17 +20311,6 @@ pub mod api {
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
                 pub struct Public(pub runtime_types::sp_core::ecdsa::Public);
-            }
-            pub mod mmr {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct BeefyNextAuthoritySet<_0> {
-                    pub id: ::core::primitive::u64,
-                    pub len: ::core::primitive::u32,
-                    pub root: _0,
-                }
             }
         }
         pub mod bitvec {
@@ -19476,6 +20503,14 @@ pub mod api {
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
+                pub struct BalanceLock<_0> {
+                    pub id: [::core::primitive::u8; 8usize],
+                    pub amount: _0,
+                    pub reasons: runtime_types::darwinia_balances::pallet::Reasons,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
                 pub enum Call {
                     #[codec(index = 0)]
                     transfer {
@@ -19586,27 +20621,48 @@ pub mod api {
                         ::core::primitive::u128,
                     ),
                     #[codec(index = 4)]
-                    Deposit(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
-                    #[codec(index = 5)]
                     Reserved(
                         ::subxt::sp_core::crypto::AccountId32,
                         ::core::primitive::u128,
                     ),
-                    #[codec(index = 6)]
+                    #[codec(index = 5)]
                     Unreserved(
                         ::subxt::sp_core::crypto::AccountId32,
                         ::core::primitive::u128,
                     ),
-                    #[codec(index = 7)]
+                    #[codec(index = 6)]
                     ReserveRepatriated(
                         ::subxt::sp_core::crypto::AccountId32,
                         ::subxt::sp_core::crypto::AccountId32,
                         ::core::primitive::u128,
                         runtime_types::frame_support::traits::tokens::misc::BalanceStatus,
                     ),
+                    #[codec(index = 7)]
+                    Deposit(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 8)]
+                    Withdraw(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 9)]
+                    Slashed(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Reasons {
+                    #[codec(index = 0)]
+                    Fee,
+                    #[codec(index = 1)]
+                    Misc,
+                    #[codec(index = 2)]
+                    All,
                 }
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
@@ -19623,21 +20679,6 @@ pub mod api {
                 pub struct ReserveData<_0, _1> {
                     pub id: _0,
                     pub amount: _1,
-                }
-            }
-        }
-        pub mod darwinia_beefy_gadget {
-            use super::runtime_types;
-            pub mod pallet {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Call {
-                    #[codec(index = 0)]
-                    set_commitment_contract {
-                        commitment_contract: runtime_types::primitive_types::H160,
-                    },
                 }
             }
         }
@@ -19799,586 +20840,6 @@ pub mod api {
                 PendingRelayHeaderParcelRejected(::core::primitive::u64),
             }
         }
-        pub mod darwinia_claims {
-            use super::runtime_types;
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum Call {
-                #[codec(index = 0)]
-                claim {
-                    dest: ::subxt::sp_core::crypto::AccountId32,
-                    signature: runtime_types::darwinia_claims::OtherSignature,
-                },
-                #[codec(index = 1)]
-                mint_claim {
-                    who: runtime_types::darwinia_claims::OtherAddress,
-                    value: ::core::primitive::u128,
-                },
-                #[codec(index = 2)]
-                move_claim {
-                    old: runtime_types::darwinia_claims::OtherAddress,
-                    new: runtime_types::darwinia_claims::OtherAddress,
-                },
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct EcdsaSignature(pub [::core::primitive::u8; 65usize]);
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum Error {
-                #[codec(index = 0)]
-                InvalidSignature,
-                #[codec(index = 1)]
-                SignerHasNoClaim,
-                #[codec(index = 2)]
-                PotUnderflow,
-                #[codec(index = 3)]
-                MoveToExistedAddress,
-                #[codec(index = 4)]
-                NewAddressTypeMis,
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum OtherAddress {
-                #[codec(index = 0)]
-                Eth([::core::primitive::u8; 20usize]),
-                #[codec(index = 1)]
-                Tron([::core::primitive::u8; 20usize]),
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum OtherSignature {
-                #[codec(index = 0)]
-                Eth(runtime_types::darwinia_claims::EcdsaSignature),
-                #[codec(index = 1)]
-                Tron(runtime_types::darwinia_claims::EcdsaSignature),
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum RawEvent<_0, _1> {
-                #[codec(index = 0)]
-                Claimed(_0, [::core::primitive::u8; 20usize], _1),
-            }
-        }
-        pub mod darwinia_democracy {
-            use super::runtime_types;
-            pub mod conviction {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Conviction {
-                    #[codec(index = 0)]
-                    None,
-                    #[codec(index = 1)]
-                    Locked1x,
-                    #[codec(index = 2)]
-                    Locked2x,
-                    #[codec(index = 3)]
-                    Locked3x,
-                    #[codec(index = 4)]
-                    Locked4x,
-                    #[codec(index = 5)]
-                    Locked5x,
-                    #[codec(index = 6)]
-                    Locked6x,
-                }
-            }
-            pub mod pallet {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Call {
-                    #[codec(index = 0)]
-                    propose {
-                        proposal_hash: ::subxt::sp_core::H256,
-                        #[codec(compact)]
-                        value: ::core::primitive::u128,
-                    },
-                    #[codec(index = 1)]
-                    second {
-                        #[codec(compact)]
-                        proposal: ::core::primitive::u32,
-                        #[codec(compact)]
-                        seconds_upper_bound: ::core::primitive::u32,
-                    },
-                    #[codec(index = 2)]
-                    vote {
-                        #[codec(compact)]
-                        ref_index: ::core::primitive::u32,
-                        vote: runtime_types::darwinia_democracy::vote::AccountVote<
-                            ::core::primitive::u128,
-                        >,
-                    },
-                    #[codec(index = 3)]
-                    emergency_cancel { ref_index: ::core::primitive::u32 },
-                    #[codec(index = 4)]
-                    external_propose {
-                        proposal_hash: ::subxt::sp_core::H256,
-                    },
-                    #[codec(index = 5)]
-                    external_propose_majority {
-                        proposal_hash: ::subxt::sp_core::H256,
-                    },
-                    #[codec(index = 6)]
-                    external_propose_default {
-                        proposal_hash: ::subxt::sp_core::H256,
-                    },
-                    #[codec(index = 7)]
-                    fast_track {
-                        proposal_hash: ::subxt::sp_core::H256,
-                        voting_period: ::core::primitive::u32,
-                        delay: ::core::primitive::u32,
-                    },
-                    #[codec(index = 8)]
-                    veto_external {
-                        proposal_hash: ::subxt::sp_core::H256,
-                    },
-                    #[codec(index = 9)]
-                    cancel_referendum {
-                        #[codec(compact)]
-                        ref_index: ::core::primitive::u32,
-                    },
-                    #[codec(index = 10)]
-                    cancel_queued { which: ::core::primitive::u32 },
-                    #[codec(index = 11)]
-                    delegate {
-                        to: ::subxt::sp_core::crypto::AccountId32,
-                        conviction: runtime_types::darwinia_democracy::conviction::Conviction,
-                        balance: ::core::primitive::u128,
-                    },
-                    #[codec(index = 12)]
-                    undelegate,
-                    #[codec(index = 13)]
-                    clear_public_proposals,
-                    #[codec(index = 14)]
-                    note_preimage {
-                        encoded_proposal: ::std::vec::Vec<::core::primitive::u8>,
-                    },
-                    #[codec(index = 15)]
-                    note_preimage_operational {
-                        encoded_proposal: ::std::vec::Vec<::core::primitive::u8>,
-                    },
-                    #[codec(index = 16)]
-                    note_imminent_preimage {
-                        encoded_proposal: ::std::vec::Vec<::core::primitive::u8>,
-                    },
-                    #[codec(index = 17)]
-                    note_imminent_preimage_operational {
-                        encoded_proposal: ::std::vec::Vec<::core::primitive::u8>,
-                    },
-                    #[codec(index = 18)]
-                    reap_preimage {
-                        proposal_hash: ::subxt::sp_core::H256,
-                        #[codec(compact)]
-                        proposal_len_upper_bound: ::core::primitive::u32,
-                    },
-                    #[codec(index = 19)]
-                    unlock {
-                        target: ::subxt::sp_core::crypto::AccountId32,
-                    },
-                    #[codec(index = 20)]
-                    remove_vote { index: ::core::primitive::u32 },
-                    #[codec(index = 21)]
-                    remove_other_vote {
-                        target: ::subxt::sp_core::crypto::AccountId32,
-                        index: ::core::primitive::u32,
-                    },
-                    #[codec(index = 22)]
-                    enact_proposal {
-                        proposal_hash: ::subxt::sp_core::H256,
-                        index: ::core::primitive::u32,
-                    },
-                    #[codec(index = 23)]
-                    blacklist {
-                        proposal_hash: ::subxt::sp_core::H256,
-                        maybe_ref_index: ::core::option::Option<::core::primitive::u32>,
-                    },
-                    #[codec(index = 24)]
-                    cancel_proposal {
-                        #[codec(compact)]
-                        prop_index: ::core::primitive::u32,
-                    },
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Error {
-                    #[codec(index = 0)]
-                    ValueLow,
-                    #[codec(index = 1)]
-                    ProposalMissing,
-                    #[codec(index = 2)]
-                    AlreadyCanceled,
-                    #[codec(index = 3)]
-                    DuplicateProposal,
-                    #[codec(index = 4)]
-                    ProposalBlacklisted,
-                    #[codec(index = 5)]
-                    NotSimpleMajority,
-                    #[codec(index = 6)]
-                    InvalidHash,
-                    #[codec(index = 7)]
-                    NoProposal,
-                    #[codec(index = 8)]
-                    AlreadyVetoed,
-                    #[codec(index = 9)]
-                    DuplicatePreimage,
-                    #[codec(index = 10)]
-                    NotImminent,
-                    #[codec(index = 11)]
-                    TooEarly,
-                    #[codec(index = 12)]
-                    Imminent,
-                    #[codec(index = 13)]
-                    PreimageMissing,
-                    #[codec(index = 14)]
-                    ReferendumInvalid,
-                    #[codec(index = 15)]
-                    PreimageInvalid,
-                    #[codec(index = 16)]
-                    NoneWaiting,
-                    #[codec(index = 17)]
-                    NotVoter,
-                    #[codec(index = 18)]
-                    NoPermission,
-                    #[codec(index = 19)]
-                    AlreadyDelegating,
-                    #[codec(index = 20)]
-                    InsufficientFunds,
-                    #[codec(index = 21)]
-                    NotDelegating,
-                    #[codec(index = 22)]
-                    VotesExist,
-                    #[codec(index = 23)]
-                    InstantNotAllowed,
-                    #[codec(index = 24)]
-                    Nonsense,
-                    #[codec(index = 25)]
-                    WrongUpperBound,
-                    #[codec(index = 26)]
-                    MaxVotesReached,
-                    #[codec(index = 27)]
-                    TooManyProposals,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Event {
-                    #[codec(index = 0)]
-                    Proposed(::core::primitive::u32, ::core::primitive::u128),
-                    #[codec(index = 1)]
-                    Tabled(
-                        ::core::primitive::u32,
-                        ::core::primitive::u128,
-                        ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>,
-                    ),
-                    #[codec(index = 2)]
-                    ExternalTabled,
-                    #[codec(index = 3)]
-                    Started(
-                        ::core::primitive::u32,
-                        runtime_types::darwinia_democracy::vote_threshold::VoteThreshold,
-                    ),
-                    #[codec(index = 4)]
-                    Passed(::core::primitive::u32),
-                    #[codec(index = 5)]
-                    NotPassed(::core::primitive::u32),
-                    #[codec(index = 6)]
-                    Cancelled(::core::primitive::u32),
-                    #[codec(index = 7)]
-                    Executed(
-                        ::core::primitive::u32,
-                        ::core::result::Result<(), runtime_types::sp_runtime::DispatchError>,
-                    ),
-                    #[codec(index = 8)]
-                    Delegated(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::subxt::sp_core::crypto::AccountId32,
-                    ),
-                    #[codec(index = 9)]
-                    Undelegated(::subxt::sp_core::crypto::AccountId32),
-                    #[codec(index = 10)]
-                    Vetoed(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::subxt::sp_core::H256,
-                        ::core::primitive::u32,
-                    ),
-                    #[codec(index = 11)]
-                    PreimageNoted(
-                        ::subxt::sp_core::H256,
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
-                    #[codec(index = 12)]
-                    PreimageUsed(
-                        ::subxt::sp_core::H256,
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
-                    #[codec(index = 13)]
-                    PreimageInvalid(::subxt::sp_core::H256, ::core::primitive::u32),
-                    #[codec(index = 14)]
-                    PreimageMissing(::subxt::sp_core::H256, ::core::primitive::u32),
-                    #[codec(index = 15)]
-                    PreimageReaped(
-                        ::subxt::sp_core::H256,
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                        ::subxt::sp_core::crypto::AccountId32,
-                    ),
-                    #[codec(index = 16)]
-                    Blacklisted(::subxt::sp_core::H256),
-                }
-            }
-            pub mod types {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct Delegations<_0> {
-                    pub votes: _0,
-                    pub capital: _0,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum ReferendumInfo<_0, _1, _2> {
-                    #[codec(index = 0)]
-                    Ongoing(runtime_types::darwinia_democracy::types::ReferendumStatus<_0, _1, _2>),
-                    #[codec(index = 1)]
-                    Finished {
-                        approved: ::core::primitive::bool,
-                        end: _0,
-                    },
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct ReferendumStatus<_0, _1, _2> {
-                    pub end: _0,
-                    pub proposal_hash: _1,
-                    pub threshold: runtime_types::darwinia_democracy::vote_threshold::VoteThreshold,
-                    pub delay: _0,
-                    pub tally: runtime_types::darwinia_democracy::types::Tally<_2>,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct Tally<_0> {
-                    pub ayes: _0,
-                    pub nays: _0,
-                    pub turnout: _0,
-                }
-            }
-            pub mod vote {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum AccountVote<_0> {
-                    #[codec(index = 0)]
-                    Standard {
-                        vote: runtime_types::darwinia_democracy::vote::Vote,
-                        balance: _0,
-                    },
-                    #[codec(index = 1)]
-                    Split { aye: _0, nay: _0 },
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct PriorLock<_0, _1>(pub _0, pub _1);
-                #[derive(
-                    :: subxt :: codec :: Encode,
-                    :: subxt :: codec :: Decode,
-                    Debug,
-                    Clone,
-                    :: subxt :: codec :: CompactAs,
-                )]
-                pub struct Vote(pub ::core::primitive::u8);
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Voting<_0, _1, _2> {
-                    #[codec(index = 0)]
-                    Direct {
-                        votes: ::std::vec::Vec<(
-                            _2,
-                            runtime_types::darwinia_democracy::vote::AccountVote<_0>,
-                        )>,
-                        delegations: runtime_types::darwinia_democracy::types::Delegations<_0>,
-                        prior: runtime_types::darwinia_democracy::vote::PriorLock<_2, _0>,
-                    },
-                    #[codec(index = 1)]
-                    Delegating {
-                        balance: _0,
-                        target: _1,
-                        conviction: runtime_types::darwinia_democracy::conviction::Conviction,
-                        delegations: runtime_types::darwinia_democracy::types::Delegations<_0>,
-                        prior: runtime_types::darwinia_democracy::vote::PriorLock<_2, _0>,
-                    },
-                }
-            }
-            pub mod vote_threshold {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum VoteThreshold {
-                    #[codec(index = 0)]
-                    SuperMajorityApprove,
-                    #[codec(index = 1)]
-                    SuperMajorityAgainst,
-                    #[codec(index = 2)]
-                    SimpleMajority,
-                }
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum PreimageStatus<_0, _1, _2> {
-                #[codec(index = 0)]
-                Missing(_2),
-                #[codec(index = 1)]
-                Available {
-                    data: ::std::vec::Vec<::core::primitive::u8>,
-                    provider: _0,
-                    deposit: _1,
-                    since: _2,
-                    expiry: ::core::option::Option<_2>,
-                },
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum Releases {
-                #[codec(index = 0)]
-                V1,
-            }
-        }
-        pub mod darwinia_elections_phragmen {
-            use super::runtime_types;
-            pub mod pallet {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Call {
-                    #[codec(index = 0)]
-                    vote {
-                        votes: ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>,
-                        #[codec(compact)]
-                        value: ::core::primitive::u128,
-                    },
-                    #[codec(index = 1)]
-                    remove_voter,
-                    #[codec(index = 2)]
-                    submit_candidacy {
-                        #[codec(compact)]
-                        candidate_count: ::core::primitive::u32,
-                    },
-                    #[codec(index = 3)]
-                    renounce_candidacy {
-                        renouncing: runtime_types::darwinia_elections_phragmen::Renouncing,
-                    },
-                    #[codec(index = 4)]
-                    remove_member {
-                        who: ::subxt::sp_runtime::MultiAddress<
-                            ::subxt::sp_core::crypto::AccountId32,
-                            (),
-                        >,
-                        has_replacement: ::core::primitive::bool,
-                    },
-                    #[codec(index = 5)]
-                    clean_defunct_voters {
-                        num_voters: ::core::primitive::u32,
-                        num_defunct: ::core::primitive::u32,
-                    },
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Error {
-                    #[codec(index = 0)]
-                    UnableToVote,
-                    #[codec(index = 1)]
-                    NoVotes,
-                    #[codec(index = 2)]
-                    TooManyVotes,
-                    #[codec(index = 3)]
-                    MaximumVotesExceeded,
-                    #[codec(index = 4)]
-                    LowBalance,
-                    #[codec(index = 5)]
-                    UnableToPayBond,
-                    #[codec(index = 6)]
-                    MustBeVoter,
-                    #[codec(index = 7)]
-                    ReportSelf,
-                    #[codec(index = 8)]
-                    DuplicatedCandidate,
-                    #[codec(index = 9)]
-                    MemberSubmit,
-                    #[codec(index = 10)]
-                    RunnerUpSubmit,
-                    #[codec(index = 11)]
-                    InsufficientCandidateFunds,
-                    #[codec(index = 12)]
-                    NotMember,
-                    #[codec(index = 13)]
-                    InvalidWitnessData,
-                    #[codec(index = 14)]
-                    InvalidVoteCount,
-                    #[codec(index = 15)]
-                    InvalidRenouncing,
-                    #[codec(index = 16)]
-                    InvalidReplacement,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Event {
-                    #[codec(index = 0)]
-                    NewTerm(
-                        ::std::vec::Vec<(
-                            ::subxt::sp_core::crypto::AccountId32,
-                            ::core::primitive::u128,
-                        )>,
-                    ),
-                    #[codec(index = 1)]
-                    EmptyTerm,
-                    #[codec(index = 2)]
-                    ElectionError,
-                    #[codec(index = 3)]
-                    MemberKicked(::subxt::sp_core::crypto::AccountId32),
-                    #[codec(index = 4)]
-                    Renounced(::subxt::sp_core::crypto::AccountId32),
-                    #[codec(index = 5)]
-                    CandidateSlashed(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
-                    #[codec(index = 6)]
-                    SeatHolderSlashed(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
-                }
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum Renouncing {
-                #[codec(index = 0)]
-                Member,
-                #[codec(index = 1)]
-                RunnerUp,
-                #[codec(index = 2)]
-                Candidate(#[codec(compact)] ::core::primitive::u32),
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct SeatHolder<_0, _1> {
-                pub who: _0,
-                pub stake: _1,
-                pub deposit: _1,
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Voter<_0, _1> {
-                pub votes: ::std::vec::Vec<_0>,
-                pub stake: _1,
-                pub deposit: _1,
-            }
-        }
         pub mod darwinia_ethereum {
             use super::runtime_types;
             pub mod pallet {
@@ -20392,6 +20853,10 @@ pub mod api {
                         transaction: runtime_types::ethereum::transaction::TransactionV2,
                     },
                     #[codec(index = 1)]
+                    message_transact {
+                        transaction: runtime_types::ethereum::transaction::TransactionV2,
+                    },
+                    #[codec(index = 2)]
                     root_transact {
                         target: runtime_types::primitive_types::H160,
                         input: ::std::vec::Vec<::core::primitive::u8>,
@@ -20413,6 +20878,10 @@ pub mod api {
                     InternalTransactionFatalError,
                     #[codec(index = 5)]
                     ReadyOnlyCall,
+                    #[codec(index = 6)]
+                    MessageTransactionError,
+                    #[codec(index = 7)]
+                    MessageValidateError,
                 }
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
@@ -20544,132 +21013,6 @@ pub mod api {
                         runtime_types::primitive_types::H160,
                         runtime_types::primitive_types::U256,
                     ),
-                }
-            }
-        }
-        pub mod darwinia_fee_market {
-            use super::runtime_types;
-            pub mod pallet {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Call {
-                    #[codec(index = 0)]
-                    enroll_and_lock_collateral {
-                        lock_collateral: ::core::primitive::u128,
-                        relay_fee: ::core::option::Option<::core::primitive::u128>,
-                    },
-                    #[codec(index = 1)]
-                    update_locked_collateral {
-                        new_collateral: ::core::primitive::u128,
-                    },
-                    #[codec(index = 2)]
-                    update_relay_fee { new_fee: ::core::primitive::u128 },
-                    #[codec(index = 3)]
-                    cancel_enrollment,
-                    #[codec(index = 4)]
-                    set_slash_protect {
-                        slash_protect: ::core::primitive::u128,
-                    },
-                    #[codec(index = 5)]
-                    set_assigned_relayers_number { number: ::core::primitive::u32 },
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Error {
-                    #[codec(index = 0)]
-                    InsufficientBalance,
-                    #[codec(index = 1)]
-                    AlreadyEnrolled,
-                    #[codec(index = 2)]
-                    NotEnrolled,
-                    #[codec(index = 3)]
-                    StillHasOrdersNotConfirmed,
-                    #[codec(index = 4)]
-                    RelayFeeTooLow,
-                    #[codec(index = 5)]
-                    OccupiedRelayer,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Event {
-                    #[codec(index = 0)]
-                    Enroll(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                        ::core::primitive::u128,
-                    ),
-                    #[codec(index = 1)]
-                    UpdateLockedCollateral(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
-                    #[codec(index = 2)]
-                    UpdateRelayFee(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
-                    #[codec(index = 3)]
-                    CancelEnrollment(::subxt::sp_core::crypto::AccountId32),
-                    #[codec(index = 4)]
-                    UpdateCollateralSlashProtect(::core::primitive::u128),
-                    #[codec(index = 5)]
-                    UpdateAssignedRelayersNumber(::core::primitive::u32),
-                    #[codec(index = 6)]
-                    FeeMarketSlash(
-                        runtime_types::darwinia_fee_market::types::SlashReport<
-                            ::subxt::sp_core::crypto::AccountId32,
-                            ::core::primitive::u32,
-                            ::core::primitive::u128,
-                        >,
-                    ),
-                }
-            }
-            pub mod types {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct Order<_0, _1, _2> {
-                    pub lane: [::core::primitive::u8; 4usize],
-                    pub message: ::core::primitive::u64,
-                    pub sent_time: _1,
-                    pub confirm_time: ::core::option::Option<_1>,
-                    pub locked_collateral: _2,
-                    pub relayers: ::std::vec::Vec<
-                        runtime_types::darwinia_fee_market::types::PriorRelayer<_0, _1, _2>,
-                    >,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct PriorRelayer<_0, _1, _2> {
-                    pub id: _0,
-                    pub fee: _2,
-                    pub valid_range: ::core::ops::Range<_1>,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct Relayer<_0, _1> {
-                    pub id: _0,
-                    pub collateral: _1,
-                    pub fee: _1,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct SlashReport<_0, _1, _2> {
-                    pub lane: [::core::primitive::u8; 4usize],
-                    pub message: ::core::primitive::u64,
-                    pub sent_time: _1,
-                    pub confirm_time: ::core::option::Option<_1>,
-                    pub delay_time: ::core::option::Option<_1>,
-                    pub account_id: _0,
-                    pub amount: _2,
                 }
             }
         }
@@ -20900,14 +21243,18 @@ pub mod api {
                         >,
                     },
                     #[codec(index = 4)]
-                    claim_mature_deposits,
+                    withdraw_unbonded {
+                        num_slashing_spans: ::core::primitive::u32,
+                    },
                     #[codec(index = 5)]
-                    try_claim_deposits_with_punish { expire_time: ::core::primitive::u64 },
+                    claim_mature_deposits,
                     #[codec(index = 6)]
+                    try_claim_deposits_with_punish { expire_time: ::core::primitive::u64 },
+                    #[codec(index = 7)]
                     validate {
                         prefs: runtime_types::darwinia_staking::structs::ValidatorPrefs,
                     },
-                    #[codec(index = 7)]
+                    #[codec(index = 8)]
                     nominate {
                         targets: ::std::vec::Vec<
                             ::subxt::sp_runtime::MultiAddress<
@@ -20916,80 +21263,80 @@ pub mod api {
                             >,
                         >,
                     },
-                    #[codec(index = 8)]
-                    chill,
                     #[codec(index = 9)]
+                    chill,
+                    #[codec(index = 10)]
                     set_payee {
                         payee: runtime_types::darwinia_staking::structs::RewardDestination<
                             ::subxt::sp_core::crypto::AccountId32,
                         >,
                     },
-                    #[codec(index = 10)]
+                    #[codec(index = 11)]
                     set_controller {
                         controller: ::subxt::sp_runtime::MultiAddress<
                             ::subxt::sp_core::crypto::AccountId32,
                             (),
                         >,
                     },
-                    #[codec(index = 11)]
+                    #[codec(index = 12)]
                     set_validator_count {
                         #[codec(compact)]
                         new: ::core::primitive::u32,
                     },
-                    #[codec(index = 12)]
+                    #[codec(index = 13)]
                     increase_validator_count {
                         #[codec(compact)]
                         additional: ::core::primitive::u32,
                     },
-                    #[codec(index = 13)]
+                    #[codec(index = 14)]
                     scale_validator_count {
                         factor: runtime_types::sp_arithmetic::per_things::Percent,
                     },
-                    #[codec(index = 14)]
-                    force_no_eras,
                     #[codec(index = 15)]
-                    force_new_era,
+                    force_no_eras,
                     #[codec(index = 16)]
+                    force_new_era,
+                    #[codec(index = 17)]
                     set_invulnerables {
                         invulnerables: ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>,
                     },
-                    #[codec(index = 17)]
+                    #[codec(index = 18)]
                     force_unstake {
                         stash: ::subxt::sp_core::crypto::AccountId32,
                         num_slashing_spans: ::core::primitive::u32,
                     },
-                    #[codec(index = 18)]
-                    force_new_era_always,
                     #[codec(index = 19)]
+                    force_new_era_always,
+                    #[codec(index = 20)]
                     cancel_deferred_slash {
                         era: ::core::primitive::u32,
                         slash_indices: ::std::vec::Vec<::core::primitive::u32>,
                     },
-                    #[codec(index = 20)]
+                    #[codec(index = 21)]
                     payout_stakers {
                         validator_stash: ::subxt::sp_core::crypto::AccountId32,
                         era: ::core::primitive::u32,
                     },
-                    #[codec(index = 21)]
+                    #[codec(index = 22)]
                     rebond {
                         #[codec(compact)]
                         plan_to_rebond_ring: ::core::primitive::u128,
                         #[codec(compact)]
                         plan_to_rebond_kton: ::core::primitive::u128,
                     },
-                    #[codec(index = 22)]
+                    #[codec(index = 23)]
                     set_history_depth {
                         #[codec(compact)]
                         new_history_depth: ::core::primitive::u32,
                         #[codec(compact)]
                         era_items_deleted: ::core::primitive::u32,
                     },
-                    #[codec(index = 23)]
+                    #[codec(index = 24)]
                     reap_stash {
                         stash: ::subxt::sp_core::crypto::AccountId32,
                         num_slashing_spans: ::core::primitive::u32,
                     },
-                    #[codec(index = 24)]
+                    #[codec(index = 25)]
                     kick {
                         who: ::std::vec::Vec<
                             ::subxt::sp_runtime::MultiAddress<
@@ -20998,7 +21345,7 @@ pub mod api {
                             >,
                         >,
                     },
-                    #[codec(index = 25)]
+                    #[codec(index = 26)]
                     set_staking_limits {
                         min_nominator_bond: ::core::primitive::u128,
                         min_validator_bond: ::core::primitive::u128,
@@ -21008,7 +21355,7 @@ pub mod api {
                             runtime_types::sp_arithmetic::per_things::Percent,
                         >,
                     },
-                    #[codec(index = 26)]
+                    #[codec(index = 27)]
                     chill_other {
                         controller: ::subxt::sp_core::crypto::AccountId32,
                     },
@@ -21341,34 +21688,6 @@ pub mod api {
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
-                pub struct BalanceLock<_0, _1> {
-                    pub id: [::core::primitive::u8; 8usize],
-                    pub lock_for: runtime_types::darwinia_support::structs::LockFor<_0, _1>,
-                    pub lock_reasons: runtime_types::darwinia_support::structs::LockReasons,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum LockFor<_0, _1> {
-                    #[codec(index = 0)]
-                    Common { amount: _0 },
-                    #[codec(index = 1)]
-                    Staking(runtime_types::darwinia_support::structs::StakingLock<_0, _1>),
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum LockReasons {
-                    #[codec(index = 0)]
-                    Fee,
-                    #[codec(index = 1)]
-                    Misc,
-                    #[codec(index = 2)]
-                    All,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
                 pub struct StakingLock<_0, _1> {
                     pub staking_amount: _0,
                     pub unbondings:
@@ -21383,102 +21702,6 @@ pub mod api {
                     pub amount: _0,
                     pub until: _1,
                 }
-            }
-        }
-        pub mod darwinia_vesting {
-            use super::runtime_types;
-            pub mod pallet {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Call {
-                    #[codec(index = 0)]
-                    vest,
-                    #[codec(index = 1)]
-                    vest_other {
-                        target: ::subxt::sp_runtime::MultiAddress<
-                            ::subxt::sp_core::crypto::AccountId32,
-                            (),
-                        >,
-                    },
-                    #[codec(index = 2)]
-                    vested_transfer {
-                        target: ::subxt::sp_runtime::MultiAddress<
-                            ::subxt::sp_core::crypto::AccountId32,
-                            (),
-                        >,
-                        schedule: runtime_types::darwinia_vesting::vesting_info::VestingInfo<
-                            ::core::primitive::u128,
-                            ::core::primitive::u32,
-                        >,
-                    },
-                    #[codec(index = 3)]
-                    force_vested_transfer {
-                        source: ::subxt::sp_runtime::MultiAddress<
-                            ::subxt::sp_core::crypto::AccountId32,
-                            (),
-                        >,
-                        target: ::subxt::sp_runtime::MultiAddress<
-                            ::subxt::sp_core::crypto::AccountId32,
-                            (),
-                        >,
-                        schedule: runtime_types::darwinia_vesting::vesting_info::VestingInfo<
-                            ::core::primitive::u128,
-                            ::core::primitive::u32,
-                        >,
-                    },
-                    #[codec(index = 4)]
-                    merge_schedules {
-                        schedule1_index: ::core::primitive::u32,
-                        schedule2_index: ::core::primitive::u32,
-                    },
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Error {
-                    #[codec(index = 0)]
-                    NotVesting,
-                    #[codec(index = 1)]
-                    AtMaxVestingSchedules,
-                    #[codec(index = 2)]
-                    AmountLow,
-                    #[codec(index = 3)]
-                    ScheduleIndexOutOfBounds,
-                    #[codec(index = 4)]
-                    InvalidScheduleParams,
-                }
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub enum Event {
-                    #[codec(index = 0)]
-                    VestingUpdated(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
-                    #[codec(index = 1)]
-                    VestingCompleted(::subxt::sp_core::crypto::AccountId32),
-                }
-            }
-            pub mod vesting_info {
-                use super::runtime_types;
-                #[derive(
-                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                )]
-                pub struct VestingInfo<_0, _1> {
-                    pub locked: _0,
-                    pub per_block: _0,
-                    pub starting_block: _1,
-                }
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum Releases {
-                #[codec(index = 0)]
-                V0,
-                #[codec(index = 1)]
-                V1,
             }
         }
         pub mod dp_asset {
@@ -22403,6 +22626,8 @@ pub mod api {
                     InvalidIssueEncoding,
                     #[codec(index = 5)]
                     InvalidAddressLen,
+                    #[codec(index = 6)]
+                    InvalidMessageSender,
                 }
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
@@ -22792,9 +23017,10 @@ pub mod api {
                         ([::core::primitive::u8; 4usize], ::core::primitive::u64),
                     ),
                     #[codec(index = 5)]
-                    MessageCallRejected(
+                    MessageCallValidateFailed(
                         [::core::primitive::u8; 4usize],
                         ([::core::primitive::u8; 4usize], ::core::primitive::u64),
+                        runtime_types::sp_runtime::transaction_validity::TransactionValidityError,
                     ),
                     #[codec(index = 6)]
                     MessageDispatchPaymentFailed(
@@ -22891,7 +23117,7 @@ pub mod api {
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
                 pub enum Call {
-                    # [codec (index = 0)] set_owner { new_owner : :: core :: option :: Option < :: subxt :: sp_core :: crypto :: AccountId32 > , } , # [codec (index = 1)] set_operating_mode { operating_mode : runtime_types :: bp_messages :: OperatingMode , } , # [codec (index = 2)] update_pallet_parameter { parameter : runtime_types :: pangolin_runtime :: bridges :: substrate :: pangoro_messages :: PangolinToPangoroMessagesParameter , } , # [codec (index = 3)] send_message { lane_id : [:: core :: primitive :: u8 ; 4usize] , payload : runtime_types :: bp_message_dispatch :: MessagePayload < :: subxt :: sp_core :: crypto :: AccountId32 , runtime_types :: sp_runtime :: MultiSigner , runtime_types :: sp_runtime :: MultiSignature , :: std :: vec :: Vec < :: core :: primitive :: u8 > > , delivery_and_dispatch_fee : :: core :: primitive :: u128 , } , # [codec (index = 4)] increase_message_fee { lane_id : [:: core :: primitive :: u8 ; 4usize] , nonce : :: core :: primitive :: u64 , additional_fee : :: core :: primitive :: u128 , } , # [codec (index = 5)] receive_messages_proof { relayer_id_at_bridged_chain : :: subxt :: sp_core :: crypto :: AccountId32 , proof : runtime_types :: bridge_runtime_common :: messages :: target :: FromBridgedChainMessagesProof < :: subxt :: sp_core :: H256 > , messages_count : :: core :: primitive :: u32 , dispatch_weight : :: core :: primitive :: u64 , } , # [codec (index = 6)] receive_messages_delivery_proof { proof : runtime_types :: bridge_runtime_common :: messages :: source :: FromBridgedChainMessagesDeliveryProof < :: subxt :: sp_core :: H256 > , relayers_state : runtime_types :: bp_messages :: UnrewardedRelayersState , } , }
+                    # [codec (index = 0)] set_owner { new_owner : :: core :: option :: Option < :: subxt :: sp_core :: crypto :: AccountId32 > , } , # [codec (index = 1)] set_operating_mode { operating_mode : runtime_types :: bp_messages :: OperatingMode , } , # [codec (index = 2)] update_pallet_parameter { parameter : runtime_types :: pangolin_runtime :: bridges_message :: pangolin_parachain :: PangolinToPangolinParachainParameter , } , # [codec (index = 3)] send_message { lane_id : [:: core :: primitive :: u8 ; 4usize] , payload : runtime_types :: bp_message_dispatch :: MessagePayload < :: subxt :: sp_core :: crypto :: AccountId32 , runtime_types :: sp_runtime :: MultiSigner , runtime_types :: sp_runtime :: MultiSignature , :: std :: vec :: Vec < :: core :: primitive :: u8 > > , delivery_and_dispatch_fee : :: core :: primitive :: u128 , } , # [codec (index = 4)] increase_message_fee { lane_id : [:: core :: primitive :: u8 ; 4usize] , nonce : :: core :: primitive :: u64 , additional_fee : :: core :: primitive :: u128 , } , # [codec (index = 5)] receive_messages_proof { relayer_id_at_bridged_chain : :: subxt :: sp_core :: crypto :: AccountId32 , proof : runtime_types :: bridge_runtime_common :: messages :: target :: FromBridgedChainMessagesProof < :: subxt :: sp_core :: H256 > , messages_count : :: core :: primitive :: u32 , dispatch_weight : :: core :: primitive :: u64 , } , # [codec (index = 6)] receive_messages_delivery_proof { proof : runtime_types :: bridge_runtime_common :: messages :: source :: FromBridgedChainMessagesDeliveryProof < :: subxt :: sp_core :: H256 > , relayers_state : runtime_types :: bp_messages :: UnrewardedRelayersState , } , }
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
@@ -22925,7 +23151,7 @@ pub mod api {
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
                 pub enum Event {
-                    # [codec (index = 0)] ParameterUpdated (runtime_types :: pangolin_runtime :: bridges :: substrate :: pangoro_messages :: PangolinToPangoroMessagesParameter ,) , # [codec (index = 1)] MessageAccepted ([:: core :: primitive :: u8 ; 4usize] , :: core :: primitive :: u64 ,) , # [codec (index = 2)] MessagesDelivered ([:: core :: primitive :: u8 ; 4usize] , runtime_types :: bp_messages :: DeliveredMessages ,) , }
+                    # [codec (index = 0)] ParameterUpdated (runtime_types :: pangolin_runtime :: bridges_message :: pangolin_parachain :: PangolinToPangolinParachainParameter ,) , # [codec (index = 1)] MessageAccepted ([:: core :: primitive :: u8 ; 4usize] , :: core :: primitive :: u64 ,) , # [codec (index = 2)] MessagesDelivered ([:: core :: primitive :: u8 ; 4usize] , runtime_types :: bp_messages :: DeliveredMessages ,) , }
             }
         }
         pub mod pallet_bridge_parachains {
@@ -23102,6 +23328,400 @@ pub mod api {
                 pub end: _1,
             }
         }
+        pub mod pallet_democracy {
+            use super::runtime_types;
+            pub mod conviction {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Conviction {
+                    #[codec(index = 0)]
+                    None,
+                    #[codec(index = 1)]
+                    Locked1x,
+                    #[codec(index = 2)]
+                    Locked2x,
+                    #[codec(index = 3)]
+                    Locked3x,
+                    #[codec(index = 4)]
+                    Locked4x,
+                    #[codec(index = 5)]
+                    Locked5x,
+                    #[codec(index = 6)]
+                    Locked6x,
+                }
+            }
+            pub mod pallet {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Call {
+                    #[codec(index = 0)]
+                    propose {
+                        proposal_hash: ::subxt::sp_core::H256,
+                        #[codec(compact)]
+                        value: ::core::primitive::u128,
+                    },
+                    #[codec(index = 1)]
+                    second {
+                        #[codec(compact)]
+                        proposal: ::core::primitive::u32,
+                        #[codec(compact)]
+                        seconds_upper_bound: ::core::primitive::u32,
+                    },
+                    #[codec(index = 2)]
+                    vote {
+                        #[codec(compact)]
+                        ref_index: ::core::primitive::u32,
+                        vote: runtime_types::pallet_democracy::vote::AccountVote<
+                            ::core::primitive::u128,
+                        >,
+                    },
+                    #[codec(index = 3)]
+                    emergency_cancel { ref_index: ::core::primitive::u32 },
+                    #[codec(index = 4)]
+                    external_propose {
+                        proposal_hash: ::subxt::sp_core::H256,
+                    },
+                    #[codec(index = 5)]
+                    external_propose_majority {
+                        proposal_hash: ::subxt::sp_core::H256,
+                    },
+                    #[codec(index = 6)]
+                    external_propose_default {
+                        proposal_hash: ::subxt::sp_core::H256,
+                    },
+                    #[codec(index = 7)]
+                    fast_track {
+                        proposal_hash: ::subxt::sp_core::H256,
+                        voting_period: ::core::primitive::u32,
+                        delay: ::core::primitive::u32,
+                    },
+                    #[codec(index = 8)]
+                    veto_external {
+                        proposal_hash: ::subxt::sp_core::H256,
+                    },
+                    #[codec(index = 9)]
+                    cancel_referendum {
+                        #[codec(compact)]
+                        ref_index: ::core::primitive::u32,
+                    },
+                    #[codec(index = 10)]
+                    cancel_queued { which: ::core::primitive::u32 },
+                    #[codec(index = 11)]
+                    delegate {
+                        to: ::subxt::sp_core::crypto::AccountId32,
+                        conviction: runtime_types::pallet_democracy::conviction::Conviction,
+                        balance: ::core::primitive::u128,
+                    },
+                    #[codec(index = 12)]
+                    undelegate,
+                    #[codec(index = 13)]
+                    clear_public_proposals,
+                    #[codec(index = 14)]
+                    note_preimage {
+                        encoded_proposal: ::std::vec::Vec<::core::primitive::u8>,
+                    },
+                    #[codec(index = 15)]
+                    note_preimage_operational {
+                        encoded_proposal: ::std::vec::Vec<::core::primitive::u8>,
+                    },
+                    #[codec(index = 16)]
+                    note_imminent_preimage {
+                        encoded_proposal: ::std::vec::Vec<::core::primitive::u8>,
+                    },
+                    #[codec(index = 17)]
+                    note_imminent_preimage_operational {
+                        encoded_proposal: ::std::vec::Vec<::core::primitive::u8>,
+                    },
+                    #[codec(index = 18)]
+                    reap_preimage {
+                        proposal_hash: ::subxt::sp_core::H256,
+                        #[codec(compact)]
+                        proposal_len_upper_bound: ::core::primitive::u32,
+                    },
+                    #[codec(index = 19)]
+                    unlock {
+                        target: ::subxt::sp_core::crypto::AccountId32,
+                    },
+                    #[codec(index = 20)]
+                    remove_vote { index: ::core::primitive::u32 },
+                    #[codec(index = 21)]
+                    remove_other_vote {
+                        target: ::subxt::sp_core::crypto::AccountId32,
+                        index: ::core::primitive::u32,
+                    },
+                    #[codec(index = 22)]
+                    enact_proposal {
+                        proposal_hash: ::subxt::sp_core::H256,
+                        index: ::core::primitive::u32,
+                    },
+                    #[codec(index = 23)]
+                    blacklist {
+                        proposal_hash: ::subxt::sp_core::H256,
+                        maybe_ref_index: ::core::option::Option<::core::primitive::u32>,
+                    },
+                    #[codec(index = 24)]
+                    cancel_proposal {
+                        #[codec(compact)]
+                        prop_index: ::core::primitive::u32,
+                    },
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Error {
+                    #[codec(index = 0)]
+                    ValueLow,
+                    #[codec(index = 1)]
+                    ProposalMissing,
+                    #[codec(index = 2)]
+                    AlreadyCanceled,
+                    #[codec(index = 3)]
+                    DuplicateProposal,
+                    #[codec(index = 4)]
+                    ProposalBlacklisted,
+                    #[codec(index = 5)]
+                    NotSimpleMajority,
+                    #[codec(index = 6)]
+                    InvalidHash,
+                    #[codec(index = 7)]
+                    NoProposal,
+                    #[codec(index = 8)]
+                    AlreadyVetoed,
+                    #[codec(index = 9)]
+                    DuplicatePreimage,
+                    #[codec(index = 10)]
+                    NotImminent,
+                    #[codec(index = 11)]
+                    TooEarly,
+                    #[codec(index = 12)]
+                    Imminent,
+                    #[codec(index = 13)]
+                    PreimageMissing,
+                    #[codec(index = 14)]
+                    ReferendumInvalid,
+                    #[codec(index = 15)]
+                    PreimageInvalid,
+                    #[codec(index = 16)]
+                    NoneWaiting,
+                    #[codec(index = 17)]
+                    NotVoter,
+                    #[codec(index = 18)]
+                    NoPermission,
+                    #[codec(index = 19)]
+                    AlreadyDelegating,
+                    #[codec(index = 20)]
+                    InsufficientFunds,
+                    #[codec(index = 21)]
+                    NotDelegating,
+                    #[codec(index = 22)]
+                    VotesExist,
+                    #[codec(index = 23)]
+                    InstantNotAllowed,
+                    #[codec(index = 24)]
+                    Nonsense,
+                    #[codec(index = 25)]
+                    WrongUpperBound,
+                    #[codec(index = 26)]
+                    MaxVotesReached,
+                    #[codec(index = 27)]
+                    TooManyProposals,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Event {
+                    #[codec(index = 0)]
+                    Proposed(::core::primitive::u32, ::core::primitive::u128),
+                    #[codec(index = 1)]
+                    Tabled(
+                        ::core::primitive::u32,
+                        ::core::primitive::u128,
+                        ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>,
+                    ),
+                    #[codec(index = 2)]
+                    ExternalTabled,
+                    #[codec(index = 3)]
+                    Started(
+                        ::core::primitive::u32,
+                        runtime_types::pallet_democracy::vote_threshold::VoteThreshold,
+                    ),
+                    #[codec(index = 4)]
+                    Passed(::core::primitive::u32),
+                    #[codec(index = 5)]
+                    NotPassed(::core::primitive::u32),
+                    #[codec(index = 6)]
+                    Cancelled(::core::primitive::u32),
+                    #[codec(index = 7)]
+                    Executed(
+                        ::core::primitive::u32,
+                        ::core::result::Result<(), runtime_types::sp_runtime::DispatchError>,
+                    ),
+                    #[codec(index = 8)]
+                    Delegated(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::subxt::sp_core::crypto::AccountId32,
+                    ),
+                    #[codec(index = 9)]
+                    Undelegated(::subxt::sp_core::crypto::AccountId32),
+                    #[codec(index = 10)]
+                    Vetoed(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::subxt::sp_core::H256,
+                        ::core::primitive::u32,
+                    ),
+                    #[codec(index = 11)]
+                    PreimageNoted(
+                        ::subxt::sp_core::H256,
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 12)]
+                    PreimageUsed(
+                        ::subxt::sp_core::H256,
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 13)]
+                    PreimageInvalid(::subxt::sp_core::H256, ::core::primitive::u32),
+                    #[codec(index = 14)]
+                    PreimageMissing(::subxt::sp_core::H256, ::core::primitive::u32),
+                    #[codec(index = 15)]
+                    PreimageReaped(
+                        ::subxt::sp_core::H256,
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                        ::subxt::sp_core::crypto::AccountId32,
+                    ),
+                    #[codec(index = 16)]
+                    Blacklisted(::subxt::sp_core::H256),
+                }
+            }
+            pub mod types {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct Delegations<_0> {
+                    pub votes: _0,
+                    pub capital: _0,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum ReferendumInfo<_0, _1, _2> {
+                    #[codec(index = 0)]
+                    Ongoing(runtime_types::pallet_democracy::types::ReferendumStatus<_0, _1, _2>),
+                    #[codec(index = 1)]
+                    Finished {
+                        approved: ::core::primitive::bool,
+                        end: _0,
+                    },
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct ReferendumStatus<_0, _1, _2> {
+                    pub end: _0,
+                    pub proposal_hash: _1,
+                    pub threshold: runtime_types::pallet_democracy::vote_threshold::VoteThreshold,
+                    pub delay: _0,
+                    pub tally: runtime_types::pallet_democracy::types::Tally<_2>,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct Tally<_0> {
+                    pub ayes: _0,
+                    pub nays: _0,
+                    pub turnout: _0,
+                }
+            }
+            pub mod vote {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum AccountVote<_0> {
+                    #[codec(index = 0)]
+                    Standard {
+                        vote: runtime_types::pallet_democracy::vote::Vote,
+                        balance: _0,
+                    },
+                    #[codec(index = 1)]
+                    Split { aye: _0, nay: _0 },
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct PriorLock<_0, _1>(pub _0, pub _1);
+                #[derive(
+                    :: subxt :: codec :: Encode,
+                    :: subxt :: codec :: Decode,
+                    Debug,
+                    Clone,
+                    :: subxt :: codec :: CompactAs,
+                )]
+                pub struct Vote(pub ::core::primitive::u8);
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Voting<_0, _1, _2> {
+                    #[codec(index = 0)]
+                    Direct {
+                        votes: ::std::vec::Vec<(
+                            _2,
+                            runtime_types::pallet_democracy::vote::AccountVote<_0>,
+                        )>,
+                        delegations: runtime_types::pallet_democracy::types::Delegations<_0>,
+                        prior: runtime_types::pallet_democracy::vote::PriorLock<_2, _0>,
+                    },
+                    #[codec(index = 1)]
+                    Delegating {
+                        balance: _0,
+                        target: _1,
+                        conviction: runtime_types::pallet_democracy::conviction::Conviction,
+                        delegations: runtime_types::pallet_democracy::types::Delegations<_0>,
+                        prior: runtime_types::pallet_democracy::vote::PriorLock<_2, _0>,
+                    },
+                }
+            }
+            pub mod vote_threshold {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum VoteThreshold {
+                    #[codec(index = 0)]
+                    SuperMajorityApprove,
+                    #[codec(index = 1)]
+                    SuperMajorityAgainst,
+                    #[codec(index = 2)]
+                    SimpleMajority,
+                }
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub enum PreimageStatus<_0, _1, _2> {
+                #[codec(index = 0)]
+                Missing(_2),
+                #[codec(index = 1)]
+                Available {
+                    data: ::std::vec::Vec<::core::primitive::u8>,
+                    provider: _0,
+                    deposit: _1,
+                    since: _2,
+                    expiry: ::core::option::Option<_2>,
+                },
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub enum Releases {
+                #[codec(index = 0)]
+                V1,
+            }
+        }
         pub mod pallet_election_provider_multi_phase {
             use super::runtime_types;
             pub mod pallet {
@@ -23229,6 +23849,297 @@ pub mod api {
                 pub voters: ::core::primitive::u32,
                 #[codec(compact)]
                 pub targets: ::core::primitive::u32,
+            }
+        }
+        pub mod pallet_elections_phragmen {
+            use super::runtime_types;
+            pub mod pallet {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Call {
+                    #[codec(index = 0)]
+                    vote {
+                        votes: ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>,
+                        #[codec(compact)]
+                        value: ::core::primitive::u128,
+                    },
+                    #[codec(index = 1)]
+                    remove_voter,
+                    #[codec(index = 2)]
+                    submit_candidacy {
+                        #[codec(compact)]
+                        candidate_count: ::core::primitive::u32,
+                    },
+                    #[codec(index = 3)]
+                    renounce_candidacy {
+                        renouncing: runtime_types::pallet_elections_phragmen::Renouncing,
+                    },
+                    #[codec(index = 4)]
+                    remove_member {
+                        who: ::subxt::sp_runtime::MultiAddress<
+                            ::subxt::sp_core::crypto::AccountId32,
+                            (),
+                        >,
+                        has_replacement: ::core::primitive::bool,
+                    },
+                    #[codec(index = 5)]
+                    clean_defunct_voters {
+                        num_voters: ::core::primitive::u32,
+                        num_defunct: ::core::primitive::u32,
+                    },
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Error {
+                    #[codec(index = 0)]
+                    UnableToVote,
+                    #[codec(index = 1)]
+                    NoVotes,
+                    #[codec(index = 2)]
+                    TooManyVotes,
+                    #[codec(index = 3)]
+                    MaximumVotesExceeded,
+                    #[codec(index = 4)]
+                    LowBalance,
+                    #[codec(index = 5)]
+                    UnableToPayBond,
+                    #[codec(index = 6)]
+                    MustBeVoter,
+                    #[codec(index = 7)]
+                    ReportSelf,
+                    #[codec(index = 8)]
+                    DuplicatedCandidate,
+                    #[codec(index = 9)]
+                    MemberSubmit,
+                    #[codec(index = 10)]
+                    RunnerUpSubmit,
+                    #[codec(index = 11)]
+                    InsufficientCandidateFunds,
+                    #[codec(index = 12)]
+                    NotMember,
+                    #[codec(index = 13)]
+                    InvalidWitnessData,
+                    #[codec(index = 14)]
+                    InvalidVoteCount,
+                    #[codec(index = 15)]
+                    InvalidRenouncing,
+                    #[codec(index = 16)]
+                    InvalidReplacement,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Event {
+                    #[codec(index = 0)]
+                    NewTerm(
+                        ::std::vec::Vec<(
+                            ::subxt::sp_core::crypto::AccountId32,
+                            ::core::primitive::u128,
+                        )>,
+                    ),
+                    #[codec(index = 1)]
+                    EmptyTerm,
+                    #[codec(index = 2)]
+                    ElectionError,
+                    #[codec(index = 3)]
+                    MemberKicked(::subxt::sp_core::crypto::AccountId32),
+                    #[codec(index = 4)]
+                    Renounced(::subxt::sp_core::crypto::AccountId32),
+                    #[codec(index = 5)]
+                    CandidateSlashed(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 6)]
+                    SeatHolderSlashed(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                }
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub enum Renouncing {
+                #[codec(index = 0)]
+                Member,
+                #[codec(index = 1)]
+                RunnerUp,
+                #[codec(index = 2)]
+                Candidate(#[codec(compact)] ::core::primitive::u32),
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct SeatHolder<_0, _1> {
+                pub who: _0,
+                pub stake: _1,
+                pub deposit: _1,
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Voter<_0, _1> {
+                pub votes: ::std::vec::Vec<_0>,
+                pub stake: _1,
+                pub deposit: _1,
+            }
+        }
+        pub mod pallet_fee_market {
+            use super::runtime_types;
+            pub mod pallet {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Call {
+                    #[codec(index = 0)]
+                    enroll_and_lock_collateral {
+                        lock_collateral: ::core::primitive::u128,
+                        relay_fee: ::core::option::Option<::core::primitive::u128>,
+                    },
+                    #[codec(index = 1)]
+                    update_locked_collateral {
+                        new_collateral: ::core::primitive::u128,
+                    },
+                    #[codec(index = 2)]
+                    update_relay_fee { new_fee: ::core::primitive::u128 },
+                    #[codec(index = 3)]
+                    cancel_enrollment,
+                    #[codec(index = 4)]
+                    set_slash_protect {
+                        slash_protect: ::core::primitive::u128,
+                    },
+                    #[codec(index = 5)]
+                    set_assigned_relayers_number { number: ::core::primitive::u32 },
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Error {
+                    #[codec(index = 0)]
+                    InsufficientBalance,
+                    #[codec(index = 1)]
+                    AlreadyEnrolled,
+                    #[codec(index = 2)]
+                    NotEnrolled,
+                    #[codec(index = 3)]
+                    CollateralTooLow,
+                    #[codec(index = 4)]
+                    StillHasOrdersNotConfirmed,
+                    #[codec(index = 5)]
+                    RelayFeeTooLow,
+                    #[codec(index = 6)]
+                    OccupiedRelayer,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Event {
+                    #[codec(index = 0)]
+                    Enroll(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 1)]
+                    UpdateLockedCollateral(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 2)]
+                    UpdateRelayFee(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 3)]
+                    CancelEnrollment(::subxt::sp_core::crypto::AccountId32),
+                    #[codec(index = 4)]
+                    UpdateCollateralSlashProtect(::core::primitive::u128),
+                    #[codec(index = 5)]
+                    UpdateAssignedRelayersNumber(::core::primitive::u32),
+                    #[codec(index = 6)]
+                    FeeMarketSlash(
+                        runtime_types::pallet_fee_market::types::SlashReport<
+                            ::subxt::sp_core::crypto::AccountId32,
+                            ::core::primitive::u32,
+                            ::core::primitive::u128,
+                        >,
+                    ),
+                    #[codec(index = 7)]
+                    OrderCreated(
+                        [::core::primitive::u8; 4usize],
+                        ::core::primitive::u64,
+                        ::core::primitive::u128,
+                        ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>,
+                        ::core::option::Option<::core::primitive::u32>,
+                    ),
+                    #[codec(index = 8)]
+                    OrderReward(
+                        [::core::primitive::u8; 4usize],
+                        ::core::primitive::u64,
+                        runtime_types::pallet_fee_market::s2s::payment::RewardItem<
+                            ::subxt::sp_core::crypto::AccountId32,
+                            ::core::primitive::u128,
+                        >,
+                    ),
+                }
+            }
+            pub mod s2s {
+                use super::runtime_types;
+                pub mod payment {
+                    use super::runtime_types;
+                    #[derive(
+                        :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                    )]
+                    pub struct RewardItem<_0, _1> {
+                        pub to_slot_relayer: ::core::option::Option<(_0, _1)>,
+                        pub to_treasury: ::core::option::Option<_1>,
+                        pub to_message_relayer: ::core::option::Option<(_0, _1)>,
+                        pub to_confirm_relayer: ::core::option::Option<(_0, _1)>,
+                    }
+                }
+            }
+            pub mod types {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct Order<_0, _1, _2> {
+                    pub lane: [::core::primitive::u8; 4usize],
+                    pub message: ::core::primitive::u64,
+                    pub sent_time: _1,
+                    pub confirm_time: ::core::option::Option<_1>,
+                    pub locked_collateral: _2,
+                    pub relayers: ::std::vec::Vec<
+                        runtime_types::pallet_fee_market::types::PriorRelayer<_0, _1, _2>,
+                    >,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct PriorRelayer<_0, _1, _2> {
+                    pub id: _0,
+                    pub fee: _2,
+                    pub valid_range: ::core::ops::Range<_1>,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct Relayer<_0, _1> {
+                    pub id: _0,
+                    pub collateral: _1,
+                    pub fee: _1,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct SlashReport<_0, _1, _2> {
+                    pub lane: [::core::primitive::u8; 4usize],
+                    pub message: ::core::primitive::u64,
+                    pub sent_time: _1,
+                    pub confirm_time: ::core::option::Option<_1>,
+                    pub delay_time: ::core::option::Option<_1>,
+                    pub account_id: _0,
+                    pub amount: _2,
+                }
             }
         }
         pub mod pallet_grandpa {
@@ -24864,23 +25775,128 @@ pub mod api {
                 }
             }
         }
+        pub mod pallet_vesting {
+            use super::runtime_types;
+            pub mod pallet {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Call {
+                    #[codec(index = 0)]
+                    vest,
+                    #[codec(index = 1)]
+                    vest_other {
+                        target: ::subxt::sp_runtime::MultiAddress<
+                            ::subxt::sp_core::crypto::AccountId32,
+                            (),
+                        >,
+                    },
+                    #[codec(index = 2)]
+                    vested_transfer {
+                        target: ::subxt::sp_runtime::MultiAddress<
+                            ::subxt::sp_core::crypto::AccountId32,
+                            (),
+                        >,
+                        schedule: runtime_types::pallet_vesting::vesting_info::VestingInfo<
+                            ::core::primitive::u128,
+                            ::core::primitive::u32,
+                        >,
+                    },
+                    #[codec(index = 3)]
+                    force_vested_transfer {
+                        source: ::subxt::sp_runtime::MultiAddress<
+                            ::subxt::sp_core::crypto::AccountId32,
+                            (),
+                        >,
+                        target: ::subxt::sp_runtime::MultiAddress<
+                            ::subxt::sp_core::crypto::AccountId32,
+                            (),
+                        >,
+                        schedule: runtime_types::pallet_vesting::vesting_info::VestingInfo<
+                            ::core::primitive::u128,
+                            ::core::primitive::u32,
+                        >,
+                    },
+                    #[codec(index = 4)]
+                    merge_schedules {
+                        schedule1_index: ::core::primitive::u32,
+                        schedule2_index: ::core::primitive::u32,
+                    },
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Error {
+                    #[codec(index = 0)]
+                    NotVesting,
+                    #[codec(index = 1)]
+                    AtMaxVestingSchedules,
+                    #[codec(index = 2)]
+                    AmountLow,
+                    #[codec(index = 3)]
+                    ScheduleIndexOutOfBounds,
+                    #[codec(index = 4)]
+                    InvalidScheduleParams,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Event {
+                    #[codec(index = 0)]
+                    VestingUpdated(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 1)]
+                    VestingCompleted(::subxt::sp_core::crypto::AccountId32),
+                }
+            }
+            pub mod vesting_info {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct VestingInfo<_0, _1> {
+                    pub locked: _0,
+                    pub per_block: _0,
+                    pub starting_block: _1,
+                }
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub enum Releases {
+                #[codec(index = 0)]
+                V0,
+                #[codec(index = 1)]
+                V1,
+            }
+        }
         pub mod pangolin_runtime {
             use super::runtime_types;
-            pub mod bridges {
+            pub mod bridges_message {
                 use super::runtime_types;
-                pub mod substrate {
+                pub mod pangolin_parachain {
                     use super::runtime_types;
-                    pub mod pangoro_messages {
-                        use super::runtime_types;
-                        #[derive(
-                            :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
-                        )]
-                        pub enum PangolinToPangoroMessagesParameter {
-                            #[codec(index = 0)]
-                            PangoroToPangolinConversionRate(
-                                runtime_types::sp_arithmetic::fixed_point::FixedU128,
-                            ),
-                        }
+                    #[derive(
+                        :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                    )]
+                    pub enum PangolinToPangolinParachainParameter {
+                        #[codec(index = 0)]
+                        PangolinParachainToPangolinConversionRate(
+                            runtime_types::sp_arithmetic::fixed_point::FixedU128,
+                        ),
+                    }
+                }
+                pub mod pangoro {
+                    use super::runtime_types;
+                    #[derive(
+                        :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                    )]
+                    pub enum PangolinToPangoroMessagesParameter {
+                        #[codec(index = 0)]
+                        PangoroToPangolinConversionRate(
+                            runtime_types::sp_arithmetic::fixed_point::FixedU128,
+                        ),
                     }
                 }
             }
@@ -25137,18 +26153,16 @@ pub mod api {
                 Session(runtime_types::pallet_session::pallet::Call),
                 #[codec(index = 13)]
                 Grandpa(runtime_types::pallet_grandpa::pallet::Call),
-                #[codec(index = 58)]
-                BeefyGadget(runtime_types::darwinia_beefy_gadget::pallet::Call),
                 #[codec(index = 14)]
                 ImOnline(runtime_types::pallet_im_online::pallet::Call),
                 #[codec(index = 17)]
-                Democracy(runtime_types::darwinia_democracy::pallet::Call),
+                Democracy(runtime_types::pallet_democracy::pallet::Call),
                 #[codec(index = 18)]
                 Council(runtime_types::pallet_collective::pallet::Call),
                 #[codec(index = 19)]
                 TechnicalCommittee(runtime_types::pallet_collective::pallet::Call),
                 #[codec(index = 20)]
-                PhragmenElection(runtime_types::darwinia_elections_phragmen::pallet::Call),
+                PhragmenElection(runtime_types::pallet_elections_phragmen::pallet::Call),
                 #[codec(index = 21)]
                 TechnicalMembership(runtime_types::pallet_membership::pallet::Call),
                 #[codec(index = 22)]
@@ -25161,10 +26175,8 @@ pub mod api {
                 Bounties(runtime_types::pallet_bounties::pallet::Call),
                 #[codec(index = 23)]
                 Sudo(runtime_types::pallet_sudo::pallet::Call),
-                #[codec(index = 24)]
-                Claims(runtime_types::darwinia_claims::Call),
                 #[codec(index = 25)]
-                Vesting(runtime_types::darwinia_vesting::pallet::Call),
+                Vesting(runtime_types::pallet_vesting::pallet::Call),
                 #[codec(index = 26)]
                 Utility(runtime_types::pallet_utility::pallet::Call),
                 #[codec(index = 27)]
@@ -25201,12 +26213,20 @@ pub mod api {
                 BridgeRococoGrandpa(runtime_types::pallet_bridge_grandpa::pallet::Call),
                 #[codec(index = 61)]
                 BridgeRococoParachains(runtime_types::pallet_bridge_parachains::pallet::Call),
+                #[codec(index = 63)]
+                BridgePangolinParachainMessages(
+                    runtime_types::pallet_bridge_messages::pallet::Call,
+                ),
                 #[codec(index = 53)]
-                FeeMarket(runtime_types::darwinia_fee_market::pallet::Call),
+                PangoroFeeMarket(runtime_types::pallet_fee_market::pallet::Call),
+                #[codec(index = 64)]
+                PangolinParachainFeeMarket(runtime_types::pallet_fee_market::pallet::Call),
                 #[codec(index = 54)]
                 TransactionPause(runtime_types::module_transaction_pause::module::Call),
                 #[codec(index = 49)]
                 Substrate2SubstrateIssuing(runtime_types::from_substrate_issuing::pallet::Call),
+                #[codec(index = 65)]
+                ToPangolinParachainBacking(runtime_types::to_parachain_backing::pallet::Call),
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub enum Event {
@@ -25231,13 +26251,13 @@ pub mod api {
                 #[codec(index = 14)]
                 ImOnline(runtime_types::pallet_im_online::pallet::Event),
                 #[codec(index = 17)]
-                Democracy(runtime_types::darwinia_democracy::pallet::Event),
+                Democracy(runtime_types::pallet_democracy::pallet::Event),
                 #[codec(index = 18)]
                 Council(runtime_types::pallet_collective::pallet::Event),
                 #[codec(index = 19)]
                 TechnicalCommittee(runtime_types::pallet_collective::pallet::Event),
                 #[codec(index = 20)]
-                PhragmenElection(runtime_types::darwinia_elections_phragmen::pallet::Event),
+                PhragmenElection(runtime_types::pallet_elections_phragmen::pallet::Event),
                 #[codec(index = 21)]
                 TechnicalMembership(runtime_types::pallet_membership::pallet::Event),
                 #[codec(index = 22)]
@@ -25250,15 +26270,8 @@ pub mod api {
                 Bounties(runtime_types::pallet_bounties::pallet::Event),
                 #[codec(index = 23)]
                 Sudo(runtime_types::pallet_sudo::pallet::Event),
-                #[codec(index = 24)]
-                Claims(
-                    runtime_types::darwinia_claims::RawEvent<
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    >,
-                ),
                 #[codec(index = 25)]
-                Vesting(runtime_types::darwinia_vesting::pallet::Event),
+                Vesting(runtime_types::pallet_vesting::pallet::Event),
                 #[codec(index = 26)]
                 Utility(runtime_types::pallet_utility::pallet::Event),
                 #[codec(index = 27)]
@@ -25309,12 +26322,24 @@ pub mod api {
                 BridgePangoroDispatch(runtime_types::pallet_bridge_dispatch::pallet::Event),
                 #[codec(index = 43)]
                 BridgePangoroMessages(runtime_types::pallet_bridge_messages::pallet::Event),
+                #[codec(index = 62)]
+                BridgePangolinParachainDispatch(
+                    runtime_types::pallet_bridge_dispatch::pallet::Event,
+                ),
+                #[codec(index = 63)]
+                BridgePangolinParachainMessages(
+                    runtime_types::pallet_bridge_messages::pallet::Event,
+                ),
                 #[codec(index = 53)]
-                FeeMarket(runtime_types::darwinia_fee_market::pallet::Event),
+                PangoroFeeMarket(runtime_types::pallet_fee_market::pallet::Event),
+                #[codec(index = 64)]
+                PangolinParachainFeeMarket(runtime_types::pallet_fee_market::pallet::Event),
                 #[codec(index = 54)]
                 TransactionPause(runtime_types::module_transaction_pause::module::Event),
                 #[codec(index = 49)]
                 Substrate2SubstrateIssuing(runtime_types::from_substrate_issuing::pallet::Event),
+                #[codec(index = 65)]
+                ToPangolinParachainBacking(runtime_types::to_parachain_backing::pallet::Event),
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub enum OriginCaller {
@@ -26219,6 +27244,54 @@ pub mod api {
                 )]
                 pub struct BlakeTwo256;
             }
+            pub mod transaction_validity {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum InvalidTransaction {
+                    #[codec(index = 0)]
+                    Call,
+                    #[codec(index = 1)]
+                    Payment,
+                    #[codec(index = 2)]
+                    Future,
+                    #[codec(index = 3)]
+                    Stale,
+                    #[codec(index = 4)]
+                    BadProof,
+                    #[codec(index = 5)]
+                    AncientBirthBlock,
+                    #[codec(index = 6)]
+                    ExhaustsResources,
+                    #[codec(index = 7)]
+                    Custom(::core::primitive::u8),
+                    #[codec(index = 8)]
+                    BadMandatory,
+                    #[codec(index = 9)]
+                    MandatoryDispatch,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum TransactionValidityError {
+                    #[codec(index = 0)]
+                    Invalid(runtime_types::sp_runtime::transaction_validity::InvalidTransaction),
+                    #[codec(index = 1)]
+                    Unknown(runtime_types::sp_runtime::transaction_validity::UnknownTransaction),
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum UnknownTransaction {
+                    #[codec(index = 0)]
+                    CannotLookup,
+                    #[codec(index = 1)]
+                    NoUnsignedValidator,
+                    #[codec(index = 2)]
+                    Custom(::core::primitive::u8),
+                }
+            }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub enum ArithmeticError {
                 #[codec(index = 0)]
@@ -26462,6 +27535,83 @@ pub mod api {
                 }
             }
         }
+        pub mod to_parachain_backing {
+            use super::runtime_types;
+            pub mod pallet {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Call {
+                    #[codec(index = 0)]
+                    lock_and_remote_issue {
+                        spec_version: ::core::primitive::u32,
+                        weight: ::core::primitive::u64,
+                        #[codec(compact)]
+                        value: ::core::primitive::u128,
+                        #[codec(compact)]
+                        fee: ::core::primitive::u128,
+                        recipient: ::subxt::sp_core::crypto::AccountId32,
+                    },
+                    #[codec(index = 1)]
+                    unlock_from_remote {
+                        amount: ::core::primitive::u128,
+                        recipient: ::subxt::sp_core::crypto::AccountId32,
+                    },
+                    #[codec(index = 2)]
+                    set_secure_limited_period { period: ::core::primitive::u32 },
+                    #[codec(index = 3)]
+                    set_security_limitation_ring_amount { limitation: ::core::primitive::u128 },
+                    #[codec(index = 4)]
+                    set_remote_mapping_token_factory_account {
+                        account: ::subxt::sp_core::crypto::AccountId32,
+                    },
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Error {
+                    #[codec(index = 0)]
+                    InsufficientBalance,
+                    #[codec(index = 1)]
+                    RingLockLimited,
+                    #[codec(index = 2)]
+                    RingDailyLimited,
+                    #[codec(index = 3)]
+                    NonceDuplicated,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Event {
+                    #[codec(index = 0)]
+                    TokenLocked(
+                        [::core::primitive::u8; 4usize],
+                        ::core::primitive::u64,
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 1)]
+                    TokenUnlocked(
+                        [::core::primitive::u8; 4usize],
+                        ::core::primitive::u64,
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    ),
+                    #[codec(index = 2)]
+                    TokenLockedConfirmed(
+                        [::core::primitive::u8; 4usize],
+                        ::core::primitive::u64,
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                        ::core::primitive::bool,
+                    ),
+                    #[codec(index = 3)]
+                    RemoteMappingFactoryAddressUpdated(::subxt::sp_core::crypto::AccountId32),
+                }
+            }
+        }
     }
     #[doc = r" The default error type returned when there is a runtime issue."]
     pub type DispatchError = self::runtime_types::sp_runtime::DispatchError;
@@ -26473,7 +27623,7 @@ pub mod api {
     impl DispatchError {
         pub fn details(&self) -> Option<ErrorDetails> {
             if let Self::Module { index, error } = self {
-                match (index , error) { (0u8 , 0u8) => Some (ErrorDetails { pallet : "System" , error : "InvalidSpecName" , docs : "The name of specification does not match between the current runtime\nand the new runtime." }) , (0u8 , 1u8) => Some (ErrorDetails { pallet : "System" , error : "SpecVersionNeedsToIncrease" , docs : "The specification version is not allowed to decrease between the current runtime\nand the new runtime." }) , (0u8 , 2u8) => Some (ErrorDetails { pallet : "System" , error : "FailedToExtractRuntimeVersion" , docs : "Failed to extract the runtime version from the new runtime.\n\nEither calling `Core_version` or decoding `RuntimeVersion` failed." }) , (0u8 , 3u8) => Some (ErrorDetails { pallet : "System" , error : "NonDefaultComposite" , docs : "Suicide called when the account has non-default composite data." }) , (0u8 , 4u8) => Some (ErrorDetails { pallet : "System" , error : "NonZeroRefCount" , docs : "There is a non-zero reference count preventing the account from being purged." }) , (2u8 , 0u8) => Some (ErrorDetails { pallet : "Babe" , error : "InvalidEquivocationProof" , docs : "An equivocation proof provided as part of an equivocation report is invalid." }) , (2u8 , 1u8) => Some (ErrorDetails { pallet : "Babe" , error : "InvalidKeyOwnershipProof" , docs : "A key ownership proof provided as part of an equivocation report is invalid." }) , (2u8 , 2u8) => Some (ErrorDetails { pallet : "Babe" , error : "DuplicateOffenceReport" , docs : "A given equivocation report is valid but already previously reported." }) , (4u8 , 0u8) => Some (ErrorDetails { pallet : "Balances" , error : "VestingBalance" , docs : "Vesting balance too high to send value." }) , (4u8 , 1u8) => Some (ErrorDetails { pallet : "Balances" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal." }) , (4u8 , 2u8) => Some (ErrorDetails { pallet : "Balances" , error : "InsufficientBalance" , docs : "Balance too low to send value." }) , (4u8 , 3u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit." }) , (4u8 , 4u8) => Some (ErrorDetails { pallet : "Balances" , error : "KeepAlive" , docs : "Transfer/payment would kill account." }) , (4u8 , 5u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account." }) , (4u8 , 6u8) => Some (ErrorDetails { pallet : "Balances" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist." }) , (4u8 , 7u8) => Some (ErrorDetails { pallet : "Balances" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (4u8 , 8u8) => Some (ErrorDetails { pallet : "Balances" , error : "LockP" , docs : "Lock - POISONED." }) , (5u8 , 0u8) => Some (ErrorDetails { pallet : "Kton" , error : "VestingBalance" , docs : "Vesting balance too high to send value." }) , (5u8 , 1u8) => Some (ErrorDetails { pallet : "Kton" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal." }) , (5u8 , 2u8) => Some (ErrorDetails { pallet : "Kton" , error : "InsufficientBalance" , docs : "Balance too low to send value." }) , (5u8 , 3u8) => Some (ErrorDetails { pallet : "Kton" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit." }) , (5u8 , 4u8) => Some (ErrorDetails { pallet : "Kton" , error : "KeepAlive" , docs : "Transfer/payment would kill account." }) , (5u8 , 5u8) => Some (ErrorDetails { pallet : "Kton" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account." }) , (5u8 , 6u8) => Some (ErrorDetails { pallet : "Kton" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist." }) , (5u8 , 7u8) => Some (ErrorDetails { pallet : "Kton" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (5u8 , 8u8) => Some (ErrorDetails { pallet : "Kton" , error : "LockP" , docs : "Lock - POISONED." }) , (7u8 , 0u8) => Some (ErrorDetails { pallet : "Authorship" , error : "InvalidUncleParent" , docs : "The uncle parent not in the chain." }) , (7u8 , 1u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UnclesAlreadySet" , docs : "Uncles already set in the block." }) , (7u8 , 2u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooManyUncles" , docs : "Too many uncles." }) , (7u8 , 3u8) => Some (ErrorDetails { pallet : "Authorship" , error : "GenesisUncle" , docs : "The uncle is genesis." }) , (7u8 , 4u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooHighUncle" , docs : "The uncle is too high in chain." }) , (7u8 , 5u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UncleAlreadyIncluded" , docs : "The uncle is already included." }) , (7u8 , 6u8) => Some (ErrorDetails { pallet : "Authorship" , error : "OldUncle" , docs : "The uncle isn't recent enough to be included." }) , (8u8 , 0u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchEarlySubmission" , docs : "Submission was too early." }) , (8u8 , 1u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchWrongWinnerCount" , docs : "Wrong number of winners presented." }) , (8u8 , 2u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchWeakSubmission" , docs : "Submission was too weak, score-wise." }) , (8u8 , 3u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedQueueFull" , docs : "The queue was full, and the solution was not better than any of the existing ones." }) , (8u8 , 4u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedCannotPayDeposit" , docs : "The origin failed to pay the deposit." }) , (8u8 , 5u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedInvalidWitness" , docs : "Witness data to dispatchable is invalid." }) , (8u8 , 6u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedTooMuchWeight" , docs : "The signed submission consumes too much weight" }) , (8u8 , 7u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "OcwCallWrongEra" , docs : "OCW submitted solution for wrong round" }) , (8u8 , 8u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "MissingSnapshotMetadata" , docs : "Snapshot metadata should exist but didn't." }) , (8u8 , 9u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "InvalidSubmissionIndex" , docs : "`Self::insert_submission` returned an invalid index." }) , (8u8 , 10u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "CallNotAllowed" , docs : "The call is not allowed at this point." }) , (9u8 , 0u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotController" , docs : "Not a controller account." }) , (9u8 , 1u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotStash" , docs : "Not a stash account." }) , (9u8 , 2u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyBonded" , docs : "Stash is already bonded." }) , (9u8 , 3u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyPaired" , docs : "Controller is already paired." }) , (9u8 , 4u8) => Some (ErrorDetails { pallet : "Staking" , error : "EmptyTargets" , docs : "Targets cannot be empty." }) , (9u8 , 5u8) => Some (ErrorDetails { pallet : "Staking" , error : "DuplicateIndex" , docs : "Duplicate index." }) , (9u8 , 6u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidSlashIndex" , docs : "Slash record index out of bounds." }) , (9u8 , 7u8) => Some (ErrorDetails { pallet : "Staking" , error : "InsufficientBond" , docs : "Can not bond with value less than minimum required." }) , (9u8 , 8u8) => Some (ErrorDetails { pallet : "Staking" , error : "NoMoreChunks" , docs : "Can not schedule more unlock chunks." }) , (9u8 , 9u8) => Some (ErrorDetails { pallet : "Staking" , error : "NoUnlockChunk" , docs : "Can not rebond without unlocking chunks." }) , (9u8 , 10u8) => Some (ErrorDetails { pallet : "Staking" , error : "FundedTarget" , docs : "Attempting to target a stash that still has funds." }) , (9u8 , 11u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidEraToReward" , docs : "Invalid era to reward." }) , (9u8 , 12u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidNumberOfNominations" , docs : "Invalid number of nominations." }) , (9u8 , 13u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotSortedAndUnique" , docs : "Items are not sorted and unique." }) , (9u8 , 14u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyClaimed" , docs : "Rewards for this era have already been claimed for this validator." }) , (9u8 , 15u8) => Some (ErrorDetails { pallet : "Staking" , error : "IncorrectHistoryDepth" , docs : "Incorrect previous history depth input provided." }) , (9u8 , 16u8) => Some (ErrorDetails { pallet : "Staking" , error : "IncorrectSlashingSpans" , docs : "Incorrect number of slashing spans provided." }) , (9u8 , 17u8) => Some (ErrorDetails { pallet : "Staking" , error : "BadState" , docs : "Internal state has become somehow corrupted and the operation cannot continue." }) , (9u8 , 18u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyTargets" , docs : "Too many nomination targets supplied." }) , (9u8 , 19u8) => Some (ErrorDetails { pallet : "Staking" , error : "BadTarget" , docs : "A nomination target was supplied that was blocked or otherwise not a validator." }) , (9u8 , 20u8) => Some (ErrorDetails { pallet : "Staking" , error : "CannotChillOther" , docs : "The user has enough bond and thus cannot be chilled forcefully by an external person." }) , (9u8 , 21u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyNominators" , docs : "There are too many nominators in the system. Governance needs to adjust the staking settings\nto keep things safe for the runtime." }) , (9u8 , 22u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyValidators" , docs : "There are too many validators in the system. Governance needs to adjust the staking settings\nto keep things safe for the runtime." }) , (9u8 , 23u8) => Some (ErrorDetails { pallet : "Staking" , error : "PayoutIns" , docs : "Payout - INSUFFICIENT" }) , (12u8 , 0u8) => Some (ErrorDetails { pallet : "Session" , error : "InvalidProof" , docs : "Invalid ownership proof." }) , (12u8 , 1u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAssociatedValidatorId" , docs : "No associated validator ID for account." }) , (12u8 , 2u8) => Some (ErrorDetails { pallet : "Session" , error : "DuplicatedKey" , docs : "Registered duplicate key." }) , (12u8 , 3u8) => Some (ErrorDetails { pallet : "Session" , error : "NoKeys" , docs : "No keys are associated with this account." }) , (12u8 , 4u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAccount" , docs : "Key setting account is not live, so it's impossible to associate keys." }) , (13u8 , 0u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "PauseFailed" , docs : "Attempt to signal GRANDPA pause when the authority set isn't live\n(either paused or already pending pause)." }) , (13u8 , 1u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "ResumeFailed" , docs : "Attempt to signal GRANDPA resume when the authority set isn't paused\n(either live or already pending resume)." }) , (13u8 , 2u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "ChangePending" , docs : "Attempt to signal GRANDPA change with one already pending." }) , (13u8 , 3u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "TooSoon" , docs : "Cannot signal forced change so soon after last." }) , (13u8 , 4u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "InvalidKeyOwnershipProof" , docs : "A key ownership proof provided as part of an equivocation report is invalid." }) , (13u8 , 5u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "InvalidEquivocationProof" , docs : "An equivocation proof provided as part of an equivocation report is invalid." }) , (13u8 , 6u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "DuplicateOffenceReport" , docs : "A given equivocation report is valid but already previously reported." }) , (14u8 , 0u8) => Some (ErrorDetails { pallet : "ImOnline" , error : "InvalidKey" , docs : "Non existent public key." }) , (14u8 , 1u8) => Some (ErrorDetails { pallet : "ImOnline" , error : "DuplicatedHeartbeat" , docs : "Duplicated heartbeat." }) , (17u8 , 0u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ValueLow" , docs : "Value too low" }) , (17u8 , 1u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ProposalMissing" , docs : "Proposal does not exist" }) , (17u8 , 2u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyCanceled" , docs : "Cannot cancel the same proposal twice" }) , (17u8 , 3u8) => Some (ErrorDetails { pallet : "Democracy" , error : "DuplicateProposal" , docs : "Proposal already made" }) , (17u8 , 4u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ProposalBlacklisted" , docs : "Proposal still blacklisted" }) , (17u8 , 5u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotSimpleMajority" , docs : "Next external proposal not simple majority" }) , (17u8 , 6u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InvalidHash" , docs : "Invalid hash" }) , (17u8 , 7u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoProposal" , docs : "No external proposal" }) , (17u8 , 8u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyVetoed" , docs : "Identity may not veto a proposal twice" }) , (17u8 , 9u8) => Some (ErrorDetails { pallet : "Democracy" , error : "DuplicatePreimage" , docs : "Preimage already noted" }) , (17u8 , 10u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotImminent" , docs : "Not imminent" }) , (17u8 , 11u8) => Some (ErrorDetails { pallet : "Democracy" , error : "TooEarly" , docs : "Too early" }) , (17u8 , 12u8) => Some (ErrorDetails { pallet : "Democracy" , error : "Imminent" , docs : "Imminent" }) , (17u8 , 13u8) => Some (ErrorDetails { pallet : "Democracy" , error : "PreimageMissing" , docs : "Preimage not found" }) , (17u8 , 14u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ReferendumInvalid" , docs : "Vote given for invalid referendum" }) , (17u8 , 15u8) => Some (ErrorDetails { pallet : "Democracy" , error : "PreimageInvalid" , docs : "Invalid preimage" }) , (17u8 , 16u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoneWaiting" , docs : "No proposals waiting" }) , (17u8 , 17u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotVoter" , docs : "The given account did not vote on the referendum." }) , (17u8 , 18u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoPermission" , docs : "The actor has no permission to conduct the action." }) , (17u8 , 19u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyDelegating" , docs : "The account is already delegating." }) , (17u8 , 20u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InsufficientFunds" , docs : "Too high a balance was provided that the account cannot afford." }) , (17u8 , 21u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotDelegating" , docs : "The account is not currently delegating." }) , (17u8 , 22u8) => Some (ErrorDetails { pallet : "Democracy" , error : "VotesExist" , docs : "The account currently has votes attached to it and the operation cannot succeed until\nthese are removed, either through `unvote` or `reap_vote`." }) , (17u8 , 23u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InstantNotAllowed" , docs : "The instant referendum origin is currently disallowed." }) , (17u8 , 24u8) => Some (ErrorDetails { pallet : "Democracy" , error : "Nonsense" , docs : "Delegation to oneself makes no sense." }) , (17u8 , 25u8) => Some (ErrorDetails { pallet : "Democracy" , error : "WrongUpperBound" , docs : "Invalid upper bound." }) , (17u8 , 26u8) => Some (ErrorDetails { pallet : "Democracy" , error : "MaxVotesReached" , docs : "Maximum number of votes reached." }) , (17u8 , 27u8) => Some (ErrorDetails { pallet : "Democracy" , error : "TooManyProposals" , docs : "Maximum number of proposals reached." }) , (18u8 , 0u8) => Some (ErrorDetails { pallet : "Council" , error : "NotMember" , docs : "Account is not a member" }) , (18u8 , 1u8) => Some (ErrorDetails { pallet : "Council" , error : "DuplicateProposal" , docs : "Duplicate proposals not allowed" }) , (18u8 , 2u8) => Some (ErrorDetails { pallet : "Council" , error : "ProposalMissing" , docs : "Proposal must exist" }) , (18u8 , 3u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongIndex" , docs : "Mismatched index" }) , (18u8 , 4u8) => Some (ErrorDetails { pallet : "Council" , error : "DuplicateVote" , docs : "Duplicate vote ignored" }) , (18u8 , 5u8) => Some (ErrorDetails { pallet : "Council" , error : "AlreadyInitialized" , docs : "Members are already initialized!" }) , (18u8 , 6u8) => Some (ErrorDetails { pallet : "Council" , error : "TooEarly" , docs : "The close call was made too early, before the end of the voting." }) , (18u8 , 7u8) => Some (ErrorDetails { pallet : "Council" , error : "TooManyProposals" , docs : "There can only be a maximum of `MaxProposals` active proposals." }) , (18u8 , 8u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongProposalWeight" , docs : "The given weight bound for the proposal was too low." }) , (18u8 , 9u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongProposalLength" , docs : "The given length bound for the proposal was too low." }) , (19u8 , 0u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "NotMember" , docs : "Account is not a member" }) , (19u8 , 1u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "DuplicateProposal" , docs : "Duplicate proposals not allowed" }) , (19u8 , 2u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "ProposalMissing" , docs : "Proposal must exist" }) , (19u8 , 3u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongIndex" , docs : "Mismatched index" }) , (19u8 , 4u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "DuplicateVote" , docs : "Duplicate vote ignored" }) , (19u8 , 5u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "AlreadyInitialized" , docs : "Members are already initialized!" }) , (19u8 , 6u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "TooEarly" , docs : "The close call was made too early, before the end of the voting." }) , (19u8 , 7u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "TooManyProposals" , docs : "There can only be a maximum of `MaxProposals` active proposals." }) , (19u8 , 8u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongProposalWeight" , docs : "The given weight bound for the proposal was too low." }) , (19u8 , 9u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongProposalLength" , docs : "The given length bound for the proposal was too low." }) , (20u8 , 0u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "UnableToVote" , docs : "Cannot vote when no candidates or members exist." }) , (20u8 , 1u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "NoVotes" , docs : "Must vote for at least one candidate." }) , (20u8 , 2u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "TooManyVotes" , docs : "Cannot vote more than candidates." }) , (20u8 , 3u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MaximumVotesExceeded" , docs : "Cannot vote more than maximum allowed." }) , (20u8 , 4u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "LowBalance" , docs : "Cannot vote with stake less than minimum balance." }) , (20u8 , 5u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "UnableToPayBond" , docs : "Voter can not pay voting bond." }) , (20u8 , 6u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MustBeVoter" , docs : "Must be a voter." }) , (20u8 , 7u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "ReportSelf" , docs : "Cannot report self." }) , (20u8 , 8u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "DuplicatedCandidate" , docs : "Duplicated candidate submission." }) , (20u8 , 9u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MemberSubmit" , docs : "Member cannot re-submit candidacy." }) , (20u8 , 10u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "RunnerUpSubmit" , docs : "Runner cannot re-submit candidacy." }) , (20u8 , 11u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InsufficientCandidateFunds" , docs : "Candidate does not have enough funds." }) , (20u8 , 12u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "NotMember" , docs : "Not a member." }) , (20u8 , 13u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidWitnessData" , docs : "The provided count of number of candidates is incorrect." }) , (20u8 , 14u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidVoteCount" , docs : "The provided count of number of votes is incorrect." }) , (20u8 , 15u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidRenouncing" , docs : "The renouncing origin presented a wrong `Renouncing` parameter." }) , (20u8 , 16u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidReplacement" , docs : "Prediction regarding replacement after member removal is wrong." }) , (21u8 , 0u8) => Some (ErrorDetails { pallet : "TechnicalMembership" , error : "AlreadyMember" , docs : "Already a member." }) , (21u8 , 1u8) => Some (ErrorDetails { pallet : "TechnicalMembership" , error : "NotMember" , docs : "Not a member." }) , (22u8 , 0u8) => Some (ErrorDetails { pallet : "Treasury" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (22u8 , 1u8) => Some (ErrorDetails { pallet : "Treasury" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (22u8 , 2u8) => Some (ErrorDetails { pallet : "Treasury" , error : "TooManyApprovals" , docs : "Too many approvals in the queue." }) , (50u8 , 0u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (50u8 , 1u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (50u8 , 2u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "TooManyApprovals" , docs : "Too many approvals in the queue." }) , (51u8 , 0u8) => Some (ErrorDetails { pallet : "Tips" , error : "ReasonTooBig" , docs : "The reason given is just too big." }) , (51u8 , 1u8) => Some (ErrorDetails { pallet : "Tips" , error : "AlreadyKnown" , docs : "The tip was already found/started." }) , (51u8 , 2u8) => Some (ErrorDetails { pallet : "Tips" , error : "UnknownTip" , docs : "The tip hash is unknown." }) , (51u8 , 3u8) => Some (ErrorDetails { pallet : "Tips" , error : "NotFinder" , docs : "The account attempting to retract the tip is not the finder of the tip." }) , (51u8 , 4u8) => Some (ErrorDetails { pallet : "Tips" , error : "StillOpen" , docs : "The tip cannot be claimed/closed because there are not enough tippers yet." }) , (51u8 , 5u8) => Some (ErrorDetails { pallet : "Tips" , error : "Premature" , docs : "The tip cannot be claimed/closed because it's still in the countdown period." }) , (52u8 , 0u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (52u8 , 1u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (52u8 , 2u8) => Some (ErrorDetails { pallet : "Bounties" , error : "ReasonTooBig" , docs : "The reason given is just too big." }) , (52u8 , 3u8) => Some (ErrorDetails { pallet : "Bounties" , error : "UnexpectedStatus" , docs : "The bounty status is unexpected." }) , (52u8 , 4u8) => Some (ErrorDetails { pallet : "Bounties" , error : "RequireCurator" , docs : "Require bounty curator." }) , (52u8 , 5u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidValue" , docs : "Invalid bounty value." }) , (52u8 , 6u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidFee" , docs : "Invalid bounty fee." }) , (52u8 , 7u8) => Some (ErrorDetails { pallet : "Bounties" , error : "PendingPayout" , docs : "A bounty payout is pending.\nTo cancel the bounty, you must unassign and slash the curator." }) , (52u8 , 8u8) => Some (ErrorDetails { pallet : "Bounties" , error : "Premature" , docs : "The bounties cannot be claimed/closed because it's still in the countdown period." }) , (23u8 , 0u8) => Some (ErrorDetails { pallet : "Sudo" , error : "RequireSudo" , docs : "Sender must be the Sudo account" }) , (24u8 , 0u8) => Some (ErrorDetails { pallet : "Claims" , error : "InvalidSignature" , docs : "Invalid Ethereum signature." }) , (24u8 , 1u8) => Some (ErrorDetails { pallet : "Claims" , error : "SignerHasNoClaim" , docs : "Ethereum address has no claim." }) , (24u8 , 2u8) => Some (ErrorDetails { pallet : "Claims" , error : "PotUnderflow" , docs : "There's not enough in the pot to pay out some unvested amount. Generally implies a logic\nlog::error." }) , (24u8 , 3u8) => Some (ErrorDetails { pallet : "Claims" , error : "MoveToExistedAddress" , docs : "Can NOT Move Claim to an EXISTED Address." }) , (24u8 , 4u8) => Some (ErrorDetails { pallet : "Claims" , error : "NewAddressTypeMis" , docs : "New Address Type - MISMATCHED" }) , (25u8 , 0u8) => Some (ErrorDetails { pallet : "Vesting" , error : "NotVesting" , docs : "The account given is not vesting." }) , (25u8 , 1u8) => Some (ErrorDetails { pallet : "Vesting" , error : "AtMaxVestingSchedules" , docs : "The account already has `MaxVestingSchedules` count of schedules and thus\ncannot add another one. Consider merging existing schedules in order to add another." }) , (25u8 , 2u8) => Some (ErrorDetails { pallet : "Vesting" , error : "AmountLow" , docs : "Amount being transferred is too low to create a vesting schedule." }) , (25u8 , 3u8) => Some (ErrorDetails { pallet : "Vesting" , error : "ScheduleIndexOutOfBounds" , docs : "An index was out of bounds of the vesting schedules." }) , (25u8 , 4u8) => Some (ErrorDetails { pallet : "Vesting" , error : "InvalidScheduleParams" , docs : "Failed to create a new schedule because some parameter was invalid." }) , (26u8 , 0u8) => Some (ErrorDetails { pallet : "Utility" , error : "TooManyCalls" , docs : "Too many calls batched." }) , (27u8 , 0u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManySubAccounts" , docs : "Too many subs-accounts." }) , (27u8 , 1u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotFound" , docs : "Account isn't found." }) , (27u8 , 2u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotNamed" , docs : "Account isn't named." }) , (27u8 , 3u8) => Some (ErrorDetails { pallet : "Identity" , error : "EmptyIndex" , docs : "Empty index." }) , (27u8 , 4u8) => Some (ErrorDetails { pallet : "Identity" , error : "FeeChanged" , docs : "Fee is changed." }) , (27u8 , 5u8) => Some (ErrorDetails { pallet : "Identity" , error : "NoIdentity" , docs : "No identity found." }) , (27u8 , 6u8) => Some (ErrorDetails { pallet : "Identity" , error : "StickyJudgement" , docs : "Sticky judgement." }) , (27u8 , 7u8) => Some (ErrorDetails { pallet : "Identity" , error : "JudgementGiven" , docs : "Judgement given." }) , (27u8 , 8u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidJudgement" , docs : "Invalid judgement." }) , (27u8 , 9u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidIndex" , docs : "The index is invalid." }) , (27u8 , 10u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidTarget" , docs : "The target is invalid." }) , (27u8 , 11u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManyFields" , docs : "Too many additional fields." }) , (27u8 , 12u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManyRegistrars" , docs : "Maximum amount of registrars reached. Cannot add any more." }) , (27u8 , 13u8) => Some (ErrorDetails { pallet : "Identity" , error : "AlreadyClaimed" , docs : "Account ID is already named." }) , (27u8 , 14u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotSub" , docs : "Sender is not a sub-account." }) , (27u8 , 15u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotOwned" , docs : "Sub-account isn't owned by sender." }) , (28u8 , 0u8) => Some (ErrorDetails { pallet : "Society" , error : "BadPosition" , docs : "An incorrect position was provided." }) , (28u8 , 1u8) => Some (ErrorDetails { pallet : "Society" , error : "NotMember" , docs : "User is not a member." }) , (28u8 , 2u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyMember" , docs : "User is already a member." }) , (28u8 , 3u8) => Some (ErrorDetails { pallet : "Society" , error : "Suspended" , docs : "User is suspended." }) , (28u8 , 4u8) => Some (ErrorDetails { pallet : "Society" , error : "NotSuspended" , docs : "User is not suspended." }) , (28u8 , 5u8) => Some (ErrorDetails { pallet : "Society" , error : "NoPayout" , docs : "Nothing to payout." }) , (28u8 , 6u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyFounded" , docs : "Society already founded." }) , (28u8 , 7u8) => Some (ErrorDetails { pallet : "Society" , error : "InsufficientPot" , docs : "Not enough in pot to accept candidate." }) , (28u8 , 8u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyVouching" , docs : "Member is already vouching or banned from vouching again." }) , (28u8 , 9u8) => Some (ErrorDetails { pallet : "Society" , error : "NotVouching" , docs : "Member is not vouching." }) , (28u8 , 10u8) => Some (ErrorDetails { pallet : "Society" , error : "Head" , docs : "Cannot remove the head of the chain." }) , (28u8 , 11u8) => Some (ErrorDetails { pallet : "Society" , error : "Founder" , docs : "Cannot remove the founder." }) , (28u8 , 12u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyBid" , docs : "User has already made a bid." }) , (28u8 , 13u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyCandidate" , docs : "User is already a candidate." }) , (28u8 , 14u8) => Some (ErrorDetails { pallet : "Society" , error : "NotCandidate" , docs : "User is not a candidate." }) , (28u8 , 15u8) => Some (ErrorDetails { pallet : "Society" , error : "MaxMembers" , docs : "Too many members in the society." }) , (28u8 , 16u8) => Some (ErrorDetails { pallet : "Society" , error : "NotFounder" , docs : "The caller is not the founder." }) , (28u8 , 17u8) => Some (ErrorDetails { pallet : "Society" , error : "NotHead" , docs : "The caller is not the head." }) , (29u8 , 0u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotAllowed" , docs : "User is not allowed to make a call on behalf of this account" }) , (29u8 , 1u8) => Some (ErrorDetails { pallet : "Recovery" , error : "ZeroThreshold" , docs : "Threshold must be greater than zero" }) , (29u8 , 2u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotEnoughFriends" , docs : "Friends list must be greater than zero and threshold" }) , (29u8 , 3u8) => Some (ErrorDetails { pallet : "Recovery" , error : "MaxFriends" , docs : "Friends list must be less than max friends" }) , (29u8 , 4u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotSorted" , docs : "Friends list must be sorted and free of duplicates" }) , (29u8 , 5u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotRecoverable" , docs : "This account is not set up for recovery" }) , (29u8 , 6u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyRecoverable" , docs : "This account is already set up for recovery" }) , (29u8 , 7u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyStarted" , docs : "A recovery process has already started for this account" }) , (29u8 , 8u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotStarted" , docs : "A recovery process has not started for this rescuer" }) , (29u8 , 9u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotFriend" , docs : "This account is not a friend who can vouch" }) , (29u8 , 10u8) => Some (ErrorDetails { pallet : "Recovery" , error : "DelayPeriod" , docs : "The friend must wait until the delay period to vouch for this recovery" }) , (29u8 , 11u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyVouched" , docs : "This user has already vouched for this recovery" }) , (29u8 , 12u8) => Some (ErrorDetails { pallet : "Recovery" , error : "Threshold" , docs : "The threshold for recovering this account has not been met" }) , (29u8 , 13u8) => Some (ErrorDetails { pallet : "Recovery" , error : "StillActive" , docs : "There are still active recovery attempts that need to be closed" }) , (29u8 , 14u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyProxy" , docs : "This account is already set up for recovery" }) , (29u8 , 15u8) => Some (ErrorDetails { pallet : "Recovery" , error : "BadState" , docs : "Some internal state is broken." }) , (30u8 , 0u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "FailedToSchedule" , docs : "Failed to schedule a call" }) , (30u8 , 1u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "NotFound" , docs : "Cannot find the scheduled call." }) , (30u8 , 2u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "TargetBlockNumberInPast" , docs : "Given target block number is in the past." }) , (30u8 , 3u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "RescheduleNoChange" , docs : "Reschedule failed because it does not change scheduled time." }) , (31u8 , 0u8) => Some (ErrorDetails { pallet : "Proxy" , error : "TooMany" , docs : "There are too many proxies registered or too many announcements pending." }) , (31u8 , 1u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotFound" , docs : "Proxy registration not found." }) , (31u8 , 2u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotProxy" , docs : "Sender is not a proxy of the account to be proxied." }) , (31u8 , 3u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unproxyable" , docs : "A call which is incompatible with the proxy type's filter was attempted." }) , (31u8 , 4u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Duplicate" , docs : "Account is already a proxy." }) , (31u8 , 5u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoPermission" , docs : "Call may not be made by proxy because it may escalate its privileges." }) , (31u8 , 6u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unannounced" , docs : "Announcement, if made at all, was made too recently." }) , (31u8 , 7u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoSelfProxy" , docs : "Cannot add self as proxy." }) , (32u8 , 0u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MinimumThreshold" , docs : "Threshold must be 2 or greater." }) , (32u8 , 1u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyApproved" , docs : "Call is already approved by this signatory." }) , (32u8 , 2u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoApprovalsNeeded" , docs : "Call doesn't need any (more) approvals." }) , (32u8 , 3u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooFewSignatories" , docs : "There are too few signatories in the list." }) , (32u8 , 4u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooManySignatories" , docs : "There are too many signatories in the list." }) , (32u8 , 5u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SignatoriesOutOfOrder" , docs : "The signatories were provided out of order; they should be ordered." }) , (32u8 , 6u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SenderInSignatories" , docs : "The sender was contained in the other signatories; it shouldn't be." }) , (32u8 , 7u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotFound" , docs : "Multisig operation not found when attempting to cancel." }) , (32u8 , 8u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotOwner" , docs : "Only the account that originally created the multisig is able to cancel it." }) , (32u8 , 9u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoTimepoint" , docs : "No timepoint was given, yet the multisig operation is already underway." }) , (32u8 , 10u8) => Some (ErrorDetails { pallet : "Multisig" , error : "WrongTimepoint" , docs : "A different timepoint was given to the multisig operation that is underway." }) , (32u8 , 11u8) => Some (ErrorDetails { pallet : "Multisig" , error : "UnexpectedTimepoint" , docs : "A timepoint was given, yet no multisig operation is underway." }) , (32u8 , 12u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MaxWeightTooLow" , docs : "The maximum weight information provided was too low." }) , (32u8 , 13u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyStored" , docs : "The data to be stored is already stored." }) , (35u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderInv" , docs : "Header - INVALID" }) , (35u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ConfirmedBlocksC" , docs : "Confirmed Blocks - CONFLICT" }) , (35u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ContinuousInv" , docs : "Continuous - INVALID" }) , (35u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AffirmationExisted" , docs : "Affirmation - EXISTED" }) , (35u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderHashInv" , docs : "Header Hash - INVALID" }) , (35u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "MMRInv" , docs : "MMR - INVALID" }) , (35u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderHashMis" , docs : "Header Hash - MISMATCHED" }) , (35u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ConfirmedHeaderNE" , docs : "Confirmed Header - NOT EXISTED" }) , (35u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ReceiptProofInv" , docs : "EthereumReceipt Proof - INVALID" }) , (35u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "PendingRelayHeaderParcelNE" , docs : "Pending Relay Header Parcel - NOT EXISTED" }) , (35u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "PendingRelayHeaderParcelAE" , docs : "Pending Relay Header Parcel - ALREADY EXISTED" }) , (35u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AlreadyVoteForAyeDup" , docs : "Already Vote for Aye - DUPLICATED" }) , (35u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AlreadyVoteForNayDup" , docs : "Already Vote for Nay - DUPLICATED" }) , (36u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AddrLenMis" , docs : "Address Length - MISMATCHED" }) , (36u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "PubkeyPrefixMis" , docs : "Pubkey Prefix - MISMATCHED" }) , (36u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "BytesCF" , docs : "Bytes - CONVERSION FAILED" }) , (36u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "IntCF" , docs : "Int - CONVERSION FAILED" }) , (36u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "ArrayCF" , docs : "Array - CONVERSION FAILED" }) , (36u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AddressCF" , docs : "Address - CONVERSION FAILED" }) , (36u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AssetAR" , docs : "Asset - ALREADY REDEEMED" }) , (36u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AuthoritiesChangeAR" , docs : "Authorities Change - ALREADY SYNCED" }) , (36u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "EthLogPF" , docs : "Eth Log - PARSING FAILED" }) , (36u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "KtonLockedNSBA" , docs : "*KTON* Locked - NO SUFFICIENT BACKING ASSETS" }) , (36u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RingLockedNSBA" , docs : "*RING* Locked - NO SUFFICIENT BACKING ASSETS" }) , (36u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "LogEntryNE" , docs : "Log Entry - NOT EXISTED" }) , (36u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RedeemDis" , docs : "Redeem - DISABLED" }) , (36u8 , 13u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RingLockLim" , docs : "Ring Lock - LIMITED" }) , (36u8 , 14u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "KtonLockLim" , docs : "Kton Lock - LIMITED" }) , (42u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "InvalidIssuingAccount" , docs : "Invalid Issuing System Account" }) , (42u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "AssetAlreadyRegistered" , docs : "assert already registered" }) , (42u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "AssetAlreadyRedeemed" , docs : "assert already redeemed" }) , (42u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "StringCF" , docs : "StringCF" }) , (42u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "InvalidEncodeERC20" , docs : "encode erc20 tx failed" }) , (42u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "InvalidAddressLen" , docs : "invalid ethereum address length" }) , (42u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "InvalidInputData" , docs : "decode input value error" }) , (42u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "DecodeEventFailed" , docs : "decode ethereum event failed" }) , (42u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "NoAuthority" , docs : "caller has no authority" }) , (42u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "UnsupportedAction" , docs : "the action is not supported" }) , (37u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayParcelAR" , docs : "Relay Parcel - ALREADY RELAYED" }) , (37u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RoundMis" , docs : "Round - MISMATCHED" }) , (37u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ActiveGamesTM" , docs : "Active Games - TOO MANY" }) , (37u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ExistedAffirmationsFoundC" , docs : "Existed Affirmation(s) Found - CONFLICT" }) , (37u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "GameAtThisRoundC" , docs : "Game at This Round - CLOSED" }) , (37u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayAffirmationDup" , docs : "Relay Affirmation - DUPLICATED" }) , (37u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "StakeIns" , docs : "Usable *RING* for Stake - INSUFFICIENT" }) , (37u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayProofsQuantityInv" , docs : "Relay Proofs Quantity - INVALID" }) , (37u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayAffirmationNE" , docs : "Relay Affirmation - NOT EXISTED" }) , (37u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ExtendedRelayAffirmationNE" , docs : "Extended Relay Affirmation - NOT EXISTED" }) , (37u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "PreviousRelayProofsInc" , docs : "Previous Relay Proofs - INCOMPLETE" }) , (37u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "PendingRelayParcelNE" , docs : "Pending Relay Parcel - NOT EXISTED" }) , (38u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "CandidateAE" , docs : "Candidate - ALREADY EXISTED" }) , (38u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "CandidateNE" , docs : "Candidate - NOT EXISTED" }) , (38u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthorityAE" , docs : "Authority - ALREADY EXISTED" }) , (38u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthorityNE" , docs : "Authority - NOT EXISTED" }) , (38u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthorityIT" , docs : "Authority - IN TERM" }) , (38u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthoritiesCountTL" , docs : "Authorities Count - TOO LOW" }) , (38u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "StakeIns" , docs : "Stake - INSUFFICIENT" }) , (38u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "OnAuthoritiesChangeDis" , docs : "On Authorities Change - DISABLED" }) , (38u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "ScheduledTM" , docs : "Scheduled Items - TOO MANY" }) , (38u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "ScheduledSignNE" , docs : "Scheduled Sign -NOT EXISTED" }) , (38u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "SignatureInv" , docs : "Signature - INVALID" }) , (38u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "TermMis" , docs : "Term - MISMATCHED" }) , (38u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthoritiesMis" , docs : "Authorities - MISMATCHED" }) , (38u8 , 13u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "NextAuthoritiesNE" , docs : "Next Authorities - NOT EXISTED" }) , (40u8 , 0u8) => Some (ErrorDetails { pallet : "EVM" , error : "BalanceLow" , docs : "Not enough balance to perform action" }) , (40u8 , 1u8) => Some (ErrorDetails { pallet : "EVM" , error : "FeeOverflow" , docs : "Calculating total fee overflowed" }) , (40u8 , 2u8) => Some (ErrorDetails { pallet : "EVM" , error : "PaymentOverflow" , docs : "Calculating total payment overflowed" }) , (40u8 , 3u8) => Some (ErrorDetails { pallet : "EVM" , error : "WithdrawFailed" , docs : "Withdraw fee failed" }) , (40u8 , 4u8) => Some (ErrorDetails { pallet : "EVM" , error : "GasPriceTooLow" , docs : "Gas price is too low." }) , (40u8 , 5u8) => Some (ErrorDetails { pallet : "EVM" , error : "InvalidNonce" , docs : "Nonce is invalid" }) , (41u8 , 0u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InvalidSignature" , docs : "Signature is invalid." }) , (41u8 , 1u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "PreLogExists" , docs : "Pre-log is present, therefore transact is not allowed." }) , (41u8 , 2u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionExitError" , docs : "The internal transaction failed." }) , (41u8 , 3u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionRevertError" , docs : "" }) , (41u8 , 4u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionFatalError" , docs : "" }) , (41u8 , 5u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "ReadyOnlyCall" , docs : "The internal call failed." }) , (45u8 , 0u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "InvalidJustification" , docs : "The given justification is invalid for the given header." }) , (45u8 , 1u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "InvalidAuthoritySet" , docs : "The authority set from the underlying header chain is invalid." }) , (45u8 , 2u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "TooManyRequests" , docs : "There are too many requests for the current window to handle." }) , (45u8 , 3u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "OldHeader" , docs : "The header being imported is older than the best finalized header known to the pallet." }) , (45u8 , 4u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "UnknownHeader" , docs : "The header is unknown to the pallet." }) , (45u8 , 5u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "UnsupportedScheduledChange" , docs : "The scheduled authority set change found in the header is unsupported by the pallet.\n\nThis is the case for non-standard (e.g forced) authority set changes." }) , (45u8 , 6u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "NotInitialized" , docs : "The pallet is not yet initialized." }) , (45u8 , 7u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "AlreadyInitialized" , docs : "The pallet has already been initialized." }) , (45u8 , 8u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "Halted" , docs : "All pallet operations are halted." }) , (45u8 , 9u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (43u8 , 0u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "Halted" , docs : "All pallet operations are halted." }) , (43u8 , 1u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "MessageRejectedByChainVerifier" , docs : "Message has been treated as invalid by chain verifier." }) , (43u8 , 2u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "MessageRejectedByLaneVerifier" , docs : "Message has been treated as invalid by lane verifier." }) , (43u8 , 3u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "FailedToWithdrawMessageFee" , docs : "Submitter has failed to pay fee for delivering and dispatching messages." }) , (43u8 , 4u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "TooManyMessagesInTheProof" , docs : "The transaction brings too many messages." }) , (43u8 , 5u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "InvalidMessagesProof" , docs : "Invalid messages has been submitted." }) , (43u8 , 6u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "InvalidMessagesDeliveryProof" , docs : "Invalid messages delivery proof has been submitted." }) , (43u8 , 7u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "InvalidUnrewardedRelayers" , docs : "The bridged chain has invalid `UnrewardedRelayers` in its storage (fatal for the lane)." }) , (43u8 , 8u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "InvalidUnrewardedRelayersState" , docs : "The relayer has declared invalid unrewarded relayers state in the\n`receive_messages_delivery_proof` call." }) , (43u8 , 9u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "MessageIsAlreadyDelivered" , docs : "The message someone is trying to work with (i.e. increase fee) is already-delivered." }) , (43u8 , 10u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "MessageIsNotYetSent" , docs : "The message someone is trying to work with (i.e. increase fee) is not yet sent." }) , (43u8 , 11u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "TryingToConfirmMoreMessagesThanExpected" , docs : "The number of actually confirmed messages is going to be larger than the number of\nmessages in the proof. This may mean that this or bridged chain storage is corrupted." }) , (60u8 , 0u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "InvalidJustification" , docs : "The given justification is invalid for the given header." }) , (60u8 , 1u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "InvalidAuthoritySet" , docs : "The authority set from the underlying header chain is invalid." }) , (60u8 , 2u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "TooManyRequests" , docs : "There are too many requests for the current window to handle." }) , (60u8 , 3u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "OldHeader" , docs : "The header being imported is older than the best finalized header known to the pallet." }) , (60u8 , 4u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "UnknownHeader" , docs : "The header is unknown to the pallet." }) , (60u8 , 5u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "UnsupportedScheduledChange" , docs : "The scheduled authority set change found in the header is unsupported by the pallet.\n\nThis is the case for non-standard (e.g forced) authority set changes." }) , (60u8 , 6u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "NotInitialized" , docs : "The pallet is not yet initialized." }) , (60u8 , 7u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "AlreadyInitialized" , docs : "The pallet has already been initialized." }) , (60u8 , 8u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "Halted" , docs : "All pallet operations are halted." }) , (60u8 , 9u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (61u8 , 0u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "UnknownRelayChainBlock" , docs : "Relay chain block is unknown to us." }) , (61u8 , 1u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "InvalidStorageProof" , docs : "Invalid storage proof has been passed." }) , (61u8 , 2u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "UnknownParaHead" , docs : "Given parachain head is unknown." }) , (61u8 , 3u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (61u8 , 4u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "FailedToExtractStateRoot" , docs : "Failed to extract state root from given parachain head." }) , (53u8 , 0u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (53u8 , 1u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "AlreadyEnrolled" , docs : "The relayer has been enrolled." }) , (53u8 , 2u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "NotEnrolled" , docs : "This relayer doesn't enroll ever." }) , (53u8 , 3u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "StillHasOrdersNotConfirmed" , docs : "Update locked collateral is not allow since some orders are not confirm." }) , (53u8 , 4u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "RelayFeeTooLow" , docs : "The fee is lower than MinimumRelayFee." }) , (53u8 , 5u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "OccupiedRelayer" , docs : "The relayer is occupied, and can't cancel enrollment now." }) , (54u8 , 0u8) => Some (ErrorDetails { pallet : "TransactionPause" , error : "CannotPause" , docs : "can not pause" }) , (54u8 , 1u8) => Some (ErrorDetails { pallet : "TransactionPause" , error : "InvalidCharacter" , docs : "invalid character encoding" }) , (49u8 , 0u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "TokenUnregistered" , docs : "Token unregistered when issuing" }) , (49u8 , 1u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "InvalidIssuingAccount" , docs : "Invalid Issuing System Account" }) , (49u8 , 2u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "StringCF" , docs : "StringCF" }) , (49u8 , 3u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "InvalidEncodeERC20" , docs : "encode erc20 tx failed" }) , (49u8 , 4u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "InvalidIssueEncoding" , docs : "encode issue tx failed" }) , (49u8 , 5u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "InvalidAddressLen" , docs : "invalid ethereum address length" }) , _ => None }
+                match (index , error) { (0u8 , 0u8) => Some (ErrorDetails { pallet : "System" , error : "InvalidSpecName" , docs : "The name of specification does not match between the current runtime\nand the new runtime." }) , (0u8 , 1u8) => Some (ErrorDetails { pallet : "System" , error : "SpecVersionNeedsToIncrease" , docs : "The specification version is not allowed to decrease between the current runtime\nand the new runtime." }) , (0u8 , 2u8) => Some (ErrorDetails { pallet : "System" , error : "FailedToExtractRuntimeVersion" , docs : "Failed to extract the runtime version from the new runtime.\n\nEither calling `Core_version` or decoding `RuntimeVersion` failed." }) , (0u8 , 3u8) => Some (ErrorDetails { pallet : "System" , error : "NonDefaultComposite" , docs : "Suicide called when the account has non-default composite data." }) , (0u8 , 4u8) => Some (ErrorDetails { pallet : "System" , error : "NonZeroRefCount" , docs : "There is a non-zero reference count preventing the account from being purged." }) , (2u8 , 0u8) => Some (ErrorDetails { pallet : "Babe" , error : "InvalidEquivocationProof" , docs : "An equivocation proof provided as part of an equivocation report is invalid." }) , (2u8 , 1u8) => Some (ErrorDetails { pallet : "Babe" , error : "InvalidKeyOwnershipProof" , docs : "A key ownership proof provided as part of an equivocation report is invalid." }) , (2u8 , 2u8) => Some (ErrorDetails { pallet : "Babe" , error : "DuplicateOffenceReport" , docs : "A given equivocation report is valid but already previously reported." }) , (4u8 , 0u8) => Some (ErrorDetails { pallet : "Balances" , error : "VestingBalance" , docs : "Vesting balance too high to send value." }) , (4u8 , 1u8) => Some (ErrorDetails { pallet : "Balances" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal." }) , (4u8 , 2u8) => Some (ErrorDetails { pallet : "Balances" , error : "InsufficientBalance" , docs : "Balance too low to send value." }) , (4u8 , 3u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit." }) , (4u8 , 4u8) => Some (ErrorDetails { pallet : "Balances" , error : "KeepAlive" , docs : "Transfer/payment would kill account." }) , (4u8 , 5u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account." }) , (4u8 , 6u8) => Some (ErrorDetails { pallet : "Balances" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist." }) , (4u8 , 7u8) => Some (ErrorDetails { pallet : "Balances" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (4u8 , 8u8) => Some (ErrorDetails { pallet : "Balances" , error : "LockP" , docs : "Lock - POISONED." }) , (5u8 , 0u8) => Some (ErrorDetails { pallet : "Kton" , error : "VestingBalance" , docs : "Vesting balance too high to send value." }) , (5u8 , 1u8) => Some (ErrorDetails { pallet : "Kton" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal." }) , (5u8 , 2u8) => Some (ErrorDetails { pallet : "Kton" , error : "InsufficientBalance" , docs : "Balance too low to send value." }) , (5u8 , 3u8) => Some (ErrorDetails { pallet : "Kton" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit." }) , (5u8 , 4u8) => Some (ErrorDetails { pallet : "Kton" , error : "KeepAlive" , docs : "Transfer/payment would kill account." }) , (5u8 , 5u8) => Some (ErrorDetails { pallet : "Kton" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account." }) , (5u8 , 6u8) => Some (ErrorDetails { pallet : "Kton" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist." }) , (5u8 , 7u8) => Some (ErrorDetails { pallet : "Kton" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (5u8 , 8u8) => Some (ErrorDetails { pallet : "Kton" , error : "LockP" , docs : "Lock - POISONED." }) , (7u8 , 0u8) => Some (ErrorDetails { pallet : "Authorship" , error : "InvalidUncleParent" , docs : "The uncle parent not in the chain." }) , (7u8 , 1u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UnclesAlreadySet" , docs : "Uncles already set in the block." }) , (7u8 , 2u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooManyUncles" , docs : "Too many uncles." }) , (7u8 , 3u8) => Some (ErrorDetails { pallet : "Authorship" , error : "GenesisUncle" , docs : "The uncle is genesis." }) , (7u8 , 4u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooHighUncle" , docs : "The uncle is too high in chain." }) , (7u8 , 5u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UncleAlreadyIncluded" , docs : "The uncle is already included." }) , (7u8 , 6u8) => Some (ErrorDetails { pallet : "Authorship" , error : "OldUncle" , docs : "The uncle isn't recent enough to be included." }) , (8u8 , 0u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchEarlySubmission" , docs : "Submission was too early." }) , (8u8 , 1u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchWrongWinnerCount" , docs : "Wrong number of winners presented." }) , (8u8 , 2u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchWeakSubmission" , docs : "Submission was too weak, score-wise." }) , (8u8 , 3u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedQueueFull" , docs : "The queue was full, and the solution was not better than any of the existing ones." }) , (8u8 , 4u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedCannotPayDeposit" , docs : "The origin failed to pay the deposit." }) , (8u8 , 5u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedInvalidWitness" , docs : "Witness data to dispatchable is invalid." }) , (8u8 , 6u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedTooMuchWeight" , docs : "The signed submission consumes too much weight" }) , (8u8 , 7u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "OcwCallWrongEra" , docs : "OCW submitted solution for wrong round" }) , (8u8 , 8u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "MissingSnapshotMetadata" , docs : "Snapshot metadata should exist but didn't." }) , (8u8 , 9u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "InvalidSubmissionIndex" , docs : "`Self::insert_submission` returned an invalid index." }) , (8u8 , 10u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "CallNotAllowed" , docs : "The call is not allowed at this point." }) , (9u8 , 0u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotController" , docs : "Not a controller account." }) , (9u8 , 1u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotStash" , docs : "Not a stash account." }) , (9u8 , 2u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyBonded" , docs : "Stash is already bonded." }) , (9u8 , 3u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyPaired" , docs : "Controller is already paired." }) , (9u8 , 4u8) => Some (ErrorDetails { pallet : "Staking" , error : "EmptyTargets" , docs : "Targets cannot be empty." }) , (9u8 , 5u8) => Some (ErrorDetails { pallet : "Staking" , error : "DuplicateIndex" , docs : "Duplicate index." }) , (9u8 , 6u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidSlashIndex" , docs : "Slash record index out of bounds." }) , (9u8 , 7u8) => Some (ErrorDetails { pallet : "Staking" , error : "InsufficientBond" , docs : "Can not bond with value less than minimum required." }) , (9u8 , 8u8) => Some (ErrorDetails { pallet : "Staking" , error : "NoMoreChunks" , docs : "Can not schedule more unlock chunks." }) , (9u8 , 9u8) => Some (ErrorDetails { pallet : "Staking" , error : "NoUnlockChunk" , docs : "Can not rebond without unlocking chunks." }) , (9u8 , 10u8) => Some (ErrorDetails { pallet : "Staking" , error : "FundedTarget" , docs : "Attempting to target a stash that still has funds." }) , (9u8 , 11u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidEraToReward" , docs : "Invalid era to reward." }) , (9u8 , 12u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidNumberOfNominations" , docs : "Invalid number of nominations." }) , (9u8 , 13u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotSortedAndUnique" , docs : "Items are not sorted and unique." }) , (9u8 , 14u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyClaimed" , docs : "Rewards for this era have already been claimed for this validator." }) , (9u8 , 15u8) => Some (ErrorDetails { pallet : "Staking" , error : "IncorrectHistoryDepth" , docs : "Incorrect previous history depth input provided." }) , (9u8 , 16u8) => Some (ErrorDetails { pallet : "Staking" , error : "IncorrectSlashingSpans" , docs : "Incorrect number of slashing spans provided." }) , (9u8 , 17u8) => Some (ErrorDetails { pallet : "Staking" , error : "BadState" , docs : "Internal state has become somehow corrupted and the operation cannot continue." }) , (9u8 , 18u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyTargets" , docs : "Too many nomination targets supplied." }) , (9u8 , 19u8) => Some (ErrorDetails { pallet : "Staking" , error : "BadTarget" , docs : "A nomination target was supplied that was blocked or otherwise not a validator." }) , (9u8 , 20u8) => Some (ErrorDetails { pallet : "Staking" , error : "CannotChillOther" , docs : "The user has enough bond and thus cannot be chilled forcefully by an external person." }) , (9u8 , 21u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyNominators" , docs : "There are too many nominators in the system. Governance needs to adjust the staking\nsettings to keep things safe for the runtime." }) , (9u8 , 22u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyValidators" , docs : "There are too many validators in the system. Governance needs to adjust the staking\nsettings to keep things safe for the runtime." }) , (9u8 , 23u8) => Some (ErrorDetails { pallet : "Staking" , error : "PayoutIns" , docs : "Payout - INSUFFICIENT" }) , (12u8 , 0u8) => Some (ErrorDetails { pallet : "Session" , error : "InvalidProof" , docs : "Invalid ownership proof." }) , (12u8 , 1u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAssociatedValidatorId" , docs : "No associated validator ID for account." }) , (12u8 , 2u8) => Some (ErrorDetails { pallet : "Session" , error : "DuplicatedKey" , docs : "Registered duplicate key." }) , (12u8 , 3u8) => Some (ErrorDetails { pallet : "Session" , error : "NoKeys" , docs : "No keys are associated with this account." }) , (12u8 , 4u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAccount" , docs : "Key setting account is not live, so it's impossible to associate keys." }) , (13u8 , 0u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "PauseFailed" , docs : "Attempt to signal GRANDPA pause when the authority set isn't live\n(either paused or already pending pause)." }) , (13u8 , 1u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "ResumeFailed" , docs : "Attempt to signal GRANDPA resume when the authority set isn't paused\n(either live or already pending resume)." }) , (13u8 , 2u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "ChangePending" , docs : "Attempt to signal GRANDPA change with one already pending." }) , (13u8 , 3u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "TooSoon" , docs : "Cannot signal forced change so soon after last." }) , (13u8 , 4u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "InvalidKeyOwnershipProof" , docs : "A key ownership proof provided as part of an equivocation report is invalid." }) , (13u8 , 5u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "InvalidEquivocationProof" , docs : "An equivocation proof provided as part of an equivocation report is invalid." }) , (13u8 , 6u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "DuplicateOffenceReport" , docs : "A given equivocation report is valid but already previously reported." }) , (14u8 , 0u8) => Some (ErrorDetails { pallet : "ImOnline" , error : "InvalidKey" , docs : "Non existent public key." }) , (14u8 , 1u8) => Some (ErrorDetails { pallet : "ImOnline" , error : "DuplicatedHeartbeat" , docs : "Duplicated heartbeat." }) , (17u8 , 0u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ValueLow" , docs : "Value too low" }) , (17u8 , 1u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ProposalMissing" , docs : "Proposal does not exist" }) , (17u8 , 2u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyCanceled" , docs : "Cannot cancel the same proposal twice" }) , (17u8 , 3u8) => Some (ErrorDetails { pallet : "Democracy" , error : "DuplicateProposal" , docs : "Proposal already made" }) , (17u8 , 4u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ProposalBlacklisted" , docs : "Proposal still blacklisted" }) , (17u8 , 5u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotSimpleMajority" , docs : "Next external proposal not simple majority" }) , (17u8 , 6u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InvalidHash" , docs : "Invalid hash" }) , (17u8 , 7u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoProposal" , docs : "No external proposal" }) , (17u8 , 8u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyVetoed" , docs : "Identity may not veto a proposal twice" }) , (17u8 , 9u8) => Some (ErrorDetails { pallet : "Democracy" , error : "DuplicatePreimage" , docs : "Preimage already noted" }) , (17u8 , 10u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotImminent" , docs : "Not imminent" }) , (17u8 , 11u8) => Some (ErrorDetails { pallet : "Democracy" , error : "TooEarly" , docs : "Too early" }) , (17u8 , 12u8) => Some (ErrorDetails { pallet : "Democracy" , error : "Imminent" , docs : "Imminent" }) , (17u8 , 13u8) => Some (ErrorDetails { pallet : "Democracy" , error : "PreimageMissing" , docs : "Preimage not found" }) , (17u8 , 14u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ReferendumInvalid" , docs : "Vote given for invalid referendum" }) , (17u8 , 15u8) => Some (ErrorDetails { pallet : "Democracy" , error : "PreimageInvalid" , docs : "Invalid preimage" }) , (17u8 , 16u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoneWaiting" , docs : "No proposals waiting" }) , (17u8 , 17u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotVoter" , docs : "The given account did not vote on the referendum." }) , (17u8 , 18u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoPermission" , docs : "The actor has no permission to conduct the action." }) , (17u8 , 19u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyDelegating" , docs : "The account is already delegating." }) , (17u8 , 20u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InsufficientFunds" , docs : "Too high a balance was provided that the account cannot afford." }) , (17u8 , 21u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotDelegating" , docs : "The account is not currently delegating." }) , (17u8 , 22u8) => Some (ErrorDetails { pallet : "Democracy" , error : "VotesExist" , docs : "The account currently has votes attached to it and the operation cannot succeed until\nthese are removed, either through `unvote` or `reap_vote`." }) , (17u8 , 23u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InstantNotAllowed" , docs : "The instant referendum origin is currently disallowed." }) , (17u8 , 24u8) => Some (ErrorDetails { pallet : "Democracy" , error : "Nonsense" , docs : "Delegation to oneself makes no sense." }) , (17u8 , 25u8) => Some (ErrorDetails { pallet : "Democracy" , error : "WrongUpperBound" , docs : "Invalid upper bound." }) , (17u8 , 26u8) => Some (ErrorDetails { pallet : "Democracy" , error : "MaxVotesReached" , docs : "Maximum number of votes reached." }) , (17u8 , 27u8) => Some (ErrorDetails { pallet : "Democracy" , error : "TooManyProposals" , docs : "Maximum number of proposals reached." }) , (18u8 , 0u8) => Some (ErrorDetails { pallet : "Council" , error : "NotMember" , docs : "Account is not a member" }) , (18u8 , 1u8) => Some (ErrorDetails { pallet : "Council" , error : "DuplicateProposal" , docs : "Duplicate proposals not allowed" }) , (18u8 , 2u8) => Some (ErrorDetails { pallet : "Council" , error : "ProposalMissing" , docs : "Proposal must exist" }) , (18u8 , 3u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongIndex" , docs : "Mismatched index" }) , (18u8 , 4u8) => Some (ErrorDetails { pallet : "Council" , error : "DuplicateVote" , docs : "Duplicate vote ignored" }) , (18u8 , 5u8) => Some (ErrorDetails { pallet : "Council" , error : "AlreadyInitialized" , docs : "Members are already initialized!" }) , (18u8 , 6u8) => Some (ErrorDetails { pallet : "Council" , error : "TooEarly" , docs : "The close call was made too early, before the end of the voting." }) , (18u8 , 7u8) => Some (ErrorDetails { pallet : "Council" , error : "TooManyProposals" , docs : "There can only be a maximum of `MaxProposals` active proposals." }) , (18u8 , 8u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongProposalWeight" , docs : "The given weight bound for the proposal was too low." }) , (18u8 , 9u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongProposalLength" , docs : "The given length bound for the proposal was too low." }) , (19u8 , 0u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "NotMember" , docs : "Account is not a member" }) , (19u8 , 1u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "DuplicateProposal" , docs : "Duplicate proposals not allowed" }) , (19u8 , 2u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "ProposalMissing" , docs : "Proposal must exist" }) , (19u8 , 3u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongIndex" , docs : "Mismatched index" }) , (19u8 , 4u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "DuplicateVote" , docs : "Duplicate vote ignored" }) , (19u8 , 5u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "AlreadyInitialized" , docs : "Members are already initialized!" }) , (19u8 , 6u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "TooEarly" , docs : "The close call was made too early, before the end of the voting." }) , (19u8 , 7u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "TooManyProposals" , docs : "There can only be a maximum of `MaxProposals` active proposals." }) , (19u8 , 8u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongProposalWeight" , docs : "The given weight bound for the proposal was too low." }) , (19u8 , 9u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongProposalLength" , docs : "The given length bound for the proposal was too low." }) , (20u8 , 0u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "UnableToVote" , docs : "Cannot vote when no candidates or members exist." }) , (20u8 , 1u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "NoVotes" , docs : "Must vote for at least one candidate." }) , (20u8 , 2u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "TooManyVotes" , docs : "Cannot vote more than candidates." }) , (20u8 , 3u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MaximumVotesExceeded" , docs : "Cannot vote more than maximum allowed." }) , (20u8 , 4u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "LowBalance" , docs : "Cannot vote with stake less than minimum balance." }) , (20u8 , 5u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "UnableToPayBond" , docs : "Voter can not pay voting bond." }) , (20u8 , 6u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MustBeVoter" , docs : "Must be a voter." }) , (20u8 , 7u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "ReportSelf" , docs : "Cannot report self." }) , (20u8 , 8u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "DuplicatedCandidate" , docs : "Duplicated candidate submission." }) , (20u8 , 9u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MemberSubmit" , docs : "Member cannot re-submit candidacy." }) , (20u8 , 10u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "RunnerUpSubmit" , docs : "Runner cannot re-submit candidacy." }) , (20u8 , 11u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InsufficientCandidateFunds" , docs : "Candidate does not have enough funds." }) , (20u8 , 12u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "NotMember" , docs : "Not a member." }) , (20u8 , 13u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidWitnessData" , docs : "The provided count of number of candidates is incorrect." }) , (20u8 , 14u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidVoteCount" , docs : "The provided count of number of votes is incorrect." }) , (20u8 , 15u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidRenouncing" , docs : "The renouncing origin presented a wrong `Renouncing` parameter." }) , (20u8 , 16u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidReplacement" , docs : "Prediction regarding replacement after member removal is wrong." }) , (21u8 , 0u8) => Some (ErrorDetails { pallet : "TechnicalMembership" , error : "AlreadyMember" , docs : "Already a member." }) , (21u8 , 1u8) => Some (ErrorDetails { pallet : "TechnicalMembership" , error : "NotMember" , docs : "Not a member." }) , (22u8 , 0u8) => Some (ErrorDetails { pallet : "Treasury" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (22u8 , 1u8) => Some (ErrorDetails { pallet : "Treasury" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (22u8 , 2u8) => Some (ErrorDetails { pallet : "Treasury" , error : "TooManyApprovals" , docs : "Too many approvals in the queue." }) , (50u8 , 0u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (50u8 , 1u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (50u8 , 2u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "TooManyApprovals" , docs : "Too many approvals in the queue." }) , (51u8 , 0u8) => Some (ErrorDetails { pallet : "Tips" , error : "ReasonTooBig" , docs : "The reason given is just too big." }) , (51u8 , 1u8) => Some (ErrorDetails { pallet : "Tips" , error : "AlreadyKnown" , docs : "The tip was already found/started." }) , (51u8 , 2u8) => Some (ErrorDetails { pallet : "Tips" , error : "UnknownTip" , docs : "The tip hash is unknown." }) , (51u8 , 3u8) => Some (ErrorDetails { pallet : "Tips" , error : "NotFinder" , docs : "The account attempting to retract the tip is not the finder of the tip." }) , (51u8 , 4u8) => Some (ErrorDetails { pallet : "Tips" , error : "StillOpen" , docs : "The tip cannot be claimed/closed because there are not enough tippers yet." }) , (51u8 , 5u8) => Some (ErrorDetails { pallet : "Tips" , error : "Premature" , docs : "The tip cannot be claimed/closed because it's still in the countdown period." }) , (52u8 , 0u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (52u8 , 1u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (52u8 , 2u8) => Some (ErrorDetails { pallet : "Bounties" , error : "ReasonTooBig" , docs : "The reason given is just too big." }) , (52u8 , 3u8) => Some (ErrorDetails { pallet : "Bounties" , error : "UnexpectedStatus" , docs : "The bounty status is unexpected." }) , (52u8 , 4u8) => Some (ErrorDetails { pallet : "Bounties" , error : "RequireCurator" , docs : "Require bounty curator." }) , (52u8 , 5u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidValue" , docs : "Invalid bounty value." }) , (52u8 , 6u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidFee" , docs : "Invalid bounty fee." }) , (52u8 , 7u8) => Some (ErrorDetails { pallet : "Bounties" , error : "PendingPayout" , docs : "A bounty payout is pending.\nTo cancel the bounty, you must unassign and slash the curator." }) , (52u8 , 8u8) => Some (ErrorDetails { pallet : "Bounties" , error : "Premature" , docs : "The bounties cannot be claimed/closed because it's still in the countdown period." }) , (23u8 , 0u8) => Some (ErrorDetails { pallet : "Sudo" , error : "RequireSudo" , docs : "Sender must be the Sudo account" }) , (25u8 , 0u8) => Some (ErrorDetails { pallet : "Vesting" , error : "NotVesting" , docs : "The account given is not vesting." }) , (25u8 , 1u8) => Some (ErrorDetails { pallet : "Vesting" , error : "AtMaxVestingSchedules" , docs : "The account already has `MaxVestingSchedules` count of schedules and thus\ncannot add another one. Consider merging existing schedules in order to add another." }) , (25u8 , 2u8) => Some (ErrorDetails { pallet : "Vesting" , error : "AmountLow" , docs : "Amount being transferred is too low to create a vesting schedule." }) , (25u8 , 3u8) => Some (ErrorDetails { pallet : "Vesting" , error : "ScheduleIndexOutOfBounds" , docs : "An index was out of bounds of the vesting schedules." }) , (25u8 , 4u8) => Some (ErrorDetails { pallet : "Vesting" , error : "InvalidScheduleParams" , docs : "Failed to create a new schedule because some parameter was invalid." }) , (26u8 , 0u8) => Some (ErrorDetails { pallet : "Utility" , error : "TooManyCalls" , docs : "Too many calls batched." }) , (27u8 , 0u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManySubAccounts" , docs : "Too many subs-accounts." }) , (27u8 , 1u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotFound" , docs : "Account isn't found." }) , (27u8 , 2u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotNamed" , docs : "Account isn't named." }) , (27u8 , 3u8) => Some (ErrorDetails { pallet : "Identity" , error : "EmptyIndex" , docs : "Empty index." }) , (27u8 , 4u8) => Some (ErrorDetails { pallet : "Identity" , error : "FeeChanged" , docs : "Fee is changed." }) , (27u8 , 5u8) => Some (ErrorDetails { pallet : "Identity" , error : "NoIdentity" , docs : "No identity found." }) , (27u8 , 6u8) => Some (ErrorDetails { pallet : "Identity" , error : "StickyJudgement" , docs : "Sticky judgement." }) , (27u8 , 7u8) => Some (ErrorDetails { pallet : "Identity" , error : "JudgementGiven" , docs : "Judgement given." }) , (27u8 , 8u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidJudgement" , docs : "Invalid judgement." }) , (27u8 , 9u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidIndex" , docs : "The index is invalid." }) , (27u8 , 10u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidTarget" , docs : "The target is invalid." }) , (27u8 , 11u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManyFields" , docs : "Too many additional fields." }) , (27u8 , 12u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManyRegistrars" , docs : "Maximum amount of registrars reached. Cannot add any more." }) , (27u8 , 13u8) => Some (ErrorDetails { pallet : "Identity" , error : "AlreadyClaimed" , docs : "Account ID is already named." }) , (27u8 , 14u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotSub" , docs : "Sender is not a sub-account." }) , (27u8 , 15u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotOwned" , docs : "Sub-account isn't owned by sender." }) , (28u8 , 0u8) => Some (ErrorDetails { pallet : "Society" , error : "BadPosition" , docs : "An incorrect position was provided." }) , (28u8 , 1u8) => Some (ErrorDetails { pallet : "Society" , error : "NotMember" , docs : "User is not a member." }) , (28u8 , 2u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyMember" , docs : "User is already a member." }) , (28u8 , 3u8) => Some (ErrorDetails { pallet : "Society" , error : "Suspended" , docs : "User is suspended." }) , (28u8 , 4u8) => Some (ErrorDetails { pallet : "Society" , error : "NotSuspended" , docs : "User is not suspended." }) , (28u8 , 5u8) => Some (ErrorDetails { pallet : "Society" , error : "NoPayout" , docs : "Nothing to payout." }) , (28u8 , 6u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyFounded" , docs : "Society already founded." }) , (28u8 , 7u8) => Some (ErrorDetails { pallet : "Society" , error : "InsufficientPot" , docs : "Not enough in pot to accept candidate." }) , (28u8 , 8u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyVouching" , docs : "Member is already vouching or banned from vouching again." }) , (28u8 , 9u8) => Some (ErrorDetails { pallet : "Society" , error : "NotVouching" , docs : "Member is not vouching." }) , (28u8 , 10u8) => Some (ErrorDetails { pallet : "Society" , error : "Head" , docs : "Cannot remove the head of the chain." }) , (28u8 , 11u8) => Some (ErrorDetails { pallet : "Society" , error : "Founder" , docs : "Cannot remove the founder." }) , (28u8 , 12u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyBid" , docs : "User has already made a bid." }) , (28u8 , 13u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyCandidate" , docs : "User is already a candidate." }) , (28u8 , 14u8) => Some (ErrorDetails { pallet : "Society" , error : "NotCandidate" , docs : "User is not a candidate." }) , (28u8 , 15u8) => Some (ErrorDetails { pallet : "Society" , error : "MaxMembers" , docs : "Too many members in the society." }) , (28u8 , 16u8) => Some (ErrorDetails { pallet : "Society" , error : "NotFounder" , docs : "The caller is not the founder." }) , (28u8 , 17u8) => Some (ErrorDetails { pallet : "Society" , error : "NotHead" , docs : "The caller is not the head." }) , (29u8 , 0u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotAllowed" , docs : "User is not allowed to make a call on behalf of this account" }) , (29u8 , 1u8) => Some (ErrorDetails { pallet : "Recovery" , error : "ZeroThreshold" , docs : "Threshold must be greater than zero" }) , (29u8 , 2u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotEnoughFriends" , docs : "Friends list must be greater than zero and threshold" }) , (29u8 , 3u8) => Some (ErrorDetails { pallet : "Recovery" , error : "MaxFriends" , docs : "Friends list must be less than max friends" }) , (29u8 , 4u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotSorted" , docs : "Friends list must be sorted and free of duplicates" }) , (29u8 , 5u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotRecoverable" , docs : "This account is not set up for recovery" }) , (29u8 , 6u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyRecoverable" , docs : "This account is already set up for recovery" }) , (29u8 , 7u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyStarted" , docs : "A recovery process has already started for this account" }) , (29u8 , 8u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotStarted" , docs : "A recovery process has not started for this rescuer" }) , (29u8 , 9u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotFriend" , docs : "This account is not a friend who can vouch" }) , (29u8 , 10u8) => Some (ErrorDetails { pallet : "Recovery" , error : "DelayPeriod" , docs : "The friend must wait until the delay period to vouch for this recovery" }) , (29u8 , 11u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyVouched" , docs : "This user has already vouched for this recovery" }) , (29u8 , 12u8) => Some (ErrorDetails { pallet : "Recovery" , error : "Threshold" , docs : "The threshold for recovering this account has not been met" }) , (29u8 , 13u8) => Some (ErrorDetails { pallet : "Recovery" , error : "StillActive" , docs : "There are still active recovery attempts that need to be closed" }) , (29u8 , 14u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyProxy" , docs : "This account is already set up for recovery" }) , (29u8 , 15u8) => Some (ErrorDetails { pallet : "Recovery" , error : "BadState" , docs : "Some internal state is broken." }) , (30u8 , 0u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "FailedToSchedule" , docs : "Failed to schedule a call" }) , (30u8 , 1u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "NotFound" , docs : "Cannot find the scheduled call." }) , (30u8 , 2u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "TargetBlockNumberInPast" , docs : "Given target block number is in the past." }) , (30u8 , 3u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "RescheduleNoChange" , docs : "Reschedule failed because it does not change scheduled time." }) , (31u8 , 0u8) => Some (ErrorDetails { pallet : "Proxy" , error : "TooMany" , docs : "There are too many proxies registered or too many announcements pending." }) , (31u8 , 1u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotFound" , docs : "Proxy registration not found." }) , (31u8 , 2u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotProxy" , docs : "Sender is not a proxy of the account to be proxied." }) , (31u8 , 3u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unproxyable" , docs : "A call which is incompatible with the proxy type's filter was attempted." }) , (31u8 , 4u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Duplicate" , docs : "Account is already a proxy." }) , (31u8 , 5u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoPermission" , docs : "Call may not be made by proxy because it may escalate its privileges." }) , (31u8 , 6u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unannounced" , docs : "Announcement, if made at all, was made too recently." }) , (31u8 , 7u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoSelfProxy" , docs : "Cannot add self as proxy." }) , (32u8 , 0u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MinimumThreshold" , docs : "Threshold must be 2 or greater." }) , (32u8 , 1u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyApproved" , docs : "Call is already approved by this signatory." }) , (32u8 , 2u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoApprovalsNeeded" , docs : "Call doesn't need any (more) approvals." }) , (32u8 , 3u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooFewSignatories" , docs : "There are too few signatories in the list." }) , (32u8 , 4u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooManySignatories" , docs : "There are too many signatories in the list." }) , (32u8 , 5u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SignatoriesOutOfOrder" , docs : "The signatories were provided out of order; they should be ordered." }) , (32u8 , 6u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SenderInSignatories" , docs : "The sender was contained in the other signatories; it shouldn't be." }) , (32u8 , 7u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotFound" , docs : "Multisig operation not found when attempting to cancel." }) , (32u8 , 8u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotOwner" , docs : "Only the account that originally created the multisig is able to cancel it." }) , (32u8 , 9u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoTimepoint" , docs : "No timepoint was given, yet the multisig operation is already underway." }) , (32u8 , 10u8) => Some (ErrorDetails { pallet : "Multisig" , error : "WrongTimepoint" , docs : "A different timepoint was given to the multisig operation that is underway." }) , (32u8 , 11u8) => Some (ErrorDetails { pallet : "Multisig" , error : "UnexpectedTimepoint" , docs : "A timepoint was given, yet no multisig operation is underway." }) , (32u8 , 12u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MaxWeightTooLow" , docs : "The maximum weight information provided was too low." }) , (32u8 , 13u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyStored" , docs : "The data to be stored is already stored." }) , (35u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderInv" , docs : "Header - INVALID" }) , (35u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ConfirmedBlocksC" , docs : "Confirmed Blocks - CONFLICT" }) , (35u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ContinuousInv" , docs : "Continuous - INVALID" }) , (35u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AffirmationExisted" , docs : "Affirmation - EXISTED" }) , (35u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderHashInv" , docs : "Header Hash - INVALID" }) , (35u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "MMRInv" , docs : "MMR - INVALID" }) , (35u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderHashMis" , docs : "Header Hash - MISMATCHED" }) , (35u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ConfirmedHeaderNE" , docs : "Confirmed Header - NOT EXISTED" }) , (35u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ReceiptProofInv" , docs : "EthereumReceipt Proof - INVALID" }) , (35u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "PendingRelayHeaderParcelNE" , docs : "Pending Relay Header Parcel - NOT EXISTED" }) , (35u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "PendingRelayHeaderParcelAE" , docs : "Pending Relay Header Parcel - ALREADY EXISTED" }) , (35u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AlreadyVoteForAyeDup" , docs : "Already Vote for Aye - DUPLICATED" }) , (35u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AlreadyVoteForNayDup" , docs : "Already Vote for Nay - DUPLICATED" }) , (36u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AddrLenMis" , docs : "Address Length - MISMATCHED" }) , (36u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "PubkeyPrefixMis" , docs : "Pubkey Prefix - MISMATCHED" }) , (36u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "BytesCF" , docs : "Bytes - CONVERSION FAILED" }) , (36u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "IntCF" , docs : "Int - CONVERSION FAILED" }) , (36u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "ArrayCF" , docs : "Array - CONVERSION FAILED" }) , (36u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AddressCF" , docs : "Address - CONVERSION FAILED" }) , (36u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AssetAR" , docs : "Asset - ALREADY REDEEMED" }) , (36u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AuthoritiesChangeAR" , docs : "Authorities Change - ALREADY SYNCED" }) , (36u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "EthLogPF" , docs : "Eth Log - PARSING FAILED" }) , (36u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "KtonLockedNSBA" , docs : "*KTON* Locked - NO SUFFICIENT BACKING ASSETS" }) , (36u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RingLockedNSBA" , docs : "*RING* Locked - NO SUFFICIENT BACKING ASSETS" }) , (36u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "LogEntryNE" , docs : "Log Entry - NOT EXISTED" }) , (36u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RedeemDis" , docs : "Redeem - DISABLED" }) , (36u8 , 13u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RingLockLim" , docs : "Ring Lock - LIMITED" }) , (36u8 , 14u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "KtonLockLim" , docs : "Kton Lock - LIMITED" }) , (42u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "InvalidIssuingAccount" , docs : "Invalid Issuing System Account" }) , (42u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "AssetAlreadyRegistered" , docs : "assert already registered" }) , (42u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "AssetAlreadyRedeemed" , docs : "assert already redeemed" }) , (42u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "StringCF" , docs : "StringCF" }) , (42u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "InvalidEncodeERC20" , docs : "encode erc20 tx failed" }) , (42u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "InvalidAddressLen" , docs : "invalid ethereum address length" }) , (42u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "InvalidInputData" , docs : "decode input value error" }) , (42u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "DecodeEventFailed" , docs : "decode ethereum event failed" }) , (42u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "NoAuthority" , docs : "caller has no authority" }) , (42u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumIssuing" , error : "UnsupportedAction" , docs : "the action is not supported" }) , (37u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayParcelAR" , docs : "Relay Parcel - ALREADY RELAYED" }) , (37u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RoundMis" , docs : "Round - MISMATCHED" }) , (37u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ActiveGamesTM" , docs : "Active Games - TOO MANY" }) , (37u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ExistedAffirmationsFoundC" , docs : "Existed Affirmation(s) Found - CONFLICT" }) , (37u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "GameAtThisRoundC" , docs : "Game at This Round - CLOSED" }) , (37u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayAffirmationDup" , docs : "Relay Affirmation - DUPLICATED" }) , (37u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "StakeIns" , docs : "Usable *RING* for Stake - INSUFFICIENT" }) , (37u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayProofsQuantityInv" , docs : "Relay Proofs Quantity - INVALID" }) , (37u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayAffirmationNE" , docs : "Relay Affirmation - NOT EXISTED" }) , (37u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ExtendedRelayAffirmationNE" , docs : "Extended Relay Affirmation - NOT EXISTED" }) , (37u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "PreviousRelayProofsInc" , docs : "Previous Relay Proofs - INCOMPLETE" }) , (37u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "PendingRelayParcelNE" , docs : "Pending Relay Parcel - NOT EXISTED" }) , (38u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "CandidateAE" , docs : "Candidate - ALREADY EXISTED" }) , (38u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "CandidateNE" , docs : "Candidate - NOT EXISTED" }) , (38u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthorityAE" , docs : "Authority - ALREADY EXISTED" }) , (38u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthorityNE" , docs : "Authority - NOT EXISTED" }) , (38u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthorityIT" , docs : "Authority - IN TERM" }) , (38u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthoritiesCountTL" , docs : "Authorities Count - TOO LOW" }) , (38u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "StakeIns" , docs : "Stake - INSUFFICIENT" }) , (38u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "OnAuthoritiesChangeDis" , docs : "On Authorities Change - DISABLED" }) , (38u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "ScheduledTM" , docs : "Scheduled Items - TOO MANY" }) , (38u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "ScheduledSignNE" , docs : "Scheduled Sign -NOT EXISTED" }) , (38u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "SignatureInv" , docs : "Signature - INVALID" }) , (38u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "TermMis" , docs : "Term - MISMATCHED" }) , (38u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "AuthoritiesMis" , docs : "Authorities - MISMATCHED" }) , (38u8 , 13u8) => Some (ErrorDetails { pallet : "EthereumRelayAuthorities" , error : "NextAuthoritiesNE" , docs : "Next Authorities - NOT EXISTED" }) , (40u8 , 0u8) => Some (ErrorDetails { pallet : "EVM" , error : "BalanceLow" , docs : "Not enough balance to perform action" }) , (40u8 , 1u8) => Some (ErrorDetails { pallet : "EVM" , error : "FeeOverflow" , docs : "Calculating total fee overflowed" }) , (40u8 , 2u8) => Some (ErrorDetails { pallet : "EVM" , error : "PaymentOverflow" , docs : "Calculating total payment overflowed" }) , (40u8 , 3u8) => Some (ErrorDetails { pallet : "EVM" , error : "WithdrawFailed" , docs : "Withdraw fee failed" }) , (40u8 , 4u8) => Some (ErrorDetails { pallet : "EVM" , error : "GasPriceTooLow" , docs : "Gas price is too low." }) , (40u8 , 5u8) => Some (ErrorDetails { pallet : "EVM" , error : "InvalidNonce" , docs : "Nonce is invalid" }) , (41u8 , 0u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InvalidSignature" , docs : "Signature is invalid." }) , (41u8 , 1u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "PreLogExists" , docs : "Pre-log is present, therefore transact is not allowed." }) , (41u8 , 2u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionExitError" , docs : "The internal transaction failed." }) , (41u8 , 3u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionRevertError" , docs : "" }) , (41u8 , 4u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionFatalError" , docs : "" }) , (41u8 , 5u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "ReadyOnlyCall" , docs : "The internal call failed." }) , (41u8 , 6u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "MessageTransactionError" , docs : "Message transaction invalid" }) , (41u8 , 7u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "MessageValidateError" , docs : "Message validate invalid" }) , (45u8 , 0u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "InvalidJustification" , docs : "The given justification is invalid for the given header." }) , (45u8 , 1u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "InvalidAuthoritySet" , docs : "The authority set from the underlying header chain is invalid." }) , (45u8 , 2u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "TooManyRequests" , docs : "There are too many requests for the current window to handle." }) , (45u8 , 3u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "OldHeader" , docs : "The header being imported is older than the best finalized header known to the pallet." }) , (45u8 , 4u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "UnknownHeader" , docs : "The header is unknown to the pallet." }) , (45u8 , 5u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "UnsupportedScheduledChange" , docs : "The scheduled authority set change found in the header is unsupported by the pallet.\n\nThis is the case for non-standard (e.g forced) authority set changes." }) , (45u8 , 6u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "NotInitialized" , docs : "The pallet is not yet initialized." }) , (45u8 , 7u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "AlreadyInitialized" , docs : "The pallet has already been initialized." }) , (45u8 , 8u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "Halted" , docs : "All pallet operations are halted." }) , (45u8 , 9u8) => Some (ErrorDetails { pallet : "BridgePangoroGrandpa" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (43u8 , 0u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "Halted" , docs : "All pallet operations are halted." }) , (43u8 , 1u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "MessageRejectedByChainVerifier" , docs : "Message has been treated as invalid by chain verifier." }) , (43u8 , 2u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "MessageRejectedByLaneVerifier" , docs : "Message has been treated as invalid by lane verifier." }) , (43u8 , 3u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "FailedToWithdrawMessageFee" , docs : "Submitter has failed to pay fee for delivering and dispatching messages." }) , (43u8 , 4u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "TooManyMessagesInTheProof" , docs : "The transaction brings too many messages." }) , (43u8 , 5u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "InvalidMessagesProof" , docs : "Invalid messages has been submitted." }) , (43u8 , 6u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "InvalidMessagesDeliveryProof" , docs : "Invalid messages delivery proof has been submitted." }) , (43u8 , 7u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "InvalidUnrewardedRelayers" , docs : "The bridged chain has invalid `UnrewardedRelayers` in its storage (fatal for the lane)." }) , (43u8 , 8u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "InvalidUnrewardedRelayersState" , docs : "The relayer has declared invalid unrewarded relayers state in the\n`receive_messages_delivery_proof` call." }) , (43u8 , 9u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "MessageIsAlreadyDelivered" , docs : "The message someone is trying to work with (i.e. increase fee) is already-delivered." }) , (43u8 , 10u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "MessageIsNotYetSent" , docs : "The message someone is trying to work with (i.e. increase fee) is not yet sent." }) , (43u8 , 11u8) => Some (ErrorDetails { pallet : "BridgePangoroMessages" , error : "TryingToConfirmMoreMessagesThanExpected" , docs : "The number of actually confirmed messages is going to be larger than the number of\nmessages in the proof. This may mean that this or bridged chain storage is corrupted." }) , (60u8 , 0u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "InvalidJustification" , docs : "The given justification is invalid for the given header." }) , (60u8 , 1u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "InvalidAuthoritySet" , docs : "The authority set from the underlying header chain is invalid." }) , (60u8 , 2u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "TooManyRequests" , docs : "There are too many requests for the current window to handle." }) , (60u8 , 3u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "OldHeader" , docs : "The header being imported is older than the best finalized header known to the pallet." }) , (60u8 , 4u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "UnknownHeader" , docs : "The header is unknown to the pallet." }) , (60u8 , 5u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "UnsupportedScheduledChange" , docs : "The scheduled authority set change found in the header is unsupported by the pallet.\n\nThis is the case for non-standard (e.g forced) authority set changes." }) , (60u8 , 6u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "NotInitialized" , docs : "The pallet is not yet initialized." }) , (60u8 , 7u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "AlreadyInitialized" , docs : "The pallet has already been initialized." }) , (60u8 , 8u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "Halted" , docs : "All pallet operations are halted." }) , (60u8 , 9u8) => Some (ErrorDetails { pallet : "BridgeRococoGrandpa" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (61u8 , 0u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "UnknownRelayChainBlock" , docs : "Relay chain block is unknown to us." }) , (61u8 , 1u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "InvalidStorageProof" , docs : "Invalid storage proof has been passed." }) , (61u8 , 2u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "UnknownParaHead" , docs : "Given parachain head is unknown." }) , (61u8 , 3u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (61u8 , 4u8) => Some (ErrorDetails { pallet : "BridgeRococoParachains" , error : "FailedToExtractStateRoot" , docs : "Failed to extract state root from given parachain head." }) , (63u8 , 0u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "Halted" , docs : "All pallet operations are halted." }) , (63u8 , 1u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "MessageRejectedByChainVerifier" , docs : "Message has been treated as invalid by chain verifier." }) , (63u8 , 2u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "MessageRejectedByLaneVerifier" , docs : "Message has been treated as invalid by lane verifier." }) , (63u8 , 3u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "FailedToWithdrawMessageFee" , docs : "Submitter has failed to pay fee for delivering and dispatching messages." }) , (63u8 , 4u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "TooManyMessagesInTheProof" , docs : "The transaction brings too many messages." }) , (63u8 , 5u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "InvalidMessagesProof" , docs : "Invalid messages has been submitted." }) , (63u8 , 6u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "InvalidMessagesDeliveryProof" , docs : "Invalid messages delivery proof has been submitted." }) , (63u8 , 7u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "InvalidUnrewardedRelayers" , docs : "The bridged chain has invalid `UnrewardedRelayers` in its storage (fatal for the lane)." }) , (63u8 , 8u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "InvalidUnrewardedRelayersState" , docs : "The relayer has declared invalid unrewarded relayers state in the\n`receive_messages_delivery_proof` call." }) , (63u8 , 9u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "MessageIsAlreadyDelivered" , docs : "The message someone is trying to work with (i.e. increase fee) is already-delivered." }) , (63u8 , 10u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "MessageIsNotYetSent" , docs : "The message someone is trying to work with (i.e. increase fee) is not yet sent." }) , (63u8 , 11u8) => Some (ErrorDetails { pallet : "BridgePangolinParachainMessages" , error : "TryingToConfirmMoreMessagesThanExpected" , docs : "The number of actually confirmed messages is going to be larger than the number of\nmessages in the proof. This may mean that this or bridged chain storage is corrupted." }) , (53u8 , 0u8) => Some (ErrorDetails { pallet : "PangoroFeeMarket" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (53u8 , 1u8) => Some (ErrorDetails { pallet : "PangoroFeeMarket" , error : "AlreadyEnrolled" , docs : "The relayer has been enrolled." }) , (53u8 , 2u8) => Some (ErrorDetails { pallet : "PangoroFeeMarket" , error : "NotEnrolled" , docs : "This relayer doesn't enroll ever." }) , (53u8 , 3u8) => Some (ErrorDetails { pallet : "PangoroFeeMarket" , error : "CollateralTooLow" , docs : "Locked collateral is too low to cover one order." }) , (53u8 , 4u8) => Some (ErrorDetails { pallet : "PangoroFeeMarket" , error : "StillHasOrdersNotConfirmed" , docs : "Update locked collateral is not allow since some orders are not confirm." }) , (53u8 , 5u8) => Some (ErrorDetails { pallet : "PangoroFeeMarket" , error : "RelayFeeTooLow" , docs : "The fee is lower than MinimumRelayFee." }) , (53u8 , 6u8) => Some (ErrorDetails { pallet : "PangoroFeeMarket" , error : "OccupiedRelayer" , docs : "The relayer is occupied, and can't cancel enrollment now." }) , (64u8 , 0u8) => Some (ErrorDetails { pallet : "PangolinParachainFeeMarket" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (64u8 , 1u8) => Some (ErrorDetails { pallet : "PangolinParachainFeeMarket" , error : "AlreadyEnrolled" , docs : "The relayer has been enrolled." }) , (64u8 , 2u8) => Some (ErrorDetails { pallet : "PangolinParachainFeeMarket" , error : "NotEnrolled" , docs : "This relayer doesn't enroll ever." }) , (64u8 , 3u8) => Some (ErrorDetails { pallet : "PangolinParachainFeeMarket" , error : "CollateralTooLow" , docs : "Locked collateral is too low to cover one order." }) , (64u8 , 4u8) => Some (ErrorDetails { pallet : "PangolinParachainFeeMarket" , error : "StillHasOrdersNotConfirmed" , docs : "Update locked collateral is not allow since some orders are not confirm." }) , (64u8 , 5u8) => Some (ErrorDetails { pallet : "PangolinParachainFeeMarket" , error : "RelayFeeTooLow" , docs : "The fee is lower than MinimumRelayFee." }) , (64u8 , 6u8) => Some (ErrorDetails { pallet : "PangolinParachainFeeMarket" , error : "OccupiedRelayer" , docs : "The relayer is occupied, and can't cancel enrollment now." }) , (54u8 , 0u8) => Some (ErrorDetails { pallet : "TransactionPause" , error : "CannotPause" , docs : "can not pause" }) , (54u8 , 1u8) => Some (ErrorDetails { pallet : "TransactionPause" , error : "InvalidCharacter" , docs : "invalid character encoding" }) , (49u8 , 0u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "TokenUnregistered" , docs : "Token unregistered when issuing" }) , (49u8 , 1u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "InvalidIssuingAccount" , docs : "Invalid Issuing System Account" }) , (49u8 , 2u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "StringCF" , docs : "StringCF" }) , (49u8 , 3u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "InvalidEncodeERC20" , docs : "encode erc20 tx failed" }) , (49u8 , 4u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "InvalidIssueEncoding" , docs : "encode issue tx failed" }) , (49u8 , 5u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "InvalidAddressLen" , docs : "invalid ethereum address length" }) , (49u8 , 6u8) => Some (ErrorDetails { pallet : "Substrate2SubstrateIssuing" , error : "InvalidMessageSender" , docs : "invalid message sender" }) , (65u8 , 0u8) => Some (ErrorDetails { pallet : "ToPangolinParachainBacking" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (65u8 , 1u8) => Some (ErrorDetails { pallet : "ToPangolinParachainBacking" , error : "RingLockLimited" , docs : "Ring Lock LIMITED." }) , (65u8 , 2u8) => Some (ErrorDetails { pallet : "ToPangolinParachainBacking" , error : "RingDailyLimited" , docs : "Redeem Daily Limited" }) , (65u8 , 3u8) => Some (ErrorDetails { pallet : "ToPangolinParachainBacking" , error : "NonceDuplicated" , docs : "Message nonce duplicated." }) , _ => None }
             } else {
                 None
             }
@@ -26586,9 +27736,6 @@ pub mod api {
         pub fn bounties(&self) -> bounties::constants::ConstantsApi {
             bounties::constants::ConstantsApi
         }
-        pub fn claims(&self) -> claims::constants::ConstantsApi {
-            claims::constants::ConstantsApi
-        }
         pub fn vesting(&self) -> vesting::constants::ConstantsApi {
             vesting::constants::ConstantsApi
         }
@@ -26650,13 +27797,28 @@ pub mod api {
         ) -> bridge_rococo_parachains::constants::ConstantsApi {
             bridge_rococo_parachains::constants::ConstantsApi
         }
-        pub fn fee_market(&self) -> fee_market::constants::ConstantsApi {
-            fee_market::constants::ConstantsApi
+        pub fn bridge_pangolin_parachain_messages(
+            &self,
+        ) -> bridge_pangolin_parachain_messages::constants::ConstantsApi {
+            bridge_pangolin_parachain_messages::constants::ConstantsApi
+        }
+        pub fn pangoro_fee_market(&self) -> pangoro_fee_market::constants::ConstantsApi {
+            pangoro_fee_market::constants::ConstantsApi
+        }
+        pub fn pangolin_parachain_fee_market(
+            &self,
+        ) -> pangolin_parachain_fee_market::constants::ConstantsApi {
+            pangolin_parachain_fee_market::constants::ConstantsApi
         }
         pub fn substrate2_substrate_issuing(
             &self,
         ) -> substrate2_substrate_issuing::constants::ConstantsApi {
             substrate2_substrate_issuing::constants::ConstantsApi
+        }
+        pub fn to_pangolin_parachain_backing(
+            &self,
+        ) -> to_pangolin_parachain_backing::constants::ConstantsApi {
+            to_pangolin_parachain_backing::constants::ConstantsApi
         }
     }
     pub struct StorageApi<'a, T: ::subxt::Config> {
@@ -26707,15 +27869,6 @@ pub mod api {
         pub fn beefy(&self) -> beefy::storage::StorageApi<'a, T> {
             beefy::storage::StorageApi::new(self.client)
         }
-        pub fn beefy_gadget(&self) -> beefy_gadget::storage::StorageApi<'a, T> {
-            beefy_gadget::storage::StorageApi::new(self.client)
-        }
-        pub fn mmr(&self) -> mmr::storage::StorageApi<'a, T> {
-            mmr::storage::StorageApi::new(self.client)
-        }
-        pub fn mmr_leaf(&self) -> mmr_leaf::storage::StorageApi<'a, T> {
-            mmr_leaf::storage::StorageApi::new(self.client)
-        }
         pub fn im_online(&self) -> im_online::storage::StorageApi<'a, T> {
             im_online::storage::StorageApi::new(self.client)
         }
@@ -26751,9 +27904,6 @@ pub mod api {
         }
         pub fn sudo(&self) -> sudo::storage::StorageApi<'a, T> {
             sudo::storage::StorageApi::new(self.client)
-        }
-        pub fn claims(&self) -> claims::storage::StorageApi<'a, T> {
-            claims::storage::StorageApi::new(self.client)
         }
         pub fn vesting(&self) -> vesting::storage::StorageApi<'a, T> {
             vesting::storage::StorageApi::new(self.client)
@@ -26818,8 +27968,18 @@ pub mod api {
         ) -> bridge_rococo_parachains::storage::StorageApi<'a, T> {
             bridge_rococo_parachains::storage::StorageApi::new(self.client)
         }
-        pub fn fee_market(&self) -> fee_market::storage::StorageApi<'a, T> {
-            fee_market::storage::StorageApi::new(self.client)
+        pub fn bridge_pangolin_parachain_messages(
+            &self,
+        ) -> bridge_pangolin_parachain_messages::storage::StorageApi<'a, T> {
+            bridge_pangolin_parachain_messages::storage::StorageApi::new(self.client)
+        }
+        pub fn pangoro_fee_market(&self) -> pangoro_fee_market::storage::StorageApi<'a, T> {
+            pangoro_fee_market::storage::StorageApi::new(self.client)
+        }
+        pub fn pangolin_parachain_fee_market(
+            &self,
+        ) -> pangolin_parachain_fee_market::storage::StorageApi<'a, T> {
+            pangolin_parachain_fee_market::storage::StorageApi::new(self.client)
         }
         pub fn transaction_pause(&self) -> transaction_pause::storage::StorageApi<'a, T> {
             transaction_pause::storage::StorageApi::new(self.client)
@@ -26828,6 +27988,11 @@ pub mod api {
             &self,
         ) -> substrate2_substrate_issuing::storage::StorageApi<'a, T> {
             substrate2_substrate_issuing::storage::StorageApi::new(self.client)
+        }
+        pub fn to_pangolin_parachain_backing(
+            &self,
+        ) -> to_pangolin_parachain_backing::storage::StorageApi<'a, T> {
+            to_pangolin_parachain_backing::storage::StorageApi::new(self.client)
         }
     }
     pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
@@ -26872,9 +28037,6 @@ pub mod api {
         pub fn grandpa(&self) -> grandpa::calls::TransactionApi<'a, T, X, A> {
             grandpa::calls::TransactionApi::new(self.client)
         }
-        pub fn beefy_gadget(&self) -> beefy_gadget::calls::TransactionApi<'a, T, X, A> {
-            beefy_gadget::calls::TransactionApi::new(self.client)
-        }
         pub fn im_online(&self) -> im_online::calls::TransactionApi<'a, T, X, A> {
             im_online::calls::TransactionApi::new(self.client)
         }
@@ -26911,9 +28073,6 @@ pub mod api {
         }
         pub fn sudo(&self) -> sudo::calls::TransactionApi<'a, T, X, A> {
             sudo::calls::TransactionApi::new(self.client)
-        }
-        pub fn claims(&self) -> claims::calls::TransactionApi<'a, T, X, A> {
-            claims::calls::TransactionApi::new(self.client)
         }
         pub fn vesting(&self) -> vesting::calls::TransactionApi<'a, T, X, A> {
             vesting::calls::TransactionApi::new(self.client)
@@ -26982,8 +28141,18 @@ pub mod api {
         ) -> bridge_rococo_parachains::calls::TransactionApi<'a, T, X, A> {
             bridge_rococo_parachains::calls::TransactionApi::new(self.client)
         }
-        pub fn fee_market(&self) -> fee_market::calls::TransactionApi<'a, T, X, A> {
-            fee_market::calls::TransactionApi::new(self.client)
+        pub fn bridge_pangolin_parachain_messages(
+            &self,
+        ) -> bridge_pangolin_parachain_messages::calls::TransactionApi<'a, T, X, A> {
+            bridge_pangolin_parachain_messages::calls::TransactionApi::new(self.client)
+        }
+        pub fn pangoro_fee_market(&self) -> pangoro_fee_market::calls::TransactionApi<'a, T, X, A> {
+            pangoro_fee_market::calls::TransactionApi::new(self.client)
+        }
+        pub fn pangolin_parachain_fee_market(
+            &self,
+        ) -> pangolin_parachain_fee_market::calls::TransactionApi<'a, T, X, A> {
+            pangolin_parachain_fee_market::calls::TransactionApi::new(self.client)
         }
         pub fn transaction_pause(&self) -> transaction_pause::calls::TransactionApi<'a, T, X, A> {
             transaction_pause::calls::TransactionApi::new(self.client)
@@ -26992,6 +28161,11 @@ pub mod api {
             &self,
         ) -> substrate2_substrate_issuing::calls::TransactionApi<'a, T, X, A> {
             substrate2_substrate_issuing::calls::TransactionApi::new(self.client)
+        }
+        pub fn to_pangolin_parachain_backing(
+            &self,
+        ) -> to_pangolin_parachain_backing::calls::TransactionApi<'a, T, X, A> {
+            to_pangolin_parachain_backing::calls::TransactionApi::new(self.client)
         }
     }
 }

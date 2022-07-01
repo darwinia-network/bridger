@@ -1,5 +1,8 @@
-pub use delivery_relay::*;
-pub use receiving_relay::*;
+#[cfg(feature = "bridge-parachain")]
+pub use self::bridge_parachain::*;
+pub use self::bridge_solochain::*;
 
-mod delivery_relay;
-mod receiving_relay;
+#[cfg(feature = "bridge-parachain")]
+mod bridge_parachain;
+mod bridge_solochain;
+mod common;

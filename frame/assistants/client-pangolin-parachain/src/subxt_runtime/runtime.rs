@@ -33,7 +33,11 @@ pub mod api {
         #[codec(index = 22)]
         BridgePangolinDispatch(bridge_pangolin_dispatch::Event),
         #[codec(index = 23)]
-        FeeMarket(fee_market::Event),
+        PangolinFeeMarket(pangolin_fee_market::Event),
+        #[codec(index = 24)]
+        FromPangolinIssuing(from_pangolin_issuing::Event),
+        #[codec(index = 25)]
+        RemoteGovernment(remote_government::Event),
     }
     pub mod system {
         use super::runtime_types;
@@ -707,11 +711,11 @@ pub mod api {
                             72u8, 80u8, 97u8, 110u8, 103u8, 111u8, 108u8, 105u8, 110u8, 32u8, 80u8,
                             97u8, 114u8, 97u8, 99u8, 104u8, 97u8, 105u8, 110u8, 72u8, 80u8, 97u8,
                             110u8, 103u8, 111u8, 108u8, 105u8, 110u8, 32u8, 80u8, 97u8, 114u8,
-                            97u8, 99u8, 104u8, 97u8, 105u8, 110u8, 1u8, 0u8, 0u8, 0u8, 3u8, 0u8,
-                            0u8, 0u8, 1u8, 0u8, 0u8, 0u8, 44u8, 223u8, 106u8, 203u8, 104u8, 153u8,
+                            97u8, 99u8, 104u8, 97u8, 105u8, 110u8, 1u8, 0u8, 0u8, 0u8, 100u8, 20u8,
+                            0u8, 0u8, 1u8, 0u8, 0u8, 0u8, 48u8, 223u8, 106u8, 203u8, 104u8, 153u8,
                             7u8, 96u8, 155u8, 4u8, 0u8, 0u8, 0u8, 55u8, 227u8, 151u8, 252u8, 124u8,
                             145u8, 245u8, 228u8, 1u8, 0u8, 0u8, 0u8, 64u8, 254u8, 58u8, 212u8, 1u8,
-                            248u8, 149u8, 154u8, 5u8, 0u8, 0u8, 0u8, 210u8, 188u8, 152u8, 151u8,
+                            248u8, 149u8, 154u8, 6u8, 0u8, 0u8, 0u8, 210u8, 188u8, 152u8, 151u8,
                             238u8, 208u8, 143u8, 21u8, 3u8, 0u8, 0u8, 0u8, 247u8, 139u8, 39u8,
                             139u8, 229u8, 63u8, 69u8, 76u8, 2u8, 0u8, 0u8, 0u8, 171u8, 60u8, 5u8,
                             114u8, 41u8, 31u8, 235u8, 139u8, 1u8, 0u8, 0u8, 0u8, 221u8, 113u8,
@@ -719,8 +723,9 @@ pub mod api {
                             157u8, 137u8, 144u8, 79u8, 91u8, 146u8, 63u8, 1u8, 0u8, 0u8, 0u8, 55u8,
                             200u8, 187u8, 19u8, 80u8, 169u8, 162u8, 168u8, 1u8, 0u8, 0u8, 0u8,
                             234u8, 147u8, 227u8, 241u8, 111u8, 61u8, 105u8, 98u8, 2u8, 0u8, 0u8,
-                            0u8, 45u8, 6u8, 198u8, 53u8, 50u8, 185u8, 56u8, 227u8, 1u8, 0u8, 0u8,
-                            0u8, 1u8, 0u8, 0u8, 0u8, 0u8,
+                            0u8, 60u8, 134u8, 72u8, 242u8, 252u8, 32u8, 139u8, 31u8, 1u8, 0u8, 0u8,
+                            0u8, 37u8, 128u8, 193u8, 193u8, 177u8, 221u8, 230u8, 148u8, 1u8, 0u8,
+                            0u8, 0u8, 1u8, 0u8, 0u8, 0u8, 0u8,
                         ][..],
                     )?)
                 }
@@ -912,7 +917,7 @@ pub mod api {
             impl ::subxt::StorageEntry for ValidationData {
                 const PALLET: &'static str = "ParachainSystem";
                 const STORAGE: &'static str = "ValidationData";
-                type Value = runtime_types::polkadot_primitives::v1::PersistedValidationData<
+                type Value = runtime_types::polkadot_primitives::v2::PersistedValidationData<
                     ::subxt::sp_core::H256,
                     ::core::primitive::u32,
                 >;
@@ -934,8 +939,17 @@ pub mod api {
                 const PALLET: &'static str = "ParachainSystem";
                 const STORAGE: &'static str = "UpgradeRestrictionSignal";
                 type Value = ::core::option::Option<
-                    runtime_types::polkadot_primitives::v1::UpgradeRestriction,
+                    runtime_types::polkadot_primitives::v2::UpgradeRestriction,
                 >;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct RelayStateProof;
+            impl ::subxt::StorageEntry for RelayStateProof {
+                const PALLET: &'static str = "ParachainSystem";
+                const STORAGE: &'static str = "RelayStateProof";
+                type Value = runtime_types::sp_trie::storage_proof::StorageProof;
                 fn key(&self) -> ::subxt::StorageEntryKey {
                     ::subxt::StorageEntryKey::Plain
                 }
@@ -953,7 +967,7 @@ pub mod api {
             impl ::subxt::StorageEntry for HostConfiguration {
                 const PALLET: &'static str = "ParachainSystem";
                 const STORAGE: &'static str = "HostConfiguration";
-                type Value = runtime_types::polkadot_primitives::v1::AbridgedHostConfiguration;
+                type Value = runtime_types::polkadot_primitives::v2::AbridgedHostConfiguration;
                 fn key(&self) -> ::subxt::StorageEntryKey {
                     ::subxt::StorageEntryKey::Plain
                 }
@@ -1122,7 +1136,7 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     ::core::option::Option<
-                        runtime_types::polkadot_primitives::v1::PersistedValidationData<
+                        runtime_types::polkadot_primitives::v2::PersistedValidationData<
                             ::subxt::sp_core::H256,
                             ::core::primitive::u32,
                         >,
@@ -1145,12 +1159,22 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     ::core::option::Option<
-                        runtime_types::polkadot_primitives::v1::UpgradeRestriction,
+                        runtime_types::polkadot_primitives::v2::UpgradeRestriction,
                     >,
                     ::subxt::BasicError,
                 > {
                     let entry = UpgradeRestrictionSignal;
                     self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn relay_state_proof(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<runtime_types::sp_trie::storage_proof::StorageProof>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = RelayStateProof;
+                    self.client.storage().fetch(&entry, hash).await
                 }                pub async fn relevant_messaging_state (& self , hash : :: core :: option :: Option < T :: Hash > ,) -> :: core :: result :: Result < :: core :: option :: Option < runtime_types :: cumulus_pallet_parachain_system :: relay_state_snapshot :: MessagingStateSnapshot > , :: subxt :: BasicError >{
                     let entry = RelevantMessagingState;
                     self.client.storage().fetch(&entry, hash).await
@@ -1160,7 +1184,7 @@ pub mod api {
                     hash: ::core::option::Option<T::Hash>,
                 ) -> ::core::result::Result<
                     ::core::option::Option<
-                        runtime_types::polkadot_primitives::v1::AbridgedHostConfiguration,
+                        runtime_types::polkadot_primitives::v2::AbridgedHostConfiguration,
                     >,
                     ::subxt::BasicError,
                 > {
@@ -1940,17 +1964,6 @@ pub mod api {
             use super::runtime_types;
             pub struct ConstantsApi;
             impl ConstantsApi {
-                pub fn transaction_byte_fee(
-                    &self,
-                ) -> ::core::result::Result<::core::primitive::u128, ::subxt::BasicError>
-                {
-                    Ok(::subxt::codec::Decode::decode(
-                        &mut &[
-                            0u8, 128u8, 224u8, 55u8, 121u8, 195u8, 17u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-                            0u8, 0u8, 0u8, 0u8,
-                        ][..],
-                    )?)
-                }
                 pub fn operational_fee_multiplier(
                     &self,
                 ) -> ::core::result::Result<::core::primitive::u8, ::subxt::BasicError>
@@ -1971,6 +1984,23 @@ pub mod api {
                         &mut &[
                             4u8, 0u8, 8u8, 175u8, 47u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
+                        ][..],
+                    )?)
+                }
+                pub fn length_to_fee(
+                    &self,
+                ) -> ::core::result::Result<
+                    ::std::vec::Vec<
+                        runtime_types::frame_support::weights::WeightToFeeCoefficient<
+                            ::core::primitive::u128,
+                        >,
+                    >,
+                    ::subxt::BasicError,
+                > {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[
+                            4u8, 0u8, 128u8, 224u8, 55u8, 121u8, 195u8, 17u8, 0u8, 0u8, 0u8, 0u8,
+                            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
                         ][..],
                     )?)
                 }
@@ -2754,6 +2784,102 @@ pub mod api {
                 const PALLET: &'static str = "XcmpQueue";
                 const FUNCTION: &'static str = "service_overweight";
             }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct suspend_xcm_execution;
+            impl ::subxt::Call for suspend_xcm_execution {
+                const PALLET: &'static str = "XcmpQueue";
+                const FUNCTION: &'static str = "suspend_xcm_execution";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct resume_xcm_execution;
+            impl ::subxt::Call for resume_xcm_execution {
+                const PALLET: &'static str = "XcmpQueue";
+                const FUNCTION: &'static str = "resume_xcm_execution";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct update_suspend_threshold {
+                pub new: ::core::primitive::u32,
+            }
+            impl ::subxt::Call for update_suspend_threshold {
+                const PALLET: &'static str = "XcmpQueue";
+                const FUNCTION: &'static str = "update_suspend_threshold";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct update_drop_threshold {
+                pub new: ::core::primitive::u32,
+            }
+            impl ::subxt::Call for update_drop_threshold {
+                const PALLET: &'static str = "XcmpQueue";
+                const FUNCTION: &'static str = "update_drop_threshold";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct update_resume_threshold {
+                pub new: ::core::primitive::u32,
+            }
+            impl ::subxt::Call for update_resume_threshold {
+                const PALLET: &'static str = "XcmpQueue";
+                const FUNCTION: &'static str = "update_resume_threshold";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct update_threshold_weight {
+                pub new: ::core::primitive::u64,
+            }
+            impl ::subxt::Call for update_threshold_weight {
+                const PALLET: &'static str = "XcmpQueue";
+                const FUNCTION: &'static str = "update_threshold_weight";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct update_weight_restrict_decay {
+                pub new: ::core::primitive::u64,
+            }
+            impl ::subxt::Call for update_weight_restrict_decay {
+                const PALLET: &'static str = "XcmpQueue";
+                const FUNCTION: &'static str = "update_weight_restrict_decay";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct update_xcmp_max_individual_weight {
+                pub new: ::core::primitive::u64,
+            }
+            impl ::subxt::Call for update_xcmp_max_individual_weight {
+                const PALLET: &'static str = "XcmpQueue";
+                const FUNCTION: &'static str = "update_xcmp_max_individual_weight";
+            }
             pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
                 client: &'a ::subxt::Client<T>,
                 marker: ::core::marker::PhantomData<(X, A)>,
@@ -2780,6 +2906,98 @@ pub mod api {
                         index,
                         weight_limit,
                     };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn suspend_xcm_execution(
+                    &self,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, suspend_xcm_execution, DispatchError>
+                {
+                    let call = suspend_xcm_execution {};
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn resume_xcm_execution(
+                    &self,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, resume_xcm_execution, DispatchError>
+                {
+                    let call = resume_xcm_execution {};
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn update_suspend_threshold(
+                    &self,
+                    new: ::core::primitive::u32,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    update_suspend_threshold,
+                    DispatchError,
+                > {
+                    let call = update_suspend_threshold { new };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn update_drop_threshold(
+                    &self,
+                    new: ::core::primitive::u32,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, update_drop_threshold, DispatchError>
+                {
+                    let call = update_drop_threshold { new };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn update_resume_threshold(
+                    &self,
+                    new: ::core::primitive::u32,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    update_resume_threshold,
+                    DispatchError,
+                > {
+                    let call = update_resume_threshold { new };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn update_threshold_weight(
+                    &self,
+                    new: ::core::primitive::u64,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    update_threshold_weight,
+                    DispatchError,
+                > {
+                    let call = update_threshold_weight { new };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn update_weight_restrict_decay(
+                    &self,
+                    new: ::core::primitive::u64,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    update_weight_restrict_decay,
+                    DispatchError,
+                > {
+                    let call = update_weight_restrict_decay { new };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn update_xcmp_max_individual_weight(
+                    &self,
+                    new: ::core::primitive::u64,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    update_xcmp_max_individual_weight,
+                    DispatchError,
+                > {
+                    let call = update_xcmp_max_individual_weight { new };
                     ::subxt::SubmittableExtrinsic::new(self.client, call)
                 }
             }
@@ -2950,6 +3168,15 @@ pub mod api {
                     ::subxt::StorageEntryKey::Plain
                 }
             }
+            pub struct QueueSuspended;
+            impl ::subxt::StorageEntry for QueueSuspended {
+                const PALLET: &'static str = "XcmpQueue";
+                const STORAGE: &'static str = "QueueSuspended";
+                type Value = ::core::primitive::bool;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
             pub struct StorageApi<'a, T: ::subxt::Config> {
                 client: &'a ::subxt::Client<T>,
             }
@@ -3081,6 +3308,14 @@ pub mod api {
                 ) -> ::core::result::Result<::core::primitive::u64, ::subxt::BasicError>
                 {
                     let entry = OverweightCount;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn queue_suspended(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<::core::primitive::bool, ::subxt::BasicError>
+                {
+                    let entry = QueueSuspended;
                     self.client.storage().fetch_or_default(&entry, hash).await
                 }
             }
@@ -4832,6 +5067,18 @@ pub mod api {
                 const PALLET: &'static str = "Proxy";
                 const EVENT: &'static str = "ProxyAdded";
             }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct ProxyRemoved {
+                pub delegator: ::subxt::sp_core::crypto::AccountId32,
+                pub delegatee: ::subxt::sp_core::crypto::AccountId32,
+                pub proxy_type:
+                    runtime_types::pangolin_parachain_runtime::pallets::proxy::ProxyType,
+                pub delay: ::core::primitive::u32,
+            }
+            impl ::subxt::Event for ProxyRemoved {
+                const PALLET: &'static str = "Proxy";
+                const EVENT: &'static str = "ProxyRemoved";
+            }
         }
         pub mod storage {
             use super::runtime_types;
@@ -5970,7 +6217,7 @@ pub mod api {
             }
         }
     }
-    pub mod fee_market {
+    pub mod pangolin_fee_market {
         use super::runtime_types;
         pub mod calls {
             use super::runtime_types;
@@ -5981,7 +6228,7 @@ pub mod api {
                 pub relay_fee: ::core::option::Option<::core::primitive::u128>,
             }
             impl ::subxt::Call for enroll_and_lock_collateral {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const FUNCTION: &'static str = "enroll_and_lock_collateral";
             }
             #[derive(
@@ -5995,7 +6242,7 @@ pub mod api {
                 pub new_collateral: ::core::primitive::u128,
             }
             impl ::subxt::Call for update_locked_collateral {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const FUNCTION: &'static str = "update_locked_collateral";
             }
             #[derive(
@@ -6009,13 +6256,13 @@ pub mod api {
                 pub new_fee: ::core::primitive::u128,
             }
             impl ::subxt::Call for update_relay_fee {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const FUNCTION: &'static str = "update_relay_fee";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct cancel_enrollment;
             impl ::subxt::Call for cancel_enrollment {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const FUNCTION: &'static str = "cancel_enrollment";
             }
             #[derive(
@@ -6029,7 +6276,7 @@ pub mod api {
                 pub slash_protect: ::core::primitive::u128,
             }
             impl ::subxt::Call for set_slash_protect {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const FUNCTION: &'static str = "set_slash_protect";
             }
             #[derive(
@@ -6043,7 +6290,7 @@ pub mod api {
                 pub number: ::core::primitive::u32,
             }
             impl ::subxt::Call for set_assigned_relayers_number {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const FUNCTION: &'static str = "set_assigned_relayers_number";
             }
             pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
@@ -6143,7 +6390,7 @@ pub mod api {
                 pub ::core::primitive::u128,
             );
             impl ::subxt::Event for Enroll {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const EVENT: &'static str = "Enroll";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -6152,7 +6399,7 @@ pub mod api {
                 pub ::core::primitive::u128,
             );
             impl ::subxt::Event for UpdateLockedCollateral {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const EVENT: &'static str = "UpdateLockedCollateral";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -6161,13 +6408,13 @@ pub mod api {
                 pub ::core::primitive::u128,
             );
             impl ::subxt::Event for UpdateRelayFee {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const EVENT: &'static str = "UpdateRelayFee";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub struct CancelEnrollment(pub ::subxt::sp_core::crypto::AccountId32);
             impl ::subxt::Event for CancelEnrollment {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const EVENT: &'static str = "CancelEnrollment";
             }
             #[derive(
@@ -6179,7 +6426,7 @@ pub mod api {
             )]
             pub struct UpdateCollateralSlashProtect(pub ::core::primitive::u128);
             impl ::subxt::Event for UpdateCollateralSlashProtect {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const EVENT: &'static str = "UpdateCollateralSlashProtect";
             }
             #[derive(
@@ -6191,7 +6438,7 @@ pub mod api {
             )]
             pub struct UpdateAssignedRelayersNumber(pub ::core::primitive::u32);
             impl ::subxt::Event for UpdateAssignedRelayersNumber {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const EVENT: &'static str = "UpdateAssignedRelayersNumber";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -6203,7 +6450,7 @@ pub mod api {
                 >,
             );
             impl ::subxt::Event for FeeMarketSlash {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const EVENT: &'static str = "FeeMarketSlash";
             }
         }
@@ -6211,7 +6458,7 @@ pub mod api {
             use super::runtime_types;
             pub struct RelayersMap(pub ::subxt::sp_core::crypto::AccountId32);
             impl ::subxt::StorageEntry for RelayersMap {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const STORAGE: &'static str = "RelayersMap";
                 type Value = runtime_types::pallet_fee_market::types::Relayer<
                     ::subxt::sp_core::crypto::AccountId32,
@@ -6226,7 +6473,7 @@ pub mod api {
             }
             pub struct Relayers;
             impl ::subxt::StorageEntry for Relayers {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const STORAGE: &'static str = "Relayers";
                 type Value = ::std::vec::Vec<::subxt::sp_core::crypto::AccountId32>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -6235,7 +6482,7 @@ pub mod api {
             }
             pub struct AssignedRelayers;
             impl ::subxt::StorageEntry for AssignedRelayers {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const STORAGE: &'static str = "AssignedRelayers";
                 type Value = ::std::vec::Vec<
                     runtime_types::pallet_fee_market::types::Relayer<
@@ -6252,7 +6499,7 @@ pub mod api {
                 pub ::core::primitive::u64,
             );
             impl ::subxt::StorageEntry for Orders {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const STORAGE: &'static str = "Orders";
                 type Value = runtime_types::pallet_fee_market::types::Order<
                     ::subxt::sp_core::crypto::AccountId32,
@@ -6261,14 +6508,14 @@ pub mod api {
                 >;
                 fn key(&self) -> ::subxt::StorageEntryKey {
                     ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
-                        &self.0,
+                        &(&self.0, &self.1),
                         ::subxt::StorageHasher::Blake2_128Concat,
                     )])
                 }
             }
             pub struct CollateralSlashProtect;
             impl ::subxt::StorageEntry for CollateralSlashProtect {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const STORAGE: &'static str = "CollateralSlashProtect";
                 type Value = ::core::primitive::u128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -6277,7 +6524,7 @@ pub mod api {
             }
             pub struct AssignedRelayersNumber;
             impl ::subxt::StorageEntry for AssignedRelayersNumber {
-                const PALLET: &'static str = "FeeMarket";
+                const PALLET: &'static str = "PangolinFeeMarket";
                 const STORAGE: &'static str = "AssignedRelayersNumber";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -6390,16 +6637,6 @@ pub mod api {
             use super::runtime_types;
             pub struct ConstantsApi;
             impl ConstantsApi {
-                pub fn pallet_id(
-                    &self,
-                ) -> ::core::result::Result<
-                    runtime_types::frame_support::PalletId,
-                    ::subxt::BasicError,
-                > {
-                    Ok(::subxt::codec::Decode::decode(
-                        &mut &[100u8, 97u8, 47u8, 102u8, 101u8, 101u8, 109u8, 107u8][..],
-                    )?)
-                }
                 pub fn treasury_pallet_id(
                     &self,
                 ) -> ::core::result::Result<
@@ -6477,6 +6714,469 @@ pub mod api {
                     Ok(::subxt::codec::Decode::decode(
                         &mut &[64u8, 13u8, 3u8, 0u8][..],
                     )?)
+                }
+            }
+        }
+    }
+    pub mod from_pangolin_issuing {
+        use super::runtime_types;
+        pub mod calls {
+            use super::runtime_types;
+            type DispatchError = runtime_types::sp_runtime::DispatchError;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct issue_from_remote {
+                pub value: ::core::primitive::u128,
+                pub recipient: ::subxt::sp_core::crypto::AccountId32,
+            }
+            impl ::subxt::Call for issue_from_remote {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const FUNCTION: &'static str = "issue_from_remote";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct burn_and_remote_unlock {
+                pub spec_version: ::core::primitive::u32,
+                pub weight: ::core::primitive::u64,
+                #[codec(compact)]
+                pub value: ::core::primitive::u128,
+                #[codec(compact)]
+                pub fee: ::core::primitive::u128,
+                pub recipient: ::subxt::sp_core::crypto::AccountId32,
+            }
+            impl ::subxt::Call for burn_and_remote_unlock {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const FUNCTION: &'static str = "burn_and_remote_unlock";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct set_remote_backing_account {
+                pub account: ::subxt::sp_core::crypto::AccountId32,
+            }
+            impl ::subxt::Call for set_remote_backing_account {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const FUNCTION: &'static str = "set_remote_backing_account";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct set_secure_limited_period {
+                pub period: ::core::primitive::u32,
+            }
+            impl ::subxt::Call for set_secure_limited_period {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const FUNCTION: &'static str = "set_secure_limited_period";
+            }
+            #[derive(
+                :: subxt :: codec :: Encode,
+                :: subxt :: codec :: Decode,
+                Debug,
+                Clone,
+                :: subxt :: codec :: CompactAs,
+            )]
+            pub struct set_security_limitation_ring_amount {
+                pub limitation: ::core::primitive::u128,
+            }
+            impl ::subxt::Call for set_security_limitation_ring_amount {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const FUNCTION: &'static str = "set_security_limitation_ring_amount";
+            }
+            pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
+                client: &'a ::subxt::Client<T>,
+                marker: ::core::marker::PhantomData<(X, A)>,
+            }
+            impl<'a, T, X, A> TransactionApi<'a, T, X, A>
+            where
+                T: ::subxt::Config,
+                X: ::subxt::SignedExtra<T>,
+                A: ::subxt::AccountData,
+            {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self {
+                        client,
+                        marker: ::core::marker::PhantomData,
+                    }
+                }
+                pub fn issue_from_remote(
+                    &self,
+                    value: ::core::primitive::u128,
+                    recipient: ::subxt::sp_core::crypto::AccountId32,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, issue_from_remote, DispatchError>
+                {
+                    let call = issue_from_remote { value, recipient };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn burn_and_remote_unlock(
+                    &self,
+                    spec_version: ::core::primitive::u32,
+                    weight: ::core::primitive::u64,
+                    value: ::core::primitive::u128,
+                    fee: ::core::primitive::u128,
+                    recipient: ::subxt::sp_core::crypto::AccountId32,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, burn_and_remote_unlock, DispatchError>
+                {
+                    let call = burn_and_remote_unlock {
+                        spec_version,
+                        weight,
+                        value,
+                        fee,
+                        recipient,
+                    };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn set_remote_backing_account(
+                    &self,
+                    account: ::subxt::sp_core::crypto::AccountId32,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    set_remote_backing_account,
+                    DispatchError,
+                > {
+                    let call = set_remote_backing_account { account };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn set_secure_limited_period(
+                    &self,
+                    period: ::core::primitive::u32,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    set_secure_limited_period,
+                    DispatchError,
+                > {
+                    let call = set_secure_limited_period { period };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn set_security_limitation_ring_amount(
+                    &self,
+                    limitation: ::core::primitive::u128,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    set_security_limitation_ring_amount,
+                    DispatchError,
+                > {
+                    let call = set_security_limitation_ring_amount { limitation };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+            }
+        }
+        pub type Event = runtime_types::dp_common_runtime::helixbridge::pallet::Event;
+        pub mod events {
+            use super::runtime_types;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct TokenBurnAndRemoteUnlocked(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for TokenBurnAndRemoteUnlocked {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const EVENT: &'static str = "TokenBurnAndRemoteUnlocked";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct TokenIssued(
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+            );
+            impl ::subxt::Event for TokenIssued {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const EVENT: &'static str = "TokenIssued";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct RemoteBackingAccountUpdated(pub ::subxt::sp_core::crypto::AccountId32);
+            impl ::subxt::Event for RemoteBackingAccountUpdated {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const EVENT: &'static str = "RemoteBackingAccountUpdated";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct TokenUnlockedConfirmed(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+                pub ::subxt::sp_core::crypto::AccountId32,
+                pub ::core::primitive::u128,
+                pub ::core::primitive::bool,
+            );
+            impl ::subxt::Event for TokenUnlockedConfirmed {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const EVENT: &'static str = "TokenUnlockedConfirmed";
+            }
+        }
+        pub mod storage {
+            use super::runtime_types;
+            pub struct RemoteBackingAccount;
+            impl ::subxt::StorageEntry for RemoteBackingAccount {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const STORAGE: &'static str = "RemoteBackingAccount";
+                type Value = ::subxt::sp_core::crypto::AccountId32;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct TransactionInfos(
+                pub [::core::primitive::u8; 4usize],
+                pub ::core::primitive::u64,
+            );
+            impl ::subxt::StorageEntry for TransactionInfos {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const STORAGE: &'static str = "TransactionInfos";
+                type Value = (
+                    ::subxt::sp_core::crypto::AccountId32,
+                    ::core::primitive::u128,
+                );
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Map(vec![::subxt::StorageMapKey::new(
+                        &self.0,
+                        ::subxt::StorageHasher::Blake2_128Concat,
+                    )])
+                }
+            }
+            pub struct SecureLimitedPeriod;
+            impl ::subxt::StorageEntry for SecureLimitedPeriod {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const STORAGE: &'static str = "SecureLimitedPeriod";
+                type Value = ::core::primitive::u32;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct SecureLimitedRingAmount;
+            impl ::subxt::StorageEntry for SecureLimitedRingAmount {
+                const PALLET: &'static str = "FromPangolinIssuing";
+                const STORAGE: &'static str = "SecureLimitedRingAmount";
+                type Value = (::core::primitive::u128, ::core::primitive::u128);
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct StorageApi<'a, T: ::subxt::Config> {
+                client: &'a ::subxt::Client<T>,
+            }
+            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self { client }
+                }
+                pub async fn remote_backing_account(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<::subxt::sp_core::crypto::AccountId32>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = RemoteBackingAccount;
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn transaction_infos(
+                    &self,
+                    _0: [::core::primitive::u8; 4usize],
+                    _1: ::core::primitive::u64,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<(
+                        ::subxt::sp_core::crypto::AccountId32,
+                        ::core::primitive::u128,
+                    )>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = TransactionInfos(_0, _1);
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn transaction_infos_iter(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::subxt::KeyIter<'a, T, TransactionInfos>,
+                    ::subxt::BasicError,
+                > {
+                    self.client.storage().iter(hash).await
+                }
+                pub async fn secure_limited_period(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
+                {
+                    let entry = SecureLimitedPeriod;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn secure_limited_ring_amount(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    (::core::primitive::u128, ::core::primitive::u128),
+                    ::subxt::BasicError,
+                > {
+                    let entry = SecureLimitedRingAmount;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+            }
+        }
+        pub mod constants {
+            use super::runtime_types;
+            pub struct ConstantsApi;
+            impl ConstantsApi {
+                pub fn pallet_id(
+                    &self,
+                ) -> ::core::result::Result<
+                    runtime_types::frame_support::PalletId,
+                    ::subxt::BasicError,
+                > {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[100u8, 97u8, 47u8, 112u8, 97u8, 97u8, 105u8, 115u8][..],
+                    )?)
+                }
+                pub fn decimal_multiplier(
+                    &self,
+                ) -> ::core::result::Result<::core::primitive::u128, ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[
+                            0u8, 202u8, 154u8, 59u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+                            0u8, 0u8, 0u8,
+                        ][..],
+                    )?)
+                }
+            }
+        }
+    }
+    pub mod remote_government {
+        use super::runtime_types;
+        pub mod calls {
+            use super::runtime_types;
+            type DispatchError = runtime_types::sp_runtime::DispatchError;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct emergency_safeguard {
+                pub call: runtime_types::pangolin_parachain_runtime::Call,
+            }
+            impl ::subxt::Call for emergency_safeguard {
+                const PALLET: &'static str = "RemoteGovernment";
+                const FUNCTION: &'static str = "emergency_safeguard";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct enact_remote_call {
+                pub call: runtime_types::pangolin_parachain_runtime::Call,
+            }
+            impl ::subxt::Call for enact_remote_call {
+                const PALLET: &'static str = "RemoteGovernment";
+                const FUNCTION: &'static str = "enact_remote_call";
+            }
+            pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
+                client: &'a ::subxt::Client<T>,
+                marker: ::core::marker::PhantomData<(X, A)>,
+            }
+            impl<'a, T, X, A> TransactionApi<'a, T, X, A>
+            where
+                T: ::subxt::Config,
+                X: ::subxt::SignedExtra<T>,
+                A: ::subxt::AccountData,
+            {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self {
+                        client,
+                        marker: ::core::marker::PhantomData,
+                    }
+                }
+                pub fn emergency_safeguard(
+                    &self,
+                    call: runtime_types::pangolin_parachain_runtime::Call,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, emergency_safeguard, DispatchError>
+                {
+                    let call = emergency_safeguard { call };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn enact_remote_call(
+                    &self,
+                    call: runtime_types::pangolin_parachain_runtime::Call,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, enact_remote_call, DispatchError>
+                {
+                    let call = enact_remote_call { call };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+            }
+        }
+        pub type Event = runtime_types::dp_common_runtime::remote_government::pallet::Event;
+        pub mod events {
+            use super::runtime_types;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Emergency;
+            impl ::subxt::Event for Emergency {
+                const PALLET: &'static str = "RemoteGovernment";
+                const EVENT: &'static str = "Emergency";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct Recovery;
+            impl ::subxt::Event for Recovery {
+                const PALLET: &'static str = "RemoteGovernment";
+                const EVENT: &'static str = "Recovery";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct RemoteCallEnacted {
+                pub result: ::core::result::Result<(), runtime_types::sp_runtime::DispatchError>,
+            }
+            impl ::subxt::Event for RemoteCallEnacted {
+                const PALLET: &'static str = "RemoteGovernment";
+                const EVENT: &'static str = "RemoteCallEnacted";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct EmergencySafeguardDone {
+                pub result: ::core::result::Result<(), runtime_types::sp_runtime::DispatchError>,
+            }
+            impl ::subxt::Event for EmergencySafeguardDone {
+                const PALLET: &'static str = "RemoteGovernment";
+                const EVENT: &'static str = "EmergencySafeguardDone";
+            }
+        }
+        pub mod storage {
+            use super::runtime_types;
+            pub struct PreviousBridgeFinalized;
+            impl ::subxt::StorageEntry for PreviousBridgeFinalized {
+                const PALLET: &'static str = "RemoteGovernment";
+                const STORAGE: &'static str = "PreviousBridgeFinalized";
+                type Value = ::subxt::sp_core::H256;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct Emergency;
+            impl ::subxt::StorageEntry for Emergency {
+                const PALLET: &'static str = "RemoteGovernment";
+                const STORAGE: &'static str = "Emergency";
+                type Value = ::core::primitive::bool;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct StorageApi<'a, T: ::subxt::Config> {
+                client: &'a ::subxt::Client<T>,
+            }
+            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self { client }
+                }
+                pub async fn previous_bridge_finalized(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<::subxt::sp_core::H256, ::subxt::BasicError>
+                {
+                    let entry = PreviousBridgeFinalized;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn emergency(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<::core::primitive::bool, ::subxt::BasicError>
+                {
+                    let entry = Emergency;
+                    self.client.storage().fetch_or_default(&entry, hash).await
                 }
             }
         }
@@ -6725,9 +7425,7 @@ pub mod api {
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
                 pub enum Call {
-                    // # [codec (index = 0)] set_validation_data {
-                    //     data : runtime_types :: cumulus_primitives_parachain_inherent :: ParachainInherentData ,
-                    // } ,
+                    // # [codec (index = 0)] set_validation_data { data : runtime_types :: cumulus_primitives_parachain_inherent :: ParachainInherentData , } ,
                     #[codec(index = 1)]
                     sudo_send_upward_message {
                         message: ::std::vec::Vec<::core::primitive::u8>,
@@ -6788,11 +7486,11 @@ pub mod api {
                     pub relay_dispatch_queue_size: (::core::primitive::u32, ::core::primitive::u32),
                     pub ingress_channels: ::std::vec::Vec<(
                         runtime_types::polkadot_parachain::primitives::Id,
-                        runtime_types::polkadot_primitives::v1::AbridgedHrmpChannel,
+                        runtime_types::polkadot_primitives::v2::AbridgedHrmpChannel,
                     )>,
                     pub egress_channels: ::std::vec::Vec<(
                         runtime_types::polkadot_parachain::primitives::Id,
-                        runtime_types::polkadot_primitives::v1::AbridgedHrmpChannel,
+                        runtime_types::polkadot_primitives::v2::AbridgedHrmpChannel,
                     )>,
                 }
             }
@@ -6843,6 +7541,22 @@ pub mod api {
                         index: ::core::primitive::u64,
                         weight_limit: ::core::primitive::u64,
                     },
+                    #[codec(index = 1)]
+                    suspend_xcm_execution,
+                    #[codec(index = 2)]
+                    resume_xcm_execution,
+                    #[codec(index = 3)]
+                    update_suspend_threshold { new: ::core::primitive::u32 },
+                    #[codec(index = 4)]
+                    update_drop_threshold { new: ::core::primitive::u32 },
+                    #[codec(index = 5)]
+                    update_resume_threshold { new: ::core::primitive::u32 },
+                    #[codec(index = 6)]
+                    update_threshold_weight { new: ::core::primitive::u64 },
+                    #[codec(index = 7)]
+                    update_weight_restrict_decay { new: ::core::primitive::u64 },
+                    #[codec(index = 8)]
+                    update_xcmp_max_individual_weight { new: ::core::primitive::u64 },
                 }
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
@@ -6950,7 +7664,7 @@ pub mod api {
             // #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             // pub struct ParachainInherentData {
             //     pub validation_data:
-            //         runtime_types::polkadot_primitives::v1::PersistedValidationData<
+            //         runtime_types::polkadot_primitives::v2::PersistedValidationData<
             //             ::subxt::sp_core::H256,
             //             ::core::primitive::u32,
             //         >,
@@ -6969,6 +7683,137 @@ pub mod api {
             //         >,
             //     >,
             // }
+        }
+        pub mod dp_common_runtime {
+            use super::runtime_types;
+            pub mod helixbridge {
+                use super::runtime_types;
+                pub mod pallet {
+                    use super::runtime_types;
+                    #[derive(
+                        :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                    )]
+                    pub enum Call {
+                        #[codec(index = 0)]
+                        issue_from_remote {
+                            value: ::core::primitive::u128,
+                            recipient: ::subxt::sp_core::crypto::AccountId32,
+                        },
+                        #[codec(index = 1)]
+                        burn_and_remote_unlock {
+                            spec_version: ::core::primitive::u32,
+                            weight: ::core::primitive::u64,
+                            #[codec(compact)]
+                            value: ::core::primitive::u128,
+                            #[codec(compact)]
+                            fee: ::core::primitive::u128,
+                            recipient: ::subxt::sp_core::crypto::AccountId32,
+                        },
+                        #[codec(index = 2)]
+                        set_remote_backing_account {
+                            account: ::subxt::sp_core::crypto::AccountId32,
+                        },
+                        #[codec(index = 3)]
+                        set_secure_limited_period { period: ::core::primitive::u32 },
+                        #[codec(index = 4)]
+                        set_security_limitation_ring_amount { limitation: ::core::primitive::u128 },
+                    }
+                    #[derive(
+                        :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                    )]
+                    pub enum Error {
+                        #[codec(index = 0)]
+                        RingDailyLimited,
+                        #[codec(index = 1)]
+                        InsufficientBalance,
+                        #[codec(index = 2)]
+                        NonceDuplicated,
+                        #[codec(index = 3)]
+                        BackingAccountNone,
+                        #[codec(index = 4)]
+                        ValueOverFlow,
+                    }
+                    #[derive(
+                        :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                    )]
+                    pub enum Event {
+                        #[codec(index = 0)]
+                        TokenBurnAndRemoteUnlocked(
+                            [::core::primitive::u8; 4usize],
+                            ::core::primitive::u64,
+                            ::subxt::sp_core::crypto::AccountId32,
+                            ::subxt::sp_core::crypto::AccountId32,
+                            ::core::primitive::u128,
+                        ),
+                        #[codec(index = 1)]
+                        TokenIssued(
+                            ::subxt::sp_core::crypto::AccountId32,
+                            ::core::primitive::u128,
+                        ),
+                        #[codec(index = 2)]
+                        RemoteBackingAccountUpdated(::subxt::sp_core::crypto::AccountId32),
+                        #[codec(index = 3)]
+                        TokenUnlockedConfirmed(
+                            [::core::primitive::u8; 4usize],
+                            ::core::primitive::u64,
+                            ::subxt::sp_core::crypto::AccountId32,
+                            ::core::primitive::u128,
+                            ::core::primitive::bool,
+                        ),
+                    }
+                }
+            }
+            pub mod remote_government {
+                use super::runtime_types;
+                pub mod pallet {
+                    use super::runtime_types;
+                    #[derive(
+                        :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                    )]
+                    pub enum Call {
+                        #[codec(index = 0)]
+                        emergency_safeguard {
+                            call: runtime_types::pangolin_parachain_runtime::Call,
+                        },
+                        #[codec(index = 1)]
+                        enact_remote_call {
+                            call: runtime_types::pangolin_parachain_runtime::Call,
+                        },
+                    }
+                    #[derive(
+                        :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                    )]
+                    pub enum Error {
+                        #[codec(index = 0)]
+                        RequireSourceRoot,
+                        #[codec(index = 1)]
+                        EmergencyOnly,
+                    }
+                    #[derive(
+                        :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                    )]
+                    pub enum Event {
+                        #[codec(index = 0)]
+                        Emergency,
+                        #[codec(index = 1)]
+                        Recovery,
+                        #[codec(index = 2)]
+                        RemoteCallEnacted {
+                            result: ::core::result::Result<
+                                (),
+                                runtime_types::sp_runtime::DispatchError,
+                            >,
+                        },
+                        #[codec(index = 3)]
+                        EmergencySafeguardDone {
+                            result: ::core::result::Result<
+                                (),
+                                runtime_types::sp_runtime::DispatchError,
+                            >,
+                        },
+                    }
+                }
+            }
         }
         pub mod finality_grandpa {
             use super::runtime_types;
@@ -6994,6 +7839,20 @@ pub mod api {
         }
         pub mod frame_support {
             use super::runtime_types;
+            pub mod dispatch {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum RawOrigin<_0> {
+                    #[codec(index = 0)]
+                    Root,
+                    #[codec(index = 1)]
+                    Signed(_0),
+                    #[codec(index = 2)]
+                    None,
+                }
+            }
             pub mod storage {
                 use super::runtime_types;
                 pub mod bounded_vec {
@@ -7301,15 +8160,6 @@ pub mod api {
                 Finalization,
                 #[codec(index = 2)]
                 Initialization,
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub enum RawOrigin<_0> {
-                #[codec(index = 0)]
-                Root,
-                #[codec(index = 1)]
-                Signed(_0),
-                #[codec(index = 2)]
-                None,
             }
         }
         pub mod pallet_authorship {
@@ -7826,10 +8676,12 @@ pub mod api {
                     #[codec(index = 2)]
                     NotEnrolled,
                     #[codec(index = 3)]
-                    StillHasOrdersNotConfirmed,
+                    CollateralTooLow,
                     #[codec(index = 4)]
-                    RelayFeeTooLow,
+                    StillHasOrdersNotConfirmed,
                     #[codec(index = 5)]
+                    RelayFeeTooLow,
+                    #[codec(index = 6)]
                     OccupiedRelayer,
                 }
                 #[derive(
@@ -8163,6 +9015,14 @@ pub mod api {
                     },
                     #[codec(index = 3)]
                     ProxyAdded {
+                        delegator: ::subxt::sp_core::crypto::AccountId32,
+                        delegatee: ::subxt::sp_core::crypto::AccountId32,
+                        proxy_type:
+                            runtime_types::pangolin_parachain_runtime::pallets::proxy::ProxyType,
+                        delay: ::core::primitive::u32,
+                    },
+                    #[codec(index = 4)]
+                    ProxyRemoved {
                         delegator: ::subxt::sp_core::crypto::AccountId32,
                         delegatee: ::subxt::sp_core::crypto::AccountId32,
                         proxy_type:
@@ -8679,7 +9539,11 @@ pub mod api {
                 #[codec(index = 21)]
                 BridgePangolinMessages(runtime_types::pallet_bridge_messages::pallet::Call),
                 #[codec(index = 23)]
-                FeeMarket(runtime_types::pallet_fee_market::pallet::Call),
+                PangolinFeeMarket(runtime_types::pallet_fee_market::pallet::Call),
+                #[codec(index = 24)]
+                FromPangolinIssuing(runtime_types::dp_common_runtime::helixbridge::pallet::Call),
+                // #[codec(index = 25)]
+                // RemoteGovernment(runtime_types::dp_common_runtime::remote_government::pallet::Call),
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub enum Event {
@@ -8714,13 +9578,21 @@ pub mod api {
                 #[codec(index = 22)]
                 BridgePangolinDispatch(runtime_types::pallet_bridge_dispatch::pallet::Event),
                 #[codec(index = 23)]
-                FeeMarket(runtime_types::pallet_fee_market::pallet::Event),
+                PangolinFeeMarket(runtime_types::pallet_fee_market::pallet::Event),
+                #[codec(index = 24)]
+                FromPangolinIssuing(runtime_types::dp_common_runtime::helixbridge::pallet::Event),
+                #[codec(index = 25)]
+                RemoteGovernment(
+                    runtime_types::dp_common_runtime::remote_government::pallet::Event,
+                ),
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub enum OriginCaller {
                 #[codec(index = 0)]
                 system(
-                    runtime_types::frame_system::RawOrigin<::subxt::sp_core::crypto::AccountId32>,
+                    runtime_types::frame_support::dispatch::RawOrigin<
+                        ::subxt::sp_core::crypto::AccountId32,
+                    >,
                 ),
                 #[codec(index = 13)]
                 PolkadotXcm(runtime_types::pallet_xcm::pallet::Origin),
@@ -8781,7 +9653,7 @@ pub mod api {
         }
         pub mod polkadot_primitives {
             use super::runtime_types;
-            pub mod v1 {
+            pub mod v2 {
                 use super::runtime_types;
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
@@ -9579,10 +10451,7 @@ pub mod api {
                 #[codec(index = 2)]
                 BadOrigin,
                 #[codec(index = 3)]
-                Module {
-                    index: ::core::primitive::u8,
-                    error: ::core::primitive::u8,
-                },
+                Module(runtime_types::sp_runtime::ModuleError),
                 #[codec(index = 4)]
                 ConsumerRemaining,
                 #[codec(index = 5)]
@@ -9593,6 +10462,13 @@ pub mod api {
                 Token(runtime_types::sp_runtime::TokenError),
                 #[codec(index = 8)]
                 Arithmetic(runtime_types::sp_runtime::ArithmeticError),
+                #[codec(index = 9)]
+                Transactional(runtime_types::sp_runtime::TransactionalError),
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct ModuleError {
+                pub index: ::core::primitive::u8,
+                pub error: [::core::primitive::u8; 4usize],
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
             pub enum MultiSignature {
@@ -9629,6 +10505,13 @@ pub mod api {
                 #[codec(index = 6)]
                 Unsupported,
             }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub enum TransactionalError {
+                #[codec(index = 0)]
+                LimitReached,
+                #[codec(index = 1)]
+                NoLayer,
+            }
         }
         pub mod sp_trie {
             use super::runtime_types;
@@ -9638,7 +10521,8 @@ pub mod api {
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
                 )]
                 pub struct StorageProof {
-                    pub trie_nodes: ::std::vec::Vec<::std::vec::Vec<::core::primitive::u8>>,
+                    pub trie_nodes:
+                        ::std::collections::BTreeSet<::std::vec::Vec<::core::primitive::u8>>,
                 }
             }
         }
@@ -10686,8 +11570,8 @@ pub mod api {
     }
     impl DispatchError {
         pub fn details(&self) -> Option<ErrorDetails> {
-            if let Self::Module { index, error } = self {
-                match (index , error) { (0u8 , 0u8) => Some (ErrorDetails { pallet : "System" , error : "InvalidSpecName" , docs : "The name of specification does not match between the current runtime\nand the new runtime." }) , (0u8 , 1u8) => Some (ErrorDetails { pallet : "System" , error : "SpecVersionNeedsToIncrease" , docs : "The specification version is not allowed to decrease between the current runtime\nand the new runtime." }) , (0u8 , 2u8) => Some (ErrorDetails { pallet : "System" , error : "FailedToExtractRuntimeVersion" , docs : "Failed to extract the runtime version from the new runtime.\n\nEither calling `Core_version` or decoding `RuntimeVersion` failed." }) , (0u8 , 3u8) => Some (ErrorDetails { pallet : "System" , error : "NonDefaultComposite" , docs : "Suicide called when the account has non-default composite data." }) , (0u8 , 4u8) => Some (ErrorDetails { pallet : "System" , error : "NonZeroRefCount" , docs : "There is a non-zero reference count preventing the account from being purged." }) , (0u8 , 5u8) => Some (ErrorDetails { pallet : "System" , error : "CallFiltered" , docs : "The origin filter prevent the call to be dispatched." }) , (1u8 , 0u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "OverlappingUpgrades" , docs : "Attempt to upgrade validation function while existing upgrade pending" }) , (1u8 , 1u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "ProhibitedByPolkadot" , docs : "Polkadot currently prohibits this parachain from upgrading its validation function" }) , (1u8 , 2u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "TooBig" , docs : "The supplied validation function has compiled into a blob larger than Polkadot is\nwilling to run" }) , (1u8 , 3u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "ValidationDataNotAvailable" , docs : "The inherent which supplies the validation data did not run this block" }) , (1u8 , 4u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "HostConfigurationNotAvailable" , docs : "The inherent which supplies the host configuration did not run this block" }) , (1u8 , 5u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "NotScheduled" , docs : "No validation function upgrade is currently scheduled." }) , (1u8 , 6u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "NothingAuthorized" , docs : "No code upgrade has been authorized." }) , (1u8 , 7u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "Unauthorized" , docs : "The given code upgrade has not been authorized." }) , (5u8 , 0u8) => Some (ErrorDetails { pallet : "Balances" , error : "VestingBalance" , docs : "Vesting balance too high to send value" }) , (5u8 , 1u8) => Some (ErrorDetails { pallet : "Balances" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal" }) , (5u8 , 2u8) => Some (ErrorDetails { pallet : "Balances" , error : "InsufficientBalance" , docs : "Balance too low to send value" }) , (5u8 , 3u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit" }) , (5u8 , 4u8) => Some (ErrorDetails { pallet : "Balances" , error : "KeepAlive" , docs : "Transfer/payment would kill account" }) , (5u8 , 5u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account" }) , (5u8 , 6u8) => Some (ErrorDetails { pallet : "Balances" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist" }) , (5u8 , 7u8) => Some (ErrorDetails { pallet : "Balances" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (7u8 , 0u8) => Some (ErrorDetails { pallet : "Authorship" , error : "InvalidUncleParent" , docs : "The uncle parent not in the chain." }) , (7u8 , 1u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UnclesAlreadySet" , docs : "Uncles already set in the block." }) , (7u8 , 2u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooManyUncles" , docs : "Too many uncles." }) , (7u8 , 3u8) => Some (ErrorDetails { pallet : "Authorship" , error : "GenesisUncle" , docs : "The uncle is genesis." }) , (7u8 , 4u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooHighUncle" , docs : "The uncle is too high in chain." }) , (7u8 , 5u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UncleAlreadyIncluded" , docs : "The uncle is already included." }) , (7u8 , 6u8) => Some (ErrorDetails { pallet : "Authorship" , error : "OldUncle" , docs : "The uncle isn't recent enough to be included." }) , (8u8 , 0u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "TooManyCandidates" , docs : "Too many candidates" }) , (8u8 , 1u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "TooFewCandidates" , docs : "Too few candidates" }) , (8u8 , 2u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "Unknown" , docs : "Unknown error" }) , (8u8 , 3u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "Permission" , docs : "Permission issue" }) , (8u8 , 4u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "AlreadyCandidate" , docs : "User is already a candidate" }) , (8u8 , 5u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "NotCandidate" , docs : "User is not a candidate" }) , (8u8 , 6u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "AlreadyInvulnerable" , docs : "User is already an Invulnerable" }) , (8u8 , 7u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "NoAssociatedValidatorId" , docs : "Account has no associated validator ID" }) , (8u8 , 8u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "ValidatorNotRegistered" , docs : "Validator ID is not yet registered" }) , (9u8 , 0u8) => Some (ErrorDetails { pallet : "Session" , error : "InvalidProof" , docs : "Invalid ownership proof." }) , (9u8 , 1u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAssociatedValidatorId" , docs : "No associated validator ID for account." }) , (9u8 , 2u8) => Some (ErrorDetails { pallet : "Session" , error : "DuplicatedKey" , docs : "Registered duplicate key." }) , (9u8 , 3u8) => Some (ErrorDetails { pallet : "Session" , error : "NoKeys" , docs : "No keys are associated with this account." }) , (9u8 , 4u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAccount" , docs : "Key setting account is not live, so it's impossible to associate keys." }) , (12u8 , 0u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "FailedToSend" , docs : "Failed to send XCM message." }) , (12u8 , 1u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "BadXcmOrigin" , docs : "Bad XCM origin." }) , (12u8 , 2u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "BadXcm" , docs : "Bad XCM data." }) , (12u8 , 3u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "BadOverweightIndex" , docs : "Bad overweight index." }) , (12u8 , 4u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "WeightOverLimit" , docs : "Provided weight is possibly not enough to execute the message." }) , (13u8 , 0u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "Unreachable" , docs : "The desired destination was unreachable, generally because there is a no way of routing\nto it." }) , (13u8 , 1u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "SendFailure" , docs : "There was some other issue (i.e. not to do with routing) in sending the message. Perhaps\na lack of space for buffering the message." }) , (13u8 , 2u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "Filtered" , docs : "The message execution fails the filter." }) , (13u8 , 3u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "UnweighableMessage" , docs : "The message's weight could not be determined." }) , (13u8 , 4u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "DestinationNotInvertible" , docs : "The destination `MultiLocation` provided cannot be inverted." }) , (13u8 , 5u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "Empty" , docs : "The assets to be sent are empty." }) , (13u8 , 6u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "CannotReanchor" , docs : "Could not re-anchor the assets to declare the fees for the destination chain." }) , (13u8 , 7u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "TooManyAssets" , docs : "Too many assets have been attempted for transfer." }) , (13u8 , 8u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "InvalidOrigin" , docs : "Origin is invalid for sending." }) , (13u8 , 9u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "BadVersion" , docs : "The version of the `Versioned` value used is not able to be interpreted." }) , (13u8 , 10u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "BadLocation" , docs : "The given location could not be used (e.g. because it cannot be expressed in the\ndesired version of XCM)." }) , (13u8 , 11u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "NoSubscription" , docs : "The referenced subscription could not be found." }) , (13u8 , 12u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "AlreadySubscribed" , docs : "The location is invalid since it already has a subscription from us." }) , (15u8 , 0u8) => Some (ErrorDetails { pallet : "DmpQueue" , error : "Unknown" , docs : "The message index given is unknown." }) , (15u8 , 1u8) => Some (ErrorDetails { pallet : "DmpQueue" , error : "OverLimit" , docs : "The amount of weight given is possibly not enough for executing the message." }) , (16u8 , 0u8) => Some (ErrorDetails { pallet : "Utility" , error : "TooManyCalls" , docs : "Too many calls batched." }) , (17u8 , 0u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MinimumThreshold" , docs : "Threshold must be 2 or greater." }) , (17u8 , 1u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyApproved" , docs : "Call is already approved by this signatory." }) , (17u8 , 2u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoApprovalsNeeded" , docs : "Call doesn't need any (more) approvals." }) , (17u8 , 3u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooFewSignatories" , docs : "There are too few signatories in the list." }) , (17u8 , 4u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooManySignatories" , docs : "There are too many signatories in the list." }) , (17u8 , 5u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SignatoriesOutOfOrder" , docs : "The signatories were provided out of order; they should be ordered." }) , (17u8 , 6u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SenderInSignatories" , docs : "The sender was contained in the other signatories; it shouldn't be." }) , (17u8 , 7u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotFound" , docs : "Multisig operation not found when attempting to cancel." }) , (17u8 , 8u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotOwner" , docs : "Only the account that originally created the multisig is able to cancel it." }) , (17u8 , 9u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoTimepoint" , docs : "No timepoint was given, yet the multisig operation is already underway." }) , (17u8 , 10u8) => Some (ErrorDetails { pallet : "Multisig" , error : "WrongTimepoint" , docs : "A different timepoint was given to the multisig operation that is underway." }) , (17u8 , 11u8) => Some (ErrorDetails { pallet : "Multisig" , error : "UnexpectedTimepoint" , docs : "A timepoint was given, yet no multisig operation is underway." }) , (17u8 , 12u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MaxWeightTooLow" , docs : "The maximum weight information provided was too low." }) , (17u8 , 13u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyStored" , docs : "The data to be stored is already stored." }) , (18u8 , 0u8) => Some (ErrorDetails { pallet : "Proxy" , error : "TooMany" , docs : "There are too many proxies registered or too many announcements pending." }) , (18u8 , 1u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotFound" , docs : "Proxy registration not found." }) , (18u8 , 2u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotProxy" , docs : "Sender is not a proxy of the account to be proxied." }) , (18u8 , 3u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unproxyable" , docs : "A call which is incompatible with the proxy type's filter was attempted." }) , (18u8 , 4u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Duplicate" , docs : "Account is already a proxy." }) , (18u8 , 5u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoPermission" , docs : "Call may not be made by proxy because it may escalate its privileges." }) , (18u8 , 6u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unannounced" , docs : "Announcement, if made at all, was made too recently." }) , (18u8 , 7u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoSelfProxy" , docs : "Cannot add self as proxy." }) , (19u8 , 0u8) => Some (ErrorDetails { pallet : "Sudo" , error : "RequireSudo" , docs : "Sender must be the Sudo account" }) , (20u8 , 0u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "InvalidJustification" , docs : "The given justification is invalid for the given header." }) , (20u8 , 1u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "InvalidAuthoritySet" , docs : "The authority set from the underlying header chain is invalid." }) , (20u8 , 2u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "TooManyRequests" , docs : "There are too many requests for the current window to handle." }) , (20u8 , 3u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "OldHeader" , docs : "The header being imported is older than the best finalized header known to the pallet." }) , (20u8 , 4u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "UnknownHeader" , docs : "The header is unknown to the pallet." }) , (20u8 , 5u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "UnsupportedScheduledChange" , docs : "The scheduled authority set change found in the header is unsupported by the pallet.\n\nThis is the case for non-standard (e.g forced) authority set changes." }) , (20u8 , 6u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "NotInitialized" , docs : "The pallet is not yet initialized." }) , (20u8 , 7u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "AlreadyInitialized" , docs : "The pallet has already been initialized." }) , (20u8 , 8u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "Halted" , docs : "All pallet operations are halted." }) , (20u8 , 9u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (21u8 , 0u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "Halted" , docs : "All pallet operations are halted." }) , (21u8 , 1u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "MessageRejectedByChainVerifier" , docs : "Message has been treated as invalid by chain verifier." }) , (21u8 , 2u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "MessageRejectedByLaneVerifier" , docs : "Message has been treated as invalid by lane verifier." }) , (21u8 , 3u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "FailedToWithdrawMessageFee" , docs : "Submitter has failed to pay fee for delivering and dispatching messages." }) , (21u8 , 4u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "TooManyMessagesInTheProof" , docs : "The transaction brings too many messages." }) , (21u8 , 5u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "InvalidMessagesProof" , docs : "Invalid messages has been submitted." }) , (21u8 , 6u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "InvalidMessagesDeliveryProof" , docs : "Invalid messages delivery proof has been submitted." }) , (21u8 , 7u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "InvalidUnrewardedRelayers" , docs : "The bridged chain has invalid `UnrewardedRelayers` in its storage (fatal for the lane)." }) , (21u8 , 8u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "InvalidUnrewardedRelayersState" , docs : "The relayer has declared invalid unrewarded relayers state in the\n`receive_messages_delivery_proof` call." }) , (21u8 , 9u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "MessageIsAlreadyDelivered" , docs : "The message someone is trying to work with (i.e. increase fee) is already-delivered." }) , (21u8 , 10u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "MessageIsNotYetSent" , docs : "The message someone is trying to work with (i.e. increase fee) is not yet sent." }) , (21u8 , 11u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "TryingToConfirmMoreMessagesThanExpected" , docs : "The number of actually confirmed messages is going to be larger than the number of\nmessages in the proof. This may mean that this or bridged chain storage is corrupted." }) , (23u8 , 0u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (23u8 , 1u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "AlreadyEnrolled" , docs : "The relayer has been enrolled." }) , (23u8 , 2u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "NotEnrolled" , docs : "This relayer doesn't enroll ever." }) , (23u8 , 3u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "StillHasOrdersNotConfirmed" , docs : "Update locked collateral is not allow since some orders are not confirm." }) , (23u8 , 4u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "RelayFeeTooLow" , docs : "The fee is lower than MinimumRelayFee." }) , (23u8 , 5u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "OccupiedRelayer" , docs : "The relayer is occupied, and can't cancel enrollment now." }) , _ => None }
+            if let Self::Module(runtime_types::sp_runtime::ModuleError { index, error }) = self {
+                match (index , error[0]) { (0u8 , 0u8) => Some (ErrorDetails { pallet : "System" , error : "InvalidSpecName" , docs : "The name of specification does not match between the current runtime\nand the new runtime." }) , (0u8 , 1u8) => Some (ErrorDetails { pallet : "System" , error : "SpecVersionNeedsToIncrease" , docs : "The specification version is not allowed to decrease between the current runtime\nand the new runtime." }) , (0u8 , 2u8) => Some (ErrorDetails { pallet : "System" , error : "FailedToExtractRuntimeVersion" , docs : "Failed to extract the runtime version from the new runtime.\n\nEither calling `Core_version` or decoding `RuntimeVersion` failed." }) , (0u8 , 3u8) => Some (ErrorDetails { pallet : "System" , error : "NonDefaultComposite" , docs : "Suicide called when the account has non-default composite data." }) , (0u8 , 4u8) => Some (ErrorDetails { pallet : "System" , error : "NonZeroRefCount" , docs : "There is a non-zero reference count preventing the account from being purged." }) , (0u8 , 5u8) => Some (ErrorDetails { pallet : "System" , error : "CallFiltered" , docs : "The origin filter prevent the call to be dispatched." }) , (1u8 , 0u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "OverlappingUpgrades" , docs : "Attempt to upgrade validation function while existing upgrade pending" }) , (1u8 , 1u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "ProhibitedByPolkadot" , docs : "Polkadot currently prohibits this parachain from upgrading its validation function" }) , (1u8 , 2u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "TooBig" , docs : "The supplied validation function has compiled into a blob larger than Polkadot is\nwilling to run" }) , (1u8 , 3u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "ValidationDataNotAvailable" , docs : "The inherent which supplies the validation data did not run this block" }) , (1u8 , 4u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "HostConfigurationNotAvailable" , docs : "The inherent which supplies the host configuration did not run this block" }) , (1u8 , 5u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "NotScheduled" , docs : "No validation function upgrade is currently scheduled." }) , (1u8 , 6u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "NothingAuthorized" , docs : "No code upgrade has been authorized." }) , (1u8 , 7u8) => Some (ErrorDetails { pallet : "ParachainSystem" , error : "Unauthorized" , docs : "The given code upgrade has not been authorized." }) , (5u8 , 0u8) => Some (ErrorDetails { pallet : "Balances" , error : "VestingBalance" , docs : "Vesting balance too high to send value" }) , (5u8 , 1u8) => Some (ErrorDetails { pallet : "Balances" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal" }) , (5u8 , 2u8) => Some (ErrorDetails { pallet : "Balances" , error : "InsufficientBalance" , docs : "Balance too low to send value" }) , (5u8 , 3u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit" }) , (5u8 , 4u8) => Some (ErrorDetails { pallet : "Balances" , error : "KeepAlive" , docs : "Transfer/payment would kill account" }) , (5u8 , 5u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account" }) , (5u8 , 6u8) => Some (ErrorDetails { pallet : "Balances" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist" }) , (5u8 , 7u8) => Some (ErrorDetails { pallet : "Balances" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (7u8 , 0u8) => Some (ErrorDetails { pallet : "Authorship" , error : "InvalidUncleParent" , docs : "The uncle parent not in the chain." }) , (7u8 , 1u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UnclesAlreadySet" , docs : "Uncles already set in the block." }) , (7u8 , 2u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooManyUncles" , docs : "Too many uncles." }) , (7u8 , 3u8) => Some (ErrorDetails { pallet : "Authorship" , error : "GenesisUncle" , docs : "The uncle is genesis." }) , (7u8 , 4u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooHighUncle" , docs : "The uncle is too high in chain." }) , (7u8 , 5u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UncleAlreadyIncluded" , docs : "The uncle is already included." }) , (7u8 , 6u8) => Some (ErrorDetails { pallet : "Authorship" , error : "OldUncle" , docs : "The uncle isn't recent enough to be included." }) , (8u8 , 0u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "TooManyCandidates" , docs : "Too many candidates" }) , (8u8 , 1u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "TooFewCandidates" , docs : "Too few candidates" }) , (8u8 , 2u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "Unknown" , docs : "Unknown error" }) , (8u8 , 3u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "Permission" , docs : "Permission issue" }) , (8u8 , 4u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "AlreadyCandidate" , docs : "User is already a candidate" }) , (8u8 , 5u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "NotCandidate" , docs : "User is not a candidate" }) , (8u8 , 6u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "AlreadyInvulnerable" , docs : "User is already an Invulnerable" }) , (8u8 , 7u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "NoAssociatedValidatorId" , docs : "Account has no associated validator ID" }) , (8u8 , 8u8) => Some (ErrorDetails { pallet : "CollatorSelection" , error : "ValidatorNotRegistered" , docs : "Validator ID is not yet registered" }) , (9u8 , 0u8) => Some (ErrorDetails { pallet : "Session" , error : "InvalidProof" , docs : "Invalid ownership proof." }) , (9u8 , 1u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAssociatedValidatorId" , docs : "No associated validator ID for account." }) , (9u8 , 2u8) => Some (ErrorDetails { pallet : "Session" , error : "DuplicatedKey" , docs : "Registered duplicate key." }) , (9u8 , 3u8) => Some (ErrorDetails { pallet : "Session" , error : "NoKeys" , docs : "No keys are associated with this account." }) , (9u8 , 4u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAccount" , docs : "Key setting account is not live, so it's impossible to associate keys." }) , (12u8 , 0u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "FailedToSend" , docs : "Failed to send XCM message." }) , (12u8 , 1u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "BadXcmOrigin" , docs : "Bad XCM origin." }) , (12u8 , 2u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "BadXcm" , docs : "Bad XCM data." }) , (12u8 , 3u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "BadOverweightIndex" , docs : "Bad overweight index." }) , (12u8 , 4u8) => Some (ErrorDetails { pallet : "XcmpQueue" , error : "WeightOverLimit" , docs : "Provided weight is possibly not enough to execute the message." }) , (13u8 , 0u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "Unreachable" , docs : "The desired destination was unreachable, generally because there is a no way of routing\nto it." }) , (13u8 , 1u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "SendFailure" , docs : "There was some other issue (i.e. not to do with routing) in sending the message. Perhaps\na lack of space for buffering the message." }) , (13u8 , 2u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "Filtered" , docs : "The message execution fails the filter." }) , (13u8 , 3u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "UnweighableMessage" , docs : "The message's weight could not be determined." }) , (13u8 , 4u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "DestinationNotInvertible" , docs : "The destination `MultiLocation` provided cannot be inverted." }) , (13u8 , 5u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "Empty" , docs : "The assets to be sent are empty." }) , (13u8 , 6u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "CannotReanchor" , docs : "Could not re-anchor the assets to declare the fees for the destination chain." }) , (13u8 , 7u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "TooManyAssets" , docs : "Too many assets have been attempted for transfer." }) , (13u8 , 8u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "InvalidOrigin" , docs : "Origin is invalid for sending." }) , (13u8 , 9u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "BadVersion" , docs : "The version of the `Versioned` value used is not able to be interpreted." }) , (13u8 , 10u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "BadLocation" , docs : "The given location could not be used (e.g. because it cannot be expressed in the\ndesired version of XCM)." }) , (13u8 , 11u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "NoSubscription" , docs : "The referenced subscription could not be found." }) , (13u8 , 12u8) => Some (ErrorDetails { pallet : "PolkadotXcm" , error : "AlreadySubscribed" , docs : "The location is invalid since it already has a subscription from us." }) , (15u8 , 0u8) => Some (ErrorDetails { pallet : "DmpQueue" , error : "Unknown" , docs : "The message index given is unknown." }) , (15u8 , 1u8) => Some (ErrorDetails { pallet : "DmpQueue" , error : "OverLimit" , docs : "The amount of weight given is possibly not enough for executing the message." }) , (16u8 , 0u8) => Some (ErrorDetails { pallet : "Utility" , error : "TooManyCalls" , docs : "Too many calls batched." }) , (17u8 , 0u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MinimumThreshold" , docs : "Threshold must be 2 or greater." }) , (17u8 , 1u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyApproved" , docs : "Call is already approved by this signatory." }) , (17u8 , 2u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoApprovalsNeeded" , docs : "Call doesn't need any (more) approvals." }) , (17u8 , 3u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooFewSignatories" , docs : "There are too few signatories in the list." }) , (17u8 , 4u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooManySignatories" , docs : "There are too many signatories in the list." }) , (17u8 , 5u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SignatoriesOutOfOrder" , docs : "The signatories were provided out of order; they should be ordered." }) , (17u8 , 6u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SenderInSignatories" , docs : "The sender was contained in the other signatories; it shouldn't be." }) , (17u8 , 7u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotFound" , docs : "Multisig operation not found when attempting to cancel." }) , (17u8 , 8u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotOwner" , docs : "Only the account that originally created the multisig is able to cancel it." }) , (17u8 , 9u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoTimepoint" , docs : "No timepoint was given, yet the multisig operation is already underway." }) , (17u8 , 10u8) => Some (ErrorDetails { pallet : "Multisig" , error : "WrongTimepoint" , docs : "A different timepoint was given to the multisig operation that is underway." }) , (17u8 , 11u8) => Some (ErrorDetails { pallet : "Multisig" , error : "UnexpectedTimepoint" , docs : "A timepoint was given, yet no multisig operation is underway." }) , (17u8 , 12u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MaxWeightTooLow" , docs : "The maximum weight information provided was too low." }) , (17u8 , 13u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyStored" , docs : "The data to be stored is already stored." }) , (18u8 , 0u8) => Some (ErrorDetails { pallet : "Proxy" , error : "TooMany" , docs : "There are too many proxies registered or too many announcements pending." }) , (18u8 , 1u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotFound" , docs : "Proxy registration not found." }) , (18u8 , 2u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotProxy" , docs : "Sender is not a proxy of the account to be proxied." }) , (18u8 , 3u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unproxyable" , docs : "A call which is incompatible with the proxy type's filter was attempted." }) , (18u8 , 4u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Duplicate" , docs : "Account is already a proxy." }) , (18u8 , 5u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoPermission" , docs : "Call may not be made by proxy because it may escalate its privileges." }) , (18u8 , 6u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unannounced" , docs : "Announcement, if made at all, was made too recently." }) , (18u8 , 7u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoSelfProxy" , docs : "Cannot add self as proxy." }) , (19u8 , 0u8) => Some (ErrorDetails { pallet : "Sudo" , error : "RequireSudo" , docs : "Sender must be the Sudo account" }) , (20u8 , 0u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "InvalidJustification" , docs : "The given justification is invalid for the given header." }) , (20u8 , 1u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "InvalidAuthoritySet" , docs : "The authority set from the underlying header chain is invalid." }) , (20u8 , 2u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "TooManyRequests" , docs : "There are too many requests for the current window to handle." }) , (20u8 , 3u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "OldHeader" , docs : "The header being imported is older than the best finalized header known to the pallet." }) , (20u8 , 4u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "UnknownHeader" , docs : "The header is unknown to the pallet." }) , (20u8 , 5u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "UnsupportedScheduledChange" , docs : "The scheduled authority set change found in the header is unsupported by the pallet.\n\nThis is the case for non-standard (e.g forced) authority set changes." }) , (20u8 , 6u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "NotInitialized" , docs : "The pallet is not yet initialized." }) , (20u8 , 7u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "AlreadyInitialized" , docs : "The pallet has already been initialized." }) , (20u8 , 8u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "Halted" , docs : "All pallet operations are halted." }) , (20u8 , 9u8) => Some (ErrorDetails { pallet : "BridgePangolinGrandpa" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (21u8 , 0u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "Halted" , docs : "All pallet operations are halted." }) , (21u8 , 1u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "MessageRejectedByChainVerifier" , docs : "Message has been treated as invalid by chain verifier." }) , (21u8 , 2u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "MessageRejectedByLaneVerifier" , docs : "Message has been treated as invalid by lane verifier." }) , (21u8 , 3u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "FailedToWithdrawMessageFee" , docs : "Submitter has failed to pay fee for delivering and dispatching messages." }) , (21u8 , 4u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "TooManyMessagesInTheProof" , docs : "The transaction brings too many messages." }) , (21u8 , 5u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "InvalidMessagesProof" , docs : "Invalid messages has been submitted." }) , (21u8 , 6u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "InvalidMessagesDeliveryProof" , docs : "Invalid messages delivery proof has been submitted." }) , (21u8 , 7u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "InvalidUnrewardedRelayers" , docs : "The bridged chain has invalid `UnrewardedRelayers` in its storage (fatal for the lane)." }) , (21u8 , 8u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "InvalidUnrewardedRelayersState" , docs : "The relayer has declared invalid unrewarded relayers state in the\n`receive_messages_delivery_proof` call." }) , (21u8 , 9u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "MessageIsAlreadyDelivered" , docs : "The message someone is trying to work with (i.e. increase fee) is already-delivered." }) , (21u8 , 10u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "MessageIsNotYetSent" , docs : "The message someone is trying to work with (i.e. increase fee) is not yet sent." }) , (21u8 , 11u8) => Some (ErrorDetails { pallet : "BridgePangolinMessages" , error : "TryingToConfirmMoreMessagesThanExpected" , docs : "The number of actually confirmed messages is going to be larger than the number of\nmessages in the proof. This may mean that this or bridged chain storage is corrupted." }) , (23u8 , 0u8) => Some (ErrorDetails { pallet : "PangolinFeeMarket" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (23u8 , 1u8) => Some (ErrorDetails { pallet : "PangolinFeeMarket" , error : "AlreadyEnrolled" , docs : "The relayer has been enrolled." }) , (23u8 , 2u8) => Some (ErrorDetails { pallet : "PangolinFeeMarket" , error : "NotEnrolled" , docs : "This relayer doesn't enroll ever." }) , (23u8 , 3u8) => Some (ErrorDetails { pallet : "PangolinFeeMarket" , error : "CollateralTooLow" , docs : "Locked collateral is too low to cover one order." }) , (23u8 , 4u8) => Some (ErrorDetails { pallet : "PangolinFeeMarket" , error : "StillHasOrdersNotConfirmed" , docs : "Update locked collateral is not allow since some orders are not confirm." }) , (23u8 , 5u8) => Some (ErrorDetails { pallet : "PangolinFeeMarket" , error : "RelayFeeTooLow" , docs : "The fee is lower than MinimumRelayFee." }) , (23u8 , 6u8) => Some (ErrorDetails { pallet : "PangolinFeeMarket" , error : "OccupiedRelayer" , docs : "The relayer is occupied, and can't cancel enrollment now." }) , (24u8 , 0u8) => Some (ErrorDetails { pallet : "FromPangolinIssuing" , error : "RingDailyLimited" , docs : "Redeem Daily Limited" }) , (24u8 , 1u8) => Some (ErrorDetails { pallet : "FromPangolinIssuing" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (24u8 , 2u8) => Some (ErrorDetails { pallet : "FromPangolinIssuing" , error : "NonceDuplicated" , docs : "Message nonce duplicated." }) , (24u8 , 3u8) => Some (ErrorDetails { pallet : "FromPangolinIssuing" , error : "BackingAccountNone" , docs : "Backing not configured" }) , (24u8 , 4u8) => Some (ErrorDetails { pallet : "FromPangolinIssuing" , error : "ValueOverFlow" , docs : "Issue value overflow" }) , (25u8 , 0u8) => Some (ErrorDetails { pallet : "RemoteGovernment" , error : "RequireSourceRoot" , docs : "Origin MUST be `SourceRoot`." }) , (25u8 , 1u8) => Some (ErrorDetails { pallet : "RemoteGovernment" , error : "EmergencyOnly" , docs : "Only available on emergency mode." }) , _ => None }
             } else {
                 None
             }
@@ -10779,8 +11663,11 @@ pub mod api {
         ) -> bridge_pangolin_messages::constants::ConstantsApi {
             bridge_pangolin_messages::constants::ConstantsApi
         }
-        pub fn fee_market(&self) -> fee_market::constants::ConstantsApi {
-            fee_market::constants::ConstantsApi
+        pub fn pangolin_fee_market(&self) -> pangolin_fee_market::constants::ConstantsApi {
+            pangolin_fee_market::constants::ConstantsApi
+        }
+        pub fn from_pangolin_issuing(&self) -> from_pangolin_issuing::constants::ConstantsApi {
+            from_pangolin_issuing::constants::ConstantsApi
         }
     }
     pub struct StorageApi<'a, T: ::subxt::Config> {
@@ -10851,8 +11738,14 @@ pub mod api {
         ) -> bridge_pangolin_messages::storage::StorageApi<'a, T> {
             bridge_pangolin_messages::storage::StorageApi::new(self.client)
         }
-        pub fn fee_market(&self) -> fee_market::storage::StorageApi<'a, T> {
-            fee_market::storage::StorageApi::new(self.client)
+        pub fn pangolin_fee_market(&self) -> pangolin_fee_market::storage::StorageApi<'a, T> {
+            pangolin_fee_market::storage::StorageApi::new(self.client)
+        }
+        pub fn from_pangolin_issuing(&self) -> from_pangolin_issuing::storage::StorageApi<'a, T> {
+            from_pangolin_issuing::storage::StorageApi::new(self.client)
+        }
+        pub fn remote_government(&self) -> remote_government::storage::StorageApi<'a, T> {
+            remote_government::storage::StorageApi::new(self.client)
         }
     }
     pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
@@ -10917,8 +11810,18 @@ pub mod api {
         ) -> bridge_pangolin_messages::calls::TransactionApi<'a, T, X, A> {
             bridge_pangolin_messages::calls::TransactionApi::new(self.client)
         }
-        pub fn fee_market(&self) -> fee_market::calls::TransactionApi<'a, T, X, A> {
-            fee_market::calls::TransactionApi::new(self.client)
+        pub fn pangolin_fee_market(
+            &self,
+        ) -> pangolin_fee_market::calls::TransactionApi<'a, T, X, A> {
+            pangolin_fee_market::calls::TransactionApi::new(self.client)
+        }
+        pub fn from_pangolin_issuing(
+            &self,
+        ) -> from_pangolin_issuing::calls::TransactionApi<'a, T, X, A> {
+            from_pangolin_issuing::calls::TransactionApi::new(self.client)
+        }
+        pub fn remote_government(&self) -> remote_government::calls::TransactionApi<'a, T, X, A> {
+            remote_government::calls::TransactionApi::new(self.client)
         }
     }
 }

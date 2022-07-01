@@ -3,4 +3,6 @@ pub mod component;
 pub mod config;
 pub mod error;
 pub mod types;
-pub mod subxt_runtime;
+
+mod fastapi;
+mod subxt_runtime;

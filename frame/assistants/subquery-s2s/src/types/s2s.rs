@@ -66,6 +66,7 @@ pub enum RelayBlockOrigin {
     BridgePangolinParachain, // from pangolin send message to pangolin parachain
     BridgeCrabParachain,     // from crab send messages to crab parachain
     BridgeCrab,              // from crab parachain send messages to crab
+    BridgeDarwinia,          // from crab send message to darwinia
 }
 
 /// justification mapping

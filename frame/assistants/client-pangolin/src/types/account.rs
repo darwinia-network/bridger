@@ -56,7 +56,8 @@ mod darwinia {
             let account_id = AccountId::from(public);
 
             // real account, convert to account id
-            let real = real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real)));
+            let real =
+                real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real.as_ref())));
 
             Ok(Self {
                 account_id,
@@ -97,7 +98,7 @@ mod darwinia {
 mod ethlike_v1 {
     use std::fmt::{Debug, Formatter};
 
-    use crate::subxt_runtime::api::runtime_types::darwinia_claims::EcdsaSignature;
+    use crate::types::EcdsaSignature;
 
     use secp256k1::SecretKey;
     use web3::signing::SecretKeyRef;

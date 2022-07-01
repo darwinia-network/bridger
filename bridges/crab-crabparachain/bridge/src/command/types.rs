@@ -8,7 +8,7 @@ use crate::types::BridgeName;
 pub enum Opts {
     /// Init bridge crab-crabparachain
     Init {
-        /// Bridge, support kusama-to-crab
+        /// Bridge
         #[structopt()]
         bridge: BridgeName,
     },

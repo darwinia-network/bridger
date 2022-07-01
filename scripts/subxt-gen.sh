@@ -31,8 +31,8 @@ OUTPUT_FILE=
 
 
 if [ "${CHAIN}" == "pangolin" ]; then
-  #ENDPOINT='https://pangolin-rpc.darwinia.network'
-  ENDPOINT='http://127.0.0.1:9966'
+  ENDPOINT='https://pangolin-rpc.darwinia.network'
+#  ENDPOINT='http://127.0.0.1:9966'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin
 fi
 
@@ -42,8 +42,8 @@ if [ "${CHAIN}" == "pangoro" ]; then
 fi
 
 if [ "${CHAIN}" == "darwinia" ]; then
-#  ENDPOINT='https://rpc.darwinia.network'
-  ENDPOINT='http://127.0.0.1:9936'
+  ENDPOINT='https://rpc.darwinia.network'
+#  ENDPOINT='http://127.0.0.1:9936'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-darwinia
 fi
 
@@ -53,7 +53,8 @@ if [ "${CHAIN}" == "rococo" ]; then
 fi
 
 if [ "${CHAIN}" == "pangolin-parachain" ]; then
-  ENDPOINT='http://127.0.0.1:40338'
+  ENDPOINT='https://pangolin-parachain-rpc.darwinia.network'
+#  ENDPOINT='http://127.0.0.1:40338'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachain
 fi
 

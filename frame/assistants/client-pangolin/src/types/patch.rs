@@ -1,11 +1,13 @@
 use std::collections::HashMap;
 
 #[cfg(feature = "ethlike-v1")]
-use codec::Encode;
-use crate::subxt_runtime::api::runtime_types::{darwinia_bridge_ethereum, darwinia_relay_primitives};
+use codec::{Decode, Encode};
 use subxt::DefaultExtra;
 
 use crate::config::PangolinSubxtConfig;
+use crate::subxt_runtime::api::runtime_types::{
+    darwinia_bridge_ethereum, darwinia_relay_primitives,
+};
 use crate::types::Balance;
 
 /// Real relay affirmation types
@@ -42,3 +44,8 @@ where
     /// mmr_root or next authorities
     pub _4: _4,
 }
+
+/// EcdsaSignature
+#[cfg(feature = "ethlike-v1")]
+#[derive(Clone, Debug, PartialEq, Eq, Encode, Decode)]
+pub struct EcdsaSignature(pub [u8; 65]);

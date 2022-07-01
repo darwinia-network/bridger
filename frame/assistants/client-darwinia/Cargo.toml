@@ -24,19 +24,54 @@ thiserror = "1"
 serde       = { version = "1", features = ["derive"] }
 serde_json  = "1"
 
-array-bytes = "1.4"
-codec       = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive", "full"] }
-subxt       = "0.18.1"
+array-bytes = "2"
+codec       = { package = "parity-scale-codec", version = "2" }
+subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.3" }
+bp-darwinia = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
 
-web3          = { git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"], optional = true }
-secp256k1     = { version = "0.20", features = ["recovery"], optional = true }
-shadow-liketh = { path = "../shadow-liketh", optional = true }
+## maybe common
+async-trait           = { optional = true, version = "0.1" }
 
-support-toolkit  = { path = "../../../frame/supports/support-toolkit" }
+## substrate
+sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+
+## ethv1
+web3          = { optional = true, git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
+secp256k1     = { optional = true, version = "0.20", features = ["recovery"] }
+shadow-liketh = { optional = true, path = "../shadow-liketh" }
+
+## s2s client
+finality-grandpa      = { optional = true, version = "0.14" }
+bridge-s2s-traits     = { optional = true, path = "../../../frame/traits/bridge-s2s", features = ["advanced-types"] }
+
+## feemarket s2s
+feemarket-s2s-traits = { optional = true, path = "../../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
+
+support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
+
+[features]
+default     = []
+ethlike-v1 = ["web3", "secp256k1", "shadow-liketh"]
+substrate   = [
+  "sp-finality-grandpa",
+  "sp-runtime",
+  "sp-core",
+]
+bridge-s2s         = [
+  "substrate",
+  "async-trait",
+  "finality-grandpa",
+  "bridge-s2s-traits",
+]
+bridge-s2s-crab = ["bridge-s2s"]
+feemarket-s2s   = [
+  "async-trait",
+  "feemarket-s2s-traits",
+]
+feemarket-s2s-crab = ["feemarket-s2s"]
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 
-[features]
-default    = []
-ethlike-v1 = ["web3", "secp256k1", "shadow-liketh"]

@@ -15,9 +15,8 @@ version       = "0.5.7"
 [dependencies]
 tracing     = "0.1"
 color-eyre  = "0.5"
-async-trait = "0.1"
 
-array-bytes = "1.4"
+array-bytes = "2"
 tokio       = { version = "1", features = ["full"] }
 
 structopt = "0.3"
@@ -31,9 +30,9 @@ support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-toolkit    = { path = "../../../frame/supports/support-toolkit" }
 
-abstract-bridge-s2s = { path = "../../../frame/abstract/bridge-s2s" }
+bridge-s2s-traits   = { path = "../../../frame/traits/bridge-s2s" }
 client-pangolin     = { path = "../../../frame/assistants/client-pangolin", features = [ "bridge-s2s-pangoro", "feemarket-s2s-pangoro" ]}
 client-pangoro      = { path = "../../../frame/assistants/client-pangoro", features = [ "bridge-s2s-pangolin", "feemarket-s2s-pangolin" ]}
 subquery-s2s        = { path = "../../../frame/assistants/subquery-s2s" }
 relay-s2s           = { path = "../../../frame/assistants/relay-s2s" }
-feemarket-ns2s      = { path = "../../../frame/assistants/feemarket-ns2s" }
+feemarket-s2s       = { path = "../../../frame/assistants/feemarket-s2s" }

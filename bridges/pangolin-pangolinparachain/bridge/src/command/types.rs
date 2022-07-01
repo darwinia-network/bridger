@@ -4,11 +4,14 @@ use crate::types::BridgeName;
 
 /// Bridge pangolin-pangolinparachain options
 #[derive(Debug, StructOpt)]
-#[structopt(name = "pangolin-pangolinparachain", about = "Bridge pangolin-pangolinparachain")]
+#[structopt(
+    name = "pangolin-pangolinparachain",
+    about = "Bridge pangolin-pangolinparachain"
+)]
 pub enum Opts {
     /// Init bridge pangolin-pangolinparachain
     Init {
-        /// Bridge, support rococo-to-pangolin
+        /// Bridge
         #[structopt()]
         bridge: BridgeName,
     },

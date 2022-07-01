@@ -12,13 +12,6 @@ pub enum BridgeName {
     PangoroToPangolin,
 }
 
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// pub struct InitBridge {
-//     pub bridge: BridgeName,
-//     pub source: ChainInfoConfig,
-//     pub target: ChainInfoConfig,
-// }
-
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct HexLaneId(pub [u8; 4]);
 
@@ -35,7 +28,7 @@ impl FromStr for HexLaneId {
 impl Display for HexLaneId {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         let lane_id = self.0;
-        let hex = array_bytes::bytes2hex("0x", lane_id);
+        let hex = array_bytes::bytes2hex("0x", lane_id.as_ref());
         f.write_str(&hex[..])
     }
 }

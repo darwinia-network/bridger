@@ -1,21 +1,28 @@
 use std::str::FromStr;
 
-use abstract_bridge_s2s::client::S2SClientRelay;
-use abstract_bridge_s2s::config::Config;
-use abstract_bridge_s2s::types::bp_header_chain;
+use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay};
+use bridge_s2s_traits::types::bp_header_chain;
+use bridge_s2s_traits::types::bp_runtime::Chain;
 use sp_runtime::codec;
 use sp_runtime::traits::Header;
+
 use support_toolkit::{convert::SmartCodecMapper, logk};
 
 use crate::error::{RelayError, RelayResult};
 use crate::types::{RelaychainHeaderInput, M_HEADER};
 
 /// relay chain to solo chain header relay runner
-pub struct RelaychainHeaderRunner<SC: S2SClientRelay, TC: S2SClientRelay> {
+pub struct RelaychainHeaderRunner<SC: S2SClientGeneric, TC: S2SClientRelay> {
     input: RelaychainHeaderInput<SC, TC>,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
+impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
+    pub fn new(input: RelaychainHeaderInput<SC, TC>) -> Self {
+        Self { input }
+    }
+}
+
+impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
     pub async fn start(&self) -> RelayResult<()> {
         loop {
             self.run().await?;
@@ -30,19 +37,19 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             client_solochain.best_target_finalized(None).await?;
         let expected_relaychain_hash =
             SmartCodecMapper::map_to(&last_relayed_relaychain_hash_in_solochain)?;
-        tracing::debug!(
-            target: "relay-s2s",
-            "{} get last relayed rococo block hash: {:?}",
-            logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", expected_relaychain_hash),
-        );
+        // tracing::debug!(
+        //     target: "relay-s2s",
+        //     "{} get last relayed relaychain block hash: {:?}",
+        //     logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
+        //     array_bytes::bytes2hex("0x", expected_relaychain_hash.as_ref()),
+        // );
         let last_relayed_relaychain_block_in_solochain = client_relaychain
             .block(Some(expected_relaychain_hash))
             .await?
             .ok_or_else(|| {
                 RelayError::Custom(format!(
-                    "Failed to query block by [{}] in rococo",
-                    array_bytes::bytes2hex("0x", expected_relaychain_hash)
+                    "Failed to query block by [{}] in relaychain",
+                    array_bytes::bytes2hex("0x", expected_relaychain_hash.as_ref())
                 ))
             })?;
 
@@ -53,7 +60,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         let block_number: u32 = SmartCodecMapper::map_to(block_number)?;
         tracing::info!(
             target: "relay-s2s",
-            "{} get last relayed rococo block number: {:?}",
+            "{} get last relayed relaychain block number: {:?}",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
             block_number,
         );
@@ -93,7 +100,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             target: "relay-s2s",
             "{} header relayed: {:?}",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", hash),
+            array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(())
     }
@@ -145,6 +152,12 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             return Ok(());
         }
         let next_para_header = next_para_header.expect("Unreachable");
+        tracing::trace!(
+            target: "relay-s2s",
+            "{} queryied last need relay parachain header is {}",
+            logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
+            next_para_header.block_number,
+        );
 
         let subquery_candidate = &self.input.subquery_candidate;
         let next_header = subquery_candidate
@@ -153,9 +166,10 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             .filter(|header| {
                 tracing::debug!(
                     target: "relay-s2s",
-                    "{} get related realy chain header: {:?}",
+                    "{} get related realy chain header: {}, last relayed header at solochain is {}",
                     logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                     header.included_relay_block,
+                    last_block_number,
                 );
                 header.included_relay_block > last_block_number
             });
@@ -173,25 +187,29 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
         match crate::keepstate::get_recently_justification(SC::CHAIN) {
             Some(justification) => {
                 let grandpa_justification: bp_header_chain::justification::GrandpaJustification<
-                    <SC::Config as Config>::Header,
+                    <SC::Chain as Chain>::Header,
                 > = codec::Decode::decode(&mut justification.as_ref()).map_err(|err| {
                     RelayError::Custom(format!(
-                        "Failed to decode justification of rococo: {:?}",
+                        "Failed to decode justification of relaychain: {:?}",
                         err
                     ))
                 })?;
                 tracing::debug!(
                     target: "relay-s2s",
-                    "{} test justification: {:?}",
+                    "{} found justification at block {} and last block number is {}",
                     logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                     grandpa_justification.commit.target_number,
+                    last_block_number,
                 );
 
                 let target_number: u32 =
                     SmartCodecMapper::map_to(&grandpa_justification.commit.target_number)?;
                 if target_number > last_block_number {
                     self.submit_finality(
-                        array_bytes::bytes2hex("", grandpa_justification.commit.target_hash),
+                        array_bytes::bytes2hex(
+                            "",
+                            grandpa_justification.commit.target_hash.as_ref(),
+                        ),
                         justification.to_vec(),
                     )
                     .await?;

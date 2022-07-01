@@ -7,35 +7,9 @@ endpoint = "wss://pangoro-rpc.darwinia.network"
 signer = "//Alice"
 
 [relay]
-# substrate-substrate bridger message relay lanes, default use `00000000`
 lanes = ["726f6c69"]
 
-#[feemarket]
-#[feemarket.subscan_left]
-#endpoint = "https://pangolin.api.subscan.io"
-#token = "12345abcde"
-#timeout = 30
-#
-#[feemarket.subscan_right]
-#endpoint = "https://pangoro.api.subscan.io"
-#token = "12345abcde"
-#timeout = 30
-
-[task]
-# 1800 seconds, 30 minutes
-interval_update_fee = 1800
-
-# Bundle 3 strategy update your fee
-# - Nothing:    Nothing to do
-# - Crazy:      If the first assigned relay is not mine. set the first assigned relayer's fee-1 to your fee.
-# - Reasonable: Query rencently orders from subscan. and calculate your fee.
-update_fee_strategy = "Nothing"
-
-[index.pangolin]
-# Subquery pangolin indexer queries url
-endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-pangolin"
-
-[index.pangoro]
-# Subquery pangoro indexer queries url
-endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-pangoro"
+[index]
+pangolin = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-pangolin" }
+pangoro  = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-pangoro" }
 

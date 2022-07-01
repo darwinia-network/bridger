@@ -1,5 +1,5 @@
-use abstract_bridge_s2s::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
-use abstract_bridge_s2s::types::ParaId;
+use bridge_s2s_traits::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
+use bridge_s2s_traits::types::ParaId;
 use sp_runtime::traits::Hash;
 use sp_runtime::traits::Header;
 use support_toolkit::{convert::SmartCodecMapper, logk};
@@ -10,6 +10,12 @@ use crate::types::{ParaHeaderInput, M_PARA_HEAD};
 /// para head to solo chain header relay runner
 pub struct ParaHeaderRunner<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> {
     input: ParaHeaderInput<SC, TC>,
+}
+
+impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHeaderRunner<SC, TC> {
+    pub fn new(input: ParaHeaderInput<SC, TC>) -> Self {
+        Self { input }
+    }
 }
 
 impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHeaderRunner<SC, TC> {
@@ -40,10 +46,10 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             .await?;
         tracing::trace!(
             target: "relay-s2s",
-            "{} the last para-head on {}: {:?}",
+            "{} the last para-head on {}: {}",
             logk::prefix_with_bridge(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
             SC::CHAIN,
-            &para_head_at_target,
+            para_head_at_target.clone().map(|v| v.at_relay_block_number.to_string()).unwrap_or("None".to_string()),
         );
 
         let best_finalized_source_block_hash = client_solochain
@@ -97,7 +103,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             (Some(_), Some(_)) => {
                 tracing::info!(
                     target: "relay-s2s",
-                    "{} not need need to relay",
+                    "{} not need to relay",
                     logk::prefix_with_bridge(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
                 );
                 false
@@ -132,7 +138,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             target: "relay-s2s",
             "{} the tx hash {} emitted",
             logk::prefix_with_bridge(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", hash),
+            array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(())
     }

@@ -36,7 +36,7 @@ impl<'de> Deserialize<'de> for EthereumReceiptProofThing {
         D: Deserializer<'de>,
     {
         let hex = String::deserialize(deserializer)?;
-        let bytes = array_bytes::hex2bytes(hex)
+        let bytes = array_bytes::hex2bytes(hex.as_ref())
             .map_err(|_e| D::Error::custom("Wrong serialize bytes, can't convert to bytes"))?;
         let ret = codec::Decode::decode(&mut bytes.as_slice())
             .map_err(|_e| D::Error::custom("Wrong serialize bytes, can't decode to struct."))?;
@@ -61,7 +61,7 @@ impl<'de> Deserialize<'de> for EthereumRelayHeaderParcel {
         D: Deserializer<'de>,
     {
         let hex = String::deserialize(deserializer)?;
-        let bytes = array_bytes::hex2bytes(hex)
+        let bytes = array_bytes::hex2bytes(hex.as_ref())
             .map_err(|_e| D::Error::custom("Wrong serialize bytes, can't convert to bytes"))?;
         let ret = codec::Decode::decode(&mut bytes.as_slice())
             .map_err(|_e| D::Error::custom("Wrong serialize bytes, can't decode to struct."))?;

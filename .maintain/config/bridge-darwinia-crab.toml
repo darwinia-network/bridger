@@ -1,71 +1,14 @@
 [darwinia]
 endpoint = "wss://rpc.darwinia.network"
 signer = "//Alice"
-# Bundle/Auto/Custom
-runtime_version_mode = "Bundle"
-# If the runtime version mode is custom, you need to set this.
-#spec_version = 12345
-# If the runtime version mode is custom, you need to set this.
-#transaction_version = 0
 
 [crab]
 endpoint = "wss://crab-rpc.darwinia.network"
 signer = "//Alice"
-# Bundle/Auto/Custom
-runtime_version_mode = "Bundle"
-# If the runtime version mode is custom, you need to set this.
-#spec_version = 12345
-# If the runtime version mode is custom, you need to set this.
-#transaction_version = 0
 
 [relay]
-# substrate-substrate bridger message relay lanes, default use `00000000`
 lanes = ["00000000"]
-# (optional) The relay message signer, if not set will use [darwinia.signer]
-signer_darwinia = "//Alice"
-# (optional) the relay message signer, if not set will use [crab.signer]
-signer_crab = "//Alice"
-# If passed, only mandatory headers (headers that are changing the GRANDPA authorities set) are relayed.
-only_mandatory_headers = false
-# Create relayers fund accounts on both chains, if it does not exists yet.
-create_relayers_fund_accounts = false
 
-# The SURI of secret key to use when transactions are submitted to the darwinia node.
-#darwinia_messages_pallet_owner = "//CrabMessagesOwner"
-# The password for the SURI of secret key to use when transactions are submitted to the darwinia node.
-#darwinia_messages_pallet_owner_password = "123456"
-# The SURI of secret key to use when transactions are submitted to the crab node.
-#crab_messages_pallet_owner = "//DarwiniaMessagesOwner"
-# The password for the SURI of secret key to use when transactions are submitted to the crab node.
-#crab_messages_pallet_owner_password = "123456"
-
-# Transactions mortality period, in blocks. MUST be a power of two in [4; 65536] range.
-# MAY NOT be larger than `BlockHashCount` parameter of the chain system module.
-# Discuss: https://github.com/darwinia-network/bridger/pull/266#discussion_r705943606
-#transactions_mortality = 256
-
-[relay.prometheus_params]
-no_prometheus = false
-prometheus_host = "127.0.0.1"
-prometheus_port = 9616
-
-#[feemarket]
-#[feemarket.subscan_left]
-#endpoint = "https://darwinia.api.subscan.io"
-#token = "12345abcde"
-#timeout = 30
-#
-#[feemarket.subscan_right]
-#endpoint = "https://crab.api.subscan.io"
-#token = "12345abcde"
-#timeout = 30
-
-[task]
-# 1800 seconds, 30 minutes
-interval_update_fee = 1800
-
-# Bundle 3 strategy update your fee
-# - Nothing:    Nothing to do
-# - Crazy:      If the first assigned relay is not mine. set the first assigned relayer's fee-1 to your fee.
-# - Reasonable: Query rencently orders from subscan. and calculate your fee.
-update_fee_strategy = "Nothing"
+[index]
+darwinia = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-darwinia" }
+crab     = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-crab" }

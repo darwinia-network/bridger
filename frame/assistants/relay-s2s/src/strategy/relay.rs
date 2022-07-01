@@ -1,7 +1,7 @@
 use std::ops::RangeInclusive;
 
-use abstract_bridge_s2s::error::S2SClientResult;
-use abstract_bridge_s2s::strategy::{RelayReference, RelayStrategy};
+use bridge_s2s_traits::error::S2SClientResult;
+use bridge_s2s_traits::strategy::{RelayReference, RelayStrategy};
 
 use crate::types::LaneId;
 

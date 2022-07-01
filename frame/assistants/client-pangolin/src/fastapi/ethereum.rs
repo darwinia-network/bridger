@@ -184,7 +184,7 @@ impl<'a> EthereumApi<'a> {
         let ethereum_tx_hash = proof
             .header
             .hash
-            .map(|hash| array_bytes::bytes2hex("", &hash))
+            .map(|hash| array_bytes::bytes2hex("", hash.as_ref()))
             .ok_or(ClientError::NoHeaderHashInEthereumReceiptProofOfThing)?;
         let account = self.client.account();
         let v = match account.real() {

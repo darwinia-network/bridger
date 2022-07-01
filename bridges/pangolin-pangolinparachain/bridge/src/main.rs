@@ -3,12 +3,9 @@ use structopt::StructOpt;
 use crate::command::types::Opts;
 
 mod bridge;
-mod chains;
 mod cli;
 mod command;
-mod feemarket;
 mod service;
-mod traits;
 mod types;
 
 #[tokio::main]

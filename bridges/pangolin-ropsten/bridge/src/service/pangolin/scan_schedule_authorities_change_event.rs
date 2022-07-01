@@ -54,7 +54,7 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
                 tracing::trace!(
                     target: "pangolin-ropsten",
                     "[pangolin] [schedule-authorities-change] The ScheduleAuthoritiesChangeEvent message: {} don't need to sign and send it at block: {}",
-                    array_bytes::bytes2hex("0x", message),
+                    array_bytes::bytes2hex("0x", message.as_ref()),
                     event.at_block_number
                 );
                 continue;
@@ -63,7 +63,7 @@ impl<'a> ScanScheduleAuthoritiesChangeEvent<'a> {
             tracing::info!(
                 target: "pangolin-ropsten",
                 "[pangolin] [schedule-authorities-change] Try sign and send authorities with message: {} at block: {}",
-                array_bytes::bytes2hex("0x", message),
+                array_bytes::bytes2hex("0x", message.as_ref()),
                 event.at_block_number
             );
             let ex = Extrinsic::SignAndSendAuthorities(message);

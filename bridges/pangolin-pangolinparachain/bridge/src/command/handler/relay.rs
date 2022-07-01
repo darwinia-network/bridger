@@ -3,7 +3,7 @@ use support_common::config::{Config, Names};
 use crate::bridge::{BridgeConfig, BridgeTask};
 
 pub async fn handle_relay() -> color_eyre::Result<()> {
-    tracing::info!(target: "pangolin-pangoro", "Start bridge pangolin-pangoro");
+    tracing::info!(target: "pangolin-pangolinparachain", "Start bridge pangolin-pangolinparachain");
     // check config
     let _bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
     let _task = BridgeTask::new().await?;

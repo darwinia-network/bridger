@@ -64,9 +64,9 @@ checksum = "94a45b455c14666b85fc40a019e8ab9eb75e3a124e05494f5397122bc9eb06e0"
 
 [[package]]
 name = "array-bytes"
-version = "1.4.1"
+version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ad284aeb45c13f2fb4f084de4a420ebf447423bdf9386c0540ce33cb3ef4b8c"
+checksum = "30725d201df311b571b927e5a175a394e3763e11451c2e6415a84dc6e891fb6d"
 
 [[package]]
 name = "arrayref"
@@ -140,7 +140,7 @@ checksum = "5e121dee8023ce33ab248d9ce1493df03c3b38a659b240096fcbd7048ff9c31f"
 dependencies = [
  "addr2line",
  "cc",
- "cfg-if 1.0.0",
+ "cfg-if",
  "libc",
  "miniz_oxide",
  "object",
@@ -149,9 +149,9 @@ dependencies = [
 
 [[package]]
 name = "base58"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5024ee8015f02155eee35c711107ddd9a9bf3cb689cf2a9089c97e79b6e1ae83"
+checksum = "6107fe1be6682a68940da878d9e9f5e90ca5745b3dec9fd1bb393c8777d4f581"
 
 [[package]]
 name = "base64"
@@ -251,7 +251,7 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 [[package]]
 name = "bp-darwinia-core"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#9cbc639462552e6c770bffdb02c2fd9d937b9eee"
+source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.3#18e43ae8c83a0dbc4cb9ac363a62baf478cc20fc"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -267,7 +267,7 @@ dependencies = [
 [[package]]
 name = "bp-messages"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#9cbc639462552e6c770bffdb02c2fd9d937b9eee"
+source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.3#18e43ae8c83a0dbc4cb9ac363a62baf478cc20fc"
 dependencies = [
  "bitvec",
  "bp-runtime",
@@ -284,7 +284,7 @@ dependencies = [
 [[package]]
 name = "bp-pangoro"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#9cbc639462552e6c770bffdb02c2fd9d937b9eee"
+source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.3#18e43ae8c83a0dbc4cb9ac363a62baf478cc20fc"
 dependencies = [
  "bp-darwinia-core",
  "bp-messages",
@@ -299,7 +299,7 @@ dependencies = [
 [[package]]
 name = "bp-runtime"
 version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.2#9cbc639462552e6c770bffdb02c2fd9d937b9eee"
+source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.3#18e43ae8c83a0dbc4cb9ac363a62baf478cc20fc"
 dependencies = [
  "frame-support",
  "hash-db",
@@ -373,12 +373,6 @@ checksum = "22a9137b95ea06864e018375b72adfb7db6e6f68cfc8df5a04d00288050485ee"
 
 [[package]]
 name = "cfg-if"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
-
-[[package]]
-name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
@@ -429,15 +423,6 @@ dependencies = [
  "support-toolkit",
  "thiserror",
  "tracing",
-]
-
-[[package]]
-name = "cloudabi"
-version = "0.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ddfc5b9aa5d4507acaf872de71051dfd0e309860e88966e1051e462a077aac4f"
-dependencies = [
- "bitflags",
 ]
 
 [[package]]
@@ -547,7 +532,7 @@ version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4dd435b205a4842da59efd07628f921c096bc1cc0a156835b4fa0bcb9a19bcce"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "crossbeam-utils",
 ]
 
@@ -557,7 +542,7 @@ version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5e5bed1f1c269533fa816a0a5492b3545209a205ca1a54842be180eb63a16a6"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "lazy_static",
 ]
 
@@ -797,7 +782,7 @@ version = "0.8.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7896dc8abb250ffdda33912550faa54c88ec8b998dec0b2c55ab224921ce11df"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
 ]
 
 [[package]]
@@ -805,15 +790,6 @@ name = "environmental"
 version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68b91989ae21441195d7d9b9993a2f9295c7e1a8c96255d8b729accddc124797"
-
-[[package]]
-name = "erased-serde"
-version = "0.3.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad132dd8d0d0b546348d7d86cb3191aad14b34e5f979781fc005c80d4ac67ffd"
-dependencies = [
- "serde 1.0.136",
-]
 
 [[package]]
 name = "ethabi"
@@ -931,7 +907,7 @@ version = "14.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37ed5e5c346de62ca5c184b4325a6600d1eaca210666e4606fe4e449574978d0"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "parity-scale-codec",
  "scale-info",
  "serde 1.0.136",
@@ -940,7 +916,7 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "bitflags",
  "frame-metadata",
@@ -967,7 +943,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "Inflector",
  "frame-support-procedural-tools",
@@ -979,7 +955,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate 1.1.0",
@@ -991,7 +967,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1001,7 +977,7 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "frame-support",
  "log",
@@ -1142,7 +1118,7 @@ version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8fc3cb4d91f53b50155bdcfd23f6a4c39ae1969c2ae85982b135750cccaf5fce"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "js-sys",
  "libc",
  "wasi 0.9.0+wasi-snapshot-preview1",
@@ -1155,7 +1131,7 @@ version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "418d37c8b1d42553c93648be529cb70f920d3baf8ef469b74b9638df426e0b4c"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "libc",
  "wasi 0.10.2+wasi-snapshot-preview1",
 ]
@@ -1297,7 +1273,7 @@ checksum = "31f4c6746584866f0feabcc69893c5b51beef3831656a968ed7ae254cdc4fd03"
 dependencies = [
  "bytes",
  "fnv",
- "itoa",
+ "itoa 1.0.1",
 ]
 
 [[package]]
@@ -1338,7 +1314,7 @@ dependencies = [
  "http-body",
  "httparse",
  "httpdate",
- "itoa",
+ "itoa 1.0.1",
  "pin-project-lite",
  "socket2",
  "tokio",
@@ -1450,7 +1426,7 @@ version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a5bbe824c507c5da5956355e86a746d82e0e1464f65d862cc5e71da70e94b2c"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
 ]
 
 [[package]]
@@ -1467,6 +1443,12 @@ name = "ipnet"
 version = "2.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68f2d64f2edebec4ce84ad108148e67e1064789bee435edc5b60ad398714a3a9"
+
+[[package]]
+name = "itoa"
+version = "0.4.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b71991ff56294aa922b450139ee08b3bfc70982c6b2c7562771375cf73542dd4"
 
 [[package]]
 name = "itoa"
@@ -1586,7 +1568,7 @@ checksum = "6607c62aa161d23d17a9072cc5da0be67cdfc89d3afb1e8d9c842bebc2525ffe"
 dependencies = [
  "arrayvec 0.5.2",
  "bitflags",
- "cfg-if 1.0.0",
+ "cfg-if",
  "ryu",
  "static_assertions",
 ]
@@ -1679,15 +1661,6 @@ checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
 
 [[package]]
 name = "lock_api"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4da24a77a3d8a6d4862d95f72e6fdb9c09a643ecdb402d754004a557f2bec75"
-dependencies = [
- "scopeguard",
-]
-
-[[package]]
-name = "lock_api"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "88943dd7ef4a2e5a4bfa2753aaab3013e34ce2533d1996fb18ef591e315e2b3b"
@@ -1701,7 +1674,7 @@ version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51b9bbe6c47d51fc3e1a9b945965946b4c44142ab8792c50835a980d362c2710"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
 ]
 
 [[package]]
@@ -1848,6 +1821,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "num-format"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bafe4179722c2894288ee77a9f044f02811c86af699344c498b0840c698a2465"
+dependencies = [
+ "arrayvec 0.4.12",
+ "itoa 0.4.8",
+]
+
+[[package]]
 name = "num-integer"
 version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1931,7 +1914,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c7ae222234c30df141154f159066c5093ff73b63204dcda7121eb082fc56a95"
 dependencies = [
  "bitflags",
- "cfg-if 1.0.0",
+ "cfg-if",
  "foreign-types",
  "libc",
  "once_cell",
@@ -1995,7 +1978,7 @@ version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6f4cb4e169446179cbc6b8b6320cc9fca49bd2e94e8db25f25f200a8ea774770"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "hashbrown",
  "impl-trait-for-tuples",
  "parity-util-mem-derive",
@@ -2023,22 +2006,12 @@ checksum = "be5e13c266502aadf83426d87d81a0f5d1ef45b8027f5a471c360abfe4bfae92"
 
 [[package]]
 name = "parking_lot"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3a704eb390aafdc107b0e392f56a82b668e3a71366993b5340f5833fd62505e"
-dependencies = [
- "lock_api 0.3.4",
- "parking_lot_core 0.7.2",
-]
-
-[[package]]
-name = "parking_lot"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d17b78036a60663b797adeaee46f5c9dfebb86948d1255007a1d6be0271ff99"
 dependencies = [
  "instant",
- "lock_api 0.4.6",
+ "lock_api",
  "parking_lot_core 0.8.5",
 ]
 
@@ -2048,22 +2021,8 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "87f5ec2493a61ac0506c0f4199f99070cbe83857b0337006a30f3e6719b8ef58"
 dependencies = [
- "lock_api 0.4.6",
+ "lock_api",
  "parking_lot_core 0.9.1",
-]
-
-[[package]]
-name = "parking_lot_core"
-version = "0.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d58c7c768d4ba344e3e8d72518ac13e259d7c7ade24167003b8488e10b6740a3"
-dependencies = [
- "cfg-if 0.1.10",
- "cloudabi",
- "libc",
- "redox_syscall 0.1.57",
- "smallvec",
- "winapi",
 ]
 
 [[package]]
@@ -2072,10 +2031,10 @@ version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d76e8e1493bcac0d2766c42737f34458f1c8c50c0d23bcb24ea953affb273216"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "instant",
  "libc",
- "redox_syscall 0.2.10",
+ "redox_syscall",
  "smallvec",
  "winapi",
 ]
@@ -2086,9 +2045,9 @@ version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28141e0cc4143da2443301914478dc976a61ffdb3f043058310c70df2fed8954"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "libc",
- "redox_syscall 0.2.10",
+ "redox_syscall",
  "smallvec",
  "windows-sys",
 ]
@@ -2382,12 +2341,6 @@ dependencies = [
 
 [[package]]
 name = "redox_syscall"
-version = "0.1.57"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41cc0f7e4d5d4544e8861606a285bb08d3e70712ccc7d2b84d7c0ccfaf4b05ce"
-
-[[package]]
-name = "redox_syscall"
 version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8383f39639269cde97d255a32bdb68c047337295414940c68bdd30c2e13203ff"
@@ -2402,7 +2355,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "528532f3d801c87aec9def2add9ca802fe569e44a544afe633765267840abe64"
 dependencies = [
  "getrandom 0.2.4",
- "redox_syscall 0.2.10",
+ "redox_syscall",
 ]
 
 [[package]]
@@ -2605,7 +2558,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c55b744399c25532d63a0d2789b109df8d46fc93752d46b0782991a931a782f"
 dependencies = [
  "bitvec",
- "cfg-if 1.0.0",
+ "cfg-if",
  "derive_more",
  "parity-scale-codec",
  "scale-info-derive",
@@ -2688,9 +2641,9 @@ dependencies = [
 
 [[package]]
 name = "secrecy"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0673d6a6449f5e7d12a1caf424fd9363e2af3a4953023ed455e3c4beef4597c0"
+checksum = "9bd1c54ea06cfd2f6b63219704de0b9b4f72dcc2b8fdef820be6cd799780e91e"
 dependencies = [
  "zeroize",
 ]
@@ -2769,7 +2722,7 @@ version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8e8d9fa5c3b304765ce1fd9c4c8a3de2c8db365a5b91be52f186efc675681d95"
 dependencies = [
- "itoa",
+ "itoa 1.0.1",
  "ryu",
  "serde 1.0.136",
 ]
@@ -2790,7 +2743,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3491c14715ca2294c4d6a88f15e84739788c1d030eed8c110436aafdaa2f3fd"
 dependencies = [
  "form_urlencoded",
- "itoa",
+ "itoa 1.0.1",
  "ryu",
  "serde 1.0.136",
 ]
@@ -2814,7 +2767,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "99cd6713db3cf16b6c84e06321e049a9b9f699826e16096d23bbcc44d15d51a6"
 dependencies = [
  "block-buffer 0.9.0",
- "cfg-if 1.0.0",
+ "cfg-if",
  "cpufeatures",
  "digest 0.9.0",
  "opaque-debug 0.3.0",
@@ -2826,7 +2779,7 @@ version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "028f48d513f9678cda28f6e4064755b3fbb2af6acd672f2c209b62323f7aea0f"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "cpufeatures",
  "digest 0.10.2",
 ]
@@ -2850,7 +2803,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4d58a1e1bf39749807d89cf2d98ac2dfa0ff1cb3faa38fbb64dd88ac8013d800"
 dependencies = [
  "block-buffer 0.9.0",
- "cfg-if 1.0.0",
+ "cfg-if",
  "cpufeatures",
  "digest 0.9.0",
  "opaque-debug 0.3.0",
@@ -2899,15 +2852,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9def91fd1e018fe007022791f865d0ccc9b3a0d5001e01aabb8b40e46000afb5"
 
 [[package]]
-name = "slog"
-version = "2.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8347046d4ebd943127157b94d63abb990fcf729dc4e9978927fdf4ac3c998d06"
-dependencies = [
- "erased-serde",
-]
-
-[[package]]
 name = "smallvec"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2941,7 +2885,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "hash-db",
  "log",
@@ -2958,7 +2902,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate 1.1.0",
@@ -2970,7 +2914,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "parity-scale-codec",
  "scale-info",
@@ -2983,7 +2927,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.14",
@@ -2998,7 +2942,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -3031,6 +2975,7 @@ dependencies = [
  "sp-runtime-interface",
  "sp-std",
  "sp-storage",
+ "ss58-registry",
  "substrate-bip39",
  "thiserror",
  "tiny-bip39",
@@ -3043,7 +2988,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3053,7 +2998,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.10.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -3064,7 +3009,7 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "async-trait",
  "impl-trait-for-tuples",
@@ -3078,7 +3023,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "futures",
  "hash-db",
@@ -3102,7 +3047,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.10.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -3118,7 +3063,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "backtrace",
 ]
@@ -3126,7 +3071,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -3148,7 +3093,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -3165,7 +3110,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "Inflector",
  "proc-macro-crate 1.1.0",
@@ -3177,7 +3122,7 @@ dependencies = [
 [[package]]
 name = "sp-staking"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "parity-scale-codec",
  "scale-info",
@@ -3188,7 +3133,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.10.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "hash-db",
  "log",
@@ -3211,12 +3156,12 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 
 [[package]]
 name = "sp-storage"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -3229,15 +3174,9 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
- "erased-serde",
- "log",
  "parity-scale-codec",
- "parking_lot 0.10.2",
- "serde 1.0.136",
- "serde_json",
- "slog",
  "sp-std",
  "tracing",
  "tracing-core",
@@ -3247,7 +3186,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -3262,7 +3201,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -3278,7 +3217,7 @@ dependencies = [
 [[package]]
 name = "sp-version-proc-macro"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "parity-scale-codec",
  "proc-macro2",
@@ -3289,7 +3228,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "4.0.0-dev"
-source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.2#5cb17b488d600befa4918915e18d40c28a25353d"
+source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.3#1df7fe589a94caa33e8b9290dd474613bc170416"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -3302,6 +3241,21 @@ name = "spin"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
+
+[[package]]
+name = "ss58-registry"
+version = "1.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77ef98aedad3dc52e10995e7ed15f1279e11d4da35795f5dac7305742d0feb66"
+dependencies = [
+ "Inflector",
+ "num-format",
+ "proc-macro2",
+ "quote",
+ "serde 1.0.136",
+ "serde_json",
+ "unicode-xid",
+]
 
 [[package]]
 name = "static_assertions"
@@ -3388,7 +3342,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 [[package]]
 name = "subxt"
 version = "0.17.0"
-source = "git+https://github.com/darwinia-network/subxt.git?branch=darwinia-v0.12.2#7a63da959877078de7db7c14cd2eed9e65e5d54e"
+source = "git+https://github.com/darwinia-network/subxt.git?branch=darwinia-v0.12.3#a8a9918afd011518524f40f437d3d6835abfaa05"
 dependencies = [
  "async-trait",
  "bitvec",
@@ -3414,7 +3368,7 @@ dependencies = [
 [[package]]
 name = "subxt-codegen"
 version = "0.17.0"
-source = "git+https://github.com/darwinia-network/subxt.git?branch=darwinia-v0.12.2#7a63da959877078de7db7c14cd2eed9e65e5d54e"
+source = "git+https://github.com/darwinia-network/subxt.git?branch=darwinia-v0.12.3#a8a9918afd011518524f40f437d3d6835abfaa05"
 dependencies = [
  "async-trait",
  "darling",
@@ -3432,7 +3386,7 @@ dependencies = [
 [[package]]
 name = "subxt-macro"
 version = "0.17.0"
-source = "git+https://github.com/darwinia-network/subxt.git?branch=darwinia-v0.12.2#7a63da959877078de7db7c14cd2eed9e65e5d54e"
+source = "git+https://github.com/darwinia-network/subxt.git?branch=darwinia-v0.12.3#a8a9918afd011518524f40f437d3d6835abfaa05"
 dependencies = [
  "async-trait",
  "darling",
@@ -3528,10 +3482,10 @@ version = "3.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5cdb1ef4eaeeaddc8fbd371e5017057064af0911902ef36b39801f67cc6d79e4"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "fastrand",
  "libc",
- "redox_syscall 0.2.10",
+ "redox_syscall",
  "remove_dir_all",
  "winapi",
 ]
@@ -3715,7 +3669,7 @@ version = "0.1.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2d8d93354fe2a8e50d5953f5ae2e47a3fc2ef03292e7ea46e3cc38f549525fb9"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "pin-project-lite",
  "tracing-attributes",
  "tracing-core",
@@ -3829,7 +3783,7 @@ version = "1.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ee73e6e4924fe940354b8d4d98cad5231175d615cd855b758adc658c0aac6a0"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "rand 0.8.4",
  "static_assertions",
 ]
@@ -3955,7 +3909,7 @@ version = "0.2.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25f1af7423d8588a3d840681122e72e6a24ddbcb3f0ec385cac0d12d24256c06"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "wasm-bindgen-macro",
 ]
 
@@ -3980,7 +3934,7 @@ version = "0.4.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2eb6ec270a31b1d3c7e266b999739109abce8b6c87e4b31fcfcd788b65267395"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "js-sys",
  "wasm-bindgen",
  "web-sys",

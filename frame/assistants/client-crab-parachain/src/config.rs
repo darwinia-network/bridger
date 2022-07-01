@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use subxt::{sp_core, sp_runtime};
+use subxt::sp_runtime;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientConfig {
@@ -16,13 +16,13 @@ pub struct ClientConfig {
 pub enum CrabParachainSubxtConfig {}
 
 impl subxt::Config for CrabParachainSubxtConfig {
-    type Index = u32;
-    type BlockNumber = u32;
-    type Hash = sp_core::H256;
-    type Hashing = sp_runtime::traits::BlakeTwo256;
-    type AccountId = sp_runtime::AccountId32;
-    type Address = sp_runtime::MultiAddress<Self::AccountId, u32>;
-    type Header = sp_runtime::generic::Header<Self::BlockNumber, sp_runtime::traits::BlakeTwo256>;
-    type Signature = sp_runtime::MultiSignature;
+    type Index = bp_crab_parachain::Nonce;
+    type BlockNumber = bp_crab_parachain::BlockNumber;
+    type Hash = bp_crab_parachain::Hash;
+    type Hashing = bp_crab_parachain::Hashing;
+    type AccountId = bp_crab_parachain::AccountId;
+    type Address = bp_crab_parachain::Address;
+    type Header = bp_crab_parachain::Header;
+    type Signature = bp_crab_parachain::Signature;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }

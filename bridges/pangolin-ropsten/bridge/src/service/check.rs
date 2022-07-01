@@ -105,9 +105,6 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
         let verified = match client.ethereum().is_verified(&tx_hash, tx_index).await {
             Ok(v) => v,
             Err(e) => {
-                if e.is_restart_need() {
-                    return Err(e.into());
-                }
                 tracing::error!(
                     target: "pangolin-ropsten",
                     "[ropsten] [check] Failed verified redeem. [{}]: {}. {:?}",
@@ -115,7 +112,7 @@ async fn run(tracker: &Tracker) -> color_eyre::Result<()> {
                     tx.block_hash,
                     e
                 );
-                false
+                return Err(e.into());
             }
         };
         if verified {

@@ -46,7 +46,7 @@ fn init_log() -> color_eyre::Result<()> {
         .unwrap_or(Level::TRACE);
 
     if use_json_adapter {
-        let _subscriber = tracing_subscriber::FmtSubscriber::builder()
+        tracing_subscriber::FmtSubscriber::builder()
             .with_max_level(max_log_level)
             .with_env_filter(
                 EnvFilter::try_from_default_env()
@@ -59,7 +59,7 @@ fn init_log() -> color_eyre::Result<()> {
         return Ok(());
     }
 
-    let _subscriber = tracing_subscriber::FmtSubscriber::builder()
+    tracing_subscriber::FmtSubscriber::builder()
         .with_max_level(max_log_level)
         .with_env_filter(
             EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::from(def_log_filter)),

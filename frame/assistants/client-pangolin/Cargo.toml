@@ -17,20 +17,19 @@ thiserror = "1"
 tracing   = "0.1"
 
 serde       = { version = "1", features = ["derive"] }
-serde_json  = "1"
 
-array-bytes = "1.4"
+array-bytes = "2"
 codec       = { package = "parity-scale-codec", version = "2" }
-subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.2" }
-bp-pangolin = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.2" }
+subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.3" }
+bp-pangolin = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
 
 ## maybe common
 async-trait = { optional = true, version = "0.1" }
 
 ## substrate
-sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
-sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.2" }
+sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
 
 ## eth-v1
 web3          = { optional = true, git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
@@ -39,15 +38,16 @@ shadow-liketh = { optional = true, path = "../shadow-liketh" }
 
 ## s2s client
 finality-grandpa      = { optional = true, version = "0.14" }
-abstract-bridge-s2s   = { optional = true, path = "../../../frame/abstract/bridge-s2s", features = ["advanced-types"] }
+bridge-s2s-traits     = { optional = true, path = "../../../frame/traits/bridge-s2s", features = ["advanced-types"] }
 
 ## feemarket s2s
-abstract-feemarket-s2s = { optional = true, path = "../../../frame/abstract/feemarket-s2s", features = ["advanced-types"] }
+feemarket-s2s-traits = { optional = true, path = "../../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
 
 support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
 
 [dev-dependencies]
-tokio = { version = "1", features = ["full"] }
+tokio      = { version = "1", features = ["full"] }
+serde_json = "1"
 
 [features]
 default     = []
@@ -61,11 +61,14 @@ bridge-s2s         = [
   "substrate",
   "async-trait",
   "finality-grandpa",
-  "abstract-bridge-s2s",
+  "bridge-s2s-traits",
 ]
 bridge-s2s-pangoro = ["bridge-s2s"]
+bridge-s2s-pangolin-parachain = ["bridge-s2s", "bridge-s2s-traits/bridge-parachain"]
+
 feemarket-s2s   = [
   "async-trait",
-  "abstract-feemarket-s2s",
+  "feemarket-s2s-traits",
 ]
 feemarket-s2s-pangoro = ["feemarket-s2s"]
+feemarket-s2s-pangolin-parachain = ["feemarket-s2s"]

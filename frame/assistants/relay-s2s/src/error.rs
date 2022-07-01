@@ -1,4 +1,4 @@
-use abstract_bridge_s2s::error::S2SClientError;
+use bridge_s2s_traits::error::S2SClientError;
 use sp_runtime::codec;
 use subquery_s2s::SubqueryComponentError;
 use thiserror::Error as ThisError;

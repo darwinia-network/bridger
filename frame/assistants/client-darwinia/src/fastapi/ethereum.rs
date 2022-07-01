@@ -116,7 +116,7 @@ impl<'a> EthereumApi<'a> {
         let ethereum_tx_hash = proof
             .header
             .hash
-            .map(|hash| array_bytes::bytes2hex("", &hash))
+            .map(|hash| array_bytes::bytes2hex("", hash.as_ref()))
             .ok_or(ClientError::NoHeaderHashInEthereumReceiptProofOfThing)?;
         let account = self.client.account();
         let v = match account.real() {
@@ -335,7 +335,7 @@ impl<'a> EthereumApi<'a> {
             .runtime()
             .storage()
             .ethereum_backing()
-            .verified_proof(&hash, &tx_index, None)
+            .verified_proof(hash, tx_index, None)
             .await?;
         Ok(v0)
     }
@@ -413,7 +413,7 @@ impl<'a> EthereumApi<'a> {
             .runtime()
             .storage()
             .ethereum_relay_authorities()
-            .mmr_roots_to_sign(&block_number, exec_block_hash)
+            .mmr_roots_to_sign(block_number, exec_block_hash)
             .await?;
         match mmr_roots_to_sign {
             None => {

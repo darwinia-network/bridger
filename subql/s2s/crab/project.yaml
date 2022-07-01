@@ -19,12 +19,34 @@ dataSources:
       handlers:
         - handler: handleBlock
           kind: substrate/BlockHandler
+
+        - handler: handleCall
+          kind: substrate/CallHandler
+
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            - module: grandpa
-              method: NewAuthorities
-            - module: bridgeCrabParachainMessages
-              method: MessageAccepted
-        - handler: handleCall
-          kind: substrate/CallHandler
+            module: grandpa
+            method: NewAuthorities
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgeCrabParachainMessages
+            method: MessageAccepted
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgeCrabParachainDispatch
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgeDarwiniaMessages
+            method: MessageAccepted
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgeDarwiniaDispatch

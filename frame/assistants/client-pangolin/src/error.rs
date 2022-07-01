@@ -32,11 +32,6 @@ pub enum ClientError {
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
 
-    // #[error("Rpc error: {0}")]
-    // Rpc(#[from] jsonrpsee_types::error::Error),
-    #[error("Serde json error: {0}")]
-    Serialization(#[from] serde_json::error::Error),
-
     #[cfg(feature = "ethlike-v1")]
     #[error("Failed to build SecretKey from authority's private key")]
     FailedToBuildSecretKey(#[from] secp256k1::Error),
@@ -102,7 +97,7 @@ impl From<array_bytes::Error> for ClientError {
 }
 
 #[cfg(feature = "bridge-s2s")]
-impl From<ClientError> for abstract_bridge_s2s::error::S2SClientError {
+impl From<ClientError> for bridge_s2s_traits::error::S2SClientError {
     fn from(error: ClientError) -> Self {
         match error {
             ClientError::SubxtBasicError(e) => Self::RPC(format!("{:?}", e)),

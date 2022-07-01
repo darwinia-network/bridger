@@ -1,9 +1,7 @@
-use crate::error::ClientResult;
-use crate::subxt_runtime::api::RuntimeApi;
 use subxt::Client;
-use subxt::rpc::{Subscription, SubscriptionClientT};
 
 use crate::config::RococoSubxtConfig;
+use crate::subxt_runtime::api::RuntimeApi;
 use crate::types::{NodeRuntimeSignedExtra, RococoAccount};
 
 /// Rococo client
@@ -40,17 +38,4 @@ impl RococoClient {
     pub fn runtime(&self) -> RuntimeApi<RococoSubxtConfig, NodeRuntimeSignedExtra> {
         self.client.clone().to_runtime_api()
     }
-}
-
-impl RococoClient {
-
-    pub async fn subscribe_grandpa_justifications(&self) -> ClientResult<Subscription<sp_core::Bytes>> {
-        let sub = self.client.rpc().client.subscribe(
-            "grandpa_subscribeJustifications",
-            None,
-            "grandpa_unsubscribeJustifications",
-        ).await?;
-        Ok(sub)
-    }
-
 }

@@ -43,3 +43,4 @@ feemarket-s2s             = { path = "../../../frame/assistants/feemarket-s2s" }
 sp-runtime = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
 sp-core    = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
 serde_json = "1"
+codec      = { package = "parity-scale-codec", version = "2" }

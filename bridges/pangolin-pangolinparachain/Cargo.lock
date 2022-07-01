@@ -437,6 +437,7 @@ dependencies = [
  "color-eyre",
  "feemarket-s2s",
  "lifeline",
+ "parity-scale-codec",
  "postage",
  "relay-s2s",
  "serde 1.0.137",

@@ -22,7 +22,7 @@ dataSources:
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            - module: grandpa
-              method: NewAuthorities
+            module: grandpa
+            method: NewAuthorities
         - handler: handleCall
           kind: substrate/CallHandler

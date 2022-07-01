@@ -24,8 +24,8 @@ dataSources:
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            - module: bridgeCrabMessages
-              method: MessageAccepted
+            module: bridgeCrabMessages
+            method: MessageAccepted
 
         - handler: handleEvent
           kind: substrate/EventHandler

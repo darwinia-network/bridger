@@ -22,8 +22,8 @@ dataSources:
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            - module: bridgePangolinMessages
-              method: MessageAccepted
+            module: bridgePangolinMessages
+            method: MessageAccepted
 
         - handler: handleEvent
           kind: substrate/EventHandler

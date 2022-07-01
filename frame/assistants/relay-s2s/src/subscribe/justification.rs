@@ -27,14 +27,12 @@ impl<SC: S2SClientGeneric, TC: S2SClientGeneric> SubscribeJustification<SC, TC> 
         let join_b = tokio::spawn(run_until_connection_lost(client_target, |justification| {
             keepstate::set_recently_justification(TC::CHAIN, justification);
         }));
-        let (_result_a, _result_b) = (
-            join_a
-                .await
-                .map_err(|e| S2SClientError::RPC(format!("{:?}", e)))?,
-            join_b
-                .await
-                .map_err(|e| S2SClientError::RPC(format!("{:?}", e)))?,
-        );
+        join_a
+            .await
+            .map_err(|e| S2SClientError::RPC(format!("{:?}", e)))??;
+        join_b
+            .await
+            .map_err(|e| S2SClientError::RPC(format!("{:?}", e)))??;
         Ok(())
     }
 }

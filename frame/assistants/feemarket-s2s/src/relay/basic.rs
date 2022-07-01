@@ -1,10 +1,10 @@
 use std::ops::Range;
 
-use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
-use abstract_bridge_s2s::strategy::{RelayReference, RelayStrategy};
+use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
+use bridge_s2s_traits::strategy::{RelayReference, RelayStrategy};
 
-use abstract_feemarket_s2s::api::FeemarketApiRelay;
-use abstract_feemarket_s2s::types::Chain;
+use feemarket_s2s_traits::api::FeemarketApiRelay;
+use feemarket_s2s_traits::types::Chain;
 use support_toolkit::logk;
 
 /// Basic relay strategy

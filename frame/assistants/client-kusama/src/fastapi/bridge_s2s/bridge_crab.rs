@@ -1,7 +1,7 @@
-use abstract_bridge_s2s::client::S2SParaBridgeClientRelaychain;
-use abstract_bridge_s2s::error::S2SClientResult;
-use abstract_bridge_s2s::types::bp_runtime::Chain;
-use abstract_bridge_s2s::types::{HeadData, ParaId};
+use bridge_s2s_traits::client::S2SParaBridgeClientRelaychain;
+use bridge_s2s_traits::error::S2SClientResult;
+use bridge_s2s_traits::types::bp_runtime::Chain;
+use bridge_s2s_traits::types::{HeadData, ParaId};
 use sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;

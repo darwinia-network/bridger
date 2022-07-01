@@ -1,5 +1,5 @@
-use abstract_bridge_s2s::client::{S2SClientRelay, S2SParaBridgeClientSolochain};
-use abstract_bridge_s2s::strategy::RelayStrategy;
+use bridge_s2s_traits::client::{S2SClientRelay, S2SParaBridgeClientSolochain};
+use bridge_s2s_traits::strategy::RelayStrategy;
 
 use crate::error::RelayResult;
 use crate::message::common::CommonDeliveryRunner;

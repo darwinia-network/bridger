@@ -1,5 +1,5 @@
 [package]
-name          = "abstract-feemarket-s2s"
+name          = "feemarket-s2s-traits"
 authors       = ["Darwinia Network <hello@darwinia.network>"]
 description   = "Darwinia bridger"
 documentation = "https://rust-docs.darwinia.network/bridger"

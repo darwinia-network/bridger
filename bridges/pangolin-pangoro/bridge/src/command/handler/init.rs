@@ -1,4 +1,4 @@
-use abstract_bridge_s2s::client::{S2SClientGeneric, S2SClientRelay};
+use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay};
 use support_toolkit::convert::SmartCodecMapper;
 
 use support_common::config::{Config, Names};

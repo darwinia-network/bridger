@@ -1,14 +1,14 @@
 use std::ops::RangeInclusive;
 
-use abstract_bridge_s2s::client::{S2SClientGeneric, S2SClientRelay};
-use abstract_bridge_s2s::error::S2SClientResult;
-use abstract_bridge_s2s::types::bp_header_chain::justification::GrandpaJustification;
-use abstract_bridge_s2s::types::bp_messages::{
+use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay};
+use bridge_s2s_traits::error::S2SClientResult;
+use bridge_s2s_traits::types::bp_header_chain::justification::GrandpaJustification;
+use bridge_s2s_traits::types::bp_messages::{
     InboundLaneData, MessageData, MessageKey, OutboundLaneData, UnrewardedRelayersState,
 };
-use abstract_bridge_s2s::types::bp_runtime::Chain;
-use abstract_bridge_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
-use abstract_bridge_s2s::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
+use bridge_s2s_traits::types::bp_runtime::Chain;
+use bridge_s2s_traits::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
+use bridge_s2s_traits::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use sp_core::crypto::AccountId32;
 use sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;

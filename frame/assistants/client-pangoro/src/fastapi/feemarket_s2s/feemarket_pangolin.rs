@@ -1,6 +1,6 @@
-use abstract_feemarket_s2s::api::FeemarketApiRelay;
-use abstract_feemarket_s2s::error::AbstractFeemarketResult;
-use abstract_feemarket_s2s::types::{Chain, Order};
+use feemarket_s2s_traits::api::FeemarketApiRelay;
+use feemarket_s2s_traits::error::AbstractFeemarketResult;
+use feemarket_s2s_traits::types::{Chain, Order};
 use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::PangoroClient;
@@ -9,8 +9,8 @@ use crate::client::PangoroClient;
 impl FeemarketApiRelay for PangoroClient {
     async fn order(
         &self,
-        laned_id: abstract_feemarket_s2s::types::LaneId,
-        message_nonce: abstract_feemarket_s2s::types::MessageNonce,
+        laned_id: feemarket_s2s_traits::types::LaneId,
+        message_nonce: feemarket_s2s_traits::types::MessageNonce,
     ) -> AbstractFeemarketResult<
         Option<
             Order<

@@ -1,7 +1,7 @@
-use abstract_bridge_s2s::client::{S2SClientBase, S2SClientGeneric};
-use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
-use abstract_bridge_s2s::types::bp_header_chain;
-use abstract_bridge_s2s::types::bp_runtime::Chain;
+use bridge_s2s_traits::client::{S2SClientBase, S2SClientGeneric};
+use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
+use bridge_s2s_traits::types::bp_header_chain;
+use bridge_s2s_traits::types::bp_runtime::Chain;
 use finality_grandpa::voter_set::VoterSet;
 use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
 use sp_runtime::generic::{Block, SignedBlock};

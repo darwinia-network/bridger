@@ -30,12 +30,12 @@ sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git
 
 support-toolkit     = { path = "../../supports/support-toolkit", features = ["convert", "log"] }
 
-abstract-bridge-s2s = { path = "../../abstract/bridge-s2s" }
+bridge-s2s-traits = { path = "../../traits/bridge-s2s" }
 subquery-s2s        = { path = "../subquery-s2s" }
 subquery-parachain  = { path = "../subquery-parachain" }
 
 [features]
 default = []
 bridge-parachain = [
-  "abstract-bridge-s2s/bridge-parachain",
+  "bridge-s2s-traits/bridge-parachain",
 ]

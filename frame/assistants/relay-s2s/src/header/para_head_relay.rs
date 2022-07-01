@@ -1,5 +1,5 @@
-use abstract_bridge_s2s::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
-use abstract_bridge_s2s::types::ParaId;
+use bridge_s2s_traits::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
+use bridge_s2s_traits::types::ParaId;
 use sp_runtime::traits::Hash;
 use sp_runtime::traits::Header;
 use support_toolkit::{convert::SmartCodecMapper, logk};

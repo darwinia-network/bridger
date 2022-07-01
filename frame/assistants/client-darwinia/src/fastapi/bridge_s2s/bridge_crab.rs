@@ -4,8 +4,8 @@ use subxt::sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;
 use subxt::StorageEntry;
 
-use abstract_bridge_s2s::error::S2SClientResult;
-use abstract_bridge_s2s::{
+use bridge_s2s_traits::error::S2SClientResult;
+use bridge_s2s_traits::{
     client::{S2SClientGeneric, S2SClientRelay},
     types::{bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common},
 };

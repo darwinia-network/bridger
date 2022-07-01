@@ -1,4 +1,4 @@
-use abstract_bridge_s2s::client::S2SClientRelay;
+use bridge_s2s_traits::client::S2SClientRelay;
 
 use crate::error::RelayResult;
 use crate::message::common::CommonReceivingRunner;

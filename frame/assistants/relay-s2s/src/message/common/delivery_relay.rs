@@ -1,9 +1,9 @@
 use std::ops::RangeInclusive;
 
-use abstract_bridge_s2s::client::S2SClientRelay;
-use abstract_bridge_s2s::strategy::RelayStrategy;
-use abstract_bridge_s2s::types::bp_messages::OutboundLaneData;
-use abstract_bridge_s2s::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
+use bridge_s2s_traits::client::S2SClientRelay;
+use bridge_s2s_traits::strategy::RelayStrategy;
+use bridge_s2s_traits::types::bp_messages::OutboundLaneData;
+use bridge_s2s_traits::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use sp_runtime::traits::Header;
 
 use support_toolkit::{convert::SmartCodecMapper, logk};

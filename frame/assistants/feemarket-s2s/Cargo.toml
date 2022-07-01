@@ -21,6 +21,6 @@ tracing     = "0.1"
 
 component-subscan   = { path = "../../components/subscan" }
 
-abstract-bridge-s2s    = { path = "../../abstract/bridge-s2s" }
-abstract-feemarket-s2s = { path = "../../abstract/feemarket-s2s" }
-support-toolkit        = { path = "../../supports/support-toolkit", features = ["log"] }
+bridge-s2s-traits    = { path = "../../traits/bridge-s2s" }
+feemarket-s2s-traits = { path = "../../traits/feemarket-s2s" }
+support-toolkit      = { path = "../../supports/support-toolkit", features = ["log"] }

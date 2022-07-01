@@ -1,7 +1,7 @@
-use abstract_bridge_s2s::client::S2SClientRelay;
-use abstract_bridge_s2s::types::bp_messages::{OutboundLaneData, UnrewardedRelayersState};
-use abstract_bridge_s2s::types::bp_runtime::Chain;
-use abstract_bridge_s2s::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
+use bridge_s2s_traits::client::S2SClientRelay;
+use bridge_s2s_traits::types::bp_messages::{OutboundLaneData, UnrewardedRelayersState};
+use bridge_s2s_traits::types::bp_runtime::Chain;
+use bridge_s2s_traits::types::bridge_runtime_common::messages::source::FromBridgedChainMessagesDeliveryProof;
 
 use support_toolkit::{convert::SmartCodecMapper, logk};
 

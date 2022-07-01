@@ -1,6 +1,6 @@
-use abstract_feemarket_s2s::api::FeemarketApiBase;
-use abstract_feemarket_s2s::error::{AbstractFeemarketError, AbstractFeemarketResult};
-use abstract_feemarket_s2s::types::Chain;
+use feemarket_s2s_traits::api::FeemarketApiBase;
+use feemarket_s2s_traits::error::{AbstractFeemarketError, AbstractFeemarketResult};
+use feemarket_s2s_traits::types::Chain;
 
 use crate::client::PangolinParachainClient;
 

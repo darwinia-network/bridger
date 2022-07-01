@@ -1,5 +1,5 @@
-use abstract_bridge_s2s::error::{S2SClientError, S2SClientResult};
-use abstract_bridge_s2s::{
+use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
+use bridge_s2s_traits::{
     client::{S2SClientBase, S2SClientGeneric},
     types::{bp_header_chain, bp_runtime::Chain},
 };

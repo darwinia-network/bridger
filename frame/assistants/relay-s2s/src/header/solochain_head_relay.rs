@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use abstract_bridge_s2s::client::S2SClientRelay;
-use abstract_bridge_s2s::types::bp_header_chain;
-use abstract_bridge_s2s::types::bp_runtime::Chain;
+use bridge_s2s_traits::client::S2SClientRelay;
+use bridge_s2s_traits::types::bp_header_chain;
+use bridge_s2s_traits::types::bp_runtime::Chain;
 use sp_runtime::codec;
 use sp_runtime::traits::Header;
 use support_toolkit::{convert::SmartCodecMapper, logk};

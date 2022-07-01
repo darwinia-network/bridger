@@ -13,38 +13,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "abstract-bridge-s2s"
-version = "0.5.7"
-dependencies = [
- "array-bytes",
- "async-trait",
- "bp-header-chain",
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
- "jsonrpsee-core",
- "parity-scale-codec",
- "scale-info",
- "serde 1.0.136",
- "sp-core",
- "sp-runtime",
- "subxt",
- "thiserror",
-]
-
-[[package]]
-name = "abstract-feemarket-s2s"
-version = "0.5.7"
-dependencies = [
- "async-trait",
- "bp-runtime",
- "pallet-fee-market",
- "parity-scale-codec",
- "subxt",
- "thiserror",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -442,8 +410,8 @@ dependencies = [
 name = "bridge-pangolin-pangoro"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
  "array-bytes",
+ "bridge-s2s-traits",
  "client-pangolin",
  "client-pangoro",
  "color-eyre",
@@ -485,6 +453,26 @@ dependencies = [
  "sp-state-machine",
  "sp-std",
  "sp-trie",
+]
+
+[[package]]
+name = "bridge-s2s-traits"
+version = "0.5.7"
+dependencies = [
+ "array-bytes",
+ "async-trait",
+ "bp-header-chain",
+ "bp-messages",
+ "bp-runtime",
+ "bridge-runtime-common",
+ "jsonrpsee-core",
+ "parity-scale-codec",
+ "scale-info",
+ "serde 1.0.136",
+ "sp-core",
+ "sp-runtime",
+ "subxt",
+ "thiserror",
 ]
 
 [[package]]
@@ -567,11 +555,11 @@ dependencies = [
 name = "client-pangolin"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
- "abstract-feemarket-s2s",
  "array-bytes",
  "async-trait",
  "bp-pangolin",
+ "bridge-s2s-traits",
+ "feemarket-s2s-traits",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.136",
@@ -588,11 +576,11 @@ dependencies = [
 name = "client-pangoro"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
- "abstract-feemarket-s2s",
  "array-bytes",
  "async-trait",
  "bp-pangoro",
+ "bridge-s2s-traits",
+ "feemarket-s2s-traits",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.136",
@@ -974,14 +962,26 @@ dependencies = [
 name = "feemarket-s2s"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
- "abstract-feemarket-s2s",
  "async-trait",
+ "bridge-s2s-traits",
  "component-subscan",
+ "feemarket-s2s-traits",
  "serde 1.0.136",
  "support-toolkit",
  "thiserror",
  "tracing",
+]
+
+[[package]]
+name = "feemarket-s2s-traits"
+version = "0.5.7"
+dependencies = [
+ "async-trait",
+ "bp-runtime",
+ "pallet-fee-market",
+ "parity-scale-codec",
+ "subxt",
+ "thiserror",
 ]
 
 [[package]]
@@ -2783,9 +2783,9 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 name = "relay-s2s"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
  "array-bytes",
  "async-trait",
+ "bridge-s2s-traits",
  "once_cell",
  "sp-core",
  "sp-runtime",

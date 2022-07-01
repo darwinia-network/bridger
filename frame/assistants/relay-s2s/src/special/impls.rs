@@ -1,8 +1,8 @@
-use abstract_bridge_s2s::client::S2SClientRelay;
-use abstract_bridge_s2s::error::S2SClientResult;
-use abstract_bridge_s2s::types::bp_runtime::Chain;
+use bridge_s2s_traits::client::S2SClientRelay;
+use bridge_s2s_traits::error::S2SClientResult;
+use bridge_s2s_traits::types::bp_runtime::Chain;
 #[cfg(feature = "bridge-parachain")]
-use abstract_bridge_s2s::{client::S2SParaBridgeClientSolochain, types::ParaId};
+use bridge_s2s_traits::{client::S2SParaBridgeClientSolochain, types::ParaId};
 
 #[cfg(feature = "bridge-parachain")]
 use support_toolkit::convert::SmartCodecMapper;

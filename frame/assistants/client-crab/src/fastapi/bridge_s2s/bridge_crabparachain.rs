@@ -1,8 +1,8 @@
 use std::ops::RangeInclusive;
 
-use abstract_bridge_s2s::client::{S2SClientGeneric, S2SClientRelay, S2SParaBridgeClientSolochain};
-use abstract_bridge_s2s::error::S2SClientResult;
-use abstract_bridge_s2s::types::{
+use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay, S2SParaBridgeClientSolochain};
+use bridge_s2s_traits::error::S2SClientResult;
+use bridge_s2s_traits::types::{
     bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,
 };
 use sp_runtime::AccountId32;
@@ -220,9 +220,9 @@ impl S2SClientRelay for CrabClient {
 impl S2SParaBridgeClientSolochain for CrabClient {
     async fn best_para_heads(
         &self,
-        para_id: abstract_bridge_s2s::types::ParaId,
+        para_id: bridge_s2s_traits::types::ParaId,
         hash: Option<<Self::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<Option<abstract_bridge_s2s::types::BestParaHead>> {
+    ) -> S2SClientResult<Option<bridge_s2s_traits::types::BestParaHead>> {
         let expected_para_id = SmartCodecMapper::map_to(&para_id)?;
         match self
             .runtime()
@@ -239,7 +239,7 @@ impl S2SParaBridgeClientSolochain for CrabClient {
     async fn submit_parachain_heads(
         &self,
         relay_block_hash: <Self::Chain as Chain>::Hash,
-        parachains: Vec<abstract_bridge_s2s::types::ParaId>,
+        parachains: Vec<bridge_s2s_traits::types::ParaId>,
         parachain_heads_proof: Vec<Vec<u8>>,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_parachains = SmartCodecMapper::map_to(&parachains)?;

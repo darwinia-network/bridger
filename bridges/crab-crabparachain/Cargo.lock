@@ -13,38 +13,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "abstract-bridge-s2s"
-version = "0.5.7"
-dependencies = [
- "array-bytes",
- "async-trait",
- "bp-header-chain",
- "bp-messages",
- "bp-runtime",
- "bridge-runtime-common",
- "jsonrpsee-core",
- "parity-scale-codec",
- "scale-info",
- "serde 1.0.137",
- "sp-core",
- "sp-runtime",
- "subxt",
- "thiserror",
-]
-
-[[package]]
-name = "abstract-feemarket-s2s"
-version = "0.5.7"
-dependencies = [
- "async-trait",
- "bp-runtime",
- "pallet-fee-market",
- "parity-scale-codec",
- "subxt",
- "thiserror",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -460,8 +428,8 @@ dependencies = [
 name = "bridge-crab-crabparachain"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
  "array-bytes",
+ "bridge-s2s-traits",
  "client-crab",
  "client-crab-parachain",
  "client-kusama",
@@ -505,6 +473,26 @@ dependencies = [
  "sp-state-machine",
  "sp-std",
  "sp-trie",
+]
+
+[[package]]
+name = "bridge-s2s-traits"
+version = "0.5.7"
+dependencies = [
+ "array-bytes",
+ "async-trait",
+ "bp-header-chain",
+ "bp-messages",
+ "bp-runtime",
+ "bridge-runtime-common",
+ "jsonrpsee-core",
+ "parity-scale-codec",
+ "scale-info",
+ "serde 1.0.137",
+ "sp-core",
+ "sp-runtime",
+ "subxt",
+ "thiserror",
 ]
 
 [[package]]
@@ -587,11 +575,11 @@ dependencies = [
 name = "client-crab"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
- "abstract-feemarket-s2s",
  "array-bytes",
  "async-trait",
  "bp-crab",
+ "bridge-s2s-traits",
+ "feemarket-s2s-traits",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.137",
@@ -608,11 +596,11 @@ dependencies = [
 name = "client-crab-parachain"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
- "abstract-feemarket-s2s",
  "array-bytes",
  "async-trait",
  "bp-crab-parachain",
+ "bridge-s2s-traits",
+ "feemarket-s2s-traits",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.137",
@@ -629,10 +617,10 @@ dependencies = [
 name = "client-kusama"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
  "array-bytes",
  "async-trait",
  "bp-kusama",
+ "bridge-s2s-traits",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.137",
@@ -1040,14 +1028,26 @@ dependencies = [
 name = "feemarket-s2s"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
- "abstract-feemarket-s2s",
  "async-trait",
+ "bridge-s2s-traits",
  "component-subscan",
+ "feemarket-s2s-traits",
  "serde 1.0.137",
  "support-toolkit",
  "thiserror",
  "tracing",
+]
+
+[[package]]
+name = "feemarket-s2s-traits"
+version = "0.5.7"
+dependencies = [
+ "async-trait",
+ "bp-runtime",
+ "pallet-fee-market",
+ "parity-scale-codec",
+ "subxt",
+ "thiserror",
 ]
 
 [[package]]
@@ -2862,9 +2862,9 @@ checksum = "49b3de9ec5dc0a3417da371aab17d729997c15010e7fd24ff707773a33bddb64"
 name = "relay-s2s"
 version = "0.5.7"
 dependencies = [
- "abstract-bridge-s2s",
  "array-bytes",
  "async-trait",
+ "bridge-s2s-traits",
  "once_cell",
  "sp-core",
  "sp-runtime",

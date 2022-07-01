@@ -39,10 +39,10 @@ sp-core             = { optional = true, git = "https://github.com/darwinia-netw
 
 ## s2s client
 finality-grandpa      = { optional = true, version = "0.14" }
-abstract-bridge-s2s   = { optional = true, path = "../../../frame/abstract/bridge-s2s", features = ["advanced-types"] }
+bridge-s2s-traits   = { optional = true, path = "../../../frame/traits/bridge-s2s", features = ["advanced-types"] }
 
 ## feemarket s2s
-abstract-feemarket-s2s = { optional = true, path = "../../../frame/abstract/feemarket-s2s", features = ["advanced-types"] }
+feemarket-s2s-traits = { optional = true, path = "../../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
 
 support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
 
@@ -57,12 +57,12 @@ bridge-s2s         = [
   "substrate",
   "async-trait",
   "finality-grandpa",
-  "abstract-bridge-s2s",
+  "bridge-s2s-traits",
 ]
 bridge-s2s-pangolin = ["bridge-s2s"]
 feemarket-s2s   = [
   "async-trait",
-  "abstract-feemarket-s2s",
+  "feemarket-s2s-traits",
 ]
 feemarket-s2s-pangolin = ["feemarket-s2s"]
 bridge-chapel = []

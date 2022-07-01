@@ -1,5 +1,5 @@
-use abstract_bridge_s2s::client::S2SClientGeneric;
-use abstract_bridge_s2s::error::S2SClientError;
+use bridge_s2s_traits::client::S2SClientGeneric;
+use bridge_s2s_traits::error::S2SClientError;
 
 use support_toolkit::logk;
 

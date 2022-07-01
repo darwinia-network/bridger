@@ -1,6 +1,6 @@
-use abstract_bridge_s2s::client::S2SClientRelay;
-use abstract_bridge_s2s::error::S2SClientResult;
-use abstract_bridge_s2s::types::bp_runtime::Chain;
+use bridge_s2s_traits::client::S2SClientRelay;
+use bridge_s2s_traits::error::S2SClientResult;
+use bridge_s2s_traits::types::bp_runtime::Chain;
 
 #[async_trait::async_trait]
 pub trait DifferentClientApi<T: S2SClientRelay> {

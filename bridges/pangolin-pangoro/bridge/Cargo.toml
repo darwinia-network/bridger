@@ -30,7 +30,7 @@ support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-toolkit    = { path = "../../../frame/supports/support-toolkit" }
 
-abstract-bridge-s2s = { path = "../../../frame/abstract/bridge-s2s" }
+bridge-s2s-traits   = { path = "../../../frame/traits/bridge-s2s" }
 client-pangolin     = { path = "../../../frame/assistants/client-pangolin", features = [ "bridge-s2s-pangoro", "feemarket-s2s-pangoro" ]}
 client-pangoro      = { path = "../../../frame/assistants/client-pangoro", features = [ "bridge-s2s-pangolin", "feemarket-s2s-pangolin" ]}
 subquery-s2s        = { path = "../../../frame/assistants/subquery-s2s" }

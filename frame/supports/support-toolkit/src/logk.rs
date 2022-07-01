@@ -13,7 +13,7 @@ static LEN_ARG: Lazy<Mutex<HashMap<u32, usize>>> = Lazy::new(|| {
 
 fn get_len_arg_with_def(index: u32, def: usize) -> usize {
     let mut data = LEN_ARG.lock().unwrap();
-    match data.get(&index) {
+    let size = match data.get(&index) {
         Some(v) => {
             if def > *v {
                 data.insert(index, def);
@@ -27,7 +27,9 @@ fn get_len_arg_with_def(index: u32, def: usize) -> usize {
             data.insert(index, len);
             len
         }
-    }
+    };
+    drop(data);
+    size
 }
 
 /// prefix multiple aruments

@@ -1,0 +1,15 @@
+[pangolin]
+endpoint = "ws://pangolin:9944"
+signer = "//Alice"
+
+[pangoro]
+endpoint = "ws://pangoro:9944"
+signer = "//Alice"
+
+[relay]
+lanes = ["726f6c69"]
+
+[index]
+pangolin = { endpoint = "http://graphql-engine-s2s-pangolin:3000" }
+pangoro  = { endpoint = "http://graphql-engine-s2s-pangoro:3000" }
+

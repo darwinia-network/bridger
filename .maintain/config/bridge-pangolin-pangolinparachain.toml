@@ -1,15 +1,12 @@
 [pangolin]
 endpoint             = "wss://pangolin-rpc.darwinia.network"
-runtime_version_mode = "Auto"
 signer               = "//Alice"
 
 [rococo]
 endpoint             = "wss://rococo-rpc.polkadot.io"
-runtime_version_mode = "Auto"
 
 [pangolin_parachain]
 endpoint             = "wss://pangolin-parachain-rpc.darwinia.network"
-runtime_version_mode = "Auto"
 signer               = "//Alice"
 
 [relay]

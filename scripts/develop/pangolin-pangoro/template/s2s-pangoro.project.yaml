@@ -1,17 +1,18 @@
 specVersion: 0.2.0
-name: bridge-s2s-rococo
+name: bridge-s2s-pangoro
 version: 0.0.4
-description: S2S bridge rococo subql
+description: S2S bridge pangoro subql
 repository: https://github.com/darwinia-network/bridger
 schema:
   file: ./schema.graphql
 
 network:
   genesisHash: '<PLEASE CHANGE TO REAL GENESIS HASH>'
-  endpoint: ws://rococo-alice:9944
+  endpoint: ws://pangoro:9944
 
 dataSources:
-  - kind: substrate/Runtime
+  - name: main
+    kind: substrate/Runtime
     startBlock: 1
     mapping:
       file: ./dist/index.js
@@ -27,3 +28,15 @@ dataSources:
           filter:
             module: grandpa
             method: NewAuthorities
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgePangolinMessages
+            method: MessageAccepted
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgePangolinDispatch
+

@@ -1,6 +1,6 @@
 import {FastEvent} from '../helpers';
 import * as storage from '../storage';
-import {RelayBlockOrigin} from "../storage";
+import {OnDemandType, RelayBlockOrigin} from "../storage";
 import {BlockHandler} from "./block";
 
 export class EventHandler {
@@ -21,13 +21,49 @@ export class EventHandler {
     logger.info(`[event] Received event: [${eventKey}] [${eventId}] in block ${blockNumber}`);
     switch (eventKey) {
       case 'grandpa:NewAuthorities': {
-        await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.Mandatory);
+        await storage.storeNeedRelayBlock(
+          this.event,
+          RelayBlockOrigin.Mandatory,
+        );
+        return;
+      }
+      case 'bridgeDarwiniaMessages:MessageAccepted': {
+        await storage.storeNeedRelayBlock(
+          this.event,
+          RelayBlockOrigin.BridgeDarwinia,
+          OnDemandType.SendMessage,
+        );
         return;
       }
       case 'bridgeCrabParachainMessages:MessageAccepted': {
-        await storage.storeNeedRelayBlock(this.event, RelayBlockOrigin.BridgeCrabParachain);
+        await storage.storeNeedRelayBlock(
+          this.event,
+          RelayBlockOrigin.BridgeCrabParachain,
+          OnDemandType.SendMessage,
+        );
         return;
       }
+    }
+
+    // dispatch
+
+    if (eventSection === 'bridgeDarwiniaDispatch') {
+      await storage.storeNeedRelayBlock(
+        this.event,
+        RelayBlockOrigin.BridgeDarwinia,
+        OnDemandType.Dispatch,
+        eventMethod,
+      );
+      return;
+    }
+    if (eventSection === 'bridgeCrabParachainDispatch') {
+      await storage.storeNeedRelayBlock(
+        this.event,
+        RelayBlockOrigin.BridgeCrabParachain,
+        OnDemandType.Dispatch,
+        eventMethod,
+      );
+      return;
     }
 
   }

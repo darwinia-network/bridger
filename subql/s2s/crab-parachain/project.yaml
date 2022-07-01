@@ -18,10 +18,16 @@ dataSources:
       handlers:
         - handler: handleBlock
           kind: substrate/BlockHandler
+        - handler: handleCall
+          kind: substrate/CallHandler
+
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
             - module: bridgeCrabMessages
               method: MessageAccepted
-        - handler: handleCall
-          kind: substrate/CallHandler
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: bridgeCrabDispatch

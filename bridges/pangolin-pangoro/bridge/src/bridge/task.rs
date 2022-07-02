@@ -24,11 +24,11 @@ impl BridgeTask {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<SubscribeService>()?;
-        stack.spawn_service::<PangolinToPangoroHeaderRelayService>()?;
-        stack.spawn_service::<PangoroToPangolinHeaderRelayService>()?;
-        stack.spawn_service::<PangolinToPangoroMessageRelayService>()?;
-        stack.spawn_service::<PangoroToPangolinMessageRelayService>()?;
-        stack.spawn_service::<FeemarketService>()?;
+        // stack.spawn_service::<PangolinToPangoroHeaderRelayService>()?;
+        // stack.spawn_service::<PangoroToPangolinHeaderRelayService>()?;
+        // stack.spawn_service::<PangolinToPangoroMessageRelayService>()?;
+        // stack.spawn_service::<PangoroToPangolinMessageRelayService>()?;
+        // stack.spawn_service::<FeemarketService>()?;
 
         Ok(Self { stack })
     }

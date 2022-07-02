@@ -1,5 +1,8 @@
+use std::time::Duration;
+
 use bridge_s2s_traits::client::S2SClientGeneric;
 use bridge_s2s_traits::error::S2SClientError;
+use jsonrpsee_core::client::Subscription;
 
 use support_toolkit::logk;
 
@@ -64,8 +67,10 @@ where
     F: Send + Sync + Fn(sp_core::Bytes),
 {
     let mut subscribe = client.subscribe_grandpa_justifications().await?;
+    let timeout = std::time::Duration::from_secs(10);
     loop {
-        match subscribe.next().await {
+        let next_justification = safe_read_justification(timeout, &mut subscribe).await?;
+        match next_justification {
             Some(justification) => {
                 let justification =
                     justification.map_err(|e| S2SClientError::RPC(format!("{:?}", e)))?;
@@ -89,5 +94,16 @@ where
                 )));
             }
         }
+    }
+}
+
+async fn safe_read_justification(
+    timeout: Duration,
+    subscribe: &mut Subscription<sp_core::Bytes>,
+) -> RelayResult<Option<Result<sp_core::Bytes, jsonrpsee_core::Error>>> {
+    let timeout = tokio::time::sleep(timeout);
+    tokio::select! {
+        res = subscribe.next() => Ok(res),
+        _ = timeout => Err(RelayError::Custom("subscribe timeout".to_string()))
     }
 }

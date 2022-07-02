@@ -2865,6 +2865,7 @@ dependencies = [
  "array-bytes",
  "async-trait",
  "bridge-s2s-traits",
+ "jsonrpsee-core",
  "once_cell",
  "sp-core",
  "sp-runtime",

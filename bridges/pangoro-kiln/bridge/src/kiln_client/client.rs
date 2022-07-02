@@ -1,11 +1,11 @@
+use bytes::Bytes;
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use std::{fs, str::FromStr};
 use web3::{transports::Http, types::Address, Web3};
-use bytes::Bytes;
 
 use super::types::{
-    BlockBody, BlockMessage, Checkpoint, Finality, GetBlockResponse, GetHeaderResponse,
-    ResponseWrapper, Snapshot, Proof,
+    BlockBody, BlockMessage, Checkpoint, Finality, GetBlockResponse, GetHeaderResponse, Proof,
+    ResponseWrapper, Snapshot, ForkVersion,
 };
 
 pub struct KilnClient {
@@ -79,6 +79,24 @@ impl KilnClient {
         Ok(res.data)
     }
 
+    pub async fn get_finality_branch(&self, state_id: impl ToString) -> color_eyre::Result<Proof> {
+        self.get_state_proof(state_id, 105).await
+    }
+
+    pub async fn get_next_sync_committee_branch(
+        &self,
+        state_id: impl ToString,
+    ) -> color_eyre::Result<Proof> {
+        self.get_state_proof(state_id, 55).await
+    }
+
+    pub async fn get_latest_execution_payload_state_root_branch(
+        &self,
+        state_id: impl ToString,
+    ) -> color_eyre::Result<Proof> {
+        self.get_state_proof(state_id, 898).await
+    }
+
     pub async fn get_state_proof(
         &self,
         state_id: impl ToString,
@@ -99,6 +117,16 @@ impl KilnClient {
             .bytes()
             .await?;
         Ok(Proof::from(res))
+    }
+
+    pub async fn get_fork_version(&self, id: impl ToString) -> color_eyre::Result<ForkVersion>{
+        let url = format!(
+            "{}/eth/v1/beacon/states/{}/fork",
+            self.api_base_url,
+            id.to_string(),
+        );
+        let res: ResponseWrapper<ForkVersion> = self.api_client.get(url).send().await?.json().await?;
+        Ok(res.data) 
     }
 }
 
@@ -160,5 +188,12 @@ mod tests {
         let client = test_client();
         let proof = client.get_state_proof(801823u32, 55u32).await.unwrap();
         println!("Single proof: {:?}", proof);
+    }
+
+    #[tokio::test]
+    async fn test_get_fork_version() {
+        let client = test_client();
+        let fork_version = client.get_fork_version(801823u32).await.unwrap();
+        println!("Fork version: {:?}", fork_version);
     }
 }

@@ -1,6 +1,6 @@
 use bytes::{Buf, Bytes};
 use serde::{Deserialize, Serialize};
-use web3::types::H256;
+use web3::{types::H256, ethabi::ethereum_types::H32};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResponseWrapper<T> {
@@ -153,4 +153,13 @@ impl From<Bytes> for Proof {
             _ => {unimplemented!();}
         }
     }
+}
+
+
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ForkVersion {
+    previous_version: H32,
+    current_version: H32,
+    epoch: String,
 }

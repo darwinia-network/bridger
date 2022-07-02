@@ -20,7 +20,7 @@ path = "src/main.rs"
 color-eyre = "0.5"
 tracing    = "0.1"
 
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.11", features = ["json", "stream"] }
 tokio   = { version = "1", features = ["full"] }
 
 serde     = { version = "1", features = ["derive"] }
@@ -31,6 +31,7 @@ futures  = "0.3.21"
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage  = "0.4"
 web3     = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }
+bytes    = "1.0"
 
 support-common   = { path = "../../../frame/supports/support-common" }
 support-lifeline = { path = "../../../frame/supports/support-lifeline" }

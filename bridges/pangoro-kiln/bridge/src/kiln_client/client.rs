@@ -1,8 +1,11 @@
+use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use std::{fs, str::FromStr};
 use web3::{transports::Http, types::Address, Web3};
+use bytes::Bytes;
 
 use super::types::{
-    BlockBody, BlockMessage, GetBlockResponse, GetHeaderResponse, ResponseWrapper, Snapshot, Checkpoint, Finality,
+    BlockBody, BlockMessage, Checkpoint, Finality, GetBlockResponse, GetHeaderResponse,
+    ResponseWrapper, Snapshot, Proof,
 };
 
 pub struct KilnClient {
@@ -66,20 +69,43 @@ impl KilnClient {
         Ok(res.data.message)
     }
 
-    pub async fn get_checkpoint(&self, id: impl ToString) -> color_eyre::Result<Finality>{
+    pub async fn get_checkpoint(&self, id: impl ToString) -> color_eyre::Result<Finality> {
         let url = format!(
             "{}/eth/v1/beacon/states/{}/finality_checkpoints",
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<Finality> =
-            self.api_client.get(url).send().await?.json().await?;
+        let res: ResponseWrapper<Finality> = self.api_client.get(url).send().await?.json().await?;
         Ok(res.data)
+    }
+
+    pub async fn get_state_proof(
+        &self,
+        state_id: impl ToString,
+        gindex: impl ToString,
+    ) -> color_eyre::Result<Proof> {
+        let url = format!(
+            "{}/eth/v1/lightclient/single_proof/{}?gindex={}",
+            self.api_base_url,
+            state_id.to_string(),
+            gindex.to_string(),
+        );
+        let res = self
+            .api_client
+            .get(url)
+            .header("content-type", "application/octet-stream")
+            .send()
+            .await?
+            .bytes()
+            .await?;
+        Ok(Proof::from(res))
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use bytes::Buf;
+
     use super::*;
 
     fn test_client() -> KilnClient {
@@ -127,5 +153,12 @@ mod tests {
         let client = test_client();
         let checkpoint = client.get_checkpoint(801823u32).await.unwrap();
         println!("Checkpoint: {:?}", checkpoint);
+    }
+
+    #[tokio::test]
+    async fn test_get_state_proof() {
+        let client = test_client();
+        let proof = client.get_state_proof(801823u32, 55u32).await.unwrap();
+        println!("Single proof: {:?}", proof);
     }
 }

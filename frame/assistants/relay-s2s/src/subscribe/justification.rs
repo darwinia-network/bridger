@@ -45,14 +45,17 @@ where
     if let Err(err) = subscribe_justification(&client, callback).await {
         tracing::error!(
             target: "relay-s2s",
-            "{} Failed to get justification from {}: {:?}",
+            "{} failed to get justification from {}: {:?}",
             logk::prefix_multi("subscribe", vec![T::CHAIN]),
             T::CHAIN,
-            err
+            err,
         );
         return Err(err);
     }
-    Ok(())
+    Err(RelayError::Custom(format!(
+        "[{}] the subscription stopped",
+        T::CHAIN,
+    )))
 }
 
 async fn subscribe_justification<T, F>(client: &T, callback: F) -> RelayResult<()>
@@ -80,9 +83,10 @@ where
                     "{} the subscription has been terminated",
                     logk::prefix_multi("subscribe", vec![T::CHAIN]),
                 );
-                return Err(RelayError::Custom(
-                    "the subscription has been terminated".to_string(),
-                ));
+                return Err(RelayError::Custom(format!(
+                    "[{}] the subscription has been terminated",
+                    T::CHAIN,
+                )));
             }
         }
     }

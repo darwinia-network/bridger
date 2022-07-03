@@ -1,6 +1,5 @@
-use support_lifeline::task::TaskStack;
-
 use crate::bridge::PangoroKilnBus;
+use support_lifeline::task::TaskStack;
 
 #[allow(dead_code)]
 #[derive(Debug)]

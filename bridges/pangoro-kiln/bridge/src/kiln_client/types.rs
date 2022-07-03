@@ -159,7 +159,7 @@ impl From<Bytes> for Proof {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ForkVersion {
-    previous_version: H32,
-    current_version: H32,
-    epoch: String,
+    pub previous_version: H32,
+    pub current_version: H32,
+    pub epoch: String,
 }

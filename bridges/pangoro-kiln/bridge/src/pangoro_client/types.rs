@@ -5,11 +5,11 @@ use web3::{
 
 #[derive(Debug)]
 pub struct BeaconBlockHeader {
-    slot: u64,
-    proposer_index: u64,
-    parent_root: H256,
-    state_root: H256,
-    body_root: H256,
+    pub slot: u64,
+    pub proposer_index: u64,
+    pub parent_root: H256,
+    pub state_root: H256,
+    pub body_root: H256,
 }
 
 impl Detokenize for BeaconBlockHeader {

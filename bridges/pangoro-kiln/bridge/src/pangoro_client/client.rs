@@ -3,18 +3,25 @@ use web3::{
     contract::{Contract, Options},
     transports::Http,
     types::{Address, H256},
-    Web3,
+    Web3, signing::Key
 };
+use secp256k1::SecretKey;
 
 use crate::pangoro_client::types::BeaconBlockHeader;
 
 pub struct PangoroClient {
-    client: Web3<Http>,
-    contract: Contract<Http>,
+    pub client: Web3<Http>,
+    pub contract: Contract<Http>,
+    pub private_key: SecretKey,
 }
 
 impl PangoroClient {
-    pub fn new(endpoint: &str, abi_path: &str, contract_address: &str) -> color_eyre::Result<Self> {
+    pub fn new(
+        endpoint: &str,
+        abi_path: &str,
+        contract_address: &str,
+        private_key: &str,
+    ) -> color_eyre::Result<Self> {
         let transport = Http::new(endpoint)?;
         let client = web3::Web3::new(transport);
         let abi = fs::read(abi_path)?;
@@ -23,7 +30,12 @@ impl PangoroClient {
             Address::from_str(contract_address)?,
             abi.as_slice(),
         )?;
-        Ok(Self { client, contract })
+        let private_key = SecretKey::from_str(private_key)?;
+        Ok(Self {
+            client,
+            contract,
+            private_key,
+        })
     }
 
     pub async fn finalized_header(&self) -> color_eyre::Result<BeaconBlockHeader> {
@@ -55,7 +67,8 @@ mod tests {
         PangoroClient::new(
             "https://pangoro-rpc.darwinia.network",
              "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
-             "0xedD0683d354b2d2c209Ac8c574ef88E85bdBEa70"
+             "0xedD0683d354b2d2c209Ac8c574ef88E85bdBEa70",
+             "03454001267e888193ea585845b6634d8977f56040199a55ba3c8654776efed8"
             ).unwrap()
     }
 

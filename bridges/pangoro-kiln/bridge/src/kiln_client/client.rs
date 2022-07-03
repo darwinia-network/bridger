@@ -1,5 +1,6 @@
 use bytes::Bytes;
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
+use support_common::error::BridgerError;
 use std::{fs, str::FromStr};
 use web3::{transports::Http, types::Address, Web3};
 
@@ -34,6 +35,25 @@ impl KilnClient {
         let res: ResponseWrapper<GetHeaderResponse> =
             self.api_client.get(url).send().await?.json().await?;
         Ok(res.data)
+    }
+
+    pub async fn find_valid_header_since(&self, mut slot: u64) -> color_eyre::Result<(u64, GetHeaderResponse)> {
+        let mut header = self.get_header(slot).await;
+        let mut count = 0;
+        while let Err(err) = header {
+            if count > 32 {
+                tracing::info!(
+                    target: "pangoro-kiln",
+                    "[header-kiln-to-pangoro] Wait for attested headers since: {:?}",
+                    slot - 32
+                );
+                return Err(err);
+            };
+            slot += 1;
+            header = self.get_header(slot).await;
+            count += 1;
+        };
+        Ok((slot, header.expect("Unreachable")))
     }
 
     pub async fn get_beacon_block_root(&self, id: impl ToString) -> color_eyre::Result<String> {

@@ -67,7 +67,7 @@ where
     F: Send + Sync + Fn(sp_core::Bytes),
 {
     let mut subscribe = client.subscribe_grandpa_justifications().await?;
-    let timeout = std::time::Duration::from_secs(10);
+    let timeout = std::time::Duration::from_secs(30);
     loop {
         let next_justification = safe_read_justification(timeout, &mut subscribe).await?;
         match next_justification {

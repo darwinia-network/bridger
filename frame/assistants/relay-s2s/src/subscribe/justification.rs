@@ -10,30 +10,23 @@ use crate::error::{RelayError, RelayResult};
 use crate::keepstate;
 use crate::types::JustificationInput;
 
-pub struct SubscribeJustification<SC: S2SClientGeneric, TC: S2SClientGeneric> {
-    input: JustificationInput<SC, TC>,
+pub struct SubscribeJustification<C: S2SClientGeneric> {
+    input: JustificationInput<C>,
 }
 
-impl<SC: S2SClientGeneric, TC: S2SClientGeneric> SubscribeJustification<SC, TC> {
-    pub fn new(input: JustificationInput<SC, TC>) -> Self {
+impl<C: S2SClientGeneric> SubscribeJustification<C> {
+    pub fn new(input: JustificationInput<C>) -> Self {
         Self { input }
     }
 }
 
-impl<SC: S2SClientGeneric, TC: S2SClientGeneric> SubscribeJustification<SC, TC> {
+impl<C: S2SClientGeneric> SubscribeJustification<C> {
     pub async fn start(self) -> RelayResult<()> {
-        let client_source = self.input.client_source;
-        let client_target = self.input.client_target;
-        let join_a = tokio::spawn(run_until_connection_lost(client_source, |justification| {
-            keepstate::set_recently_justification(SC::CHAIN, justification);
-        }));
-        let join_b = tokio::spawn(run_until_connection_lost(client_target, |justification| {
-            keepstate::set_recently_justification(TC::CHAIN, justification);
+        let client = self.input.client;
+        let join_a = tokio::spawn(run_until_connection_lost(client, |justification| {
+            keepstate::set_recently_justification(C::CHAIN, justification);
         }));
         join_a
-            .await
-            .map_err(|e| S2SClientError::RPC(format!("{:?}", e)))??;
-        join_b
             .await
             .map_err(|e| S2SClientError::RPC(format!("{:?}", e)))??;
         Ok(())

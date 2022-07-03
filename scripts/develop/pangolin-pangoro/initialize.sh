@@ -12,7 +12,7 @@ CONTAINER_SUBQL_BUILD=subql-build
 EXEC_PG="docker exec -it ${CONTAINER_POSTGRES}"
 EXEC_SUBQL_BUILD="docker exec -it ${CONTAINER_SUBQL_BUILD}"
 
-DATABASES='subql_s2s_pangolin subql_s2s_pangolin_parachain subql_s2s_rococo subql_parachain_rococo'
+DATABASES='subql_s2s_pangolin subql_s2s_pangoro'
 
 
 for DB in ${DATABASES}; do
@@ -30,7 +30,7 @@ docker run -dit \
   -v ${WORKSPACE}/subql:/data \
   node:14
 
-SUBQL_PROJECTS='s2s/pangolin s2s/pangolin-parachain s2s/rococo parachain/rococo'
+SUBQL_PROJECTS='s2s/pangolin s2s/pangoro'
 
 for PROJ in ${SUBQL_PROJECTS}; do
   ${EXEC_SUBQL_BUILD} sh -c "cd /data/${PROJ} && npm i && npm run codegen && npm run build"

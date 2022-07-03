@@ -59,7 +59,7 @@ async fn start() -> color_eyre::Result<()> {
         client_solochain: client_crab,
         subquery_relaychain: subquery_kusama,
         subquery_parachain: subquery_crab_parachain,
-        index_origin_type: OriginType::BridgeCrab,
+        index_origin_type: OriginType::BridgeCrabParachain,
         subquery_candidate,
     };
     let runner = RelaychainHeaderRunner::new(input);

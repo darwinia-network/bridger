@@ -6,11 +6,12 @@ Contributor Guide
 The first, please read [Usage](./usage.md) to known how to compile bridger and
 set to local mode.
 
-## How to run bridge pangolin-pangolinparachain in local
+We bundle some develop tools in bridger
+- [pangolin-pangolinparachain](../scripts/develop/pangolin-pangolinparachain)
+- [pangolin-pangoro](../scripts/develop/pangolin-pangoro)
 
-We bundle a develop tools in bridger
-project ([pangolin-pangolinparachain](../scripts/develop/pangolin-pangolinparachain))
-.
+
+## How to run bridge pangolin-pangolinparachain in local
 
 ### First
 
@@ -56,3 +57,7 @@ to start all nodes/subqls
 When all nodes are started successfully. Please modify the subql's `endpoint`
 /`genesisHash`/`startBlock`. and run `docker-compose restart`
 
+
+## How to run bridge pangolin-pangoro in local
+
+The steps is same with pangolin-pangolinparachain

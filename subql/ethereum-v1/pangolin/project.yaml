@@ -19,16 +19,30 @@ dataSources:
       handlers:
         - handler: handleBlock
           kind: substrate/BlockHandler
+
+        - handler: handleCall
+          kind: substrate/CallHandler
+
         - handler: handleEvent
           kind: substrate/EventHandler
           filter:
-            - module: ethereumRelayAuthorities
-              method: MMRRootSigned
-            - module: ethereumRelayAuthorities
-              method: ScheduleMMRRoot
-            - module: ethereumRelayAuthorities
-              method: ScheduleAuthoritiesChange
-            - module: ethereumRelayAuthorities
-              method: AuthoritiesChangeSigned
-        - handler: handleCall
-          kind: substrate/CallHandler
+            module: ethereumRelayAuthorities
+            method: MMRRootSigned
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: ethereumRelayAuthorities
+            method: ScheduleMMRRoot
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: ethereumRelayAuthorities
+            method: ScheduleAuthoritiesChange
+
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: ethereumRelayAuthorities
+            method: AuthoritiesChangeSigned

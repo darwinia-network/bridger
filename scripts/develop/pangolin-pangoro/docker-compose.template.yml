@@ -1,0 +1,164 @@
+version: "3"
+services:
+
+  postgres:
+    container_name: roli-postgres
+    image: postgres:12-alpine
+    volumes:
+      - ${DATA_DIR}/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ##
+  # s2s pangolin
+  ##
+
+  subquery-node-s2s-pangolin:
+    container_name: roli-subquery-node-s2s-pangolin
+    image: onfinality/subql-node:${SUBQL_NODE_VERSION}
+    depends_on:
+      "postgres":
+        condition: service_healthy
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: subql_s2s_pangolin
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      - ${SUBQL_S2S_PANGOLIN_DIR}:/app
+    command:
+      - -f=/app
+      - --db-schema=app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://subquery-node-s2s-pangolin:3000/ready"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  graphql-engine-s2s-pangolin:
+    container_name: roli-graphql-engine-pangolin
+    image: onfinality/subql-query:${SUBQL_QUERY_VERSION}
+    ports:
+      - "${SUBQL_S2S_PANGOLIN_PORT}:3000"
+    depends_on:
+      "postgres":
+        condition: service_healthy
+      "subquery-node-s2s-pangolin":
+        condition: service_healthy
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: subql_s2s_pangolin
+      DB_HOST: postgres
+      DB_PORT: 5432
+    command:
+      - --name=app
+      - --playground
+      - --indexer=http://subquery-node-s2s-pangolin:3000
+
+  ##
+  # s2s pangoro
+  ##
+
+  subquery-node-s2s-pangoro:
+    container_name: roli-subquery-node-s2s-pangoro
+    image: onfinality/subql-node:${SUBQL_NODE_VERSION}
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: subql_s2s_pangoro
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      - ${SUBQL_S2S_PANGORO_DIR}:/app
+    command:
+      - -f=/app
+      - --db-schema=app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://subquery-node-pangoro:3000/ready"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  graphql-engine-s2s-pangoro:
+    container_name: roli-graphql-engine-s2s-pangoro
+    image: onfinality/subql-query:${SUBQL_QUERY_VERSION}
+    ports:
+      - "${SUBQL_S2S_PANGORO_PORT}:3000"
+    depends_on:
+      - postgres
+      - subquery-node-s2s-pangoro
+    restart: always
+    environment:
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_DATABASE: subql_s2s_pangoro
+      DB_HOST: postgres
+      DB_PORT: 5432
+    command:
+      - --name=app
+      - --playground
+      - --indexer=http://subquery-node-s2s-pangoro:3000
+
+  ##
+  # pangolin node
+  ##
+  pangolin:
+    container_name: roli-pangolin
+    image: rust:1
+    volumes:
+      - ${RUSTUP_HOME}:/usr/local/rustup
+      - ${CARGO_HOME}/git:/usr/local/cargo/git
+      - ${CARGO_HOME}/registry:/usr/local/cargo/registry
+      - ${PANGOLIN_SOURCE}:/data/source
+      - ${DATA_DIR}:/data/node-data
+      - ${BIN_PATH}/entrypoint:/entrypoint
+    environment:
+      CARGO_TERM_COLOR: always
+    ports:
+      - "${PANGOLIN_PORT_WS}:9944"
+    entrypoint: /entrypoint/run-pangolin.sh
+
+  ##
+  # pangoro node
+  ##
+  pangoro:
+    container_name: roli-pangoro
+    image: rust:1
+    volumes:
+      - ${RUSTUP_HOME}:/usr/local/rustup
+      - ${CARGO_HOME}/git:/usr/local/cargo/git
+      - ${CARGO_HOME}/registry:/usr/local/cargo/registry
+      - ${PANGOLIN_SOURCE}:/data/source
+      - ${DATA_DIR}:/data/node-data
+      - ${BIN_PATH}/entrypoint:/entrypoint
+    environment:
+      CARGO_TERM_COLOR: always
+    ports:
+      - "${PANGOLIN_PORT_WS}:9944"
+    entrypoint: /entrypoint/run-pangoro.sh
+
+  ##
+  # bridger
+  ##
+  bridger:
+    container_name: roli-bridger
+    image: quay.io/darwinia-network/bridger:sha-124a1ad
+    environment:
+      BRIDGER_HOME: /data/bridger
+    volumes:
+      - ${BRIDGER_HOME}:/data/bridger
+    command:
+      - pangolin-pangoro
+      - start

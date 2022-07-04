@@ -42,9 +42,8 @@ pub struct ParaHeaderInput<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeC
     pub para_id: u32,
 }
 
-pub struct JustificationInput<SC: S2SClientGeneric, TC: S2SClientGeneric> {
-    pub client_source: SC,
-    pub client_target: TC,
+pub struct JustificationInput<C: S2SClientGeneric> {
+    pub client: C,
 }
 
 pub struct MessageDeliveryInput<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy> {

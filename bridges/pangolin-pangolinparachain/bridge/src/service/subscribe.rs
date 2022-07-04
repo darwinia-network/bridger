@@ -9,7 +9,8 @@ use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
 
 #[derive(Debug)]
 pub struct SubscribeService {
-    _greet: Lifeline,
+    _greet_pangolin: Lifeline,
+    _greet_rococo: Lifeline,
 }
 
 impl BridgeService for SubscribeService {}
@@ -19,27 +20,55 @@ impl Service for SubscribeService {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task(&format!("{}-relay", BridgeTask::name()), async move {
-            while let Err(e) = start().await {
-                tracing::error!(target: "pangolin-pangolinparachain", "[subscribe] Failed to start subscribe {:?}", e);
-                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                tracing::info!(target: "pangolin-pangolinparachain", "[subscribe] Try to restart subscription service.");
-            }
-            Ok(())
-        });
-        Ok(Self { _greet })
+        let _greet_pangolin = Self::try_task(
+            &format!("{}-subscribe-pangolin", BridgeTask::name()),
+            async move {
+                while let Err(e) = start_pangolin().await {
+                    tracing::error!(target: "pangolin-pangolinparachain", "[subscribe] [pangolin] failed to start subscribe {:?}", e);
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    tracing::info!(target: "pangolin-pangolinparachain", "[subscribe] [pangolin] try to restart subscription service.");
+                }
+                Ok(())
+            },
+        );
+        let _greet_rococo = Self::try_task(
+            &format!("{}-subscribe-rococo", BridgeTask::name()),
+            async move {
+                while let Err(e) = start_rococo().await {
+                    tracing::error!(target: "pangolin-pangolinparachain", "[subscribe] [rococo] failed to start subscribe {:?}", e);
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    tracing::info!(target: "pangolin-pangolinparachain", "[subscribe] [rococo] try to restart subscription service.");
+                }
+                Ok(())
+            },
+        );
+        Ok(Self {
+            _greet_pangolin,
+            _greet_rococo,
+        })
     }
 }
 
-async fn start() -> color_eyre::Result<()> {
+async fn start_pangolin() -> color_eyre::Result<()> {
     let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
 
     let client_pangolin = bridge_config.pangolin.to_pangolin_client().await?;
+
+    let input = JustificationInput {
+        client: client_pangolin,
+    };
+    let subscribe = SubscribeJustification::new(input);
+    subscribe.start().await?;
+    Ok(())
+}
+
+async fn start_rococo() -> color_eyre::Result<()> {
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachain)?;
+
     let client_rococo = bridge_config.rococo.to_rococo_client().await?;
 
     let input = JustificationInput {
-        client_source: client_pangolin,
-        client_target: client_rococo,
+        client: client_rococo,
     };
     let subscribe = SubscribeJustification::new(input);
     subscribe.start().await?;

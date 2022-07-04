@@ -39,9 +39,9 @@ pub fn set_recently_justification(chain: &'static str, justification: sp_core::B
     let mut data = RECENTLY_JUSTIFICATIONS.lock().unwrap();
     let queue = data
         .entry(chain)
-        .or_insert_with(|| VecDeque::with_capacity(100));
+        .or_insert_with(|| VecDeque::with_capacity(10));
     queue.push_back(justification);
-    if queue.len() >= 100 {
+    if queue.len() >= 10 {
         queue.pop_front();
     }
 }
@@ -49,5 +49,6 @@ pub fn set_recently_justification(chain: &'static str, justification: sp_core::B
 pub(crate) fn get_recently_justification(chain: &'static str) -> Option<sp_core::Bytes> {
     let recently_justifications = RECENTLY_JUSTIFICATIONS.lock().unwrap();
     let justification_queue = recently_justifications.get(chain);
-    justification_queue.map(|v| v.back().cloned()).flatten()
+    let justification = justification_queue.map(|v| v.back().cloned()).flatten();
+    justification
 }

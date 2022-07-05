@@ -34,10 +34,11 @@ impl Service for KilnToPangoroHeaderRelayService {
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(&format!("header-kiln-to-pangoro"), async move {
-            while let Err(_) = start().await {
+            while let Err(error) = start().await {
                 tracing::error!(
                     target: "pangoro-kiln",
-                    "Failed to start kiln-to-pangoro header relay service, restart after some seconds",
+                    "Failed to start kiln-to-pangoro header relay service, restart after some seconds: {:?}",
+                    error
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }
@@ -49,6 +50,7 @@ impl Service for KilnToPangoroHeaderRelayService {
 
 async fn start() -> color_eyre::Result<()> {
     let config: BridgeConfig = Config::restore(Names::BridgePangoroKiln)?;
+    println!("{:?}", &config);
     let pangoro_client = PangoroClient::new(
         &config.pangoro.endpoint,
         &config
@@ -79,6 +81,7 @@ async fn start() -> color_eyre::Result<()> {
             );
             return Err(error);
         }
+        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
     }
 }
 

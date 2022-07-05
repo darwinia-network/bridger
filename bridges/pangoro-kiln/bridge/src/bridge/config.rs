@@ -13,4 +13,6 @@ pub struct ChainInfoConfig {
     pub contract_address: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contract_abi_path: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub private_key: Option<String>,
 }

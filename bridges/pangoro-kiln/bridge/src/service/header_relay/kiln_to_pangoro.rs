@@ -4,21 +4,21 @@ use std::{
 };
 
 use crate::{
-    bridge::PangoroKilnBus,
+    bridge::{BridgeConfig, PangoroKilnBus},
     kiln_client::{client::KilnClient, types::Proof},
     pangoro_client::client::PangoroClient,
 };
 use lifeline::{Lifeline, Service, Task};
-use reqwest::header;
+use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use web3::{
     contract::{
-        tokens::{Tokenizable, TokenizableItem, Tokenize},
+        tokens::{Tokenizable, Tokenize},
         Options,
     },
-    ethabi::{ethereum_types::H32, Token},
-    types::{Bytes, H256},
+    ethabi::Token,
+    types::{H256, U256},
 };
 
 #[derive(Debug)]
@@ -37,8 +37,7 @@ impl Service for KilnToPangoroHeaderRelayService {
             while let Err(e) = start().await {
                 tracing::error!(
                     target: "pangoro-kiln",
-                    "Failed to start kiln-to-pangoro header relay service, restart after some seconds: {:?}",
-                    e,
+                    "Failed to start kiln-to-pangoro header relay service, restart after some seconds",
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }
@@ -49,7 +48,38 @@ impl Service for KilnToPangoroHeaderRelayService {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    todo!()
+    let config: BridgeConfig = Config::restore(Names::BridgePangoroKiln)?;
+    let pangoro_client = PangoroClient::new(
+        &config.pangoro.endpoint,
+        &config
+            .pangoro
+            .contract_abi_path
+            .ok_or_else(|| BridgerError::Custom(String::from("Contract ABI path missed")))?,
+        &config
+            .pangoro
+            .contract_address
+            .ok_or_else(|| BridgerError::Custom(String::from("Contract address missed")))?,
+        &config
+            .pangoro
+            .private_key
+            .ok_or_else(|| BridgerError::Custom(String::from("Private key missed")))?,
+    )?;
+    let kiln_client = KilnClient::new(&config.kiln.endpoint)?;
+    let header_relay = HeaderRelay {
+        pangoro_client,
+        kiln_client,
+    };
+
+    loop {
+        if let Err(error) = header_relay.header_relay().await {
+            tracing::error!(
+                target: "pangoro-kiln",
+                "Failed relay header : {:?}",
+                error
+            );
+            return Err(error);
+        }
+    }
 }
 
 pub struct HeaderRelay {
@@ -59,15 +89,11 @@ pub struct HeaderRelay {
 
 impl HeaderRelay {
     pub async fn header_relay(&self) -> color_eyre::Result<()> {
-        tracing::info!(
-            target: "pangoro-kiln",
-            "Start to relay headers: Kiln => Pangoro",
-        );
         let old_finalized_header = self.pangoro_client.finalized_header().await?;
         tracing::info!(
             target: "pangoro-kiln",
-            "Lastest relayed header: {:?}",
-            &old_finalized_header,
+            "[Header][Kiln => Pangoro] Latest kiln header on pangoro: {:?}",
+            &old_finalized_header.slot,
         );
         let old_finalized_header_root = self
             .kiln_client
@@ -85,22 +111,20 @@ impl HeaderRelay {
             .kiln_client
             .find_valid_header_since(attested_header_slot)
             .await?;
-        tracing::info!(
+        tracing::debug!(
             target: "pangoro-kiln",
-            "Next attested header: {:?}, {:?}",
+            "[Header][Kiln => Pangoro] Next attested header: {:?}",
             &slot,
-            &attested_header
         );
         let sync_aggregate_slot = slot.add(1);
         let (sync_aggregate_slot, _sync_aggregate_header) = self
             .kiln_client
             .find_valid_header_since(sync_aggregate_slot)
             .await?;
-        tracing::info!(
+        tracing::debug!(
             target: "pangoro-kiln",
-            "Next sync aggregate header: {:?}, {:?}",
+            "[Header][Kiln => Pangoro] Next sync aggregate header: {:?}",
             &sync_aggregate_slot,
-            &_sync_aggregate_header
         );
         let sync_aggregate_block = self
             .kiln_client
@@ -109,19 +133,19 @@ impl HeaderRelay {
         let _new_period = sync_aggregate_slot.div(32).div(256);
 
         let sync_aggregate = sync_aggregate_block.body.sync_aggregate;
-        let mut sync_aggregate_bits: Vec<H256> = Vec::new();
+        let mut sync_aggregate_bits: Vec<Token> = Vec::new();
 
         let bits = sync_aggregate.sync_committee_bits;
-        sync_aggregate_bits.push(H256::from_str(&bits[..66])?);
-        sync_aggregate_bits.push(H256::from_str(&bits[66..])?);
+        sync_aggregate_bits.push(H256::from_str(&bits[..66])?.into_token());
+        sync_aggregate_bits.push(H256::from_str(&bits[66..])?.into_token());
 
         let checkpoint = self.kiln_client.get_checkpoint(slot).await?;
         let finalized_header_root = checkpoint.finalized.root;
         let finalized_header = self.kiln_client.get_header(finalized_header_root).await?;
         tracing::info!(
             target: "pangoro-kiln",
-            "Finalized header to relay : {:?}",
-            &finalized_header,
+            "[Header][Kiln => Pangoro] Finalized header to relay: {:?}",
+            &finalized_header.slot,
         );
         let finality_branch = self.kiln_client.get_finality_branch(slot).await?;
         let witnesses = match finality_branch {
@@ -138,61 +162,83 @@ impl HeaderRelay {
             .await?;
 
         let header_message = attested_header.header.message;
-        let attested_header = (
-            header_message.slot.parse::<u64>()?,
-            header_message.proposer_index.parse::<u64>()?,
-            H256::from_str(&header_message.parent_root)?,
-            H256::from_str(&header_message.state_root)?,
-            H256::from_str(&header_message.body_root)?,
-        )
-            .into_tokens();
-        let signature_sync_committee = (
-            current_sync_committee
-                .pubkeys
-                .iter()
-                .map(|s| hex::decode(&s.clone()[2..]))
-                .collect::<Result<Vec<Vec<u8>>, _>>()?,
-            hex::decode(&current_sync_committee.aggregate_pubkey.clone()[2..])?,
-        )
-            .into_tokens();
+        let attested_header = Token::Tuple(
+            (
+                header_message.slot.parse::<u64>()?,
+                header_message.proposer_index.parse::<u64>()?,
+                H256::from_str(&header_message.parent_root)?,
+                H256::from_str(&header_message.state_root)?,
+                H256::from_str(&header_message.body_root)?,
+            )
+                .into_tokens(),
+        );
+        let signature_sync_committee = Token::Tuple(
+            (
+                Token::FixedArray(
+                    current_sync_committee
+                        .pubkeys
+                        .iter()
+                        .map(|s| hex::decode(&s.clone()[2..]))
+                        .collect::<Result<Vec<Vec<u8>>, _>>()?
+                        .iter()
+                        .map(|s| Token::Bytes(s.to_vec()))
+                        .collect::<Vec<Token>>(),
+                ),
+                hex::decode(&current_sync_committee.aggregate_pubkey.clone()[2..])?,
+            )
+                .into_tokens(),
+        );
 
         let message = finalized_header.header.message;
-        let finalized_header = (
-            message.slot,
-            message.proposer_index,
-            H256::from_str(&message.parent_root)?,
-            H256::from_str(&message.state_root)?,
-            H256::from_str(&message.body_root)?,
-        )
-            .into_tokens();
+        let finalized_header = Token::Tuple(
+            (
+                message.slot.parse::<u64>()?,
+                message.proposer_index.parse::<u64>()?,
+                H256::from_str(&message.parent_root)?,
+                H256::from_str(&message.state_root)?,
+                H256::from_str(&message.body_root)?,
+            )
+                .into_tokens(),
+        );
 
-        let sync_aggregate = (
-            sync_aggregate_bits,
-            hex::decode(&sync_aggregate.sync_committee_signature.clone()[2..])?,
-        )
-            .into_tokens();
+        let sync_aggregate = Token::Tuple(
+            (
+                Token::FixedArray(sync_aggregate_bits),
+                hex::decode(&sync_aggregate.sync_committee_signature.clone()[2..])?,
+            )
+                .into_tokens(),
+        );
+        let parameter = Token::Tuple(
+            (
+                attested_header,
+                signature_sync_committee,
+                finalized_header,
+                witnesses,
+                sync_aggregate,
+                Token::FixedBytes(fork_version.current_version.as_bytes().to_vec()),
+                sync_aggregate_slot,
+            )
+                .into_tokens(),
+        );
+
         let tx = self
             .pangoro_client
             .contract
             .signed_call(
                 "import_finalized_header",
-                (
-                    attested_header,
-                    signature_sync_committee,
-                    finalized_header,
-                    witnesses,
-                    sync_aggregate,
-                    fork_version.current_version.as_bytes().to_vec(),
-                    sync_aggregate_slot,
-                ),
-                Options::default(),
+                (parameter,),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    ..Default::default()
+                },
                 &self.pangoro_client.private_key,
             )
             .await?;
 
         tracing::info!(
             target: "pangoro-kiln",
-            "Sending tx: {:?}",
+            "[Header][Kiln => Pangoro] Sending tx: {:?}",
             &tx
         );
         Ok(())
@@ -210,7 +256,7 @@ mod tests {
                 "https://pangoro-rpc.darwinia.network",
                 "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
                 "0xedD0683d354b2d2c209Ac8c574ef88E85bdBEa70",
-                "03454001267e888193ea585845b6634d8977f56040199a55ba3c8654776efed8"
+                "//Alice"
             ).unwrap()
         )
     }
@@ -218,7 +264,10 @@ mod tests {
     #[tokio::test]
     async fn test_header_relay() {
         let (kiln_client, pangoro_client) = test_client();
-        let header_relay_service = HeaderRelay {pangoro_client, kiln_client};
+        let header_relay_service = HeaderRelay {
+            pangoro_client,
+            kiln_client,
+        };
         let result = header_relay_service.header_relay().await;
     }
 }

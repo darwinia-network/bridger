@@ -1,12 +1,12 @@
 use bytes::Bytes;
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
-use support_common::error::BridgerError;
 use std::{fs, str::FromStr};
+use support_common::error::BridgerError;
 use web3::{transports::Http, types::Address, Web3};
 
 use super::types::{
-    BlockBody, BlockMessage, Checkpoint, Finality, GetBlockResponse, GetHeaderResponse, Proof,
-    ResponseWrapper, Snapshot, ForkVersion,
+    BlockBody, BlockMessage, Checkpoint, Finality, ForkVersion, GetBlockResponse,
+    GetHeaderResponse, Proof, ResponseWrapper, Snapshot,
 };
 
 pub struct KilnClient {
@@ -37,7 +37,10 @@ impl KilnClient {
         Ok(res.data)
     }
 
-    pub async fn find_valid_header_since(&self, mut slot: u64) -> color_eyre::Result<(u64, GetHeaderResponse)> {
+    pub async fn find_valid_header_since(
+        &self,
+        mut slot: u64,
+    ) -> color_eyre::Result<(u64, GetHeaderResponse)> {
         let mut header = self.get_header(slot).await;
         let mut count = 0;
         while let Err(err) = header {
@@ -52,7 +55,7 @@ impl KilnClient {
             slot += 1;
             header = self.get_header(slot).await;
             count += 1;
-        };
+        }
         Ok((slot, header.expect("Unreachable")))
     }
 
@@ -139,20 +142,20 @@ impl KilnClient {
         Ok(Proof::from(res))
     }
 
-    pub async fn get_fork_version(&self, id: impl ToString) -> color_eyre::Result<ForkVersion>{
+    pub async fn get_fork_version(&self, id: impl ToString) -> color_eyre::Result<ForkVersion> {
         let url = format!(
             "{}/eth/v1/beacon/states/{}/fork",
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<ForkVersion> = self.api_client.get(url).send().await?.json().await?;
-        Ok(res.data) 
+        let res: ResponseWrapper<ForkVersion> =
+            self.api_client.get(url).send().await?.json().await?;
+        Ok(res.data)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use bytes::Buf;
 
     use super::*;
 

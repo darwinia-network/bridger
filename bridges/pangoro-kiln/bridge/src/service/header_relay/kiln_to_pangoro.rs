@@ -34,7 +34,7 @@ impl Service for KilnToPangoroHeaderRelayService {
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task(&format!("header-kiln-to-pangoro"), async move {
-            while let Err(e) = start().await {
+            while let Err(_) = start().await {
                 tracing::error!(
                     target: "pangoro-kiln",
                     "Failed to start kiln-to-pangoro header relay service, restart after some seconds",
@@ -145,7 +145,7 @@ impl HeaderRelay {
         tracing::info!(
             target: "pangoro-kiln",
             "[Header][Kiln => Pangoro] Finalized header to relay: {:?}",
-            &finalized_header.slot,
+            &finalized_header.header.message.slot,
         );
         let finality_branch = self.kiln_client.get_finality_branch(slot).await?;
         let witnesses = match finality_branch {
@@ -242,32 +242,5 @@ impl HeaderRelay {
             &tx
         );
         Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn test_client() -> (KilnClient, PangoroClient) {
-        (
-            KilnClient::new("http://localhost:5052").unwrap(),
-            PangoroClient::new(
-                "https://pangoro-rpc.darwinia.network",
-                "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
-                "0xedD0683d354b2d2c209Ac8c574ef88E85bdBEa70",
-                "//Alice"
-            ).unwrap()
-        )
-    }
-
-    #[tokio::test]
-    async fn test_header_relay() {
-        let (kiln_client, pangoro_client) = test_client();
-        let header_relay_service = HeaderRelay {
-            pangoro_client,
-            kiln_client,
-        };
-        let result = header_relay_service.header_relay().await;
     }
 }

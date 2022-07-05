@@ -2,7 +2,6 @@ use secp256k1::SecretKey;
 use std::{fs, str::FromStr};
 use web3::{
     contract::{Contract, Options},
-    signing::Key,
     transports::Http,
     types::{Address, H256},
     Web3,
@@ -67,9 +66,9 @@ mod tests {
     fn test_client() -> PangoroClient {
         PangoroClient::new(
             "https://pangoro-rpc.darwinia.network",
-             "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
-             "0xedD0683d354b2d2c209Ac8c574ef88E85bdBEa70",
-             "//Alice"
+         "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
+         "0xedD0683d354b2d2c209Ac8c574ef88E85bdBEa70",
+         "//Alice"
             ).unwrap()
     }
 

@@ -1,12 +1,6 @@
-use bytes::Bytes;
-use reqwest::header::{HeaderMap, CONTENT_TYPE};
-use std::{fs, str::FromStr};
-use support_common::error::BridgerError;
-use web3::{transports::Http, types::Address, Web3};
-
 use super::types::{
-    BlockBody, BlockMessage, Checkpoint, Finality, ForkVersion, GetBlockResponse,
-    GetHeaderResponse, Proof, ResponseWrapper, Snapshot,
+    BlockMessage, Finality, ForkVersion, GetBlockResponse, GetHeaderResponse, Proof,
+    ResponseWrapper, Snapshot,
 };
 
 pub struct KilnClient {

@@ -155,6 +155,7 @@ dependencies = [
  "color-eyre",
  "component-http-client",
  "futures",
+ "hamming",
  "hex",
  "lifeline",
  "postage",
@@ -678,6 +679,12 @@ dependencies = [
  "tokio-util 0.6.9",
  "tracing",
 ]
+
+[[package]]
+name = "hamming"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65043da274378d68241eb9a8f8f8aa54e349136f7b8e12f63e3ef44043cc30e1"
 
 [[package]]
 name = "hashbrown"

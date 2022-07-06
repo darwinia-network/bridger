@@ -92,11 +92,14 @@ pub struct HeaderRelay {
 
 impl HeaderRelay {
     pub async fn header_relay(&self) -> color_eyre::Result<()> {
+        let kiln_current_head = self.kiln_client.get_header("head").await?;
+        let kiln_current_slot = kiln_current_head.header.message.slot.parse::<u64>()?;
         let old_finalized_header = self.pangoro_client.finalized_header().await?;
         tracing::info!(
             target: "pangoro-kiln",
-            "[Header][Kiln => Pangoro] Latest kiln header on pangoro: {:?}",
+            "[Header][Kiln => Pangoro] Latest kiln header on pangoro: {:?}, And current kiln header: {:?}",
             &old_finalized_header.slot,
+            kiln_current_slot,
         );
         let old_finalized_header_root = self
             .kiln_client
@@ -110,29 +113,43 @@ impl HeaderRelay {
         let _old_period = old_finalized_header.slot.div(32).div(256);
 
         let attested_header_slot = old_finalized_header.slot.add(96);
-        let (slot, attested_header) = self
+
+        if attested_header_slot >= kiln_current_slot {
+            tracing::info!(
+                target: "pangoro-kiln",
+                "[Header][Kiln => Pangoro] Current slot is {:?}, wait for finality",
+                &kiln_current_slot,
+            );
+            return Ok(());
+        }
+
+        let (slot, sync_aggregate_slot, attested_header, sync_aggregate_block) = match self
             .kiln_client
-            .find_valid_header_since(attested_header_slot)
-            .await?;
-        tracing::debug!(
+            .find_valid_attested_header(kiln_current_slot, attested_header_slot)
+            .await?
+        {
+            None => {
+                tracing::info!(
+                    target: "pangoro-kiln",
+                    "[Header][Kiln => Pangoro] Wait for valid attested header",
+                );
+                return Ok(());
+            }
+            Some((slot, sync_aggregate_slot, attested_header, sync_aggregate_block)) => (
+                slot,
+                sync_aggregate_slot,
+                attested_header,
+                sync_aggregate_block,
+            ),
+        };
+
+        tracing::info!(
             target: "pangoro-kiln",
-            "[Header][Kiln => Pangoro] Next attested header: {:?}",
-            &slot,
+            "[Header][Kiln => Pangoro] Next attested header: {:?}, sync aggregate header: {:?}",
+            slot,
+            sync_aggregate_slot,
         );
-        let sync_aggregate_slot = slot.add(1);
-        let (sync_aggregate_slot, _sync_aggregate_header) = self
-            .kiln_client
-            .find_valid_header_since(sync_aggregate_slot)
-            .await?;
-        tracing::debug!(
-            target: "pangoro-kiln",
-            "[Header][Kiln => Pangoro] Next sync aggregate header: {:?}",
-            &sync_aggregate_slot,
-        );
-        let sync_aggregate_block = self
-            .kiln_client
-            .get_beacon_block(sync_aggregate_slot)
-            .await?;
+
         let _new_period = sync_aggregate_slot.div(32).div(256);
 
         let sync_aggregate = sync_aggregate_block.body.sync_aggregate;

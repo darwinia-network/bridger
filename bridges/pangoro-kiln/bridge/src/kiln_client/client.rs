@@ -2,6 +2,7 @@ use super::types::{
     BlockMessage, Finality, ForkVersion, GetBlockResponse, GetHeaderResponse, Proof,
     ResponseWrapper, Snapshot,
 };
+use support_common::error::BridgerError;
 
 pub struct KilnClient {
     api_client: reqwest::Client,
@@ -33,16 +34,17 @@ impl KilnClient {
 
     pub async fn find_valid_header_since(
         &self,
+        current_slot: u64,
         mut slot: u64,
     ) -> color_eyre::Result<(u64, GetHeaderResponse)> {
         let mut header = self.get_header(slot).await;
         let mut count = 0;
         while let Err(err) = header {
-            if count > 32 {
+            if slot > current_slot {
                 tracing::info!(
                     target: "pangoro-kiln",
                     "[header-kiln-to-pangoro] Wait for attested headers since: {:?}",
-                    slot - 32
+                    slot - count
                 );
                 return Err(err);
             };
@@ -51,6 +53,46 @@ impl KilnClient {
             count += 1;
         }
         Ok((slot, header.expect("Unreachable")))
+    }
+
+    pub async fn find_valid_attested_header(
+        &self,
+        current_slot: u64,
+        mut slot: u64,
+    ) -> color_eyre::Result<Option<(u64, u64, GetHeaderResponse, BlockMessage)>> {
+        loop {
+            if slot > current_slot {
+                return Ok(None);
+            }
+            match self.find_valid_header_since(current_slot, slot).await {
+                Ok((attest_slot, header)) => {
+                    let (sync_slot, sync_header) = self
+                        .find_valid_header_since(current_slot, attest_slot + 1)
+                        .await?;
+                    let sync_block = self.get_beacon_block(sync_slot).await?;
+                    match Self::is_valid_sync_aggregate_block(&sync_block)? {
+                        true => return Ok(Some((attest_slot, sync_slot, header, sync_block))),
+                        false => {
+                            slot += 1;
+                            continue;
+                        }
+                    }
+                }
+                Err(_) => {
+                    slot += 1;
+                    continue;
+                }
+            }
+        }
+    }
+
+    fn is_valid_sync_aggregate_block(block: &BlockMessage) -> color_eyre::Result<bool> {
+        let bytes = hex::decode(&block.body.sync_aggregate.sync_committee_bits.clone()[2..]);
+        if let Ok(bytes) = bytes {
+            Ok(hamming::weight(&bytes) * 3 > 512 * 2)
+        } else {
+            Err(BridgerError::Custom(String::from("Failed to decode sync_committee_bits")).into())
+        }
     }
 
     pub async fn get_beacon_block_root(&self, id: impl ToString) -> color_eyre::Result<String> {
@@ -145,6 +187,10 @@ impl KilnClient {
         let res: ResponseWrapper<ForkVersion> =
             self.api_client.get(url).send().await?.json().await?;
         Ok(res.data)
+    }
+
+    pub async fn get_sync_committee_period_update() -> color_eyre::Result<()> {
+        todo!()
     }
 }
 

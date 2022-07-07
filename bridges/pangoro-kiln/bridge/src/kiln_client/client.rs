@@ -124,13 +124,10 @@ impl KilnClient {
         Ok(res.data)
     }
 
-    pub async fn get_light_client_snapshot(
-        &self,
-        block_root: &str,
-    ) -> color_eyre::Result<Snapshot> {
+    pub async fn get_bootstrap(&self, header_root: &str) -> color_eyre::Result<Snapshot> {
         let url = format!(
-            "{}/eth/v1/lightclient/snapshot/{}",
-            self.api_base_url, block_root,
+            "{}/eth/v1/light_client/bootstrap/{}",
+            self.api_base_url, header_root,
         );
         let res: ResponseWrapper<Snapshot> = self.api_client.get(url).send().await?.json().await?;
         Ok(res.data)
@@ -140,7 +137,7 @@ impl KilnClient {
         let begin_slot = period * 32 * 256;
         for slot in begin_slot..((period + 1) * 32 * 256) {
             if let Ok(block_root) = self.get_beacon_block_root(slot).await {
-                if let Ok(snapshot) = self.get_light_client_snapshot(&block_root).await {
+                if let Ok(snapshot) = self.get_bootstrap(&block_root).await {
                     return Ok(snapshot);
                 }
             };
@@ -193,7 +190,7 @@ impl KilnClient {
         gindex: impl ToString,
     ) -> color_eyre::Result<Proof> {
         let url = format!(
-            "{}/eth/v1/lightclient/single_proof/{}?gindex={}",
+            "{}/eth/v1/light_client/single_proof/{}?gindex={}",
             self.api_base_url,
             state_id.to_string(),
             gindex.to_string(),
@@ -220,8 +217,19 @@ impl KilnClient {
         Ok(res.data)
     }
 
-    pub async fn get_sync_committee_period_update() -> color_eyre::Result<()> {
-        todo!()
+    pub async fn get_sync_committee_period_update(
+        &self,
+        start_period: impl ToString,
+        count: impl ToString,
+    ) -> color_eyre::Result<()> {
+        let url = format!(
+            "{}/eth/v1/light_client/updates?start_period={}&count={}",
+            self.api_base_url,
+            start_period.to_string(),
+            count.to_string(),
+        );
+        // let res = self.api_client.get(url).send().await?.json().await?;
+        Ok(())
     }
 }
 
@@ -237,7 +245,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_header() {
         let client = test_client();
-        let header = client.get_header(651232).await.unwrap();
+        let header = client.get_header(1000).await.unwrap();
         println!("Header at slot 651232: {:?}", header);
 
         let header = client.get_header("finalized").await.unwrap();
@@ -247,19 +255,17 @@ mod tests {
     #[tokio::test]
     async fn test_get_beacon_block_root() {
         let client = test_client();
-        let block_root = client.get_beacon_block_root(651232).await.unwrap();
-        println!("Block root at slot 651232: {:?}", block_root);
+        let block_root = client.get_beacon_block_root(120960).await.unwrap();
+        println!("Block root at slot 120960: {:?}", block_root);
     }
 
     #[tokio::test]
-    async fn test_get_light_client_snapshot() {
+    async fn test_get_bootstrap() {
         let client = test_client();
-        let snapshot = client
-            .get_light_client_snapshot(
-                "0xc3873d516be87b55b7729fa4ad06f33ce7b16076ac828e206bfeb85f2b1377e2",
-            )
-            .await
-            .unwrap();
+
+        let header_root = client.get_beacon_block_root(120960).await.unwrap();
+        println!("Header root: {:?}", header_root);
+        let snapshot = client.get_bootstrap(&header_root).await.unwrap();
         println!("Block snapshot: {:?}", snapshot);
     }
 
@@ -280,7 +286,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_state_proof() {
         let client = test_client();
-        let proof = client.get_state_proof(801823u32, 55u32).await.unwrap();
+        let proof = client.get_state_proof(120960u32, 55u32).await.unwrap();
         println!("Single proof: {:?}", proof);
     }
 

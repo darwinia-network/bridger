@@ -101,16 +101,12 @@ impl HeaderRelay {
             &old_finalized_header.slot,
             kiln_current_slot,
         );
-        let old_finalized_header_root = self
-            .kiln_client
-            .get_beacon_block_root(old_finalized_header.slot)
-            .await?;
+        let old_period = old_finalized_header.slot.div(32).div(256);
         let snapshot = self
             .kiln_client
-            .get_light_client_snapshot(&old_finalized_header_root)
+            .find_valid_snapshot_in_period(old_period)
             .await?;
         let current_sync_committee = snapshot.current_sync_committee;
-        let _old_period = old_finalized_header.slot.div(32).div(256);
 
         let attested_header_slot = old_finalized_header.slot.add(96);
 
@@ -123,25 +119,37 @@ impl HeaderRelay {
             return Ok(());
         }
 
-        let (slot, sync_aggregate_slot, attested_header, sync_aggregate_block) = match self
-            .kiln_client
-            .find_valid_attested_header(kiln_current_slot, attested_header_slot)
-            .await?
-        {
-            None => {
-                tracing::info!(
-                    target: "pangoro-kiln",
-                    "[Header][Kiln => Pangoro] Wait for valid attested header",
-                );
-                return Ok(());
-            }
-            Some((slot, sync_aggregate_slot, attested_header, sync_aggregate_block)) => (
-                slot,
-                sync_aggregate_slot,
-                attested_header,
-                sync_aggregate_block,
-            ),
-        };
+        let (slot, sync_aggregate_slot, attested_header, sync_aggregate_block, finalized_header) =
+            match self
+                .kiln_client
+                .find_valid_attested_header(
+                    kiln_current_slot,
+                    attested_header_slot,
+                    old_finalized_header.slot,
+                )
+                .await?
+            {
+                None => {
+                    tracing::info!(
+                        target: "pangoro-kiln",
+                        "[Header][Kiln => Pangoro] Wait for valid attested header",
+                    );
+                    return Ok(());
+                }
+                Some((
+                    slot,
+                    sync_aggregate_slot,
+                    attested_header,
+                    sync_aggregate_block,
+                    finalized_header,
+                )) => (
+                    slot,
+                    sync_aggregate_slot,
+                    attested_header,
+                    sync_aggregate_block,
+                    finalized_header,
+                ),
+            };
 
         tracing::info!(
             target: "pangoro-kiln",
@@ -159,9 +167,6 @@ impl HeaderRelay {
         sync_aggregate_bits.push(H256::from_str(&bits[..66])?.into_token());
         sync_aggregate_bits.push(H256::from_str(&bits[66..])?.into_token());
 
-        let checkpoint = self.kiln_client.get_checkpoint(slot).await?;
-        let finalized_header_root = checkpoint.finalized.root;
-        let finalized_header = self.kiln_client.get_header(finalized_header_root).await?;
         tracing::info!(
             target: "pangoro-kiln",
             "[Header][Kiln => Pangoro] Finalized header to relay: {:?}",

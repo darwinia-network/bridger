@@ -59,7 +59,9 @@ impl KilnClient {
         &self,
         current_slot: u64,
         mut slot: u64,
-    ) -> color_eyre::Result<Option<(u64, u64, GetHeaderResponse, BlockMessage)>> {
+        last_relayed_slot: u64,
+    ) -> color_eyre::Result<Option<(u64, u64, GetHeaderResponse, BlockMessage, GetHeaderResponse)>>
+    {
         loop {
             if slot > current_slot {
                 return Ok(None);
@@ -69,9 +71,26 @@ impl KilnClient {
                     let (sync_slot, sync_header) = self
                         .find_valid_header_since(current_slot, attest_slot + 1)
                         .await?;
+
+                    let checkpoint = self.get_checkpoint(attest_slot).await?;
+                    let finalized_header = self.get_header(checkpoint.finalized.root).await?;
+                    let finalized_slot = finalized_header.header.message.slot.parse::<u64>()?;
+                    if finalized_slot == last_relayed_slot {
+                        slot += 32;
+                        continue;
+                    }
+
                     let sync_block = self.get_beacon_block(sync_slot).await?;
                     match Self::is_valid_sync_aggregate_block(&sync_block)? {
-                        true => return Ok(Some((attest_slot, sync_slot, header, sync_block))),
+                        true => {
+                            return Ok(Some((
+                                attest_slot,
+                                sync_slot,
+                                header,
+                                sync_block,
+                                finalized_header,
+                            )))
+                        }
                         false => {
                             slot += 1;
                             continue;
@@ -115,6 +134,18 @@ impl KilnClient {
         );
         let res: ResponseWrapper<Snapshot> = self.api_client.get(url).send().await?.json().await?;
         Ok(res.data)
+    }
+
+    pub async fn find_valid_snapshot_in_period(&self, period: u64) -> color_eyre::Result<Snapshot> {
+        let begin_slot = period * 32 * 256;
+        for slot in begin_slot..((period + 1) * 32 * 256) {
+            if let Ok(block_root) = self.get_beacon_block_root(slot).await {
+                if let Ok(snapshot) = self.get_light_client_snapshot(&block_root).await {
+                    return Ok(snapshot);
+                }
+            };
+        }
+        Err(BridgerError::Custom("Not found valid snapshot".into()).into())
     }
 
     pub async fn get_beacon_block(&self, id: impl ToString) -> color_eyre::Result<BlockMessage> {

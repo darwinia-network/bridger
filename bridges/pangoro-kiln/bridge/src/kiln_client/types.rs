@@ -1,6 +1,6 @@
 use bytes::{Buf, Bytes};
 use serde::{Deserialize, Serialize};
-use web3::{types::H256, ethabi::ethereum_types::H32};
+use web3::{ethabi::ethereum_types::H32, types::H256};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResponseWrapper<T> {
@@ -40,6 +40,11 @@ pub struct Snapshot {
 pub struct SyncCommittee {
     pub pubkeys: Vec<String>,
     pub aggregate_pubkey: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct SyncCommitteePeriodUpdate {
+    pub next_sync_committee: SyncCommittee,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -150,12 +155,12 @@ impl From<Bytes> for Proof {
                         .collect()
                 },
             },
-            _ => {unimplemented!();}
+            _ => {
+                unimplemented!();
+            }
         }
     }
 }
-
-
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ForkVersion {

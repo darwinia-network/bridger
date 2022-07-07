@@ -1,6 +1,6 @@
 use super::types::{
     BlockMessage, Finality, ForkVersion, GetBlockResponse, GetHeaderResponse, Proof,
-    ResponseWrapper, Snapshot,
+    ResponseWrapper, Snapshot, SyncCommittee, SyncCommitteePeriodUpdate,
 };
 use support_common::error::BridgerError;
 
@@ -221,15 +221,16 @@ impl KilnClient {
         &self,
         start_period: impl ToString,
         count: impl ToString,
-    ) -> color_eyre::Result<()> {
+    ) -> color_eyre::Result<Vec<SyncCommitteePeriodUpdate>> {
         let url = format!(
             "{}/eth/v1/light_client/updates?start_period={}&count={}",
             self.api_base_url,
             start_period.to_string(),
             count.to_string(),
         );
-        // let res = self.api_client.get(url).send().await?.json().await?;
-        Ok(())
+        let res: ResponseWrapper<Vec<SyncCommitteePeriodUpdate>> =
+            self.api_client.get(url).send().await?.json().await?;
+        Ok((res.data))
     }
 }
 
@@ -295,5 +296,15 @@ mod tests {
         let client = test_client();
         let fork_version = client.get_fork_version(801823u32).await.unwrap();
         println!("Fork version: {:?}", fork_version);
+    }
+
+    #[tokio::test]
+    async fn test_get_sync_committee_period_update() {
+        let client = test_client();
+        let update = client
+            .get_sync_committee_period_update(12, 1)
+            .await
+            .unwrap();
+        println!("Update: {:?}", update);
     }
 }

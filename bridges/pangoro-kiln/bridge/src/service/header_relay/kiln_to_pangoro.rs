@@ -40,7 +40,7 @@ impl Service for KilnToPangoroHeaderRelayService {
                     "Failed to start kiln-to-pangoro header relay service, restart after some seconds: {:?}",
                     error
                 );
-                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                tokio::time::sleep(std::time::Duration::from_secs(10)).await;
             }
             Ok(())
         });
@@ -74,7 +74,7 @@ async fn start() -> color_eyre::Result<()> {
             );
             return Err(error);
         }
-        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
     }
 }
 

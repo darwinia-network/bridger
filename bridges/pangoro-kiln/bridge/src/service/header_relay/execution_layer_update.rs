@@ -84,17 +84,17 @@ impl ExecutionLayer {
             .kiln_client
             .get_beacon_block(last_relayed_header.slot)
             .await?;
-
+        let latest_execution_payload_state_root =
+            H256::from_str(&finalized_block.body.execution_payload.state_root)?;
         let relayed_state_root = self.pangoro_client.execution_layer_state_root().await?;
-        if relayed_state_root.is_zero() {
+
+        if relayed_state_root != latest_execution_payload_state_root {
             tracing::info!(
                 target: "pangoro-kiln",
                 "[ExecutionLayer][Kiln => Pangoro] Try to relay execution layer state at slot: {:?}",
                 last_relayed_header.slot,
             );
 
-            let latest_execution_payload_state_root =
-                H256::from_str(&finalized_block.body.execution_payload.state_root)?;
             let state_root_branch = self
                 .kiln_client
                 .get_latest_execution_payload_state_root_branch(last_relayed_header.slot)

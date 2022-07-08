@@ -94,15 +94,9 @@ impl HeaderRelay {
             &old_finalized_header.slot,
             kiln_current_slot,
         );
-        let old_period = old_finalized_header.slot.div(32).div(256);
-        let snapshot = self
-            .kiln_client
-            .find_valid_snapshot_in_period(old_period)
-            .await?;
-        let current_sync_committee = snapshot.current_sync_committee;
+        let _old_period = old_finalized_header.slot.div(32).div(256);
 
         let attested_header_slot = old_finalized_header.slot.add(96);
-
         if attested_header_slot >= kiln_current_slot {
             tracing::info!(
                 target: "pangoro-kiln",
@@ -151,7 +145,12 @@ impl HeaderRelay {
             sync_aggregate_slot,
         );
 
-        let _new_period = sync_aggregate_slot.div(32).div(256);
+        let new_period = sync_aggregate_slot.div(32).div(256);
+        let snapshot = self
+            .kiln_client
+            .find_valid_snapshot_in_period(new_period)
+            .await?;
+        let current_sync_committee = snapshot.current_sync_committee;
 
         let sync_aggregate = sync_aggregate_block.body.sync_aggregate;
         let mut sync_aggregate_bits: Vec<Token> = Vec::new();

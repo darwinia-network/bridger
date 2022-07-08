@@ -67,6 +67,13 @@ impl PangoroClient {
         let root: H256 = query.await?;
         Ok(root)
     }
+
+    pub async fn execution_layer_state_root(&self) -> color_eyre::Result<H256> {
+        let query =
+            self.execution_layer_contract
+                .query("state_root", (), None, Options::default(), None);
+        Ok(query.await?)
+    }
 }
 
 #[cfg(test)]
@@ -78,7 +85,7 @@ mod tests {
             "https://pangoro-rpc.darwinia.network",
             "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
             "0x9920317f841F3653464bf37512c939744502CA74",
-            "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
+            "/Users/furoxr/Projects/darwinia-messages-sol/contracts/bridge/abi/src/truth/eth/ExecutionLayer.sol/ExecutionLayer.json",
             "0x99B9C72c93EBC472Ce1A27e064067E78FDcb36E9",
             "//Alice"
         ).unwrap()
@@ -96,5 +103,12 @@ mod tests {
         let client = test_client();
         let sync_committee_root = client.sync_committee_roots(12).await.unwrap();
         println!("Sync committee root: {:?}", sync_committee_root);
+    }
+
+    #[tokio::test]
+    async fn test_query_execution_layer_state_root() {
+        let client = test_client();
+        let state_root = client.execution_layer_state_root().await.unwrap();
+        println!("Execution layer state root: {:?}", state_root);
     }
 }

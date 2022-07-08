@@ -12,6 +12,7 @@ use crate::pangoro_client::types::BeaconBlockHeader;
 pub struct PangoroClient {
     pub client: Web3<Http>,
     pub contract: Contract<Http>,
+    pub execution_layer_contract: Contract<Http>,
     pub private_key: SecretKey,
 }
 
@@ -20,20 +21,29 @@ impl PangoroClient {
         endpoint: &str,
         abi_path: &str,
         contract_address: &str,
+        execution_layer_abi_path: &str,
+        execution_layer_contract_address: &str,
         private_key: &str,
     ) -> color_eyre::Result<Self> {
         let transport = Http::new(endpoint)?;
         let client = web3::Web3::new(transport);
         let abi = fs::read(abi_path)?;
+        let execution_layer_abi = fs::read(execution_layer_abi_path)?;
         let contract = Contract::from_json(
             client.eth(),
             Address::from_str(contract_address)?,
             abi.as_slice(),
         )?;
+        let execution_layer_contract = Contract::from_json(
+            client.eth(),
+            Address::from_str(execution_layer_contract_address)?,
+            &execution_layer_abi,
+        )?;
         let private_key = SecretKey::from_str(private_key)?;
         Ok(Self {
             client,
             contract,
+            execution_layer_contract,
             private_key,
         })
     }
@@ -66,10 +76,12 @@ mod tests {
     fn test_client() -> PangoroClient {
         PangoroClient::new(
             "https://pangoro-rpc.darwinia.network",
-         "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
-         "0x9920317f841F3653464bf37512c939744502CA74",
-         "//Alice"
-            ).unwrap()
+            "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
+            "0x9920317f841F3653464bf37512c939744502CA74",
+            "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
+            "0x99B9C72c93EBC472Ce1A27e064067E78FDcb36E9",
+            "//Alice"
+        ).unwrap()
     }
 
     #[tokio::test]

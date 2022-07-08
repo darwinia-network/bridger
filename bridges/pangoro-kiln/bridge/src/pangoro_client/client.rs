@@ -67,7 +67,7 @@ mod tests {
         PangoroClient::new(
             "https://pangoro-rpc.darwinia.network",
          "/Users/furoxr/Projects/bridger/frame/abstract/bridge-s2e/src/BeaconLightClient_abi.json",
-         "0xedD0683d354b2d2c209Ac8c574ef88E85bdBEa70",
+         "0x9920317f841F3653464bf37512c939744502CA74",
          "//Alice"
             ).unwrap()
     }
@@ -82,7 +82,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_sync_committee_roots() {
         let client = test_client();
-        let sync_committee_root = client.sync_committee_roots(79).await.unwrap();
+        let sync_committee_root = client.sync_committee_roots(12).await.unwrap();
         println!("Sync committee root: {:?}", sync_committee_root);
     }
 }

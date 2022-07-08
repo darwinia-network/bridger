@@ -1,6 +1,7 @@
 use crate::{
     bridge::PangoroKilnBus,
     service::header_relay::{
+        execution_layer_update::ExecutionLayerRelay,
         kiln_to_pangoro::KilnToPangoroHeaderRelayService,
         sync_committee_update::SyncCommitteeUpdateService,
     },
@@ -19,6 +20,7 @@ impl PangoroKilnServiceManager {
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<KilnToPangoroHeaderRelayService>()?;
         stack.spawn_service::<SyncCommitteeUpdateService>()?;
+        stack.spawn_service::<ExecutionLayerRelay>()?;
         Ok(Self { stack })
     }
 }

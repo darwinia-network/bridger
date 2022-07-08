@@ -1,7 +1,4 @@
-use std::{
-    ops::{Add, Div},
-    str::FromStr,
-};
+use std::str::FromStr;
 
 use crate::{
     bridge::{BridgeConfig, PangoroKilnBus},
@@ -13,10 +10,7 @@ use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use web3::{
-    contract::{
-        tokens::{Tokenizable, Tokenize},
-        Options,
-    },
+    contract::{tokens::Tokenize, Options},
     ethabi::Token,
     types::{H256, U256},
 };
@@ -85,6 +79,63 @@ pub struct ExecutionLayer {
 
 impl ExecutionLayer {
     pub async fn execution_layer_relay(&self) -> color_eyre::Result<()> {
-        todo!()
+        let last_relayed_header = self.pangoro_client.finalized_header().await?;
+        let finalized_block = self
+            .kiln_client
+            .get_beacon_block(last_relayed_header.slot)
+            .await?;
+
+        let latest_execution_payload_state_root =
+            H256::from_str(&finalized_block.body.execution_payload.state_root)?;
+        if latest_execution_payload_state_root.is_zero() {
+            tracing::info!(
+                target: "pangoro-kiln",
+                "[ExecutionLayer][Kiln => Pangoro] Try to relay execution layer state at slot: {:?}",
+                last_relayed_header.slot,
+            );
+
+            let state_root_branch = self
+                .kiln_client
+                .get_latest_execution_payload_state_root_branch(last_relayed_header.slot)
+                .await?;
+            let witnesses = match state_root_branch {
+                Proof::SingleProof {
+                    gindex: _,
+                    leaf: _,
+                    witnesses,
+                } => witnesses,
+                _ => return Err(BridgerError::Custom("Not implemented!".to_string()).into()),
+            };
+            let parameter =
+                Token::Tuple((latest_execution_payload_state_root, witnesses).into_tokens());
+            let tx = self
+                .pangoro_client
+                .execution_layer_contract
+                .signed_call(
+                    "import_latest_execution_payload_state_root",
+                    (parameter,),
+                    Options {
+                        gas: Some(U256::from(10000000)),
+                        gas_price: Some(U256::from(1300000000)),
+                        ..Default::default()
+                    },
+                    &self.pangoro_client.private_key,
+                )
+                .await?;
+
+            tracing::info!(
+                target: "pangoro-kiln",
+                "[ExecutionLayer][Kiln => Pangoro] Sending tx: {:?}",
+                &tx
+            );
+        } else {
+            tracing::info!(
+                target: "pangoro-kiln",
+                "[ExecutionLayer][Kiln => Pangoro] Latest execution payload state root at slot {:?} is : {:?}",
+                last_relayed_header.slot,
+                &latest_execution_payload_state_root
+            );
+        }
+        Ok(())
     }
 }

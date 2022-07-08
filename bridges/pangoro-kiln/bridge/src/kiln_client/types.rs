@@ -121,13 +121,14 @@ pub struct Finality {
     pub finalized: Checkpoint,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum Proof {
     SingleProof {
         gindex: u16,
         leaf: H256,
         witnesses: Vec<H256>,
     },
+    #[allow(dead_code)]
     TreeOffsets {
         offsets: Vec<u16>,
         leaves: Vec<H256>,

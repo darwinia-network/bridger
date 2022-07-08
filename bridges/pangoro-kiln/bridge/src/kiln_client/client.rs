@@ -1,6 +1,6 @@
 use super::types::{
     BlockMessage, Finality, ForkVersion, GetBlockResponse, GetHeaderResponse, Proof,
-    ResponseWrapper, Snapshot, SyncCommittee, SyncCommitteePeriodUpdate,
+    ResponseWrapper, Snapshot, SyncCommitteePeriodUpdate,
 };
 use support_common::error::BridgerError;
 
@@ -14,11 +14,11 @@ impl KilnClient {
         // let transport = Http::new(endpoint)?;
         // let client = web3::Web3::new(transport);
         let api_client = reqwest::Client::new();
-        return Ok(Self {
+        Ok(Self {
             // client,
             api_client,
             api_base_url: String::from(api_endpoint),
-        });
+        })
     }
 
     pub async fn get_header(&self, id: impl ToString) -> color_eyre::Result<GetHeaderResponse> {
@@ -68,7 +68,7 @@ impl KilnClient {
             }
             match self.find_valid_header_since(current_slot, slot).await {
                 Ok((attest_slot, header)) => {
-                    let (sync_slot, sync_header) = self
+                    let (sync_slot, _sync_header) = self
                         .find_valid_header_since(current_slot, attest_slot + 1)
                         .await?;
 
@@ -230,7 +230,7 @@ impl KilnClient {
         );
         let res: ResponseWrapper<Vec<SyncCommitteePeriodUpdate>> =
             self.api_client.get(url).send().await?.json().await?;
-        Ok((res.data))
+        Ok(res.data)
     }
 }
 

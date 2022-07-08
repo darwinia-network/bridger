@@ -18,9 +18,9 @@ impl Detokenize for BeaconBlockHeader {
         Self: Sized,
     {
         if tokens.len() != 5 {
-            return Err(contract::Error::InvalidOutputType(String::from(
+            Err(contract::Error::InvalidOutputType(String::from(
                 "Wrong type!",
-            )));
+            )))
         } else {
             Ok(Self {
                 slot: u64::from_token(tokens[0].clone())?,

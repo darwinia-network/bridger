@@ -27,7 +27,7 @@ impl Service for ExecutionLayerRelay {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task(&format!("execution-kiln-to-pangoro"), async move {
+        let _greet = Self::try_task("execution-layer-kiln-to-pangoro", async move {
             while let Err(error) = start().await {
                 tracing::error!(
                     target: "pangoro-kiln",
@@ -85,15 +85,16 @@ impl ExecutionLayer {
             .get_beacon_block(last_relayed_header.slot)
             .await?;
 
-        let latest_execution_payload_state_root =
-            H256::from_str(&finalized_block.body.execution_payload.state_root)?;
-        if latest_execution_payload_state_root.is_zero() {
+        let relayed_state_root = self.pangoro_client.execution_layer_state_root().await?;
+        if relayed_state_root.is_zero() {
             tracing::info!(
                 target: "pangoro-kiln",
                 "[ExecutionLayer][Kiln => Pangoro] Try to relay execution layer state at slot: {:?}",
                 last_relayed_header.slot,
             );
 
+            let latest_execution_payload_state_root =
+                H256::from_str(&finalized_block.body.execution_payload.state_root)?;
             let state_root_branch = self
                 .kiln_client
                 .get_latest_execution_payload_state_root_branch(last_relayed_header.slot)
@@ -133,7 +134,7 @@ impl ExecutionLayer {
                 target: "pangoro-kiln",
                 "[ExecutionLayer][Kiln => Pangoro] Latest execution payload state root at slot {:?} is : {:?}",
                 last_relayed_header.slot,
-                &latest_execution_payload_state_root
+                &relayed_state_root,
             );
         }
         Ok(())

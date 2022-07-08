@@ -33,7 +33,7 @@ impl Service for KilnToPangoroHeaderRelayService {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task(&format!("header-kiln-to-pangoro"), async move {
+        let _greet = Self::try_task("header-kiln-to-pangoro", async move {
             while let Err(error) = start().await {
                 tracing::error!(
                     target: "pangoro-kiln",

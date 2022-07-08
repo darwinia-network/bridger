@@ -27,7 +27,7 @@ impl Service for SyncCommitteeUpdateService {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task(&format!("header-kiln-to-pangoro"), async move {
+        let _greet = Self::try_task("sync-committee-update-kiln-to-pangoro", async move {
             while let Err(error) = start().await {
                 tracing::error!(
                     target: "pangoro-kiln",
@@ -133,7 +133,7 @@ impl SyncCommitteeUpdate {
             .kiln_client
             .get_sync_committee_period_update(period, 1)
             .await?;
-        if sync_committee_update.len() == 0 {
+        if sync_committee_update.is_empty() {
             return Err(BridgerError::Custom("Failed to get sync committee update".into()).into());
         }
         let next_sync_committee = sync_committee_update

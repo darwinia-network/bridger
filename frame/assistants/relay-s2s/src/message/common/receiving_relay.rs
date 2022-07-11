@@ -65,7 +65,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
             );
             return Ok(None);
         }
-        if let Some(last_relayed_nonce) = keepstate::get_last_receiving_relayed_nonce() {
+        if let Some(last_relayed_nonce) = keepstate::get_last_receiving_relayed_nonce(TC::CHAIN) {
             if last_relayed_nonce >= max_confirm_end_at_target {
                 tracing::warn!(
                     target: "relay-s2s",
@@ -123,6 +123,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
             let last_relayed_nonce = self.run().await?;
             if last_relayed_nonce.is_some() {
                 keepstate::set_last_receiving_relayed_nonce(
+                    TC::CHAIN,
                     last_relayed_nonce.expect("Unreachable"),
                 );
             }

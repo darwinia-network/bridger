@@ -4,7 +4,7 @@ use std::sync::Mutex;
 
 use once_cell::sync::Lazy;
 
-static LAST_RELAYED_NONCE: Lazy<Mutex<HashMap<&str, u64>>> = Lazy::new(|| {
+static LAST_RELAYED_NONCE: Lazy<Mutex<HashMap<String, u64>>> = Lazy::new(|| {
     let map = HashMap::new();
     Mutex::new(map)
 });
@@ -15,24 +15,24 @@ static RECENTLY_JUSTIFICATIONS: Lazy<Mutex<HashMap<&str, VecDeque<sp_core::Bytes
         Mutex::new(map)
     });
 
-pub fn get_last_delivery_relayed_nonce() -> Option<u64> {
+pub fn get_last_delivery_relayed_nonce(chain: &str) -> Option<u64> {
     let data = LAST_RELAYED_NONCE.lock().unwrap();
-    data.get("delivery").cloned()
+    data.get(&format!("{}-delivery", chain)).cloned()
 }
 
-pub fn set_last_delivery_relayed_nonce(nonce: u64) {
+pub fn set_last_delivery_relayed_nonce(chain: &str, nonce: u64) {
     let mut data = LAST_RELAYED_NONCE.lock().unwrap();
-    data.insert("delivery", nonce);
+    data.insert(format!("{}-delivery", chain), nonce);
 }
 
-pub fn get_last_receiving_relayed_nonce() -> Option<u64> {
+pub fn get_last_receiving_relayed_nonce(chain: &str) -> Option<u64> {
     let data = LAST_RELAYED_NONCE.lock().unwrap();
-    data.get("receiving").cloned()
+    data.get(&format!("{}-receiving", chain)).cloned()
 }
 
-pub fn set_last_receiving_relayed_nonce(nonce: u64) {
+pub fn set_last_receiving_relayed_nonce(chain: &str, nonce: u64) {
     let mut data = LAST_RELAYED_NONCE.lock().unwrap();
-    data.insert("receiving", nonce);
+    data.insert(format!("{}-receiving", chain), nonce);
 }
 
 pub fn set_recently_justification(chain: &'static str, justification: sp_core::Bytes) {

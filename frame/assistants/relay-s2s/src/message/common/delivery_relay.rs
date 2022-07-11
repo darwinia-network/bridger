@@ -73,7 +73,7 @@ where
 
         // assemble nonce range
         let start: u64 = latest_confirmed_nonce + 1;
-        if let Some(last_relayed_nonce) = keepstate::get_last_delivery_relayed_nonce() {
+        if let Some(last_relayed_nonce) = keepstate::get_last_delivery_relayed_nonce(SC::CHAIN) {
             if last_relayed_nonce >= start {
                 tracing::warn!(
                     target: "relay-s2s",
@@ -121,6 +121,7 @@ where
             let last_relayed_nonce = self.run(self.input.nonces_limit).await?;
             if last_relayed_nonce.is_some() {
                 keepstate::set_last_delivery_relayed_nonce(
+                    SC::CHAIN,
                     last_relayed_nonce.expect("Unreachable"),
                 );
             }

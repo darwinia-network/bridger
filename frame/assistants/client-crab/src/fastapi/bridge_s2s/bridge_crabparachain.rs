@@ -236,7 +236,7 @@ impl S2SClientRelay for CrabClient {
             .tx()
             .bridge_crab_parachain_messages()
             .receive_messages_delivery_proof(expected_proof, expected_relayers_state)
-            .sign_and_submit(self.account().signer())
+            .sign_and_submit_then_watch(self.account().signer())
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
@@ -281,7 +281,7 @@ impl S2SParaBridgeClientSolochain for CrabClient {
             .tx()
             .bridge_kusama_parachain()
             .submit_parachain_heads(relay_block_hash, expected_parachains, parachain_heads_proof)
-            .sign_and_submit(self.account().signer())
+            .sign_and_submit_then_watch(self.account().signer())
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(

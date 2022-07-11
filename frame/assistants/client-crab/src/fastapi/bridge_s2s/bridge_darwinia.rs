@@ -1,8 +1,6 @@
 use std::ops::RangeInclusive;
 
-use bridge_s2s_traits::client::{
-    S2SClientBase, S2SClientGeneric, S2SClientRelay, S2SParaBridgeClientSolochain,
-};
+use bridge_s2s_traits::client::{S2SClientBase, S2SClientGeneric, S2SClientRelay};
 use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
 use bridge_s2s_traits::types::{
     bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,

@@ -141,7 +141,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
         if source_outbound_lane_data.latest_received_nonce
             == source_outbound_lane_data.latest_generated_nonce
         {
-            tracing::info!(
+            tracing::debug!(
                 target: "relay-s2s",
                 "{} all nonces received, nothing to do.",
                 logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
@@ -186,7 +186,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
             .receive_messages_delivery_proof(proof, relayers_state)
             .await?;
 
-        tracing::debug!(
+        tracing::info!(
             target: "relay-s2s",
             "{} receiving extensics sent successful: {}",
             logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),

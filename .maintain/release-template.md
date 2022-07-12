@@ -4,7 +4,12 @@
 
 ## Changed
 
-- Add crab-crabparachain bridge (#471)
+- Refactor s2s bridge (#467)
+- Fix Pangolin<>Pangolin Parachain (#477)
+- s2s bridge abstraction, and feemarket relay strategy (#476)
+- Migrate to new s2s bridge (#479)
+- Improve bridge s2s (#481)
+- Improve s2s bridge (#483)
 
 ## Resources
 

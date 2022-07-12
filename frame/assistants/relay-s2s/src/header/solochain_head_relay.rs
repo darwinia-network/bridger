@@ -124,7 +124,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
 
             return Ok(Some(block_to_relay.block_number));
         }
-        tracing::info!(
+        tracing::debug!(
             target: "relay-s2s",
             "{} the next mandatory block not found",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),

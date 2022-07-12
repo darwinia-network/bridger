@@ -1,8 +1,6 @@
 [pangoro]
 endpoint = "https://pangoro-rpc.darwinia.network"
-contract_abi_path = "/path/to/BeaconLightClient_abi.json"
 contract_address = "0x9920317f841F3653464bf37512c939744502CA74"
-execution_layer_contract_abi_path = "/path/to/ExecutionLayer_abi.json"
 execution_layer_contract_address = "0x99B9C72c93EBC472Ce1A27e064067E78FDcb36E9"
 private_key = "//Alice"
 

@@ -1,4 +1,4 @@
-use std::{fs, str::FromStr};
+use std::str::FromStr;
 
 use crate::pangoro_client::types::{BSCHeader, Checkpoint, TBSCHeader};
 use secp256k1::SecretKey;
@@ -17,19 +17,13 @@ pub struct PangoroClient {
 }
 
 impl PangoroClient {
-    pub fn new(
-        endpoint: &str,
-        bsc_abi_path: &str,
-        bsc_address: &str,
-        private_key: &str,
-    ) -> color_eyre::Result<Self> {
+    pub fn new(endpoint: &str, bsc_address: &str, private_key: &str) -> color_eyre::Result<Self> {
         let transport = Http::new(endpoint)?;
         let client = Web3::new(transport);
-        let abi = fs::read(bsc_abi_path)?;
         let bsc_light_client = Contract::from_json(
             client.eth(),
             Address::from_str(bsc_address)?,
-            abi.as_slice(),
+            include_bytes!("BSCLightClient.json"),
         )?;
         let private_key = SecretKey::from_str(private_key)?;
         Ok(Self {
@@ -92,10 +86,10 @@ mod tests {
     fn test_client() -> PangoroClient {
         PangoroClient::new(
             "https://pangoro-rpc.darwinia.network",
-            "/Users/furoxr/Projects/darwinia-messages-sol/contracts/bridge/abi/src/truth/bsc/BSCLightClient.sol/BSCLightClient.json",
             "0x6ac5ae3fa61b2cbea625dd24f57bdc3d952333c9",
-            "03454001267e888193ea585845b6634d8977f56040199a55ba3c8654776efed8"
-        ).unwrap()
+            "//Alice",
+        )
+        .unwrap()
     }
 
     #[tokio::test]

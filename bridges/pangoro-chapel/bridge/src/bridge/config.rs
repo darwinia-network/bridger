@@ -8,7 +8,6 @@ pub struct ChapelWeb3Config {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PangoroConfig {
     pub endpoint: String,
-    pub bsc_abi_path: String,
     pub bsc_address: String,
     pub private_key: String,
 }

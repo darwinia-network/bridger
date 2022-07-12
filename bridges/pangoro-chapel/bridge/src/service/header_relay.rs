@@ -77,7 +77,6 @@ pub async fn relay_chapel_headers(config: PangoroChapelConfig) -> color_eyre::Re
     tracing::trace!(target: "pangoro-chapel", "Initialize Pangoro subxt client");
     let pangoro = PangoroClient::new(
         &config.pangoro.endpoint,
-        &config.pangoro.bsc_abi_path,
         &config.pangoro.bsc_address,
         &config.pangoro.private_key,
     )?;

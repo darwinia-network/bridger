@@ -5,6 +5,7 @@ use crate::command::types::Opts;
 mod bridge;
 mod cli;
 mod command;
+mod pangoro_client;
 mod service;
 
 #[tokio::main]

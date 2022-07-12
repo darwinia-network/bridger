@@ -1,6 +1,6 @@
 [package]
 name = "component-subscan"
-version = "0.5.7"
+version = "0.6.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"

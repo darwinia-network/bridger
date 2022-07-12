@@ -324,6 +324,7 @@ dependencies = [
  "futures",
  "lifeline",
  "postage",
+ "secp256k1",
  "serde 1.0.136",
  "structopt",
  "strum",

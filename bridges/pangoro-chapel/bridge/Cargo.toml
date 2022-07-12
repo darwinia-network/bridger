@@ -42,5 +42,6 @@ support-terminal   = { path = "../../../frame/supports/support-terminal" }
 
 component-http-client = { path = "../../../frame/components/http-client" }
 
-web3 = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }
+web3      = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }
+secp256k1 = { version = "0.21" }
 futures = "0.3.21"

@@ -1,6 +1,5 @@
 [pangoro]
 endpoint = "https://pangoro-rpc.darwinia.network:443"
-bsc_abi_path = "/Users/furoxr/Projects/darwinia-messages-sol/contracts/bridge/abi/src/truth/bsc/BSCLightClient.sol/BSCLightClient.json"
 bsc_address = "0x6ac5ae3fa61b2cbea625dd24f57bdc3d952333c9"
 private_key = "//Alice"
 

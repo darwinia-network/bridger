@@ -1,10 +1,9 @@
 use std::ops::RangeInclusive;
 
-use bridge_s2s_traits::client::S2SClientGeneric;
-use bridge_s2s_traits::error::S2SClientResult;
-use bridge_s2s_traits::{
-    client::S2SClientRelay,
-    types::{bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common},
+use bridge_s2s_traits::client::{S2SClientBase, S2SClientGeneric, S2SClientRelay};
+use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
+use bridge_s2s_traits::types::{
+    bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,
 };
 use sp_runtime::AccountId32;
 use subxt::sp_core::storage::StorageKey;
@@ -98,14 +97,21 @@ impl S2SClientRelay for CrabClient {
         &self,
         initialization_data: <Self as S2SClientGeneric>::InitializationData,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
-        let hash = self
-            .runtime()
+        let runtime = self.runtime();
+        let track = runtime
             .tx()
             .bridge_darwinia_grandpa()
             .initialize(initialization_data)
-            .sign_and_submit(self.account().signer())
+            .sign_and_submit_then_watch(self.account().signer())
             .await?;
-        Ok(hash)
+        let events = track.wait_for_finalized_success().await.map_err(|e| {
+            S2SClientError::RPC(format!(
+                "send transactioni failed {}: {:?}",
+                <Self as S2SClientBase>::CHAIN,
+                e
+            ))
+        })?;
+        Ok(events.extrinsic_hash())
     }
 
     async fn submit_finality_proof(
@@ -117,13 +123,21 @@ impl S2SClientRelay for CrabClient {
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_target = SmartCodecMapper::map_to(&finality_target)?;
         let expected_justification = SmartCodecMapper::map_to(&justification)?;
-        Ok(self
-            .runtime()
+        let runtime = self.runtime();
+        let track = runtime
             .tx()
             .bridge_darwinia_grandpa()
             .submit_finality_proof(expected_target, expected_justification)
-            .sign_and_submit(self.account().signer())
-            .await?)
+            .sign_and_submit_then_watch(self.account().signer())
+            .await?;
+        let events = track.wait_for_finalized_success().await.map_err(|e| {
+            S2SClientError::RPC(format!(
+                "send transactioni failed {}: {:?}",
+                <Self as S2SClientBase>::CHAIN,
+                e
+            ))
+        })?;
+        Ok(events.extrinsic_hash())
     }
 
     async fn outbound_lanes(
@@ -184,8 +198,8 @@ impl S2SClientRelay for CrabClient {
         dispatch_weight: u64,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
-        Ok(self
-            .runtime()
+        let runtime = self.runtime();
+        let track = runtime
             .tx()
             .bridge_darwinia_messages()
             .receive_messages_proof(
@@ -194,8 +208,16 @@ impl S2SClientRelay for CrabClient {
                 messages_count,
                 dispatch_weight,
             )
-            .sign_and_submit(self.account().signer())
-            .await?)
+            .sign_and_submit_then_watch(self.account().signer())
+            .await?;
+        let events = track.wait_for_finalized_success().await.map_err(|e| {
+            S2SClientError::RPC(format!(
+                "send transactioni failed {}: {:?}",
+                <Self as S2SClientBase>::CHAIN,
+                e
+            ))
+        })?;
+        Ok(events.extrinsic_hash())
     }
 
     async fn receive_messages_delivery_proof(
@@ -207,12 +229,20 @@ impl S2SClientRelay for CrabClient {
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
         let expected_relayers_state = SmartCodecMapper::map_to(&relayers_state)?;
-        Ok(self
-            .runtime()
+        let runtime = self.runtime();
+        let track = runtime
             .tx()
             .bridge_darwinia_messages()
             .receive_messages_delivery_proof(expected_proof, expected_relayers_state)
-            .sign_and_submit(self.account().signer())
-            .await?)
+            .sign_and_submit_then_watch(self.account().signer())
+            .await?;
+        let events = track.wait_for_finalized_success().await.map_err(|e| {
+            S2SClientError::RPC(format!(
+                "send transactioni failed {}: {:?}",
+                <Self as S2SClientBase>::CHAIN,
+                e
+            ))
+        })?;
+        Ok(events.extrinsic_hash())
     }
 }

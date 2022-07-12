@@ -60,19 +60,24 @@ where
             outbound_lane_data.latest_received_nonce,
             outbound_lane_data.latest_generated_nonce,
         );
+        tracing::info!(
+            target: "relay-s2s",
+            "{} sync status: [{},{}]",
+            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            latest_confirmed_nonce,
+            latest_generated_nonce,
+        );
         if latest_confirmed_nonce == latest_generated_nonce {
             return Ok(None);
         }
 
         // assemble nonce range
         let start: u64 = latest_confirmed_nonce + 1;
-        if let Some(last_relayed_nonce) = keepstate::get_last_delivery_relayed_nonce() {
+        if let Some(last_relayed_nonce) = keepstate::get_last_delivery_relayed_nonce(SC::CHAIN) {
             if last_relayed_nonce >= start {
                 tracing::warn!(
                     target: "relay-s2s",
-                    "{} have a batches of transactions in progress. \
-                    waiting for this batches to complete. last relayed noce is {} and expect to start with {}. \
-                    please wait receiving.",
+                    "{} last relayed nonce is {} but start nonce is {}, please wait receiving.",
                     logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                     last_relayed_nonce,
                     start,
@@ -116,6 +121,7 @@ where
             let last_relayed_nonce = self.run(self.input.nonces_limit).await?;
             if last_relayed_nonce.is_some() {
                 keepstate::set_last_delivery_relayed_nonce(
+                    SC::CHAIN,
                     last_relayed_nonce.expect("Unreachable"),
                 );
             }
@@ -138,7 +144,7 @@ where
         {
             Some(v) => v,
             None => {
-                tracing::info!(
+                tracing::debug!(
                     target: "relay-s2s",
                     "{} all nonces delivered, nothing to do.",
                     logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
@@ -146,7 +152,7 @@ where
                 return Ok(None);
             }
         };
-        tracing::info!(
+        tracing::debug!(
             target: "relay-s2s",
             "{} assembled nonces {:?}",
             logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
@@ -267,7 +273,7 @@ where
             )
             .await?;
 
-        tracing::debug!(
+        tracing::info!(
             target: "relay-s2s",
             "{} the nonces {:?} in delivered to target chain -> {}",
             logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),

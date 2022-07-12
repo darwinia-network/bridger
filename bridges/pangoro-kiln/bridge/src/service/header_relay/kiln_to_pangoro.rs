@@ -53,9 +53,7 @@ async fn start() -> color_eyre::Result<()> {
     println!("{:?}", &config);
     let pangoro_client = PangoroClient::new(
         &config.pangoro.endpoint,
-        &config.pangoro.contract_abi_path,
         &config.pangoro.contract_address,
-        &config.pangoro.execution_layer_contract_abi_path,
         &config.pangoro.execution_layer_contract_address,
         &config.pangoro.private_key,
     )?;

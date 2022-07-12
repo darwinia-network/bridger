@@ -12,8 +12,6 @@ pub struct ChainInfoConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contract_address: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contract_abi_path: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub private_key: Option<String>,
 }
 
@@ -21,8 +19,6 @@ pub struct ChainInfoConfig {
 pub struct PangoroConfig {
     pub endpoint: String,
     pub contract_address: String,
-    pub contract_abi_path: String,
     pub execution_layer_contract_address: String,
-    pub execution_layer_contract_abi_path: String,
     pub private_key: String,
 }

@@ -243,6 +243,7 @@ mod tests {
         KilnClient::new("http://localhost:5052").unwrap()
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_header() {
         let client = test_client();
@@ -253,6 +254,7 @@ mod tests {
         println!("Finalized header: {:?}", header);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_beacon_block_root() {
         let client = test_client();
@@ -260,6 +262,7 @@ mod tests {
         println!("Block root at slot 120960: {:?}", block_root);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_bootstrap() {
         let client = test_client();
@@ -270,20 +273,23 @@ mod tests {
         println!("Block snapshot: {:?}", snapshot);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_beacon_block() {
         let client = test_client();
-        let block_body = client.get_beacon_block(801823u32).await.unwrap();
+        let block_body = client.get_beacon_block(120960).await.unwrap();
         println!("Block body: {:?}", block_body.body.sync_aggregate);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_checkpoint() {
         let client = test_client();
-        let checkpoint = client.get_checkpoint(801823u32).await.unwrap();
+        let checkpoint = client.get_checkpoint(120960).await.unwrap();
         println!("Checkpoint: {:?}", checkpoint);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_state_proof() {
         let client = test_client();
@@ -291,13 +297,15 @@ mod tests {
         println!("Single proof: {:?}", proof);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_fork_version() {
         let client = test_client();
-        let fork_version = client.get_fork_version(801823u32).await.unwrap();
+        let fork_version = client.get_fork_version(120960).await.unwrap();
         println!("Fork version: {:?}", fork_version);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_sync_committee_period_update() {
         let client = test_client();

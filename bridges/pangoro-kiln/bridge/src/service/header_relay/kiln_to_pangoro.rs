@@ -55,7 +55,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro.endpoint,
         &config.pangoro.contract_address,
         &config.pangoro.execution_layer_contract_address,
-        &config.pangoro.private_key,
+        Some(&config.pangoro.private_key),
     )?;
     let kiln_client = KilnClient::new(&config.kiln.endpoint)?;
     let header_relay = HeaderRelay {
@@ -247,7 +247,9 @@ impl HeaderRelay {
                     gas_price: Some(U256::from(1300000000)),
                     ..Default::default()
                 },
-                &self.pangoro_client.private_key,
+                &self.pangoro_client.private_key.ok_or_else(|| {
+                    BridgerError::Custom("Failed to get log_bloom from block".into())
+                })?,
             )
             .await?;
 

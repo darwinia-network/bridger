@@ -13,7 +13,7 @@ pub struct PangoroClient {
     pub client: Web3<Http>,
     pub contract: Contract<Http>,
     pub execution_layer_contract: Contract<Http>,
-    pub private_key: SecretKey,
+    pub private_key: Option<SecretKey>,
 }
 
 impl PangoroClient {
@@ -21,7 +21,7 @@ impl PangoroClient {
         endpoint: &str,
         contract_address: &str,
         execution_layer_contract_address: &str,
-        private_key: &str,
+        private_key: Option<&str>,
     ) -> color_eyre::Result<Self> {
         let transport = Http::new(endpoint)?;
         let client = web3::Web3::new(transport);
@@ -35,7 +35,7 @@ impl PangoroClient {
             Address::from_str(execution_layer_contract_address)?,
             include_bytes!("ExecutionLayer.json"),
         )?;
-        let private_key = SecretKey::from_str(private_key)?;
+        let private_key = private_key.map(SecretKey::from_str).transpose()?;
         Ok(Self {
             client,
             contract,
@@ -81,7 +81,7 @@ mod tests {
             "https://pangoro-rpc.darwinia.network",
             "0x9920317f841F3653464bf37512c939744502CA74",
             "0x99B9C72c93EBC472Ce1A27e064067E78FDcb36E9",
-            "//Alice",
+            None,
         )
         .unwrap()
     }

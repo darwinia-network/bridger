@@ -14,6 +14,9 @@ query queryNeedRelay($origin: String!, $lane: String!, $nonce: Int!) {
       messageNonce: {
         equalTo: $nonce
       }
+      onDemandType: {
+        equalTo: "send-message"
+      }
     }
   ) {
     nodes {

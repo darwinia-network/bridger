@@ -316,7 +316,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangoro-ropsten"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "client-pangoro",
  "color-eyre",
@@ -413,7 +413,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangoro"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "array-bytes",
  "bp-pangoro",
@@ -466,7 +466,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -3405,7 +3405,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
  "config",
@@ -3424,7 +3424,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -3432,7 +3432,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "colored",
  "serde 1.0.136",
@@ -3442,7 +3442,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "parity-scale-codec",
  "thiserror",

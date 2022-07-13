@@ -10,7 +10,7 @@ license       = "MIT"
 name          = "subquery-parachain"
 readme        = 'README.md'
 repository    = "https://github.com/darwinia-network/bridger"
-version       = "0.6.0"
+version       = "0.6.1"
 
 [dependencies]
 include_dir = "0.7.2"

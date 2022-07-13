@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use crate::pangoro_client::types::{BSCHeader, Checkpoint, TBSCHeader};
 use secp256k1::SecretKey;
+use support_common::error::BridgerError;
 use web3::{
     contract::{tokens::Tokenize, Contract, Options},
     ethabi::Token,
@@ -13,11 +14,15 @@ use web3::{
 pub struct PangoroClient {
     pub client: Web3<Http>,
     pub bsc_light_client: Contract<Http>,
-    pub private_key: SecretKey,
+    pub private_key: Option<SecretKey>,
 }
 
 impl PangoroClient {
-    pub fn new(endpoint: &str, bsc_address: &str, private_key: &str) -> color_eyre::Result<Self> {
+    pub fn new(
+        endpoint: &str,
+        bsc_address: &str,
+        private_key: Option<&str>,
+    ) -> color_eyre::Result<Self> {
         let transport = Http::new(endpoint)?;
         let client = Web3::new(transport);
         let bsc_light_client = Contract::from_json(
@@ -25,7 +30,9 @@ impl PangoroClient {
             Address::from_str(bsc_address)?,
             include_bytes!("BSCLightClient.json"),
         )?;
-        let private_key = SecretKey::from_str(private_key)?;
+        let private_key = private_key
+            .map(|key| SecretKey::from_str(key))
+            .transpose()?;
         Ok(Self {
             client,
             bsc_light_client,
@@ -72,7 +79,9 @@ impl PangoroClient {
                     gas_price: Some(U256::from(1300000000)),
                     ..Default::default()
                 },
-                &self.private_key,
+                &self
+                    .private_key
+                    .ok_or_else(|| BridgerError::Custom("Private key is not valid".into()))?,
             )
             .await?;
         Ok(tx)
@@ -87,7 +96,7 @@ mod tests {
         PangoroClient::new(
             "https://pangoro-rpc.darwinia.network",
             "0x6ac5ae3fa61b2cbea625dd24f57bdc3d952333c9",
-            "//Alice",
+            None,
         )
         .unwrap()
     }

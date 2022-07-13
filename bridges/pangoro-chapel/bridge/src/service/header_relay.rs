@@ -104,7 +104,7 @@ pub async fn relay_chapel_headers(config: PangoroChapelConfig) -> color_eyre::Re
     let pangoro = PangoroClient::new(
         &config.pangoro.endpoint,
         &config.pangoro.bsc_address,
-        &config.pangoro.private_key,
+        Some(&config.pangoro.private_key),
     )?;
     let transport = web3::transports::Http::new(&config.chapel.endpoint)?;
     tracing::trace!(target: "pangoro-chapel", "Initialize Chapel web3 client");

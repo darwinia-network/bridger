@@ -1,6 +1,6 @@
 [pangoro]
 endpoint = "https://pangoro-rpc.darwinia.network:443"
-bsc_address = "0x6ac5ae3fa61b2cbea625dd24f57bdc3d952333c9"
+bsc_address = "0x3de59b57461754576d76a76c49797684cbae7834"
 private_key = "//Alice"
 
 [chapel]

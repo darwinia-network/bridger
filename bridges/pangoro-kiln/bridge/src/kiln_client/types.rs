@@ -169,3 +169,11 @@ pub struct ForkVersion {
     pub current_version: H32,
     pub epoch: String,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FinalityUpdate {
+    pub attested_header: HeaderMessage,
+    pub finalized_header: HeaderMessage,
+    pub finality_branch: Vec<String>,
+    pub sync_aggregate: SyncAggregate,
+}

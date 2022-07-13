@@ -1,6 +1,6 @@
 use super::types::{
-    BlockMessage, Finality, ForkVersion, GetBlockResponse, GetHeaderResponse, Proof,
-    ResponseWrapper, Snapshot, SyncCommitteePeriodUpdate,
+    BlockMessage, Finality, FinalityUpdate, ForkVersion, GetBlockResponse, GetHeaderResponse,
+    Proof, ResponseWrapper, Snapshot, SyncCommitteePeriodUpdate,
 };
 use support_common::error::BridgerError;
 
@@ -217,6 +217,13 @@ impl KilnClient {
         Ok(res.data)
     }
 
+    pub async fn get_finality_update(&self) -> color_eyre::Result<FinalityUpdate> {
+        let url = format!("{}/eth/v1/light_client/finality_update/", self.api_base_url,);
+        let res: ResponseWrapper<FinalityUpdate> =
+            self.api_client.get(url).send().await?.json().await?;
+        Ok(res.data)
+    }
+
     pub async fn get_sync_committee_period_update(
         &self,
         start_period: impl ToString,
@@ -314,5 +321,12 @@ mod tests {
             .await
             .unwrap();
         println!("Update: {:?}", update);
+    }
+
+    #[tokio::test]
+    async fn test_get_finality_update() {
+        let client = test_client();
+        let finality_update = client.get_finality_update().await.unwrap();
+        println!("Finality update: {:?}", finality_update);
     }
 }

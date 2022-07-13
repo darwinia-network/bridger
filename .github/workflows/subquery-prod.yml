@@ -36,13 +36,13 @@ jobs:
           subql_path: subql/ethereum-v1/${{ matrix.chain }}
           # prod_mode: true
 
-      - uses: ./.github/actions/smart-subquery
-        name: Deploy subql-bridge-${{ matrix.chain }}
-        with:
-          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
-          subquery_org: ${{ env.SUBQUERY_ORG_PRD }}
-          project_key: subql-bridge-${{ matrix.chain }}
-          subql_path: subql/ethereum-v1/${{ matrix.chain }}
+#      - uses: ./.github/actions/smart-subquery
+#        name: Deploy subql-bridge-${{ matrix.chain }}
+#        with:
+#          subquery_token: ${{ secrets.SUBQUERY_TOKEN }}
+#          subquery_org: ${{ env.SUBQUERY_ORG_PRD }}
+#          project_key: subql-bridge-${{ matrix.chain }}
+#          subql_path: subql/ethereum-v1/${{ matrix.chain }}
 
   bridge-parachain-finality:
     name: Subql Parachain

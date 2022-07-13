@@ -1,4 +1,5 @@
 use lifeline::{Lifeline, Service, Task};
+use support_common::error::BridgerError;
 use web3::transports::Http;
 use web3::types::{BlockId, BlockNumber, U256, U64};
 use web3::Web3;
@@ -39,7 +40,32 @@ pub async fn get_bsc_header(
     block_number: u64,
 ) -> color_eyre::Result<BSCHeader> {
     let block_number = BlockId::Number(BlockNumber::Number(U64::from(block_number)));
-    let block = client.eth().block(block_number).await.unwrap().unwrap();
+    let block = client
+        .eth()
+        .block(block_number)
+        .await?
+        .ok_or_else(|| BridgerError::Custom("Failed to get block".into()))?;
+
+    let log_bloom = web3::types::Bytes(
+        block
+            .logs_bloom
+            .ok_or_else(|| BridgerError::Custom("Failed to get log_bloom from block".into()))?
+            .0
+            .into(),
+    );
+    let number = U256::from(
+        block
+            .number
+            .ok_or_else(|| BridgerError::Custom("Failed to get number from block".into()))?
+            .as_u64(),
+    );
+    let nonce = block
+        .nonce
+        .ok_or_else(|| BridgerError::Custom("Failed to get nonce from block".into()))?
+        .0;
+    let mix_digest = block
+        .mix_hash
+        .ok_or_else(|| BridgerError::Custom("Failed to get mix_digest from block".into()))?;
 
     Ok(BSCHeader {
         parent_hash: block.parent_hash,
@@ -48,15 +74,15 @@ pub async fn get_bsc_header(
         state_root: block.state_root,
         transactions_root: block.transactions_root,
         receipts_root: block.receipts_root,
-        log_bloom: web3::types::Bytes(block.logs_bloom.unwrap().0.into()),
         difficulty: block.difficulty,
-        number: U256::from(block.number.unwrap().as_u64()),
         gas_limit: block.gas_limit,
         gas_used: block.gas_used,
         timestamp: block.timestamp,
         extra_data: block.extra_data,
-        mix_digest: block.mix_hash.unwrap(),
-        nonce: block.nonce.unwrap().0,
+        mix_digest,
+        number,
+        log_bloom,
+        nonce,
     })
 }
 

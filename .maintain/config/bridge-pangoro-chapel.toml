@@ -1,7 +1,8 @@
 [pangoro]
-endpoint = "wss://pangoro-rpc.darwinia.network:443"
-relayer_private_key = "//Alice"
-# relayer_real_account = "0x..."
+endpoint = "https://pangoro-rpc.darwinia.network:443"
+bsc_address = "0x3de59b57461754576d76a76c49797684cbae7834"
+private_key = "//Alice"
 
 [chapel]
-endpoint = "https://data-seed-prebsc-1-s1.binance.org:8545/"
+endpoint = "https://data-seed-prebsc-1-s1.binance.org:8545"
+

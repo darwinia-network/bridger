@@ -25,6 +25,7 @@ jobs:
           - pangolin-pangoro
           - darwinia-crab
           # - pangoro-chapel
+          # - pangoro-kiln
           - pangolin-pangolinparachain
           - crab-crabparachain
     steps:
@@ -104,6 +105,7 @@ jobs:
           - pangolin-pangoro
           - darwinia-crab
           # - pangoro-chapel
+          # - pangoro-kiln
           - pangolin-pangolinparachain
     steps:
       - uses: actions/checkout@v2
@@ -177,6 +179,7 @@ jobs:
           - pangolin-pangoro
           - darwinia-crab
           # - pangoro-chapel
+          # - pangoro-kiln
           - pangolin-pangolinparachain
     steps:
       - uses: actions/checkout@v2

@@ -334,7 +334,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangolin-ropsten"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "array-bytes",
  "client-pangolin",
@@ -458,7 +458,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangolin"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "array-bytes",
  "bp-pangolin",
@@ -513,7 +513,7 @@ dependencies = [
 
 [[package]]
 name = "component-ethereum"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "array-bytes",
  "color-eyre",
@@ -527,7 +527,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -537,7 +537,7 @@ dependencies = [
 
 [[package]]
 name = "component-state"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -3036,7 +3036,7 @@ dependencies = [
 
 [[package]]
 name = "shadow-liketh"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "blake2-rfc",
  "component-ethereum",
@@ -3603,7 +3603,7 @@ dependencies = [
 
 [[package]]
 name = "subquery-d2e"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "async-trait",
  "gql_client",
@@ -3701,7 +3701,7 @@ dependencies = [
 
 [[package]]
 name = "support-command-kv"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
  "component-state",
@@ -3719,7 +3719,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
  "config",
@@ -3738,7 +3738,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -3754,7 +3754,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "colored",
  "serde 1.0.136",
@@ -3764,7 +3764,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "parity-scale-codec",
  "thiserror",
@@ -3772,7 +3772,7 @@ dependencies = [
 
 [[package]]
 name = "support-tracker"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
  "microkv",
@@ -3847,7 +3847,7 @@ dependencies = [
 
 [[package]]
 name = "thegraph-liketh"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "async-trait",
  "gql_client",

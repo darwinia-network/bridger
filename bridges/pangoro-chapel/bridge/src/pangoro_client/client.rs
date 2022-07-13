@@ -31,7 +31,7 @@ impl PangoroClient {
             include_bytes!("BSCLightClient.json"),
         )?;
         let private_key = private_key
-            .map(|key| SecretKey::from_str(key))
+            .map(SecretKey::from_str)
             .transpose()?;
         Ok(Self {
             client,

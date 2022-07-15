@@ -1,13 +1,17 @@
+use crate::{
+    kiln_client::types::{HeaderMessage, SyncAggregate, SyncCommittee},
+    pangoro_client::types::BeaconBlockHeader,
+};
 use secp256k1::SecretKey;
 use std::str::FromStr;
+use support_common::error::BridgerError;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenize, Contract, Options},
+    ethabi::{ethereum_types::H32, Token},
     transports::Http,
-    types::{Address, H256},
+    types::{Address, H256, U256},
     Web3,
 };
-
-use crate::pangoro_client::types::BeaconBlockHeader;
 
 pub struct PangoroClient {
     pub client: Web3<Http>,
@@ -69,6 +73,55 @@ impl PangoroClient {
             self.execution_layer_contract
                 .query("state_root", (), None, Options::default(), None);
         Ok(query.await?)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub async fn import_finalized_header(
+        &self,
+        attested_header: &HeaderMessage,
+        signature_sync_committee: &SyncCommittee,
+        finalized_header: &HeaderMessage,
+        finality_branch: &[String],
+        sync_aggregate: &SyncAggregate,
+        fork_version: &H32,
+        signature_slot: u64,
+    ) -> color_eyre::Result<H256> {
+        let parameter = Token::Tuple(
+            (
+                attested_header.get_token()?,
+                signature_sync_committee.get_token()?,
+                finalized_header.get_token()?,
+                finality_branch
+                    .iter()
+                    .map(|x| H256::from_str(x))
+                    .collect::<Result<Vec<H256>, _>>()?,
+                sync_aggregate.get_token()?,
+                Token::FixedBytes(fork_version.as_bytes().to_vec()),
+                signature_slot,
+            )
+                .into_tokens(),
+        );
+        let tx = self
+            .contract
+            .signed_call(
+                "import_finalized_header",
+                (parameter,),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    ..Default::default()
+                },
+                &self.private_key.ok_or_else(|| {
+                    BridgerError::Custom("Failed to get log_bloom from block".into())
+                })?,
+            )
+            .await?;
+        tracing::info!(
+            target: "pangoro-kiln",
+            "[Header][Kiln => Pangoro] Sending tx: {:?}",
+            &tx
+        );
+        Ok(tx)
     }
 }
 

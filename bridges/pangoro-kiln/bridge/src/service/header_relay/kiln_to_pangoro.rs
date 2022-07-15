@@ -1,25 +1,15 @@
-use std::{
-    ops::{Add, Div},
-    str::FromStr,
-};
+use std::{ops::Div, str::FromStr};
 
 use crate::{
     bridge::{BridgeConfig, PangoroKilnBus},
-    kiln_client::{client::KilnClient, types::Proof},
+    kiln_client::{client::KilnClient, types::FinalityUpdate},
     pangoro_client::client::PangoroClient,
 };
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
-use web3::{
-    contract::{
-        tokens::{Tokenizable, Tokenize},
-        Options,
-    },
-    ethabi::Token,
-    types::{H256, U256},
-};
+use web3::ethabi::ethereum_types::H32;
 
 #[derive(Debug)]
 pub struct KilnToPangoroHeaderRelayService {
@@ -76,42 +66,137 @@ async fn start() -> color_eyre::Result<()> {
     }
 }
 
+#[derive(Debug)]
+pub struct HeaderRelayState {
+    // Latest relayed header slot at Pangoro
+    pub relayed_slot: u64,
+    // Latest relayed period at Pangoro
+    pub relayed_period: u64,
+    // Latest header slot at Kiln
+    pub current_slot: u64,
+    // Latest period at Kiln
+    pub current_period: u64,
+}
+
 pub struct HeaderRelay {
     pub pangoro_client: PangoroClient,
     pub kiln_client: KilnClient,
 }
 
 impl HeaderRelay {
+    pub async fn get_state(&self) -> color_eyre::Result<HeaderRelayState> {
+        let relayed = self.pangoro_client.finalized_header().await?;
+        let current_head = self.kiln_client.get_header("head").await?;
+        let current_slot = current_head.header.message.slot.parse::<u64>()?;
+        let current_period = current_slot.div(32).div(256);
+        let relayed_period = relayed.slot.div(32).div(256);
+        Ok(HeaderRelayState {
+            relayed_slot: relayed.slot,
+            relayed_period,
+            current_slot,
+            current_period,
+        })
+    }
+
     pub async fn header_relay(&self) -> color_eyre::Result<()> {
-        let kiln_current_head = self.kiln_client.get_header("head").await?;
-        let kiln_current_slot = kiln_current_head.header.message.slot.parse::<u64>()?;
-        let old_finalized_header = self.pangoro_client.finalized_header().await?;
+        let state = self.get_state().await?;
+        let next_sync_aggregate_root = self
+            .pangoro_client
+            .sync_committee_roots(state.relayed_period + 1)
+            .await?;
         tracing::info!(
             target: "pangoro-kiln",
-            "[Header][Kiln => Pangoro] Latest kiln header on pangoro: {:?}, And current kiln header: {:?}",
-            &old_finalized_header.slot,
-            kiln_current_slot,
+            "[Header][Kiln => Pangoro] State: {:?}",
+            state
         );
-        let _old_period = old_finalized_header.slot.div(32).div(256);
+        if state.current_period == state.relayed_period {
+            self.relay_latest(state).await
+        } else {
+            if next_sync_aggregate_root.is_zero() {
+                return Ok(());
+            }
+            if state.current_period == state.relayed_period + 1 {
+                self.relay_latest(state).await
+            } else {
+                self.relay_next_period(state).await
+            }
+        }
+    }
 
-        let attested_header_slot = old_finalized_header.slot.add(96);
-        if attested_header_slot >= kiln_current_slot {
-            tracing::info!(
-                target: "pangoro-kiln",
-                "[Header][Kiln => Pangoro] Current slot is {:?}, wait for finality",
-                &kiln_current_slot,
-            );
+    pub async fn relay_latest(&self, state: HeaderRelayState) -> color_eyre::Result<()> {
+        let finality_update: FinalityUpdate = self.kiln_client.get_finality_update().await?;
+        let update_finality_slot = finality_update.finalized_header.slot.parse::<u64>()?;
+        let update_finality_period = update_finality_slot.div(32).div(256);
+
+        // The latest finality header has been relayed
+        if update_finality_slot == state.relayed_slot {
             return Ok(());
         }
 
-        let (slot, sync_aggregate_slot, attested_header, sync_aggregate_block, finalized_header) =
-            match self
+        let (_slot, sync_aggregate_slot, _attested_header, _sync_aggregate_block) = match self
+            .kiln_client
+            .find_valid_attested_header(
+                state.current_slot,
+                finality_update.attested_header.slot.parse::<u64>()?,
+            )
+            .await?
+        {
+            None => {
+                tracing::info!(
+                    target: "pangoro-kiln",
+                    "[Header][Kiln => Pangoro] Wait for valid attested header",
+                );
+                return Ok(());
+            }
+            Some((slot, sync_aggregate_slot, attested_header, sync_aggregate_block)) => (
+                slot,
+                sync_aggregate_slot,
+                attested_header,
+                sync_aggregate_block,
+            ),
+        };
+
+        let sync_change = self
+            .kiln_client
+            .get_sync_committee_period_update(update_finality_period - 1, 1)
+            .await?;
+        if sync_change.is_empty() {
+            return Err(BridgerError::Custom("Failed to get sync committee update".into()).into());
+        }
+        let current_sync_committee = sync_change[0].next_sync_committee.clone();
+        let fork_version = self
+            .kiln_client
+            .get_fork_version(sync_aggregate_slot)
+            .await?;
+
+        let _tx = self
+            .pangoro_client
+            .import_finalized_header(
+                &finality_update.attested_header,
+                &current_sync_committee,
+                &finality_update.finalized_header,
+                &finality_update.finality_branch,
+                &finality_update.sync_aggregate,
+                &fork_version.current_version,
+                sync_aggregate_slot,
+            )
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn relay_next_period(&self, state: HeaderRelayState) -> color_eyre::Result<()> {
+        let _target_period = state.relayed_period + 1;
+        let sync_change = self
+            .kiln_client
+            .get_sync_committee_period_update(state.relayed_period, 2)
+            .await?;
+
+        if let [last_finality, target_finality] = sync_change.as_slice() {
+            let attested_slot: u64 = target_finality.attested_header.slot.parse()?;
+            let (_slot, sync_aggregate_slot, _attested_header, _sync_aggregate_block) = match self
                 .kiln_client
-                .find_valid_attested_header(
-                    kiln_current_slot,
-                    attested_header_slot,
-                    old_finalized_header.slot,
-                )
+                .find_valid_attested_header(state.current_slot, attested_slot)
                 .await?
             {
                 None => {
@@ -121,143 +206,29 @@ impl HeaderRelay {
                     );
                     return Ok(());
                 }
-                Some((
+                Some((slot, sync_aggregate_slot, attested_header, sync_aggregate_block)) => (
                     slot,
                     sync_aggregate_slot,
                     attested_header,
                     sync_aggregate_block,
-                    finalized_header,
-                )) => (
-                    slot,
-                    sync_aggregate_slot,
-                    attested_header,
-                    sync_aggregate_block,
-                    finalized_header,
                 ),
             };
 
-        tracing::info!(
-            target: "pangoro-kiln",
-            "[Header][Kiln => Pangoro] Next attested header: {:?}, sync aggregate header: {:?}",
-            slot,
-            sync_aggregate_slot,
-        );
-
-        let new_period = sync_aggregate_slot.div(32).div(256);
-        let snapshot = self
-            .kiln_client
-            .find_valid_snapshot_in_period(new_period)
-            .await?;
-        let current_sync_committee = snapshot.current_sync_committee;
-
-        let sync_aggregate = sync_aggregate_block.body.sync_aggregate;
-        let mut sync_aggregate_bits: Vec<Token> = Vec::new();
-
-        let bits = sync_aggregate.sync_committee_bits;
-        sync_aggregate_bits.push(H256::from_str(&bits[..66])?.into_token());
-        sync_aggregate_bits.push(H256::from_str(&bits[66..])?.into_token());
-
-        tracing::info!(
-            target: "pangoro-kiln",
-            "[Header][Kiln => Pangoro] Finalized header to relay: {:?}",
-            &finalized_header.header.message.slot,
-        );
-        let finality_branch = self.kiln_client.get_finality_branch(slot).await?;
-        let witnesses = match finality_branch {
-            Proof::SingleProof {
-                gindex: _,
-                leaf: _,
-                witnesses,
-            } => witnesses,
-            _ => return Err(BridgerError::Custom("Not implemented!".to_string()).into()),
-        };
-        let fork_version = self
-            .kiln_client
-            .get_fork_version(sync_aggregate_slot)
-            .await?;
-
-        let header_message = attested_header.header.message;
-        let attested_header = Token::Tuple(
-            (
-                header_message.slot.parse::<u64>()?,
-                header_message.proposer_index.parse::<u64>()?,
-                H256::from_str(&header_message.parent_root)?,
-                H256::from_str(&header_message.state_root)?,
-                H256::from_str(&header_message.body_root)?,
-            )
-                .into_tokens(),
-        );
-        let signature_sync_committee = Token::Tuple(
-            (
-                Token::FixedArray(
-                    current_sync_committee
-                        .pubkeys
-                        .iter()
-                        .map(|s| hex::decode(&s.clone()[2..]))
-                        .collect::<Result<Vec<Vec<u8>>, _>>()?
-                        .iter()
-                        .map(|s| Token::Bytes(s.to_vec()))
-                        .collect::<Vec<Token>>(),
-                ),
-                hex::decode(&current_sync_committee.aggregate_pubkey.clone()[2..])?,
-            )
-                .into_tokens(),
-        );
-
-        let message = finalized_header.header.message;
-        let finalized_header = Token::Tuple(
-            (
-                message.slot.parse::<u64>()?,
-                message.proposer_index.parse::<u64>()?,
-                H256::from_str(&message.parent_root)?,
-                H256::from_str(&message.state_root)?,
-                H256::from_str(&message.body_root)?,
-            )
-                .into_tokens(),
-        );
-
-        let sync_aggregate = Token::Tuple(
-            (
-                Token::FixedArray(sync_aggregate_bits),
-                hex::decode(&sync_aggregate.sync_committee_signature.clone()[2..])?,
-            )
-                .into_tokens(),
-        );
-        let parameter = Token::Tuple(
-            (
-                attested_header,
-                signature_sync_committee,
-                finalized_header,
-                witnesses,
-                sync_aggregate,
-                Token::FixedBytes(fork_version.current_version.as_bytes().to_vec()),
-                sync_aggregate_slot,
-            )
-                .into_tokens(),
-        );
-
-        let tx = self
-            .pangoro_client
-            .contract
-            .signed_call(
-                "import_finalized_header",
-                (parameter,),
-                Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
-                    ..Default::default()
-                },
-                &self.pangoro_client.private_key.ok_or_else(|| {
-                    BridgerError::Custom("Failed to get log_bloom from block".into())
-                })?,
-            )
-            .await?;
-
-        tracing::info!(
-            target: "pangoro-kiln",
-            "[Header][Kiln => Pangoro] Sending tx: {:?}",
-            &tx
-        );
-        Ok(())
+            let _tx = self
+                .pangoro_client
+                .import_finalized_header(
+                    &target_finality.attested_header,
+                    &last_finality.next_sync_committee,
+                    &target_finality.finalized_header,
+                    &target_finality.finality_branch,
+                    &target_finality.sync_aggregate,
+                    &H32::from_str(&target_finality.fork_version)?,
+                    sync_aggregate_slot,
+                )
+                .await?;
+            Ok(())
+        } else {
+            Err(BridgerError::Custom("Failed to get sync committee update".into()).into())
+        }
     }
 }

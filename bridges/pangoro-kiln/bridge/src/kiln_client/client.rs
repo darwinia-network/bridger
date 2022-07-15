@@ -308,6 +308,7 @@ mod tests {
         println!("Update: {:?}", update);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_finality_update() {
         let client = test_client();

@@ -1,6 +1,11 @@
 use bytes::{Buf, Bytes};
 use serde::{Deserialize, Serialize};
-use web3::{ethabi::ethereum_types::H32, types::H256};
+use std::str::FromStr;
+use web3::{
+    contract::tokens::{Tokenizable, Tokenize},
+    ethabi::{ethereum_types::H32, Token},
+    types::H256,
+};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResponseWrapper<T> {
@@ -29,6 +34,21 @@ pub struct HeaderMessage {
     pub body_root: String,
 }
 
+impl HeaderMessage {
+    pub fn get_token(&self) -> color_eyre::Result<Token> {
+        Ok(Token::Tuple(
+            (
+                self.slot.parse::<u64>()?,
+                self.proposer_index.parse::<u64>()?,
+                H256::from_str(&self.parent_root)?,
+                H256::from_str(&self.state_root)?,
+                H256::from_str(&self.body_root)?,
+            )
+                .into_tokens(),
+        ))
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Snapshot {
     pub header: HeaderMessage,
@@ -42,9 +62,34 @@ pub struct SyncCommittee {
     pub aggregate_pubkey: String,
 }
 
+impl SyncCommittee {
+    pub fn get_token(&self) -> color_eyre::Result<Token> {
+        Ok(Token::Tuple(
+            (
+                Token::FixedArray(
+                    self.pubkeys
+                        .iter()
+                        .map(|s| hex::decode(&s.clone()[2..]))
+                        .collect::<Result<Vec<Vec<u8>>, _>>()?
+                        .iter()
+                        .map(|s| Token::Bytes(s.to_vec()))
+                        .collect::<Vec<Token>>(),
+                ),
+                hex::decode(&self.aggregate_pubkey.clone()[2..])?,
+            )
+                .into_tokens(),
+        ))
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SyncCommitteePeriodUpdate {
+    pub attested_header: HeaderMessage,
     pub next_sync_committee: SyncCommittee,
+    pub finalized_header: HeaderMessage,
+    pub finality_branch: Vec<String>,
+    pub sync_aggregate: SyncAggregate,
+    pub fork_version: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -95,6 +140,23 @@ pub struct Checkpoint {
 pub struct SyncAggregate {
     pub sync_committee_bits: String,
     pub sync_committee_signature: String,
+}
+
+impl SyncAggregate {
+    pub fn get_token(&self) -> color_eyre::Result<Token> {
+        let mut sync_aggregate_bits: Vec<Token> = Vec::new();
+        let bits = self.sync_committee_bits.clone();
+        sync_aggregate_bits.push(H256::from_str(&bits[..66])?.into_token());
+        sync_aggregate_bits.push(H256::from_str(&bits[66..])?.into_token());
+
+        Ok(Token::Tuple(
+            (
+                Token::FixedArray(sync_aggregate_bits),
+                hex::decode(&self.sync_committee_signature.clone()[2..])?,
+            )
+                .into_tokens(),
+        ))
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

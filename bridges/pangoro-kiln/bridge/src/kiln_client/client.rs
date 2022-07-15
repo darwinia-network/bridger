@@ -59,9 +59,7 @@ impl KilnClient {
         &self,
         current_slot: u64,
         mut slot: u64,
-        last_relayed_slot: u64,
-    ) -> color_eyre::Result<Option<(u64, u64, GetHeaderResponse, BlockMessage, GetHeaderResponse)>>
-    {
+    ) -> color_eyre::Result<Option<(u64, u64, GetHeaderResponse, BlockMessage)>> {
         loop {
             if slot > current_slot {
                 return Ok(None);
@@ -72,25 +70,9 @@ impl KilnClient {
                         .find_valid_header_since(current_slot, attest_slot + 1)
                         .await?;
 
-                    let checkpoint = self.get_checkpoint(attest_slot).await?;
-                    let finalized_header = self.get_header(checkpoint.finalized.root).await?;
-                    let finalized_slot = finalized_header.header.message.slot.parse::<u64>()?;
-                    if finalized_slot == last_relayed_slot {
-                        slot += 32;
-                        continue;
-                    }
-
                     let sync_block = self.get_beacon_block(sync_slot).await?;
                     match Self::is_valid_sync_aggregate_block(&sync_block)? {
-                        true => {
-                            return Ok(Some((
-                                attest_slot,
-                                sync_slot,
-                                header,
-                                sync_block,
-                                finalized_header,
-                            )))
-                        }
+                        true => return Ok(Some((attest_slot, sync_slot, header, sync_block))),
                         false => {
                             slot += 1;
                             continue;
@@ -133,6 +115,7 @@ impl KilnClient {
         Ok(res.data)
     }
 
+    #[allow(dead_code)]
     pub async fn find_valid_snapshot_in_period(&self, period: u64) -> color_eyre::Result<Snapshot> {
         let begin_slot = period * 32 * 256;
         for slot in begin_slot..((period + 1) * 32 * 256) {
@@ -156,6 +139,7 @@ impl KilnClient {
         Ok(res.data.message)
     }
 
+    #[allow(dead_code)]
     pub async fn get_checkpoint(&self, id: impl ToString) -> color_eyre::Result<Finality> {
         let url = format!(
             "{}/eth/v1/beacon/states/{}/finality_checkpoints",
@@ -166,6 +150,7 @@ impl KilnClient {
         Ok(res.data)
     }
 
+    #[allow(dead_code)]
     pub async fn get_finality_branch(&self, state_id: impl ToString) -> color_eyre::Result<Proof> {
         self.get_state_proof(state_id, 105).await
     }

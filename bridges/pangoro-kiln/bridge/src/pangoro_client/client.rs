@@ -75,6 +75,7 @@ impl PangoroClient {
         Ok(query.await?)
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn import_finalized_header(
         &self,
         attested_header: &HeaderMessage,

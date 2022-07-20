@@ -7,7 +7,7 @@ pub struct Inbound {
 }
 
 impl Inbound {
-    pub fn new(client: Web3<Http>, address: &str) -> color_eyre::Result<Self> {
+    pub fn new(client: &Web3<Http>, address: &str) -> color_eyre::Result<Self> {
         let contract = Contract::from_json(
             client.eth(),
             Address::from_str(address)?,
@@ -37,6 +37,6 @@ mod tests {
     fn test_inbound() {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let client = web3::Web3::new(transport);
-        Inbound::new(client, "0xE04c799682F9509CF3D23A15F4A8ddc32648EDd4").unwrap();
+        Inbound::new(&client, "0xE04c799682F9509CF3D23A15F4A8ddc32648EDd4").unwrap();
     }
 }

@@ -160,6 +160,7 @@ dependencies = [
  "lifeline",
  "postage",
  "reqwest",
+ "rlp",
  "secp256k1",
  "serde 1.0.139",
  "structopt",

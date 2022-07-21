@@ -35,6 +35,7 @@ postage   = "0.4"
 secp256k1 = { version = "0.21" }
 web3      = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }
 hamming   = "0.1"
+rlp       = "0.5.1"
 
 support-common   = { path = "../../../frame/supports/support-common" }
 support-lifeline = { path = "../../../frame/supports/support-lifeline" }

@@ -239,3 +239,28 @@ pub struct FinalityUpdate {
     pub finality_branch: Vec<String>,
     pub sync_aggregate: SyncAggregate,
 }
+
+#[derive(Debug, Clone)]
+pub struct MessagesProof {
+    pub account_proof: web3::types::Bytes,
+    pub lane_id_proof: web3::types::Bytes,
+    pub lane_nonce_proof: web3::types::Bytes,
+    pub lane_messages_proof: Vec<web3::types::Bytes>,
+}
+
+impl MessagesProof {
+    pub fn get_token(&self) -> color_eyre::Result<Token> {
+        Ok(Token::Tuple(
+            (
+                self.account_proof.clone(),
+                self.lane_id_proof.clone(),
+                self.lane_nonce_proof.clone(),
+                self.lane_messages_proof
+                    .iter()
+                    .map(|x| x.clone().into_token())
+                    .collect::<Vec<Token>>(),
+            )
+                .into_tokens(),
+        ))
+    }
+}

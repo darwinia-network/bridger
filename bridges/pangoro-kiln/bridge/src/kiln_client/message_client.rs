@@ -8,6 +8,8 @@ use web3::{
 
 use crate::message_contract::{inbound::Inbound, outbound::Outbound};
 
+use super::types::MessagesProof;
+
 const LANE_IDENTIFY_SLOT: u64 = 0u64;
 const LANE_NONCE_SLOT: u64 = 1u64;
 const LANE_MESSAGE_SLOT: u64 = 2u64;
@@ -40,7 +42,7 @@ impl KilnMessageClient {
         begin: u64,
         end: u64,
         block_number: Option<BlockNumber>,
-    ) -> color_eyre::Result<()> {
+    ) -> color_eyre::Result<MessagesProof> {
         let lane_id_proof = self
             .get_storage_proof(
                 self.outbound.contract.address(),
@@ -64,14 +66,20 @@ impl KilnMessageClient {
             .ok_or_else(|| BridgerError::Custom("Failed to get message_proof".into()))?;
 
         let account_proof = Self::encode_proof(&lane_id_proof.account_proof);
-        let lane_id_proof_ = Self::encode_proof(&lane_id_proof.storage_proof[0].proof);
-        let lane_nonce_proof_ = Self::encode_proof(&lane_nonce_proof.storage_proof[0].proof);
-        let message_proof = message_proof
+        let lane_id_proof = Self::encode_proof(&lane_id_proof.storage_proof[0].proof);
+        let lane_nonce_proof = Self::encode_proof(&lane_nonce_proof.storage_proof[0].proof);
+        let lane_messages_proof = message_proof
             .storage_proof
             .iter()
-            .map(|x| Self::encode_proof(&x.proof));
+            .map(|x| Self::encode_proof(&x.proof))
+            .collect::<Vec<Bytes>>();
 
-        Ok(())
+        Ok(MessagesProof {
+            account_proof,
+            lane_id_proof,
+            lane_nonce_proof,
+            lane_messages_proof,
+        })
     }
 
     fn encode_proof(proofs: &Vec<Bytes>) -> Bytes {

@@ -1,10 +1,9 @@
 use std::str::FromStr;
 
 use secp256k1::SecretKey;
-use support_common::error::BridgerError;
 pub use types::*;
 use web3::{
-    contract::{tokens::Tokenize, Contract, Options},
+    contract::{Contract, Options},
     transports::Http,
     types::{Address, H256, U256},
     Web3,
@@ -34,7 +33,8 @@ impl Outbound {
     pub async fn send_message(
         &self,
         message: SendMessage,
-        private_key: SecretKey,
+        private_key: &SecretKey,
+        fee: U256,
     ) -> color_eyre::Result<H256> {
         let tx = self
             .contract
@@ -44,9 +44,10 @@ impl Outbound {
                 Options {
                     gas: Some(U256::from(10000000)),
                     gas_price: Some(U256::from(1300000000)),
+                    value: Some(fee),
                     ..Default::default()
                 },
-                &private_key,
+                private_key,
             )
             .await?;
         Ok(tx)
@@ -256,7 +257,7 @@ mod tests {
             encoded: web3::types::Bytes(vec![]),
         };
         let tx = outbound
-            .send_message(send_message, private_key)
+            .send_message(send_message, &private_key, U256::from(100000000000000u64))
             .await
             .unwrap();
         println!("Tx: {:?}", tx);

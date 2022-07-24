@@ -1,10 +1,12 @@
 use std::str::FromStr;
 
+use secp256k1::SecretKey;
+use support_common::error::BridgerError;
 pub use types::*;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenize, Contract, Options},
     transports::Http,
-    types::Address,
+    types::{Address, H256, U256},
     Web3,
 };
 
@@ -29,8 +31,25 @@ impl Outbound {
             .await?)
     }
 
-    pub async fn send_message(&self) -> color_eyre::Result<()> {
-        todo!()
+    pub async fn send_message(
+        &self,
+        message: SendMessage,
+        private_key: SecretKey,
+    ) -> color_eyre::Result<H256> {
+        let tx = self
+            .contract
+            .signed_call(
+                "send_message",
+                message,
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    ..Default::default()
+                },
+                &private_key,
+            )
+            .await?;
+        Ok(tx)
     }
 
     pub async fn data(&self) -> color_eyre::Result<OutboundLaneDataStorage> {
@@ -42,11 +61,10 @@ impl Outbound {
 }
 
 pub mod types {
-    use support_common::error::BridgerError;
     use web3::{
-        contract::tokens::{Detokenize, Tokenizable, TokenizableItem},
+        contract::tokens::{Detokenize, Tokenizable, Tokenize},
         ethabi::Token,
-        types::{Bytes, U256},
+        types::{Address, Bytes, U256},
     };
 
     #[derive(Debug)]
@@ -154,6 +172,18 @@ pub mod types {
             }
         }
     }
+
+    #[derive(Debug)]
+    pub struct SendMessage {
+        pub target_contract: Address,
+        pub encoded: Bytes,
+    }
+
+    impl Tokenize for SendMessage {
+        fn into_tokens(self) -> Vec<Token> {
+            (self.target_contract, self.encoded).into_tokens()
+        }
+    }
 }
 
 #[cfg(test)]
@@ -167,7 +197,7 @@ mod tests {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let client = web3::Web3::new(transport);
         (
-            client,
+            client.clone(),
             Outbound::new(&client, "0x4214611Be6cA4E337b37e192abF076F715Af4CaE").unwrap(),
         )
     }
@@ -214,5 +244,21 @@ mod tests {
         let (_, outbound) = test_client();
         let res = outbound.data().await.unwrap();
         println!("Data: {:?}", res);
+    }
+
+    #[tokio::test]
+    async fn test_send_message() {
+        let (_, outbound) = test_client();
+        let private_key = SecretKey::from_str("//Alice").unwrap();
+        let send_message = SendMessage {
+            target_contract: Address::from_str("0x0000000000000000000000000000000000000000")
+                .unwrap(),
+            encoded: web3::types::Bytes(vec![]),
+        };
+        let tx = outbound
+            .send_message(send_message, private_key)
+            .await
+            .unwrap();
+        println!("Tx: {:?}", tx);
     }
 }

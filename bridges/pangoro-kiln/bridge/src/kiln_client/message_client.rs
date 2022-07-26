@@ -1,12 +1,17 @@
+use futures::future;
 use support_common::error::BridgerError;
 use web3::{
+    ethabi::{Bytes as AbiBytes, Log, RawLog, Token},
     signing::keccak256,
     transports::Http,
-    types::{Address, BlockNumber, Bytes, Proof as Web3Proof, U256},
+    types::{Address, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
     Web3,
 };
 
-use crate::message_contract::{inbound::Inbound, outbound::Outbound};
+use crate::message_contract::{
+    inbound::{Inbound, Message, OutboundLaneData, Payload},
+    outbound::{MessageAccepted, Outbound},
+};
 
 use super::types::MessagesProof;
 
@@ -35,6 +40,90 @@ impl KilnMessageClient {
             inbound,
             outbound,
         })
+    }
+
+    pub async fn prepare_for_messages_delivery(&self) -> color_eyre::Result<()> {
+        todo!()
+    }
+
+    pub async fn build_messages_data(&self) -> color_eyre::Result<OutboundLaneData> {
+        let outbound_lane_nonce = self.outbound.outbound_lane_nonce().await?;
+        let outbound_data = self.outbound.data().await?;
+        let (begin, end) = (
+            outbound_lane_nonce.latest_received_nonce + 1,
+            outbound_lane_nonce.latest_generated_nonce,
+        );
+
+        if (end - begin + 1) as usize != outbound_data.messages.len() {
+            return Err(BridgerError::Custom("Build messages data failed".into()).into());
+        }
+
+        let events = self.query_message_accepted_events(begin, end).await?;
+        let accepted_events: Vec<MessageAccepted> = events
+            .into_iter()
+            .map(MessageAccepted::from_log)
+            .collect::<Result<Vec<MessageAccepted>, _>>()?;
+
+        let messages: Vec<Message> = std::iter::zip(outbound_data.messages, accepted_events)
+            .into_iter()
+            .map(|(message, event)| Message {
+                encoded_key: message.encoded_key,
+                payload: Payload {
+                    source: event.source,
+                    target: event.target,
+                    encoded: event.encoded,
+                },
+            })
+            .collect();
+
+        Ok(OutboundLaneData {
+            latest_received_nonce: outbound_data.latest_received_nonce,
+            messages,
+        })
+    }
+
+    pub async fn query_message_accepted_events(
+        &self,
+        begin: u64,
+        end: u64,
+    ) -> color_eyre::Result<Vec<Log>> {
+        let logs: Result<Vec<Option<Log>>, _> =
+            future::try_join_all((begin..=end).map(|nonce| self.query_message_event(nonce))).await;
+        if let Some(logs) = logs?.into_iter().collect::<Option<Vec<_>>>() {
+            Ok(logs)
+        } else {
+            Err(BridgerError::Custom(format!(
+                "Failed to get message events from {:?} to {:?}",
+                begin, end
+            ))
+            .into())
+        }
+    }
+
+    pub async fn query_message_event(&self, nonce: u64) -> color_eyre::Result<Option<Log>> {
+        let event = self.outbound.contract.abi().event("MessageAccepted")?;
+        let mut filter = FilterBuilder::default();
+        filter = filter.from_block(BlockNumber::Earliest);
+        filter = filter.address(vec![self.outbound.contract.address()]);
+        filter = filter.topics(
+            Some(vec![event.signature()]),
+            Some(vec![H256::from_low_u64_be(nonce)]),
+            None,
+            None,
+        );
+        let logs = self.client.eth().logs(filter.build()).await?;
+        let logs: Vec<Log> = logs
+            .iter()
+            .map(|l| RawLog {
+                topics: l.topics.clone(),
+                data: l.data.0.clone(),
+            })
+            .map(|rl| event.parse_log(rl))
+            .collect::<Result<Vec<Log>, _>>()?;
+        match logs.as_slice() {
+            [x] => Ok(Some(x.clone())),
+            _ => Ok(None),
+        }
     }
 
     pub async fn build_messages_proof(
@@ -128,8 +217,8 @@ mod tests {
     fn test_client() -> KilnMessageClient {
         KilnMessageClient::new(
             "http://localhost:8545",
-            "0xE04c799682F9509CF3D23A15F4A8ddc32648EDd4",
-            "0x4214611Be6cA4E337b37e192abF076F715Af4CaE",
+            "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
+            "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
         )
         .unwrap()
     }
@@ -148,5 +237,26 @@ mod tests {
             .ok_or_else(|| BridgerError::Custom("Failed to get message_proof".into()))
             .unwrap();
         println!("Proof: {:?}", message_proof);
+    }
+
+    #[tokio::test]
+    async fn test_build_lane_data() {
+        let client = test_client();
+        let lane_data = client.build_messages_data().await.unwrap();
+        println!("Lane data: {:?}", lane_data);
+    }
+
+    #[tokio::test]
+    async fn test_query_message_accepted_events() {
+        let client = test_client();
+        let logs = client.query_message_accepted_events(1, 2).await.unwrap();
+        println!("Logs: {:?}", logs);
+    }
+
+    #[tokio::test]
+    async fn test_query_message_event() {
+        let client = test_client();
+        let log = client.query_message_event(2).await.unwrap();
+        println!("event: {:?}", MessageAccepted::from_log(log.unwrap()));
     }
 }

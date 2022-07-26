@@ -255,10 +255,12 @@ impl MessagesProof {
                 self.account_proof.clone(),
                 self.lane_id_proof.clone(),
                 self.lane_nonce_proof.clone(),
-                self.lane_messages_proof
-                    .iter()
-                    .map(|x| x.clone().into_token())
-                    .collect::<Vec<Token>>(),
+                Token::Array(
+                    self.lane_messages_proof
+                        .iter()
+                        .map(|x| x.clone().into_token())
+                        .collect::<Vec<Token>>(),
+                ),
             )
                 .into_tokens(),
         ))

@@ -1,7 +1,7 @@
 use futures::future;
 use support_common::error::BridgerError;
 use web3::{
-    ethabi::{Bytes as AbiBytes, Log, RawLog, Token},
+    ethabi::{encode, Bytes as AbiBytes, Log, RawLog, Token},
     signing::keccak256,
     transports::Http,
     types::{Address, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
@@ -9,7 +9,7 @@ use web3::{
 };
 
 use crate::message_contract::{
-    inbound::{Inbound, Message, OutboundLaneData, Payload},
+    inbound::{Inbound, Message, OutboundLaneData, Payload, ReceiveMessagesProof},
     outbound::{MessageAccepted, Outbound},
 };
 
@@ -42,18 +42,33 @@ impl KilnMessageClient {
         })
     }
 
-    pub async fn prepare_for_messages_delivery(&self) -> color_eyre::Result<()> {
-        todo!()
-    }
-
-    pub async fn build_messages_data(&self) -> color_eyre::Result<OutboundLaneData> {
+    pub async fn prepare_for_messages_delivery(
+        &self,
+        block_number: Option<BlockNumber>,
+    ) -> color_eyre::Result<ReceiveMessagesProof> {
         let outbound_lane_nonce = self.outbound.outbound_lane_nonce().await?;
-        let outbound_data = self.outbound.data().await?;
         let (begin, end) = (
             outbound_lane_nonce.latest_received_nonce + 1,
             outbound_lane_nonce.latest_generated_nonce,
         );
+        let outbound_lane_data = self.build_messages_data(begin, end).await?;
+        let proof = self
+            .build_messages_proof(begin, end, block_number)
+            .await?
+            .get_token()?;
+        let messages_proof = Bytes(encode(&vec![proof]));
+        Ok(ReceiveMessagesProof {
+            outbound_lane_data,
+            messages_proof,
+        })
+    }
 
+    pub async fn build_messages_data(
+        &self,
+        begin: u64,
+        end: u64,
+    ) -> color_eyre::Result<OutboundLaneData> {
+        let outbound_data = self.outbound.data().await?;
         if (end - begin + 1) as usize != outbound_data.messages.len() {
             return Err(BridgerError::Custom("Build messages data failed".into()).into());
         }
@@ -212,13 +227,27 @@ impl KilnMessageClient {
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
+    use secp256k1::SecretKey;
+    use web3::types::U64;
+
     use super::*;
 
     fn test_client() -> KilnMessageClient {
         KilnMessageClient::new(
             "http://localhost:8545",
-            "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
+            "0x588abe3F7EE935137102C5e2B8042788935f4CB0",
             "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
+        )
+        .unwrap()
+    }
+
+    fn test_pangoro_client() -> KilnMessageClient {
+        KilnMessageClient::new(
+            "https://pangoro-rpc.darwinia.network",
+            "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
+            "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5",
         )
         .unwrap()
     }
@@ -242,7 +271,12 @@ mod tests {
     #[tokio::test]
     async fn test_build_lane_data() {
         let client = test_client();
-        let lane_data = client.build_messages_data().await.unwrap();
+        let outbound_lane_nonce = client.outbound.outbound_lane_nonce().await.unwrap();
+        let (begin, end) = (
+            outbound_lane_nonce.latest_received_nonce + 1,
+            outbound_lane_nonce.latest_generated_nonce,
+        );
+        let lane_data = client.build_messages_data(begin, end).await.unwrap();
         println!("Lane data: {:?}", lane_data);
     }
 
@@ -258,5 +292,26 @@ mod tests {
         let client = test_client();
         let log = client.query_message_event(2).await.unwrap();
         println!("event: {:?}", MessageAccepted::from_log(log.unwrap()));
+    }
+
+    #[tokio::test]
+    async fn test_receive_messages_proof() {
+        let kiln_client = test_client();
+        let pangoro_client = test_pangoro_client();
+        let private_key = SecretKey::from_str("//Alice").unwrap();
+        let proof = kiln_client
+            .prepare_for_messages_delivery(Some(BlockNumber::Number(U64::from(1580730u64))))
+            .await
+            .unwrap();
+        println!("proof: {:?}", proof);
+        let tx = pangoro_client
+            .inbound
+            .receive_messages_proof(proof, &private_key)
+            .await
+            .unwrap();
+        println!("tx: {:?}", tx);
+
+        let inbound_status = pangoro_client.inbound.data().await.unwrap();
+        println!("pangoro inbound: {:?}", inbound_status);
     }
 }

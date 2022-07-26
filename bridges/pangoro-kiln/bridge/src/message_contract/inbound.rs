@@ -46,7 +46,10 @@ impl Inbound {
             .contract
             .signed_call(
                 "receive_messages_proof",
-                messages_proof,
+                (
+                    messages_proof.outbound_lane_data,
+                    messages_proof.messages_proof,
+                ),
                 Options {
                     gas: Some(U256::from(10000000)),
                     gas_price: Some(U256::from(1300000000)),

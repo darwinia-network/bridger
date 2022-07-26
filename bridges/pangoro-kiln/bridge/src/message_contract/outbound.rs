@@ -42,8 +42,8 @@ impl Outbound {
                 "send_message",
                 message,
                 Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
+                    gas: Some(U256::from(10000000u64)),
+                    gas_price: Some(U256::from(1300000000u64)),
                     value: Some(fee),
                     ..Default::default()
                 },
@@ -62,10 +62,11 @@ impl Outbound {
 }
 
 pub mod types {
+    use support_common::error::BridgerError;
     use web3::{
         contract::tokens::{Detokenize, Tokenizable, Tokenize},
-        ethabi::Token,
-        types::{Address, Bytes, U256},
+        ethabi::{Log, Token},
+        types::{Address, Bytes, H256, U256},
     };
 
     #[derive(Debug)]
@@ -103,7 +104,7 @@ pub mod types {
     #[derive(Debug)]
     pub struct MessageStorage {
         pub encoded_key: U256,
-        pub payload_hash: Bytes,
+        pub payload_hash: H256,
     }
 
     impl Detokenize for MessageStorage {
@@ -118,7 +119,7 @@ pub mod types {
                 )));
             }
 
-            let (encoded_key, payload_hash): (U256, Bytes) = Detokenize::from_tokens(tokens)?;
+            let (encoded_key, payload_hash): (U256, H256) = Detokenize::from_tokens(tokens)?;
             Ok(Self {
                 encoded_key,
                 payload_hash,
@@ -185,6 +186,40 @@ pub mod types {
             (self.target_contract, self.encoded).into_tokens()
         }
     }
+
+    #[derive(Debug)]
+    pub struct MessageAccepted {
+        pub nonce: u64,
+        pub source: Address,
+        pub target: Address,
+        pub encoded: Bytes,
+    }
+
+    impl MessageAccepted {
+        pub fn from_log(log: Log) -> color_eyre::Result<Self> {
+            fn get_value(log: &Log, name: &str) -> color_eyre::Result<Token> {
+                log.params
+                    .iter()
+                    .find(|&x| x.name == name)
+                    .map(|x| x.value.clone())
+                    .ok_or_else(|| {
+                        BridgerError::Custom(format!("Failed to get {:?} from event", name)).into()
+                    })
+            }
+
+            let nonce = get_value(&log, "nonce")?;
+            let source = get_value(&log, "source")?;
+            let target = get_value(&log, "target")?;
+            let encoded = get_value(&log, "encoded")?;
+
+            Ok(Self {
+                nonce: Tokenizable::from_token(nonce)?,
+                source: Tokenizable::from_token(source)?,
+                target: Tokenizable::from_token(target)?,
+                encoded: Tokenizable::from_token(encoded)?,
+            })
+        }
+    }
 }
 
 #[cfg(test)]
@@ -199,7 +234,7 @@ mod tests {
         let client = web3::Web3::new(transport);
         (
             client.clone(),
-            Outbound::new(&client, "0x4214611Be6cA4E337b37e192abF076F715Af4CaE").unwrap(),
+            Outbound::new(&client, "0xee4f69fc69F2C203a0572e43375f68a6e9027998").unwrap(),
         )
     }
 
@@ -216,14 +251,24 @@ mod tests {
         let event = outbound.contract.abi().event("MessageAccepted").unwrap();
         let mut filter = FilterBuilder::default();
         filter = filter.from_block(BlockNumber::Earliest);
-        filter = filter.topics(Some(vec![event.signature()]), None, None, None);
+        filter = filter.address(vec![Address::from_str(
+            "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
+        )
+        .unwrap()]);
+        filter = filter.topics(
+            Some(vec![event.signature()]),
+            Some(vec![H256::from_low_u64_be(2)]),
+            None,
+            None,
+        );
         let log = client.eth().logs(filter.build()).await.unwrap();
         for l in log.iter() {
             let raw_log = RawLog {
                 topics: l.topics.clone(),
                 data: l.data.0.clone(),
             };
-            let rl = event.parse_log(raw_log);
+            let rl = event.parse_log(raw_log.clone());
+            println!("{:?}", l);
             println!("{:?}", rl);
             println!("-----");
         }

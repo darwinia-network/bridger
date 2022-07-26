@@ -347,7 +347,7 @@ mod tests {
         let client = web3::Web3::new(transport);
         (
             client.clone(),
-            Inbound::new(&client, "0xE04c799682F9509CF3D23A15F4A8ddc32648EDd4").unwrap(),
+            Inbound::new(&client, "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207").unwrap(),
         )
     }
 

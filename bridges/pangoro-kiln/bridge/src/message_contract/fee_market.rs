@@ -50,21 +50,24 @@ pub mod types {}
 
 #[cfg(test)]
 mod tests {
+    use web3::ethabi::Token;
+
     use super::*;
 
     #[test]
     fn test_fee_market() {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let client = web3::Web3::new(transport);
-        FeeMarket::new(client, "0x9FbA8f0a0Bd6CbcB6283c042edc6b20894Be09c8").unwrap();
+        FeeMarket::new(client, "0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap();
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_enroll() {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let client = web3::Web3::new(transport);
         let fee_market =
-            FeeMarket::new(client, "0x9FbA8f0a0Bd6CbcB6283c042edc6b20894Be09c8").unwrap();
+            FeeMarket::new(client, "0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap();
         let private_key = SecretKey::from_str("//Alice").unwrap();
         let tx = fee_market
             .enroll(
@@ -75,5 +78,29 @@ mod tests {
             .await
             .unwrap();
         println!("{:?}", tx);
+    }
+
+    #[tokio::test]
+    async fn test_query() {
+        let transport = Http::new("http://127.0.0.1:8545").unwrap();
+        let client = web3::Web3::new(transport);
+        let fee_market =
+            FeeMarket::new(client, "0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap();
+        let r: Token = fee_market
+            .contract
+            .query(
+                "getTopRelayers",
+                (),
+                None,
+                Options {
+                    gas: Some(U256::from(10000000u64)),
+                    gas_price: Some(U256::from(1300000000u64)),
+                    ..Default::default()
+                },
+                None,
+            )
+            .await
+            .unwrap();
+        println!("{:?}", r);
     }
 }

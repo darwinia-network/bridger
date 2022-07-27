@@ -65,8 +65,8 @@ pub mod types {
     use support_common::error::BridgerError;
     use web3::{
         contract::tokens::{Detokenize, Tokenizable, Tokenize},
-        ethabi::{Log, Token},
-        types::{Address, Bytes, H256, U256},
+        ethabi::{Log, RawLog, Token},
+        types::{Address, Bytes, Log as DetailedLog, H256, U256},
     };
 
     #[derive(Debug)]
@@ -101,7 +101,7 @@ pub mod types {
         pub messages: Vec<MessageStorage>,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct MessageStorage {
         pub encoded_key: U256,
         pub payload_hash: H256,
@@ -187,16 +187,17 @@ pub mod types {
         }
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct MessageAccepted {
         pub nonce: u64,
         pub source: Address,
         pub target: Address,
         pub encoded: Bytes,
+        pub block_number: u64,
     }
 
     impl MessageAccepted {
-        pub fn from_log(log: Log) -> color_eyre::Result<Self> {
+        pub fn from_log(log: Log, block_number: u64) -> color_eyre::Result<Self> {
             fn get_value(log: &Log, name: &str) -> color_eyre::Result<Token> {
                 log.params
                     .iter()
@@ -217,6 +218,7 @@ pub mod types {
                 source: Tokenizable::from_token(source)?,
                 target: Tokenizable::from_token(target)?,
                 encoded: Tokenizable::from_token(encoded)?,
+                block_number,
             })
         }
     }

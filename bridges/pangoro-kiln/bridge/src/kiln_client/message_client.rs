@@ -1,10 +1,13 @@
 use futures::future;
 use support_common::error::BridgerError;
 use web3::{
-    ethabi::{encode, Bytes as AbiBytes, Log, RawLog, Token},
+    ethabi::{encode, Log, RawLog, Token},
     signing::keccak256,
     transports::Http,
-    types::{Address, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
+    types::{
+        Address, BlockNumber, Bytes, FilterBuilder, Log as DetailedLog, Proof as Web3Proof, H256,
+        U256,
+    },
     Web3,
 };
 
@@ -19,13 +22,13 @@ const LANE_IDENTIFY_SLOT: u64 = 0u64;
 const LANE_NONCE_SLOT: u64 = 1u64;
 const LANE_MESSAGE_SLOT: u64 = 2u64;
 
-pub struct KilnMessageClient {
+pub struct MessageClient {
     pub client: Web3<Http>,
     pub inbound: Inbound,
     pub outbound: Outbound,
 }
 
-impl KilnMessageClient {
+impl MessageClient {
     pub fn new(
         endpoint: &str,
         inbound_address: &str,
@@ -44,13 +47,10 @@ impl KilnMessageClient {
 
     pub async fn prepare_for_messages_delivery(
         &self,
+        begin: u64,
+        end: u64,
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<ReceiveMessagesProof> {
-        let outbound_lane_nonce = self.outbound.outbound_lane_nonce().await?;
-        let (begin, end) = (
-            outbound_lane_nonce.latest_received_nonce + 1,
-            outbound_lane_nonce.latest_generated_nonce,
-        );
         let outbound_lane_data = self.build_messages_data(begin, end).await?;
         let proof = self
             .build_messages_proof(begin, end, block_number)
@@ -69,17 +69,24 @@ impl KilnMessageClient {
         end: u64,
     ) -> color_eyre::Result<OutboundLaneData> {
         let outbound_data = self.outbound.data().await?;
-        if (end - begin + 1) as usize != outbound_data.messages.len() {
+        let outbound_lane_nonce = self.outbound.outbound_lane_nonce().await?;
+        let (outbound_begin, outbound_end) = (
+            outbound_lane_nonce.latest_received_nonce + 1,
+            outbound_lane_nonce.latest_generated_nonce,
+        );
+        let messages = Vec::from_iter(
+            outbound_data.messages
+                [(begin - outbound_begin) as usize..=(end - outbound_begin) as usize]
+                .iter()
+                .cloned(),
+        );
+
+        if (end - begin + 1) as usize != messages.len() {
             return Err(BridgerError::Custom("Build messages data failed".into()).into());
         }
 
-        let events = self.query_message_accepted_events(begin, end).await?;
-        let accepted_events: Vec<MessageAccepted> = events
-            .into_iter()
-            .map(MessageAccepted::from_log)
-            .collect::<Result<Vec<MessageAccepted>, _>>()?;
-
-        let messages: Vec<Message> = std::iter::zip(outbound_data.messages, accepted_events)
+        let accepted_events = self.query_message_accepted_events(begin, end).await?;
+        let messages: Vec<Message> = std::iter::zip(messages, accepted_events)
             .into_iter()
             .map(|(message, event)| Message {
                 encoded_key: message.encoded_key,
@@ -101,9 +108,10 @@ impl KilnMessageClient {
         &self,
         begin: u64,
         end: u64,
-    ) -> color_eyre::Result<Vec<Log>> {
-        let logs: Result<Vec<Option<Log>>, _> =
-            future::try_join_all((begin..=end).map(|nonce| self.query_message_event(nonce))).await;
+    ) -> color_eyre::Result<Vec<MessageAccepted>> {
+        let logs: Result<Vec<Option<MessageAccepted>>, _> =
+            future::try_join_all((begin..=end).map(|nonce| self.query_message_accepted(nonce)))
+                .await;
         if let Some(logs) = logs?.into_iter().collect::<Option<Vec<_>>>() {
             Ok(logs)
         } else {
@@ -115,7 +123,10 @@ impl KilnMessageClient {
         }
     }
 
-    pub async fn query_message_event(&self, nonce: u64) -> color_eyre::Result<Option<Log>> {
+    pub async fn query_message_accepted(
+        &self,
+        nonce: u64,
+    ) -> color_eyre::Result<Option<MessageAccepted>> {
         let event = self.outbound.contract.abi().event("MessageAccepted")?;
         let mut filter = FilterBuilder::default();
         filter = filter.from_block(BlockNumber::Earliest);
@@ -127,15 +138,25 @@ impl KilnMessageClient {
             None,
         );
         let logs = self.client.eth().logs(filter.build()).await?;
-        let logs: Vec<Log> = logs
-            .iter()
-            .map(|l| RawLog {
-                topics: l.topics.clone(),
-                data: l.data.0.clone(),
+
+        let events: Vec<MessageAccepted> = logs
+            .into_iter()
+            .map(|l| {
+                let row_log = RawLog {
+                    topics: l.topics.clone(),
+                    data: l.data.0.clone(),
+                };
+                let block_number = l
+                    .block_number
+                    .ok_or_else(|| BridgerError::Custom("Failed toget block number".into()))?
+                    .as_u64();
+                Ok(MessageAccepted::from_log(
+                    event.parse_log(row_log)?,
+                    block_number,
+                )?)
             })
-            .map(|rl| event.parse_log(rl))
-            .collect::<Result<Vec<Log>, _>>()?;
-        match logs.as_slice() {
+            .collect::<color_eyre::Result<Vec<MessageAccepted>>>()?;
+        match events.as_slice() {
             [x] => Ok(Some(x.clone())),
             _ => Ok(None),
         }
@@ -234,8 +255,8 @@ mod tests {
 
     use super::*;
 
-    fn test_client() -> KilnMessageClient {
-        KilnMessageClient::new(
+    fn test_client() -> MessageClient {
+        MessageClient::new(
             "http://localhost:8545",
             "0x588abe3F7EE935137102C5e2B8042788935f4CB0",
             "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
@@ -243,8 +264,8 @@ mod tests {
         .unwrap()
     }
 
-    fn test_pangoro_client() -> KilnMessageClient {
-        KilnMessageClient::new(
+    fn test_pangoro_client() -> MessageClient {
+        MessageClient::new(
             "https://pangoro-rpc.darwinia.network",
             "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
             "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5",
@@ -257,7 +278,7 @@ mod tests {
     async fn test_get_storage_proof() {
         let client = test_client();
         let (begin, end) = (1, 2);
-        let message_keys = KilnMessageClient::build_message_storage_keys(begin, end);
+        let message_keys = MessageClient::build_message_storage_keys(begin, end);
         println!("Message keys: {:?}", message_keys);
         let message_proof = client
             .get_storage_proof(client.outbound.contract.address(), message_keys, None)
@@ -290,8 +311,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_message_event() {
         let client = test_client();
-        let log = client.query_message_event(2).await.unwrap();
-        println!("event: {:?}", MessageAccepted::from_log(log.unwrap()));
+        let event = client.query_message_accepted(2).await.unwrap();
+        println!("event: {:?}", event);
     }
 
     #[tokio::test]
@@ -300,7 +321,7 @@ mod tests {
         let pangoro_client = test_pangoro_client();
         let private_key = SecretKey::from_str("//Alice").unwrap();
         let proof = kiln_client
-            .prepare_for_messages_delivery(Some(BlockNumber::Number(U64::from(1580730u64))))
+            .prepare_for_messages_delivery(1, 2, Some(BlockNumber::Number(U64::from(1580730u64))))
             .await
             .unwrap();
         println!("proof: {:?}", proof);

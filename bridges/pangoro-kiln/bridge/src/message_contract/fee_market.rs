@@ -44,6 +44,24 @@ impl FeeMarket {
             .await?;
         Ok(tx)
     }
+
+    pub async fn deposit(&self, fee: U256, private_key: &SecretKey) -> color_eyre::Result<H256> {
+        let tx = self
+            .contract
+            .signed_call(
+                "deposit",
+                (),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    value: Some(fee),
+                    ..Default::default()
+                },
+                private_key,
+            )
+            .await?;
+        Ok(tx)
+    }
 }
 
 pub mod types {}
@@ -54,14 +72,13 @@ mod tests {
 
     use super::*;
 
-    #[test]
-    fn test_fee_market() {
+    fn test_fee_market() -> FeeMarket {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let client = web3::Web3::new(transport);
-        FeeMarket::new(client, "0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap();
+        FeeMarket::new(client, "0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap()
     }
 
-    #[ignore]
+    // #[ignore]
     #[tokio::test]
     async fn test_enroll() {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
@@ -75,6 +92,17 @@ mod tests {
                 U256::from(100000000000000u64),
                 &private_key,
             )
+            .await
+            .unwrap();
+        println!("{:?}", tx);
+    }
+
+    #[tokio::test]
+    async fn test_deposit() {
+        let fee_market = test_fee_market();
+        let private_key = SecretKey::from_str("//Alice").unwrap();
+        let tx = fee_market
+            .deposit(U256::from(100000000000000u64), &private_key)
             .await
             .unwrap();
         println!("{:?}", tx);

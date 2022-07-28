@@ -47,16 +47,16 @@ async fn start() -> color_eyre::Result<()> {
     )?;
     let beacon_rpc_client = KilnClient::new(&config.kiln.endpoint)?;
     let source = MessageClient::new(
-        "http://localhost:8545",
-        "0x588abe3F7EE935137102C5e2B8042788935f4CB0",
-        "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
+        &config.kiln.execution_layer_endpoint,
+        &config.kiln.inbound_address,
+        &config.kiln.outbound_address,
         Some(&config.pangoro.private_key),
     )
     .unwrap();
     let target = MessageClient::new(
-        "https://pangoro-rpc.darwinia.network",
-        "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
-        "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5",
+        &config.pangoro.endpoint,
+        &config.pangoro.inbound_address,
+        &config.pangoro.outbound_address,
         Some(&config.pangoro.private_key),
     )
     .unwrap();
@@ -164,42 +164,5 @@ impl MessageRelay {
             .get_beacon_block(finalized.slot)
             .await?;
         Ok(block.body.execution_payload.block_number.parse()?)
-    }
-}
-
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn test_message_delivery() {
-        let source = MessageClient::new(
-            "http://localhost:8545",
-            "0x588abe3F7EE935137102C5e2B8042788935f4CB0",
-            "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
-            None,
-        )
-        .unwrap();
-        let target = MessageClient::new(
-            "https://pangoro-rpc.darwinia.network",
-            "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
-            "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5",
-            None,
-        )
-        .unwrap();
-        let beacon_rpc_client = KilnClient::new("http://localhost:5052").unwrap();
-        let beacon_light_client = PangoroClient::new(
-            "http://localhost:5052",
-            "0x59EA974B74ec6A49338438bCc5d0388E294E4E20",
-            "0x43258d32E29b2C866d882183758B864471A26b96",
-            None,
-        )
-        .unwrap();
-        let client = MessageRelay {
-            source,
-            target,
-            beacon_rpc_client,
-            beacon_light_client,
-        };
-        client.message_relay().await.unwrap();
     }
 }

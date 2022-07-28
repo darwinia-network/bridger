@@ -1,7 +1,7 @@
 use web3::types::BlockNumber;
 
 use crate::{
-    kiln_client::{client::KilnClient, message_client::MessageClient},
+    kiln_client::client::KilnClient, message_contract::message_client::MessageClient,
     pangoro_client::client::PangoroClient,
 };
 

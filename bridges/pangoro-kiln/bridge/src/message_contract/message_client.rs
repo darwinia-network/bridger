@@ -16,7 +16,7 @@ use crate::message_contract::{
     outbound::{MessageAccepted, Outbound},
 };
 
-use super::types::MessagesProof;
+use crate::kiln_client::types::MessagesProof;
 
 const LANE_IDENTIFY_SLOT: u64 = 0u64;
 const LANE_NONCE_SLOT: u64 = 1u64;

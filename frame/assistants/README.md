@@ -12,7 +12,6 @@ the same. There are mapping table to describe relationship.
 | -------- | ------------------------ | --------------------------------- |
 | Pangolin | EthereumRelay            | DarwiniaEthereumRelay             |
 | Pangolin | EthereumRelayerGame      | Instance1DarwiniaRelayerGame      |
-| Pangolin | EthereumRelayAuthorities | Instance1DarwiniaRelayAuthorities |
 | Darwinia | EthereumRelay            | DarwiniaEthereumRelay             |
 | Darwinia | EthereumRelayerGame      | Instance1DarwiniaRelayerGame      |
 | Darwinia | EthereumRelayAuthorities | Instance1DarwiniaRelayAuthorities |

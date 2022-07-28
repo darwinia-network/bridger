@@ -30,6 +30,7 @@ impl Inbound {
             .await?)
     }
 
+    #[allow(dead_code)]
     pub async fn data(&self) -> color_eyre::Result<InboundLaneData> {
         Ok(self
             .contract

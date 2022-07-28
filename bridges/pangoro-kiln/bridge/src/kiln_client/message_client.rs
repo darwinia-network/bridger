@@ -40,7 +40,7 @@ impl MessageClient {
         let client = Web3::new(transport);
         let inbound = Inbound::new(&client, inbound_address)?;
         let outbound = Outbound::new(&client, outbound_address)?;
-        let private_key = private_key.map(|x| SecretKey::from_str(x)).transpose()?;
+        let private_key = private_key.map(SecretKey::from_str).transpose()?;
 
         Ok(Self {
             client,
@@ -67,7 +67,7 @@ impl MessageClient {
             .build_messages_proof(begin, end, block_number)
             .await?
             .get_token()?;
-        let messages_proof = Bytes(encode(&vec![proof]));
+        let messages_proof = Bytes(encode(&[proof]));
         Ok(ReceiveMessagesProof {
             outbound_lane_data,
             messages_proof,
@@ -81,7 +81,7 @@ impl MessageClient {
     ) -> color_eyre::Result<OutboundLaneData> {
         let outbound_data = self.outbound.data().await?;
         let outbound_lane_nonce = self.outbound.outbound_lane_nonce().await?;
-        let (outbound_begin, outbound_end) = (
+        let (outbound_begin, _outbound_end) = (
             outbound_lane_nonce.latest_received_nonce + 1,
             outbound_lane_nonce.latest_generated_nonce,
         );
@@ -161,10 +161,7 @@ impl MessageClient {
                     .block_number
                     .ok_or_else(|| BridgerError::Custom("Failed toget block number".into()))?
                     .as_u64();
-                Ok(MessageAccepted::from_log(
-                    event.parse_log(row_log)?,
-                    block_number,
-                )?)
+                MessageAccepted::from_log(event.parse_log(row_log)?, block_number)
             })
             .collect::<color_eyre::Result<Vec<MessageAccepted>>>()?;
         match events.as_slice() {
@@ -196,7 +193,6 @@ impl MessageClient {
             .await?
             .ok_or_else(|| BridgerError::Custom("Failed to get lane_nonce_proof".into()))?;
         let message_keys = Self::build_message_storage_keys(begin, end);
-        println!("Message_keys: {:?}", message_keys);
         let message_proof = self
             .get_storage_proof(self.outbound.contract.address(), message_keys, block_number)
             .await?
@@ -219,7 +215,7 @@ impl MessageClient {
         })
     }
 
-    fn encode_proof(proofs: &Vec<Bytes>) -> Bytes {
+    fn encode_proof(proofs: &[Bytes]) -> Bytes {
         Bytes::from(
             &rlp::encode_list::<Vec<u8>, _>(
                 proofs

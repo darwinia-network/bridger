@@ -8,11 +8,13 @@ use web3::{
     Web3,
 };
 
+#[allow(dead_code)]
 pub struct FeeMarket {
     pub contract: Contract<Http>,
 }
 
 impl FeeMarket {
+    #[allow(dead_code)]
     pub fn new(client: Web3<Http>, address: &str) -> color_eyre::Result<Self> {
         let contract = Contract::from_json(
             client.eth(),
@@ -22,6 +24,7 @@ impl FeeMarket {
         Ok(Self { contract })
     }
 
+    #[allow(dead_code)]
     pub async fn enroll(
         &self,
         prev: Address,
@@ -45,6 +48,7 @@ impl FeeMarket {
         Ok(tx)
     }
 
+    #[allow(dead_code)]
     pub async fn deposit(&self, fee: U256, private_key: &SecretKey) -> color_eyre::Result<H256> {
         let tx = self
             .contract

@@ -30,6 +30,7 @@ impl Outbound {
             .await?)
     }
 
+    #[allow(dead_code)]
     pub async fn send_message(
         &self,
         message: SendMessage,

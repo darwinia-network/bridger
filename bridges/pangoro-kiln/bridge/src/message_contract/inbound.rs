@@ -355,6 +355,7 @@ mod tests {
         )
     }
 
+    #[ignore]
     #[test]
     fn test_inbound() {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
@@ -362,6 +363,7 @@ mod tests {
         Inbound::new(&client, "0xE04c799682F9509CF3D23A15F4A8ddc32648EDd4").unwrap();
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_inbound_lane_data() {
         let (_, inbound) = test_client();
@@ -369,6 +371,7 @@ mod tests {
         println!("{:?}", data);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_inbound_lane_nonce() {
         let (_, inbound) = test_client();

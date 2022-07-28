@@ -299,6 +299,7 @@ mod tests {
         println!("Proof: {:?}", message_proof);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_build_lane_data() {
         let client = test_client();
@@ -311,6 +312,7 @@ mod tests {
         println!("Lane data: {:?}", lane_data);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_message_accepted_events() {
         let client = test_client();
@@ -318,6 +320,7 @@ mod tests {
         println!("Logs: {:?}", logs);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_message_event() {
         let client = test_client();
@@ -325,6 +328,7 @@ mod tests {
         println!("event: {:?}", event);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_receive_messages_proof() {
         let kiln_client = test_client();

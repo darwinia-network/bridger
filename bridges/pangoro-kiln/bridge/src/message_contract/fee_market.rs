@@ -82,7 +82,7 @@ mod tests {
         FeeMarket::new(client, "0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap()
     }
 
-    // #[ignore]
+    #[ignore]
     #[tokio::test]
     async fn test_enroll() {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
@@ -101,6 +101,7 @@ mod tests {
         println!("{:?}", tx);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_deposit() {
         let fee_market = test_fee_market();
@@ -112,6 +113,7 @@ mod tests {
         println!("{:?}", tx);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query() {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();

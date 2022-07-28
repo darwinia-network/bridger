@@ -241,6 +241,7 @@ mod tests {
         )
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_outbound() {
         let (client, outbound) = test_client();
@@ -277,6 +278,7 @@ mod tests {
         }
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_outbound_lane_nonce() {
         let (_, outbound) = test_client();
@@ -288,6 +290,7 @@ mod tests {
         println!("nonce: {:?}", res);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_data_() {
         let (_, outbound) = test_client();
@@ -295,6 +298,7 @@ mod tests {
         println!("Data: {:?}", res);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_send_message() {
         let (_, outbound) = test_client();

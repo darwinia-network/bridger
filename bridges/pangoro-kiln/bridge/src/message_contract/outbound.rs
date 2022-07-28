@@ -65,8 +65,8 @@ pub mod types {
     use support_common::error::BridgerError;
     use web3::{
         contract::tokens::{Detokenize, Tokenizable, Tokenize},
-        ethabi::{Log, RawLog, Token},
-        types::{Address, Bytes, Log as DetailedLog, H256, U256},
+        ethabi::{Log, Token},
+        types::{Address, Bytes, H256, U256},
     };
 
     #[derive(Debug)]

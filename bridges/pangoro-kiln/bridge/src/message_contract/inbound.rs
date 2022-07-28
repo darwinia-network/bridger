@@ -205,7 +205,7 @@ pub mod types {
         }
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct ReceiveMessagesProof {
         pub outbound_lane_data: OutboundLaneData,
         pub messages_proof: Bytes,
@@ -238,7 +238,7 @@ pub mod types {
         }
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct OutboundLaneData {
         pub latest_received_nonce: u64,
         pub messages: Vec<Message>,
@@ -270,7 +270,7 @@ pub mod types {
         }
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct Message {
         pub encoded_key: U256,
         pub payload: Payload,
@@ -304,7 +304,7 @@ pub mod types {
     }
     impl TokenizableItem for Message {}
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct Payload {
         pub source: Address,
         pub target: Address,

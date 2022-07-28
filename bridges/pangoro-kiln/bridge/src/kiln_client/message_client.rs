@@ -1,13 +1,13 @@
+use std::str::FromStr;
+
 use futures::future;
+use secp256k1::SecretKey;
 use support_common::error::BridgerError;
 use web3::{
-    ethabi::{encode, Log, RawLog, Token},
+    ethabi::{encode, RawLog},
     signing::keccak256,
     transports::Http,
-    types::{
-        Address, BlockNumber, Bytes, FilterBuilder, Log as DetailedLog, Proof as Web3Proof, H256,
-        U256,
-    },
+    types::{Address, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
     Web3,
 };
 
@@ -26,6 +26,7 @@ pub struct MessageClient {
     pub client: Web3<Http>,
     pub inbound: Inbound,
     pub outbound: Outbound,
+    pub private_key: Option<SecretKey>,
 }
 
 impl MessageClient {
@@ -33,16 +34,26 @@ impl MessageClient {
         endpoint: &str,
         inbound_address: &str,
         outbound_address: &str,
+        private_key: Option<&str>,
     ) -> color_eyre::Result<Self> {
         let transport = Http::new(endpoint)?;
         let client = Web3::new(transport);
         let inbound = Inbound::new(&client, inbound_address)?;
         let outbound = Outbound::new(&client, outbound_address)?;
+        let private_key = private_key.map(|x| SecretKey::from_str(x)).transpose()?;
+
         Ok(Self {
             client,
             inbound,
             outbound,
+            private_key,
         })
+    }
+
+    pub fn private_key(&self) -> color_eyre::Result<SecretKey> {
+        Ok(self
+            .private_key
+            .ok_or_else(|| BridgerError::Custom("Private key not found!".into()))?)
     }
 
     pub async fn prepare_for_messages_delivery(
@@ -185,6 +196,7 @@ impl MessageClient {
             .await?
             .ok_or_else(|| BridgerError::Custom("Failed to get lane_nonce_proof".into()))?;
         let message_keys = Self::build_message_storage_keys(begin, end);
+        println!("Message_keys: {:?}", message_keys);
         let message_proof = self
             .get_storage_proof(self.outbound.contract.address(), message_keys, block_number)
             .await?
@@ -260,6 +272,7 @@ mod tests {
             "http://localhost:8545",
             "0x588abe3F7EE935137102C5e2B8042788935f4CB0",
             "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
+            None,
         )
         .unwrap()
     }
@@ -269,6 +282,7 @@ mod tests {
             "https://pangoro-rpc.darwinia.network",
             "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
             "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5",
+            None,
         )
         .unwrap()
     }

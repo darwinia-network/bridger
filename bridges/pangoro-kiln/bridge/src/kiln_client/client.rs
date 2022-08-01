@@ -269,8 +269,11 @@ mod tests {
     #[tokio::test]
     async fn test_get_beacon_block() {
         let client = test_client();
-        let block_body = client.get_beacon_block(120960).await.unwrap();
-        println!("Block body: {:?}", block_body.body.sync_aggregate);
+        let block_body = client.get_beacon_block(257600).await.unwrap();
+        println!(
+            "Block body: {:?}",
+            block_body.body.execution_payload.block_number
+        );
     }
 
     #[ignore]

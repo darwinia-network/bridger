@@ -5,6 +5,7 @@ mod bridge;
 mod cli;
 mod command;
 mod kiln_client;
+mod message_contract;
 mod pangoro_client;
 mod service;
 

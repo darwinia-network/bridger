@@ -151,6 +151,7 @@ dependencies = [
 name = "bridge-pangoro-kiln"
 version = "0.6.1"
 dependencies = [
+ "async-trait",
  "bytes",
  "color-eyre",
  "component-http-client",
@@ -160,6 +161,7 @@ dependencies = [
  "lifeline",
  "postage",
  "reqwest",
+ "rlp",
  "secp256k1",
  "serde 1.0.139",
  "structopt",

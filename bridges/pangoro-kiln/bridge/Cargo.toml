@@ -17,8 +17,9 @@ name = "bridge-pangoro-kiln"
 path = "src/main.rs"
 
 [dependencies]
-color-eyre = "0.5"
-tracing    = "0.1"
+color-eyre  = "0.5"
+tracing     = "0.1"
+async-trait = "0.1"
 
 reqwest = { version = "0.11", features = ["json", "stream"] }
 tokio   = { version = "1", features = ["full"] }
@@ -35,6 +36,7 @@ postage   = "0.4"
 secp256k1 = { version = "0.21" }
 web3      = { git = "https://github.com/tomusdrw/rust-web3", branch = "master", features = ["signing"] }
 hamming   = "0.1"
+rlp       = "0.5.1"
 
 support-common   = { path = "../../../frame/supports/support-common" }
 support-lifeline = { path = "../../../frame/supports/support-lifeline" }

@@ -132,8 +132,8 @@ mod tests {
     fn test_client() -> PangoroClient {
         PangoroClient::new(
             "https://pangoro-rpc.darwinia.network",
-            "0x9920317f841F3653464bf37512c939744502CA74",
-            "0x99B9C72c93EBC472Ce1A27e064067E78FDcb36E9",
+            "0x59EA974B74ec6A49338438bCc5d0388E294E4E20",
+            "0x43258d32E29b2C866d882183758B864471A26b96",
             None,
         )
         .unwrap()

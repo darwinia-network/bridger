@@ -40,7 +40,6 @@ impl Service for KilnToPangoroHeaderRelayService {
 
 async fn start() -> color_eyre::Result<()> {
     let config: BridgeConfig = Config::restore(Names::BridgePangoroKiln)?;
-    println!("{:?}", &config);
     let pangoro_client = PangoroClient::new(
         &config.pangoro.endpoint,
         &config.pangoro.contract_address,

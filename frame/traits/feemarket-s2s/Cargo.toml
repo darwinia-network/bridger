@@ -17,10 +17,10 @@ thiserror   = "1"
 async-trait = "0.1"
 
 codec             = { package = "parity-scale-codec", version = "2" }
-bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
-pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
+bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.4" }
+pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.4" }
 
-subxt       = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.3" }
+subxt       = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.4" }
 
 [features]
 default = []

@@ -23,16 +23,16 @@ codec          = { package = "parity-scale-codec", version = "2" }
 scale-info     = { version = "1.0.0", features = ["bit-vec"] }
 jsonrpsee-core = "0.8"
 
-sp-core               = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
-sp-runtime            = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.3" }
+sp-core               = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.4" }
+sp-runtime            = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.4" }
 
-bp-runtime            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
-bp-messages           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
-bridge-runtime-common = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
-bp-header-chain       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.3" }
+bp-runtime            = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.4" }
+bp-messages           = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.4" }
+bridge-runtime-common = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.4" }
+bp-header-chain       = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.4" }
 
 array-bytes = { optional = true, version = "2" }
-subxt       = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.3" }
+subxt       = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.4" }
 
 [features]
 default  = []

@@ -1,15 +1,15 @@
 use std::collections::HashMap;
 
-use crate::subxt_runtime::api::runtime_types;
-use crate::subxt_runtime::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
-use crate::subxt_runtime::api::runtime_types::pangolin_runtime::pallets::proxy::ProxyType;
-use crate::subxt_runtime::api::runtime_types::to_ethereum_backing::pallet::RedeemFor;
 use subxt::{BasicError, MetadataError};
 
 use crate::client::PangolinClient;
 use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::helpers;
+use crate::subxt_runtime::api::runtime_types;
+use crate::subxt_runtime::api::runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
+use crate::subxt_runtime::api::runtime_types::pangolin_runtime::pallets::proxy::ProxyType;
+use crate::subxt_runtime::api::runtime_types::to_ethereum_backing::pallet::RedeemFor;
 use crate::types::{
     AffirmationsReturn, BetterRelayAffirmation, EcdsaMessage, EthereumAccount,
     EthereumReceiptProofThing,
@@ -100,74 +100,6 @@ impl<'a> EthereumApi<'a> {
                     .tx()
                     .ethereum_relay()
                     .affirm(parcel, None)
-                    .sign_and_submit(account.signer())
-                    .await?
-            }
-        };
-        Ok(v)
-    }
-
-    /// Register erc20 token
-    pub async fn register_erc20(
-        &self,
-        proof: EthereumReceiptProofThing,
-    ) -> ClientResult<subxt::sp_core::H256> {
-        let account = self.client.account();
-        let v = match account.real() {
-            Some(real) => {
-                let call = runtime_types::pangolin_runtime::Call::EthereumIssuing(
-                    runtime_types::from_ethereum_issuing::pallet::Call::register_erc20 {
-                        proof: (proof.header, proof.receipt_proof, proof.mmr_proof),
-                    },
-                );
-                self.client
-                    .runtime()
-                    .tx()
-                    .proxy()
-                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit(account.signer())
-                    .await?
-            }
-            None => {
-                self.client
-                    .runtime()
-                    .tx()
-                    .ethereum_issuing()
-                    .register_erc20((proof.header, proof.receipt_proof, proof.mmr_proof))
-                    .sign_and_submit(account.signer())
-                    .await?
-            }
-        };
-        Ok(v)
-    }
-
-    /// redeem erc20
-    pub async fn redeem_erc20(
-        &self,
-        proof: EthereumReceiptProofThing,
-    ) -> ClientResult<subxt::sp_core::H256> {
-        let account = self.client.account();
-        let v = match account.real() {
-            Some(real) => {
-                let call = runtime_types::pangolin_runtime::Call::EthereumIssuing(
-                    runtime_types::from_ethereum_issuing::pallet::Call::redeem_erc20 {
-                        proof: (proof.header, proof.receipt_proof, proof.mmr_proof),
-                    },
-                );
-                self.client
-                    .runtime()
-                    .tx()
-                    .proxy()
-                    .proxy(real.clone(), Some(ProxyType::EthereumBridge), call)
-                    .sign_and_submit(account.signer())
-                    .await?
-            }
-            None => {
-                self.client
-                    .runtime()
-                    .tx()
-                    .ethereum_issuing()
-                    .redeem_erc20((proof.header, proof.receipt_proof, proof.mmr_proof))
                     .sign_and_submit(account.signer())
                     .await?
             }
@@ -284,8 +216,8 @@ impl<'a> EthereumApi<'a> {
                     "Proxied ecdsa sign and submit mmr_root to darwinia, block_number: {}",
                     block_number
                 );
-                let call = runtime_types::pangolin_runtime::Call::EthereumRelayAuthorities(
-                    runtime_types::darwinia_relay_authorities::Call::submit_signed_mmr_root {
+                let call = runtime_types::pangolin_runtime::Call::EcdsaRelayAuthority(
+                    runtime_types::darwinia_relay_authority::pallet::Call::submit_signed_mmr_root {
                         block_number,
                         signature: signature.0,
                     },
@@ -308,7 +240,7 @@ impl<'a> EthereumApi<'a> {
                 self.client
                     .runtime()
                     .tx()
-                    .ethereum_relay_authorities()
+                    .ecdsa_relay_authority()
                     .submit_signed_mmr_root(block_number, signature.0)
                     .sign_and_submit(darwinia_account.signer())
                     .await?
@@ -329,8 +261,8 @@ impl<'a> EthereumApi<'a> {
         let v = match darwinia_account.real() {
             Some(real) => {
                 tracing::trace!(target: "client-pangolin", "Proxied ecdsa sign and submit authorities to darwinia");
-                let call = runtime_types::pangolin_runtime::Call::EthereumRelayAuthorities(
-                    runtime_types::darwinia_relay_authorities::Call::submit_signed_authorities {
+                let call = runtime_types::pangolin_runtime::Call::EcdsaRelayAuthority(
+                    runtime_types::darwinia_relay_authority::pallet::Call::submit_signed_authorities {
                         signature: signature.0,
                     },
                 );
@@ -347,7 +279,7 @@ impl<'a> EthereumApi<'a> {
                 self.client
                     .runtime()
                     .tx()
-                    .ethereum_relay_authorities()
+                    .ecdsa_relay_authority()
                     .submit_signed_authorities(signature.0)
                     .sign_and_submit(darwinia_account.signer())
                     .await?
@@ -405,14 +337,7 @@ impl<'a> EthereumApi<'a> {
             .ethereum_backing()
             .verified_proof(hash, tx_index, None)
             .await?;
-        let v1: bool = self
-            .client
-            .runtime()
-            .storage()
-            .ethereum_issuing()
-            .verified_issuing_proof(hash, tx_index, None)
-            .await?;
-        Ok(v0 || v1)
+        Ok(v0)
     }
 
     /// Is authority
@@ -431,10 +356,10 @@ impl<'a> EthereumApi<'a> {
             .client
             .runtime()
             .storage()
-            .ethereum_relay_authorities()
+            .ecdsa_relay_authority()
             .authorities(hash)
             .await?;
-        Ok(authorities.iter().any(|v| &v.account_id == account))
+        Ok(authorities.0.iter().any(|v| &v.account_id == account))
     }
 
     /// need to sign authorities
@@ -454,14 +379,14 @@ impl<'a> EthereumApi<'a> {
             .client
             .runtime()
             .storage()
-            .ethereum_relay_authorities()
+            .ecdsa_relay_authority()
             .authorities_to_sign(hash)
             .await?;
         match ret {
             None => Ok(false),
             Some(r) => {
                 if r.0 == message {
-                    let includes = r.1.iter().any(|a| &a.0 == account);
+                    let includes = r.1 .0.iter().any(|a| &a.0 == account);
                     Ok(!includes)
                 } else {
                     Ok(false)
@@ -487,7 +412,7 @@ impl<'a> EthereumApi<'a> {
             .client
             .runtime()
             .storage()
-            .ethereum_relay_authorities()
+            .ecdsa_relay_authority()
             .mmr_roots_to_sign(block_number, exec_block_hash)
             .await?;
         match mmr_roots_to_sign {
@@ -501,7 +426,7 @@ impl<'a> EthereumApi<'a> {
                 Ok(false)
             }
             Some(m) => {
-                let need = !m.signatures.iter().any(|a| &a.0 == account);
+                let need = !m.signatures.0.iter().any(|a| &a.0 == account);
                 if !need {
                     tracing::debug!(
                         target: "client-pangolin",
@@ -521,7 +446,7 @@ impl<'a> EthereumApi<'a> {
             .client
             .runtime()
             .storage()
-            .ethereum_relay_authorities()
+            .ecdsa_relay_authority()
             .next_term(None)
             .await
         {

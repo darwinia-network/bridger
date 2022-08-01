@@ -5,13 +5,11 @@ use codec::{Decode, Encode};
 use subxt::DefaultExtra;
 
 use crate::config::PangolinSubxtConfig;
-use crate::subxt_runtime::api::runtime_types::{
-    darwinia_bridge_ethereum, darwinia_relay_primitives,
-};
+use crate::subxt_runtime::api::runtime_types::{darwinia_bridge_ethereum, dp_relayer_game};
 use crate::types::Balance;
 
 /// Real relay affirmation types
-pub type BetterRelayAffirmation = darwinia_relay_primitives::relayer_game::RelayAffirmation<
+pub type BetterRelayAffirmation = dp_relayer_game::RelayAffirmation<
     darwinia_bridge_ethereum::EthereumRelayHeaderParcel,
     <PangolinSubxtConfig as subxt::Config>::AccountId,
     Balance,

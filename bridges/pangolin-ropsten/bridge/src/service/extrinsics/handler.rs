@@ -136,24 +136,8 @@ impl ExtrinsicsHandler {
                     ex_hash
                 );
             }
-            TransactionType::RegisterErc20Token => {
-                let ex_hash = self.client.ethereum().register_erc20(proof).await?;
-                tracing::info!(
-                    target: "pangolin-ropsten",
-                    "[pangolin] [extrinsics] [redeem] register erc20 token tx {:?} with extrinsic {:?}",
-                    ethereum_tx.tx_hash,
-                    ex_hash
-                );
-            }
-            TransactionType::RedeemErc20Token => {
-                let ex_hash = self.client.ethereum().redeem_erc20(proof).await?;
-                tracing::info!(
-                    target: "pangolin-ropsten",
-                    "[pangolin] [extrinsics] [redeem] redeem erc20 token tx {:?} with extrinsic {:?}",
-                    ethereum_tx.tx_hash,
-                    ex_hash
-                );
-            }
+            TransactionType::RegisterErc20Token => {}
+            TransactionType::RedeemErc20Token => {}
             _ => {
                 let redeem_for = match ethereum_tx.tx_type {
                     TransactionType::Deposit => RedeemFor::Deposit,

@@ -1,13 +1,14 @@
 [darwinia]
 endpoint = "wss://rpc.darwinia.network"
-signer = "//Alice"
+signer   = "//Alice"
 
 [crab]
 endpoint = "wss://crab-rpc.darwinia.network"
-signer = "//Alice"
+signer   = "//Alice"
 
 [relay]
-lanes = ["00000000"]
+lanes            = ["00000000"]
+enable_mandatory = false
 
 [index]
 darwinia = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-darwinia" }

@@ -60,6 +60,7 @@ async fn start() -> color_eyre::Result<()> {
         client_target: client_pangoro,
         subquery_source: subquery_pangolin,
         index_origin_type: OriginType::BridgePangoro,
+        enable_mandatory: relay_config.enable_mandatory,
     };
     let runner = SolochainHeaderRunner::new(input);
     Ok(runner.start().await?)

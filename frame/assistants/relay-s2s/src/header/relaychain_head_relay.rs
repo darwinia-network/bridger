@@ -68,7 +68,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
 
         let subquery_relaychain = &self.input.subquery_relaychain;
         let next_mandatory_block = subquery_relaychain
-            .next_mandatory_header(last_block_number)
+            .next_mandatory_header(block_number)
             .await?;
 
         match next_mandatory_block {

@@ -26,6 +26,8 @@ pub struct RelayConfig {
     /// Hex-encoded lane identifiers that should be served by the complex relay.
     pub lanes: Vec<HexLaneId>,
     pub para_id: u32,
+    #[serde(default)]
+    pub enable_mandatory: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

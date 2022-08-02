@@ -34,6 +34,8 @@ pub struct ChainInfoConfig {
 pub struct RelayConfig {
     /// Hex-encoded lane identifiers that should be served by the complex relay.
     pub lanes: Vec<HexLaneId>,
+    #[serde(default)]
+    pub enable_mandatory: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

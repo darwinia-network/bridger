@@ -5,6 +5,7 @@ use bridge_s2s_traits::types::bp_header_chain;
 use bridge_s2s_traits::types::bp_runtime::Chain;
 use sp_runtime::codec;
 use sp_runtime::traits::Header;
+use subquery_s2s::types::NeedRelayBlock;
 
 use support_toolkit::{convert::SmartCodecMapper, logk};
 
@@ -65,8 +66,27 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             block_number,
         );
 
-        if self.try_to_relay_mandatory(block_number).await?.is_none() {
-            self.try_to_relay_header_on_demand(block_number).await?;
+        let subquery_relaychain = &self.input.subquery_relaychain;
+        let next_mandatory_block = subquery_relaychain
+            .next_mandatory_header(last_block_number)
+            .await?;
+
+        match next_mandatory_block {
+            Some(block_to_relay) => {
+                if self.input.enable_mandatory {
+                    self.try_to_relay_mandatory(block_to_relay).await?;
+                } else {
+                    tracing::warn!(
+                        target: "relay-s2s",
+                        "{} found mandatory header ({}) but you disabled relay it.",
+                        logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
+                        block_to_relay.block_number,
+                    );
+                }
+            }
+            None => {
+                self.try_to_relay_header_on_demand(block_number).await?;
+            }
         }
 
         Ok(())
@@ -106,41 +126,26 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
     }
 
     /// Try to relay mandatory headers, return Ok(Some(block_number)) if success, else Ok(None)
-    async fn try_to_relay_mandatory(&self, last_block_number: u32) -> RelayResult<Option<u32>> {
-        let subquery_relaychain = &self.input.subquery_relaychain;
-
-        let next_mandatory_block = subquery_relaychain
-            .next_mandatory_header(last_block_number)
+    async fn try_to_relay_mandatory(&self, block_to_relay: NeedRelayBlock) -> RelayResult<()> {
+        tracing::info!(
+            target: "relay-s2s",
+            "{} the next mandatory block: {:?}",
+            logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
+            &block_to_relay.block_number,
+        );
+        let justification = subquery_relaychain
+            .find_justification(block_to_relay.block_hash.clone(), true)
+            .await?
+            .ok_or_else(|| {
+                RelayError::Custom(format!(
+                    "Failed to query justification for block hash: {:?}",
+                    &block_to_relay.block_hash
+                ))
+            })?;
+        self.submit_finality(block_to_relay.block_hash, justification.justification)
             .await?;
 
-        if let Some(block_to_relay) = next_mandatory_block {
-            tracing::info!(
-                target: "relay-s2s",
-                "{} the next mandatory block: {:?}",
-                logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-                &block_to_relay.block_number,
-            );
-            let justification = subquery_relaychain
-                .find_justification(block_to_relay.block_hash.clone(), true)
-                .await?
-                .ok_or_else(|| {
-                    RelayError::Custom(format!(
-                        "Failed to query justification for block hash: {:?}",
-                        &block_to_relay.block_hash
-                    ))
-                })?;
-            self.submit_finality(block_to_relay.block_hash, justification.justification)
-                .await?;
-
-            Ok(Some(block_to_relay.block_number))
-        } else {
-            tracing::debug!(
-                target: "relay-s2s",
-                "{} the next mandatory block not found",
-                logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-            );
-            Ok(None)
-        }
+        Ok(())
     }
 
     async fn try_to_relay_header_on_demand(&self, last_block_number: u32) -> RelayResult<()> {

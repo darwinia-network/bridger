@@ -10,8 +10,9 @@ endpoint = "wss://crab-parachain-rpc.darwinia.network:443"
 signer   = "//Alice"
 
 [relay]
-lanes   = ["70616372"]
-para_id = 2105
+lanes            = ["70616372"]
+para_id          = 2105
+enable_mandatory = false
 
 [index]
 crab               = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-crab" }

@@ -22,6 +22,7 @@ pub struct SolochainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub client_target: TC,
     pub subquery_source: Subquery,
     pub index_origin_type: OriginType,
+    pub enable_mandatory: bool,
 }
 
 #[cfg(feature = "bridge-parachain")]
@@ -33,6 +34,7 @@ pub struct RelaychainHeaderInput<SC: S2SClientGeneric, TC: S2SClientRelay> {
     pub index_origin_type: OriginType,
     // todo: merge this subquery to subquery_relaychain
     pub subquery_candidate: subquery_parachain::Subquery,
+    pub enable_mandatory: bool,
 }
 
 #[cfg(feature = "bridge-parachain")]

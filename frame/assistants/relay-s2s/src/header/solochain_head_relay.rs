@@ -122,6 +122,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
             &block_to_relay.block_number
         );
+        let subquery_source = &self.input.subquery_source;
         let justification = subquery_source
             .find_justification(block_to_relay.block_hash.clone(), true)
             .await?

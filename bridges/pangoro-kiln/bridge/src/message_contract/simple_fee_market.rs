@@ -1,6 +1,10 @@
 use std::str::FromStr;
 
 use crate::message_contract::simple_fee_market::types::Order;
+use bridge_e2e_traits::{
+    error::{E2EClientError, E2EClientResult},
+    strategy::RelayStrategy,
+};
 use secp256k1::SecretKey;
 use web3::{
     contract::{Contract, Options},
@@ -10,13 +14,14 @@ use web3::{
 };
 
 #[allow(dead_code)]
+#[derive(Debug, Clone)]
 pub struct SimpleFeeMarket {
     pub contract: Contract<Http>,
 }
 
 impl SimpleFeeMarket {
     #[allow(dead_code)]
-    pub fn new(client: Web3<Http>, address: &str) -> color_eyre::Result<Self> {
+    pub fn new(client: &Web3<Http>, address: &str) -> color_eyre::Result<Self> {
         let contract = Contract::from_json(
             client.eth(),
             Address::from_str(address)?,
@@ -76,6 +81,50 @@ impl SimpleFeeMarket {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct SimpleFeeMarketRelayStrategy {
+    fee_market: SimpleFeeMarket,
+    account: Address,
+}
+
+impl SimpleFeeMarketRelayStrategy {
+    pub fn new(fee_market: SimpleFeeMarket, account: Address) -> Self {
+        Self {
+            fee_market,
+            account,
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl RelayStrategy for SimpleFeeMarketRelayStrategy {
+    async fn decide(&mut self, encoded_key: U256) -> E2EClientResult<bool> {
+        let order = self
+            .fee_market
+            .order(encoded_key)
+            .await
+            .map_err(|e| E2EClientError::Custom(format!("[feemarket]: {:?}", e)))?;
+
+        let is_assigned_relayer = order.assigned_relayer == self.account;
+        if is_assigned_relayer {
+            tracing::info!(
+                target: "feemarket",
+                "[feemarket] You are assigned relayer, you must be relay this message: {:?}",
+                encoded_key
+            );
+            return Ok(true);
+        }
+
+        tracing::info!(
+            target: "feemarket",
+            "[feemarket] You aren't assigned relayer, and nonce({:?}) is on-time. so don't relay this",
+            encoded_key
+        );
+
+        Ok(false)
+    }
+}
+
 pub mod types {
     use web3::contract::tokens::Detokenize;
     use web3::contract::Error;
@@ -118,8 +167,7 @@ mod tests {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let client = web3::Web3::new(transport);
         let fee_market =
-            SimpleFeeMarket::new(client.clone(), "0x721F10bdE716FF44F596Afa2E8726aF197e6218E")
-                .unwrap();
+            SimpleFeeMarket::new(&client, "0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap();
         (client, fee_market)
     }
 
@@ -129,7 +177,7 @@ mod tests {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let client = web3::Web3::new(transport);
         let fee_market =
-            SimpleFeeMarket::new(client, "0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap();
+            SimpleFeeMarket::new(&client, "0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap();
         let private_key = SecretKey::from_str("//Alice").unwrap();
         let tx = fee_market
             .enroll(

@@ -1,4 +1,7 @@
-use std::str::FromStr;
+use std::{
+    str::FromStr,
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 use crate::message_contract::simple_fee_market::types::Order;
 use bridge_e2e_traits::{
@@ -79,6 +82,13 @@ impl SimpleFeeMarket {
             .query("orderOf", (key,), None, Options::default(), None)
             .await?)
     }
+
+    pub async fn relay_time(&self) -> color_eyre::Result<u64> {
+        Ok(self
+            .contract
+            .query("relayTime", (), None, Options::default(), None)
+            .await?)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -109,8 +119,25 @@ impl RelayStrategy for SimpleFeeMarketRelayStrategy {
         if is_assigned_relayer {
             tracing::info!(
                 target: "feemarket",
-                "[feemarket] You are assigned relayer, you must be relay this message: {:?}",
+                "[feemarket] You are assigned relayer, you must relay this message: {:?}",
                 encoded_key
+            );
+            return Ok(true);
+        }
+
+        let relay_time = self
+            .fee_market
+            .relay_time()
+            .await
+            .map_err(|e| E2EClientError::Custom(format!("[feemarket]: {:?}", e)))?;
+        let current_time = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map_err(|e| E2EClientError::Custom(format!("[feemarket]: {:?}", e)))?
+            .as_secs();
+        if current_time - order.assigned_time as u64 > relay_time {
+            tracing::info!(
+                target: "feemarket",
+                "[feemarket] You aren't assigned relayer, but this message is timeout. Decide to relay this message"
             );
             return Ok(true);
         }
@@ -222,6 +249,13 @@ mod tests {
             .await
             .unwrap();
         println!("{:?}", order);
+    }
+
+    #[tokio::test]
+    async fn test_query_relay_time() {
+        let (_, fee_market) = test_fee_market();
+        let time = fee_market.relay_time().await.unwrap();
+        println!("Relay time is : {:?}", time);
     }
 
     #[tokio::test]

@@ -1,50 +1,50 @@
-name: Subgraph develop
-
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
-jobs:
-  thegraph-ethereum:
-    name: Subgraph Ethereum like v1
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        chain: [ethereum, ropsten]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - name: Deploy
-        working-directory: thegraph/ethereum
-        run: |
-          npm i
-          npm run codegen -- subgraph-${{ matrix.chain }}.yaml
-          npm run build -- subgraph-${{ matrix.chain }}.yaml
-          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_DEV }} \
-            fewensa/bridge-${{ matrix.chain }} \
-            subgraph-${{ matrix.chain }}.yaml
-
-  thegraph-bsc:
-    name: Subgraph BSC
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        chain: [chapel]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - name: Deploy
-        working-directory: thegraph/bsc
-        run: |
-          npm i
-          npm run codegen -- subgraph-${{ matrix.chain }}.yaml
-          npm run build -- subgraph-${{ matrix.chain }}.yaml
-          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_DEV }} \
-            fewensa/bridge-${{ matrix.chain }} \
-            subgraph-${{ matrix.chain }}.yaml
+#name: Subgraph develop
+#
+#on:
+#  push:
+#    branches: [ master ]
+#  pull_request:
+#    branches: [ master ]
+#
+#jobs:
+#  thegraph-ethereum:
+#    name: Subgraph Ethereum like v1
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        chain: [ethereum, ropsten]
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-node@v2
+#        with:
+#          node-version: '16'
+#      - name: Deploy
+#        working-directory: thegraph/ethereum
+#        run: |
+#          npm i
+#          npm run codegen -- subgraph-${{ matrix.chain }}.yaml
+#          npm run build -- subgraph-${{ matrix.chain }}.yaml
+#          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_DEV }} \
+#            fewensa/bridge-${{ matrix.chain }} \
+#            subgraph-${{ matrix.chain }}.yaml
+#
+#  thegraph-bsc:
+#    name: Subgraph BSC
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        chain: [chapel]
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-node@v2
+#        with:
+#          node-version: '16'
+#      - name: Deploy
+#        working-directory: thegraph/bsc
+#        run: |
+#          npm i
+#          npm run codegen -- subgraph-${{ matrix.chain }}.yaml
+#          npm run build -- subgraph-${{ matrix.chain }}.yaml
+#          npm run deploy -- --access-token ${{ secrets.THEGRAPH_TOKEN_DEV }} \
+#            fewensa/bridge-${{ matrix.chain }} \
+#            subgraph-${{ matrix.chain }}.yaml

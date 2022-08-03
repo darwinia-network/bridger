@@ -4,7 +4,7 @@
 
 ## Changed
 
-- fix bug for bridge s2s (#489)
+- Optional mandatory header relay (#496)
 
 ## Resources
 

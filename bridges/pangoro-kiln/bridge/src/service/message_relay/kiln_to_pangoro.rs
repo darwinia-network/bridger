@@ -1,5 +1,9 @@
-use web3::types::BlockNumber;
+use std::str::FromStr;
 
+use bridge_e2e_traits::strategy::EnforcementRelayStrategy;
+use web3::types::{Address, BlockNumber, U256};
+
+use crate::message_contract::simple_fee_market::{SimpleFeeMarket, SimpleFeeMarketRelayStrategy};
 use crate::{
     kiln_client::client::KilnClient, message_contract::message_client::MessageClient,
     pangoro_client::client::PangoroClient,
@@ -50,6 +54,8 @@ async fn start() -> color_eyre::Result<()> {
         &config.kiln.execution_layer_endpoint,
         &config.kiln.inbound_address,
         &config.kiln.outbound_address,
+        &config.kiln.fee_market_address,
+        Address::from_str(&config.kiln.account)?,
         Some(&config.pangoro.private_key),
     )
     .unwrap();
@@ -57,6 +63,8 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro.endpoint,
         &config.pangoro.inbound_address,
         &config.pangoro.outbound_address,
+        &config.pangoro.fee_market_address,
+        Address::from_str(&config.pangoro.account)?,
         Some(&config.pangoro.private_key),
     )
     .unwrap();
@@ -142,6 +150,24 @@ impl MessageRelay {
                 Some(BlockNumber::from(finalized_block_number)),
             )
             .await?;
+        let mut strategy = EnforcementRelayStrategy::new(self.source.strategy.clone());
+        let encoded_keys: Vec<U256> = proof
+            .outbound_lane_data
+            .messages
+            .iter()
+            .map(|x| x.encoded_key)
+            .collect();
+
+        if !strategy.decide(&encoded_keys).await? {
+            tracing::info!(
+                target: "pangoro-kiln",
+                "[MessageDelivery][Kiln => Pangoro] The relay strategy decide to not relay thess messaages {:?}",
+                (begin, end)
+            );
+
+            return Ok(());
+        }
+
         let tx = self
             .target
             .inbound

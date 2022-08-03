@@ -18,6 +18,8 @@ use crate::message_contract::{
 
 use crate::kiln_client::types::MessagesProof;
 
+use super::simple_fee_market::{SimpleFeeMarket, SimpleFeeMarketRelayStrategy};
+
 const LANE_IDENTIFY_SLOT: u64 = 0u64;
 const LANE_NONCE_SLOT: u64 = 1u64;
 const LANE_MESSAGE_SLOT: u64 = 2u64;
@@ -26,6 +28,7 @@ pub struct MessageClient {
     pub client: Web3<Http>,
     pub inbound: Inbound,
     pub outbound: Outbound,
+    pub strategy: SimpleFeeMarketRelayStrategy,
     pub private_key: Option<SecretKey>,
 }
 
@@ -34,18 +37,22 @@ impl MessageClient {
         endpoint: &str,
         inbound_address: &str,
         outbound_address: &str,
+        fee_market_address: &str,
+        account: Address,
         private_key: Option<&str>,
     ) -> color_eyre::Result<Self> {
         let transport = Http::new(endpoint)?;
         let client = Web3::new(transport);
         let inbound = Inbound::new(&client, inbound_address)?;
         let outbound = Outbound::new(&client, outbound_address)?;
+        let fee_market = SimpleFeeMarket::new(&client, fee_market_address)?;
         let private_key = private_key.map(SecretKey::from_str).transpose()?;
-
+        let strategy = SimpleFeeMarketRelayStrategy::new(fee_market, account);
         Ok(Self {
             client,
             inbound,
             outbound,
+            strategy,
             private_key,
         })
     }
@@ -268,6 +275,8 @@ mod tests {
             "http://localhost:8545",
             "0x588abe3F7EE935137102C5e2B8042788935f4CB0",
             "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
+            "0x721F10bdE716FF44F596Afa2E8726aF197e6218E",
+            Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
         )
         .unwrap()
@@ -278,6 +287,8 @@ mod tests {
             "https://pangoro-rpc.darwinia.network",
             "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
             "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5",
+            "0xB59a893f5115c1Ca737E36365302550074C32023",
+            Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
         )
         .unwrap()

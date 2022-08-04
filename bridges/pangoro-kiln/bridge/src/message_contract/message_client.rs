@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use bridge_e2e_traits::strategy::RelayStrategy;
 use futures::future;
 use secp256k1::SecretKey;
 use support_common::error::BridgerError;
@@ -24,39 +25,39 @@ const LANE_IDENTIFY_SLOT: u64 = 0u64;
 const LANE_NONCE_SLOT: u64 = 1u64;
 const LANE_MESSAGE_SLOT: u64 = 2u64;
 
-pub struct MessageClient {
+pub struct MessageClient<T: RelayStrategy> {
     pub client: Web3<Http>,
     pub inbound: Inbound,
     pub outbound: Outbound,
-    pub strategy: SimpleFeeMarketRelayStrategy,
+    pub strategy: T,
     pub private_key: Option<SecretKey>,
 }
 
-impl MessageClient {
-    pub fn new(
-        endpoint: &str,
-        inbound_address: &str,
-        outbound_address: &str,
-        fee_market_address: &str,
-        account: Address,
-        private_key: Option<&str>,
-    ) -> color_eyre::Result<Self> {
-        let transport = Http::new(endpoint)?;
-        let client = Web3::new(transport);
-        let inbound = Inbound::new(&client, inbound_address)?;
-        let outbound = Outbound::new(&client, outbound_address)?;
-        let fee_market = SimpleFeeMarket::new(&client, fee_market_address)?;
-        let private_key = private_key.map(SecretKey::from_str).transpose()?;
-        let strategy = SimpleFeeMarketRelayStrategy::new(fee_market, account);
-        Ok(Self {
-            client,
-            inbound,
-            outbound,
-            strategy,
-            private_key,
-        })
-    }
+pub fn build_message_client_with_simple_fee_market(
+    endpoint: &str,
+    inbound_address: &str,
+    outbound_address: &str,
+    fee_market_address: &str,
+    account: Address,
+    private_key: Option<&str>,
+) -> color_eyre::Result<MessageClient<SimpleFeeMarketRelayStrategy>> {
+    let transport = Http::new(endpoint)?;
+    let client = Web3::new(transport);
+    let inbound = Inbound::new(&client, inbound_address)?;
+    let outbound = Outbound::new(&client, outbound_address)?;
+    let fee_market = SimpleFeeMarket::new(&client, fee_market_address)?;
+    let strategy = SimpleFeeMarketRelayStrategy::new(fee_market, account);
+    let private_key = private_key.map(SecretKey::from_str).transpose()?;
+    Ok(MessageClient {
+        client,
+        inbound,
+        outbound,
+        strategy,
+        private_key,
+    })
+}
 
+impl<T: RelayStrategy> MessageClient<T> {
     pub fn private_key(&self) -> color_eyre::Result<SecretKey> {
         Ok(self
             .private_key
@@ -270,8 +271,8 @@ mod tests {
 
     use super::*;
 
-    fn test_client() -> MessageClient {
-        MessageClient::new(
+    fn test_client() -> MessageClient<SimpleFeeMarketRelayStrategy> {
+        let client = build_message_client_with_simple_fee_market(
             "http://localhost:8545",
             "0x588abe3F7EE935137102C5e2B8042788935f4CB0",
             "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
@@ -279,11 +280,12 @@ mod tests {
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
         )
-        .unwrap()
+        .unwrap();
+        client
     }
 
-    fn test_pangoro_client() -> MessageClient {
-        MessageClient::new(
+    fn test_pangoro_client() -> MessageClient<SimpleFeeMarketRelayStrategy> {
+        build_message_client_with_simple_fee_market(
             "https://pangoro-rpc.darwinia.network",
             "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
             "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5",
@@ -299,7 +301,8 @@ mod tests {
     async fn test_get_storage_proof() {
         let client = test_client();
         let (begin, end) = (1, 2);
-        let message_keys = MessageClient::build_message_storage_keys(begin, end);
+        let message_keys =
+            MessageClient::<SimpleFeeMarketRelayStrategy>::build_message_storage_keys(begin, end);
         println!("Message keys: {:?}", message_keys);
         let message_proof = client
             .get_storage_proof(client.outbound.contract.address(), message_keys, None)

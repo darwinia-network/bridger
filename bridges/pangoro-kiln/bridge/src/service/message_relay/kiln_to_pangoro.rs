@@ -1,8 +1,9 @@
 use std::str::FromStr;
 
-use bridge_e2e_traits::strategy::EnforcementRelayStrategy;
+use bridge_e2e_traits::strategy::{EnforcementRelayStrategy, RelayStrategy};
 use web3::types::{Address, BlockNumber, U256};
 
+use crate::message_contract::message_client::build_message_client_with_simple_fee_market;
 use crate::message_contract::simple_fee_market::{SimpleFeeMarket, SimpleFeeMarketRelayStrategy};
 use crate::{
     kiln_client::client::KilnClient, message_contract::message_client::MessageClient,
@@ -50,7 +51,7 @@ async fn start() -> color_eyre::Result<()> {
         Some(&config.pangoro.private_key),
     )?;
     let beacon_rpc_client = KilnClient::new(&config.kiln.endpoint)?;
-    let source = MessageClient::new(
+    let source = build_message_client_with_simple_fee_market(
         &config.kiln.execution_layer_endpoint,
         &config.kiln.inbound_address,
         &config.kiln.outbound_address,
@@ -59,7 +60,7 @@ async fn start() -> color_eyre::Result<()> {
         Some(&config.pangoro.private_key),
     )
     .unwrap();
-    let target = MessageClient::new(
+    let target = build_message_client_with_simple_fee_market(
         &config.pangoro.endpoint,
         &config.pangoro.inbound_address,
         &config.pangoro.outbound_address,
@@ -88,14 +89,14 @@ async fn start() -> color_eyre::Result<()> {
     }
 }
 
-pub struct MessageRelay {
-    pub source: MessageClient,
-    pub target: MessageClient,
+pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
+    pub source: MessageClient<S0>,
+    pub target: MessageClient<S1>,
     pub beacon_rpc_client: KilnClient,
     pub beacon_light_client: PangoroClient,
 }
 
-impl MessageRelay {
+impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
     async fn message_relay(&self) -> color_eyre::Result<()> {
         let received_nonce = self.target.inbound.inbound_lane_nonce().await?;
         let latest_nonce = self.source.outbound.outbound_lane_nonce().await?;

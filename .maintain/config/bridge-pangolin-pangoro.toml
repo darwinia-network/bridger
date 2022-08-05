@@ -11,6 +11,6 @@ lanes            = ["726f6c69"]
 enable_mandatory = false
 
 [index]
-pangolin = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-pangolin" }
-pangoro  = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-pangoro" }
+pangolin = { endpoint = "https://subql.darwinia.network/subql-bridger-pangolin" }
+pangoro  = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro" }
 

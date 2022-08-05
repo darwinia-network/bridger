@@ -47,4 +47,4 @@ timeout = 3000
 endpoint = "https://api.thegraph.com/subgraphs/name/darwinia-network/bridge-ethereum"
 
 [subquery]
-endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-darwinia"
+endpoint = "https://subql.darwinia.network/subql-bridger-darwinia"

@@ -105,7 +105,6 @@ pub struct IndexConfig {
     pub pangolin: SubqueryConfig,
     pub pangolin_parachain: SubqueryConfig,
     pub rococo: SubqueryConfig,
-    pub parachain_rococo: subquery_parachain::SubqueryConfig,
 }
 
 impl IndexConfig {
@@ -122,13 +121,6 @@ impl IndexConfig {
 
     pub fn to_rococo_subquery(&self) -> Subquery {
         SubqueryComponent::component(self.rococo.clone(), BridgeName::PangolinParachain)
-    }
-
-    pub fn to_candidate_subquery(&self) -> subquery_parachain::Subquery {
-        subquery_parachain::SubqueryComponent::component(
-            self.parachain_rococo.clone(),
-            subquery_parachain::types::BridgeName::PangolinParachain,
-        )
     }
 }
 

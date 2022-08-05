@@ -52,7 +52,6 @@ async fn start() -> color_eyre::Result<()> {
     let config_index = bridge_config.index;
     let subquery_kusama = config_index.to_kusama_subquery();
     let subquery_crab_parachain = config_index.to_crab_parachain_subquery();
-    let subquery_candidate = config_index.to_candidate_subquery();
 
     let input = RelaychainHeaderInput {
         client_relaychain: client_kusama,
@@ -60,7 +59,6 @@ async fn start() -> color_eyre::Result<()> {
         subquery_relaychain: subquery_kusama,
         subquery_parachain: subquery_crab_parachain,
         index_origin_type: OriginType::BridgeCrab,
-        subquery_candidate,
         enable_mandatory: bridge_config.relay.enable_mandatory,
     };
     let runner = RelaychainHeaderRunner::new(input);

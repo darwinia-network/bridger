@@ -9,6 +9,11 @@ use crate::types::{
     OriginType, QueryNeedRelay, QueryNextOnDemandBlockVars, QueryNextRelayBlockVars,
     RelayBlockOrigin,
 };
+#[cfg(feature = "relaychain")]
+use crate::types::{
+    CandidateIncludedEvent, QueryNextCandidateIncludedEventVars,
+    QueryNextCandidateIncludedEventWithParaHeadVars,
+};
 use crate::SubqueryComponentResult;
 
 /// Graphql dir
@@ -136,5 +141,31 @@ impl Subquery {
             .map(|item| item.nodes.clone())
             .unwrap_or_default();
         Ok(blocks.get(0).cloned())
+    }
+}
+
+#[cfg(feature = "relaychain")]
+impl Subquery {
+    pub async fn get_block_with_para_head(
+        &self,
+        para_head_hash: impl AsRef<str>,
+    ) -> SubqueryComponentResult<Option<CandidateIncludedEvent>> {
+        let query =
+            self.read_graphql("next_candidate_included_event_with_para_head.query.graphql")?;
+        let vars = QueryNextCandidateIncludedEventWithParaHeadVars {
+            para_head: String::from(para_head_hash.as_ref()),
+        };
+        let data = self
+            .client
+            .query_with_vars_unwrap::<HashMap<String, DataWrapper<CandidateIncludedEvent>>, QueryNextCandidateIncludedEventWithParaHeadVars>(
+                query, vars,
+            )
+            .await
+            .map_err(SubqueryComponentError::from)?;
+        let event = data
+            .get("candidateIncludedEvents")
+            .map(|item| item.nodes.clone())
+            .unwrap_or_default();
+        Ok(event.get(0).cloned())
     }
 }

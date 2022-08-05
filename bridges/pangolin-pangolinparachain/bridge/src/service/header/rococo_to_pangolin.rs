@@ -52,7 +52,6 @@ async fn start() -> color_eyre::Result<()> {
     let config_index = bridge_config.index;
     let subquery_rococo = config_index.to_rococo_subquery();
     let subquery_pangolin_parachain = config_index.to_pangolin_parachain_subquery();
-    let subquery_candidate = config_index.to_candidate_subquery();
 
     let input = RelaychainHeaderInput {
         client_relaychain: client_rococo,
@@ -60,7 +59,6 @@ async fn start() -> color_eyre::Result<()> {
         subquery_relaychain: subquery_rococo,
         subquery_parachain: subquery_pangolin_parachain,
         index_origin_type: OriginType::BridgePangolin,
-        subquery_candidate,
         enable_mandatory: bridge_config.relay.enable_mandatory,
     };
     let runner = RelaychainHeaderRunner::new(input);

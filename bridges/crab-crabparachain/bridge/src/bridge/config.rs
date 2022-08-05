@@ -103,7 +103,6 @@ pub struct IndexConfig {
     pub crab: SubqueryConfig,
     pub crab_parachain: SubqueryConfig,
     pub kusama: SubqueryConfig,
-    pub parachain_kusama: subquery_parachain::SubqueryConfig,
 }
 
 impl IndexConfig {
@@ -117,13 +116,6 @@ impl IndexConfig {
 
     pub fn to_kusama_subquery(&self) -> Subquery {
         SubqueryComponent::component(self.kusama.clone(), BridgeName::CrabParachain)
-    }
-
-    pub fn to_candidate_subquery(&self) -> subquery_parachain::Subquery {
-        subquery_parachain::SubqueryComponent::component(
-            self.parachain_kusama.clone(),
-            subquery_parachain::types::BridgeName::CrabParachain,
-        )
     }
 }
 

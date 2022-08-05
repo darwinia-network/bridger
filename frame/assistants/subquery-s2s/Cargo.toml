@@ -13,7 +13,7 @@ repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.6.2"
 
 [dependencies]
-include_dir = "0.7.2"
+include_dir = "0.7"
 thiserror   = "1.0"
 tracing     = "0.1"
 
@@ -26,6 +26,10 @@ strum       = { version = "0.21", features = ["derive"] }
 array-bytes = "2"
 
 gql_client = "1"
+
+[features]
+default    = []
+relaychain = []
 
 [dev-dependencies]
 tokio       = { version = "1", features = ["full"] }

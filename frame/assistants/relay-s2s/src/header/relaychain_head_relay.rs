@@ -165,8 +165,8 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             next_para_header.block_number,
         );
 
-        let subquery_candidate = &self.input.subquery_candidate;
-        let next_header = subquery_candidate
+        let subquery_relaychain = &self.input.subquery_relaychain;
+        let next_header = subquery_relaychain
             .get_block_with_para_head(next_para_header.block_hash)
             .await?
             .filter(|header| {

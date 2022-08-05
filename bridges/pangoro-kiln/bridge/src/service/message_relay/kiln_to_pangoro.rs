@@ -54,7 +54,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.kiln.execution_layer_endpoint,
         Address::from_str(&config.kiln.inbound_address)?,
         Address::from_str(&config.kiln.outbound_address)?,
-        &config.kiln.fee_market_address,
+        Address::from_str(&config.kiln.fee_market_address)?,
         Address::from_str(&config.kiln.account)?,
         Some(&config.pangoro.private_key),
     )
@@ -63,7 +63,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro.endpoint,
         Address::from_str(&config.pangoro.inbound_address)?,
         Address::from_str(&config.pangoro.outbound_address)?,
-        &config.pangoro.fee_market_address,
+        Address::from_str(&config.pangoro.fee_market_address)?,
         Address::from_str(&config.pangoro.account)?,
         Some(&config.pangoro.private_key),
     )

@@ -53,7 +53,7 @@ async fn start() -> color_eyre::Result<()> {
     let beacon_rpc_client = KilnClient::new(&config.kiln.endpoint)?;
     let source = build_message_client_with_simple_fee_market(
         &config.kiln.execution_layer_endpoint,
-        &config.kiln.inbound_address,
+        Address::from_str(&config.kiln.inbound_address)?,
         &config.kiln.outbound_address,
         &config.kiln.fee_market_address,
         Address::from_str(&config.kiln.account)?,
@@ -62,7 +62,7 @@ async fn start() -> color_eyre::Result<()> {
     .unwrap();
     let target = build_message_client_with_simple_fee_market(
         &config.pangoro.endpoint,
-        &config.pangoro.inbound_address,
+        Address::from_str(&config.pangoro.inbound_address)?,
         &config.pangoro.outbound_address,
         &config.pangoro.fee_market_address,
         Address::from_str(&config.pangoro.account)?,

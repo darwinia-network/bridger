@@ -38,9 +38,10 @@ web3      = { version = "0.18.0", features = ["signing"] }
 hamming   = "0.1"
 rlp       = "0.5.1"
 
-support-common   = { path = "../../../frame/supports/support-common" }
-support-lifeline = { path = "../../../frame/supports/support-lifeline" }
-support-terminal = { path = "../../../frame/supports/support-terminal" }
-bridge-e2e-traits       = { path = "../../../frame/traits/bridge-e2e" }
-
+support-common        = { path = "../../../frame/supports/support-common" }
+support-lifeline      = { path = "../../../frame/supports/support-lifeline" }
+support-terminal      = { path = "../../../frame/supports/support-terminal" }
+bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
 component-http-client = { path = "../../../frame/components/http-client" }
+
+client-contracts = { path = "../../../frame/assistants/client-contracts" }

@@ -12,9 +12,10 @@ use web3::{
     Web3,
 };
 
-use crate::message_contract::{
-    inbound::{Inbound, Message, OutboundLaneData, Payload, ReceiveMessagesProof},
-    outbound::{MessageAccepted, Outbound},
+use crate::message_contract::outbound::{MessageAccepted, Outbound};
+use client_contracts::{
+    inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
+    Inbound,
 };
 
 use crate::kiln_client::types::MessagesProof;
@@ -35,7 +36,7 @@ pub struct MessageClient<T: RelayStrategy> {
 
 pub fn build_message_client_with_simple_fee_market(
     endpoint: &str,
-    inbound_address: &str,
+    inbound_address: Address,
     outbound_address: &str,
     fee_market_address: &str,
     account: Address,
@@ -267,14 +268,14 @@ mod tests {
     use std::str::FromStr;
 
     use secp256k1::SecretKey;
-    use web3::types::U64;
+    use web3::types::{Address, U64};
 
     use super::*;
 
     fn test_client() -> MessageClient<SimpleFeeMarketRelayStrategy> {
         let client = build_message_client_with_simple_fee_market(
             "http://localhost:8545",
-            "0x588abe3F7EE935137102C5e2B8042788935f4CB0",
+            Address::from_str("0x588abe3F7EE935137102C5e2B8042788935f4CB0").unwrap(),
             "0xee4f69fc69F2C203a0572e43375f68a6e9027998",
             "0x721F10bdE716FF44F596Afa2E8726aF197e6218E",
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
@@ -287,7 +288,7 @@ mod tests {
     fn test_pangoro_client() -> MessageClient<SimpleFeeMarketRelayStrategy> {
         build_message_client_with_simple_fee_market(
             "https://pangoro-rpc.darwinia.network",
-            "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207",
+            Address::from_str("0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207").unwrap(),
             "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5",
             "0xB59a893f5115c1Ca737E36365302550074C32023",
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),

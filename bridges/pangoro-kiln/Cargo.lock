@@ -170,6 +170,7 @@ dependencies = [
  "async-trait",
  "bridge-e2e-traits",
  "bytes",
+ "client-contracts",
  "color-eyre",
  "component-http-client",
  "futures",
@@ -252,6 +253,22 @@ dependencies = [
  "textwrap",
  "unicode-width",
  "vec_map",
+]
+
+[[package]]
+name = "client-contracts"
+version = "0.6.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bridge-e2e-traits",
+ "futures",
+ "hamming",
+ "rlp",
+ "secp256k1",
+ "thiserror",
+ "tokio",
+ "web3",
 ]
 
 [[package]]

@@ -1,12 +1,12 @@
 [crab]
-endpoint = "wss://crab-rpc.darwinia.network:443"
+endpoint = "wss://crab-rpc.darwinia.network"
 signer   = "//Alice"
 
 [kusama]
 endpoint = "wss://kusama-rpc.polkadot.io:443"
 
 [crab_parachain]
-endpoint = "wss://crab-parachain-rpc.darwinia.network:443"
+endpoint = "wss://crab-parachain-rpc.darwinia.network"
 signer   = "//Alice"
 
 [relay]

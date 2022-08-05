@@ -4,7 +4,6 @@ use bridge_e2e_traits::strategy::{EnforcementRelayStrategy, RelayStrategy};
 use web3::types::{Address, BlockNumber, U256};
 
 use crate::message_contract::message_client::build_message_client_with_simple_fee_market;
-use crate::message_contract::simple_fee_market::{SimpleFeeMarket, SimpleFeeMarketRelayStrategy};
 use crate::{
     kiln_client::client::KilnClient, message_contract::message_client::MessageClient,
     pangoro_client::client::PangoroClient,
@@ -54,7 +53,7 @@ async fn start() -> color_eyre::Result<()> {
     let source = build_message_client_with_simple_fee_market(
         &config.kiln.execution_layer_endpoint,
         Address::from_str(&config.kiln.inbound_address)?,
-        &config.kiln.outbound_address,
+        Address::from_str(&config.kiln.outbound_address)?,
         &config.kiln.fee_market_address,
         Address::from_str(&config.kiln.account)?,
         Some(&config.pangoro.private_key),
@@ -63,7 +62,7 @@ async fn start() -> color_eyre::Result<()> {
     let target = build_message_client_with_simple_fee_market(
         &config.pangoro.endpoint,
         Address::from_str(&config.pangoro.inbound_address)?,
-        &config.pangoro.outbound_address,
+        Address::from_str(&config.pangoro.outbound_address)?,
         &config.pangoro.fee_market_address,
         Address::from_str(&config.pangoro.account)?,
         Some(&config.pangoro.private_key),

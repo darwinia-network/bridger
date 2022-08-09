@@ -17,11 +17,11 @@ use client_contracts::{
     inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
     Inbound,
 };
-use client_contracts::{outbound_types::MessageAccepted, Outbound};
+use client_contracts::{outbound_types::MessageAccepted, Outbound, SimpleFeeMarket};
 
 use crate::kiln_client::types::MessagesProof;
 
-use super::simple_fee_market::{SimpleFeeMarket, SimpleFeeMarketRelayStrategy};
+use super::simple_fee_market::SimpleFeeMarketRelayStrategy;
 
 const LANE_IDENTIFY_SLOT: u64 = 0u64;
 const LANE_NONCE_SLOT: u64 = 1u64;
@@ -39,7 +39,7 @@ pub fn build_message_client_with_simple_fee_market(
     endpoint: &str,
     inbound_address: Address,
     outbound_address: Address,
-    fee_market_address: &str,
+    fee_market_address: Address,
     account: Address,
     private_key: Option<&str>,
 ) -> color_eyre::Result<MessageClient<SimpleFeeMarketRelayStrategy>> {
@@ -278,7 +278,7 @@ mod tests {
             "http://localhost:8545",
             Address::from_str("0x588abe3F7EE935137102C5e2B8042788935f4CB0").unwrap(),
             Address::from_str("0xee4f69fc69F2C203a0572e43375f68a6e9027998").unwrap(),
-            "0x721F10bdE716FF44F596Afa2E8726aF197e6218E",
+            Address::from_str("0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap(),
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
         )
@@ -291,7 +291,7 @@ mod tests {
             "https://pangoro-rpc.darwinia.network",
             Address::from_str("0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207").unwrap(),
             Address::from_str("0xEe8CA1000c0310afF74BA0D71a99EC02650798E5").unwrap(),
-            "0xB59a893f5115c1Ca737E36365302550074C32023",
+            Address::from_str("0xB59a893f5115c1Ca737E36365302550074C32023").unwrap(),
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
         )

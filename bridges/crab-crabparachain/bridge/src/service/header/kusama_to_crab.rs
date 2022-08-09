@@ -61,6 +61,7 @@ async fn start() -> color_eyre::Result<()> {
         subquery_parachain: subquery_crab_parachain,
         index_origin_type: OriginType::BridgeCrab,
         subquery_candidate,
+        enable_mandatory: bridge_config.relay.enable_mandatory,
     };
     let runner = RelaychainHeaderRunner::new(input);
     Ok(runner.start().await?)

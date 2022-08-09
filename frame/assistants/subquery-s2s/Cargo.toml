@@ -10,7 +10,7 @@ license       = "MIT"
 name          = "subquery-s2s"
 readme        = 'README.md'
 repository    = "https://github.com/darwinia-network/bridger"
-version       = "0.6.1"
+version       = "0.6.2"
 
 [dependencies]
 include_dir = "0.7.2"

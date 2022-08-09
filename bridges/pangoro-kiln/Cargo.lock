@@ -156,7 +156,7 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
 name = "bridge-e2e-traits"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "async-trait",
  "thiserror",
@@ -165,7 +165,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangoro-kiln"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "async-trait",
  "bridge-e2e-traits",
@@ -257,7 +257,7 @@ dependencies = [
 
 [[package]]
 name = "client-contracts"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -311,7 +311,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -1968,7 +1968,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "color-eyre",
  "config",
@@ -1987,7 +1987,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -1995,7 +1995,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "colored",
  "serde 1.0.139",

@@ -103,6 +103,13 @@ impl PosaLightClient {
             )
             .await?)
     }
+
+    pub async fn block_number(&self) -> BridgeContractResult<U256> {
+        Ok(self
+            .contract
+            .query("block_number", (), None, Options::default(), None)
+            .await?)
+    }
 }
 
 pub mod types {
@@ -150,4 +157,22 @@ pub mod types {
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use std::str::FromStr;
+
+    use super::*;
+    use web3::transports::Http;
+
+    #[tokio::test]
+    async fn test_query() {
+        let transport = Http::new("http://127.0.0.1:8545").unwrap();
+        let client = web3::Web3::new(transport);
+        let lclient = PosaLightClient::new(
+            &client,
+            Address::from_str("0xd345Cc26e3685DA584AC9C38393F9f603B122EcF").unwrap(),
+        )
+        .unwrap();
+        let result = lclient.block_number().await.unwrap();
+        dbg!(result);
+    }
+}

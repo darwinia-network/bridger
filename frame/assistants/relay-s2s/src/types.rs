@@ -32,8 +32,6 @@ pub struct RelaychainHeaderInput<SC: S2SClientGeneric, TC: S2SClientRelay> {
     pub subquery_relaychain: Subquery,
     pub subquery_parachain: Subquery,
     pub index_origin_type: OriginType,
-    // todo: merge this subquery to subquery_relaychain
-    pub subquery_candidate: subquery_parachain::Subquery,
     pub enable_mandatory: bool,
 }
 

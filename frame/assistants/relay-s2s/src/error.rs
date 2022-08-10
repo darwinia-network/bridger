@@ -16,13 +16,3 @@ pub enum RelayError {
     #[error("Custom: {0}")]
     Custom(String),
 }
-
-impl From<subquery_parachain::SubqueryComponentError> for RelayError {
-    fn from(error: subquery_parachain::SubqueryComponentError) -> Self {
-        match error {
-            subquery_parachain::SubqueryComponentError::GraphQL(message) => {
-                RelayError::Subquery(SubqueryComponentError::GraphQL(message))
-            }
-        }
-    }
-}

@@ -33,10 +33,10 @@ support-toolkit     = { path = "../../supports/support-toolkit", features = ["co
 
 bridge-s2s-traits = { path = "../../traits/bridge-s2s" }
 subquery-s2s        = { path = "../subquery-s2s" }
-subquery-parachain  = { path = "../subquery-parachain" }
 
 [features]
 default = []
 bridge-parachain = [
   "bridge-s2s-traits/bridge-parachain",
+  "subquery-s2s/relaychain"
 ]

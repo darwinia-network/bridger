@@ -416,7 +416,7 @@ dependencies = [
  "serde 1.0.136",
  "structopt",
  "strum",
- "subquery-s2s",
+ "subquery",
  "support-common",
  "support-lifeline",
  "support-toolkit",
@@ -2786,8 +2786,7 @@ dependencies = [
  "once_cell",
  "sp-core",
  "sp-runtime",
- "subquery-parachain",
- "subquery-s2s",
+ "subquery",
  "support-toolkit",
  "thiserror",
  "tokio",
@@ -3788,23 +3787,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "subquery-parachain"
-version = "0.6.2"
-dependencies = [
- "async-trait",
- "gql_client",
- "hex",
- "include_dir",
- "serde 1.0.136",
- "serde-aux",
- "serde-hex",
- "strum",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "subquery-s2s"
+name = "subquery"
 version = "0.6.2"
 dependencies = [
  "array-bytes",

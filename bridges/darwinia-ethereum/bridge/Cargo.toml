@@ -56,5 +56,5 @@ component-http-client     = { path = "../../../frame/components/http-client" }
 component-state           = { path = "../../../frame/components/state" }
 
 thegraph-liketh = { path = "../../../frame/assistants/thegraph-liketh" }
-subquery-d2e    = { path = "../../../frame/assistants/subquery-d2e" }
+subquery        = { path = "../../../frame/assistants/subquery", features = ["bridge-ethv1"] }
 shadow-liketh   = { path = "../../../frame/assistants/shadow-liketh" }

@@ -2,7 +2,7 @@ use codec::Decode;
 
 use client_pangolin_parachain::types::runtime_types::bp_header_chain::justification::GrandpaJustification;
 use client_pangolin_parachain::types::runtime_types::sp_runtime::generic::header::Header as FinalityTarget;
-use subquery_s2s::types::{JustificationMapping, NeedRelayBlock};
+use subquery::types::{JustificationMapping, NeedRelayBlock};
 
 #[test]
 fn test_finality_target() {

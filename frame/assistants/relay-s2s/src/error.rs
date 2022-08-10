@@ -1,6 +1,6 @@
 use bridge_s2s_traits::error::S2SClientError;
 use sp_runtime::codec;
-use subquery_s2s::SubqueryComponentError;
+use subquery::SubqueryComponentError;
 use thiserror::Error as ThisError;
 
 pub type RelayResult<T> = Result<T, RelayError>;
@@ -15,14 +15,4 @@ pub enum RelayError {
     Codec(#[from] codec::Error),
     #[error("Custom: {0}")]
     Custom(String),
-}
-
-impl From<subquery_parachain::SubqueryComponentError> for RelayError {
-    fn from(error: subquery_parachain::SubqueryComponentError) -> Self {
-        match error {
-            subquery_parachain::SubqueryComponentError::GraphQL(message) => {
-                RelayError::Subquery(SubqueryComponentError::GraphQL(message))
-            }
-        }
-    }
 }

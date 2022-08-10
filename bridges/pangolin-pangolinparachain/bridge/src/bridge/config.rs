@@ -5,8 +5,8 @@ use client_pangolin_parachain::component::PangolinParachainClientComponent;
 use client_rococo::client::RococoClient;
 use client_rococo::component::RococoClientComponent;
 use serde::{Deserialize, Serialize};
-use subquery_s2s::types::BridgeName;
-use subquery_s2s::{Subquery, SubqueryComponent, SubqueryConfig};
+use subquery::types::BridgeName;
+use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 
 use support_common::error::BridgerError;
 
@@ -105,7 +105,6 @@ pub struct IndexConfig {
     pub pangolin: SubqueryConfig,
     pub pangolin_parachain: SubqueryConfig,
     pub rococo: SubqueryConfig,
-    pub parachain_rococo: subquery_parachain::SubqueryConfig,
 }
 
 impl IndexConfig {
@@ -122,13 +121,6 @@ impl IndexConfig {
 
     pub fn to_rococo_subquery(&self) -> Subquery {
         SubqueryComponent::component(self.rococo.clone(), BridgeName::PangolinParachain)
-    }
-
-    pub fn to_candidate_subquery(&self) -> subquery_parachain::Subquery {
-        subquery_parachain::SubqueryComponent::component(
-            self.parachain_rococo.clone(),
-            subquery_parachain::types::BridgeName::PangolinParachain,
-        )
     }
 }
 

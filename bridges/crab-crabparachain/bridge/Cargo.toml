@@ -34,7 +34,6 @@ bridge-s2s-traits     = { path = "../../../frame/traits/bridge-s2s" }
 client-crab           = { path = "../../../frame/assistants/client-crab", features = [ "bridge-s2s-crab-parachain", "feemarket-s2s-crab-parachain" ]}
 client-kusama         = { path = "../../../frame/assistants/client-kusama", features = [ "bridge-s2s-crab" ] }
 client-crab-parachain = { path = "../../../frame/assistants/client-crab-parachain", features = [ "bridge-s2s-crab", "feemarket-s2s-crab" ] }
-subquery-s2s          = { path = "../../../frame/assistants/subquery-s2s" }
-subquery-parachain    = { path = "../../../frame/assistants/subquery-parachain" }
+subquery              = { path = "../../../frame/assistants/subquery", features = ["bridge-parachain"] }
 relay-s2s             = { path = "../../../frame/assistants/relay-s2s", features = [ "bridge-parachain" ] }
 feemarket-s2s         = { path = "../../../frame/assistants/feemarket-s2s" }

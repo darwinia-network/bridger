@@ -11,5 +11,5 @@ lanes            = ["00000000"]
 enable_mandatory = false
 
 [index]
-darwinia = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-darwinia" }
-crab     = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-crab" }
+darwinia = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia" }
+crab     = { endpoint = "https://subql.darwinia.network/subql-bridger-crab" }

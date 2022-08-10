@@ -5,8 +5,8 @@ use client_crab_parachain::component::CrabParachainClientComponent;
 use client_kusama::client::KusamaClient;
 use client_kusama::component::KusamaClientComponent;
 use serde::{Deserialize, Serialize};
-use subquery_s2s::types::BridgeName;
-use subquery_s2s::{Subquery, SubqueryComponent, SubqueryConfig};
+use subquery::types::BridgeName;
+use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 
 use support_common::error::BridgerError;
 
@@ -103,7 +103,6 @@ pub struct IndexConfig {
     pub crab: SubqueryConfig,
     pub crab_parachain: SubqueryConfig,
     pub kusama: SubqueryConfig,
-    pub parachain_kusama: subquery_parachain::SubqueryConfig,
 }
 
 impl IndexConfig {
@@ -117,13 +116,6 @@ impl IndexConfig {
 
     pub fn to_kusama_subquery(&self) -> Subquery {
         SubqueryComponent::component(self.kusama.clone(), BridgeName::CrabParachain)
-    }
-
-    pub fn to_candidate_subquery(&self) -> subquery_parachain::Subquery {
-        subquery_parachain::SubqueryComponent::component(
-            self.parachain_kusama.clone(),
-            subquery_parachain::types::BridgeName::CrabParachain,
-        )
     }
 }
 

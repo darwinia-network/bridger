@@ -1,12 +1,12 @@
 [crab]
-endpoint = "wss://crab-rpc.darwinia.network:443"
+endpoint = "wss://crab-rpc.darwinia.network"
 signer   = "//Alice"
 
 [kusama]
 endpoint = "wss://kusama-rpc.polkadot.io:443"
 
 [crab_parachain]
-endpoint = "wss://crab-parachain-rpc.darwinia.network:443"
+endpoint = "wss://crab-parachain-rpc.darwinia.network"
 signer   = "//Alice"
 
 [relay]
@@ -15,8 +15,7 @@ para_id          = 2105
 enable_mandatory = false
 
 [index]
-crab               = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-crab" }
-kusama             = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-kusama" }
-crab_parachain     = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-bridge-s2s-crab-parachain" }
-parachain_kusama   = { endpoint = "https://api.subquery.network/sq/darwinia-network/subql-parachain-kusama" }
+crab               = { endpoint = "https://subql.darwinia.network/subql-bridger-crab" }
+kusama             = { endpoint = "https://subql.darwinia.network/subql-bridger-kusama" }
+crab_parachain     = { endpoint = "https://subql.darwinia.network/subql-bridger-crab-parachain" }
 

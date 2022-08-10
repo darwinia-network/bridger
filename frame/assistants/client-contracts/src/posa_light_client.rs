@@ -10,11 +10,11 @@ use web3::{
 
 use crate::error::BridgeContractResult;
 
-pub struct Inbound {
+pub struct PosaLightClient {
     pub contract: Contract<Http>,
 }
 
-impl Inbound {
+impl PosaLightClient {
     pub fn new(client: &Web3<Http>, address: Address) -> BridgeContractResult<Self> {
         let contract = Contract::from_json(
             client.eth(),

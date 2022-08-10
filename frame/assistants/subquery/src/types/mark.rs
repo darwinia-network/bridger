@@ -33,6 +33,7 @@ impl BridgeName {
             Self::DarwiniaEthereum => "darwinia-ethereum",
             #[cfg(feature = "bridge-s2s")]
             Self::PangolinParachain => "pangolin-parachain",
+            #[cfg(feature = "bridge-s2s")]
             Self::PangolinPangoro => "pangolin-pangoro",
             #[cfg(feature = "bridge-s2s")]
             Self::CrabParachain => "crab-parachain",

@@ -34,8 +34,8 @@ gql_client = "1"
 
 [features]
 default          = []
-bridge-s2s       = []
+bridge-s2s       = ["array-bytes"]
 bridge-parachain = ["bridge-s2s"]
-bridge-ethv1     = ["array-bytes"]
+bridge-ethv1     = []
 bridge-ethv2     = []
 

@@ -3,8 +3,8 @@ use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay};
 use bridge_s2s_traits::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
 use bridge_s2s_traits::strategy::RelayStrategy;
 use bridge_s2s_traits::types::bp_runtime::Chain;
-use subquery_s2s::types::{OriginType, RelayBlockOrigin};
-use subquery_s2s::Subquery;
+use subquery::types::{OriginType, RelayBlockOrigin};
+use subquery::Subquery;
 
 use crate::error::{RelayError, RelayResult};
 

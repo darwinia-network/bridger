@@ -28,12 +28,14 @@ serde-hex   = "0.1"
 async-trait = "0.1"
 strum       = { version = "0.21", features = ["derive"] }
 hex         = "0.4"
+array-bytes = { optional = true, version = "2" }
 
 gql_client = "1"
 
 [features]
-default      = []
-bridge-s2s   = []
-bridge-ethv1 = []
-bridge-ethv2 = []
+default          = []
+bridge-s2s       = []
+bridge-parachain = ["bridge-s2s"]
+bridge-ethv1     = ["array-bytes"]
+bridge-ethv2     = []
 

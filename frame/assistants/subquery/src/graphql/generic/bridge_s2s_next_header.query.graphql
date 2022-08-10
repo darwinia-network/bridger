@@ -1,0 +1,31 @@
+query queryNextRelayBlock($block: Int!) {
+  needRelayBlocks (
+    first: 1
+    orderBy: BLOCK_NUMBER_ASC
+    filter: {
+      blockNumber: {
+        greaterThan: $block
+      }
+      type: {
+        equalTo: "mandatory"
+      }
+    }
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
+      type
+      origin
+      laneId
+      messageNonce
+      parentHash
+      stateRoot
+      extrinsicsRoot
+      digest
+      onDemandType
+      additional
+      timestamp
+    }
+  }
+}

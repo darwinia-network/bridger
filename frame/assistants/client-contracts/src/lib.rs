@@ -2,6 +2,7 @@ pub mod chain_message_committer;
 pub mod error;
 pub mod inbound;
 pub mod outbound;
+pub mod posa_light_client;
 pub mod simple_fee_market;
 
 pub use chain_message_committer::ChainMessageCommitter;

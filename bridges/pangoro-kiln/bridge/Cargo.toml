@@ -43,5 +43,5 @@ support-lifeline      = { path = "../../../frame/supports/support-lifeline" }
 support-terminal      = { path = "../../../frame/supports/support-terminal" }
 bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
 component-http-client = { path = "../../../frame/components/http-client" }
-
-client-contracts = { path = "../../../frame/assistants/client-contracts" }
+subquery              = { path = "../../../frame/assistants/subquery", features = [ "bridge-ethv2" ] }
+client-contracts      = { path = "../../../frame/assistants/client-contracts" }

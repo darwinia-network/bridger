@@ -1,9 +1,12 @@
 use serde::{Deserialize, Serialize};
+use subquery::types::BridgeName;
+use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
     pub pangoro: PangoroConfig,
     pub kiln: ChainInfoConfig,
+    pub index: IndexConfig,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -30,4 +33,15 @@ pub struct PangoroConfig {
     pub inbound_address: String,
     pub outbound_address: String,
     pub fee_market_address: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct IndexConfig {
+    pub pangoro: SubqueryConfig,
+}
+
+impl IndexConfig {
+    pub fn to_pangoro_subquery(&self) -> Subquery {
+        SubqueryComponent::component(self.pangoro.clone(), BridgeName::PangoroGoerli)
+    }
 }

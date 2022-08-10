@@ -1,0 +1,26 @@
+query nextCollectedEnoughAuthoritiesChangeSignaturesEvent($block: Int) {
+  collectedEnoughAuthoritiesChangeSignaturesEvents(
+    orderBy: BLOCK_NUMBER_ASC
+    first: 1
+    filter: {
+      blockNumber: {
+        greaterThan: $block
+      }
+    }
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
+      message
+      operation
+      signatures {
+        nodes {
+          id
+          address
+          signature
+        }
+      }
+    }
+  }
+}

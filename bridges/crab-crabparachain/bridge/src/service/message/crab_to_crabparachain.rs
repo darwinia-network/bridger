@@ -2,7 +2,7 @@ use client_crab::client::CrabClient;
 use client_crab_parachain::client::CrabParachainClient;
 use feemarket_s2s::relay::basic::BasicRelayStrategy;
 use lifeline::{Lifeline, Service, Task};
-use subquery_s2s::types::RelayBlockOrigin;
+use subquery::types::RelayBlockOrigin;
 
 use relay_s2s::message::{BridgeParachainReceivingRunner, BridgeSolochainDeliveryRunner};
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};

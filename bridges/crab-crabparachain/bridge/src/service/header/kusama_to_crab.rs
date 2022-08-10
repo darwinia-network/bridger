@@ -1,5 +1,5 @@
 use lifeline::{Lifeline, Service, Task};
-use subquery_s2s::types::OriginType;
+use subquery::types::OriginType;
 
 use relay_s2s::header::RelaychainHeaderRunner;
 use relay_s2s::types::RelaychainHeaderInput;

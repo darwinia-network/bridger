@@ -3,8 +3,8 @@ use microkv::namespace::NamespaceMicroKV;
 use postage::broadcast;
 
 use component_ethereum::ethereum::EthereumComponent;
-use subquery_d2e::types::BridgeName;
-use subquery_d2e::SubqueryComponent;
+use subquery::types::BridgeName;
+use subquery::SubqueryComponent;
 use support_common::config::{Config, Names};
 use support_tracker::Tracker;
 

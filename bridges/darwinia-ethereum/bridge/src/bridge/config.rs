@@ -5,7 +5,7 @@ use component_ethereum::ethereum::EthereumConfig;
 use component_ethereum::web3::Web3Config;
 use component_http_client::HttpClientConfig;
 use shadow_liketh::config::ShadowConfig;
-use subquery_d2e::SubqueryConfig;
+use subquery::SubqueryConfig;
 use thegraph_liketh::config::TheGraphLikeEthConfig;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

@@ -440,7 +440,7 @@ dependencies = [
  "sp-runtime",
  "structopt",
  "strum",
- "subquery-s2s",
+ "subquery",
  "support-common",
  "support-lifeline",
  "support-toolkit",
@@ -3878,6 +3878,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "subquery"
+version = "0.6.2"
+dependencies = [
+ "async-trait",
+ "gql_client",
+ "hex",
+ "include_dir",
+ "serde 1.0.137",
+ "serde-aux",
+ "serde-hex",
+ "strum",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

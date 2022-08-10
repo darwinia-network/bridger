@@ -5,8 +5,8 @@ use client_crab_parachain::component::CrabParachainClientComponent;
 use client_kusama::client::KusamaClient;
 use client_kusama::component::KusamaClientComponent;
 use serde::{Deserialize, Serialize};
-use subquery_s2s::types::BridgeName;
-use subquery_s2s::{Subquery, SubqueryComponent, SubqueryConfig};
+use subquery::types::BridgeName;
+use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 
 use support_common::error::BridgerError;
 

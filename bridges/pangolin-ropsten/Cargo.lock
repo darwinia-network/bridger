@@ -347,7 +347,7 @@ dependencies = [
  "shadow-liketh",
  "structopt",
  "strum",
- "subquery-d2e",
+ "subquery",
  "support-command-kv",
  "support-common",
  "support-lifeline",
@@ -3626,9 +3626,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "subquery-d2e"
+name = "subquery"
 version = "0.6.2"
 dependencies = [
+ "array-bytes",
  "async-trait",
  "gql_client",
  "hex",

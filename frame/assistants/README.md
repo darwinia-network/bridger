@@ -26,7 +26,7 @@ Please note the following storage keys
 
 effect chains:
 - pangolin
-- pangoro
+- darwinia
 
 
 - *Feemarket::Orders

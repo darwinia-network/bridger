@@ -3,8 +3,8 @@ use client_crab::component::CrabClientComponent;
 use client_darwinia::client::DarwiniaClient;
 use client_darwinia::component::DarwiniaClientComponent;
 use serde::{Deserialize, Serialize};
-use subquery_s2s::types::BridgeName;
-use subquery_s2s::{Subquery, SubqueryComponent, SubqueryConfig};
+use subquery::types::BridgeName;
+use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 
 use crate::types::HexLaneId;
 

@@ -440,7 +440,7 @@ dependencies = [
  "sp-runtime",
  "structopt",
  "strum",
- "subquery-s2s",
+ "subquery",
  "support-common",
  "support-lifeline",
  "support-toolkit",
@@ -2870,7 +2870,7 @@ dependencies = [
  "once_cell",
  "sp-core",
  "sp-runtime",
- "subquery-s2s",
+ "subquery",
  "support-toolkit",
  "thiserror",
  "tokio",
@@ -3881,7 +3881,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "subquery-s2s"
+name = "subquery"
 version = "0.6.2"
 dependencies = [
  "array-bytes",

@@ -1,7 +1,7 @@
 use client_crab::client::CrabClient;
 use client_darwinia::client::DarwiniaClient;
 use lifeline::{Lifeline, Service, Task};
-use subquery_s2s::types::RelayBlockOrigin;
+use subquery::types::RelayBlockOrigin;
 
 use feemarket_s2s::relay::basic::BasicRelayStrategy;
 use relay_s2s::message::{BridgeSolochainDeliveryRunner, BridgeSolochainReceivingRunner};

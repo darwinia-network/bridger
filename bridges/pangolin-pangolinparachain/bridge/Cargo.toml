@@ -34,7 +34,7 @@ bridge-s2s-traits         = { path = "../../../frame/traits/bridge-s2s" }
 client-pangolin           = { path = "../../../frame/assistants/client-pangolin", features = [ "bridge-s2s-pangolin-parachain", "feemarket-s2s-pangolin-parachain" ]}
 client-rococo             = { path = "../../../frame/assistants/client-rococo", features = [ "bridge-s2s-pangolin" ] }
 client-pangolin-parachain = { path = "../../../frame/assistants/client-pangolin-parachain", features = [ "bridge-s2s-pangolin", "feemarket-s2s-pangolin" ] }
-subquery-s2s              = { path = "../../../frame/assistants/subquery-s2s", features = ["relaychain"] }
+subquery                  = { path = "../../../frame/assistants/subquery", features = ["bridge-parachain"] }
 relay-s2s                 = { path = "../../../frame/assistants/relay-s2s", features = [ "bridge-parachain" ] }
 feemarket-s2s             = { path = "../../../frame/assistants/feemarket-s2s" }
 

@@ -1,5 +1,5 @@
 [package]
-name = "subquery-d2e"
+name = "subquery"
 version = "0.6.2"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -28,5 +28,14 @@ serde-hex   = "0.1"
 async-trait = "0.1"
 strum       = { version = "0.21", features = ["derive"] }
 hex         = "0.4"
+array-bytes = { optional = true, version = "2" }
 
 gql_client = "1"
+
+[features]
+default          = []
+bridge-s2s       = ["array-bytes"]
+bridge-parachain = ["bridge-s2s"]
+bridge-ethv1     = []
+bridge-ethv2     = []
+

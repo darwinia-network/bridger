@@ -5,7 +5,7 @@ use bridge_s2s_traits::types::bp_header_chain;
 use bridge_s2s_traits::types::bp_runtime::Chain;
 use sp_runtime::codec;
 use sp_runtime::traits::Header;
-use subquery_s2s::types::NeedRelayBlock;
+use subquery::types::NeedRelayBlock;
 
 use support_toolkit::{convert::SmartCodecMapper, logk};
 

@@ -1,51 +1,12 @@
 use std::collections::HashMap;
 
-use gql_client::Client;
-use include_dir::{include_dir, Dir};
-
-use crate::error::SubqueryComponentError;
+#[cfg(feature = "bridge-parachain")]
+use crate::types::{CandidateIncludedEvent, QueryNextCandidateIncludedEventWithParaHeadVars};
 use crate::types::{
-    BridgeName, DataWrapper, FindJustificationVars, JustificationMapping, NeedRelayBlock,
-    OriginType, QueryNeedRelay, QueryNextOnDemandBlockVars, QueryNextRelayBlockVars,
-    RelayBlockOrigin,
+    DataWrapper, FindJustificationVars, JustificationMapping, NeedRelayBlock, OriginType,
+    QueryNeedRelay, QueryNextOnDemandBlockVars, QueryNextRelayBlockVars, RelayBlockOrigin,
 };
-#[cfg(feature = "relaychain")]
-use crate::types::{
-    CandidateIncludedEvent, QueryNextCandidateIncludedEventVars,
-    QueryNextCandidateIncludedEventWithParaHeadVars,
-};
-use crate::SubqueryComponentResult;
-
-/// Graphql dir
-static GRAPHQL_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/graphql");
-
-/// Subquery client
-#[derive(Clone, Debug)]
-pub struct Subquery {
-    client: Client,
-    bridge: BridgeName,
-}
-
-impl Subquery {
-    /// Create subquery instance
-    pub fn new(client: Client, bridge: BridgeName) -> Self {
-        Self { client, bridge }
-    }
-}
-
-impl Subquery {
-    fn read_graphql(&self, file: impl AsRef<str>) -> SubqueryComponentResult<&str> {
-        let file = file.as_ref();
-        let dir = self.bridge.directory();
-        let graph = GRAPHQL_DIR
-            .get_file(format!("{}/{}", dir, file))
-            .or_else(|| GRAPHQL_DIR.get_file(format!("generic/{}", file)))
-            .ok_or_else(|| SubqueryComponentError::GraphQL("No graphql fround".to_string()))?;
-        graph.contents_utf8().ok_or_else(|| {
-            SubqueryComponentError::GraphQL("Failed to read graphql file".to_string())
-        })
-    }
-}
+use crate::{Subquery, SubqueryComponentError, SubqueryComponentResult};
 
 impl Subquery {
     /// Query next mandatory header
@@ -53,7 +14,7 @@ impl Subquery {
         &self,
         block_number: u32,
     ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {
-        let query = self.read_graphql("next_header.query.graphql")?;
+        let query = self.read_graphql("bridge_s2s_next_header.query.graphql")?;
         let vars = QueryNextRelayBlockVars {
             block: block_number,
         };
@@ -76,7 +37,7 @@ impl Subquery {
         &self,
         origin: OriginType,
     ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {
-        let query = self.read_graphql("next_needed_header.query.graphql")?;
+        let query = self.read_graphql("bridge_s2s_next_needed_header.query.graphql")?;
         let vars = QueryNextOnDemandBlockVars { origin };
         let data = self
             .client
@@ -96,8 +57,10 @@ impl Subquery {
         block_hash: impl AsRef<str>,
         is_mandatory: bool,
     ) -> SubqueryComponentResult<Option<JustificationMapping>> {
-        let query_by_hash = self.read_graphql("justification_mapping_by_hash.query.graphql")?;
-        let query_latest = self.read_graphql("justification_mapping_latest.query.graphql")?;
+        let query_by_hash =
+            self.read_graphql("bridge_s2s_justification_mapping_by_hash.query.graphql")?;
+        let query_latest =
+            self.read_graphql("bridge_s2s_justification_mapping_latest.query.graphql")?;
         let vars = FindJustificationVars {
             hash: block_hash.as_ref().to_string(),
         };
@@ -122,7 +85,7 @@ impl Subquery {
         lane: [u8; 4],
         nonce: u64,
     ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {
-        let query = self.read_graphql("query_need_relay.graphql")?;
+        let query = self.read_graphql("bridge_s2s_query_need_relay.graphql")?;
         let lane_hex = array_bytes::bytes2hex("", &lane);
         let vars = QueryNeedRelay {
             origin,
@@ -144,14 +107,15 @@ impl Subquery {
     }
 }
 
-#[cfg(feature = "relaychain")]
+#[cfg(feature = "bridge-parachain")]
 impl Subquery {
     pub async fn get_block_with_para_head(
         &self,
         para_head_hash: impl AsRef<str>,
     ) -> SubqueryComponentResult<Option<CandidateIncludedEvent>> {
-        let query =
-            self.read_graphql("next_candidate_included_event_with_para_head.query.graphql")?;
+        let query = self.read_graphql(
+            "bridge_s2s_next_candidate_included_event_with_para_head.query.graphql",
+        )?;
         let vars = QueryNextCandidateIncludedEventWithParaHeadVars {
             para_head: String::from(para_head_hash.as_ref()),
         };

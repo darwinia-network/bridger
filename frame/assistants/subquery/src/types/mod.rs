@@ -14,7 +14,5 @@ mod bridge_ethv1;
 mod bridge_ethv2;
 #[cfg(feature = "bridge-s2s")]
 mod bridge_s2s;
-mod chain;
 mod mark;
-mod patch;
 mod subquery;

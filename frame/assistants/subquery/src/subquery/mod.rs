@@ -2,10 +2,7 @@ use gql_client::Client;
 use include_dir::{include_dir, Dir};
 
 use crate::error::SubqueryComponentError;
-use crate::types::{
-    BridgeName, DataWrapper, EmptyQueryVar, MMRRootSignedEvent, QueryTransactionsVars,
-    ScheduleAuthoritiesChangeEvent, ScheduleMMRRootEvent,
-};
+use crate::types::BridgeName;
 use crate::SubqueryComponentResult;
 
 #[cfg(feature = "bridge-ethv1")]

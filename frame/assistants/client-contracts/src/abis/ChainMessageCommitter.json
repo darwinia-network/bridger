@@ -16,7 +16,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "position",
+        "name": "pos",
         "type": "uint256"
       },
       {
@@ -37,7 +37,7 @@
         "type": "uint256"
       }
     ],
-    "name": "chains",
+    "name": "chainOf",
     "outputs": [
       {
         "internalType": "address",
@@ -78,7 +78,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "chainPos",
+        "name": "pos",
         "type": "uint256"
       }
     ],
@@ -88,6 +88,38 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "count",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "pos",
+        "type": "uint256"
+      }
+    ],
+    "name": "leaveOf",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -107,16 +139,139 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "merkle_tree",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "pos",
+        "type": "uint256"
+      }
+    ],
+    "name": "proof",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "root",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32[]",
+            "name": "proof",
+            "type": "bytes32[]"
+          }
+        ],
+        "internalType": "struct MessageSingleProof",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "chainPos",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lanePos",
+        "type": "uint256"
+      }
+    ],
+    "name": "prove",
+    "outputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32[]",
+                "name": "proof",
+                "type": "bytes32[]"
+              }
+            ],
+            "internalType": "struct MessageSingleProof",
+            "name": "chainProof",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32[]",
+                "name": "proof",
+                "type": "bytes32[]"
+              }
+            ],
+            "internalType": "struct MessageSingleProof",
+            "name": "laneProof",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct MessageProof",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
-        "name": "laneCommitter",
+        "name": "committer",
         "type": "address"
       }
     ],
     "name": "registry",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "tree",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "root",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "pure",
     "type": "function"
   },
   {

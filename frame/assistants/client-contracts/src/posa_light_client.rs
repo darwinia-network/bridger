@@ -25,6 +25,62 @@ impl PosaLightClient {
         Ok(Self { contract })
     }
 
+    pub async fn add_relayer(
+        &self,
+        relayer: Address,
+        threshold: U256,
+        signatures: Vec<Bytes>,
+        from: Address,
+    ) -> BridgeContractResult<H256> {
+        Ok(self
+            .contract
+            .call(
+                "add_relayer",
+                (relayer, threshold, signatures),
+                from,
+                Options::default(),
+            )
+            .await?)
+    }
+
+    pub async fn remove_relayer(
+        &self,
+        prev_relayer: Address,
+        relayer: Address,
+        threshold: U256,
+        signatures: Vec<Bytes>,
+        from: Address,
+    ) -> BridgeContractResult<H256> {
+        Ok(self
+            .contract
+            .call(
+                "add_relayer",
+                (prev_relayer, relayer, threshold, signatures),
+                from,
+                Options::default(),
+            )
+            .await?)
+    }
+
+    pub async fn swap_relayer(
+        &self,
+        prev_relayer: Address,
+        old_relayer: Address,
+        new_relayer: Address,
+        signatures: Vec<Bytes>,
+        from: Address,
+    ) -> BridgeContractResult<H256> {
+        Ok(self
+            .contract
+            .call(
+                "add_relayer",
+                (prev_relayer, old_relayer, new_relayer, signatures),
+                from,
+                Options::default(),
+            )
+            .await?)
+    }
+
     pub async fn import_message_commitment(
         &self,
         commitment: Commitment,

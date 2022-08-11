@@ -1,11 +1,12 @@
+use support_common::config::{Config, Names};
+use support_tracker::Tracker;
+
 use crate::bridge::BridgeConfig;
 use crate::service::ecdsa_relay::collected_enough_authorities_change_signatures::CollectedEnoughAuthoritiesChangeSignaturesRunner;
 use crate::service::ecdsa_relay::collected_enough_new_message_root_signatures::CollectedEnoughNewMessageRootSignaturesRunner;
 use crate::service::ecdsa_relay::collecting_authorities_change_signatures::CollectingAuthoritiesChangeSignaturesRunner;
 use crate::service::ecdsa_relay::collecting_new_message_root_signatures::CollectingNewMessageRootSignaturesRunner;
 use crate::service::ecdsa_relay::types::EcdsaSource;
-use support_common::config::{Config, Names};
-use support_tracker::Tracker;
 
 pub struct EcdsaScanner;
 
@@ -27,7 +28,7 @@ impl EcdsaScanner {
         let subquery = config.index.to_pangoro_subquery();
         let client = config.pangoro_substrate.to_substrate_client().await?;
         let mut source = EcdsaSource {
-            block: 0,
+            block: None,
             subquery,
             client,
         };
@@ -38,7 +39,7 @@ impl EcdsaScanner {
                 "[pangoro] [ecdsa] Track pangoro scan block: {} ",
                 from,
             );
-            source.block = from as u32;
+            source.block = Some(from as u32);
 
             let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source.clone());
             runner.start().await?;

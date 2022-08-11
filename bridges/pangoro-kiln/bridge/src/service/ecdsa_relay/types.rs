@@ -6,4 +6,5 @@ pub struct EcdsaSource {
     pub block: Option<u32>,
     pub subquery: Subquery,
     pub client: PangoroClient,
+    pub ecdsa_private_key: [u8; 20],
 }

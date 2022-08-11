@@ -1,7 +1,7 @@
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, H256, U256},
+    types::{Address, BlockId, H256, U256},
     Web3,
 };
 
@@ -35,6 +35,7 @@ impl ChainMessageCommitter {
         &self,
         chain_pos: U256,
         lane_pos: U256,
+        block_id: Option<BlockId>,
     ) -> BridgeContractResult<MessageProof> {
         Ok(self
             .contract
@@ -43,7 +44,7 @@ impl ChainMessageCommitter {
                 (chain_pos, lane_pos),
                 None,
                 Options::default(),
-                None,
+                block_id,
             )
             .await?)
     }

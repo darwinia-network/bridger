@@ -289,8 +289,8 @@ mod tests {
     fn test_pangoro_client() -> MessageClient<SimpleFeeMarketRelayStrategy> {
         build_message_client_with_simple_fee_market(
             "https://pangoro-rpc.darwinia.network",
-            Address::from_str("0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207").unwrap(),
-            Address::from_str("0xEe8CA1000c0310afF74BA0D71a99EC02650798E5").unwrap(),
+            Address::from_str("0x3E37361F50a178e05E5d81234dDE67E6cC991ed1").unwrap(),
+            Address::from_str("0x634370aCf53cf55ad270E084442ea7A23B43B26a").unwrap(),
             Address::from_str("0xB59a893f5115c1Ca737E36365302550074C32023").unwrap(),
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
@@ -318,7 +318,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_build_lane_data() {
-        let client = test_client();
+        let client = test_pangoro_client();
         let outbound_lane_nonce = client.outbound.outbound_lane_nonce().await.unwrap();
         let (begin, end) = (
             outbound_lane_nonce.latest_received_nonce + 1,
@@ -339,7 +339,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_query_message_event() {
-        let client = test_client();
+        let client = test_pangoro_client();
         let event = client.query_message_accepted(2).await.unwrap();
         println!("event: {:?}", event);
     }

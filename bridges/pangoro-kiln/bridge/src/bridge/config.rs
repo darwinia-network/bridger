@@ -24,6 +24,7 @@ pub struct ChainInfoConfig {
     pub inbound_address: String,
     pub outbound_address: String,
     pub fee_market_address: String,
+    pub posa_light_client_address: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -35,6 +36,8 @@ pub struct PangoroEVMConfig {
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,
+    pub chain_message_committer_address: String,
+    pub lane_message_committer_address: String,
     pub fee_market_address: String,
 }
 

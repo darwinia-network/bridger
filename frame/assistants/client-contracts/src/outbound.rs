@@ -56,6 +56,13 @@ impl Outbound {
             .query("data", (), None, Options::default(), None)
             .await?)
     }
+
+    pub async fn get_lane_info(&self) -> BridgeContractResult<(u32, u32, u32, u32)> {
+        Ok(self
+            .contract
+            .query("getLaneInfo", (), None, Options::default(), None)
+            .await?)
+    }
 }
 
 pub mod types {
@@ -287,6 +294,13 @@ mod tests {
         let (_, outbound) = test_client();
         let res = outbound.data().await.unwrap();
         println!("Data: {:?}", res);
+    }
+
+    #[tokio::test]
+    async fn test_get_lane_info() {
+        let (_, outbound) = test_client();
+        let res = outbound.get_lane_info().await.unwrap();
+        dbg!(res);
     }
 
     #[tokio::test]

@@ -38,11 +38,16 @@ web3      = { version = "0.18.0", features = ["signing"] }
 hamming   = "0.1"
 rlp       = "0.5.1"
 
-support-common        = { path = "../../../frame/supports/support-common" }
-support-lifeline      = { path = "../../../frame/supports/support-lifeline" }
-support-terminal      = { path = "../../../frame/supports/support-terminal" }
-bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
+support-common     = { path = "../../../frame/supports/support-common" }
+support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
+support-terminal   = { path = "../../../frame/supports/support-terminal" }
+support-tracker    = { path = "../../../frame/supports/support-tracker" }
+support-command-kv = { path = "../../../frame/supports/support-command-kv" }
+
 component-http-client = { path = "../../../frame/components/http-client" }
+component-state       = { path = "../../../frame/components/state" }
+
+bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
 subquery              = { path = "../../../frame/assistants/subquery", features = [ "bridge-ethv2" ] }
 client-contracts      = { path = "../../../frame/assistants/client-contracts" }
 client-pangoro        = { path = "../../../frame/assistants/client-pangoro", features = [ "bridge-ethv2" ] }

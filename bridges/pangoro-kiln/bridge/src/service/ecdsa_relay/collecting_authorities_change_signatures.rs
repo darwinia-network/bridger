@@ -12,6 +12,17 @@ impl CollectingAuthoritiesChangeSignaturesRunner {
 
 impl CollectingAuthoritiesChangeSignaturesRunner {
     pub async fn start(&self) -> color_eyre::Result<()> {
+        let client = &self.source.client;
+        let subquery = &self.source.subquery;
+
+        subquery.next_collecting_authorities_change_signatures_event()
+
+        let acts = client
+            .runtime()
+            .storage()
+            .ecdsa_authority()
+            .authorities_change_to_sign(None)
+            .await?;
         Ok(())
     }
 }

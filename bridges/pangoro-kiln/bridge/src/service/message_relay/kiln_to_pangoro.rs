@@ -44,10 +44,10 @@ impl Service for KilnPangoroMessageRelay {
 async fn start() -> color_eyre::Result<()> {
     let config: BridgeConfig = Config::restore(Names::BridgePangoroKiln)?;
     let beacon_light_client = PangoroClient::new(
-        &config.pangoro.endpoint,
-        &config.pangoro.contract_address,
-        &config.pangoro.execution_layer_contract_address,
-        Some(&config.pangoro.private_key),
+        &config.pangoro_evm.endpoint,
+        &config.pangoro_evm.contract_address,
+        &config.pangoro_evm.execution_layer_contract_address,
+        Some(&config.pangoro_evm.private_key),
     )?;
     let beacon_rpc_client = KilnClient::new(&config.kiln.endpoint)?;
     let source = build_message_client_with_simple_fee_market(
@@ -56,16 +56,16 @@ async fn start() -> color_eyre::Result<()> {
         Address::from_str(&config.kiln.outbound_address)?,
         Address::from_str(&config.kiln.fee_market_address)?,
         Address::from_str(&config.kiln.account)?,
-        Some(&config.pangoro.private_key),
+        Some(&config.pangoro_evm.private_key),
     )
     .unwrap();
     let target = build_message_client_with_simple_fee_market(
-        &config.pangoro.endpoint,
-        Address::from_str(&config.pangoro.inbound_address)?,
-        Address::from_str(&config.pangoro.outbound_address)?,
-        Address::from_str(&config.pangoro.fee_market_address)?,
-        Address::from_str(&config.pangoro.account)?,
-        Some(&config.pangoro.private_key),
+        &config.pangoro_evm.endpoint,
+        Address::from_str(&config.pangoro_evm.inbound_address)?,
+        Address::from_str(&config.pangoro_evm.outbound_address)?,
+        Address::from_str(&config.pangoro_evm.fee_market_address)?,
+        Address::from_str(&config.pangoro_evm.account)?,
+        Some(&config.pangoro_evm.private_key),
     )
     .unwrap();
     let message_relay_service = MessageRelay {

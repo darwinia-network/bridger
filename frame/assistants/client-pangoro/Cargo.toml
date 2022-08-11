@@ -53,19 +53,20 @@ substrate   = [
   "sp-runtime",
   "sp-core",
 ]
-bridge-s2s         = [
+bridge-s2s  = [
   "substrate",
   "async-trait",
   "finality-grandpa",
   "bridge-s2s-traits",
 ]
 bridge-s2s-pangolin = ["bridge-s2s"]
-feemarket-s2s   = [
+feemarket-s2s = [
   "async-trait",
   "feemarket-s2s-traits",
 ]
 feemarket-s2s-pangolin = ["feemarket-s2s"]
 bridge-chapel = []
+bridge-ethv2  = []
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

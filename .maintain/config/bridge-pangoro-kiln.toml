@@ -1,16 +1,20 @@
-[pangoro]
-endpoint = "https://pangoro-rpc.darwinia.network"
-contract_address = "0x59EA974B74ec6A49338438bCc5d0388E294E4E20"
+[pangoro_evm]
+endpoint                         = "https://pangoro-rpc.darwinia.network"
+contract_address                 = "0x59EA974B74ec6A49338438bCc5d0388E294E4E20"
 execution_layer_contract_address = "0x43258d32E29b2C866d882183758B864471A26b96"
-inbound_address = "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207"
-outbound_address = "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5"
+inbound_address                  = "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207"
+outbound_address                 = "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5"
+private_key                      = "//Alice"
+
+[pangoro_substrate]
+endpoint    = "https://pangoro-rpc.darwinia.network"
 private_key = "//Alice"
 
 [kiln]
-endpoint = "http://localhost:5052"
+endpoint                 = "http://localhost:5052"
 execution_layer_endpoint = "http://localhost:8545"
-inbound_address = "0x588abe3F7EE935137102C5e2B8042788935f4CB0"
-outbound_address = "0xee4f69fc69F2C203a0572e43375f68a6e9027998"
+inbound_address          = "0x588abe3F7EE935137102C5e2B8042788935f4CB0"
+outbound_address         = "0xee4f69fc69F2C203a0572e43375f68a6e9027998"
 
 [index]
 pangoro = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro" }

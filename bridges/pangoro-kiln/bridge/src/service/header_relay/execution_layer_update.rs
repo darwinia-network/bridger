@@ -45,10 +45,10 @@ impl Service for ExecutionLayerRelay {
 async fn start() -> color_eyre::Result<()> {
     let config: BridgeConfig = Config::restore(Names::BridgePangoroKiln)?;
     let pangoro_client = PangoroClient::new(
-        &config.pangoro.endpoint,
-        &config.pangoro.contract_address,
-        &config.pangoro.execution_layer_contract_address,
-        Some(&config.pangoro.private_key),
+        &config.pangoro_evm.endpoint,
+        &config.pangoro_evm.contract_address,
+        &config.pangoro_evm.execution_layer_contract_address,
+        Some(&config.pangoro_evm.private_key),
     )?;
     let kiln_client = KilnClient::new(&config.kiln.endpoint)?;
     let execution_layer_relay = ExecutionLayer {

@@ -59,6 +59,14 @@ impl Inbound {
             .await?;
         Ok(tx)
     }
+
+    // Returns (thisChainPosition, thisLanePosition, bridgedChainPosition, bridgedLanePosition)
+    pub async fn get_lane_info(&self) -> BridgeContractResult<(u32, u32, u32, u32)> {
+        Ok(self
+            .contract
+            .query("getLaneInfo", (), None, Options::default(), None)
+            .await?)
+    }
 }
 
 pub mod types {

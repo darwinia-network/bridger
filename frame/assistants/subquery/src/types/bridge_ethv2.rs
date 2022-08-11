@@ -1,12 +1,21 @@
 pub use self::query_vars::*;
 pub use self::schema_types::*;
 
-mod query_vars {}
+mod query_vars {
+    use serde::Serialize;
+
+    #[derive(Clone, Debug, Serialize)]
+    pub(crate) struct QueryWithBlockNumberVars {
+        pub(crate) block: u32,
+    }
+}
 
 mod schema_types {
     use serde::{Deserialize, Serialize};
     use serde_hex::SerHexSeq;
     use serde_hex::StrictPfx;
+
+    use crate::types::DataWrapper;
 
     #[derive(Clone, Debug, Deserialize, Serialize)]
     pub struct EcdsaSignature {
@@ -56,7 +65,7 @@ mod schema_types {
         pub block_hash: Vec<u8>,
         #[serde(with = "SerHexSeq::<StrictPfx>")]
         pub message: Vec<u8>,
-        pub signatures: Vec<EcdsaSignature>,
+        pub signatures: DataWrapper<EcdsaSignature>,
         pub operation: String,
     }
 
@@ -70,7 +79,7 @@ mod schema_types {
         pub block_hash: Vec<u8>,
         #[serde(with = "SerHexSeq::<StrictPfx>")]
         pub message: Vec<u8>,
-        pub signatures: Vec<EcdsaSignature>,
+        pub signatures: DataWrapper<EcdsaSignature>,
         #[serde(rename = "commitmentBlockNumber")]
         pub commitment_block_number: u32,
         #[serde(with = "SerHexSeq::<StrictPfx>")]

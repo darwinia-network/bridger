@@ -9,7 +9,7 @@ use crate::{
     pangoro_client::client::PangoroClient,
 };
 
-use crate::bridge::{BridgeConfig, PangoroKilnBus};
+use crate::bridge::{BridgeBus, BridgeConfig};
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
@@ -22,7 +22,7 @@ pub struct KilnPangoroMessageRelay {
 impl BridgeService for KilnPangoroMessageRelay {}
 
 impl Service for KilnPangoroMessageRelay {
-    type Bus = PangoroKilnBus;
+    type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {

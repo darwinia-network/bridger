@@ -50,7 +50,7 @@ impl PangoroEVMConfig {
     pub fn to_fast_ethereum_account(&self) -> FastEthereumAccount {
         FastEthereumAccount::new(&self.private_key)
     }
-    
+
     pub fn to_web3_client(&self) -> color_eyre::Result<Web3<Http>> {
         let transport = Http::new(&self.endpoint)?;
         let client = Web3::new(transport);
@@ -70,6 +70,9 @@ impl ChainInfoConfig {
         let client = Web3::new(transport);
         let address = Address::from_str(&self.posa_light_client_address)?;
         Ok(PosaLightClient::new(client, address)?)
+    }
+    pub fn to_ethereum_account(&self) -> FastEthereumAccount {
+        FastEthereumAccount::new(&self.private_key)
     }
 }
 

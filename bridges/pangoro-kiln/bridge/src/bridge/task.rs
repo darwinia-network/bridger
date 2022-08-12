@@ -1,6 +1,6 @@
 use crate::service::ecdsa_relay::ECDSARelayService;
 use crate::{
-    bridge::PangoroKilnBus,
+    bridge::BridgeBus,
     service::{
         header_relay::{
             execution_layer_update::ExecutionLayerRelay,
@@ -15,7 +15,7 @@ use support_lifeline::task::TaskStack;
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct BridgeTask {
-    stack: TaskStack<PangoroKilnBus>,
+    stack: TaskStack<BridgeBus>,
 }
 
 impl BridgeTask {
@@ -26,7 +26,7 @@ impl BridgeTask {
 
 impl BridgeTask {
     pub async fn new() -> color_eyre::Result<Self> {
-        let bus = PangoroKilnBus::default();
+        let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
         stack.spawn_service::<KilnToPangoroHeaderRelayService>()?;
         stack.spawn_service::<SyncCommitteeUpdateService>()?;

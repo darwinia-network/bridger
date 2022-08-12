@@ -13,7 +13,7 @@ use crate::message_contract::message_client::build_message_client_with_simple_fe
 use crate::message_contract::message_client::MessageClient;
 use crate::message_contract::utils::query_message_accepted;
 
-use crate::bridge::{BridgeConfig, PangoroKilnBus};
+use crate::bridge::{BridgeBus, BridgeConfig};
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
@@ -26,7 +26,7 @@ pub struct PangoroKilnMessageRelay {
 impl BridgeService for PangoroKilnMessageRelay {}
 
 impl Service for PangoroKilnMessageRelay {
-    type Bus = PangoroKilnBus;
+    type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
@@ -53,9 +53,7 @@ async fn start() -> color_eyre::Result<()> {
         Address::from_str(&config.kiln.outbound_address)?,
         Address::from_str(&config.kiln.fee_market_address)?,
         Address::from_str(&config.kiln.account)?,
-        Some(&config.kiln.private_key.ok_or_else(|| {
-            BridgerError::Custom("Private key of kiln not found in the config".into())
-        })?),
+        Some(&config.kiln.private_key),
     )
     .unwrap();
     let source = build_darwinia_message_client(
@@ -70,7 +68,7 @@ async fn start() -> color_eyre::Result<()> {
     )
     .unwrap();
     let posa_light_client = PosaLightClient::new(
-        &target.client,
+        target.client.clone(),
         Address::from_str(&config.kiln.posa_light_client_address)?,
     )?;
     let message_relay_service = MessageRelay {

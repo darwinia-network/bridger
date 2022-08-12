@@ -1,7 +1,7 @@
 use std::{ops::Div, str::FromStr};
 
 use crate::{
-    bridge::{BridgeConfig, PangoroKilnBus},
+    bridge::{BridgeBus, BridgeConfig},
     kiln_client::{client::KilnClient, types::FinalityUpdate},
     pangoro_client::client::PangoroClient,
 };
@@ -19,7 +19,7 @@ pub struct KilnToPangoroHeaderRelayService {
 impl BridgeService for KilnToPangoroHeaderRelayService {}
 
 impl Service for KilnToPangoroHeaderRelayService {
-    type Bus = PangoroKilnBus;
+    type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {

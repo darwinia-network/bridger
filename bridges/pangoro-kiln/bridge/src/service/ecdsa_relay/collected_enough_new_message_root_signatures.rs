@@ -39,25 +39,25 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
         let signature_nodes = event.signatures.nodes;
         let signatures = signature_nodes
             .iter()
-            .map(|item| item.signature)
+            .map(|item| item.signature.clone())
             .collect::<Vec<Vec<u8>>>();
 
         let mr_slice: [u8; 32] = event
             .commitment_message_root
             .try_into()
             .map_err(|e| BridgerError::Custom(format!("Wrong message root: {:?}", e)))?;
-        let n_slice: [u64; 4] = event
-            .commitment_nonce
-            .try_into()
-            .map_err(|e| BridgerError::Custom(format!("Wrong nonce: {:?}", e)))?;
-        let commitment = Commitment {
-            block_number: event.commitment_block_number,
-            message_root: H256(mr_slice),
-            nonce: U256(n_slice),
-        };
-        let _hash = client_posa
-            .import_message_commitment(commitment, signatures, &ethereum_account.secret_key()?)
-            .await?;
+        // let n_slice: [u64; 4] = event
+        //     .commitment_nonce // wrong commitment nonce types
+        //     .try_into()
+        //     .map_err(|e| BridgerError::Custom(format!("Wrong nonce: {:?}", e)))?;
+        // let commitment = Commitment {
+        //     block_number: event.commitment_block_number,
+        //     message_root: H256(mr_slice),
+        //     nonce: U256(n_slice),
+        // };
+        // let _hash = client_posa
+        //     .import_message_commitment(commitment, signatures, &ethereum_account.secret_key()?)
+        //     .await?;
         Ok(None)
     }
 }

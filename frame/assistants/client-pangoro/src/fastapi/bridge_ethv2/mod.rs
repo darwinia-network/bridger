@@ -1,6 +1,6 @@
 use crate::client::PangoroClient;
 use crate::config::PangoroSubxtConfig;
-use crate::error::ClientError;
+use crate::error::{ClientError, ClientResult};
 use crate::types::runtime_types;
 
 impl PangoroClient {
@@ -10,7 +10,11 @@ impl PangoroClient {
         block_number: Option<u32>,
         your_address: &[u8; 20],
     ) -> ClientResult<bool> {
-        let hash = self.subxt().rpc().block_hash(block_number).await?;
+        let hash = self
+            .subxt()
+            .rpc()
+            .block_hash(block_number.map(Into::into))
+            .await?;
         let authorities = self
             .runtime()
             .storage()
@@ -18,9 +22,9 @@ impl PangoroClient {
             .authorities(hash)
             .await?;
         let authorities = authorities.0;
-        let iam = authorities.iter().any(|&item| {
-            let authority: [u8; 20] = item.0;
-            authority.as_slice() == your_address
+        let iam = authorities.iter().any(|item| {
+            let authority: &[u8; 20] = &item.0;
+            authority == your_address
         });
         Ok(iam)
     }
@@ -30,14 +34,14 @@ impl PangoroClient {
         address: [u8; 20],
         signatures: Vec<u8>,
     ) -> ClientResult<<PangoroSubxtConfig as subxt::Config>::Hash> {
-        let fixed_signatures: [u8; 65] = signatures.try_into().map_err(|e| {
+        let fixed_signatures: [u8; 65] = signatures.try_into().map_err(|e: Vec<u8>| {
             ClientError::Custom(format!(
                 "Wrong signatures data: {}",
                 array_bytes::bytes2hex("0x", e.as_slice())
             ))
         })?;
-        let track = self
-            .runtime()
+        let runtime = self.runtime();
+        let track = runtime
             .tx()
             .ecdsa_authority()
             .submit_authorities_change_signature(
@@ -47,11 +51,7 @@ impl PangoroClient {
             .sign_and_submit_then_watch(self.account().signer())
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
-            S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
-                <Self as S2SClientBase>::CHAIN,
-                e
-            ))
+            ClientError::Custom(format!("send transactioni failed pangoro: {:?}", e))
         })?;
         Ok(events.extrinsic_hash())
     }
@@ -61,14 +61,14 @@ impl PangoroClient {
         address: [u8; 20],
         signatures: Vec<u8>,
     ) -> ClientResult<<PangoroSubxtConfig as subxt::Config>::Hash> {
-        let fixed_signatures: [u8; 65] = signatures.try_into().map_err(|e| {
+        let fixed_signatures: [u8; 65] = signatures.try_into().map_err(|e: Vec<u8>| {
             ClientError::Custom(format!(
                 "Wrong signatures data: {}",
                 array_bytes::bytes2hex("0x", e.as_slice())
             ))
         })?;
-        let track = self
-            .runtime()
+        let runtime = self.runtime();
+        let track = runtime
             .tx()
             .ecdsa_authority()
             .submit_new_message_root_signature(
@@ -78,11 +78,7 @@ impl PangoroClient {
             .sign_and_submit_then_watch(self.account().signer())
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
-            S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
-                <Self as S2SClientBase>::CHAIN,
-                e
-            ))
+            ClientError::Custom(format!("send transactioni failed pangoro: {:?}", e))
         })?;
         Ok(events.extrinsic_hash())
     }

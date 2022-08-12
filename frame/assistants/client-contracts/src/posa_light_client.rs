@@ -10,6 +10,7 @@ use web3::{
 
 use crate::error::BridgeContractResult;
 
+#[derive(Debug, Clone)]
 pub struct PosaLightClient {
     contract: Contract<Http>,
 }
@@ -111,7 +112,7 @@ impl PosaLightClient {
     }
 }
 
-mod types {
+pub mod types {
     use web3::{
         contract::tokens::{Detokenize, Tokenizable},
         ethabi::Token,

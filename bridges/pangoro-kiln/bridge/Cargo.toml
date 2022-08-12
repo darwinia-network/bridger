@@ -37,6 +37,7 @@ secp256k1 = { version = "0.21" }
 web3      = { version = "0.18", features = ["signing"] }
 hamming   = "0.1"
 rlp       = "0.5"
+microkv   = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
 support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }

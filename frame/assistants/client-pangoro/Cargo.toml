@@ -38,11 +38,14 @@ sp-runtime          = { optional = true, git = "https://github.com/darwinia-netw
 sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.4" }
 
 ## s2s client
-finality-grandpa      = { optional = true, version = "0.14" }
+finality-grandpa    = { optional = true, version = "0.14" }
 bridge-s2s-traits   = { optional = true, path = "../../../frame/traits/bridge-s2s", features = ["advanced-types"] }
 
 ## feemarket s2s
 feemarket-s2s-traits = { optional = true, path = "../../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
+
+## e2e client
+bridge-e2e-traits = { optional = true, path = "../../../frame/traits/bridge-e2e" }
 
 support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
 
@@ -66,7 +69,7 @@ feemarket-s2s = [
 ]
 feemarket-s2s-pangolin = ["feemarket-s2s"]
 bridge-chapel = []
-bridge-ethv2  = []
+bridge-ethv2  = ["bridge-e2e-traits"]
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

@@ -1,18 +1,13 @@
+use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
 use component_state::state::BridgeState;
-use subquery::Subquery;
-use support_common::config::{Config, Names};
+use support_common::config::Names;
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
-use crate::bridge::{BridgeConfig, BridgeTask, PangoroKilnBus};
-use crate::service::ecdsa_relay::collected_enough_authorities_change_signatures::CollectedEnoughAuthoritiesChangeSignaturesRunner;
-use crate::service::ecdsa_relay::collected_enough_new_message_root_signatures::CollectedEnoughNewMessageRootSignaturesRunner;
-use crate::service::ecdsa_relay::collecting_authorities_change_signatures::CollectingAuthoritiesChangeSignaturesRunner;
-use crate::service::ecdsa_relay::collecting_new_message_root_signatures::CollectingNewMessageRootSignaturesRunner;
+use crate::bridge::{BridgeBus, BridgeTask};
 use crate::service::ecdsa_relay::ecdsa_scanner::EcdsaScanner;
-use crate::service::ecdsa_relay::types::EcdsaSource;
 
 mod collected_enough_authorities_change_signatures;
 mod collected_enough_new_message_root_signatures;
@@ -29,10 +24,10 @@ pub struct ECDSARelayService {
 impl BridgeService for ECDSARelayService {}
 
 impl Service for ECDSARelayService {
-    type Bus = PangoroKilnBus;
+    type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
-    fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
+    fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(BridgeTask::name());
         let tracker = Tracker::new(microkv.clone(), "scan.pangoro");

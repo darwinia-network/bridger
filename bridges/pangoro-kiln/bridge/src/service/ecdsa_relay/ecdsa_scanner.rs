@@ -1,3 +1,4 @@
+use microkv::namespace::NamespaceMicroKV;
 use support_common::config::{Config, Names};
 use support_tracker::Tracker;
 
@@ -29,14 +30,16 @@ impl EcdsaScanner {
         let client_pangoro_web3 = config.pangoro_evm.to_web3_client()?;
         let client_pangoro_substrate = config.pangoro_substrate.to_substrate_client().await?;
         let client_posa = config.kiln.to_posa_client()?;
-        let account = config.pangoro_evm.to_fast_ethereum_account();
+        let pangoro_evm_account = config.pangoro_evm.to_fast_ethereum_account();
+        let ethereum_account = config.kiln.to_ethereum_account();
         let mut source = EcdsaSource {
             block: None,
             subquery,
             client_pangoro_web3,
             client_pangoro_substrate,
             client_posa,
-            pangoro_evm_account: account,
+            pangoro_evm_account,
+            ethereum_account,
         };
 
         loop {

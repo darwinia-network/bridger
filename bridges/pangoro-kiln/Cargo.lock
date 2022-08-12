@@ -351,6 +351,7 @@ dependencies = [
  "hamming",
  "hex",
  "lifeline",
+ "microkv",
  "postage",
  "relay-e2e",
  "reqwest",
@@ -468,6 +469,7 @@ version = "0.6.2"
 dependencies = [
  "array-bytes",
  "bp-pangoro",
+ "bridge-e2e-traits",
  "parity-scale-codec",
  "serde 1.0.139",
  "serde_json",

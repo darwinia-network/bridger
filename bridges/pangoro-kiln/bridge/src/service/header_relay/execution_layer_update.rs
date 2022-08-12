@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::{
-    bridge::{BridgeConfig, PangoroKilnBus},
+    bridge::{BridgeBus, BridgeConfig},
     kiln_client::{client::KilnClient, types::Proof},
     pangoro_client::client::PangoroClient,
 };
@@ -23,7 +23,7 @@ pub struct ExecutionLayerRelay {
 impl BridgeService for ExecutionLayerRelay {}
 
 impl Service for ExecutionLayerRelay {
-    type Bus = PangoroKilnBus;
+    type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {

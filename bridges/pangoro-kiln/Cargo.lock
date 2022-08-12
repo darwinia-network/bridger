@@ -352,6 +352,7 @@ dependencies = [
  "hex",
  "lifeline",
  "postage",
+ "relay-e2e",
  "reqwest",
  "rlp",
  "secp256k1",
@@ -2539,6 +2540,18 @@ name = "regex-syntax"
 version = "0.6.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
+
+[[package]]
+name = "relay-e2e"
+version = "0.6.2"
+dependencies = [
+ "array-bytes",
+ "bridge-e2e-traits",
+ "secp256k1",
+ "thiserror",
+ "tracing",
+ "web3",
+]
 
 [[package]]
 name = "remove_dir_all"

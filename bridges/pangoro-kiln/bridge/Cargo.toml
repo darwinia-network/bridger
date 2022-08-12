@@ -29,14 +29,14 @@ structopt = "0.3"
 strum     = { version = "0.21", features = ["derive"] }
 
 bytes     = "1.0"
-futures   = "0.3.21"
+futures   = "0.3"
 hex       = "0.4"
 lifeline  = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage   = "0.4"
 secp256k1 = { version = "0.21" }
-web3      = { version = "0.18.0", features = ["signing"] }
+web3      = { version = "0.18", features = ["signing"] }
 hamming   = "0.1"
-rlp       = "0.5.1"
+rlp       = "0.5"
 
 support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
@@ -51,3 +51,4 @@ bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
 subquery              = { path = "../../../frame/assistants/subquery", features = [ "bridge-ethv2" ] }
 client-contracts      = { path = "../../../frame/assistants/client-contracts" }
 client-pangoro        = { path = "../../../frame/assistants/client-pangoro", features = [ "bridge-ethv2" ] }
+relay-e2e             = { path = "../../../frame/assistants/relay-e2e" }

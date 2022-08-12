@@ -26,12 +26,19 @@ impl EcdsaScanner {
     async fn run(&self, microkv: NamespaceMicroKV, tracker: Tracker) -> color_eyre::Result<()> {
         let config: BridgeConfig = Config::restore(Names::BridgePangoroKiln)?;
         let subquery = config.index.to_pangoro_subquery();
-        let client = config.pangoro_substrate.to_substrate_client().await?;
+        let client_pangoro_web3 = config.pangoro_evm.to_web3_client()?;
+        let client_pangoro_substrate = config.pangoro_substrate.to_substrate_client().await?;
+        let client_posa = config.kiln.to_posa_client()?;
+        let account = config.pangoro_evm.to_fast_ethereum_account();
         let mut source = EcdsaSource {
             block: None,
             subquery,
-            client,
+            client_pangoro_web3,
+            client_pangoro_substrate,
+            client_posa,
+            pangoro_evm_account: account,
         };
+
         loop {
             let from = tracker.current().await?;
             tracing::info!(

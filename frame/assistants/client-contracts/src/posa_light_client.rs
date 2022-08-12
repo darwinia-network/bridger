@@ -11,11 +11,11 @@ use web3::{
 use crate::error::BridgeContractResult;
 
 pub struct PosaLightClient {
-    pub contract: Contract<Http>,
+    contract: Contract<Http>,
 }
 
 impl PosaLightClient {
-    pub fn new(client: &Web3<Http>, address: Address) -> BridgeContractResult<Self> {
+    pub fn new(client: Web3<Http>, address: Address) -> BridgeContractResult<Self> {
         let contract = Contract::from_json(
             client.eth(),
             address,
@@ -86,7 +86,6 @@ impl PosaLightClient {
         commitment: Commitment,
         signature: Vec<Bytes>,
         private_key: &SecretKey,
-        fee: U256,
     ) -> BridgeContractResult<H256> {
         Ok(self
             .contract
@@ -96,7 +95,7 @@ impl PosaLightClient {
                 Options {
                     gas: Some(U256::from(10000000u64)),
                     gas_price: Some(U256::from(1300000000u64)),
-                    value: Some(fee),
+                    // value: Some(fee),
                     ..Default::default()
                 },
                 private_key,
@@ -112,7 +111,7 @@ impl PosaLightClient {
     }
 }
 
-pub mod types {
+mod types {
     use web3::{
         contract::tokens::{Detokenize, Tokenizable},
         ethabi::Token,

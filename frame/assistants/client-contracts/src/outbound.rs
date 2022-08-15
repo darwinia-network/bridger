@@ -68,15 +68,14 @@ impl Outbound {
 
     pub async fn receive_messages_delivery_proof(
         &self,
-        inbound_lane_data: InboundLaneData,
-        messages_proof: Bytes,
+        proof: ReceiveMessagesDeliveryProof,
         private_key: &SecretKey,
     ) -> BridgeContractResult<H256> {
         let tx = self
             .contract
             .signed_call(
                 "receive_messages_delivery_proof",
-                (inbound_lane_data, messages_proof),
+                (proof.inbound_lane_data, proof.messages_proof),
                 Options {
                     gas: Some(U256::from(10000000)),
                     gas_price: Some(U256::from(1300000000)),
@@ -96,7 +95,9 @@ pub mod types {
         types::{Address, Bytes, H256, U256},
     };
 
-    use crate::{error::BridgeContractError, outbound::BridgeContractResult};
+    use crate::{
+        error::BridgeContractError, inbound_types::InboundLaneData, outbound::BridgeContractResult,
+    };
 
     #[derive(Debug)]
     pub struct OutboundLaneNonce {
@@ -250,6 +251,12 @@ pub mod types {
                 block_number,
             })
         }
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct ReceiveMessagesDeliveryProof {
+        pub inbound_lane_data: InboundLaneData,
+        pub messages_proof: Bytes,
     }
 }
 

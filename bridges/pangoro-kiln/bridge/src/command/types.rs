@@ -1,4 +1,5 @@
 use structopt::StructOpt;
+use support_command_kv::NamespaceKvOpts;
 
 /// Bridge pangoro-kiln options
 #[derive(Debug, StructOpt)]
@@ -6,4 +7,10 @@ use structopt::StructOpt;
 pub enum Opts {
     /// Start bridge pangoro-kiln
     Start,
+    /// Kv command
+    Kv {
+        /// Commands of kv
+        #[structopt(flatten)]
+        command: NamespaceKvOpts,
+    },
 }

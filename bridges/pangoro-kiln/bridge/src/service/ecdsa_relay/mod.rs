@@ -30,7 +30,7 @@ impl Service for ECDSARelayService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(BridgeTask::name());
-        let tracker = Tracker::new(microkv.clone(), "scan.pangoro");
+        let tracker = Tracker::new(microkv.clone(), "scan.pangoro.ecdsa");
         let _greet = Self::try_task("ecdsa-relay-pangoro-to-kiln", async move {
             let scanner = EcdsaScanner;
             scanner.start(microkv.clone(), tracker.clone()).await;

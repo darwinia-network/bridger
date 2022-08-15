@@ -45,7 +45,7 @@ impl EcdsaScanner {
         loop {
             let from = tracker.current().await?;
             tracing::info!(
-                target: "pangoro-iln",
+                target: "pangoro-kiln",
                 "[pangoro] [ecdsa] Track pangoro scan block: {} ",
                 from,
             );

@@ -26,7 +26,7 @@ impl CollectingAuthoritiesChangeSignaturesRunner {
         if cacse.is_none() {
             tracing::debug!(
                 target: "pangoro-kiln",
-                "[pangoro] [ecdsa] not more authorities change events after {}",
+                "[pangoro] [ecdsa] no more authorities change events after {}",
                 from_block,
             );
             return Ok(None);

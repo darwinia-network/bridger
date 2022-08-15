@@ -25,7 +25,7 @@ impl CollectingNewMessageRootSignaturesRunner {
         if cacse.is_none() {
             tracing::debug!(
                 target: "pangoro-kiln",
-                "[pangoro] [ecdsa] not more new message root signatures events after {}",
+                "[pangoro] [ecdsa] no more new message root signatures events after {}",
                 from_block,
             );
             return Ok(None);

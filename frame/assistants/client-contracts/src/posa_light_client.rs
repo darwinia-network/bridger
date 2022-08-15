@@ -168,7 +168,7 @@ mod tests {
         let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let client = web3::Web3::new(transport);
         let lclient = PosaLightClient::new(
-            &client,
+            client,
             Address::from_str("0xd345Cc26e3685DA584AC9C38393F9f603B122EcF").unwrap(),
         )
         .unwrap();

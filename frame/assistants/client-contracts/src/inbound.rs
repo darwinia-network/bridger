@@ -104,111 +104,104 @@ pub mod types {
         }
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct InboundLaneData {
         pub relayers: Vec<UnrewardedRelayer>,
         pub last_confirmed_nonce: u64,
         pub last_delivered_nonce: u64,
     }
 
-    impl Detokenize for InboundLaneData {
-        fn from_tokens(tokens: Vec<Token>) -> Result<Self, web3::contract::Error>
-        where
-            Self: Sized,
-        {
-            match Token::from_tokens(tokens.clone())? {
-                Token::Tuple(tokens) if tokens.len() == 3 => {
-                    let mut iter = tokens.clone().into_iter();
-                    let relayers_token = iter.next().expect("Unreachable!");
-                    let relayers = match Token::from_tokens(vec![relayers_token])? {
-                        Token::Array(r_tokens) => {
-                            let r: Result<Vec<UnrewardedRelayer>, _> = r_tokens
-                                .into_iter()
-                                .map(|x| UnrewardedRelayer::from_tokens(vec![x]))
-                                .collect();
-                            r?
-                        }
-                        _ => {
-                            return Err(web3::contract::Error::InvalidOutputType(format!(
-                                "Failed to decode from : {:?}",
-                                tokens
-                            )))
-                        }
-                    };
-                    let last_confirmed_nonce = u64::from_token(iter.next().expect("Unreachable!"))?;
-                    let last_delivered_nonce = u64::from_token(iter.next().expect("Unreachable!"))?;
-                    Ok(Self {
-                        relayers,
-                        last_confirmed_nonce,
-                        last_delivered_nonce,
-                    })
-                }
-                _ => Err(web3::contract::Error::InvalidOutputType(format!(
-                    "Failed to decode from : {:?}",
-                    tokens
-                ))),
-            }
-        }
-    }
-
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct UnrewardedRelayer {
         pub relayer: Address,
-        pub delivered_messages: DeliveredMessages,
+        pub messages: DeliveredMessages,
     }
 
-    impl Detokenize for UnrewardedRelayer {
-        fn from_tokens(tokens: Vec<Token>) -> Result<Self, web3::contract::Error>
-        where
-            Self: Sized,
-        {
-            match Token::from_tokens(tokens.clone())? {
-                Token::Tuple(tokens) if tokens.len() == 2 => {
-                    let mut iter = tokens.into_iter();
-                    let relayer_token = iter.next().expect("Unreachable!");
-                    let relayer = Address::from_token(relayer_token)?;
-                    let delivered_messages_token = iter.next().expect("Unreachable!");
-                    let delivered_messages =
-                        DeliveredMessages::from_tokens(vec![delivered_messages_token])?;
-                    Ok(Self {
-                        relayer,
-                        delivered_messages,
-                    })
-                }
-                _ => Err(web3::contract::Error::InvalidOutputType(format!(
-                    "Failed to decode from : {:?}",
-                    tokens
-                ))),
-            }
-        }
-    }
-
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct DeliveredMessages {
         pub begin: u64,
         pub end: u64,
         pub dispatch_results: U256,
     }
 
-    impl Detokenize for DeliveredMessages {
-        fn from_tokens(tokens: Vec<Token>) -> Result<Self, web3::contract::Error>
+    impl Tokenizable for DeliveredMessages {
+        fn from_token(token: Token) -> Result<Self, web3::contract::Error>
         where
             Self: Sized,
         {
-            match Token::from_tokens(tokens.clone())? {
-                Token::Tuple(tokens) => {
-                    let (begin, end, dispatch_results) = Detokenize::from_tokens(tokens)?;
-                    Ok(Self {
-                        begin,
-                        end,
-                        dispatch_results,
-                    })
-                }
-                _ => Err(web3::contract::Error::InvalidOutputType(format!(
+            if let Token::Tuple(tokens) = token {
+                let (begin, end, dispatch_results) = Detokenize::from_tokens(tokens)?;
+                Ok(Self {
+                    begin,
+                    end,
+                    dispatch_results,
+                })
+            } else {
+                Err(web3::contract::Error::InvalidOutputType(format!(
                     "Failed to decode from : {:?}",
-                    tokens
-                ))),
+                    token
+                )))
             }
+        }
+
+        fn into_token(self) -> Token {
+            Token::Tuple(vec![
+                self.begin.into_token(),
+                self.end.into_token(),
+                self.dispatch_results.into_token(),
+            ])
+        }
+    }
+
+    impl Tokenizable for UnrewardedRelayer {
+        fn from_token(token: Token) -> Result<Self, web3::contract::Error>
+        where
+            Self: Sized,
+        {
+            if let Token::Tuple(tokens) = token {
+                let (relayer, messages) = Detokenize::from_tokens(tokens)?;
+                Ok(Self { relayer, messages })
+            } else {
+                Err(web3::contract::Error::InvalidOutputType(format!(
+                    "Failed to decode from : {:?}",
+                    token
+                )))
+            }
+        }
+
+        fn into_token(self) -> Token {
+            Token::Tuple(vec![self.relayer.into_token(), self.messages.into_token()])
+        }
+    }
+    impl TokenizableItem for UnrewardedRelayer {}
+
+    impl Tokenizable for InboundLaneData {
+        fn from_token(token: Token) -> Result<Self, web3::contract::Error>
+        where
+            Self: Sized,
+        {
+            if let Token::Tuple(tokens) = token {
+                let (relayers, last_confirmed_nonce, last_delivered_nonce) =
+                    Detokenize::from_tokens(tokens)?;
+                Ok(Self {
+                    relayers,
+                    last_confirmed_nonce,
+                    last_delivered_nonce,
+                })
+            } else {
+                Err(web3::contract::Error::InvalidOutputType(format!(
+                    "Failed to decode from : {:?}",
+                    token
+                )))
+            }
+        }
+
+        fn into_token(self) -> Token {
+            Token::Tuple(vec![
+                self.relayers.into_token(),
+                self.last_confirmed_nonce.into_token(),
+                self.last_delivered_nonce.into_token(),
+            ])
         }
     }
 
@@ -355,13 +348,13 @@ mod tests {
     use super::*;
 
     fn test_client() -> (Web3<Http>, Inbound) {
-        let transport = Http::new("http://127.0.0.1:8545").unwrap();
+        let transport = Http::new("https://pangoro-rpc.darwinia.network").unwrap();
         let client = web3::Web3::new(transport);
         (
             client.clone(),
             Inbound::new(
                 &client,
-                Address::from_str("0x588abe3F7EE935137102C5e2B8042788935f4CB0").unwrap(),
+                Address::from_str("0x3E37361F50a178e05E5d81234dDE67E6cC991ed1").unwrap(),
             )
             .unwrap(),
         )

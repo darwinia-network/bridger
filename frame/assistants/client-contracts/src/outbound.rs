@@ -1,10 +1,11 @@
 pub use crate::error::BridgeContractResult;
+use crate::inbound_types::InboundLaneData;
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, H256, U256},
+    types::{Address, Bytes, H256, U256},
     Web3,
 };
 
@@ -63,6 +64,28 @@ impl Outbound {
             .contract
             .query("getLaneInfo", (), None, Options::default(), None)
             .await?)
+    }
+
+    pub async fn receive_messages_delivery_proof(
+        &self,
+        inbound_lane_data: InboundLaneData,
+        messages_proof: Bytes,
+        private_key: &SecretKey,
+    ) -> BridgeContractResult<H256> {
+        let tx = self
+            .contract
+            .signed_call(
+                "receive_messages_delivery_proof",
+                (inbound_lane_data, messages_proof),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    ..Default::default()
+                },
+                private_key,
+            )
+            .await?;
+        Ok(tx)
     }
 }
 
@@ -237,6 +260,7 @@ mod tests {
     use super::*;
     use web3::contract::Options;
     use web3::ethabi::{RawLog, Token};
+    use web3::signing::{Key, SecretKeyRef};
     use web3::types::{BlockNumber, FilterBuilder};
 
     fn test_client() -> (Web3<Http>, Outbound) {
@@ -308,6 +332,8 @@ mod tests {
     async fn test_send_message() {
         let (_, outbound) = test_client();
         let private_key = SecretKey::from_str("//Alice").unwrap();
+        let address = SecretKeyRef::from(&private_key).address();
+
         let send_message = SendMessage {
             target_contract: Address::from_str("0x0000000000000000000000000000000000000000")
                 .unwrap(),

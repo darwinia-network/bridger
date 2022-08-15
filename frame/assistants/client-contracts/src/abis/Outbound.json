@@ -165,5 +165,69 @@
     ],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "relayer",
+                "type": "address"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint64",
+                    "name": "begin",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "end",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "dispatch_results",
+                    "type": "uint256"
+                  }
+                ],
+                "internalType": "struct TargetChain.DeliveredMessages",
+                "name": "messages",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct TargetChain.UnrewardedRelayer[]",
+            "name": "relayers",
+            "type": "tuple[]"
+          },
+          {
+            "internalType": "uint64",
+            "name": "last_confirmed_nonce",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "last_delivered_nonce",
+            "type": "uint64"
+          }
+        ],
+        "internalType": "struct TargetChain.InboundLaneData",
+        "name": "inboundLaneData",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "messagesProof",
+        "type": "bytes"
+      }
+    ],
+    "name": "receive_messages_delivery_proof",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ]

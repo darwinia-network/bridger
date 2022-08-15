@@ -266,3 +266,28 @@ impl MessagesProof {
         ))
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct MessagesConfirmationProof {
+    pub account_proof: web3::types::Bytes,
+    pub lane_nonce_proof: web3::types::Bytes,
+    pub lane_relayers_proof: Vec<web3::types::Bytes>,
+}
+
+impl MessagesConfirmationProof {
+    pub fn get_token(&self) -> color_eyre::Result<Token> {
+        Ok(Token::Tuple(
+            (
+                self.account_proof.clone(),
+                self.lane_nonce_proof.clone(),
+                Token::Array(
+                    self.lane_relayers_proof
+                        .iter()
+                        .map(|x| x.clone().into_token())
+                        .collect::<Vec<Token>>(),
+                ),
+            )
+                .into_tokens(),
+        ))
+    }
+}

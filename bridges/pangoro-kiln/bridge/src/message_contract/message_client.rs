@@ -15,17 +15,18 @@ use web3::{
 use client_contracts::{
     error::BridgeContractError,
     inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
+    outbound_types::ReceiveMessagesDeliveryProof,
     Inbound,
 };
 use client_contracts::{outbound_types::MessageAccepted, Outbound, SimpleFeeMarket};
 
 use crate::kiln_client::types::MessagesProof;
 
-use super::simple_fee_market::SimpleFeeMarketRelayStrategy;
+use super::{simple_fee_market::SimpleFeeMarketRelayStrategy, utils::build_eth_confirmation_proof};
 
-const LANE_IDENTIFY_SLOT: u64 = 0u64;
-const LANE_NONCE_SLOT: u64 = 1u64;
-const LANE_MESSAGE_SLOT: u64 = 2u64;
+pub const LANE_IDENTIFY_SLOT: u64 = 0u64;
+pub const LANE_NONCE_SLOT: u64 = 1u64;
+pub const LANE_MESSAGE_SLOT: u64 = 2u64;
 
 pub struct MessageClient<T: RelayStrategy> {
     pub client: Web3<Http>,
@@ -64,6 +65,22 @@ impl<T: RelayStrategy> MessageClient<T> {
         Ok(self
             .private_key
             .ok_or_else(|| BridgerError::Custom("Private key not found!".into()))?)
+    }
+
+    pub async fn prepare_for_messages_confirmation(
+        &self,
+        begin: u64,
+        end: u64,
+        block_number: Option<BlockNumber>,
+    ) -> color_eyre::Result<ReceiveMessagesDeliveryProof> {
+        let inbound_lane_data = self.inbound.data().await?;
+        let messages_proof =
+            build_eth_confirmation_proof(&self.client, &self.inbound, begin, end, block_number)
+                .await?;
+        Ok(ReceiveMessagesDeliveryProof {
+            inbound_lane_data,
+            messages_proof,
+        })
     }
 
     pub async fn prepare_for_messages_delivery(

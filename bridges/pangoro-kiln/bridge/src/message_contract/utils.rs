@@ -8,11 +8,16 @@ use client_contracts::{
 use futures::future;
 use support_common::error::BridgerError;
 use web3::{
-    ethabi::RawLog,
+    ethabi::{encode, RawLog},
+    signing::keccak256,
     transports::Http,
-    types::{BlockId, BlockNumber, FilterBuilder, H256, U256},
+    types::{Address, BlockId, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
     Web3,
 };
+
+use crate::kiln_client::types::MessagesConfirmationProof;
+
+use super::message_client::{LANE_IDENTIFY_SLOT, LANE_MESSAGE_SLOT, LANE_NONCE_SLOT};
 
 pub async fn build_darwinia_delivery_proof(
     outbound: &Outbound,
@@ -56,6 +61,96 @@ async fn build_darwinia_proof(
     Ok(chain_message_committer
         .prove(bridged_chain_pos, U256::from(lane_pos), block_id)
         .await?)
+}
+
+pub async fn build_eth_confirmation_proof(
+    client: &Web3<Http>,
+    inbound: &Inbound,
+    begin: u64,
+    end: u64,
+    block_number: Option<BlockNumber>,
+) -> color_eyre::Result<Bytes> {
+    let lane_id_proof = build_eth_proof(
+        client,
+        inbound.contract.address(),
+        vec![U256::from(LANE_IDENTIFY_SLOT)],
+        block_number,
+    )
+    .await?
+    .ok_or_else(|| BridgerError::Custom("Failed to get lane_id_proof".into()))?;
+    let lane_nonce_proof = build_eth_proof(
+        client,
+        inbound.contract.address(),
+        vec![U256::from(LANE_NONCE_SLOT)],
+        block_number,
+    )
+    .await?
+    .ok_or_else(|| BridgerError::Custom("Failed to get lane_nonce_proof".into()))?;
+    let relayer_keys = build_relayer_keys(begin, end)?;
+    let lane_relayers_proof = build_eth_proof(
+        client,
+        inbound.contract.address(),
+        relayer_keys,
+        block_number,
+    )
+    .await?
+    .ok_or_else(|| BridgerError::Custom("Failed to get lane_nonce_proof".into()))?;
+
+    let proof = MessagesConfirmationProof {
+        account_proof: encode_proof(&lane_id_proof.account_proof),
+        lane_nonce_proof: encode_proof(&lane_nonce_proof.storage_proof[0].proof),
+        lane_relayers_proof: lane_relayers_proof
+            .storage_proof
+            .iter()
+            .map(|x| encode_proof(&x.proof))
+            .collect(),
+    };
+    Ok(Bytes(encode(&[proof.get_token()?])))
+}
+
+async fn build_eth_proof(
+    client: &Web3<Http>,
+    address: Address,
+    storage_keys: Vec<U256>,
+    block_number: Option<BlockNumber>,
+) -> color_eyre::Result<Option<Web3Proof>> {
+    Ok(client
+        .eth()
+        .proof(address, storage_keys, block_number)
+        .await?)
+}
+
+pub fn build_relayer_keys(begin: u64, end: u64) -> color_eyre::Result<Vec<U256>> {
+    let mut result: Vec<U256> = Vec::new();
+    for pos in begin..=end {
+        let pos = U256::from(pos);
+        let slot = U256::from(LANE_MESSAGE_SLOT);
+        let bytes: &mut [u8] = &mut [0u8; 64];
+        pos.to_big_endian(&mut bytes[..32]);
+        slot.to_big_endian(&mut bytes[32..]);
+        let key1 = U256::from(keccak256(bytes));
+        let keys: Result<Vec<U256>, _> = (1..=2)
+            .map(|num| {
+                key1.checked_add(U256::from(num as u64))
+                    .ok_or_else(|| BridgerError::Custom("Failed to build relayer keys".into()))
+            })
+            .collect();
+        result.push(key1);
+        result.extend(keys?);
+    }
+    Ok(result)
+}
+
+pub fn encode_proof(proofs: &[Bytes]) -> Bytes {
+    Bytes::from(
+        &rlp::encode_list::<Vec<u8>, _>(
+            proofs
+                .iter()
+                .map(|x| x.0.clone())
+                .collect::<Vec<Vec<u8>>>()
+                .as_slice(),
+        )[..],
+    )
 }
 
 pub async fn build_messages_data(

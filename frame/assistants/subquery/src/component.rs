@@ -7,7 +7,7 @@ pub struct SubqueryComponent;
 
 impl SubqueryComponent {
     /// Get subquery instance
-    pub fn component(config: SubqueryConfig, bridge: BridgeName,) -> Subquery {
+    pub fn component(config: SubqueryConfig, bridge: BridgeName) -> Subquery {
         let client = gql_client::Client::new(config.endpoint);
         Subquery::new(client, bridge)
     }

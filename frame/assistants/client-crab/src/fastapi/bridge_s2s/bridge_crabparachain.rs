@@ -108,7 +108,7 @@ impl S2SClientRelay for CrabClient {
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
+                "send transaction failed {}: {:?}",
                 <Self as S2SClientBase>::CHAIN,
                 e
             ))
@@ -134,7 +134,7 @@ impl S2SClientRelay for CrabClient {
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
+                "send transaction failed {}: {:?}",
                 <Self as S2SClientBase>::CHAIN,
                 e
             ))
@@ -214,7 +214,7 @@ impl S2SClientRelay for CrabClient {
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
+                "send transaction failed {}: {:?}",
                 <Self as S2SClientBase>::CHAIN,
                 e
             ))
@@ -240,7 +240,7 @@ impl S2SClientRelay for CrabClient {
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
+                "send transaction failed {}: {:?}",
                 <Self as S2SClientBase>::CHAIN,
                 e
             ))
@@ -285,7 +285,7 @@ impl S2SParaBridgeClientSolochain for CrabClient {
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
+                "send transaction failed {}: {:?}",
                 <Self as S2SClientBase>::CHAIN,
                 e
             ))

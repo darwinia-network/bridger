@@ -17,7 +17,7 @@ impl CollectingNewMessageRootSignaturesRunner {
         let client_pangoro_web3 = &self.source.client_pangoro_web3;
         let subquery = &self.source.subquery;
         let from_block = self.source.block.unwrap_or_default();
-        let eth_account = &self.source.pangoro_evm_account;
+        let pangoro_evm_account = &self.source.pangoro_evm_account;
 
         let cacse = subquery
             .next_collecting_new_message_root_signatures_event(from_block)
@@ -31,8 +31,13 @@ impl CollectingNewMessageRootSignaturesRunner {
             return Ok(None);
         }
         let event = cacse.expect("Unreachable");
+        tracing::info!(
+            target: "pangoro-kiln",
+            "[pangoro] [ecdsa] found new message root signature event from block {}",
+            event.block_number,
+        );
         if !client_pangoro_substrate
-            .is_ecdsa_authority(Some(event.block_number), &eth_account.address()?.0)
+            .is_ecdsa_authority(Some(event.block_number), &pangoro_evm_account.address()?.0)
             .await?
         {
             tracing::warn!(
@@ -45,13 +50,13 @@ impl CollectingNewMessageRootSignaturesRunner {
             .accounts()
             .sign(
                 event.message.as_slice(),
-                SecretKeyRef::new(&eth_account.secret_key()?),
+                SecretKeyRef::new(&pangoro_evm_account.secret_key()?),
             )
             .signature;
 
-        let address = eth_account.address()?;
+        let address = pangoro_evm_account.address()?;
         let _hash = client_pangoro_substrate
-            .submit_authorities_change_signature(address.0, signature.0)
+            .submit_new_message_root_signature(address.0, signature.0)
             .await?;
 
         Ok(Some(event.block_number))

@@ -51,7 +51,7 @@ impl PangoroClient {
             .sign_and_submit_then_watch(self.account().signer())
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
-            ClientError::Custom(format!("send transactioni failed pangoro: {:?}", e))
+            ClientError::Custom(format!("send transaction failed pangoro: {:?}", e))
         })?;
         Ok(events.extrinsic_hash())
     }
@@ -78,7 +78,7 @@ impl PangoroClient {
             .sign_and_submit_then_watch(self.account().signer())
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
-            ClientError::Custom(format!("send transactioni failed pangoro: {:?}", e))
+            ClientError::Custom(format!("send transaction failed pangoro: {:?}", e))
         })?;
         Ok(events.extrinsic_hash())
     }

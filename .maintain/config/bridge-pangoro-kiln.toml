@@ -17,4 +17,4 @@ inbound_address          = "0x588abe3F7EE935137102C5e2B8042788935f4CB0"
 outbound_address         = "0xee4f69fc69F2C203a0572e43375f68a6e9027998"
 
 [index]
-pangoro = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro" }
+pangoro = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro/" }

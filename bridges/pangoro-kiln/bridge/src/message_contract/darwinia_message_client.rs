@@ -13,13 +13,16 @@ use web3::{
 };
 
 use client_contracts::{
-    inbound_types::ReceiveMessagesProof, ChainMessageCommitter, Inbound, LaneMessageCommitter,
+    inbound_types::ReceiveMessagesProof, outbound_types::ReceiveMessagesDeliveryProof,
+    ChainMessageCommitter, Inbound, LaneMessageCommitter,
 };
 use client_contracts::{Outbound, SimpleFeeMarket};
 
 use super::{
     simple_fee_market::SimpleFeeMarketRelayStrategy,
-    utils::{build_darwinia_delivery_proof, build_messages_data},
+    utils::{
+        build_darwinia_confirmation_proof, build_darwinia_delivery_proof, build_messages_data,
+    },
 };
 
 pub struct DarwiniaMessageClient<T: RelayStrategy> {
@@ -71,6 +74,24 @@ impl<T: RelayStrategy> DarwiniaMessageClient<T> {
             .ok_or_else(|| BridgerError::Custom("Private key not found!".into()))?)
     }
 
+    pub async fn prepare_for_messages_confirmation(
+        &self,
+        block_id: Option<BlockId>,
+    ) -> color_eyre::Result<ReceiveMessagesDeliveryProof> {
+        let inbound_lane_data = self.inbound.data().await?;
+        let messages_proof = build_darwinia_confirmation_proof(
+            &self.inbound,
+            &self.lane_message_committer,
+            &self.chain_message_committer,
+            block_id,
+        )
+        .await?;
+        Ok(ReceiveMessagesDeliveryProof {
+            inbound_lane_data,
+            messages_proof,
+        })
+    }
+
     pub async fn prepare_for_messages_delivery(
         &self,
         begin: u64,
@@ -79,16 +100,14 @@ impl<T: RelayStrategy> DarwiniaMessageClient<T> {
     ) -> color_eyre::Result<ReceiveMessagesProof> {
         let outbound_lane_data =
             build_messages_data(&self.client, &self.outbound, begin, end).await?;
-        let proof = build_darwinia_delivery_proof(
+        let messages_proof = build_darwinia_delivery_proof(
             &self.outbound,
             &self.lane_message_committer,
             &self.chain_message_committer,
             block_number.map(BlockId::from),
         )
-        .await?
-        .into_token();
+        .await?;
 
-        let messages_proof = Bytes(encode(&[proof]));
         Ok(ReceiveMessagesProof {
             outbound_lane_data,
             messages_proof,

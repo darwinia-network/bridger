@@ -8,6 +8,7 @@ use client_contracts::{
 use futures::future;
 use support_common::error::BridgerError;
 use web3::{
+    contract::tokens::Tokenizable,
     ethabi::{encode, RawLog},
     signing::keccak256,
     transports::Http,
@@ -24,8 +25,9 @@ pub async fn build_darwinia_delivery_proof(
     lane_message_committer: &LaneMessageCommitter,
     chain_message_committer: &ChainMessageCommitter,
     block_id: Option<BlockId>,
-) -> color_eyre::Result<MessageProof> {
+) -> color_eyre::Result<Bytes> {
     let (_, lane_pos, _, _) = outbound.get_lane_info().await?;
+
     Ok(build_darwinia_proof(
         lane_message_committer,
         chain_message_committer,
@@ -35,12 +37,12 @@ pub async fn build_darwinia_delivery_proof(
     .await?)
 }
 
-pub async fn build_darwinia_confirm_proof(
+pub async fn build_darwinia_confirmation_proof(
     inbound: &Inbound,
     lane_message_committer: &LaneMessageCommitter,
     chain_message_committer: &ChainMessageCommitter,
     block_id: Option<BlockId>,
-) -> color_eyre::Result<MessageProof> {
+) -> color_eyre::Result<Bytes> {
     let (_, lane_pos, _, _) = inbound.get_lane_info().await?;
     Ok(build_darwinia_proof(
         lane_message_committer,
@@ -56,11 +58,14 @@ async fn build_darwinia_proof(
     chain_message_committer: &ChainMessageCommitter,
     lane_pos: u32,
     block_id: Option<BlockId>,
-) -> color_eyre::Result<MessageProof> {
+) -> color_eyre::Result<Bytes> {
     let bridged_chain_pos = lane_message_committer.bridged_chain_position().await?;
-    Ok(chain_message_committer
+    let proof = chain_message_committer
         .prove(bridged_chain_pos, U256::from(lane_pos), block_id)
-        .await?)
+        .await?
+        .into_token();
+
+    Ok(Bytes(encode(&[proof])))
 }
 
 pub async fn build_eth_confirmation_proof(

@@ -1,4 +1,5 @@
 use microkv::namespace::NamespaceMicroKV;
+
 use support_common::config::{Config, Names};
 use support_tracker::Tracker;
 
@@ -9,11 +10,19 @@ use crate::service::ecdsa_relay::collecting_authorities_change_signatures::Colle
 use crate::service::ecdsa_relay::collecting_new_message_root_signatures::CollectingNewMessageRootSignaturesRunner;
 use crate::service::ecdsa_relay::types::EcdsaSource;
 
+#[derive(Clone, Copy, Debug)]
+pub enum EcdsaScanType {
+    CollectingMessage,
+    CollectedMessage,
+    CollectingAuthority,
+    CollectedAuthority,
+}
+
 pub struct EcdsaScanner;
 
 impl EcdsaScanner {
-    pub async fn start(&self, microkv: NamespaceMicroKV, tracker: Tracker) {
-        while let Err(err) = self.run(microkv.clone(), tracker.clone()).await {
+    pub async fn start(&self, tracker: Tracker, scan_type: EcdsaScanType) {
+        while let Err(err) = self.run(tracker.clone(), scan_type).await {
             tracing::error!(
                 target: "pangoro-kiln",
                 "[pangoro] [ecdsa] An error occurred while processing the extrinsics: {:?}",
@@ -24,7 +33,7 @@ impl EcdsaScanner {
         }
     }
 
-    async fn run(&self, microkv: NamespaceMicroKV, tracker: Tracker) -> color_eyre::Result<()> {
+    async fn run(&self, tracker: Tracker, scan_type: EcdsaScanType) -> color_eyre::Result<()> {
         let config: BridgeConfig = Config::restore(Names::BridgePangoroKiln)?;
         let subquery = config.index.to_pangoro_subquery();
         let client_pangoro_web3 = config.pangoro_evm.to_web3_client()?;
@@ -50,6 +59,25 @@ impl EcdsaScanner {
                 from,
             );
             source.block = Some(from as u32);
+
+            // match scan_type {
+            //     EcdsaScanType::CollectingMessage => {
+            //         let runner = CollectingNewMessageRootSignaturesRunner::new(source.clone());
+            //         let l1 = runner.start().await?;
+            //     },
+            //     EcdsaScanType::CollectedMessage => {
+            //         let runner = CollectedEnoughNewMessageRootSignaturesRunner::new(source.clone());
+            //         let l3 = runner.start().await?;
+            //     },
+            //     EcdsaScanType::CollectingAuthority => {
+            //         let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source.clone());
+            //         let l0 = runner.start().await?;
+            //     },
+            //     EcdsaScanType::CollectedAuthority => {
+            //         let runner = CollectedEnoughAuthoritiesChangeSignaturesRunner::new(source.clone());
+            //         let l2 = runner.start().await?;
+            //     },
+            // }
 
             let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source.clone());
             runner.start().await?;

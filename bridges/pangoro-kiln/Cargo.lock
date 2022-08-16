@@ -339,6 +339,7 @@ dependencies = [
 name = "bridge-pangoro-kiln"
 version = "0.6.2"
 dependencies = [
+ "array-bytes",
  "async-trait",
  "bridge-e2e-traits",
  "bytes",

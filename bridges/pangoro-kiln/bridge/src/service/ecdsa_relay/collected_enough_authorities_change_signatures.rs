@@ -1,3 +1,8 @@
+use web3::types::H160;
+
+use subquery::types::AOperationType;
+use support_common::error::BridgerError;
+
 use crate::service::ecdsa_relay::types::EcdsaSource;
 
 pub struct CollectedEnoughAuthoritiesChangeSignaturesRunner {
@@ -13,8 +18,10 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
 impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
     pub async fn start(&self) -> color_eyre::Result<Option<u32>> {
         let client_posa = &self.source.client_posa;
+        let client_pangoro_substrate = &self.source.client_pangoro_substrate;
         let subquery = &self.source.subquery;
         let from_block = self.source.block.unwrap_or_default();
+        let ethereum_account = &self.source.ethereum_account;
 
         let cacse = subquery
             .next_collected_enough_authorities_change_signatures_event(from_block)
@@ -29,8 +36,72 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
         }
         let event = cacse.expect("Unreachable");
 
-        // client_posa
+        let signature_nodes = event.signatures.nodes;
+        let signatures = signature_nodes
+            .iter()
+            .map(|item| item.signature.clone())
+            .collect::<Vec<Vec<u8>>>();
 
-        Ok(None)
+        let threshold = client_pangoro_substrate
+            .calac_threshold(Some(event.block_number))
+            .await?;
+
+        let address_prev = event.operation_pre.map(H160);
+        let address_new = event.operation_new.map(H160);
+        let address_old = event.operation_old.map(H160);
+        let hash = match event.operation_type {
+            AOperationType::Add => {
+                client_posa
+                    .add_relayer(
+                        address_new.ok_or_else(|| {
+                            BridgerError::Custom("not found new authority account".to_string())
+                        })?,
+                        threshold.into(),
+                        signatures,
+                        ethereum_account.address()?,
+                    )
+                    .await?
+            }
+            AOperationType::Remove => {
+                client_posa
+                    .remove_relayer(
+                        address_prev.ok_or_else(|| {
+                            BridgerError::Custom("not found previous authority account".to_string())
+                        })?,
+                        address_new.ok_or_else(|| {
+                            BridgerError::Custom("not found new authority account".to_string())
+                        })?,
+                        threshold.into(),
+                        signatures,
+                        ethereum_account.address()?,
+                    )
+                    .await?
+            }
+            AOperationType::Swap => {
+                client_posa
+                    .swap_relayer(
+                        address_prev.ok_or_else(|| {
+                            BridgerError::Custom("not found previous authority account".to_string())
+                        })?,
+                        address_old.ok_or_else(|| {
+                            BridgerError::Custom("not found old authority account".to_string())
+                        })?,
+                        address_new.ok_or_else(|| {
+                            BridgerError::Custom("not found new authority account".to_string())
+                        })?,
+                        signatures,
+                        ethereum_account.address()?,
+                    )
+                    .await?
+            }
+        };
+
+        tracing::info!(
+            target: "pangoro-kiln",
+            "[pangoro] [ecdsa] authorities change submitted: {}",
+            array_bytes::bytes2hex("0x", &hash.0),
+        );
+
+        Ok(Some(event.block_number))
     }
 }

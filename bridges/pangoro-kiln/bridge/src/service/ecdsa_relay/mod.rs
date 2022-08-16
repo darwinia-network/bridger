@@ -19,6 +19,9 @@ mod types;
 #[derive(Debug)]
 pub struct ECDSARelayService {
     _greet_collecting_message: Lifeline,
+    _greet_collected_message: Lifeline,
+    _greet_collecting_authorities: Lifeline,
+    _greet_collected_authorities: Lifeline,
 }
 
 impl BridgeService for ECDSARelayService {}
@@ -30,16 +33,59 @@ impl Service for ECDSARelayService {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(BridgeTask::name());
-        let tracker = Tracker::new(microkv.clone(), "scan.pangoro.ecdsa");
-        let _greet_collecting_message = Self::try_task("ecdsa-relay-pangoro-to-kiln", async move {
-            let scanner = EcdsaScanner;
-            scanner
-                .start(tracker.clone(), EcdsaScanType::CollectingMessage)
-                .await;
-            Ok(())
-        });
+        let tracker_collecting_message =
+            Tracker::new(microkv.clone(), "scan.pangoro.collecting-message");
+        let tracker_collected_message =
+            Tracker::new(microkv.clone(), "scan.pangoro.collected-message");
+        let tracker_collecting_authorities =
+            Tracker::new(microkv.clone(), "scan.pangoro.collecting-authorities");
+        let tracker_collected_authorities =
+            Tracker::new(microkv, "scan.pangoro.collected-authorities");
+        let _greet_collecting_message =
+            Self::try_task("pangoro-to-kiln-ecdsa-collecting-message", async move {
+                EcdsaScanner
+                    .start(
+                        tracker_collecting_message.clone(),
+                        EcdsaScanType::CollectingMessage,
+                    )
+                    .await;
+                Ok(())
+            });
+        let _greet_collected_message =
+            Self::try_task("pangoro-to-kiln-ecdsa-collected-message", async move {
+                EcdsaScanner
+                    .start(
+                        tracker_collected_message.clone(),
+                        EcdsaScanType::CollectedMessage,
+                    )
+                    .await;
+                Ok(())
+            });
+        let _greet_collecting_authorities =
+            Self::try_task("pangoro-to-kiln-ecdsa-collecting-authorities", async move {
+                EcdsaScanner
+                    .start(
+                        tracker_collecting_authorities.clone(),
+                        EcdsaScanType::CollectingAuthority,
+                    )
+                    .await;
+                Ok(())
+            });
+        let _greet_collected_authorities =
+            Self::try_task("pangoro-to-kiln-ecdsa-collected-authorities", async move {
+                EcdsaScanner
+                    .start(
+                        tracker_collected_authorities.clone(),
+                        EcdsaScanType::CollectedAuthority,
+                    )
+                    .await;
+                Ok(())
+            });
         Ok(Self {
             _greet_collecting_message,
+            _greet_collected_message,
+            _greet_collecting_authorities,
+            _greet_collected_authorities,
         })
     }
 }

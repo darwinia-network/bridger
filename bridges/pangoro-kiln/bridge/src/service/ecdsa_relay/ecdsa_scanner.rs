@@ -1,5 +1,3 @@
-use microkv::namespace::NamespaceMicroKV;
-
 use support_common::config::{Config, Names};
 use support_tracker::Tracker;
 
@@ -60,27 +58,30 @@ impl EcdsaScanner {
             );
             source.block = Some(from as u32);
 
-            match scan_type {
+            let finished_block = match scan_type {
                 EcdsaScanType::CollectingMessage => {
                     let runner = CollectingNewMessageRootSignaturesRunner::new(source.clone());
-                    let l1 = runner.start().await?;
+                    runner.start().await?
                 }
                 EcdsaScanType::CollectedMessage => {
                     let runner = CollectedEnoughNewMessageRootSignaturesRunner::new(source.clone());
-                    let l3 = runner.start().await?;
+                    runner.start().await?
                 }
                 EcdsaScanType::CollectingAuthority => {
                     let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source.clone());
-                    let l0 = runner.start().await?;
+                    runner.start().await?
                 }
                 EcdsaScanType::CollectedAuthority => {
                     let runner =
                         CollectedEnoughAuthoritiesChangeSignaturesRunner::new(source.clone());
-                    let l2 = runner.start().await?;
+                    runner.start().await?
                 }
+            };
+            if finished_block.is_some() {
+                tracker.finish(finished_block.unwrap() as usize)?;
             }
 
-            tokio::time::sleep(std::time::Duration::from_secs(15)).await;
+            tokio::time::sleep(std::time::Duration::from_secs(10)).await;
         }
     }
 }

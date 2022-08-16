@@ -12,6 +12,7 @@ mod query_vars {
 
 mod schema_types {
     use serde::{Deserialize, Serialize};
+    use serde_hex::SerHexOpt;
     use serde_hex::SerHexSeq;
     use serde_hex::StrictPfx;
 
@@ -78,12 +79,15 @@ mod schema_types {
         pub signatures: DataWrapper<EcdsaSignature>,
         #[serde(rename = "operationType")]
         pub operation_type: AOperationType,
+        #[serde(with = "SerHexOpt::<StrictPfx>")]
         #[serde(rename = "operationNew")]
-        pub operation_new: Option<String>,
+        pub operation_new: Option<[u8; 20]>,
+        #[serde(with = "SerHexOpt::<StrictPfx>")]
         #[serde(rename = "operationOld")]
-        pub operation_old: Option<String>,
+        pub operation_old: Option<[u8; 20]>,
+        #[serde(with = "SerHexOpt::<StrictPfx>")]
         #[serde(rename = "operationPre")]
-        pub operation_pre: Option<String>,
+        pub operation_pre: Option<[u8; 20]>,
     }
 
     #[derive(Clone, Debug, Deserialize, Serialize)]

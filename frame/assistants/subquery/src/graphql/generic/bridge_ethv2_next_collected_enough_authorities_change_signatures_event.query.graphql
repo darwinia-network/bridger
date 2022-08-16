@@ -10,10 +10,13 @@ query nextCollectedEnoughAuthoritiesChangeSignaturesEvent($block: Int) {
   ) {
     nodes {
       id
-      blockNumber
       blockHash
+      blockNumber
       message
-      operation
+      operationType
+      operationPre
+      operationNew
+      operationOld
       signatures {
         nodes {
           id

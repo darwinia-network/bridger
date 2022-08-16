@@ -1,8 +1,9 @@
-use crate::service::ecdsa_relay::types::EcdsaSource;
 use client_contracts::posa_light_client::Commitment;
+use web3::types::H256;
+
 use support_common::error::BridgerError;
-use web3::signing::SecretKeyRef;
-use web3::types::{H256, U256};
+
+use crate::service::ecdsa_relay::types::EcdsaSource;
 
 pub struct CollectedEnoughNewMessageRootSignaturesRunner {
     source: EcdsaSource,
@@ -17,10 +18,8 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
 impl CollectedEnoughNewMessageRootSignaturesRunner {
     pub async fn start(&self) -> color_eyre::Result<Option<u32>> {
         let client_posa = &self.source.client_posa;
-        let client_pangoro_web3 = &self.source.client_pangoro_web3;
         let subquery = &self.source.subquery;
         let from_block = self.source.block.unwrap_or_default();
-        let pangoro_evm_account = &self.source.pangoro_evm_account;
         let ethereum_account = &self.source.ethereum_account;
 
         let cacse = subquery
@@ -46,18 +45,19 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
             .commitment_message_root
             .try_into()
             .map_err(|e| BridgerError::Custom(format!("Wrong message root: {:?}", e)))?;
-        // let n_slice: [u64; 4] = event
-        //     .commitment_nonce // wrong commitment nonce types
-        //     .try_into()
-        //     .map_err(|e| BridgerError::Custom(format!("Wrong nonce: {:?}", e)))?;
-        // let commitment = Commitment {
-        //     block_number: event.commitment_block_number,
-        //     message_root: H256(mr_slice),
-        //     nonce: U256(n_slice),
-        // };
-        // let _hash = client_posa
-        //     .import_message_commitment(commitment, signatures, &ethereum_account.secret_key()?)
-        //     .await?;
-        Ok(None)
+        let commitment = Commitment {
+            block_number: event.commitment_block_number,
+            message_root: H256(mr_slice),
+            nonce: event.commitment_nonce.into(),
+        };
+        let hash = client_posa
+            .import_message_commitment(commitment, signatures, &ethereum_account.secret_key()?)
+            .await?;
+        tracing::info!(
+            target: "pangoro-kiln",
+            "[pangoro] [ecdsa] submitted collected enouth new message root signature: {}",
+            array_bytes::bytes2hex("0x", &hash.0),
+        );
+        Ok(Some(event.block_number))
     }
 }

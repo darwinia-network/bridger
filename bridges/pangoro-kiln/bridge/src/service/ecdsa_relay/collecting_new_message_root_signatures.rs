@@ -54,7 +54,7 @@ impl CollectingNewMessageRootSignaturesRunner {
         tracing::info!(
             target: "pangoro-kiln",
             "[pangoro] [ecdsa] submitted new message root signature: {}",
-            hash,
+            array_bytes::bytes2hex("0x", &hash.0),
         );
         Ok(Some(event.block_number))
     }

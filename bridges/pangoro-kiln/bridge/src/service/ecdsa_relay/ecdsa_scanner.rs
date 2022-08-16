@@ -60,36 +60,25 @@ impl EcdsaScanner {
             );
             source.block = Some(from as u32);
 
-            // match scan_type {
-            //     EcdsaScanType::CollectingMessage => {
-            //         let runner = CollectingNewMessageRootSignaturesRunner::new(source.clone());
-            //         let l1 = runner.start().await?;
-            //     },
-            //     EcdsaScanType::CollectedMessage => {
-            //         let runner = CollectedEnoughNewMessageRootSignaturesRunner::new(source.clone());
-            //         let l3 = runner.start().await?;
-            //     },
-            //     EcdsaScanType::CollectingAuthority => {
-            //         let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source.clone());
-            //         let l0 = runner.start().await?;
-            //     },
-            //     EcdsaScanType::CollectedAuthority => {
-            //         let runner = CollectedEnoughAuthoritiesChangeSignaturesRunner::new(source.clone());
-            //         let l2 = runner.start().await?;
-            //     },
-            // }
-
-            let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source.clone());
-            runner.start().await?;
-
-            let runner = CollectingNewMessageRootSignaturesRunner::new(source.clone());
-            runner.start().await?;
-
-            let runner = CollectedEnoughAuthoritiesChangeSignaturesRunner::new(source.clone());
-            runner.start().await?;
-
-            let runner = CollectedEnoughNewMessageRootSignaturesRunner::new(source.clone());
-            runner.start().await?;
+            match scan_type {
+                EcdsaScanType::CollectingMessage => {
+                    let runner = CollectingNewMessageRootSignaturesRunner::new(source.clone());
+                    let l1 = runner.start().await?;
+                }
+                EcdsaScanType::CollectedMessage => {
+                    let runner = CollectedEnoughNewMessageRootSignaturesRunner::new(source.clone());
+                    let l3 = runner.start().await?;
+                }
+                EcdsaScanType::CollectingAuthority => {
+                    let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source.clone());
+                    let l0 = runner.start().await?;
+                }
+                EcdsaScanType::CollectedAuthority => {
+                    let runner =
+                        CollectedEnoughAuthoritiesChangeSignaturesRunner::new(source.clone());
+                    let l2 = runner.start().await?;
+                }
+            }
 
             tokio::time::sleep(std::time::Duration::from_secs(15)).await;
         }

@@ -18,6 +18,16 @@ mod schema_types {
     use crate::types::DataWrapper;
 
     #[derive(Clone, Debug, Deserialize, Serialize)]
+    pub enum AOperationType {
+        #[serde(rename = "add")]
+        Add,
+        #[serde(rename = "remove")]
+        Remove,
+        #[serde(rename = "swap")]
+        Swap,
+    }
+
+    #[derive(Clone, Debug, Deserialize, Serialize)]
     pub struct EcdsaSignature {
         pub id: String,
         #[serde(rename = "blockNumber")]
@@ -66,7 +76,14 @@ mod schema_types {
         #[serde(with = "SerHexSeq::<StrictPfx>")]
         pub message: Vec<u8>,
         pub signatures: DataWrapper<EcdsaSignature>,
-        pub operation: String,
+        #[serde(rename = "operationType")]
+        pub operation_type: AOperationType,
+        #[serde(rename = "operationNew")]
+        pub operation_new: Option<String>,
+        #[serde(rename = "operationOld")]
+        pub operation_old: Option<String>,
+        #[serde(rename = "operationPre")]
+        pub operation_pre: Option<String>,
     }
 
     #[derive(Clone, Debug, Deserialize, Serialize)]

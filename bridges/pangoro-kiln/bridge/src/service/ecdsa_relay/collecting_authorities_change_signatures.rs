@@ -15,10 +15,9 @@ impl CollectingAuthoritiesChangeSignaturesRunner {
 impl CollectingAuthoritiesChangeSignaturesRunner {
     pub async fn start(&self) -> color_eyre::Result<Option<u32>> {
         let client_pangoro_substrate = &self.source.client_pangoro_substrate;
-        let client_pangoro_web3 = &self.source.client_pangoro_web3;
         let subquery = &self.source.subquery;
         let from_block = self.source.block.unwrap_or_default();
-        let eth_account = &self.source.pangoro_evm_account;
+        let pangoro_evm_account = &self.source.pangoro_evm_account;
 
         let cacse = subquery
             .next_collecting_authorities_change_signatures_event(from_block)
@@ -33,7 +32,7 @@ impl CollectingAuthoritiesChangeSignaturesRunner {
         }
         let event = cacse.expect("Unreachable");
         if !client_pangoro_substrate
-            .is_ecdsa_authority(Some(event.block_number), &eth_account.address()?.0)
+            .is_ecdsa_authority(Some(event.block_number), &pangoro_evm_account.address()?.0)
             .await?
         {
             tracing::warn!(
@@ -43,19 +42,16 @@ impl CollectingAuthoritiesChangeSignaturesRunner {
             return Ok(Some(event.block_number));
         }
 
-        let signature = client_pangoro_web3
-            .accounts()
-            .sign(
-                event.message.as_slice(),
-                SecretKeyRef::new(&eth_account.secret_key()?),
-            )
-            .signature;
-
-        let address = eth_account.address()?;
-        let _hash = client_pangoro_substrate
-            .submit_authorities_change_signature(address.0, signature.0)
+        let address = pangoro_evm_account.address()?;
+        let signature = pangoro_evm_account.sign(event.message.as_slice())?;
+        let hash = client_pangoro_substrate
+            .submit_authorities_change_signature(address.0, signature)
             .await?;
-
+        tracing::info!(
+            target: "pangoro-kiln",
+            "[pangoro] [ecdsa] submitted new message root signature: {}",
+            hash,
+        );
         Ok(Some(event.block_number))
     }
 }

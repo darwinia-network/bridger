@@ -345,16 +345,23 @@ pub mod types {
 mod tests {
     use std::str::FromStr;
 
+    use web3::{
+        ethabi::{RawLog, Token},
+        types::{BlockNumber, FilterBuilder},
+    };
+
     use super::*;
 
     fn test_client() -> (Web3<Http>, Inbound) {
         let transport = Http::new("https://pangoro-rpc.darwinia.network").unwrap();
+        // let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let client = web3::Web3::new(transport);
         (
             client.clone(),
             Inbound::new(
                 &client,
                 Address::from_str("0x3E37361F50a178e05E5d81234dDE67E6cC991ed1").unwrap(),
+                // Address::from_str("0xB0c14Ca271eE4B00ede33505203143C66645f6E4").unwrap(),
             )
             .unwrap(),
         )
@@ -374,5 +381,42 @@ mod tests {
         let (_, inbound) = test_client();
         let nonce = inbound.inbound_lane_nonce().await.unwrap();
         println!("{:?}", nonce);
+    }
+
+    #[ignore]
+    #[tokio::test]
+    async fn test_query_events() {
+        let (client, inbound) = test_client();
+        let events: Vec<Token> = inbound
+            .contract
+            .events("MessageDispatched", (), (), ())
+            .await
+            .unwrap();
+        println!("{:?}", events);
+
+        let event = inbound.contract.abi().event("MessageDispatched").unwrap();
+        let mut filter = FilterBuilder::default();
+        filter = filter.from_block(BlockNumber::from(3713560u64));
+        filter = filter.to_block(BlockNumber::from(3713562u64));
+        filter = filter.address(vec![inbound.contract.address()]);
+        filter = filter.topics(
+            Some(vec![event.signature()]),
+            // Some(vec![H256::from_low_u64_be(2)]),
+            None,
+            None,
+            None,
+        );
+        let log = client.eth().logs(filter.build()).await.unwrap();
+        dbg!(&log);
+        for l in log.iter() {
+            let raw_log = RawLog {
+                topics: l.topics.clone(),
+                data: l.data.0.clone(),
+            };
+            let rl = event.parse_log(raw_log.clone());
+            println!("{:?}", l);
+            println!("{:?}", rl);
+            println!("-----");
+        }
     }
 }

@@ -42,9 +42,7 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
             .map(|item| item.signature.clone())
             .collect::<Vec<Vec<u8>>>();
 
-        let threshold = client_pangoro_substrate
-            .calac_threshold(Some(event.block_number))
-            .await?;
+        let threshold = event.threshold;
 
         let address_prev = event.operation_pre.map(H160);
         let address_new = event.operation_new.map(H160);
@@ -56,7 +54,11 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
                         address_new.ok_or_else(|| {
                             BridgerError::Custom("not found new authority account".to_string())
                         })?,
-                        threshold.into(),
+                        threshold
+                            .ok_or_else(|| {
+                                BridgerError::Custom("no threshold from event".to_string())
+                            })?
+                            .into(),
                         signatures,
                         ethereum_account.address()?,
                     )
@@ -71,7 +73,11 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
                         address_new.ok_or_else(|| {
                             BridgerError::Custom("not found new authority account".to_string())
                         })?,
-                        threshold.into(),
+                        threshold
+                            .ok_or_else(|| {
+                                BridgerError::Custom("no threshold from event".to_string())
+                            })?
+                            .into(),
                         signatures,
                         ethereum_account.address()?,
                     )

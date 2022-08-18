@@ -17,6 +17,7 @@ query nextCollectedEnoughAuthoritiesChangeSignaturesEvent($block: Int) {
       operationPre
       operationNew
       operationOld
+      threshold
       signatures {
         nodes {
           id

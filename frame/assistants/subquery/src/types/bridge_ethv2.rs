@@ -88,6 +88,7 @@ mod schema_types {
         #[serde(with = "SerHexOpt::<StrictPfx>")]
         #[serde(rename = "operationPre")]
         pub operation_pre: Option<[u8; 20]>,
+        pub threshold: Option<u32>,
     }
 
     #[derive(Clone, Debug, Deserialize, Serialize)]

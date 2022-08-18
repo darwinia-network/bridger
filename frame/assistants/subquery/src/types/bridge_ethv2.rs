@@ -31,11 +31,6 @@ mod schema_types {
     #[derive(Clone, Debug, Deserialize, Serialize)]
     pub struct EcdsaSignature {
         pub id: String,
-        #[serde(rename = "blockNumber")]
-        pub block_number: u32,
-        #[serde(with = "SerHexSeq::<StrictPfx>")]
-        #[serde(rename = "blockHash")]
-        pub block_hash: Vec<u8>,
         #[serde(with = "SerHexSeq::<StrictPfx>")]
         pub address: Vec<u8>,
         #[serde(with = "SerHexSeq::<StrictPfx>")]

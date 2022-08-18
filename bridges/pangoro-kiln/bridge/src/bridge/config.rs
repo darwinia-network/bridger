@@ -66,7 +66,7 @@ pub struct PangoroSubstrateConfig {
 
 impl ChainInfoConfig {
     pub fn to_posa_client(&self) -> color_eyre::Result<PosaLightClient> {
-        let transport = Http::new(&self.endpoint)?;
+        let transport = Http::new(&self.execution_layer_endpoint)?;
         let client = Web3::new(transport);
         let address = Address::from_str(&self.posa_light_client_address)?;
         Ok(PosaLightClient::new(client, address)?)

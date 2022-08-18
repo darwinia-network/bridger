@@ -1,7 +1,7 @@
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenizable, Contract, Options},
     ethabi::Bytes,
     transports::Http,
     types::{Address, H256, U256},
@@ -55,7 +55,7 @@ impl PosaLightClient {
         Ok(self
             .contract
             .call(
-                "add_relayer",
+                "remove_relayer",
                 (prev_relayer, relayer, threshold, signatures),
                 from,
                 Options::default(),
@@ -69,15 +69,19 @@ impl PosaLightClient {
         old_relayer: Address,
         new_relayer: Address,
         signatures: Vec<Bytes>,
-        from: Address,
+        private_key: &SecretKey,
     ) -> BridgeContractResult<H256> {
         Ok(self
             .contract
-            .call(
-                "add_relayer",
+            .signed_call(
+                "swap_relayer",
                 (prev_relayer, old_relayer, new_relayer, signatures),
-                from,
-                Options::default(),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    ..Default::default()
+                },
+                private_key,
             )
             .await?)
     }

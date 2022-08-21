@@ -41,7 +41,7 @@ impl Outbound {
                 message,
                 Options {
                     gas: Some(U256::from(10000000u64)),
-                    gas_price: Some(U256::from(1300000000u64)),
+                    gas_price: Some(U256::from(1000000000u64)),
                     value: Some(fee),
                     ..Default::default()
                 },
@@ -271,9 +271,10 @@ mod tests {
     use web3::types::{BlockNumber, FilterBuilder};
 
     fn test_client() -> (Web3<Http>, Outbound) {
-        let transport = Http::new("http://127.0.0.1:8545").unwrap();
+        // let transport = Http::new("http://127.0.0.1:8545").unwrap();
+        let transport = Http::new("https://pangoro-rpc.darwinia.network").unwrap();
         let client = web3::Web3::new(transport);
-        let address = Address::from_str("0xee4f69fc69F2C203a0572e43375f68a6e9027998").unwrap();
+        let address = Address::from_str("0x634370aCf53cf55ad270E084442ea7A23B43B26a").unwrap();
         (client.clone(), Outbound::new(&client, address).unwrap())
     }
 
@@ -336,18 +337,34 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_query_fee_market_address() {
+        let (_, outbound) = test_client();
+        let res: Address = outbound
+            .contract
+            .query("FEE_MARKET", (), None, Options::default(), None)
+            .await
+            .unwrap();
+        dbg!(res);
+    }
+
+    #[tokio::test]
     async fn test_send_message() {
         let (_, outbound) = test_client();
         let private_key = SecretKey::from_str("//Alice").unwrap();
-        let address = SecretKeyRef::from(&private_key).address();
 
         let send_message = SendMessage {
             target_contract: Address::from_str("0x0000000000000000000000000000000000000000")
                 .unwrap(),
             encoded: web3::types::Bytes(vec![]),
         };
+        let value = U256::from_dec_str("30000000000000000000").unwrap();
+        dbg!(value);
         let tx = outbound
-            .send_message(send_message, &private_key, U256::from(100000000000000u64))
+            .send_message(
+                send_message,
+                &private_key,
+                U256::from_dec_str("20000000000000000000").unwrap(),
+            )
             .await
             .unwrap();
         println!("Tx: {:?}", tx);

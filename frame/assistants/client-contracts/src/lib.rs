@@ -8,6 +8,7 @@ pub mod posa_light_client;
 pub mod simple_fee_market;
 
 pub use chain_message_committer::ChainMessageCommitter;
+pub use fee_market::{types as fee_market_types, FeeMarket};
 pub use inbound::{types as inbound_types, Inbound};
 pub use lane_message_committer::LaneMessageCommitter;
 pub use outbound::{types as outbound_types, Outbound};

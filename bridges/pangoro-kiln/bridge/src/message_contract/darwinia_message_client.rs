@@ -5,10 +5,8 @@ use bridge_e2e_traits::strategy::RelayStrategy;
 use secp256k1::SecretKey;
 use support_common::error::BridgerError;
 use web3::{
-    contract::tokens::Tokenizable,
-    ethabi::encode,
     transports::Http,
-    types::{Address, BlockId, BlockNumber, Bytes},
+    types::{Address, BlockId, BlockNumber},
     Web3,
 };
 
@@ -16,10 +14,10 @@ use client_contracts::{
     inbound_types::ReceiveMessagesProof, outbound_types::ReceiveMessagesDeliveryProof,
     ChainMessageCommitter, Inbound, LaneMessageCommitter,
 };
-use client_contracts::{Outbound, SimpleFeeMarket};
+use client_contracts::{FeeMarket, Outbound};
 
 use super::{
-    simple_fee_market::SimpleFeeMarketRelayStrategy,
+    fee_market::FeeMarketRelayStrategy,
     utils::{
         build_darwinia_confirmation_proof, build_darwinia_delivery_proof, build_messages_data,
     },
@@ -44,13 +42,13 @@ pub fn build_darwinia_message_client(
     fee_market_address: Address,
     account: Address,
     private_key: Option<&str>,
-) -> color_eyre::Result<DarwiniaMessageClient<SimpleFeeMarketRelayStrategy>> {
+) -> color_eyre::Result<DarwiniaMessageClient<FeeMarketRelayStrategy>> {
     let transport = Http::new(endpoint)?;
     let client = Web3::new(transport);
     let inbound = Inbound::new(&client, inbound_address)?;
     let outbound = Outbound::new(&client, outbound_address)?;
-    let fee_market = SimpleFeeMarket::new(&client, fee_market_address)?;
-    let strategy = SimpleFeeMarketRelayStrategy::new(fee_market, account);
+    let fee_market = FeeMarket::new(&client, fee_market_address)?;
+    let strategy = FeeMarketRelayStrategy::new(fee_market, account);
     let chain_message_committer =
         ChainMessageCommitter::new(&client, chain_message_committer_address)?;
     let lane_message_committer =

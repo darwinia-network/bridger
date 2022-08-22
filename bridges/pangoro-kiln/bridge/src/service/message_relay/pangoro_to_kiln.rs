@@ -1,15 +1,15 @@
 use std::str::FromStr;
 
 use bridge_e2e_traits::strategy::{EnforcementRelayStrategy, RelayStrategy};
-use client_contracts::{PosaLightClient, SimpleFeeMarket};
+use client_contracts::PosaLightClient;
 
-use support_common::error::BridgerError;
 use web3::types::{Address, BlockNumber, U256};
 
 use crate::kiln_client::client::KilnClient;
 use crate::message_contract::darwinia_message_client::{
     build_darwinia_message_client, DarwiniaMessageClient,
 };
+use crate::message_contract::fee_market::FeeMarketRelayStrategy;
 use crate::message_contract::message_client::build_message_client_with_simple_fee_market;
 use crate::message_contract::message_client::MessageClient;
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
@@ -67,7 +67,7 @@ impl Service for PangoroKilnMessageRelay {
 }
 
 async fn message_relay_client_builder(
-) -> color_eyre::Result<MessageRelay<SimpleFeeMarketRelayStrategy, SimpleFeeMarketRelayStrategy>> {
+) -> color_eyre::Result<MessageRelay<FeeMarketRelayStrategy, SimpleFeeMarketRelayStrategy>> {
     let config: BridgeConfig = Config::restore(Names::BridgePangoroKiln)?;
     let beacon_light_client = PangoroClient::new(
         &config.pangoro_evm.endpoint,

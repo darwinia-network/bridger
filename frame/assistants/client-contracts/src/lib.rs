@@ -1,6 +1,6 @@
 pub mod chain_message_committer;
 pub mod error;
-mod fee_market;
+pub mod fee_market;
 pub mod inbound;
 pub mod lane_message_committer;
 pub mod outbound;

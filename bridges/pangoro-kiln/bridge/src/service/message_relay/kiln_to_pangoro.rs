@@ -7,6 +7,7 @@ use web3::types::{Address, BlockId, BlockNumber, U256};
 use crate::message_contract::darwinia_message_client::{
     build_darwinia_message_client, DarwiniaMessageClient,
 };
+use crate::message_contract::fee_market::FeeMarketRelayStrategy;
 use crate::message_contract::message_client::build_message_client_with_simple_fee_market;
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
 use crate::{
@@ -65,7 +66,7 @@ impl Service for KilnPangoroMessageRelay {
 }
 
 async fn message_relay_client_builder(
-) -> color_eyre::Result<MessageRelay<SimpleFeeMarketRelayStrategy, SimpleFeeMarketRelayStrategy>> {
+) -> color_eyre::Result<MessageRelay<SimpleFeeMarketRelayStrategy, FeeMarketRelayStrategy>> {
     let config: BridgeConfig = Config::restore(Names::BridgePangoroKiln)?;
     let beacon_light_client = PangoroClient::new(
         &config.pangoro_evm.endpoint,

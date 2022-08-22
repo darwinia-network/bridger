@@ -44,9 +44,7 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
                 let mut new = item.signature.clone();
                 let index = new.len() - 2;
                 let num: u16 = u16::from_be_bytes(new[index..].try_into()?) + 27;
-                dbg!(&new);
                 new.splice((new.len() - 2).., num.to_be_bytes());
-                dbg!(&new);
                 Ok(new)
             })
             .collect::<color_eyre::Result<Vec<Vec<u8>>>>()?;

@@ -38,8 +38,14 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
         let signature_nodes = event.signatures.nodes;
         let signatures = signature_nodes
             .iter()
-            .map(|item| item.signature.clone())
-            .collect::<Vec<Vec<u8>>>();
+            .map(|item| {
+                let mut new = item.signature.clone();
+                let index = new.len() - 2;
+                let num: u16 = u16::from_be_bytes(new[index..].try_into()?) + 27;
+                new.splice((new.len() - 2).., num.to_be_bytes());
+                Ok(new)
+            })
+            .collect::<color_eyre::Result<Vec<Vec<u8>>>>()?;
 
         let mr_slice: [u8; 32] = event
             .commitment_message_root

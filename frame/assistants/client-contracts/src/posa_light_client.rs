@@ -114,6 +114,13 @@ impl PosaLightClient {
             .query("block_number", (), None, Options::default(), None)
             .await?)
     }
+
+    pub async fn get_relayers(&self) -> BridgeContractResult<Vec<Address>> {
+        Ok(self
+            .contract
+            .query("get_relayers", (), None, Options::default(), None)
+            .await?)
+    }
 }
 
 pub mod types {
@@ -177,6 +184,19 @@ mod tests {
         )
         .unwrap();
         let result = lclient.block_number().await.unwrap();
+        dbg!(result);
+    }
+
+    #[tokio::test]
+    async fn test_get_relayers() {
+        let transport = Http::new("https://rpc.ankr.com/eth_goerli").unwrap();
+        let client = web3::Web3::new(transport);
+        let lclient = PosaLightClient::new(
+            client,
+            Address::from_str("0x8809f9b3ACEF1dA309f49b5Ab97A4C0faA64E6Ae").unwrap(),
+        )
+        .unwrap();
+        let result = lclient.get_relayers().await.unwrap();
         dbg!(result);
     }
 }

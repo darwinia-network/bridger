@@ -1,6 +1,6 @@
 [package]
 name = "relay-s2s"
-version = "0.6.2"
+version = "0.6.3"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"

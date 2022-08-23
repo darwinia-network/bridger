@@ -402,7 +402,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangolin-pangoro"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "array-bytes",
  "bridge-s2s-traits",
@@ -451,7 +451,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-s2s-traits"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -547,7 +547,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangolin"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -568,7 +568,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangoro"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -617,7 +617,7 @@ dependencies = [
 
 [[package]]
 name = "component-subscan"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "reqwest",
  "serde 1.0.136",
@@ -954,7 +954,7 @@ dependencies = [
 
 [[package]]
 name = "feemarket-s2s"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "async-trait",
  "bridge-s2s-traits",
@@ -968,7 +968,7 @@ dependencies = [
 
 [[package]]
 name = "feemarket-s2s-traits"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "async-trait",
  "bp-runtime",
@@ -2777,7 +2777,7 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 
 [[package]]
 name = "relay-s2s"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -3788,7 +3788,7 @@ dependencies = [
 
 [[package]]
 name = "subquery"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -3887,7 +3887,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "color-eyre",
  "config",
@@ -3906,7 +3906,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -3914,7 +3914,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "once_cell",
  "pad",

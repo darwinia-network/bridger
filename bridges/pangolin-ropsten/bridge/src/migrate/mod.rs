@@ -8,6 +8,8 @@ mod v1;
 mod v2;
 mod v3;
 
+type MigrationStep = Vec<Box<dyn Fn(&MicroKV) -> color_eyre::Result<()>>>;
+
 pub fn migrate(microkv: &MicroKV, version: usize) -> color_eyre::Result<()> {
     let saved_version = current_version(microkv)?;
     // same version, no migrate
@@ -15,7 +17,7 @@ pub fn migrate(microkv: &MicroKV, version: usize) -> color_eyre::Result<()> {
         return Ok(());
     }
 
-    let steps: Vec<Box<dyn Fn(&MicroKV) -> color_eyre::Result<()>>> = vec![
+    let steps: MigrationStep = vec![
         Box::new(v0::migrate),
         Box::new(v1::migrate),
         Box::new(v2::migrate),

@@ -2,9 +2,12 @@
 
 ## Upgrade Guide
 
+[Upgrade guide for v0.6.3](https://github.com/darwinia-network/bridger/issues/505)
+
 ## Changed
 
-- Optional mandatory header relay (#496)
+- Clean index (#500)
+- Merge subquery (#503)
 
 ## Resources
 

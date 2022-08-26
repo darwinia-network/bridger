@@ -3,7 +3,7 @@ pub use types::*;
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, H256, U256},
+    types::{Address, BlockId, H256, U256},
     Web3,
 };
 
@@ -21,10 +21,13 @@ impl Inbound {
         Ok(Self { contract })
     }
 
-    pub async fn inbound_lane_nonce(&self) -> BridgeContractResult<InboundLaneNonce> {
+    pub async fn inbound_lane_nonce(
+        &self,
+        at_block: Option<BlockId>,
+    ) -> BridgeContractResult<InboundLaneNonce> {
         Ok(self
             .contract
-            .query("inboundLaneNonce", (), None, Options::default(), None)
+            .query("inboundLaneNonce", (), None, Options::default(), at_block)
             .await?)
     }
 
@@ -379,7 +382,7 @@ mod tests {
     #[tokio::test]
     async fn test_inbound_lane_nonce() {
         let (_, inbound) = test_client();
-        let nonce = inbound.inbound_lane_nonce().await.unwrap();
+        let nonce = inbound.inbound_lane_nonce(None).await.unwrap();
         println!("{:?}", nonce);
     }
 

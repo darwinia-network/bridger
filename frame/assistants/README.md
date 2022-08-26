@@ -14,7 +14,6 @@ the same. There are mapping table to describe relationship.
 | Pangolin | EthereumRelayerGame          | Instance1DarwiniaRelayerGame          |
 | Darwinia | EthereumRelay                | DarwiniaEthereumRelay                 |
 | Darwinia | EthereumRelayerGame          | Instance1DarwiniaRelayerGame          |
-| Darwinia | ~~EthereumRelayAuthorities~~ | ~~Instance1DarwiniaRelayAuthorities~~ |
 
 WARNING:
 For [subxt@darwinia-v0.12.2](https://github.com/darwinia-network/subxt/tree/darwinia-v0.12.2)
@@ -27,6 +26,7 @@ Please note the following storage keys
 effect chains:
 - pangolin
 - pangoro
+- darwinia
 
 
 - *Feemarket::Orders

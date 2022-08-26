@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use client_contracts::{
     chain_message_committer::types::MessageProof,
     error::BridgeContractError,
@@ -7,6 +9,7 @@ use client_contracts::{
 };
 use futures::future;
 use support_common::error::BridgerError;
+use thegraph_liketh::graph::TheGraphLikeEth;
 use web3::{
     contract::tokens::Tokenizable,
     ethabi::{encode, RawLog},
@@ -160,6 +163,7 @@ pub fn encode_proof(proofs: &[Bytes]) -> Bytes {
 
 pub async fn build_messages_data(
     client: &Web3<Http>,
+    indexer: &TheGraphLikeEth,
     outbound: &Outbound,
     begin: u64,
     end: u64,
@@ -180,7 +184,7 @@ pub async fn build_messages_data(
         return Err(BridgerError::Custom("Build messages data failed".into()).into());
     }
 
-    let accepted_events = query_message_accepted_events(client, outbound, begin, end).await?;
+    let accepted_events = query_message_accepted_events_thegraph(indexer, begin, end).await?;
     let messages: Vec<Message> = std::iter::zip(messages, accepted_events)
         .into_iter()
         .map(|(message, event)| Message {
@@ -244,6 +248,45 @@ pub async fn query_message_accepted_events(
 ) -> color_eyre::Result<Vec<MessageAccepted>> {
     let logs: Result<Vec<Option<MessageAccepted>>, _> = future::try_join_all(
         (begin..=end).map(|nonce| query_message_accepted(client, outbound, nonce)),
+    )
+    .await;
+    if let Some(logs) = logs?.into_iter().collect::<Option<Vec<_>>>() {
+        Ok(logs)
+    } else {
+        Err(BridgerError::Custom(format!(
+            "Failed to get message events from {:?} to {:?}",
+            begin, end
+        ))
+        .into())
+    }
+}
+
+pub async fn query_message_accepted_thegraph(
+    thegraph_client: &TheGraphLikeEth,
+    nonce: u64,
+) -> color_eyre::Result<Option<MessageAccepted>> {
+    Ok(thegraph_client
+        .query_message_accepted(nonce)
+        .await?
+        .map(|x| -> color_eyre::Result<MessageAccepted> {
+            Ok(MessageAccepted {
+                nonce: x.nonce,
+                source: Address::from_str(&x.source)?,
+                target: Address::from_str(&x.target)?,
+                encoded: Bytes(hex::decode(&x.encoded[2..])?),
+                block_number: x.block_number,
+            })
+        })
+        .transpose()?)
+}
+
+pub async fn query_message_accepted_events_thegraph(
+    client: &TheGraphLikeEth,
+    begin: u64,
+    end: u64,
+) -> color_eyre::Result<Vec<MessageAccepted>> {
+    let logs: Result<Vec<Option<MessageAccepted>>, _> = future::try_join_all(
+        (begin..=end).map(|nonce| query_message_accepted_thegraph(client, nonce)),
     )
     .await;
     if let Some(logs) = logs?.into_iter().collect::<Option<Vec<_>>>() {

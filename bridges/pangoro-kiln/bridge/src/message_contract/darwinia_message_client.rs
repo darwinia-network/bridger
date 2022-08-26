@@ -4,6 +4,7 @@ use bridge_e2e_traits::strategy::RelayStrategy;
 
 use secp256k1::SecretKey;
 use support_common::error::BridgerError;
+use thegraph_liketh::graph::TheGraphLikeEth;
 use web3::{
     transports::Http,
     types::{Address, BlockId, BlockNumber},
@@ -31,6 +32,7 @@ pub struct DarwiniaMessageClient<T: RelayStrategy> {
     pub lane_message_committer: LaneMessageCommitter,
     pub strategy: T,
     pub private_key: Option<SecretKey>,
+    pub indexer: TheGraphLikeEth,
 }
 
 pub fn build_darwinia_message_client(
@@ -42,6 +44,7 @@ pub fn build_darwinia_message_client(
     fee_market_address: Address,
     account: Address,
     private_key: Option<&str>,
+    indexer: TheGraphLikeEth,
 ) -> color_eyre::Result<DarwiniaMessageClient<FeeMarketRelayStrategy>> {
     let transport = Http::new(endpoint)?;
     let client = Web3::new(transport);
@@ -62,6 +65,7 @@ pub fn build_darwinia_message_client(
         lane_message_committer,
         strategy,
         private_key,
+        indexer,
     })
 }
 
@@ -97,7 +101,7 @@ impl<T: RelayStrategy> DarwiniaMessageClient<T> {
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<ReceiveMessagesProof> {
         let outbound_lane_data =
-            build_messages_data(&self.client, &self.outbound, begin, end).await?;
+            build_messages_data(&self.client, &self.indexer, &self.outbound, begin, end).await?;
         let messages_proof = build_darwinia_delivery_proof(
             &self.outbound,
             &self.lane_message_committer,

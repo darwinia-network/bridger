@@ -367,6 +367,7 @@ dependencies = [
  "support-lifeline",
  "support-terminal",
  "support-tracker",
+ "thegraph-liketh",
  "tokio",
  "tracing",
  "web3",
@@ -3799,6 +3800,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 dependencies = [
  "unicode-width",
+]
+
+[[package]]
+name = "thegraph-liketh"
+version = "0.6.2"
+dependencies = [
+ "async-trait",
+ "gql_client",
+ "include_dir",
+ "serde 1.0.139",
+ "serde-aux",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

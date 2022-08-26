@@ -26,7 +26,6 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
         let cacse = subquery
             .next_collected_enough_authorities_change_signatures_event(from_block)
             .await?;
-        dbg!(&cacse);
         if cacse.is_none() {
             tracing::debug!(
                 target: "pangoro-kiln",

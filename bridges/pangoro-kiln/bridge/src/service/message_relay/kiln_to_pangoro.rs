@@ -47,7 +47,7 @@ impl Service for KilnPangoroMessageRelay {
         let _greet_confirmation = Self::try_task(
             "message-confirmation-pangoro-to-kiln",
             async move {
-                while let Err(error) = start_delivery().await {
+                while let Err(error) = start_confirmation().await {
                     tracing::error!(
                         target: "pangoro-kiln",
                         "Failed to start kiln-to-pangoro message confirmation service, restart after some seconds: {:?}",
@@ -93,10 +93,11 @@ async fn message_relay_client_builder(
         Address::from_str(&config.pangoro_evm.fee_market_address)?,
         Address::from_str(&config.pangoro_evm.account)?,
         Some(&config.pangoro_evm.private_key),
+        config.index.to_pangoro_thegraph()?,
     )
     .unwrap();
     let posa_light_client = PosaLightClient::new(
-        target.client.clone(),
+        source.client.clone(),
         Address::from_str(&config.kiln.posa_light_client_address)?,
     )?;
     Ok(MessageRelay {
@@ -148,7 +149,7 @@ pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
 
 impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
     async fn message_relay(&self) -> color_eyre::Result<()> {
-        let received_nonce = self.target.inbound.inbound_lane_nonce().await?;
+        let received_nonce = self.target.inbound.inbound_lane_nonce(None).await?;
         let latest_nonce = self.source.outbound.outbound_lane_nonce().await?;
 
         if received_nonce.last_delivered_nonce == latest_nonce.latest_generated_nonce {
@@ -262,7 +263,13 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         let last_relayed_target_block_in_source = self.best_target_block_at_source().await?;
 
         // assemble unrewarded relayers state
-        let target_inbound_state = self.target.inbound.inbound_lane_nonce().await?;
+        let target_inbound_state = self
+            .target
+            .inbound
+            .inbound_lane_nonce(Some(BlockId::from(BlockNumber::from(
+                last_relayed_target_block_in_source,
+            ))))
+            .await?;
         let (begin, end) = (
             target_inbound_state.relayer_range_front,
             target_inbound_state.relayer_range_back,

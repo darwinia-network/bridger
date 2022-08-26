@@ -54,4 +54,5 @@ subquery              = { path = "../../../frame/assistants/subquery", features 
 client-contracts      = { path = "../../../frame/assistants/client-contracts" }
 client-pangoro        = { path = "../../../frame/assistants/client-pangoro", features = [ "bridge-ethv2" ] }
 relay-e2e             = { path = "../../../frame/assistants/relay-e2e" }
+thegraph-liketh     = { path = "../../../frame/assistants/thegraph-liketh" }
 

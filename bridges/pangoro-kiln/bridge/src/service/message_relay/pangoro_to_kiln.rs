@@ -3,7 +3,9 @@ use std::str::FromStr;
 use bridge_e2e_traits::strategy::{EnforcementRelayStrategy, RelayStrategy};
 use client_contracts::PosaLightClient;
 
-use web3::types::{Address, BlockNumber, U256};
+use thegraph_liketh::component::TheGraphLikeEthComponent;
+use thegraph_liketh::graph::TheGraphLikeEth;
+use web3::types::{Address, BlockId, BlockNumber, U256};
 
 use crate::kiln_client::client::KilnClient;
 use crate::message_contract::darwinia_message_client::{
@@ -13,7 +15,7 @@ use crate::message_contract::fee_market::FeeMarketRelayStrategy;
 use crate::message_contract::message_client::build_message_client_with_simple_fee_market;
 use crate::message_contract::message_client::MessageClient;
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
-use crate::message_contract::utils::query_message_accepted;
+use crate::message_contract::utils::{query_message_accepted, query_message_accepted_thegraph};
 
 use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::pangoro_client::client::PangoroClient;
@@ -94,6 +96,7 @@ async fn message_relay_client_builder(
         Address::from_str(&config.pangoro_evm.fee_market_address)?,
         Address::from_str(&config.pangoro_evm.account)?,
         Some(&config.pangoro_evm.private_key),
+        config.index.to_pangoro_thegraph()?,
     )
     .unwrap();
     let posa_light_client = PosaLightClient::new(
@@ -149,7 +152,7 @@ pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
 
 impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
     async fn message_relay(&self) -> color_eyre::Result<()> {
-        let received_nonce = self.target.inbound.inbound_lane_nonce().await?;
+        let received_nonce = self.target.inbound.inbound_lane_nonce(None).await?;
         let latest_nonce = self.source.outbound.outbound_lane_nonce().await?;
 
         if received_nonce.last_delivered_nonce == latest_nonce.latest_generated_nonce {
@@ -172,8 +175,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             end,
         );
         let finalized_block_number = self.best_source_block_at_target().await?;
-        let end_event =
-            query_message_accepted(&self.source.client, &self.source.outbound, end).await?;
+        let end_event = query_message_accepted_thegraph(&self.source.indexer, end).await?;
 
         if let Some(event) = end_event {
             tracing::info!(
@@ -259,7 +261,13 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         let last_relayed_target_block_in_source = self.best_target_block_at_source().await?;
 
         // assemble unrewarded relayers state
-        let target_inbound_state = self.target.inbound.inbound_lane_nonce().await?;
+        let target_inbound_state = self
+            .target
+            .inbound
+            .inbound_lane_nonce(Some(BlockId::from(BlockNumber::from(
+                last_relayed_target_block_in_source,
+            ))))
+            .await?;
         let (begin, end) = (
             target_inbound_state.relayer_range_front,
             target_inbound_state.relayer_range_back,

@@ -1,0 +1,14 @@
+query LastTransaction($nonce: BigInt!) {
+  messageAcceptedEntities(
+    where: {
+        nonce: $nonce
+      }
+  ) {
+    block_number
+    nonce
+    encoded
+    source
+    target
+    id
+  }
+}

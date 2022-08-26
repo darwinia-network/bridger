@@ -2,12 +2,11 @@
 
 ## Upgrade Guide
 
-[Upgrade guide for v0.6.3](https://github.com/darwinia-network/bridger/issues/505)
+[Upgrade guide for v0.6.4](https://github.com/darwinia-network/bridger/issues/509)
 
 ## Changed
 
-- Clean index (#500)
-- Merge subquery (#503)
+- Update ecdsa relay pallet name for bridge darwinia-ethereum (#507)
 
 ## Resources
 

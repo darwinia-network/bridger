@@ -6,6 +6,7 @@ use support_lifeline::task::TaskStack;
 
 use crate::bridge::BridgeConfig;
 use crate::service::ecdsa_relay::ECDSARelayService;
+use crate::service::message_relay::pangoro_to_kiln::PangoroKilnMessageRelay;
 use crate::{
     bridge::BridgeBus,
     service::{
@@ -42,11 +43,12 @@ impl BridgeTask {
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new(bus);
-        // stack.spawn_service::<KilnToPangoroHeaderRelayService>()?;
-        // stack.spawn_service::<SyncCommitteeUpdateService>()?;
-        // stack.spawn_service::<ExecutionLayerRelay>()?;
-        // stack.spawn_service::<KilnPangoroMessageRelay>()?;
+        stack.spawn_service::<KilnToPangoroHeaderRelayService>()?;
+        stack.spawn_service::<SyncCommitteeUpdateService>()?;
+        stack.spawn_service::<ExecutionLayerRelay>()?;
+        stack.spawn_service::<KilnPangoroMessageRelay>()?;
         stack.spawn_service::<ECDSARelayService>()?;
+        stack.spawn_service::<PangoroKilnMessageRelay>()?;
         Ok(Self { stack })
     }
 }

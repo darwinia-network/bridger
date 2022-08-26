@@ -48,7 +48,7 @@ impl Service for PangoroKilnMessageRelay {
         let _greet_confirmation = Self::try_task(
             "message-confirmation-pangoro-to-kiln",
             async move {
-                while let Err(error) = start_delivery().await {
+                while let Err(error) = start_confirmation().await {
                     tracing::error!(
                         target: "pangoro-kiln",
                         "Failed to start pangoro-to-kiln message confirmation service, restart after some seconds: {:?}",

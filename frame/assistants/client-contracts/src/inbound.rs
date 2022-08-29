@@ -124,7 +124,6 @@ pub mod types {
     pub struct DeliveredMessages {
         pub begin: u64,
         pub end: u64,
-        pub dispatch_results: U256,
     }
 
     impl Tokenizable for DeliveredMessages {
@@ -133,12 +132,8 @@ pub mod types {
             Self: Sized,
         {
             if let Token::Tuple(tokens) = token {
-                let (begin, end, dispatch_results) = Detokenize::from_tokens(tokens)?;
-                Ok(Self {
-                    begin,
-                    end,
-                    dispatch_results,
-                })
+                let (begin, end) = Detokenize::from_tokens(tokens)?;
+                Ok(Self { begin, end })
             } else {
                 Err(web3::contract::Error::InvalidOutputType(format!(
                     "Failed to decode from : {:?}",
@@ -148,11 +143,7 @@ pub mod types {
         }
 
         fn into_token(self) -> Token {
-            Token::Tuple(vec![
-                self.begin.into_token(),
-                self.end.into_token(),
-                self.dispatch_results.into_token(),
-            ])
+            Token::Tuple(vec![self.begin.into_token(), self.end.into_token()])
         }
     }
 

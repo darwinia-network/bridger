@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
 use client_contracts::{
-    chain_message_committer::types::MessageProof,
     error::BridgeContractError,
     inbound_types::{Message, OutboundLaneData, Payload},
     outbound::MessageAccepted,
@@ -137,14 +136,11 @@ pub fn build_relayer_keys(begin: u64, end: u64) -> color_eyre::Result<Vec<U256>>
         pos.to_big_endian(&mut bytes[..32]);
         slot.to_big_endian(&mut bytes[32..]);
         let key1 = U256::from(keccak256(bytes));
-        let keys: Result<Vec<U256>, _> = (1..=2)
-            .map(|num| {
-                key1.checked_add(U256::from(num as u64))
-                    .ok_or_else(|| BridgerError::Custom("Failed to build relayer keys".into()))
-            })
-            .collect();
+        let key2 = key1
+            .checked_add(U256::from(1u64))
+            .ok_or_else(|| BridgerError::Custom("Failed to build relayer keys".into()))?;
         result.push(key1);
-        result.extend(keys?);
+        result.push(key2);
     }
     Ok(result)
 }

@@ -21,7 +21,7 @@ pub enum BridgeName {
     /// bridge darwinia<>crab
     #[cfg(feature = "bridge-s2s")]
     DarwiniaCrab,
-    /// bridge pangoro<>goerli (kiln)
+    /// bridge pangoro<>goerli (goerli)
     #[cfg(feature = "bridge-ethv2")]
     PangoroGoerli,
 }

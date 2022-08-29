@@ -10,7 +10,7 @@ private_key                      = "//Alice"
 endpoint    = "https://pangoro-rpc.darwinia.network"
 private_key = "//Alice"
 
-[kiln]
+[goerli]
 endpoint                 = "http://localhost:5052"
 execution_layer_endpoint = "http://localhost:8545"
 inbound_address          = "0x588abe3F7EE935137102C5e2B8042788935f4CB0"

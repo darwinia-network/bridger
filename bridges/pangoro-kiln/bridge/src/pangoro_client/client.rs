@@ -71,7 +71,7 @@ impl PangoroClient {
     pub async fn execution_layer_state_root(&self) -> color_eyre::Result<H256> {
         let query =
             self.execution_layer_contract
-                .query("state_root", (), None, Options::default(), None);
+                .query("merkle_root", (), None, Options::default(), None);
         Ok(query.await?)
     }
 

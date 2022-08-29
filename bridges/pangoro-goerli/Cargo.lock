@@ -336,7 +336,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridge-pangoro-kiln"
+name = "bridge-pangoro-goerli"
 version = "0.6.2"
 dependencies = [
  "array-bytes",

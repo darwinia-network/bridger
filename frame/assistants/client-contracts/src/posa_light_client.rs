@@ -1,7 +1,7 @@
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
-    contract::{tokens::Tokenizable, Contract, Options},
+    contract::{Contract, Options},
     ethabi::Bytes,
     transports::Http,
     types::{Address, H256, U256},

@@ -2,7 +2,6 @@ use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
 use component_state::state::BridgeState;
-use support_common::config::Names;
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
@@ -61,8 +60,9 @@ impl Service for ECDSARelayService {
                     .await;
                 Ok(())
             });
-        let _greet_collecting_authorities =
-            Self::try_task("pangoro-to-goerli-ecdsa-collecting-authorities", async move {
+        let _greet_collecting_authorities = Self::try_task(
+            "pangoro-to-goerli-ecdsa-collecting-authorities",
+            async move {
                 EcdsaScanner
                     .start(
                         tracker_collecting_authorities.clone(),
@@ -70,9 +70,11 @@ impl Service for ECDSARelayService {
                     )
                     .await;
                 Ok(())
-            });
-        let _greet_collected_authorities =
-            Self::try_task("pangoro-to-goerli-ecdsa-collected-authorities", async move {
+            },
+        );
+        let _greet_collected_authorities = Self::try_task(
+            "pangoro-to-goerli-ecdsa-collected-authorities",
+            async move {
                 EcdsaScanner
                     .start(
                         tracker_collected_authorities.clone(),
@@ -80,7 +82,8 @@ impl Service for ECDSARelayService {
                     )
                     .await;
                 Ok(())
-            });
+            },
+        );
         Ok(Self {
             _greet_collecting_message,
             _greet_collected_message,

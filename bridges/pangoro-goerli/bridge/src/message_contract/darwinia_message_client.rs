@@ -35,6 +35,7 @@ pub struct DarwiniaMessageClient<T: RelayStrategy> {
     pub indexer: TheGraphLikeEth,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn build_darwinia_message_client(
     endpoint: &str,
     inbound_address: Address,
@@ -101,7 +102,7 @@ impl<T: RelayStrategy> DarwiniaMessageClient<T> {
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<ReceiveMessagesProof> {
         let outbound_lane_data =
-            build_messages_data(&self.client, &self.indexer, &self.outbound, begin, end).await?;
+            build_messages_data(&self.indexer, &self.outbound, begin, end).await?;
         let messages_proof = build_darwinia_delivery_proof(
             &self.outbound,
             &self.lane_message_committer,

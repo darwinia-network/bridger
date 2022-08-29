@@ -18,7 +18,7 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
 impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
     pub async fn start(&self) -> color_eyre::Result<Option<u32>> {
         let client_posa = &self.source.client_posa;
-        let client_pangoro_substrate = &self.source.client_pangoro_substrate;
+        let _client_pangoro_substrate = &self.source.client_pangoro_substrate;
         let subquery = &self.source.subquery;
         let from_block = self.source.block.unwrap_or_default();
         let ethereum_account = &self.source.ethereum_account;

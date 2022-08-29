@@ -1,5 +1,4 @@
 use crate::service::ecdsa_relay::types::EcdsaSource;
-use web3::signing::{Key, SecretKeyRef};
 
 pub struct CollectingNewMessageRootSignaturesRunner {
     source: EcdsaSource,

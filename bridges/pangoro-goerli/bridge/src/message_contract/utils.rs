@@ -30,13 +30,13 @@ pub async fn build_darwinia_delivery_proof(
 ) -> color_eyre::Result<Bytes> {
     let (_, lane_pos, _, _) = outbound.get_lane_info().await?;
 
-    Ok(build_darwinia_proof(
+    build_darwinia_proof(
         lane_message_committer,
         chain_message_committer,
         lane_pos,
         block_id,
     )
-    .await?)
+    .await
 }
 
 pub async fn build_darwinia_confirmation_proof(
@@ -46,13 +46,13 @@ pub async fn build_darwinia_confirmation_proof(
     block_id: Option<BlockId>,
 ) -> color_eyre::Result<Bytes> {
     let (_, lane_pos, _, _) = inbound.get_lane_info().await?;
-    Ok(build_darwinia_proof(
+    build_darwinia_proof(
         lane_message_committer,
         chain_message_committer,
         lane_pos,
         block_id,
     )
-    .await?)
+    .await
 }
 
 async fn build_darwinia_proof(
@@ -158,7 +158,6 @@ pub fn encode_proof(proofs: &[Bytes]) -> Bytes {
 }
 
 pub async fn build_messages_data(
-    client: &Web3<Http>,
     indexer: &TheGraphLikeEth,
     outbound: &Outbound,
     begin: u64,
@@ -199,6 +198,7 @@ pub async fn build_messages_data(
     })
 }
 
+#[allow(dead_code)]
 pub async fn query_message_accepted(
     client: &Web3<Http>,
     outbound: &Outbound,
@@ -236,6 +236,7 @@ pub async fn query_message_accepted(
     }
 }
 
+#[allow(dead_code)]
 pub async fn query_message_accepted_events(
     client: &Web3<Http>,
     outbound: &Outbound,
@@ -261,7 +262,7 @@ pub async fn query_message_accepted_thegraph(
     thegraph_client: &TheGraphLikeEth,
     nonce: u64,
 ) -> color_eyre::Result<Option<MessageAccepted>> {
-    Ok(thegraph_client
+    thegraph_client
         .query_message_accepted(nonce)
         .await?
         .map(|x| -> color_eyre::Result<MessageAccepted> {
@@ -273,7 +274,7 @@ pub async fn query_message_accepted_thegraph(
                 block_number: x.block_number,
             })
         })
-        .transpose()?)
+        .transpose()
 }
 
 pub async fn query_message_accepted_events_thegraph(

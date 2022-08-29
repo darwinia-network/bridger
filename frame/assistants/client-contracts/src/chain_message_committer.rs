@@ -120,7 +120,9 @@ pub mod types {
 }
 
 mod tests {
+    #[allow(unused_imports)]
     use super::*;
+    #[allow(unused_imports)]
     use std::str::FromStr;
 
     #[tokio::test]

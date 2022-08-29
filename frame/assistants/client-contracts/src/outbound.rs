@@ -1,11 +1,10 @@
 pub use crate::error::BridgeContractResult;
-use crate::inbound_types::InboundLaneData;
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, Bytes, H256, U256},
+    types::{Address, H256, U256},
     Web3,
 };
 

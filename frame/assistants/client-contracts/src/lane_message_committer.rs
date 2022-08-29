@@ -1,7 +1,7 @@
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, H256, U256},
+    types::{Address, U256},
     Web3,
 };
 
@@ -33,7 +33,9 @@ impl LaneMessageCommitter {
 pub mod types {}
 
 mod tests {
+    #[allow(unused_imports)]
     use super::*;
+    #[allow(unused_imports)]
     use std::str::FromStr;
 
     #[tokio::test]

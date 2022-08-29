@@ -3,8 +3,6 @@ use std::str::FromStr;
 use bridge_e2e_traits::strategy::{EnforcementRelayStrategy, RelayStrategy};
 use client_contracts::PosaLightClient;
 
-use thegraph_liketh::component::TheGraphLikeEthComponent;
-use thegraph_liketh::graph::TheGraphLikeEth;
 use web3::types::{Address, BlockId, BlockNumber, U256};
 
 use crate::goerli_client::client::GoerliClient;
@@ -15,7 +13,7 @@ use crate::message_contract::fee_market::FeeMarketRelayStrategy;
 use crate::message_contract::message_client::build_message_client_with_simple_fee_market;
 use crate::message_contract::message_client::MessageClient;
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
-use crate::message_contract::utils::{query_message_accepted, query_message_accepted_thegraph};
+use crate::message_contract::utils::query_message_accepted_thegraph;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::pangoro_client::client::PangoroClient;

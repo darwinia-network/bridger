@@ -155,7 +155,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         if received_nonce.last_delivered_nonce == latest_nonce.latest_generated_nonce {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Goerli => Pangoro] Last delivered nonce is {:?}, equal to lastest generated. Do nothing.",
+                "[MessageDelivery][Goerli=>Pangoro] Last delivered nonce is {:?}, equal to lastest generated. Do nothing.",
                 received_nonce.last_delivered_nonce,
             );
             return Ok(());
@@ -167,7 +167,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         );
         tracing::info!(
             target: "pangoro-goerli",
-            "[MessageDelivery][Goerli => Pangoro] Nonce range: [{:?}, {:?}]",
+            "[MessageDelivery][Goerli=>Pangoro] Nonce range: [{:?}, {:?}]",
             begin,
             end,
         );
@@ -177,7 +177,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         if let Some(event) = end_event {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Goerli => Pangoro] Message at block: {:?}, latest relayed header: {:?}",
+                "[MessageDelivery][Goerli=>Pangoro] Message at block: {:?}, latest relayed header: {:?}",
                 event.block_number,
                 finalized_block_number,
             );
@@ -186,7 +186,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             if event.block_number > finalized_block_number {
                 tracing::info!(
                     target: "pangoro-goerli",
-                    "[MessageDelivery][Goerli => Pangoro] Message at block: {:?}, latest relayed header: {:?}, wait for header relay.",
+                    "[MessageDelivery][Goerli=>Pangoro] Message at block: {:?}, latest relayed header: {:?}, wait for header relay.",
                     event.block_number,
                     finalized_block_number,
                 );
@@ -213,7 +213,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         if !strategy.decide(&encoded_keys).await? {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Goerli => Pangoro] The relay strategy decide to not relay thess messaages {:?}",
+                "[MessageDelivery][Goerli=>Pangoro] The relay strategy decide to not relay thess messaages {:?}",
                 (begin, end)
             );
 
@@ -228,7 +228,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         tracing::info!(
             target: "pangoro-goerli",
-            "[MessageDelivery][Goerli => Pangoro] Sending tx: {:?}",
+            "[MessageDelivery][Goerli=>Pangoro] Sending tx: {:?}",
             tx
         );
 
@@ -253,7 +253,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageConfirmation][goerli=>Pangoro] All confirmed({:?}), nothing to do.",
+                "[MessageConfirmation][Goerli=>Pangoro] All confirmed({:?}), nothing to do.",
                 source_outbound_lane_data
             );
             return Ok(());
@@ -279,7 +279,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageConfirmation][goerli=>Pangoro] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
+                "[MessageConfirmation][Goerli=>Pangoro] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
                 source_outbound_lane_data.latest_received_nonce,
                 target_inbound_state.last_delivered_nonce + 1,
                 source_outbound_lane_data.latest_generated_nonce
@@ -289,7 +289,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         tracing::info!(
             target: "pangoro-goerli",
-            "[MessageConfirmation][goerli=>Pangoro] Try to confirm nonces [{:?}:{:?}]",
+            "[MessageConfirmation][Goerli=>Pangoro] Try to confirm nonces [{:?}:{:?}]",
             begin,
             end,
         );
@@ -310,7 +310,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         tracing::info!(
             target: "relay-s2s",
-            "[MessageConfirmation][goerli=>Pangoro] Messages confirmation tx: {:?}",
+            "[MessageConfirmation][Goerli=>Pangoro] Messages confirmation tx: {:?}",
             hash
         );
         Ok(())

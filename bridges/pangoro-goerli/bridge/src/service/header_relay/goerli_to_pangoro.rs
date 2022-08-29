@@ -105,7 +105,7 @@ impl HeaderRelay {
             .await?;
         tracing::info!(
             target: "pangoro-goerli",
-            "[Header][Goerli => Pangoro] State: {:?}",
+            "[Header][Goerli=>Pangoro] State: {:?}",
             state
         );
         if state.current_period == state.relayed_period {
@@ -143,7 +143,7 @@ impl HeaderRelay {
             None => {
                 tracing::info!(
                     target: "pangoro-goerli",
-                    "[Header][Goerli => Pangoro] Wait for valid attested header",
+                    "[Header][Goerli=>Pangoro] Wait for valid attested header",
                 );
                 return Ok(());
             }
@@ -201,7 +201,7 @@ impl HeaderRelay {
                 None => {
                     tracing::info!(
                         target: "pangoro-goerli",
-                        "[Header][Goerli => Pangoro] Wait for valid attested header",
+                        "[Header][Goerli=>Pangoro] Wait for valid attested header",
                     );
                     return Ok(());
                 }

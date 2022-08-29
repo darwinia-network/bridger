@@ -60,7 +60,7 @@ async fn start() -> color_eyre::Result<()> {
         if let Err(error) = update_manager.sync_committee_update().await {
             tracing::error!(
                 target: "pangoro-goerli",
-                "[SyncCommittee][Goerli => Pangoro] Failed relay sync committee update : {:?}",
+                "[SyncCommittee][Goerli=>Pangoro] Failed relay sync committee update : {:?}",
                 error
             );
             return Err(error);
@@ -84,7 +84,7 @@ impl SyncCommitteeUpdate {
         if next_sync_committee.is_zero() {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[SyncCommittee][Goerli => Pangoro] Try to relay SyncCommittee at period {:?}",
+                "[SyncCommittee][Goerli=>Pangoro] Try to relay SyncCommittee at period {:?}",
                 period + 1,
             );
 
@@ -110,13 +110,13 @@ impl SyncCommitteeUpdate {
 
             tracing::info!(
                 target: "pangoro-goerli",
-                "[SyncCommittee][Goerli => Pangoro] Sending tx: {:?}",
+                "[SyncCommittee][Goerli=>Pangoro] Sending tx: {:?}",
                 &tx
             );
         } else {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[SyncCommittee][Goerli => Pangoro] Next sync committee is {:?}",
+                "[SyncCommittee][Goerli=>Pangoro] Next sync committee is {:?}",
                 next_sync_committee
             );
         }

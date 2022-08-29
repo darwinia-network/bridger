@@ -118,7 +118,7 @@ impl PangoroClient {
             .await?;
         tracing::info!(
             target: "pangoro-goerli",
-            "[Header][Goerli => Pangoro] Sending tx: {:?}",
+            "[Header][Goerli=>Pangoro] Sending tx: {:?}",
             &tx
         );
         Ok(tx)

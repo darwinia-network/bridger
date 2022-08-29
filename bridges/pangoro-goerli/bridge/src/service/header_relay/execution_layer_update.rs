@@ -88,7 +88,7 @@ impl ExecutionLayer {
         if relayed_state_root != latest_execution_payload_state_root {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[ExecutionLayer][Goerli => Pangoro] Try to relay execution layer state at slot: {:?}",
+                "[ExecutionLayer][Goerli=>Pangoro] Try to relay execution layer state at slot: {:?}",
                 last_relayed_header.slot,
             );
 
@@ -125,13 +125,13 @@ impl ExecutionLayer {
 
             tracing::info!(
                 target: "pangoro-goerli",
-                "[ExecutionLayer][Goerli => Pangoro] Sending tx: {:?}",
+                "[ExecutionLayer][Goerli=>Pangoro] Sending tx: {:?}",
                 &tx
             );
         } else {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[ExecutionLayer][Goerli => Pangoro] Latest execution payload state root at slot {:?} is : {:?}",
+                "[ExecutionLayer][Goerli=>Pangoro] Latest execution payload state root at slot {:?} is : {:?}",
                 last_relayed_header.slot,
                 &relayed_state_root,
             );

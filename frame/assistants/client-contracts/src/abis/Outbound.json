@@ -1,49 +1,155 @@
 [
   {
-    "inputs": [],
-    "name": "outboundLaneNonce",
-    "outputs": [
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_lightClientBridge",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_feeMarket",
+        "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_thisChainPosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_thisLanePosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_bridgedChainPosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_bridgedLanePosition",
+        "type": "uint32"
+      },
       {
         "internalType": "uint64",
-        "name": "latest_received_nonce",
+        "name": "_oldest_unpruned_nonce",
         "type": "uint64"
       },
       {
         "internalType": "uint64",
-        "name": "latest_generated_nonce",
+        "name": "_latest_received_nonce",
         "type": "uint64"
       },
       {
+        "internalType": "uint64",
+        "name": "_latest_generated_nonce",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint64",
+        "name": "nonce",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "source",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "encoded",
+        "type": "bytes"
+      }
+    ],
+    "name": "MessageAccepted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
         "internalType": "uint64",
         "name": "oldest_unpruned_nonce",
         "type": "uint64"
+      }
+    ],
+    "name": "MessagePruned",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint64",
+        "name": "begin",
+        "type": "uint64"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint64",
+        "name": "end",
+        "type": "uint64"
+      }
+    ],
+    "name": "MessagesDelivered",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "FEE_MARKET",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "targetContract",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes",
-        "name": "encoded",
-        "type": "bytes"
-      }
-    ],
-    "name": "send_message",
+    "inputs": [],
+    "name": "VERIFIER",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "contract IVerifier",
         "name": "",
-        "type": "uint256"
+        "type": "address"
       }
     ],
-    "stateMutability": "payable",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "commitment",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -86,17 +192,12 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "targetContract",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes",
-        "name": "encoded",
-        "type": "bytes"
+        "internalType": "uint64",
+        "name": "nonce",
+        "type": "uint64"
       }
     ],
-    "name": "send_message",
+    "name": "encodeMessageKey",
     "outputs": [
       {
         "internalType": "uint256",
@@ -104,39 +205,8 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "payable",
+    "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint64",
-        "name": "nonce",
-        "type": "uint64"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "source",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "target",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes",
-        "name": "encoded",
-        "type": "bytes"
-      }
-    ],
-    "name": "MessageAccepted",
-    "type": "event"
   },
   {
     "inputs": [],
@@ -167,6 +237,61 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "message_size",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "size",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "name": "messages",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "outboundLaneNonce",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "latest_received_nonce",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "latest_generated_nonce",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "oldest_unpruned_nonce",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "components": [
@@ -188,11 +313,6 @@
                     "internalType": "uint64",
                     "name": "end",
                     "type": "uint64"
-                  },
-                  {
-                    "internalType": "uint256",
-                    "name": "dispatch_results",
-                    "type": "uint256"
                   }
                 ],
                 "internalType": "struct TargetChain.DeliveredMessages",
@@ -231,13 +351,52 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "FEE_MARKET",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "targetContract",
         "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "encoded",
+        "type": "bytes"
+      }
+    ],
+    "name": "send_message",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "slot0",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "bridgedLanePosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "bridgedChainPosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "thisLanePosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "thisChainPosition",
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",

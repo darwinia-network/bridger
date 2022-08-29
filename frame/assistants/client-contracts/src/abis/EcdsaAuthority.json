@@ -5,21 +5,6 @@
         "internalType": "bytes32",
         "name": "_domain_separator",
         "type": "bytes32"
-      },
-      {
-        "internalType": "address[]",
-        "name": "_relayers",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_threshold",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_nonce",
-        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",

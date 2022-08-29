@@ -133,6 +133,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "src",
@@ -311,7 +324,7 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "assignedRelayer",
+        "name": "relayer",
         "type": "address"
       },
       {
@@ -481,12 +494,12 @@
         "components": [
           {
             "internalType": "uint32",
-            "name": "assignedTime",
+            "name": "time",
             "type": "uint32"
           },
           {
             "internalType": "uint32",
-            "name": "assignedRelayersNumber",
+            "name": "number",
             "type": "uint32"
           },
           {
@@ -503,7 +516,7 @@
         "components": [
           {
             "internalType": "address",
-            "name": "assignedRelayer",
+            "name": "relayer",
             "type": "address"
           },
           {
@@ -616,6 +629,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -714,12 +734,12 @@
     "outputs": [
       {
         "internalType": "uint32",
-        "name": "assignedTime",
+        "name": "time",
         "type": "uint32"
       },
       {
         "internalType": "uint32",
-        "name": "assignedRelayersNumber",
+        "name": "number",
         "type": "uint32"
       },
       {
@@ -840,47 +860,6 @@
       }
     ],
     "name": "setOutbound",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "assigned_relayers_number",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "collateral_perorder",
-        "type": "uint256"
-      }
-    ],
-    "name": "setParaRelay",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "slash_time",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "relay_time",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "price_ratio",
-        "type": "uint32"
-      }
-    ],
-    "name": "setParaTime",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

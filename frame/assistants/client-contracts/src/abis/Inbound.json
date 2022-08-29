@@ -1,27 +1,85 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_lightClientBridge",
+        "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_thisChainPosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_thisLanePosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_bridgedChainPosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_bridgedLanePosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_last_confirmed_nonce",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_last_delivered_nonce",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "nonce",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "result",
+        "type": "bool"
+      }
+    ],
+    "name": "MessageDispatched",
+    "type": "event"
+  },
+  {
     "inputs": [],
-    "name": "inboundLaneNonce",
+    "name": "VERIFIER",
     "outputs": [
       {
-        "internalType": "uint64",
-        "name": "last_confirmed_nonce",
-        "type": "uint64"
-      },
+        "internalType": "contract IVerifier",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "commitment",
+    "outputs": [
       {
-        "internalType": "uint64",
-        "name": "last_delivered_nonce",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint64",
-        "name": "relayer_range_front",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint64",
-        "name": "relayer_range_back",
-        "type": "uint64"
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
       }
     ],
     "stateMutability": "view",
@@ -51,11 +109,6 @@
                     "internalType": "uint64",
                     "name": "end",
                     "type": "uint64"
-                  },
-                  {
-                    "internalType": "uint256",
-                    "name": "dispatch_results",
-                    "type": "uint256"
                   }
                 ],
                 "internalType": "struct TargetChain.DeliveredMessages",
@@ -81,6 +134,81 @@
         "internalType": "struct TargetChain.InboundLaneData",
         "name": "lane_data",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "nonce",
+        "type": "uint64"
+      }
+    ],
+    "name": "encodeMessageKey",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getLaneInfo",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "inboundLaneNonce",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "last_confirmed_nonce",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "last_delivered_nonce",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "relayer_range_front",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "relayer_range_back",
+        "type": "uint64"
       }
     ],
     "stateMutability": "view",
@@ -146,50 +274,93 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getLaneInfo",
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "name": "relayers",
     "outputs": [
       {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
+        "internalType": "address",
+        "name": "relayer",
+        "type": "address"
       },
       {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "begin",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "end",
+            "type": "uint64"
+          }
+        ],
+        "internalType": "struct TargetChain.DeliveredMessages",
+        "name": "messages",
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "anonymous": false,
-    "inputs": [
+    "inputs": [],
+    "name": "relayers_back",
+    "outputs": [
       {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "nonce",
-        "type": "uint64"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "result",
-        "type": "bool"
+        "internalType": "address",
+        "name": "pre_relayer",
+        "type": "address"
       }
     ],
-    "name": "MessageDispatched",
-    "type": "event"
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "relayers_size",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "size",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "slot0",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "bridgedLanePosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "bridgedChainPosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "thisLanePosition",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "thisChainPosition",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   }
 ]

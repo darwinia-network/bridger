@@ -31,15 +31,19 @@ impl PosaLightClient {
         relayer: Address,
         threshold: U256,
         signatures: Vec<Bytes>,
-        from: Address,
+        private_key: &SecretKey,
     ) -> BridgeContractResult<H256> {
         Ok(self
             .contract
-            .call(
+            .signed_call(
                 "add_relayer",
                 (relayer, threshold, signatures),
-                from,
-                Options::default(),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    ..Default::default()
+                },
+                private_key,
             )
             .await?)
     }
@@ -50,15 +54,19 @@ impl PosaLightClient {
         relayer: Address,
         threshold: U256,
         signatures: Vec<Bytes>,
-        from: Address,
+        private_key: &SecretKey,
     ) -> BridgeContractResult<H256> {
         Ok(self
             .contract
-            .call(
+            .signed_call(
                 "remove_relayer",
                 (prev_relayer, relayer, threshold, signatures),
-                from,
-                Options::default(),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    ..Default::default()
+                },
+                private_key,
             )
             .await?)
     }

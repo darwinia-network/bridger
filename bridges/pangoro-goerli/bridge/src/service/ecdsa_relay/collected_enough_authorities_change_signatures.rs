@@ -66,7 +66,7 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
                             })?
                             .into(),
                         signatures,
-                        ethereum_account.address()?,
+                        &ethereum_account.secret_key()?,
                     )
                     .await?
             }
@@ -76,7 +76,7 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
                         address_prev.ok_or_else(|| {
                             BridgerError::Custom("not found previous authority account".to_string())
                         })?,
-                        address_new.ok_or_else(|| {
+                        address_old.ok_or_else(|| {
                             BridgerError::Custom("not found new authority account".to_string())
                         })?,
                         threshold
@@ -85,7 +85,7 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
                             })?
                             .into(),
                         signatures,
-                        ethereum_account.address()?,
+                        &ethereum_account.secret_key()?,
                     )
                     .await?
             }

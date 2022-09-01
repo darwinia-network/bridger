@@ -108,7 +108,7 @@ impl GoerliClient {
 
     pub async fn get_bootstrap(&self, header_root: &str) -> color_eyre::Result<Snapshot> {
         let url = format!(
-            "{}/eth/v1/beacon/bootstrap/{}",
+            "{}/eth/v1/beacon/light_client/bootstrap/{}",
             self.api_base_url, header_root,
         );
         let res: ResponseWrapper<Snapshot> = self.api_client.get(url).send().await?.json().await?;
@@ -175,7 +175,7 @@ impl GoerliClient {
         gindex: impl ToString,
     ) -> color_eyre::Result<Proof> {
         let url = format!(
-            "{}/eth/v1/beacon/single_proof/{}?gindex={}",
+            "{}/eth/v1/beacon/light_client/single_proof/{}?gindex={}",
             self.api_base_url,
             state_id.to_string(),
             gindex.to_string(),
@@ -203,7 +203,10 @@ impl GoerliClient {
     }
 
     pub async fn get_finality_update(&self) -> color_eyre::Result<FinalityUpdate> {
-        let url = format!("{}/eth/v1/beacon/finality_update/", self.api_base_url,);
+        let url = format!(
+            "{}/eth/v1/beacon/light_client/finality_update/",
+            self.api_base_url,
+        );
         let res: ResponseWrapper<FinalityUpdate> =
             self.api_client.get(url).send().await?.json().await?;
         Ok(res.data)
@@ -215,7 +218,7 @@ impl GoerliClient {
         count: impl ToString,
     ) -> color_eyre::Result<Vec<SyncCommitteePeriodUpdate>> {
         let url = format!(
-            "{}/eth/v1/beacon/updates?start_period={}&count={}",
+            "{}/eth/v1/beacon/light_client/updates?start_period={}&count={}",
             self.api_base_url,
             start_period.to_string(),
             count.to_string(),
@@ -269,7 +272,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_beacon_block() {
         let client = test_client();
-        let block_body = client.get_beacon_block(257600).await.unwrap();
+        let block_body = client.get_beacon_block(100).await.unwrap();
         println!(
             "Block body: {:?}",
             block_body.body.execution_payload.block_number

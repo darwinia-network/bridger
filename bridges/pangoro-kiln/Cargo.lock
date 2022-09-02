@@ -149,7 +149,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangoro-kiln"
-version = "0.6.3"
+version = "0.6.4"
 dependencies = [
  "async-trait",
  "bytes",
@@ -277,7 +277,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.6.3"
+version = "0.6.4"
 dependencies = [
  "color-eyre",
  "reqwest",
@@ -1938,7 +1938,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.6.3"
+version = "0.6.4"
 dependencies = [
  "color-eyre",
  "config",
@@ -1957,7 +1957,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.6.3"
+version = "0.6.4"
 dependencies = [
  "color-eyre",
  "lifeline",
@@ -1965,7 +1965,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.6.3"
+version = "0.6.4"
 dependencies = [
  "colored",
  "serde 1.0.141",

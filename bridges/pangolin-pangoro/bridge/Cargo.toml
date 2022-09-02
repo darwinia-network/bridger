@@ -10,7 +10,7 @@ license       = "MIT"
 name          = "bridge-pangolin-pangoro"
 readme        = 'README.md'
 repository    = "https://github.com/darwinia-network/bridger"
-version       = "0.6.3"
+version       = "0.6.4"
 
 [dependencies]
 tracing     = "0.1"

@@ -8,13 +8,12 @@ subxt generated code is also follow this. but currently Darwinia/Pangolin chains
 also have some pallet use v1 style. It happens that pallet and prefix are not
 the same. There are mapping table to describe relationship.
 
-| Chain    | Pallet Name              | Storage Prefix                    |
-| -------- | ------------------------ | --------------------------------- |
-| Pangolin | EthereumRelay            | DarwiniaEthereumRelay             |
-| Pangolin | EthereumRelayerGame      | Instance1DarwiniaRelayerGame      |
-| Darwinia | EthereumRelay            | DarwiniaEthereumRelay             |
-| Darwinia | EthereumRelayerGame      | Instance1DarwiniaRelayerGame      |
-| Darwinia | EthereumRelayAuthorities | Instance1DarwiniaRelayAuthorities |
+| Chain    | Pallet Name                  | Storage Prefix                        |
+| -------- |------------------------------|---------------------------------------|
+| Pangolin | EthereumRelay                | DarwiniaEthereumRelay                 |
+| Pangolin | EthereumRelayerGame          | Instance1DarwiniaRelayerGame          |
+| Darwinia | EthereumRelay                | DarwiniaEthereumRelay                 |
+| Darwinia | EthereumRelayerGame          | Instance1DarwiniaRelayerGame          |
 
 WARNING:
 For [subxt@darwinia-v0.12.2](https://github.com/darwinia-network/subxt/tree/darwinia-v0.12.2)
@@ -27,6 +26,7 @@ Please note the following storage keys
 effect chains:
 - pangolin
 - pangoro
+- darwinia
 
 
 - *Feemarket::Orders

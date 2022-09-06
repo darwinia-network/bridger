@@ -1,5 +1,3 @@
-#[cfg(feature = "bridge-chapel")]
-mod bridge_chapel;
 #[cfg(feature = "bridge-ethv2")]
 mod bridge_ethv2;
 #[cfg(feature = "bridge-s2s")]

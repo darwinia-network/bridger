@@ -68,7 +68,6 @@ feemarket-s2s = [
   "feemarket-s2s-traits",
 ]
 feemarket-s2s-pangolin = ["feemarket-s2s"]
-bridge-chapel = []
 bridge-ethv2  = ["bridge-e2e-traits"]
 
 [dev-dependencies]

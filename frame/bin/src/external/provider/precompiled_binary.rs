@@ -69,11 +69,11 @@ impl PrecompiledBinaryExecutor {
                 }
             }
         }
-        return Err(BridgerError::UnsupportExternal(format!(
+        Err(BridgerError::UnsupportExternal(format!(
             "Not support this subcommand: {}",
             self.command
         ))
-        .into());
+        .into())
     }
 
     fn download_and_extract_binary_with_command(
@@ -246,7 +246,7 @@ impl PrecompiledBinaryExecutor {
                 }
             }
 
-            if (&*zip_inner_file.name()).ends_with('/') {
+            if zip_inner_file.name().ends_with('/') {
                 tracing::debug!(target: "bridger", "File {} extracted to \"{}\"", i, outpath.display());
                 std::fs::create_dir_all(&outpath)?;
             } else {

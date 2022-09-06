@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use subxt::{BasicError, MetadataError};
-
 use crate::client::DarwiniaClient;
 use crate::config::DarwiniaSubxtConfig;
 use crate::error::{ClientError, ClientResult};
@@ -216,8 +214,8 @@ impl<'a> EthereumApi<'a> {
                     "Proxied ecdsa sign and submit mmr_root to darwinia, block_number: {}",
                     block_number
                 );
-                let call = runtime_types::darwinia_runtime::Call::EthereumRelayAuthorities(
-                    runtime_types::darwinia_relay_authorities::Call::submit_signed_mmr_root {
+                let call = runtime_types::darwinia_runtime::Call::EcdsaRelayAuthority(
+                    runtime_types::darwinia_relay_authority::pallet::Call::submit_signed_mmr_root {
                         block_number,
                         signature: signature.0,
                     },
@@ -240,7 +238,7 @@ impl<'a> EthereumApi<'a> {
                 self.client
                     .runtime()
                     .tx()
-                    .ethereum_relay_authorities()
+                    .ecdsa_relay_authority()
                     .submit_signed_mmr_root(block_number, signature.0)
                     .sign_and_submit(darwinia_account.signer())
                     .await?
@@ -261,8 +259,8 @@ impl<'a> EthereumApi<'a> {
         let v = match darwinia_account.real() {
             Some(real) => {
                 tracing::trace!(target: "client-darwinia", "Proxied ecdsa sign and submit authorities to darwinia");
-                let call = runtime_types::darwinia_runtime::Call::EthereumRelayAuthorities(
-                    runtime_types::darwinia_relay_authorities::Call::submit_signed_authorities {
+                let call = runtime_types::darwinia_runtime::Call::EcdsaRelayAuthority(
+                    runtime_types::darwinia_relay_authority::pallet::Call::submit_signed_authorities {
                         signature: signature.0,
                     },
                 );
@@ -279,7 +277,7 @@ impl<'a> EthereumApi<'a> {
                 self.client
                     .runtime()
                     .tx()
-                    .ethereum_relay_authorities()
+                    .ecdsa_relay_authority()
                     .submit_signed_authorities(signature.0)
                     .sign_and_submit(darwinia_account.signer())
                     .await?
@@ -356,10 +354,10 @@ impl<'a> EthereumApi<'a> {
             .client
             .runtime()
             .storage()
-            .ethereum_relay_authorities()
+            .ecdsa_relay_authority()
             .authorities(hash)
             .await?;
-        Ok(authorities.iter().any(|v| &v.account_id == account))
+        Ok(authorities.0.iter().any(|v| &v.account_id == account))
     }
 
     /// need to sign authorities
@@ -379,14 +377,14 @@ impl<'a> EthereumApi<'a> {
             .client
             .runtime()
             .storage()
-            .ethereum_relay_authorities()
+            .ecdsa_relay_authority()
             .authorities_to_sign(hash)
             .await?;
         match ret {
             None => Ok(false),
             Some(r) => {
                 if r.0 == message {
-                    let includes = r.1.iter().any(|a| &a.0 == account);
+                    let includes = r.1 .0.iter().any(|a| &a.0 == account);
                     Ok(!includes)
                 } else {
                     Ok(false)
@@ -412,7 +410,7 @@ impl<'a> EthereumApi<'a> {
             .client
             .runtime()
             .storage()
-            .ethereum_relay_authorities()
+            .ecdsa_relay_authority()
             .mmr_roots_to_sign(block_number, exec_block_hash)
             .await?;
         match mmr_roots_to_sign {
@@ -426,7 +424,7 @@ impl<'a> EthereumApi<'a> {
                 Ok(false)
             }
             Some(m) => {
-                let need = !m.signatures.iter().any(|a| &a.0 == account);
+                let need = !m.signatures.0.iter().any(|a| &a.0 == account);
                 if !need {
                     tracing::debug!(
                         target: "client-darwinia",
@@ -440,32 +438,14 @@ impl<'a> EthereumApi<'a> {
     }
 
     /// hack query ethereum relay authorities next term.
-    /// todo: fix storage prefix name same with pallet name is better way
     pub async fn ethereum_relay_authorities_next_term(&self) -> ClientResult<u32> {
-        let current_term = match self
+        let current_term = self
             .client
             .runtime()
             .storage()
-            .ethereum_relay_authorities()
+            .ecdsa_relay_authority()
             .next_term(None)
-            .await
-        {
-            Ok(v) => v,
-            Err(e) => match e {
-                BasicError::Metadata(MetadataError::PalletNotFound(pallet_name)) => {
-                    match &pallet_name[..] {
-                        "Instance1DarwiniaRelayAuthorities" => 0u32,
-                        _ => {
-                            return Err(BasicError::Metadata(MetadataError::PalletNotFound(
-                                pallet_name,
-                            ))
-                            .into());
-                        }
-                    }
-                }
-                _ => return Err(e.into()),
-            },
-        };
+            .await?;
         Ok(current_term)
     }
 }

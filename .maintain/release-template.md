@@ -2,9 +2,11 @@
 
 ## Upgrade Guide
 
+[Upgrade guide for v0.6.4](https://github.com/darwinia-network/bridger/issues/509)
+
 ## Changed
 
-- Optional mandatory header relay (#496)
+- Update ecdsa relay pallet name for bridge darwinia-ethereum (#507)
 
 ## Resources
 

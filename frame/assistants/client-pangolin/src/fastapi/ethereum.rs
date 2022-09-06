@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use subxt::{BasicError, MetadataError};
-
 use crate::client::PangolinClient;
 use crate::config::PangolinSubxtConfig;
 use crate::error::{ClientError, ClientResult};
@@ -440,32 +438,14 @@ impl<'a> EthereumApi<'a> {
     }
 
     /// hack query ethereum relay authorities next term.
-    /// todo: fix storage prefix name same with pallet name is better way
     pub async fn ethereum_relay_authorities_next_term(&self) -> ClientResult<u32> {
-        let current_term = match self
+        let current_term = self
             .client
             .runtime()
             .storage()
             .ecdsa_relay_authority()
             .next_term(None)
-            .await
-        {
-            Ok(v) => v,
-            Err(e) => match e {
-                BasicError::Metadata(MetadataError::PalletNotFound(pallet_name)) => {
-                    match &pallet_name[..] {
-                        "Instance1DarwiniaRelayAuthorities" => 0u32,
-                        _ => {
-                            return Err(BasicError::Metadata(MetadataError::PalletNotFound(
-                                pallet_name,
-                            ))
-                            .into());
-                        }
-                    }
-                }
-                _ => return Err(e.into()),
-            },
-        };
+            .await?;
         Ok(current_term)
     }
 }

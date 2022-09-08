@@ -196,6 +196,11 @@ impl HeaderRelay {
             .beacon_light_client
             .import_finalized_header(finalized_header_update, &self.pangoro_client.private_key)
             .await?;
+        tracing::info!(
+            target: "pangoro-goerli",
+            "[Header][Goerli=>Pangoro] Sending tx: {:?}",
+            &tx
+        );
 
         Ok(())
     }
@@ -250,6 +255,11 @@ impl HeaderRelay {
                 .beacon_light_client
                 .import_finalized_header(finalized_header_update, &self.pangoro_client.private_key)
                 .await?;
+            tracing::info!(
+            target: "pangoro-goerli",
+                "[Header][Goerli=>Pangoro] Sending tx: {:?}",
+                &tx
+            );
             Ok(())
         } else {
             Err(BridgerError::Custom("Failed to get sync committee update".into()).into())

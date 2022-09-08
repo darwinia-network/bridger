@@ -281,7 +281,7 @@ pub mod types {
     }
 
     impl Tokenizable for SyncCommitteePeriodUpdate {
-        fn from_token(token: Token) -> Result<Self, web3::contract::Error>
+        fn from_token(_token: Token) -> Result<Self, web3::contract::Error>
         where
             Self: Sized,
         {

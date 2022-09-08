@@ -1,16 +1,10 @@
-use crate::{
-    goerli_client::types::{HeaderMessage, SyncAggregate, SyncCommittee},
-    pangoro_client::types::BeaconBlockHeader,
-};
 use client_contracts::beacon_light_client::BeaconLightClient;
 use secp256k1::SecretKey;
 use std::str::FromStr;
-use support_common::error::BridgerError;
 use web3::{
-    contract::{tokens::Tokenize, Contract, Options},
-    ethabi::{ethereum_types::H32, Token},
+    contract::{Contract, Options},
     transports::Http,
-    types::{Address, H256, U256},
+    types::{Address, H256},
     Web3,
 };
 

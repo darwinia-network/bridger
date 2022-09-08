@@ -13,7 +13,66 @@ use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::KusamaClient;
 use crate::error::{ClientError, ClientResult};
-use crate::types::runtime_types::bp_header_chain::InitializationData;
+
+type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
+
+const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
+
+impl KusamaClient {
+    async fn grandpa_authorities(&self, at: sp_core::H256) -> ClientResult<AuthorityList> {
+        let params = subxt::rpc::rpc_params![
+            "GrandpaApi_grandpa_authorities",
+            sp_core::Bytes(Vec::new()),
+            at
+        ];
+        let hex: String = self
+            .subxt()
+            .rpc()
+            .client
+            .request("state_call", params)
+            .await?;
+        let raw_authorities_set = array_bytes::hex2bytes(hex.as_ref())?;
+        let authorities = codec::Decode::decode(&mut &raw_authorities_set[..]).map_err(|err| {
+            ClientError::Custom(format!(
+                "[DecodeAuthorities] Can not decode authorities: {:?}",
+                err
+            ))
+        })?;
+        Ok(authorities)
+    }
+
+    /// Find header digest that schedules next GRANDPA authorities set.
+    fn find_grandpa_authorities_scheduled_change(
+        &self,
+        header: &SpHeader,
+    ) -> Option<ScheduledChange<u32>> {
+        let filter_log = |log: ConsensusLog<u32>| match log {
+            ConsensusLog::ScheduledChange(change) => Some(change),
+            _ => None,
+        };
+
+        // find the first consensus digest with the right ID which converts to
+        // the right kind of consensus log.
+        header
+            .digest
+            .logs
+            .iter()
+            .filter_map(|item| match item {
+                DigestItem::Consensus(engine, logs) => {
+                    if engine == &GRANDPA_ENGINE_ID {
+                        Some(&logs[..])
+                    } else {
+                        None
+                    }
+                }
+                _ => None,
+            })
+            .find_map(|mut l| {
+                let log = codec::Decode::decode(&mut l).ok();
+                log.and_then(filter_log)
+            })
+    }
+}
 
 impl S2SClientBase for KusamaClient {
     const CHAIN: &'static str = "kusama";
@@ -24,7 +83,7 @@ impl S2SClientBase for KusamaClient {
 
 #[async_trait::async_trait]
 impl S2SClientGeneric for KusamaClient {
-    type InitializationData = InitializationData<BundleHeader>;
+    type InitializationData = bp_header_chain::InitializationData<SpHeader>;
 
     async fn subscribe_grandpa_justifications(
         &self,

@@ -16,7 +16,6 @@ type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::He
     u32,
     crate::types::runtime_types::sp_runtime::traits::BlakeTwo256,
 >;
-type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 
 impl S2SClientBase for PangolinParachainClient {
     const CHAIN: &'static str = "pangolinparachain";

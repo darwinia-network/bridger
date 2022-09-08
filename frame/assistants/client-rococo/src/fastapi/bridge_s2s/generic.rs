@@ -15,10 +15,6 @@ use crate::client::RococoClient;
 use crate::error::{ClientError, ClientResult};
 use crate::types::runtime_types::bp_header_chain::InitializationData;
 
-type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::Header<
-    u32,
-    crate::types::runtime_types::sp_runtime::traits::BlakeTwo256,
->;
 type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 
 const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
@@ -88,7 +84,7 @@ impl S2SClientBase for RococoClient {
 
 #[async_trait::async_trait]
 impl S2SClientGeneric for RococoClient {
-    type InitializationData = InitializationData<BundleHeader>;
+    type InitializationData = bp_header_chain::InitializationData<SpHeader>;
 
     async fn subscribe_grandpa_justifications(
         &self,

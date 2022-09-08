@@ -1,7 +1,10 @@
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
-    contract::{tokens::Tokenizable, Contract, Options},
+    contract::{
+        tokens::{Tokenizable, Tokenize},
+        Contract, Options,
+    },
     ethabi::Token,
     transports::Http,
     types::{Address, H256, U256},
@@ -29,8 +32,15 @@ impl BeaconLightClient {
         let query = self
             .contract
             .query("finalized_header", (), None, Options::default(), None);
-        let tokens: Vec<Token> = query.await?;
-        Ok(HeaderMessage::from_token(Token::Tuple(tokens))?)
+        let (slot, proposer_index, parent_root, state_root, body_root) = query.await?;
+        let header = HeaderMessage {
+            slot,
+            proposer_index,
+            parent_root,
+            state_root,
+            body_root,
+        };
+        Ok(header)
     }
 
     pub async fn sync_committee_roots(&self, period: u64) -> BridgeContractResult<H256> {
@@ -54,7 +64,7 @@ impl BeaconLightClient {
             .contract
             .signed_call(
                 "import_finalized_header",
-                finalized_header_update,
+                (finalized_header_update,),
                 Options {
                     gas: Some(U256::from(10000000)),
                     gas_price: Some(U256::from(1300000000)),
@@ -95,6 +105,7 @@ pub mod types {
         types::{Bytes, H256},
     };
 
+    #[derive(Debug, Clone)]
     pub struct FinalizedHeaderUpdate {
         pub attested_header: HeaderMessage,
         pub signature_sync_committee: SyncCommittee,
@@ -166,7 +177,7 @@ pub mod types {
                     self.finalized_header.clone(),
                     self.finality_branch.clone(),
                     self.sync_aggregate.clone(),
-                    self.fork_version.clone(),
+                    Token::FixedBytes(self.fork_version.clone().0),
                     self.signature_slot.clone(),
                 )
                     .into_tokens(),
@@ -197,7 +208,12 @@ pub mod types {
         fn into_token(self) -> web3::ethabi::Token {
             Token::Tuple(
                 (
-                    self.sync_committee_bits.clone(),
+                    Token::FixedArray(
+                        self.sync_committee_bits
+                            .into_iter()
+                            .map(|x| x.into_token())
+                            .collect(),
+                    ),
                     self.sync_committee_signature.clone(),
                 )
                     .into_tokens(),

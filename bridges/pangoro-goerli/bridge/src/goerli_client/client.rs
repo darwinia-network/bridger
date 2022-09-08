@@ -11,11 +11,8 @@ pub struct GoerliClient {
 
 impl GoerliClient {
     pub fn new(api_endpoint: &str) -> color_eyre::Result<Self> {
-        // let transport = Http::new(endpoint)?;
-        // let client = web3::Web3::new(transport);
         let api_client = reqwest::Client::new();
         Ok(Self {
-            // client,
             api_client,
             api_base_url: String::from(api_endpoint),
         })

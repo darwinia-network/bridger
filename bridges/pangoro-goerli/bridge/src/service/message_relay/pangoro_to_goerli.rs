@@ -73,7 +73,7 @@ async fn message_relay_client_builder(
         &config.pangoro_evm.endpoint,
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
-        Some(&config.pangoro_evm.private_key),
+        &config.pangoro_evm.private_key,
     )?;
     let beacon_rpc_client = GoerliClient::new(&config.goerli.endpoint)?;
     let target = build_message_client_with_simple_fee_market(
@@ -315,7 +315,11 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
     }
 
     async fn best_target_block_at_source(&self) -> color_eyre::Result<u64> {
-        let finalized = self.beacon_light_client.finalized_header().await?;
+        let finalized = self
+            .beacon_light_client
+            .beacon_light_client
+            .finalized_header()
+            .await?;
         let block = self
             .beacon_rpc_client
             .get_beacon_block(finalized.slot)

@@ -1,11 +1,17 @@
 use bytes::{Buf, Bytes};
+use client_contracts::beacon_light_client_types::HeaderMessage as ContractHeaderMessage;
+use client_contracts::beacon_light_client_types::SyncAggregate as ContractSyncAggregate;
+use client_contracts::beacon_light_client_types::SyncCommittee as ContractSyncCommittee;
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 use std::str::FromStr;
 use web3::{
     contract::tokens::{Tokenizable, Tokenize},
     ethabi::{ethereum_types::H32, Token},
-    types::H256,
+    types::{Bytes as Web3Bytes, H256},
 };
+
+use serde::de::{self, Deserializer};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResponseWrapper<T> {
@@ -27,27 +33,41 @@ pub struct Header {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct HeaderMessage {
-    pub slot: String,
-    pub proposer_index: String,
+    #[serde(deserialize_with = "from_str")]
+    pub slot: u64,
+    #[serde(deserialize_with = "from_str")]
+    pub proposer_index: u64,
     pub parent_root: String,
     pub state_root: String,
     pub body_root: String,
 }
 
 impl HeaderMessage {
-    pub fn get_token(&self) -> color_eyre::Result<Token> {
-        Ok(Token::Tuple(
-            (
-                self.slot.parse::<u64>()?,
-                self.proposer_index.parse::<u64>()?,
-                H256::from_str(&self.parent_root)?,
-                H256::from_str(&self.state_root)?,
-                H256::from_str(&self.body_root)?,
-            )
-                .into_tokens(),
-        ))
+    pub fn to_contract_type(&self) -> color_eyre::Result<ContractHeaderMessage> {
+        Ok(ContractHeaderMessage {
+            slot: self.slot,
+            proposer_index: self.proposer_index,
+            parent_root: H256::from_str(&self.parent_root)?,
+            state_root: H256::from_str(&self.state_root)?,
+            body_root: H256::from_str(&self.body_root)?,
+        })
     }
 }
+
+// impl HeaderMessage {
+//     pub fn get_token(&self) -> color_eyre::Result<Token> {
+//         Ok(Token::Tuple(
+//             (
+//                 self.slot.parse::<u64>()?,
+//                 self.proposer_index.parse::<u64>()?,
+//                 H256::from_str(&self.parent_root)?,
+//                 H256::from_str(&self.state_root)?,
+//                 H256::from_str(&self.body_root)?,
+//             )
+//                 .into_tokens(),
+//         ))
+//     }
+// }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Snapshot {
@@ -63,6 +83,17 @@ pub struct SyncCommittee {
 }
 
 impl SyncCommittee {
+    pub fn to_contract_type(&self) -> color_eyre::Result<ContractSyncCommittee> {
+        Ok(ContractSyncCommittee {
+            pubkeys: self
+                .pubkeys
+                .iter()
+                .map(|x| hex::decode(&x.clone()[2..]))
+                .collect::<Result<Vec<Vec<u8>>, _>>()?,
+            aggregate_pubkey: Web3Bytes(hex::decode(&self.aggregate_pubkey.clone()[2..])?),
+        })
+    }
+
     pub fn get_token(&self) -> color_eyre::Result<Token> {
         Ok(Token::Tuple(
             (
@@ -143,6 +174,19 @@ pub struct SyncAggregate {
 }
 
 impl SyncAggregate {
+    pub fn to_contract_type(&self) -> color_eyre::Result<ContractSyncAggregate> {
+        let mut sync_committee_bits: [H256; 2] = [H256::default(); 2];
+        sync_committee_bits[0] = H256::from_str(&self.sync_committee_bits[..66])?;
+        sync_committee_bits[1] = H256::from_str(&self.sync_committee_bits[66..])?;
+
+        let sync_committee_signature =
+            Web3Bytes(hex::decode(&self.sync_committee_signature.clone()[2..])?);
+        Ok(ContractSyncAggregate {
+            sync_committee_bits,
+            sync_committee_signature,
+        })
+    }
+
     pub fn get_token(&self) -> color_eyre::Result<Token> {
         let mut sync_aggregate_bits: Vec<Token> = Vec::new();
         let bits = self.sync_committee_bits.clone();
@@ -290,4 +334,14 @@ impl MessagesConfirmationProof {
                 .into_tokens(),
         ))
     }
+}
+
+fn from_str<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+    T: FromStr,
+    T::Err: Display,
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    T::from_str(&s).map_err(de::Error::custom)
 }

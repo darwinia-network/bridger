@@ -48,7 +48,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.endpoint,
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
-        Some(&config.pangoro_evm.private_key),
+        &config.pangoro_evm.private_key,
     )?;
     let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let update_manager = SyncCommitteeUpdate {
@@ -76,11 +76,23 @@ pub struct SyncCommitteeUpdate {
 
 impl SyncCommitteeUpdate {
     pub async fn sync_committee_update(&self) -> color_eyre::Result<()> {
-        let last_relayed_header = self.pangoro_client.finalized_header().await?;
+        let last_relayed_header = self
+            .pangoro_client
+            .beacon_light_client
+            .finalized_header()
+            .await?;
         let period = last_relayed_header.slot.div(32).div(256);
 
-        let _current_sync_committee = self.pangoro_client.sync_committee_roots(period).await?;
-        let next_sync_committee = self.pangoro_client.sync_committee_roots(period + 1).await?;
+        let _current_sync_committee = self
+            .pangoro_client
+            .beacon_light_client
+            .sync_committee_roots(period)
+            .await?;
+        let next_sync_committee = self
+            .pangoro_client
+            .beacon_light_client
+            .sync_committee_roots(period + 1)
+            .await?;
         if next_sync_committee.is_zero() {
             tracing::info!(
                 target: "pangoro-goerli",

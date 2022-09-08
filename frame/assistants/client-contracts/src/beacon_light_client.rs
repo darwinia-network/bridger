@@ -45,7 +45,7 @@ impl BeaconLightClient {
         Ok(root)
     }
 
-    pub async fn import_frinalized_header(
+    pub async fn import_finalized_header(
         &self,
         finalized_header_update: FinalizedHeaderUpdate,
         private_key: &SecretKey,

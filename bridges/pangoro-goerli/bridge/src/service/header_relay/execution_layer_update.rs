@@ -48,7 +48,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.endpoint,
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
-        Some(&config.pangoro_evm.private_key),
+        &config.pangoro_evm.private_key,
     )?;
     let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let execution_layer_relay = ExecutionLayer {
@@ -76,7 +76,11 @@ pub struct ExecutionLayer {
 
 impl ExecutionLayer {
     pub async fn execution_layer_relay(&self) -> color_eyre::Result<()> {
-        let last_relayed_header = self.pangoro_client.finalized_header().await?;
+        let last_relayed_header = self
+            .pangoro_client
+            .beacon_light_client
+            .finalized_header()
+            .await?;
         let finalized_block = self
             .goerli_client
             .get_beacon_block(last_relayed_header.slot)
@@ -117,9 +121,7 @@ impl ExecutionLayer {
                         gas_price: Some(U256::from(1300000000)),
                         ..Default::default()
                     },
-                    &self.pangoro_client.private_key.ok_or_else(|| {
-                        BridgerError::Custom("Failed to get log_bloom from block".into())
-                    })?,
+                    &self.pangoro_client.private_key,
                 )
                 .await?;
 

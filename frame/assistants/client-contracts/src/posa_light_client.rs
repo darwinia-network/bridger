@@ -129,6 +129,13 @@ impl PosaLightClient {
             .query("get_relayers", (), None, Options::default(), None)
             .await?)
     }
+
+    pub async fn nonce(&self) -> BridgeContractResult<U256> {
+        Ok(self
+            .contract
+            .query("nonce", (), None, Options::default(), None)
+            .await?)
+    }
 }
 
 pub mod types {
@@ -182,15 +189,21 @@ mod tests {
     use super::*;
     use web3::transports::Http;
 
+    fn test_client() -> PosaLightClient {
+        let transport =
+            Http::new("https://eth-goerli.g.alchemy.com/v2/WerPq7On62-wy_ARssv291ZPg1TGR5vi")
+                .unwrap();
+        let client = web3::Web3::new(transport);
+        PosaLightClient::new(
+            client,
+            Address::from_str("0x9F04c46AB2531c95FbC7325DF22187dCE9248cF2").unwrap(),
+        )
+        .unwrap()
+    }
+
     #[tokio::test]
     async fn test_query() {
-        let transport = Http::new("http://127.0.0.1:8545").unwrap();
-        let client = web3::Web3::new(transport);
-        let lclient = PosaLightClient::new(
-            client,
-            Address::from_str("0xd345Cc26e3685DA584AC9C38393F9f603B122EcF").unwrap(),
-        )
-        .unwrap();
+        let lclient = test_client();
         let result = lclient.block_number().await.unwrap();
         dbg!(result);
     }
@@ -205,6 +218,13 @@ mod tests {
         )
         .unwrap();
         let result = lclient.get_relayers().await.unwrap();
+        dbg!(result);
+    }
+
+    #[tokio::test]
+    async fn test_nonce() {
+        let client = test_client();
+        let result = client.nonce().await.unwrap();
         dbg!(result);
     }
 }

@@ -13,7 +13,6 @@ use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::RococoClient;
 use crate::error::{ClientError, ClientResult};
-use crate::types::runtime_types::bp_header_chain::InitializationData;
 
 type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 

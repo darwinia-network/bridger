@@ -65,6 +65,27 @@ impl BeaconLightClient {
             .await?;
         Ok(tx)
     }
+
+    pub async fn import_next_sync_committee(
+        &self,
+        sync_committee_update: SyncCommitteePeriodUpdate,
+        private_key: &SecretKey,
+    ) -> BridgeContractResult<H256> {
+        let tx = self
+            .contract
+            .signed_call(
+                "import_next_sync_committee",
+                (sync_committee_update,),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    ..Default::default()
+                },
+                private_key,
+            )
+            .await?;
+        Ok(tx)
+    }
 }
 
 pub mod types {
@@ -250,6 +271,31 @@ pub mod types {
                 self.state_root.into_token(),
                 self.body_root.into_token(),
             ])
+        }
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct SyncCommitteePeriodUpdate {
+        pub sync_committee: SyncCommittee,
+        pub next_sync_committee_branch: Vec<H256>,
+    }
+
+    impl Tokenizable for SyncCommitteePeriodUpdate {
+        fn from_token(token: Token) -> Result<Self, web3::contract::Error>
+        where
+            Self: Sized,
+        {
+            todo!()
+        }
+
+        fn into_token(self) -> Token {
+            Token::Tuple(
+                (
+                    self.sync_committee.into_token(),
+                    self.next_sync_committee_branch.into_token(),
+                )
+                    .into_tokens(),
+            )
         }
     }
 }

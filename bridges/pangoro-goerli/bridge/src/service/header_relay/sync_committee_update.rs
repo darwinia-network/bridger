@@ -5,15 +5,11 @@ use crate::{
     goerli_client::{client::GoerliClient, types::Proof},
     pangoro_client::client::PangoroClient,
 };
+use client_contracts::beacon_light_client_types::SyncCommitteePeriodUpdate;
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
-use web3::{
-    contract::{tokens::Tokenize, Options},
-    ethabi::Token,
-    types::U256,
-};
 
 #[derive(Debug)]
 pub struct SyncCommitteeUpdateService {
@@ -100,24 +96,13 @@ impl SyncCommitteeUpdate {
                 period + 1,
             );
 
-            let parameter = self
+            let sync_committee_update = self
                 .get_sync_committee_update_parameter(period, last_relayed_header.slot)
                 .await?;
             let tx = self
                 .pangoro_client
-                .contract
-                .signed_call(
-                    "import_next_sync_committee",
-                    (parameter,),
-                    Options {
-                        gas: Some(U256::from(10000000)),
-                        gas_price: Some(U256::from(1300000000)),
-                        ..Default::default()
-                    },
-                    &self.pangoro_client.private_key.ok_or_else(|| {
-                        BridgerError::Custom("Failed to get log_bloom from block".into())
-                    })?,
-                )
+                .beacon_light_client
+                .import_next_sync_committee(sync_committee_update, &self.pangoro_client.private_key)
                 .await?;
 
             tracing::info!(
@@ -139,7 +124,7 @@ impl SyncCommitteeUpdate {
         &self,
         period: u64,
         slot: u64,
-    ) -> color_eyre::Result<Token> {
+    ) -> color_eyre::Result<SyncCommitteePeriodUpdate> {
         let sync_committee_update = self
             .goerli_client
             .get_sync_committee_period_update(period, 1)
@@ -164,23 +149,9 @@ impl SyncCommitteeUpdate {
             } => witnesses,
             _ => return Err(BridgerError::Custom("Not implemented!".to_string()).into()),
         };
-
-        let next_sync_committee = Token::Tuple(
-            (
-                Token::FixedArray(
-                    next_sync_committee
-                        .pubkeys
-                        .iter()
-                        .map(|s| hex::decode(&s.clone()[2..]))
-                        .collect::<Result<Vec<Vec<u8>>, _>>()?
-                        .iter()
-                        .map(|s| Token::Bytes(s.to_vec()))
-                        .collect::<Vec<Token>>(),
-                ),
-                hex::decode(&next_sync_committee.aggregate_pubkey.clone()[2..])?,
-            )
-                .into_tokens(),
-        );
-        Ok(Token::Tuple((next_sync_committee, witnesses).into_tokens()))
+        Ok(SyncCommitteePeriodUpdate {
+            sync_committee: next_sync_committee.to_contract_type()?,
+            next_sync_committee_branch: witnesses,
+        })
     }
 }

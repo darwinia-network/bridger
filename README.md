@@ -38,11 +38,33 @@ cd bridger/
 ./bridger.sh -h
 ```
 
+##### Set registry
+
+You need set registry when you want to compile from source, because default
+registry from download precompile binary from Github release page. So set
+registry to local
+
+```text
+./bridger.sh registry set --type local
+```
+
+## Environment Vars
+
+The bridger program will read some environments.
+
+| Name             | Description                                                                                                                       |
+|------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `BRIDGER_HOME`   | All data of bridger and bridges will be store in this path. If not set this value, the default will be store in `$HOME/.bridger`. |
+| `LOG_ADAPTER`    | Custom log adapter, you can use `json` value. after do this, all logs will output use json format.                                |
+| `LOG_MAX_LEVEL`  | Max log level, default is `trace`                                                                                                 |
+| `RUST_BACKTRACE` | You can set  `1` or `0` to enable or disable error full error trace                                                               |
+| `RUST_LOG`       | Custom log level for target or crate                                                                                              |
+
 ## Configuration
 
 The currently darwinia-bridger supports muliti bridges. Each bridge has its own configuration file. The configuration filename pattern is `bridges-<BRIDGE_NAME>.toml`
 
-The default configuration dir is `~/.bridger`.  
+The default configuration dir is your `BRIDGER_HOME` env var.  
 
 If you use docker to run the bridger. You should put your configuration file to your dir that will be mapped to the container's `/root/.bridger`. For example: `/home/ubuntu/bridger_config_dir/pangolin-pangoro`.
 
@@ -175,4 +197,15 @@ Update the bridger version in your `docker-compose.yml` file, then,
 ```bash
 docker-compose down
 docker-compose up -d
+```
+
+## Advanced
+
+### Init bridge
+
+After the blockchain is reset, the bridge needs to be initialized. The user does not need to do this, it is usually done by the developer.
+
+```bash
+bridger pangolin-pangoro init pangolin-to-pangoro
+bridger pangolin-pangoro init pangoro-to-pangolin
 ```

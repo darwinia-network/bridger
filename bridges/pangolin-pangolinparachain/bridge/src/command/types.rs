@@ -11,7 +11,7 @@ use crate::types::BridgeName;
 pub enum Opts {
     /// Init bridge pangolin-pangolinparachain
     Init {
-        /// Bridge
+        /// Bridge, support pangolin-to-pangolin-parachain rococo-to-pangolin
         #[structopt()]
         bridge: BridgeName,
     },

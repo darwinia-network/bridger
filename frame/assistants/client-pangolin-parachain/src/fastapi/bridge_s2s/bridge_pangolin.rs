@@ -1,8 +1,6 @@
 use std::ops::RangeInclusive;
 
-use bridge_s2s_traits::client::{
-    S2SClientBase, S2SClientGeneric, S2SClientRelay, S2SParaBridgeClientSolochain,
-};
+use bridge_s2s_traits::client::{S2SClientBase, S2SClientGeneric, S2SClientRelay};
 use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
 use bridge_s2s_traits::types::bp_header_chain::justification::GrandpaJustification;
 use bridge_s2s_traits::types::bp_messages::{
@@ -112,7 +110,7 @@ impl S2SClientRelay for PangolinParachainClient {
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
+                "send transaction failed {}: {:?}",
                 <Self as S2SClientBase>::CHAIN,
                 e
             ))
@@ -136,7 +134,7 @@ impl S2SClientRelay for PangolinParachainClient {
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
+                "send transaction failed {}: {:?}",
                 <Self as S2SClientBase>::CHAIN,
                 e
             ))
@@ -214,7 +212,7 @@ impl S2SClientRelay for PangolinParachainClient {
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
+                "send transaction failed {}: {:?}",
                 <Self as S2SClientBase>::CHAIN,
                 e
             ))
@@ -238,7 +236,7 @@ impl S2SClientRelay for PangolinParachainClient {
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
-                "send transactioni failed {}: {:?}",
+                "send transaction failed {}: {:?}",
                 <Self as S2SClientBase>::CHAIN,
                 e
             ))

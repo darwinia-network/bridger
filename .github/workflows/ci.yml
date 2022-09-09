@@ -43,7 +43,7 @@ jobs:
           - darwinia-ethereum
           - pangolin-pangoro
           - darwinia-crab
-          - pangoro-chapel
+          # - pangoro-chapel
           # - pangoro-kiln
           - pangolin-pangolinparachain
           - crab-crabparachain

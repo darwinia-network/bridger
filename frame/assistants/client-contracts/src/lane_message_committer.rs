@@ -25,7 +25,7 @@ impl LaneMessageCommitter {
     pub async fn bridged_chain_position(&self) -> BridgeContractResult<U256> {
         Ok(self
             .contract
-            .query("bridgedChainPosition", (), None, Options::default(), None)
+            .query("BRIDGED_CHAIN_POSITION", (), None, Options::default(), None)
             .await?)
     }
 }
@@ -44,7 +44,7 @@ mod tests {
         let client = web3::Web3::new(transport);
         let c = LaneMessageCommitter::new(
             &client,
-            Address::from_str("0x8c6eb3e19dA6b3808592E3D54d31999adD444605").unwrap(),
+            Address::from_str("0xeB9e7B56Dc3B45a0FdE1bAF63d6A74586D41aee3").unwrap(),
         )
         .unwrap();
         let result = c.bridged_chain_position().await.unwrap();

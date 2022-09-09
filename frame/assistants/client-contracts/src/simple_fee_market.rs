@@ -77,7 +77,7 @@ impl SimpleFeeMarket {
     pub async fn relay_time(&self) -> BridgeContractResult<u64> {
         Ok(self
             .contract
-            .query("relayTime", (), None, Options::default(), None)
+            .query("RELAY_TIME", (), None, Options::default(), None)
             .await?)
     }
 }
@@ -123,9 +123,11 @@ mod tests {
     use super::*;
 
     fn test_fee_market() -> (Web3<Http>, SimpleFeeMarket) {
-        let transport = Http::new("http://127.0.0.1:8545").unwrap();
+        let transport =
+            Http::new("https://eth-goerli.g.alchemy.com/v2/WerPq7On62-wy_ARssv291ZPg1TGR5vi")
+                .unwrap();
         let client = web3::Web3::new(transport);
-        let address = Address::from_str("0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap();
+        let address = Address::from_str("0x380244554a9C51f0CCaFec90A2766B0C8b698a4a").unwrap();
         let fee_market = SimpleFeeMarket::new(&client, address).unwrap();
         (client, fee_market)
     }
@@ -165,6 +167,18 @@ mod tests {
         let r: Token = fee_market
             .contract
             .query("getTopRelayer", (), None, Options::default(), None)
+            .await
+            .unwrap();
+        println!("{:?}", r);
+        let r: Token = fee_market
+            .contract
+            .query(
+                "feeOf",
+                (Address::from_str("0x7181932da75bee6d3604f4ae56077b52fb0c5a3b").unwrap(),),
+                None,
+                Options::default(),
+                None,
+            )
             .await
             .unwrap();
         println!("{:?}", r);

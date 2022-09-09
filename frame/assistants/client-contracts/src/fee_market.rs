@@ -76,7 +76,7 @@ impl FeeMarket {
     pub async fn relay_time(&self) -> BridgeContractResult<u64> {
         Ok(self
             .contract
-            .query("relayTime", (), None, Options::default(), None)
+            .query("RELAY_TIME", (), None, Options::default(), None)
             .await?)
     }
 }
@@ -164,6 +164,7 @@ mod tests {
     use std::str::FromStr;
 
     use web3::ethabi::{RawLog, Token};
+    use web3::signing::Key;
     use web3::types::{BlockNumber, FilterBuilder, Log};
 
     use super::*;
@@ -172,7 +173,7 @@ mod tests {
         // let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let transport = Http::new("https://pangoro-rpc.darwinia.network").unwrap();
         let client = web3::Web3::new(transport);
-        let address = Address::from_str("0xe87f80b603116abbca563c18ee84eb1ce6a3d913").unwrap();
+        let address = Address::from_str("0x6eDcF984eF28C29aa48242B92685244bcD6D7203").unwrap();
         let fee_market = FeeMarket::new(&client, address).unwrap();
         (client, fee_market)
     }

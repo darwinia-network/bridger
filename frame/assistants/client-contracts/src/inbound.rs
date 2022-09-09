@@ -354,7 +354,7 @@ mod tests {
             client.clone(),
             Inbound::new(
                 &client,
-                Address::from_str("0x3E37361F50a178e05E5d81234dDE67E6cC991ed1").unwrap(),
+                Address::from_str("0x39539c494dA9b97dD716e167f9cBF25438fe72d0").unwrap(),
                 // Address::from_str("0xB0c14Ca271eE4B00ede33505203143C66645f6E4").unwrap(),
             )
             .unwrap(),
@@ -373,7 +373,10 @@ mod tests {
     #[tokio::test]
     async fn test_inbound_lane_nonce() {
         let (_, inbound) = test_client();
-        let nonce = inbound.inbound_lane_nonce(None).await.unwrap();
+        let nonce = inbound
+            .inbound_lane_nonce(Some(BlockId::Number(BlockNumber::from(1))))
+            .await
+            .unwrap();
         println!("{:?}", nonce);
     }
 

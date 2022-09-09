@@ -210,11 +210,13 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_relayers() {
-        let transport = Http::new("https://rpc.ankr.com/eth_goerli").unwrap();
+        let transport =
+            Http::new("https://eth-goerli.g.alchemy.com/v2/WerPq7On62-wy_ARssv291ZPg1TGR5vi")
+                .unwrap();
         let client = web3::Web3::new(transport);
         let lclient = PosaLightClient::new(
             client,
-            Address::from_str("0x8809f9b3ACEF1dA309f49b5Ab97A4C0faA64E6Ae").unwrap(),
+            Address::from_str("0x6c74a72444048A8588dEBeb749Ee60DB842aD90f").unwrap(),
         )
         .unwrap();
         let result = lclient.get_relayers().await.unwrap();

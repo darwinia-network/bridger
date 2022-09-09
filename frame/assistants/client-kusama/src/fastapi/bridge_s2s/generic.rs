@@ -153,12 +153,12 @@ impl S2SClientGeneric for KusamaClient {
                     initial_header_hash
                 ))
             })?;
-        tracing::trace!(target: "client-rococo", "Selected initial header [{}]: {}",
+        tracing::trace!(target: "client-kusama", "Selected initial header [{}]: {}",
             initial_header_number,
             initial_header_hash,
         );
         let initial_authorities_set = self.grandpa_authorities(initial_header_hash).await?;
-        tracing::trace!(target: "client-rococo", "Selected initial authorities set: {:?}",
+        tracing::trace!(target: "client-kusama", "Selected initial authorities set: {:?}",
             initial_authorities_set,
         );
 
@@ -183,7 +183,7 @@ impl S2SClientGeneric for KusamaClient {
             authorities_for_verification =
                 self.grandpa_authorities(initial_header.parent_hash).await?;
             tracing::trace!(
-                target: "client-rococo",
+                target: "client-kusama",
                 "Selected header is scheduling GRANDPA authorities set changes. Using previous set: {:?}",
                 authorities_for_verification,
             );
@@ -199,7 +199,7 @@ impl S2SClientGeneric for KusamaClient {
             )))?;
         loop {
             tracing::trace!(
-                target: "client-rococo",
+                target: "client-kusama",
                 "Trying GRANDPA authorities set id: {}",
                 initial_authorities_set_id,
             );

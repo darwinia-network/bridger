@@ -67,7 +67,20 @@
   },
   {
     "inputs": [],
-    "name": "bridgedChainPosition",
+    "name": "BRIDGED_CHAIN_POSITION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "THIS_CHAIN_POSITION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -294,19 +307,6 @@
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "thisChainPosition",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",

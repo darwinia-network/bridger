@@ -1,4 +1,4 @@
-pub use self::query_vars::*;
+pub(crate) use self::query_vars::*;
 pub use self::schema_types::*;
 
 mod query_vars {

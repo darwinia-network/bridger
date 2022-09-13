@@ -62,7 +62,7 @@ The bridger program will read some environments.
 
 ## Configuration
 
-The currently darwinia-bridger supports muliti bridges. Each bridge has its own configuration file. The configuration filename pattern is `bridges-<BRIDGE_NAME>.toml`
+The currently darwinia-bridger supports muliti bridges. Each bridge has its own configuration file. The configuration filename pattern is `bridge-<BRIDGE_NAME>.toml`
 
 The default configuration dir is your `BRIDGER_HOME` env var.  
 

@@ -1,6 +1,10 @@
 darwinia-ethereum
 ===
 
+## Warining
+
+This crate may be deprecated after the merge of ETH.
+
 ## Prepare
 
 1. Read [Usage](../../../docs/Usage.md)

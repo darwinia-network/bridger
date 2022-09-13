@@ -40,7 +40,7 @@ jobs:
       matrix:
         bridge:
           - pangolin-ropsten
-          - darwinia-ethereum
+          - darwinia-ethereum-pow
           - pangolin-pangoro
           - darwinia-crab
           # - pangoro-chapel

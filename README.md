@@ -127,7 +127,7 @@ docker run -d \
   pangolin-pangoro start
 ```
 
-Note: It is recommended that you create a directory specific to a bridge if you use docker to run Bridger. Here we have a `pangolin-pangoro` dir in your local config dir.
+Note: It is recommended that you create a directory specific to a bridge if you use docker to run bridger. Here we have a `pangolin-pangoro` dir in your local config dir.
 
 ##### Update
 

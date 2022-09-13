@@ -16,9 +16,9 @@ Darwinia Bridger (this repo) is an implementation of a relayer client written in
 
 Download the binary from [latest release](https://github.com/darwinia-network/bridger/releases/latest).
 
-* The asset name for macOs is `bridger-darwin-x86_64.zip`.  
-* The asset name for Linux is `bridger-linux-x86_64.zip`.  
-* The asset name for Windows is `bridger-windows-x86_64.zip`.  
+* The asset name for macOs is `bridger-darwin-x86_64.zip`.
+* The asset name for Linux is `bridger-linux-x86_64.zip`.
+* The asset name for Windows is `bridger-windows-x86_64.zip`.
 
 ### Pull the Docker image
 
@@ -64,17 +64,17 @@ The bridger program will read some environments.
 
 The currently darwinia-bridger supports muliti bridges. Each bridge has its own configuration file. The configuration filename pattern is `bridge-<BRIDGE_NAME>.toml`
 
-The default configuration dir is your `BRIDGER_HOME` env var.  
+The default configuration dir is your `BRIDGER_HOME` env var.
 
 If you use docker to run the bridger. You should put your configuration file to your dir that will be mapped to the container's `/root/.bridger`. For example: `/home/ubuntu/bridger_config_dir/pangolin-pangoro`.
 
 
 ### Mainnet
-| TYPE                | BRIDGE NAME                 |                                                              |
-| ------------------- | --------------------------- | ------------------------------------------------------------ |
-| substrate-ethereum  | darwinia-ethereum           | [Guide](./bridges/darwinia-ethereum/docs/Guide.md)           |
-| substrate-substrate | darwinia-crab               | [Guide](./bridges/darwinia-crab/docs/Guide.md)               |
-| substrate-substrate | crab-crabparachain          | [Guide](./bridges/crab-crabparachain/docs/Guide.md)          |
+| TYPE                | BRIDGE NAME           |                                                        |
+| ------------------- |-----------------------|--------------------------------------------------------|
+| substrate-ethereum  | darwinia-ethereum-pow | [Guide](./bridges/darwinia-ethereum-pow/docs/Guide.md) |
+| substrate-substrate | darwinia-crab         | [Guide](./bridges/darwinia-crab/docs/Guide.md)         |
+| substrate-substrate | crab-crabparachain    | [Guide](./bridges/crab-crabparachain/docs/Guide.md)    |
 
 ### Testnet
 | TYPE                | BRIDGE NAME                 |                                                               |
@@ -83,7 +83,7 @@ If you use docker to run the bridger. You should put your configuration file to 
 | substrate-substrate | pangolin-pangoro            | [Guide](./bridges/pangolin-pangoro/docs/Guide.md)             |
 | substrate-substrate | pangolin-pangolinparachain  | [Guide](./bridges/pangolin-pangolinparachain/docs/Guide.md)   |
 
-> Goerli is the testnet of Ethereum.  
+> Goerli is the testnet of Ethereum.
 > Pangolin is the testnet of Crab.
 > Pangoro is the testnet of Darwinia.
 

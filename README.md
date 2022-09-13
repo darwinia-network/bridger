@@ -161,7 +161,7 @@ services:
       - pangolin-pangoro
       - start
 
-pangolin-pangolinparachain:
+  pangolin-pangolinparachain:
     container_name: pangolin-pangolinparachain
     image: quay.io/darwinia-network/bridger:v0.6.4
     restart: always

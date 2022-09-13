@@ -1,9 +1,13 @@
 darwinia-ethereum
 ===
 
+## Warining
+
+This crate may be deprecated after the merge of ETH.
+
 ## Prepare
 
-1. Read [Usage](../../../docs/Usage.md)
+1. Read [README](../../../README.md)
 2. `cp .maintain/config/bridge-darwinia-ethereum.toml ~/.bridger`
    The dir can be any path you like, and fill the content.
 

@@ -16,7 +16,7 @@ async fn test_mmr_root_with_proof_about_ropsten() {
         .mmr_proof(member_leaf_index, last_leaf_index)
         .await
         .unwrap();
-    let parent_mmr_root_hex = array_bytes::bytes2hex("0x", parent_mmr_root);
+    let parent_mmr_root_hex = array_bytes::bytes2hex("0x", &parent_mmr_root);
     println!(
         "[ROPSTEN] PARENT MMR ROOT FOR BLOCK {}: {}",
         block, parent_mmr_root_hex,
@@ -26,7 +26,7 @@ async fn test_mmr_root_with_proof_about_ropsten() {
         member_leaf_index, last_leaf_index,
     );
     for item in mmr_proof {
-        let hex = array_bytes::bytes2hex("", item);
+        let hex = array_bytes::bytes2hex("", &item);
         println!("{}", hex);
     }
 }
@@ -66,7 +66,7 @@ async fn test_receipt_about_ropsten() {
             .unwrap();
         println!(
             "check: [{}], {}",
-            array_bytes::bytes2hex("", check_hash),
+            array_bytes::bytes2hex("", &check_hash),
             result,
         );
     }
@@ -91,7 +91,7 @@ async fn test_mmr_root_with_proof_about_ethereum() {
         .mmr_proof(member_leaf_index, last_leaf_index)
         .await
         .unwrap();
-    let parent_mmr_root_hex = array_bytes::bytes2hex("0x", parent_mmr_root);
+    let parent_mmr_root_hex = array_bytes::bytes2hex("0x", &parent_mmr_root);
     println!(
         "[ETHEREUM] PARENT MMR ROOT FOR BLOCK {}: {}",
         block, parent_mmr_root_hex,
@@ -101,7 +101,7 @@ async fn test_mmr_root_with_proof_about_ethereum() {
         member_leaf_index, last_leaf_index,
     );
     for item in mmr_proof {
-        let hex = array_bytes::bytes2hex("", item);
+        let hex = array_bytes::bytes2hex("", &item);
         println!("{}", hex);
     }
 }
@@ -120,7 +120,7 @@ async fn test_receipt_about_ethereum() {
         mmr_proof.member_leaf_index, mmr_proof.last_leaf_index,
     );
     for item in mmr_proof.proof {
-        let hex = array_bytes::bytes2hex("", item);
+        let hex = array_bytes::bytes2hex("", &item);
         println!("{}", hex);
     }
 }
@@ -136,4 +136,15 @@ fn test_sort_by_refs() {
             .cmp(&arr0.iter().position(|r| r == b).unwrap())
     });
     assert_eq!(arr0, arr1);
+}
+
+#[test]
+fn test_get_peaks() {
+    let mmr_size = support_mmr::mmr::leaf_index_to_mmr_size(10);
+    let peaks = support_mmr::mmr::get_peaks(mmr_size);
+    assert_eq!(peaks, vec![14, 17, 18]);
+
+    let mmr_size = support_mmr::mmr::leaf_index_to_mmr_size(2);
+    let peaks = support_mmr::mmr::get_peaks(mmr_size);
+    assert_eq!(peaks, vec![2, 3]);
 }

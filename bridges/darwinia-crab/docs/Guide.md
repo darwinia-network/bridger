@@ -1,27 +1,25 @@
 Bridge of darwinia-crab
 ===
 
-## Prepare
+Create the configuration file in your config dir. You can create it by coping from a template file. 
 
-1. Read [Usage](../../../docs/Usage.md)
-2. `cp .maintain/config/bridge-darwinia-crab.toml ~/.bridger`
+  ```bash
+  cp .maintain/config/bridge-darwinia-crab.toml ~/.bridger
+  ``` 
 
-   Copy config to default config path `~/.bridger` and fill the content.
+  If you use docker, you should copy it to your local mapped config dir.
 
-> About start `darwinia` and `crab` chain you can read [darwinia](https://github.com/darwinia-network/darwinia#building).
-> In addition, we also deployed two public chains
-> - `darwinia`: wss://rpc.darwinia.network
-> - `crab`: wss://crab-rpc.darwinia.network
+## Edit
 
-## Init
+You only need to modify two parameters:
 
-```bash
-bridger darwinia-crab init darwinia-to-crab
-bridger darwinia-crab init crab-to-darwinia
-```
+* darwinia.signer
+  The private key of darwinia account to sign tx.
 
-## Start
+* crab.signer
+  The private key of crab account to sign tx.
 
+## Bridge start command
 
 ```bash
 bridger darwinia-crab start

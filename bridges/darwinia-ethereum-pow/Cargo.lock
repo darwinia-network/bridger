@@ -327,7 +327,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridge-darwinia-ethereum"
+name = "bridge-darwinia-ethereum-pow"
 version = "0.6.4"
 dependencies = [
  "array-bytes",

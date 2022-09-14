@@ -64,10 +64,13 @@ impl Inbound {
     }
 
     // Returns (thisChainPosition, thisLanePosition, bridgedChainPosition, bridgedLanePosition)
-    pub async fn get_lane_info(&self) -> BridgeContractResult<(u32, u32, u32, u32)> {
+    pub async fn get_lane_info(
+        &self,
+        at_block: Option<BlockId>,
+    ) -> BridgeContractResult<(u32, u32, u32, u32)> {
         Ok(self
             .contract
-            .query("getLaneInfo", (), None, Options::default(), None)
+            .query("getLaneInfo", (), None, Options::default(), at_block)
             .await?)
     }
 }

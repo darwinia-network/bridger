@@ -45,7 +45,7 @@ pub async fn build_darwinia_confirmation_proof(
     chain_message_committer: &ChainMessageCommitter,
     block_id: Option<BlockId>,
 ) -> color_eyre::Result<Bytes> {
-    let (_, lane_pos, _, _) = inbound.get_lane_info().await?;
+    let (_, lane_pos, _, _) = inbound.get_lane_info(block_id).await?;
     build_darwinia_proof(
         lane_message_committer,
         chain_message_committer,

@@ -8,7 +8,7 @@ use web3::{
     ethabi::{encode, RawLog},
     signing::keccak256,
     transports::Http,
-    types::{Address, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
+    types::{Address, BlockId, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
     Web3,
 };
 
@@ -73,7 +73,8 @@ impl<T: RelayStrategy> MessageClient<T> {
         end: u64,
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<ReceiveMessagesDeliveryProof> {
-        let inbound_lane_data = self.inbound.data().await?;
+        let at_block = block_number.map(|x| BlockId::Number(x.clone()));
+        let inbound_lane_data = self.inbound.data(at_block).await?;
         let messages_proof =
             build_eth_confirmation_proof(&self.client, &self.inbound, begin, end, block_number)
                 .await?;
@@ -379,7 +380,7 @@ mod tests {
             .unwrap();
         println!("tx: {:?}", tx);
 
-        let inbound_status = pangoro_client.inbound.data().await.unwrap();
+        let inbound_status = pangoro_client.inbound.data(None).await.unwrap();
         println!("pangoro inbound: {:?}", inbound_status);
     }
 }

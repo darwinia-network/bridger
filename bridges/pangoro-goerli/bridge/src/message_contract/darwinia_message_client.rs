@@ -81,7 +81,7 @@ impl<T: RelayStrategy> DarwiniaMessageClient<T> {
         &self,
         block_id: Option<BlockId>,
     ) -> color_eyre::Result<ReceiveMessagesDeliveryProof> {
-        let inbound_lane_data = self.inbound.data().await?;
+        let inbound_lane_data = self.inbound.data(block_id).await?;
         let messages_proof = build_darwinia_confirmation_proof(
             &self.inbound,
             &self.lane_message_committer,

@@ -32,10 +32,10 @@ impl Inbound {
     }
 
     #[allow(dead_code)]
-    pub async fn data(&self) -> BridgeContractResult<InboundLaneData> {
+    pub async fn data(&self, at_block: Option<BlockId>) -> BridgeContractResult<InboundLaneData> {
         Ok(self
             .contract
-            .query("data", (), None, Options::default(), None)
+            .query("data", (), None, Options::default(), at_block)
             .await?)
     }
 
@@ -53,8 +53,8 @@ impl Inbound {
                     messages_proof.messages_proof,
                 ),
                 Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
+                    gas: Some(U256::from(20000000)),
+                    gas_price: Some(U256::from(2300000000u64)),
                     ..Default::default()
                 },
                 private_key,
@@ -365,7 +365,7 @@ mod tests {
     #[tokio::test]
     async fn test_inbound_lane_data() {
         let (_, inbound) = test_client();
-        let data = inbound.data().await.unwrap();
+        let data = inbound.data(None).await.unwrap();
         println!("{:?}", data);
     }
 

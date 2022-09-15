@@ -79,6 +79,37 @@ impl FeeMarket {
             .query("RELAY_TIME", (), None, Options::default(), None)
             .await?)
     }
+
+    pub async fn get_relayer(&self, prev: Address) -> BridgeContractResult<Address> {
+        Ok(self
+            .contract
+            .query("relayers", (prev,), None, Options::default(), None)
+            .await?)
+    }
+
+    pub async fn move_relayer(
+        &self,
+        old_prev: Address,
+        new_prev: Address,
+        new_fee: U256,
+        private_key: &SecretKey,
+    ) -> BridgeContractResult<H256> {
+        let tx = self
+            .contract
+            .signed_call(
+                "move",
+                (old_prev, new_prev, new_fee),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(U256::from(1300000000)),
+                    value: Some(new_fee),
+                    ..Default::default()
+                },
+                private_key,
+            )
+            .await?;
+        Ok(tx)
+    }
 }
 
 pub mod types {

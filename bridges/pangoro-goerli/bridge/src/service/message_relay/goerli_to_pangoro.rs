@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use bridge_e2e_traits::strategy::{EnforcementRelayStrategy, RelayStrategy};
+use bridge_e2e_traits::strategy::RelayStrategy;
 use client_contracts::PosaLightClient;
 use web3::types::{Address, BlockId, BlockNumber, U256};
 
@@ -112,7 +112,7 @@ async fn message_relay_client_builder(
 }
 
 async fn start_delivery() -> color_eyre::Result<()> {
-    let message_relay_service = message_relay_client_builder().await?;
+    let mut message_relay_service = message_relay_client_builder().await?;
     loop {
         if let Err(error) = message_relay_service.message_relay().await {
             tracing::error!(
@@ -150,9 +150,9 @@ pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
 }
 
 impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
-    async fn message_relay(&self) -> color_eyre::Result<()> {
+    async fn message_relay(&mut self) -> color_eyre::Result<()> {
         let received_nonce = self.target.inbound.inbound_lane_nonce(None).await?;
-        let latest_nonce = self.source.outbound.outbound_lane_nonce().await?;
+        let latest_nonce = self.source.outbound.outbound_lane_nonce(None).await?;
 
         if received_nonce.last_delivered_nonce == latest_nonce.latest_generated_nonce {
             tracing::info!(
@@ -163,38 +163,40 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             return Ok(());
         }
 
+        let finalized_block_number = self.best_source_block_at_target().await?;
+        let outbound_nonce = self
+            .source
+            .outbound
+            .outbound_lane_nonce(Some(BlockId::Number(BlockNumber::from(
+                finalized_block_number,
+            ))))
+            .await?;
         let (begin, end) = (
             latest_nonce.latest_received_nonce + 1,
             latest_nonce.latest_generated_nonce,
         );
-        tracing::info!(
-            target: "pangoro-goerli",
-            "[MessageDelivery][Goerli=>Pangoro] Nonce range: [{:?}, {:?}]",
-            begin,
-            end,
-        );
-        let finalized_block_number = self.finalized_target_header_number_at_source().await?;
-        let end_event = self.source.query_message_accepted(end).await?;
 
-        if let Some(event) = end_event {
+        if received_nonce.last_delivered_nonce >= outbound_nonce.latest_generated_nonce {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Goerli=>Pangoro] Message at block: {:?}, latest relayed header: {:?}",
-                event.block_number,
-                finalized_block_number,
+                "[MessageDelivery][Goerli=>Pangoro] Messages: [{:?}, {:?}] need to be relayed, wait for header relay",
+                begin,
+                end
             );
-
-            // Need to wait for header relay.
-            if event.block_number > finalized_block_number {
-                tracing::info!(
-                    target: "pangoro-goerli",
-                    "[MessageDelivery][Goerli=>Pangoro] Message at block: {:?}, latest relayed header: {:?}, wait for header relay.",
-                    event.block_number,
-                    finalized_block_number,
-                );
-                return Ok(());
-            }
+            return Ok(());
         }
+
+        let (begin, end) = (
+            outbound_nonce.latest_received_nonce + 1,
+            outbound_nonce.latest_generated_nonce,
+        );
+
+        tracing::info!(
+            target: "pangoro-goerli",
+            "[MessageDelivery][Goerli=>Pangoro] Try to relay messages: [{:?}, {:?}]",
+            begin,
+            end
+        );
 
         let proof = self
             .source
@@ -204,7 +206,6 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
                 Some(BlockNumber::from(finalized_block_number)),
             )
             .await?;
-        let mut strategy = EnforcementRelayStrategy::new(self.source.strategy.clone());
         let encoded_keys: Vec<U256> = proof
             .outbound_lane_data
             .messages
@@ -212,21 +213,37 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .map(|x| x.encoded_key)
             .collect();
 
-        if !strategy.decide(&encoded_keys).await? {
+        // Calculate devliery_size parameter in inbound.receive_messages_proof
+        let mut count = 0;
+        for (index, key) in encoded_keys.iter().enumerate() {
+            // Messages less or equal than last_delivered_nonce have been delivered.
+            let is_delivered = index as u64 + begin <= received_nonce.last_delivered_nonce;
+            if is_delivered || self.source.strategy.decide(*key).await? {
+                count = count + 1;
+            } else {
+                break;
+            }
+        }
+        if count == 0 {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Goerli=>Pangoro] The relay strategy decide to not relay thess messaages {:?}",
-                (begin, end)
+                "[MessageDelivery][Goerli=>Pangoro] Decided not to relay",
             );
-
             return Ok(());
         }
+        tracing::info!(
+            target: "pangoro-goerli",
+            "[MessageDelivery][Goerli=>Pangoro] Relaying messages: [{:?}, {:?}]",
+            begin,
+            begin + count - 1,
+        );
 
         let tx = self
             .target
             .inbound
             .receive_messages_proof(
                 proof,
+                U256::from(count),
                 &self.target.private_key()?,
                 self.target.gas_option.clone(),
             )
@@ -241,7 +258,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         Ok(())
     }
 
-    async fn finalized_target_header_number_at_source(&self) -> color_eyre::Result<u64> {
+    async fn best_source_block_at_target(&self) -> color_eyre::Result<u64> {
         let finalized = self
             .beacon_light_client
             .beacon_light_client
@@ -257,7 +274,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
 impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
     pub async fn message_confirm(&self) -> color_eyre::Result<()> {
-        let source_outbound_lane_data = self.source.outbound.outbound_lane_nonce().await?;
+        let source_outbound_lane_data = self.source.outbound.outbound_lane_nonce(None).await?;
         if source_outbound_lane_data.latest_received_nonce
             == source_outbound_lane_data.latest_generated_nonce
         {

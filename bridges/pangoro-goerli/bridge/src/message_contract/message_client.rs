@@ -112,7 +112,7 @@ impl<T: RelayStrategy> MessageClient<T> {
         end: u64,
     ) -> color_eyre::Result<OutboundLaneData> {
         let outbound_data = self.outbound.data().await?;
-        let outbound_lane_nonce = self.outbound.outbound_lane_nonce().await?;
+        let outbound_lane_nonce = self.outbound.outbound_lane_nonce(None).await?;
         let (outbound_begin, _outbound_end) = (
             outbound_lane_nonce.latest_received_nonce + 1,
             outbound_lane_nonce.latest_generated_nonce,
@@ -343,7 +343,7 @@ mod tests {
     #[tokio::test]
     async fn test_build_lane_data() {
         let client = test_pangoro_client();
-        let outbound_lane_nonce = client.outbound.outbound_lane_nonce().await.unwrap();
+        let outbound_lane_nonce = client.outbound.outbound_lane_nonce(None).await.unwrap();
         let (begin, end) = (
             outbound_lane_nonce.latest_received_nonce + 1,
             outbound_lane_nonce.latest_generated_nonce,
@@ -381,7 +381,7 @@ mod tests {
         println!("proof: {:?}", proof);
         let tx = pangoro_client
             .inbound
-            .receive_messages_proof(proof, &private_key)
+            .receive_messages_proof(proof, U256::from(2), &private_key, Options::default())
             .await
             .unwrap();
         println!("tx: {:?}", tx);

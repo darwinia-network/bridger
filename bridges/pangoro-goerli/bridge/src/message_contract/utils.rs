@@ -164,7 +164,7 @@ pub async fn build_messages_data(
     end: u64,
 ) -> color_eyre::Result<OutboundLaneData> {
     let outbound_data = outbound.data().await?;
-    let outbound_lane_nonce = outbound.outbound_lane_nonce().await?;
+    let outbound_lane_nonce = outbound.outbound_lane_nonce(None).await?;
     let (outbound_begin, _outbound_end) = (
         outbound_lane_nonce.latest_received_nonce + 1,
         outbound_lane_nonce.latest_generated_nonce,

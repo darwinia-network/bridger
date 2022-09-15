@@ -38,11 +38,7 @@ impl PosaLightClient {
             .signed_call(
                 "add_relayer",
                 (relayer, threshold, signatures),
-                Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
-                    ..Default::default()
-                },
+                Options::default(),
                 private_key,
             )
             .await?)
@@ -61,11 +57,7 @@ impl PosaLightClient {
             .signed_call(
                 "remove_relayer",
                 (prev_relayer, relayer, threshold, signatures),
-                Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
-                    ..Default::default()
-                },
+                Options::default(),
                 private_key,
             )
             .await?)
@@ -84,11 +76,7 @@ impl PosaLightClient {
             .signed_call(
                 "swap_relayer",
                 (prev_relayer, old_relayer, new_relayer, signatures),
-                Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
-                    ..Default::default()
-                },
+                Options::default(),
                 private_key,
             )
             .await?)
@@ -105,12 +93,7 @@ impl PosaLightClient {
             .signed_call(
                 "import_message_commitment",
                 (commitment, signature),
-                Options {
-                    gas: Some(U256::from(10000000u64)),
-                    gas_price: Some(U256::from(1300000000u64)),
-                    // value: Some(fee),
-                    ..Default::default()
-                },
+                Options::default(),
                 private_key,
             )
             .await?)

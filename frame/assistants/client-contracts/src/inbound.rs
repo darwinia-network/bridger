@@ -3,7 +3,7 @@ pub use types::*;
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, BlockId, H256, U256},
+    types::{Address, BlockId, H256},
     Web3,
 };
 
@@ -43,6 +43,7 @@ impl Inbound {
         &self,
         messages_proof: ReceiveMessagesProof,
         private_key: &SecretKey,
+        options: Options,
     ) -> BridgeContractResult<H256> {
         let tx = self
             .contract
@@ -52,11 +53,7 @@ impl Inbound {
                     messages_proof.outbound_lane_data,
                     messages_proof.messages_proof,
                 ),
-                Options {
-                    gas: Some(U256::from(20000000)),
-                    gas_price: Some(U256::from(2300000000u64)),
-                    ..Default::default()
-                },
+                options,
                 private_key,
             )
             .await?;

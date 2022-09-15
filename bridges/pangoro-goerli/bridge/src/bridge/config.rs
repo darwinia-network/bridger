@@ -9,8 +9,9 @@ use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 use thegraph_liketh::component::TheGraphLikeEthComponent;
 use thegraph_liketh::config::TheGraphLikeEthConfig;
 use thegraph_liketh::graph::TheGraphLikeEth;
+use web3::contract::Options;
 use web3::transports::Http;
-use web3::types::Address;
+use web3::types::{Address, U256};
 use web3::Web3;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -33,6 +34,8 @@ pub struct ChainInfoConfig {
     pub outbound_address: String,
     pub fee_market_address: String,
     pub posa_light_client_address: String,
+    pub gas: u64,
+    pub gas_price: u64,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -47,6 +50,8 @@ pub struct PangoroEVMConfig {
     pub chain_message_committer_address: String,
     pub lane_message_committer_address: String,
     pub fee_market_address: String,
+    pub gas: u64,
+    pub gas_price: u64,
 }
 
 impl PangoroEVMConfig {
@@ -58,6 +63,14 @@ impl PangoroEVMConfig {
         let transport = Http::new(&self.endpoint)?;
         let client = Web3::new(transport);
         Ok(client)
+    }
+
+    pub fn gas_option(&self) -> Options {
+        Options {
+            gas: Some(U256::from(self.gas)),
+            gas_price: Some(U256::from(self.gas_price)),
+            ..Default::default()
+        }
     }
 }
 
@@ -74,8 +87,17 @@ impl ChainInfoConfig {
         let address = Address::from_str(&self.posa_light_client_address)?;
         Ok(PosaLightClient::new(client, address)?)
     }
+
     pub fn to_ethereum_account(&self) -> FastEthereumAccount {
         FastEthereumAccount::new(&self.private_key)
+    }
+
+    pub fn gas_option(&self) -> Options {
+        Options {
+            gas: Some(U256::from(self.gas)),
+            gas_price: Some(U256::from(self.gas_price)),
+            ..Default::default()
+        }
     }
 }
 

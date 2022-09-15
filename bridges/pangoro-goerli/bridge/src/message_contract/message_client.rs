@@ -5,6 +5,7 @@ use futures::future;
 use secp256k1::SecretKey;
 use support_common::error::BridgerError;
 use web3::{
+    contract::Options,
     ethabi::{encode, RawLog},
     signing::keccak256,
     transports::Http,
@@ -34,6 +35,7 @@ pub struct MessageClient<T: RelayStrategy> {
     pub outbound: Outbound,
     pub strategy: T,
     pub private_key: Option<SecretKey>,
+    pub gas_option: Options,
 }
 
 pub fn build_message_client_with_simple_fee_market(
@@ -43,6 +45,7 @@ pub fn build_message_client_with_simple_fee_market(
     fee_market_address: Address,
     account: Address,
     private_key: Option<&str>,
+    gas_option: Options,
 ) -> color_eyre::Result<MessageClient<SimpleFeeMarketRelayStrategy>> {
     let transport = Http::new(endpoint)?;
     let client = Web3::new(transport);
@@ -57,6 +60,7 @@ pub fn build_message_client_with_simple_fee_market(
         outbound,
         strategy,
         private_key,
+        gas_option,
     })
 }
 
@@ -299,6 +303,7 @@ mod tests {
             Address::from_str("0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap(),
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
+            Options::default(),
         )
         .unwrap();
         client
@@ -312,6 +317,7 @@ mod tests {
             Address::from_str("0xB59a893f5115c1Ca737E36365302550074C32023").unwrap(),
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
+            Options::default(),
         )
         .unwrap()
     }

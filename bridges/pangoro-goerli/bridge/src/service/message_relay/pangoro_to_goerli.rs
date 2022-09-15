@@ -83,6 +83,7 @@ async fn message_relay_client_builder(
         Address::from_str(&config.goerli.fee_market_address)?,
         Address::from_str(&config.goerli.account)?,
         Some(&config.goerli.private_key),
+        config.goerli.gas_option(),
     )
     .unwrap();
     let source = build_darwinia_message_client(
@@ -95,6 +96,7 @@ async fn message_relay_client_builder(
         Address::from_str(&config.pangoro_evm.account)?,
         Some(&config.pangoro_evm.private_key),
         config.index.to_pangoro_thegraph()?,
+        config.pangoro_evm.gas_option(),
     )
     .unwrap();
     let posa_light_client = PosaLightClient::new(
@@ -224,7 +226,11 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         let tx = self
             .target
             .inbound
-            .receive_messages_proof(proof, &self.target.private_key()?)
+            .receive_messages_proof(
+                proof,
+                &self.target.private_key()?,
+                self.target.gas_option.clone(),
+            )
             .await?;
 
         tracing::info!(
@@ -303,7 +309,11 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         let hash = self
             .source
             .outbound
-            .receive_messages_delivery_proof(proof, &self.source.private_key()?)
+            .receive_messages_delivery_proof(
+                proof,
+                &self.source.private_key()?,
+                self.source.gas_option.clone(),
+            )
             .await?;
 
         tracing::info!(

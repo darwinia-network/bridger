@@ -3,7 +3,7 @@ pub use types::*;
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, H256, U256},
+    types::{Address, H256},
     Web3,
 };
 
@@ -61,11 +61,7 @@ impl BeaconLightClient {
             .signed_call(
                 "import_finalized_header",
                 (finalized_header_update,),
-                Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
-                    ..Default::default()
-                },
+                Options::default(),
                 private_key,
             )
             .await?;
@@ -82,11 +78,7 @@ impl BeaconLightClient {
             .signed_call(
                 "import_next_sync_committee",
                 (sync_committee_update,),
-                Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
-                    ..Default::default()
-                },
+                Options::default(),
                 private_key,
             )
             .await?;

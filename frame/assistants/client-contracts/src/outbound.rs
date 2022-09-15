@@ -39,8 +39,6 @@ impl Outbound {
                 "send_message",
                 message,
                 Options {
-                    gas: Some(U256::from(10000000u64)),
-                    gas_price: Some(U256::from(1000000000u64)),
                     value: Some(fee),
                     ..Default::default()
                 },
@@ -69,17 +67,14 @@ impl Outbound {
         &self,
         proof: ReceiveMessagesDeliveryProof,
         private_key: &SecretKey,
+        options: Options,
     ) -> BridgeContractResult<H256> {
         let tx = self
             .contract
             .signed_call(
                 "receive_messages_delivery_proof",
                 (proof.inbound_lane_data, proof.messages_proof),
-                Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
-                    ..Default::default()
-                },
+                options,
                 private_key,
             )
             .await?;
@@ -273,7 +268,7 @@ mod tests {
         // let transport = Http::new("http://127.0.0.1:8545").unwrap();
         let transport = Http::new("https://pangoro-rpc.darwinia.network").unwrap();
         let client = web3::Web3::new(transport);
-        let address = Address::from_str("0x634370aCf53cf55ad270E084442ea7A23B43B26a").unwrap();
+        let address = Address::from_str("0x654FE7E51eCA910800Df4E1fA8F2CD8Fb1aFEc4A").unwrap();
         (client.clone(), Outbound::new(&client, address).unwrap())
     }
 

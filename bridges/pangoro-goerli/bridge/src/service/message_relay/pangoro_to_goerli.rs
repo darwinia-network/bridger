@@ -185,7 +185,6 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             return Ok(());
         }
 
-        let limit = 10;
         let (begin, end) = (
             outbound_nonce.latest_received_nonce + 1,
             outbound_nonce.latest_generated_nonce,
@@ -212,9 +211,12 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .map(|x| x.encoded_key)
             .collect();
 
+        // Calculate devliery_size parameter in inbound.receive_messages_proof
         let mut count = 0;
-        for key in encoded_keys {
-            if self.source.strategy.decide(key).await? {
+        for (index, key) in encoded_keys.iter().enumerate() {
+            // Messages less or equal than last_delivered_nonce have been delivered.
+            let is_delivered = index as u64 + begin <= received_nonce.last_delivered_nonce;
+            if is_delivered || self.source.strategy.decide(*key).await? {
                 count = count + 1;
             } else {
                 break;

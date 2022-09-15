@@ -3,7 +3,7 @@ pub use types::*;
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, BlockId, H256},
+    types::{Address, BlockId, H256, U256},
     Web3,
 };
 
@@ -42,6 +42,7 @@ impl Inbound {
     pub async fn receive_messages_proof(
         &self,
         messages_proof: ReceiveMessagesProof,
+        delivery_size: U256,
         private_key: &SecretKey,
         options: Options,
     ) -> BridgeContractResult<H256> {
@@ -52,6 +53,7 @@ impl Inbound {
                 (
                     messages_proof.outbound_lane_data,
                     messages_proof.messages_proof,
+                    delivery_size,
                 ),
                 options,
                 private_key,

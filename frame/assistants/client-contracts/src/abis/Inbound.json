@@ -266,6 +266,11 @@
         "internalType": "bytes",
         "name": "messagesProof",
         "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "delivery_size",
+        "type": "uint256"
       }
     ],
     "name": "receive_messages_proof",
@@ -304,60 +309,6 @@
         "internalType": "struct TargetChain.DeliveredMessages",
         "name": "messages",
         "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "relayers_back",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "pre_relayer",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "relayers_size",
-    "outputs": [
-      {
-        "internalType": "uint64",
-        "name": "size",
-        "type": "uint64"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "slot0",
-    "outputs": [
-      {
-        "internalType": "uint32",
-        "name": "bridgedLanePosition",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "bridgedChainPosition",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "thisLanePosition",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "thisChainPosition",
-        "type": "uint32"
       }
     ],
     "stateMutability": "view",

@@ -4,7 +4,7 @@ pub use types::*;
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, H256, U256},
+    types::{Address, BlockId, H256, U256},
     Web3,
 };
 
@@ -19,10 +19,13 @@ impl Outbound {
         Ok(Self { contract })
     }
 
-    pub async fn outbound_lane_nonce(&self) -> BridgeContractResult<OutboundLaneNonce> {
+    pub async fn outbound_lane_nonce(
+        &self,
+        at_block: Option<BlockId>,
+    ) -> BridgeContractResult<OutboundLaneNonce> {
         Ok(self
             .contract
-            .query("outboundLaneNonce", (), None, Options::default(), None)
+            .query("outboundLaneNonce", (), None, Options::default(), at_block)
             .await?)
     }
 

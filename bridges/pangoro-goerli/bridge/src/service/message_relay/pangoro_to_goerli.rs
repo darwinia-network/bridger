@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use bridge_e2e_traits::strategy::{EnforcementRelayStrategy, RelayStrategy};
+use bridge_e2e_traits::strategy::RelayStrategy;
 use client_contracts::PosaLightClient;
 
 use web3::types::{Address, BlockId, BlockNumber, U256};
@@ -13,7 +13,6 @@ use crate::message_contract::fee_market::FeeMarketRelayStrategy;
 use crate::message_contract::message_client::build_message_client_with_simple_fee_market;
 use crate::message_contract::message_client::MessageClient;
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
-use crate::message_contract::utils::query_message_accepted_thegraph;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::pangoro_client::client::PangoroClient;
@@ -113,7 +112,7 @@ async fn message_relay_client_builder(
 }
 
 async fn start_delivery() -> color_eyre::Result<()> {
-    let service = message_relay_client_builder().await?;
+    let mut service = message_relay_client_builder().await?;
     loop {
         if let Err(error) = service.message_relay().await {
             tracing::error!(
@@ -151,9 +150,9 @@ pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
 }
 
 impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
-    async fn message_relay(&self) -> color_eyre::Result<()> {
+    async fn message_relay(&mut self) -> color_eyre::Result<()> {
         let received_nonce = self.target.inbound.inbound_lane_nonce(None).await?;
-        let latest_nonce = self.source.outbound.outbound_lane_nonce().await?;
+        let latest_nonce = self.source.outbound.outbound_lane_nonce(None).await?;
 
         if received_nonce.last_delivered_nonce == latest_nonce.latest_generated_nonce {
             tracing::info!(
@@ -163,39 +162,40 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             );
             return Ok(());
         }
-
+        let finalized_block_number = self.best_source_block_at_target().await?;
+        let outbound_nonce = self
+            .source
+            .outbound
+            .outbound_lane_nonce(Some(BlockId::Number(BlockNumber::from(
+                finalized_block_number,
+            ))))
+            .await?;
         let (begin, end) = (
             latest_nonce.latest_received_nonce + 1,
             latest_nonce.latest_generated_nonce,
         );
-        tracing::info!(
-            target: "pangoro-goerli",
-            "[MessageDelivery][Pangoro=>Goerli] Nonce range: [{:?}, {:?}]",
-            begin,
-            end,
-        );
-        let finalized_block_number = self.best_source_block_at_target().await?;
-        let end_event = query_message_accepted_thegraph(&self.source.indexer, end).await?;
 
-        if let Some(event) = end_event {
+        if received_nonce.last_delivered_nonce >= outbound_nonce.latest_generated_nonce {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Pangoro=>Goerli] Message at block: {:?}, latest relayed header: {:?}",
-                event.block_number,
-                finalized_block_number,
+                "[MessageDelivery][Pangoro=>Goerli] Messages: [{:?}, {:?}] need to be relayed, wait for header relay",
+                begin,
+                end
             );
-
-            // Need to wait for header relay.
-            if event.block_number > finalized_block_number {
-                tracing::info!(
-                    target: "pangoro-goerli",
-                    "[MessageDelivery][Pangoro=>Goerli] Message at block: {:?}, latest relayed header: {:?}, wait for header relay.",
-                    event.block_number,
-                    finalized_block_number,
-                );
-                return Ok(());
-            }
+            return Ok(());
         }
+
+        let limit = 10;
+        let (begin, end) = (
+            outbound_nonce.latest_received_nonce + 1,
+            outbound_nonce.latest_generated_nonce,
+        );
+        tracing::info!(
+            target: "pangoro-goerli",
+            "[MessageDelivery][Pangoro=>Goerli] Try to relay messages: [{:?}, {:?}]",
+            begin,
+            end
+        );
 
         let proof = self
             .source
@@ -205,7 +205,6 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
                 Some(BlockNumber::from(finalized_block_number)),
             )
             .await?;
-        let mut strategy = EnforcementRelayStrategy::new(self.source.strategy.clone());
         let encoded_keys: Vec<U256> = proof
             .outbound_lane_data
             .messages
@@ -213,21 +212,35 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .map(|x| x.encoded_key)
             .collect();
 
-        if !strategy.decide(&encoded_keys).await? {
+        let mut count = 0;
+        for key in encoded_keys {
+            if self.source.strategy.decide(key).await? {
+                count = count + 1;
+            } else {
+                break;
+            }
+        }
+        if count == 0 {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Pangoro=>Goerli] The relay strategy decide to not relay thess messaages {:?}",
-                (begin, end)
+                "[MessageDelivery][Pangoro=>Goerli] Decided not to relay",
             );
-
             return Ok(());
         }
+
+        tracing::info!(
+            target: "pangoro-goerli",
+            "[MessageDelivery][Pangoro=>Goerli] Relaying messages: [{:?}, {:?}]",
+            begin,
+            begin + count - 1,
+        );
 
         let tx = self
             .target
             .inbound
             .receive_messages_proof(
                 proof,
+                U256::from(count),
                 &self.target.private_key()?,
                 self.target.gas_option.clone(),
             )
@@ -249,7 +262,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
 impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
     pub async fn message_confirm(&self) -> color_eyre::Result<()> {
-        let source_outbound_lane_data = self.source.outbound.outbound_lane_nonce().await?;
+        let source_outbound_lane_data = self.source.outbound.outbound_lane_nonce(None).await?;
         if source_outbound_lane_data.latest_received_nonce
             == source_outbound_lane_data.latest_generated_nonce
         {

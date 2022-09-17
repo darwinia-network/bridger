@@ -36,7 +36,8 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
         }
         let event = cacse.expect("Unreachable");
 
-        let signature_nodes = event.signatures.nodes;
+        let mut signature_nodes = event.signatures.nodes;
+        signature_nodes.sort_by(|a, b| a.address.cmp(&b.address));
         let signatures = signature_nodes
             .iter()
             .map(|item| {

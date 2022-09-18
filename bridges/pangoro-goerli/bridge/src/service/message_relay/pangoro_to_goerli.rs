@@ -163,7 +163,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             );
             return Ok(());
         }
-        let finalized_block_number = self.best_source_block_at_target().await?;
+        let finalized_block_number = self.best_source_block_at_target().await? - 1;
         let outbound_nonce = self
             .source
             .outbound

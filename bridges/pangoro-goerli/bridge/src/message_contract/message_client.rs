@@ -94,7 +94,9 @@ impl<T: RelayStrategy> MessageClient<T> {
         end: u64,
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<ReceiveMessagesProof> {
-        let outbound_lane_data = self.build_messages_data(begin, end).await?;
+        let outbound_lane_data = self
+            .build_messages_data(begin, end, block_number.map(BlockId::from))
+            .await?;
         let proof = self
             .build_messages_proof(begin, end, block_number)
             .await?
@@ -110,9 +112,10 @@ impl<T: RelayStrategy> MessageClient<T> {
         &self,
         begin: u64,
         end: u64,
+        at_block: Option<BlockId>,
     ) -> color_eyre::Result<OutboundLaneData> {
-        let outbound_data = self.outbound.data().await?;
-        let outbound_lane_nonce = self.outbound.outbound_lane_nonce(None).await?;
+        let outbound_data = self.outbound.data(at_block).await?;
+        let outbound_lane_nonce = self.outbound.outbound_lane_nonce(at_block).await?;
         let (outbound_begin, _outbound_end) = (
             outbound_lane_nonce.latest_received_nonce + 1,
             outbound_lane_nonce.latest_generated_nonce,

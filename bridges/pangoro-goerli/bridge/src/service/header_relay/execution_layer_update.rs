@@ -1,9 +1,10 @@
-use std::str::FromStr;
+use std::{str::FromStr, time::Duration};
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
     goerli_client::{client::GoerliClient, types::Proof},
     pangoro_client::client::PangoroClient,
+    web3_helper::wait_for_transaction_confirmation,
 };
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
@@ -125,12 +126,18 @@ impl ExecutionLayer {
                     &self.pangoro_client.private_key,
                 )
                 .await?;
-
             tracing::info!(
                 target: "pangoro-goerli",
                 "[ExecutionLayer][Goerli=>Pangoro] Sending tx: {:?}",
                 &tx
             );
+            wait_for_transaction_confirmation(
+                tx,
+                self.pangoro_client.client.transport(),
+                Duration::from_secs(5),
+                3,
+            )
+            .await?;
         } else {
             tracing::info!(
                 target: "pangoro-goerli",

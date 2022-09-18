@@ -1,9 +1,10 @@
-use std::{ops::Div, str::FromStr};
+use std::{ops::Div, str::FromStr, time::Duration};
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
     goerli_client::{client::GoerliClient, types::FinalityUpdate},
     pangoro_client::client::PangoroClient,
+    web3_helper::wait_for_transaction_confirmation,
 };
 use client_contracts::beacon_light_client::FinalizedHeaderUpdate;
 use lifeline::{Lifeline, Service, Task};
@@ -193,22 +194,8 @@ impl HeaderRelay {
             fork_version: Bytes(fork_version.current_version.as_ref().to_vec()),
             signature_slot: sync_aggregate_slot,
         };
-        dbg!((&self.pangoro_client.private_key).address());
-        let tx = self
-            .pangoro_client
-            .beacon_light_client
-            .import_finalized_header(
-                finalized_header_update,
-                &self.pangoro_client.private_key,
-                self.pangoro_client.gas_option.clone(),
-            )
+        self.import_finalized_header_with_confirmation(finalized_header_update)
             .await?;
-        tracing::info!(
-            target: "pangoro-goerli",
-            "[Header][Goerli=>Pangoro] Sending tx: {:?}",
-            &tx
-        );
-
         Ok(())
     }
 
@@ -257,23 +244,39 @@ impl HeaderRelay {
                 fork_version: Bytes(fork_version),
                 signature_slot: sync_aggregate_slot,
             };
-            let tx = self
-                .pangoro_client
-                .beacon_light_client
-                .import_finalized_header(
-                    finalized_header_update,
-                    &self.pangoro_client.private_key,
-                    self.pangoro_client.gas_option.clone(),
-                )
+            self.import_finalized_header_with_confirmation(finalized_header_update)
                 .await?;
-            tracing::info!(
-            target: "pangoro-goerli",
-                "[Header][Goerli=>Pangoro] Sending tx: {:?}",
-                &tx
-            );
             Ok(())
         } else {
             Err(BridgerError::Custom("Failed to get sync committee update".into()).into())
         }
+    }
+
+    async fn import_finalized_header_with_confirmation(
+        &self,
+        finalized_header_update: FinalizedHeaderUpdate,
+    ) -> color_eyre::Result<()> {
+        let tx = self
+            .pangoro_client
+            .beacon_light_client
+            .import_finalized_header(
+                finalized_header_update,
+                &self.pangoro_client.private_key,
+                self.pangoro_client.gas_option.clone(),
+            )
+            .await?;
+        tracing::info!(
+        target: "pangoro-goerli",
+            "[Header][Goerli=>Pangoro] Sending tx: {:?}",
+            &tx
+        );
+        wait_for_transaction_confirmation(
+            tx,
+            self.pangoro_client.client.transport(),
+            Duration::from_secs(5),
+            3,
+        )
+        .await?;
+        Ok(())
     }
 }

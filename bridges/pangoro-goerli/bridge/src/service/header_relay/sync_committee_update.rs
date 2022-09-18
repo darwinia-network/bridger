@@ -1,9 +1,10 @@
-use std::ops::Div;
+use std::{ops::Div, time::Duration};
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
     goerli_client::{client::GoerliClient, types::Proof},
     pangoro_client::client::PangoroClient,
+    web3_helper::wait_for_transaction_confirmation,
 };
 use client_contracts::beacon_light_client_types::SyncCommitteePeriodUpdate;
 use lifeline::{Lifeline, Service, Task};
@@ -115,6 +116,13 @@ impl SyncCommitteeUpdate {
                 "[SyncCommittee][Goerli=>Pangoro] Sending tx: {:?}",
                 &tx
             );
+            wait_for_transaction_confirmation(
+                tx,
+                self.pangoro_client.client.transport(),
+                Duration::from_secs(5),
+                3,
+            )
+            .await?;
         } else {
             tracing::info!(
                 target: "pangoro-goerli",

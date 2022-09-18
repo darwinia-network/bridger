@@ -73,6 +73,7 @@ async fn message_relay_client_builder(
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
+        config.pangoro_evm.gas_option(),
     )?;
     let beacon_rpc_client = GoerliClient::new(&config.goerli.endpoint)?;
     let source = build_message_client_with_simple_fee_market(
@@ -164,6 +165,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         }
 
         let finalized_block_number = self.best_source_block_at_target().await?;
+        dbg!(&finalized_block_number);
         let outbound_nonce = self
             .source
             .outbound
@@ -171,6 +173,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
                 finalized_block_number,
             ))))
             .await?;
+
         let (begin, end) = (
             latest_nonce.latest_received_nonce + 1,
             latest_nonce.latest_generated_nonce,
@@ -215,10 +218,11 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         // Calculate devliery_size parameter in inbound.receive_messages_proof
         let mut count = 0;
+        let limit = 2;
         for (index, key) in encoded_keys.iter().enumerate() {
             // Messages less or equal than last_delivered_nonce have been delivered.
             let is_delivered = index as u64 + begin <= received_nonce.last_delivered_nonce;
-            if is_delivered || self.source.strategy.decide(*key).await? {
+            if count <= limit && (is_delivered || self.source.strategy.decide(*key).await?) {
                 count = count + 1;
             } else {
                 break;

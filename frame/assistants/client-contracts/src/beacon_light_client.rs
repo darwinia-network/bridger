@@ -55,13 +55,14 @@ impl BeaconLightClient {
         &self,
         finalized_header_update: FinalizedHeaderUpdate,
         private_key: &SecretKey,
+        options: Options,
     ) -> BridgeContractResult<H256> {
         let tx = self
             .contract
             .signed_call(
                 "import_finalized_header",
                 (finalized_header_update,),
-                Options::default(),
+                options,
                 private_key,
             )
             .await?;
@@ -72,13 +73,14 @@ impl BeaconLightClient {
         &self,
         sync_committee_update: SyncCommitteePeriodUpdate,
         private_key: &SecretKey,
+        options: Options,
     ) -> BridgeContractResult<H256> {
         let tx = self
             .contract
             .signed_call(
                 "import_next_sync_committee",
                 (sync_committee_update,),
-                Options::default(),
+                options,
                 private_key,
             )
             .await?;

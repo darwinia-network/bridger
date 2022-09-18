@@ -1,13 +1,6 @@
-use crate::command::types::Opts;
+use bridge_pangoro_goerli::cli;
+use bridge_pangoro_goerli::command::types::Opts;
 use structopt::StructOpt;
-
-mod bridge;
-mod cli;
-mod command;
-mod goerli_client;
-mod message_contract;
-mod pangoro_client;
-mod service;
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {

@@ -1,6 +1,6 @@
 use crate::bridge::BridgeTask;
 use crate::command::handler;
-use crate::Opts;
+use crate::command::types::Opts;
 use component_state::state::StateOptions;
 
 /// Execute command

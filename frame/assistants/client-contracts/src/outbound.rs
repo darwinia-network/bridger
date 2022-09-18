@@ -42,6 +42,8 @@ impl Outbound {
                 "send_message",
                 message,
                 Options {
+                    gas: Some(U256::from(20000000)),
+                    gas_price: Some(U256::from(23000000000u64)),
                     value: Some(fee),
                     ..Default::default()
                 },
@@ -51,10 +53,13 @@ impl Outbound {
         Ok(tx)
     }
 
-    pub async fn data(&self) -> BridgeContractResult<OutboundLaneDataStorage> {
+    pub async fn data(
+        &self,
+        at_block: Option<BlockId>,
+    ) -> BridgeContractResult<OutboundLaneDataStorage> {
         Ok(self
             .contract
-            .query("data", (), None, Options::default(), None)
+            .query("data", (), None, Options::default(), at_block)
             .await?)
     }
 
@@ -202,7 +207,7 @@ pub mod types {
         }
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct SendMessage {
         pub target_contract: Address,
         pub encoded: Bytes,

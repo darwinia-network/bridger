@@ -16,7 +16,7 @@ async fn transaction_receipt_block_number_check<T: Transport>(
 }
 
 // Given a transaction hash, wait for confirmations.
-async fn wait_for_transaction_confirmation<T: Transport>(
+pub async fn wait_for_transaction_confirmation<T: Transport>(
     hash: H256,
     transport: T,
     poll_interval: Duration,

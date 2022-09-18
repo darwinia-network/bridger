@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use std::time::Duration;
 
 use bridge_e2e_traits::strategy::RelayStrategy;
 use client_contracts::PosaLightClient;
@@ -16,6 +17,7 @@ use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::pangoro_client::client::PangoroClient;
+use crate::web3_helper::wait_for_transaction_confirmation;
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
@@ -255,6 +257,14 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             tx
         );
 
+        wait_for_transaction_confirmation(
+            tx,
+            self.target.client.transport(),
+            Duration::from_secs(5),
+            1,
+        )
+        .await?;
+
         Ok(())
     }
 
@@ -337,6 +347,13 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             "[MessageConfirmation][Pangoro=>Goerli] Messages confirmation tx: {:?}",
             hash
         );
+        wait_for_transaction_confirmation(
+            hash,
+            self.source.client.transport(),
+            Duration::from_secs(5),
+            1,
+        )
+        .await?;
         Ok(())
     }
 

@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use std::time::Duration;
 
 use bridge_e2e_traits::strategy::RelayStrategy;
 use client_contracts::PosaLightClient;
@@ -10,6 +11,7 @@ use crate::message_contract::darwinia_message_client::{
 use crate::message_contract::fee_market::FeeMarketRelayStrategy;
 use crate::message_contract::message_client::build_message_client_with_simple_fee_market;
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
+use crate::web3_helper::wait_for_transaction_confirmation;
 use crate::{
     goerli_client::client::GoerliClient, message_contract::message_client::MessageClient,
     pangoro_client::client::PangoroClient,
@@ -165,7 +167,6 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         }
 
         let finalized_block_number = self.best_source_block_at_target().await?;
-        dbg!(&finalized_block_number);
         let outbound_nonce = self
             .source
             .outbound
@@ -218,11 +219,10 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         // Calculate devliery_size parameter in inbound.receive_messages_proof
         let mut count = 0;
-        let limit = 2;
         for (index, key) in encoded_keys.iter().enumerate() {
             // Messages less or equal than last_delivered_nonce have been delivered.
             let is_delivered = index as u64 + begin <= received_nonce.last_delivered_nonce;
-            if count <= limit && (is_delivered || self.source.strategy.decide(*key).await?) {
+            if is_delivered || self.source.strategy.decide(*key).await? {
                 count = count + 1;
             } else {
                 break;
@@ -258,6 +258,14 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             "[MessageDelivery][Goerli=>Pangoro] Sending tx: {:?}",
             tx
         );
+
+        wait_for_transaction_confirmation(
+            tx,
+            self.target.client.transport(),
+            Duration::from_secs(5),
+            1,
+        )
+        .await?;
 
         Ok(())
     }
@@ -348,6 +356,14 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             "[MessageConfirmation][Goerli=>Pangoro] Messages confirmation tx: {:?}",
             hash
         );
+        wait_for_transaction_confirmation(
+            hash,
+            self.source.client.transport(),
+            Duration::from_secs(5),
+            1,
+        )
+        .await?;
+
         Ok(())
     }
 

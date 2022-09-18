@@ -9,7 +9,7 @@ use web3::types::{Address, U256};
 
 #[derive(Debug, Clone)]
 pub struct FeeMarketRelayStrategy {
-    fee_market: FeeMarket,
+    pub fee_market: FeeMarket,
     account: Address,
 }
 

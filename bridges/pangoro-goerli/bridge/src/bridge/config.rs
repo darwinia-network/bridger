@@ -92,6 +92,12 @@ impl ChainInfoConfig {
         FastEthereumAccount::new(&self.private_key)
     }
 
+    pub fn to_web3_client(&self) -> color_eyre::Result<Web3<Http>> {
+        let transport = Http::new(&self.execution_layer_endpoint)?;
+        let client = Web3::new(transport);
+        Ok(client)
+    }
+
     pub fn gas_option(&self) -> Options {
         Options {
             gas: Some(U256::from(self.gas)),

@@ -1,4 +1,8 @@
-use crate::service::ecdsa_relay::types::EcdsaSource;
+use std::time::Duration;
+
+use crate::{
+    service::ecdsa_relay::types::EcdsaSource, web3_helper::wait_for_transaction_confirmation,
+};
 
 pub struct CollectingNewMessageRootSignaturesRunner {
     source: EcdsaSource,
@@ -50,11 +54,19 @@ impl CollectingNewMessageRootSignaturesRunner {
         let hash = client_pangoro_substrate
             .submit_new_message_root_signature(address.0, signature)
             .await?;
+
         tracing::info!(
             target: "pangoro-goerli",
             "[pangoro] [ecdsa] submitted new message root signature: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
+        wait_for_transaction_confirmation(
+            hash,
+            self.source.client_pangoro_web3.transport(),
+            Duration::from_secs(5),
+            3,
+        )
+        .await?;
         Ok(Some(event.block_number))
     }
 }

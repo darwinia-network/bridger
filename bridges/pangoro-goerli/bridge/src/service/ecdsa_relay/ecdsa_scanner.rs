@@ -35,6 +35,7 @@ impl EcdsaScanner {
         let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
         let subquery = config.index.to_pangoro_subquery();
         let client_pangoro_web3 = config.pangoro_evm.to_web3_client()?;
+        let client_goerli_web3 = config.goerli.to_web3_client()?;
         let client_pangoro_substrate = config.pangoro_substrate.to_substrate_client().await?;
         let client_posa = config.goerli.to_posa_client()?;
         let pangoro_evm_account = config.pangoro_evm.to_fast_ethereum_account();
@@ -43,6 +44,7 @@ impl EcdsaScanner {
             block: None,
             subquery,
             client_pangoro_web3,
+            client_goerli_web3,
             client_pangoro_substrate,
             client_posa,
             pangoro_evm_account,

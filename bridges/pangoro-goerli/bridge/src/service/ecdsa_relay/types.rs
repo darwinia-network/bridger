@@ -11,6 +11,7 @@ pub struct EcdsaSource {
     pub block: Option<u32>,
     pub subquery: Subquery,
     pub client_pangoro_web3: Web3<Http>,
+    pub client_goerli_web3: Web3<Http>,
     pub client_pangoro_substrate: PangoroClient,
     pub client_posa: PosaLightClient,
     pub pangoro_evm_account: FastEthereumAccount,

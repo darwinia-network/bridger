@@ -1,9 +1,13 @@
+use std::time::Duration;
+
 use web3::types::H160;
 
 use subquery::types::AOperationType;
 use support_common::error::BridgerError;
 
-use crate::service::ecdsa_relay::types::EcdsaSource;
+use crate::{
+    service::ecdsa_relay::types::EcdsaSource, web3_helper::wait_for_transaction_confirmation,
+};
 
 pub struct CollectedEnoughAuthoritiesChangeSignaturesRunner {
     source: EcdsaSource,
@@ -114,6 +118,13 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
             "[pangoro] [ecdsa] authorities change submitted: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
+        wait_for_transaction_confirmation(
+            hash,
+            self.source.client_goerli_web3.transport(),
+            Duration::from_secs(5),
+            3,
+        )
+        .await?;
 
         Ok(Some(event.block_number))
     }

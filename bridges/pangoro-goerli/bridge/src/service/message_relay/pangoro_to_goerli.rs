@@ -73,6 +73,7 @@ async fn message_relay_client_builder(
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
+        config.pangoro_evm.gas_option(),
     )?;
     let beacon_rpc_client = GoerliClient::new(&config.goerli.endpoint)?;
     let target = build_message_client_with_simple_fee_market(

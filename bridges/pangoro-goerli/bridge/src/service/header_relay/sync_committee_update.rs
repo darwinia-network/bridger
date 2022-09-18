@@ -45,6 +45,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
+        config.pangoro_evm.gas_option(),
     )?;
     let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let update_manager = SyncCommitteeUpdate {
@@ -102,7 +103,11 @@ impl SyncCommitteeUpdate {
             let tx = self
                 .pangoro_client
                 .beacon_light_client
-                .import_next_sync_committee(sync_committee_update, &self.pangoro_client.private_key)
+                .import_next_sync_committee(
+                    sync_committee_update,
+                    &self.pangoro_client.private_key,
+                    self.pangoro_client.gas_option.clone(),
+                )
                 .await?;
 
             tracing::info!(

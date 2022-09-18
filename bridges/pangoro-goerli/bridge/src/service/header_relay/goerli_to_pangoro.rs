@@ -12,6 +12,7 @@ use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use web3::{
     ethabi::ethereum_types::H32,
+    signing::Key,
     types::{Bytes, H256},
 };
 
@@ -49,6 +50,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
+        config.pangoro_evm.gas_option(),
     )?;
     let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let header_relay = HeaderRelay {
@@ -191,10 +193,15 @@ impl HeaderRelay {
             fork_version: Bytes(fork_version.current_version.as_ref().to_vec()),
             signature_slot: sync_aggregate_slot,
         };
+        dbg!((&self.pangoro_client.private_key).address());
         let tx = self
             .pangoro_client
             .beacon_light_client
-            .import_finalized_header(finalized_header_update, &self.pangoro_client.private_key)
+            .import_finalized_header(
+                finalized_header_update,
+                &self.pangoro_client.private_key,
+                self.pangoro_client.gas_option.clone(),
+            )
             .await?;
         tracing::info!(
             target: "pangoro-goerli",
@@ -253,7 +260,11 @@ impl HeaderRelay {
             let tx = self
                 .pangoro_client
                 .beacon_light_client
-                .import_finalized_header(finalized_header_update, &self.pangoro_client.private_key)
+                .import_finalized_header(
+                    finalized_header_update,
+                    &self.pangoro_client.private_key,
+                    self.pangoro_client.gas_option.clone(),
+                )
                 .await?;
             tracing::info!(
             target: "pangoro-goerli",

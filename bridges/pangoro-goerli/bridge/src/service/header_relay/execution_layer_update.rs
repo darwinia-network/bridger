@@ -49,6 +49,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
+        config.pangoro_evm.gas_option(),
     )?;
     let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let execution_layer_relay = ExecutionLayer {

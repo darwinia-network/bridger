@@ -13,6 +13,7 @@ pub struct PangoroClient {
     pub beacon_light_client: BeaconLightClient,
     pub execution_layer_contract: Contract<Http>,
     pub private_key: SecretKey,
+    pub gas_option: Options,
 }
 
 impl PangoroClient {
@@ -21,6 +22,7 @@ impl PangoroClient {
         contract_address: &str,
         execution_layer_contract_address: &str,
         private_key: &str,
+        gas_option: Options,
     ) -> color_eyre::Result<Self> {
         let transport = Http::new(endpoint)?;
         let client = web3::Web3::new(transport);
@@ -37,6 +39,7 @@ impl PangoroClient {
             beacon_light_client,
             execution_layer_contract,
             private_key,
+            gas_option,
         })
     }
 

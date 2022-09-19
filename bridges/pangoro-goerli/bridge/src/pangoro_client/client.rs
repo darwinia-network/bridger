@@ -89,6 +89,7 @@ mod tests {
     //     println!("Sync committee root: {:?}", sync_committee_root);
     // }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_execution_layer_state_root() {
         let client = test_client();

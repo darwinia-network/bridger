@@ -12,7 +12,7 @@ use crate::error::BridgeContractResult;
 
 #[derive(Debug, Clone)]
 pub struct PosaLightClient {
-    contract: Contract<Http>,
+    pub contract: Contract<Http>,
 }
 
 impl PosaLightClient {
@@ -119,6 +119,13 @@ impl PosaLightClient {
             .query("nonce", (), None, Options::default(), None)
             .await?)
     }
+
+    pub async fn merkle_root(&self) -> BridgeContractResult<H256> {
+        Ok(self
+            .contract
+            .query("merkle_root", (), None, Options::default(), None)
+            .await?)
+    }
 }
 
 pub mod types {
@@ -179,7 +186,7 @@ mod tests {
         let client = web3::Web3::new(transport);
         PosaLightClient::new(
             client,
-            Address::from_str("0x9F04c46AB2531c95FbC7325DF22187dCE9248cF2").unwrap(),
+            Address::from_str("0x82afDD48E3a06672c7C87A6742eC14d1088f6eF7").unwrap(),
         )
         .unwrap()
     }
@@ -210,6 +217,12 @@ mod tests {
     async fn test_nonce() {
         let client = test_client();
         let result = client.nonce().await.unwrap();
+        dbg!(result);
+
+        let result = client.merkle_root().await.unwrap();
+        dbg!(result);
+
+        let result = client.block_number().await.unwrap();
         dbg!(result);
     }
 }

@@ -7,7 +7,7 @@ use web3::{
 
 use crate::error::BridgeContractResult;
 
-use self::types::MessageProof;
+use self::types::{MessageProof, MessageSingleProof};
 
 pub struct ChainMessageCommitter {
     pub contract: Contract<Http>,
@@ -28,6 +28,17 @@ impl ChainMessageCommitter {
         Ok(self
             .contract
             .query("commitment", (), None, Options::default(), None)
+            .await?)
+    }
+
+    pub async fn proof(
+        &self,
+        pos: U256,
+        at_block: Option<BlockId>,
+    ) -> BridgeContractResult<MessageSingleProof> {
+        Ok(self
+            .contract
+            .query("proof", (pos,), None, Options::default(), at_block)
             .await?)
     }
 
@@ -120,6 +131,8 @@ pub mod types {
 }
 
 mod tests {
+    use web3::types::BlockNumber;
+
     #[allow(unused_imports)]
     use super::*;
     #[allow(unused_imports)]
@@ -131,10 +144,23 @@ mod tests {
         let client = web3::Web3::new(transport);
         let c = ChainMessageCommitter::new(
             &client,
-            Address::from_str("0x492b0E386ddC970395B3A506E2E56DfFaf49947D").unwrap(),
+            Address::from_str("0xbA6c0608f68fA12600382Cd4D964DF9f090AA5B5").unwrap(),
         )
         .unwrap();
         let result = c.commitment().await.unwrap();
         dbg!(result);
+
+        let pos = U256::from_dec_str("1").unwrap();
+        let merkle_tree = c.proof(pos, None).await.unwrap();
+        println!("{:?}", merkle_tree.root);
+
+        for num in vec![
+            149771u64, 148133u64, 148122u64, 148121u64, 148120u64, 148119u64, 148118u64, 148116u64,
+            148115u64,
+        ] {
+            let at_block = BlockId::from(BlockNumber::from(num));
+            let merkle_tree = c.proof(pos, Some(at_block)).await.unwrap();
+            println!("{:?} {:?}", at_block, merkle_tree.root);
+        }
     }
 }

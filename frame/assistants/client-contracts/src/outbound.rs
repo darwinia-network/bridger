@@ -35,6 +35,7 @@ impl Outbound {
         message: SendMessage,
         private_key: &SecretKey,
         fee: U256,
+        options: Options,
     ) -> BridgeContractResult<H256> {
         let tx = self
             .contract
@@ -42,10 +43,8 @@ impl Outbound {
                 "send_message",
                 message,
                 Options {
-                    gas: Some(U256::from(20000000)),
-                    gas_price: Some(U256::from(23000000000u64)),
                     value: Some(fee),
-                    ..Default::default()
+                    ..options
                 },
                 private_key,
             )
@@ -327,7 +326,7 @@ mod tests {
     #[tokio::test]
     async fn test_data_() {
         let (_, outbound) = test_client();
-        let res = outbound.data().await.unwrap();
+        let res = outbound.data(None).await.unwrap();
         println!("Data: {:?}", res);
     }
 
@@ -366,6 +365,7 @@ mod tests {
                 send_message,
                 &private_key,
                 U256::from_dec_str("20000000000000000000").unwrap(),
+                Options::default(),
             )
             .await
             .unwrap();

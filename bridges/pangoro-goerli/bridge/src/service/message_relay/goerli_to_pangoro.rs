@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use bridge_e2e_traits::strategy::RelayStrategy;
 use client_contracts::PosaLightClient;
-use web3::types::{Address, BlockId, BlockNumber, U256};
+use web3::types::{Address, BlockId, BlockNumber, H256, U256};
 
 use crate::message_contract::darwinia_message_client::{
     build_darwinia_message_client, DarwiniaMessageClient,
@@ -166,7 +166,17 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             return Ok(());
         }
 
-        let finalized_block_number = self.best_source_block_at_target().await?;
+        let finalized_block_number = match self.best_source_block_at_target().await? {
+            None => {
+                tracing::info!(
+                    target: "pangoro-goerli",
+                    "[MessageDelivery][Goerli=>Pangoro] Wait for execution layer relay",
+                );
+                return Ok(());
+            }
+            Some(num) => num,
+        };
+
         let outbound_nonce = self
             .source
             .outbound
@@ -217,12 +227,19 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .map(|x| x.encoded_key)
             .collect();
 
+        let max_unconfirmed_messages = 20;
+
         // Calculate devliery_size parameter in inbound.receive_messages_proof
         let mut count = 0;
         for (index, key) in encoded_keys.iter().enumerate() {
+            let current = index as u64 + begin;
+
             // Messages less or equal than last_delivered_nonce have been delivered.
-            let is_delivered = index as u64 + begin <= received_nonce.last_delivered_nonce;
-            if is_delivered || self.source.strategy.decide(*key).await? {
+            let is_delivered = current <= received_nonce.last_delivered_nonce;
+            let not_beyond_confirm =
+                current - received_nonce.last_confirmed_nonce <= max_unconfirmed_messages;
+
+            if not_beyond_confirm && (is_delivered || self.source.strategy.decide(*key).await?) {
                 count = count + 1;
             } else {
                 break;
@@ -270,7 +287,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         Ok(())
     }
 
-    async fn best_source_block_at_target(&self) -> color_eyre::Result<u64> {
+    async fn best_source_block_at_target(&self) -> color_eyre::Result<Option<u64>> {
         let finalized = self
             .beacon_light_client
             .beacon_light_client
@@ -280,7 +297,15 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .beacon_rpc_client
             .get_beacon_block(finalized.slot)
             .await?;
-        Ok(block.body.execution_payload.block_number.parse()?)
+        let execution_state_root = self
+            .beacon_light_client
+            .execution_layer_state_root(None)
+            .await?;
+        if execution_state_root != H256::from_str(&block.body.execution_payload.state_root)? {
+            Ok(None)
+        } else {
+            Ok(Some(block.body.execution_payload.block_number.parse()?))
+        }
     }
 }
 

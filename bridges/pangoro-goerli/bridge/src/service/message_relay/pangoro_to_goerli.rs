@@ -214,12 +214,19 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .map(|x| x.encoded_key)
             .collect();
 
+        let max_unconfirmed_messages = 20;
+
         // Calculate devliery_size parameter in inbound.receive_messages_proof
         let mut count = 0;
         for (index, key) in encoded_keys.iter().enumerate() {
+            let current = index as u64 + begin;
+
             // Messages less or equal than last_delivered_nonce have been delivered.
-            let is_delivered = index as u64 + begin <= received_nonce.last_delivered_nonce;
-            if is_delivered || self.source.strategy.decide(*key).await? {
+            let is_delivered = current <= received_nonce.last_delivered_nonce;
+            let not_beyond_confirm =
+                current - received_nonce.last_confirmed_nonce <= max_unconfirmed_messages;
+
+            if not_beyond_confirm && (is_delivered || self.source.strategy.decide(*key).await?) {
                 count = count + 1;
             } else {
                 break;

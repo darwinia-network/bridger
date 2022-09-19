@@ -351,7 +351,7 @@ mod tests {
             outbound_lane_nonce.latest_received_nonce + 1,
             outbound_lane_nonce.latest_generated_nonce,
         );
-        let lane_data = client.build_messages_data(begin, end).await.unwrap();
+        let lane_data = client.build_messages_data(begin, end, None).await.unwrap();
         println!("Lane data: {:?}", lane_data);
     }
 

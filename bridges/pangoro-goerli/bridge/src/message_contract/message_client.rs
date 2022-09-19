@@ -77,7 +77,7 @@ impl<T: RelayStrategy> MessageClient<T> {
         end: u64,
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<ReceiveMessagesDeliveryProof> {
-        let at_block = block_number.map(|x| BlockId::Number(x.clone()));
+        let at_block = block_number.map(BlockId::Number);
         let inbound_lane_data = self.inbound.data(at_block).await?;
         let messages_proof =
             build_eth_confirmation_proof(&self.client, &self.inbound, begin, end, block_number)

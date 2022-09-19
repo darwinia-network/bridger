@@ -240,7 +240,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
                 current - received_nonce.last_confirmed_nonce <= max_unconfirmed_messages;
 
             if not_beyond_confirm && (is_delivered || self.source.strategy.decide(*key).await?) {
-                count = count + 1;
+                count += 1;
             } else {
                 break;
             }

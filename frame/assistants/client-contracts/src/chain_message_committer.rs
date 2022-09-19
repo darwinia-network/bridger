@@ -131,6 +131,7 @@ pub mod types {
 }
 
 mod tests {
+    #[allow(unused_imports)]
     use web3::types::BlockNumber;
 
     #[allow(unused_imports)]

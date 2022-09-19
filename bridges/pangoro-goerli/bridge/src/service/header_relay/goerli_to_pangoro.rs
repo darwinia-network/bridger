@@ -13,7 +13,6 @@ use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use web3::{
     ethabi::ethereum_types::H32,
-    signing::Key,
     types::{Bytes, H256},
 };
 

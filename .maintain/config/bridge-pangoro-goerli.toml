@@ -1,3 +1,17 @@
+[general]
+# Whether to relay beacon headers from goerli to pangoro
+header_goerli_to_pangoro = true
+# Whether to relay sync commit from goerli to pangoro
+sync_commit_goerli_to_pangoro = true
+# Whether to relay execution layer state root from goerli to pangoro
+execution_layer_goerli_to_pangoro = true
+# Whether to sign the messages root and relay headers from pangoro to goerli
+ecdsa_service = true
+# Whether to relay messages from goerli to pangoro
+msg_goerli_to_pangoro = true
+# Whether to relay messages from pangoro to goerli
+msg_pangoro_to_goerli = true
+
 [pangoro_evm]
 endpoint                         = "https://pangoro-rpc.darwinia.network"
 contract_address                 = "0x59EA974B74ec6A49338438bCc5d0388E294E4E20"

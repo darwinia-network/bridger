@@ -101,6 +101,7 @@ mod tests {
         .unwrap()
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_finalized_header() {
         let client = test_client();

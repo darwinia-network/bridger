@@ -2,6 +2,7 @@
 pub enum LikethChain {
     Ethereum,
     Ropsten,
+    Pangoro,
 }
 
 impl LikethChain {
@@ -10,6 +11,7 @@ impl LikethChain {
         match self {
             Self::Ethereum => "ethereum",
             Self::Ropsten => "ropsten",
+            Self::Pangoro => "pangoro",
         }
     }
 }

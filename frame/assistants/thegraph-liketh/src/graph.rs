@@ -3,7 +3,8 @@ use include_dir::{include_dir, Dir};
 
 use crate::error::{TheGraphLikethComponentError, TheGraphLikethComponentReuslt};
 use crate::types::{
-    EmptyQueryVar, LikethChain, QueryTransactionsVars, TheGraphResponse, TransactionEntity,
+    EmptyQueryVar, LikethChain, MessageAcceptedEvent, QueryMessageEventVars, QueryTransactionsVars,
+    TheGraphResponse, TransactionEntity,
 };
 
 /// Graphql dir
@@ -80,6 +81,32 @@ impl TheGraphLikeEth {
         Err(TheGraphLikethComponentError::UnknownResponse(format!(
             "QUERY: {}, VARS: [{}, {}]",
             query, from, first
+        ))
+        .into())
+    }
+
+    pub async fn query_message_accepted(
+        &self,
+        nonce: u64,
+    ) -> TheGraphLikethComponentReuslt<Option<MessageAcceptedEvent>> {
+        let query = self.read_graphql("message_accepted_event.query.graphql")?;
+        let vars = QueryMessageEventVars { nonce };
+        let data = self
+            .client
+            .query_with_vars_unwrap::<TheGraphResponse, QueryMessageEventVars>(query, vars)
+            .await
+            .map_err(TheGraphLikethComponentError::from)?;
+        if let TheGraphResponse::MessageAcceptedEntities(events) = data {
+            if events.len() == 1 {
+                return Ok(Some(events[0].clone()));
+            } else {
+                return Ok(None);
+            }
+        }
+
+        Err(TheGraphLikethComponentError::UnknownResponse(format!(
+            "QUERY: {}, VARS: {}",
+            query, nonce
         ))
         .into())
     }

@@ -30,7 +30,10 @@ strum       = { version = "0.21", features = ["derive"] }
 hex         = "0.4"
 array-bytes = { optional = true, version = "2" }
 
-gql_client = "1"
+gql_client  = "1"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
 
 [features]
 default          = []

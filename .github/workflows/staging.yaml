@@ -25,7 +25,7 @@ jobs:
          - pangolin-pangoro
          - darwinia-crab
          - pangoro-chapel
-         - pangoro-kiln
+         - pangoro-goerli
          - pangolin-pangolinparachain
          - crab-crabparachain
     steps:

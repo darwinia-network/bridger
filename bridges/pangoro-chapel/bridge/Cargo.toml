@@ -35,7 +35,6 @@ serde     = { version = "1", features = ["derive"] }
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage  = "0.4"
 
-client-pangoro     = { path = "../../../frame/assistants/client-pangoro", features = ["bridge-chapel"] }
 support-common     = { path = "../../../frame/supports/support-common" }
 support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }

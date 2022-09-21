@@ -37,18 +37,30 @@ impl BridgeTask {
             db_name: Self::name().to_string(),
         })?;
         // check config
-        let _bridge_config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
 
         let bus = BridgeBus::default();
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new(bus);
-        stack.spawn_service::<GoerliToPangoroHeaderRelayService>()?;
-        stack.spawn_service::<SyncCommitteeUpdateService>()?;
-        stack.spawn_service::<ExecutionLayerRelay>()?;
-        stack.spawn_service::<GoerliPangoroMessageRelay>()?;
-        stack.spawn_service::<ECDSARelayService>()?;
-        stack.spawn_service::<PangoroGoerliMessageRelay>()?;
+        if bridge_config.general.header_goerli_to_pangoro {
+            stack.spawn_service::<GoerliToPangoroHeaderRelayService>()?;
+        }
+        if bridge_config.general.sync_commit_goerli_to_pangoro {
+            stack.spawn_service::<SyncCommitteeUpdateService>()?;
+        }
+        if bridge_config.general.execution_layer_goerli_to_pangoro {
+            stack.spawn_service::<ExecutionLayerRelay>()?;
+        }
+        if bridge_config.general.ecdsa_service {
+            stack.spawn_service::<ECDSARelayService>()?;
+        }
+        if bridge_config.general.msg_goerli_to_pangoro {
+            stack.spawn_service::<GoerliPangoroMessageRelay>()?;
+        }
+        if bridge_config.general.msg_pangoro_to_goerli {
+            stack.spawn_service::<PangoroGoerliMessageRelay>()?;
+        }
         Ok(Self { stack })
     }
 }

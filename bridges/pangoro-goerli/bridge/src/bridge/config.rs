@@ -16,10 +16,21 @@ use web3::Web3;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
+    pub general: GeneralConfig,
     pub pangoro_evm: PangoroEVMConfig,
     pub pangoro_substrate: PangoroSubstrateConfig,
     pub goerli: ChainInfoConfig,
     pub index: IndexConfig,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct GeneralConfig {
+    pub header_goerli_to_pangoro: bool,
+    pub sync_commit_goerli_to_pangoro: bool,
+    pub execution_layer_goerli_to_pangoro: bool,
+    pub ecdsa_service: bool,
+    pub msg_goerli_to_pangoro: bool,
+    pub msg_pangoro_to_goerli: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

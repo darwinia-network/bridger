@@ -1,5 +1,5 @@
 [package]
-name = "support-gas-price"
+name = "support-etherscan"
 version = "0.6.4"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"

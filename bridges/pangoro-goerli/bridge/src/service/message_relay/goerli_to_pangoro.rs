@@ -324,7 +324,9 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         }
 
         // query last relayed header
-        let last_relayed_target_block_in_source = self.best_target_block_at_source().await?;
+        // Since the header at block number x from pangoro means the state at block number x - 1,
+        // we need to minus 1 to get the relay block number.
+        let last_relayed_target_block_in_source = self.best_target_block_at_source().await? - 1;
 
         // assemble unrewarded relayers state
         let target_inbound_state = self

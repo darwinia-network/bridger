@@ -9,7 +9,20 @@
     { "source": "/pangolin-pangoro/", "destination": "/pangolin-pangoro/bridge_pangolin_pangoro" },
     { "source": "/pangolin-ropsten/", "destination": "/pangolin-ropsten/bridge_pangolin_ropsten" },
     { "source": "/pangoro-chapel/", "destination": "/pangoro-chapel/bridge_pangoro_chapel" },
-    { "source": "/pangoro-goerli/", "destination": "/pangoro-goerli/bridge_pangoro_goerli" }
+    { "source": "/pangoro-goerli/", "destination": "/pangoro-goerli/bridge_pangoro_goerli" },
+
+
+    {
+      "source": "/frame/",
+      "destination": "/bridger/frame/bridger",
+      "has": [
+          {
+            "type": "header",
+            "key": "host",
+            "value": "rust-docs.darwinia.network"
+          }
+      ]
+    }
   ],
   "trailingSlash": true,
   "headers": [

@@ -68,6 +68,7 @@ jobs:
   deploy-rust-docs:
     name: Deploy rust docs
     runs-on: ubuntu-latest
+    needs: [ build-rust-docs-frame, build-rust-docs-bridge ]
     steps:
 
       - uses: actions/download-artifact@v2

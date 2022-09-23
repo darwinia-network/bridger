@@ -64,8 +64,8 @@ jobs:
           cargo doc --all --no-deps --release
       - name: Collect docs
         run: |
-          mkdir rust_docs
-          mv bridges/${{ matrix.package }}/target/doc rust_docs/${{ matrix.package }}
+          mkdir -p rust_docs/bridges
+          mv bridges/${{ matrix.package }}/target/doc rust_docs/bridges/${{ matrix.package }}
 
       - name: Upload shared
         uses: actions/upload-artifact@v2
@@ -73,10 +73,81 @@ jobs:
           name: shared-artifact
           path: rust_docs
 
+
+  build-rust-docs-assistants:
+    name: Build rust docs (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+         - client-contracts
+         - feemarket-s2s
+         - relay-e2e
+         - relay-s2s
+         - shadow-liketh
+         - subquery
+         - thegraph-liketh
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - name: Build rust docs
+        run: |
+          cd frame/assistants/${{ matrix.package }}
+          cargo doc --all --no-deps --release
+      - name: Collect docs
+        run: |
+          mkdir -p rust_docs/assistants/
+          mv frame/assistants/${{ matrix.package }}/target/doc rust_docs/assistants/${{ matrix.package }}
+
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: shared-artifact
+          path: rust_docs
+
+
+  build-rust-docs-traits:
+    name: Build rust docs (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+         - bridge-e2e
+         - bridge-s2s
+         - feemarket-s2s
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - name: Build rust docs
+        run: |
+          cd frame/assistants/${{ matrix.package }}
+          cargo doc --all --no-deps --release
+      - name: Collect docs
+        run: |
+          mkdir rust_docs/traits
+          mv frame/traits/${{ matrix.package }}/target/doc rust_docs/traits/${{ matrix.package }}
+
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: shared-artifact
+          path: rust_docs
+
+
   deploy-rust-docs:
     name: Deploy rust docs
     runs-on: ubuntu-latest
-    needs: [ build-rust-docs-frame, build-rust-docs-bridge ]
+    needs: 
+      - build-rust-docs-frame
+      - build-rust-docs-bridge
+      - build-rust-docs-assistants
+      - build-rust-docs-traits
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2

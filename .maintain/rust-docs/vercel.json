@@ -1,6 +1,8 @@
 {
   "redirects": [
-    { "source": "/", "destination": "/darwinia_bridger" }
+    { "source": "/", "destination": "/frame/darwinia_bridger" },
+    { "source": "/frame", "destination": "/frame/darwinia_bridger" },
+    { "source": "/crab-crabparachain", "destination": "/bridge_crab_crabparachain/main" }
   ],
   "trailingSlash": true,
   "headers": [

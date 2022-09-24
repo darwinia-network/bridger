@@ -4,7 +4,7 @@ use std::time::Duration;
 use bridge_e2e_traits::strategy::RelayStrategy;
 use client_contracts::PosaLightClient;
 
-use web3::types::{Address, BlockId, BlockNumber, U256};
+use web3::types::{Address, BlockId, BlockNumber, H256, U256};
 
 use crate::goerli_client::client::GoerliClient;
 use crate::message_contract::darwinia_message_client::{
@@ -295,7 +295,16 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         }
 
         // query last relayed header
-        let last_relayed_target_block_in_source = self.best_target_block_at_source().await?;
+        let last_relayed_target_block_in_source = match self.best_target_block_at_source().await? {
+            None => {
+                tracing::info!(
+                    target: "pangoro-goerli",
+                    "[MessageConfirmation][Pangoro=>Goerli] Wait for execution layer relay",
+                );
+                return Ok(());
+            }
+            Some(num) => num,
+        };
 
         // assemble unrewarded relayers state
         let target_inbound_state = self
@@ -364,7 +373,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         Ok(())
     }
 
-    async fn best_target_block_at_source(&self) -> color_eyre::Result<u64> {
+    async fn best_target_block_at_source(&self) -> color_eyre::Result<Option<u64>> {
         let finalized = self
             .beacon_light_client
             .beacon_light_client
@@ -374,6 +383,14 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .beacon_rpc_client
             .get_beacon_block(finalized.slot)
             .await?;
-        Ok(block.body.execution_payload.block_number.parse()?)
+        let execution_state_root = self
+            .beacon_light_client
+            .execution_layer_state_root(None)
+            .await?;
+        if execution_state_root != H256::from_str(&block.body.execution_payload.state_root)? {
+            Ok(None)
+        } else {
+            Ok(Some(block.body.execution_payload.block_number.parse()?))
+        }
     }
 }

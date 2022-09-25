@@ -150,7 +150,10 @@ impl HeaderRelay {
 
         let (_slot, sync_aggregate_slot, _attested_header, _sync_aggregate_block) = match self
             .goerli_client
-            .find_valid_attested_header(state.current_slot, finality_update.attested_header.slot)
+            .find_valid_attested_header(
+                state.current_slot,
+                finality_update.attested_header.slot - 1,
+            )
             .await?
         {
             None => {

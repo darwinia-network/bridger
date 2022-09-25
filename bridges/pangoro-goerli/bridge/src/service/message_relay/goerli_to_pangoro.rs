@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use bridge_e2e_traits::strategy::RelayStrategy;
 use client_contracts::PosaLightClient;
+use web3::contract::Options;
 use web3::types::{Address, BlockId, BlockNumber, H256, U256};
 
 use crate::message_contract::darwinia_message_client::{
@@ -11,7 +12,7 @@ use crate::message_contract::darwinia_message_client::{
 use crate::message_contract::fee_market::FeeMarketRelayStrategy;
 use crate::message_contract::message_client::build_message_client_with_simple_fee_market;
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
-use crate::web3_helper::wait_for_transaction_confirmation;
+use crate::web3_helper::{wait_for_transaction_confirmation, GasPriceOracle};
 use crate::{
     goerli_client::client::GoerliClient, message_contract::message_client::MessageClient,
     pangoro_client::client::PangoroClient,
@@ -85,7 +86,8 @@ async fn message_relay_client_builder(
         Address::from_str(&config.goerli.fee_market_address)?,
         Address::from_str(&config.goerli.account)?,
         Some(&config.goerli.private_key),
-        config.goerli.gas_option(),
+        U256::from_dec_str(&config.goerli.max_gas_price)?,
+        &config.goerli.etherscan_api_key,
     )
     .unwrap();
     let target = build_darwinia_message_client(
@@ -367,6 +369,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             ))))
             .await?;
 
+        let gas_price = self.source.gas_price().await?;
         // send proof
         let hash = self
             .source
@@ -374,7 +377,11 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .receive_messages_delivery_proof(
                 proof,
                 &self.source.private_key()?,
-                self.source.gas_option.clone(),
+                Options {
+                    gas: Some(U256::from_dec_str("2000000")?),
+                    gas_price: Some(gas_price),
+                    ..Default::default()
+                },
             )
             .await?;
 

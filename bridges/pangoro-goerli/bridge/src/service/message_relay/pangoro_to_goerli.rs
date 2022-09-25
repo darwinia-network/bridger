@@ -4,6 +4,7 @@ use std::time::Duration;
 use bridge_e2e_traits::strategy::RelayStrategy;
 use client_contracts::PosaLightClient;
 
+use web3::contract::Options;
 use web3::types::{Address, BlockId, BlockNumber, H256, U256};
 
 use crate::goerli_client::client::GoerliClient;
@@ -17,7 +18,7 @@ use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::pangoro_client::client::PangoroClient;
-use crate::web3_helper::wait_for_transaction_confirmation;
+use crate::web3_helper::{wait_for_transaction_confirmation, GasPriceOracle};
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
@@ -85,7 +86,8 @@ async fn message_relay_client_builder(
         Address::from_str(&config.goerli.fee_market_address)?,
         Address::from_str(&config.goerli.account)?,
         Some(&config.goerli.private_key),
-        config.goerli.gas_option(),
+        U256::from_dec_str(&config.goerli.max_gas_price)?,
+        &config.goerli.etherscan_api_key,
     )
     .unwrap();
     let source = build_darwinia_message_client(
@@ -247,6 +249,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             begin + count - 1,
         );
 
+        let gas_price = self.target.gas_price().await?;
         let tx = self
             .target
             .inbound
@@ -254,7 +257,11 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
                 proof,
                 U256::from(count),
                 &self.target.private_key()?,
-                self.target.gas_option.clone(),
+                Options {
+                    gas: Some(U256::from_dec_str("2000000")?),
+                    gas_price: Some(gas_price),
+                    ..Default::default()
+                },
             )
             .await?;
 

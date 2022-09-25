@@ -4,6 +4,7 @@ use bridge_e2e_traits::strategy::RelayStrategy;
 use futures::future;
 use secp256k1::SecretKey;
 use support_common::error::BridgerError;
+use support_etherscan::EtherscanClient;
 use web3::{
     contract::Options,
     ethabi::{encode, RawLog},
@@ -21,7 +22,7 @@ use client_contracts::{
 };
 use client_contracts::{outbound_types::MessageAccepted, Outbound, SimpleFeeMarket};
 
-use crate::goerli_client::types::MessagesProof;
+use crate::{goerli_client::types::MessagesProof, web3_helper::GasPriceOracle};
 
 use super::{simple_fee_market::SimpleFeeMarketRelayStrategy, utils::build_eth_confirmation_proof};
 
@@ -35,7 +36,22 @@ pub struct MessageClient<T: RelayStrategy> {
     pub outbound: Outbound,
     pub strategy: T,
     pub private_key: Option<SecretKey>,
-    pub gas_option: Options,
+    pub max_gas_price: U256,
+    pub etherscan_client: EtherscanClient,
+}
+
+impl<T: RelayStrategy> GasPriceOracle for MessageClient<T> {
+    fn get_web3(&self) -> &Web3<Http> {
+        &self.client
+    }
+
+    fn get_etherscan_client(&self) -> Option<&EtherscanClient> {
+        Some(&self.etherscan_client)
+    }
+
+    fn max_gas_price(&self) -> U256 {
+        self.max_gas_price.clone()
+    }
 }
 
 pub fn build_message_client_with_simple_fee_market(
@@ -45,7 +61,8 @@ pub fn build_message_client_with_simple_fee_market(
     fee_market_address: Address,
     account: Address,
     private_key: Option<&str>,
-    gas_option: Options,
+    max_gas_price: U256,
+    etherscan_api_key: &str,
 ) -> color_eyre::Result<MessageClient<SimpleFeeMarketRelayStrategy>> {
     let transport = Http::new(endpoint)?;
     let client = Web3::new(transport);
@@ -54,13 +71,15 @@ pub fn build_message_client_with_simple_fee_market(
     let fee_market = SimpleFeeMarket::new(&client, fee_market_address)?;
     let strategy = SimpleFeeMarketRelayStrategy::new(fee_market, account);
     let private_key = private_key.map(SecretKey::from_str).transpose()?;
+    let etherscan_client = EtherscanClient::new(etherscan_api_key)?;
     Ok(MessageClient {
         client,
         inbound,
         outbound,
         strategy,
         private_key,
-        gas_option,
+        etherscan_client,
+        max_gas_price,
     })
 }
 

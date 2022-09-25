@@ -29,6 +29,7 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
         let cacse = subquery
             .next_collected_enough_new_message_root_signatures_event(from_block)
             .await?;
+
         if cacse.is_none() {
             tracing::debug!(
                 target: "pangoro-goerli",
@@ -38,6 +39,15 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
             return Ok(None);
         }
         let event = cacse.expect("Unreachable");
+        let latest_relayed_block_number = self.source.client_posa.block_number().await?;
+        if latest_relayed_block_number.as_u32() >= event.block_number {
+            tracing::info!(
+                target: "pangoro-goerli",
+                "[pangoro] [ecdsa] Latest relayed block number is: {:?}",
+                event.block_number
+            );
+            return Ok(Some(event.block_number));
+        }
 
         let mut signature_nodes = event.signatures.nodes;
         signature_nodes.sort_by(|a, b| a.address.cmp(&b.address));

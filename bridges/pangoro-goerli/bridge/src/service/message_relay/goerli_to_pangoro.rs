@@ -76,7 +76,7 @@ async fn message_relay_client_builder(
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
-        config.pangoro_evm.gas_option(),
+        U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
     let beacon_rpc_client = GoerliClient::new(&config.goerli.endpoint)?;
     let source = build_message_client_with_simple_fee_market(
@@ -100,7 +100,6 @@ async fn message_relay_client_builder(
         Address::from_str(&config.pangoro_evm.account)?,
         Some(&config.pangoro_evm.private_key),
         config.index.to_pangoro_thegraph()?,
-        config.pangoro_evm.gas_option(),
     )
     .unwrap();
     let posa_light_client = PosaLightClient::new(
@@ -261,6 +260,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             begin + count - 1,
         );
 
+        let gas_price = self.beacon_light_client.gas_price().await?;
         let tx = self
             .target
             .inbound
@@ -268,7 +268,11 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
                 proof,
                 U256::from(count),
                 &self.target.private_key()?,
-                self.target.gas_option.clone(),
+                Options {
+                    gas: Some(U256::from_dec_str("10000000")?),
+                    gas_price: Some(gas_price),
+                    ..Default::default()
+                },
             )
             .await?;
 

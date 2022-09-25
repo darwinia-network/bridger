@@ -4,16 +4,32 @@ use std::str::FromStr;
 use web3::{
     contract::{Contract, Options},
     transports::Http,
-    types::{Address, BlockId, H256},
+    types::{Address, BlockId, H256, U256},
     Web3,
 };
+
+use crate::web3_helper::GasPriceOracle;
 
 pub struct PangoroClient {
     pub client: Web3<Http>,
     pub beacon_light_client: BeaconLightClient,
     pub execution_layer_contract: Contract<Http>,
     pub private_key: SecretKey,
-    pub gas_option: Options,
+    pub max_gas_price: U256,
+}
+
+impl GasPriceOracle for PangoroClient {
+    fn get_web3(&self) -> &Web3<Http> {
+        &self.client
+    }
+
+    fn get_etherscan_client(&self) -> Option<&support_etherscan::EtherscanClient> {
+        None
+    }
+
+    fn max_gas_price(&self) -> U256 {
+        self.max_gas_price.clone()
+    }
 }
 
 impl PangoroClient {
@@ -22,7 +38,7 @@ impl PangoroClient {
         contract_address: &str,
         execution_layer_contract_address: &str,
         private_key: &str,
-        gas_option: Options,
+        max_gas_price: U256,
     ) -> color_eyre::Result<Self> {
         let transport = Http::new(endpoint)?;
         let client = web3::Web3::new(transport);
@@ -39,7 +55,7 @@ impl PangoroClient {
             beacon_light_client,
             execution_layer_contract,
             private_key,
-            gas_option,
+            max_gas_price,
         })
     }
 
@@ -70,7 +86,7 @@ mod tests {
             "0x59EA974B74ec6A49338438bCc5d0388E294E4E20",
             "0x3F58e8Cf0DE243f978834e11e0CC419670FCe6d8",
             "",
-            Options::default(),
+            U256::from_dec_str("1000000"),
         )
         .unwrap()
     }

@@ -61,9 +61,7 @@ pub struct PangoroEVMConfig {
     pub chain_message_committer_address: String,
     pub lane_message_committer_address: String,
     pub fee_market_address: String,
-    pub gas: u64,
-    // pub max_gas_price: String,
-    pub gas_price: u64,
+    pub max_gas_price: String,
 }
 
 impl PangoroEVMConfig {
@@ -75,14 +73,6 @@ impl PangoroEVMConfig {
         let transport = Http::new(&self.endpoint)?;
         let client = Web3::new(transport);
         Ok(client)
-    }
-
-    pub fn gas_option(&self) -> Options {
-        Options {
-            gas: Some(U256::from(self.gas)),
-            gas_price: Some(U256::from(self.gas_price)),
-            ..Default::default()
-        }
     }
 }
 

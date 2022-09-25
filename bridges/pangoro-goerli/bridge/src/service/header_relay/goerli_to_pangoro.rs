@@ -4,7 +4,7 @@ use crate::{
     bridge::{BridgeBus, BridgeConfig},
     goerli_client::{client::GoerliClient, types::FinalityUpdate},
     pangoro_client::client::PangoroClient,
-    web3_helper::wait_for_transaction_confirmation,
+    web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
 use client_contracts::beacon_light_client::FinalizedHeaderUpdate;
 use lifeline::{Lifeline, Service, Task};
@@ -12,8 +12,9 @@ use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
 use web3::{
+    contract::Options,
     ethabi::ethereum_types::H32,
-    types::{Bytes, H256},
+    types::{Bytes, H256, U256},
 };
 
 #[derive(Debug)]
@@ -50,7 +51,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
-        config.pangoro_evm.gas_option(),
+        U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
     let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let header_relay = HeaderRelay {
@@ -258,13 +259,19 @@ impl HeaderRelay {
         &self,
         finalized_header_update: FinalizedHeaderUpdate,
     ) -> color_eyre::Result<()> {
+        let gas_price = self.pangoro_client.gas_price().await?;
+
         let tx = self
             .pangoro_client
             .beacon_light_client
             .import_finalized_header(
                 finalized_header_update,
                 &self.pangoro_client.private_key,
-                self.pangoro_client.gas_option.clone(),
+                Options {
+                    gas: Some(U256::from_dec_str("5000000")?),
+                    gas_price: Some(gas_price),
+                    ..Default::default()
+                },
             )
             .await?;
         tracing::info!(

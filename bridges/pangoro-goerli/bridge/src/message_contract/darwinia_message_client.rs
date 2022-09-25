@@ -34,7 +34,6 @@ pub struct DarwiniaMessageClient<T: RelayStrategy> {
     pub strategy: T,
     pub private_key: Option<SecretKey>,
     pub indexer: TheGraphLikeEth,
-    pub gas_option: Options,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -48,7 +47,6 @@ pub fn build_darwinia_message_client(
     account: Address,
     private_key: Option<&str>,
     indexer: TheGraphLikeEth,
-    gas_option: Options,
 ) -> color_eyre::Result<DarwiniaMessageClient<FeeMarketRelayStrategy>> {
     let transport = Http::new(endpoint)?;
     let client = Web3::new(transport);
@@ -70,7 +68,6 @@ pub fn build_darwinia_message_client(
         strategy,
         private_key,
         indexer,
-        gas_option,
     })
 }
 

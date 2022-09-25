@@ -325,7 +325,8 @@ mod tests {
             Address::from_str("0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap(),
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
-            Options::default(),
+            U256::from_dec_str("1000000").unwrap(),
+            "",
         )
         .unwrap();
         client
@@ -339,7 +340,8 @@ mod tests {
             Address::from_str("0xB59a893f5115c1Ca737E36365302550074C32023").unwrap(),
             Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
             None,
-            Options::default(),
+            U256::from_dec_str("1000000").unwrap(),
+            "",
         )
         .unwrap()
     }

@@ -86,7 +86,7 @@ mod tests {
             "0x59EA974B74ec6A49338438bCc5d0388E294E4E20",
             "0x3F58e8Cf0DE243f978834e11e0CC419670FCe6d8",
             "",
-            U256::from_dec_str("1000000"),
+            U256::from_dec_str("1000000").unwrap(),
         )
         .unwrap()
     }

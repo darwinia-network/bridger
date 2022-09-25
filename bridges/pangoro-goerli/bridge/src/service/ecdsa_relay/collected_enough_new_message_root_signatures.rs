@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use client_contracts::posa_light_client::Commitment;
 use web3::types::H256;
@@ -11,16 +11,33 @@ use crate::{
 
 pub struct CollectedEnoughNewMessageRootSignaturesRunner {
     source: EcdsaSource,
+    interval: u64,
+    last_relay_time: u64,
 }
 
 impl CollectedEnoughNewMessageRootSignaturesRunner {
-    pub fn new(source: EcdsaSource) -> Self {
-        Self { source }
+    pub fn new(source: EcdsaSource, interval: u64) -> Self {
+        Self {
+            source,
+            interval,
+            last_relay_time: u64::MIN,
+        }
     }
 }
 
 impl CollectedEnoughNewMessageRootSignaturesRunner {
-    pub async fn start(&self) -> color_eyre::Result<Option<u32>> {
+    pub async fn start(&mut self) -> color_eyre::Result<Option<u32>> {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+        if now - self.last_relay_time <= self.interval {
+            tracing::info!(
+                target: "pangoro-goerli",
+                "[pangoro] [ecdsa] Last relaying time is {:?}, wait for {} seconds to scan new message root",
+                self.last_relay_time,
+                now - self.last_relay_time
+            );
+            return Ok(None);
+        }
+
         let client_posa = &self.source.client_posa;
         let subquery = &self.source.subquery;
         let from_block = self.source.block.unwrap_or_default();
@@ -86,6 +103,7 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
             3,
         )
         .await?;
+        self.last_relay_time = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         Ok(Some(event.block_number))
     }
 }

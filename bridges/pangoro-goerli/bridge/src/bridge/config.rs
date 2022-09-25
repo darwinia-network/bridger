@@ -31,6 +31,10 @@ pub struct GeneralConfig {
     pub ecdsa_service: bool,
     pub msg_goerli_to_pangoro: bool,
     pub msg_pangoro_to_goerli: bool,
+    // Max message numbers per delivery
+    pub max_message_num_per_relaying: u64,
+    // Minium interval(seconds) between every header delivery
+    pub header_relay_minimum_interval: u64,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

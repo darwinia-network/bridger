@@ -174,9 +174,10 @@ impl<T: RelayStrategy> MessageClient<T> {
         begin: u64,
         end: u64,
     ) -> color_eyre::Result<Vec<MessageAccepted>> {
-        let logs: Result<Vec<Option<MessageAccepted>>, _> =
-            future::try_join_all((begin..=end).map(|nonce| self.query_message_accepted(nonce)))
-                .await;
+        let logs: Result<Vec<Option<MessageAccepted>>, _> = future::try_join_all(
+            (begin..=end).map(|nonce| self.query_message_accepted_with_retry(nonce)),
+        )
+        .await;
         if let Some(logs) = logs?.into_iter().collect::<Option<Vec<_>>>() {
             Ok(logs)
         } else {
@@ -186,6 +187,26 @@ impl<T: RelayStrategy> MessageClient<T> {
             ))
             .into())
         }
+    }
+
+    pub async fn query_message_accepted_with_retry(
+        &self,
+        nonce: u64,
+    ) -> color_eyre::Result<Option<MessageAccepted>> {
+        let mut count = 0;
+        while count < 3 {
+            match self.query_message_accepted(nonce).await {
+                Ok(v) => return Ok(v),
+                Err(error) => {
+                    count += 1;
+                    if count > 3 {
+                        return Err(error);
+                    }
+                    tokio::time::sleep(std::time::Duration::from_secs(1 * count)).await;
+                }
+            }
+        }
+        Ok(None)
     }
 
     pub async fn query_message_accepted(
@@ -231,7 +252,7 @@ impl<T: RelayStrategy> MessageClient<T> {
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<MessagesProof> {
         let lane_id_proof = self
-            .get_storage_proof(
+            .get_storage_proof_with_retry(
                 self.outbound.contract.address(),
                 vec![U256::from(LANE_IDENTIFY_SLOT)],
                 block_number,
@@ -239,7 +260,7 @@ impl<T: RelayStrategy> MessageClient<T> {
             .await?
             .ok_or_else(|| BridgerError::Custom("Failed to get lane_id_proof".into()))?;
         let lane_nonce_proof = self
-            .get_storage_proof(
+            .get_storage_proof_with_retry(
                 self.outbound.contract.address(),
                 vec![U256::from(LANE_NONCE_SLOT)],
                 block_number,
@@ -248,7 +269,11 @@ impl<T: RelayStrategy> MessageClient<T> {
             .ok_or_else(|| BridgerError::Custom("Failed to get lane_nonce_proof".into()))?;
         let message_keys = Self::build_message_storage_keys(begin, end);
         let message_proof = self
-            .get_storage_proof(self.outbound.contract.address(), message_keys, block_number)
+            .get_storage_proof_with_retry(
+                self.outbound.contract.address(),
+                message_keys,
+                block_number,
+            )
             .await?
             .ok_or_else(|| BridgerError::Custom("Failed to get message_proof".into()))?;
 
@@ -292,6 +317,31 @@ impl<T: RelayStrategy> MessageClient<T> {
                 U256::from(keccak256(bytes))
             })
             .collect()
+    }
+
+    pub async fn get_storage_proof_with_retry(
+        &self,
+        address: Address,
+        storage_keys: Vec<U256>,
+        block_number: Option<BlockNumber>,
+    ) -> color_eyre::Result<Option<Web3Proof>> {
+        let mut count = 0;
+        while count < 3 {
+            match self
+                .get_storage_proof(address, storage_keys.clone(), block_number)
+                .await
+            {
+                Ok(v) => return Ok(v),
+                Err(error) => {
+                    count += 1;
+                    if count > 3 {
+                        return Err(error);
+                    }
+                    tokio::time::sleep(std::time::Duration::from_secs(1 * count)).await;
+                }
+            }
+        }
+        Ok(None)
     }
 
     pub async fn get_storage_proof(

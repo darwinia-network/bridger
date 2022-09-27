@@ -211,7 +211,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         tracing::info!(
             target: "pangoro-goerli",
             "[MessageDelivery][Goerli=>Pangoro] Try to relay messages: [{:?}, {:?}]",
-            begin,
+            received_nonce.last_delivered_nonce + 1,
             end
         );
 
@@ -230,38 +230,56 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .map(|x| x.encoded_key)
             .collect();
 
-        let limit = self.max_message_num_per_relaying;
+        let confirm_limit = 20;
 
         // Calculate devliery_size parameter in inbound.receive_messages_proof
         let mut count = 0;
+        let mut delivered = 0;
         for (index, key) in encoded_keys.iter().enumerate() {
             let current = index as u64 + begin;
 
             // Messages less or equal than last_delivered_nonce have been delivered.
             let is_delivered = current <= received_nonce.last_delivered_nonce;
-            let beyond_limit = current - received_nonce.last_confirmed_nonce <= limit;
+            let beyond_confirm_limit =
+                current - received_nonce.last_confirmed_nonce > confirm_limit;
 
-            if beyond_limit && (is_delivered || self.source.strategy.decide(*key).await?) {
+            if beyond_confirm_limit {
+                break;
+            }
+
+            if is_delivered {
+                delivered += 1;
+                count += 1;
+                continue;
+            }
+
+            if self.source.strategy.decide(*key).await? {
                 count += 1;
             } else {
                 break;
             }
+
+            if count - delivered >= self.max_message_num_per_relaying {
+                break;
+            }
         }
-        if count == 0 {
+
+        if count == delivered {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Goerli=>Pangoro] Decided not to relay",
+                "[MessageDelivery][Goerli=>Pangoro] No need to relay",
             );
             return Ok(());
         }
         tracing::info!(
             target: "pangoro-goerli",
             "[MessageDelivery][Goerli=>Pangoro] Relaying messages: [{:?}, {:?}]",
-            begin,
+            begin + delivered,
             begin + count - 1,
         );
 
         let gas_price = self.beacon_light_client.gas_price().await?;
+        let gas = U256::from_dec_str("30000000")?;
         let tx = self
             .target
             .inbound
@@ -270,7 +288,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
                 U256::from(count),
                 &self.target.private_key()?,
                 Options {
-                    gas: Some(U256::from_dec_str("10000000")?),
+                    gas: Some(gas),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },

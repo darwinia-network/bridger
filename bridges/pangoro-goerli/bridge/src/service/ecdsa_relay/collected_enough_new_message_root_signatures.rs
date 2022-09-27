@@ -33,7 +33,7 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
                 target: "pangoro-goerli",
                 "[pangoro] [ecdsa] Last relaying time is {:?}, wait for {} seconds to scan new message root",
                 self.last_relay_time,
-                now - self.last_relay_time
+                self.interval - (now - self.last_relay_time)
             );
             return Ok(None);
         }
@@ -57,10 +57,10 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
         }
         let event = cacse.expect("Unreachable");
         let latest_relayed_block_number = self.source.client_posa.block_number().await?;
-        if latest_relayed_block_number.as_u32() >= event.block_number {
+        if latest_relayed_block_number.as_u32() >= event.commitment_block_number {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[pangoro] [ecdsa] Latest relayed block number is: {:?}",
+                "[pangoro] [ecdsa] [collectedMessage] Latest relayed block number is: {:?}",
                 event.block_number
             );
             return Ok(Some(event.block_number));

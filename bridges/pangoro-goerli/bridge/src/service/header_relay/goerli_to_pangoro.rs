@@ -123,7 +123,7 @@ impl HeaderRelay {
                 target: "pangoro-goerli",
                 "[Header][Goerli=>Pangoro] Last relaying time is {:?}, wait for {} seconds to start again.",
                 self.last_relay_time,
-                now - self.last_relay_time
+                self.minimal_interval - (now - self.last_relay_time)
             );
             return Ok(());
         }

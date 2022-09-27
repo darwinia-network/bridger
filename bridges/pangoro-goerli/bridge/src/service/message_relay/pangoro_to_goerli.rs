@@ -112,6 +112,7 @@ async fn message_relay_client_builder(
         posa_light_client,
         beacon_rpc_client,
         beacon_light_client,
+        max_message_num_per_relaying: config.general.max_message_num_per_relaying,
     })
 }
 
@@ -151,6 +152,7 @@ pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
     pub posa_light_client: PosaLightClient,
     pub beacon_rpc_client: GoerliClient,
     pub beacon_light_client: PangoroClient,
+    pub max_message_num_per_relaying: u64,
 }
 
 impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
@@ -215,7 +217,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .map(|x| x.encoded_key)
             .collect();
 
-        let max_unconfirmed_messages = 20;
+        let limit = self.max_message_num_per_relaying;
 
         // Calculate devliery_size parameter in inbound.receive_messages_proof
         let mut count = 0;
@@ -224,10 +226,9 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
             // Messages less or equal than last_delivered_nonce have been delivered.
             let is_delivered = current <= received_nonce.last_delivered_nonce;
-            let not_beyond_confirm =
-                current - received_nonce.last_confirmed_nonce <= max_unconfirmed_messages;
+            let beyond_limit = current - received_nonce.last_confirmed_nonce <= limit;
 
-            if not_beyond_confirm && (is_delivered || self.source.strategy.decide(*key).await?) {
+            if beyond_limit && (is_delivered || self.source.strategy.decide(*key).await?) {
                 count += 1;
             } else {
                 break;

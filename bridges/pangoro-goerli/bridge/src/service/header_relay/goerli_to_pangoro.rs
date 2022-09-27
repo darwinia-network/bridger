@@ -1,4 +1,8 @@
-use std::{ops::Div, str::FromStr, time::Duration};
+use std::{
+    ops::Div,
+    str::FromStr,
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
@@ -54,9 +58,11 @@ async fn start() -> color_eyre::Result<()> {
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
     let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
-    let header_relay = HeaderRelay {
+    let mut header_relay = HeaderRelay {
         pangoro_client,
         goerli_client,
+        minimal_interval: config.general.header_relay_minimum_interval,
+        last_relay_time: u64::MIN,
     };
 
     loop {
@@ -87,6 +93,8 @@ pub struct HeaderRelayState {
 pub struct HeaderRelay {
     pub pangoro_client: PangoroClient,
     pub goerli_client: GoerliClient,
+    pub minimal_interval: u64,
+    pub last_relay_time: u64,
 }
 
 impl HeaderRelay {
@@ -108,7 +116,18 @@ impl HeaderRelay {
         })
     }
 
-    pub async fn header_relay(&self) -> color_eyre::Result<()> {
+    pub async fn header_relay(&mut self) -> color_eyre::Result<()> {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+        if now - self.last_relay_time <= self.minimal_interval {
+            tracing::info!(
+                target: "pangoro-goerli",
+                "[Header][Goerli=>Pangoro] Last relaying time is {:?}, wait for {} seconds to start again.",
+                self.last_relay_time,
+                now - self.last_relay_time
+            );
+            return Ok(());
+        }
+
         let state = self.get_state().await?;
         let next_sync_aggregate_root = self
             .pangoro_client
@@ -134,7 +153,7 @@ impl HeaderRelay {
         }
     }
 
-    pub async fn relay_latest(&self, state: HeaderRelayState) -> color_eyre::Result<()> {
+    pub async fn relay_latest(&mut self, state: HeaderRelayState) -> color_eyre::Result<()> {
         let finality_update: FinalityUpdate = self.goerli_client.get_finality_update().await?;
         let update_finality_slot = finality_update.finalized_header.slot;
         let update_finality_period = update_finality_slot.div(32).div(256);
@@ -202,7 +221,7 @@ impl HeaderRelay {
         Ok(())
     }
 
-    pub async fn relay_next_period(&self, state: HeaderRelayState) -> color_eyre::Result<()> {
+    pub async fn relay_next_period(&mut self, state: HeaderRelayState) -> color_eyre::Result<()> {
         let _target_period = state.relayed_period + 1;
         let sync_change = self
             .goerli_client
@@ -256,7 +275,7 @@ impl HeaderRelay {
     }
 
     async fn import_finalized_header_with_confirmation(
-        &self,
+        &mut self,
         finalized_header_update: FinalizedHeaderUpdate,
     ) -> color_eyre::Result<()> {
         let gas_price = self.pangoro_client.gas_price().await?;
@@ -286,6 +305,7 @@ impl HeaderRelay {
             3,
         )
         .await?;
+        self.last_relay_time = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         Ok(())
     }
 }

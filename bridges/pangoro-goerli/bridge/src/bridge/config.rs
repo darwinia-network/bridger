@@ -9,9 +9,8 @@ use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 use thegraph_liketh::component::TheGraphLikeEthComponent;
 use thegraph_liketh::config::TheGraphLikeEthConfig;
 use thegraph_liketh::graph::TheGraphLikeEth;
-use web3::contract::Options;
 use web3::transports::Http;
-use web3::types::{Address, U256};
+use web3::types::Address;
 use web3::Web3;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

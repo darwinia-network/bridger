@@ -6,7 +6,6 @@ use secp256k1::SecretKey;
 use support_common::error::BridgerError;
 use thegraph_liketh::graph::TheGraphLikeEth;
 use web3::{
-    contract::Options,
     transports::Http,
     types::{Address, BlockId, BlockNumber},
     Web3,

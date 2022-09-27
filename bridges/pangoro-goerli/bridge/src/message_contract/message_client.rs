@@ -6,7 +6,6 @@ use secp256k1::SecretKey;
 use support_common::error::BridgerError;
 use support_etherscan::EtherscanClient;
 use web3::{
-    contract::Options,
     ethabi::{encode, RawLog},
     signing::keccak256,
     transports::Http,
@@ -50,10 +49,11 @@ impl<T: RelayStrategy> GasPriceOracle for MessageClient<T> {
     }
 
     fn max_gas_price(&self) -> U256 {
-        self.max_gas_price.clone()
+        self.max_gas_price
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn build_message_client_with_simple_fee_market(
     endpoint: &str,
     inbound_address: Address,
@@ -202,7 +202,7 @@ impl<T: RelayStrategy> MessageClient<T> {
                     if count > 3 {
                         return Err(error);
                     }
-                    tokio::time::sleep(std::time::Duration::from_secs(1 * count)).await;
+                    tokio::time::sleep(std::time::Duration::from_secs(count)).await;
                 }
             }
         }
@@ -337,7 +337,7 @@ impl<T: RelayStrategy> MessageClient<T> {
                     if count > 3 {
                         return Err(error);
                     }
-                    tokio::time::sleep(std::time::Duration::from_secs(1 * count)).await;
+                    tokio::time::sleep(std::time::Duration::from_secs(count)).await;
                 }
             }
         }
@@ -363,7 +363,10 @@ mod tests {
     use std::str::FromStr;
 
     use secp256k1::SecretKey;
-    use web3::types::{Address, U64};
+    use web3::{
+        contract::Options,
+        types::{Address, U64},
+    };
 
     use super::*;
 

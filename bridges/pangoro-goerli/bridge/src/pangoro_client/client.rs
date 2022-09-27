@@ -28,7 +28,7 @@ impl GasPriceOracle for PangoroClient {
     }
 
     fn max_gas_price(&self) -> U256 {
-        self.max_gas_price.clone()
+        self.max_gas_price
     }
 }
 

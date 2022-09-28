@@ -111,7 +111,7 @@ impl SyncCommitteeUpdate {
                     sync_committee_update,
                     &self.pangoro_client.private_key,
                     Options {
-                        gas: Some(U256::from_dec_str("100000")?),
+                        gas: Some(U256::from_dec_str("10000000")?),
                         gas_price: Some(gas_price),
                         ..Default::default()
                     },

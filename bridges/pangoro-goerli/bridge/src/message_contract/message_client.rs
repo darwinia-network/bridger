@@ -7,7 +7,7 @@ use support_common::error::BridgerError;
 use support_etherscan::EtherscanClient;
 use web3::{
     ethabi::{encode, RawLog},
-    signing::keccak256,
+    signing::{keccak256, Key},
     transports::Http,
     types::{Address, BlockId, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
     Web3,
@@ -34,7 +34,7 @@ pub struct MessageClient<T: RelayStrategy> {
     pub inbound: Inbound,
     pub outbound: Outbound,
     pub strategy: T,
-    pub private_key: Option<SecretKey>,
+    pub private_key: SecretKey,
     pub max_gas_price: U256,
     pub etherscan_client: EtherscanClient,
 }
@@ -53,14 +53,12 @@ impl<T: RelayStrategy> GasPriceOracle for MessageClient<T> {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
 pub fn build_message_client_with_simple_fee_market(
     endpoint: &str,
     inbound_address: Address,
     outbound_address: Address,
     fee_market_address: Address,
-    account: Address,
-    private_key: Option<&str>,
+    private_key: &str,
     max_gas_price: U256,
     etherscan_api_key: &str,
 ) -> color_eyre::Result<MessageClient<SimpleFeeMarketRelayStrategy>> {
@@ -69,8 +67,9 @@ pub fn build_message_client_with_simple_fee_market(
     let inbound = Inbound::new(&client, inbound_address)?;
     let outbound = Outbound::new(&client, outbound_address)?;
     let fee_market = SimpleFeeMarket::new(&client, fee_market_address)?;
+    let private_key = SecretKey::from_str(private_key)?;
+    let account = (&private_key).address();
     let strategy = SimpleFeeMarketRelayStrategy::new(fee_market, account);
-    let private_key = private_key.map(SecretKey::from_str).transpose()?;
     let etherscan_client = EtherscanClient::new(etherscan_api_key)?;
     Ok(MessageClient {
         client,
@@ -84,12 +83,6 @@ pub fn build_message_client_with_simple_fee_market(
 }
 
 impl<T: RelayStrategy> MessageClient<T> {
-    pub fn private_key(&self) -> color_eyre::Result<SecretKey> {
-        Ok(self
-            .private_key
-            .ok_or_else(|| BridgerError::Custom("Private key not found!".into()))?)
-    }
-
     pub async fn prepare_for_messages_confirmation(
         &self,
         begin: u64,
@@ -194,19 +187,18 @@ impl<T: RelayStrategy> MessageClient<T> {
         nonce: u64,
     ) -> color_eyre::Result<Option<MessageAccepted>> {
         let mut count = 0;
-        while count < 3 {
+        loop {
             match self.query_message_accepted(nonce).await {
                 Ok(v) => return Ok(v),
                 Err(error) => {
-                    count += 1;
                     if count > 3 {
                         return Err(error);
                     }
                     tokio::time::sleep(std::time::Duration::from_secs(count)).await;
+                    count += 1;
                 }
             }
         }
-        Ok(None)
     }
 
     pub async fn query_message_accepted(
@@ -326,22 +318,21 @@ impl<T: RelayStrategy> MessageClient<T> {
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<Option<Web3Proof>> {
         let mut count = 0;
-        while count < 3 {
+        loop {
             match self
                 .get_storage_proof(address, storage_keys.clone(), block_number)
                 .await
             {
                 Ok(v) => return Ok(v),
                 Err(error) => {
-                    count += 1;
                     if count > 3 {
                         return Err(error);
                     }
+                    count += 1;
                     tokio::time::sleep(std::time::Duration::from_secs(count)).await;
                 }
             }
         }
-        Ok(None)
     }
 
     pub async fn get_storage_proof(
@@ -376,8 +367,7 @@ mod tests {
             Address::from_str("0x588abe3F7EE935137102C5e2B8042788935f4CB0").unwrap(),
             Address::from_str("0xee4f69fc69F2C203a0572e43375f68a6e9027998").unwrap(),
             Address::from_str("0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap(),
-            Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
-            None,
+            "",
             U256::from_dec_str("1000000").unwrap(),
             "",
         )
@@ -391,8 +381,7 @@ mod tests {
             Address::from_str("0x3E37361F50a178e05E5d81234dDE67E6cC991ed1").unwrap(),
             Address::from_str("0x634370aCf53cf55ad270E084442ea7A23B43B26a").unwrap(),
             Address::from_str("0xB59a893f5115c1Ca737E36365302550074C32023").unwrap(),
-            Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
-            None,
+            "",
             U256::from_dec_str("1000000").unwrap(),
             "",
         )

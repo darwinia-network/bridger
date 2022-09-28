@@ -2,8 +2,7 @@ use crate::command::handler;
 use crate::Opt;
 
 pub fn execute(opt: Opt) -> color_eyre::Result<()> {
-    run(opt)?;
-    Ok(())
+    run(opt)
 }
 
 fn run(opt: Opt) -> color_eyre::Result<()> {

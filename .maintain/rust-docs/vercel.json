@@ -1,0 +1,51 @@
+{
+  "redirects": [
+    { "source": "/frame/", "destination": "/frame/bridger" },
+    { "source": "/template/", "destination": "/template/bridge_template" },
+    { "source": "/crab-crabparachain/", "destination": "/crab-crabparachain/bridge_crab_crabparachain" },
+    { "source": "/darwinia-crab/", "destination": "/darwinia-crab/bridge_darwinia_crab" },
+    { "source": "/darwinia-ethereum-pow/", "destination": "/darwinia-ethereum-pow/bridge_darwinia_ethereum_pow" },
+    { "source": "/pangolin-pangolinparachain/", "destination": "/pangolin-pangolinparachain/bridge_pangolin_pangolinparachain" },
+    { "source": "/pangolin-pangoro/", "destination": "/pangolin-pangoro/bridge_pangolin_pangoro" },
+    { "source": "/pangolin-ropsten/", "destination": "/pangolin-ropsten/bridge_pangolin_ropsten" },
+    { "source": "/pangoro-chapel/", "destination": "/pangoro-chapel/bridge_pangoro_chapel" },
+    { "source": "/pangoro-goerli/", "destination": "/pangoro-goerli/bridge_pangoro_goerli" },
+
+
+    {
+      "source": "/frame/",
+      "destination": "/bridger/frame/bridger",
+      "has": [
+          {
+            "type": "header",
+            "key": "host",
+            "value": "rust-docs.darwinia.network"
+          }
+      ]
+    }
+  ],
+  "trailingSlash": true,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=2592000"
+        }
+      ]
+    }
+  ]
+}

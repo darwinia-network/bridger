@@ -8,10 +8,11 @@ on:
 env:
   RUST_TOOLCHAIN: nightly
 
+
 jobs:
 
-  build-rust-docs:
-    name: Build rust docs
+  build-rust-docs-frame:
+    name: Build rust docs (frame)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,15 +24,146 @@ jobs:
         run: |
           cd frame
           cargo doc --all --no-deps --release
+
+      - name: Collect docs
+        run: |
+          mkdir rust_docs
+          mv frame/target/doc rust_docs/frame
+
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: shared-artifact
+          path: rust_docs
+
+  build-rust-docs-bridge:
+    name: Build rust docs (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+         - crab-crabparachain
+         - darwinia-crab
+         - darwinia-ethereum-pow
+         - pangolin-pangoro
+         - pangolin-ropsten
+         - pangoro-chapel
+         - pangoro-goerli
+         - template
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - name: Build rust docs
+        run: |
+          cd bridges/${{ matrix.package }}
+          cargo doc --all --no-deps --release
+      - name: Collect docs
+        run: |
+          mkdir -p rust_docs/bridges
+          mv bridges/${{ matrix.package }}/target/doc rust_docs/bridges/${{ matrix.package }}
+
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: shared-artifact
+          path: rust_docs
+
+
+  build-rust-docs-assistants:
+    name: Build rust docs (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+         - client-contracts
+         - feemarket-s2s
+         - relay-e2e
+         - relay-s2s
+         - shadow-liketh
+         - subquery
+         - thegraph-liketh
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - name: Build rust docs
+        run: |
+          cd frame/assistants/${{ matrix.package }}
+          cargo doc --all --no-deps --release
+      - name: Collect docs
+        run: |
+          mkdir -p rust_docs/assistants/
+          mv frame/assistants/${{ matrix.package }}/target/doc rust_docs/assistants/${{ matrix.package }}
+
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: shared-artifact
+          path: rust_docs
+
+
+  build-rust-docs-traits:
+    name: Build rust docs (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+         - bridge-e2e
+         - bridge-s2s
+         - feemarket-s2s
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - name: Build rust docs
+        run: |
+          cd frame/assistants/${{ matrix.package }}
+          cargo doc --all --no-deps --release
+      - name: Collect docs
+        run: |
+          mkdir rust_docs/traits
+          mv frame/traits/${{ matrix.package }}/target/doc rust_docs/traits/${{ matrix.package }}
+
+      - name: Upload shared
+        uses: actions/upload-artifact@v2
+        with:
+          name: shared-artifact
+          path: rust_docs
+
+
+  deploy-rust-docs:
+    name: Deploy rust docs
+    runs-on: ubuntu-latest
+    needs: 
+      - build-rust-docs-frame
+      - build-rust-docs-bridge
+      - build-rust-docs-assistants
+      - build-rust-docs-traits
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: shared-artifact
+          path: rust_docs
+
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
       - name: Install vercel-ci
         run: npm i -g vercel
+
       - name: Deploy rust docs
         run: |
-          mv .maintain/vercel.json frame/target/doc
-          mv frame/target/doc frame/target/${GITHUB_REPOSITORY#*/}
-          cd frame/target/${GITHUB_REPOSITORY#*/}
+          mv .maintain/rust-docs/* rust_docs/
+          mv rust_docs bridger
+          cd bridger
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering link --confirm
           vercel --token ${{ secrets.VERCEL_TOKEN }} --scope itering deploy --prod
+

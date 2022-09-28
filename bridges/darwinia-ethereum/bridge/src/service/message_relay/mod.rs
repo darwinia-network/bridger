@@ -1,2 +1,2 @@
-pub mod eth_to_darwinia;
-pub mod darwinia_to_eth;
+pub mod goerli_to_pangoro;
+pub mod pangoro_to_goerli;

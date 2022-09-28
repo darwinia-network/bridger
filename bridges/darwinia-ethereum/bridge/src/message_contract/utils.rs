@@ -18,7 +18,7 @@ use web3::{
     Web3,
 };
 
-use crate::eth_client::types::MessagesConfirmationProof;
+use crate::goerli_client::types::MessagesConfirmationProof;
 
 use super::message_client::{LANE_IDENTIFY_SLOT, LANE_MESSAGE_SLOT, LANE_NONCE_SLOT};
 

@@ -2,8 +2,8 @@ use std::{str::FromStr, time::Duration};
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
-    eth_client::{client::EthClient, types::Proof},
-    darwinia_client::client::DarwiniaClient,
+    goerli_client::{client::GoerliClient, types::Proof},
+    pangoro_client::client::PangoroClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
 use lifeline::{Lifeline, Service, Task};
@@ -28,11 +28,11 @@ impl Service for ExecutionLayerRelay {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task("execution-layer-eth-to-darwinia", async move {
+        let _greet = Self::try_task("execution-layer-goerli-to-pangoro", async move {
             while let Err(error) = start().await {
                 tracing::error!(
-                    target: "darwinia-eth",
-                    "Failed to start eth-to-darwinia execution payload state root relay service, restart after some seconds: {:?}",
+                    target: "pangoro-goerli",
+                    "Failed to start goerli-to-pangoro execution payload state root relay service, restart after some seconds: {:?}",
                     error
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(15)).await;
@@ -44,24 +44,24 @@ impl Service for ExecutionLayerRelay {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
-    let darwinia_client = DarwiniaClient::new(
-        &config.darwinia_evm.endpoint,
-        &config.darwinia_evm.contract_address,
-        &config.darwinia_evm.execution_layer_contract_address,
-        &config.darwinia_evm.private_key,
-        U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
+    let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
+    let pangoro_client = PangoroClient::new(
+        &config.pangoro_evm.endpoint,
+        &config.pangoro_evm.contract_address,
+        &config.pangoro_evm.execution_layer_contract_address,
+        &config.pangoro_evm.private_key,
+        U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
-    let eth_client = EthClient::new(&config.eth.endpoint)?;
+    let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let execution_layer_relay = ExecutionLayer {
-        darwinia_client,
-        eth_client,
+        pangoro_client,
+        goerli_client,
     };
 
     loop {
         if let Err(error) = execution_layer_relay.execution_layer_relay().await {
             tracing::error!(
-                target: "darwinia-eth",
+                target: "pangoro-goerli",
                 "Failed to relay exection payload state root: {:?}",
                 error
             );
@@ -72,34 +72,34 @@ async fn start() -> color_eyre::Result<()> {
 }
 
 pub struct ExecutionLayer {
-    pub darwinia_client: DarwiniaClient,
-    pub eth_client: EthClient,
+    pub pangoro_client: PangoroClient,
+    pub goerli_client: GoerliClient,
 }
 
 impl ExecutionLayer {
     pub async fn execution_layer_relay(&self) -> color_eyre::Result<()> {
         let last_relayed_header = self
-            .darwinia_client
+            .pangoro_client
             .beacon_light_client
             .finalized_header()
             .await?;
         let finalized_block = self
-            .eth_client
+            .goerli_client
             .get_beacon_block(last_relayed_header.slot)
             .await?;
         let latest_execution_payload_state_root =
             H256::from_str(&finalized_block.body.execution_payload.state_root)?;
-        let relayed_state_root = self.darwinia_client.execution_layer_state_root(None).await?;
+        let relayed_state_root = self.pangoro_client.execution_layer_state_root(None).await?;
 
         if relayed_state_root != latest_execution_payload_state_root {
             tracing::info!(
-                target: "darwinia-eth",
-                "[ExecutionLayer][Eth=>Darwinia] Try to relay execution layer state at slot: {:?}",
+                target: "pangoro-goerli",
+                "[ExecutionLayer][Goerli=>Pangoro] Try to relay execution layer state at slot: {:?}",
                 last_relayed_header.slot,
             );
 
             let state_root_branch = self
-                .eth_client
+                .goerli_client
                 .get_latest_execution_payload_state_root_branch(last_relayed_header.slot)
                 .await?;
             let witnesses = match state_root_branch {
@@ -113,9 +113,9 @@ impl ExecutionLayer {
             let parameter =
                 Token::Tuple((latest_execution_payload_state_root, witnesses).into_tokens());
 
-            let gas_price = self.darwinia_client.gas_price().await?;
+            let gas_price = self.pangoro_client.gas_price().await?;
             let tx = self
-                .darwinia_client
+                .pangoro_client
                 .execution_layer_contract
                 .signed_call(
                     "import_latest_execution_payload_state_root",
@@ -125,25 +125,25 @@ impl ExecutionLayer {
                         gas_price: Some(gas_price),
                         ..Default::default()
                     },
-                    &self.darwinia_client.private_key,
+                    &self.pangoro_client.private_key,
                 )
                 .await?;
             tracing::info!(
-                target: "darwinia-eth",
-                "[ExecutionLayer][Eth=>Darwinia] Sending tx: {:?}",
+                target: "pangoro-goerli",
+                "[ExecutionLayer][Goerli=>Pangoro] Sending tx: {:?}",
                 &tx
             );
             wait_for_transaction_confirmation(
                 tx,
-                self.darwinia_client.client.transport(),
+                self.pangoro_client.client.transport(),
                 Duration::from_secs(5),
                 3,
             )
             .await?;
         } else {
             tracing::info!(
-                target: "darwinia-eth",
-                "[ExecutionLayer][Eth=>Darwinia] Latest execution payload state root at slot {:?} is : {:?}",
+                target: "pangoro-goerli",
+                "[ExecutionLayer][Goerli=>Pangoro] Latest execution payload state root at slot {:?} is : {:?}",
                 last_relayed_header.slot,
                 &relayed_state_root,
             );

@@ -1,6 +1,6 @@
 use client_contracts::PosaLightClient;
-use client_darwinia::client::DarwiniaClient;
-use client_darwinia::component::DarwiniaClientComponent;
+use client_pangoro::client::PangoroClient;
+use client_pangoro::component::PangoroClientComponent;
 use relay_e2e::types::ethereum::FastEthereumAccount;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
@@ -16,20 +16,20 @@ use web3::Web3;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
     pub general: GeneralConfig,
-    pub darwinia_evm: DarwiniaEVMConfig,
-    pub darwinia_substrate: DarwiniaSubstrateConfig,
-    pub eth: ChainInfoConfig,
+    pub pangoro_evm: PangoroEVMConfig,
+    pub pangoro_substrate: PangoroSubstrateConfig,
+    pub goerli: ChainInfoConfig,
     pub index: IndexConfig,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GeneralConfig {
-    pub header_eth_to_darwinia: bool,
-    pub sync_commit_eth_to_darwinia: bool,
-    pub execution_layer_eth_to_darwinia: bool,
+    pub header_goerli_to_pangoro: bool,
+    pub sync_commit_goerli_to_pangoro: bool,
+    pub execution_layer_goerli_to_pangoro: bool,
     pub ecdsa_service: bool,
-    pub msg_eth_to_darwinia: bool,
-    pub msg_darwinia_to_eth: bool,
+    pub msg_goerli_to_pangoro: bool,
+    pub msg_pangoro_to_goerli: bool,
     // Max message numbers per delivery
     pub max_message_num_per_relaying: u64,
     // Minium interval(seconds) between every header delivery
@@ -53,7 +53,7 @@ pub struct ChainInfoConfig {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct DarwiniaEVMConfig {
+pub struct PangoroEVMConfig {
     pub endpoint: String,
     pub contract_address: String,
     pub execution_layer_contract_address: String,
@@ -67,7 +67,7 @@ pub struct DarwiniaEVMConfig {
     pub max_gas_price: String,
 }
 
-impl DarwiniaEVMConfig {
+impl PangoroEVMConfig {
     pub fn to_fast_ethereum_account(&self) -> FastEthereumAccount {
         FastEthereumAccount::new(&self.private_key)
     }
@@ -80,7 +80,7 @@ impl DarwiniaEVMConfig {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct DarwiniaSubstrateConfig {
+pub struct PangoroSubstrateConfig {
     pub endpoint: String,
     pub private_key: String,
 }
@@ -104,9 +104,9 @@ impl ChainInfoConfig {
     }
 }
 
-impl From<DarwiniaSubstrateConfig> for client_darwinia::config::ClientConfig {
-    fn from(config: DarwiniaSubstrateConfig) -> Self {
-        client_darwinia::config::ClientConfig {
+impl From<PangoroSubstrateConfig> for client_pangoro::config::ClientConfig {
+    fn from(config: PangoroSubstrateConfig) -> Self {
+        client_pangoro::config::ClientConfig {
             endpoint: config.endpoint,
             relayer_private_key: config.private_key,
             relayer_real_account: None,
@@ -114,28 +114,28 @@ impl From<DarwiniaSubstrateConfig> for client_darwinia::config::ClientConfig {
     }
 }
 
-impl DarwiniaSubstrateConfig {
-    pub async fn to_substrate_client(&self) -> color_eyre::Result<DarwiniaClient> {
+impl PangoroSubstrateConfig {
+    pub async fn to_substrate_client(&self) -> color_eyre::Result<PangoroClient> {
         let config = self.clone().into();
-        Ok(DarwiniaClientComponent::component(config).await?)
+        Ok(PangoroClientComponent::component(config).await?)
     }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IndexConfig {
-    pub darwinia: SubqueryConfig,
-    pub darwinia_evm: TheGraphLikeEthConfig,
+    pub pangoro: SubqueryConfig,
+    pub pangoro_evm: TheGraphLikeEthConfig,
 }
 
 impl IndexConfig {
-    pub fn to_darwinia_subquery(&self) -> Subquery {
-        SubqueryComponent::component(self.darwinia.clone(), BridgeName::DarwiniaEthereum)
+    pub fn to_pangoro_subquery(&self) -> Subquery {
+        SubqueryComponent::component(self.pangoro.clone(), BridgeName::PangoroGoerli)
     }
 
-    pub fn to_darwinia_thegraph(&self) -> color_eyre::Result<TheGraphLikeEth> {
+    pub fn to_pangoro_thegraph(&self) -> color_eyre::Result<TheGraphLikeEth> {
         Ok(TheGraphLikeEthComponent::component(
-            self.darwinia_evm.clone(),
-            thegraph_liketh::types::LikethChain::Darwinia,
+            self.pangoro_evm.clone(),
+            thegraph_liketh::types::LikethChain::Pangoro,
         )?)
     }
 }

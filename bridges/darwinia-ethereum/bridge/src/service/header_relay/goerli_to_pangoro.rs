@@ -6,8 +6,8 @@ use std::{
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
-    eth_client::{client::EthClient, types::FinalityUpdate},
-    darwinia_client::client::DarwiniaClient,
+    goerli_client::{client::GoerliClient, types::FinalityUpdate},
+    pangoro_client::client::PangoroClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
 use client_contracts::beacon_light_client::FinalizedHeaderUpdate;
@@ -22,22 +22,22 @@ use web3::{
 };
 
 #[derive(Debug)]
-pub struct EthToDarwiniaHeaderRelayService {
+pub struct GoerliToPangoroHeaderRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for EthToDarwiniaHeaderRelayService {}
+impl BridgeService for GoerliToPangoroHeaderRelayService {}
 
-impl Service for EthToDarwiniaHeaderRelayService {
+impl Service for GoerliToPangoroHeaderRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task("header-eth-to-darwinia", async move {
+        let _greet = Self::try_task("header-goerli-to-pangoro", async move {
             while let Err(error) = start().await {
                 tracing::error!(
-                    target: "darwinia-eth",
-                    "Failed to start eth-to-darwinia header relay service, restart after some seconds: {:?}",
+                    target: "pangoro-goerli",
+                    "Failed to start goerli-to-pangoro header relay service, restart after some seconds: {:?}",
                     error
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -49,18 +49,18 @@ impl Service for EthToDarwiniaHeaderRelayService {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
-    let darwinia_client = DarwiniaClient::new(
-        &config.darwinia_evm.endpoint,
-        &config.darwinia_evm.contract_address,
-        &config.darwinia_evm.execution_layer_contract_address,
-        &config.darwinia_evm.private_key,
-        U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
+    let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
+    let pangoro_client = PangoroClient::new(
+        &config.pangoro_evm.endpoint,
+        &config.pangoro_evm.contract_address,
+        &config.pangoro_evm.execution_layer_contract_address,
+        &config.pangoro_evm.private_key,
+        U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
-    let eth_client = EthClient::new(&config.eth.endpoint)?;
+    let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let mut header_relay = HeaderRelay {
-        darwinia_client,
-        eth_client,
+        pangoro_client,
+        goerli_client,
         minimal_interval: config.general.header_relay_minimum_interval,
         last_relay_time: u64::MIN,
     };
@@ -68,7 +68,7 @@ async fn start() -> color_eyre::Result<()> {
     loop {
         if let Err(error) = header_relay.header_relay().await {
             tracing::error!(
-                target: "darwinia-eth",
+                target: "pangoro-goerli",
                 "Failed relay header : {:?}",
                 error
             );
@@ -80,19 +80,19 @@ async fn start() -> color_eyre::Result<()> {
 
 #[derive(Debug)]
 pub struct HeaderRelayState {
-    // Latest relayed header slot at Darwinia
+    // Latest relayed header slot at Pangoro
     pub relayed_slot: u64,
-    // Latest relayed period at Darwinia
+    // Latest relayed period at Pangoro
     pub relayed_period: u64,
-    // Latest header slot at Eth
+    // Latest header slot at Goerli
     pub current_slot: u64,
-    // Latest period at Eth
+    // Latest period at Goerli
     pub current_period: u64,
 }
 
 pub struct HeaderRelay {
-    pub darwinia_client: DarwiniaClient,
-    pub eth_client: EthClient,
+    pub pangoro_client: PangoroClient,
+    pub goerli_client: GoerliClient,
     pub minimal_interval: u64,
     pub last_relay_time: u64,
 }
@@ -100,11 +100,11 @@ pub struct HeaderRelay {
 impl HeaderRelay {
     pub async fn get_state(&self) -> color_eyre::Result<HeaderRelayState> {
         let relayed = self
-            .darwinia_client
+            .pangoro_client
             .beacon_light_client
             .finalized_header()
             .await?;
-        let current_head = self.eth_client.get_header("head").await?;
+        let current_head = self.goerli_client.get_header("head").await?;
         let current_slot = current_head.header.message.slot;
         let current_period = current_slot.div(32).div(256);
         let relayed_period = relayed.slot.div(32).div(256);
@@ -120,8 +120,8 @@ impl HeaderRelay {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         if now - self.last_relay_time <= self.minimal_interval {
             tracing::info!(
-                target: "darwinia-eth",
-                "[Header][Eth=>Darwinia] Last relaying time is {:?}, wait for {} seconds to start again.",
+                target: "pangoro-goerli",
+                "[Header][Goerli=>Pangoro] Last relaying time is {:?}, wait for {} seconds to start again.",
                 self.last_relay_time,
                 self.minimal_interval - (now - self.last_relay_time)
             );
@@ -130,13 +130,13 @@ impl HeaderRelay {
 
         let state = self.get_state().await?;
         let next_sync_aggregate_root = self
-            .darwinia_client
+            .pangoro_client
             .beacon_light_client
             .sync_committee_roots(state.relayed_period + 1)
             .await?;
         tracing::info!(
-            target: "darwinia-eth",
-            "[Header][Eth=>Darwinia] State: {:?}",
+            target: "pangoro-goerli",
+            "[Header][Goerli=>Pangoro] State: {:?}",
             state
         );
         if state.current_period == state.relayed_period {
@@ -154,13 +154,13 @@ impl HeaderRelay {
     }
 
     pub async fn relay_latest(&mut self, state: HeaderRelayState) -> color_eyre::Result<()> {
-        let finality_update: FinalityUpdate = self.eth_client.get_finality_update().await?;
+        let finality_update: FinalityUpdate = self.goerli_client.get_finality_update().await?;
         let update_finality_slot = finality_update.finalized_header.slot;
         let update_finality_period = update_finality_slot.div(32).div(256);
 
         tracing::info!(
-            target: "darwinia-eth",
-            "[Header][Eth=>Darwinia] Latest finality slot: {:?}",
+            target: "pangoro-goerli",
+            "[Header][Goerli=>Pangoro] Latest finality slot: {:?}",
             &update_finality_slot
         );
         // The latest finality header has been relayed
@@ -169,7 +169,7 @@ impl HeaderRelay {
         }
 
         let (_slot, sync_aggregate_slot, _attested_header, _sync_aggregate_block) = match self
-            .eth_client
+            .goerli_client
             .find_valid_attested_header(
                 state.current_slot,
                 finality_update.attested_header.slot - 1,
@@ -178,8 +178,8 @@ impl HeaderRelay {
         {
             None => {
                 tracing::info!(
-                    target: "darwinia-eth",
-                    "[Header][Eth=>Darwinia] Wait for valid attested header",
+                    target: "pangoro-goerli",
+                    "[Header][Goerli=>Pangoro] Wait for valid attested header",
                 );
                 return Ok(());
             }
@@ -192,14 +192,14 @@ impl HeaderRelay {
         };
 
         let sync_change = self
-            .eth_client
+            .goerli_client
             .get_sync_committee_period_update(update_finality_period - 1, 1)
             .await?;
         if sync_change.is_empty() {
             return Err(BridgerError::Custom("Failed to get sync committee update".into()).into());
         }
         let fork_version = self
-            .eth_client
+            .goerli_client
             .get_fork_version(sync_aggregate_slot)
             .await?;
 
@@ -224,21 +224,21 @@ impl HeaderRelay {
     pub async fn relay_next_period(&mut self, state: HeaderRelayState) -> color_eyre::Result<()> {
         let _target_period = state.relayed_period + 1;
         let sync_change = self
-            .eth_client
+            .goerli_client
             .get_sync_committee_period_update(state.relayed_period, 2)
             .await?;
 
         if let [last_finality, target_finality] = sync_change.as_slice() {
             let attested_slot: u64 = target_finality.attested_header.slot;
             let (_slot, sync_aggregate_slot, _attested_header, _sync_aggregate_block) = match self
-                .eth_client
+                .goerli_client
                 .find_valid_attested_header(state.current_slot, attested_slot)
                 .await?
             {
                 None => {
                     tracing::info!(
-                        target: "darwinia-eth",
-                        "[Header][Eth=>Darwinia] Wait for valid attested header",
+                        target: "pangoro-goerli",
+                        "[Header][Goerli=>Pangoro] Wait for valid attested header",
                     );
                     return Ok(());
                 }
@@ -278,14 +278,14 @@ impl HeaderRelay {
         &mut self,
         finalized_header_update: FinalizedHeaderUpdate,
     ) -> color_eyre::Result<()> {
-        let gas_price = self.darwinia_client.gas_price().await?;
+        let gas_price = self.pangoro_client.gas_price().await?;
 
         let tx = self
-            .darwinia_client
+            .pangoro_client
             .beacon_light_client
             .import_finalized_header(
                 finalized_header_update,
-                &self.darwinia_client.private_key,
+                &self.pangoro_client.private_key,
                 Options {
                     gas: Some(U256::from_dec_str("5000000")?),
                     gas_price: Some(gas_price),
@@ -294,13 +294,13 @@ impl HeaderRelay {
             )
             .await?;
         tracing::info!(
-        target: "darwinia-eth",
-            "[Header][Eth=>Darwinia] Sending tx: {:?}",
+        target: "pangoro-goerli",
+            "[Header][Goerli=>Pangoro] Sending tx: {:?}",
             &tx
         );
         wait_for_transaction_confirmation(
             tx,
-            self.darwinia_client.client.transport(),
+            self.pangoro_client.client.transport(),
             Duration::from_secs(5),
             3,
         )

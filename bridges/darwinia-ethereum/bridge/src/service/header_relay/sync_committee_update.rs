@@ -59,7 +59,7 @@ async fn start() -> color_eyre::Result<()> {
         if let Err(error) = update_manager.sync_committee_update().await {
             tracing::error!(
                 target: "pangoro-goerli",
-                "[SyncCommittee][Goerli=>Darwinia] Failed relay sync committee update : {:?}",
+                "[SyncCommittee][Ethereum=>Darwinia] Failed relay sync committee update : {:?}",
                 error
             );
             return Err(error);
@@ -95,7 +95,7 @@ impl SyncCommitteeUpdate {
         if next_sync_committee.is_zero() {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[SyncCommittee][Goerli=>Darwinia] Try to relay SyncCommittee at period {:?}",
+                "[SyncCommittee][Ethereum=>Darwinia] Try to relay SyncCommittee at period {:?}",
                 period + 1,
             );
 
@@ -120,7 +120,7 @@ impl SyncCommitteeUpdate {
 
             tracing::info!(
                 target: "pangoro-goerli",
-                "[SyncCommittee][Goerli=>Darwinia] Sending tx: {:?}",
+                "[SyncCommittee][Ethereum=>Darwinia] Sending tx: {:?}",
                 &tx
             );
             wait_for_transaction_confirmation(
@@ -133,7 +133,7 @@ impl SyncCommitteeUpdate {
         } else {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[SyncCommittee][Goerli=>Darwinia] Next sync committee is {:?}",
+                "[SyncCommittee][Ethereum=>Darwinia] Next sync committee is {:?}",
                 next_sync_committee
             );
         }

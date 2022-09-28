@@ -122,7 +122,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         if let Err(error) = service.message_relay().await {
             tracing::error!(
                 target: "pangoro-goerli",
-                "[MessagesDelivery][Darwinia=>Goerli] Failed to relay messages: {:?}",
+                "[MessagesDelivery][Darwinia=>Ethereum] Failed to relay messages: {:?}",
                 error
             );
             return Err(error);
@@ -137,7 +137,7 @@ async fn start_confirmation() -> color_eyre::Result<()> {
         if let Err(error) = service.message_confirm().await {
             tracing::error!(
                 target: "pangoro-goerli",
-                "[MessagesConfirmation][Darwinia=>Goerli] Failed to confirm messages: {:?}",
+                "[MessagesConfirmation][Darwinia=>Ethereum] Failed to confirm messages: {:?}",
                 error
             );
             return Err(error);
@@ -163,7 +163,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         if received_nonce.last_delivered_nonce == latest_nonce.latest_generated_nonce {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Darwinia=>Goerli] Last delivered nonce is {:?}, equal to lastest generated. Do nothing.",
+                "[MessageDelivery][Darwinia=>Ethereum] Last delivered nonce is {:?}, equal to lastest generated. Do nothing.",
                 received_nonce.last_delivered_nonce,
             );
             return Ok(());
@@ -184,7 +184,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         if received_nonce.last_delivered_nonce >= outbound_nonce.latest_generated_nonce {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Darwinia=>Goerli] Messages: [{:?}, {:?}] need to be relayed, wait for header relay",
+                "[MessageDelivery][Darwinia=>Ethereum] Messages: [{:?}, {:?}] need to be relayed, wait for header relay",
                 begin,
                 end
             );
@@ -197,7 +197,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         );
         tracing::info!(
             target: "pangoro-goerli",
-            "[MessageDelivery][Darwinia=>Goerli] Try to relay messages: [{:?}, {:?}]",
+            "[MessageDelivery][Darwinia=>Ethereum] Try to relay messages: [{:?}, {:?}]",
             received_nonce.last_delivered_nonce + 1,
             end
         );
@@ -254,14 +254,14 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         if count == delivered {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Darwinia=>Goerli] No need to relay",
+                "[MessageDelivery][Darwinia=>Ethereum] No need to relay",
             );
             return Ok(());
         }
 
         tracing::info!(
             target: "pangoro-goerli",
-            "[MessageDelivery][Darwinia=>Goerli] Relaying messages: [{:?}, {:?}]",
+            "[MessageDelivery][Darwinia=>Ethereum] Relaying messages: [{:?}, {:?}]",
             begin + delivered,
             begin + count - 1,
         );
@@ -285,7 +285,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         tracing::info!(
             target: "pangoro-goerli",
-            "[MessageDelivery][Darwinia=>Goerli] Sending tx: {:?}",
+            "[MessageDelivery][Darwinia=>Ethereum] Sending tx: {:?}",
             tx
         );
 
@@ -313,7 +313,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageConfirmation][Darwinia=>Goerli] All confirmed({:?}), nothing to do.",
+                "[MessageConfirmation][Darwinia=>Ethereum] All confirmed({:?}), nothing to do.",
                 source_outbound_lane_data
             );
             return Ok(());
@@ -324,7 +324,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             None => {
                 tracing::info!(
                     target: "pangoro-goerli",
-                    "[MessageConfirmation][Darwinia=>Goerli] Wait for execution layer relay",
+                    "[MessageConfirmation][Darwinia=>Ethereum] Wait for execution layer relay",
                 );
                 return Ok(());
             }
@@ -348,7 +348,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageConfirmation][Darwinia=>Goerli] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
+                "[MessageConfirmation][Darwinia=>Ethereum] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
                 source_outbound_lane_data.latest_received_nonce,
                 target_inbound_state.last_delivered_nonce + 1,
                 source_outbound_lane_data.latest_generated_nonce
@@ -358,7 +358,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         tracing::info!(
             target: "pangoro-goerli",
-            "[MessageConfirmation][Darwinia=>Goerli] Try to confirm nonces [{:?}:{:?}]",
+            "[MessageConfirmation][Darwinia=>Ethereum] Try to confirm nonces [{:?}:{:?}]",
             begin,
             end,
         );
@@ -390,7 +390,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         tracing::info!(
             target: "relay-s2s",
-            "[MessageConfirmation][Darwinia=>Goerli] Messages confirmation tx: {:?}",
+            "[MessageConfirmation][Darwinia=>Ethereum] Messages confirmation tx: {:?}",
             hash
         );
         wait_for_transaction_confirmation(

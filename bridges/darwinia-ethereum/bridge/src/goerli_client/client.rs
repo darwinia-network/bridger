@@ -39,8 +39,8 @@ impl EthereumClient {
         while let Err(err) = header {
             if slot > current_slot {
                 tracing::info!(
-                    target: "pangoro-goerli",
-                    "[header-goerli-to-pangoro] Wait for attested headers since: {:?}",
+                    target: "darwinia-goerli",
+                    "[header-goerli-to-darwinia] Wait for attested headers since: {:?}",
                     slot - count
                 );
                 return Err(err);

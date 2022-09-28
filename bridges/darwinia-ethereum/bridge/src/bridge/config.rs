@@ -1,6 +1,6 @@
 use client_contracts::PosaLightClient;
-use client_pangoro::client::DarwiniaClient;
-use client_pangoro::component::DarwiniaClientComponent;
+use client_darwinia::client::DarwiniaClient;
+use client_darwinia::component::DarwiniaClientComponent;
 use relay_e2e::types::ethereum::FastEthereumAccount;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
@@ -16,20 +16,20 @@ use web3::Web3;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
     pub general: GeneralConfig,
-    pub pangoro_evm: DarwiniaEVMConfig,
-    pub pangoro_substrate: DarwiniaSubstrateConfig,
+    pub darwinia_evm: DarwiniaEVMConfig,
+    pub darwinia_substrate: DarwiniaSubstrateConfig,
     pub goerli: ChainInfoConfig,
     pub index: IndexConfig,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GeneralConfig {
-    pub header_goerli_to_pangoro: bool,
-    pub sync_commit_goerli_to_pangoro: bool,
-    pub execution_layer_goerli_to_pangoro: bool,
+    pub header_goerli_to_darwinia: bool,
+    pub sync_commit_goerli_to_darwinia: bool,
+    pub execution_layer_goerli_to_darwinia: bool,
     pub ecdsa_service: bool,
-    pub msg_goerli_to_pangoro: bool,
-    pub msg_pangoro_to_goerli: bool,
+    pub msg_goerli_to_darwinia: bool,
+    pub msg_darwinia_to_goerli: bool,
     // Max message numbers per delivery
     pub max_message_num_per_relaying: u64,
     // Minium interval(seconds) between every header delivery
@@ -104,9 +104,9 @@ impl ChainInfoConfig {
     }
 }
 
-impl From<DarwiniaSubstrateConfig> for client_pangoro::config::ClientConfig {
+impl From<DarwiniaSubstrateConfig> for client_darwinia::config::ClientConfig {
     fn from(config: DarwiniaSubstrateConfig) -> Self {
-        client_pangoro::config::ClientConfig {
+        client_darwinia::config::ClientConfig {
             endpoint: config.endpoint,
             relayer_private_key: config.private_key,
             relayer_real_account: None,
@@ -123,18 +123,18 @@ impl DarwiniaSubstrateConfig {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IndexConfig {
-    pub pangoro: SubqueryConfig,
-    pub pangoro_evm: TheGraphLikeEthConfig,
+    pub darwinia: SubqueryConfig,
+    pub darwinia_evm: TheGraphLikeEthConfig,
 }
 
 impl IndexConfig {
-    pub fn to_pangoro_subquery(&self) -> Subquery {
-        SubqueryComponent::component(self.pangoro.clone(), BridgeName::DarwiniaEthereum)
+    pub fn to_darwinia_subquery(&self) -> Subquery {
+        SubqueryComponent::component(self.darwinia.clone(), BridgeName::DarwiniaEthereum)
     }
 
-    pub fn to_pangoro_thegraph(&self) -> color_eyre::Result<TheGraphLikeEth> {
+    pub fn to_darwinia_thegraph(&self) -> color_eyre::Result<TheGraphLikeEth> {
         Ok(TheGraphLikeEthComponent::component(
-            self.pangoro_evm.clone(),
+            self.darwinia_evm.clone(),
             thegraph_liketh::types::LikethChain::Darwinia,
         )?)
     }

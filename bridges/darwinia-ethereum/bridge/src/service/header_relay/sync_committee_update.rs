@@ -3,7 +3,7 @@ use std::{ops::Div, time::Duration};
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
     goerli_client::{client::EthereumClient, types::Proof},
-    pangoro_client::client::DarwiniaClient,
+    darwinia_client::client::DarwiniaClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
 use client_contracts::beacon_light_client_types::SyncCommitteePeriodUpdate;
@@ -25,11 +25,11 @@ impl Service for SyncCommitteeUpdateService {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task("sync-committee-update-goerli-to-pangoro", async move {
+        let _greet = Self::try_task("sync-committee-update-goerli-to-darwinia", async move {
             while let Err(error) = start().await {
                 tracing::error!(
-                    target: "pangoro-goerli",
-                    "Failed to start goerli-to-pangoro sync committee update relay service, restart after some seconds: {:?}",
+                    target: "darwinia-goerli",
+                    "Failed to start goerli-to-darwinia sync committee update relay service, restart after some seconds: {:?}",
                     error
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
@@ -42,23 +42,23 @@ impl Service for SyncCommitteeUpdateService {
 
 async fn start() -> color_eyre::Result<()> {
     let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
-    let pangoro_client = DarwiniaClient::new(
-        &config.pangoro_evm.endpoint,
-        &config.pangoro_evm.contract_address,
-        &config.pangoro_evm.execution_layer_contract_address,
-        &config.pangoro_evm.private_key,
-        U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
+    let darwinia_client = DarwiniaClient::new(
+        &config.darwinia_evm.endpoint,
+        &config.darwinia_evm.contract_address,
+        &config.darwinia_evm.execution_layer_contract_address,
+        &config.darwinia_evm.private_key,
+        U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
     )?;
     let goerli_client = EthereumClient::new(&config.goerli.endpoint)?;
     let update_manager = SyncCommitteeUpdate {
-        pangoro_client,
+        darwinia_client,
         goerli_client,
     };
 
     loop {
         if let Err(error) = update_manager.sync_committee_update().await {
             tracing::error!(
-                target: "pangoro-goerli",
+                target: "darwinia-goerli",
                 "[SyncCommittee][Ethereum=>Darwinia] Failed relay sync committee update : {:?}",
                 error
             );
@@ -69,32 +69,32 @@ async fn start() -> color_eyre::Result<()> {
 }
 
 pub struct SyncCommitteeUpdate {
-    pub pangoro_client: DarwiniaClient,
+    pub darwinia_client: DarwiniaClient,
     pub goerli_client: EthereumClient,
 }
 
 impl SyncCommitteeUpdate {
     pub async fn sync_committee_update(&self) -> color_eyre::Result<()> {
         let last_relayed_header = self
-            .pangoro_client
+            .darwinia_client
             .beacon_light_client
             .finalized_header()
             .await?;
         let period = last_relayed_header.slot.div(32).div(256);
 
         let _current_sync_committee = self
-            .pangoro_client
+            .darwinia_client
             .beacon_light_client
             .sync_committee_roots(period)
             .await?;
         let next_sync_committee = self
-            .pangoro_client
+            .darwinia_client
             .beacon_light_client
             .sync_committee_roots(period + 1)
             .await?;
         if next_sync_committee.is_zero() {
             tracing::info!(
-                target: "pangoro-goerli",
+                target: "darwinia-goerli",
                 "[SyncCommittee][Ethereum=>Darwinia] Try to relay SyncCommittee at period {:?}",
                 period + 1,
             );
@@ -103,13 +103,13 @@ impl SyncCommitteeUpdate {
                 .get_sync_committee_update_parameter(period, last_relayed_header.slot)
                 .await?;
 
-            let gas_price = self.pangoro_client.gas_price().await?;
+            let gas_price = self.darwinia_client.gas_price().await?;
             let tx = self
-                .pangoro_client
+                .darwinia_client
                 .beacon_light_client
                 .import_next_sync_committee(
                     sync_committee_update,
-                    &self.pangoro_client.private_key,
+                    &self.darwinia_client.private_key,
                     Options {
                         gas: Some(U256::from_dec_str("10000000")?),
                         gas_price: Some(gas_price),
@@ -119,20 +119,20 @@ impl SyncCommitteeUpdate {
                 .await?;
 
             tracing::info!(
-                target: "pangoro-goerli",
+                target: "darwinia-goerli",
                 "[SyncCommittee][Ethereum=>Darwinia] Sending tx: {:?}",
                 &tx
             );
             wait_for_transaction_confirmation(
                 tx,
-                self.pangoro_client.client.transport(),
+                self.darwinia_client.client.transport(),
                 Duration::from_secs(5),
                 3,
             )
             .await?;
         } else {
             tracing::info!(
-                target: "pangoro-goerli",
+                target: "darwinia-goerli",
                 "[SyncCommittee][Ethereum=>Darwinia] Next sync committee is {:?}",
                 next_sync_committee
             );

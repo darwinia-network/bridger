@@ -82,7 +82,7 @@ mod tests {
 
     fn test_client() -> DarwiniaClient {
         DarwiniaClient::new(
-            "https://pangoro-rpc.darwinia.network",
+            "https://darwinia-rpc.darwinia.network",
             "0x59EA974B74ec6A49338438bCc5d0388E294E4E20",
             "0x3F58e8Cf0DE243f978834e11e0CC419670FCe6d8",
             "",

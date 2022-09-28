@@ -33,15 +33,15 @@ impl Service for ECDSARelayService {
         let state = bus.storage().clone_resource::<BridgeState>()?;
         let microkv = state.microkv_with_namespace(BridgeTask::name());
         let tracker_collecting_message =
-            Tracker::new(microkv.clone(), "scan.pangoro.collecting-message");
+            Tracker::new(microkv.clone(), "scan.darwinia.collecting-message");
         let tracker_collected_message =
-            Tracker::new(microkv.clone(), "scan.pangoro.collected-message");
+            Tracker::new(microkv.clone(), "scan.darwinia.collected-message");
         let tracker_collecting_authorities =
-            Tracker::new(microkv.clone(), "scan.pangoro.collecting-authorities");
+            Tracker::new(microkv.clone(), "scan.darwinia.collecting-authorities");
         let tracker_collected_authorities =
-            Tracker::new(microkv, "scan.pangoro.collected-authorities");
+            Tracker::new(microkv, "scan.darwinia.collected-authorities");
         let _greet_collecting_message =
-            Self::try_task("pangoro-to-goerli-ecdsa-collecting-message", async move {
+            Self::try_task("darwinia-to-goerli-ecdsa-collecting-message", async move {
                 EcdsaScanner
                     .start(
                         tracker_collecting_message.clone(),
@@ -51,7 +51,7 @@ impl Service for ECDSARelayService {
                 Ok(())
             });
         let _greet_collected_message =
-            Self::try_task("pangoro-to-goerli-ecdsa-collected-message", async move {
+            Self::try_task("darwinia-to-goerli-ecdsa-collected-message", async move {
                 EcdsaScanner
                     .start(
                         tracker_collected_message.clone(),
@@ -61,7 +61,7 @@ impl Service for ECDSARelayService {
                 Ok(())
             });
         let _greet_collecting_authorities = Self::try_task(
-            "pangoro-to-goerli-ecdsa-collecting-authorities",
+            "darwinia-to-goerli-ecdsa-collecting-authorities",
             async move {
                 EcdsaScanner
                     .start(
@@ -73,7 +73,7 @@ impl Service for ECDSARelayService {
             },
         );
         let _greet_collected_authorities = Self::try_task(
-            "pangoro-to-goerli-ecdsa-collected-authorities",
+            "darwinia-to-goerli-ecdsa-collected-authorities",
             async move {
                 EcdsaScanner
                     .start(

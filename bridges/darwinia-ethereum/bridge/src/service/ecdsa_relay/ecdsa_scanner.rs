@@ -22,8 +22,8 @@ impl EcdsaScanner {
     pub async fn start(&self, tracker: Tracker, scan_type: EcdsaScanType) {
         while let Err(err) = self.run(tracker.clone(), scan_type).await {
             tracing::error!(
-                target: "pangoro-goerli",
-                "[pangoro] [ecdsa] An error occurred while processing the extrinsics: {:?}",
+                target: "darwinia-goerli",
+                "[darwinia] [ecdsa] An error occurred while processing the extrinsics: {:?}",
                 err
             );
             // Prevent too fast refresh errors
@@ -33,29 +33,29 @@ impl EcdsaScanner {
 
     async fn run(&self, tracker: Tracker, scan_type: EcdsaScanType) -> color_eyre::Result<()> {
         let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
-        let subquery = config.index.to_pangoro_subquery();
-        let client_pangoro_web3 = config.pangoro_evm.to_web3_client()?;
+        let subquery = config.index.to_darwinia_subquery();
+        let client_darwinia_web3 = config.darwinia_evm.to_web3_client()?;
         let client_goerli_web3 = config.goerli.to_web3_client()?;
-        let client_pangoro_substrate = config.pangoro_substrate.to_substrate_client().await?;
+        let client_darwinia_substrate = config.darwinia_substrate.to_substrate_client().await?;
         let client_posa = config.goerli.to_posa_client()?;
-        let pangoro_evm_account = config.pangoro_evm.to_fast_ethereum_account();
+        let darwinia_evm_account = config.darwinia_evm.to_fast_ethereum_account();
         let ethereum_account = config.goerli.to_ethereum_account();
         let mut source = EcdsaSource {
             block: None,
             subquery,
-            client_pangoro_web3,
+            client_darwinia_web3,
             client_goerli_web3,
-            client_pangoro_substrate,
+            client_darwinia_substrate,
             client_posa,
-            pangoro_evm_account,
+            darwinia_evm_account,
             ethereum_account,
         };
 
         loop {
             let from = tracker.current().await?;
             tracing::info!(
-                target: "pangoro-goerli",
-                "[pangoro] [ecdsa] Track pangoro scan block: {} ",
+                target: "darwinia-goerli",
+                "[darwinia] [ecdsa] Track darwinia scan block: {} ",
                 from,
             );
             source.block = Some(from as u32);

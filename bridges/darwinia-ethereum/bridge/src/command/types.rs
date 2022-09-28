@@ -1,11 +1,11 @@
 use structopt::StructOpt;
 use support_command_kv::NamespaceKvOpts;
 
-/// Bridge pangoro-goerli options
+/// Bridge darwinia-goerli options
 #[derive(Debug, StructOpt)]
-#[structopt(name = "pangoro-goerli", about = "Bridge pangoro-goerli")]
+#[structopt(name = "darwinia-goerli", about = "Bridge darwinia-goerli")]
 pub enum Opts {
-    /// Start bridge pangoro-goerli
+    /// Start bridge darwinia-goerli
     Start,
     /// Kv command
     Kv {

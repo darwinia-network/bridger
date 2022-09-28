@@ -7,7 +7,7 @@ use std::{
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
     goerli_client::{client::GoerliClient, types::FinalityUpdate},
-    pangoro_client::client::PangoroClient,
+    pangoro_client::client::DarwiniaClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
 use client_contracts::beacon_light_client::FinalizedHeaderUpdate;
@@ -22,13 +22,13 @@ use web3::{
 };
 
 #[derive(Debug)]
-pub struct GoerliToPangoroHeaderRelayService {
+pub struct GoerliToDarwiniaHeaderRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for GoerliToPangoroHeaderRelayService {}
+impl BridgeService for GoerliToDarwiniaHeaderRelayService {}
 
-impl Service for GoerliToPangoroHeaderRelayService {
+impl Service for GoerliToDarwiniaHeaderRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
@@ -49,8 +49,8 @@ impl Service for GoerliToPangoroHeaderRelayService {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
-    let pangoro_client = PangoroClient::new(
+    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaGoerli)?;
+    let pangoro_client = DarwiniaClient::new(
         &config.pangoro_evm.endpoint,
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
@@ -91,7 +91,7 @@ pub struct HeaderRelayState {
 }
 
 pub struct HeaderRelay {
-    pub pangoro_client: PangoroClient,
+    pub pangoro_client: DarwiniaClient,
     pub goerli_client: GoerliClient,
     pub minimal_interval: u64,
     pub last_relay_time: u64,

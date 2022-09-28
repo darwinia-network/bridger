@@ -10,7 +10,7 @@ use web3::{
 
 use crate::web3_helper::GasPriceOracle;
 
-pub struct PangoroClient {
+pub struct DarwiniaClient {
     pub client: Web3<Http>,
     pub beacon_light_client: BeaconLightClient,
     pub execution_layer_contract: Contract<Http>,
@@ -18,7 +18,7 @@ pub struct PangoroClient {
     pub max_gas_price: U256,
 }
 
-impl GasPriceOracle for PangoroClient {
+impl GasPriceOracle for DarwiniaClient {
     fn get_web3(&self) -> &Web3<Http> {
         &self.client
     }
@@ -32,7 +32,7 @@ impl GasPriceOracle for PangoroClient {
     }
 }
 
-impl PangoroClient {
+impl DarwiniaClient {
     pub fn new(
         endpoint: &str,
         contract_address: &str,
@@ -80,8 +80,8 @@ mod tests {
 
     use super::*;
 
-    fn test_client() -> PangoroClient {
-        PangoroClient::new(
+    fn test_client() -> DarwiniaClient {
+        DarwiniaClient::new(
             "https://pangoro-rpc.darwinia.network",
             "0x59EA974B74ec6A49338438bCc5d0388E294E4E20",
             "0x3F58e8Cf0DE243f978834e11e0CC419670FCe6d8",

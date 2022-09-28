@@ -32,7 +32,7 @@ impl EcdsaScanner {
     }
 
     async fn run(&self, tracker: Tracker, scan_type: EcdsaScanType) -> color_eyre::Result<()> {
-        let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
+        let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaGoerli)?;
         let subquery = config.index.to_pangoro_subquery();
         let client_pangoro_web3 = config.pangoro_evm.to_web3_client()?;
         let client_goerli_web3 = config.goerli.to_web3_client()?;

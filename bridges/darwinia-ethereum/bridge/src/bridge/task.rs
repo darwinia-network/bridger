@@ -6,16 +6,16 @@ use support_lifeline::task::TaskStack;
 
 use crate::bridge::BridgeConfig;
 use crate::service::ecdsa_relay::ECDSARelayService;
-use crate::service::message_relay::pangoro_to_goerli::PangoroGoerliMessageRelay;
+use crate::service::message_relay::pangoro_to_goerli::DarwiniaGoerliMessageRelay;
 use crate::{
     bridge::BridgeBus,
     service::{
         header_relay::{
             execution_layer_update::ExecutionLayerRelay,
-            goerli_to_pangoro::GoerliToPangoroHeaderRelayService,
+            goerli_to_pangoro::GoerliToDarwiniaHeaderRelayService,
             sync_committee_update::SyncCommitteeUpdateService,
         },
-        message_relay::goerli_to_pangoro::GoerliPangoroMessageRelay,
+        message_relay::goerli_to_pangoro::GoerliDarwiniaMessageRelay,
     },
 };
 
@@ -37,14 +37,14 @@ impl BridgeTask {
             db_name: Self::name().to_string(),
         })?;
         // check config
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgeDarwiniaGoerli)?;
 
         let bus = BridgeBus::default();
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new(bus);
         if bridge_config.general.header_goerli_to_pangoro {
-            stack.spawn_service::<GoerliToPangoroHeaderRelayService>()?;
+            stack.spawn_service::<GoerliToDarwiniaHeaderRelayService>()?;
         }
         if bridge_config.general.sync_commit_goerli_to_pangoro {
             stack.spawn_service::<SyncCommitteeUpdateService>()?;
@@ -56,10 +56,10 @@ impl BridgeTask {
             stack.spawn_service::<ECDSARelayService>()?;
         }
         if bridge_config.general.msg_goerli_to_pangoro {
-            stack.spawn_service::<GoerliPangoroMessageRelay>()?;
+            stack.spawn_service::<GoerliDarwiniaMessageRelay>()?;
         }
         if bridge_config.general.msg_pangoro_to_goerli {
-            stack.spawn_service::<PangoroGoerliMessageRelay>()?;
+            stack.spawn_service::<DarwiniaGoerliMessageRelay>()?;
         }
         Ok(Self { stack })
     }

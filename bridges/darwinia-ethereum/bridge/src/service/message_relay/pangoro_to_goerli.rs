@@ -17,21 +17,21 @@ use crate::message_contract::message_client::MessageClient;
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
-use crate::pangoro_client::client::PangoroClient;
+use crate::pangoro_client::client::DarwiniaClient;
 use crate::web3_helper::{wait_for_transaction_confirmation, GasPriceOracle};
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
 #[derive(Debug)]
-pub struct PangoroGoerliMessageRelay {
+pub struct DarwiniaGoerliMessageRelay {
     _greet_delivery: Lifeline,
     _greet_confirmation: Lifeline,
 }
 
-impl BridgeService for PangoroGoerliMessageRelay {}
+impl BridgeService for DarwiniaGoerliMessageRelay {}
 
-impl Service for PangoroGoerliMessageRelay {
+impl Service for DarwiniaGoerliMessageRelay {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
@@ -70,8 +70,8 @@ impl Service for PangoroGoerliMessageRelay {
 
 async fn message_relay_client_builder(
 ) -> color_eyre::Result<MessageRelay<FeeMarketRelayStrategy, SimpleFeeMarketRelayStrategy>> {
-    let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
-    let beacon_light_client = PangoroClient::new(
+    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaGoerli)?;
+    let beacon_light_client = DarwiniaClient::new(
         &config.pangoro_evm.endpoint,
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
@@ -151,7 +151,7 @@ pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
     pub target: MessageClient<S1>,
     pub posa_light_client: PosaLightClient,
     pub beacon_rpc_client: GoerliClient,
-    pub beacon_light_client: PangoroClient,
+    pub beacon_light_client: DarwiniaClient,
     pub max_message_num_per_relaying: u64,
 }
 

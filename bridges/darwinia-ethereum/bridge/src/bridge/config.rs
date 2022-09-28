@@ -1,6 +1,6 @@
 use client_contracts::PosaLightClient;
-use client_pangoro::client::PangoroClient;
-use client_pangoro::component::PangoroClientComponent;
+use client_pangoro::client::DarwiniaClient;
+use client_pangoro::component::DarwiniaClientComponent;
 use relay_e2e::types::ethereum::FastEthereumAccount;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
@@ -16,8 +16,8 @@ use web3::Web3;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
     pub general: GeneralConfig,
-    pub pangoro_evm: PangoroEVMConfig,
-    pub pangoro_substrate: PangoroSubstrateConfig,
+    pub pangoro_evm: DarwiniaEVMConfig,
+    pub pangoro_substrate: DarwiniaSubstrateConfig,
     pub goerli: ChainInfoConfig,
     pub index: IndexConfig,
 }
@@ -53,7 +53,7 @@ pub struct ChainInfoConfig {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PangoroEVMConfig {
+pub struct DarwiniaEVMConfig {
     pub endpoint: String,
     pub contract_address: String,
     pub execution_layer_contract_address: String,
@@ -67,7 +67,7 @@ pub struct PangoroEVMConfig {
     pub max_gas_price: String,
 }
 
-impl PangoroEVMConfig {
+impl DarwiniaEVMConfig {
     pub fn to_fast_ethereum_account(&self) -> FastEthereumAccount {
         FastEthereumAccount::new(&self.private_key)
     }
@@ -80,7 +80,7 @@ impl PangoroEVMConfig {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PangoroSubstrateConfig {
+pub struct DarwiniaSubstrateConfig {
     pub endpoint: String,
     pub private_key: String,
 }
@@ -104,8 +104,8 @@ impl ChainInfoConfig {
     }
 }
 
-impl From<PangoroSubstrateConfig> for client_pangoro::config::ClientConfig {
-    fn from(config: PangoroSubstrateConfig) -> Self {
+impl From<DarwiniaSubstrateConfig> for client_pangoro::config::ClientConfig {
+    fn from(config: DarwiniaSubstrateConfig) -> Self {
         client_pangoro::config::ClientConfig {
             endpoint: config.endpoint,
             relayer_private_key: config.private_key,
@@ -114,10 +114,10 @@ impl From<PangoroSubstrateConfig> for client_pangoro::config::ClientConfig {
     }
 }
 
-impl PangoroSubstrateConfig {
-    pub async fn to_substrate_client(&self) -> color_eyre::Result<PangoroClient> {
+impl DarwiniaSubstrateConfig {
+    pub async fn to_substrate_client(&self) -> color_eyre::Result<DarwiniaClient> {
         let config = self.clone().into();
-        Ok(PangoroClientComponent::component(config).await?)
+        Ok(DarwiniaClientComponent::component(config).await?)
     }
 }
 
@@ -129,7 +129,7 @@ pub struct IndexConfig {
 
 impl IndexConfig {
     pub fn to_pangoro_subquery(&self) -> Subquery {
-        SubqueryComponent::component(self.pangoro.clone(), BridgeName::PangoroGoerli)
+        SubqueryComponent::component(self.pangoro.clone(), BridgeName::DarwiniaGoerli)
     }
 
     pub fn to_pangoro_thegraph(&self) -> color_eyre::Result<TheGraphLikeEth> {

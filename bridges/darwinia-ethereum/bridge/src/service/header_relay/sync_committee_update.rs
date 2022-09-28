@@ -3,7 +3,7 @@ use std::{ops::Div, time::Duration};
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
     goerli_client::{client::GoerliClient, types::Proof},
-    pangoro_client::client::PangoroClient,
+    pangoro_client::client::DarwiniaClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
 use client_contracts::beacon_light_client_types::SyncCommitteePeriodUpdate;
@@ -41,8 +41,8 @@ impl Service for SyncCommitteeUpdateService {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
-    let pangoro_client = PangoroClient::new(
+    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaGoerli)?;
+    let pangoro_client = DarwiniaClient::new(
         &config.pangoro_evm.endpoint,
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
@@ -69,7 +69,7 @@ async fn start() -> color_eyre::Result<()> {
 }
 
 pub struct SyncCommitteeUpdate {
-    pub pangoro_client: PangoroClient,
+    pub pangoro_client: DarwiniaClient,
     pub goerli_client: GoerliClient,
 }
 

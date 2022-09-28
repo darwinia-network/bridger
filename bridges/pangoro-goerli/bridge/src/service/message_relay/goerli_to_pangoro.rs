@@ -96,8 +96,7 @@ async fn message_relay_client_builder(
         Address::from_str(&config.pangoro_evm.chain_message_committer_address)?,
         Address::from_str(&config.pangoro_evm.lane_message_committer_address)?,
         Address::from_str(&config.pangoro_evm.fee_market_address)?,
-        Address::from_str(&config.pangoro_evm.account)?,
-        Some(&config.pangoro_evm.private_key),
+        &config.pangoro_evm.private_key,
         config.index.to_pangoro_thegraph()?,
     )
     .unwrap();
@@ -285,7 +284,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .receive_messages_proof(
                 proof,
                 U256::from(count),
-                &self.target.private_key()?,
+                &self.target.private_key,
                 Options {
                     gas: Some(gas),
                     gas_price: Some(gas_price),

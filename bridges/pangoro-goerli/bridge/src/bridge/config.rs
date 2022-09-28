@@ -56,7 +56,6 @@ pub struct PangoroEVMConfig {
     pub endpoint: String,
     pub contract_address: String,
     pub execution_layer_contract_address: String,
-    pub account: String,
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,

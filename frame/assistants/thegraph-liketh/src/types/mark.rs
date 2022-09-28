@@ -3,6 +3,7 @@ pub enum LikethChain {
     Ethereum,
     Ropsten,
     Pangoro,
+    Darwinia,
 }
 
 impl LikethChain {
@@ -12,6 +13,7 @@ impl LikethChain {
             Self::Ethereum => "ethereum",
             Self::Ropsten => "ropsten",
             Self::Pangoro => "pangoro",
+            Self::Darwinia => "darwinia",
         }
     }
 }

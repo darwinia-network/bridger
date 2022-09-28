@@ -11,6 +11,10 @@ ecdsa_service = true
 msg_goerli_to_pangoro = true
 # Whether to relay messages from pangoro to goerli
 msg_pangoro_to_goerli = true
+# Max number of messages every delivery
+max_message_num_per_relaying = 15
+# Minimum seconds between two header relay
+header_relay_minimum_interval = 900
 
 [pangoro_evm]
 endpoint                         = "https://pangoro-rpc.darwinia.network"
@@ -21,11 +25,10 @@ outbound_address                 = "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5"
 chain_message_committer_address  = "0x01D1Cb6D629536b893f2343B95124aDB6a8ae68b"
 lane_message_committer_address   = "0x5313Bf259a4C723cdD6bE4B6387d21321f180D03"
 account                          = "0x..."
+# private_key should not start with 0x
 private_key                      = "//Alice"
-# Gas limit
-gas = 20000000
-# Gas price
-gas_price = 1000000000
+# Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
+max_gas_price = 9000000000
 
 [pangoro_substrate]
 endpoint    = "https://pangoro-rpc.darwinia.network"
@@ -41,8 +44,12 @@ account                   = "0x..."
 # Goerli account private_key should not starts with 0x.
 private_key               = "..."
 posa_light_client_address = "0x6c74a72444048A8588dEBeb749Ee60DB842aD90f"
-gas = 20000000
-gas_price = 23000000000
+# Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
+max_gas_price = 9000000000
+# Bridger use etherscan gas oracle to get more appropriate gas price.
+# Register to get a free etherescan api key at https://docs.etherscan.io/api-endpoints/gas-tracker
+etherscan_api_key = "api_key..."
+
 
 [index]
 pangoro = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro/" }

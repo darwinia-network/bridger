@@ -4,12 +4,12 @@ use super::types::{
 };
 use support_common::error::BridgerError;
 
-pub struct GoerliClient {
+pub struct EthereumClient {
     api_client: reqwest::Client,
     api_base_url: String,
 }
 
-impl GoerliClient {
+impl EthereumClient {
     pub fn new(api_endpoint: &str) -> color_eyre::Result<Self> {
         let api_client = reqwest::Client::new();
         Ok(Self {
@@ -231,8 +231,8 @@ mod tests {
 
     use super::*;
 
-    fn test_client() -> GoerliClient {
-        GoerliClient::new("http://localhost:5052").unwrap()
+    fn test_client() -> EthereumClient {
+        EthereumClient::new("http://localhost:5052").unwrap()
     }
 
     #[ignore]

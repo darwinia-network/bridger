@@ -7,7 +7,7 @@ use client_contracts::PosaLightClient;
 use web3::contract::Options;
 use web3::types::{Address, BlockId, BlockNumber, H256, U256};
 
-use crate::goerli_client::client::GoerliClient;
+use crate::goerli_client::client::EthereumClient;
 use crate::message_contract::darwinia_message_client::{
     build_darwinia_message_client, DarwiniaMessageClient,
 };
@@ -24,14 +24,14 @@ use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
 #[derive(Debug)]
-pub struct DarwiniaGoerliMessageRelay {
+pub struct DarwiniaEthereumMessageRelay {
     _greet_delivery: Lifeline,
     _greet_confirmation: Lifeline,
 }
 
-impl BridgeService for DarwiniaGoerliMessageRelay {}
+impl BridgeService for DarwiniaEthereumMessageRelay {}
 
-impl Service for DarwiniaGoerliMessageRelay {
+impl Service for DarwiniaEthereumMessageRelay {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
@@ -70,7 +70,7 @@ impl Service for DarwiniaGoerliMessageRelay {
 
 async fn message_relay_client_builder(
 ) -> color_eyre::Result<MessageRelay<FeeMarketRelayStrategy, SimpleFeeMarketRelayStrategy>> {
-    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaGoerli)?;
+    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
     let beacon_light_client = DarwiniaClient::new(
         &config.pangoro_evm.endpoint,
         &config.pangoro_evm.contract_address,
@@ -78,7 +78,7 @@ async fn message_relay_client_builder(
         &config.pangoro_evm.private_key,
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
-    let beacon_rpc_client = GoerliClient::new(&config.goerli.endpoint)?;
+    let beacon_rpc_client = EthereumClient::new(&config.goerli.endpoint)?;
     let target = build_message_client_with_simple_fee_market(
         &config.goerli.execution_layer_endpoint,
         Address::from_str(&config.goerli.inbound_address)?,
@@ -150,7 +150,7 @@ pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
     pub source: DarwiniaMessageClient<S0>,
     pub target: MessageClient<S1>,
     pub posa_light_client: PosaLightClient,
-    pub beacon_rpc_client: GoerliClient,
+    pub beacon_rpc_client: EthereumClient,
     pub beacon_light_client: DarwiniaClient,
     pub max_message_num_per_relaying: u64,
 }

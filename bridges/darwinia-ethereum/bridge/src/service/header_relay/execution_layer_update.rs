@@ -2,7 +2,7 @@ use std::{str::FromStr, time::Duration};
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
-    goerli_client::{client::GoerliClient, types::Proof},
+    goerli_client::{client::EthereumClient, types::Proof},
     pangoro_client::client::DarwiniaClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
@@ -44,7 +44,7 @@ impl Service for ExecutionLayerRelay {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaGoerli)?;
+    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
     let pangoro_client = DarwiniaClient::new(
         &config.pangoro_evm.endpoint,
         &config.pangoro_evm.contract_address,
@@ -52,7 +52,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.private_key,
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
-    let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
+    let goerli_client = EthereumClient::new(&config.goerli.endpoint)?;
     let execution_layer_relay = ExecutionLayer {
         pangoro_client,
         goerli_client,
@@ -73,7 +73,7 @@ async fn start() -> color_eyre::Result<()> {
 
 pub struct ExecutionLayer {
     pub pangoro_client: DarwiniaClient,
-    pub goerli_client: GoerliClient,
+    pub goerli_client: EthereumClient,
 }
 
 impl ExecutionLayer {

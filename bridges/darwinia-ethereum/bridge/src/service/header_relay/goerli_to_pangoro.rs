@@ -6,7 +6,7 @@ use std::{
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
-    goerli_client::{client::GoerliClient, types::FinalityUpdate},
+    goerli_client::{client::EthereumClient, types::FinalityUpdate},
     pangoro_client::client::DarwiniaClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
@@ -22,13 +22,13 @@ use web3::{
 };
 
 #[derive(Debug)]
-pub struct GoerliToDarwiniaHeaderRelayService {
+pub struct EthereumToDarwiniaHeaderRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for GoerliToDarwiniaHeaderRelayService {}
+impl BridgeService for EthereumToDarwiniaHeaderRelayService {}
 
-impl Service for GoerliToDarwiniaHeaderRelayService {
+impl Service for EthereumToDarwiniaHeaderRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
@@ -49,7 +49,7 @@ impl Service for GoerliToDarwiniaHeaderRelayService {
 }
 
 async fn start() -> color_eyre::Result<()> {
-    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaGoerli)?;
+    let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
     let pangoro_client = DarwiniaClient::new(
         &config.pangoro_evm.endpoint,
         &config.pangoro_evm.contract_address,
@@ -57,7 +57,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.private_key,
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
-    let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
+    let goerli_client = EthereumClient::new(&config.goerli.endpoint)?;
     let mut header_relay = HeaderRelay {
         pangoro_client,
         goerli_client,
@@ -92,7 +92,7 @@ pub struct HeaderRelayState {
 
 pub struct HeaderRelay {
     pub pangoro_client: DarwiniaClient,
-    pub goerli_client: GoerliClient,
+    pub goerli_client: EthereumClient,
     pub minimal_interval: u64,
     pub last_relay_time: u64,
 }

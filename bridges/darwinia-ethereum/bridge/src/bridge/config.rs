@@ -129,7 +129,7 @@ pub struct IndexConfig {
 
 impl IndexConfig {
     pub fn to_pangoro_subquery(&self) -> Subquery {
-        SubqueryComponent::component(self.pangoro.clone(), BridgeName::DarwiniaGoerli)
+        SubqueryComponent::component(self.pangoro.clone(), BridgeName::DarwiniaEthereum)
     }
 
     pub fn to_pangoro_thegraph(&self) -> color_eyre::Result<TheGraphLikeEth> {

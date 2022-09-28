@@ -22,7 +22,7 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
 impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
     pub async fn start(&self) -> color_eyre::Result<Option<u32>> {
         let client_posa = &self.source.client_posa;
-        let _client_pangoro_substrate = &self.source.client_pangoro_substrate;
+        let _client_darwinia_substrate = &self.source.client_darwinia_substrate;
         let subquery = &self.source.subquery;
         let from_block = self.source.block.unwrap_or_default();
         let ethereum_account = &self.source.ethereum_account;
@@ -32,8 +32,8 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
             .await?;
         if cacse.is_none() {
             tracing::debug!(
-                target: "pangoro-goerli",
-                "[pangoro] [ecdsa] no more new message root signatures events after {}",
+                target: "darwinia-eth",
+                "[darwinia] [ecdsa] no more new message root signatures events after {}",
                 from_block,
             );
             return Ok(None);
@@ -114,13 +114,13 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
         };
 
         tracing::info!(
-            target: "pangoro-goerli",
-            "[pangoro] [ecdsa] authorities change submitted: {}",
+            target: "darwinia-eth",
+            "[darwinia] [ecdsa] authorities change submitted: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
         wait_for_transaction_confirmation(
             hash,
-            self.source.client_goerli_web3.transport(),
+            self.source.client_eth_web3.transport(),
             Duration::from_secs(5),
             3,
         )

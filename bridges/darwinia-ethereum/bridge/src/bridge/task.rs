@@ -6,16 +6,16 @@ use support_lifeline::task::TaskStack;
 
 use crate::bridge::BridgeConfig;
 use crate::service::ecdsa_relay::ECDSARelayService;
-use crate::service::message_relay::pangoro_to_goerli::PangoroGoerliMessageRelay;
+use crate::service::message_relay::darwinia_to_eth::DarwiniaEthMessageRelay;
 use crate::{
     bridge::BridgeBus,
     service::{
         header_relay::{
+            eth_to_darwinia::EthToDarwiniaHeaderRelayService,
             execution_layer_update::ExecutionLayerRelay,
-            goerli_to_pangoro::GoerliToPangoroHeaderRelayService,
             sync_committee_update::SyncCommitteeUpdateService,
         },
-        message_relay::goerli_to_pangoro::GoerliPangoroMessageRelay,
+        message_relay::eth_to_darwinia::EthDarwiniaMessageRelay,
     },
 };
 
@@ -27,7 +27,7 @@ pub struct BridgeTask {
 
 impl BridgeTask {
     pub fn name() -> &'static str {
-        "pangoro-goerli"
+        "darwinia-eth"
     }
 }
 
@@ -37,29 +37,29 @@ impl BridgeTask {
             db_name: Self::name().to_string(),
         })?;
         // check config
-        let bridge_config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
+        let bridge_config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
 
         let bus = BridgeBus::default();
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new(bus);
-        if bridge_config.general.header_goerli_to_pangoro {
-            stack.spawn_service::<GoerliToPangoroHeaderRelayService>()?;
+        if bridge_config.general.header_eth_to_darwinia {
+            stack.spawn_service::<EthToDarwiniaHeaderRelayService>()?;
         }
-        if bridge_config.general.sync_commit_goerli_to_pangoro {
+        if bridge_config.general.sync_commit_eth_to_darwinia {
             stack.spawn_service::<SyncCommitteeUpdateService>()?;
         }
-        if bridge_config.general.execution_layer_goerli_to_pangoro {
+        if bridge_config.general.execution_layer_eth_to_darwinia {
             stack.spawn_service::<ExecutionLayerRelay>()?;
         }
         if bridge_config.general.ecdsa_service {
             stack.spawn_service::<ECDSARelayService>()?;
         }
-        if bridge_config.general.msg_goerli_to_pangoro {
-            stack.spawn_service::<GoerliPangoroMessageRelay>()?;
+        if bridge_config.general.msg_eth_to_darwinia {
+            stack.spawn_service::<EthDarwiniaMessageRelay>()?;
         }
-        if bridge_config.general.msg_pangoro_to_goerli {
-            stack.spawn_service::<PangoroGoerliMessageRelay>()?;
+        if bridge_config.general.msg_darwinia_to_eth {
+            stack.spawn_service::<DarwiniaEthMessageRelay>()?;
         }
         Ok(Self { stack })
     }

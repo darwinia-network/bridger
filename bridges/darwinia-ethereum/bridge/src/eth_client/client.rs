@@ -4,12 +4,12 @@ use super::types::{
 };
 use support_common::error::BridgerError;
 
-pub struct GoerliClient {
+pub struct EthClient {
     api_client: reqwest::Client,
     api_base_url: String,
 }
 
-impl GoerliClient {
+impl EthClient {
     pub fn new(api_endpoint: &str) -> color_eyre::Result<Self> {
         let api_client = reqwest::Client::new();
         Ok(Self {
@@ -39,8 +39,8 @@ impl GoerliClient {
         while let Err(err) = header {
             if slot > current_slot {
                 tracing::info!(
-                    target: "pangoro-goerli",
-                    "[header-goerli-to-pangoro] Wait for attested headers since: {:?}",
+                    target: "darwinia-eth",
+                    "[header-eth-to-darwinia] Wait for attested headers since: {:?}",
                     slot - count
                 );
                 return Err(err);
@@ -231,8 +231,8 @@ mod tests {
 
     use super::*;
 
-    fn test_client() -> GoerliClient {
-        GoerliClient::new("http://localhost:5052").unwrap()
+    fn test_client() -> EthClient {
+        EthClient::new("http://localhost:5052").unwrap()
     }
 
     #[ignore]

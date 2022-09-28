@@ -6,16 +6,16 @@ use support_lifeline::task::TaskStack;
 
 use crate::bridge::BridgeConfig;
 use crate::service::ecdsa_relay::ECDSARelayService;
-use crate::service::message_relay::darwinia_to_goerli::DarwiniaEthereumMessageRelay;
+use crate::service::message_relay::darwinia_to_ethereum::DarwiniaEthereumMessageRelay;
 use crate::{
     bridge::BridgeBus,
     service::{
         header_relay::{
             execution_layer_update::ExecutionLayerRelay,
-            goerli_to_darwinia::EthereumToDarwiniaHeaderRelayService,
+            ethereum_to_darwinia::EthereumToDarwiniaHeaderRelayService,
             sync_committee_update::SyncCommitteeUpdateService,
         },
-        message_relay::goerli_to_darwinia::EthereumDarwiniaMessageRelay,
+        message_relay::ethereum_to_darwinia::EthereumDarwiniaMessageRelay,
     },
 };
 
@@ -27,7 +27,7 @@ pub struct BridgeTask {
 
 impl BridgeTask {
     pub fn name() -> &'static str {
-        "darwinia-goerli"
+        "darwinia-ethereum"
     }
 }
 
@@ -43,22 +43,22 @@ impl BridgeTask {
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new(bus);
-        if bridge_config.general.header_goerli_to_darwinia {
+        if bridge_config.general.header_ethereum_to_darwinia {
             stack.spawn_service::<EthereumToDarwiniaHeaderRelayService>()?;
         }
-        if bridge_config.general.sync_commit_goerli_to_darwinia {
+        if bridge_config.general.sync_commit_ethereum_to_darwinia {
             stack.spawn_service::<SyncCommitteeUpdateService>()?;
         }
-        if bridge_config.general.execution_layer_goerli_to_darwinia {
+        if bridge_config.general.execution_layer_ethereum_to_darwinia {
             stack.spawn_service::<ExecutionLayerRelay>()?;
         }
         if bridge_config.general.ecdsa_service {
             stack.spawn_service::<ECDSARelayService>()?;
         }
-        if bridge_config.general.msg_goerli_to_darwinia {
+        if bridge_config.general.msg_ethereum_to_darwinia {
             stack.spawn_service::<EthereumDarwiniaMessageRelay>()?;
         }
-        if bridge_config.general.msg_darwinia_to_goerli {
+        if bridge_config.general.msg_darwinia_to_ethereum {
             stack.spawn_service::<DarwiniaEthereumMessageRelay>()?;
         }
         Ok(Self { stack })

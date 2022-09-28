@@ -2,7 +2,7 @@ use std::{str::FromStr, time::Duration};
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
-    goerli_client::{client::EthereumClient, types::Proof},
+    ethereum_client::{client::EthereumClient, types::Proof},
     darwinia_client::client::DarwiniaClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
@@ -28,11 +28,11 @@ impl Service for ExecutionLayerRelay {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task("execution-layer-goerli-to-darwinia", async move {
+        let _greet = Self::try_task("execution-layer-ethereum-to-darwinia", async move {
             while let Err(error) = start().await {
                 tracing::error!(
-                    target: "darwinia-goerli",
-                    "Failed to start goerli-to-darwinia execution payload state root relay service, restart after some seconds: {:?}",
+                    target: "darwinia-ethereum",
+                    "Failed to start ethereum-to-darwinia execution payload state root relay service, restart after some seconds: {:?}",
                     error
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(15)).await;
@@ -52,16 +52,16 @@ async fn start() -> color_eyre::Result<()> {
         &config.darwinia_evm.private_key,
         U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
     )?;
-    let goerli_client = EthereumClient::new(&config.goerli.endpoint)?;
+    let ethereum_client = EthereumClient::new(&config.ethereum.endpoint)?;
     let execution_layer_relay = ExecutionLayer {
         darwinia_client,
-        goerli_client,
+        ethereum_client,
     };
 
     loop {
         if let Err(error) = execution_layer_relay.execution_layer_relay().await {
             tracing::error!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "Failed to relay exection payload state root: {:?}",
                 error
             );
@@ -73,7 +73,7 @@ async fn start() -> color_eyre::Result<()> {
 
 pub struct ExecutionLayer {
     pub darwinia_client: DarwiniaClient,
-    pub goerli_client: EthereumClient,
+    pub ethereum_client: EthereumClient,
 }
 
 impl ExecutionLayer {
@@ -84,7 +84,7 @@ impl ExecutionLayer {
             .finalized_header()
             .await?;
         let finalized_block = self
-            .goerli_client
+            .ethereum_client
             .get_beacon_block(last_relayed_header.slot)
             .await?;
         let latest_execution_payload_state_root =
@@ -93,13 +93,13 @@ impl ExecutionLayer {
 
         if relayed_state_root != latest_execution_payload_state_root {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[ExecutionLayer][Ethereum=>Darwinia] Try to relay execution layer state at slot: {:?}",
                 last_relayed_header.slot,
             );
 
             let state_root_branch = self
-                .goerli_client
+                .ethereum_client
                 .get_latest_execution_payload_state_root_branch(last_relayed_header.slot)
                 .await?;
             let witnesses = match state_root_branch {
@@ -129,7 +129,7 @@ impl ExecutionLayer {
                 )
                 .await?;
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[ExecutionLayer][Ethereum=>Darwinia] Sending tx: {:?}",
                 &tx
             );
@@ -142,7 +142,7 @@ impl ExecutionLayer {
             .await?;
         } else {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[ExecutionLayer][Ethereum=>Darwinia] Latest execution payload state root at slot {:?} is : {:?}",
                 last_relayed_header.slot,
                 &relayed_state_root,

@@ -30,7 +30,7 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         if now - self.last_relay_time <= self.interval {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] Last relaying time is {:?}, wait for {} seconds to scan new message root",
                 self.last_relay_time,
                 self.interval - (now - self.last_relay_time)
@@ -49,7 +49,7 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
 
         if cacse.is_none() {
             tracing::debug!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] no more new message root signatures events after {}",
                 from_block,
             );
@@ -59,7 +59,7 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
         let latest_relayed_block_number = self.source.client_posa.block_number().await?;
         if latest_relayed_block_number.as_u32() >= event.commitment_block_number {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] [collectedMessage] Latest relayed block number is: {:?}",
                 event.block_number
             );
@@ -92,13 +92,13 @@ impl CollectedEnoughNewMessageRootSignaturesRunner {
             .import_message_commitment(commitment, signatures, &ethereum_account.secret_key()?)
             .await?;
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[darwinia] [ecdsa] submitted collected enouth new message root signature: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
         wait_for_transaction_confirmation(
             hash,
-            self.source.client_goerli_web3.transport(),
+            self.source.client_ethereum_web3.transport(),
             Duration::from_secs(5),
             3,
         )

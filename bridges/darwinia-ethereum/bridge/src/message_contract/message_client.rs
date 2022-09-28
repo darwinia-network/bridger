@@ -21,7 +21,7 @@ use client_contracts::{
 };
 use client_contracts::{outbound_types::MessageAccepted, Outbound, SimpleFeeMarket};
 
-use crate::{goerli_client::types::MessagesProof, web3_helper::GasPriceOracle};
+use crate::{ethereum_client::types::MessagesProof, web3_helper::GasPriceOracle};
 
 use super::{simple_fee_market::SimpleFeeMarketRelayStrategy, utils::build_eth_confirmation_proof};
 
@@ -448,10 +448,10 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_receive_messages_proof() {
-        let goerli_client = test_client();
+        let ethereum_client = test_client();
         let darwinia_client = test_darwinia_client();
         let private_key = SecretKey::from_str("//Alice").unwrap();
-        let proof = goerli_client
+        let proof = ethereum_client
             .prepare_for_messages_delivery(1, 2, Some(BlockNumber::Number(U64::from(1580730u64))))
             .await
             .unwrap();

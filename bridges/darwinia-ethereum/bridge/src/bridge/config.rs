@@ -18,18 +18,18 @@ pub struct BridgeConfig {
     pub general: GeneralConfig,
     pub darwinia_evm: DarwiniaEVMConfig,
     pub darwinia_substrate: DarwiniaSubstrateConfig,
-    pub goerli: ChainInfoConfig,
+    pub ethereum: ChainInfoConfig,
     pub index: IndexConfig,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GeneralConfig {
-    pub header_goerli_to_darwinia: bool,
-    pub sync_commit_goerli_to_darwinia: bool,
-    pub execution_layer_goerli_to_darwinia: bool,
+    pub header_ethereum_to_darwinia: bool,
+    pub sync_commit_ethereum_to_darwinia: bool,
+    pub execution_layer_ethereum_to_darwinia: bool,
     pub ecdsa_service: bool,
-    pub msg_goerli_to_darwinia: bool,
-    pub msg_darwinia_to_goerli: bool,
+    pub msg_ethereum_to_darwinia: bool,
+    pub msg_darwinia_to_ethereum: bool,
     // Max message numbers per delivery
     pub max_message_num_per_relaying: u64,
     // Minium interval(seconds) between every header delivery

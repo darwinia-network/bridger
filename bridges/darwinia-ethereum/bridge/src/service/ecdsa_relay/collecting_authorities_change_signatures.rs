@@ -22,7 +22,7 @@ impl CollectingAuthoritiesChangeSignaturesRunner {
             .await?;
         if cacse.is_none() {
             tracing::debug!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] no more authorities change events after {}",
                 from_block,
             );
@@ -34,7 +34,7 @@ impl CollectingAuthoritiesChangeSignaturesRunner {
             .await?
         {
             tracing::warn!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] you are not authority account. nothing to do."
             );
             return Ok(Some(event.block_number));
@@ -46,7 +46,7 @@ impl CollectingAuthoritiesChangeSignaturesRunner {
             .submit_authorities_change_signature(address.0, signature)
             .await?;
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[darwinia] [ecdsa] submitted new message root signature: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );

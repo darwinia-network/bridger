@@ -41,7 +41,7 @@ impl Service for ECDSARelayService {
         let tracker_collected_authorities =
             Tracker::new(microkv, "scan.darwinia.collected-authorities");
         let _greet_collecting_message =
-            Self::try_task("darwinia-to-goerli-ecdsa-collecting-message", async move {
+            Self::try_task("darwinia-to-ethereum-ecdsa-collecting-message", async move {
                 EcdsaScanner
                     .start(
                         tracker_collecting_message.clone(),
@@ -51,7 +51,7 @@ impl Service for ECDSARelayService {
                 Ok(())
             });
         let _greet_collected_message =
-            Self::try_task("darwinia-to-goerli-ecdsa-collected-message", async move {
+            Self::try_task("darwinia-to-ethereum-ecdsa-collected-message", async move {
                 EcdsaScanner
                     .start(
                         tracker_collected_message.clone(),
@@ -61,7 +61,7 @@ impl Service for ECDSARelayService {
                 Ok(())
             });
         let _greet_collecting_authorities = Self::try_task(
-            "darwinia-to-goerli-ecdsa-collecting-authorities",
+            "darwinia-to-ethereum-ecdsa-collecting-authorities",
             async move {
                 EcdsaScanner
                     .start(
@@ -73,7 +73,7 @@ impl Service for ECDSARelayService {
             },
         );
         let _greet_collected_authorities = Self::try_task(
-            "darwinia-to-goerli-ecdsa-collected-authorities",
+            "darwinia-to-ethereum-ecdsa-collected-authorities",
             async move {
                 EcdsaScanner
                     .start(

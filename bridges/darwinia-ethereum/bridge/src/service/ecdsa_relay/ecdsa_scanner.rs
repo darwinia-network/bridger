@@ -22,7 +22,7 @@ impl EcdsaScanner {
     pub async fn start(&self, tracker: Tracker, scan_type: EcdsaScanType) {
         while let Err(err) = self.run(tracker.clone(), scan_type).await {
             tracing::error!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] An error occurred while processing the extrinsics: {:?}",
                 err
             );
@@ -35,16 +35,16 @@ impl EcdsaScanner {
         let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)?;
         let subquery = config.index.to_darwinia_subquery();
         let client_darwinia_web3 = config.darwinia_evm.to_web3_client()?;
-        let client_goerli_web3 = config.goerli.to_web3_client()?;
+        let client_ethereum_web3 = config.ethereum.to_web3_client()?;
         let client_darwinia_substrate = config.darwinia_substrate.to_substrate_client().await?;
-        let client_posa = config.goerli.to_posa_client()?;
+        let client_posa = config.ethereum.to_posa_client()?;
         let darwinia_evm_account = config.darwinia_evm.to_fast_ethereum_account();
-        let ethereum_account = config.goerli.to_ethereum_account();
+        let ethereum_account = config.ethereum.to_ethereum_account();
         let mut source = EcdsaSource {
             block: None,
             subquery,
             client_darwinia_web3,
-            client_goerli_web3,
+            client_ethereum_web3,
             client_darwinia_substrate,
             client_posa,
             darwinia_evm_account,
@@ -54,7 +54,7 @@ impl EcdsaScanner {
         loop {
             let from = tracker.current().await?;
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] Track darwinia scan block: {} ",
                 from,
             );

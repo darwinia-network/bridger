@@ -32,7 +32,7 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
             .await?;
         if cacse.is_none() {
             tracing::debug!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] no more new message root signatures events after {}",
                 from_block,
             );
@@ -114,13 +114,13 @@ impl CollectedEnoughAuthoritiesChangeSignaturesRunner {
         };
 
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[darwinia] [ecdsa] authorities change submitted: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
         wait_for_transaction_confirmation(
             hash,
-            self.source.client_goerli_web3.transport(),
+            self.source.client_ethereum_web3.transport(),
             Duration::from_secs(5),
             3,
         )

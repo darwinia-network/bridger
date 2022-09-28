@@ -6,7 +6,7 @@ use std::{
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
-    goerli_client::{client::EthereumClient, types::FinalityUpdate},
+    ethereum_client::{client::EthereumClient, types::FinalityUpdate},
     darwinia_client::client::DarwiniaClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
@@ -33,11 +33,11 @@ impl Service for EthereumToDarwiniaHeaderRelayService {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task("header-goerli-to-darwinia", async move {
+        let _greet = Self::try_task("header-ethereum-to-darwinia", async move {
             while let Err(error) = start().await {
                 tracing::error!(
-                    target: "darwinia-goerli",
-                    "Failed to start goerli-to-darwinia header relay service, restart after some seconds: {:?}",
+                    target: "darwinia-ethereum",
+                    "Failed to start ethereum-to-darwinia header relay service, restart after some seconds: {:?}",
                     error
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(10)).await;
@@ -57,10 +57,10 @@ async fn start() -> color_eyre::Result<()> {
         &config.darwinia_evm.private_key,
         U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
     )?;
-    let goerli_client = EthereumClient::new(&config.goerli.endpoint)?;
+    let ethereum_client = EthereumClient::new(&config.ethereum.endpoint)?;
     let mut header_relay = HeaderRelay {
         darwinia_client,
-        goerli_client,
+        ethereum_client,
         minimal_interval: config.general.header_relay_minimum_interval,
         last_relay_time: u64::MIN,
     };
@@ -68,7 +68,7 @@ async fn start() -> color_eyre::Result<()> {
     loop {
         if let Err(error) = header_relay.header_relay().await {
             tracing::error!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "Failed relay header : {:?}",
                 error
             );
@@ -92,7 +92,7 @@ pub struct HeaderRelayState {
 
 pub struct HeaderRelay {
     pub darwinia_client: DarwiniaClient,
-    pub goerli_client: EthereumClient,
+    pub ethereum_client: EthereumClient,
     pub minimal_interval: u64,
     pub last_relay_time: u64,
 }
@@ -104,7 +104,7 @@ impl HeaderRelay {
             .beacon_light_client
             .finalized_header()
             .await?;
-        let current_head = self.goerli_client.get_header("head").await?;
+        let current_head = self.ethereum_client.get_header("head").await?;
         let current_slot = current_head.header.message.slot;
         let current_period = current_slot.div(32).div(256);
         let relayed_period = relayed.slot.div(32).div(256);
@@ -120,7 +120,7 @@ impl HeaderRelay {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         if now - self.last_relay_time <= self.minimal_interval {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[Header][Ethereum=>Darwinia] Last relaying time is {:?}, wait for {} seconds to start again.",
                 self.last_relay_time,
                 self.minimal_interval - (now - self.last_relay_time)
@@ -135,7 +135,7 @@ impl HeaderRelay {
             .sync_committee_roots(state.relayed_period + 1)
             .await?;
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[Header][Ethereum=>Darwinia] State: {:?}",
             state
         );
@@ -154,12 +154,12 @@ impl HeaderRelay {
     }
 
     pub async fn relay_latest(&mut self, state: HeaderRelayState) -> color_eyre::Result<()> {
-        let finality_update: FinalityUpdate = self.goerli_client.get_finality_update().await?;
+        let finality_update: FinalityUpdate = self.ethereum_client.get_finality_update().await?;
         let update_finality_slot = finality_update.finalized_header.slot;
         let update_finality_period = update_finality_slot.div(32).div(256);
 
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[Header][Ethereum=>Darwinia] Latest finality slot: {:?}",
             &update_finality_slot
         );
@@ -169,7 +169,7 @@ impl HeaderRelay {
         }
 
         let (_slot, sync_aggregate_slot, _attested_header, _sync_aggregate_block) = match self
-            .goerli_client
+            .ethereum_client
             .find_valid_attested_header(
                 state.current_slot,
                 finality_update.attested_header.slot - 1,
@@ -178,7 +178,7 @@ impl HeaderRelay {
         {
             None => {
                 tracing::info!(
-                    target: "darwinia-goerli",
+                    target: "darwinia-ethereum",
                     "[Header][Ethereum=>Darwinia] Wait for valid attested header",
                 );
                 return Ok(());
@@ -192,14 +192,14 @@ impl HeaderRelay {
         };
 
         let sync_change = self
-            .goerli_client
+            .ethereum_client
             .get_sync_committee_period_update(update_finality_period - 1, 1)
             .await?;
         if sync_change.is_empty() {
             return Err(BridgerError::Custom("Failed to get sync committee update".into()).into());
         }
         let fork_version = self
-            .goerli_client
+            .ethereum_client
             .get_fork_version(sync_aggregate_slot)
             .await?;
 
@@ -224,20 +224,20 @@ impl HeaderRelay {
     pub async fn relay_next_period(&mut self, state: HeaderRelayState) -> color_eyre::Result<()> {
         let _target_period = state.relayed_period + 1;
         let sync_change = self
-            .goerli_client
+            .ethereum_client
             .get_sync_committee_period_update(state.relayed_period, 2)
             .await?;
 
         if let [last_finality, target_finality] = sync_change.as_slice() {
             let attested_slot: u64 = target_finality.attested_header.slot;
             let (_slot, sync_aggregate_slot, _attested_header, _sync_aggregate_block) = match self
-                .goerli_client
+                .ethereum_client
                 .find_valid_attested_header(state.current_slot, attested_slot)
                 .await?
             {
                 None => {
                     tracing::info!(
-                        target: "darwinia-goerli",
+                        target: "darwinia-ethereum",
                         "[Header][Ethereum=>Darwinia] Wait for valid attested header",
                     );
                     return Ok(());
@@ -294,7 +294,7 @@ impl HeaderRelay {
             )
             .await?;
         tracing::info!(
-        target: "darwinia-goerli",
+        target: "darwinia-ethereum",
             "[Header][Ethereum=>Darwinia] Sending tx: {:?}",
             &tx
         );

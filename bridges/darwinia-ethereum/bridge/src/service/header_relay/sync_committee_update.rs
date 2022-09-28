@@ -2,7 +2,7 @@ use std::{ops::Div, time::Duration};
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
-    goerli_client::{client::EthereumClient, types::Proof},
+    ethereum_client::{client::EthereumClient, types::Proof},
     darwinia_client::client::DarwiniaClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
@@ -25,11 +25,11 @@ impl Service for SyncCommitteeUpdateService {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task("sync-committee-update-goerli-to-darwinia", async move {
+        let _greet = Self::try_task("sync-committee-update-ethereum-to-darwinia", async move {
             while let Err(error) = start().await {
                 tracing::error!(
-                    target: "darwinia-goerli",
-                    "Failed to start goerli-to-darwinia sync committee update relay service, restart after some seconds: {:?}",
+                    target: "darwinia-ethereum",
+                    "Failed to start ethereum-to-darwinia sync committee update relay service, restart after some seconds: {:?}",
                     error
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
@@ -49,16 +49,16 @@ async fn start() -> color_eyre::Result<()> {
         &config.darwinia_evm.private_key,
         U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
     )?;
-    let goerli_client = EthereumClient::new(&config.goerli.endpoint)?;
+    let ethereum_client = EthereumClient::new(&config.ethereum.endpoint)?;
     let update_manager = SyncCommitteeUpdate {
         darwinia_client,
-        goerli_client,
+        ethereum_client,
     };
 
     loop {
         if let Err(error) = update_manager.sync_committee_update().await {
             tracing::error!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[SyncCommittee][Ethereum=>Darwinia] Failed relay sync committee update : {:?}",
                 error
             );
@@ -70,7 +70,7 @@ async fn start() -> color_eyre::Result<()> {
 
 pub struct SyncCommitteeUpdate {
     pub darwinia_client: DarwiniaClient,
-    pub goerli_client: EthereumClient,
+    pub ethereum_client: EthereumClient,
 }
 
 impl SyncCommitteeUpdate {
@@ -94,7 +94,7 @@ impl SyncCommitteeUpdate {
             .await?;
         if next_sync_committee.is_zero() {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[SyncCommittee][Ethereum=>Darwinia] Try to relay SyncCommittee at period {:?}",
                 period + 1,
             );
@@ -119,7 +119,7 @@ impl SyncCommitteeUpdate {
                 .await?;
 
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[SyncCommittee][Ethereum=>Darwinia] Sending tx: {:?}",
                 &tx
             );
@@ -132,7 +132,7 @@ impl SyncCommitteeUpdate {
             .await?;
         } else {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[SyncCommittee][Ethereum=>Darwinia] Next sync committee is {:?}",
                 next_sync_committee
             );
@@ -146,7 +146,7 @@ impl SyncCommitteeUpdate {
         slot: u64,
     ) -> color_eyre::Result<SyncCommitteePeriodUpdate> {
         let sync_committee_update = self
-            .goerli_client
+            .ethereum_client
             .get_sync_committee_period_update(period, 1)
             .await?;
         if sync_committee_update.is_empty() {
@@ -158,7 +158,7 @@ impl SyncCommitteeUpdate {
             .next_sync_committee
             .clone();
         let next_sync_committee_branch = self
-            .goerli_client
+            .ethereum_client
             .get_next_sync_committee_branch(slot)
             .await?;
         let witnesses = match next_sync_committee_branch {

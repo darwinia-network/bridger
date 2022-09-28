@@ -22,7 +22,7 @@ impl CollectingNewMessageRootSignaturesRunner {
             .await?;
         if cacse.is_none() {
             tracing::debug!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] no more new message root signatures events after {}",
                 from_block,
             );
@@ -32,7 +32,7 @@ impl CollectingNewMessageRootSignaturesRunner {
         let latest_relayed_block_number = self.source.client_posa.block_number().await?;
         if latest_relayed_block_number.as_u32() >= event.block_number {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] [collectingMessage] Latest relayed block number is: {:?}",
                 event.block_number
             );
@@ -40,7 +40,7 @@ impl CollectingNewMessageRootSignaturesRunner {
         }
 
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[darwinia] [ecdsa] found new message root signature event from block {}",
             event.block_number,
         );
@@ -49,7 +49,7 @@ impl CollectingNewMessageRootSignaturesRunner {
             .await?
         {
             tracing::warn!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[darwinia] [ecdsa] you are not authority account. nothing to do.",
             );
             return Ok(Some(event.block_number));
@@ -62,7 +62,7 @@ impl CollectingNewMessageRootSignaturesRunner {
             .await?;
 
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[darwinia] [ecdsa] submitted new message root signature: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );

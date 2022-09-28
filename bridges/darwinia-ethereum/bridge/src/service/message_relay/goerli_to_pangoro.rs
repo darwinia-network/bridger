@@ -14,7 +14,7 @@ use crate::message_contract::message_client::build_message_client_with_simple_fe
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
 use crate::web3_helper::{wait_for_transaction_confirmation, GasPriceOracle};
 use crate::{
-    goerli_client::client::EthereumClient, message_contract::message_client::MessageClient,
+    ethereum_client::client::EthereumClient, message_contract::message_client::MessageClient,
     darwinia_client::client::DarwiniaClient,
 };
 
@@ -36,11 +36,11 @@ impl Service for EthereumDarwiniaMessageRelay {
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet_delivery = Self::try_task("message-relay-goerli-to-darwinia", async move {
+        let _greet_delivery = Self::try_task("message-relay-ethereum-to-darwinia", async move {
             while let Err(error) = start_delivery().await {
                 tracing::error!(
-                    target: "darwinia-goerli",
-                    "Failed to start goerli-to-darwinia message relay service, restart after some seconds: {:?}",
+                    target: "darwinia-ethereum",
+                    "Failed to start ethereum-to-darwinia message relay service, restart after some seconds: {:?}",
                     error
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(15)).await;
@@ -48,12 +48,12 @@ impl Service for EthereumDarwiniaMessageRelay {
             Ok(())
         });
         let _greet_confirmation = Self::try_task(
-            "message-confirmation-darwinia-to-goerli",
+            "message-confirmation-darwinia-to-ethereum",
             async move {
                 while let Err(error) = start_confirmation().await {
                     tracing::error!(
-                        target: "darwinia-goerli",
-                        "Failed to start goerli-to-darwinia message confirmation service, restart after some seconds: {:?}",
+                        target: "darwinia-ethereum",
+                        "Failed to start ethereum-to-darwinia message confirmation service, restart after some seconds: {:?}",
                         error
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(15)).await;
@@ -78,16 +78,16 @@ async fn message_relay_client_builder(
         &config.darwinia_evm.private_key,
         U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
     )?;
-    let beacon_rpc_client = EthereumClient::new(&config.goerli.endpoint)?;
+    let beacon_rpc_client = EthereumClient::new(&config.ethereum.endpoint)?;
     let source = build_message_client_with_simple_fee_market(
-        &config.goerli.execution_layer_endpoint,
-        Address::from_str(&config.goerli.inbound_address)?,
-        Address::from_str(&config.goerli.outbound_address)?,
-        Address::from_str(&config.goerli.fee_market_address)?,
-        Address::from_str(&config.goerli.account)?,
-        Some(&config.goerli.private_key),
-        U256::from_dec_str(&config.goerli.max_gas_price)?,
-        &config.goerli.etherscan_api_key,
+        &config.ethereum.execution_layer_endpoint,
+        Address::from_str(&config.ethereum.inbound_address)?,
+        Address::from_str(&config.ethereum.outbound_address)?,
+        Address::from_str(&config.ethereum.fee_market_address)?,
+        Address::from_str(&config.ethereum.account)?,
+        Some(&config.ethereum.private_key),
+        U256::from_dec_str(&config.ethereum.max_gas_price)?,
+        &config.ethereum.etherscan_api_key,
     )
     .unwrap();
     let target = build_darwinia_message_client(
@@ -104,7 +104,7 @@ async fn message_relay_client_builder(
     .unwrap();
     let posa_light_client = PosaLightClient::new(
         source.client.clone(),
-        Address::from_str(&config.goerli.posa_light_client_address)?,
+        Address::from_str(&config.ethereum.posa_light_client_address)?,
     )?;
     Ok(MessageRelay {
         source,
@@ -121,8 +121,8 @@ async fn start_delivery() -> color_eyre::Result<()> {
     loop {
         if let Err(error) = message_relay_service.message_relay().await {
             tracing::error!(
-                target: "darwinia-goerli",
-                "[MessageDelivery][goerli=>Darwinia] Failed to relay message: {:?}",
+                target: "darwinia-ethereum",
+                "[MessageDelivery][ethereum=>Darwinia] Failed to relay message: {:?}",
                 error
             );
             return Err(error);
@@ -136,8 +136,8 @@ async fn start_confirmation() -> color_eyre::Result<()> {
     loop {
         if let Err(error) = message_relay_service.message_confirm().await {
             tracing::error!(
-                target: "darwinia-goerli",
-                "[MessageConfirmation][goerli=>Darwinia] Failed to confirm message: {:?}",
+                target: "darwinia-ethereum",
+                "[MessageConfirmation][ethereum=>Darwinia] Failed to confirm message: {:?}",
                 error
             );
             return Err(error);
@@ -162,7 +162,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         if received_nonce.last_delivered_nonce == latest_nonce.latest_generated_nonce {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[MessageDelivery][Ethereum=>Darwinia] Last delivered nonce is {:?}, equal to lastest generated. Do nothing.",
                 received_nonce.last_delivered_nonce,
             );
@@ -172,7 +172,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         let finalized_block_number = match self.best_source_block_at_target().await? {
             None => {
                 tracing::info!(
-                    target: "darwinia-goerli",
+                    target: "darwinia-ethereum",
                     "[MessageDelivery][Ethereum=>Darwinia] Wait for execution layer relay",
                 );
                 return Ok(());
@@ -195,7 +195,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         if received_nonce.last_delivered_nonce >= outbound_nonce.latest_generated_nonce {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[MessageDelivery][Ethereum=>Darwinia] Messages: [{:?}, {:?}] need to be relayed, wait for header relay",
                 begin,
                 end
@@ -209,7 +209,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         );
 
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[MessageDelivery][Ethereum=>Darwinia] Try to relay messages: [{:?}, {:?}]",
             received_nonce.last_delivered_nonce + 1,
             end
@@ -266,13 +266,13 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
 
         if count == delivered {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[MessageDelivery][Ethereum=>Darwinia] No need to relay",
             );
             return Ok(());
         }
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[MessageDelivery][Ethereum=>Darwinia] Relaying messages: [{:?}, {:?}]",
             begin + delivered,
             begin + count - 1,
@@ -296,7 +296,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .await?;
 
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[MessageDelivery][Ethereum=>Darwinia] Sending tx: {:?}",
             tx
         );
@@ -341,7 +341,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             == source_outbound_lane_data.latest_generated_nonce
         {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[MessageConfirmation][Ethereum=>Darwinia] All confirmed({:?}), nothing to do.",
                 source_outbound_lane_data
             );
@@ -369,7 +369,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             == target_inbound_state.last_delivered_nonce
         {
             tracing::info!(
-                target: "darwinia-goerli",
+                target: "darwinia-ethereum",
                 "[MessageConfirmation][Ethereum=>Darwinia] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
                 source_outbound_lane_data.latest_received_nonce,
                 target_inbound_state.last_delivered_nonce + 1,
@@ -379,7 +379,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         }
 
         tracing::info!(
-            target: "darwinia-goerli",
+            target: "darwinia-ethereum",
             "[MessageConfirmation][Ethereum=>Darwinia] Try to confirm nonces [{:?}:{:?}]",
             begin,
             end,

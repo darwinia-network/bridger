@@ -80,6 +80,20 @@ impl SimpleFeeMarket {
             .query("RELAY_TIME", (), None, Options::default(), None)
             .await?)
     }
+
+    pub async fn get_top_relayer(&self) -> BridgeContractResult<Address> {
+        Ok(self
+            .contract
+            .query("getTopRelayer", (), None, Options::default(), None)
+            .await?)
+    }
+
+    pub async fn fee_of(&self, relayer_address: Address) -> BridgeContractResult<U256> {
+        Ok(self
+            .contract
+            .query("feeOf", (relayer_address,), None, Options::default(), None)
+            .await?)
+    }
 }
 
 pub mod types {
@@ -136,11 +150,11 @@ mod tests {
     #[tokio::test]
     async fn test_enroll() {
         let (_, fee_market) = test_fee_market();
-        let private_key = SecretKey::from_str("//Alice").unwrap();
+        let private_key = SecretKey::from_str("").unwrap();
         let tx = fee_market
             .enroll(
                 Address::from_str("0x0000000000000000000000000000000000000001").unwrap(),
-                U256::from(100000000000000u64),
+                U256::from(100_000_000_000_000u64),
                 &private_key,
             )
             .await
@@ -152,9 +166,9 @@ mod tests {
     #[tokio::test]
     async fn test_deposit() {
         let (_, fee_market) = test_fee_market();
-        let private_key = SecretKey::from_str("//Alice").unwrap();
+        let private_key = SecretKey::from_str("").unwrap();
         let tx = fee_market
-            .deposit(U256::from(100000000000000u64), &private_key)
+            .deposit(U256::from(10_000_000_000_000_000u64), &private_key)
             .await
             .unwrap();
         println!("{:?}", tx);
@@ -196,9 +210,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_relay_time() {
-        let (_, fee_market) = test_fee_market();
+        let (client, fee_market) = test_fee_market();
         let time = fee_market.relay_time().await.unwrap();
         println!("Relay time is : {:?}", time);
+
+        let r = client.eth().gas_price().await.unwrap();
+        dbg!(r);
     }
 
     #[tokio::test]

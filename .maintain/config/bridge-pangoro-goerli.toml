@@ -1,3 +1,21 @@
+[general]
+# Whether to relay beacon headers from goerli to pangoro
+header_goerli_to_pangoro = true
+# Whether to relay sync commit from goerli to pangoro
+sync_commit_goerli_to_pangoro = true
+# Whether to relay execution layer state root from goerli to pangoro
+execution_layer_goerli_to_pangoro = true
+# Whether to sign the messages root and relay headers from pangoro to goerli
+ecdsa_service = true
+# Whether to relay messages from goerli to pangoro
+msg_goerli_to_pangoro = true
+# Whether to relay messages from pangoro to goerli
+msg_pangoro_to_goerli = true
+# Max number of messages every delivery
+max_message_num_per_relaying = 15
+# Minimum seconds between two header relay
+header_relay_minimum_interval = 900
+
 [pangoro_evm]
 endpoint                         = "https://pangoro-rpc.darwinia.network"
 contract_address                 = "0x59EA974B74ec6A49338438bCc5d0388E294E4E20"
@@ -6,12 +24,10 @@ inbound_address                  = "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207"
 outbound_address                 = "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5"
 chain_message_committer_address  = "0x01D1Cb6D629536b893f2343B95124aDB6a8ae68b"
 lane_message_committer_address   = "0x5313Bf259a4C723cdD6bE4B6387d21321f180D03"
-account                          = "0x..."
-private_key                      = "//Alice"
-# Gas limit
-gas = 20000000
-# Gas price
-gas_price = 1000000000
+# private_key should not start with 0x
+private_key                      = "..."
+# Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
+max_gas_price = 9000000000
 
 [pangoro_substrate]
 endpoint    = "https://pangoro-rpc.darwinia.network"
@@ -23,12 +39,15 @@ execution_layer_endpoint  = "http://localhost:8545"
 inbound_address           = "0x588abe3F7EE935137102C5e2B8042788935f4CB0"
 outbound_address          = "0xee4f69fc69F2C203a0572e43375f68a6e9027998"
 fee_market_address        = "0x4ca59Ec46543E10De53C97332B8fe656e7a22878"
-account                   = "0x..."
 # Goerli account private_key should not starts with 0x.
 private_key               = "..."
 posa_light_client_address = "0x6c74a72444048A8588dEBeb749Ee60DB842aD90f"
-gas = 20000000
-gas_price = 23000000000
+# Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
+max_gas_price = 9000000000
+# Bridger use etherscan gas oracle to get more appropriate gas price.
+# Register to get a free etherescan api key at https://docs.etherscan.io/api-endpoints/gas-tracker
+etherscan_api_key = "api_key..."
+
 
 [index]
 pangoro = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro/" }

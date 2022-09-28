@@ -4,7 +4,7 @@ use crate::{
     bridge::{BridgeBus, BridgeConfig},
     goerli_client::{client::GoerliClient, types::Proof},
     pangoro_client::client::PangoroClient,
-    web3_helper::wait_for_transaction_confirmation,
+    web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
@@ -50,7 +50,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
-        config.pangoro_evm.gas_option(),
+        U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
     let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let execution_layer_relay = ExecutionLayer {
@@ -112,6 +112,8 @@ impl ExecutionLayer {
             };
             let parameter =
                 Token::Tuple((latest_execution_payload_state_root, witnesses).into_tokens());
+
+            let gas_price = self.pangoro_client.gas_price().await?;
             let tx = self
                 .pangoro_client
                 .execution_layer_contract
@@ -120,7 +122,7 @@ impl ExecutionLayer {
                     (parameter,),
                     Options {
                         gas: Some(U256::from(10000000)),
-                        gas_price: Some(U256::from(1300000000)),
+                        gas_price: Some(gas_price),
                         ..Default::default()
                     },
                     &self.pangoro_client.private_key,

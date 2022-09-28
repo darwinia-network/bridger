@@ -4,13 +4,14 @@ use crate::{
     bridge::{BridgeBus, BridgeConfig},
     goerli_client::{client::GoerliClient, types::Proof},
     pangoro_client::client::PangoroClient,
-    web3_helper::wait_for_transaction_confirmation,
+    web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
 use client_contracts::beacon_light_client_types::SyncCommitteePeriodUpdate;
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
 use support_lifeline::service::BridgeService;
+use web3::{contract::Options, types::U256};
 
 #[derive(Debug)]
 pub struct SyncCommitteeUpdateService {
@@ -46,7 +47,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
-        config.pangoro_evm.gas_option(),
+        U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
     let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
     let update_manager = SyncCommitteeUpdate {
@@ -101,13 +102,19 @@ impl SyncCommitteeUpdate {
             let sync_committee_update = self
                 .get_sync_committee_update_parameter(period, last_relayed_header.slot)
                 .await?;
+
+            let gas_price = self.pangoro_client.gas_price().await?;
             let tx = self
                 .pangoro_client
                 .beacon_light_client
                 .import_next_sync_committee(
                     sync_committee_update,
                     &self.pangoro_client.private_key,
-                    self.pangoro_client.gas_option.clone(),
+                    Options {
+                        gas: Some(U256::from_dec_str("10000000")?),
+                        gas_price: Some(gas_price),
+                        ..Default::default()
+                    },
                 )
                 .await?;
 

@@ -4,10 +4,10 @@ use bridge_e2e_traits::strategy::RelayStrategy;
 use futures::future;
 use secp256k1::SecretKey;
 use support_common::error::BridgerError;
+use support_etherscan::EtherscanClient;
 use web3::{
-    contract::Options,
     ethabi::{encode, RawLog},
-    signing::keccak256,
+    signing::{keccak256, Key},
     transports::Http,
     types::{Address, BlockId, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
     Web3,
@@ -21,7 +21,7 @@ use client_contracts::{
 };
 use client_contracts::{outbound_types::MessageAccepted, Outbound, SimpleFeeMarket};
 
-use crate::goerli_client::types::MessagesProof;
+use crate::{goerli_client::types::MessagesProof, web3_helper::GasPriceOracle};
 
 use super::{simple_fee_market::SimpleFeeMarketRelayStrategy, utils::build_eth_confirmation_proof};
 
@@ -34,8 +34,23 @@ pub struct MessageClient<T: RelayStrategy> {
     pub inbound: Inbound,
     pub outbound: Outbound,
     pub strategy: T,
-    pub private_key: Option<SecretKey>,
-    pub gas_option: Options,
+    pub private_key: SecretKey,
+    pub max_gas_price: U256,
+    pub etherscan_client: EtherscanClient,
+}
+
+impl<T: RelayStrategy> GasPriceOracle for MessageClient<T> {
+    fn get_web3(&self) -> &Web3<Http> {
+        &self.client
+    }
+
+    fn get_etherscan_client(&self) -> Option<&EtherscanClient> {
+        Some(&self.etherscan_client)
+    }
+
+    fn max_gas_price(&self) -> U256 {
+        self.max_gas_price
+    }
 }
 
 pub fn build_message_client_with_simple_fee_market(
@@ -43,34 +58,31 @@ pub fn build_message_client_with_simple_fee_market(
     inbound_address: Address,
     outbound_address: Address,
     fee_market_address: Address,
-    account: Address,
-    private_key: Option<&str>,
-    gas_option: Options,
+    private_key: &str,
+    max_gas_price: U256,
+    etherscan_api_key: &str,
 ) -> color_eyre::Result<MessageClient<SimpleFeeMarketRelayStrategy>> {
     let transport = Http::new(endpoint)?;
     let client = Web3::new(transport);
     let inbound = Inbound::new(&client, inbound_address)?;
     let outbound = Outbound::new(&client, outbound_address)?;
     let fee_market = SimpleFeeMarket::new(&client, fee_market_address)?;
+    let private_key = SecretKey::from_str(private_key)?;
+    let account = (&private_key).address();
     let strategy = SimpleFeeMarketRelayStrategy::new(fee_market, account);
-    let private_key = private_key.map(SecretKey::from_str).transpose()?;
+    let etherscan_client = EtherscanClient::new(etherscan_api_key)?;
     Ok(MessageClient {
         client,
         inbound,
         outbound,
         strategy,
         private_key,
-        gas_option,
+        etherscan_client,
+        max_gas_price,
     })
 }
 
 impl<T: RelayStrategy> MessageClient<T> {
-    pub fn private_key(&self) -> color_eyre::Result<SecretKey> {
-        Ok(self
-            .private_key
-            .ok_or_else(|| BridgerError::Custom("Private key not found!".into()))?)
-    }
-
     pub async fn prepare_for_messages_confirmation(
         &self,
         begin: u64,
@@ -155,9 +167,10 @@ impl<T: RelayStrategy> MessageClient<T> {
         begin: u64,
         end: u64,
     ) -> color_eyre::Result<Vec<MessageAccepted>> {
-        let logs: Result<Vec<Option<MessageAccepted>>, _> =
-            future::try_join_all((begin..=end).map(|nonce| self.query_message_accepted(nonce)))
-                .await;
+        let logs: Result<Vec<Option<MessageAccepted>>, _> = future::try_join_all(
+            (begin..=end).map(|nonce| self.query_message_accepted_with_retry(nonce)),
+        )
+        .await;
         if let Some(logs) = logs?.into_iter().collect::<Option<Vec<_>>>() {
             Ok(logs)
         } else {
@@ -166,6 +179,25 @@ impl<T: RelayStrategy> MessageClient<T> {
                 begin, end
             ))
             .into())
+        }
+    }
+
+    pub async fn query_message_accepted_with_retry(
+        &self,
+        nonce: u64,
+    ) -> color_eyre::Result<Option<MessageAccepted>> {
+        let mut count = 0;
+        loop {
+            match self.query_message_accepted(nonce).await {
+                Ok(v) => return Ok(v),
+                Err(error) => {
+                    if count > 3 {
+                        return Err(error);
+                    }
+                    tokio::time::sleep(std::time::Duration::from_secs(count)).await;
+                    count += 1;
+                }
+            }
         }
     }
 
@@ -212,7 +244,7 @@ impl<T: RelayStrategy> MessageClient<T> {
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<MessagesProof> {
         let lane_id_proof = self
-            .get_storage_proof(
+            .get_storage_proof_with_retry(
                 self.outbound.contract.address(),
                 vec![U256::from(LANE_IDENTIFY_SLOT)],
                 block_number,
@@ -220,7 +252,7 @@ impl<T: RelayStrategy> MessageClient<T> {
             .await?
             .ok_or_else(|| BridgerError::Custom("Failed to get lane_id_proof".into()))?;
         let lane_nonce_proof = self
-            .get_storage_proof(
+            .get_storage_proof_with_retry(
                 self.outbound.contract.address(),
                 vec![U256::from(LANE_NONCE_SLOT)],
                 block_number,
@@ -229,7 +261,11 @@ impl<T: RelayStrategy> MessageClient<T> {
             .ok_or_else(|| BridgerError::Custom("Failed to get lane_nonce_proof".into()))?;
         let message_keys = Self::build_message_storage_keys(begin, end);
         let message_proof = self
-            .get_storage_proof(self.outbound.contract.address(), message_keys, block_number)
+            .get_storage_proof_with_retry(
+                self.outbound.contract.address(),
+                message_keys,
+                block_number,
+            )
             .await?
             .ok_or_else(|| BridgerError::Custom("Failed to get message_proof".into()))?;
 
@@ -275,6 +311,30 @@ impl<T: RelayStrategy> MessageClient<T> {
             .collect()
     }
 
+    pub async fn get_storage_proof_with_retry(
+        &self,
+        address: Address,
+        storage_keys: Vec<U256>,
+        block_number: Option<BlockNumber>,
+    ) -> color_eyre::Result<Option<Web3Proof>> {
+        let mut count = 0;
+        loop {
+            match self
+                .get_storage_proof(address, storage_keys.clone(), block_number)
+                .await
+            {
+                Ok(v) => return Ok(v),
+                Err(error) => {
+                    if count > 3 {
+                        return Err(error);
+                    }
+                    count += 1;
+                    tokio::time::sleep(std::time::Duration::from_secs(count)).await;
+                }
+            }
+        }
+    }
+
     pub async fn get_storage_proof(
         &self,
         address: Address,
@@ -294,7 +354,10 @@ mod tests {
     use std::str::FromStr;
 
     use secp256k1::SecretKey;
-    use web3::types::{Address, U64};
+    use web3::{
+        contract::Options,
+        types::{Address, U64},
+    };
 
     use super::*;
 
@@ -304,9 +367,9 @@ mod tests {
             Address::from_str("0x588abe3F7EE935137102C5e2B8042788935f4CB0").unwrap(),
             Address::from_str("0xee4f69fc69F2C203a0572e43375f68a6e9027998").unwrap(),
             Address::from_str("0x721F10bdE716FF44F596Afa2E8726aF197e6218E").unwrap(),
-            Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
-            None,
-            Options::default(),
+            "",
+            U256::from_dec_str("1000000").unwrap(),
+            "",
         )
         .unwrap();
         client
@@ -318,9 +381,9 @@ mod tests {
             Address::from_str("0x3E37361F50a178e05E5d81234dDE67E6cC991ed1").unwrap(),
             Address::from_str("0x634370aCf53cf55ad270E084442ea7A23B43B26a").unwrap(),
             Address::from_str("0xB59a893f5115c1Ca737E36365302550074C32023").unwrap(),
-            Address::from_str("0x7181932Da75beE6D3604F4ae56077B52fB0c5a3b").unwrap(),
-            None,
-            Options::default(),
+            "",
+            U256::from_dec_str("1000000").unwrap(),
+            "",
         )
         .unwrap()
     }

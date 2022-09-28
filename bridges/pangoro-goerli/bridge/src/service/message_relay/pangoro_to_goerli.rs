@@ -4,7 +4,8 @@ use std::time::Duration;
 use bridge_e2e_traits::strategy::RelayStrategy;
 use client_contracts::PosaLightClient;
 
-use web3::types::{Address, BlockId, BlockNumber, U256};
+use web3::contract::Options;
+use web3::types::{Address, BlockId, BlockNumber, H256, U256};
 
 use crate::goerli_client::client::GoerliClient;
 use crate::message_contract::darwinia_message_client::{
@@ -17,7 +18,7 @@ use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::pangoro_client::client::PangoroClient;
-use crate::web3_helper::wait_for_transaction_confirmation;
+use crate::web3_helper::{wait_for_transaction_confirmation, GasPriceOracle};
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
@@ -75,7 +76,7 @@ async fn message_relay_client_builder(
         &config.pangoro_evm.contract_address,
         &config.pangoro_evm.execution_layer_contract_address,
         &config.pangoro_evm.private_key,
-        config.pangoro_evm.gas_option(),
+        U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
     let beacon_rpc_client = GoerliClient::new(&config.goerli.endpoint)?;
     let target = build_message_client_with_simple_fee_market(
@@ -83,9 +84,9 @@ async fn message_relay_client_builder(
         Address::from_str(&config.goerli.inbound_address)?,
         Address::from_str(&config.goerli.outbound_address)?,
         Address::from_str(&config.goerli.fee_market_address)?,
-        Address::from_str(&config.goerli.account)?,
-        Some(&config.goerli.private_key),
-        config.goerli.gas_option(),
+        &config.goerli.private_key,
+        U256::from_dec_str(&config.goerli.max_gas_price)?,
+        &config.goerli.etherscan_api_key,
     )
     .unwrap();
     let source = build_darwinia_message_client(
@@ -95,10 +96,8 @@ async fn message_relay_client_builder(
         Address::from_str(&config.pangoro_evm.chain_message_committer_address)?,
         Address::from_str(&config.pangoro_evm.lane_message_committer_address)?,
         Address::from_str(&config.pangoro_evm.fee_market_address)?,
-        Address::from_str(&config.pangoro_evm.account)?,
-        Some(&config.pangoro_evm.private_key),
+        &config.pangoro_evm.private_key,
         config.index.to_pangoro_thegraph()?,
-        config.pangoro_evm.gas_option(),
     )
     .unwrap();
     let posa_light_client = PosaLightClient::new(
@@ -111,6 +110,7 @@ async fn message_relay_client_builder(
         posa_light_client,
         beacon_rpc_client,
         beacon_light_client,
+        max_message_num_per_relaying: config.general.max_message_num_per_relaying,
     })
 }
 
@@ -150,6 +150,7 @@ pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
     pub posa_light_client: PosaLightClient,
     pub beacon_rpc_client: GoerliClient,
     pub beacon_light_client: PangoroClient,
+    pub max_message_num_per_relaying: u64,
 }
 
 impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
@@ -195,7 +196,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         tracing::info!(
             target: "pangoro-goerli",
             "[MessageDelivery][Pangoro=>Goerli] Try to relay messages: [{:?}, {:?}]",
-            begin,
+            received_nonce.last_delivered_nonce + 1,
             end
         );
 
@@ -214,28 +215,44 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .map(|x| x.encoded_key)
             .collect();
 
-        let max_unconfirmed_messages = 20;
+        let confirm_limit = 20;
 
         // Calculate devliery_size parameter in inbound.receive_messages_proof
         let mut count = 0;
+        let mut delivered = 0;
         for (index, key) in encoded_keys.iter().enumerate() {
             let current = index as u64 + begin;
 
             // Messages less or equal than last_delivered_nonce have been delivered.
             let is_delivered = current <= received_nonce.last_delivered_nonce;
-            let not_beyond_confirm =
-                current - received_nonce.last_confirmed_nonce <= max_unconfirmed_messages;
+            let beyond_confirm_limit =
+                current - received_nonce.last_confirmed_nonce > confirm_limit;
 
-            if not_beyond_confirm && (is_delivered || self.source.strategy.decide(*key).await?) {
+            if beyond_confirm_limit {
+                break;
+            }
+
+            if is_delivered {
+                delivered += 1;
+                count += 1;
+                continue;
+            }
+
+            if self.source.strategy.decide(*key).await? {
                 count += 1;
             } else {
                 break;
             }
+
+            if count - delivered >= self.max_message_num_per_relaying {
+                break;
+            }
         }
-        if count == 0 {
+
+        if count == delivered {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[MessageDelivery][Pangoro=>Goerli] Decided not to relay",
+                "[MessageDelivery][Pangoro=>Goerli] No need to relay",
             );
             return Ok(());
         }
@@ -243,18 +260,24 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         tracing::info!(
             target: "pangoro-goerli",
             "[MessageDelivery][Pangoro=>Goerli] Relaying messages: [{:?}, {:?}]",
-            begin,
+            begin + delivered,
             begin + count - 1,
         );
 
+        let gas = U256::from_dec_str("300000")? * (end - begin + 2);
+        let gas_price = self.target.gas_price().await?;
         let tx = self
             .target
             .inbound
             .receive_messages_proof(
                 proof,
                 U256::from(count),
-                &self.target.private_key()?,
-                self.target.gas_option.clone(),
+                &self.target.private_key,
+                Options {
+                    gas: Some(gas),
+                    gas_price: Some(gas_price),
+                    ..Default::default()
+                },
             )
             .await?;
 
@@ -295,7 +318,16 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         }
 
         // query last relayed header
-        let last_relayed_target_block_in_source = self.best_target_block_at_source().await?;
+        let last_relayed_target_block_in_source = match self.best_target_block_at_source().await? {
+            None => {
+                tracing::info!(
+                    target: "pangoro-goerli",
+                    "[MessageConfirmation][Pangoro=>Goerli] Wait for execution layer relay",
+                );
+                return Ok(());
+            }
+            Some(num) => num,
+        };
 
         // assemble unrewarded relayers state
         let target_inbound_state = self
@@ -338,14 +370,19 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             )
             .await?;
 
+        let gas_price = self.beacon_light_client.gas_price().await?;
         // send proof
         let hash = self
             .source
             .outbound
             .receive_messages_delivery_proof(
                 proof,
-                &self.source.private_key()?,
-                self.source.gas_option.clone(),
+                &self.source.private_key,
+                Options {
+                    gas: Some(U256::from_dec_str("10000000")?),
+                    gas_price: Some(gas_price),
+                    ..Default::default()
+                },
             )
             .await?;
 
@@ -364,7 +401,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
         Ok(())
     }
 
-    async fn best_target_block_at_source(&self) -> color_eyre::Result<u64> {
+    async fn best_target_block_at_source(&self) -> color_eyre::Result<Option<u64>> {
         let finalized = self
             .beacon_light_client
             .beacon_light_client
@@ -374,6 +411,14 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .beacon_rpc_client
             .get_beacon_block(finalized.slot)
             .await?;
-        Ok(block.body.execution_payload.block_number.parse()?)
+        let execution_state_root = self
+            .beacon_light_client
+            .execution_layer_state_root(None)
+            .await?;
+        if execution_state_root != H256::from_str(&block.body.execution_payload.state_root)? {
+            Ok(None)
+        } else {
+            Ok(Some(block.body.execution_payload.block_number.parse()?))
+        }
     }
 }

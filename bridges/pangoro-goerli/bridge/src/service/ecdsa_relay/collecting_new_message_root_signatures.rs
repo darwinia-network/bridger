@@ -29,6 +29,16 @@ impl CollectingNewMessageRootSignaturesRunner {
             return Ok(None);
         }
         let event = cacse.expect("Unreachable");
+        let latest_relayed_block_number = self.source.client_posa.block_number().await?;
+        if latest_relayed_block_number.as_u32() >= event.block_number {
+            tracing::info!(
+                target: "pangoro-goerli",
+                "[pangoro] [ecdsa] [collectingMessage] Latest relayed block number is: {:?}",
+                event.block_number
+            );
+            return Ok(Some(event.block_number));
+        }
+
         tracing::info!(
             target: "pangoro-goerli",
             "[pangoro] [ecdsa] found new message root signature event from block {}",

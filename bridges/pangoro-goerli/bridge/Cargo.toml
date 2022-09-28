@@ -45,6 +45,7 @@ support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-terminal   = { path = "../../../frame/supports/support-terminal" }
 support-tracker    = { path = "../../../frame/supports/support-tracker" }
 support-command-kv = { path = "../../../frame/supports/support-command-kv" }
+support-etherscan  = { path = "../../../frame/supports/support-etherscan" }
 
 component-http-client = { path = "../../../frame/components/http-client" }
 component-state       = { path = "../../../frame/components/state" }
@@ -54,5 +55,5 @@ subquery              = { path = "../../../frame/assistants/subquery", features 
 client-contracts      = { path = "../../../frame/assistants/client-contracts" }
 client-pangoro        = { path = "../../../frame/assistants/client-pangoro", features = [ "bridge-ethv2" ] }
 relay-e2e             = { path = "../../../frame/assistants/relay-e2e" }
-thegraph-liketh     = { path = "../../../frame/assistants/thegraph-liketh" }
+thegraph-liketh       = { path = "../../../frame/assistants/thegraph-liketh" }
 

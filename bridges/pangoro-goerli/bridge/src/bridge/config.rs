@@ -9,17 +9,31 @@ use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 use thegraph_liketh::component::TheGraphLikeEthComponent;
 use thegraph_liketh::config::TheGraphLikeEthConfig;
 use thegraph_liketh::graph::TheGraphLikeEth;
-use web3::contract::Options;
 use web3::transports::Http;
-use web3::types::{Address, U256};
+use web3::types::Address;
 use web3::Web3;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
+    pub general: GeneralConfig,
     pub pangoro_evm: PangoroEVMConfig,
     pub pangoro_substrate: PangoroSubstrateConfig,
     pub goerli: ChainInfoConfig,
     pub index: IndexConfig,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct GeneralConfig {
+    pub header_goerli_to_pangoro: bool,
+    pub sync_commit_goerli_to_pangoro: bool,
+    pub execution_layer_goerli_to_pangoro: bool,
+    pub ecdsa_service: bool,
+    pub msg_goerli_to_pangoro: bool,
+    pub msg_pangoro_to_goerli: bool,
+    // Max message numbers per delivery
+    pub max_message_num_per_relaying: u64,
+    // Minium interval(seconds) between every header delivery
+    pub header_relay_minimum_interval: u64,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -28,14 +42,13 @@ pub struct ChainInfoConfig {
     pub execution_layer_endpoint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contract_address: Option<String>,
-    pub account: String,
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,
     pub fee_market_address: String,
     pub posa_light_client_address: String,
-    pub gas: u64,
-    pub gas_price: u64,
+    pub max_gas_price: String,
+    pub etherscan_api_key: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -43,15 +56,13 @@ pub struct PangoroEVMConfig {
     pub endpoint: String,
     pub contract_address: String,
     pub execution_layer_contract_address: String,
-    pub account: String,
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,
     pub chain_message_committer_address: String,
     pub lane_message_committer_address: String,
     pub fee_market_address: String,
-    pub gas: u64,
-    pub gas_price: u64,
+    pub max_gas_price: String,
 }
 
 impl PangoroEVMConfig {
@@ -63,14 +74,6 @@ impl PangoroEVMConfig {
         let transport = Http::new(&self.endpoint)?;
         let client = Web3::new(transport);
         Ok(client)
-    }
-
-    pub fn gas_option(&self) -> Options {
-        Options {
-            gas: Some(U256::from(self.gas)),
-            gas_price: Some(U256::from(self.gas_price)),
-            ..Default::default()
-        }
     }
 }
 
@@ -96,14 +99,6 @@ impl ChainInfoConfig {
         let transport = Http::new(&self.execution_layer_endpoint)?;
         let client = Web3::new(transport);
         Ok(client)
-    }
-
-    pub fn gas_option(&self) -> Options {
-        Options {
-            gas: Some(U256::from(self.gas)),
-            gas_price: Some(U256::from(self.gas_price)),
-            ..Default::default()
-        }
     }
 }
 

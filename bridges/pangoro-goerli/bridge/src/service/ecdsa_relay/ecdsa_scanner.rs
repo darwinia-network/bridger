@@ -66,7 +66,10 @@ impl EcdsaScanner {
                     runner.start().await?
                 }
                 EcdsaScanType::CollectedMessage => {
-                    let runner = CollectedEnoughNewMessageRootSignaturesRunner::new(source.clone());
+                    let mut runner = CollectedEnoughNewMessageRootSignaturesRunner::new(
+                        source.clone(),
+                        config.general.header_relay_minimum_interval,
+                    );
                     runner.start().await?
                 }
                 EcdsaScanType::CollectingAuthority => {

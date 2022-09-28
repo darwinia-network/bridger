@@ -37,9 +37,9 @@ private_key = "//Alice"
 
 [ethereum]
 # Beacon chain rpc endpoint
-endpoint                  = "http://localhost:5052"
-# Execution layer rpc endpoint
-execution_layer_endpoint  = "http://localhost:8545"
+endpoint                  = "https://lodestar-mainnet-rpc.darwinia.network"
+# Execution layer rpc endpoint, register one at https://dashboard.alchemy.com/
+execution_layer_endpoint  = "..."
 inbound_address           = "0x4E210866d089856a8A0435965FefEe19640487E5"
 outbound_address          = "0x169F28bfbfFCddFdc772A94Cf020bbB4CAdc8E01"
 fee_market_address        = "0xCD97185B7d05f8ea91d241C8dfD51a2Cc9c0547a"
@@ -53,7 +53,6 @@ max_gas_price = 9000000000
 # Register to get a free etherescan api key at https://docs.etherscan.io/api-endpoints/gas-tracker
 etherscan_api_key = "api_key..."
 
-
 [index]
 darwinia = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia/" }
-darwinia_evm = { endpoint = "http://localhost:8000/subgraphs/name/ethv2" }
+darwinia_evm = { endpoint = "https://thegraph.darwinia.network/ethv2" }

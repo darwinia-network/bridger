@@ -94,7 +94,7 @@ impl ExecutionLayer {
         if relayed_state_root != latest_execution_payload_state_root {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[ExecutionLayer][Goerli=>Pangoro] Try to relay execution layer state at slot: {:?}",
+                "[ExecutionLayer][Goerli=>Darwinia] Try to relay execution layer state at slot: {:?}",
                 last_relayed_header.slot,
             );
 
@@ -130,7 +130,7 @@ impl ExecutionLayer {
                 .await?;
             tracing::info!(
                 target: "pangoro-goerli",
-                "[ExecutionLayer][Goerli=>Pangoro] Sending tx: {:?}",
+                "[ExecutionLayer][Goerli=>Darwinia] Sending tx: {:?}",
                 &tx
             );
             wait_for_transaction_confirmation(
@@ -143,7 +143,7 @@ impl ExecutionLayer {
         } else {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[ExecutionLayer][Goerli=>Pangoro] Latest execution payload state root at slot {:?} is : {:?}",
+                "[ExecutionLayer][Goerli=>Darwinia] Latest execution payload state root at slot {:?} is : {:?}",
                 last_relayed_header.slot,
                 &relayed_state_root,
             );

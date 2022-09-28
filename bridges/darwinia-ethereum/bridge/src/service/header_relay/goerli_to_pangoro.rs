@@ -80,9 +80,9 @@ async fn start() -> color_eyre::Result<()> {
 
 #[derive(Debug)]
 pub struct HeaderRelayState {
-    // Latest relayed header slot at Pangoro
+    // Latest relayed header slot at Darwinia
     pub relayed_slot: u64,
-    // Latest relayed period at Pangoro
+    // Latest relayed period at Darwinia
     pub relayed_period: u64,
     // Latest header slot at Goerli
     pub current_slot: u64,
@@ -121,7 +121,7 @@ impl HeaderRelay {
         if now - self.last_relay_time <= self.minimal_interval {
             tracing::info!(
                 target: "pangoro-goerli",
-                "[Header][Goerli=>Pangoro] Last relaying time is {:?}, wait for {} seconds to start again.",
+                "[Header][Goerli=>Darwinia] Last relaying time is {:?}, wait for {} seconds to start again.",
                 self.last_relay_time,
                 self.minimal_interval - (now - self.last_relay_time)
             );
@@ -136,7 +136,7 @@ impl HeaderRelay {
             .await?;
         tracing::info!(
             target: "pangoro-goerli",
-            "[Header][Goerli=>Pangoro] State: {:?}",
+            "[Header][Goerli=>Darwinia] State: {:?}",
             state
         );
         if state.current_period == state.relayed_period {
@@ -160,7 +160,7 @@ impl HeaderRelay {
 
         tracing::info!(
             target: "pangoro-goerli",
-            "[Header][Goerli=>Pangoro] Latest finality slot: {:?}",
+            "[Header][Goerli=>Darwinia] Latest finality slot: {:?}",
             &update_finality_slot
         );
         // The latest finality header has been relayed
@@ -179,7 +179,7 @@ impl HeaderRelay {
             None => {
                 tracing::info!(
                     target: "pangoro-goerli",
-                    "[Header][Goerli=>Pangoro] Wait for valid attested header",
+                    "[Header][Goerli=>Darwinia] Wait for valid attested header",
                 );
                 return Ok(());
             }
@@ -238,7 +238,7 @@ impl HeaderRelay {
                 None => {
                     tracing::info!(
                         target: "pangoro-goerli",
-                        "[Header][Goerli=>Pangoro] Wait for valid attested header",
+                        "[Header][Goerli=>Darwinia] Wait for valid attested header",
                     );
                     return Ok(());
                 }
@@ -295,7 +295,7 @@ impl HeaderRelay {
             .await?;
         tracing::info!(
         target: "pangoro-goerli",
-            "[Header][Goerli=>Pangoro] Sending tx: {:?}",
+            "[Header][Goerli=>Darwinia] Sending tx: {:?}",
             &tx
         );
         wait_for_transaction_confirmation(

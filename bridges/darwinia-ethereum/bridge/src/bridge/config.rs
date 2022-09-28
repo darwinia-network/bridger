@@ -135,7 +135,7 @@ impl IndexConfig {
     pub fn to_pangoro_thegraph(&self) -> color_eyre::Result<TheGraphLikeEth> {
         Ok(TheGraphLikeEthComponent::component(
             self.pangoro_evm.clone(),
-            thegraph_liketh::types::LikethChain::Pangoro,
+            thegraph_liketh::types::LikethChain::Darwinia,
         )?)
     }
 }

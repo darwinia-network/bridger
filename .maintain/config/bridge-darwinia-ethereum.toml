@@ -1,50 +1,59 @@
-[darwinia]
-# The WebSocket endpoint of any archive node (`darwinia --pruning=archive`) and enabling offchain-indexing, supports `ws://` and `wss://`.
-endpoint = "ws://127.0.0.1:9944"
+[general]
+# Whether to relay beacon headers from ethereum to darwinia
+header_ethereum_to_darwinia = true
+# Whether to relay sync commit from ethereum to darwinia
+sync_commit_ethereum_to_darwinia = true
+# Whether to relay execution layer state root from ethereum to darwinia
+execution_layer_ethereum_to_darwinia = true
+# Whether to sign the messages root and relay headers from darwinia to ethereum
+ecdsa_service = true
+# Whether to relay messages from ethereum to darwinia
+msg_ethereum_to_darwinia = true
+# Whether to relay messages from darwinia to ethereum
+msg_darwinia_to_ethereum = true
+# Max number of messages every delivery
+max_message_num_per_relaying = 15
+# Minimum seconds between two header relay
+header_relay_minimum_interval = 900
 
-# Private key in hex of your account or proxy account to sign relay extrinsics. It is highly recommended to use a proxy account to prevent exposing your main account's private key.
-# Proxy account is an account that can "perform" on behalf of your "real" account.
-# To allow an account proxying extrinsics, you need to open [Extrinsics in apps.darwinia.network](https://apps.darwinia.network/#/extrinsics), switch to your "real" account, and submit the `proxy.addProxy(proxy_account, ProxyType.EthereumBridge, 0)` extrinsic to delegate it.
-# private key of relayer, or, private key of proxy
-# Here is a [tool](https://polkadot.subscan.io/tools/ss58_transform) provided by Subscan that helps convert SS58 addresses to public keys.
-relayer_private_key = "0x..."
-# (optional) real account public key
-# If you set `seed` to the private key of your proxy account, you have to set this to the public key of your "real" account as well.
-relayer_real_account = "0x..."
+[darwinia_evm]
+endpoint                         = "https://darwinia-rpc.darwinia.network"
+contract_address                 = "0x9C266C48F07121181d8424768f0deD0170cC63A6"
+execution_layer_contract_address = "0xe50F1Ddf0C8778773f07Eb2759d045Ece19F6Cc1"
+inbound_address                  = "0xf1B8a9F8436800499DB8186f2da2fb3e78Ff7c2B"
+outbound_address                 = "0xcA3749C8C3aF04278D596a3fBe461481B6aa1b01"
+fee_market_address               = "0xcA927Df15afb7629b79dA4713a871190315c7409"
+chain_message_committer_address  = "0xea7d0fE22AF25d9655f7AdDd6a59E37e84B3AB5F"
+lane_message_committer_address   = "0x56746a8099a7e6D962802A23e01FeDdc1282cDAe"
+account                          = "0x..."
+# private_key should not start with 0x
+private_key                      = "//Alice"
+# Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
+max_gas_price = 9000000000
 
-# private key to sign ecdsa messages
-ecdsa_authority_private_key = "0x..."
-
-[web3]
-endpoint = "https://mainnet.infura.io/v3/<YOUR_KEY>"
+[darwinia_substrate]
+endpoint    = "wss://darwinia-rpc.darwinia.network"
+private_key = "//Alice"
 
 [ethereum]
-# below two need to be all setted if you want to do the relay job
-# (optional) the person who will relay darwinia data to ethereum
-relayer_private_key = "0x..."
-# (optional) the darwinia account public key who will get the reward
-relayer_beneficiary_darwinia_account = "0x..."
+# Beacon chain rpc endpoint
+endpoint                  = "http://localhost:5052"
+# Execution layer rpc endpoint
+execution_layer_endpoint  = "http://localhost:8545"
+inbound_address           = "0x4E210866d089856a8A0435965FefEe19640487E5"
+outbound_address          = "0x169F28bfbfFCddFdc772A94Cf020bbB4CAdc8E01"
+fee_market_address        = "0xCD97185B7d05f8ea91d241C8dfD51a2Cc9c0547a"
+account                   = "0x..."
+# Ethereum account private_key should not starts with 0x.
+private_key               = "..."
+posa_light_client_address = "0xf46349a32cA70C0B9fFbD19937Fb1623e7F3db19"
+# Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
+max_gas_price = 9000000000
+# Bridger use etherscan gas oracle to get more appropriate gas price.
+# Register to get a free etherescan api key at https://docs.etherscan.io/api-endpoints/gas-tracker
+etherscan_api_key = "api_key..."
 
-# listen to set authorities
-subscribe_relay_address = "0x5cde5Aafeb8E06Ce9e4F94c2406d3B6CB7098E49"
 
-[shadow]
-# The endpoint of [Darwinia Shadow service](https://github.com/darwinia-network/shadow), supports HTTP and HTTPS. For example using the official service:
-endpoint = "https://shadow-ethereum.darwinia.network"
-thegraph = "https://api.thegraph.com/subgraphs/name/darwinia-network/ethereum-mmr"
-
-[task]
-interval_ethereum = 120
-interval_relay = 60
-interval_guard = 30
-interval_check = 90
-check_timeout = 2000
-
-[http_client]
-timeout = 3000
-
-[thegraph]
-endpoint = "https://api.thegraph.com/subgraphs/name/darwinia-network/bridge-ethereum"
-
-[subquery]
-endpoint = "https://subql.darwinia.network/subql-bridger-darwinia"
+[index]
+darwinia = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia/" }
+darwinia_evm = { endpoint = "http://localhost:8000/subgraphs/name/ethv2" }

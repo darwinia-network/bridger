@@ -42,7 +42,6 @@ pub struct ChainInfoConfig {
     pub execution_layer_endpoint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contract_address: Option<String>,
-    pub account: String,
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,
@@ -57,7 +56,6 @@ pub struct DarwiniaEVMConfig {
     pub endpoint: String,
     pub contract_address: String,
     pub execution_layer_contract_address: String,
-    pub account: String,
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,

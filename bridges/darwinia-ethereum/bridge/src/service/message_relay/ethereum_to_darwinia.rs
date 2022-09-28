@@ -14,8 +14,8 @@ use crate::message_contract::message_client::build_message_client_with_simple_fe
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
 use crate::web3_helper::{wait_for_transaction_confirmation, GasPriceOracle};
 use crate::{
-    ethereum_client::client::EthereumClient, message_contract::message_client::MessageClient,
-    darwinia_client::client::DarwiniaClient,
+    darwinia_client::client::DarwiniaClient, ethereum_client::client::EthereumClient,
+    message_contract::message_client::MessageClient,
 };
 
 use crate::bridge::{BridgeBus, BridgeConfig};
@@ -84,8 +84,7 @@ async fn message_relay_client_builder(
         Address::from_str(&config.ethereum.inbound_address)?,
         Address::from_str(&config.ethereum.outbound_address)?,
         Address::from_str(&config.ethereum.fee_market_address)?,
-        Address::from_str(&config.ethereum.account)?,
-        Some(&config.ethereum.private_key),
+        &config.ethereum.private_key,
         U256::from_dec_str(&config.ethereum.max_gas_price)?,
         &config.ethereum.etherscan_api_key,
     )
@@ -97,8 +96,7 @@ async fn message_relay_client_builder(
         Address::from_str(&config.darwinia_evm.chain_message_committer_address)?,
         Address::from_str(&config.darwinia_evm.lane_message_committer_address)?,
         Address::from_str(&config.darwinia_evm.fee_market_address)?,
-        Address::from_str(&config.darwinia_evm.account)?,
-        Some(&config.darwinia_evm.private_key),
+        &config.darwinia_evm.private_key,
         config.index.to_darwinia_thegraph()?,
     )
     .unwrap();
@@ -286,7 +284,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .receive_messages_proof(
                 proof,
                 U256::from(count),
-                &self.target.private_key()?,
+                &self.target.private_key,
                 Options {
                     gas: Some(gas),
                     gas_price: Some(gas_price),
@@ -399,7 +397,7 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .outbound
             .receive_messages_delivery_proof(
                 proof,
-                &self.source.private_key()?,
+                &self.source.private_key,
                 Options {
                     gas: Some(U256::from_dec_str("2000000")?),
                     gas_price: Some(gas_price),

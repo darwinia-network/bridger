@@ -261,6 +261,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
+name = "bp-darwinia"
+version = "0.1.0"
+source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.4#30c30311fd601a10546243dbcf9358565d2d1976"
+dependencies = [
+ "bp-darwinia-core",
+ "bp-messages",
+ "bp-runtime",
+ "frame-support",
+ "sp-api",
+ "sp-runtime",
+ "sp-std",
+ "sp-version",
+]
+
+[[package]]
 name = "bp-darwinia-core"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.4#30c30311fd601a10546243dbcf9358565d2d1976"
@@ -294,21 +309,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-pangoro"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.4#30c30311fd601a10546243dbcf9358565d2d1976"
-dependencies = [
- "bp-darwinia-core",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "sp-api",
- "sp-runtime",
- "sp-std",
- "sp-version",
-]
-
-[[package]]
 name = "bp-runtime"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.4#30c30311fd601a10546243dbcf9358565d2d1976"
@@ -327,16 +327,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridge-e2e-traits"
-version = "0.6.4"
-dependencies = [
- "async-trait",
- "thiserror",
- "web3",
-]
-
-[[package]]
-name = "bridge-pangoro-goerli"
+name = "bridge-darwinia-ethereum"
 version = "0.6.4"
 dependencies = [
  "array-bytes",
@@ -344,7 +335,7 @@ dependencies = [
  "bridge-e2e-traits",
  "bytes",
  "client-contracts",
- "client-pangoro",
+ "client-darwinia",
  "color-eyre",
  "component-http-client",
  "component-state",
@@ -371,6 +362,15 @@ dependencies = [
  "thegraph-liketh",
  "tokio",
  "tracing",
+ "web3",
+]
+
+[[package]]
+name = "bridge-e2e-traits"
+version = "0.6.4"
+dependencies = [
+ "async-trait",
+ "thiserror",
  "web3",
 ]
 
@@ -467,12 +467,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "client-pangoro"
+name = "client-darwinia"
 version = "0.6.4"
 dependencies = [
  "array-bytes",
- "bp-pangoro",
- "bridge-e2e-traits",
+ "bp-darwinia",
  "parity-scale-codec",
  "serde 1.0.139",
  "serde_json",

@@ -6,6 +6,9 @@ pub enum BridgeName {
     /// bridge pangolin-ropsten
     #[cfg(feature = "bridge-ethv1")]
     PangolinRopsten,
+    /// bridge darwinia-ethereum-pow
+    #[cfg(feature = "bridge-ethv1")]
+    DarwiniaEthereumPow,
     /// bridge darwinia-ethereum
     #[cfg(feature = "bridge-ethv2")]
     DarwiniaEthereum,
@@ -32,6 +35,8 @@ impl BridgeName {
         match self {
             #[cfg(feature = "bridge-ethv1")]
             Self::PangolinRopsten => "pangolin-ropsten",
+            #[cfg(feature = "bridge-ethv1")]
+            Self::DarwiniaEthereumPow => "darwinia-ethereum-pow",
             #[cfg(feature = "bridge-ethv2")]
             Self::DarwiniaEthereum => "darwinia-ethereum",
             #[cfg(feature = "bridge-s2s")]

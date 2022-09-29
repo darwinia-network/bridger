@@ -71,6 +71,7 @@ feemarket-s2s   = [
   "feemarket-s2s-traits",
 ]
 feemarket-s2s-crab = ["feemarket-s2s"]
+ecdsa-authority = []
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

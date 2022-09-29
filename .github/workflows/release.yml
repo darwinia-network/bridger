@@ -22,10 +22,11 @@ jobs:
           - bridger
           - pangolin-ropsten
           - darwinia-ethereum-pow
+          - darwinia-ethereum
           - pangolin-pangoro
           - darwinia-crab
-          # - pangoro-chapel
-          # - pangoro-goerli
+          - pangoro-chapel
+          - pangoro-goerli
           - pangolin-pangolinparachain
           - crab-crabparachain
     steps:

@@ -41,6 +41,7 @@ jobs:
         bridge:
           - pangolin-ropsten
           - darwinia-ethereum-pow
+          - darwinia-ethereum
           - pangolin-pangoro
           - darwinia-crab
           - pangoro-chapel

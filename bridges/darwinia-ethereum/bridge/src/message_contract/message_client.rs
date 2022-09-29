@@ -21,7 +21,7 @@ use client_contracts::{
 };
 use client_contracts::{outbound_types::MessageAccepted, Outbound, SimpleFeeMarket};
 
-use crate::{goerli_client::types::MessagesProof, web3_helper::GasPriceOracle};
+use crate::{ethereum_client::types::MessagesProof, web3_helper::GasPriceOracle};
 
 use super::{simple_fee_market::SimpleFeeMarketRelayStrategy, utils::build_eth_confirmation_proof};
 
@@ -53,7 +53,6 @@ impl<T: RelayStrategy> GasPriceOracle for MessageClient<T> {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
 pub fn build_message_client_with_simple_fee_market(
     endpoint: &str,
     inbound_address: Address,
@@ -188,18 +187,19 @@ impl<T: RelayStrategy> MessageClient<T> {
         nonce: u64,
     ) -> color_eyre::Result<Option<MessageAccepted>> {
         let mut count = 0;
-        loop {
+        while count < 3 {
             match self.query_message_accepted(nonce).await {
                 Ok(v) => return Ok(v),
                 Err(error) => {
+                    count += 1;
                     if count > 3 {
                         return Err(error);
                     }
                     tokio::time::sleep(std::time::Duration::from_secs(count)).await;
-                    count += 1;
                 }
             }
         }
+        Ok(None)
     }
 
     pub async fn query_message_accepted(
@@ -319,21 +319,22 @@ impl<T: RelayStrategy> MessageClient<T> {
         block_number: Option<BlockNumber>,
     ) -> color_eyre::Result<Option<Web3Proof>> {
         let mut count = 0;
-        loop {
+        while count < 3 {
             match self
                 .get_storage_proof(address, storage_keys.clone(), block_number)
                 .await
             {
                 Ok(v) => return Ok(v),
                 Err(error) => {
+                    count += 1;
                     if count > 3 {
                         return Err(error);
                     }
-                    count += 1;
                     tokio::time::sleep(std::time::Duration::from_secs(count)).await;
                 }
             }
         }
+        Ok(None)
     }
 
     pub async fn get_storage_proof(
@@ -376,9 +377,9 @@ mod tests {
         client
     }
 
-    fn test_pangoro_client() -> MessageClient<SimpleFeeMarketRelayStrategy> {
+    fn test_darwinia_client() -> MessageClient<SimpleFeeMarketRelayStrategy> {
         build_message_client_with_simple_fee_market(
-            "https://pangoro-rpc.darwinia.network",
+            "https://darwinia-rpc.darwinia.network",
             Address::from_str("0x3E37361F50a178e05E5d81234dDE67E6cC991ed1").unwrap(),
             Address::from_str("0x634370aCf53cf55ad270E084442ea7A23B43B26a").unwrap(),
             Address::from_str("0xB59a893f5115c1Ca737E36365302550074C32023").unwrap(),
@@ -409,7 +410,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_build_lane_data() {
-        let client = test_pangoro_client();
+        let client = test_darwinia_client();
         let outbound_lane_nonce = client.outbound.outbound_lane_nonce(None).await.unwrap();
         let (begin, end) = (
             outbound_lane_nonce.latest_received_nonce + 1,
@@ -430,7 +431,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_query_message_event() {
-        let client = test_pangoro_client();
+        let client = test_darwinia_client();
         let event = client.query_message_accepted(2).await.unwrap();
         println!("event: {:?}", event);
     }
@@ -438,22 +439,22 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_receive_messages_proof() {
-        let goerli_client = test_client();
-        let pangoro_client = test_pangoro_client();
+        let ethereum_client = test_client();
+        let darwinia_client = test_darwinia_client();
         let private_key = SecretKey::from_str("//Alice").unwrap();
-        let proof = goerli_client
+        let proof = ethereum_client
             .prepare_for_messages_delivery(1, 2, Some(BlockNumber::Number(U64::from(1580730u64))))
             .await
             .unwrap();
         println!("proof: {:?}", proof);
-        let tx = pangoro_client
+        let tx = darwinia_client
             .inbound
             .receive_messages_proof(proof, U256::from(2), &private_key, Options::default())
             .await
             .unwrap();
         println!("tx: {:?}", tx);
 
-        let inbound_status = pangoro_client.inbound.data(None).await.unwrap();
-        println!("pangoro inbound: {:?}", inbound_status);
+        let inbound_status = darwinia_client.inbound.data(None).await.unwrap();
+        println!("darwinia inbound: {:?}", inbound_status);
     }
 }

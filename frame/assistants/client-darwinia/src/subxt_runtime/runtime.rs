@@ -22,6 +22,8 @@ pub mod api {
         ImOnline(im_online::Event),
         #[codec(index = 36)]
         EcdsaRelayAuthority(ecdsa_relay_authority::Event),
+        #[codec(index = 51)]
+        EcdsaAuthority(ecdsa_authority::Event),
         #[codec(index = 37)]
         Democracy(democracy::Event),
         #[codec(index = 16)]
@@ -746,7 +748,7 @@ pub mod api {
                         &mut &[
                             32u8, 68u8, 97u8, 114u8, 119u8, 105u8, 110u8, 105u8, 97u8, 32u8, 68u8,
                             97u8, 114u8, 119u8, 105u8, 110u8, 105u8, 97u8, 0u8, 0u8, 0u8, 0u8,
-                            208u8, 4u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 56u8, 223u8, 106u8, 203u8,
+                            218u8, 4u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 56u8, 223u8, 106u8, 203u8,
                             104u8, 153u8, 7u8, 96u8, 155u8, 3u8, 0u8, 0u8, 0u8, 55u8, 227u8, 151u8,
                             252u8, 124u8, 145u8, 245u8, 228u8, 1u8, 0u8, 0u8, 0u8, 64u8, 254u8,
                             58u8, 212u8, 1u8, 248u8, 149u8, 154u8, 5u8, 0u8, 0u8, 0u8, 188u8,
@@ -1544,95 +1546,96 @@ pub mod api {
         pub mod events {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Endowed(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Endowed {
+                pub account: ::subxt::sp_core::crypto::AccountId32,
+                pub free_balance: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Endowed {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "Endowed";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct DustLost(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct DustLost {
+                pub account: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for DustLost {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "DustLost";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Transfer(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Transfer {
+                pub from: ::subxt::sp_core::crypto::AccountId32,
+                pub to: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Transfer {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "Transfer";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct BalanceSet(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-                pub ::core::primitive::u128,
-            );
+            pub struct BalanceSet {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub free: ::core::primitive::u128,
+                pub reserved: ::core::primitive::u128,
+            }
             impl ::subxt::Event for BalanceSet {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "BalanceSet";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Reserved(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Reserved {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Reserved {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "Reserved";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Unreserved(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Unreserved {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Unreserved {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "Unreserved";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct ReserveRepatriated(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-                pub runtime_types::frame_support::traits::tokens::misc::BalanceStatus,
-            );
+            pub struct ReserveRepatriated {
+                pub from: ::subxt::sp_core::crypto::AccountId32,
+                pub to: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+                pub destination_status:
+                    runtime_types::frame_support::traits::tokens::misc::BalanceStatus,
+            }
             impl ::subxt::Event for ReserveRepatriated {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "ReserveRepatriated";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Deposit(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Deposit {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Deposit {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "Deposit";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Withdraw(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Withdraw {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Withdraw {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "Withdraw";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Slashed(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Slashed {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Slashed {
                 const PALLET: &'static str = "Balances";
                 const EVENT: &'static str = "Slashed";
@@ -2012,95 +2015,96 @@ pub mod api {
         pub mod events {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Endowed(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Endowed {
+                pub account: ::subxt::sp_core::crypto::AccountId32,
+                pub free_balance: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Endowed {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "Endowed";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct DustLost(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct DustLost {
+                pub account: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for DustLost {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "DustLost";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Transfer(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Transfer {
+                pub from: ::subxt::sp_core::crypto::AccountId32,
+                pub to: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Transfer {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "Transfer";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct BalanceSet(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-                pub ::core::primitive::u128,
-            );
+            pub struct BalanceSet {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub free: ::core::primitive::u128,
+                pub reserved: ::core::primitive::u128,
+            }
             impl ::subxt::Event for BalanceSet {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "BalanceSet";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Reserved(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Reserved {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Reserved {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "Reserved";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Unreserved(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Unreserved {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Unreserved {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "Unreserved";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct ReserveRepatriated(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-                pub runtime_types::frame_support::traits::tokens::misc::BalanceStatus,
-            );
+            pub struct ReserveRepatriated {
+                pub from: ::subxt::sp_core::crypto::AccountId32,
+                pub to: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+                pub destination_status:
+                    runtime_types::frame_support::traits::tokens::misc::BalanceStatus,
+            }
             impl ::subxt::Event for ReserveRepatriated {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "ReserveRepatriated";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Deposit(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Deposit {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Deposit {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "Deposit";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Withdraw(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Withdraw {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Withdraw {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "Withdraw";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Slashed(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::core::primitive::u128,
-            );
+            pub struct Slashed {
+                pub who: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: ::core::primitive::u128,
+            }
             impl ::subxt::Event for Slashed {
                 const PALLET: &'static str = "Kton";
                 const EVENT: &'static str = "Slashed";
@@ -5948,6 +5952,82 @@ pub mod api {
             }
         }
     }
+    pub mod message_gadget {
+        use super::runtime_types;
+        pub mod calls {
+            use super::runtime_types;
+            type DispatchError = runtime_types::sp_runtime::DispatchError;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct set_commitment_contract {
+                pub commitment_contract: runtime_types::primitive_types::H160,
+            }
+            impl ::subxt::Call for set_commitment_contract {
+                const PALLET: &'static str = "MessageGadget";
+                const FUNCTION: &'static str = "set_commitment_contract";
+            }
+            pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
+                client: &'a ::subxt::Client<T>,
+                marker: ::core::marker::PhantomData<(X, A)>,
+            }
+            impl<'a, T, X, A> TransactionApi<'a, T, X, A>
+            where
+                T: ::subxt::Config,
+                X: ::subxt::SignedExtra<T>,
+                A: ::subxt::AccountData,
+            {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self {
+                        client,
+                        marker: ::core::marker::PhantomData,
+                    }
+                }
+                pub fn set_commitment_contract(
+                    &self,
+                    commitment_contract: runtime_types::primitive_types::H160,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    set_commitment_contract,
+                    DispatchError,
+                > {
+                    let call = set_commitment_contract {
+                        commitment_contract,
+                    };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+            }
+        }
+        pub mod storage {
+            use super::runtime_types;
+            pub struct CommitmentContract;
+            impl ::subxt::StorageEntry for CommitmentContract {
+                const PALLET: &'static str = "MessageGadget";
+                const STORAGE: &'static str = "CommitmentContract";
+                type Value = runtime_types::primitive_types::H160;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct StorageApi<'a, T: ::subxt::Config> {
+                client: &'a ::subxt::Client<T>,
+            }
+            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self { client }
+                }
+                pub async fn commitment_contract(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<runtime_types::primitive_types::H160, ::subxt::BasicError>
+                {
+                    let entry = CommitmentContract;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+            }
+        }
+    }
     pub mod ecdsa_relay_authority {
         use super::runtime_types;
         pub mod calls {
@@ -6476,6 +6556,384 @@ pub mod api {
                 {
                     Ok(::subxt::codec::Decode::decode(
                         &mut &[10u8, 0u8, 0u8, 0u8][..],
+                    )?)
+                }
+            }
+        }
+    }
+    pub mod ecdsa_authority {
+        use super::runtime_types;
+        pub mod calls {
+            use super::runtime_types;
+            type DispatchError = runtime_types::sp_runtime::DispatchError;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct add_authority {
+                pub new: runtime_types::primitive_types::H160,
+            }
+            impl ::subxt::Call for add_authority {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const FUNCTION: &'static str = "add_authority";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct remove_authority {
+                pub old: runtime_types::primitive_types::H160,
+            }
+            impl ::subxt::Call for remove_authority {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const FUNCTION: &'static str = "remove_authority";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct swap_authority {
+                pub old: runtime_types::primitive_types::H160,
+                pub new: runtime_types::primitive_types::H160,
+            }
+            impl ::subxt::Call for swap_authority {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const FUNCTION: &'static str = "swap_authority";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct submit_authorities_change_signature {
+                pub address: runtime_types::primitive_types::H160,
+                pub signature: runtime_types::sp_core::ecdsa::Signature,
+            }
+            impl ::subxt::Call for submit_authorities_change_signature {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const FUNCTION: &'static str = "submit_authorities_change_signature";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct submit_new_message_root_signature {
+                pub address: runtime_types::primitive_types::H160,
+                pub signature: runtime_types::sp_core::ecdsa::Signature,
+            }
+            impl ::subxt::Call for submit_new_message_root_signature {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const FUNCTION: &'static str = "submit_new_message_root_signature";
+            }
+            pub struct TransactionApi<'a, T: ::subxt::Config, X, A> {
+                client: &'a ::subxt::Client<T>,
+                marker: ::core::marker::PhantomData<(X, A)>,
+            }
+            impl<'a, T, X, A> TransactionApi<'a, T, X, A>
+            where
+                T: ::subxt::Config,
+                X: ::subxt::SignedExtra<T>,
+                A: ::subxt::AccountData,
+            {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self {
+                        client,
+                        marker: ::core::marker::PhantomData,
+                    }
+                }
+                pub fn add_authority(
+                    &self,
+                    new: runtime_types::primitive_types::H160,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, add_authority, DispatchError>
+                {
+                    let call = add_authority { new };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn remove_authority(
+                    &self,
+                    old: runtime_types::primitive_types::H160,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, remove_authority, DispatchError>
+                {
+                    let call = remove_authority { old };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn swap_authority(
+                    &self,
+                    old: runtime_types::primitive_types::H160,
+                    new: runtime_types::primitive_types::H160,
+                ) -> ::subxt::SubmittableExtrinsic<'a, T, X, A, swap_authority, DispatchError>
+                {
+                    let call = swap_authority { old, new };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn submit_authorities_change_signature(
+                    &self,
+                    address: runtime_types::primitive_types::H160,
+                    signature: runtime_types::sp_core::ecdsa::Signature,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    submit_authorities_change_signature,
+                    DispatchError,
+                > {
+                    let call = submit_authorities_change_signature { address, signature };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+                pub fn submit_new_message_root_signature(
+                    &self,
+                    address: runtime_types::primitive_types::H160,
+                    signature: runtime_types::sp_core::ecdsa::Signature,
+                ) -> ::subxt::SubmittableExtrinsic<
+                    'a,
+                    T,
+                    X,
+                    A,
+                    submit_new_message_root_signature,
+                    DispatchError,
+                > {
+                    let call = submit_new_message_root_signature { address, signature };
+                    ::subxt::SubmittableExtrinsic::new(self.client, call)
+                }
+            }
+        }
+        pub type Event = runtime_types::darwinia_ecdsa_authority::pallet::Event;
+        pub mod events {
+            use super::runtime_types;
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct CollectingAuthoritiesChangeSignatures {
+                pub message: [::core::primitive::u8; 32usize],
+            }
+            impl ::subxt::Event for CollectingAuthoritiesChangeSignatures {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const EVENT: &'static str = "CollectingAuthoritiesChangeSignatures";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct CollectedEnoughAuthoritiesChangeSignatures {
+                pub operation: runtime_types::darwinia_ecdsa_authority::primitives::Operation,
+                pub new_threshold: ::core::option::Option<::core::primitive::u32>,
+                pub message: [::core::primitive::u8; 32usize],
+                pub signatures: ::std::vec::Vec<(
+                    runtime_types::primitive_types::H160,
+                    runtime_types::sp_core::ecdsa::Signature,
+                )>,
+            }
+            impl ::subxt::Event for CollectedEnoughAuthoritiesChangeSignatures {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const EVENT: &'static str = "CollectedEnoughAuthoritiesChangeSignatures";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct CollectingNewMessageRootSignatures {
+                pub message: [::core::primitive::u8; 32usize],
+            }
+            impl ::subxt::Event for CollectingNewMessageRootSignatures {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const EVENT: &'static str = "CollectingNewMessageRootSignatures";
+            }
+            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
+            pub struct CollectedEnoughNewMessageRootSignatures {
+                pub commitment: runtime_types::darwinia_ecdsa_authority::primitives::Commitment,
+                pub message: [::core::primitive::u8; 32usize],
+                pub signatures: ::std::vec::Vec<(
+                    runtime_types::primitive_types::H160,
+                    runtime_types::sp_core::ecdsa::Signature,
+                )>,
+            }
+            impl ::subxt::Event for CollectedEnoughNewMessageRootSignatures {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const EVENT: &'static str = "CollectedEnoughNewMessageRootSignatures";
+            }
+        }
+        pub mod storage {
+            use super::runtime_types;
+            pub struct Authorities;
+            impl ::subxt::StorageEntry for Authorities {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const STORAGE: &'static str = "Authorities";
+                type Value = runtime_types::frame_support::storage::bounded_vec::BoundedVec<
+                    runtime_types::primitive_types::H160,
+                >;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct NextAuthorities;
+            impl ::subxt::StorageEntry for NextAuthorities {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const STORAGE: &'static str = "NextAuthorities";
+                type Value = runtime_types::frame_support::storage::bounded_vec::BoundedVec<
+                    runtime_types::primitive_types::H160,
+                >;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct Nonce;
+            impl ::subxt::StorageEntry for Nonce {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const STORAGE: &'static str = "Nonce";
+                type Value = ::core::primitive::u32;
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct AuthoritiesChangeToSign;
+            impl ::subxt::StorageEntry for AuthoritiesChangeToSign {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const STORAGE: &'static str = "AuthoritiesChangeToSign";
+                type Value = (
+                    runtime_types::darwinia_ecdsa_authority::primitives::Operation,
+                    ::core::option::Option<::core::primitive::u32>,
+                    [::core::primitive::u8; 32usize],
+                    runtime_types::frame_support::storage::bounded_vec::BoundedVec<(
+                        runtime_types::primitive_types::H160,
+                        runtime_types::sp_core::ecdsa::Signature,
+                    )>,
+                );
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct NewMessageRootToSign;
+            impl ::subxt::StorageEntry for NewMessageRootToSign {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const STORAGE: &'static str = "NewMessageRootToSign";
+                type Value = (
+                    runtime_types::darwinia_ecdsa_authority::primitives::Commitment,
+                    [::core::primitive::u8; 32usize],
+                    runtime_types::frame_support::storage::bounded_vec::BoundedVec<(
+                        runtime_types::primitive_types::H160,
+                        runtime_types::sp_core::ecdsa::Signature,
+                    )>,
+                );
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct PreviousMessageRoot;
+            impl ::subxt::StorageEntry for PreviousMessageRoot {
+                const PALLET: &'static str = "EcdsaAuthority";
+                const STORAGE: &'static str = "PreviousMessageRoot";
+                type Value = (::core::primitive::u32, ::subxt::sp_core::H256);
+                fn key(&self) -> ::subxt::StorageEntryKey {
+                    ::subxt::StorageEntryKey::Plain
+                }
+            }
+            pub struct StorageApi<'a, T: ::subxt::Config> {
+                client: &'a ::subxt::Client<T>,
+            }
+            impl<'a, T: ::subxt::Config> StorageApi<'a, T> {
+                pub fn new(client: &'a ::subxt::Client<T>) -> Self {
+                    Self { client }
+                }
+                pub async fn authorities(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    runtime_types::frame_support::storage::bounded_vec::BoundedVec<
+                        runtime_types::primitive_types::H160,
+                    >,
+                    ::subxt::BasicError,
+                > {
+                    let entry = Authorities;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn next_authorities(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    runtime_types::frame_support::storage::bounded_vec::BoundedVec<
+                        runtime_types::primitive_types::H160,
+                    >,
+                    ::subxt::BasicError,
+                > {
+                    let entry = NextAuthorities;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn nonce(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
+                {
+                    let entry = Nonce;
+                    self.client.storage().fetch_or_default(&entry, hash).await
+                }
+                pub async fn authorities_change_to_sign(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<(
+                        runtime_types::darwinia_ecdsa_authority::primitives::Operation,
+                        ::core::option::Option<::core::primitive::u32>,
+                        [::core::primitive::u8; 32usize],
+                        runtime_types::frame_support::storage::bounded_vec::BoundedVec<(
+                            runtime_types::primitive_types::H160,
+                            runtime_types::sp_core::ecdsa::Signature,
+                        )>,
+                    )>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = AuthoritiesChangeToSign;
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn new_message_root_to_sign(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<(
+                        runtime_types::darwinia_ecdsa_authority::primitives::Commitment,
+                        [::core::primitive::u8; 32usize],
+                        runtime_types::frame_support::storage::bounded_vec::BoundedVec<(
+                            runtime_types::primitive_types::H160,
+                            runtime_types::sp_core::ecdsa::Signature,
+                        )>,
+                    )>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = NewMessageRootToSign;
+                    self.client.storage().fetch(&entry, hash).await
+                }
+                pub async fn previous_message_root(
+                    &self,
+                    hash: ::core::option::Option<T::Hash>,
+                ) -> ::core::result::Result<
+                    ::core::option::Option<(::core::primitive::u32, ::subxt::sp_core::H256)>,
+                    ::subxt::BasicError,
+                > {
+                    let entry = PreviousMessageRoot;
+                    self.client.storage().fetch(&entry, hash).await
+                }
+            }
+        }
+        pub mod constants {
+            use super::runtime_types;
+            pub struct ConstantsApi;
+            impl ConstantsApi {
+                pub fn max_authorities(
+                    &self,
+                ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[7u8, 0u8, 0u8, 0u8][..],
+                    )?)
+                }
+                pub fn chain_id(
+                    &self,
+                ) -> ::core::result::Result<
+                    ::std::vec::Vec<::core::primitive::u8>,
+                    ::subxt::BasicError,
+                > {
+                    Ok(::subxt::codec::Decode::decode(&mut &[8u8, 52u8, 54u8][..])?)
+                }
+                pub fn sign_threshold(
+                    &self,
+                ) -> ::core::result::Result<
+                    runtime_types::sp_arithmetic::per_things::Perbill,
+                    ::subxt::BasicError,
+                > {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[0u8, 70u8, 195u8, 35u8][..],
+                    )?)
+                }
+                pub fn sync_interval(
+                    &self,
+                ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[10u8, 0u8, 0u8, 0u8][..],
+                    )?)
+                }
+                pub fn max_pending_period(
+                    &self,
+                ) -> ::core::result::Result<::core::primitive::u32, ::subxt::BasicError>
+                {
+                    Ok(::subxt::codec::Decode::decode(
+                        &mut &[100u8, 0u8, 0u8, 0u8][..],
                     )?)
                 }
             }
@@ -14598,7 +15056,7 @@ pub mod api {
             use super::runtime_types;
             pub struct ConfirmedHeaderParcels(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for ConfirmedHeaderParcels {
-                const PALLET: &'static str = "DarwiniaEthereumRelay";
+                const PALLET: &'static str = "EthereumRelay";
                 const STORAGE: &'static str = "ConfirmedHeaderParcels";
                 type Value = runtime_types::darwinia_bridge_ethereum::EthereumRelayHeaderParcel;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14610,7 +15068,7 @@ pub mod api {
             }
             pub struct ConfirmedBlockNumbers;
             impl ::subxt::StorageEntry for ConfirmedBlockNumbers {
-                const PALLET: &'static str = "DarwiniaEthereumRelay";
+                const PALLET: &'static str = "EthereumRelay";
                 const STORAGE: &'static str = "ConfirmedBlockNumbers";
                 type Value = ::std::vec::Vec<::core::primitive::u64>;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14619,7 +15077,7 @@ pub mod api {
             }
             pub struct BestConfirmedBlockNumber;
             impl ::subxt::StorageEntry for BestConfirmedBlockNumber {
-                const PALLET: &'static str = "DarwiniaEthereumRelay";
+                const PALLET: &'static str = "EthereumRelay";
                 const STORAGE: &'static str = "BestConfirmedBlockNumber";
                 type Value = ::core::primitive::u64;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14628,7 +15086,7 @@ pub mod api {
             }
             pub struct ConfirmedDepth;
             impl ::subxt::StorageEntry for ConfirmedDepth {
-                const PALLET: &'static str = "DarwiniaEthereumRelay";
+                const PALLET: &'static str = "EthereumRelay";
                 const STORAGE: &'static str = "ConfirmedDepth";
                 type Value = ::core::primitive::u32;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14637,7 +15095,7 @@ pub mod api {
             }
             pub struct DagsMerkleRoots(pub ::core::primitive::u64);
             impl ::subxt::StorageEntry for DagsMerkleRoots {
-                const PALLET: &'static str = "DarwiniaEthereumRelay";
+                const PALLET: &'static str = "EthereumRelay";
                 const STORAGE: &'static str = "DagsMerkleRoots";
                 type Value = runtime_types::ethereum_types::hash::H128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14649,7 +15107,7 @@ pub mod api {
             }
             pub struct ReceiptVerifyFee;
             impl ::subxt::StorageEntry for ReceiptVerifyFee {
-                const PALLET: &'static str = "DarwiniaEthereumRelay";
+                const PALLET: &'static str = "EthereumRelay";
                 const STORAGE: &'static str = "ReceiptVerifyFee";
                 type Value = ::core::primitive::u128;
                 fn key(&self) -> ::subxt::StorageEntryKey {
@@ -14658,7 +15116,7 @@ pub mod api {
             }
             pub struct PendingRelayHeaderParcels;
             impl ::subxt::StorageEntry for PendingRelayHeaderParcels {
-                const PALLET: &'static str = "DarwiniaEthereumRelay";
+                const PALLET: &'static str = "EthereumRelay";
                 const STORAGE: &'static str = "PendingRelayHeaderParcels";
                 type Value = ::std::vec::Vec<(
                     ::core::primitive::u32,
@@ -17557,54 +18015,44 @@ pub mod api {
         pub mod events {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Log(pub runtime_types::ethereum::log::Log);
+            pub struct Log {
+                pub log: runtime_types::ethereum::log::Log,
+            }
             impl ::subxt::Event for Log {
                 const PALLET: &'static str = "EVM";
                 const EVENT: &'static str = "Log";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Created(pub runtime_types::primitive_types::H160);
+            pub struct Created {
+                pub address: runtime_types::primitive_types::H160,
+            }
             impl ::subxt::Event for Created {
                 const PALLET: &'static str = "EVM";
                 const EVENT: &'static str = "Created";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct CreatedFailed(pub runtime_types::primitive_types::H160);
+            pub struct CreatedFailed {
+                pub address: runtime_types::primitive_types::H160,
+            }
             impl ::subxt::Event for CreatedFailed {
                 const PALLET: &'static str = "EVM";
                 const EVENT: &'static str = "CreatedFailed";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Executed(pub runtime_types::primitive_types::H160);
+            pub struct Executed {
+                pub address: runtime_types::primitive_types::H160,
+            }
             impl ::subxt::Event for Executed {
                 const PALLET: &'static str = "EVM";
                 const EVENT: &'static str = "Executed";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct ExecutedFailed(pub runtime_types::primitive_types::H160);
+            pub struct ExecutedFailed {
+                pub address: runtime_types::primitive_types::H160,
+            }
             impl ::subxt::Event for ExecutedFailed {
                 const PALLET: &'static str = "EVM";
                 const EVENT: &'static str = "ExecutedFailed";
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct BalanceDeposit(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub runtime_types::primitive_types::H160,
-                pub runtime_types::primitive_types::U256,
-            );
-            impl ::subxt::Event for BalanceDeposit {
-                const PALLET: &'static str = "EVM";
-                const EVENT: &'static str = "BalanceDeposit";
-            }
-            #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct BalanceWithdraw(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub runtime_types::primitive_types::H160,
-                pub runtime_types::primitive_types::U256,
-            );
-            impl ::subxt::Event for BalanceWithdraw {
-                const PALLET: &'static str = "EVM";
-                const EVENT: &'static str = "BalanceWithdraw";
             }
         }
         pub mod storage {
@@ -17768,32 +18216,32 @@ pub mod api {
         pub mod events {
             use super::runtime_types;
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct Executed(
-                pub runtime_types::primitive_types::H160,
-                pub runtime_types::primitive_types::H160,
-                pub ::subxt::sp_core::H256,
-                pub runtime_types::evm_core::error::ExitReason,
-            );
+            pub struct Executed {
+                pub from: runtime_types::primitive_types::H160,
+                pub to: runtime_types::primitive_types::H160,
+                pub transaction_hash: ::subxt::sp_core::H256,
+                pub exit_reason: runtime_types::evm_core::error::ExitReason,
+            }
             impl ::subxt::Event for Executed {
                 const PALLET: &'static str = "Ethereum";
                 const EVENT: &'static str = "Executed";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct DVMTransfer(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub runtime_types::primitive_types::U256,
-            );
+            pub struct DVMTransfer {
+                pub from: ::subxt::sp_core::crypto::AccountId32,
+                pub to: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: runtime_types::primitive_types::U256,
+            }
             impl ::subxt::Event for DVMTransfer {
                 const PALLET: &'static str = "Ethereum";
                 const EVENT: &'static str = "DVMTransfer";
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
-            pub struct KtonDVMTransfer(
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub ::subxt::sp_core::crypto::AccountId32,
-                pub runtime_types::primitive_types::U256,
-            );
+            pub struct KtonDVMTransfer {
+                pub from: ::subxt::sp_core::crypto::AccountId32,
+                pub to: ::subxt::sp_core::crypto::AccountId32,
+                pub amount: runtime_types::primitive_types::U256,
+            }
             impl ::subxt::Event for KtonDVMTransfer {
                 const PALLET: &'static str = "Ethereum";
                 const EVENT: &'static str = "KtonDVMTransfer";
@@ -18443,59 +18891,60 @@ pub mod api {
                 )]
                 pub enum Event {
                     #[codec(index = 0)]
-                    Endowed(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
+                    Endowed {
+                        account: ::subxt::sp_core::crypto::AccountId32,
+                        free_balance: ::core::primitive::u128,
+                    },
                     #[codec(index = 1)]
-                    DustLost(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
+                    DustLost {
+                        account: ::subxt::sp_core::crypto::AccountId32,
+                        amount: ::core::primitive::u128,
+                    },
                     #[codec(index = 2)]
-                    Transfer(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
+                    Transfer {
+                        from: ::subxt::sp_core::crypto::AccountId32,
+                        to: ::subxt::sp_core::crypto::AccountId32,
+                        amount: ::core::primitive::u128,
+                    },
                     #[codec(index = 3)]
-                    BalanceSet(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                        ::core::primitive::u128,
-                    ),
+                    BalanceSet {
+                        who: ::subxt::sp_core::crypto::AccountId32,
+                        free: ::core::primitive::u128,
+                        reserved: ::core::primitive::u128,
+                    },
                     #[codec(index = 4)]
-                    Reserved(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
+                    Reserved {
+                        who: ::subxt::sp_core::crypto::AccountId32,
+                        amount: ::core::primitive::u128,
+                    },
                     #[codec(index = 5)]
-                    Unreserved(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
+                    Unreserved {
+                        who: ::subxt::sp_core::crypto::AccountId32,
+                        amount: ::core::primitive::u128,
+                    },
                     #[codec(index = 6)]
-                    ReserveRepatriated(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                        runtime_types::frame_support::traits::tokens::misc::BalanceStatus,
-                    ),
+                    ReserveRepatriated {
+                        from: ::subxt::sp_core::crypto::AccountId32,
+                        to: ::subxt::sp_core::crypto::AccountId32,
+                        amount: ::core::primitive::u128,
+                        destination_status:
+                            runtime_types::frame_support::traits::tokens::misc::BalanceStatus,
+                    },
                     #[codec(index = 7)]
-                    Deposit(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
+                    Deposit {
+                        who: ::subxt::sp_core::crypto::AccountId32,
+                        amount: ::core::primitive::u128,
+                    },
                     #[codec(index = 8)]
-                    Withdraw(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
+                    Withdraw {
+                        who: ::subxt::sp_core::crypto::AccountId32,
+                        amount: ::core::primitive::u128,
+                    },
                     #[codec(index = 9)]
-                    Slashed(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::core::primitive::u128,
-                    ),
+                    Slashed {
+                        who: ::subxt::sp_core::crypto::AccountId32,
+                        amount: ::core::primitive::u128,
+                    },
                 }
                 #[derive(
                     :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
@@ -18695,6 +19144,126 @@ pub mod api {
                 }
             }
         }
+        pub mod darwinia_ecdsa_authority {
+            use super::runtime_types;
+            pub mod pallet {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Call {
+                    #[codec(index = 0)]
+                    add_authority {
+                        new: runtime_types::primitive_types::H160,
+                    },
+                    #[codec(index = 1)]
+                    remove_authority {
+                        old: runtime_types::primitive_types::H160,
+                    },
+                    #[codec(index = 2)]
+                    swap_authority {
+                        old: runtime_types::primitive_types::H160,
+                        new: runtime_types::primitive_types::H160,
+                    },
+                    #[codec(index = 3)]
+                    submit_authorities_change_signature {
+                        address: runtime_types::primitive_types::H160,
+                        signature: runtime_types::sp_core::ecdsa::Signature,
+                    },
+                    #[codec(index = 4)]
+                    submit_new_message_root_signature {
+                        address: runtime_types::primitive_types::H160,
+                        signature: runtime_types::sp_core::ecdsa::Signature,
+                    },
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Error {
+                    #[codec(index = 0)]
+                    AuthorityExisted,
+                    #[codec(index = 1)]
+                    TooManyAuthorities,
+                    #[codec(index = 2)]
+                    NotAuthority,
+                    #[codec(index = 3)]
+                    AtLeastOneAuthority,
+                    #[codec(index = 4)]
+                    OnAuthoritiesChange,
+                    #[codec(index = 5)]
+                    NoAuthoritiesChange,
+                    #[codec(index = 6)]
+                    NoNewMessageRoot,
+                    #[codec(index = 7)]
+                    BadSignature,
+                    #[codec(index = 8)]
+                    AlreadySubmitted,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Event {
+                    #[codec(index = 0)]
+                    CollectingAuthoritiesChangeSignatures {
+                        message: [::core::primitive::u8; 32usize],
+                    },
+                    #[codec(index = 1)]
+                    CollectedEnoughAuthoritiesChangeSignatures {
+                        operation: runtime_types::darwinia_ecdsa_authority::primitives::Operation,
+                        new_threshold: ::core::option::Option<::core::primitive::u32>,
+                        message: [::core::primitive::u8; 32usize],
+                        signatures: ::std::vec::Vec<(
+                            runtime_types::primitive_types::H160,
+                            runtime_types::sp_core::ecdsa::Signature,
+                        )>,
+                    },
+                    #[codec(index = 2)]
+                    CollectingNewMessageRootSignatures {
+                        message: [::core::primitive::u8; 32usize],
+                    },
+                    #[codec(index = 3)]
+                    CollectedEnoughNewMessageRootSignatures {
+                        commitment: runtime_types::darwinia_ecdsa_authority::primitives::Commitment,
+                        message: [::core::primitive::u8; 32usize],
+                        signatures: ::std::vec::Vec<(
+                            runtime_types::primitive_types::H160,
+                            runtime_types::sp_core::ecdsa::Signature,
+                        )>,
+                    },
+                }
+            }
+            pub mod primitives {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub struct Commitment {
+                    pub block_number: ::core::primitive::u32,
+                    pub message_root: ::subxt::sp_core::H256,
+                    pub nonce: ::core::primitive::u32,
+                }
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Operation {
+                    #[codec(index = 0)]
+                    AddMember {
+                        new: runtime_types::primitive_types::H160,
+                    },
+                    #[codec(index = 1)]
+                    RemoveMember {
+                        pre: runtime_types::primitive_types::H160,
+                        old: runtime_types::primitive_types::H160,
+                    },
+                    #[codec(index = 2)]
+                    SwapMembers {
+                        pre: runtime_types::primitive_types::H160,
+                        old: runtime_types::primitive_types::H160,
+                        new: runtime_types::primitive_types::H160,
+                    },
+                }
+            }
+        }
         pub mod darwinia_ethereum {
             use super::runtime_types;
             pub mod pallet {
@@ -18743,24 +19312,24 @@ pub mod api {
                 )]
                 pub enum Event {
                     #[codec(index = 0)]
-                    Executed(
-                        runtime_types::primitive_types::H160,
-                        runtime_types::primitive_types::H160,
-                        ::subxt::sp_core::H256,
-                        runtime_types::evm_core::error::ExitReason,
-                    ),
+                    Executed {
+                        from: runtime_types::primitive_types::H160,
+                        to: runtime_types::primitive_types::H160,
+                        transaction_hash: ::subxt::sp_core::H256,
+                        exit_reason: runtime_types::evm_core::error::ExitReason,
+                    },
                     #[codec(index = 1)]
-                    DVMTransfer(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::subxt::sp_core::crypto::AccountId32,
-                        runtime_types::primitive_types::U256,
-                    ),
+                    DVMTransfer {
+                        from: ::subxt::sp_core::crypto::AccountId32,
+                        to: ::subxt::sp_core::crypto::AccountId32,
+                        amount: runtime_types::primitive_types::U256,
+                    },
                     #[codec(index = 2)]
-                    KtonDVMTransfer(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        ::subxt::sp_core::crypto::AccountId32,
-                        runtime_types::primitive_types::U256,
-                    ),
+                    KtonDVMTransfer {
+                        from: ::subxt::sp_core::crypto::AccountId32,
+                        to: ::subxt::sp_core::crypto::AccountId32,
+                        amount: runtime_types::primitive_types::U256,
+                    },
                 }
             }
             #[derive(:: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone)]
@@ -18847,27 +19416,40 @@ pub mod api {
                 )]
                 pub enum Event {
                     #[codec(index = 0)]
-                    Log(runtime_types::ethereum::log::Log),
+                    Log {
+                        log: runtime_types::ethereum::log::Log,
+                    },
                     #[codec(index = 1)]
-                    Created(runtime_types::primitive_types::H160),
+                    Created {
+                        address: runtime_types::primitive_types::H160,
+                    },
                     #[codec(index = 2)]
-                    CreatedFailed(runtime_types::primitive_types::H160),
+                    CreatedFailed {
+                        address: runtime_types::primitive_types::H160,
+                    },
                     #[codec(index = 3)]
-                    Executed(runtime_types::primitive_types::H160),
+                    Executed {
+                        address: runtime_types::primitive_types::H160,
+                    },
                     #[codec(index = 4)]
-                    ExecutedFailed(runtime_types::primitive_types::H160),
-                    #[codec(index = 5)]
-                    BalanceDeposit(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        runtime_types::primitive_types::H160,
-                        runtime_types::primitive_types::U256,
-                    ),
-                    #[codec(index = 6)]
-                    BalanceWithdraw(
-                        ::subxt::sp_core::crypto::AccountId32,
-                        runtime_types::primitive_types::H160,
-                        runtime_types::primitive_types::U256,
-                    ),
+                    ExecutedFailed {
+                        address: runtime_types::primitive_types::H160,
+                    },
+                }
+            }
+        }
+        pub mod darwinia_message_gadget {
+            use super::runtime_types;
+            pub mod pallet {
+                use super::runtime_types;
+                #[derive(
+                    :: subxt :: codec :: Encode, :: subxt :: codec :: Decode, Debug, Clone,
+                )]
+                pub enum Call {
+                    #[codec(index = 0)]
+                    set_commitment_contract {
+                        commitment_contract: runtime_types::primitive_types::H160,
+                    },
                 }
             }
         }
@@ -19255,8 +19837,12 @@ pub mod api {
                 Grandpa(runtime_types::pallet_grandpa::pallet::Call),
                 #[codec(index = 14)]
                 ImOnline(runtime_types::pallet_im_online::pallet::Call),
+                #[codec(index = 50)]
+                MessageGadget(runtime_types::darwinia_message_gadget::pallet::Call),
                 #[codec(index = 36)]
                 EcdsaRelayAuthority(runtime_types::darwinia_relay_authority::pallet::Call),
+                #[codec(index = 51)]
+                EcdsaAuthority(runtime_types::darwinia_ecdsa_authority::pallet::Call),
                 #[codec(index = 37)]
                 Democracy(runtime_types::pallet_democracy::pallet::Call),
                 #[codec(index = 16)]
@@ -19336,6 +19922,8 @@ pub mod api {
                 ImOnline(runtime_types::pallet_im_online::pallet::Event),
                 #[codec(index = 36)]
                 EcdsaRelayAuthority(runtime_types::darwinia_relay_authority::pallet::Event),
+                #[codec(index = 51)]
+                EcdsaAuthority(runtime_types::darwinia_ecdsa_authority::pallet::Event),
                 #[codec(index = 37)]
                 Democracy(runtime_types::pallet_democracy::pallet::Event),
                 #[codec(index = 16)]
@@ -25140,7 +25728,7 @@ pub mod api {
     impl DispatchError {
         pub fn details(&self) -> Option<ErrorDetails> {
             if let Self::Module { index, error } = self {
-                match (index , error) { (0u8 , 0u8) => Some (ErrorDetails { pallet : "System" , error : "InvalidSpecName" , docs : "The name of specification does not match between the current runtime\nand the new runtime." }) , (0u8 , 1u8) => Some (ErrorDetails { pallet : "System" , error : "SpecVersionNeedsToIncrease" , docs : "The specification version is not allowed to decrease between the current runtime\nand the new runtime." }) , (0u8 , 2u8) => Some (ErrorDetails { pallet : "System" , error : "FailedToExtractRuntimeVersion" , docs : "Failed to extract the runtime version from the new runtime.\n\nEither calling `Core_version` or decoding `RuntimeVersion` failed." }) , (0u8 , 3u8) => Some (ErrorDetails { pallet : "System" , error : "NonDefaultComposite" , docs : "Suicide called when the account has non-default composite data." }) , (0u8 , 4u8) => Some (ErrorDetails { pallet : "System" , error : "NonZeroRefCount" , docs : "There is a non-zero reference count preventing the account from being purged." }) , (0u8 , 5u8) => Some (ErrorDetails { pallet : "System" , error : "CallFiltered" , docs : "The origin filter prevent the call to be dispatched." }) , (2u8 , 0u8) => Some (ErrorDetails { pallet : "Babe" , error : "InvalidEquivocationProof" , docs : "An equivocation proof provided as part of an equivocation report is invalid." }) , (2u8 , 1u8) => Some (ErrorDetails { pallet : "Babe" , error : "InvalidKeyOwnershipProof" , docs : "A key ownership proof provided as part of an equivocation report is invalid." }) , (2u8 , 2u8) => Some (ErrorDetails { pallet : "Babe" , error : "DuplicateOffenceReport" , docs : "A given equivocation report is valid but already previously reported." }) , (4u8 , 0u8) => Some (ErrorDetails { pallet : "Balances" , error : "VestingBalance" , docs : "Vesting balance too high to send value." }) , (4u8 , 1u8) => Some (ErrorDetails { pallet : "Balances" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal." }) , (4u8 , 2u8) => Some (ErrorDetails { pallet : "Balances" , error : "InsufficientBalance" , docs : "Balance too low to send value." }) , (4u8 , 3u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit." }) , (4u8 , 4u8) => Some (ErrorDetails { pallet : "Balances" , error : "KeepAlive" , docs : "Transfer/payment would kill account." }) , (4u8 , 5u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account." }) , (4u8 , 6u8) => Some (ErrorDetails { pallet : "Balances" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist." }) , (4u8 , 7u8) => Some (ErrorDetails { pallet : "Balances" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (4u8 , 8u8) => Some (ErrorDetails { pallet : "Balances" , error : "LockP" , docs : "Lock - POISONED." }) , (5u8 , 0u8) => Some (ErrorDetails { pallet : "Kton" , error : "VestingBalance" , docs : "Vesting balance too high to send value." }) , (5u8 , 1u8) => Some (ErrorDetails { pallet : "Kton" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal." }) , (5u8 , 2u8) => Some (ErrorDetails { pallet : "Kton" , error : "InsufficientBalance" , docs : "Balance too low to send value." }) , (5u8 , 3u8) => Some (ErrorDetails { pallet : "Kton" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit." }) , (5u8 , 4u8) => Some (ErrorDetails { pallet : "Kton" , error : "KeepAlive" , docs : "Transfer/payment would kill account." }) , (5u8 , 5u8) => Some (ErrorDetails { pallet : "Kton" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account." }) , (5u8 , 6u8) => Some (ErrorDetails { pallet : "Kton" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist." }) , (5u8 , 7u8) => Some (ErrorDetails { pallet : "Kton" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (5u8 , 8u8) => Some (ErrorDetails { pallet : "Kton" , error : "LockP" , docs : "Lock - POISONED." }) , (7u8 , 0u8) => Some (ErrorDetails { pallet : "Authorship" , error : "InvalidUncleParent" , docs : "The uncle parent not in the chain." }) , (7u8 , 1u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UnclesAlreadySet" , docs : "Uncles already set in the block." }) , (7u8 , 2u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooManyUncles" , docs : "Too many uncles." }) , (7u8 , 3u8) => Some (ErrorDetails { pallet : "Authorship" , error : "GenesisUncle" , docs : "The uncle is genesis." }) , (7u8 , 4u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooHighUncle" , docs : "The uncle is too high in chain." }) , (7u8 , 5u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UncleAlreadyIncluded" , docs : "The uncle is already included." }) , (7u8 , 6u8) => Some (ErrorDetails { pallet : "Authorship" , error : "OldUncle" , docs : "The uncle isn't recent enough to be included." }) , (38u8 , 0u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchEarlySubmission" , docs : "Submission was too early." }) , (38u8 , 1u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchWrongWinnerCount" , docs : "Wrong number of winners presented." }) , (38u8 , 2u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchWeakSubmission" , docs : "Submission was too weak, score-wise." }) , (38u8 , 3u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedQueueFull" , docs : "The queue was full, and the solution was not better than any of the existing ones." }) , (38u8 , 4u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedCannotPayDeposit" , docs : "The origin failed to pay the deposit." }) , (38u8 , 5u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedInvalidWitness" , docs : "Witness data to dispatchable is invalid." }) , (38u8 , 6u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedTooMuchWeight" , docs : "The signed submission consumes too much weight" }) , (38u8 , 7u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "OcwCallWrongEra" , docs : "OCW submitted solution for wrong round" }) , (38u8 , 8u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "MissingSnapshotMetadata" , docs : "Snapshot metadata should exist but didn't." }) , (38u8 , 9u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "InvalidSubmissionIndex" , docs : "`Self::insert_submission` returned an invalid index." }) , (38u8 , 10u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "CallNotAllowed" , docs : "The call is not allowed at this point." }) , (8u8 , 0u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotController" , docs : "Not a controller account." }) , (8u8 , 1u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotStash" , docs : "Not a stash account." }) , (8u8 , 2u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyBonded" , docs : "Stash is already bonded." }) , (8u8 , 3u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyPaired" , docs : "Controller is already paired." }) , (8u8 , 4u8) => Some (ErrorDetails { pallet : "Staking" , error : "EmptyTargets" , docs : "Targets cannot be empty." }) , (8u8 , 5u8) => Some (ErrorDetails { pallet : "Staking" , error : "DuplicateIndex" , docs : "Duplicate index." }) , (8u8 , 6u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidSlashIndex" , docs : "Slash record index out of bounds." }) , (8u8 , 7u8) => Some (ErrorDetails { pallet : "Staking" , error : "InsufficientBond" , docs : "Cannot have a validator or nominator role, with value less than the minimum defined by\ngovernance (see `MinValidatorBond` and `MinNominatorBond`). If unbonding is the\nintention, `chill` first to remove one's role as validator/nominator." }) , (8u8 , 8u8) => Some (ErrorDetails { pallet : "Staking" , error : "NoMoreChunks" , docs : "Can not schedule more unlock chunks." }) , (8u8 , 9u8) => Some (ErrorDetails { pallet : "Staking" , error : "NoUnlockChunk" , docs : "Can not rebond without unlocking chunks." }) , (8u8 , 10u8) => Some (ErrorDetails { pallet : "Staking" , error : "FundedTarget" , docs : "Attempting to target a stash that still has funds." }) , (8u8 , 11u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidEraToReward" , docs : "Invalid era to reward." }) , (8u8 , 12u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidNumberOfNominations" , docs : "Invalid number of nominations." }) , (8u8 , 13u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotSortedAndUnique" , docs : "Items are not sorted and unique." }) , (8u8 , 14u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyClaimed" , docs : "Rewards for this era have already been claimed for this validator." }) , (8u8 , 15u8) => Some (ErrorDetails { pallet : "Staking" , error : "IncorrectHistoryDepth" , docs : "Incorrect previous history depth input provided." }) , (8u8 , 16u8) => Some (ErrorDetails { pallet : "Staking" , error : "IncorrectSlashingSpans" , docs : "Incorrect number of slashing spans provided." }) , (8u8 , 17u8) => Some (ErrorDetails { pallet : "Staking" , error : "BadState" , docs : "Internal state has become somehow corrupted and the operation cannot continue." }) , (8u8 , 18u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyTargets" , docs : "Too many nomination targets supplied." }) , (8u8 , 19u8) => Some (ErrorDetails { pallet : "Staking" , error : "BadTarget" , docs : "A nomination target was supplied that was blocked or otherwise not a validator." }) , (8u8 , 20u8) => Some (ErrorDetails { pallet : "Staking" , error : "CannotChillOther" , docs : "The user has enough bond and thus cannot be chilled forcefully by an external person." }) , (8u8 , 21u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyNominators" , docs : "There are too many nominators in the system. Governance needs to adjust the staking\nsettings to keep things safe for the runtime." }) , (8u8 , 22u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyValidators" , docs : "There are too many validators in the system. Governance needs to adjust the staking\nsettings to keep things safe for the runtime." }) , (8u8 , 23u8) => Some (ErrorDetails { pallet : "Staking" , error : "PayoutIns" , docs : "Payout - INSUFFICIENT" }) , (11u8 , 0u8) => Some (ErrorDetails { pallet : "Session" , error : "InvalidProof" , docs : "Invalid ownership proof." }) , (11u8 , 1u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAssociatedValidatorId" , docs : "No associated validator ID for account." }) , (11u8 , 2u8) => Some (ErrorDetails { pallet : "Session" , error : "DuplicatedKey" , docs : "Registered duplicate key." }) , (11u8 , 3u8) => Some (ErrorDetails { pallet : "Session" , error : "NoKeys" , docs : "No keys are associated with this account." }) , (11u8 , 4u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAccount" , docs : "Key setting account is not live, so it's impossible to associate keys." }) , (13u8 , 0u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "PauseFailed" , docs : "Attempt to signal GRANDPA pause when the authority set isn't live\n(either paused or already pending pause)." }) , (13u8 , 1u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "ResumeFailed" , docs : "Attempt to signal GRANDPA resume when the authority set isn't paused\n(either live or already pending resume)." }) , (13u8 , 2u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "ChangePending" , docs : "Attempt to signal GRANDPA change with one already pending." }) , (13u8 , 3u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "TooSoon" , docs : "Cannot signal forced change so soon after last." }) , (13u8 , 4u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "InvalidKeyOwnershipProof" , docs : "A key ownership proof provided as part of an equivocation report is invalid." }) , (13u8 , 5u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "InvalidEquivocationProof" , docs : "An equivocation proof provided as part of an equivocation report is invalid." }) , (13u8 , 6u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "DuplicateOffenceReport" , docs : "A given equivocation report is valid but already previously reported." }) , (14u8 , 0u8) => Some (ErrorDetails { pallet : "ImOnline" , error : "InvalidKey" , docs : "Non existent public key." }) , (14u8 , 1u8) => Some (ErrorDetails { pallet : "ImOnline" , error : "DuplicatedHeartbeat" , docs : "Duplicated heartbeat." }) , (36u8 , 0u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "TooManyMembers" , docs : "Too many members" }) , (36u8 , 1u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "CandidateAE" , docs : "Candidate - ALREADY EXISTED" }) , (36u8 , 2u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "CandidateNE" , docs : "Candidate - NOT EXISTED" }) , (36u8 , 3u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthorityAE" , docs : "Authority - ALREADY EXISTED" }) , (36u8 , 4u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthorityNE" , docs : "Authority - NOT EXISTED" }) , (36u8 , 5u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthorityIT" , docs : "Authority - IN TERM" }) , (36u8 , 6u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthoritiesCountTL" , docs : "Authorities Count - TOO LOW" }) , (36u8 , 7u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "StakeIns" , docs : "Stake - INSUFFICIENT" }) , (36u8 , 8u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "OnAuthoritiesChangeDis" , docs : "On Authorities Change - DISABLED" }) , (36u8 , 9u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "ScheduledSignNE" , docs : "Scheduled Sign -NOT EXISTED" }) , (36u8 , 10u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "SignatureInv" , docs : "Signature - INVALID" }) , (36u8 , 11u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "TermMis" , docs : "Term - MISMATCHED" }) , (36u8 , 12u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthoritiesMis" , docs : "Authorities - MISMATCHED" }) , (36u8 , 13u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "NextAuthoritiesNE" , docs : "Next Authorities - NOT EXISTED" }) , (36u8 , 14u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "TooManySchedules" , docs : "Too many scheduled `MmrToSign`." }) , (37u8 , 0u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ValueLow" , docs : "Value too low" }) , (37u8 , 1u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ProposalMissing" , docs : "Proposal does not exist" }) , (37u8 , 2u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyCanceled" , docs : "Cannot cancel the same proposal twice" }) , (37u8 , 3u8) => Some (ErrorDetails { pallet : "Democracy" , error : "DuplicateProposal" , docs : "Proposal already made" }) , (37u8 , 4u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ProposalBlacklisted" , docs : "Proposal still blacklisted" }) , (37u8 , 5u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotSimpleMajority" , docs : "Next external proposal not simple majority" }) , (37u8 , 6u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InvalidHash" , docs : "Invalid hash" }) , (37u8 , 7u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoProposal" , docs : "No external proposal" }) , (37u8 , 8u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyVetoed" , docs : "Identity may not veto a proposal twice" }) , (37u8 , 9u8) => Some (ErrorDetails { pallet : "Democracy" , error : "DuplicatePreimage" , docs : "Preimage already noted" }) , (37u8 , 10u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotImminent" , docs : "Not imminent" }) , (37u8 , 11u8) => Some (ErrorDetails { pallet : "Democracy" , error : "TooEarly" , docs : "Too early" }) , (37u8 , 12u8) => Some (ErrorDetails { pallet : "Democracy" , error : "Imminent" , docs : "Imminent" }) , (37u8 , 13u8) => Some (ErrorDetails { pallet : "Democracy" , error : "PreimageMissing" , docs : "Preimage not found" }) , (37u8 , 14u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ReferendumInvalid" , docs : "Vote given for invalid referendum" }) , (37u8 , 15u8) => Some (ErrorDetails { pallet : "Democracy" , error : "PreimageInvalid" , docs : "Invalid preimage" }) , (37u8 , 16u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoneWaiting" , docs : "No proposals waiting" }) , (37u8 , 17u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotVoter" , docs : "The given account did not vote on the referendum." }) , (37u8 , 18u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoPermission" , docs : "The actor has no permission to conduct the action." }) , (37u8 , 19u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyDelegating" , docs : "The account is already delegating." }) , (37u8 , 20u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InsufficientFunds" , docs : "Too high a balance was provided that the account cannot afford." }) , (37u8 , 21u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotDelegating" , docs : "The account is not currently delegating." }) , (37u8 , 22u8) => Some (ErrorDetails { pallet : "Democracy" , error : "VotesExist" , docs : "The account currently has votes attached to it and the operation cannot succeed until\nthese are removed, either through `unvote` or `reap_vote`." }) , (37u8 , 23u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InstantNotAllowed" , docs : "The instant referendum origin is currently disallowed." }) , (37u8 , 24u8) => Some (ErrorDetails { pallet : "Democracy" , error : "Nonsense" , docs : "Delegation to oneself makes no sense." }) , (37u8 , 25u8) => Some (ErrorDetails { pallet : "Democracy" , error : "WrongUpperBound" , docs : "Invalid upper bound." }) , (37u8 , 26u8) => Some (ErrorDetails { pallet : "Democracy" , error : "MaxVotesReached" , docs : "Maximum number of votes reached." }) , (37u8 , 27u8) => Some (ErrorDetails { pallet : "Democracy" , error : "TooManyProposals" , docs : "Maximum number of proposals reached." }) , (16u8 , 0u8) => Some (ErrorDetails { pallet : "Council" , error : "NotMember" , docs : "Account is not a member" }) , (16u8 , 1u8) => Some (ErrorDetails { pallet : "Council" , error : "DuplicateProposal" , docs : "Duplicate proposals not allowed" }) , (16u8 , 2u8) => Some (ErrorDetails { pallet : "Council" , error : "ProposalMissing" , docs : "Proposal must exist" }) , (16u8 , 3u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongIndex" , docs : "Mismatched index" }) , (16u8 , 4u8) => Some (ErrorDetails { pallet : "Council" , error : "DuplicateVote" , docs : "Duplicate vote ignored" }) , (16u8 , 5u8) => Some (ErrorDetails { pallet : "Council" , error : "AlreadyInitialized" , docs : "Members are already initialized!" }) , (16u8 , 6u8) => Some (ErrorDetails { pallet : "Council" , error : "TooEarly" , docs : "The close call was made too early, before the end of the voting." }) , (16u8 , 7u8) => Some (ErrorDetails { pallet : "Council" , error : "TooManyProposals" , docs : "There can only be a maximum of `MaxProposals` active proposals." }) , (16u8 , 8u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongProposalWeight" , docs : "The given weight bound for the proposal was too low." }) , (16u8 , 9u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongProposalLength" , docs : "The given length bound for the proposal was too low." }) , (17u8 , 0u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "NotMember" , docs : "Account is not a member" }) , (17u8 , 1u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "DuplicateProposal" , docs : "Duplicate proposals not allowed" }) , (17u8 , 2u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "ProposalMissing" , docs : "Proposal must exist" }) , (17u8 , 3u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongIndex" , docs : "Mismatched index" }) , (17u8 , 4u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "DuplicateVote" , docs : "Duplicate vote ignored" }) , (17u8 , 5u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "AlreadyInitialized" , docs : "Members are already initialized!" }) , (17u8 , 6u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "TooEarly" , docs : "The close call was made too early, before the end of the voting." }) , (17u8 , 7u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "TooManyProposals" , docs : "There can only be a maximum of `MaxProposals` active proposals." }) , (17u8 , 8u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongProposalWeight" , docs : "The given weight bound for the proposal was too low." }) , (17u8 , 9u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongProposalLength" , docs : "The given length bound for the proposal was too low." }) , (18u8 , 0u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "UnableToVote" , docs : "Cannot vote when no candidates or members exist." }) , (18u8 , 1u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "NoVotes" , docs : "Must vote for at least one candidate." }) , (18u8 , 2u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "TooManyVotes" , docs : "Cannot vote more than candidates." }) , (18u8 , 3u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MaximumVotesExceeded" , docs : "Cannot vote more than maximum allowed." }) , (18u8 , 4u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "LowBalance" , docs : "Cannot vote with stake less than minimum balance." }) , (18u8 , 5u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "UnableToPayBond" , docs : "Voter can not pay voting bond." }) , (18u8 , 6u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MustBeVoter" , docs : "Must be a voter." }) , (18u8 , 7u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "ReportSelf" , docs : "Cannot report self." }) , (18u8 , 8u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "DuplicatedCandidate" , docs : "Duplicated candidate submission." }) , (18u8 , 9u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MemberSubmit" , docs : "Member cannot re-submit candidacy." }) , (18u8 , 10u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "RunnerUpSubmit" , docs : "Runner cannot re-submit candidacy." }) , (18u8 , 11u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InsufficientCandidateFunds" , docs : "Candidate does not have enough funds." }) , (18u8 , 12u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "NotMember" , docs : "Not a member." }) , (18u8 , 13u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidWitnessData" , docs : "The provided count of number of candidates is incorrect." }) , (18u8 , 14u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidVoteCount" , docs : "The provided count of number of votes is incorrect." }) , (18u8 , 15u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidRenouncing" , docs : "The renouncing origin presented a wrong `Renouncing` parameter." }) , (18u8 , 16u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidReplacement" , docs : "Prediction regarding replacement after member removal is wrong." }) , (19u8 , 0u8) => Some (ErrorDetails { pallet : "TechnicalMembership" , error : "AlreadyMember" , docs : "Already a member." }) , (19u8 , 1u8) => Some (ErrorDetails { pallet : "TechnicalMembership" , error : "NotMember" , docs : "Not a member." }) , (20u8 , 0u8) => Some (ErrorDetails { pallet : "Treasury" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (20u8 , 1u8) => Some (ErrorDetails { pallet : "Treasury" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (20u8 , 2u8) => Some (ErrorDetails { pallet : "Treasury" , error : "TooManyApprovals" , docs : "Too many approvals in the queue." }) , (39u8 , 0u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (39u8 , 1u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (39u8 , 2u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "TooManyApprovals" , docs : "Too many approvals in the queue." }) , (40u8 , 0u8) => Some (ErrorDetails { pallet : "Tips" , error : "ReasonTooBig" , docs : "The reason given is just too big." }) , (40u8 , 1u8) => Some (ErrorDetails { pallet : "Tips" , error : "AlreadyKnown" , docs : "The tip was already found/started." }) , (40u8 , 2u8) => Some (ErrorDetails { pallet : "Tips" , error : "UnknownTip" , docs : "The tip hash is unknown." }) , (40u8 , 3u8) => Some (ErrorDetails { pallet : "Tips" , error : "NotFinder" , docs : "The account attempting to retract the tip is not the finder of the tip." }) , (40u8 , 4u8) => Some (ErrorDetails { pallet : "Tips" , error : "StillOpen" , docs : "The tip cannot be claimed/closed because there are not enough tippers yet." }) , (40u8 , 5u8) => Some (ErrorDetails { pallet : "Tips" , error : "Premature" , docs : "The tip cannot be claimed/closed because it's still in the countdown period." }) , (41u8 , 0u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (41u8 , 1u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (41u8 , 2u8) => Some (ErrorDetails { pallet : "Bounties" , error : "ReasonTooBig" , docs : "The reason given is just too big." }) , (41u8 , 3u8) => Some (ErrorDetails { pallet : "Bounties" , error : "UnexpectedStatus" , docs : "The bounty status is unexpected." }) , (41u8 , 4u8) => Some (ErrorDetails { pallet : "Bounties" , error : "RequireCurator" , docs : "Require bounty curator." }) , (41u8 , 5u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidValue" , docs : "Invalid bounty value." }) , (41u8 , 6u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidFee" , docs : "Invalid bounty fee." }) , (41u8 , 7u8) => Some (ErrorDetails { pallet : "Bounties" , error : "PendingPayout" , docs : "A bounty payout is pending.\nTo cancel the bounty, you must unassign and slash the curator." }) , (41u8 , 8u8) => Some (ErrorDetails { pallet : "Bounties" , error : "Premature" , docs : "The bounties cannot be claimed/closed because it's still in the countdown period." }) , (27u8 , 0u8) => Some (ErrorDetails { pallet : "Sudo" , error : "RequireSudo" , docs : "Sender must be the Sudo account" }) , (21u8 , 0u8) => Some (ErrorDetails { pallet : "Vesting" , error : "NotVesting" , docs : "The account given is not vesting." }) , (21u8 , 1u8) => Some (ErrorDetails { pallet : "Vesting" , error : "AtMaxVestingSchedules" , docs : "The account already has `MaxVestingSchedules` count of schedules and thus\ncannot add another one. Consider merging existing schedules in order to add another." }) , (21u8 , 2u8) => Some (ErrorDetails { pallet : "Vesting" , error : "AmountLow" , docs : "Amount being transferred is too low to create a vesting schedule." }) , (21u8 , 3u8) => Some (ErrorDetails { pallet : "Vesting" , error : "ScheduleIndexOutOfBounds" , docs : "An index was out of bounds of the vesting schedules." }) , (21u8 , 4u8) => Some (ErrorDetails { pallet : "Vesting" , error : "InvalidScheduleParams" , docs : "Failed to create a new schedule because some parameter was invalid." }) , (22u8 , 0u8) => Some (ErrorDetails { pallet : "Utility" , error : "TooManyCalls" , docs : "Too many calls batched." }) , (23u8 , 0u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManySubAccounts" , docs : "Too many subs-accounts." }) , (23u8 , 1u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotFound" , docs : "Account isn't found." }) , (23u8 , 2u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotNamed" , docs : "Account isn't named." }) , (23u8 , 3u8) => Some (ErrorDetails { pallet : "Identity" , error : "EmptyIndex" , docs : "Empty index." }) , (23u8 , 4u8) => Some (ErrorDetails { pallet : "Identity" , error : "FeeChanged" , docs : "Fee is changed." }) , (23u8 , 5u8) => Some (ErrorDetails { pallet : "Identity" , error : "NoIdentity" , docs : "No identity found." }) , (23u8 , 6u8) => Some (ErrorDetails { pallet : "Identity" , error : "StickyJudgement" , docs : "Sticky judgement." }) , (23u8 , 7u8) => Some (ErrorDetails { pallet : "Identity" , error : "JudgementGiven" , docs : "Judgement given." }) , (23u8 , 8u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidJudgement" , docs : "Invalid judgement." }) , (23u8 , 9u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidIndex" , docs : "The index is invalid." }) , (23u8 , 10u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidTarget" , docs : "The target is invalid." }) , (23u8 , 11u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManyFields" , docs : "Too many additional fields." }) , (23u8 , 12u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManyRegistrars" , docs : "Maximum amount of registrars reached. Cannot add any more." }) , (23u8 , 13u8) => Some (ErrorDetails { pallet : "Identity" , error : "AlreadyClaimed" , docs : "Account ID is already named." }) , (23u8 , 14u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotSub" , docs : "Sender is not a sub-account." }) , (23u8 , 15u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotOwned" , docs : "Sub-account isn't owned by sender." }) , (24u8 , 0u8) => Some (ErrorDetails { pallet : "Society" , error : "BadPosition" , docs : "An incorrect position was provided." }) , (24u8 , 1u8) => Some (ErrorDetails { pallet : "Society" , error : "NotMember" , docs : "User is not a member." }) , (24u8 , 2u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyMember" , docs : "User is already a member." }) , (24u8 , 3u8) => Some (ErrorDetails { pallet : "Society" , error : "Suspended" , docs : "User is suspended." }) , (24u8 , 4u8) => Some (ErrorDetails { pallet : "Society" , error : "NotSuspended" , docs : "User is not suspended." }) , (24u8 , 5u8) => Some (ErrorDetails { pallet : "Society" , error : "NoPayout" , docs : "Nothing to payout." }) , (24u8 , 6u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyFounded" , docs : "Society already founded." }) , (24u8 , 7u8) => Some (ErrorDetails { pallet : "Society" , error : "InsufficientPot" , docs : "Not enough in pot to accept candidate." }) , (24u8 , 8u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyVouching" , docs : "Member is already vouching or banned from vouching again." }) , (24u8 , 9u8) => Some (ErrorDetails { pallet : "Society" , error : "NotVouching" , docs : "Member is not vouching." }) , (24u8 , 10u8) => Some (ErrorDetails { pallet : "Society" , error : "Head" , docs : "Cannot remove the head of the chain." }) , (24u8 , 11u8) => Some (ErrorDetails { pallet : "Society" , error : "Founder" , docs : "Cannot remove the founder." }) , (24u8 , 12u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyBid" , docs : "User has already made a bid." }) , (24u8 , 13u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyCandidate" , docs : "User is already a candidate." }) , (24u8 , 14u8) => Some (ErrorDetails { pallet : "Society" , error : "NotCandidate" , docs : "User is not a candidate." }) , (24u8 , 15u8) => Some (ErrorDetails { pallet : "Society" , error : "MaxMembers" , docs : "Too many members in the society." }) , (24u8 , 16u8) => Some (ErrorDetails { pallet : "Society" , error : "NotFounder" , docs : "The caller is not the founder." }) , (24u8 , 17u8) => Some (ErrorDetails { pallet : "Society" , error : "NotHead" , docs : "The caller is not the head." }) , (25u8 , 0u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotAllowed" , docs : "User is not allowed to make a call on behalf of this account" }) , (25u8 , 1u8) => Some (ErrorDetails { pallet : "Recovery" , error : "ZeroThreshold" , docs : "Threshold must be greater than zero" }) , (25u8 , 2u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotEnoughFriends" , docs : "Friends list must be greater than zero and threshold" }) , (25u8 , 3u8) => Some (ErrorDetails { pallet : "Recovery" , error : "MaxFriends" , docs : "Friends list must be less than max friends" }) , (25u8 , 4u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotSorted" , docs : "Friends list must be sorted and free of duplicates" }) , (25u8 , 5u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotRecoverable" , docs : "This account is not set up for recovery" }) , (25u8 , 6u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyRecoverable" , docs : "This account is already set up for recovery" }) , (25u8 , 7u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyStarted" , docs : "A recovery process has already started for this account" }) , (25u8 , 8u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotStarted" , docs : "A recovery process has not started for this rescuer" }) , (25u8 , 9u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotFriend" , docs : "This account is not a friend who can vouch" }) , (25u8 , 10u8) => Some (ErrorDetails { pallet : "Recovery" , error : "DelayPeriod" , docs : "The friend must wait until the delay period to vouch for this recovery" }) , (25u8 , 11u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyVouched" , docs : "This user has already vouched for this recovery" }) , (25u8 , 12u8) => Some (ErrorDetails { pallet : "Recovery" , error : "Threshold" , docs : "The threshold for recovering this account has not been met" }) , (25u8 , 13u8) => Some (ErrorDetails { pallet : "Recovery" , error : "StillActive" , docs : "There are still active recovery attempts that need to be closed" }) , (25u8 , 14u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyProxy" , docs : "This account is already set up for recovery" }) , (25u8 , 15u8) => Some (ErrorDetails { pallet : "Recovery" , error : "BadState" , docs : "Some internal state is broken." }) , (26u8 , 0u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "FailedToSchedule" , docs : "Failed to schedule a call" }) , (26u8 , 1u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "NotFound" , docs : "Cannot find the scheduled call." }) , (26u8 , 2u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "TargetBlockNumberInPast" , docs : "Given target block number is in the past." }) , (26u8 , 3u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "RescheduleNoChange" , docs : "Reschedule failed because it does not change scheduled time." }) , (28u8 , 0u8) => Some (ErrorDetails { pallet : "Proxy" , error : "TooMany" , docs : "There are too many proxies registered or too many announcements pending." }) , (28u8 , 1u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotFound" , docs : "Proxy registration not found." }) , (28u8 , 2u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotProxy" , docs : "Sender is not a proxy of the account to be proxied." }) , (28u8 , 3u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unproxyable" , docs : "A call which is incompatible with the proxy type's filter was attempted." }) , (28u8 , 4u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Duplicate" , docs : "Account is already a proxy." }) , (28u8 , 5u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoPermission" , docs : "Call may not be made by proxy because it may escalate its privileges." }) , (28u8 , 6u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unannounced" , docs : "Announcement, if made at all, was made too recently." }) , (28u8 , 7u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoSelfProxy" , docs : "Cannot add self as proxy." }) , (29u8 , 0u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MinimumThreshold" , docs : "Threshold must be 2 or greater." }) , (29u8 , 1u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyApproved" , docs : "Call is already approved by this signatory." }) , (29u8 , 2u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoApprovalsNeeded" , docs : "Call doesn't need any (more) approvals." }) , (29u8 , 3u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooFewSignatories" , docs : "There are too few signatories in the list." }) , (29u8 , 4u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooManySignatories" , docs : "There are too many signatories in the list." }) , (29u8 , 5u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SignatoriesOutOfOrder" , docs : "The signatories were provided out of order; they should be ordered." }) , (29u8 , 6u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SenderInSignatories" , docs : "The sender was contained in the other signatories; it shouldn't be." }) , (29u8 , 7u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotFound" , docs : "Multisig operation not found when attempting to cancel." }) , (29u8 , 8u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotOwner" , docs : "Only the account that originally created the multisig is able to cancel it." }) , (29u8 , 9u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoTimepoint" , docs : "No timepoint was given, yet the multisig operation is already underway." }) , (29u8 , 10u8) => Some (ErrorDetails { pallet : "Multisig" , error : "WrongTimepoint" , docs : "A different timepoint was given to the multisig operation that is underway." }) , (29u8 , 11u8) => Some (ErrorDetails { pallet : "Multisig" , error : "UnexpectedTimepoint" , docs : "A timepoint was given, yet no multisig operation is underway." }) , (29u8 , 12u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MaxWeightTooLow" , docs : "The maximum weight information provided was too low." }) , (29u8 , 13u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyStored" , docs : "The data to be stored is already stored." }) , (32u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderInv" , docs : "Header - INVALID" }) , (32u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ConfirmedBlocksC" , docs : "Confirmed Blocks - CONFLICT" }) , (32u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ContinuousInv" , docs : "Continuous - INVALID" }) , (32u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AffirmationExisted" , docs : "Affirmation - EXISTED" }) , (32u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderHashInv" , docs : "Header Hash - INVALID" }) , (32u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "MMRInv" , docs : "MMR - INVALID" }) , (32u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderHashMis" , docs : "Header Hash - MISMATCHED" }) , (32u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ConfirmedHeaderNE" , docs : "Confirmed Header - NOT EXISTED" }) , (32u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ReceiptProofInv" , docs : "EthereumReceipt Proof - INVALID" }) , (32u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "PendingRelayHeaderParcelNE" , docs : "Pending Relay Header Parcel - NOT EXISTED" }) , (32u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "PendingRelayHeaderParcelAE" , docs : "Pending Relay Header Parcel - ALREADY EXISTED" }) , (32u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AlreadyVoteForAyeDup" , docs : "Already Vote for Aye - DUPLICATED" }) , (32u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AlreadyVoteForNayDup" , docs : "Already Vote for Nay - DUPLICATED" }) , (31u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AddrLenMis" , docs : "Address Length - MISMATCHED" }) , (31u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "PubkeyPrefixMis" , docs : "Pubkey Prefix - MISMATCHED" }) , (31u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "BytesCF" , docs : "Bytes - CONVERSION FAILED" }) , (31u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "IntCF" , docs : "Int - CONVERSION FAILED" }) , (31u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "ArrayCF" , docs : "Array - CONVERSION FAILED" }) , (31u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AddressCF" , docs : "Address - CONVERSION FAILED" }) , (31u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AssetAR" , docs : "Asset - ALREADY REDEEMED" }) , (31u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AuthoritiesChangeAR" , docs : "Authorities Change - ALREADY SYNCED" }) , (31u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "EthLogPF" , docs : "Eth Log - PARSING FAILED" }) , (31u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "KtonLockedNSBA" , docs : "*KTON* Locked - NO SUFFICIENT BACKING ASSETS" }) , (31u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RingLockedNSBA" , docs : "*RING* Locked - NO SUFFICIENT BACKING ASSETS" }) , (31u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "LogEntryNE" , docs : "Log Entry - NOT EXISTED" }) , (31u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RedeemDis" , docs : "Redeem - DISABLED" }) , (31u8 , 13u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RingLockLim" , docs : "Ring Lock - LIMITED" }) , (31u8 , 14u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "KtonLockLim" , docs : "Kton Lock - LIMITED" }) , (33u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayParcelAR" , docs : "Relay Parcel - ALREADY RELAYED" }) , (33u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RoundMis" , docs : "Round - MISMATCHED" }) , (33u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ActiveGamesTM" , docs : "Active Games - TOO MANY" }) , (33u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ExistedAffirmationsFoundC" , docs : "Existed Affirmation(s) Found - CONFLICT" }) , (33u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "GameAtThisRoundC" , docs : "Game at This Round - CLOSED" }) , (33u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayAffirmationDup" , docs : "Relay Affirmation - DUPLICATED" }) , (33u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "StakeIns" , docs : "Usable *RING* for Stake - INSUFFICIENT" }) , (33u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayProofsQuantityInv" , docs : "Relay Proofs Quantity - INVALID" }) , (33u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayAffirmationNE" , docs : "Relay Affirmation - NOT EXISTED" }) , (33u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ExtendedRelayAffirmationNE" , docs : "Extended Relay Affirmation - NOT EXISTED" }) , (33u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "PreviousRelayProofsInc" , docs : "Previous Relay Proofs - INCOMPLETE" }) , (33u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "PendingRelayParcelNE" , docs : "Pending Relay Parcel - NOT EXISTED" }) , (43u8 , 0u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "InvalidJustification" , docs : "The given justification is invalid for the given header." }) , (43u8 , 1u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "InvalidAuthoritySet" , docs : "The authority set from the underlying header chain is invalid." }) , (43u8 , 2u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "TooManyRequests" , docs : "There are too many requests for the current window to handle." }) , (43u8 , 3u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "OldHeader" , docs : "The header being imported is older than the best finalized header known to the pallet." }) , (43u8 , 4u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "UnknownHeader" , docs : "The header is unknown to the pallet." }) , (43u8 , 5u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "UnsupportedScheduledChange" , docs : "The scheduled authority set change found in the header is unsupported by the pallet.\n\nThis is the case for non-standard (e.g forced) authority set changes." }) , (43u8 , 6u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "NotInitialized" , docs : "The pallet is not yet initialized." }) , (43u8 , 7u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "AlreadyInitialized" , docs : "The pallet has already been initialized." }) , (43u8 , 8u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "Halted" , docs : "All pallet operations are halted." }) , (43u8 , 9u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (44u8 , 0u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "Halted" , docs : "All pallet operations are halted." }) , (44u8 , 1u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "MessageRejectedByChainVerifier" , docs : "Message has been treated as invalid by chain verifier." }) , (44u8 , 2u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "MessageRejectedByLaneVerifier" , docs : "Message has been treated as invalid by lane verifier." }) , (44u8 , 3u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "FailedToWithdrawMessageFee" , docs : "Submitter has failed to pay fee for delivering and dispatching messages." }) , (44u8 , 4u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "TooManyMessagesInTheProof" , docs : "The transaction brings too many messages." }) , (44u8 , 5u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "InvalidMessagesProof" , docs : "Invalid messages has been submitted." }) , (44u8 , 6u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "InvalidMessagesDeliveryProof" , docs : "Invalid messages delivery proof has been submitted." }) , (44u8 , 7u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "InvalidUnrewardedRelayers" , docs : "The bridged chain has invalid `UnrewardedRelayers` in its storage (fatal for the lane)." }) , (44u8 , 8u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "InvalidUnrewardedRelayersState" , docs : "The relayer has declared invalid unrewarded relayers state in the\n`receive_messages_delivery_proof` call." }) , (44u8 , 9u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "MessageIsAlreadyDelivered" , docs : "The message someone is trying to work with (i.e. increase fee) is already-delivered." }) , (44u8 , 10u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "MessageIsNotYetSent" , docs : "The message someone is trying to work with (i.e. increase fee) is not yet sent." }) , (44u8 , 11u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "TryingToConfirmMoreMessagesThanExpected" , docs : "The number of actually confirmed messages is going to be larger than the number of\nmessages in the proof. This may mean that this or bridged chain storage is corrupted." }) , (45u8 , 0u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (45u8 , 1u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "AlreadyEnrolled" , docs : "The relayer has been enrolled." }) , (45u8 , 2u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "NotEnrolled" , docs : "This relayer doesn't enroll ever." }) , (45u8 , 3u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "CollateralTooLow" , docs : "Locked collateral is too low to cover one order." }) , (45u8 , 4u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "StillHasOrdersNotConfirmed" , docs : "Update locked collateral is not allow since some orders are not confirm." }) , (45u8 , 5u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "RelayFeeTooLow" , docs : "The fee is lower than MinimumRelayFee." }) , (45u8 , 6u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "OccupiedRelayer" , docs : "The relayer is occupied, and can't cancel enrollment now." }) , (46u8 , 0u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (46u8 , 1u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "RingLockLimited" , docs : "Ring Lock LIMITED." }) , (46u8 , 2u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "RingDailyLimited" , docs : "Redeem Daily Limited" }) , (46u8 , 3u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "NonceDuplicated" , docs : "Message nonce duplicated." }) , (46u8 , 4u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "UnsupportedToken" , docs : "Unsupported token" }) , (46u8 , 5u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "InvalidRecipient" , docs : "Invalid recipient" }) , (47u8 , 0u8) => Some (ErrorDetails { pallet : "EVM" , error : "BalanceLow" , docs : "Not enough balance to perform action" }) , (47u8 , 1u8) => Some (ErrorDetails { pallet : "EVM" , error : "FeeOverflow" , docs : "Calculating total fee overflowed" }) , (47u8 , 2u8) => Some (ErrorDetails { pallet : "EVM" , error : "PaymentOverflow" , docs : "Calculating total payment overflowed" }) , (47u8 , 3u8) => Some (ErrorDetails { pallet : "EVM" , error : "WithdrawFailed" , docs : "Withdraw fee failed" }) , (47u8 , 4u8) => Some (ErrorDetails { pallet : "EVM" , error : "GasPriceTooLow" , docs : "Gas price is too low." }) , (47u8 , 5u8) => Some (ErrorDetails { pallet : "EVM" , error : "InvalidNonce" , docs : "Nonce is invalid" }) , (48u8 , 0u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InvalidSignature" , docs : "Signature is invalid." }) , (48u8 , 1u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "PreLogExists" , docs : "Pre-log is present, therefore transact is not allowed." }) , (48u8 , 2u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionExitError" , docs : "The internal transaction failed." }) , (48u8 , 3u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionRevertError" , docs : "" }) , (48u8 , 4u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionFatalError" , docs : "" }) , (48u8 , 5u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "ReadyOnlyCall" , docs : "The internal call failed." }) , (48u8 , 6u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "MessageTransactionError" , docs : "Message transaction invalid" }) , (48u8 , 7u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "MessageValidateError" , docs : "Message validate invalid" }) , _ => None }
+                match (index , error) { (0u8 , 0u8) => Some (ErrorDetails { pallet : "System" , error : "InvalidSpecName" , docs : "The name of specification does not match between the current runtime\nand the new runtime." }) , (0u8 , 1u8) => Some (ErrorDetails { pallet : "System" , error : "SpecVersionNeedsToIncrease" , docs : "The specification version is not allowed to decrease between the current runtime\nand the new runtime." }) , (0u8 , 2u8) => Some (ErrorDetails { pallet : "System" , error : "FailedToExtractRuntimeVersion" , docs : "Failed to extract the runtime version from the new runtime.\n\nEither calling `Core_version` or decoding `RuntimeVersion` failed." }) , (0u8 , 3u8) => Some (ErrorDetails { pallet : "System" , error : "NonDefaultComposite" , docs : "Suicide called when the account has non-default composite data." }) , (0u8 , 4u8) => Some (ErrorDetails { pallet : "System" , error : "NonZeroRefCount" , docs : "There is a non-zero reference count preventing the account from being purged." }) , (0u8 , 5u8) => Some (ErrorDetails { pallet : "System" , error : "CallFiltered" , docs : "The origin filter prevent the call to be dispatched." }) , (2u8 , 0u8) => Some (ErrorDetails { pallet : "Babe" , error : "InvalidEquivocationProof" , docs : "An equivocation proof provided as part of an equivocation report is invalid." }) , (2u8 , 1u8) => Some (ErrorDetails { pallet : "Babe" , error : "InvalidKeyOwnershipProof" , docs : "A key ownership proof provided as part of an equivocation report is invalid." }) , (2u8 , 2u8) => Some (ErrorDetails { pallet : "Babe" , error : "DuplicateOffenceReport" , docs : "A given equivocation report is valid but already previously reported." }) , (4u8 , 0u8) => Some (ErrorDetails { pallet : "Balances" , error : "VestingBalance" , docs : "Vesting balance too high to send value." }) , (4u8 , 1u8) => Some (ErrorDetails { pallet : "Balances" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal." }) , (4u8 , 2u8) => Some (ErrorDetails { pallet : "Balances" , error : "InsufficientBalance" , docs : "Balance too low to send value." }) , (4u8 , 3u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit." }) , (4u8 , 4u8) => Some (ErrorDetails { pallet : "Balances" , error : "KeepAlive" , docs : "Transfer/payment would kill account." }) , (4u8 , 5u8) => Some (ErrorDetails { pallet : "Balances" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account." }) , (4u8 , 6u8) => Some (ErrorDetails { pallet : "Balances" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist." }) , (4u8 , 7u8) => Some (ErrorDetails { pallet : "Balances" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (4u8 , 8u8) => Some (ErrorDetails { pallet : "Balances" , error : "LockP" , docs : "Lock - POISONED." }) , (5u8 , 0u8) => Some (ErrorDetails { pallet : "Kton" , error : "VestingBalance" , docs : "Vesting balance too high to send value." }) , (5u8 , 1u8) => Some (ErrorDetails { pallet : "Kton" , error : "LiquidityRestrictions" , docs : "Account liquidity restrictions prevent withdrawal." }) , (5u8 , 2u8) => Some (ErrorDetails { pallet : "Kton" , error : "InsufficientBalance" , docs : "Balance too low to send value." }) , (5u8 , 3u8) => Some (ErrorDetails { pallet : "Kton" , error : "ExistentialDeposit" , docs : "Value too low to create account due to existential deposit." }) , (5u8 , 4u8) => Some (ErrorDetails { pallet : "Kton" , error : "KeepAlive" , docs : "Transfer/payment would kill account." }) , (5u8 , 5u8) => Some (ErrorDetails { pallet : "Kton" , error : "ExistingVestingSchedule" , docs : "A vesting schedule already exists for this account." }) , (5u8 , 6u8) => Some (ErrorDetails { pallet : "Kton" , error : "DeadAccount" , docs : "Beneficiary account must pre-exist." }) , (5u8 , 7u8) => Some (ErrorDetails { pallet : "Kton" , error : "TooManyReserves" , docs : "Number of named reserves exceed MaxReserves" }) , (5u8 , 8u8) => Some (ErrorDetails { pallet : "Kton" , error : "LockP" , docs : "Lock - POISONED." }) , (7u8 , 0u8) => Some (ErrorDetails { pallet : "Authorship" , error : "InvalidUncleParent" , docs : "The uncle parent not in the chain." }) , (7u8 , 1u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UnclesAlreadySet" , docs : "Uncles already set in the block." }) , (7u8 , 2u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooManyUncles" , docs : "Too many uncles." }) , (7u8 , 3u8) => Some (ErrorDetails { pallet : "Authorship" , error : "GenesisUncle" , docs : "The uncle is genesis." }) , (7u8 , 4u8) => Some (ErrorDetails { pallet : "Authorship" , error : "TooHighUncle" , docs : "The uncle is too high in chain." }) , (7u8 , 5u8) => Some (ErrorDetails { pallet : "Authorship" , error : "UncleAlreadyIncluded" , docs : "The uncle is already included." }) , (7u8 , 6u8) => Some (ErrorDetails { pallet : "Authorship" , error : "OldUncle" , docs : "The uncle isn't recent enough to be included." }) , (38u8 , 0u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchEarlySubmission" , docs : "Submission was too early." }) , (38u8 , 1u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchWrongWinnerCount" , docs : "Wrong number of winners presented." }) , (38u8 , 2u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "PreDispatchWeakSubmission" , docs : "Submission was too weak, score-wise." }) , (38u8 , 3u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedQueueFull" , docs : "The queue was full, and the solution was not better than any of the existing ones." }) , (38u8 , 4u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedCannotPayDeposit" , docs : "The origin failed to pay the deposit." }) , (38u8 , 5u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedInvalidWitness" , docs : "Witness data to dispatchable is invalid." }) , (38u8 , 6u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "SignedTooMuchWeight" , docs : "The signed submission consumes too much weight" }) , (38u8 , 7u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "OcwCallWrongEra" , docs : "OCW submitted solution for wrong round" }) , (38u8 , 8u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "MissingSnapshotMetadata" , docs : "Snapshot metadata should exist but didn't." }) , (38u8 , 9u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "InvalidSubmissionIndex" , docs : "`Self::insert_submission` returned an invalid index." }) , (38u8 , 10u8) => Some (ErrorDetails { pallet : "ElectionProviderMultiPhase" , error : "CallNotAllowed" , docs : "The call is not allowed at this point." }) , (8u8 , 0u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotController" , docs : "Not a controller account." }) , (8u8 , 1u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotStash" , docs : "Not a stash account." }) , (8u8 , 2u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyBonded" , docs : "Stash is already bonded." }) , (8u8 , 3u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyPaired" , docs : "Controller is already paired." }) , (8u8 , 4u8) => Some (ErrorDetails { pallet : "Staking" , error : "EmptyTargets" , docs : "Targets cannot be empty." }) , (8u8 , 5u8) => Some (ErrorDetails { pallet : "Staking" , error : "DuplicateIndex" , docs : "Duplicate index." }) , (8u8 , 6u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidSlashIndex" , docs : "Slash record index out of bounds." }) , (8u8 , 7u8) => Some (ErrorDetails { pallet : "Staking" , error : "InsufficientBond" , docs : "Cannot have a validator or nominator role, with value less than the minimum defined by\ngovernance (see `MinValidatorBond` and `MinNominatorBond`). If unbonding is the\nintention, `chill` first to remove one's role as validator/nominator." }) , (8u8 , 8u8) => Some (ErrorDetails { pallet : "Staking" , error : "NoMoreChunks" , docs : "Can not schedule more unlock chunks." }) , (8u8 , 9u8) => Some (ErrorDetails { pallet : "Staking" , error : "NoUnlockChunk" , docs : "Can not rebond without unlocking chunks." }) , (8u8 , 10u8) => Some (ErrorDetails { pallet : "Staking" , error : "FundedTarget" , docs : "Attempting to target a stash that still has funds." }) , (8u8 , 11u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidEraToReward" , docs : "Invalid era to reward." }) , (8u8 , 12u8) => Some (ErrorDetails { pallet : "Staking" , error : "InvalidNumberOfNominations" , docs : "Invalid number of nominations." }) , (8u8 , 13u8) => Some (ErrorDetails { pallet : "Staking" , error : "NotSortedAndUnique" , docs : "Items are not sorted and unique." }) , (8u8 , 14u8) => Some (ErrorDetails { pallet : "Staking" , error : "AlreadyClaimed" , docs : "Rewards for this era have already been claimed for this validator." }) , (8u8 , 15u8) => Some (ErrorDetails { pallet : "Staking" , error : "IncorrectHistoryDepth" , docs : "Incorrect previous history depth input provided." }) , (8u8 , 16u8) => Some (ErrorDetails { pallet : "Staking" , error : "IncorrectSlashingSpans" , docs : "Incorrect number of slashing spans provided." }) , (8u8 , 17u8) => Some (ErrorDetails { pallet : "Staking" , error : "BadState" , docs : "Internal state has become somehow corrupted and the operation cannot continue." }) , (8u8 , 18u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyTargets" , docs : "Too many nomination targets supplied." }) , (8u8 , 19u8) => Some (ErrorDetails { pallet : "Staking" , error : "BadTarget" , docs : "A nomination target was supplied that was blocked or otherwise not a validator." }) , (8u8 , 20u8) => Some (ErrorDetails { pallet : "Staking" , error : "CannotChillOther" , docs : "The user has enough bond and thus cannot be chilled forcefully by an external person." }) , (8u8 , 21u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyNominators" , docs : "There are too many nominators in the system. Governance needs to adjust the staking\nsettings to keep things safe for the runtime." }) , (8u8 , 22u8) => Some (ErrorDetails { pallet : "Staking" , error : "TooManyValidators" , docs : "There are too many validators in the system. Governance needs to adjust the staking\nsettings to keep things safe for the runtime." }) , (8u8 , 23u8) => Some (ErrorDetails { pallet : "Staking" , error : "PayoutIns" , docs : "Payout - INSUFFICIENT" }) , (11u8 , 0u8) => Some (ErrorDetails { pallet : "Session" , error : "InvalidProof" , docs : "Invalid ownership proof." }) , (11u8 , 1u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAssociatedValidatorId" , docs : "No associated validator ID for account." }) , (11u8 , 2u8) => Some (ErrorDetails { pallet : "Session" , error : "DuplicatedKey" , docs : "Registered duplicate key." }) , (11u8 , 3u8) => Some (ErrorDetails { pallet : "Session" , error : "NoKeys" , docs : "No keys are associated with this account." }) , (11u8 , 4u8) => Some (ErrorDetails { pallet : "Session" , error : "NoAccount" , docs : "Key setting account is not live, so it's impossible to associate keys." }) , (13u8 , 0u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "PauseFailed" , docs : "Attempt to signal GRANDPA pause when the authority set isn't live\n(either paused or already pending pause)." }) , (13u8 , 1u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "ResumeFailed" , docs : "Attempt to signal GRANDPA resume when the authority set isn't paused\n(either live or already pending resume)." }) , (13u8 , 2u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "ChangePending" , docs : "Attempt to signal GRANDPA change with one already pending." }) , (13u8 , 3u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "TooSoon" , docs : "Cannot signal forced change so soon after last." }) , (13u8 , 4u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "InvalidKeyOwnershipProof" , docs : "A key ownership proof provided as part of an equivocation report is invalid." }) , (13u8 , 5u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "InvalidEquivocationProof" , docs : "An equivocation proof provided as part of an equivocation report is invalid." }) , (13u8 , 6u8) => Some (ErrorDetails { pallet : "Grandpa" , error : "DuplicateOffenceReport" , docs : "A given equivocation report is valid but already previously reported." }) , (14u8 , 0u8) => Some (ErrorDetails { pallet : "ImOnline" , error : "InvalidKey" , docs : "Non existent public key." }) , (14u8 , 1u8) => Some (ErrorDetails { pallet : "ImOnline" , error : "DuplicatedHeartbeat" , docs : "Duplicated heartbeat." }) , (36u8 , 0u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "TooManyMembers" , docs : "Too many members" }) , (36u8 , 1u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "CandidateAE" , docs : "Candidate - ALREADY EXISTED" }) , (36u8 , 2u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "CandidateNE" , docs : "Candidate - NOT EXISTED" }) , (36u8 , 3u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthorityAE" , docs : "Authority - ALREADY EXISTED" }) , (36u8 , 4u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthorityNE" , docs : "Authority - NOT EXISTED" }) , (36u8 , 5u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthorityIT" , docs : "Authority - IN TERM" }) , (36u8 , 6u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthoritiesCountTL" , docs : "Authorities Count - TOO LOW" }) , (36u8 , 7u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "StakeIns" , docs : "Stake - INSUFFICIENT" }) , (36u8 , 8u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "OnAuthoritiesChangeDis" , docs : "On Authorities Change - DISABLED" }) , (36u8 , 9u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "ScheduledSignNE" , docs : "Scheduled Sign -NOT EXISTED" }) , (36u8 , 10u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "SignatureInv" , docs : "Signature - INVALID" }) , (36u8 , 11u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "TermMis" , docs : "Term - MISMATCHED" }) , (36u8 , 12u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "AuthoritiesMis" , docs : "Authorities - MISMATCHED" }) , (36u8 , 13u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "NextAuthoritiesNE" , docs : "Next Authorities - NOT EXISTED" }) , (36u8 , 14u8) => Some (ErrorDetails { pallet : "EcdsaRelayAuthority" , error : "TooManySchedules" , docs : "Too many scheduled `MmrToSign`." }) , (51u8 , 0u8) => Some (ErrorDetails { pallet : "EcdsaAuthority" , error : "AuthorityExisted" , docs : "The authority is already existed." }) , (51u8 , 1u8) => Some (ErrorDetails { pallet : "EcdsaAuthority" , error : "TooManyAuthorities" , docs : "Too many authorities." }) , (51u8 , 2u8) => Some (ErrorDetails { pallet : "EcdsaAuthority" , error : "NotAuthority" , docs : "This is not an authority." }) , (51u8 , 3u8) => Some (ErrorDetails { pallet : "EcdsaAuthority" , error : "AtLeastOneAuthority" , docs : "Require at least one authority. Not allow to decrease below one." }) , (51u8 , 4u8) => Some (ErrorDetails { pallet : "EcdsaAuthority" , error : "OnAuthoritiesChange" , docs : "Currently, the authorities is changing." }) , (51u8 , 5u8) => Some (ErrorDetails { pallet : "EcdsaAuthority" , error : "NoAuthoritiesChange" , docs : "Didn't find any authorities changes to sign." }) , (51u8 , 6u8) => Some (ErrorDetails { pallet : "EcdsaAuthority" , error : "NoNewMessageRoot" , docs : "Didn't find any new message root to sign." }) , (51u8 , 7u8) => Some (ErrorDetails { pallet : "EcdsaAuthority" , error : "BadSignature" , docs : "Failed to verify the signature." }) , (51u8 , 8u8) => Some (ErrorDetails { pallet : "EcdsaAuthority" , error : "AlreadySubmitted" , docs : "This authority had already finished his duty." }) , (37u8 , 0u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ValueLow" , docs : "Value too low" }) , (37u8 , 1u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ProposalMissing" , docs : "Proposal does not exist" }) , (37u8 , 2u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyCanceled" , docs : "Cannot cancel the same proposal twice" }) , (37u8 , 3u8) => Some (ErrorDetails { pallet : "Democracy" , error : "DuplicateProposal" , docs : "Proposal already made" }) , (37u8 , 4u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ProposalBlacklisted" , docs : "Proposal still blacklisted" }) , (37u8 , 5u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotSimpleMajority" , docs : "Next external proposal not simple majority" }) , (37u8 , 6u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InvalidHash" , docs : "Invalid hash" }) , (37u8 , 7u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoProposal" , docs : "No external proposal" }) , (37u8 , 8u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyVetoed" , docs : "Identity may not veto a proposal twice" }) , (37u8 , 9u8) => Some (ErrorDetails { pallet : "Democracy" , error : "DuplicatePreimage" , docs : "Preimage already noted" }) , (37u8 , 10u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotImminent" , docs : "Not imminent" }) , (37u8 , 11u8) => Some (ErrorDetails { pallet : "Democracy" , error : "TooEarly" , docs : "Too early" }) , (37u8 , 12u8) => Some (ErrorDetails { pallet : "Democracy" , error : "Imminent" , docs : "Imminent" }) , (37u8 , 13u8) => Some (ErrorDetails { pallet : "Democracy" , error : "PreimageMissing" , docs : "Preimage not found" }) , (37u8 , 14u8) => Some (ErrorDetails { pallet : "Democracy" , error : "ReferendumInvalid" , docs : "Vote given for invalid referendum" }) , (37u8 , 15u8) => Some (ErrorDetails { pallet : "Democracy" , error : "PreimageInvalid" , docs : "Invalid preimage" }) , (37u8 , 16u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoneWaiting" , docs : "No proposals waiting" }) , (37u8 , 17u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotVoter" , docs : "The given account did not vote on the referendum." }) , (37u8 , 18u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NoPermission" , docs : "The actor has no permission to conduct the action." }) , (37u8 , 19u8) => Some (ErrorDetails { pallet : "Democracy" , error : "AlreadyDelegating" , docs : "The account is already delegating." }) , (37u8 , 20u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InsufficientFunds" , docs : "Too high a balance was provided that the account cannot afford." }) , (37u8 , 21u8) => Some (ErrorDetails { pallet : "Democracy" , error : "NotDelegating" , docs : "The account is not currently delegating." }) , (37u8 , 22u8) => Some (ErrorDetails { pallet : "Democracy" , error : "VotesExist" , docs : "The account currently has votes attached to it and the operation cannot succeed until\nthese are removed, either through `unvote` or `reap_vote`." }) , (37u8 , 23u8) => Some (ErrorDetails { pallet : "Democracy" , error : "InstantNotAllowed" , docs : "The instant referendum origin is currently disallowed." }) , (37u8 , 24u8) => Some (ErrorDetails { pallet : "Democracy" , error : "Nonsense" , docs : "Delegation to oneself makes no sense." }) , (37u8 , 25u8) => Some (ErrorDetails { pallet : "Democracy" , error : "WrongUpperBound" , docs : "Invalid upper bound." }) , (37u8 , 26u8) => Some (ErrorDetails { pallet : "Democracy" , error : "MaxVotesReached" , docs : "Maximum number of votes reached." }) , (37u8 , 27u8) => Some (ErrorDetails { pallet : "Democracy" , error : "TooManyProposals" , docs : "Maximum number of proposals reached." }) , (16u8 , 0u8) => Some (ErrorDetails { pallet : "Council" , error : "NotMember" , docs : "Account is not a member" }) , (16u8 , 1u8) => Some (ErrorDetails { pallet : "Council" , error : "DuplicateProposal" , docs : "Duplicate proposals not allowed" }) , (16u8 , 2u8) => Some (ErrorDetails { pallet : "Council" , error : "ProposalMissing" , docs : "Proposal must exist" }) , (16u8 , 3u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongIndex" , docs : "Mismatched index" }) , (16u8 , 4u8) => Some (ErrorDetails { pallet : "Council" , error : "DuplicateVote" , docs : "Duplicate vote ignored" }) , (16u8 , 5u8) => Some (ErrorDetails { pallet : "Council" , error : "AlreadyInitialized" , docs : "Members are already initialized!" }) , (16u8 , 6u8) => Some (ErrorDetails { pallet : "Council" , error : "TooEarly" , docs : "The close call was made too early, before the end of the voting." }) , (16u8 , 7u8) => Some (ErrorDetails { pallet : "Council" , error : "TooManyProposals" , docs : "There can only be a maximum of `MaxProposals` active proposals." }) , (16u8 , 8u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongProposalWeight" , docs : "The given weight bound for the proposal was too low." }) , (16u8 , 9u8) => Some (ErrorDetails { pallet : "Council" , error : "WrongProposalLength" , docs : "The given length bound for the proposal was too low." }) , (17u8 , 0u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "NotMember" , docs : "Account is not a member" }) , (17u8 , 1u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "DuplicateProposal" , docs : "Duplicate proposals not allowed" }) , (17u8 , 2u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "ProposalMissing" , docs : "Proposal must exist" }) , (17u8 , 3u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongIndex" , docs : "Mismatched index" }) , (17u8 , 4u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "DuplicateVote" , docs : "Duplicate vote ignored" }) , (17u8 , 5u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "AlreadyInitialized" , docs : "Members are already initialized!" }) , (17u8 , 6u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "TooEarly" , docs : "The close call was made too early, before the end of the voting." }) , (17u8 , 7u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "TooManyProposals" , docs : "There can only be a maximum of `MaxProposals` active proposals." }) , (17u8 , 8u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongProposalWeight" , docs : "The given weight bound for the proposal was too low." }) , (17u8 , 9u8) => Some (ErrorDetails { pallet : "TechnicalCommittee" , error : "WrongProposalLength" , docs : "The given length bound for the proposal was too low." }) , (18u8 , 0u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "UnableToVote" , docs : "Cannot vote when no candidates or members exist." }) , (18u8 , 1u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "NoVotes" , docs : "Must vote for at least one candidate." }) , (18u8 , 2u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "TooManyVotes" , docs : "Cannot vote more than candidates." }) , (18u8 , 3u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MaximumVotesExceeded" , docs : "Cannot vote more than maximum allowed." }) , (18u8 , 4u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "LowBalance" , docs : "Cannot vote with stake less than minimum balance." }) , (18u8 , 5u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "UnableToPayBond" , docs : "Voter can not pay voting bond." }) , (18u8 , 6u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MustBeVoter" , docs : "Must be a voter." }) , (18u8 , 7u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "ReportSelf" , docs : "Cannot report self." }) , (18u8 , 8u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "DuplicatedCandidate" , docs : "Duplicated candidate submission." }) , (18u8 , 9u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "MemberSubmit" , docs : "Member cannot re-submit candidacy." }) , (18u8 , 10u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "RunnerUpSubmit" , docs : "Runner cannot re-submit candidacy." }) , (18u8 , 11u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InsufficientCandidateFunds" , docs : "Candidate does not have enough funds." }) , (18u8 , 12u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "NotMember" , docs : "Not a member." }) , (18u8 , 13u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidWitnessData" , docs : "The provided count of number of candidates is incorrect." }) , (18u8 , 14u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidVoteCount" , docs : "The provided count of number of votes is incorrect." }) , (18u8 , 15u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidRenouncing" , docs : "The renouncing origin presented a wrong `Renouncing` parameter." }) , (18u8 , 16u8) => Some (ErrorDetails { pallet : "PhragmenElection" , error : "InvalidReplacement" , docs : "Prediction regarding replacement after member removal is wrong." }) , (19u8 , 0u8) => Some (ErrorDetails { pallet : "TechnicalMembership" , error : "AlreadyMember" , docs : "Already a member." }) , (19u8 , 1u8) => Some (ErrorDetails { pallet : "TechnicalMembership" , error : "NotMember" , docs : "Not a member." }) , (20u8 , 0u8) => Some (ErrorDetails { pallet : "Treasury" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (20u8 , 1u8) => Some (ErrorDetails { pallet : "Treasury" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (20u8 , 2u8) => Some (ErrorDetails { pallet : "Treasury" , error : "TooManyApprovals" , docs : "Too many approvals in the queue." }) , (39u8 , 0u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (39u8 , 1u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (39u8 , 2u8) => Some (ErrorDetails { pallet : "KtonTreasury" , error : "TooManyApprovals" , docs : "Too many approvals in the queue." }) , (40u8 , 0u8) => Some (ErrorDetails { pallet : "Tips" , error : "ReasonTooBig" , docs : "The reason given is just too big." }) , (40u8 , 1u8) => Some (ErrorDetails { pallet : "Tips" , error : "AlreadyKnown" , docs : "The tip was already found/started." }) , (40u8 , 2u8) => Some (ErrorDetails { pallet : "Tips" , error : "UnknownTip" , docs : "The tip hash is unknown." }) , (40u8 , 3u8) => Some (ErrorDetails { pallet : "Tips" , error : "NotFinder" , docs : "The account attempting to retract the tip is not the finder of the tip." }) , (40u8 , 4u8) => Some (ErrorDetails { pallet : "Tips" , error : "StillOpen" , docs : "The tip cannot be claimed/closed because there are not enough tippers yet." }) , (40u8 , 5u8) => Some (ErrorDetails { pallet : "Tips" , error : "Premature" , docs : "The tip cannot be claimed/closed because it's still in the countdown period." }) , (41u8 , 0u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InsufficientProposersBalance" , docs : "Proposer's balance is too low." }) , (41u8 , 1u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidIndex" , docs : "No proposal or bounty at that index." }) , (41u8 , 2u8) => Some (ErrorDetails { pallet : "Bounties" , error : "ReasonTooBig" , docs : "The reason given is just too big." }) , (41u8 , 3u8) => Some (ErrorDetails { pallet : "Bounties" , error : "UnexpectedStatus" , docs : "The bounty status is unexpected." }) , (41u8 , 4u8) => Some (ErrorDetails { pallet : "Bounties" , error : "RequireCurator" , docs : "Require bounty curator." }) , (41u8 , 5u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidValue" , docs : "Invalid bounty value." }) , (41u8 , 6u8) => Some (ErrorDetails { pallet : "Bounties" , error : "InvalidFee" , docs : "Invalid bounty fee." }) , (41u8 , 7u8) => Some (ErrorDetails { pallet : "Bounties" , error : "PendingPayout" , docs : "A bounty payout is pending.\nTo cancel the bounty, you must unassign and slash the curator." }) , (41u8 , 8u8) => Some (ErrorDetails { pallet : "Bounties" , error : "Premature" , docs : "The bounties cannot be claimed/closed because it's still in the countdown period." }) , (27u8 , 0u8) => Some (ErrorDetails { pallet : "Sudo" , error : "RequireSudo" , docs : "Sender must be the Sudo account" }) , (21u8 , 0u8) => Some (ErrorDetails { pallet : "Vesting" , error : "NotVesting" , docs : "The account given is not vesting." }) , (21u8 , 1u8) => Some (ErrorDetails { pallet : "Vesting" , error : "AtMaxVestingSchedules" , docs : "The account already has `MaxVestingSchedules` count of schedules and thus\ncannot add another one. Consider merging existing schedules in order to add another." }) , (21u8 , 2u8) => Some (ErrorDetails { pallet : "Vesting" , error : "AmountLow" , docs : "Amount being transferred is too low to create a vesting schedule." }) , (21u8 , 3u8) => Some (ErrorDetails { pallet : "Vesting" , error : "ScheduleIndexOutOfBounds" , docs : "An index was out of bounds of the vesting schedules." }) , (21u8 , 4u8) => Some (ErrorDetails { pallet : "Vesting" , error : "InvalidScheduleParams" , docs : "Failed to create a new schedule because some parameter was invalid." }) , (22u8 , 0u8) => Some (ErrorDetails { pallet : "Utility" , error : "TooManyCalls" , docs : "Too many calls batched." }) , (23u8 , 0u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManySubAccounts" , docs : "Too many subs-accounts." }) , (23u8 , 1u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotFound" , docs : "Account isn't found." }) , (23u8 , 2u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotNamed" , docs : "Account isn't named." }) , (23u8 , 3u8) => Some (ErrorDetails { pallet : "Identity" , error : "EmptyIndex" , docs : "Empty index." }) , (23u8 , 4u8) => Some (ErrorDetails { pallet : "Identity" , error : "FeeChanged" , docs : "Fee is changed." }) , (23u8 , 5u8) => Some (ErrorDetails { pallet : "Identity" , error : "NoIdentity" , docs : "No identity found." }) , (23u8 , 6u8) => Some (ErrorDetails { pallet : "Identity" , error : "StickyJudgement" , docs : "Sticky judgement." }) , (23u8 , 7u8) => Some (ErrorDetails { pallet : "Identity" , error : "JudgementGiven" , docs : "Judgement given." }) , (23u8 , 8u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidJudgement" , docs : "Invalid judgement." }) , (23u8 , 9u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidIndex" , docs : "The index is invalid." }) , (23u8 , 10u8) => Some (ErrorDetails { pallet : "Identity" , error : "InvalidTarget" , docs : "The target is invalid." }) , (23u8 , 11u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManyFields" , docs : "Too many additional fields." }) , (23u8 , 12u8) => Some (ErrorDetails { pallet : "Identity" , error : "TooManyRegistrars" , docs : "Maximum amount of registrars reached. Cannot add any more." }) , (23u8 , 13u8) => Some (ErrorDetails { pallet : "Identity" , error : "AlreadyClaimed" , docs : "Account ID is already named." }) , (23u8 , 14u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotSub" , docs : "Sender is not a sub-account." }) , (23u8 , 15u8) => Some (ErrorDetails { pallet : "Identity" , error : "NotOwned" , docs : "Sub-account isn't owned by sender." }) , (24u8 , 0u8) => Some (ErrorDetails { pallet : "Society" , error : "BadPosition" , docs : "An incorrect position was provided." }) , (24u8 , 1u8) => Some (ErrorDetails { pallet : "Society" , error : "NotMember" , docs : "User is not a member." }) , (24u8 , 2u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyMember" , docs : "User is already a member." }) , (24u8 , 3u8) => Some (ErrorDetails { pallet : "Society" , error : "Suspended" , docs : "User is suspended." }) , (24u8 , 4u8) => Some (ErrorDetails { pallet : "Society" , error : "NotSuspended" , docs : "User is not suspended." }) , (24u8 , 5u8) => Some (ErrorDetails { pallet : "Society" , error : "NoPayout" , docs : "Nothing to payout." }) , (24u8 , 6u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyFounded" , docs : "Society already founded." }) , (24u8 , 7u8) => Some (ErrorDetails { pallet : "Society" , error : "InsufficientPot" , docs : "Not enough in pot to accept candidate." }) , (24u8 , 8u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyVouching" , docs : "Member is already vouching or banned from vouching again." }) , (24u8 , 9u8) => Some (ErrorDetails { pallet : "Society" , error : "NotVouching" , docs : "Member is not vouching." }) , (24u8 , 10u8) => Some (ErrorDetails { pallet : "Society" , error : "Head" , docs : "Cannot remove the head of the chain." }) , (24u8 , 11u8) => Some (ErrorDetails { pallet : "Society" , error : "Founder" , docs : "Cannot remove the founder." }) , (24u8 , 12u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyBid" , docs : "User has already made a bid." }) , (24u8 , 13u8) => Some (ErrorDetails { pallet : "Society" , error : "AlreadyCandidate" , docs : "User is already a candidate." }) , (24u8 , 14u8) => Some (ErrorDetails { pallet : "Society" , error : "NotCandidate" , docs : "User is not a candidate." }) , (24u8 , 15u8) => Some (ErrorDetails { pallet : "Society" , error : "MaxMembers" , docs : "Too many members in the society." }) , (24u8 , 16u8) => Some (ErrorDetails { pallet : "Society" , error : "NotFounder" , docs : "The caller is not the founder." }) , (24u8 , 17u8) => Some (ErrorDetails { pallet : "Society" , error : "NotHead" , docs : "The caller is not the head." }) , (25u8 , 0u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotAllowed" , docs : "User is not allowed to make a call on behalf of this account" }) , (25u8 , 1u8) => Some (ErrorDetails { pallet : "Recovery" , error : "ZeroThreshold" , docs : "Threshold must be greater than zero" }) , (25u8 , 2u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotEnoughFriends" , docs : "Friends list must be greater than zero and threshold" }) , (25u8 , 3u8) => Some (ErrorDetails { pallet : "Recovery" , error : "MaxFriends" , docs : "Friends list must be less than max friends" }) , (25u8 , 4u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotSorted" , docs : "Friends list must be sorted and free of duplicates" }) , (25u8 , 5u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotRecoverable" , docs : "This account is not set up for recovery" }) , (25u8 , 6u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyRecoverable" , docs : "This account is already set up for recovery" }) , (25u8 , 7u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyStarted" , docs : "A recovery process has already started for this account" }) , (25u8 , 8u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotStarted" , docs : "A recovery process has not started for this rescuer" }) , (25u8 , 9u8) => Some (ErrorDetails { pallet : "Recovery" , error : "NotFriend" , docs : "This account is not a friend who can vouch" }) , (25u8 , 10u8) => Some (ErrorDetails { pallet : "Recovery" , error : "DelayPeriod" , docs : "The friend must wait until the delay period to vouch for this recovery" }) , (25u8 , 11u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyVouched" , docs : "This user has already vouched for this recovery" }) , (25u8 , 12u8) => Some (ErrorDetails { pallet : "Recovery" , error : "Threshold" , docs : "The threshold for recovering this account has not been met" }) , (25u8 , 13u8) => Some (ErrorDetails { pallet : "Recovery" , error : "StillActive" , docs : "There are still active recovery attempts that need to be closed" }) , (25u8 , 14u8) => Some (ErrorDetails { pallet : "Recovery" , error : "AlreadyProxy" , docs : "This account is already set up for recovery" }) , (25u8 , 15u8) => Some (ErrorDetails { pallet : "Recovery" , error : "BadState" , docs : "Some internal state is broken." }) , (26u8 , 0u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "FailedToSchedule" , docs : "Failed to schedule a call" }) , (26u8 , 1u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "NotFound" , docs : "Cannot find the scheduled call." }) , (26u8 , 2u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "TargetBlockNumberInPast" , docs : "Given target block number is in the past." }) , (26u8 , 3u8) => Some (ErrorDetails { pallet : "Scheduler" , error : "RescheduleNoChange" , docs : "Reschedule failed because it does not change scheduled time." }) , (28u8 , 0u8) => Some (ErrorDetails { pallet : "Proxy" , error : "TooMany" , docs : "There are too many proxies registered or too many announcements pending." }) , (28u8 , 1u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotFound" , docs : "Proxy registration not found." }) , (28u8 , 2u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NotProxy" , docs : "Sender is not a proxy of the account to be proxied." }) , (28u8 , 3u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unproxyable" , docs : "A call which is incompatible with the proxy type's filter was attempted." }) , (28u8 , 4u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Duplicate" , docs : "Account is already a proxy." }) , (28u8 , 5u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoPermission" , docs : "Call may not be made by proxy because it may escalate its privileges." }) , (28u8 , 6u8) => Some (ErrorDetails { pallet : "Proxy" , error : "Unannounced" , docs : "Announcement, if made at all, was made too recently." }) , (28u8 , 7u8) => Some (ErrorDetails { pallet : "Proxy" , error : "NoSelfProxy" , docs : "Cannot add self as proxy." }) , (29u8 , 0u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MinimumThreshold" , docs : "Threshold must be 2 or greater." }) , (29u8 , 1u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyApproved" , docs : "Call is already approved by this signatory." }) , (29u8 , 2u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoApprovalsNeeded" , docs : "Call doesn't need any (more) approvals." }) , (29u8 , 3u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooFewSignatories" , docs : "There are too few signatories in the list." }) , (29u8 , 4u8) => Some (ErrorDetails { pallet : "Multisig" , error : "TooManySignatories" , docs : "There are too many signatories in the list." }) , (29u8 , 5u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SignatoriesOutOfOrder" , docs : "The signatories were provided out of order; they should be ordered." }) , (29u8 , 6u8) => Some (ErrorDetails { pallet : "Multisig" , error : "SenderInSignatories" , docs : "The sender was contained in the other signatories; it shouldn't be." }) , (29u8 , 7u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotFound" , docs : "Multisig operation not found when attempting to cancel." }) , (29u8 , 8u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NotOwner" , docs : "Only the account that originally created the multisig is able to cancel it." }) , (29u8 , 9u8) => Some (ErrorDetails { pallet : "Multisig" , error : "NoTimepoint" , docs : "No timepoint was given, yet the multisig operation is already underway." }) , (29u8 , 10u8) => Some (ErrorDetails { pallet : "Multisig" , error : "WrongTimepoint" , docs : "A different timepoint was given to the multisig operation that is underway." }) , (29u8 , 11u8) => Some (ErrorDetails { pallet : "Multisig" , error : "UnexpectedTimepoint" , docs : "A timepoint was given, yet no multisig operation is underway." }) , (29u8 , 12u8) => Some (ErrorDetails { pallet : "Multisig" , error : "MaxWeightTooLow" , docs : "The maximum weight information provided was too low." }) , (29u8 , 13u8) => Some (ErrorDetails { pallet : "Multisig" , error : "AlreadyStored" , docs : "The data to be stored is already stored." }) , (32u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderInv" , docs : "Header - INVALID" }) , (32u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ConfirmedBlocksC" , docs : "Confirmed Blocks - CONFLICT" }) , (32u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ContinuousInv" , docs : "Continuous - INVALID" }) , (32u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AffirmationExisted" , docs : "Affirmation - EXISTED" }) , (32u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderHashInv" , docs : "Header Hash - INVALID" }) , (32u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "MMRInv" , docs : "MMR - INVALID" }) , (32u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "HeaderHashMis" , docs : "Header Hash - MISMATCHED" }) , (32u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ConfirmedHeaderNE" , docs : "Confirmed Header - NOT EXISTED" }) , (32u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "ReceiptProofInv" , docs : "EthereumReceipt Proof - INVALID" }) , (32u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "PendingRelayHeaderParcelNE" , docs : "Pending Relay Header Parcel - NOT EXISTED" }) , (32u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "PendingRelayHeaderParcelAE" , docs : "Pending Relay Header Parcel - ALREADY EXISTED" }) , (32u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AlreadyVoteForAyeDup" , docs : "Already Vote for Aye - DUPLICATED" }) , (32u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumRelay" , error : "AlreadyVoteForNayDup" , docs : "Already Vote for Nay - DUPLICATED" }) , (31u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AddrLenMis" , docs : "Address Length - MISMATCHED" }) , (31u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "PubkeyPrefixMis" , docs : "Pubkey Prefix - MISMATCHED" }) , (31u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "BytesCF" , docs : "Bytes - CONVERSION FAILED" }) , (31u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "IntCF" , docs : "Int - CONVERSION FAILED" }) , (31u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "ArrayCF" , docs : "Array - CONVERSION FAILED" }) , (31u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AddressCF" , docs : "Address - CONVERSION FAILED" }) , (31u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AssetAR" , docs : "Asset - ALREADY REDEEMED" }) , (31u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "AuthoritiesChangeAR" , docs : "Authorities Change - ALREADY SYNCED" }) , (31u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "EthLogPF" , docs : "Eth Log - PARSING FAILED" }) , (31u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "KtonLockedNSBA" , docs : "*KTON* Locked - NO SUFFICIENT BACKING ASSETS" }) , (31u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RingLockedNSBA" , docs : "*RING* Locked - NO SUFFICIENT BACKING ASSETS" }) , (31u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "LogEntryNE" , docs : "Log Entry - NOT EXISTED" }) , (31u8 , 12u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RedeemDis" , docs : "Redeem - DISABLED" }) , (31u8 , 13u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "RingLockLim" , docs : "Ring Lock - LIMITED" }) , (31u8 , 14u8) => Some (ErrorDetails { pallet : "EthereumBacking" , error : "KtonLockLim" , docs : "Kton Lock - LIMITED" }) , (33u8 , 0u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayParcelAR" , docs : "Relay Parcel - ALREADY RELAYED" }) , (33u8 , 1u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RoundMis" , docs : "Round - MISMATCHED" }) , (33u8 , 2u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ActiveGamesTM" , docs : "Active Games - TOO MANY" }) , (33u8 , 3u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ExistedAffirmationsFoundC" , docs : "Existed Affirmation(s) Found - CONFLICT" }) , (33u8 , 4u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "GameAtThisRoundC" , docs : "Game at This Round - CLOSED" }) , (33u8 , 5u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayAffirmationDup" , docs : "Relay Affirmation - DUPLICATED" }) , (33u8 , 6u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "StakeIns" , docs : "Usable *RING* for Stake - INSUFFICIENT" }) , (33u8 , 7u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayProofsQuantityInv" , docs : "Relay Proofs Quantity - INVALID" }) , (33u8 , 8u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "RelayAffirmationNE" , docs : "Relay Affirmation - NOT EXISTED" }) , (33u8 , 9u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "ExtendedRelayAffirmationNE" , docs : "Extended Relay Affirmation - NOT EXISTED" }) , (33u8 , 10u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "PreviousRelayProofsInc" , docs : "Previous Relay Proofs - INCOMPLETE" }) , (33u8 , 11u8) => Some (ErrorDetails { pallet : "EthereumRelayerGame" , error : "PendingRelayParcelNE" , docs : "Pending Relay Parcel - NOT EXISTED" }) , (43u8 , 0u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "InvalidJustification" , docs : "The given justification is invalid for the given header." }) , (43u8 , 1u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "InvalidAuthoritySet" , docs : "The authority set from the underlying header chain is invalid." }) , (43u8 , 2u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "TooManyRequests" , docs : "There are too many requests for the current window to handle." }) , (43u8 , 3u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "OldHeader" , docs : "The header being imported is older than the best finalized header known to the pallet." }) , (43u8 , 4u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "UnknownHeader" , docs : "The header is unknown to the pallet." }) , (43u8 , 5u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "UnsupportedScheduledChange" , docs : "The scheduled authority set change found in the header is unsupported by the pallet.\n\nThis is the case for non-standard (e.g forced) authority set changes." }) , (43u8 , 6u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "NotInitialized" , docs : "The pallet is not yet initialized." }) , (43u8 , 7u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "AlreadyInitialized" , docs : "The pallet has already been initialized." }) , (43u8 , 8u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "Halted" , docs : "All pallet operations are halted." }) , (43u8 , 9u8) => Some (ErrorDetails { pallet : "BridgeCrabGrandpa" , error : "StorageRootMismatch" , docs : "The storage proof doesn't contains storage root. So it is invalid for given header." }) , (44u8 , 0u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "Halted" , docs : "All pallet operations are halted." }) , (44u8 , 1u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "MessageRejectedByChainVerifier" , docs : "Message has been treated as invalid by chain verifier." }) , (44u8 , 2u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "MessageRejectedByLaneVerifier" , docs : "Message has been treated as invalid by lane verifier." }) , (44u8 , 3u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "FailedToWithdrawMessageFee" , docs : "Submitter has failed to pay fee for delivering and dispatching messages." }) , (44u8 , 4u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "TooManyMessagesInTheProof" , docs : "The transaction brings too many messages." }) , (44u8 , 5u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "InvalidMessagesProof" , docs : "Invalid messages has been submitted." }) , (44u8 , 6u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "InvalidMessagesDeliveryProof" , docs : "Invalid messages delivery proof has been submitted." }) , (44u8 , 7u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "InvalidUnrewardedRelayers" , docs : "The bridged chain has invalid `UnrewardedRelayers` in its storage (fatal for the lane)." }) , (44u8 , 8u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "InvalidUnrewardedRelayersState" , docs : "The relayer has declared invalid unrewarded relayers state in the\n`receive_messages_delivery_proof` call." }) , (44u8 , 9u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "MessageIsAlreadyDelivered" , docs : "The message someone is trying to work with (i.e. increase fee) is already-delivered." }) , (44u8 , 10u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "MessageIsNotYetSent" , docs : "The message someone is trying to work with (i.e. increase fee) is not yet sent." }) , (44u8 , 11u8) => Some (ErrorDetails { pallet : "BridgeCrabMessages" , error : "TryingToConfirmMoreMessagesThanExpected" , docs : "The number of actually confirmed messages is going to be larger than the number of\nmessages in the proof. This may mean that this or bridged chain storage is corrupted." }) , (45u8 , 0u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (45u8 , 1u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "AlreadyEnrolled" , docs : "The relayer has been enrolled." }) , (45u8 , 2u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "NotEnrolled" , docs : "This relayer doesn't enroll ever." }) , (45u8 , 3u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "CollateralTooLow" , docs : "Locked collateral is too low to cover one order." }) , (45u8 , 4u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "StillHasOrdersNotConfirmed" , docs : "Update locked collateral is not allow since some orders are not confirm." }) , (45u8 , 5u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "RelayFeeTooLow" , docs : "The fee is lower than MinimumRelayFee." }) , (45u8 , 6u8) => Some (ErrorDetails { pallet : "FeeMarket" , error : "OccupiedRelayer" , docs : "The relayer is occupied, and can't cancel enrollment now." }) , (46u8 , 0u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "InsufficientBalance" , docs : "Insufficient balance." }) , (46u8 , 1u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "RingLockLimited" , docs : "Ring Lock LIMITED." }) , (46u8 , 2u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "RingDailyLimited" , docs : "Redeem Daily Limited" }) , (46u8 , 3u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "NonceDuplicated" , docs : "Message nonce duplicated." }) , (46u8 , 4u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "UnsupportedToken" , docs : "Unsupported token" }) , (46u8 , 5u8) => Some (ErrorDetails { pallet : "ToCrabBacking" , error : "InvalidRecipient" , docs : "Invalid recipient" }) , (47u8 , 0u8) => Some (ErrorDetails { pallet : "EVM" , error : "BalanceLow" , docs : "Not enough balance to perform action" }) , (47u8 , 1u8) => Some (ErrorDetails { pallet : "EVM" , error : "FeeOverflow" , docs : "Calculating total fee overflowed" }) , (47u8 , 2u8) => Some (ErrorDetails { pallet : "EVM" , error : "PaymentOverflow" , docs : "Calculating total payment overflowed" }) , (47u8 , 3u8) => Some (ErrorDetails { pallet : "EVM" , error : "WithdrawFailed" , docs : "Withdraw fee failed" }) , (47u8 , 4u8) => Some (ErrorDetails { pallet : "EVM" , error : "GasPriceTooLow" , docs : "Gas price is too low." }) , (47u8 , 5u8) => Some (ErrorDetails { pallet : "EVM" , error : "InvalidNonce" , docs : "Nonce is invalid" }) , (48u8 , 0u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InvalidSignature" , docs : "Signature is invalid." }) , (48u8 , 1u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "PreLogExists" , docs : "Pre-log is present, therefore transact is not allowed." }) , (48u8 , 2u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionExitError" , docs : "The internal transaction failed." }) , (48u8 , 3u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionRevertError" , docs : "" }) , (48u8 , 4u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "InternalTransactionFatalError" , docs : "" }) , (48u8 , 5u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "ReadyOnlyCall" , docs : "The internal call failed." }) , (48u8 , 6u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "MessageTransactionError" , docs : "Message transaction invalid" }) , (48u8 , 7u8) => Some (ErrorDetails { pallet : "Ethereum" , error : "MessageValidateError" , docs : "Message validate invalid" }) , _ => None }
             } else {
                 None
             }
@@ -25237,6 +25825,9 @@ pub mod api {
         }
         pub fn ecdsa_relay_authority(&self) -> ecdsa_relay_authority::constants::ConstantsApi {
             ecdsa_relay_authority::constants::ConstantsApi
+        }
+        pub fn ecdsa_authority(&self) -> ecdsa_authority::constants::ConstantsApi {
+            ecdsa_authority::constants::ConstantsApi
         }
         pub fn democracy(&self) -> democracy::constants::ConstantsApi {
             democracy::constants::ConstantsApi
@@ -25359,8 +25950,14 @@ pub mod api {
         pub fn darwinia_header_mmr(&self) -> darwinia_header_mmr::storage::StorageApi<'a, T> {
             darwinia_header_mmr::storage::StorageApi::new(self.client)
         }
+        pub fn message_gadget(&self) -> message_gadget::storage::StorageApi<'a, T> {
+            message_gadget::storage::StorageApi::new(self.client)
+        }
         pub fn ecdsa_relay_authority(&self) -> ecdsa_relay_authority::storage::StorageApi<'a, T> {
             ecdsa_relay_authority::storage::StorageApi::new(self.client)
+        }
+        pub fn ecdsa_authority(&self) -> ecdsa_authority::storage::StorageApi<'a, T> {
+            ecdsa_authority::storage::StorageApi::new(self.client)
         }
         pub fn democracy(&self) -> democracy::storage::StorageApi<'a, T> {
             democracy::storage::StorageApi::new(self.client)
@@ -25492,10 +26089,16 @@ pub mod api {
         pub fn im_online(&self) -> im_online::calls::TransactionApi<'a, T, X, A> {
             im_online::calls::TransactionApi::new(self.client)
         }
+        pub fn message_gadget(&self) -> message_gadget::calls::TransactionApi<'a, T, X, A> {
+            message_gadget::calls::TransactionApi::new(self.client)
+        }
         pub fn ecdsa_relay_authority(
             &self,
         ) -> ecdsa_relay_authority::calls::TransactionApi<'a, T, X, A> {
             ecdsa_relay_authority::calls::TransactionApi::new(self.client)
+        }
+        pub fn ecdsa_authority(&self) -> ecdsa_authority::calls::TransactionApi<'a, T, X, A> {
+            ecdsa_authority::calls::TransactionApi::new(self.client)
         }
         pub fn democracy(&self) -> democracy::calls::TransactionApi<'a, T, X, A> {
             democracy::calls::TransactionApi::new(self.client)

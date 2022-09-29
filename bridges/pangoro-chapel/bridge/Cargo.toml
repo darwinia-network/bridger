@@ -1,6 +1,6 @@
 [package]
 name = "bridge-pangoro-ropsten"
-version = "0.6.4"
+version = "0.7.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"

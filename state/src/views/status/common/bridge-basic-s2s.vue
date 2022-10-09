@@ -1,14 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="12">
-      <v-tabs v-model="source.tab">
-        <v-tabs-slider :color="sourceChain.color"/>
-        <v-tab key="tab-relay-header">Header</v-tab>
-        <v-tab key="tab-relay-message">Message</v-tab>
-        <v-tab key="tab-feemarket">Feemarket</v-tab>
-      </v-tabs>
-    </v-col>
-    <v-col cols="12" v-if="source.tab === 0">
+    <v-col md="6" sm="12" xs="12">
       <s2s-header-relay
         :key="`s2s-header-${sourceChain.name}-${targetChain.name}`"
         :source-client="sourceClient"
@@ -17,7 +9,15 @@
         :target-chain="targetChain"
       />
     </v-col>
-    <v-col cols="12" v-if="source.tab === 1">
+    <v-col md="6" sm="12" xs="12">
+      <s2s-feemarket
+        :key="`s2s-feemarket-${sourceChain.name}-${targetChain.name}`"
+        :source-client="sourceClient"
+        :source-chain="sourceChain"
+        :target-chain="targetChain"
+      />
+    </v-col>
+    <v-col cols="12">
       <s2s-message-relay
         :key="`s2s-message-${sourceChain.name}-${targetChain.name}`"
         :source-client="sourceClient"
@@ -26,18 +26,17 @@
         :target-chain="targetChain"
       />
     </v-col>
-    <v-col cols="12" v-if="source.tab === 2">
-      <s2s-feemarket
-        :key="`s2s-feemarket-${sourceChain.name}-${targetChain.name}`"
-        :source-client="sourceClient"
-        :source-chain="sourceChain"
-        :target-chain="targetChain"
-      />
+
+    <v-col cols="12">
+      <v-alert text color="grey accent-4" icon="mdi-information">
+        More feemarket operation please visit
+        <v-btn text small href="https://feemarket.darwinia.network" target="_blank">
+          feemarket ui
+        </v-btn>
+        project.
+      </v-alert>
     </v-col>
 
-<!--    <v-col cols="12">
-      <v-divider/>
-    </v-col>-->
   </v-row>
 </template>
 
@@ -73,7 +72,6 @@ export default {
         sourceClient: null,
         targetClient: null,
       },
-      tab: 1,
     },
   }),
   created() {

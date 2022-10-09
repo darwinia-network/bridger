@@ -1,5 +1,8 @@
 <template>
   <v-row>
+    <v-col cols="12">
+      <h2 class="text-h5 font-weight-thin">Message</h2>
+    </v-col>
     <v-col cols="12" v-for="item in source.lanes" :key="`lane-${item}`">
       <message-relay
         :lane="item"

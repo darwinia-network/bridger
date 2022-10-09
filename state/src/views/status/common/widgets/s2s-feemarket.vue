@@ -1,5 +1,8 @@
 <template>
   <v-row>
+    <v-col cols="12">
+      <h2 class="text-h5 font-weight-thin">Fee market</h2>
+    </v-col>
     <v-col cols="12" v-if="source.ampleRelayers">
       <v-simple-table dense>
         <template v-slot:default>
@@ -24,10 +27,7 @@
           </tr>
           <tr v-for="(relayer, ix) in source.assignedRelayers" :key="relayer.id">
             <td>
-              <code>{{ relayer.id }}</code>
-              <v-btn icon small :href="`${sourceChain.explorer}/account/${relayer.id}`" target="_blank">
-                <v-icon small>mdi-open-in-new</v-icon>
-              </v-btn>
+              <external-subscan :identity="relayer.id" type="account" :chain="sourceChain" />
             </td>
             <td><code>{{ relayer.collateral }}</code></td>
             <td>
@@ -41,21 +41,12 @@
     <v-col cols="12" v-else>
       <p>No assigned relayers</p>
     </v-col>
-    <v-col cols="12">
-      <v-alert text color="grey accent-4" icon="mdi-information">
-        More feemarket operation please visit
-        <v-btn text small href="https://feemarket.darwinia.network" target="_blank">
-          feemarket ui
-        </v-btn>
-        project.
-      </v-alert>
-      <p>
-      </p>
-    </v-col>
   </v-row>
 </template>
 
 <script>
+
+import ExternalSubscan from '@/components/widgets/external-subscan';
 
 async function initState(vm) {
   const bridgeTarget = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
@@ -68,6 +59,7 @@ async function initState(vm) {
 }
 
 export default {
+  components: {ExternalSubscan},
   props: {
     sourceClient: {
       type: Object,

@@ -20,16 +20,14 @@
     <v-divider/>
     <v-container>
       <v-row>
-        <v-col cols="12">
+        <v-col cols="6">
           <h3 class="subtitle-1">Delivery</h3>
           <v-divider/>
-        </v-col>
-        <v-col cols="12">
           <v-simple-table dense>
             <template v-slot:default>
               <thead>
               <tr>
-                <th style="width: 30%">Title</th>
+                <th style="width: 70%">Title</th>
                 <th>Value</th>
               </tr>
               </thead>
@@ -62,17 +60,14 @@
             </template>
           </v-simple-table>
         </v-col>
-        <v-col cols="12">
+        <v-col cols="6">
           <h3 class="subtitle-1">Receiving</h3>
           <v-divider/>
-        </v-col>
-
-        <v-col cols="12">
           <v-simple-table dense>
             <template v-slot:default>
               <thead>
               <tr>
-                <th style="width: 30%">Title</th>
+                <th style="width: 45%">Title</th>
                 <th>Value</th>
               </tr>
               </thead>
@@ -104,6 +99,8 @@
           </v-simple-table>
         </v-col>
         <v-col cols="12" v-if="!loading.targetChainInboundLaneData">
+          <h3 class="subtitle-1">Dispatch info</h3>
+          <v-divider class="mb-3"/>
           <v-row>
             <v-col cols="6" v-for="item in source.targetChainInboundLaneData.relayers">
               <v-card :loading="loading.targetChainInboundLaneData">

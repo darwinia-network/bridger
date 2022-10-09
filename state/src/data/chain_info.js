@@ -14,8 +14,8 @@ const darwinia = {
         grandpa: 'bridgeCrabGrandpa',
         messages: 'bridgeCrabMessages',
       },
+      lanes: ['0x00000000'],
     },
-    lanes: ['0x00000000'],
   },
   subql: 'https://subql.darwinia.network/subql-bridger-darwinia',
 };

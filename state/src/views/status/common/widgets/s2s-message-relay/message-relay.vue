@@ -98,51 +98,73 @@
             </template>
           </v-simple-table>
         </v-col>
-        <v-col cols="12" v-if="!loading.targetChainInboundLaneData">
-          <h3 class="subtitle-1">Dispatch info</h3>
-          <v-divider class="mb-3"/>
-          <v-row>
-            <v-col cols="6" v-for="item in source.targetChainInboundLaneData.relayers">
-              <v-card :loading="loading.targetChainInboundLaneData">
-                <v-container>
-                  <v-simple-table dense>
-                    <template v-slot:default>
-                      <thead>
-                      <tr>
-                        <th style="width: 30%">Title</th>
-                        <th>Value</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <tr>
-                        <td class="subtitle-2">Relayer</td>
-                        <td>
-                          <external-subscan :identity="item.relayer" type="account"
-                                            :chain="targetChain"/>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="subtitle-2">Begin</td>
-                        <td>{{ item.messages.begin }}</td>
-                      </tr>
-                      <tr>
-                        <td class="subtitle-2">End</td>
-                        <td>{{ item.messages.end }}</td>
-                      </tr>
-                      <tr>
-                        <td class="subtitle-2">Result</td>
-                        <td>{{ item.messages.dispatchResults }}</td>
-                      </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                </v-container>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-col>
+        <v-expand-transition>
+          <v-col cols="12" v-if="!loading.targetChainInboundLaneData && cond.showDispatchInfo">
+            <v-row>
+              <v-col cols="12">
+                <h3 class="subtitle-1">Dispatch info</h3>
+                <v-divider class="mb-3"/>
+              </v-col>
+              <v-col cols="6" v-for="item in source.targetChainInboundLaneData.relayers">
+                <v-card :loading="loading.targetChainInboundLaneData">
+                  <v-container>
+                    <v-simple-table dense>
+                      <template v-slot:default>
+                        <thead>
+                        <tr>
+                          <th style="width: 30%">Title</th>
+                          <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                          <td class="subtitle-2">Relayer</td>
+                          <td>
+                            <external-subscan :identity="item.relayer" type="account"
+                                              :chain="targetChain"/>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="subtitle-2">Begin</td>
+                          <td>{{ item.messages.begin }}</td>
+                        </tr>
+                        <tr>
+                          <td class="subtitle-2">End</td>
+                          <td>{{ item.messages.end }}</td>
+                        </tr>
+                        <tr>
+                          <td class="subtitle-2">Result</td>
+                          <td>{{ item.messages.dispatchResults }}</td>
+                        </tr>
+                        </tbody>
+                      </template>
+                    </v-simple-table>
+                  </v-container>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-expand-transition>
       </v-row>
     </v-container>
+    <v-card-actions>
+      <v-spacer/>
+      <template v-if="!loading.targetChainInboundLaneData && source.targetChainInboundLaneData.relayers.length > 0">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+              @click="cond.showDispatchInfo = !cond.showDispatchInfo"
+            >
+              <v-icon>{{ cond.showDispatchInfo ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+            </v-btn>
+          </template>
+          <span>Expanded more details</span>
+        </v-tooltip>
+      </template>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -209,10 +231,13 @@ export default {
       sourceChainOutboundLaneData: null,
       targetRelayedBlockAtSource: null,
     },
+    cond: {
+      showDispatchInfo: false,
+    },
     loading: {
       sourceChainOutboundLaneData: true,
       targetChainInboundLaneData: true,
-    }
+    },
   }),
   created() {
     initState(this);

@@ -14,15 +14,24 @@
             <td class="subtitle-2">Last relayed block (hash)</td>
             <td>
               <v-progress-linear v-if="loading.bestFinalizedHash" :color="sourceChain.color" indeterminate/>
-              <view-block-id v-else :identity="source.bestFinalizedHash" :chain="sourceChain"/>
+              <external-subscan
+                v-else
+                :identity="source.bestFinalizedHash"
+                type="block"
+                :chain="sourceChain"
+              />
             </td>
           </tr>
           <tr>
             <td class="subtitle-2">Last relayed block (number)</td>
             <td>
               <v-progress-linear v-if="loading.bestFinalizedBlock" :color="sourceChain.color" indeterminate/>
-              <view-block-id v-else :identity="`${source.bestFinalizedBlock.block.header.number}`"
-                             :chain="sourceChain"/>
+              <external-subscan
+                v-else
+                :identity="`${source.bestFinalizedBlock.block.header.number}`"
+                type="block"
+                :chain="sourceChain"
+              />
             </td>
           </tr>
           <tr>
@@ -32,12 +41,16 @@
               <div
                 v-else
                 :class="{
-                'green--text': source.nextMandatoryHeader < source.bestFinalizedBlock.block.header.number,
-                'red--text': source.nextMandatoryHeader >= source.bestFinalizedBlock.block.header.number,
+                'green--text': source.nextMandatoryHeader <= source.bestFinalizedBlock.block.header.number,
+                'red--text': source.nextMandatoryHeader > source.bestFinalizedBlock.block.header.number,
                 }"
               >
-                <view-block-id v-if="source.nextMandatoryHeader" :identity="`${source.nextMandatoryHeader}`"
-                               :chain="sourceChain"/>
+                <external-subscan
+                  v-if="source.nextMandatoryHeader"
+                  :identity="`${source.nextMandatoryHeader}`"
+                  type="block"
+                  :chain="sourceChain"
+                />
               </div>
             </td>
           </tr>
@@ -48,12 +61,16 @@
               <div
                 v-else
                 :class="{
-                'green--text': source.nextOnDemandBlock < source.bestFinalizedBlock.block.header.number,
-                'red--text': source.nextOnDemandBlock >= source.bestFinalizedBlock.block.header.number,
+                'green--text': source.nextOnDemandBlock <= source.bestFinalizedBlock.block.header.number,
+                'red--text': source.nextOnDemandBlock > source.bestFinalizedBlock.block.header.number,
                 }"
               >
-                <view-block-id v-if="source.nextOnDemandBlock" :identity="`${source.nextOnDemandBlock}`"
-                               :chain="sourceChain"/>
+                <external-subscan
+                  v-if="source.nextOnDemandBlock"
+                  :identity="`${source.nextOnDemandBlock}`"
+                  type="block"
+                  :chain="sourceChain"
+                />
               </div>
             </td>
           </tr>
@@ -66,7 +83,7 @@
 
 <script>
 
-import ViewBlockId from '@/components/widgets/view-block-id';
+import ExternalSubscan from '@/components/widgets/external-subscan';
 
 async function initState(vm) {
   // subscribe best finalized
@@ -136,7 +153,7 @@ async function queryNextOnDemandBlock(vm) {
 }
 
 export default {
-  components: {ViewBlockId},
+  components: {ExternalSubscan},
   props: {
     sourceClient: {
       type: Object,

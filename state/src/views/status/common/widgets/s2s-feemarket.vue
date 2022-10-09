@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="12" v-if="source.feemarket.ampleRelayers">
+    <v-col cols="12" v-if="source.ampleRelayers">
       <v-simple-table dense>
         <template v-slot:default>
           <thead>
@@ -11,12 +11,18 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-if="loading.feemarket">
-            <td><v-progress-linear :color="sourceChain.color" indeterminate/></td>
-            <td><v-progress-linear :color="sourceChain.color" indeterminate/></td>
-            <td><v-progress-linear :color="sourceChain.color" indeterminate/></td>
+          <tr v-if="loading.assignedRelayers">
+            <td>
+              <v-progress-linear :color="sourceChain.color" indeterminate/>
+            </td>
+            <td>
+              <v-progress-linear :color="sourceChain.color" indeterminate/>
+            </td>
+            <td>
+              <v-progress-linear :color="sourceChain.color" indeterminate/>
+            </td>
           </tr>
-          <tr v-for="(relayer, ix) in source.feemarket.assignedRelayers" :key="relayer.id">
+          <tr v-for="(relayer, ix) in source.assignedRelayers" :key="relayer.id">
             <td>
               <code>{{ relayer.id }}</code>
               <v-btn icon small :href="`${sourceChain.explorer}/account/${relayer.id}`" target="_blank">
@@ -25,7 +31,7 @@
             </td>
             <td><code>{{ relayer.collateral }}</code></td>
             <td>
-              <code :class="{'green--text': ix === source.feemarket.assignedRelayers.length - 1}" v-text="relayer.fee"/>
+              <code :class="{'green--text': ix === source.assignedRelayers.length - 1}" v-text="relayer.fee"/>
             </td>
           </tr>
           </tbody>
@@ -52,12 +58,13 @@
 <script>
 
 async function initState(vm) {
-  vm.loading.feemarket = true;
   const bridgeTarget = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
-  const relayers = await vm.sourceClient.query[bridgeTarget.query_name.feemarket].assignedRelayers();
-  vm.source.feemarket.ampleRelayers = relayers.isSome;
-  vm.source.feemarket.assignedRelayers = relayers.toHuman();
-  vm.loading.feemarket = false;
+  vm.subscriber.assignedRelayers = await vm.sourceClient.query[bridgeTarget.query_name.feemarket]
+    .assignedRelayers(v => {
+      vm.source.ampleRelayers = v.isSome;
+      vm.source.assignedRelayers = v.toJSON();
+      vm.loading.assignedRelayers = false;
+    });
 }
 
 export default {
@@ -74,17 +81,22 @@ export default {
   },
   data: () => ({
     source: {
-      feemarket: {
-        ampleRelayers: true,
-        assignedRelayers: [],
-      },
+      ampleRelayers: true,
+      assignedRelayers: [],
+    },
+    subscriber: {
+      assignedRelayers: null,
     },
     loading: {
-      feemarket: false,
+      assignedRelayers: true,
     }
   }),
   created() {
     initState(this);
+  },
+  destroyed() {
+    const vm = this;
+    vm.subscriber.assignedRelayers && vm.subscriber.assignedRelayers();
   }
 }
 </script>

@@ -2,13 +2,13 @@
   <v-row>
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
-        <v-col cols="10" v-bind="attrs" v-on="on">
+        <v-col cols="8" v-bind="attrs" v-on="on">
           <vue-ellipsis :text="identity"/>
         </v-col>
       </template>
       <span v-text="identity"/>
     </v-tooltip>
-    <v-col cols="2">
+    <v-col cols="4">
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn x-small icon v-bind="attrs" v-on="on" v-clipboard:copy="identity" v-clipboard:success="onCopy">
@@ -19,7 +19,7 @@
       </v-tooltip>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn x-small icon :href="`${chain.explorer}/block/${identity}`" target="_blank" v-bind="attrs" v-on="on">
+          <v-btn x-small icon :href="`${chain.explorer}/${type}/${identity}`" target="_blank" v-bind="attrs" v-on="on">
             <v-icon x-small>mdi-open-in-new</v-icon>
           </v-btn>
         </template>
@@ -34,6 +34,10 @@ export default {
   props: {
     identity: {
       type: String | Number,
+    },
+    type: {
+      type: String,
+      default: 'block',
     },
     chain: {
       type: Object,

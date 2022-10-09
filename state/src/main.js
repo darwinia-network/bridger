@@ -11,6 +11,7 @@ import VueEllipsis from 'vue-ellipsis-component'
 
 import Is from './plugins/is'
 import Subql from './plugins/subql'
+import Stream from './plugins/stream'
 
 import './plugins/logger'
 import './plugins/toast'
@@ -27,6 +28,7 @@ Vue.use(VueLocalStorage, {
 });
 Vue.use(VueClipboard);
 Vue.use(VueEllipsis);
+Vue.use(Stream);
 Vue.use(Is);
 Vue.use(Subql);
 

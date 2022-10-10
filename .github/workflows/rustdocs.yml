@@ -47,6 +47,8 @@ jobs:
          - darwinia-ethereum-pow
          - pangolin-pangoro
          - pangolin-ropsten
+         - pangolin-pangolinparachain
+         - pangolin-pangolinparachainalpha
          - pangoro-chapel
          - pangoro-goerli
          - template
@@ -141,7 +143,7 @@ jobs:
   deploy-rust-docs:
     name: Deploy rust docs
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - build-rust-docs-frame
       - build-rust-docs-bridge
       - build-rust-docs-assistants

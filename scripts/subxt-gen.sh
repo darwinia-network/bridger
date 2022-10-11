@@ -73,6 +73,11 @@ if [ "${CHAIN}" == "kusama" ]; then
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-kusama
 fi
 
+if [ "${CHAIN}" == "moonbase" ]; then
+  ENDPOINT='https://frag-moonbase-relay-rpc.g.moonbase.moonbeam.network'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-moonbase
+fi
+
 if [ -z "${ENDPOINT}" ]; then
   echo 'Not support chain:' ${CHAIN}
   exit 1

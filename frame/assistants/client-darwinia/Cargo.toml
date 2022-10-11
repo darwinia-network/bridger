@@ -26,16 +26,16 @@ serde_json  = "1"
 
 array-bytes = "2"
 codec       = { package = "parity-scale-codec", version = "2" }
-subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.4" }
-bp-darwinia = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.4" }
+subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
+bp-darwinia = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
 
 ## maybe common
 async-trait           = { optional = true, version = "0.1" }
 
 ## substrate
-sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.4" }
-sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.4" }
-sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.4" }
+sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
 
 ## ethv1
 web3          = { optional = true, git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }

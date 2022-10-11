@@ -71,5 +71,6 @@ feemarket-s2s = [
   "async-trait",
   "feemarket-s2s-traits",
 ]
-feemarket-s2s-pangoro = ["feemarket-s2s"]
-feemarket-s2s-pangolin-parachain = ["feemarket-s2s"]
+feemarket-s2s-pangoro                  = ["feemarket-s2s"]
+feemarket-s2s-pangolin-parachain       = ["feemarket-s2s"]
+feemarket-s2s-pangolin-parachain-alpha = ["feemarket-s2s"]

@@ -1,0 +1,20 @@
+[pangolin]
+endpoint             = "wss://pangolin-rpc.darwinia.network"
+signer               = "//Alice"
+
+[moonbase]
+endpoint             = "wss://frag-moonbase-relay-rpc-ws.g.moonbase.moonbeam.network"
+
+[pangolin_parachain_alpha]
+endpoint             = "wss://pangolin-parachain-alpha-rpc.darwinia.network"
+signer               = "//Alice"
+
+[relay]
+lanes            = ["706c7061"]
+para_id          = 2105
+enable_mandatory = false
+
+[index]
+pangolin                 = { endpoint = "https://subql.darwinia.network/subql-bridger-pangolin" }
+moonbase                 = { endpoint = "https://subql.darwinia.network/subql-bridger-moonbase" }
+pangolin_parachain_alpha = { endpoint = "https://subql.darwinia.network/subql-bridger-pangolin-parachain-alpha" }

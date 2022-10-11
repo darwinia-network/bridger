@@ -70,18 +70,18 @@ If you use docker to run the bridger. You should put your configuration file to 
 
 
 ### Mainnet
-| TYPE                | BRIDGE NAME           |                                                        |
-| ------------------- |-----------------------|--------------------------------------------------------|
-| substrate-ethereum  | darwinia-ethereum-pow | [Guide](./bridges/darwinia-ethereum-pow/docs/Guide.md) |
-| substrate-substrate | darwinia-crab         | [Guide](./bridges/darwinia-crab/docs/Guide.md)         |
-| substrate-substrate | crab-crabparachain    | [Guide](./bridges/crab-crabparachain/docs/Guide.md)    |
+| TYPE                | BRIDGE NAME        |                                                                 |
+|---------------------|--------------------|-----------------------------------------------------------------|
+| evm-ethereum        | darwinia-ethereum  | [Guide](https://github.com/darwinia-network/bridger/issues/528) |
+| substrate-substrate | darwinia-crab      | [Guide](./bridges/darwinia-crab/docs/Guide.md)                  |
+| substrate-substrate | crab-crabparachain | [Guide](./bridges/crab-crabparachain/docs/Guide.md)             |
 
 ### Testnet
-| TYPE                | BRIDGE NAME                 |                                                               |
-| ------------------- | --------------------------- | ------------------------------------------------------------- |
-| substrate-ethereum  | pangoro-goerli              | [Guide](./bridges/pangoro-goerli/docs/Guide.md)               |
-| substrate-substrate | pangolin-pangoro            | [Guide](./bridges/pangolin-pangoro/docs/Guide.md)             |
-| substrate-substrate | pangolin-pangolinparachain  | [Guide](./bridges/pangolin-pangolinparachain/docs/Guide.md)   |
+| TYPE                | BRIDGE NAME                 |                                                                 |
+|---------------------| --------------------------- |-----------------------------------------------------------------|
+| evm-ethereum        | pangoro-goerli              | [Guide](https://github.com/darwinia-network/bridger/issues/528) |
+| substrate-substrate | pangolin-pangoro            | [Guide](./bridges/pangolin-pangoro/docs/Guide.md)               |
+| substrate-substrate | pangolin-pangolinparachain  | [Guide](./bridges/pangolin-pangolinparachain/docs/Guide.md)     |
 
 > Goerli is the testnet of Ethereum.
 > Pangolin is the testnet of Crab.

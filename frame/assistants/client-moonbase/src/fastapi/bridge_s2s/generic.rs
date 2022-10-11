@@ -77,7 +77,7 @@ impl MoonbaseClient {
 impl S2SClientBase for MoonbaseClient {
     const CHAIN: &'static str = "kusama";
 
-    type Chain = bp_kusama::Moonbase;
+    type Chain = bp_kusama::Kusama;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

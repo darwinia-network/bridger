@@ -1,8 +1,6 @@
 use subxt::Client;
 
 use crate::config::DarwiniaSubxtConfig;
-#[cfg(feature = "ethlike-v1")]
-use crate::fastapi::ethereum::EthereumApi;
 use crate::subxt_runtime::api::RuntimeApi;
 use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
 
@@ -39,11 +37,5 @@ impl DarwiniaClient {
     /// Runtime api
     pub fn runtime(&self) -> RuntimeApi<DarwiniaSubxtConfig, NodeRuntimeSignedExtra> {
         self.client.clone().to_runtime_api()
-    }
-
-    /// Ethereum api
-    #[cfg(feature = "ethlike-v1")]
-    pub fn ethereum(&self) -> EthereumApi {
-        EthereumApi::new(self)
     }
 }

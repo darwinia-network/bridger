@@ -29,14 +29,6 @@ pub enum ClientError {
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
 
-    #[cfg(feature = "ethlike-v1")]
-    #[error("Failed to build SecretKey from authority's private key")]
-    FailedToBuildSecretKey(#[from] secp256k1::Error),
-
-    #[cfg(feature = "ethlike-v1")]
-    #[error("Failed to connect ethereum rpc http endpoint")]
-    CannotConnectToWeb3(#[from] web3::Error),
-
     #[error("No signer seed set for authority, please check your config.toml")]
     NoAuthoritySignerSeed,
 

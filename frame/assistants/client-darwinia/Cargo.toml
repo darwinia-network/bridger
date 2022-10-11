@@ -37,11 +37,6 @@ sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-netw
 sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.4" }
 sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.4" }
 
-## ethv1
-web3          = { optional = true, git = "https://github.com/wuminzhe/rust-web3.git", branch = "master", features = ["signing"] }
-secp256k1     = { optional = true, version = "0.20", features = ["recovery"] }
-shadow-liketh = { optional = true, path = "../shadow-liketh" }
-
 ## s2s client
 finality-grandpa      = { optional = true, version = "0.14" }
 bridge-s2s-traits     = { optional = true, path = "../../../frame/traits/bridge-s2s", features = ["advanced-types"] }
@@ -53,7 +48,6 @@ support-toolkit  = { path = "../../../frame/supports/support-toolkit", features 
 
 [features]
 default     = []
-ethlike-v1 = ["web3", "secp256k1", "shadow-liketh"]
 substrate   = [
   "sp-finality-grandpa",
   "sp-runtime",

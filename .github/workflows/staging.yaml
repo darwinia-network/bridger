@@ -20,8 +20,6 @@ jobs:
       matrix:
         package:
           - bridger
-          - pangolin-ropsten
-          - darwinia-ethereum-pow
           - darwinia-ethereum
           - pangolin-pangoro
           - darwinia-crab

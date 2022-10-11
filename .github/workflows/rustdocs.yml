@@ -42,16 +42,14 @@ jobs:
     strategy:
       matrix:
         package:
-         - crab-crabparachain
-         - darwinia-crab
-         - darwinia-ethereum-pow
-         - pangolin-pangoro
-         - pangolin-ropsten
-         - pangolin-pangolinparachain
-         - pangolin-pangolinparachainalpha
-         - pangoro-chapel
-         - pangoro-goerli
-         - template
+          - crab-crabparachain
+          - darwinia-crab
+          - pangolin-pangoro
+          - pangolin-pangolinparachain
+          - pangolin-pangolinparachainalpha
+          - pangoro-chapel
+          - pangoro-goerli
+          - template
     steps:
       - uses: actions/checkout@v2
       - name: Install Rust toolchain
@@ -84,7 +82,6 @@ jobs:
          - feemarket-s2s
          - relay-e2e
          - relay-s2s
-         - shadow-liketh
          - subquery
          - thegraph-liketh
     steps:

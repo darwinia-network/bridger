@@ -39,8 +39,6 @@ jobs:
     strategy:
       matrix:
         bridge:
-          - pangolin-ropsten
-          - darwinia-ethereum-pow
           - darwinia-ethereum
           - pangolin-pangoro
           - darwinia-crab

@@ -57,6 +57,8 @@ mod query_vars {
         BridgePangoro,
         #[serde(rename = "bridge-pangolin-parachain")]
         BridgePangolinParachain,
+        #[serde(rename = "bridge-pangolin-parachainapha")]
+        BridgePangolinParachainAlpha,
         #[serde(rename = "bridge-pangolin")]
         BridgePangolin,
         #[serde(rename = "bridge-crab-parachain")]

@@ -17,4 +17,4 @@ enable_mandatory = false
 [index]
 pangolin                 = { endpoint = "https://subql.darwinia.network/subql-bridger-pangolin" }
 moonbase                 = { endpoint = "https://subql.darwinia.network/subql-bridger-moonbase" }
-pangolin_parachain_alpha = { endpoint = "https://subql.darwinia.network/subql-bridger-pangolin-parachain-alpha" }
+pangolin_parachain_alpha = { endpoint = "https://subql.darwinia.network/subql-bridger-pangolin-parachainalpha" }

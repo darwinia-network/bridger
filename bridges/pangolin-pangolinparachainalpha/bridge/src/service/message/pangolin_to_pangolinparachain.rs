@@ -113,7 +113,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         client_target: input.client_target,
         subquery_source: input.subquery_source,
         subquery_target: input.subquery_target,
-        relay_block_origin: RelayBlockOrigin::BridgePangolinParachain,
+        relay_block_origin: RelayBlockOrigin::BridgePangolinParachainAlpha,
         relay_strategy,
     };
     let runner = BridgeSolochainDeliveryRunner::new(input);

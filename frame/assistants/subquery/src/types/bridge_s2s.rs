@@ -152,6 +152,9 @@ mod schema_types {
         BridgePangoro,
         // from pangolin send message to pangoro
         BridgePangolinParachain,
+        // from pangolin send message to pangoro
+        #[serde(rename = "bridge-pangolin-parachainalpha")]
+        BridgePangolinParachainAlpha,
         // from pangolin send message to pangolin parachain
         BridgeCrabParachain,
         // from crab send messages to crab parachain

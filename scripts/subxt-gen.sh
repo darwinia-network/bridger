@@ -58,6 +58,11 @@ if [ "${CHAIN}" == "pangolin-parachain" ]; then
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachain
 fi
 
+#if [ "${CHAIN}" == "pangolin-parachainalpha" ]; then
+#  ENDPOINT='https://pangolin-parachain-alpha-rpc.darwinia.network'
+#  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachainalpha
+#fi
+
 if [ "${CHAIN}" == "crab" ]; then
   ENDPOINT='https://crab-rpc.darwinia.network'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-crab

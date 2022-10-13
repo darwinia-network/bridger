@@ -46,6 +46,7 @@ const crab = {
         parachains: 'bridgeKusamaParachain',
       },
       lanes: ['0x70616372'],
+      relay_chain: 'kusama',
     },
   },
   subql: 'https://subql.darwinia.network/subql-bridger-crab',
@@ -77,6 +78,7 @@ const pangolin = {
         parachains: 'bridgeRococoParachain',
       },
       lanes: ['0x70616c69'],
+      relay_chain: 'rococo',
     },
   },
   subql: 'https://subql.darwinia.network/subql-bridger-pangolin',
@@ -121,6 +123,7 @@ const pangolin_parachain = {
         messages: 'bridgePangolinMessages',
       },
       lanes: ['0x70616c69'],
+      relay_chain: 'rococo',
     },
   },
   subql: 'https://subql.darwinia.network/subql-bridger-pangolin-parachain',
@@ -143,9 +146,32 @@ const crab_parachain = {
         messages: 'bridgePangolinMessages',
       },
       lanes: ['0x70616372'],
+      relay_chain: 'kusama',
     }
   },
   subql: 'https://subql.darwinia.network/subql-bridger-crab-parachain',
+};
+
+const kusama = {
+  endpoint: {
+    websocket: 'wss://kusama-rpc.polkadot.io',
+  },
+  name: 'Kusama',
+  logo: 'https://polkadot.js.org/apps/static/kusama-128.e5f13822..gif',
+  color: '#424242',
+  explorer: 'https://kusama.subscan.io',
+  currency: 'KSM',
+};
+
+const rococo = {
+  endpoint: {
+    websocket: 'wss://rococo-rpc.polkadot.io',
+  },
+  name: 'Rococo',
+  logo: 'https://polkadot.js.org/apps/static/rococo.560c473b..svg',
+  color: 'purple',
+  explorer: 'https://rococo.subscan.io',
+  currency: 'ROC',
 };
 
 const goerli = {
@@ -165,4 +191,6 @@ export default {
   'pangolinparachain': pangolin_parachain,
   'crabparachain': crab_parachain,
   goerli,
+  kusama,
+  rococo,
 }

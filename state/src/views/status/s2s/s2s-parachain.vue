@@ -15,7 +15,14 @@
             indeterminate
             v-if="loading.solochainClient || loading.parachainClient"
           />
-          <span v-else>solochain -> parachain</span>
+          <bridge-basic-s2s
+            v-else
+            :key="`bridge-${source.chain.solochain.name}-${source.chain.parachain.name}`"
+            :source-client="source.client.solochain"
+            :target-client="source.client.parachain"
+            :source-chain="source.chain.solochain"
+            :target-chain="source.chain.parachain"
+          />
         </bridge-skeleton>
       </v-col>
       <v-col cols="12">
@@ -59,6 +66,8 @@
 <script>
 
 import BridgeSkeleton from '@/views/status/common/bridge-skeleton'
+import BridgeBasicS2s from '@/views/status/common/bridge-basic-s2s'
+
 import * as dataSource from "@/data/data_source";
 import {ApiPromise, WsProvider} from "@polkadot/api";
 
@@ -106,6 +115,7 @@ export default {
   },
   components: {
     BridgeSkeleton,
+    BridgeBasicS2s,
   },
   data: () => ({
     source: {

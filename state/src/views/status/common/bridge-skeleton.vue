@@ -122,9 +122,6 @@ export default {
       this.source.delaySourceClient = sourceClient;
       _initState(this);
     },
-    tesv(v) {
-      console.log(v);
-    }
   },
   computed: {
     client() {

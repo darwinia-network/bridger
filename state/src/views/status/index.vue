@@ -25,7 +25,6 @@ import S2sParachain from '@/views/status/s2s/s2s-parachain';
 function initState(vm) {
   const params = vm.$route.params;
   const gbridge = dataSource.findBridge(params.bridge);
-  console.log(JSON.stringify(gbridge));
   if (!gbridge) {
     vm.$router.push({path: '/'});
     return;

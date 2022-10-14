@@ -20,6 +20,7 @@
     <v-col cols="12">
       <s2s-message-relay
         :key="`s2s-message-${sourceChain.name}-${targetChain.name}`"
+        :parachain-bridge="parachainBridge"
         :source-client="sourceClient"
         :target-client="targetClient"
         :source-chain="sourceChain"
@@ -52,6 +53,10 @@ async function initState(vm) {
 
 export default {
   props: {
+    parachainBridge: {
+      type: Boolean,
+      default: false,
+    },
     sourceClient: {
       type: Object,
     },

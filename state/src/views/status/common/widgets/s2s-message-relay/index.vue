@@ -6,6 +6,7 @@
     <v-col cols="12" v-for="item in source.lanes" :key="`lane-${item}`">
       <message-relay
         :lane="item"
+        :parachain-bridge="parachainBridge"
         :source-client="sourceClient"
         :target-client="targetClient"
         :source-chain="sourceChain"
@@ -29,6 +30,10 @@ export default {
   props: {
     sourceClient: {
       type: Object,
+    },
+    parachainBridge: {
+      type: Boolean,
+      default: false,
     },
     targetClient: {
       type: Object,

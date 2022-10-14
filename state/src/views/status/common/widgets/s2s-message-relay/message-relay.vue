@@ -175,7 +175,6 @@ import ExternalSubscan from '@/components/widgets/external-subscan';
 
 async function initState(vm) {
   const sourceChainBridgeTarget = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
-  const targetChainBridgeTarget = vm.targetChain.bridge_target[vm.sourceChain.bridge_chain_name];
   vm.subscriber.sourceChainOutboundLaneData = await vm.sourceClient
     .query[sourceChainBridgeTarget.query_name.messages]
     .outboundLanes(vm.lane, async v => {
@@ -183,28 +182,60 @@ async function initState(vm) {
       vm.loading.sourceChainOutboundLaneData = false;
     });
 
+  if (vm.parachainBridge) {
+    await listenParachainInboundLaneData(vm);
+  } else {
+    await listenSolochainInboundLaneData(vm);
+  }
+}
+
+async function listenSolochainInboundLaneData(vm) {
+  const sourceChainBridgeTarget = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
+  const targetChainBridgeTarget = vm.targetChain.bridge_target[vm.sourceChain.bridge_chain_name];
   vm.subscriber.targetRelayedBlockAtSource = await vm.sourceClient
     .query[sourceChainBridgeTarget.query_name.grandpa]
     .bestFinalized(async v => {
       vm.source.lastTargetChainRelayedBlockAtSource = v.toJSON();
-      const atApi = await vm.targetClient.at(vm.source.lastTargetChainRelayedBlockAtSource);
-      const inboundLaneData = await atApi
-        .query[targetChainBridgeTarget.query_name.messages]
-        .inboundLanes(vm.lane);
-      vm.source.targetChainInboundLaneData = inboundLaneData.toJSON();
-      vm.source.maxConfirmEndAtTarget = vm.$stream(vm.source.targetChainInboundLaneData.relayers)
-        .map(item => item.messages.end)
-        .max()
-        .orElse(0);
-
+      await queryTargetChainInboundLaneData(vm);
       vm.loading.targetChainInboundLaneData = false;
     });
 }
+
+async function listenParachainInboundLaneData(vm) {
+  const sourceChainBridgeTarget = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
+  vm.subscriber.targetRelayedBlockAtSource = await vm.sourceClient
+    .query[sourceChainBridgeTarget.query_name.parachains]
+    .bestParaHeads(sourceChainBridgeTarget.para_id, async v => {
+      // headHash
+      const paraHead = v.toJSON();
+      vm.source.lastTargetChainRelayedBlockAtSource = paraHead.headHash;
+      await queryTargetChainInboundLaneData(vm);
+      vm.loading.targetChainInboundLaneData = false;
+    });
+}
+
+async function queryTargetChainInboundLaneData(vm) {
+  const targetChainBridgeTarget = vm.targetChain.bridge_target[vm.sourceChain.bridge_chain_name];
+  const atApi = await vm.targetClient.at(vm.source.lastTargetChainRelayedBlockAtSource);
+  const inboundLaneData = await atApi
+    .query[targetChainBridgeTarget.query_name.messages]
+    .inboundLanes(vm.lane);
+  vm.source.targetChainInboundLaneData = inboundLaneData.toJSON();
+  vm.source.maxConfirmEndAtTarget = vm.$stream(vm.source.targetChainInboundLaneData.relayers)
+    .map(item => item.messages.end)
+    .max()
+    .orElse(0);
+}
+
 
 export default {
   props: {
     lane: {
       type: String,
+    },
+    parachainBridge: {
+      type: Boolean,
+      default: false,
     },
     sourceClient: {
       type: Object,

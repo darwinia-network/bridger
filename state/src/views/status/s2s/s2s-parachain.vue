@@ -18,6 +18,7 @@
           <bridge-basic-s2s
             v-else
             :key="`bridge-${source.chain.solochain.name}-${source.chain.parachain.name}`"
+            :parachain-bridge="true"
             :source-client="source.client.solochain"
             :target-client="source.client.parachain"
             :source-chain="source.chain.solochain"

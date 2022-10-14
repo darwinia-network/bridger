@@ -15,6 +15,9 @@ pub enum BridgeName {
     /// bridge pangolin<>pangolin-parachain
     #[cfg(feature = "bridge-s2s")]
     PangolinParachain,
+    /// bridge pangolin<>pangolin-parachainalpha
+    #[cfg(feature = "bridge-s2s")]
+    PangolinParachainAlpha,
     /// bridge pangolin<>pangoro
     #[cfg(feature = "bridge-s2s")]
     PangolinPangoro,
@@ -41,6 +44,8 @@ impl BridgeName {
             Self::DarwiniaEthereum => "darwinia-ethereum",
             #[cfg(feature = "bridge-s2s")]
             Self::PangolinParachain => "pangolin-parachain",
+            #[cfg(feature = "bridge-s2s")]
+            Self::PangolinParachainAlpha => "pangolin-parachainalpha",
             #[cfg(feature = "bridge-s2s")]
             Self::PangolinPangoro => "pangolin-pangoro",
             #[cfg(feature = "bridge-s2s")]

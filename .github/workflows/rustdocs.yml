@@ -42,12 +42,14 @@ jobs:
     strategy:
       matrix:
         package:
-         - crab-crabparachain
-         - darwinia-crab
-         - pangolin-pangoro
-         - pangoro-chapel
-         - pangoro-goerli
-         - template
+          - crab-crabparachain
+          - darwinia-crab
+          - pangolin-pangoro
+          - pangolin-pangolinparachain
+          - pangolin-pangolinparachainalpha
+          - pangoro-chapel
+          - pangoro-goerli
+          - template
     steps:
       - uses: actions/checkout@v2
       - name: Install Rust toolchain

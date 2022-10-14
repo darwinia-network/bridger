@@ -19,14 +19,15 @@ jobs:
     strategy:
       matrix:
         package:
-         - bridger
-         - darwinia-ethereum
-         - pangolin-pangoro
-         - darwinia-crab
-         - pangoro-chapel
-         - pangoro-goerli
-         - pangolin-pangolinparachain
-         - crab-crabparachain
+          - bridger
+          - darwinia-ethereum
+          - pangolin-pangoro
+          - darwinia-crab
+          - pangoro-chapel
+          - pangoro-goerli
+          - pangolin-pangolinparachain
+          - pangolin-pangolinparachainalpha
+          - crab-crabparachain
     steps:
       - uses: actions/checkout@v2
 

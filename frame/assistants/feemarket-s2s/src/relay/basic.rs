@@ -66,7 +66,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         // -----
 
         let order = order.unwrap();
-        let relayers = order.relayers;
+        let relayers = order.assigned_relayers;
 
         // If not have any assigned relayers, everyone participates in the relay.
         if relayers.is_empty() {

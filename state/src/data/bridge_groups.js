@@ -6,6 +6,7 @@ export default [
       {enable: true, name: 'crab-crabparachain', mode: 'mainnet', bridge_type: 'parachain'},
       {enable: true, name: 'pangolin-pangoro', mode: 'testnet', bridge_type: 's2s'},
       {enable: true, name: 'pangolin-pangolinparachain', mode: 'testnet', bridge_type: 'parachain'},
+      {enable: true, name: 'pangolin-pangolinparachainalpha', mode: 'testnet', bridge_type: 'parachain'},
     ],
   },
   {

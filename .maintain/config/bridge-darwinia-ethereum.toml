@@ -32,7 +32,7 @@ max_gas_price = 9000000000
 
 [darwinia_substrate]
 endpoint    = "wss://darwinia-rpc.darwinia.network"
-private_key = "//Alice"
+private_key = "YOUR_PRIVATE_KEY_STARTING_WITH_0x"
 
 [ethereum]
 # Beacon chain rpc endpoint
@@ -43,7 +43,7 @@ inbound_address           = "0x4E210866d089856a8A0435965FefEe19640487E5"
 outbound_address          = "0x169F28bfbfFCddFdc772A94Cf020bbB4CAdc8E01"
 fee_market_address        = "0xCD97185B7d05f8ea91d241C8dfD51a2Cc9c0547a"
 # Ethereum account private_key should not starts with 0x.
-private_key               = "..."
+private_key               = "YOUR_PRIVATE_KEY_STARTING_WITH_0x"
 posa_light_client_address = "0xf46349a32cA70C0B9fFbD19937Fb1623e7F3db19"
 # Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
 max_gas_price = 9000000000

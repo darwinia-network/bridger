@@ -53,4 +53,4 @@ etherscan_api_key = "api_key..."
 
 [index]
 darwinia = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia/" }
-darwinia_evm = { endpoint = "https://thegraph.darwinia.network/ethv2" }
+darwinia_evm = { endpoint = "https://thegraph.darwinia.network/ethv2/subgraphs/name/bridge-darwinia" }

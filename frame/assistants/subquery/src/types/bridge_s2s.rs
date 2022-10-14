@@ -57,6 +57,8 @@ mod query_vars {
         BridgePangoro,
         #[serde(rename = "bridge-pangolin-parachain")]
         BridgePangolinParachain,
+        #[serde(rename = "bridge-pangolin-parachainalpha")]
+        BridgePangolinParachainAlpha,
         #[serde(rename = "bridge-pangolin")]
         BridgePangolin,
         #[serde(rename = "bridge-crab-parachain")]
@@ -152,6 +154,9 @@ mod schema_types {
         BridgePangoro,
         // from pangolin send message to pangoro
         BridgePangolinParachain,
+        // from pangolin send message to pangoro
+        #[serde(rename = "bridge-pangolin-parachainalpha")]
+        BridgePangolinParachainAlpha,
         // from pangolin send message to pangolin parachain
         BridgeCrabParachain,
         // from crab send messages to crab parachain

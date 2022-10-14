@@ -58,6 +58,11 @@ if [ "${CHAIN}" == "pangolin-parachain" ]; then
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachain
 fi
 
+#if [ "${CHAIN}" == "pangolin-parachainalpha" ]; then
+#  ENDPOINT='https://pangolin-parachain-alpha-rpc.darwinia.network'
+#  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachainalpha
+#fi
+
 if [ "${CHAIN}" == "crab" ]; then
   ENDPOINT='https://crab-rpc.darwinia.network'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-crab
@@ -71,6 +76,11 @@ fi
 if [ "${CHAIN}" == "kusama" ]; then
   ENDPOINT='https://kusama-rpc.dwellir.com'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-kusama
+fi
+
+if [ "${CHAIN}" == "moonbase" ]; then
+  ENDPOINT='https://frag-moonbase-relay-rpc.g.moonbase.moonbeam.network'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-moonbase
 fi
 
 if [ -z "${ENDPOINT}" ]; then

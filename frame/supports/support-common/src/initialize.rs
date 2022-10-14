@@ -27,6 +27,7 @@ fn init_log() -> color_eyre::Result<()> {
         "pangoro-chapel=trace",
         "crab-crabparachain=trace",
         "pangolin-pangolinparachain=trace",
+        "pangolin-pangolinparachainalpha=trace",
         "darwinia-ethereum=trace",
         "darwinia-crab=trace",
         "client-pangolin=trace",

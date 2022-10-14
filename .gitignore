@@ -20,3 +20,5 @@ generated
 metadata.scale
 *.dep.txt
 *.log
+
+package-lock.json

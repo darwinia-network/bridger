@@ -6,10 +6,10 @@ use std::{
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
-    goerli_client::{client::GoerliClient, types::FinalityUpdate},
     pangoro_client::client::PangoroClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
+use client_beacon::{client::BeaconApiClient, types::FinalityUpdate};
 use client_contracts::beacon_light_client::FinalizedHeaderUpdate;
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
@@ -57,7 +57,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.private_key,
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
-    let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
+    let goerli_client = BeaconApiClient::new(&config.goerli.endpoint)?;
     let mut header_relay = HeaderRelay {
         pangoro_client,
         goerli_client,
@@ -92,7 +92,7 @@ pub struct HeaderRelayState {
 
 pub struct HeaderRelay {
     pub pangoro_client: PangoroClient,
-    pub goerli_client: GoerliClient,
+    pub goerli_client: BeaconApiClient,
     pub minimal_interval: u64,
     pub last_relay_time: u64,
 }

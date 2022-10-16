@@ -352,6 +352,7 @@ dependencies = [
  "async-trait",
  "bridge-e2e-traits",
  "bytes",
+ "client-beacon",
  "client-contracts",
  "client-pangoro",
  "color-eyre",
@@ -459,6 +460,23 @@ dependencies = [
  "textwrap",
  "unicode-width",
  "vec_map",
+]
+
+[[package]]
+name = "client-beacon"
+version = "0.6.4"
+dependencies = [
+ "bytes",
+ "client-contracts",
+ "futures",
+ "hamming",
+ "hex",
+ "reqwest",
+ "serde 1.0.145",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "web3",
 ]
 
 [[package]]

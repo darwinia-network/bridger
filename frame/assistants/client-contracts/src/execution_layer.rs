@@ -22,10 +22,7 @@ impl ExecutionLayer {
         Ok(Self { contract })
     }
 
-    pub async fn execution_layer_state_root(
-        &self,
-        at_block: Option<BlockId>,
-    ) -> BridgeContractResult<H256> {
+    pub async fn merkle_root(&self, at_block: Option<BlockId>) -> BridgeContractResult<H256> {
         let query = self
             .contract
             .query("merkle_root", (), None, Options::default(), at_block);

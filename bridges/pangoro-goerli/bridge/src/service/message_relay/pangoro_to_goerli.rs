@@ -413,7 +413,8 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .await?;
         let execution_state_root = self
             .beacon_light_client
-            .execution_layer_state_root(None)
+            .execution_layer
+            .merkle_root(None)
             .await?;
         if execution_state_root != H256::from_str(&block.body.execution_payload.state_root)? {
             Ok(None)

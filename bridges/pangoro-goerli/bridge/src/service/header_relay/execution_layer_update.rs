@@ -89,7 +89,11 @@ impl ExecutionLayer {
             .await?;
         let latest_execution_payload_state_root =
             H256::from_str(&finalized_block.body.execution_payload.state_root)?;
-        let relayed_state_root = self.pangoro_client.execution_layer_state_root(None).await?;
+        let relayed_state_root = self
+            .pangoro_client
+            .execution_layer
+            .merkle_root(None)
+            .await?;
 
         if relayed_state_root != latest_execution_payload_state_root {
             tracing::info!(
@@ -116,7 +120,8 @@ impl ExecutionLayer {
             let gas_price = self.pangoro_client.gas_price().await?;
             let tx = self
                 .pangoro_client
-                .execution_layer_contract
+                .execution_layer
+                .contract
                 .signed_call(
                     "import_latest_execution_payload_state_root",
                     (parameter,),

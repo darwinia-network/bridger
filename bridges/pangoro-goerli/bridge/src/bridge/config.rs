@@ -2,7 +2,8 @@ use client_contracts::PosaLightClient;
 use client_pangoro::client::PangoroClient;
 use client_pangoro::component::PangoroClientComponent;
 use relay_e2e::types::ethereum::FastEthereumAccount;
-use serde::{Deserialize, Serialize};
+use serde::{de, Deserialize, Deserializer, Serialize};
+use std::fmt::Display;
 use std::str::FromStr;
 use subquery::types::BridgeName;
 use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
@@ -42,6 +43,7 @@ pub struct ChainInfoConfig {
     pub execution_layer_endpoint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contract_address: Option<String>,
+    #[serde(deserialize_with = "evm_secret_key_from_str")]
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,
@@ -56,6 +58,7 @@ pub struct PangoroEVMConfig {
     pub endpoint: String,
     pub contract_address: String,
     pub execution_layer_contract_address: String,
+    #[serde(deserialize_with = "evm_secret_key_from_str")]
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,
@@ -136,4 +139,14 @@ impl IndexConfig {
             thegraph_liketh::types::LikethChain::Pangoro,
         )?)
     }
+}
+
+fn evm_secret_key_from_str<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+    T: FromStr,
+    T::Err: Display,
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?.replace("0x", "");
+    T::from_str(&s).map_err(de::Error::custom)
 }

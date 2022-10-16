@@ -39,11 +39,7 @@ impl BeaconApiClient {
         let mut count = 0;
         while let Err(err) = header {
             if slot > current_slot {
-                tracing::info!(
-                    target: "pangoro-goerli",
-                    "[header-goerli-to-pangoro] Wait for attested headers since: {:?}",
-                    slot - count
-                );
+                tracing::info!("Wait for attested headers since: {:?}", slot - count);
                 return Err(err);
             };
             slot += 1;

@@ -17,7 +17,7 @@ max_message_num_per_relaying = 15
 header_relay_minimum_interval = 900
 
 [darwinia_evm]
-endpoint                         = "https://darwinia-rpc.darwinia.network"
+endpoint                         = "https://rpc.darwinia.network"
 contract_address                 = "0x9C266C48F07121181d8424768f0deD0170cC63A6"
 execution_layer_contract_address = "0xe50F1Ddf0C8778773f07Eb2759d045Ece19F6Cc1"
 inbound_address                  = "0xf1B8a9F8436800499DB8186f2da2fb3e78Ff7c2B"
@@ -25,14 +25,14 @@ outbound_address                 = "0xcA3749C8C3aF04278D596a3fBe461481B6aa1b01"
 fee_market_address               = "0xcA927Df15afb7629b79dA4713a871190315c7409"
 chain_message_committer_address  = "0xea7d0fE22AF25d9655f7AdDd6a59E37e84B3AB5F"
 lane_message_committer_address   = "0x56746a8099a7e6D962802A23e01FeDdc1282cDAe"
-# private_key should not start with 0x
-private_key                      = "//Alice"
+# private_key, remove leading 0x
+private_key                      = "YOUR_PRIVATE_KEY_WITHOUT_0x_PREFIX"
 # Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
 max_gas_price = 9000000000
 
 [darwinia_substrate]
 endpoint    = "wss://darwinia-rpc.darwinia.network"
-private_key = "//Alice"
+private_key = "YOUR_PRIVATE_KEY_STARTING_WITH_0x"
 
 [ethereum]
 # Beacon chain rpc endpoint
@@ -43,7 +43,7 @@ inbound_address           = "0x4E210866d089856a8A0435965FefEe19640487E5"
 outbound_address          = "0x169F28bfbfFCddFdc772A94Cf020bbB4CAdc8E01"
 fee_market_address        = "0xCD97185B7d05f8ea91d241C8dfD51a2Cc9c0547a"
 # Ethereum account private_key should not starts with 0x.
-private_key               = "..."
+private_key               = "YOUR_PRIVATE_KEY_STARTING_WITH_0x"
 posa_light_client_address = "0xf46349a32cA70C0B9fFbD19937Fb1623e7F3db19"
 # Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
 max_gas_price = 9000000000
@@ -53,4 +53,4 @@ etherscan_api_key = "api_key..."
 
 [index]
 darwinia = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia/" }
-darwinia_evm = { endpoint = "https://thegraph.darwinia.network/ethv2" }
+darwinia_evm = { endpoint = "https://thegraph.darwinia.network/ethv2/subgraphs/name/bridge-darwinia" }

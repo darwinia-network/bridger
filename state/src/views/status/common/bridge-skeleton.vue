@@ -9,7 +9,9 @@
                 <img :src="sourceChain.logo" :alt="sourceChain.name" v-if="sourceChain.logo">
                 <v-icon v-if="!sourceChain.logo" size="54">mdi-alpha-c</v-icon>
               </v-avatar>
-              <h2 v-bind="attrs" v-on="on" class="body-1 font-weight-light">{{ sourceChain.name }}</h2>
+              <span v-bind="attrs" class="body-1 font-weight-light">
+                <vue-ellipsis :text="sourceChain.name"/>
+              </span>
             </template>
             <span>Source chain</span>
           </v-tooltip>
@@ -65,7 +67,9 @@
                 <img :src="targetChain.logo" :alt="targetChain.name" v-if="targetChain.logo">
                 <v-icon v-if="!targetChain.logo" size="54">mdi-alpha-c</v-icon>
               </v-avatar>
-              <h2 v-bind="attrs" v-on="on" class="body-1 font-weight-light">{{ targetChain.name }}</h2>
+              <span v-bind="attrs" class="body-1 font-weight-light">
+                <vue-ellipsis :text="targetChain.name"/>
+              </span>
             </template>
             <span>Target chain</span>
           </v-tooltip>

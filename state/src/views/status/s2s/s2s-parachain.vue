@@ -45,19 +45,19 @@
       </v-col>
       <v-col cols="12">
         <bridge-skeleton
-          ref="relaychain_to_solochain_message"
-          :source-client="source.client.relaychain"
-          :source-chain="source.chain.relaychain"
+          ref="parachainchain_to_solochain_message"
+          :source-client="source.client.parachain"
+          :source-chain="source.chain.parachain"
           :target-chain="source.chain.solochain"
-          v-if="source.chain.relaychain && source.chain.solochain"
+          v-if="source.chain.parachain && source.chain.solochain"
         >
           <v-progress-linear
             class="mt-15"
-            :color="source.chain.relaychain.color"
+            :color="source.chain.parachain.color"
             indeterminate
-            v-if="loading.relaychainClient || loading.solochainClient"
+            v-if="loading.parachainClient || loading.solochainClient"
           />
-          <span v-else>relaychain -> solochain mesage</span>
+          <span v-else>parachain -> solochain mesage</span>
         </bridge-skeleton>
       </v-col>
     </v-row>

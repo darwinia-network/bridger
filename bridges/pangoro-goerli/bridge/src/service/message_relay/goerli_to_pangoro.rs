@@ -2,6 +2,7 @@ use std::str::FromStr;
 use std::time::Duration;
 
 use bridge_e2e_traits::strategy::RelayStrategy;
+use client_beacon::client::BeaconApiClient;
 use client_contracts::PosaLightClient;
 use web3::contract::Options;
 use web3::types::{Address, BlockId, BlockNumber, H256, U256};
@@ -14,8 +15,7 @@ use crate::message_contract::message_client::build_message_client_with_simple_fe
 use crate::message_contract::simple_fee_market::SimpleFeeMarketRelayStrategy;
 use crate::web3_helper::{wait_for_transaction_confirmation, GasPriceOracle};
 use crate::{
-    goerli_client::client::GoerliClient, message_contract::message_client::MessageClient,
-    pangoro_client::client::PangoroClient,
+    message_contract::message_client::MessageClient, pangoro_client::client::PangoroClient,
 };
 
 use crate::bridge::{BridgeBus, BridgeConfig};
@@ -78,7 +78,7 @@ async fn message_relay_client_builder(
         &config.pangoro_evm.private_key,
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
-    let beacon_rpc_client = GoerliClient::new(&config.goerli.endpoint)?;
+    let beacon_rpc_client = BeaconApiClient::new(&config.goerli.endpoint)?;
     let source = build_message_client_with_simple_fee_market(
         &config.goerli.execution_layer_endpoint,
         Address::from_str(&config.goerli.inbound_address)?,
@@ -148,7 +148,7 @@ pub struct MessageRelay<S0: RelayStrategy, S1: RelayStrategy> {
     pub source: MessageClient<S0>,
     pub target: DarwiniaMessageClient<S1>,
     pub posa_light_client: PosaLightClient,
-    pub beacon_rpc_client: GoerliClient,
+    pub beacon_rpc_client: BeaconApiClient,
     pub beacon_light_client: PangoroClient,
     pub max_message_num_per_relaying: u64,
 }
@@ -322,7 +322,8 @@ impl<S0: RelayStrategy, S1: RelayStrategy> MessageRelay<S0, S1> {
             .await?;
         let execution_state_root = self
             .beacon_light_client
-            .execution_layer_state_root(None)
+            .execution_layer
+            .merkle_root(None)
             .await?;
         if execution_state_root != H256::from_str(&block.body.execution_payload.state_root)? {
             Ok(None)

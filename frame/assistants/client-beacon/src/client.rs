@@ -2,15 +2,16 @@ use super::types::{
     BlockMessage, Finality, FinalityUpdate, ForkVersion, GetBlockResponse, GetHeaderResponse,
     Proof, ResponseWrapper, Snapshot, SyncCommitteePeriodUpdate,
 };
-use support_common::error::BridgerError;
+use crate::error::{BeaconApiError, BeaconApiResult};
+use reqwest::header::CONTENT_TYPE;
 
-pub struct GoerliClient {
+pub struct BeaconApiClient {
     api_client: reqwest::Client,
     api_base_url: String,
 }
 
-impl GoerliClient {
-    pub fn new(api_endpoint: &str) -> color_eyre::Result<Self> {
+impl BeaconApiClient {
+    pub fn new(api_endpoint: &str) -> BeaconApiResult<Self> {
         let api_client = reqwest::Client::new();
         Ok(Self {
             api_client,
@@ -18,7 +19,7 @@ impl GoerliClient {
         })
     }
 
-    pub async fn get_header(&self, id: impl ToString) -> color_eyre::Result<GetHeaderResponse> {
+    pub async fn get_header(&self, id: impl ToString) -> BeaconApiResult<GetHeaderResponse> {
         let url = format!(
             "{}/eth/v1/beacon/headers/{}",
             self.api_base_url,
@@ -33,16 +34,12 @@ impl GoerliClient {
         &self,
         current_slot: u64,
         mut slot: u64,
-    ) -> color_eyre::Result<(u64, GetHeaderResponse)> {
+    ) -> BeaconApiResult<(u64, GetHeaderResponse)> {
         let mut header = self.get_header(slot).await;
         let mut count = 0;
         while let Err(err) = header {
             if slot > current_slot {
-                tracing::info!(
-                    target: "pangoro-goerli",
-                    "[header-goerli-to-pangoro] Wait for attested headers since: {:?}",
-                    slot - count
-                );
+                tracing::info!("Wait for attested headers since: {:?}", slot - count);
                 return Err(err);
             };
             slot += 1;
@@ -56,7 +53,7 @@ impl GoerliClient {
         &self,
         current_slot: u64,
         mut slot: u64,
-    ) -> color_eyre::Result<Option<(u64, u64, GetHeaderResponse, BlockMessage)>> {
+    ) -> BeaconApiResult<Option<(u64, u64, GetHeaderResponse, BlockMessage)>> {
         loop {
             if slot > current_slot {
                 return Ok(None);
@@ -84,16 +81,16 @@ impl GoerliClient {
         }
     }
 
-    fn is_valid_sync_aggregate_block(block: &BlockMessage) -> color_eyre::Result<bool> {
+    fn is_valid_sync_aggregate_block(block: &BlockMessage) -> BeaconApiResult<bool> {
         let bytes = hex::decode(&block.body.sync_aggregate.sync_committee_bits.clone()[2..]);
         if let Ok(bytes) = bytes {
             Ok(hamming::weight(&bytes) * 3 > 512 * 2)
         } else {
-            Err(BridgerError::Custom(String::from("Failed to decode sync_committee_bits")).into())
+            Err(BeaconApiError::Custom(String::from("Failed to decode sync_committee_bits")).into())
         }
     }
 
-    pub async fn get_beacon_block_root(&self, id: impl ToString) -> color_eyre::Result<String> {
+    pub async fn get_beacon_block_root(&self, id: impl ToString) -> BeaconApiResult<String> {
         let url = format!(
             "{}/eth/v1/beacon/blocks/{}/root",
             self.api_base_url,
@@ -103,7 +100,7 @@ impl GoerliClient {
         Ok(res.data)
     }
 
-    pub async fn get_bootstrap(&self, header_root: &str) -> color_eyre::Result<Snapshot> {
+    pub async fn get_bootstrap(&self, header_root: &str) -> BeaconApiResult<Snapshot> {
         let url = format!(
             "{}/eth/v1/beacon/light_client/bootstrap/{}",
             self.api_base_url, header_root,
@@ -113,7 +110,7 @@ impl GoerliClient {
     }
 
     #[allow(dead_code)]
-    pub async fn find_valid_snapshot_in_period(&self, period: u64) -> color_eyre::Result<Snapshot> {
+    pub async fn find_valid_snapshot_in_period(&self, period: u64) -> BeaconApiResult<Snapshot> {
         let begin_slot = period * 32 * 256;
         for slot in begin_slot..((period + 1) * 32 * 256) {
             if let Ok(block_root) = self.get_beacon_block_root(slot).await {
@@ -122,10 +119,10 @@ impl GoerliClient {
                 }
             };
         }
-        Err(BridgerError::Custom("Not found valid snapshot".into()).into())
+        Err(BeaconApiError::Custom("Not found valid snapshot".into()).into())
     }
 
-    pub async fn get_beacon_block(&self, id: impl ToString) -> color_eyre::Result<BlockMessage> {
+    pub async fn get_beacon_block(&self, id: impl ToString) -> BeaconApiResult<BlockMessage> {
         let url = format!(
             "{}/eth/v2/beacon/blocks/{}",
             self.api_base_url,
@@ -137,7 +134,7 @@ impl GoerliClient {
     }
 
     #[allow(dead_code)]
-    pub async fn get_checkpoint(&self, id: impl ToString) -> color_eyre::Result<Finality> {
+    pub async fn get_checkpoint(&self, id: impl ToString) -> BeaconApiResult<Finality> {
         let url = format!(
             "{}/eth/v1/beacon/states/{}/finality_checkpoints",
             self.api_base_url,
@@ -148,21 +145,21 @@ impl GoerliClient {
     }
 
     #[allow(dead_code)]
-    pub async fn get_finality_branch(&self, state_id: impl ToString) -> color_eyre::Result<Proof> {
+    pub async fn get_finality_branch(&self, state_id: impl ToString) -> BeaconApiResult<Proof> {
         self.get_state_proof(state_id, 105).await
     }
 
     pub async fn get_next_sync_committee_branch(
         &self,
         state_id: impl ToString,
-    ) -> color_eyre::Result<Proof> {
+    ) -> BeaconApiResult<Proof> {
         self.get_state_proof(state_id, 55).await
     }
 
     pub async fn get_latest_execution_payload_state_root_branch(
         &self,
         state_id: impl ToString,
-    ) -> color_eyre::Result<Proof> {
+    ) -> BeaconApiResult<Proof> {
         self.get_state_proof(state_id, 898).await
     }
 
@@ -170,25 +167,31 @@ impl GoerliClient {
         &self,
         state_id: impl ToString,
         gindex: impl ToString,
-    ) -> color_eyre::Result<Proof> {
+    ) -> BeaconApiResult<Proof> {
         let url = format!(
             "{}/eth/v1/beacon/light_client/single_proof/{}?gindex={}",
             self.api_base_url,
             state_id.to_string(),
             gindex.to_string(),
         );
-        let res = self
+        let response = self
             .api_client
-            .get(url)
+            .get(url.clone())
             .header("content-type", "application/octet-stream")
             .send()
-            .await?
-            .bytes()
             .await?;
-        Ok(Proof::from(res))
+        let content_type = response.headers()[CONTENT_TYPE].as_bytes().to_vec();
+        let content_type = String::from_utf8(content_type)?;
+        if !response.status().is_success() || content_type.contains("application/json") {
+            tracing::error!("Failed to get state proof. Api: {:?}", url);
+            return Err(BeaconApiError::Custom("Failed to get state proof".into()));
+        }
+
+        let data = response.bytes().await?;
+        Ok(Proof::try_from(data)?)
     }
 
-    pub async fn get_fork_version(&self, id: impl ToString) -> color_eyre::Result<ForkVersion> {
+    pub async fn get_fork_version(&self, id: impl ToString) -> BeaconApiResult<ForkVersion> {
         let url = format!(
             "{}/eth/v1/beacon/states/{}/fork",
             self.api_base_url,
@@ -199,7 +202,7 @@ impl GoerliClient {
         Ok(res.data)
     }
 
-    pub async fn get_finality_update(&self) -> color_eyre::Result<FinalityUpdate> {
+    pub async fn get_finality_update(&self) -> BeaconApiResult<FinalityUpdate> {
         let url = format!(
             "{}/eth/v1/beacon/light_client/finality_update/",
             self.api_base_url,
@@ -213,7 +216,7 @@ impl GoerliClient {
         &self,
         start_period: impl ToString,
         count: impl ToString,
-    ) -> color_eyre::Result<Vec<SyncCommitteePeriodUpdate>> {
+    ) -> BeaconApiResult<Vec<SyncCommitteePeriodUpdate>> {
         let url = format!(
             "{}/eth/v1/beacon/light_client/updates?start_period={}&count={}",
             self.api_base_url,
@@ -231,8 +234,8 @@ mod tests {
 
     use super::*;
 
-    fn test_client() -> GoerliClient {
-        GoerliClient::new("http://localhost:5052").unwrap()
+    fn test_client() -> BeaconApiClient {
+        BeaconApiClient::new("http://localhost:5052").unwrap()
     }
 
     #[ignore]

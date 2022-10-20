@@ -5,6 +5,7 @@ use client_contracts::beacon_light_client_types::SyncCommittee as ContractSyncCo
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::str::FromStr;
+use support_common::error::BridgerError;
 use web3::{
     contract::tokens::{Tokenizable, Tokenize},
     ethabi::{ethereum_types::H32, Token},
@@ -193,10 +194,12 @@ pub enum Proof {
     },
 }
 
-impl From<Bytes> for Proof {
-    fn from(mut x: Bytes) -> Self {
+impl TryFrom<Bytes> for Proof {
+    type Error = BridgerError;
+
+    fn try_from(mut x: Bytes) -> Result<Self, Self::Error> {
         match x.get_u8() {
-            0u8 => Proof::SingleProof {
+            0u8 => Ok(Proof::SingleProof {
                 gindex: x.get_u16_le(),
                 leaf: {
                     let mut leaf = [0u8; 32];
@@ -213,10 +216,8 @@ impl From<Bytes> for Proof {
                         })
                         .collect()
                 },
-            },
-            _ => {
-                unimplemented!();
-            }
+            }),
+            _ => Err(BridgerError::Custom("Unimplemented!".into())),
         }
     }
 }

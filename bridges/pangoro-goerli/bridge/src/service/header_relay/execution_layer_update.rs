@@ -2,10 +2,10 @@ use std::{str::FromStr, time::Duration};
 
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
-    goerli_client::{client::GoerliClient, types::Proof},
     pangoro_client::client::PangoroClient,
     web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
+use client_beacon::{client::BeaconApiClient, types::Proof};
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
@@ -52,7 +52,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.private_key,
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
-    let goerli_client = GoerliClient::new(&config.goerli.endpoint)?;
+    let goerli_client = BeaconApiClient::new(&config.goerli.endpoint)?;
     let execution_layer_relay = ExecutionLayer {
         pangoro_client,
         goerli_client,
@@ -73,7 +73,7 @@ async fn start() -> color_eyre::Result<()> {
 
 pub struct ExecutionLayer {
     pub pangoro_client: PangoroClient,
-    pub goerli_client: GoerliClient,
+    pub goerli_client: BeaconApiClient,
 }
 
 impl ExecutionLayer {
@@ -89,7 +89,11 @@ impl ExecutionLayer {
             .await?;
         let latest_execution_payload_state_root =
             H256::from_str(&finalized_block.body.execution_payload.state_root)?;
-        let relayed_state_root = self.pangoro_client.execution_layer_state_root(None).await?;
+        let relayed_state_root = self
+            .pangoro_client
+            .execution_layer
+            .merkle_root(None)
+            .await?;
 
         if relayed_state_root != latest_execution_payload_state_root {
             tracing::info!(
@@ -116,7 +120,8 @@ impl ExecutionLayer {
             let gas_price = self.pangoro_client.gas_price().await?;
             let tx = self
                 .pangoro_client
-                .execution_layer_contract
+                .execution_layer
+                .contract
                 .signed_call(
                     "import_latest_execution_payload_state_root",
                     (parameter,),

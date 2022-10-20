@@ -13,6 +13,16 @@ use web3::{
 
 use serde::de::{self, Deserializer};
 
+use crate::error::BeaconApiError;
+use crate::error::BeaconApiResult;
+
+fn h256_from_str(value: &str) -> BeaconApiResult<H256> {
+    H256::from_str(value).or(Err(BeaconApiError::DecodeError(
+        value.into(),
+        "H256".into(),
+    )))
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResponseWrapper<T> {
     pub data: T,
@@ -43,13 +53,13 @@ pub struct HeaderMessage {
 }
 
 impl HeaderMessage {
-    pub fn to_contract_type(&self) -> color_eyre::Result<ContractHeaderMessage> {
+    pub fn to_contract_type(&self) -> BeaconApiResult<ContractHeaderMessage> {
         Ok(ContractHeaderMessage {
             slot: self.slot,
             proposer_index: self.proposer_index,
-            parent_root: H256::from_str(&self.parent_root)?,
-            state_root: H256::from_str(&self.state_root)?,
-            body_root: H256::from_str(&self.body_root)?,
+            parent_root: h256_from_str(&self.parent_root)?,
+            state_root: h256_from_str(&self.state_root)?,
+            body_root: h256_from_str(&self.body_root)?,
         })
     }
 }
@@ -68,7 +78,7 @@ pub struct SyncCommittee {
 }
 
 impl SyncCommittee {
-    pub fn to_contract_type(&self) -> color_eyre::Result<ContractSyncCommittee> {
+    pub fn to_contract_type(&self) -> BeaconApiResult<ContractSyncCommittee> {
         Ok(ContractSyncCommittee {
             pubkeys: self
                 .pubkeys
@@ -141,10 +151,10 @@ pub struct SyncAggregate {
 }
 
 impl SyncAggregate {
-    pub fn to_contract_type(&self) -> color_eyre::Result<ContractSyncAggregate> {
+    pub fn to_contract_type(&self) -> BeaconApiResult<ContractSyncAggregate> {
         let mut sync_committee_bits: [H256; 2] = [H256::default(); 2];
-        sync_committee_bits[0] = H256::from_str(&self.sync_committee_bits[..66])?;
-        sync_committee_bits[1] = H256::from_str(&self.sync_committee_bits[66..])?;
+        sync_committee_bits[0] = h256_from_str(&self.sync_committee_bits[..66])?;
+        sync_committee_bits[1] = h256_from_str(&self.sync_committee_bits[66..])?;
 
         let sync_committee_signature =
             Web3Bytes(hex::decode(&self.sync_committee_signature.clone()[2..])?);
@@ -193,10 +203,12 @@ pub enum Proof {
     },
 }
 
-impl From<Bytes> for Proof {
-    fn from(mut x: Bytes) -> Self {
+impl TryFrom<Bytes> for Proof {
+    type Error = BeaconApiError;
+
+    fn try_from(mut x: Bytes) -> Result<Self, Self::Error> {
         match x.get_u8() {
-            0u8 => Proof::SingleProof {
+            0u8 => Ok(Proof::SingleProof {
                 gindex: x.get_u16_le(),
                 leaf: {
                     let mut leaf = [0u8; 32];
@@ -213,10 +225,8 @@ impl From<Bytes> for Proof {
                         })
                         .collect()
                 },
-            },
-            _ => {
-                unimplemented!();
-            }
+            }),
+            _ => Err(BeaconApiError::Custom("Unimplemented!".into())),
         }
     }
 }
@@ -245,7 +255,7 @@ pub struct MessagesProof {
 }
 
 impl MessagesProof {
-    pub fn get_token(&self) -> color_eyre::Result<Token> {
+    pub fn get_token(&self) -> BeaconApiResult<Token> {
         Ok(Token::Tuple(
             (
                 self.account_proof.clone(),
@@ -271,7 +281,7 @@ pub struct MessagesConfirmationProof {
 }
 
 impl MessagesConfirmationProof {
-    pub fn get_token(&self) -> color_eyre::Result<Token> {
+    pub fn get_token(&self) -> BeaconApiResult<Token> {
         Ok(Token::Tuple(
             (
                 self.account_proof.clone(),

@@ -2,6 +2,7 @@ use super::types::{
     BlockMessage, Finality, FinalityUpdate, ForkVersion, GetBlockResponse, GetHeaderResponse,
     Proof, ResponseWrapper, Snapshot, SyncCommitteePeriodUpdate,
 };
+use reqwest::header::CONTENT_TYPE;
 use support_common::error::BridgerError;
 
 pub struct EthereumClient {
@@ -177,15 +178,21 @@ impl EthereumClient {
             state_id.to_string(),
             gindex.to_string(),
         );
-        let res = self
+        let response = self
             .api_client
-            .get(url)
+            .get(url.clone())
             .header("content-type", "application/octet-stream")
             .send()
-            .await?
-            .bytes()
             .await?;
-        Ok(Proof::from(res))
+        let content_type = response.headers()[CONTENT_TYPE].as_bytes().to_vec();
+        let content_type = String::from_utf8(content_type)?;
+        if !response.status().is_success() || content_type.contains("application/json") {
+            tracing::error!("Failed to get state proof. Api: {:?}", url);
+            return Err(BridgerError::Custom("Failed to get state proof".into()).into());
+        }
+
+        let data = response.bytes().await?;
+        Ok(Proof::try_from(data)?)
     }
 
     pub async fn get_fork_version(&self, id: impl ToString) -> color_eyre::Result<ForkVersion> {

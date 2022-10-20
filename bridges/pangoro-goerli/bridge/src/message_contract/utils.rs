@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use client_beacon::types::MessagesConfirmationProof;
 use client_contracts::{
     error::BridgeContractError,
     inbound_types::{Message, OutboundLaneData, Payload},
@@ -17,8 +18,6 @@ use web3::{
     types::{Address, BlockId, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
     Web3,
 };
-
-use crate::goerli_client::types::MessagesConfirmationProof;
 
 use super::message_client::{LANE_IDENTIFY_SLOT, LANE_MESSAGE_SLOT, LANE_NONCE_SLOT};
 

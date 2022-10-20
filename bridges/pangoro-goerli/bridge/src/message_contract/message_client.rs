@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use bridge_e2e_traits::strategy::RelayStrategy;
+use client_beacon::types::MessagesProof;
 use futures::future;
 use secp256k1::SecretKey;
 use support_common::error::BridgerError;
@@ -21,7 +22,7 @@ use client_contracts::{
 };
 use client_contracts::{outbound_types::MessageAccepted, Outbound, SimpleFeeMarket};
 
-use crate::{goerli_client::types::MessagesProof, web3_helper::GasPriceOracle};
+use crate::web3_helper::GasPriceOracle;
 
 use super::{simple_fee_market::SimpleFeeMarketRelayStrategy, utils::build_eth_confirmation_proof};
 

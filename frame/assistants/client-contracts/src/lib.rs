@@ -1,7 +1,7 @@
 pub mod beacon_light_client;
 pub mod chain_message_committer;
 pub mod error;
-// pub mod execution_layer;
+pub mod execution_layer;
 pub mod fee_market;
 pub mod inbound;
 pub mod lane_message_committer;
@@ -11,6 +11,7 @@ pub mod simple_fee_market;
 
 pub use beacon_light_client::{types as beacon_light_client_types, BeaconLightClient};
 pub use chain_message_committer::ChainMessageCommitter;
+pub use execution_layer::ExecutionLayer;
 pub use fee_market::{types as fee_market_types, FeeMarket};
 pub use inbound::{types as inbound_types, Inbound};
 pub use lane_message_committer::LaneMessageCommitter;

@@ -17,4 +17,7 @@ version       = "0.7.0"
 thiserror   = "1"
 async-trait = "0.1"
 web3        = { version = "0.18.0", features = ["signing"] }
+secp256k1   = { version = "0.21" }
 
+support-etherscan     = { path = "../../../frame/supports/support-etherscan" }
+client-contracts      = { path = "../../../frame/assistants/client-contracts" }

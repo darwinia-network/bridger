@@ -6,5 +6,5 @@ members = [
 ]
 exclude = [
   "assistants",
-  "abstract",
+  "traits",
 ]

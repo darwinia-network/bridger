@@ -46,6 +46,7 @@
 
 <script>
 
+import { BN } from '@polkadot/util'
 import ExternalSubscan from '@/components/widgets/external-subscan';
 
 async function initState(vm) {
@@ -55,12 +56,27 @@ async function initState(vm) {
       vm.source.ampleRelayers = v.isSome;
       vm.source.assignedRelayers = v.toJSON();
       vm.loading.assignedRelayers = false;
+      if (vm.parachainBridge) {
+        vm.source.assignedRelayers = vm.$stream(vm.source.assignedRelayers)
+        .map(item => {
+          return {
+            ...item,
+            collateral: new BN(vm.source.assignedRelayers[0].collateral.replace('0x', ''), 16).toString(),
+            fee: new BN(vm.source.assignedRelayers[0].fee.replace('0x', ''), 16).toString(),
+          }
+        })
+        .toArray();
+      }
     });
 }
 
 export default {
   components: {ExternalSubscan},
   props: {
+    parachainBridge: {
+      type: Boolean,
+      default: false,
+    },
     sourceClient: {
       type: Object,
     },

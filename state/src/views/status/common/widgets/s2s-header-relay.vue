@@ -57,7 +57,7 @@
               </div>
             </td>
           </tr>
-          <tr>
+          <tr v-if="!parachainBridge">
             <td class="subtitle-2">Next on-demand block</td>
             <td>
               <v-progress-linear v-if="loading.nextOnDemandBlock" :color="sourceChain.color" indeterminate/>
@@ -90,23 +90,31 @@ import ExternalSubscan from '@/components/widgets/external-subscan';
 
 async function initState(vm) {
   // subscribe best finalized
-  vm.subscriber.bestFinalized = await vm.targetClient.query[
-    vm.targetChain.bridge_target[vm.sourceChain.bridge_chain_name].query_name.grandpa
-    ].bestFinalized(async v => {
-    vm.loading.bestFinalizedHash = false;
-    vm.loading.bestFinalizedBlock = true;
+  vm.subscriber.bestFinalized = await vm.targetClient.query[_grandpaPalletName(vm)]
+    .bestFinalized(async v => {
+      vm.loading.bestFinalizedHash = false;
+      vm.loading.bestFinalizedBlock = true;
 
-    // query block from best finalized
-    const blockHash = v.toHuman();
-    vm.source.bestFinalizedHash = blockHash;
-    const block = await vm.sourceClient.rpc.chain.getBlock(blockHash);
-    vm.source.bestFinalizedBlock = block.toJSON();
-    vm.loading.bestFinalizedBlock = false;
+      // query block from best finalized
+      const blockHash = v.toHuman();
+      vm.source.bestFinalizedHash = blockHash;
+      const block = await vm.sourceClient.rpc.chain.getBlock(blockHash);
+      vm.source.bestFinalizedBlock = block.toJSON();
+      vm.loading.bestFinalizedBlock = false;
 
-    // query next on-demand header
-    await queryNextMandatoryBlock(vm);
-    await queryNextOnDemandBlock(vm);
-  });
+      // query next on-demand header
+      await queryNextMandatoryBlock(vm);
+      if (!vm.parachainBridge) {
+        await queryNextOnDemandBlock(vm);
+      }
+    });
+}
+
+function _grandpaPalletName(vm) {
+  if (vm.parachainBridge) {
+    return vm.grandpaPalletName;
+  }
+  return vm.targetChain.bridge_target[vm.sourceChain.bridge_chain_name].query_name.grandpa;
 }
 
 async function subscribeNextMandatoryBlock(vm) {
@@ -158,6 +166,10 @@ async function queryNextOnDemandBlock(vm) {
 export default {
   components: {ExternalSubscan},
   props: {
+    parachainBridge: {
+      type: Boolean,
+      default: false,
+    },
     sourceClient: {
       type: Object,
     },
@@ -169,6 +181,9 @@ export default {
     },
     targetChain: {
       type: Object,
+    },
+    grandpaPalletName: {
+      type: String,
     },
   },
   data: () => ({

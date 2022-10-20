@@ -17,7 +17,7 @@
         </template>
         <span>Copy</span>
       </v-tooltip>
-      <v-tooltip bottom>
+      <v-tooltip bottom v-if="chain.explorer">
         <template v-slot:activator="{ on, attrs }">
           <v-btn x-small icon :href="`${chain.explorer}/${type}/${identity}`" target="_blank" v-bind="attrs" v-on="on">
             <v-icon x-small>mdi-open-in-new</v-icon>
@@ -25,6 +25,9 @@
         </template>
         <span>Explorer</span>
       </v-tooltip>
+      <v-btn v-else x-small icon disabled>
+        <v-icon x-small>mdi-open-in-new</v-icon>
+      </v-btn>
     </v-col>
   </v-row>
 </template>

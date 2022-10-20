@@ -200,6 +200,7 @@ const kusama = {
   color: '#424242',
   explorer: 'https://kusama.subscan.io',
   currency: 'KSM',
+  subql: 'https://subql.darwinia.network/subql-bridger-kusama',
 };
 
 const rococo = {
@@ -211,6 +212,7 @@ const rococo = {
   color: 'purple',
   explorer: 'https://rococo.subscan.io',
   currency: 'ROC',
+  subql: 'https://subql.darwinia.network/subql-bridger-rococo',
 };
 
 const moonbase = {
@@ -220,8 +222,9 @@ const moonbase = {
   name: 'Moonbase',
   logo: 'https://polkadot.js.org/apps/static/polkadot-circle.1eea41b2..svg',
   color: '#FF4081',
-  explorer: 'https://rococo.subscan.io',
+  explorer: null,
   currency: 'M',
+  subql: 'https://subql.darwinia.network/subql-bridger-moonbase',
 };
 
 const goerli = {

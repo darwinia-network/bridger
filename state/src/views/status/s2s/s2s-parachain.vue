@@ -27,8 +27,11 @@
         </bridge-skeleton>
       </v-col>
       <v-col cols="12">
+        <v-divider/>
+      </v-col>
+      <v-col cols="12">
         <bridge-skeleton
-          ref="relaychain_to_solochain_header"
+          ref="relaychain_to_solochain"
           :source-client="source.client.relaychain"
           :source-chain="source.chain.relaychain"
           :target-chain="source.chain.solochain"
@@ -40,12 +43,20 @@
             indeterminate
             v-if="loading.relaychainClient || loading.solochainClient"
           />
-          <span v-else>relaychain -> solochain header</span>
+          <bridge-s2s-parachain
+            v-else
+            :solo-client="source.client.solochain"
+            :para-client="source.client.parachain"
+            :relay-client="source.client.relaychain"
+            :solo-chain="source.chain.solochain"
+            :para-chain="source.chain.parachain"
+            :relay-chain="source.chain.relaychain"
+          />
         </bridge-skeleton>
       </v-col>
       <v-col cols="12">
         <bridge-skeleton
-          ref="parachainchain_to_solochain_message"
+          ref="parachainchain_to_solochain"
           :source-client="source.client.parachain"
           :source-chain="source.chain.parachain"
           :target-chain="source.chain.solochain"
@@ -68,6 +79,7 @@
 
 import BridgeSkeleton from '@/views/status/common/bridge-skeleton'
 import BridgeBasicS2s from '@/views/status/common/bridge-basic-s2s'
+import BridgeS2sParachain from '@/views/status/common/bridge-s2s-parachain'
 
 import * as dataSource from "@/data/data_source";
 import {ApiPromise, WsProvider} from "@polkadot/api";
@@ -98,14 +110,15 @@ async function initState(vm) {
   const relaychainProvider = new WsProvider(vm.source.chain.relaychain.endpoint.websocket);
   vm.source.client.solochain = await ApiPromise.create({provider: solochainProvider});
   vm.loading.solochainClient = false;
-  // vm.$refs['left_to_right'].initState(vm.source.client.left);
+  vm.$refs['solochain_to_parachain'].initState(vm.source.client.solochain);
 
   vm.source.client.parachain = await ApiPromise.create({provider: parachainProvider});
   vm.loading.parachainClient = false;
-  // vm.$refs['right_to_left'].initState(vm.source.client.right);
+  vm.$refs['parachainchain_to_solochain'].initState(vm.source.client.parachain);
 
   vm.source.client.relaychain = await ApiPromise.create({provider: relaychainProvider});
   vm.loading.relaychainClient = false;
+  vm.$refs['relaychain_to_solochain'].initState(vm.source.client.relaychain);
 }
 
 export default {
@@ -115,6 +128,7 @@ export default {
     },
   },
   components: {
+    BridgeS2sParachain,
     BridgeSkeleton,
     BridgeBasicS2s,
   },

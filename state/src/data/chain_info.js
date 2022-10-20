@@ -7,6 +7,7 @@ const darwinia = {
   color: 'pink',
   explorer: 'https://darwinia.subscan.io',
   currency: 'RING',
+  precision: 9,
   bridge_target: {
     crab: {
       query_name: {
@@ -29,6 +30,7 @@ const crab = {
   color: 'deep-purple',
   explorer: 'https://crab.subscan.io',
   currency: 'CRAB',
+  precision: 9,
   bridge_target: {
     darwinia: {
       query_name: {
@@ -62,6 +64,7 @@ const pangolin = {
   color: 'teal',
   explorer: 'https://pangolin.subscan.io',
   currency: 'PRING',
+  precision: 9,
   bridge_target: {
     pangoro: {
       query_name: {
@@ -106,6 +109,7 @@ const pangoro = {
   color: 'lime',
   explorer: 'https://pangoro.subscan.io',
   currency: 'ORING',
+  precision: 9,
   bridge_target: {
     pangolin: {
       query_name: {
@@ -128,6 +132,7 @@ const pangolin_parachain = {
   color: 'teal',
   explorer: 'https://pangolin-parachain.subscan.io',
   currency: 'PRING',
+  precision: 18,
   bridge_target: {
     pangolin: {
       query_name: {
@@ -152,6 +157,7 @@ const pangolin_parachain_alpha = {
   color: 'teal',
   explorer: 'https://pangolin-parachain.subscan.io',
   currency: 'PRING',
+  precision: 18,
   bridge_target: {
     pangolin: {
       query_name: {
@@ -176,6 +182,7 @@ const crab_parachain = {
   color: 'deep-purple',
   explorer: 'https://crab-parachain.subscan.io',
   currency: 'CRAB',
+  precision: 18,
   bridge_target: {
     crab: {
       query_name: {
@@ -200,6 +207,7 @@ const kusama = {
   color: '#424242',
   explorer: 'https://kusama.subscan.io',
   currency: 'KSM',
+  precision: 9,
   subql: 'https://subql.darwinia.network/subql-bridger-kusama',
 };
 
@@ -212,6 +220,7 @@ const rococo = {
   color: 'purple',
   explorer: 'https://rococo.subscan.io',
   currency: 'ROC',
+  precision: 9,
   subql: 'https://subql.darwinia.network/subql-bridger-rococo',
 };
 
@@ -224,6 +233,7 @@ const moonbase = {
   color: '#FF4081',
   explorer: null,
   currency: 'M',
+  precision: 9,
   subql: 'https://subql.darwinia.network/subql-bridger-moonbase',
 };
 

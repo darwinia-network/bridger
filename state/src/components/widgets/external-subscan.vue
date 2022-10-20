@@ -2,13 +2,13 @@
   <v-row>
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
-        <v-col cols="8" v-bind="attrs" v-on="on">
+        <v-col cols="7" v-bind="attrs" v-on="on">
           <vue-ellipsis :text="identity"/>
         </v-col>
       </template>
       <span v-text="identity"/>
     </v-tooltip>
-    <v-col cols="4">
+    <v-col cols="5">
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn x-small icon v-bind="attrs" v-on="on" v-clipboard:copy="identity" v-clipboard:success="onCopy">

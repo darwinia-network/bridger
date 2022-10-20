@@ -27,7 +27,7 @@
           </tr>
           <tr v-for="(relayer, ix) in source.assignedRelayers" :key="relayer.id">
             <td>
-              <external-subscan :identity="relayer.id" type="account" :chain="sourceChain" />
+              <external-subscan :identity="relayer.id" type="account" :chain="sourceChain"/>
             </td>
             <td><code>{{ relayer.collateral }}</code></td>
             <td>
@@ -46,7 +46,7 @@
 
 <script>
 
-import { BN } from '@polkadot/util'
+import BigNumber from 'bignumber.js'
 import ExternalSubscan from '@/components/widgets/external-subscan';
 
 async function initState(vm) {
@@ -56,27 +56,24 @@ async function initState(vm) {
       vm.source.ampleRelayers = v.isSome;
       vm.source.assignedRelayers = v.toJSON();
       vm.loading.assignedRelayers = false;
-      if (vm.parachainBridge) {
-        vm.source.assignedRelayers = vm.$stream(vm.source.assignedRelayers)
+      const precision = new BigNumber(10).pow(vm.sourceChain.precision);
+      vm.source.assignedRelayers = vm.$stream(vm.source.assignedRelayers)
         .map(item => {
+          const collateral = new BigNumber(item.collateral);
+          const fee = new BigNumber(item.fee);
           return {
             ...item,
-            collateral: new BN(vm.source.assignedRelayers[0].collateral.replace('0x', ''), 16).toString(),
-            fee: new BN(vm.source.assignedRelayers[0].fee.replace('0x', ''), 16).toString(),
+            collateral: collateral.div(precision),
+            fee: fee.div(precision),
           }
         })
         .toArray();
-      }
     });
 }
 
 export default {
   components: {ExternalSubscan},
   props: {
-    parachainBridge: {
-      type: Boolean,
-      default: false,
-    },
     sourceClient: {
       type: Object,
     },

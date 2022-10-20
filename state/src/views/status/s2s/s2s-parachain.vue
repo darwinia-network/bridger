@@ -43,7 +43,7 @@
             indeterminate
             v-if="loading.relaychainClient || loading.solochainClient"
           />
-          <bridge-s2s-parachain
+          <bridge-s2s-parachain-header
             v-else
             :solo-client="source.client.solochain"
             :para-client="source.client.parachain"
@@ -68,7 +68,15 @@
             indeterminate
             v-if="loading.parachainClient || loading.solochainClient"
           />
-          <span v-else>parachain -> solochain mesage</span>
+          <bridge-s2s-parachain-message
+            v-else
+            :solo-client="source.client.solochain"
+            :para-client="source.client.parachain"
+            :relay-client="source.client.relaychain"
+            :solo-chain="source.chain.solochain"
+            :para-chain="source.chain.parachain"
+            :relay-chain="source.chain.relaychain"
+          />
         </bridge-skeleton>
       </v-col>
     </v-row>
@@ -79,10 +87,11 @@
 
 import BridgeSkeleton from '@/views/status/common/bridge-skeleton'
 import BridgeBasicS2s from '@/views/status/common/bridge-basic-s2s'
-import BridgeS2sParachain from '@/views/status/common/bridge-s2s-parachain'
+import BridgeS2sParachainHeader from '@/views/status/common/bridge-s2s-parachain-header'
 
 import * as dataSource from "@/data/data_source";
 import {ApiPromise, WsProvider} from "@polkadot/api";
+import BridgeS2sParachainMessage from "@/views/status/common/bridge-s2s-parachain-message";
 
 async function initState(vm) {
   const name = vm.bridge.name;
@@ -128,7 +137,8 @@ export default {
     },
   },
   components: {
-    BridgeS2sParachain,
+    BridgeS2sParachainMessage,
+    BridgeS2sParachainHeader,
     BridgeSkeleton,
     BridgeBasicS2s,
   },

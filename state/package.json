@@ -13,6 +13,7 @@
     "@vuejs-community/vue-filter-date-format": "^1.6.3",
     "@vuejs-community/vue-filter-date-parse": "^1.1.6",
     "axios": "^1.1.2",
+    "bignumber.js": "^9.1.0",
     "core-js": "^3.8.3",
     "is_js": "^0.9.0",
     "streamjs": "^1.6.4",

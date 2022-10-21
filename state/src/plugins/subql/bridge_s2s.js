@@ -1,4 +1,8 @@
-import {BRIDGE_S2S_NEXT_MANDATORY_BLOCK, BRIDGE_S2S_NEXT_ON_DEMAND_BLOCK} from './graphql_query'
+import {
+  BRIDGE_S2S_NEXT_CANDIDATE_INCLUDED_EVENT,
+  BRIDGE_S2S_NEXT_MANDATORY_BLOCK,
+  BRIDGE_S2S_NEXT_ON_DEMAND_BLOCK
+} from './graphql_query'
 import is from 'is_js';
 
 export function SubqlBridgeS2S(query, host) {
@@ -46,6 +50,24 @@ fn.nextOnDemandBlock = async function (origin) {
     variable: {origin},
   });
   const nodes = ret['needRelayBlocks']['nodes'];
+  if (is.not.empty(nodes)) {
+    return nodes[0];
+  }
+  return null;
+}
+
+/**
+ * query next candidate include event
+ * @param paraHead
+ * @returns {Promise<void>}
+ */
+fn.queryNextCandidateIncludedEvent = async function(paraHead) {
+  const ret = await this.query({
+    host: this.host,
+    graphql: BRIDGE_S2S_NEXT_CANDIDATE_INCLUDED_EVENT,
+    variable: {para_head: paraHead}
+  });
+  const nodes = ret['candidateIncludedEvents']['nodes'];
   if (is.not.empty(nodes)) {
     return nodes[0];
   }

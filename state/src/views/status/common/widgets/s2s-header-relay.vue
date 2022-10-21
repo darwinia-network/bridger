@@ -77,6 +77,9 @@
               </div>
             </td>
           </tr>
+          <template v-else>
+            <slot name="extra" />
+          </template>
           </tbody>
         </template>
       </v-simple-table>

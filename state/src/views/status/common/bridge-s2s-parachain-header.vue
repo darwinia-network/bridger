@@ -1,14 +1,13 @@
 <template>
   <v-row>
     <v-col md="6" sm="12" xs="12">
-      <s2s-header-relay
-        :key="`s2s-header-${relayChain.name}-${soloChain.name}`"
-        :parachain-bridge="true"
-        :grandpa-pallet-name="soloChain.bridge_target[paraChain.bridge_chain_name].query_name.grandpa"
-        :source-client="relayClient"
-        :target-client="soloClient"
-        :source-chain="relayChain"
-        :target-chain="soloChain"
+      <parachain-header-relay
+        :solo-client="soloClient"
+        :para-client="paraClient"
+        :relay-client="relayClient"
+        :solo-chain="soloChain"
+        :para-chain="paraChain"
+        :relay-chain="relayChain"
       />
     </v-col>
     <v-col md="6" sm="12" xs="12">
@@ -18,10 +17,11 @@
 </template>
 
 <script>
-import S2sHeaderRelay from '@/views/status/common/widgets/s2s-header-relay'
+
+import ParachainHeaderRelay from "@/views/status/common/widgets/parachain-header-relay";
 
 export default {
-  components: {S2sHeaderRelay},
+  components: {ParachainHeaderRelay},
   props: {
     soloClient: {
       type: Object,

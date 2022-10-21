@@ -73,3 +73,30 @@ query queryNextRelayBlock($origin: String!) {
   }
 }
 `;
+
+/**
+ * next candidate included event
+ * @type {string}
+ */
+export const BRIDGE_S2S_NEXT_CANDIDATE_INCLUDED_EVENT = `
+query queryNextCandidateIncludedEvent($para_head: String!) {
+  candidateIncludedEvents (
+    first: 1
+    orderBy: INCLUDED_RELAY_BLOCK_ASC
+    filter: {
+      paraHead: {
+          equalTo: $para_head
+      }
+    }
+  ) {
+    nodes {
+      id
+      includedRelayBlock
+      paraId
+      signature
+      paraHead
+      relayParent
+    }
+  }
+}
+`;

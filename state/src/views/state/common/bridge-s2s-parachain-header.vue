@@ -25,8 +25,8 @@
 
 <script>
 
-import ParachainHeaderRelay from "@/views/status/common/widgets/parachain-header-relay";
-import ParaheadRelay from "@/views/status/common/widgets/parahead-relay";
+import ParachainHeaderRelay from "@/views/state/common/widgets/parachain-header-relay";
+import ParaheadRelay from "@/views/state/common/widgets/parahead-relay";
 
 export default {
   components: {ParaheadRelay, ParachainHeaderRelay},

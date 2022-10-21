@@ -10,8 +10,8 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/status/:bridge',
-    component: () => import('../views/status/index.vue')
+    path: '/state/:bridge',
+    component: () => import('../views/state/index.vue')
   }
 ]
 

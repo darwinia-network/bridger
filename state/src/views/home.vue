@@ -21,7 +21,7 @@
           <v-divider/>
 
           <v-list dense>
-            <v-list-item :to="`/status/${bridge.name}`" v-for="bridge in group.bridges">
+            <v-list-item :to="`/state/${bridge.name}`" v-for="bridge in group.bridges">
               <v-list-item-content>
                 <v-list-item-title>{{ bridge.name }}</v-list-item-title>
               </v-list-item-content>

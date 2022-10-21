@@ -21,7 +21,7 @@
                     link
                     v-bind="attrs"
                     v-on="on"
-                    :to="`/status/${bridge.name}`"
+                    :to="`/state/${bridge.name}`"
                   >
                     <v-list-item-title v-text="bridge.name"/>
                     <v-list-item-icon v-if="bridge.mode === 'testnet'">

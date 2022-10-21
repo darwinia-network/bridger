@@ -31,8 +31,8 @@
 
 import * as dataSource from '@/data/data_source.js'
 
-import S2sRaw from '@/views/status/s2s/s2s-raw';
-import S2sParachain from '@/views/status/s2s/s2s-parachain';
+import S2sRaw from '@/views/state/s2s/s2s-raw';
+import S2sParachain from '@/views/state/s2s/s2s-parachain';
 
 function initState(vm) {
   const params = vm.$route.params;

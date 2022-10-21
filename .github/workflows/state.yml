@@ -33,3 +33,10 @@ jobs:
           enable_notify_slack: true
           slack_channel: bridger
           slack_webhook: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
+
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: darwinia-network/bridger
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}

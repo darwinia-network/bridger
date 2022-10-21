@@ -155,7 +155,7 @@ const pangolin_parachain_alpha = {
   name: 'Pangolin Parachain Alpha',
   logo: 'https://polkadot.js.org/apps/static/pangolin.db0518f6..svg',
   color: 'teal',
-  explorer: 'https://pangolin-parachain.subscan.io',
+  explorer: null,
   currency: 'PRING',
   precision: 18,
   bridge_target: {

@@ -9,7 +9,7 @@
       :source-chain="relayChain"
       :target-chain="soloChain"
     >
-      <template v-slot:extra>
+      <template v-slot:default>
         <tr :key="`on-demand-${paraChain.name}-${soloChain.name}`">
           <td class="subtitle-2">Next on-demand block</td>
           <td>

@@ -11,7 +11,14 @@
       />
     </v-col>
     <v-col md="6" sm="12" xs="12">
-      parahead relay
+      <parahead-relay
+        :solo-client="soloClient"
+        :para-client="paraClient"
+        :relay-client="relayClient"
+        :solo-chain="soloChain"
+        :para-chain="paraChain"
+        :relay-chain="relayChain"
+      />
     </v-col>
   </v-row>
 </template>
@@ -19,9 +26,10 @@
 <script>
 
 import ParachainHeaderRelay from "@/views/status/common/widgets/parachain-header-relay";
+import ParaheadRelay from "@/views/status/common/widgets/parahead-relay";
 
 export default {
-  components: {ParachainHeaderRelay},
+  components: {ParaheadRelay, ParachainHeaderRelay},
   props: {
     soloClient: {
       type: Object,

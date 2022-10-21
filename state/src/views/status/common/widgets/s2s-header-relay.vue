@@ -78,7 +78,7 @@
             </td>
           </tr>
           <template v-else>
-            <slot name="extra" />
+            <slot/>
           </template>
           </tbody>
         </template>

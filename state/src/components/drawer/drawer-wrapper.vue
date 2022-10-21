@@ -34,6 +34,7 @@
             </template>
           </v-list-group>
 
+<!--
           <v-list-group prepend-icon="mdi-dev-to">
             <template v-slot:activator>
               <v-list-item-title class="text-uppercase">DEVELOPMENT</v-list-item-title>
@@ -42,6 +43,7 @@
               <drawer-development/>
             </v-list-item>
           </v-list-group>
+-->
 
           <v-list-group prepend-icon="mdi-cog">
             <template v-slot:activator>

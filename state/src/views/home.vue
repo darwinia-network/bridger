@@ -32,6 +32,7 @@
           </v-list>
         </v-card>
 
+<!--
         <v-card tile dense class="mt-2" width="50%">
           <v-card-title>
             <v-icon>mdi-dev-to</v-icon>
@@ -41,6 +42,7 @@
           <v-divider/>
           <drawer-development/>
         </v-card>
+-->
 
         <v-card tile dense class="mt-2" width="50%">
           <v-card-title>

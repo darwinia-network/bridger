@@ -32,7 +32,7 @@ jobs:
           prod_mode: true
           enable_cache: true
           enable_notify_slack: true
-          slack_channel: bridger
+          slack_channel: darwinia-bridger
           slack_webhook: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
 
       - uses: vishnudxb/cancel-workflow@v1.2

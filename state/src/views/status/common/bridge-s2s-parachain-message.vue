@@ -1,6 +1,16 @@
 <template>
   <v-row>
-    <v-col md="6" sm="12" xs="12">
+    <v-col cols="12">
+      <s2s-message-relay
+        :key="`s2s-message-${paraChain.name}-${soloChain.name}`"
+        :parachain-bridge="false"
+        :source-client="paraClient"
+        :target-client="soloClient"
+        :source-chain="paraChain"
+        :target-chain="soloChain"
+      />
+    </v-col>
+    <v-col cols="12">
       <s2s-feemarket
         :key="`s2s-feemarket-${paraChain.name}-${soloChain.name}`"
         :source-client="paraClient"
@@ -13,9 +23,10 @@
 
 <script>
 import S2sFeemarket from '@/views/status/common/widgets/s2s-feemarket'
+import S2sMessageRelay from '@/views/status/common/widgets/s2s-message-relay';
 
 export default {
-  components: {S2sFeemarket},
+  components: {S2sFeemarket, S2sMessageRelay},
   props: {
     soloClient: {
       type: Object,

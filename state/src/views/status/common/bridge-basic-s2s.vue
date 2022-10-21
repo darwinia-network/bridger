@@ -28,15 +28,6 @@
       />
     </v-col>
 
-    <v-col cols="12">
-      <v-alert text color="grey accent-4" icon="mdi-information">
-        More feemarket operation please visit
-        <v-btn text small href="https://feemarket.darwinia.network" target="_blank">
-          feemarket ui
-        </v-btn>
-        project.
-      </v-alert>
-    </v-col>
 
   </v-row>
 </template>

@@ -12,6 +12,18 @@
     >
       <s2s-parachain :key="source.status_bridge.bridge.name" :bridge="source.status_bridge.bridge"/>
     </v-col>
+
+    <v-col cols="12">
+      <v-container>
+        <v-alert text color="grey accent-4" icon="mdi-information">
+          More feemarket operation please visit
+          <v-btn text small href="https://feemarket.darwinia.network" target="_blank">
+            feemarket ui
+          </v-btn>
+          project.
+        </v-alert>
+      </v-container>
+    </v-col>
   </v-row>
 </template>
 

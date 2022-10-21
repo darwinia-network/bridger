@@ -28,12 +28,12 @@ async function initState(vm) {
 export default {
   components: {MessageRelay},
   props: {
-    sourceClient: {
-      type: Object,
-    },
     parachainBridge: {
       type: Boolean,
       default: false,
+    },
+    sourceClient: {
+      type: Object,
     },
     targetClient: {
       type: Object,

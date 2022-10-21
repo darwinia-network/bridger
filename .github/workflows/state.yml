@@ -22,12 +22,12 @@ jobs:
 
       - uses: ./.github/actions/smart-vercel
         name: Deploy to Vercel
-        working-directory: state
         with:
           vercel_token: ${{ secrets.VERCEL_TOKEN }}
           vercel_group: itering
           preview_output: true
           project_name: bridger-state
+          workdir: state
           prod_mode: true
           enable_cache: true
           enable_notify_slack: true

@@ -28,6 +28,7 @@ jobs:
           preview_output: true
           project_name: bridger-state
           workdir: state
+          dist_path: dist
           prod_mode: true
           enable_cache: true
           enable_notify_slack: true

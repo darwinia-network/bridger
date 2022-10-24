@@ -21,8 +21,14 @@ edition = "2021"
 tracing     = "0.1"
 thiserror   = "1.0"
 array-bytes = "2"
+tokio       = { version = "1", features = ["time"] }
 
 secp256k1 = { version = "0.21" }
 web3      = { version = "0.18", features = ["signing"] }
 
-bridge-e2e-traits = { path = "../../traits/bridge-e2e" }
+bridge-e2e-traits     = { path = "../../traits/bridge-e2e" }
+client-contracts      = { path = "../../../frame/assistants/client-contracts" }
+client-beacon         = { path = "../../../frame/assistants/client-beacon" }
+support-etherscan     = { path = "../../../frame/supports/support-etherscan" }
+support-tracker       = { path = "../../../frame/supports/support-tracker" }
+subquery              = { path = "../../../frame/assistants/subquery", features = [ "bridge-ethv2" ] }

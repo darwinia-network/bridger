@@ -2,14 +2,19 @@ use std::cmp;
 
 use client_contracts::{BeaconLightClient, ExecutionLayer};
 use secp256k1::SecretKey;
+use subxt::Config;
 use support_etherscan::{EtherscanClient, Result as EtherscanResult};
 use web3::{transports::Http, types::U256, Web3};
 
-#[async_trait::async_trait]
-pub trait GasPriceOracle {
+use crate::error::E2EClientResult;
+
+pub trait Web3Client: Send + Sync + Clone {
     // Returns web3 client
     fn get_web3(&self) -> &Web3<Http>;
+}
 
+#[async_trait::async_trait]
+pub trait GasPriceOracle: Web3Client {
     // Returns etherscan api client
     fn get_etherscan_client(&self) -> Option<&EtherscanClient>;
 
@@ -30,11 +35,32 @@ pub trait GasPriceOracle {
 }
 
 pub trait EthTruthLayerLightClient: GasPriceOracle {
-    fn web3_client(&self) -> &Web3<Http>;
-
     fn beacon_light_client(&self) -> &BeaconLightClient;
 
     fn execution_layer(&self) -> &ExecutionLayer;
 
     fn private_key(&self) -> &SecretKey;
+}
+
+#[async_trait::async_trait()]
+pub trait EcdsaClient: Send + Sync + Clone {
+    type SubxtConfig: subxt::Config;
+
+    async fn is_ecdsa_authority(
+        &self,
+        block_number: Option<u32>,
+        your_address: &[u8; 20],
+    ) -> E2EClientResult<bool>;
+
+    async fn submit_authorities_change_signature(
+        &self,
+        address: [u8; 20],
+        signatures: Vec<u8>,
+    ) -> E2EClientResult<<Self::SubxtConfig as Config>::Hash>;
+
+    async fn submit_new_message_root_signature(
+        &self,
+        address: [u8; 20],
+        signatures: Vec<u8>,
+    ) -> E2EClientResult<<Self::SubxtConfig as Config>::Hash>;
 }

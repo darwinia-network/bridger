@@ -2,14 +2,18 @@ use crate::client::PangoroClient;
 use crate::config::PangoroSubxtConfig;
 use crate::error::{ClientError, ClientResult};
 use crate::types::runtime_types;
+use bridge_e2e_traits::{client::EcdsaClient, error::E2EClientResult};
 
-impl PangoroClient {
+#[async_trait::async_trait]
+impl EcdsaClient for PangoroClient {
+    type SubxtConfig = PangoroSubxtConfig;
+
     /// current account is ecdsa authority account
-    pub async fn is_ecdsa_authority(
+    async fn is_ecdsa_authority(
         &self,
         block_number: Option<u32>,
         your_address: &[u8; 20],
-    ) -> ClientResult<bool> {
+    ) -> E2EClientResult<bool> {
         let hash = self
             .subxt()
             .rpc()
@@ -29,11 +33,11 @@ impl PangoroClient {
         Ok(iam)
     }
 
-    pub async fn submit_authorities_change_signature(
+    async fn submit_authorities_change_signature(
         &self,
         address: [u8; 20],
         signatures: Vec<u8>,
-    ) -> ClientResult<<PangoroSubxtConfig as subxt::Config>::Hash> {
+    ) -> E2EClientResult<<PangoroSubxtConfig as subxt::Config>::Hash> {
         let fixed_signatures: [u8; 65] = signatures.try_into().map_err(|e: Vec<u8>| {
             ClientError::Custom(format!(
                 "Wrong signatures data: {}",
@@ -56,11 +60,11 @@ impl PangoroClient {
         Ok(events.extrinsic_hash())
     }
 
-    pub async fn submit_new_message_root_signature(
+    async fn submit_new_message_root_signature(
         &self,
         address: [u8; 20],
         signatures: Vec<u8>,
-    ) -> ClientResult<<PangoroSubxtConfig as subxt::Config>::Hash> {
+    ) -> E2EClientResult<<PangoroSubxtConfig as subxt::Config>::Hash> {
         let fixed_signatures: [u8; 65] = signatures.try_into().map_err(|e: Vec<u8>| {
             ClientError::Custom(format!(
                 "Wrong signatures data: {}",

@@ -82,20 +82,25 @@
 <script>
 
 async function _initState(vm) {
-  vm.client.rpc.chain.subscribeNewHeads(header => {
-    vm.source.header.last = header;
-    vm.cond.highlight.last = true;
-    setTimeout(() => vm.cond.highlight.last = false, 500);
-  });
-  vm.client.rpc.chain.subscribeFinalizedHeads(header => {
-    vm.source.header.finalized = header;
-    vm.cond.highlight.finalized = true;
-    setTimeout(() => vm.cond.highlight.finalized = false, 500);
-  });
+  if (vm.chainType === 'substrate') {
+    vm.client.rpc.chain.subscribeNewHeads(header => {
+      vm.source.header.last = header;
+      vm.cond.highlight.last = true;
+      setTimeout(() => vm.cond.highlight.last = false, 500);
+    });
+    vm.client.rpc.chain.subscribeFinalizedHeads(header => {
+      vm.source.header.finalized = header;
+      vm.cond.highlight.finalized = true;
+      setTimeout(() => vm.cond.highlight.finalized = false, 500);
+    });
+  }
 }
 
 export default {
   props: {
+    chainType: {
+      type: String,
+    },
     sourceClient: {
       type: Object,
     },

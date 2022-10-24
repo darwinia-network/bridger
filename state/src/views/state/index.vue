@@ -17,7 +17,7 @@
 
     <template v-if="source.status_bridge.group === 'E2E'">
       <v-col cols="12">
-        <e2e-raw :bridge="source.status_bridge.bridge"/>
+        <e2e-raw :key="source.status_bridge.bridge.name" :bridge="source.status_bridge.bridge"/>
       </v-col>
     </template>
 

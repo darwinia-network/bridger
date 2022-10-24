@@ -4,6 +4,8 @@
       <v-col cols="12">
         <bridge-skeleton
           ref="solochain_to_parachain"
+          chain-type="substrate"
+          :key="`s2s-parachain-${source.chain.solochain.name}-${source.chain.parachain.name}`"
           :source-client="source.client.solochain"
           :source-chain="source.chain.solochain"
           :target-chain="source.chain.parachain"
@@ -32,6 +34,8 @@
       <v-col cols="12">
         <bridge-skeleton
           ref="relaychain_to_solochain"
+          chain-type="substrate"
+          :key="`s2s-parachain-${source.chain.relaychain.name}-${source.chain.solochain.name}`"
           :source-client="source.client.relaychain"
           :source-chain="source.chain.relaychain"
           :target-chain="source.chain.solochain"
@@ -57,6 +61,8 @@
       <v-col cols="12">
         <bridge-skeleton
           ref="parachainchain_to_solochain"
+          chain-type="substrate"
+          :key="`s2s-parachain-${source.chain.parachain.name}-${source.chain.solochain.name}`"
           :source-client="source.client.parachain"
           :source-chain="source.chain.parachain"
           :target-chain="source.chain.solochain"
@@ -85,7 +91,7 @@
 
 <script>
 
-import BridgeSkeleton from '@/views/state/s2s/common/bridge-skeleton'
+import BridgeSkeleton from '@/components/skeleton/bridge-skeleton'
 import BridgeBasicS2s from '@/views/state/s2s/common/bridge-basic-s2s'
 import BridgeS2sParachainHeader from '@/views/state/s2s/common/bridge-s2s-parachain-header'
 

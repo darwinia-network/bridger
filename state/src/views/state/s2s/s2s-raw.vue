@@ -4,6 +4,8 @@
       <v-col cols="12">
         <bridge-skeleton
           ref="left_to_right"
+          chain-type="substrate"
+          :key="`s2s-${source.chain.left.name}-${source.chain.right.name}`"
           :source-client="source.client.left"
           :source-chain="source.chain.left"
           :target-chain="source.chain.right"
@@ -31,6 +33,8 @@
       <v-col cols="12">
         <bridge-skeleton
           ref="right_to_left"
+          chain-type="substrate"
+          :key="`s2s-${source.chain.right.name}-${source.chain.left.name}`"
           :source-client="source.client.right"
           :source-chain="source.chain.right"
           :target-chain="source.chain.left"
@@ -61,7 +65,7 @@
 import {ApiPromise, WsProvider} from '@polkadot/api';
 import * as dataSource from '@/data/data_source'
 
-import BridgeSkeleton from '@/views/state/s2s/common/bridge-skeleton'
+import BridgeSkeleton from '@/components/skeleton/bridge-skeleton'
 import BridgeBasicS2s from '@/views/state/s2s/common/bridge-basic-s2s'
 
 async function initState(vm) {

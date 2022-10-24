@@ -1,17 +1,25 @@
 <template>
   <v-row>
-    <v-col
-      cols="12"
-      v-if="source.status_bridge.group = 'S2S' && source.status_bridge.bridge.bridge_type === 's2s'"
-    >
-      <s2s-raw :key="source.status_bridge.bridge.name" :bridge="source.status_bridge.bridge"/>
-    </v-col>
-    <v-col
-      cols="12"
-      v-if="source.status_bridge.group = 'S2S' && source.status_bridge.bridge.bridge_type === 'parachain'"
-    >
-      <s2s-parachain :key="source.status_bridge.bridge.name" :bridge="source.status_bridge.bridge"/>
-    </v-col>
+    <template v-if="source.status_bridge.group === 'S2S'">
+      <v-col
+        cols="12"
+        v-if="source.status_bridge.bridge.bridge_type === 's2s'"
+      >
+        <s2s-raw :key="source.status_bridge.bridge.name" :bridge="source.status_bridge.bridge"/>
+      </v-col>
+      <v-col
+        cols="12"
+        v-if="source.status_bridge.bridge.bridge_type === 'parachain'"
+      >
+        <s2s-parachain :key="source.status_bridge.bridge.name" :bridge="source.status_bridge.bridge"/>
+      </v-col>
+    </template>
+
+    <template v-if="source.status_bridge.group === 'E2E'">
+      <v-col cols="12">
+        <e2e-raw :bridge="source.status_bridge.bridge"/>
+      </v-col>
+    </template>
 
     <v-col cols="12">
       <v-container>
@@ -33,6 +41,7 @@ import * as dataSource from '@/data/data_source.js'
 
 import S2sRaw from '@/views/state/s2s/s2s-raw';
 import S2sParachain from '@/views/state/s2s/s2s-parachain';
+import E2eRaw from "@/views/state/e2e/e2e-raw";
 
 function initState(vm) {
   const params = vm.$route.params;
@@ -46,6 +55,7 @@ function initState(vm) {
 
 export default {
   components: {
+    E2eRaw,
     S2sParachain,
     S2sRaw,
   },

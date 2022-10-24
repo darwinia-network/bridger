@@ -15,6 +15,7 @@ export function bridgerGroups(
     const bridges = group.bridges;
     const allowBridges = [];
     for (const bridge of bridges) {
+      if (!bridge.enable) continue;
       if (!allowDisabled && !bridge.enable) {
         continue;
       }

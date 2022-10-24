@@ -243,6 +243,22 @@ const goerli = {
   },
   name: 'Goerli',
   logo: 'https://goerli.etherscan.io/images/svg/brands/ethereum.svg?v=1.3',
+  color: '#f1f2f4',
+  explorer: 'https://goerli.etherscan.io/',
+  currency: 'ETH',
+  precision: 18,
+};
+
+const ethereum = {
+  endpoint: {
+    http: 'https://eth-mainnet.g.alchemy.com/v2/x-Yy-QAog0fzfJQlr0VKreOZaq4KgVUJ',
+  },
+  name: 'Ethereum',
+  logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Eth-diamond-rainbow.png/440px-Eth-diamond-rainbow.png',
+  color: '#d692cf',
+  explorer: 'https://etherscan.io/',
+  currency: 'ETH',
+  precision: 18,
 };
 
 
@@ -254,8 +270,9 @@ export default {
   'pangolinparachain': pangolin_parachain,
   'pangolinparachainalpha': pangolin_parachain_alpha,
   'crabparachain': crab_parachain,
-  goerli,
   kusama,
   rococo,
   moonbase,
+  goerli,
+  ethereum,
 }

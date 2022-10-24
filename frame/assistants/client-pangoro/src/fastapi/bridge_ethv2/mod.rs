@@ -1,6 +1,6 @@
 use crate::client::PangoroClient;
 use crate::config::PangoroSubxtConfig;
-use crate::error::{ClientError, ClientResult};
+use crate::error::ClientError;
 use crate::types::runtime_types;
 use bridge_e2e_traits::{client::EcdsaClient, error::E2EClientResult};
 

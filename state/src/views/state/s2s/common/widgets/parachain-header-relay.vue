@@ -38,7 +38,7 @@
 
 <script>
 
-import S2sHeaderRelay from '@/views/state/common/widgets/s2s-header-relay';
+import S2sHeaderRelay from '@/views/state/s2s/common/widgets/s2s-header-relay';
 import ExternalSubscan from '@/components/widgets/external-subscan';
 
 

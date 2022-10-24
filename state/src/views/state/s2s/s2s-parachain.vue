@@ -85,13 +85,13 @@
 
 <script>
 
-import BridgeSkeleton from '@/views/state/common/bridge-skeleton'
-import BridgeBasicS2s from '@/views/state/common/bridge-basic-s2s'
-import BridgeS2sParachainHeader from '@/views/state/common/bridge-s2s-parachain-header'
+import BridgeSkeleton from '@/views/state/s2s/common/bridge-skeleton'
+import BridgeBasicS2s from '@/views/state/s2s/common/bridge-basic-s2s'
+import BridgeS2sParachainHeader from '@/views/state/s2s/common/bridge-s2s-parachain-header'
 
 import * as dataSource from "@/data/data_source";
 import {ApiPromise, WsProvider} from "@polkadot/api";
-import BridgeS2sParachainMessage from "@/views/state/common/bridge-s2s-parachain-message";
+import BridgeS2sParachainMessage from "@/views/state/s2s/common/bridge-s2s-parachain-message";
 
 async function initState(vm) {
   const name = vm.bridge.name;

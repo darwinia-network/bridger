@@ -61,8 +61,8 @@
 import {ApiPromise, WsProvider} from '@polkadot/api';
 import * as dataSource from '@/data/data_source'
 
-import BridgeSkeleton from '@/views/state/common/bridge-skeleton'
-import BridgeBasicS2s from '@/views/state/common/bridge-basic-s2s'
+import BridgeSkeleton from '@/views/state/s2s/common/bridge-skeleton'
+import BridgeBasicS2s from '@/views/state/s2s/common/bridge-basic-s2s'
 
 async function initState(vm) {
   const name = vm.bridge.name;

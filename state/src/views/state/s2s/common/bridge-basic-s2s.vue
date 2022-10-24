@@ -34,10 +34,10 @@
 
 <script>
 
-import S2sFeemarket from '@/views/state/common/widgets/s2s-feemarket';
-import S2sMessageRelay from '@/views/state/common/widgets/s2s-message-relay';
-import S2sHeaderRelay from '@/views/state/common/widgets/s2s-header-relay';
-import S2sPanelChain from '@/views/state/common/panel/s2s-panel-chain';
+import S2sFeemarket from '@/views/state/s2s/common/widgets/s2s-feemarket';
+import S2sMessageRelay from '@/views/state/s2s/common/widgets/s2s-message-relay';
+import S2sHeaderRelay from '@/views/state/s2s/common/widgets/s2s-header-relay';
+import S2sPanelChain from '@/views/state/s2s/common/panel/s2s-panel-chain';
 
 async function initState(vm) {
 }

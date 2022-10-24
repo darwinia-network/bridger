@@ -22,8 +22,8 @@
 </template>
 
 <script>
-import S2sFeemarket from '@/views/state/common/widgets/s2s-feemarket'
-import S2sMessageRelay from '@/views/state/common/widgets/s2s-message-relay';
+import S2sFeemarket from '@/views/state/s2s/common/widgets/s2s-feemarket'
+import S2sMessageRelay from '@/views/state/s2s/common/widgets/s2s-message-relay';
 
 export default {
   components: {S2sFeemarket, S2sMessageRelay},

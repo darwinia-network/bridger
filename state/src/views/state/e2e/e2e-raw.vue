@@ -42,8 +42,10 @@
             v-else
             :evm-chain="source.chain.evm"
             :ethereum-chain="source.chain.ethereum"
+            :beacon-chain="source.chain.beacon"
             :evm-client="source.client.evm"
             :ethereum-client="source.client.ethereum"
+            :beacon-client="source.client.beacon"
           />
         </bridge-skeleton>
       </v-col>
@@ -71,10 +73,13 @@ async function initState(vm) {
   }
   vm.source.chain.evm = {...evmChain, bridge_chain_name: evmChainName};
   vm.source.chain.ethereum = {...ethereumChain, bridge_chain_name: ethereumChainName};
-  vm.source.client.evm = vm.$contract.darwinia({endpoint: vm.source.chain.evm.endpoint.evm});
-  vm.source.client.ethereum = vm.$contract.ethereum({endpoint: vm.source.chain.ethereum.endpoint.http});
+  vm.source.chain.beacon = {};
+  vm.source.client.evm = vm.$eth2.evm({endpoint: vm.source.chain.evm.endpoint.evm});
+  vm.source.client.ethereum = vm.$eth2.ethereum({endpoint: vm.source.chain.ethereum.endpoint.http});
+  vm.source.client.beacon = vm.$eth2.beacon({endpoint: 'https://lodestar-mainnet-rpc.darwinia.network'});
   vm.loading.evmClient = false;
   vm.loading.ethereumClient = false;
+  vm.loading.beaconClient = false;
 }
 
 export default {
@@ -89,15 +94,18 @@ export default {
       chain: {
         evm: null,
         ethereum: null,
+        beacon: null,
       },
       client: {
         evm: null,
         ethereum: null,
+        beacon: null,
       },
     },
     loading: {
       evmClient: true,
       ethereumClient: true,
+      beaconClient: true,
     }
   }),
   created() {

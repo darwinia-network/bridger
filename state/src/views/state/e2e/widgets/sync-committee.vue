@@ -3,6 +3,7 @@
     <v-col cols="12">
       Sync committee
       <pre>{{source}}</pre>
+      <pre>{{loading}}</pre>
     </v-col>
   </v-row>
 </template>
@@ -14,12 +15,17 @@ async function initState(vm) {
   const header = await vm.evmClient.beaconLightClient(beaconLightClientAddress)
     .finalizedHeader();
   const period = header.slot.div(32).div(256);
-  vm.source.currentSyncCommitteeRoots = await vm.evmClient.beaconLightClient(beaconLightClientAddress)
+  vm.source.currentSyncCommitteeRoots = await vm.evmClient
+    .beaconLightClient(beaconLightClientAddress)
     .syncCommitteeRoots(period);
   vm.loading.currentSyncCommitteeRoots = false;
-  vm.source.nextSyncCommitteeRoots = await vm.evmClient.beaconLightClient(beaconLightClientAddress)
+  vm.source.nextSyncCommitteeRoots = await vm.evmClient
+    .beaconLightClient(beaconLightClientAddress)
     .syncCommitteeRoots(period.add(1));
   vm.loading.nextSyncCommitteeRoots = false;
+  const syncCommitteePeriodUpdate = await vm.beaconClient.getSyncCommitteePeriodUpdate(period.toString(), 1);
+  vm.source.syncCommitteePeriodUpdate = syncCommitteePeriodUpdate.data;
+  vm.loading.syncCommitteePeriodUpdate = false;
 }
 
 export default {
@@ -30,10 +36,16 @@ export default {
     ethereumChain: {
       type: Object,
     },
+    beaconChain: {
+      type: Object,
+    },
     evmClient: {
       type: Object,
     },
     ethereumClient: {
+      type: Object,
+    },
+    beaconClient: {
       type: Object,
     },
   },
@@ -41,10 +53,12 @@ export default {
     source: {
       currentSyncCommitteeRoots: null,
       nextSyncCommitteeRoots: null,
+      syncCommitteePeriodUpdate: null,
     },
     loading: {
       currentSyncCommitteeRoots: true,
       nextSyncCommitteeRoots: true,
+      syncCommitteePeriodUpdate: true,
     },
   }),
   created() {

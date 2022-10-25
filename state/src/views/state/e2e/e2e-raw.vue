@@ -38,6 +38,13 @@
             indeterminate
             v-if="loading.evmClient || loading.ethereumClient"
           />
+          <ethereum-to-evm
+            v-else
+            :evm-chain="source.chain.evm"
+            :ethereum-chain="source.chain.ethereum"
+            :evm-client="source.client.evm"
+            :ethereum-client="source.client.ethereum"
+          />
         </bridge-skeleton>
       </v-col>
     </v-row>
@@ -47,8 +54,7 @@
 <script>
 
 import BridgeSkeleton from '@/components/skeleton/bridge-skeleton';
-
-import Web3 from 'web3'
+import EthereumToEvm from '@/views/state/e2e/wrapper/ethereum-to-evm';
 
 import * as dataSource from '@/data/data_source';
 
@@ -65,15 +71,14 @@ async function initState(vm) {
   }
   vm.source.chain.evm = {...evmChain, bridge_chain_name: evmChainName};
   vm.source.chain.ethereum = {...ethereumChain, bridge_chain_name: ethereumChainName};
-  vm.source.client.evm = new Web3(vm.source.chain.evm.endpoint.evm);
-  vm.source.client.ethereum = new Web3(vm.source.chain.ethereum.endpoint.http);
-  console.log(vm.source.client.evm);
+  vm.source.client.evm = vm.$contract.darwinia({endpoint: vm.source.chain.evm.endpoint.evm});
+  vm.source.client.ethereum = vm.$contract.ethereum({endpoint: vm.source.chain.ethereum.endpoint.http});
   vm.loading.evmClient = false;
   vm.loading.ethereumClient = false;
 }
 
 export default {
-  components: {BridgeSkeleton},
+  components: {EthereumToEvm, BridgeSkeleton},
   props: {
     bridge: {
       type: Object,

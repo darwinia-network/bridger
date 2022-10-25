@@ -12,6 +12,7 @@ import VueEllipsis from 'vue-ellipsis-component'
 import Is from './plugins/is'
 import Subql from './plugins/subql'
 import Stream from './plugins/stream'
+import Contract from './plugins/contract'
 
 import './plugins/logger'
 import './plugins/toast'
@@ -31,6 +32,7 @@ Vue.use(VueEllipsis);
 Vue.use(Stream);
 Vue.use(Is);
 Vue.use(Subql);
+Vue.use(Contract);
 
 
 new Vue({

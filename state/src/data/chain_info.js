@@ -262,6 +262,18 @@ const ethereum = {
   precision: 18,
 };
 
+const lodestarMainnet = {
+  endpoint: {
+    http: 'https://lodestar-mainnet-rpc.darwinia.network',
+  },
+  name: 'Lodestar',
+  logo: 'https://chainsafe.github.io/lodestar/assets/lodestar_icon_300.png',
+  color: '#ce8596',
+  explorer: null,
+  currency: 'ETH',
+  precision: 18,
+};
+
 
 export default {
   darwinia,
@@ -276,4 +288,5 @@ export default {
   moonbase,
   goerli,
   ethereum,
+  lodestarmainnet: lodestarMainnet,
 }

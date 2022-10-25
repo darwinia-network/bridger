@@ -83,8 +83,6 @@ async function initState(vm) {
   vm.source.chain.right = {...rightChain, bridge_chain_name: rightName};
 
 
-  vm.loading.sourceClient = true;
-  vm.loading.targetClient = true;
   const leftProvider = new WsProvider(vm.source.chain.left.endpoint.websocket);
   const rightProvider = new WsProvider(vm.source.chain.right.endpoint.websocket);
   vm.source.client.left = await ApiPromise.create({provider: leftProvider});
@@ -121,8 +119,8 @@ export default {
       }
     },
     loading: {
-      sourceClient: false,
-      targetClient: false,
+      sourceClient: true,
+      targetClient: true,
     },
   }),
   created() {

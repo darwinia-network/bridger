@@ -5,17 +5,17 @@
         <bridge-skeleton
           ref="left_to_right"
           chain-type="ethereum"
-          :key="`e2e-${source.chain.left.name}-${source.chain.right.name}`"
-          :source-client="source.client.left"
-          :source-chain="source.chain.left"
-          :target-chain="source.chain.right"
-          v-if="source.chain.left && source.chain.right"
+          :key="`e2e-${source.chain.evm.name}-${source.chain.ethereum.name}`"
+          :source-client="source.client.evm"
+          :source-chain="source.chain.evm"
+          :target-chain="source.chain.ethereum"
+          v-if="source.chain.evm && source.chain.ethereum"
         >
           <v-progress-linear
             class="mt-15"
-            :color="source.chain.left.color"
+            :color="source.chain.evm.color"
             indeterminate
-            v-if="loading.sourceClient || loading.targetClient"
+            v-if="loading.evmClient || loading.ethereumClient"
           />
         </bridge-skeleton>
       </v-col>
@@ -26,17 +26,17 @@
         <bridge-skeleton
           ref="right_to_left"
           chain-type="ethereum"
-          :key="`e2e-${source.chain.right.name}-${source.chain.left.name}`"
-          :source-client="source.client.right"
-          :source-chain="source.chain.right"
-          :target-chain="source.chain.left"
-          v-if="source.chain.left && source.chain.right"
+          :key="`e2e-${source.chain.ethereum.name}-${source.chain.evm.name}`"
+          :source-client="source.client.ethereum"
+          :source-chain="source.chain.ethereum"
+          :target-chain="source.chain.evm"
+          v-if="source.chain.evm && source.chain.ethereum"
         >
           <v-progress-linear
             class="mt-15"
-            :color="source.chain.right.color"
+            :color="source.chain.ethereum.color"
             indeterminate
-            v-if="loading.sourceClient || loading.targetClient"
+            v-if="loading.evmClient || loading.ethereumClient"
           />
         </bridge-skeleton>
       </v-col>
@@ -46,22 +46,30 @@
 
 <script>
 
-import * as dataSource from "@/data/data_source";
-import BridgeSkeleton from "@/components/skeleton/bridge-skeleton";
+import BridgeSkeleton from '@/components/skeleton/bridge-skeleton';
+
+import Web3 from 'web3'
+
+import * as dataSource from '@/data/data_source';
 
 async function initState(vm) {
   const name = vm.bridge.name;
-  const [leftName, rightName] = name.split('-');
-  const [leftChain, rightChain] = [
-    dataSource.chainInfo(leftName),
-    dataSource.chainInfo(rightName),
+  const [evmChainName, ethereumChainName] = name.split('-');
+  const [evmChain, ethereumChain] = [
+    dataSource.chainInfo(evmChainName),
+    dataSource.chainInfo(ethereumChainName),
   ];
-  if (!leftChain || !rightChain) {
+  if (!evmChain || !ethereumChain) {
     await vm.$router.push({path: '/'})
     return;
   }
-  vm.source.chain.left = {...leftChain, bridge_chain_name: leftName};
-  vm.source.chain.right = {...rightChain, bridge_chain_name: rightName};
+  vm.source.chain.evm = {...evmChain, bridge_chain_name: evmChainName};
+  vm.source.chain.ethereum = {...ethereumChain, bridge_chain_name: ethereumChainName};
+  vm.source.client.evm = new Web3(vm.source.chain.evm.endpoint.evm);
+  vm.source.client.ethereum = new Web3(vm.source.chain.ethereum.endpoint.http);
+  console.log(vm.source.client.evm);
+  vm.loading.evmClient = false;
+  vm.loading.ethereumClient = false;
 }
 
 export default {
@@ -74,17 +82,17 @@ export default {
   data: () => ({
     source: {
       chain: {
-        left: null,
-        right: null,
+        evm: null,
+        ethereum: null,
       },
       client: {
-        left: null,
-        right: null,
+        evm: null,
+        ethereum: null,
       },
     },
     loading: {
-      sourceClient: true,
-      targetClient: true,
+      evmClient: true,
+      ethereumClient: true,
     }
   }),
   created() {

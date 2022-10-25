@@ -1,6 +1,7 @@
 const darwinia = {
   endpoint: {
     websocket: 'wss://rpc.darwinia.network',
+    evm: 'https://rpc.darwinia.network',
   },
   name: 'Darwinia',
   logo: 'https://polkadot.js.org/apps/static/darwinia.70c5ca41..svg',

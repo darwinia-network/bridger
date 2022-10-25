@@ -7,6 +7,7 @@ use web3::{
 
 use crate::error::BridgeContractResult;
 
+#[derive(Debug, Clone)]
 pub struct ExecutionLayer {
     pub contract: Contract<Http>,
 }

@@ -7,13 +7,15 @@ use std::{
 use crate::{
     bridge::{BridgeBus, BridgeConfig},
     pangoro_client::client::PangoroClient,
-    web3_helper::{wait_for_transaction_confirmation, GasPriceOracle},
 };
+use bridge_e2e_traits::client::GasPriceOracle;
 use client_beacon::{client::BeaconApiClient, types::FinalityUpdate};
 use client_contracts::beacon_light_client::FinalizedHeaderUpdate;
 use lifeline::{Lifeline, Service, Task};
+use relay_e2e::header::eth_beacon_header_relay::BeaconHeaderRelayRunner;
 use support_common::config::{Config, Names};
 use support_common::error::BridgerError;
+use support_etherscan::wait_for_transaction_confirmation;
 use support_lifeline::service::BridgeService;
 use web3::{
     contract::Options,
@@ -58,21 +60,21 @@ async fn start() -> color_eyre::Result<()> {
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
     let goerli_client = BeaconApiClient::new(&config.goerli.endpoint)?;
-    let mut header_relay = HeaderRelay {
-        pangoro_client,
-        goerli_client,
+    let mut header_relay = BeaconHeaderRelayRunner {
+        eth_light_client: pangoro_client,
+        beacon_api_client: goerli_client,
         minimal_interval: config.general.header_relay_minimum_interval,
         last_relay_time: u64::MIN,
     };
 
     loop {
-        if let Err(error) = header_relay.header_relay().await {
+        if let Err(error) = header_relay.start().await {
             tracing::error!(
                 target: "pangoro-goerli",
                 "Failed relay header : {:?}",
                 error
             );
-            return Err(error);
+            return Err(error.into());
         }
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
     }

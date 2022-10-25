@@ -9,6 +9,7 @@ use web3::{
 
 use crate::error::BridgeContractResult;
 
+#[derive(Debug, Clone)]
 pub struct BeaconLightClient {
     pub contract: Contract<Http>,
 }

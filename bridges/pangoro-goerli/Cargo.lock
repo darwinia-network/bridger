@@ -340,7 +340,6 @@ name = "bridge-e2e-traits"
 version = "0.7.0"
 dependencies = [
  "async-trait",
- "bp-runtime",
  "client-contracts",
  "secp256k1",
  "subxt",

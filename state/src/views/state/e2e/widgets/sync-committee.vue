@@ -2,6 +2,7 @@
   <v-row>
     <v-col cols="12">
       Sync committee
+      <pre>{{source}}</pre>
     </v-col>
   </v-row>
 </template>
@@ -12,9 +13,13 @@ async function initState(vm) {
   const beaconLightClientAddress = '0x9C266C48F07121181d8424768f0deD0170cC63A6';
   const header = await vm.evmClient.beaconLightClient(beaconLightClientAddress)
     .finalizedHeader();
-  const syncCommitteeRoots = await vm.evmClient.beaconLightClient(beaconLightClientAddress)
-    .syncCommitteeRoots(header.slot.div(32).div(256));
-  console.log(syncCommitteeRoots);
+  const period = header.slot.div(32).div(256);
+  vm.source.currentSyncCommitteeRoots = await vm.evmClient.beaconLightClient(beaconLightClientAddress)
+    .syncCommitteeRoots(period);
+  vm.loading.currentSyncCommitteeRoots = false;
+  vm.source.nextSyncCommitteeRoots = await vm.evmClient.beaconLightClient(beaconLightClientAddress)
+    .syncCommitteeRoots(period.add(1));
+  vm.loading.nextSyncCommitteeRoots = false;
 }
 
 export default {
@@ -32,7 +37,16 @@ export default {
       type: Object,
     },
   },
-  data: () => ({}),
+  data: () => ({
+    source: {
+      currentSyncCommitteeRoots: null,
+      nextSyncCommitteeRoots: null,
+    },
+    loading: {
+      currentSyncCommitteeRoots: true,
+      nextSyncCommitteeRoots: true,
+    },
+  }),
   created() {
     initState(this);
   }

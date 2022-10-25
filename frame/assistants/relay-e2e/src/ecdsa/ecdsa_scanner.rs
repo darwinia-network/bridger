@@ -21,20 +21,12 @@ pub enum EcdsaScanType {
     CollectedAuthority,
 }
 
-pub struct EcdsaScanner;
+#[async_trait::async_trait]
+pub trait EcdsaScanner<T: EcdsaClient> {
+    async fn get_ecdsa_source(&self) -> RelayResult<EcdsaSource<T>>;
 
-impl EcdsaScanner {
-    pub async fn start<T: EcdsaClient>(
-        &self,
-        tracker: Tracker,
-        scan_type: EcdsaScanType,
-        source: EcdsaSource<T>,
-        minimal_interval: u64,
-    ) {
-        while let Err(err) = self
-            .run(tracker.clone(), scan_type, source.clone(), minimal_interval)
-            .await
-        {
+    async fn start(&self, tracker: Tracker, scan_type: EcdsaScanType) {
+        while let Err(err) = self.run(tracker.clone(), scan_type).await {
             tracing::error!(
                 target: "pangoro-goerli",
                 "[pangoro] [ecdsa] An error occurred while processing the extrinsics: {:?}",
@@ -45,13 +37,8 @@ impl EcdsaScanner {
         }
     }
 
-    async fn run<T: EcdsaClient>(
-        &self,
-        tracker: Tracker,
-        scan_type: EcdsaScanType,
-        mut source: EcdsaSource<T>,
-        minimal_interval: u64,
-    ) -> RelayResult<()> {
+    async fn run(&self, tracker: Tracker, scan_type: EcdsaScanType) -> RelayResult<()> {
+        let mut source = self.get_ecdsa_source().await?;
         loop {
             let from = tracker
                 .current()
@@ -72,7 +59,7 @@ impl EcdsaScanner {
                 EcdsaScanType::CollectedMessage => {
                     let mut runner = CollectedEnoughNewMessageRootSignaturesRunner::new(
                         source.clone(),
-                        minimal_interval,
+                        source.minimal_interval,
                     );
                     runner.start().await?
                 }

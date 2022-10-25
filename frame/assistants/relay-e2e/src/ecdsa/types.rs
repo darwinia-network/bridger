@@ -16,4 +16,5 @@ pub struct EcdsaSource<T: EcdsaClient> {
     pub client_posa: PosaLightClient,
     pub darwinia_evm_account: FastEthereumAccount,
     pub ethereum_account: FastEthereumAccount,
+    pub minimal_interval: u64,
 }

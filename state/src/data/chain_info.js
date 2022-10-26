@@ -278,6 +278,7 @@ const ethereum = {
         inbound: '0x4E210866d089856a8A0435965FefEe19640487E5',
         outbound: '0x169F28bfbfFCddFdc772A94Cf020bbB4CAdc8E01',
         feemarket: '0xCD97185B7d05f8ea91d241C8dfD51a2Cc9c0547a',
+        posa: '0xf46349a32cA70C0B9fFbD19937Fb1623e7F3db19',
       },
     }
   }

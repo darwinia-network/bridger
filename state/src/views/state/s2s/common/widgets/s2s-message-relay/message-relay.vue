@@ -191,7 +191,6 @@ async function initState(vm) {
 
 async function listenSolochainInboundLaneData(vm) {
   const sourceChainBridgeTarget = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
-  const targetChainBridgeTarget = vm.targetChain.bridge_target[vm.sourceChain.bridge_chain_name];
   vm.subscriber.targetRelayedBlockAtSource = await vm.sourceClient
     .query[sourceChainBridgeTarget.query_name.grandpa]
     .bestFinalized(async v => {

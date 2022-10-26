@@ -34,11 +34,20 @@
     -->
     <v-col cols="12">
       <message-relay
+        direction="execution-to-evm"
         :source-chain="executionChain"
         :target-chain="evmChain"
         :source-client="executionClient"
         :target-client="evmClient"
       />
+<!--      <message-relay
+        direction="evm-to-execution"
+        :source-chain="evmChain"
+        :target-chain="executionChain"
+        :source-client="evmClient"
+        :target-client="executionClient"
+        :consensus-client="consensusClient"
+      />-->
     </v-col>
   </v-row>
 </template>

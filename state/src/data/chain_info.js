@@ -18,6 +18,17 @@ const darwinia = {
       },
       lanes: ['0x00000000'],
     },
+    ethereum: {
+      contract: {
+        lc_consensus: '0x9C266C48F07121181d8424768f0deD0170cC63A6',
+        lc_execution: '0xe50F1Ddf0C8778773f07Eb2759d045Ece19F6Cc1',
+        inbound: '0xf1B8a9F8436800499DB8186f2da2fb3e78Ff7c2B',
+        outbound: '0xcA3749C8C3aF04278D596a3fBe461481B6aa1b01',
+        feemarket: '0xcA927Df15afb7629b79dA4713a871190315c7409',
+        chain_message_committer: '0xea7d0fE22AF25d9655f7AdDd6a59E37e84B3AB5F',
+        lane_message_committer: '0x56746a8099a7e6D962802A23e01FeDdc1282cDAe',
+      },
+    },
   },
   subql: 'https://subql.darwinia.network/subql-bridger-darwinia',
 };
@@ -260,6 +271,16 @@ const ethereum = {
   explorer: 'https://etherscan.io/',
   currency: 'ETH',
   precision: 18,
+  consensus_chain: 'lodestarmainnet',
+  bridge_target: {
+    darwinia: {
+      contract: {
+        inbound: '0x4E210866d089856a8A0435965FefEe19640487E5',
+        outbound: '0x169F28bfbfFCddFdc772A94Cf020bbB4CAdc8E01',
+        feemarket: '0xCD97185B7d05f8ea91d241C8dfD51a2Cc9c0547a',
+      },
+    }
+  }
 };
 
 const lodestarMainnet = {

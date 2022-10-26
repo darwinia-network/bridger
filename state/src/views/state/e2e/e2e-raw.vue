@@ -4,18 +4,18 @@
       <v-col cols="12">
         <bridge-skeleton
           ref="left_to_right"
-          chain-type="ethereum"
-          :key="`e2e-${source.chain.evm.name}-${source.chain.ethereum.name}`"
+          chain-type="execution"
+          :key="`e2e-${source.chain.evm.name}-${source.chain.execution.name}`"
           :source-client="source.client.evm"
           :source-chain="source.chain.evm"
-          :target-chain="source.chain.ethereum"
-          v-if="source.chain.evm && source.chain.ethereum"
+          :target-chain="source.chain.execution"
+          v-if="source.chain.evm && source.chain.execution"
         >
           <v-progress-linear
             class="mt-15"
             :color="source.chain.evm.color"
             indeterminate
-            v-if="loading.evmClient || loading.ethereumClient"
+            v-if="loading.evmClient || loading.executionClient"
           />
         </bridge-skeleton>
       </v-col>
@@ -25,27 +25,27 @@
       <v-col cols="12">
         <bridge-skeleton
           ref="right_to_left"
-          chain-type="ethereum"
-          :key="`e2e-${source.chain.ethereum.name}-${source.chain.evm.name}`"
-          :source-client="source.client.ethereum"
-          :source-chain="source.chain.ethereum"
+          chain-type="execution"
+          :key="`e2e-${source.chain.execution.name}-${source.chain.evm.name}`"
+          :source-client="source.client.execution"
+          :source-chain="source.chain.execution"
           :target-chain="source.chain.evm"
-          v-if="source.chain.evm && source.chain.ethereum"
+          v-if="source.chain.evm && source.chain.execution"
         >
           <v-progress-linear
             class="mt-15"
-            :color="source.chain.ethereum.color"
+            :color="source.chain.execution.color"
             indeterminate
-            v-if="loading.evmClient || loading.ethereumClient"
+            v-if="loading.evmClient || loading.executionClient"
           />
-          <ethereum-to-evm
+          <execution-to-evm
             v-else
             :evm-chain="source.chain.evm"
-            :ethereum-chain="source.chain.ethereum"
-            :beacon-chain="source.chain.beacon"
+            :execution-chain="source.chain.execution"
+            :consensus-chain="source.chain.consensus"
             :evm-client="source.client.evm"
-            :ethereum-client="source.client.ethereum"
-            :beacon-client="source.client.beacon"
+            :execution-client="source.client.execution"
+            :consensus-client="source.client.consensus"
           />
         </bridge-skeleton>
       </v-col>
@@ -56,34 +56,35 @@
 <script>
 
 import BridgeSkeleton from '@/components/skeleton/bridge-skeleton';
-import EthereumToEvm from '@/views/state/e2e/wrapper/ethereum-to-evm';
+import ExecutionToEvm from '@/views/state/e2e/wrapper/execution-to-evm';
 
 import * as dataSource from '@/data/data_source';
 
 async function initState(vm) {
   const name = vm.bridge.name;
-  const [evmChainName, ethereumChainName] = name.split('-');
-  const [evmChain, ethereumChain] = [
+  const [evmChainName, executionChainName] = name.split('-');
+  const [evmChain, executionChain] = [
     dataSource.chainInfo(evmChainName),
-    dataSource.chainInfo(ethereumChainName),
+    dataSource.chainInfo(executionChainName),
   ];
-  if (!evmChain || !ethereumChain) {
+  if (!evmChain || !executionChain) {
     await vm.$router.push({path: '/'})
     return;
   }
+  const consensusChain = dataSource.chainInfo(executionChain.consensus_chain);
   vm.source.chain.evm = {...evmChain, bridge_chain_name: evmChainName};
-  vm.source.chain.ethereum = {...ethereumChain, bridge_chain_name: ethereumChainName};
-  vm.source.chain.beacon = {};
+  vm.source.chain.execution = {...executionChain, bridge_chain_name: executionChainName};
+  vm.source.chain.consensus = {...consensusChain, bridge_chain_name: executionChain.consensus};
   vm.source.client.evm = vm.$eth2.evm({endpoint: vm.source.chain.evm.endpoint.evm});
-  vm.source.client.ethereum = vm.$eth2.ethereum({endpoint: vm.source.chain.ethereum.endpoint.http});
-  vm.source.client.beacon = vm.$eth2.beacon({endpoint: 'https://lodestar-mainnet-rpc.darwinia.network'});
+  vm.source.client.execution = vm.$eth2.execution({endpoint: vm.source.chain.execution.endpoint.http});
+  vm.source.client.consensus = vm.$eth2.consensus({endpoint: vm.source.chain.consensus.endpoint.http});
   vm.loading.evmClient = false;
-  vm.loading.ethereumClient = false;
-  vm.loading.beaconClient = false;
+  vm.loading.executionClient = false;
+  vm.loading.consensusClient = false;
 }
 
 export default {
-  components: {EthereumToEvm, BridgeSkeleton},
+  components: {ExecutionToEvm, BridgeSkeleton},
   props: {
     bridge: {
       type: Object,
@@ -93,19 +94,19 @@ export default {
     source: {
       chain: {
         evm: null,
-        ethereum: null,
-        beacon: null,
+        execution: null,
+        consensus: null,
       },
       client: {
         evm: null,
-        ethereum: null,
-        beacon: null,
+        execution: null,
+        consensus: null,
       },
     },
     loading: {
       evmClient: true,
-      ethereumClient: true,
-      beaconClient: true,
+      executionClient: true,
+      consensusClient: true,
     }
   }),
   created() {

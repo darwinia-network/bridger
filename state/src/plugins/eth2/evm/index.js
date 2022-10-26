@@ -1,4 +1,4 @@
-import {BeaconLightClient} from "@/plugins/eth2/evm/beacon";
+import {ConsensusLightClient} from "@/plugins/eth2/evm/consensus";
 
 
 export function EvmClient(client) {
@@ -7,8 +7,8 @@ export function EvmClient(client) {
 
 const fn = EvmClient.prototype;
 
-fn.beaconLightClient = function (address) {
-  return new BeaconLightClient(this.client, address);
+fn.consensusLightClient = function (address) {
+  return new ConsensusLightClient(this.client, address);
 };
 
 

@@ -1,17 +1,17 @@
 import { ethers } from "ethers";
 
-const beaconChainLightClientABI = require('../abis/BeaconLightClient.json');
+const consensusChainLightClientABI = require('../abis/BeaconLightClient.json');
 
-export function BeaconLightClient(client, address) {
+export function ConsensusLightClient(client, address) {
   this.client = client;
   // this.contract = new web3.eth.Contract(
   //   beaconChainLightClient,
   //   address,
   // );
-  this.contract = new ethers.Contract(address, beaconChainLightClientABI, client);
+  this.contract = new ethers.Contract(address, consensusChainLightClientABI, client);
 }
 
-const fn = BeaconLightClient.prototype;
+const fn = ConsensusLightClient.prototype;
 
 /**
  *

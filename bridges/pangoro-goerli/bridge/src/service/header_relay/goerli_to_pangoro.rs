@@ -54,15 +54,6 @@ async fn start() -> color_eyre::Result<()> {
         last_relay_time: u64::MIN,
     };
 
-    loop {
-        if let Err(error) = header_relay.start().await {
-            tracing::error!(
-                target: "pangoro-goerli",
-                "Failed relay header : {:?}",
-                error
-            );
-            return Err(error.into());
-        }
-        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-    }
+    header_relay.start().await?;
+    Ok(())
 }

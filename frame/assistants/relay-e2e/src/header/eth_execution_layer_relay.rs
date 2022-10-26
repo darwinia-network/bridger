@@ -19,7 +19,7 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
     pub async fn start(&mut self) -> RelayResult<()> {
         loop {
             self.run().await?;
-            tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+            tokio::time::sleep(std::time::Duration::from_secs(15)).await;
         }
     }
 

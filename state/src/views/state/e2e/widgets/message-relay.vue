@@ -157,6 +157,7 @@ async function queryInbound(vm) {
   const bridgeTargetAtSource = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
   const bridgeTargetAtTarget = vm.targetChain.bridge_target[vm.sourceChain.bridge_chain_name];
 
+  // query last relayed target chain header at source
   vm.loading.lastTargetChainRelayedBlockAtSource = true;
   let lastTargetChainRelayedBlockAtSource;
   switch (vm.direction) {
@@ -181,7 +182,6 @@ async function queryInbound(vm) {
       }
       break;
   }
-  vm.source.lastTargetChainRelayedBlockAtSource = lastTargetChainRelayedBlockAtSource;
   vm.loading.lastTargetChainRelayedBlockAtSource = false;
   if (!lastTargetChainRelayedBlockAtSource) {
     vm.cond.noTargetChainHeaderAtSource = true;
@@ -190,6 +190,11 @@ async function queryInbound(vm) {
   }
   vm.cond.noTargetChainHeaderAtSource = false;
 
+  // query inbound lane data from target chain at relayed header
+  if (lastTargetChainRelayedBlockAtSource.isEqualTo(vm.source.lastTargetChainRelayedBlockAtSource)) {
+    return;
+  }
+  vm.source.lastTargetChainRelayedBlockAtSource = lastTargetChainRelayedBlockAtSource;
   vm.loading.targetChainInboundLaneData = true;
   const inboundLaneNonce = await vm.targetClient.message({
     inbound: bridgeTargetAtTarget.contract.inbound,

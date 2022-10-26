@@ -1,7 +1,6 @@
 <template>
   <v-row>
-<!--
-    <v-col md="12" sm="12" xs="12">
+    <v-col md="6" sm="12" xs="12">
       <committee-consensus-to-evm
         :evm-chain="evmChain"
         :execution-chain="executionChain"
@@ -10,6 +9,9 @@
         :execution-client="executionClient"
         :consensus-client="consensusClient"
       />
+    </v-col>
+    <v-col md="6" sm="12" xs="12">
+      <e2e-feemarket/>
     </v-col>
     <v-col md="6" sm="12" xs="12">
       <header-consensus-to-evm
@@ -31,7 +33,6 @@
         :consensus-client="consensusClient"
       />
     </v-col>
-    -->
     <v-col cols="12">
       <message-relay
         direction="execution-to-evm"
@@ -40,14 +41,14 @@
         :source-client="executionClient"
         :target-client="evmClient"
       />
-<!--      <message-relay
-        direction="evm-to-execution"
-        :source-chain="evmChain"
-        :target-chain="executionChain"
-        :source-client="evmClient"
-        :target-client="executionClient"
-        :consensus-client="consensusClient"
-      />-->
+      <!--      <message-relay
+              direction="evm-to-execution"
+              :source-chain="evmChain"
+              :target-chain="executionChain"
+              :source-client="evmClient"
+              :target-client="executionClient"
+              :consensus-client="consensusClient"
+            />-->
     </v-col>
   </v-row>
 </template>
@@ -57,9 +58,10 @@ import CommitteeConsensusToEvm from '@/views/state/e2e/widgets/committee-consens
 import HeaderConsensusToEvm from '@/views/state/e2e/widgets/header-consensus-to-evm';
 import HeaderExecutionToEvm from "@/views/state/e2e/widgets/header-execution-to-evm";
 import MessageRelay from "@/views/state/e2e/widgets/message-relay";
+import E2eFeemarket from "@/views/state/e2e/widgets/e2e-feemarket";
 
 export default {
-  components: {MessageRelay, HeaderExecutionToEvm, HeaderConsensusToEvm, CommitteeConsensusToEvm},
+  components: {E2eFeemarket, MessageRelay, HeaderExecutionToEvm, HeaderConsensusToEvm, CommitteeConsensusToEvm},
   props: {
     evmChain: {
       type: Object,
@@ -80,9 +82,7 @@ export default {
       type: Object,
     },
   },
-  data: () => ({
-
-  }),
+  data: () => ({}),
   created() {
   }
 }

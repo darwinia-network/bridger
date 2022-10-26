@@ -17,7 +17,7 @@
             <td class="subtitle-2">Last relayed block (hash)</td>
             <td>
               <v-progress-linear v-if="loading.bestFinalizedHash" :color="sourceChain.color" indeterminate/>
-              <external-subscan
+              <external-explorer
                 v-else
                 :identity="source.bestFinalizedHash"
                 type="block"
@@ -29,7 +29,7 @@
             <td class="subtitle-2">Last relayed block (number)</td>
             <td>
               <v-progress-linear v-if="loading.bestFinalizedBlock" :color="sourceChain.color" indeterminate/>
-              <external-subscan
+              <external-explorer
                 v-else
                 :identity="`${source.bestFinalizedBlock.block.header.number}`"
                 type="block"
@@ -48,7 +48,7 @@
                 'red--text': source.nextMandatoryHeader > source.bestFinalizedBlock.block.header.number,
                 }"
               >
-                <external-subscan
+                <external-explorer
                   v-if="source.nextMandatoryHeader"
                   :identity="`${source.nextMandatoryHeader}`"
                   type="block"
@@ -68,7 +68,7 @@
                 'red--text': source.nextOnDemandBlock > source.bestFinalizedBlock.block.header.number,
                 }"
               >
-                <external-subscan
+                <external-explorer
                   v-if="source.nextOnDemandBlock"
                   :identity="`${source.nextOnDemandBlock}`"
                   type="block"
@@ -89,7 +89,7 @@
 
 <script>
 
-import ExternalSubscan from '@/components/widgets/external-subscan';
+import ExternalExplorer from '@/components/widgets/external-explorer';
 
 async function initState(vm) {
   // subscribe best finalized
@@ -167,7 +167,7 @@ async function queryNextOnDemandBlock(vm) {
 }
 
 export default {
-  components: {ExternalSubscan},
+  components: {ExternalExplorer},
   props: {
     parachainBridge: {
       type: Boolean,

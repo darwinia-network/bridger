@@ -1,11 +1,14 @@
 <template>
   <v-row>
     <v-col cols="12">
+      <h2 class="text-h5 font-weight-thin">Sync committee</h2>
+    </v-col>
+    <v-col cols="12">
       <v-simple-table dense>
         <template v-slot:default>
           <thead>
           <tr>
-            <th style="width: 30%">Title</th>
+            <th style="width: 40%">Title</th>
             <th>Value</th>
           </tr>
           </thead>

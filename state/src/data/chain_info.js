@@ -256,7 +256,7 @@ const goerli = {
   name: 'Goerli',
   logo: 'https://goerli.etherscan.io/images/svg/brands/ethereum.svg?v=1.3',
   color: '#bbbbbb',
-  explorer: 'https://goerli.etherscan.io/',
+  explorer: 'https://goerli.etherscan.io',
   currency: 'ETH',
   precision: 18,
 };
@@ -268,7 +268,7 @@ const ethereum = {
   name: 'Ethereum',
   logo: 'https://cdn.worldvectorlogo.com/logos/ethereum-eth.svg',
   color: '#627eea',
-  explorer: 'https://etherscan.io/',
+  explorer: 'https://etherscan.io',
   currency: 'ETH',
   precision: 18,
   consensus_chain: 'lodestarmainnet',

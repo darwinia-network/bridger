@@ -1,11 +1,14 @@
 <template>
   <v-row>
     <v-col cols="12">
+      <h2 class="text-h5 font-weight-thin">Consensus header</h2>
+    </v-col>
+    <v-col cols="12">
       <v-simple-table dense>
         <template v-slot:default>
           <thead>
           <tr>
-            <th style="width: 30%">Title</th>
+            <th style="width: 40%">Title</th>
             <th>Value</th>
           </tr>
           </thead>
@@ -54,11 +57,10 @@ async function initState(vm) {
 
 
 async function queryRelyInfo(vm) {
-  vm.loading.relayedHeader = true;
-  vm.loading.lastHeader = true;
   const bridgeTarget = vm.evmChain.bridge_target[vm.executionChain.bridge_chain_name];
   const consensusLightClientAddress = bridgeTarget.contract.lc_consensus;
   // query relayed header
+  vm.loading.relayedHeader = true;
   vm.source.relayedHeader = await vm.evmClient
     .consensusLightClient(consensusLightClientAddress)
     .finalizedHeader();
@@ -66,6 +68,7 @@ async function queryRelyInfo(vm) {
   vm.loading.relayedHeader = false;
 
   // query last header from consensus chain
+  vm.loading.lastHeader = true;
   const lastHeader = await vm.consensusClient.header('head');
   vm.source.lastHeader = lastHeader.data;
   vm.source.currentPeriod = vm.$eth2.toolkit.calcPeriod(new BigNumber(vm.source.lastHeader.header.message.slot));

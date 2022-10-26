@@ -4,10 +4,6 @@ const consensusChainLightClientABI = require('../abis/BeaconLightClient.json');
 
 export function ConsensusLightClient(client, address) {
   this.client = client;
-  // this.contract = new web3.eth.Contract(
-  //   beaconChainLightClient,
-  //   address,
-  // );
   this.contract = new ethers.Contract(address, consensusChainLightClientABI, client);
 }
 

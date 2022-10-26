@@ -21,7 +21,7 @@
                 'red--text': source.nextOnDemandBlock > source.bestFinalizedBlock.block.header.number,
                 }"
               >
-                <external-subscan
+                <external-explorer
                   v-if="source.nextOnDemandBlock"
                   :identity="`${source.nextOnDemandBlock}`"
                   type="block"
@@ -39,7 +39,7 @@
 <script>
 
 import S2sHeaderRelay from '@/views/state/s2s/common/widgets/s2s-header-relay';
-import ExternalSubscan from '@/components/widgets/external-subscan';
+import ExternalExplorer from '@/components/widgets/external-explorer';
 
 
 async function initState(vm) {
@@ -86,7 +86,7 @@ async function queryNextOnDemandBlock(vm) {
 }
 
 export default {
-  components: {ExternalSubscan, S2sHeaderRelay},
+  components: {ExternalExplorer, S2sHeaderRelay},
   props: {
     soloClient: {
       type: Object,

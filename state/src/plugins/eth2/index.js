@@ -23,7 +23,7 @@ export default {
       },
       evm: options => new EvmClient(client(options)),
       execution: options => new ExecutionClient(client(options)),
-      consensus: options => new ConsensusClient(options)
+      consensus: options => new ConsensusClient(options),
     }
   }
 }

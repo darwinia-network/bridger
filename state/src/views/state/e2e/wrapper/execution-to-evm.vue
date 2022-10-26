@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="12">
+    <v-col md="12" sm="12" xs="12">
       <committee-consensus-to-evm
         :evm-chain="evmChain"
         :execution-chain="executionChain"
@@ -10,7 +10,7 @@
         :consensus-client="consensusClient"
       />
     </v-col>
-    <v-col cols="12">
+    <v-col md="6" sm="12" xs="12">
       <header-consensus-to-evm
         :evm-chain="evmChain"
         :execution-chain="executionChain"
@@ -20,7 +20,7 @@
         :consensus-client="consensusClient"
       />
     </v-col>
-    <v-col cols="12">
+    <v-col md="6" sm="12" xs="12">
       <header-execution-to-evm
         :evm-chain="evmChain"
         :execution-chain="executionChain"

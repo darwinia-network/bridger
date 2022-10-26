@@ -77,7 +77,7 @@
                 <td>
                   <v-progress-linear v-if="loading.targetChainInboundLaneData" :color="sourceChain.color"
                                      indeterminate/>
-                  <external-subscan v-else :identity="source.lastTargetChainRelayedBlockAtSource" type="block"
+                  <external-explorer v-else :identity="source.lastTargetChainRelayedBlockAtSource" type="block"
                                     :chain="targetChain"/>
                 </td>
               </tr>
@@ -120,7 +120,7 @@
                         <tr>
                           <td class="subtitle-2">Relayer</td>
                           <td>
-                            <external-subscan :identity="item.relayer" type="account"
+                            <external-explorer :identity="item.relayer" type="account"
                                               :chain="targetChain"/>
                           </td>
                         </tr>
@@ -171,7 +171,7 @@
 <script>
 
 
-import ExternalSubscan from '@/components/widgets/external-subscan';
+import ExternalExplorer from '@/components/widgets/external-explorer';
 
 async function initState(vm) {
   const sourceChainBridgeTarget = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
@@ -250,7 +250,7 @@ export default {
       type: Object,
     },
   },
-  components: {ExternalSubscan},
+  components: {ExternalExplorer},
   data: () => ({
     source: {
       sourceChainOutboundLaneData: null,

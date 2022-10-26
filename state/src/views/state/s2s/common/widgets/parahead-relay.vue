@@ -17,7 +17,7 @@
             <td class="subtitle-2">Relayed parahead hash (parachain)</td>
             <td>
               <v-progress-linear v-if="loading.paraHeadAtTarget" :color="relayChain.color" indeterminate/>
-              <external-subscan
+              <external-explorer
                 v-else
                 :identity="`${source.paraHeadAtTarget.headHash}`"
                 type="block"
@@ -36,7 +36,7 @@
                 'green--text': source.paraHeadAtTarget.atRelayBlockNumber >= source.relayedGrandpaBlock.block.header.number,
                 }"
               >
-                <external-subscan
+                <external-explorer
                   :identity="`${source.paraHeadAtTarget.atRelayBlockNumber}`"
                   type="block"
                   :chain="relayChain"
@@ -48,7 +48,7 @@
             <td class="subtitle-2">Last relayed block (relaychain)</td>
             <td>
               <v-progress-linear v-if="loading.relayedGrandpaBlockHash" :color="relayChain.color" indeterminate/>
-              <external-subscan
+              <external-explorer
                 v-else
                 :identity="`${source.relayedGrandpaBlock.block.header.number}`"
                 type="block"
@@ -61,7 +61,7 @@
               <td class="subtitle-2">Last parachain by relayed at source (relaychain)</td>
               <td>
                 <v-progress-linear v-if="loading.paraHeadAtSourceByLastRelayedGrandpa" :color="relayChain.color" indeterminate/>
-                <external-subscan
+                <external-explorer
                   v-else
                   :identity="`${source.paraHeadAtSourceByLastRelayedGrandpa}`"
                   type="block"
@@ -80,7 +80,7 @@
 
 <script>
 
-import ExternalSubscan from '@/components/widgets/external-subscan';
+import ExternalExplorer from '@/components/widgets/external-explorer';
 
 async function initState(vm) {
   // vm.soloClient.query[]
@@ -111,7 +111,7 @@ async function initState(vm) {
 }
 
 export default {
-  components: {ExternalSubscan},
+  components: {ExternalExplorer},
   props: {
     soloClient: {
       type: Object,

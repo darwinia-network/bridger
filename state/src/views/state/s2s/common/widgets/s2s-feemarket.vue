@@ -27,7 +27,7 @@
           </tr>
           <tr v-for="(relayer, ix) in source.assignedRelayers" :key="relayer.id">
             <td>
-              <external-subscan :identity="relayer.id" type="account" :chain="sourceChain"/>
+              <external-explorer :identity="relayer.id" type="account" :chain="sourceChain"/>
             </td>
             <td><code>{{ relayer.collateral }}</code></td>
             <td>
@@ -47,7 +47,7 @@
 <script>
 
 import BigNumber from 'bignumber.js'
-import ExternalSubscan from '@/components/widgets/external-subscan';
+import ExternalExplorer from '@/components/widgets/external-explorer';
 
 async function initState(vm) {
   const bridgeTarget = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
@@ -72,7 +72,7 @@ async function initState(vm) {
 }
 
 export default {
-  components: {ExternalSubscan},
+  components: {ExternalExplorer},
   props: {
     sourceClient: {
       type: Object,

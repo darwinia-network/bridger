@@ -1,5 +1,6 @@
 <template>
   <v-row>
+<!--
     <v-col md="12" sm="12" xs="12">
       <committee-consensus-to-evm
         :evm-chain="evmChain"
@@ -30,6 +31,15 @@
         :consensus-client="consensusClient"
       />
     </v-col>
+    -->
+    <v-col cols="12">
+      <message-relay
+        :source-chain="executionChain"
+        :target-chain="evmChain"
+        :source-client="executionClient"
+        :target-client="evmClient"
+      />
+    </v-col>
   </v-row>
 </template>
 
@@ -37,9 +47,10 @@
 import CommitteeConsensusToEvm from '@/views/state/e2e/widgets/committee-consensus-to-evm';
 import HeaderConsensusToEvm from '@/views/state/e2e/widgets/header-consensus-to-evm';
 import HeaderExecutionToEvm from "@/views/state/e2e/widgets/header-execution-to-evm";
+import MessageRelay from "@/views/state/e2e/widgets/message-relay";
 
 export default {
-  components: {HeaderExecutionToEvm, HeaderConsensusToEvm, CommitteeConsensusToEvm},
+  components: {MessageRelay, HeaderExecutionToEvm, HeaderConsensusToEvm, CommitteeConsensusToEvm},
   props: {
     evmChain: {
       type: Object,

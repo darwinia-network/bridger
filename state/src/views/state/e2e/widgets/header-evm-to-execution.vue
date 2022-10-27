@@ -71,16 +71,24 @@
             </td>
           </tr>
           </tbody>
-          <v-container class="pl-16" v-if="!loading.lastCollectedMessageRootSignature">
-            <span class="body-2 font-weight-thin">Signatures</span>
-            <v-list dense>
-              <v-list-item v-for="(signature, ix) in source.lastCollectedMessageRootSignature.signatures.nodes">
-                <v-list-item-title>
-                  <external-explorer :identity="signature.address" type="account" :chain="evmChain"/>
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-container>
+          <v-btn icon @click="cond.showConnectedMessageSignature = !cond.showConnectedMessageSignature">
+            <v-icon>{{ cond.showConnectedMessageSignature ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+          </v-btn>
+          <v-expand-transition>
+            <v-container
+              class="pl-5"
+              v-if="!loading.lastCollectedMessageRootSignature && cond.showConnectedMessageSignature"
+            >
+              <span class="body-2 font-weight-thin">Signatures</span>
+              <v-list dense>
+                <v-list-item v-for="(signature, ix) in source.lastCollectedMessageRootSignature.signatures.nodes">
+                  <v-list-item-title>
+                    <external-explorer :identity="signature.address" type="account" :chain="evmChain"/>
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-container>
+          </v-expand-transition>
         </template>
       </v-simple-table>
     </v-col>
@@ -138,16 +146,21 @@
             </td>
           </tr>
           </tbody>
-          <v-container class="pl-16" v-if="!loading.lastCollectedAuthoritiesChange">
-            <span class="body-2 font-weight-thin">Signatures</span>
-            <v-list dense>
-              <v-list-item v-for="(signature, ix) in source.lastCollectedAuthoritiesChange.signatures.nodes">
-                <v-list-item-title>
-                  <external-explorer :identity="signature.address" type="account" :chain="evmChain"/>
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-container>
+          <v-btn icon @click="cond.showConnectedAuthoritiesSignature = !cond.showConnectedAuthoritiesSignature">
+            <v-icon>{{ cond.showConnectedAuthoritiesSignature ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+          </v-btn>
+          <v-expand-transition>
+            <v-container class="pl-5" v-if="!loading.lastCollectedAuthoritiesChange && cond.showConnectedAuthoritiesSignature">
+              <span class="body-2 font-weight-thin">Signatures</span>
+              <v-list dense>
+                <v-list-item v-for="(signature, ix) in source.lastCollectedAuthoritiesChange.signatures.nodes">
+                  <v-list-item-title>
+                    <external-explorer :identity="signature.address" type="account" :chain="evmChain"/>
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-container>
+          </v-expand-transition>
         </template>
       </v-simple-table>
     </v-col>
@@ -190,8 +203,6 @@ async function queryAuthorityChange(vm) {
     .lastCollectedAuthoritiesChangeSignatureEvent();
   vm.loading.lastCollectedAuthoritiesChange = false;
 
-  console.log(vm.source.lastCollectingAuthoritiesChange);
-  console.log(vm.source.lastCollectedAuthoritiesChange);
 }
 
 
@@ -220,6 +231,10 @@ export default {
       lastCollectedMessageRootSignature: true,
       lastCollectingAuthoritiesChange: true,
       lastCollectedAuthoritiesChange: true,
+    },
+    cond: {
+      showConnectedMessageSignature: false,
+      showConnectedAuthoritiesSignature: false,
     },
     subscriber: {
       queryMessage: null,

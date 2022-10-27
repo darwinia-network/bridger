@@ -100,3 +100,96 @@ query queryNextCandidateIncludedEvent($para_head: String!) {
   }
 }
 `;
+
+/**
+ * last collecting new message root signatures event
+ * @type {string}
+ */
+export const BRIDGE_E2E_LAST_COLLECTING_NEW_MESSAGE_ROOT_SIGNATURES_EVENT = `
+query lastCollectingNewMessageRootSignaturesEvent {
+  collectingNewMessageRootSignaturesEvents(
+    orderBy: BLOCK_NUMBER_DESC
+    first: 1
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
+      message
+    }
+  }
+}
+`;
+
+/**
+ * last collected new message root signatures event
+ * @type {string}
+ */
+export const BRIDGE_E2E_LAST_COLLECTED_NEW_MESSAGE_ROOT_SIGNATURES_EVENT = `
+query nextCollectedEnoughNewMessageRootSignaturesEvent {
+  collectedEnoughNewMessageRootSignaturesEvents(
+    orderBy: BLOCK_NUMBER_DESC
+    first: 1
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
+      message
+      commitmentBlockNumber
+      commitmentNonce
+      signatures {
+        nodes {
+          id
+          address
+          signature
+        }
+      }
+    }
+  }
+}
+`;
+
+export const BRIDGE_E2E_LAST_COLLECTING_AUTHORITIES_CHANGE_SIGNATURE_EVENT = `
+query nextCollectingAuthoritiesChangeSignaturesEvent {
+  collectingAuthoritiesChangeSignaturesEvents(
+    orderBy: BLOCK_NUMBER_DESC
+    first: 1
+  ) {
+    nodes {
+      id
+      blockNumber
+      blockHash
+      message
+    }
+  }
+}
+`;
+
+export const BRIDGE_E2E_LAST_COLLECTED_AUTHORITIES_CHANGE_SIGNATURE_EVENT = `
+query nextCollectedEnoughAuthoritiesChangeSignaturesEven {
+  collectedEnoughAuthoritiesChangeSignaturesEvents(
+    orderBy: BLOCK_NUMBER_DESC
+    first: 1
+  ) {
+    nodes {
+      id
+      blockHash
+      blockNumber
+      message
+      operationType
+      operationPre
+      operationNew
+      operationOld
+      threshold
+      signatures {
+        nodes {
+          id
+          address
+          signature
+        }
+      }
+    }
+  }
+}
+`;

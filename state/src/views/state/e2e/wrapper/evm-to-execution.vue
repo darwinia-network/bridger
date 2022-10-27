@@ -1,6 +1,13 @@
 <template>
   <v-row>
-    <v-col md="6" sm="12" xs="12">
+    <v-col cols="12">
+      <header-evm-to-execution
+        :evm-chain="evmChain"
+        :evm-client="evmClient"
+        :execution-chain="executionChain"
+      />
+    </v-col>
+    <v-col cols="12">
       <e2e-feemarket
         :source-chain="evmChain"
         :source-client="evmClient"
@@ -23,9 +30,10 @@
 <script>
 import MessageRelay from "@/views/state/e2e/widgets/message-relay";
 import E2eFeemarket from "@/views/state/e2e/widgets/e2e-feemarket";
+import HeaderEvmToExecution from "@/views/state/e2e/widgets/header-evm-to-execution";
 
 export default {
-  components: {E2eFeemarket, MessageRelay},
+  components: {HeaderEvmToExecution, E2eFeemarket, MessageRelay},
   props: {
     evmChain: {
       type: Object,

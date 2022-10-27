@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {SubqlBridgeS2S} from './bridge_s2s';
+import {SubqlBridgeE2E} from "@/plugins/subql/bridge_e2e";
 
 /**
  *
@@ -26,6 +27,7 @@ export default {
     Vue.prototype.$subql = {
       query,
       bridge_s2s: host => new SubqlBridgeS2S(query, host),
+      bridge_e2e: host => new SubqlBridgeE2E(query, host),
     }
   }
 }

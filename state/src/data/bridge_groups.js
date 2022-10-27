@@ -13,7 +13,7 @@ export default [
     name: 'E2E',
     bridges: [
       {enable: true, name: 'darwinia-ethereum', mode: 'mainnet'},
-      {enable: true, name: 'pangoro-goerli', mode: 'testnet'},
+      {enable: false, name: 'pangoro-goerli', mode: 'testnet'},
     ],
   }
 ];

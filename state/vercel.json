@@ -23,6 +23,7 @@
     }
   ],
   "rewrites": [
-    { "source": "/state", "destination": "/index.html" }
+    { "source": "/state", "destination": "/index.html" },
+    { "source": "/state/*", "destination": "/index.html" }
   ]
 }

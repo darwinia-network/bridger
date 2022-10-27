@@ -1,6 +1,6 @@
 query nextCollectingNewMessageRootSignaturesEvent($block: Int) {
   collectingNewMessageRootSignaturesEvents(
-    orderBy: BLOCK_NUMBER_DESC
+    orderBy: BLOCK_NUMBER_ASC
     first: 1
     filter: {
       blockNumber: {

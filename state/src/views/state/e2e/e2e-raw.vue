@@ -17,6 +17,15 @@
             indeterminate
             v-if="loading.evmClient || loading.executionClient"
           />
+          <evm-to-execution
+            v-else
+            :evm-chain="source.chain.evm"
+            :execution-chain="source.chain.execution"
+            :consensus-chain="source.chain.consensus"
+            :evm-client="source.client.evm"
+            :execution-client="source.client.execution"
+            :consensus-client="source.client.consensus"
+          />
         </bridge-skeleton>
       </v-col>
       <v-col cols="12">
@@ -59,6 +68,7 @@ import BridgeSkeleton from '@/components/skeleton/bridge-skeleton';
 import ExecutionToEvm from '@/views/state/e2e/wrapper/execution-to-evm';
 
 import * as dataSource from '@/data/data_source';
+import EvmToExecution from "@/views/state/e2e/wrapper/evm-to-execution";
 
 async function initState(vm) {
   const name = vm.bridge.name;
@@ -84,7 +94,7 @@ async function initState(vm) {
 }
 
 export default {
-  components: {ExecutionToEvm, BridgeSkeleton},
+  components: {EvmToExecution, ExecutionToEvm, BridgeSkeleton},
   props: {
     bridge: {
       type: Object,

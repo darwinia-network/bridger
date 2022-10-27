@@ -9,6 +9,7 @@ const darwinia = {
   explorer: 'https://darwinia.subscan.io',
   currency: 'RING',
   precision: 9,
+  precisionEvm: 18,
   bridge_target: {
     crab: {
       query_name: {

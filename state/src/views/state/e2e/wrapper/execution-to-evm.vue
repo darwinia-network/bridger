@@ -11,7 +11,11 @@
       />
     </v-col>
     <v-col md="6" sm="12" xs="12">
-      <e2e-feemarket/>
+      <e2e-feemarket
+        :source-chain="executionChain"
+        :source-client="executionClient"
+        :target-chain="evmChain"
+      />
     </v-col>
     <v-col md="6" sm="12" xs="12">
       <header-consensus-to-evm
@@ -41,14 +45,6 @@
         :source-client="executionClient"
         :target-client="evmClient"
       />
-      <!--      <message-relay
-              direction="evm-to-execution"
-              :source-chain="evmChain"
-              :target-chain="executionChain"
-              :source-client="evmClient"
-              :target-client="executionClient"
-              :consensus-client="consensusClient"
-            />-->
     </v-col>
   </v-row>
 </template>

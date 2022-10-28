@@ -1254,9 +1254,8 @@ checksum = "22030e2c5a68ec659fde1e949a745124b48e6fa8b045b7ed5bd1fe4ccc5c4e5d"
 
 [[package]]
 name = "gql_client"
-version = "1.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2ad0b978ded703acd23762f99e0f701450c9d0066912c0d7f9bf65bf017d87d"
+version = "1.0.7"
+source = "git+https://github.com/arthurkhlghatyan/gql-client-rs.git?branch=fewensa-new-features#c4a5116c112d119154cf45a1b012a12523afdc7a"
 dependencies = [
  "log",
  "reqwest",

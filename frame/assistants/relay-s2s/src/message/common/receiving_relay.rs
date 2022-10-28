@@ -150,7 +150,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
             return Ok(None);
         }
 
-        // query last relayed header
+        // query last relayed header (from source chain)
         let last_relayed_target_hash_in_source = self.different.best_target_finalized(None).await?;
         let expected_target_hash = SmartCodecMapper::map_to(&last_relayed_target_hash_in_source)?;
 

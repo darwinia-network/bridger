@@ -8,7 +8,7 @@
         cols="12" lg="8" md="8"
         class="d-flex flex-column justify-center align-center"
       >
-        <h1 class="text-h1 text-uppercase">Bridger status</h1>
+        <h1 class="text-h1 text-uppercase">Bridger state</h1>
         <h2 class="subtitle-1 text-uppercase">Darwinia</h2>
         <p class="mt-5"></p>
 

@@ -1,0 +1,10 @@
+
+
+.box-bar .v-navigation-drawer__border {
+    width: 0 !important;
+}
+
+.text-block-number::before {
+  content: '#';
+}
+

@@ -3,7 +3,8 @@ use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay};
 use bridge_s2s_traits::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
 use bridge_s2s_traits::strategy::RelayStrategy;
 use bridge_s2s_traits::types::bp_runtime::Chain;
-use subquery::types::{OriginType, RelayBlockOrigin};
+
+use subquery::types::OriginType;
 use subquery::Subquery;
 
 use crate::error::{RelayError, RelayResult};
@@ -54,7 +55,7 @@ pub struct MessageDeliveryInput<SC: S2SClientRelay, TC: S2SClientRelay, Strategy
     pub client_target: TC,
     pub subquery_source: Subquery,
     pub subquery_target: Subquery,
-    pub relay_block_origin: RelayBlockOrigin,
+    pub relay_block_origin: OriginType,
     pub relay_strategy: Strategy,
 }
 

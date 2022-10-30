@@ -29,9 +29,9 @@ pub struct ChannelState {
     // Status of inbound at target side from the perspective of the source side
     target_inbound_relayed: InboundLaneNonce,
     // Latest source block at target light client
-    source_block_at_target: Option<BlockId>,
+    source_block_at_target: Option<BlockNumber>,
     // Latest target block at source light client
-    target_block_at_source: Option<BlockId>,
+    target_block_at_source: Option<BlockNumber>,
 }
 
 impl<S0, S1> MessageRelayRunner<S0, S1>
@@ -46,21 +46,21 @@ where
             .target
             .latest_light_client_block_number()
             .await?
-            .map(|x| BlockId::from(BlockNumber::from(x)));
+            .map(BlockNumber::from);
         let target_block_at_source = self
             .source
             .latest_light_client_block_number()
             .await?
-            .map(|x| BlockId::from(BlockNumber::from(x)));
+            .map(BlockNumber::from);
         let source_outbound_relayed = self
             .source
             .outbound()
-            .outbound_lane_nonce(source_block_at_target)
+            .outbound_lane_nonce(source_block_at_target.map(BlockId::Number))
             .await?;
         let target_inbound_relayed = self
             .source
             .inbound()
-            .inbound_lane_nonce(target_block_at_source)
+            .inbound_lane_nonce(target_block_at_source.map(BlockId::Number))
             .await?;
         self.state = ChannelState {
             source_outbound,
@@ -125,7 +125,10 @@ where
             end
         );
 
-        let proof = self.source.prepare_for_delivery().await?;
+        let proof = self
+            .source
+            .prepare_for_delivery(begin, end, self.state.source_block_at_target)
+            .await?;
         let encoded_keys: Vec<U256> = proof
             .outbound_lane_data
             .messages
@@ -253,7 +256,10 @@ where
             end,
         );
         // read proof
-        let proof = self.target.prepare_for_confirmation().await?;
+        let proof = self
+            .target
+            .prepare_for_confirmation(begin, end, self.state.target_block_at_source)
+            .await?;
 
         let gas_price = self.source.gas_price().await?;
         // send proof

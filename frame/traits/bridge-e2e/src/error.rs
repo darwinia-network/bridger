@@ -9,6 +9,10 @@ pub enum E2EClientError {
     RPC(String),
     #[error(transparent)]
     ContractError(#[from] BridgeContractError),
+    #[error(transparent)]
+    Web3Error(#[from] web3::Error),
+    #[error(transparent)]
+    Web3AbiError(#[from] web3::ethabi::Error),
     #[error("Custom: {0}")]
     Custom(String),
 }

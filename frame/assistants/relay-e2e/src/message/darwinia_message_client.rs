@@ -143,14 +143,16 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
         if execution_state_root != latest_state_root {
             Ok(None)
         } else {
-            Ok(Some(
-                block
-                    .body
-                    .execution_payload
-                    .block_number
-                    .parse()
-                    .map_err(|e| E2EClientError::Custom(format!("{}", e)))?,
-            ))
+            let block_number: u64 = block
+                .body
+                .execution_payload
+                .block_number
+                .parse()
+                .map_err(|e| E2EClientError::Custom(format!("{}", e)))?;
+
+            // Since the header at block number x from Darwinia means the state at block number x - 1,
+            // we need to minus 1 to get the relay block number.
+            Ok(Some(block_number - 1))
         }
     }
 }

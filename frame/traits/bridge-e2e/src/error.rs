@@ -1,3 +1,4 @@
+use client_contracts::error::BridgeContractError;
 use thiserror::Error as ThisError;
 
 pub type E2EClientResult<T> = Result<T, E2EClientError>;
@@ -6,6 +7,8 @@ pub type E2EClientResult<T> = Result<T, E2EClientError>;
 pub enum E2EClientError {
     #[error("RPC: {0}")]
     RPC(String),
+    #[error(transparent)]
+    ContractError(#[from] BridgeContractError),
     #[error("Custom: {0}")]
     Custom(String),
 }

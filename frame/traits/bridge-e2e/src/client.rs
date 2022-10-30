@@ -11,7 +11,7 @@ use web3::{transports::Http, types::U256, Web3};
 
 use crate::error::E2EClientResult;
 
-pub trait Web3Client: Send + Sync + Clone {
+pub trait Web3Client: Send + Sync {
     // Returns web3 client
     fn get_web3(&self) -> &Web3<Http>;
 }
@@ -76,7 +76,7 @@ pub trait MessageClient: GasPriceOracle {
 
     fn private_key(&self) -> &SecretKey;
 
-    async fn decide(&self, encoded_keys: U256) -> E2EClientResult<bool>;
+    async fn decide(&mut self, encoded_key: U256) -> E2EClientResult<bool>;
 
     async fn prepare_for_delivery(&self) -> E2EClientResult<ReceiveMessagesProof>;
 

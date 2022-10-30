@@ -7,6 +7,7 @@ use client_contracts::{BeaconLightClient, ExecutionLayer};
 use secp256k1::SecretKey;
 use subxt::Config;
 use support_etherscan::{EtherscanClient, Result as EtherscanResult};
+use web3::types::BlockNumber;
 use web3::{transports::Http, types::U256, Web3};
 
 use crate::error::E2EClientResult;
@@ -78,11 +79,21 @@ pub trait MessageClient: GasPriceOracle {
 
     async fn decide(&mut self, encoded_key: U256) -> E2EClientResult<bool>;
 
-    async fn prepare_for_delivery(&self) -> E2EClientResult<ReceiveMessagesProof>;
+    async fn prepare_for_delivery(
+        &self,
+        begin: u64,
+        end: u64,
+        block_number: Option<BlockNumber>,
+    ) -> E2EClientResult<ReceiveMessagesProof>;
 
     fn delivery_gas_unit(&self) -> E2EClientResult<U256>;
 
-    async fn prepare_for_confirmation(&self) -> E2EClientResult<ReceiveMessagesDeliveryProof>;
+    async fn prepare_for_confirmation(
+        &self,
+        begin: u64,
+        end: u64,
+        block_number: Option<BlockNumber>,
+    ) -> E2EClientResult<ReceiveMessagesDeliveryProof>;
 
     fn confirmation_gas_unit(&self) -> E2EClientResult<U256>;
 

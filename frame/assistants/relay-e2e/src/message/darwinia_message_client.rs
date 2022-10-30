@@ -7,14 +7,17 @@ use bridge_e2e_traits::{
 };
 use client_beacon::client::BeaconApiClient;
 use client_contracts::{
-    inbound_types::ReceiveMessagesProof, outbound_types::ReceiveMessagesDeliveryProof,
+    inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
+    outbound_types::{MessageAccepted, ReceiveMessagesDeliveryProof},
     ChainMessageCommitter, Inbound, LaneMessageCommitter, Outbound,
 };
 use secp256k1::SecretKey;
 use thegraph_liketh::graph::TheGraphLikeEth;
 use web3::{
+    contract::tokens::Tokenizable,
+    ethabi::encode,
     transports::Http,
-    types::{H256, U256},
+    types::{Address, BlockId, BlockNumber, Bytes, H256, U256},
     Web3,
 };
 
@@ -68,15 +71,38 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
         self.strategy.decide(encoded_key).await
     }
 
-    async fn prepare_for_delivery(&self) -> E2EClientResult<ReceiveMessagesProof> {
-        todo!()
+    async fn prepare_for_delivery(
+        &self,
+        begin: u64,
+        end: u64,
+        block_number: Option<BlockNumber>,
+    ) -> E2EClientResult<ReceiveMessagesProof> {
+        let outbound_lane_data =
+            build_messages_data(&self.indexer, &self.outbound, begin, end, block_number).await?;
+        let messages_proof = build_darwinia_delivery_proof(
+            &self.outbound,
+            &self.lane_message_committer,
+            &self.chain_message_committer,
+            block_number.map(BlockId::from),
+        )
+        .await?;
+
+        Ok(ReceiveMessagesProof {
+            outbound_lane_data,
+            messages_proof,
+        })
     }
 
     fn delivery_gas_unit(&self) -> E2EClientResult<U256> {
         Ok(U256::from_dec_str("1000000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
     }
 
-    async fn prepare_for_confirmation(&self) -> E2EClientResult<ReceiveMessagesDeliveryProof> {
+    async fn prepare_for_confirmation(
+        &self,
+        begin: u64,
+        end: u64,
+        block_number: Option<BlockNumber>,
+    ) -> E2EClientResult<ReceiveMessagesDeliveryProof> {
         todo!()
     }
 
@@ -114,5 +140,126 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
                     .map_err(|e| E2EClientError::Custom(format!("{}", e)))?,
             ))
         }
+    }
+}
+
+pub async fn build_messages_data(
+    indexer: &TheGraphLikeEth,
+    outbound: &Outbound,
+    begin: u64,
+    end: u64,
+    at_block: Option<BlockNumber>,
+) -> E2EClientResult<OutboundLaneData> {
+    let outbound_data = outbound.data(at_block.map(BlockId::from)).await?;
+    let outbound_lane_nonce = outbound
+        .outbound_lane_nonce(at_block.map(BlockId::from))
+        .await?;
+    let (outbound_begin, _outbound_end) = (
+        outbound_lane_nonce.latest_received_nonce + 1,
+        outbound_lane_nonce.latest_generated_nonce,
+    );
+    let messages = Vec::from_iter(
+        outbound_data.messages[(begin - outbound_begin) as usize..=(end - outbound_begin) as usize]
+            .iter()
+            .cloned(),
+    );
+
+    if (end - begin + 1) as usize != messages.len() {
+        return Err(E2EClientError::Custom("Build messages data failed".into()).into());
+    }
+
+    let accepted_events = query_message_accepted_events_thegraph(indexer, begin, end).await?;
+    let messages: Vec<Message> = std::iter::zip(messages, accepted_events)
+        .into_iter()
+        .map(|(message, event)| Message {
+            encoded_key: message.encoded_key,
+            payload: Payload {
+                source: event.source,
+                target: event.target,
+                encoded: event.encoded,
+            },
+        })
+        .collect();
+
+    Ok(OutboundLaneData {
+        latest_received_nonce: outbound_data.latest_received_nonce,
+        messages,
+    })
+}
+
+pub async fn build_darwinia_delivery_proof(
+    outbound: &Outbound,
+    lane_message_committer: &LaneMessageCommitter,
+    chain_message_committer: &ChainMessageCommitter,
+    block_id: Option<BlockId>,
+) -> E2EClientResult<Bytes> {
+    let (_, lane_pos, _, _) = outbound.get_lane_info().await?;
+
+    build_darwinia_proof(
+        lane_message_committer,
+        chain_message_committer,
+        lane_pos,
+        block_id,
+    )
+    .await
+}
+
+async fn build_darwinia_proof(
+    lane_message_committer: &LaneMessageCommitter,
+    chain_message_committer: &ChainMessageCommitter,
+    lane_pos: u32,
+    block_id: Option<BlockId>,
+) -> E2EClientResult<Bytes> {
+    let bridged_chain_pos = lane_message_committer.bridged_chain_position().await?;
+    let proof = chain_message_committer
+        .prove(bridged_chain_pos, U256::from(lane_pos), block_id)
+        .await?
+        .into_token();
+
+    Ok(Bytes(encode(&[proof])))
+}
+
+pub async fn query_message_accepted_thegraph(
+    thegraph_client: &TheGraphLikeEth,
+    nonce: u64,
+) -> E2EClientResult<Option<MessageAccepted>> {
+    thegraph_client
+        .query_message_accepted(nonce)
+        .await
+        .map_err(|e| E2EClientError::Custom(format!("{}", e)))?
+        .map(|x| -> E2EClientResult<MessageAccepted> {
+            Ok(MessageAccepted {
+                nonce: x.nonce,
+                source: Address::from_str(&x.source)
+                    .map_err(|e| E2EClientError::Custom(format!("{}", e)))?,
+                target: Address::from_str(&x.target)
+                    .map_err(|e| E2EClientError::Custom(format!("{}", e)))?,
+                encoded: Bytes(
+                    hex::decode(&x.encoded[2..])
+                        .map_err(|e| E2EClientError::Custom(format!("{}", e)))?,
+                ),
+                block_number: x.block_number,
+            })
+        })
+        .transpose()
+}
+
+pub async fn query_message_accepted_events_thegraph(
+    client: &TheGraphLikeEth,
+    begin: u64,
+    end: u64,
+) -> E2EClientResult<Vec<MessageAccepted>> {
+    let logs: Result<Vec<Option<MessageAccepted>>, _> = futures::future::try_join_all(
+        (begin..=end).map(|nonce| query_message_accepted_thegraph(client, nonce)),
+    )
+    .await;
+    if let Some(logs) = logs?.into_iter().collect::<Option<Vec<_>>>() {
+        Ok(logs)
+    } else {
+        Err(E2EClientError::Custom(format!(
+            "Failed to get message events from {:?} to {:?}",
+            begin, end
+        ))
+        .into())
     }
 }

@@ -99,11 +99,23 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
 
     async fn prepare_for_confirmation(
         &self,
-        begin: u64,
-        end: u64,
+        _begin: u64,
+        _end: u64,
         block_number: Option<BlockNumber>,
     ) -> E2EClientResult<ReceiveMessagesDeliveryProof> {
-        todo!()
+        let block_id = block_number.map(BlockId::from);
+        let inbound_lane_data = self.inbound.data(block_id).await?;
+        let messages_proof = build_darwinia_confirmation_proof(
+            &self.inbound,
+            &self.lane_message_committer,
+            &self.chain_message_committer,
+            block_id,
+        )
+        .await?;
+        Ok(ReceiveMessagesDeliveryProof {
+            inbound_lane_data,
+            messages_proof,
+        })
     }
 
     fn confirmation_gas_unit(&self) -> E2EClientResult<U256> {
@@ -141,6 +153,22 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
             ))
         }
     }
+}
+
+pub async fn build_darwinia_confirmation_proof(
+    inbound: &Inbound,
+    lane_message_committer: &LaneMessageCommitter,
+    chain_message_committer: &ChainMessageCommitter,
+    block_id: Option<BlockId>,
+) -> E2EClientResult<Bytes> {
+    let (_, lane_pos, _, _) = inbound.get_lane_info(block_id).await?;
+    build_darwinia_proof(
+        lane_message_committer,
+        chain_message_committer,
+        lane_pos,
+        block_id,
+    )
+    .await
 }
 
 pub async fn build_messages_data(

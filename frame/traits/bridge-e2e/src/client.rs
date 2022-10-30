@@ -1,5 +1,8 @@
 use std::cmp;
 
+use crate::strategy::RelayStrategy;
+use client_contracts::outbound_types::ReceiveMessagesDeliveryProof;
+use client_contracts::{inbound_types::ReceiveMessagesProof, Inbound, Outbound};
 use client_contracts::{BeaconLightClient, ExecutionLayer};
 use secp256k1::SecretKey;
 use subxt::Config;
@@ -63,4 +66,25 @@ pub trait EcdsaClient: Send + Sync + Clone {
         address: [u8; 20],
         signatures: Vec<u8>,
     ) -> E2EClientResult<<Self::SubxtConfig as Config>::Hash>;
+}
+
+#[async_trait::async_trait]
+pub trait MessageClient: GasPriceOracle {
+    fn inbound(&self) -> &Inbound;
+
+    fn outbound(&self) -> &Outbound;
+
+    fn private_key(&self) -> &SecretKey;
+
+    async fn decide(&self, encoded_keys: U256) -> E2EClientResult<bool>;
+
+    async fn prepare_for_delivery(&self) -> E2EClientResult<ReceiveMessagesProof>;
+
+    fn delivery_gas_unit(&self) -> E2EClientResult<U256>;
+
+    async fn prepare_for_confirmation(&self) -> E2EClientResult<ReceiveMessagesDeliveryProof>;
+
+    fn confirmation_gas_unit(&self) -> E2EClientResult<U256>;
+
+    async fn latest_light_client_block_number(&self) -> E2EClientResult<Option<u64>>;
 }

@@ -80,13 +80,13 @@ pub struct MessageReceivingInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub subquery_target: Subquery,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay> MessageReceivingInput<SC, TC> {
-    // todo: support multiple lanes
-    pub fn lane(&self) -> RelayResult<LaneId> {
-        self.lanes
-            .clone()
-            .get(0)
-            .cloned()
-            .ok_or_else(|| RelayError::Custom("Missing lane id".to_string()))
-    }
-}
+// impl<SC: S2SClientRelay, TC: S2SClientRelay> MessageReceivingInput<SC, TC> {
+//     // todo: support multiple lanes
+//     pub fn lane(&self) -> RelayResult<LaneId> {
+//         self.lanes
+//             .clone()
+//             .get(0)
+//             .cloned()
+//             .ok_or_else(|| RelayError::Custom("Missing lane id".to_string()))
+//     }
+// }

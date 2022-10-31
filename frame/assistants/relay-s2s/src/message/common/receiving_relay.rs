@@ -8,7 +8,7 @@ use support_toolkit::{convert::SmartCodecMapper, logk};
 use crate::error::RelayResult;
 use crate::keepstate;
 use crate::special::DifferentClientApi;
-use crate::types::{MessageReceivingInput, M_RECEIVING};
+use crate::types::{LaneId, MessageReceivingInput, M_RECEIVING};
 
 pub struct CommonReceivingRunner<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
 {
@@ -30,19 +30,18 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
 impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
     CommonReceivingRunner<SC, TC, DC>
 {
-    async fn source_outbound_lane_data(&self) -> RelayResult<OutboundLaneData> {
-        let lane = self.input.lane()?;
+    async fn source_outbound_lane_data(&self, lane: LaneId) -> RelayResult<OutboundLaneData> {
         let outbound_lane_data = self.input.client_source.outbound_lanes(lane, None).await?;
         Ok(outbound_lane_data)
     }
 
     async fn target_unrewarded_relayers_state(
         &self,
+        lane: LaneId,
         at_block: <TC::Chain as Chain>::Hash,
         source_outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<(u64, UnrewardedRelayersState)>> {
         let block_hex = array_bytes::bytes2hex("0x", at_block.as_ref());
-        let lane = self.input.lane()?;
         let inbound_lane_data = self
             .input
             .client_target
@@ -120,32 +119,37 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
             logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            let last_relayed_nonce = self.run().await?;
-            if last_relayed_nonce.is_some() {
-                keepstate::set_last_receiving_relayed_nonce(
-                    TC::CHAIN,
-                    last_relayed_nonce.expect("Unreachable"),
-                );
+            for lane in &self.input.lanes {
+                let last_relayed_nonce = self.run(*lane).await?;
+                if last_relayed_nonce.is_some() {
+                    keepstate::set_last_receiving_relayed_nonce(
+                        TC::CHAIN,
+                        last_relayed_nonce.expect("Unreachable"),
+                    );
+                }
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
     }
 
-    async fn run(&self) -> RelayResult<Option<u64>> {
-        let lane = self.input.lane()?;
-
+    async fn run(&self, lane: LaneId) -> RelayResult<Option<u64>> {
         // alias
         let client_source = &self.input.client_source;
         let client_target = &self.input.client_target;
 
-        let source_outbound_lane_data = self.source_outbound_lane_data().await?;
+        let source_outbound_lane_data = self.source_outbound_lane_data(lane).await?;
         if source_outbound_lane_data.latest_received_nonce
             == source_outbound_lane_data.latest_generated_nonce
         {
             tracing::debug!(
                 target: "relay-s2s",
                 "{} all nonces received, nothing to do.",
-                logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge_and_others(
+                    M_RECEIVING,
+                    SC::CHAIN,
+                    TC::CHAIN,
+                    vec![array_bytes::bytes2hex("0x", &lane),],
+                ),
             );
             return Ok(None);
         }
@@ -156,7 +160,11 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
 
         // assemble unrewarded relayers state
         let (max_confirmed_nonce_at_target, relayers_state) = match self
-            .target_unrewarded_relayers_state(expected_target_hash, &source_outbound_lane_data)
+            .target_unrewarded_relayers_state(
+                lane,
+                expected_target_hash,
+                &source_outbound_lane_data,
+            )
             .await?
         {
             Some(v) => v,
@@ -164,7 +172,12 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                 tracing::warn!(
                     target: "relay-s2s",
                     "{} no unrewarded relayers state found by {}",
-                    logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge_and_others(
+                        M_RECEIVING,
+                        SC::CHAIN,
+                        TC::CHAIN,
+                        vec![array_bytes::bytes2hex("0x", &lane),],
+                    ),
                     TC::CHAIN,
                 );
                 return Ok(None);
@@ -190,7 +203,12 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
         tracing::info!(
             target: "relay-s2s",
             "{} receiving extensics sent successful: {}",
-            logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge_and_others(
+                M_RECEIVING,
+                SC::CHAIN,
+                TC::CHAIN,
+                vec![array_bytes::bytes2hex("0x", &lane),],
+            ),
             array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(Some(max_confirmed_nonce_at_target))

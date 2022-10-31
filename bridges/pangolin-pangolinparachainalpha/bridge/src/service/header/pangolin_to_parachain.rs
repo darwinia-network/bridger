@@ -58,10 +58,8 @@ async fn start() -> color_eyre::Result<()> {
 
     let config_index = bridge_config.index;
     let subquery_pangolin = config_index.to_pangolin_subquery();
-    let lanes = relay_config.raw_lanes();
 
     let input = SolochainHeaderInput {
-        lanes,
         client_source: client_pangolin,
         client_target: client_pangolin_parachain,
         subquery_source: subquery_pangolin,

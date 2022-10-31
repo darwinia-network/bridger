@@ -12,7 +12,7 @@ use crate::error::{RelayError, RelayResult};
 use crate::keepstate;
 use crate::special::DifferentClientApi;
 use crate::strategy::{EnforcementDecideReference, EnforcementRelayStrategy};
-use crate::types::{MessageDeliveryInput, M_DELIVERY};
+use crate::types::{LaneId, MessageDeliveryInput, M_DELIVERY};
 
 pub struct CommonDeliveryRunner<SC, TC, DC, Strategy>
 where
@@ -45,14 +45,14 @@ where
     DC: DifferentClientApi<TC>,
     Strategy: RelayStrategy,
 {
-    async fn source_outbound_lane_data(&self) -> RelayResult<OutboundLaneData> {
-        let lane = self.input.lane()?;
+    async fn source_outbound_lane_data(&self, lane: LaneId) -> RelayResult<OutboundLaneData> {
         let outbound_lane_data = self.input.client_source.outbound_lanes(lane, None).await?;
         Ok(outbound_lane_data)
     }
 
     async fn assemble_nonces(
         &self,
+        lane: LaneId,
         limit: u64,
         outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<RangeInclusive<u64>>> {
@@ -63,7 +63,12 @@ where
         tracing::info!(
             target: "relay-s2s",
             "{} sync status: [{},{}]",
-            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge_and_others(
+                M_DELIVERY,
+                SC::CHAIN,
+                TC::CHAIN,
+                vec![array_bytes::bytes2hex("0x", &lane),],
+            ),
             latest_confirmed_nonce,
             latest_generated_nonce,
         );
@@ -78,7 +83,12 @@ where
                 tracing::warn!(
                     target: "relay-s2s",
                     "{} last relayed nonce is {} but start nonce is {}, please wait receiving.",
-                    logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge_and_others(
+                        M_DELIVERY,
+                        SC::CHAIN,
+                        TC::CHAIN,
+                        vec![array_bytes::bytes2hex("0x", &lane),],
+                    ),
                     last_relayed_nonce,
                     start,
                 );
@@ -90,7 +100,12 @@ where
         tracing::trace!(
             target: "relay-s2s",
             "{} assemble nonces, start from {} and last generated is {}",
-            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge_and_others(
+                M_DELIVERY,
+                SC::CHAIN,
+                TC::CHAIN,
+                vec![array_bytes::bytes2hex("0x", &lane),],
+            ),
             start,
             latest_generated_nonce,
         );
@@ -118,20 +133,21 @@ where
             logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            let last_relayed_nonce = self.run(self.input.nonces_limit).await?;
-            if last_relayed_nonce.is_some() {
-                keepstate::set_last_delivery_relayed_nonce(
-                    SC::CHAIN,
-                    last_relayed_nonce.expect("Unreachable"),
-                );
+            for lane in &self.input.lanes {
+                let last_relayed_nonce = self.run(*lane, self.input.nonces_limit).await?;
+                if last_relayed_nonce.is_some() {
+                    keepstate::set_last_delivery_relayed_nonce(
+                        SC::CHAIN,
+                        last_relayed_nonce.expect("Unreachable"),
+                    );
+                }
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
     }
 
-    async fn run(&self, limit: u64) -> RelayResult<Option<u64>> {
-        let lane = self.input.lane()?;
-        let source_outbound_lane_data = self.source_outbound_lane_data().await?;
+    async fn run(&self, lane: LaneId, limit: u64) -> RelayResult<Option<u64>> {
+        let source_outbound_lane_data = self.source_outbound_lane_data(lane).await?;
 
         // alias
         let client_source = &self.input.client_source;
@@ -139,7 +155,7 @@ where
         let subquery_source = &self.input.subquery_source;
 
         let nonces = match self
-            .assemble_nonces(limit, &source_outbound_lane_data)
+            .assemble_nonces(lane, limit, &source_outbound_lane_data)
             .await?
         {
             Some(v) => v,
@@ -147,7 +163,12 @@ where
                 tracing::debug!(
                     target: "relay-s2s",
                     "{} all nonces delivered, nothing to do.",
-                    logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge_and_others(
+                        M_DELIVERY,
+                        SC::CHAIN,
+                        TC::CHAIN,
+                        vec![array_bytes::bytes2hex("0x", &lane),],
+                    ),
                 );
                 return Ok(None);
             }
@@ -155,7 +176,12 @@ where
         tracing::debug!(
             target: "relay-s2s",
             "{} assembled nonces {:?}",
-            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge_and_others(
+                M_DELIVERY,
+                SC::CHAIN,
+                TC::CHAIN,
+                vec![array_bytes::bytes2hex("0x", &lane),],
+            ),
             nonces,
         );
 
@@ -169,7 +195,12 @@ where
                 tracing::warn!(
                     target: "relay-s2s",
                     "{} the last nonce({}) isn't storage by indexer for {} chain",
-                    logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge_and_others(
+                        M_DELIVERY,
+                        SC::CHAIN,
+                        TC::CHAIN,
+                        vec![array_bytes::bytes2hex("0x", &lane),],
+                    ),
                     nonces.end(),
                     SC::CHAIN,
                 );
@@ -199,7 +230,12 @@ where
             tracing::warn!(
                 target: "relay-s2s",
                 "{} the last nonce({}) at block {} is less then last relayed header {}, please wait header relay.",
-                logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge_and_others(
+                    M_DELIVERY,
+                    SC::CHAIN,
+                    TC::CHAIN,
+                    vec![array_bytes::bytes2hex("0x", &lane),],
+                ),
                 nonces.end(),
                 last_relay.block_number,
                 relayed_block_number,
@@ -254,7 +290,12 @@ where
             tracing::warn!(
                 target: "relay-s2s",
                 "{} the relay strategy decide not relay these nonces({:?})",
-                logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge_and_others(
+                    M_DELIVERY,
+                    SC::CHAIN,
+                    TC::CHAIN,
+                    vec![array_bytes::bytes2hex("0x", &lane),],
+                ),
                 nonces,
             );
             return Ok(None);
@@ -276,7 +317,12 @@ where
         tracing::info!(
             target: "relay-s2s",
             "{} the nonces {:?} in delivered to target chain -> {}",
-            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge_and_others(
+                M_DELIVERY,
+                SC::CHAIN,
+                TC::CHAIN,
+                vec![array_bytes::bytes2hex("0x", &lane),],
+            ),
             nonces,
             array_bytes::bytes2hex("0x", hash.as_ref()),
         );

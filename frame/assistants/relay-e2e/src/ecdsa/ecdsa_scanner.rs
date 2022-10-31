@@ -28,8 +28,8 @@ pub trait EcdsaScanner<T: EcdsaClient> {
     async fn start(&self, tracker: Tracker, scan_type: EcdsaScanType) {
         while let Err(err) = self.run(tracker.clone(), scan_type).await {
             tracing::error!(
-                target: "pangoro-goerli",
-                "[pangoro] [ecdsa] An error occurred while processing the extrinsics: {:?}",
+                target: "relay-e2e",
+                "[darwinia] [ecdsa] An error occurred while processing the extrinsics: {:?}",
                 err
             );
             // Prevent too fast refresh errors
@@ -45,8 +45,8 @@ pub trait EcdsaScanner<T: EcdsaClient> {
                 .await
                 .map_err(|e| RelayError::Custom(format!("{}", e)))?;
             tracing::info!(
-                target: "pangoro-goerli",
-                "[pangoro] [ecdsa] Track pangoro scan block: {} ",
+                target: "relay-e2e",
+                "[darwinia] [ecdsa] Track darwinia scan block: {} ",
                 from,
             );
             source.block = Some(from as u32);

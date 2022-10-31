@@ -31,8 +31,8 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
             .as_secs();
         if now - self.last_relay_time <= self.interval {
             tracing::info!(
-                target: "pangoro-goerli",
-                "[pangoro] [ecdsa] Last relaying time is {:?}, wait for {} seconds to scan new message root",
+                target: "relay-e2e",
+                "[darwinia] [ecdsa] Last relaying time is {:?}, wait for {} seconds to scan new message root",
                 self.last_relay_time,
                 self.interval - (now - self.last_relay_time)
             );
@@ -50,8 +50,8 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
 
         if cacse.is_none() {
             tracing::debug!(
-                target: "pangoro-goerli",
-                "[pangoro] [ecdsa] no more new message root signatures events after {}",
+                target: "relay-e2e",
+                "[darwinia] [ecdsa] no more new message root signatures events after {}",
                 from_block,
             );
             return Ok(None);
@@ -60,8 +60,8 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
         let latest_relayed_block_number = self.source.client_posa.block_number().await?;
         if latest_relayed_block_number.as_u32() >= event.commitment_block_number {
             tracing::info!(
-                target: "pangoro-goerli",
-                "[pangoro] [ecdsa] [collectedMessage] Latest relayed block number is: {:?}",
+                target: "relay-e2e",
+                "[darwinia] [ecdsa] [collectedMessage] Latest relayed block number is: {:?}",
                 event.block_number
             );
             return Ok(Some(event.block_number));
@@ -98,8 +98,8 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
             .import_message_commitment(commitment, signatures, &ethereum_account.secret_key()?)
             .await?;
         tracing::info!(
-            target: "pangoro-goerli",
-            "[pangoro] [ecdsa] submitted collected enouth new message root signature: {}",
+            target: "relay-e2e",
+            "[darwinia] [ecdsa] submitted collected enouth new message root signature: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
         support_etherscan::wait_for_transaction_confirmation(

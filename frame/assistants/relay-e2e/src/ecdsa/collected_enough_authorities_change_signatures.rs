@@ -19,7 +19,7 @@ impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
 impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
     pub async fn start(&self) -> RelayResult<Option<u32>> {
         let client_posa = &self.source.client_posa;
-        let _client_pangoro_substrate = &self.source.client_darwinia_substrate;
+        let _client_darwinia_substrate = &self.source.client_darwinia_substrate;
         let subquery = &self.source.subquery;
         let from_block = self.source.block.unwrap_or_default();
         let ethereum_account = &self.source.ethereum_account;
@@ -29,8 +29,8 @@ impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
             .await?;
         if cacse.is_none() {
             tracing::debug!(
-                target: "pangoro-goerli",
-                "[pangoro] [ecdsa] no more new message root signatures events after {}",
+                target: "relay-e2e",
+                "[darwinia] [ecdsa] no more new message root signatures events after {}",
                 from_block,
             );
             return Ok(None);
@@ -115,8 +115,8 @@ impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
         };
 
         tracing::info!(
-            target: "pangoro-goerli",
-            "[pangoro] [ecdsa] authorities change submitted: {}",
+            target: "relay-e2e",
+            "[darwinia] [ecdsa] authorities change submitted: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
         support_etherscan::wait_for_transaction_confirmation(

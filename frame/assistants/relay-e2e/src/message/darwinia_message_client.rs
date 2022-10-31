@@ -152,6 +152,8 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
 
             // Since the header at block number x from Darwinia means the state at block number x - 1,
             // we need to minus 1 to get the relay block number.
+            // The reason of this issue is that EVM on substrate is invoked after the substrate execution, So the
+            // message root at block X, which is generated at substrate runtime, only includes the state of block X-1 at EVM.
             Ok(Some(block_number - 1))
         }
     }

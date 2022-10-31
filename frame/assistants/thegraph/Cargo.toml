@@ -1,5 +1,5 @@
 [package]
-name = "thegraph-liketh"
+name = "thegraph"
 version = "0.7.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -27,3 +27,7 @@ serde-aux   = "0.6"
 async-trait = "0.1"
 
 gql_client  = "1"
+
+[features]
+default      = []
+bridge-ethv2 = []

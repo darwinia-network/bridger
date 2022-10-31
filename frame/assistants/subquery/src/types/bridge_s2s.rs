@@ -5,9 +5,7 @@ pub use self::schema_types::*;
 
 // query variable types
 mod query_vars {
-    use serde::Serialize;
-
-    use super::schema_types::RelayBlockOrigin;
+    use serde::{Deserialize, Serialize};
 
     #[derive(Clone, Debug, Serialize)]
     pub(crate) struct QueryNextRelayBlockVars {
@@ -31,7 +29,7 @@ mod query_vars {
 
     #[derive(Clone, Debug, Serialize)]
     pub(crate) struct QueryNeedRelay {
-        pub origin: RelayBlockOrigin,
+        pub origin: OriginType,
         pub lane: String,
         pub nonce: u64,
     }
@@ -49,7 +47,7 @@ mod query_vars {
         pub(crate) block_number: u32,
     }
 
-    #[derive(Clone, Debug, Serialize)]
+    #[derive(Clone, Debug, Deserialize, Serialize)]
     pub enum OriginType {
         #[serde(rename = "mandatory")]
         Mandatory,
@@ -77,6 +75,8 @@ mod schema_types {
 
     use crate::SubqueryComponentResult;
 
+    use super::OriginType;
+
     /// need relay block
     #[derive(Clone, Debug, Deserialize, Serialize)]
     pub struct NeedRelayBlock {
@@ -89,7 +89,7 @@ mod schema_types {
         pub block_hash: String,
         #[serde(rename = "type")]
         pub type_: RelayBlockType,
-        pub origin: RelayBlockOrigin,
+        pub origin: OriginType,
         #[serde(rename = "laneId")]
         pub lane_id: Option<String>,
         #[serde(rename = "messageNonce")]
@@ -133,36 +133,6 @@ mod schema_types {
     pub enum RelayBlockType {
         Mandatory,
         OnDemand,
-    }
-
-    #[derive(
-        Clone,
-        Debug,
-        Deserialize,
-        Serialize,
-        Eq,
-        PartialEq,
-        strum::EnumString,
-        strum::EnumVariantNames,
-    )]
-    #[strum(serialize_all = "kebab_case")]
-    #[serde(rename_all = "kebab-case")]
-    pub enum RelayBlockOrigin {
-        Mandatory,
-        BridgePangolin,
-        // from pangolin parachain send message to pangolin
-        BridgePangoro,
-        // from pangolin send message to pangoro
-        BridgePangolinParachain,
-        // from pangolin send message to pangoro
-        #[serde(rename = "bridge-pangolin-parachainalpha")]
-        BridgePangolinParachainAlpha,
-        // from pangolin send message to pangolin parachain
-        BridgeCrabParachain,
-        // from crab send messages to crab parachain
-        BridgeCrab,
-        // from crab parachain send messages to crab
-        BridgeDarwinia, // from crab send message to darwinia
     }
 
     /// justification mapping

@@ -1,11 +1,11 @@
 use client_pangolin::client::PangolinClient;
 use client_pangolin_parachain::client::PangolinParachainClient;
 use lifeline::{Lifeline, Service, Task};
-use subquery::types::RelayBlockOrigin;
 
 use feemarket_s2s::relay::basic::BasicRelayStrategy;
 use relay_s2s::message::{BridgeParachainDeliveryRunner, BridgeSolochainReceivingRunner};
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
+use subquery::types::OriginType;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
@@ -113,7 +113,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         client_target: input.client_target,
         subquery_source: input.subquery_source,
         subquery_target: input.subquery_target,
-        relay_block_origin: RelayBlockOrigin::BridgePangolin,
+        relay_block_origin: OriginType::BridgePangolin,
         relay_strategy,
     };
     let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangolinParachainAlpha)?;

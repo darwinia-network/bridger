@@ -2,7 +2,7 @@ use gql_client::GraphQLError;
 use thiserror::Error as ThisError;
 
 /// TheGraphLiketh component result
-pub type TheGraphLikethComponentReuslt<T> = Result<T, TheGraphLikethComponentError>;
+pub type ThegraphComponentReuslt<T> = Result<T, TheGraphLikethComponentError>;
 
 /// Ethereum component error
 #[derive(ThisError, Debug)]

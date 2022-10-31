@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use crate::types::{CandidateIncludedEvent, QueryNextCandidateIncludedEventWithParaHeadVars};
 use crate::types::{
     DataWrapper, FindJustificationVars, JustificationMapping, NeedRelayBlock, OriginType,
-    QueryNeedRelay, QueryNextOnDemandBlockVars, QueryNextRelayBlockVars, RelayBlockOrigin,
+    QueryNeedRelay, QueryNextOnDemandBlockVars, QueryNextRelayBlockVars,
 };
 use crate::{Subquery, SubqueryComponentError, SubqueryComponentResult};
 
@@ -81,7 +81,7 @@ impl Subquery {
     /// Query relay info by nonce
     pub async fn query_need_relay(
         &self,
-        origin: RelayBlockOrigin,
+        origin: OriginType,
         lane: [u8; 4],
         nonce: u64,
     ) -> SubqueryComponentResult<Option<NeedRelayBlock>> {

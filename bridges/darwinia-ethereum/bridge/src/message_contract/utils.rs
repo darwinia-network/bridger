@@ -8,7 +8,7 @@ use client_contracts::{
 };
 use futures::future;
 use support_common::error::BridgerError;
-use thegraph_liketh::graph::TheGraphLikeEth;
+use thegraph::Thegraph;
 use web3::{
     contract::tokens::Tokenizable,
     ethabi::{encode, RawLog},
@@ -158,7 +158,7 @@ pub fn encode_proof(proofs: &[Bytes]) -> Bytes {
 }
 
 pub async fn build_messages_data(
-    indexer: &TheGraphLikeEth,
+    indexer: &Thegraph,
     outbound: &Outbound,
     begin: u64,
     end: u64,
@@ -262,7 +262,7 @@ pub async fn query_message_accepted_events(
 }
 
 pub async fn query_message_accepted_thegraph(
-    thegraph_client: &TheGraphLikeEth,
+    thegraph_client: &Thegraph,
     nonce: u64,
 ) -> color_eyre::Result<Option<MessageAccepted>> {
     thegraph_client
@@ -281,7 +281,7 @@ pub async fn query_message_accepted_thegraph(
 }
 
 pub async fn query_message_accepted_events_thegraph(
-    client: &TheGraphLikeEth,
+    client: &Thegraph,
     begin: u64,
     end: u64,
 ) -> color_eyre::Result<Vec<MessageAccepted>> {

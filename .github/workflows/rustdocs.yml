@@ -83,7 +83,7 @@ jobs:
          - relay-e2e
          - relay-s2s
          - subquery
-         - thegraph-liketh
+         - thegraph
     steps:
       - uses: actions/checkout@v2
       - name: Install Rust toolchain

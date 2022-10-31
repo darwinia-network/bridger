@@ -1,6 +1,5 @@
 use std::cmp;
 
-use crate::strategy::RelayStrategy;
 use client_contracts::outbound_types::ReceiveMessagesDeliveryProof;
 use client_contracts::{inbound_types::ReceiveMessagesProof, Inbound, Outbound};
 use client_contracts::{BeaconLightClient, ExecutionLayer};

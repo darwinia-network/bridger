@@ -8,7 +8,7 @@ use web3::{
     types::{BlockId, BlockNumber, U256},
 };
 
-use crate::error::{RelayError, RelayResult};
+use crate::error::RelayResult;
 
 #[derive(Debug)]
 pub struct MessageRelayRunner<S0: MessageClient, S1: MessageClient> {

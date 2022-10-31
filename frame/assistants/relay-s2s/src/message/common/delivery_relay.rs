@@ -12,7 +12,7 @@ use crate::error::{RelayError, RelayResult};
 use crate::keepstate;
 use crate::special::DifferentClientApi;
 use crate::strategy::{EnforcementDecideReference, EnforcementRelayStrategy};
-use crate::types::{MessageDeliveryInput, M_DELIVERY};
+use crate::types::{LaneId, MessageDeliveryInput, M_DELIVERY};
 
 pub struct CommonDeliveryRunner<SC, TC, DC, Strategy>
 where
@@ -45,8 +45,7 @@ where
     DC: DifferentClientApi<TC>,
     Strategy: RelayStrategy,
 {
-    async fn source_outbound_lane_data(&self) -> RelayResult<OutboundLaneData> {
-        let lane = self.input.lane()?;
+    async fn source_outbound_lane_data(&self, lane: LaneId) -> RelayResult<OutboundLaneData> {
         let outbound_lane_data = self.input.client_source.outbound_lanes(lane, None).await?;
         Ok(outbound_lane_data)
     }
@@ -118,7 +117,8 @@ where
             logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            let last_relayed_nonce = self.run(self.input.nonces_limit).await?;
+            let lane = self.input.lane()?;
+            let last_relayed_nonce = self.run(lane, self.input.nonces_limit).await?;
             if last_relayed_nonce.is_some() {
                 keepstate::set_last_delivery_relayed_nonce(
                     SC::CHAIN,
@@ -129,9 +129,8 @@ where
         }
     }
 
-    async fn run(&self, limit: u64) -> RelayResult<Option<u64>> {
-        let lane = self.input.lane()?;
-        let source_outbound_lane_data = self.source_outbound_lane_data().await?;
+    async fn run(&self, lane: LaneId, limit: u64) -> RelayResult<Option<u64>> {
+        let source_outbound_lane_data = self.source_outbound_lane_data(lane).await?;
 
         // alias
         let client_source = &self.input.client_source;

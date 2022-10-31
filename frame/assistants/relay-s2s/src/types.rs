@@ -57,18 +57,18 @@ pub struct MessageDeliveryInput<SC: S2SClientRelay, TC: S2SClientRelay, Strategy
     pub relay_strategy: Strategy,
 }
 
-impl<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy>
-    MessageDeliveryInput<SC, TC, Strategy>
-{
-    // todo: support multiple lanes
-    pub fn lane(&self) -> RelayResult<LaneId> {
-        self.lanes
-            .clone()
-            .get(0)
-            .cloned()
-            .ok_or_else(|| RelayError::Custom("Missing lane id".to_string()))
-    }
-}
+// impl<SC: S2SClientRelay, TC: S2SClientRelay, Strategy: RelayStrategy>
+//     MessageDeliveryInput<SC, TC, Strategy>
+// {
+//     // todo: support multiple lanes
+//     pub fn lane(&self) -> RelayResult<LaneId> {
+//         self.lanes
+//             .clone()
+//             .get(0)
+//             .cloned()
+//             .ok_or_else(|| RelayError::Custom("Missing lane id".to_string()))
+//     }
+// }
 
 pub struct MessageReceivingInput<SC: S2SClientRelay, TC: S2SClientRelay> {
     pub lanes: Vec<LaneId>,

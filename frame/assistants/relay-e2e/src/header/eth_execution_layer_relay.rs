@@ -44,8 +44,8 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
 
         if relayed_state_root != latest_execution_payload_state_root {
             tracing::info!(
-                target: "pangoro-goerli",
-                "[ExecutionLayer][Goerli=>Pangoro] Try to relay execution layer state at slot: {:?}",
+                target: "relay-e2e",
+                "[ExecutionLayer] Try to relay execution layer state at slot: {:?}",
                 last_relayed_header.slot,
             );
 
@@ -81,8 +81,8 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
                 )
                 .await?;
             tracing::info!(
-                target: "pangoro-goerli",
-                "[ExecutionLayer][Goerli=>Pangoro] Sending tx: {:?}",
+                target: "relay-e2e",
+                "[ExecutionLayer] Sending tx: {:?}",
                 &tx
             );
             support_etherscan::wait_for_transaction_confirmation(
@@ -94,8 +94,8 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
             .await?;
         } else {
             tracing::info!(
-                target: "pangoro-goerli",
-                "[ExecutionLayer][Goerli=>Pangoro] Latest execution payload state root at slot {:?} is : {:?}",
+                target: "relay-e2e",
+                "[ExecutionLayer] Latest execution payload state root at slot {:?} is : {:?}",
                 last_relayed_header.slot,
                 &relayed_state_root,
             );

@@ -80,7 +80,7 @@ where
         {
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageDelivery][Pangoro=>Goerli] Last delivered nonce is {:?}, equal to lastest generated. Do nothing.",
+                "[MessageDelivery] Last delivered nonce is {:?}, equal to lastest generated. Do nothing.",
                 self.state.target_inbound.last_delivered_nonce,
             );
             return Ok(());

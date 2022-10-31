@@ -50,8 +50,8 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             .as_secs();
         if now - self.last_relay_time <= self.minimal_interval {
             tracing::info!(
-                target: "pangoro-goerli",
-                "[Header][Goerli=>Pangoro] Last relaying time is {:?}, wait for {} seconds to start again.",
+                target: "relay-e2e",
+                "[Header] Last relaying time is {:?}, wait for {} seconds to start again.",
                 self.last_relay_time,
                 self.minimal_interval - (now - self.last_relay_time)
             );
@@ -65,8 +65,8 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             .sync_committee_roots(state.relayed_period + 1)
             .await?;
         tracing::info!(
-            target: "pangoro-goerli",
-            "[Header][Goerli=>Pangoro] State: {:?}",
+            target: "relay-e2e",
+            "[Header] State: {:?}",
             state
         );
         if state.current_period == state.relayed_period {
@@ -107,8 +107,8 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
         let update_finality_period = update_finality_slot.div(32).div(256);
 
         tracing::info!(
-            target: "pangoro-goerli",
-            "[Header][Goerli=>Pangoro] Latest finality slot: {:?}",
+            target: "relay-e2e",
+            "[Header] Latest finality slot: {:?}",
             &update_finality_slot
         );
         // The latest finality header has been relayed
@@ -126,8 +126,8 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
         {
             None => {
                 tracing::info!(
-                    target: "pangoro-goerli",
-                    "[Header][Goerli=>Pangoro] Wait for valid attested header",
+                    target: "relay-e2e",
+                    "[Header] Wait for valid attested header",
                 );
                 return Ok(());
             }
@@ -186,8 +186,8 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             {
                 None => {
                     tracing::info!(
-                        target: "pangoro-goerli",
-                        "[Header][Goerli=>Pangoro] Wait for valid attested header",
+                        target: "relay-e2e",
+                        "[Header] Wait for valid attested header",
                     );
                     return Ok(());
                 }
@@ -248,8 +248,8 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             )
             .await?;
         tracing::info!(
-            target: "pangoro-goerli",
-            "[Header][Goerli=>Pangoro] Sending tx: {:?}",
+            target: "relay-e2e",
+            "[Header] Sending tx: {:?}",
             &tx
         );
         wait_for_transaction_confirmation(

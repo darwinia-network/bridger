@@ -40,8 +40,8 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             .await?;
         if next_sync_committee.is_zero() {
             tracing::info!(
-                target: "pangoro-goerli",
-                "[SyncCommittee][Goerli=>Pangoro] Try to relay SyncCommittee at period {:?}",
+                target: "relay-e2e",
+                "[SyncCommittee] Try to relay SyncCommittee at period {:?}",
                 period + 1,
             );
 
@@ -68,8 +68,8 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 .await?;
 
             tracing::info!(
-                target: "pangoro-goerli",
-                "[SyncCommittee][Goerli=>Pangoro] Sending tx: {:?}",
+                target: "relay-e2e",
+                "[SyncCommittee] Sending tx: {:?}",
                 &tx
             );
             support_etherscan::wait_for_transaction_confirmation(
@@ -81,8 +81,8 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             .await?;
         } else {
             tracing::info!(
-                target: "pangoro-goerli",
-                "[SyncCommittee][Goerli=>Pangoro] Next sync committee is {:?}",
+                target: "relay-e2e",
+                "[SyncCommittee] Next sync committee is {:?}",
                 next_sync_committee
             );
         }

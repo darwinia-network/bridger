@@ -22,3 +22,4 @@ metadata.scale
 *.log
 
 package-lock.json
+dist

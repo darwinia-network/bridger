@@ -24,6 +24,6 @@
   ],
   "rewrites": [
     { "source": "/state", "destination": "/index.html" },
-    { "source": "/state/*", "destination": "/index.html" }
+    { "source": "/state/:match*", "destination": "/index.html" }
   ]
 }

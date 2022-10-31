@@ -1,11 +1,9 @@
 use serde::Deserialize;
 
-use crate::types::{MessageAcceptedEvent, TransactionEntity};
+use crate::types::MessageAcceptedEvent;
 
 #[derive(Debug, Deserialize)]
 pub(crate) enum TheGraphResponse {
-    #[serde(rename = "transactionEntities")]
-    TransactionEntities(Vec<TransactionEntity>),
     #[serde(rename = "messageAcceptedEntities")]
     MessageAcceptedEntities(Vec<MessageAcceptedEvent>),
 }

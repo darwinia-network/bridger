@@ -55,5 +55,5 @@ subquery              = { path = "../../../frame/assistants/subquery", features 
 client-contracts      = { path = "../../../frame/assistants/client-contracts" }
 client-darwinia       = { path = "../../../frame/assistants/client-darwinia", features = [ "ecdsa-authority" ] }
 relay-e2e             = { path = "../../../frame/assistants/relay-e2e" }
-thegraph-liketh       = { path = "../../../frame/assistants/thegraph-liketh" }
+thegraph              = { path = "../../../frame/assistants/thegraph", features = [ "bridge-ethv2" ] }
 

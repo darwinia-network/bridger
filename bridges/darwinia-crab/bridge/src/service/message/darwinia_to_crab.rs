@@ -1,11 +1,11 @@
 use client_crab::client::CrabClient;
 use client_darwinia::client::DarwiniaClient;
-use lifeline::{Lifeline, Service, Task};
-use subquery::types::RelayBlockOrigin;
-
 use feemarket_s2s::relay::basic::BasicRelayStrategy;
+use lifeline::{Lifeline, Service, Task};
 use relay_s2s::message::{BridgeSolochainDeliveryRunner, BridgeSolochainReceivingRunner};
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
+
+use subquery::types::OriginType;
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
@@ -109,7 +109,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         client_target: input.client_target,
         subquery_source: input.subquery_source,
         subquery_target: input.subquery_target,
-        relay_block_origin: RelayBlockOrigin::BridgeCrab,
+        relay_block_origin: OriginType::BridgeCrab,
         relay_strategy,
     };
     let runner = BridgeSolochainDeliveryRunner::new(input);

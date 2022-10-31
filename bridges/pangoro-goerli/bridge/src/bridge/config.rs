@@ -7,9 +7,9 @@ use std::fmt::Display;
 use std::str::FromStr;
 use subquery::types::BridgeName;
 use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
-use thegraph_liketh::component::TheGraphLikeEthComponent;
-use thegraph_liketh::config::TheGraphLikeEthConfig;
-use thegraph_liketh::graph::TheGraphLikeEth;
+use thegraph::Thegraph;
+use thegraph::ThegraphComponent;
+use thegraph::ThegraphConfig;
 use web3::transports::Http;
 use web3::types::Address;
 use web3::Web3;
@@ -125,7 +125,7 @@ impl PangoroSubstrateConfig {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IndexConfig {
     pub pangoro: SubqueryConfig,
-    pub pangoro_evm: TheGraphLikeEthConfig,
+    pub pangoro_evm: ThegraphConfig,
 }
 
 impl IndexConfig {
@@ -133,10 +133,10 @@ impl IndexConfig {
         SubqueryComponent::component(self.pangoro.clone(), BridgeName::PangoroGoerli)
     }
 
-    pub fn to_pangoro_thegraph(&self) -> color_eyre::Result<TheGraphLikeEth> {
-        Ok(TheGraphLikeEthComponent::component(
+    pub fn to_pangoro_thegraph(&self) -> color_eyre::Result<Thegraph> {
+        Ok(ThegraphComponent::component(
             self.pangoro_evm.clone(),
-            thegraph_liketh::types::LikethChain::Pangoro,
+            thegraph::types::LikethChain::Pangoro,
         )?)
     }
 }

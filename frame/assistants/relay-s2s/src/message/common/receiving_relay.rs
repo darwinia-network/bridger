@@ -37,11 +37,11 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
 
     async fn target_unrewarded_relayers_state(
         &self,
+        lane: LaneId,
         at_block: <TC::Chain as Chain>::Hash,
         source_outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<(u64, UnrewardedRelayersState)>> {
         let block_hex = array_bytes::bytes2hex("0x", at_block.as_ref());
-        let lane = self.input.lane()?;
         let inbound_lane_data = self
             .input
             .client_target
@@ -119,8 +119,8 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
             logk::prefix_with_bridge(M_RECEIVING, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            for lane in self.input.lanes {
-                let last_relayed_nonce = self.run(lane).await?;
+            for lane in &self.input.lanes {
+                let last_relayed_nonce = self.run(*lane).await?;
                 if last_relayed_nonce.is_some() {
                     keepstate::set_last_receiving_relayed_nonce(
                         TC::CHAIN,
@@ -148,7 +148,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                     M_RECEIVING,
                     SC::CHAIN,
                     TC::CHAIN,
-                    vec![array_bytes::bytes2hex("0x", lane),],
+                    vec![array_bytes::bytes2hex("0x", &lane),],
                 ),
             );
             return Ok(None);
@@ -160,7 +160,11 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
 
         // assemble unrewarded relayers state
         let (max_confirmed_nonce_at_target, relayers_state) = match self
-            .target_unrewarded_relayers_state(expected_target_hash, &source_outbound_lane_data)
+            .target_unrewarded_relayers_state(
+                lane,
+                expected_target_hash,
+                &source_outbound_lane_data,
+            )
             .await?
         {
             Some(v) => v,
@@ -172,7 +176,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                         M_RECEIVING,
                         SC::CHAIN,
                         TC::CHAIN,
-                        vec![array_bytes::bytes2hex("0x", lane),],
+                        vec![array_bytes::bytes2hex("0x", &lane),],
                     ),
                     TC::CHAIN,
                 );
@@ -203,7 +207,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                 M_RECEIVING,
                 SC::CHAIN,
                 TC::CHAIN,
-                vec![array_bytes::bytes2hex("0x", lane),],
+                vec![array_bytes::bytes2hex("0x", &lane),],
             ),
             array_bytes::bytes2hex("0x", hash.as_ref()),
         );

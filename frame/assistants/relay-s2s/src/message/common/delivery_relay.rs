@@ -117,8 +117,8 @@ where
             logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            for lane in self.input.lanes {
-                let last_relayed_nonce = self.run(lane, self.input.nonces_limit).await?;
+            for lane in &self.input.lanes {
+                let last_relayed_nonce = self.run(*lane, self.input.nonces_limit).await?;
                 if last_relayed_nonce.is_some() {
                     keepstate::set_last_delivery_relayed_nonce(
                         SC::CHAIN,
@@ -151,7 +151,7 @@ where
                         M_DELIVERY,
                         SC::CHAIN,
                         TC::CHAIN,
-                        vec![array_bytes::bytes2hex("0x", lane),],
+                        vec![array_bytes::bytes2hex("0x", &lane),],
                     ),
                 );
                 return Ok(None);
@@ -164,7 +164,7 @@ where
                 M_DELIVERY,
                 SC::CHAIN,
                 TC::CHAIN,
-                vec![array_bytes::bytes2hex("0x", lane),],
+                vec![array_bytes::bytes2hex("0x", &lane),],
             ),
             nonces,
         );
@@ -183,7 +183,7 @@ where
                         M_DELIVERY,
                         SC::CHAIN,
                         TC::CHAIN,
-                        vec![array_bytes::bytes2hex("0x", lane),],
+                        vec![array_bytes::bytes2hex("0x", &lane),],
                     ),
                     nonces.end(),
                     SC::CHAIN,
@@ -218,7 +218,7 @@ where
                     M_DELIVERY,
                     SC::CHAIN,
                     TC::CHAIN,
-                    vec![array_bytes::bytes2hex("0x", lane),],
+                    vec![array_bytes::bytes2hex("0x", &lane),],
                 ),
                 nonces.end(),
                 last_relay.block_number,
@@ -278,7 +278,7 @@ where
                     M_DELIVERY,
                     SC::CHAIN,
                     TC::CHAIN,
-                    vec![array_bytes::bytes2hex("0x", lane),],
+                    vec![array_bytes::bytes2hex("0x", &lane),],
                 ),
                 nonces,
             );
@@ -301,11 +301,11 @@ where
         tracing::info!(
             target: "relay-s2s",
             "{} the nonces {:?} in delivered to target chain -> {}",
-            logk::prefix_with_bridge(
+            logk::prefix_with_bridge_and_others(
                 M_DELIVERY,
                 SC::CHAIN,
                 TC::CHAIN,
-                vec![array_bytes::bytes2hex("0x", lane),],
+                vec![array_bytes::bytes2hex("0x", &lane),],
             ),
             nonces,
             array_bytes::bytes2hex("0x", hash.as_ref()),

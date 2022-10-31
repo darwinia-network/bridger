@@ -7,8 +7,6 @@ use bridge_s2s_traits::types::bp_runtime::Chain;
 use subquery::types::OriginType;
 use subquery::Subquery;
 
-use crate::error::{RelayError, RelayResult};
-
 pub(crate) static M_HEADER: &str = "header";
 #[cfg(feature = "bridge-parachain")]
 pub(crate) static M_PARA_HEAD: &str = "para-head";

@@ -117,15 +117,16 @@ where
             logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
         );
         loop {
-            let lane = self.input.lane()?;
-            let last_relayed_nonce = self.run(lane, self.input.nonces_limit).await?;
-            if last_relayed_nonce.is_some() {
-                keepstate::set_last_delivery_relayed_nonce(
-                    SC::CHAIN,
-                    last_relayed_nonce.expect("Unreachable"),
-                );
+            for lane in self.input.lanes {
+                let last_relayed_nonce = self.run(lane, self.input.nonces_limit).await?;
+                if last_relayed_nonce.is_some() {
+                    keepstate::set_last_delivery_relayed_nonce(
+                        SC::CHAIN,
+                        last_relayed_nonce.expect("Unreachable"),
+                    );
+                }
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
     }
 
@@ -146,7 +147,12 @@ where
                 tracing::debug!(
                     target: "relay-s2s",
                     "{} all nonces delivered, nothing to do.",
-                    logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge_and_others(
+                        M_DELIVERY,
+                        SC::CHAIN,
+                        TC::CHAIN,
+                        vec![array_bytes::bytes2hex("0x", lane),],
+                    ),
                 );
                 return Ok(None);
             }
@@ -154,7 +160,12 @@ where
         tracing::debug!(
             target: "relay-s2s",
             "{} assembled nonces {:?}",
-            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge_and_others(
+                M_DELIVERY,
+                SC::CHAIN,
+                TC::CHAIN,
+                vec![array_bytes::bytes2hex("0x", lane),],
+            ),
             nonces,
         );
 
@@ -168,7 +179,12 @@ where
                 tracing::warn!(
                     target: "relay-s2s",
                     "{} the last nonce({}) isn't storage by indexer for {} chain",
-                    logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge_and_others(
+                        M_DELIVERY,
+                        SC::CHAIN,
+                        TC::CHAIN,
+                        vec![array_bytes::bytes2hex("0x", lane),],
+                    ),
                     nonces.end(),
                     SC::CHAIN,
                 );
@@ -198,7 +214,12 @@ where
             tracing::warn!(
                 target: "relay-s2s",
                 "{} the last nonce({}) at block {} is less then last relayed header {}, please wait header relay.",
-                logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge_and_others(
+                    M_DELIVERY,
+                    SC::CHAIN,
+                    TC::CHAIN,
+                    vec![array_bytes::bytes2hex("0x", lane),],
+                ),
                 nonces.end(),
                 last_relay.block_number,
                 relayed_block_number,
@@ -253,7 +274,12 @@ where
             tracing::warn!(
                 target: "relay-s2s",
                 "{} the relay strategy decide not relay these nonces({:?})",
-                logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                logk::prefix_with_bridge_and_others(
+                    M_DELIVERY,
+                    SC::CHAIN,
+                    TC::CHAIN,
+                    vec![array_bytes::bytes2hex("0x", lane),],
+                ),
                 nonces,
             );
             return Ok(None);
@@ -275,7 +301,12 @@ where
         tracing::info!(
             target: "relay-s2s",
             "{} the nonces {:?} in delivered to target chain -> {}",
-            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge(
+                M_DELIVERY,
+                SC::CHAIN,
+                TC::CHAIN,
+                vec![array_bytes::bytes2hex("0x", lane),],
+            ),
             nonces,
             array_bytes::bytes2hex("0x", hash.as_ref()),
         );

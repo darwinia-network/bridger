@@ -17,9 +17,6 @@ pub(crate) static M_RECEIVING: &str = "receiving";
 pub type LaneId = [u8; 4];
 
 pub struct SolochainHeaderInput<SC: S2SClientRelay, TC: S2SClientRelay> {
-    // not used for header relay
-    #[deprecated]
-    pub lanes: Vec<LaneId>,
     pub client_source: SC,
     pub client_target: TC,
     pub subquery_source: Subquery,

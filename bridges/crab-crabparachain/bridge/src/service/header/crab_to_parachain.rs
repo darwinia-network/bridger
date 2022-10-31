@@ -55,10 +55,8 @@ async fn start() -> color_eyre::Result<()> {
 
     let config_index = bridge_config.index;
     let subquery_crab = config_index.to_crab_subquery();
-    let lanes = relay_config.raw_lanes();
 
     let input = SolochainHeaderInput {
-        lanes,
         client_source: client_crab,
         client_target: client_crab_parachain,
         subquery_source: subquery_crab,

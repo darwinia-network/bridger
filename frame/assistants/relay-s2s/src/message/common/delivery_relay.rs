@@ -52,6 +52,7 @@ where
 
     async fn assemble_nonces(
         &self,
+        lane: LaneId,
         limit: u64,
         outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<RangeInclusive<u64>>> {
@@ -62,7 +63,12 @@ where
         tracing::info!(
             target: "relay-s2s",
             "{} sync status: [{},{}]",
-            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge_and_others(
+                M_DELIVERY,
+                SC::CHAIN,
+                TC::CHAIN,
+                vec![array_bytes::bytes2hex("0x", &lane),],
+            ),
             latest_confirmed_nonce,
             latest_generated_nonce,
         );
@@ -77,7 +83,12 @@ where
                 tracing::warn!(
                     target: "relay-s2s",
                     "{} last relayed nonce is {} but start nonce is {}, please wait receiving.",
-                    logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    logk::prefix_with_bridge_and_others(
+                        M_DELIVERY,
+                        SC::CHAIN,
+                        TC::CHAIN,
+                        vec![array_bytes::bytes2hex("0x", &lane),],
+                    ),
                     last_relayed_nonce,
                     start,
                 );
@@ -89,7 +100,12 @@ where
         tracing::trace!(
             target: "relay-s2s",
             "{} assemble nonces, start from {} and last generated is {}",
-            logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+            logk::prefix_with_bridge_and_others(
+                M_DELIVERY,
+                SC::CHAIN,
+                TC::CHAIN,
+                vec![array_bytes::bytes2hex("0x", &lane),],
+            ),
             start,
             latest_generated_nonce,
         );
@@ -139,7 +155,7 @@ where
         let subquery_source = &self.input.subquery_source;
 
         let nonces = match self
-            .assemble_nonces(limit, &source_outbound_lane_data)
+            .assemble_nonces(lane, limit, &source_outbound_lane_data)
             .await?
         {
             Some(v) => v,

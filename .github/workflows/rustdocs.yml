@@ -92,12 +92,12 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
       - name: Build rust docs
         run: |
-          cd frame/assistants/${{ matrix.package }}
+          cd assistants/${{ matrix.package }}
           cargo doc --all --no-deps --release
       - name: Collect docs
         run: |
           mkdir -p rust_docs/assistants/
-          mv frame/assistants/${{ matrix.package }}/target/doc rust_docs/assistants/${{ matrix.package }}
+          mv assistants/${{ matrix.package }}/target/doc rust_docs/assistants/${{ matrix.package }}
 
       - name: Upload shared
         uses: actions/upload-artifact@v2
@@ -123,7 +123,7 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
       - name: Build rust docs
         run: |
-          cd frame/assistants/${{ matrix.package }}
+          cd frame/traits/${{ matrix.package }}
           cargo doc --all --no-deps --release
       - name: Collect docs
         run: |

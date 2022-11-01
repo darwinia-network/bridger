@@ -35,3 +35,14 @@ postage  = "0.4"
 support-common     = { path = "../../frame/supports/support-common" }
 support-lifeline   = { path = "../../frame/supports/support-lifeline" }
 support-toolkit    = { path = "../../frame/supports/support-toolkit" }
+
+bridge-s2s-traits   = { path = "../../frame/traits/bridge-s2s" }
+subquery            = { path = "../subquery", features = [ "bridge-s2s" ] }
+relay-s2s           = { path = "../relay-s2s" }
+feemarket-s2s       = { path = "../feemarket-s2s" }
+
+[features]
+default        = []
+solo-with-solo = []
+solo-with-para = []
+para-with-para = []

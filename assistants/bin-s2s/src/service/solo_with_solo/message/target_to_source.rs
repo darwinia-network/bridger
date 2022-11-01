@@ -1,5 +1,5 @@
-use client_pangolin::client::PangolinClient;
-use client_pangoro::client::PangoroClient;
+use client_crab::client::CrabClient;
+use client_darwinia::client::DarwiniaClient;
 use feemarket_s2s::relay::basic::BasicRelayStrategy;
 use lifeline::{Lifeline, Service, Task};
 use relay_s2s::message::{BridgeSolochainDeliveryRunner, BridgeSolochainReceivingRunner};
@@ -12,49 +12,49 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::{BridgeBus, BridgeConfig};
 
 #[derive(Debug)]
-pub struct PangoroToPangolinMessageRelayService {
+pub struct TargetToSourceMessageRelayService {
     _greet_delivery: Lifeline,
     _greet_receiving: Lifeline,
 }
 
-impl BridgeService for PangoroToPangolinMessageRelayService {}
+impl BridgeService for TargetToSourceMessageRelayService {}
 
-impl Service for PangoroToPangolinMessageRelayService {
+impl Service for TargetToSourceMessageRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet_delivery = Self::try_task(
-            "pangoro-to-pangolin-message-delivery-service",
+            "target-to-source-message-delivery-service",
             async move {
                 while let Err(e) = start_delivery().await {
                     tracing::error!(
-                        target: "pangolin-pangoro",
-                        "[message-relay] [pangoro-to-pangolin] An error occurred for message delivery relay {:?}",
+                        target: "bin-s2s",
+                        "[message-relay] [target-to-source] An error occurred for message delivery relay {:?}",
                         e,
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     tracing::info!(
-                        target: "pangolin-pangoro",
-                        "[message-relay] [pangoro-to-pangolin] Try to restart message delivery relay service.",
+                        target: "bin-s2s",
+                        "[message-relay] [target-to-source] Try to restart message delivery relay service.",
                     );
                 }
                 Ok(())
             },
         );
         let _greet_receiving = Self::try_task(
-            "pangoro-to-pangolin-message-receiving-service",
+            "target-to-source-message-receiving-service",
             async move {
                 while let Err(e) = start_receiving().await {
                     tracing::error!(
-                        target: "pangolin-pangoro",
-                        "[message-relay] [pangoro-to-pangolin] An error occurred for message receiving relay {:?}",
+                        target: "bin-s2s",
+                        "[message-relay] [target-to-source] An error occurred for message receiving relay {:?}",
                         e,
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     tracing::info!(
-                        target: "pangolin-pangoro",
-                        "[message-relay] [pangoro-to-pangolin] Try to restart message receiving relay service.",
+                        target: "bin-s2s",
+                        "[message-relay] [target-to-source] Try to restart message receiving relay service.",
                     );
                 }
                 Ok(())
@@ -67,35 +67,34 @@ impl Service for PangoroToPangolinMessageRelayService {
     }
 }
 
-async fn message_input() -> color_eyre::Result<MessageReceivingInput<PangoroClient, PangolinClient>>
-{
-    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangoro)?;
+async fn message_input() -> color_eyre::Result<MessageReceivingInput<DarwiniaClient, CrabClient>> {
+    let bridge_config: BridgeConfig = Config::restore(Names::BridgeDarwiniaCrab)?;
     let relay_config = bridge_config.relay;
 
-    let client_pangoro = bridge_config.pangoro.to_pangoro_client().await?;
-    let client_pangolin = bridge_config.pangolin.to_pangolin_client().await?;
+    let client_darwinia = bridge_config.darwinia.to_darwinia_client().await?;
+    let client_crab = bridge_config.crab.to_crab_client().await?;
 
     let config_index = bridge_config.index;
-    let subquery_pangolin = config_index.to_pangolin_subquery();
-    let subquery_pangoro = config_index.to_pangoro_subquery();
+    let subquery_crab = config_index.to_crab_subquery();
+    let subquery_darwinia = config_index.to_darwinia_subquery();
 
     let lanes = relay_config.raw_lanes();
 
     let input = MessageReceivingInput {
         lanes,
-        relayer_account: client_pangoro.account().account_id().clone(),
-        client_source: client_pangoro,
-        client_target: client_pangolin,
-        subquery_source: subquery_pangoro,
-        subquery_target: subquery_pangolin,
+        relayer_account: client_darwinia.account().account_id().clone(),
+        client_source: client_darwinia,
+        client_target: client_crab,
+        subquery_source: subquery_darwinia,
+        subquery_target: subquery_crab,
     };
     Ok(input)
 }
 
 async fn start_delivery() -> color_eyre::Result<()> {
     tracing::info!(
-        target: "pangolin-pangoro",
-        "[message-delivery] [delivery-pangoro-to-pangolin] SERVICE RESTARTING..."
+        target: "bin-s2s",
+        "[message-delivery] [delivery-target-to-source] SERVICE RESTARTING..."
     );
     let input = message_input().await?;
     let relay_strategy = BasicRelayStrategy::new(
@@ -110,7 +109,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
         client_target: input.client_target,
         subquery_source: input.subquery_source,
         subquery_target: input.subquery_target,
-        relay_block_origin: OriginType::BridgePangolin,
+        relay_block_origin: OriginType::BridgeCrab,
         relay_strategy,
     };
     let runner = BridgeSolochainDeliveryRunner::new(input);
@@ -119,8 +118,8 @@ async fn start_delivery() -> color_eyre::Result<()> {
 
 async fn start_receiving() -> color_eyre::Result<()> {
     tracing::info!(
-        target: "pangolin-pangoro",
-        "[message-receiving] [receiving-pangoro-to-pangolin] SERVICE RESTARTING..."
+        target: "bin-s2s",
+        "[message-receiving] [receiving-target-to-source] SERVICE RESTARTING..."
     );
     let input = message_input().await?;
     let runner = BridgeSolochainReceivingRunner::new(input);

@@ -1988,8 +1988,8 @@ dependencies = [
 name = "support-lifeline"
 version = "0.7.0"
 dependencies = [
- "color-eyre",
  "lifeline",
+ "thiserror",
 ]
 
 [[package]]

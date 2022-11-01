@@ -9,28 +9,28 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::{BridgeBus, BridgeConfig};
 
 #[derive(Debug)]
-pub struct PangoroToPangolinHeaderRelayService {
+pub struct SourceToTargetHeaderRelayService {
     _greet: Lifeline,
 }
 
-impl BridgeService for PangoroToPangolinHeaderRelayService {}
+impl BridgeService for SourceToTargetHeaderRelayService {}
 
-impl Service for PangoroToPangolinHeaderRelayService {
+impl Service for SourceToTargetHeaderRelayService {
     type Bus = BridgeBus;
     type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task("pangoro-to-pangolin-header-relay-service", async move {
+        let _greet = Self::try_task("source-to-target-header-relay-service", async move {
             while let Err(e) = start().await {
                 tracing::error!(
-                    target: "pangolin-pangoro",
-                    "[header-relay] [pangoro-to-pangolin] An error occurred for header relay {:?}",
+                    target: "bind-s2s",
+                    "[header-relay] [source-to-target] An error occurred for header relay {:?}",
                     e,
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 tracing::info!(
-                    target: "pangolin-pangoro",
-                    "[header-relay] [pangoro-to-pangolin] Try to restart header relay service.",
+                    target: "bind-s2s",
+                    "[header-relay] [source-to-target] Try to restart header relay service.",
                 );
             }
             Ok(())
@@ -41,23 +41,23 @@ impl Service for PangoroToPangolinHeaderRelayService {
 
 async fn start() -> color_eyre::Result<()> {
     tracing::info!(
-        target: "pangolin-pangoro",
-        "[header-pangolin-to-pangoro] [pangoro-to-pangolin] SERVICE RESTARTING..."
+        target: "bind-s2s",
+        "[header-source-to-target] [source-to-target] SERVICE RESTARTING..."
     );
-    let bridge_config: BridgeConfig = Config::restore(Names::BridgePangolinPangoro)?;
+    let bridge_config: BridgeConfig = Config::restore(Names::Bridgetargetsource)?;
     let relay_config = bridge_config.relay;
 
-    let client_pangolin = bridge_config.pangolin.to_pangolin_client().await?;
-    let client_pangoro = bridge_config.pangoro.to_pangoro_client().await?;
+    let client_source = bridge_config.source.to_source_client().await?;
+    let client_target = bridge_config.target.to_target_client().await?;
 
     let config_index = bridge_config.index;
-    let subquery_pangoro = config_index.to_pangoro_subquery();
+    let subquery_source = config_index.to_source_subquery();
 
     let input = SolochainHeaderInput {
-        client_source: client_pangoro,
-        client_target: client_pangolin,
-        subquery_source: subquery_pangoro,
-        index_origin_type: OriginType::BridgePangolin,
+        client_source: client_source,
+        client_target: client_target,
+        subquery_source: subquery_source,
+        index_origin_type: OriginType::Bridgetarget,
         enable_mandatory: relay_config.enable_mandatory,
     };
     let runner = SolochainHeaderRunner::new(input);

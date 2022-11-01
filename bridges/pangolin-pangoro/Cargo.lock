@@ -187,6 +187,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "bin-s2s"
+version = "0.7.0"
+dependencies = [
+ "array-bytes",
+ "bridge-s2s-traits",
+ "feemarket-s2s",
+ "lifeline",
+ "postage",
+ "relay-s2s",
+ "serde 1.0.136",
+ "structopt",
+ "strum",
+ "subquery",
+ "support-common",
+ "support-lifeline",
+ "support-toolkit",
+ "thiserror",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -254,22 +276,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-darwinia-core"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.5#d6b3f0f92a9e35c83d85484c4ffe318b115afabc"
-dependencies = [
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "bp-header-chain"
 version = "0.1.0"
 source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.5#d6b3f0f92a9e35c83d85484c4ffe318b115afabc"
@@ -314,36 +320,6 @@ dependencies = [
  "serde 1.0.136",
  "sp-core",
  "sp-std",
-]
-
-[[package]]
-name = "bp-pangolin"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.5#d6b3f0f92a9e35c83d85484c4ffe318b115afabc"
-dependencies = [
- "bp-darwinia-core",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "sp-api",
- "sp-runtime",
- "sp-std",
- "sp-version",
-]
-
-[[package]]
-name = "bp-pangoro"
-version = "0.1.0"
-source = "git+https://github.com/darwinia-network/darwinia-bridges-substrate.git?branch=darwinia-v0.12.5#d6b3f0f92a9e35c83d85484c4ffe318b115afabc"
-dependencies = [
- "bp-darwinia-core",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "sp-api",
- "sp-runtime",
- "sp-std",
- "sp-version",
 ]
 
 [[package]]
@@ -403,24 +379,7 @@ dependencies = [
 name = "bridge-pangolin-pangoro"
 version = "0.7.0"
 dependencies = [
- "array-bytes",
- "bridge-s2s-traits",
- "client-pangolin",
- "client-pangoro",
- "color-eyre",
- "feemarket-s2s",
- "lifeline",
- "postage",
- "relay-s2s",
- "serde 1.0.136",
- "structopt",
- "strum",
- "subquery",
- "support-common",
- "support-lifeline",
- "support-toolkit",
- "tokio",
- "tracing",
+ "bin-s2s",
 ]
 
 [[package]]
@@ -455,7 +414,6 @@ dependencies = [
 name = "bridge-s2s-traits"
 version = "0.7.0"
 dependencies = [
- "array-bytes",
  "async-trait",
  "bp-header-chain",
  "bp-messages",
@@ -467,7 +425,6 @@ dependencies = [
  "serde 1.0.136",
  "sp-core",
  "sp-runtime",
- "subxt",
  "thiserror",
 ]
 
@@ -514,12 +471,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "chameleon"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12bd83544cd11113170ce1eee45383928f3f720bc8b305af18c2a3da3547e1ae"
-
-[[package]]
 name = "chrono"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -541,53 +492,10 @@ dependencies = [
  "ansi_term",
  "atty",
  "bitflags",
- "strsim 0.8.0",
+ "strsim",
  "textwrap",
  "unicode-width",
  "vec_map",
-]
-
-[[package]]
-name = "client-pangolin"
-version = "0.7.0"
-dependencies = [
- "array-bytes",
- "async-trait",
- "bp-pangolin",
- "bridge-s2s-traits",
- "feemarket-s2s-traits",
- "finality-grandpa",
- "parity-scale-codec",
- "serde 1.0.136",
- "sp-core",
- "sp-finality-grandpa",
- "sp-runtime",
- "subxt",
- "support-toolkit",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "client-pangoro"
-version = "0.7.0"
-dependencies = [
- "array-bytes",
- "async-trait",
- "bp-pangoro",
- "bridge-s2s-traits",
- "feemarket-s2s-traits",
- "finality-grandpa",
- "parity-scale-codec",
- "serde 1.0.136",
- "serde_json",
- "sp-core",
- "sp-finality-grandpa",
- "sp-runtime",
- "subxt",
- "support-toolkit",
- "thiserror",
- "tracing",
 ]
 
 [[package]]
@@ -763,52 +671,6 @@ dependencies = [
  "rand_core 0.5.1",
  "subtle",
  "zeroize",
-]
-
-[[package]]
-name = "darling"
-version = "0.13.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a01d95850c592940db9b8194bc39f4bc0e89dee5c4265e4b1807c34a9aba453c"
-dependencies = [
- "darling_core",
- "darling_macro",
-]
-
-[[package]]
-name = "darling_core"
-version = "0.13.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "859d65a907b6852c9361e3185c862aae7fafd2887876799fa55f5f99dc40d610"
-dependencies = [
- "fnv",
- "ident_case",
- "proc-macro2",
- "quote",
- "strsim 0.10.0",
- "syn",
-]
-
-[[package]]
-name = "darling_macro"
-version = "0.13.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c972679f83bdf9c42bd905396b6c3588a843a17f0f16dfcfa3e2c5d57441835"
-dependencies = [
- "darling_core",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "derivative"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcc3dd5e9e9c0b295d6e1e4d811fb6f157d5ffd784b8d202fc62eac8035a770b"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -1023,7 +885,6 @@ dependencies = [
  "bp-runtime",
  "pallet-fee-market",
  "parity-scale-codec",
- "subxt",
  "thiserror",
 ]
 
@@ -1166,7 +1027,7 @@ version = "4.0.0-dev"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.5#9d8aa8802c0da0d4449afbd6f629edbcc0102640"
 dependencies = [
  "frame-support-procedural-tools-derive",
- "proc-macro-crate 1.1.3",
+ "proc-macro-crate",
  "proc-macro2",
  "quote",
  "syn",
@@ -1377,7 +1238,7 @@ dependencies = [
  "indexmap",
  "slab",
  "tokio",
- "tokio-util 0.7.1",
+ "tokio-util",
  "tracing",
 ]
 
@@ -1554,12 +1415,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ident_case"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
-
-[[package]]
 name = "idna"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1689,37 +1544,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "jsonrpsee"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05fd8cd6c6b1bbd06881d2cf88f1fc83cc36c98f2219090f839115fb4a956cb9"
-dependencies = [
- "jsonrpsee-client-transport",
- "jsonrpsee-core",
-]
-
-[[package]]
-name = "jsonrpsee-client-transport"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3303cdf246e6ab76e2866fb3d9acb6c76a068b1b28bd923a1b7a8122257ad7b5"
-dependencies = [
- "futures",
- "http",
- "jsonrpsee-core",
- "jsonrpsee-types",
- "pin-project 1.0.10",
- "rustls-native-certs",
- "soketto",
- "thiserror",
- "tokio",
- "tokio-rustls",
- "tokio-util 0.6.10",
- "tracing",
- "webpki-roots",
-]
-
-[[package]]
 name = "jsonrpsee-core"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1733,13 +1557,10 @@ dependencies = [
  "futures-util",
  "hyper",
  "jsonrpsee-types",
- "rustc-hash",
  "serde 1.0.136",
  "serde_json",
  "soketto",
  "thiserror",
- "tokio",
- "tracing",
 ]
 
 [[package]]
@@ -2408,7 +2229,7 @@ version = "2.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1557010476e0595c9b568d16dcfb81b93cdeb157612726f5170d31aa707bed27"
 dependencies = [
- "proc-macro-crate 1.1.3",
+ "proc-macro-crate",
  "proc-macro2",
  "quote",
  "syn",
@@ -2624,15 +2445,6 @@ dependencies = [
  "impl-serde",
  "scale-info",
  "uint",
-]
-
-[[package]]
-name = "proc-macro-crate"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d6ea3c4595b96363c13943497db34af4460fb474a95c43f4446ad341b8c9785"
-dependencies = [
- "toml",
 ]
 
 [[package]]
@@ -2909,7 +2721,7 @@ dependencies = [
  "percent-encoding",
  "pin-project-lite",
  "rustls",
- "rustls-pemfile 0.3.0",
+ "rustls-pemfile",
  "serde 1.0.136",
  "serde_json",
  "serde_urlencoded",
@@ -2995,31 +2807,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustls-native-certs"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0167bac7a9f490495f3c33013e7722b53cb087ecbe082fb0c6387c96f634ea50"
-dependencies = [
- "openssl-probe",
- "rustls-pemfile 1.0.0",
- "schannel",
- "security-framework",
-]
-
-[[package]]
 name = "rustls-pemfile"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ee86d63972a7c661d1536fefe8c3c8407321c3df668891286de28abcd087360"
-dependencies = [
- "base64",
-]
-
-[[package]]
-name = "rustls-pemfile"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e7522c9de787ff061458fe9a829dc790a3f5b22dc571694fc5883f448b94d9a9"
 dependencies = [
  "base64",
 ]
@@ -3050,7 +2841,7 @@ version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baeb2780690380592f86205aa4ee49815feb2acad8c2f59e6dd207148c3f1fcd"
 dependencies = [
- "proc-macro-crate 1.1.3",
+ "proc-macro-crate",
  "proc-macro2",
  "quote",
  "syn",
@@ -3398,7 +3189,7 @@ version = "4.0.0-dev"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.5#9d8aa8802c0da0d4449afbd6f629edbcc0102640"
 dependencies = [
  "blake2-rfc",
- "proc-macro-crate 1.1.3",
+ "proc-macro-crate",
  "proc-macro2",
  "quote",
  "syn",
@@ -3652,7 +3443,7 @@ version = "4.0.0"
 source = "git+https://github.com/darwinia-network/substrate.git?branch=darwinia-v0.12.5#9d8aa8802c0da0d4449afbd6f629edbcc0102640"
 dependencies = [
  "Inflector",
- "proc-macro-crate 1.1.3",
+ "proc-macro-crate",
  "proc-macro2",
  "quote",
  "syn",
@@ -3840,12 +3631,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ea5119cdb4c55b55d432abb513a0429384878c15dde60cc77b1c99de1a95a6a"
 
 [[package]]
-name = "strsim"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
-
-[[package]]
 name = "structopt"
 version = "0.3.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3927,69 +3712,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
-name = "subxt"
-version = "0.17.0"
-source = "git+https://github.com/darwinia-network/subxt.git?branch=darwinia-v0.12.5#1f2665d240dee83eddb000ffc9a04f6cd409f1b9"
-dependencies = [
- "async-trait",
- "bitvec",
- "chameleon",
- "derivative",
- "frame-metadata",
- "futures",
- "hex",
- "jsonrpsee",
- "log",
- "num-traits 0.2.14",
- "parity-scale-codec",
- "scale-info",
- "serde 1.0.136",
- "serde_json",
- "sp-core",
- "sp-runtime",
- "sp-version",
- "subxt-macro",
- "thiserror",
-]
-
-[[package]]
-name = "subxt-codegen"
-version = "0.17.0"
-source = "git+https://github.com/darwinia-network/subxt.git?branch=darwinia-v0.12.5#1f2665d240dee83eddb000ffc9a04f6cd409f1b9"
-dependencies = [
- "async-trait",
- "darling",
- "frame-metadata",
- "heck",
- "parity-scale-codec",
- "proc-macro-crate 0.1.5",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "scale-info",
- "syn",
-]
-
-[[package]]
-name = "subxt-macro"
-version = "0.17.0"
-source = "git+https://github.com/darwinia-network/subxt.git?branch=darwinia-v0.12.5#1f2665d240dee83eddb000ffc9a04f6cd409f1b9"
-dependencies = [
- "async-trait",
- "darling",
- "frame-metadata",
- "heck",
- "parity-scale-codec",
- "proc-macro-crate 0.1.5",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "scale-info",
- "subxt-codegen",
- "syn",
-]
-
-[[package]]
 name = "support-common"
 version = "0.7.0"
 dependencies = [
@@ -4012,8 +3734,8 @@ dependencies = [
 name = "support-lifeline"
 version = "0.7.0"
 dependencies = [
- "color-eyre",
  "lifeline",
+ "thiserror",
 ]
 
 [[package]]
@@ -4211,21 +3933,6 @@ dependencies = [
  "rustls",
  "tokio",
  "webpki",
-]
-
-[[package]]
-name = "tokio-util"
-version = "0.6.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36943ee01a6d67977dd3f84a5a1d2efeb4ada3a1ae771cadfaa535d9d9fc6507"
-dependencies = [
- "bytes",
- "futures-core",
- "futures-io",
- "futures-sink",
- "log",
- "pin-project-lite",
- "tokio",
 ]
 
 [[package]]

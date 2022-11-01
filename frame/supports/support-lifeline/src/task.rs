@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use crate::error::SupportLifelineResult;
 use crate::service::BridgeService;
 
 /// Lifeline task stack, keep all running services
@@ -29,14 +30,14 @@ impl<B: lifeline::Bus> TaskStack<B> {
 
     /// Spawn lifeline service
     pub fn spawn_service<
-        S: lifeline::Service<Bus = B, Lifeline = color_eyre::Result<S>>
+        S: lifeline::Service<Bus = B, Lifeline = SupportLifelineResult<S>>
             + BridgeService
             + Send
             + Sync
             + 'static,
     >(
         &mut self,
-    ) -> color_eyre::Result<()> {
+    ) -> SupportLifelineResult<()> {
         let type_name = std::any::type_name::<S>();
         let service = Box::new(S::spawn(&self.bus)?);
         self.services.insert(type_name.to_string(), service);
@@ -45,7 +46,7 @@ impl<B: lifeline::Bus> TaskStack<B> {
 
     /// Stop lifeline service
     pub fn stop_service<
-        S: lifeline::Service<Bus = B, Lifeline = color_eyre::Result<S>> + BridgeService,
+        S: lifeline::Service<Bus = B, Lifeline = SupportLifelineResult<S>> + BridgeService,
     >(
         &mut self,
     ) -> Option<Box<dyn BridgeService + Send + Sync>> {
@@ -55,32 +56,30 @@ impl<B: lifeline::Bus> TaskStack<B> {
 
     /// Respawn lifeline service
     pub fn respawn_service<
-        S: lifeline::Service<Bus = B, Lifeline = color_eyre::Result<S>>
+        S: lifeline::Service<Bus = B, Lifeline = SupportLifelineResult<S>>
             + BridgeService
             + Send
             + Sync
             + 'static,
     >(
         &mut self,
-    ) -> color_eyre::Result<()> {
+    ) -> SupportLifelineResult<()> {
         // keep it until leave this block
         let _ = self.stop_service::<S>();
         self.spawn_service::<S>()
     }
 
     /// Lifeline service carry
-    pub fn carry_from<CY: lifeline::Bus>(&mut self, other: &TaskStack<CY>) -> color_eyre::Result<()>
+    pub fn carry_from<CY: lifeline::Bus>(
+        &mut self,
+        other: &TaskStack<CY>,
+    ) -> SupportLifelineResult<()>
     where
         B: lifeline::Bus
-            + lifeline::prelude::CarryFrom<CY, Lifeline = color_eyre::Result<lifeline::Lifeline>>,
+            + lifeline::prelude::CarryFrom<CY, Lifeline = SupportLifelineResult<lifeline::Lifeline>>,
     {
         let lifeline = self.bus.carry_from(&other.bus)?;
         self.carries.push(lifeline);
         Ok(())
     }
-
-    // pub fn carry(&mut self, lifeline: lifeline::Lifeline) -> color_eyre::Result<()> {
-    //     self.carries.push(lifeline);
-    //     Ok(())
-    // }
 }

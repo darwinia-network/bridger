@@ -21,7 +21,7 @@ async-trait = "0.1"
 serde          = { version = "1.0.124", features = ["derive"] }
 codec          = { package = "parity-scale-codec", version = "2" }
 scale-info     = { version = "1.0.0", features = ["bit-vec"] }
-jsonrpsee-core = "0.8"
+jsonrpsee-core = { version = "0.8", features = ["client"] }
 
 sp-core               = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
 sp-runtime            = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }

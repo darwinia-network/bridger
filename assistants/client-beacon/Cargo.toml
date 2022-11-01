@@ -1,6 +1,6 @@
 [package]
-name = "relay-e2e"
-version = "0.7.0"
+name = "client-beacon"
+version = "0.6.4"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -18,11 +18,16 @@ readme = 'README.md'
 edition = "2021"
 
 [dependencies]
+tokio       = { version = "1", features = ["full"] }
 tracing     = "0.1"
+futures     = "0.3.21"
+web3        = { version = "0.18.0", features = ["signing"] }
 thiserror   = "1.0"
-array-bytes = "2"
+bytes       = "1.0"
+serde       = { version = "1", features = ["derive"] }
+hex         = "0.4"
+hamming     = "0.1"
+reqwest = { version = "0.11", features = ["json", "stream"] }
 
-secp256k1 = { version = "0.21" }
-web3      = { version = "0.18", features = ["signing"] }
+client-contracts  = { path = "../client-contracts" }
 
-bridge-e2e-traits = { path = "../../traits/bridge-e2e" }

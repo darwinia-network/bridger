@@ -33,9 +33,9 @@ sp-core             = { optional = true, git = "https://github.com/darwinia-netw
 
 ## s2s client
 finality-grandpa      = { optional = true, version = "0.14" }
-bridge-s2s-traits     = { optional = true, path = "../../../frame/traits/bridge-s2s", features = ["advanced-types"] }
+bridge-s2s-traits     = { optional = true, path = "../../frame/traits/bridge-s2s", features = ["advanced-types"] }
 
-support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
+support-toolkit  = { path = "../../frame/supports/support-toolkit", features = ["convert"] }
 
 [features]
 default     = []

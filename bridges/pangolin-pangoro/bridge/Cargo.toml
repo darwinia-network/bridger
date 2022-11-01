@@ -31,8 +31,8 @@ support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
 support-toolkit    = { path = "../../../frame/supports/support-toolkit" }
 
 bridge-s2s-traits   = { path = "../../../frame/traits/bridge-s2s" }
-client-pangolin     = { path = "../../../frame/assistants/client-pangolin", features = [ "bridge-s2s-pangoro", "feemarket-s2s-pangoro" ]}
-client-pangoro      = { path = "../../../frame/assistants/client-pangoro", features = [ "bridge-s2s-pangolin", "feemarket-s2s-pangolin" ]}
-subquery            = { path = "../../../frame/assistants/subquery", features = [ "bridge-s2s" ] }
-relay-s2s           = { path = "../../../frame/assistants/relay-s2s" }
-feemarket-s2s       = { path = "../../../frame/assistants/feemarket-s2s" }
+client-pangolin     = { path = "../../../assistants/client-pangolin", features = [ "bridge-s2s-pangoro", "feemarket-s2s-pangoro" ]}
+client-pangoro      = { path = "../../../assistants/client-pangoro", features = [ "bridge-s2s-pangolin", "feemarket-s2s-pangolin" ]}
+subquery            = { path = "../../../assistants/subquery", features = [ "bridge-s2s" ] }
+relay-s2s           = { path = "../../../assistants/relay-s2s" }
+feemarket-s2s       = { path = "../../../assistants/feemarket-s2s" }

@@ -51,10 +51,10 @@ component-http-client = { path = "../../../frame/components/http-client" }
 component-state       = { path = "../../../frame/components/state" }
 
 bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
-subquery              = { path = "../../../frame/assistants/subquery", features = [ "bridge-ethv2" ] }
-client-contracts      = { path = "../../../frame/assistants/client-contracts" }
-client-pangoro        = { path = "../../../frame/assistants/client-pangoro", features = [ "bridge-ethv2" ] }
-client-beacon         = { path = "../../../frame/assistants/client-beacon" }
-relay-e2e             = { path = "../../../frame/assistants/relay-e2e" }
-thegraph              = { path = "../../../frame/assistants/thegraph", features = [ "bridge-ethv2" ] }
+subquery              = { path = "../../../assistants/subquery", features = [ "bridge-ethv2" ] }
+client-contracts      = { path = "../../../assistants/client-contracts" }
+client-pangoro        = { path = "../../../assistants/client-pangoro", features = [ "bridge-ethv2" ] }
+client-beacon         = { path = "../../../assistants/client-beacon" }
+relay-e2e             = { path = "../../../assistants/relay-e2e" }
+thegraph              = { path = "../../../assistants/thegraph", features = [ "bridge-ethv2" ] }
 

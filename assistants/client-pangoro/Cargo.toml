@@ -1,5 +1,5 @@
 [package]
-name = "client-pangolin-parachain"
+name = "client-pangoro"
 version = "0.7.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -18,18 +18,19 @@ readme = 'README.md'
 edition = "2021"
 
 [dependencies]
+tracing = "0.1"
 thiserror = "1"
-tracing   = "0.1"
 
 serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
 
-array-bytes           = "2"
-codec                 = { package = "parity-scale-codec", version = "2" }
-subxt                 = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
-bp-pangolin-parachain = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
+array-bytes = "2"
+codec       = { package = "parity-scale-codec", version = "2" }
+subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
+bp-pangoro  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
 
 ## maybe common
-async-trait = { optional = true, version = "0.1" }
+async-trait           = { optional = true, version = "0.1" }
 
 ## substrate
 sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
@@ -37,13 +38,16 @@ sp-runtime          = { optional = true, git = "https://github.com/darwinia-netw
 sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
 
 ## s2s client
-finality-grandpa      = { optional = true, version = "0.14" }
-bridge-s2s-traits     = { optional = true, path = "../../../frame/traits/bridge-s2s", features = ["advanced-types"] }
+finality-grandpa    = { optional = true, version = "0.14" }
+bridge-s2s-traits   = { optional = true, path = "../../frame/traits/bridge-s2s", features = ["advanced-types"] }
 
 ## feemarket s2s
-feemarket-s2s-traits = { optional = true, path = "../../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
+feemarket-s2s-traits = { optional = true, path = "../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
 
-support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
+## e2e client
+bridge-e2e-traits = { optional = true, path = "../../frame/traits/bridge-e2e" }
+
+support-toolkit  = { path = "../../frame/supports/support-toolkit", features = ["convert"] }
 
 [features]
 default     = []
@@ -52,16 +56,20 @@ substrate   = [
   "sp-runtime",
   "sp-core",
 ]
-bridge-s2s         = [
+bridge-s2s  = [
   "substrate",
   "async-trait",
   "finality-grandpa",
   "bridge-s2s-traits",
 ]
 bridge-s2s-pangolin = ["bridge-s2s"]
-feemarket-s2s   = [
+feemarket-s2s = [
   "async-trait",
   "feemarket-s2s-traits",
 ]
 feemarket-s2s-pangolin = ["feemarket-s2s"]
+bridge-ethv2  = ["bridge-e2e-traits"]
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
 

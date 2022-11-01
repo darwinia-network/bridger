@@ -1,5 +1,5 @@
 [package]
-name = "client-crab-parachain"
+name = "client-pangolin-parachain"
 version = "0.7.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -26,7 +26,7 @@ serde       = { version = "1", features = ["derive"] }
 array-bytes           = "2"
 codec                 = { package = "parity-scale-codec", version = "2" }
 subxt                 = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
-bp-crab-parachain     = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
+bp-pangolin-parachain = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
 
 ## maybe common
 async-trait = { optional = true, version = "0.1" }
@@ -38,12 +38,12 @@ sp-core             = { optional = true, git = "https://github.com/darwinia-netw
 
 ## s2s client
 finality-grandpa      = { optional = true, version = "0.14" }
-bridge-s2s-traits     = { optional = true, path = "../../../frame/traits/bridge-s2s", features = ["advanced-types"] }
+bridge-s2s-traits     = { optional = true, path = "../../frame/traits/bridge-s2s", features = ["advanced-types"] }
 
 ## feemarket s2s
-feemarket-s2s-traits = { optional = true, path = "../../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
+feemarket-s2s-traits = { optional = true, path = "../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
 
-support-toolkit  = { path = "../../../frame/supports/support-toolkit", features = ["convert"] }
+support-toolkit  = { path = "../../frame/supports/support-toolkit", features = ["convert"] }
 
 [features]
 default     = []
@@ -58,10 +58,10 @@ bridge-s2s         = [
   "finality-grandpa",
   "bridge-s2s-traits",
 ]
-bridge-s2s-crab = ["bridge-s2s"]
+bridge-s2s-pangolin = ["bridge-s2s"]
 feemarket-s2s   = [
   "async-trait",
   "feemarket-s2s-traits",
 ]
-feemarket-s2s-crab = ["feemarket-s2s"]
+feemarket-s2s-pangolin = ["feemarket-s2s"]
 

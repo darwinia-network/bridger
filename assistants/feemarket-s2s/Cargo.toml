@@ -19,8 +19,8 @@ serde       = { version = "1", features = ["derive"] }
 thiserror   = "1.0"
 tracing     = "0.1"
 
-component-subscan   = { path = "../../components/subscan" }
+component-subscan   = { path = "../../frame/components/subscan" }
 
-bridge-s2s-traits    = { path = "../../traits/bridge-s2s" }
-feemarket-s2s-traits = { path = "../../traits/feemarket-s2s" }
-support-toolkit      = { path = "../../supports/support-toolkit", features = ["log"] }
+bridge-s2s-traits    = { path = "../../frame/traits/bridge-s2s" }
+feemarket-s2s-traits = { path = "../../frame/traits/feemarket-s2s" }
+support-toolkit      = { path = "../../frame/supports/support-toolkit", features = ["log"] }

@@ -1,5 +1,5 @@
 [package]
-name = "client-contracts"
+name = "relay-e2e"
 version = "0.7.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
@@ -18,15 +18,11 @@ readme = 'README.md'
 edition = "2021"
 
 [dependencies]
-async-trait = "0.1"
-tokio       = { version = "1", features = ["full"] }
-futures     = "0.3.21"
-secp256k1   = { version = "0.21" }
-web3        = { version = "0.18.0", features = ["signing"] }
-hamming     = "0.1"
-rlp         = "0.5.1"
+tracing     = "0.1"
 thiserror   = "1.0"
-anyhow      = "1.0"
+array-bytes = "2"
 
-bridge-e2e-traits = { path = "../../../frame/traits/bridge-e2e" }
+secp256k1 = { version = "0.21" }
+web3      = { version = "0.18", features = ["signing"] }
 
+bridge-e2e-traits = { path = "../../frame/traits/bridge-e2e" }

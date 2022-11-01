@@ -12,7 +12,7 @@ use client_contracts::{
     ChainMessageCommitter, Inbound, LaneMessageCommitter, Outbound,
 };
 use secp256k1::SecretKey;
-use thegraph_liketh::graph::TheGraphLikeEth;
+use thegraph::Thegraph;
 use web3::{
     contract::tokens::Tokenizable,
     ethabi::encode,
@@ -31,7 +31,7 @@ pub struct DarwiniaMessageClient<T: RelayStrategy> {
     pub lane_message_committer: LaneMessageCommitter,
     pub strategy: T,
     pub private_key: SecretKey,
-    pub indexer: TheGraphLikeEth,
+    pub indexer: Thegraph,
 
     pub beacon_rpc_client: BeaconApiClient,
     pub eth_light_client: EthLightClient,
@@ -176,7 +176,7 @@ pub async fn build_darwinia_confirmation_proof(
 }
 
 pub async fn build_messages_data(
-    indexer: &TheGraphLikeEth,
+    indexer: &Thegraph,
     outbound: &Outbound,
     begin: u64,
     end: u64,
@@ -252,7 +252,7 @@ async fn build_darwinia_proof(
 }
 
 pub async fn query_message_accepted_thegraph(
-    thegraph_client: &TheGraphLikeEth,
+    thegraph_client: &Thegraph,
     nonce: u64,
 ) -> E2EClientResult<Option<MessageAccepted>> {
     thegraph_client
@@ -277,7 +277,7 @@ pub async fn query_message_accepted_thegraph(
 }
 
 pub async fn query_message_accepted_events_thegraph(
-    client: &TheGraphLikeEth,
+    client: &Thegraph,
     begin: u64,
     end: u64,
 ) -> E2EClientResult<Vec<MessageAccepted>> {

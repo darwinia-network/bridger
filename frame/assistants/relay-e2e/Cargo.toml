@@ -37,5 +37,4 @@ client-beacon         = { path = "../../../frame/assistants/client-beacon" }
 support-etherscan     = { path = "../../../frame/supports/support-etherscan" }
 support-tracker       = { path = "../../../frame/supports/support-tracker" }
 subquery              = { path = "../../../frame/assistants/subquery", features = [ "bridge-ethv2" ] }
-thegraph-liketh       = { path = "../../../frame/assistants/thegraph-liketh" }
-
+thegraph              = { path = "../../../frame/assistants/thegraph", features = [ "bridge-ethv2" ] }

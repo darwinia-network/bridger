@@ -3,7 +3,7 @@ use std::str::FromStr;
 use bridge_e2e_traits::strategy::RelayStrategy;
 
 use secp256k1::SecretKey;
-use thegraph_liketh::graph::TheGraphLikeEth;
+use thegraph::Thegraph;
 use web3::{
     signing::Key,
     transports::Http,
@@ -32,7 +32,7 @@ pub struct DarwiniaMessageClient<T: RelayStrategy> {
     pub lane_message_committer: LaneMessageCommitter,
     pub strategy: T,
     pub private_key: SecretKey,
-    pub indexer: TheGraphLikeEth,
+    pub indexer: Thegraph,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -44,7 +44,7 @@ pub fn build_darwinia_message_client(
     lane_message_committer_address: Address,
     fee_market_address: Address,
     private_key: &str,
-    indexer: TheGraphLikeEth,
+    indexer: Thegraph,
 ) -> color_eyre::Result<DarwiniaMessageClient<FeeMarketRelayStrategy>> {
     let transport = Http::new(endpoint)?;
     let client = Web3::new(transport);

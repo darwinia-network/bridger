@@ -7,9 +7,9 @@ use std::fmt::Display;
 use std::str::FromStr;
 use subquery::types::BridgeName;
 use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
-use thegraph_liketh::component::TheGraphLikeEthComponent;
-use thegraph_liketh::config::TheGraphLikeEthConfig;
-use thegraph_liketh::graph::TheGraphLikeEth;
+use thegraph::Thegraph;
+use thegraph::ThegraphComponent;
+use thegraph::ThegraphConfig;
 use web3::transports::Http;
 use web3::types::Address;
 use web3::Web3;
@@ -125,7 +125,7 @@ impl DarwiniaSubstrateConfig {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IndexConfig {
     pub darwinia: SubqueryConfig,
-    pub darwinia_evm: TheGraphLikeEthConfig,
+    pub darwinia_evm: ThegraphConfig,
 }
 
 impl IndexConfig {
@@ -133,10 +133,10 @@ impl IndexConfig {
         SubqueryComponent::component(self.darwinia.clone(), BridgeName::DarwiniaEthereum)
     }
 
-    pub fn to_darwinia_thegraph(&self) -> color_eyre::Result<TheGraphLikeEth> {
-        Ok(TheGraphLikeEthComponent::component(
+    pub fn to_darwinia_thegraph(&self) -> color_eyre::Result<Thegraph> {
+        Ok(ThegraphComponent::component(
             self.darwinia_evm.clone(),
-            thegraph_liketh::types::LikethChain::Darwinia,
+            thegraph::types::LikethChain::Darwinia,
         )?)
     }
 }

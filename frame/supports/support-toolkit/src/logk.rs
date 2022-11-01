@@ -50,8 +50,24 @@ pub fn prefix_with_relation(
     second: impl AsRef<str>,
     relation: impl AsRef<str>,
 ) -> String {
+    prefix_with_relation_and_others(mark, first, second, relation, Vec::<String>::new())
+}
+
+pub fn prefix_with_relation_and_others(
+    mark: impl AsRef<str>,
+    first: impl AsRef<str>,
+    second: impl AsRef<str>,
+    relation: impl AsRef<str>,
+    others: Vec<impl AsRef<str>>,
+) -> String {
     let chain = format!("{}{}{}", first.as_ref(), relation.as_ref(), second.as_ref());
-    prefix_multi(mark, vec![chain])
+    let mut args = vec![chain];
+    let mut o = others
+        .iter()
+        .map(|v| v.as_ref().to_string())
+        .collect::<Vec<String>>();
+    args.append(&mut o);
+    prefix_multi(mark, args)
 }
 
 /// log prefix
@@ -60,5 +76,14 @@ pub fn prefix_with_bridge(
     source: impl AsRef<str>,
     target: impl AsRef<str>,
 ) -> String {
-    prefix_with_relation(mark, source, target, ">")
+    prefix_with_bridge_and_others(mark, source, target, Vec::<String>::new())
+}
+
+pub fn prefix_with_bridge_and_others(
+    mark: impl AsRef<str>,
+    source: impl AsRef<str>,
+    target: impl AsRef<str>,
+    others: Vec<impl AsRef<str>>,
+) -> String {
+    prefix_with_relation_and_others(mark, source, target, ">", others)
 }

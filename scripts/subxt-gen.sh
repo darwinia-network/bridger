@@ -33,54 +33,54 @@ OUTPUT_FILE=
 if [ "${CHAIN}" == "pangolin" ]; then
   ENDPOINT='https://pangolin-rpc.darwinia.network'
 #  ENDPOINT='http://127.0.0.1:9966'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-pangolin
 fi
 
 if [ "${CHAIN}" == "pangoro" ]; then
   ENDPOINT='https://pangoro-rpc.darwinia.network'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangoro
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-pangoro
 fi
 
 if [ "${CHAIN}" == "darwinia" ]; then
   ENDPOINT='https://rpc.darwinia.network'
 #  ENDPOINT='http://127.0.0.1:9936'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-darwinia
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-darwinia
 fi
 
 if [ "${CHAIN}" == "rococo" ]; then
   ENDPOINT='https://rococo-rpc.polkadot.io'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-rococo
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-rococo
 fi
 
 if [ "${CHAIN}" == "pangolin-parachain" ]; then
   ENDPOINT='https://pangolin-parachain-rpc.darwinia.network'
 #  ENDPOINT='http://127.0.0.1:40338'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachain
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-pangolin-parachain
 fi
 
 #if [ "${CHAIN}" == "pangolin-parachainalpha" ]; then
 #  ENDPOINT='https://pangolin-parachain-alpha-rpc.darwinia.network'
-#  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-pangolin-parachainalpha
+#  OUTPUT_PATH=${WORK_PATH}/assistants/client-pangolin-parachainalpha
 #fi
 
 if [ "${CHAIN}" == "crab" ]; then
   ENDPOINT='https://crab-rpc.darwinia.network'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-crab
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-crab
 fi
 
 if [ "${CHAIN}" == "crab-parachain" ]; then
   ENDPOINT='https://crab-parachain-rpc.darwinia.network'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-crab-parachain
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-crab-parachain
 fi
 
 if [ "${CHAIN}" == "kusama" ]; then
   ENDPOINT='https://kusama-rpc.dwellir.com'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-kusama
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-kusama
 fi
 
 if [ "${CHAIN}" == "moonbase" ]; then
   ENDPOINT='https://frag-moonbase-relay-rpc.g.moonbase.moonbeam.network'
-  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-moonbase
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-moonbase
 fi
 
 if [ -z "${ENDPOINT}" ]; then

@@ -5,8 +5,6 @@ use crate::error::SubqueryComponentError;
 use crate::types::BridgeName;
 use crate::SubqueryComponentResult;
 
-#[cfg(feature = "bridge-ethv1")]
-mod bridge_ethv1;
 #[cfg(feature = "bridge-ethv2")]
 mod bridge_ethv2;
 #[cfg(feature = "bridge-s2s")]
@@ -32,7 +30,7 @@ impl Subquery {
 impl Subquery {
     fn read_graphql(&self, file: impl AsRef<str>) -> SubqueryComponentResult<&str> {
         let file = file.as_ref();
-        let dir = self.bridge.directory();
+        let dir = self.bridge.name();
         let graph = GRAPHQL_DIR
             .get_file(format!("{}/{}", dir, file))
             .or_else(|| GRAPHQL_DIR.get_file(format!("generic/{}", file)))

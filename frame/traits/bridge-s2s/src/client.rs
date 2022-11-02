@@ -10,7 +10,7 @@ use crate::error::S2SClientResult;
 use crate::types::bp_runtime::Chain;
 
 /// S2S bridge client types defined
-pub trait S2SClientBase: 'static + Send + Sync + Clone {
+pub trait S2SClientBase: 'static + Send + Sync + Sized + Clone {
     const CHAIN: &'static str;
     type Chain: Chain;
     type Extrinsic: Codec + EncodeLike + Clone + Eq + Extrinsic + Debug + MaybeSerializeDeserialize;

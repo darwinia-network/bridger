@@ -23,18 +23,23 @@ tracing     = "0.1"
 thiserror   = "1.0"
 
 array-bytes = "2"
+async-trait = "0.1"
 tokio       = { version = "1", features = ["full"] }
 
 structopt = "0.3"
 strum     = { version = "0.21", features = ["derive"] }
 serde     = { version = "1", features = ["derive"] }
+codec     = { package = "parity-scale-codec", version = "2" }
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage  = "0.4"
 
+sp-runtime         = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+
 support-common     = { path = "../../frame/supports/support-common" }
 support-lifeline   = { path = "../../frame/supports/support-lifeline" }
 support-toolkit    = { path = "../../frame/supports/support-toolkit" }
+support-types      = { path = "../../frame/supports/support-types" }
 
 bridge-s2s-traits   = { path = "../../frame/traits/bridge-s2s" }
 subquery            = { path = "../subquery", features = [ "bridge-s2s" ] }

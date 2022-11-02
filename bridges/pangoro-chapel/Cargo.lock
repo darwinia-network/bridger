@@ -1971,12 +1971,12 @@ version = "0.7.0"
 dependencies = [
  "color-eyre",
  "config",
- "dirs",
  "serde 1.0.136",
  "serde-hjson",
  "serde_json",
  "serde_yaml",
  "strum",
+ "support-types",
  "thiserror",
  "toml",
  "tracing",
@@ -2000,6 +2000,14 @@ dependencies = [
  "serde 1.0.136",
  "structopt",
  "strum",
+]
+
+[[package]]
+name = "support-types"
+version = "0.7.0"
+dependencies = [
+ "dirs",
+ "serde 1.0.136",
 ]
 
 [[package]]

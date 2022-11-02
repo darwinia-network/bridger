@@ -21,7 +21,7 @@ impl BridgeService for SourceToTargetMessageRelayService {}
 
 impl Service for SourceToTargetMessageRelayService {
     type Bus = BridgeBus;
-    type Lifeline = color_eyre::Result<Self>;
+    type Lifeline = BinS2SResult<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet_delivery = Self::try_task(
@@ -67,12 +67,12 @@ impl Service for SourceToTargetMessageRelayService {
     }
 }
 
-async fn message_input() -> color_eyre::Result<MessageReceivingInput<CrabClient, DarwiniaClient>> {
+async fn message_input() -> BinS2SError<MessageReceivingInput<CrabClient, DarwiniaClient>> {
     let bridge_config: BridgeConfig = Config::restore(Names::BridgeDarwiniaCrab)?;
     let relay_config = bridge_config.relay;
 
-    let client_crab = bridge_config.crab.to_crab_client().await?;
-    let client_darwinia = bridge_config.darwinia.to_darwinia_client().await?;
+    let client_crab = bridge_config.source.to_crab_client().await?;
+    let client_darwinia = bridge_config.target.to_darwinia_client().await?;
 
     let config_index = bridge_config.index;
     let subquery_crab = config_index.to_crab_subquery();
@@ -91,7 +91,7 @@ async fn message_input() -> color_eyre::Result<MessageReceivingInput<CrabClient,
     Ok(input)
 }
 
-async fn start_delivery() -> color_eyre::Result<()> {
+async fn start_delivery() -> BinS2SResult<()> {
     tracing::info!(
         target: "bin-s2s",
         "[message-delivery] [delivery-source-to-target] SERVICE RESTARTING..."
@@ -116,7 +116,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
     Ok(runner.start().await?)
 }
 
-async fn start_receiving() -> color_eyre::Result<()> {
+async fn start_receiving() -> BinS2SResult<()> {
     tracing::info!(
         target: "bin-s2s",
         "[message-receiving] [receiving-source-to-target] SERVICE RESTARTING..."

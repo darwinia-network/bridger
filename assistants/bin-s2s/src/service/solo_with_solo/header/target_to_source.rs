@@ -17,7 +17,7 @@ impl BridgeService for TargetToSourceHeaderRelayService {}
 
 impl Service for TargetToSourceHeaderRelayService {
     type Bus = BridgeBus;
-    type Lifeline = color_eyre::Result<Self>;
+    type Lifeline = BinS2SResult<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task("target-to-source-header-relay-service", async move {
@@ -39,7 +39,7 @@ impl Service for TargetToSourceHeaderRelayService {
     }
 }
 
-async fn start() -> color_eyre::Result<()> {
+async fn start() -> BinS2SResult<()> {
     tracing::info!(
         target: "bin-s2s",
         "[header-source-to-target] [target-to-source] SERVICE RESTARTING..."
@@ -47,8 +47,8 @@ async fn start() -> color_eyre::Result<()> {
     let bridge_config: BridgeConfig = Config::restore(Names::BridgeDarwiniaCrab)?;
     let relay_config = bridge_config.relay;
 
-    let client_crab = bridge_config.crab.to_crab_client().await?;
-    let client_darwinia = bridge_config.darwinia.to_darwinia_client().await?;
+    let client_crab = bridge_config.source.to_crab_client().await?;
+    let client_darwinia = bridge_config.target.to_darwinia_client().await?;
 
     let config_index = bridge_config.index;
     let subquery_darwinia = config_index.to_darwinia_subquery();

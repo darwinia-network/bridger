@@ -3931,6 +3931,7 @@ dependencies = [
  "serde-aux",
  "serde-hex",
  "strum",
+ "support-types",
  "thiserror",
  "tracing",
 ]
@@ -4023,12 +4024,12 @@ version = "0.7.0"
 dependencies = [
  "color-eyre",
  "config",
- "dirs",
  "serde 1.0.137",
  "serde-hjson",
  "serde_json",
  "serde_yaml",
  "strum",
+ "support-types",
  "thiserror",
  "toml",
  "tracing",
@@ -4052,6 +4053,14 @@ dependencies = [
  "pad",
  "parity-scale-codec",
  "thiserror",
+]
+
+[[package]]
+name = "support-types"
+version = "0.7.0"
+dependencies = [
+ "dirs",
+ "serde 1.0.137",
 ]
 
 [[package]]

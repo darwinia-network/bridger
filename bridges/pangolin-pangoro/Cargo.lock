@@ -191,18 +191,22 @@ name = "bin-s2s"
 version = "0.7.0"
 dependencies = [
  "array-bytes",
+ "async-trait",
  "bridge-s2s-traits",
  "feemarket-s2s",
  "lifeline",
+ "parity-scale-codec",
  "postage",
  "relay-s2s",
  "serde 1.0.136",
+ "sp-runtime",
  "structopt",
  "strum",
  "subquery",
  "support-common",
  "support-lifeline",
  "support-toolkit",
+ "support-types",
  "thiserror",
  "tokio",
  "tracing",
@@ -3688,6 +3692,7 @@ dependencies = [
  "serde-aux",
  "serde-hex",
  "strum",
+ "support-types",
  "thiserror",
  "tracing",
 ]
@@ -3717,12 +3722,12 @@ version = "0.7.0"
 dependencies = [
  "color-eyre",
  "config",
- "dirs",
  "serde 1.0.136",
  "serde-hjson",
  "serde_json",
  "serde_yaml",
  "strum",
+ "support-types",
  "thiserror",
  "toml",
  "tracing",
@@ -3746,6 +3751,14 @@ dependencies = [
  "pad",
  "parity-scale-codec",
  "thiserror",
+]
+
+[[package]]
+name = "support-types"
+version = "0.7.0"
+dependencies = [
+ "dirs",
+ "serde 1.0.136",
 ]
 
 [[package]]

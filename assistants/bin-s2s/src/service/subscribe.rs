@@ -1,11 +1,12 @@
 use lifeline::{Lifeline, Service, Task};
-
 use relay_s2s::subscribe::SubscribeJustification;
 use relay_s2s::types::JustificationInput;
+
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
+use crate::error::BinS2SResult;
 
 #[derive(Debug)]
 pub struct SubscribeService {
@@ -17,7 +18,7 @@ impl BridgeService for SubscribeService {}
 
 impl Service for SubscribeService {
     type Bus = BridgeBus;
-    type Lifeline = color_eyre::Result<Self>;
+    type Lifeline = BinS2SResult<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet_darwinia = Self::try_task(
@@ -49,10 +50,10 @@ impl Service for SubscribeService {
     }
 }
 
-async fn start_darwinia() -> color_eyre::Result<()> {
+async fn start_darwinia() -> BinS2SResult<()> {
     let bridge_config: BridgeConfig = Config::restore(Names::BridgeDarwiniaCrab)?;
 
-    let client_darwinia = bridge_config.darwinia.to_darwinia_client().await?;
+    let client_darwinia = bridge_config.target.to_darwinia_client().await?;
 
     let input = JustificationInput {
         client: client_darwinia,
@@ -62,10 +63,10 @@ async fn start_darwinia() -> color_eyre::Result<()> {
     Ok(())
 }
 
-async fn start_crab() -> color_eyre::Result<()> {
+async fn start_crab() -> BinS2SResult<()> {
     let bridge_config: BridgeConfig = Config::restore(Names::BridgeDarwiniaCrab)?;
 
-    let client_crab = bridge_config.crab.to_crab_client().await?;
+    let client_crab = bridge_config.source.to_crab_client().await?;
 
     let input = JustificationInput {
         client: client_crab,

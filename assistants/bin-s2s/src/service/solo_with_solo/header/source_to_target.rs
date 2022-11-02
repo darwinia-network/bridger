@@ -1,65 +1,96 @@
-use lifeline::{Lifeline, Service, Task};
-use subquery::types::OriginType;
+use std::marker::PhantomData;
 
+use lifeline::dyn_bus::DynBus;
+use lifeline::{Lifeline, Service, Task};
 use relay_s2s::header::SolochainHeaderRunner;
 use relay_s2s::types::SolochainHeaderInput;
-use support_common::config::{Config, Names};
+
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
+use crate::error::BinS2SResult;
+use crate::traits::{S2SSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
-pub struct SourceToTargetHeaderRelayService {
+pub struct SourceToTargetHeaderRelayService<CI: S2SSoloChainInfo, SI: SubqueryInfo> {
     _greet: Lifeline,
+    _chain_info: PhantomData<CI>,
+    _subquery_info: PhantomData<SI>,
 }
 
-impl BridgeService for SourceToTargetHeaderRelayService {}
+impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeService
+    for SourceToTargetHeaderRelayService<CI, SI>
+{
+}
 
-impl Service for SourceToTargetHeaderRelayService {
+impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetHeaderRelayService<CI, SI> {
     type Bus = BridgeBus;
-    type Lifeline = color_eyre::Result<Self>;
+    type Lifeline = BinS2SResult<Self>;
 
-    fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
-        let _greet = Self::try_task("source-to-target-header-relay-service", async move {
-            while let Err(e) = start().await {
+    fn spawn(bus: &Self::Bus) -> Self::Lifeline {
+        let bridge_config: BridgeConfig<CI, SI> = bus.storage().clone_resource();
+        let config_chain = &bridge_config.chain;
+        let task_name = format!(
+            "{}-{}-reader-relay-service",
+            config_chain.source.chain().name(),
+            config_chain.target.chain().name(),
+        );
+
+        let _greet = Self::try_task(task_name, async move {
+            while let Err(e) = Self::start(bus).await {
                 tracing::error!(
-                    target: "bind-s2s",
-                    "[header-relay] [source-to-target] An error occurred for header relay {:?}",
+                    target: "bin-s2s",
+                    "[header-relay] [{}-to-{}] An error occurred for header relay {:?}",
+                    config_chain.source.chain().name(),
+                    config_chain.target.chain().name(),
                     e,
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 tracing::info!(
-                    target: "bind-s2s",
-                    "[header-relay] [source-to-target] Try to restart header relay service.",
+                    target: "bin-s2s",
+                    "[header-relay] [{}-to-{}] Try to restart header relay service.",
+                    config_chain.source.chain().name(),
+                    config_chain.target.chain().name(),
                 );
             }
             Ok(())
         });
-        Ok(Self { _greet })
+        Ok(Self {
+            _greet,
+            _chain_info: Default::default(),
+            _subquery_info: Default::default(),
+        })
     }
 }
 
-async fn start() -> color_eyre::Result<()> {
-    tracing::info!(
-        target: "bind-s2s",
-        "[header-source-to-target] [source-to-target] SERVICE RESTARTING..."
-    );
-    let bridge_config: BridgeConfig = Config::restore(Names::Bridgetargetsource)?;
-    let relay_config = bridge_config.relay;
+impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> SourceToTargetHeaderRelayService<CI, SI> {
+    async fn start(bus: &BridgeBus) -> BinS2SResult<()> {
+        tracing::info!(
+            target: "bin-s2s",
+            "[header-source-to-target] [source-to-target] SERVICE RESTARTING..."
+        );
+        // let bridge_config: BridgeConfig<CI, SI> = Config::restore(Names::BridgeDarwiniaCrab)?;
+        let bridge_config: BridgeConfig<CI, SI> = bus.storage().clone_resource();
+        let relay_config = bridge_config.relay;
 
-    let client_source = bridge_config.source.to_source_client().await?;
-    let client_target = bridge_config.target.to_target_client().await?;
+        let config_chain = bridge_config.chain;
 
-    let config_index = bridge_config.index;
-    let subquery_source = config_index.to_source_subquery();
+        let client_source = config_chain.source.client().await?;
+        let client_target = config_chain.target.client().await?;
 
-    let input = SolochainHeaderInput {
-        client_source: client_source,
-        client_target: client_target,
-        subquery_source: subquery_source,
-        index_origin_type: OriginType::Bridgetarget,
-        enable_mandatory: relay_config.enable_mandatory,
-    };
-    let runner = SolochainHeaderRunner::new(input);
-    Ok(runner.start().await?)
+        let config_index = bridge_config.index;
+        let subquery_source = config_index.source.subquery()?;
+
+        let chain_name = client_source.chain_name();
+
+        let input = SolochainHeaderInput {
+            client_source,
+            client_target,
+            subquery_source,
+            index_origin_type: config_chain.target.origin_type(),
+            enable_mandatory: relay_config.enable_mandatory,
+        };
+        let runner = SolochainHeaderRunner::new(input);
+        Ok(runner.start().await?)
+    }
 }

@@ -32,6 +32,8 @@ array-bytes = { optional = true, version = "2" }
 
 gql_client  = "1"
 
+support-types = { path = "../../frame/supports/support-types" }
+
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 
@@ -39,6 +41,5 @@ tokio = { version = "1", features = ["full"] }
 default          = []
 bridge-s2s       = ["array-bytes"]
 bridge-parachain = ["bridge-s2s"]
-bridge-ethv1     = []
 bridge-ethv2     = []
 

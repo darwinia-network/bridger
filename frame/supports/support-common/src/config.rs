@@ -3,7 +3,8 @@ use std::path::PathBuf;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use crate::constants;
+use support_types::constants;
+
 use crate::error::BridgerError;
 
 /// The config names

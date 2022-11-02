@@ -1,6 +1,5 @@
 use std::marker::PhantomData;
 
-use bridge_s2s_traits::client::S2SClientBase;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 use relay_s2s::header::SolochainHeaderRunner;

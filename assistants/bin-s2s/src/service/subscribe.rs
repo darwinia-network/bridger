@@ -5,11 +5,10 @@ use lifeline::{Lifeline, Service, Task};
 use relay_s2s::subscribe::SubscribeJustification;
 use relay_s2s::types::JustificationInput;
 
-use support_common::config::{Config, Names};
 use support_lifeline::error::SupportLifelineResult;
 use support_lifeline::service::BridgeService;
 
-use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
+use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::error::{BinS2SError, BinS2SResult};
 use crate::traits::{S2SSoloChainInfo, SubqueryInfo};
 

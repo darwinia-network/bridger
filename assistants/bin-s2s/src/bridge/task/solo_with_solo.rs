@@ -7,7 +7,6 @@ use support_lifeline::task::TaskStack;
 use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::error::BinS2SResult;
 use crate::service::feemarket::FeemarketService;
-#[cfg(feature = "solo-with-solo")]
 use crate::service::solo_with_solo::{
     SourceToTargetHeaderRelayService, TargetToSourceHeaderRelayService,
 };
@@ -22,32 +21,17 @@ pub struct BridgeTask<CI: S2SSoloChainInfo, SI: SubqueryInfo> {
 }
 
 impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
-    pub fn name() -> &'static str {
-        "darwinia-crab"
-    }
-}
-
-impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
-    #[cfg(feature = "solo-with-solo")]
-    fn spawn_relay_solo_with_solo(stack: &mut TaskStack<BridgeBus>) -> BinS2SResult<()> {
-        stack.spawn_service::<SourceToTargetHeaderRelayService<CI, SI>>()?;
-        stack.spawn_service::<TargetToSourceHeaderRelayService<CI, SI>>()?;
-        // stack.spawn_service::<SourceToTargetMessageRelayService>()?;
-        // stack.spawn_service::<TargetToSourceMessageRelayService>()?;
-        Ok(())
-    }
-}
-
-impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
     pub fn new(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<Self> {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
+        stack.bus().store_resource(bridge_config);
         stack.spawn_service::<SubscribeService<CI, SI>>()?;
         stack.spawn_service::<FeemarketService>()?;
-        stack.bus().store_resource(bridge_config);
+        stack.spawn_service::<SourceToTargetHeaderRelayService<CI, SI>>()?;
+        stack.spawn_service::<TargetToSourceHeaderRelayService<CI, SI>>()?;
 
-        #[cfg(feature = "solo-with-solo")]
-        Self::spawn_relay_solo_with_solo(&mut stack)?;
+        // stack.spawn_service::<SourceToTargetMessageRelayService>()?;
+        // stack.spawn_service::<TargetToSourceMessageRelayService>()?;
 
         Ok(Self {
             stack,

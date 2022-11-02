@@ -72,23 +72,14 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> SourceToTargetHeaderRelayService<CI
             target: "bin-s2s",
             "[header-source-to-target] [source-to-target] SERVICE RESTARTING..."
         );
-        // let bridge_config: BridgeConfig<CI, SI> = Config::restore(Names::BridgeDarwiniaCrab)?;
         let relay_config = bridge_config.relay;
-
         let config_chain = bridge_config.chain;
-
-        let client_source = config_chain.source.client().await?;
-        let client_target = config_chain.target.client().await?;
-
         let config_index = bridge_config.index;
-        let subquery_source = config_index.source.subquery()?;
-
-        let chain_name = client_source.chain_name();
 
         let input = SolochainHeaderInput {
-            client_source,
-            client_target,
-            subquery_source,
+            client_source: config_chain.source.client().await?,
+            client_target: config_chain.target.client().await?,
+            subquery_source: config_index.source.subquery()?,
             index_origin_type: config_chain.target.origin_type(),
             enable_mandatory: relay_config.enable_mandatory,
         };

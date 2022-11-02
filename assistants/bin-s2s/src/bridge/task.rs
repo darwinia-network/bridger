@@ -8,7 +8,9 @@ use crate::bridge::{BridgeBus, BridgeConfig};
 use crate::error::BinS2SResult;
 use crate::service::feemarket::FeemarketService;
 #[cfg(feature = "solo-with-solo")]
-use crate::service::solo_with_solo::SourceToTargetHeaderRelayService;
+use crate::service::solo_with_solo::{
+    SourceToTargetHeaderRelayService, TargetToSourceHeaderRelayService,
+};
 use crate::service::subscribe::SubscribeService;
 use crate::traits::{S2SSoloChainInfo, SubqueryInfo};
 
@@ -29,7 +31,7 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
     #[cfg(feature = "solo-with-solo")]
     fn spawn_relay_solo_with_solo(stack: &mut TaskStack<BridgeBus>) -> BinS2SResult<()> {
         stack.spawn_service::<SourceToTargetHeaderRelayService<CI, SI>>()?;
-        // stack.spawn_service::<TargetToSourceHeaderRelayService>()?;
+        stack.spawn_service::<TargetToSourceHeaderRelayService<CI, SI>>()?;
         // stack.spawn_service::<SourceToTargetMessageRelayService>()?;
         // stack.spawn_service::<TargetToSourceMessageRelayService>()?;
         Ok(())

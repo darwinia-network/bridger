@@ -22,9 +22,6 @@ pub trait S2SClientBase: 'static + Send + Sync + Sized + Clone {
         + Extrinsic
         + Debug
         + MaybeSerializeDeserialize;
-    fn chain_name(&self) -> &'static str {
-        Self::CHAIN
-    }
 }
 
 /// S2S bridge client generic trait

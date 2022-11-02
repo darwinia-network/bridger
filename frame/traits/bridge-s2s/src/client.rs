@@ -13,7 +13,18 @@ use crate::types::bp_runtime::Chain;
 pub trait S2SClientBase: 'static + Send + Sync + Sized + Clone {
     const CHAIN: &'static str;
     type Chain: Chain;
-    type Extrinsic: Codec + EncodeLike + Clone + Eq + Extrinsic + Debug + MaybeSerializeDeserialize;
+    type Extrinsic: Send
+        + Sync
+        + Codec
+        + EncodeLike
+        + Clone
+        + Eq
+        + Extrinsic
+        + Debug
+        + MaybeSerializeDeserialize;
+    fn chain_name(&self) -> &'static str {
+        Self::CHAIN
+    }
 }
 
 /// S2S bridge client generic trait

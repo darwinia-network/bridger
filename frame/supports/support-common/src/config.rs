@@ -93,7 +93,7 @@ impl Config {
 impl Config {
     /// Store without file format, if the config is exists will be replace it.
     /// If not choose toml default.
-    pub fn store(name: Names, config: impl Serialize) -> color_eyre::Result<()> {
+    pub fn store(name: Names, config: impl Serialize) -> Result<(), BridgerError> {
         Self::new().persist(name.name(), config, None)
     }
 
@@ -102,12 +102,12 @@ impl Config {
         name: Names,
         config: impl Serialize,
         format: ConfigFormat,
-    ) -> color_eyre::Result<()> {
+    ) -> Result<(), BridgerError> {
         Self::new().persist(name.name(), config, Some(format))
     }
 
     /// Restore config from file by name
-    pub fn restore<T: DeserializeOwned>(name: Names) -> color_eyre::Result<T> {
+    pub fn restore<T: DeserializeOwned>(name: Names) -> Result<T, BridgerError> {
         Self::new().load(name.name())
     }
 
@@ -125,7 +125,7 @@ impl Config {
         &self,
         config: impl Serialize,
         format: &ConfigFormat,
-    ) -> color_eyre::Result<String> {
+    ) -> Result<String, BridgerError> {
         let content = match format {
             ConfigFormat::Yml => serde_yaml::to_string(&config)?,
             ConfigFormat::Json => serde_json::to_string_pretty(&config)?,
@@ -143,7 +143,7 @@ impl Config {
     fn find_config_file(
         &self,
         name: impl AsRef<str>,
-    ) -> color_eyre::Result<Option<(PathBuf, ConfigFormat)>> {
+    ) -> Result<Option<(PathBuf, ConfigFormat)>, BridgerError> {
         let mut config_file = None;
         if !self.base_path.exists() {
             tracing::warn!(target: "bridger", "The base_path ({}) is not found.", self.base_path.display());
@@ -191,7 +191,7 @@ impl Config {
         name: impl AsRef<str>,
         config: impl Serialize,
         format: Option<ConfigFormat>,
-    ) -> color_eyre::Result<()> {
+    ) -> Result<(), BridgerError> {
         if !self.base_path.exists() {
             std::fs::create_dir_all(&self.base_path)?;
         }
@@ -209,7 +209,7 @@ impl Config {
         Ok(())
     }
 
-    fn load<T: DeserializeOwned>(&self, name: impl AsRef<str>) -> color_eyre::Result<T> {
+    fn load<T: DeserializeOwned>(&self, name: impl AsRef<str>) -> Result<T, BridgerError> {
         if !self.base_path.exists() {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::NotFound,

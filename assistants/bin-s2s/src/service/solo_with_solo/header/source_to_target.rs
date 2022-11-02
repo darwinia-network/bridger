@@ -1,14 +1,16 @@
 use std::marker::PhantomData;
 
+use bridge_s2s_traits::client::S2SClientBase;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 use relay_s2s::header::SolochainHeaderRunner;
 use relay_s2s::types::SolochainHeaderInput;
 
+use support_lifeline::error::SupportLifelineResult;
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::{BridgeBus, BridgeConfig};
-use crate::error::BinS2SResult;
+use crate::error::{BinS2SError, BinS2SResult};
 use crate::traits::{S2SSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
@@ -25,19 +27,20 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeService
 
 impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetHeaderRelayService<CI, SI> {
     type Bus = BridgeBus;
-    type Lifeline = BinS2SResult<Self>;
+    type Lifeline = SupportLifelineResult<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let bridge_config: BridgeConfig<CI, SI> = bus.storage().clone_resource();
-        let config_chain = &bridge_config.chain;
+        let bridge_config: BridgeConfig<CI, SI> =
+            bus.storage().clone_resource().map_err(BinS2SError::from)?;
+        let config_chain = bridge_config.chain.clone();
         let task_name = format!(
             "{}-{}-reader-relay-service",
             config_chain.source.chain().name(),
             config_chain.target.chain().name(),
         );
 
-        let _greet = Self::try_task(task_name, async move {
-            while let Err(e) = Self::start(bus).await {
+        let _greet = Self::try_task(&task_name, async move {
+            while let Err(e) = Self::start(bridge_config.clone()).await {
                 tracing::error!(
                     target: "bin-s2s",
                     "[header-relay] [{}-to-{}] An error occurred for header relay {:?}",
@@ -64,13 +67,12 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetHeaderRel
 }
 
 impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> SourceToTargetHeaderRelayService<CI, SI> {
-    async fn start(bus: &BridgeBus) -> BinS2SResult<()> {
+    async fn start(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<()> {
         tracing::info!(
             target: "bin-s2s",
             "[header-source-to-target] [source-to-target] SERVICE RESTARTING..."
         );
         // let bridge_config: BridgeConfig<CI, SI> = Config::restore(Names::BridgeDarwiniaCrab)?;
-        let bridge_config: BridgeConfig<CI, SI> = bus.storage().clone_resource();
         let relay_config = bridge_config.relay;
 
         let config_chain = bridge_config.chain;

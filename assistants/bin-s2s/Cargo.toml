@@ -29,12 +29,9 @@ tokio       = { version = "1", features = ["full"] }
 structopt = "0.3"
 strum     = { version = "0.21", features = ["derive"] }
 serde     = { version = "1", features = ["derive"] }
-codec     = { package = "parity-scale-codec", version = "2" }
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage  = "0.4"
-
-sp-runtime         = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
 
 support-common     = { path = "../../frame/supports/support-common" }
 support-lifeline   = { path = "../../frame/supports/support-lifeline" }

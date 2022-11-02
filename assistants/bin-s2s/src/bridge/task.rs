@@ -28,7 +28,7 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
 impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
     #[cfg(feature = "solo-with-solo")]
     fn spawn_relay_solo_with_solo(stack: &mut TaskStack<BridgeBus>) -> BinS2SResult<()> {
-        stack.spawn_service::<SourceToTargetHeaderRelayService>()?;
+        stack.spawn_service::<SourceToTargetHeaderRelayService<CI, SI>>()?;
         // stack.spawn_service::<TargetToSourceHeaderRelayService>()?;
         // stack.spawn_service::<SourceToTargetMessageRelayService>()?;
         // stack.spawn_service::<TargetToSourceMessageRelayService>()?;
@@ -40,7 +40,7 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
     pub fn new(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<Self> {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
-        stack.spawn_service::<SubscribeService>()?;
+        stack.spawn_service::<SubscribeService<CI, SI>>()?;
         stack.spawn_service::<FeemarketService>()?;
         stack.bus().store_resource(bridge_config);
 

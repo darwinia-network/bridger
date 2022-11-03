@@ -42,9 +42,14 @@ if [ "${CHAIN}" == "pangoro" ]; then
 fi
 
 if [ "${CHAIN}" == "darwinia" ]; then
-  ENDPOINT='https://rpc.darwinia.network'
-#  ENDPOINT='http://127.0.0.1:9936'
+#  ENDPOINT='https://rpc.darwinia.network'
+  ENDPOINT='http://127.0.0.1:9988'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-darwinia
+fi
+
+if [ "${CHAIN}" == "darwinia-parachain" ]; then
+  ENDPOINT='http://127.0.0.1:9988'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-darwinia-parachain
 fi
 
 if [ "${CHAIN}" == "rococo" ]; then

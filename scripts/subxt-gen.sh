@@ -83,6 +83,11 @@ if [ "${CHAIN}" == "kusama" ]; then
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-kusama
 fi
 
+if [ "${CHAIN}" == "polkadot" ]; then
+  ENDPOINT='https://rpc.polkadot.io'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-polkadot
+fi
+
 if [ "${CHAIN}" == "moonbase" ]; then
   ENDPOINT='https://frag-moonbase-relay-rpc.g.moonbase.moonbeam.network'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-moonbase

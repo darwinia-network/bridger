@@ -65,6 +65,8 @@ mod query_vars {
         BridgeCrab,
         #[serde(rename = "bridge-darwinia")]
         BridgeDarwinia,
+        #[serde(rename = "bridge-darwinia-parachain")]
+        BridgeDarwiniaParachain,
     }
 }
 

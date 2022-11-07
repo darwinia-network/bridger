@@ -42,9 +42,14 @@ if [ "${CHAIN}" == "pangoro" ]; then
 fi
 
 if [ "${CHAIN}" == "darwinia" ]; then
-  ENDPOINT='https://rpc.darwinia.network'
-#  ENDPOINT='http://127.0.0.1:9936'
+#  ENDPOINT='https://rpc.darwinia.network'
+  ENDPOINT='http://127.0.0.1:9988'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-darwinia
+fi
+
+if [ "${CHAIN}" == "darwinia-parachain" ]; then
+  ENDPOINT='http://127.0.0.1:9988'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-darwinia-parachain
 fi
 
 if [ "${CHAIN}" == "rococo" ]; then
@@ -76,6 +81,11 @@ fi
 if [ "${CHAIN}" == "kusama" ]; then
   ENDPOINT='https://kusama-rpc.dwellir.com'
   OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-kusama
+fi
+
+if [ "${CHAIN}" == "polkadot" ]; then
+  ENDPOINT='https://rpc.polkadot.io'
+  OUTPUT_PATH=${WORK_PATH}/frame/assistants/client-polkadot
 fi
 
 if [ "${CHAIN}" == "moonbase" ]; then

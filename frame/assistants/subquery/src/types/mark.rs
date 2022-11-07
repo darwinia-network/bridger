@@ -30,6 +30,9 @@ pub enum BridgeName {
     /// bridge pangoro<>goerli (goerli)
     #[cfg(feature = "bridge-ethv2")]
     PangoroGoerli,
+    /// bridge darwinia<>darwinia-parachain
+    #[cfg(feature = "bridge-s2s")]
+    DarwiniaParachain,
 }
 
 impl BridgeName {
@@ -54,6 +57,8 @@ impl BridgeName {
             Self::DarwiniaCrab => "darwinia-crab",
             #[cfg(feature = "bridge-ethv2")]
             Self::PangoroGoerli => "pangoro-goerli",
+            #[cfg(feature = "bridge-s2s")]
+            Self::DarwiniaParachain => "darwinia-parachain",
         }
     }
 }

@@ -23,7 +23,7 @@ impl FeemarketApiRelay for DarwiniaClient {
         match self
             .runtime()
             .storage()
-            .darwinia_parachain_fee_market()
+            .fee_market()
             .orders(laned_id, message_nonce, None)
             .await?
         {

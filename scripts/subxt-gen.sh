@@ -47,6 +47,11 @@ if [ "${CHAIN}" == "darwinia" ]; then
   OUTPUT_PATH=${WORK_PATH}/assistants/client-darwinia
 fi
 
+if [ "${CHAIN}" == "darwinia-parachain" ]; then
+  ENDPOINT='http://127.0.0.1:9988'
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-darwinia-parachain
+fi
+
 if [ "${CHAIN}" == "rococo" ]; then
   ENDPOINT='https://rococo-rpc.polkadot.io'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-rococo
@@ -81,6 +86,11 @@ fi
 if [ "${CHAIN}" == "moonbase" ]; then
   ENDPOINT='https://frag-moonbase-relay-rpc.g.moonbase.moonbeam.network'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-moonbase
+fi
+
+if [ "${CHAIN}" == "polkadot" ]; then
+  ENDPOINT='https://rpc.polkadot.io'
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-polkadot
 fi
 
 if [ -z "${ENDPOINT}" ]; then

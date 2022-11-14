@@ -130,7 +130,7 @@ impl Tracker {
                     return Ok(v.as_u64());
                 }
                 if v.is_boolean() {
-                    return Ok(v.as_bool().map(|b| if b { 1 } else { 0 }));
+                    return Ok(v.as_bool().map(u64::from));
                 }
                 if v.is_string() {
                     return match v.as_str() {

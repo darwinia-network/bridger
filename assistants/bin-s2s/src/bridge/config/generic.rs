@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use crate::traits::SubqueryInfo;
 use crate::types::HexLaneId;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -9,12 +8,8 @@ pub struct RelayConfig {
     pub lanes: Vec<HexLaneId>,
     #[serde(default)]
     pub enable_mandatory: bool,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct IndexConfig<SI: SubqueryInfo> {
-    pub source: SI,
-    pub target: SI,
+    #[cfg(any(feature = "solo-with-para", feature = "para-with-para"))]
+    pub para_id: u32,
 }
 
 impl RelayConfig {

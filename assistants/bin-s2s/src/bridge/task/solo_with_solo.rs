@@ -4,24 +4,25 @@ use lifeline::dyn_bus::DynBus;
 
 use support_lifeline::task::TaskStack;
 
-use crate::bridge::{BridgeBus, BridgeConfig};
+use crate::bridge::config::solo_with_solo::BridgeConfig;
+use crate::bridge::BridgeBus;
 use crate::error::BinS2SResult;
 use crate::service::feemarket::FeemarketService;
+use crate::service::solo_with_solo::SubscribeService;
 use crate::service::solo_with_solo::{
     SourceToTargetHeaderRelayService, SourceToTargetMessageRelayService,
     TargetToSourceHeaderRelayService, TargetToSourceMessageRelayService,
 };
-use crate::service::subscribe::SubscribeService;
-use crate::traits::{S2SSoloChainInfo, SubqueryInfo};
+use crate::traits::{S2SSoloBridgeSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
-pub struct BridgeTask<CI: S2SSoloChainInfo, SI: SubqueryInfo> {
+pub struct BridgeTask<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> {
     stack: TaskStack<BridgeBus>,
     _chain_info: PhantomData<CI>,
     _subquery_info: PhantomData<SI>,
 }
 
-impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
+impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
     pub fn new(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<Self> {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
@@ -41,7 +42,7 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
     }
 }
 
-impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
+impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
     #[allow(dead_code)]
     pub fn stack(&self) -> &TaskStack<BridgeBus> {
         &self.stack

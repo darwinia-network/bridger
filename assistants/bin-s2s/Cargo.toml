@@ -48,5 +48,5 @@ feemarket-s2s        = { path = "../feemarket-s2s" }
 [features]
 default        = []
 solo-with-solo = []
-solo-with-para = []
-para-with-para = []
+solo-with-para = ["relay-s2s/bridge-parachain"]
+para-with-para = ["relay-s2s/bridge-parachain"]

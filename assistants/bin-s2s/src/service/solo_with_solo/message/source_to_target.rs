@@ -9,24 +9,25 @@ use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
 use support_lifeline::error::SupportLifelineResult;
 use support_lifeline::service::BridgeService;
 
-use crate::bridge::{BridgeBus, BridgeConfig};
+use crate::bridge::config::solo_with_solo::BridgeConfig;
+use crate::bridge::BridgeBus;
 use crate::error::{BinS2SError, BinS2SResult};
-use crate::traits::{S2SSoloChainInfo, SubqueryInfo};
+use crate::traits::{S2SSoloBridgeSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
-pub struct SourceToTargetMessageRelayService<CI: S2SSoloChainInfo, SI: SubqueryInfo> {
+pub struct SourceToTargetMessageRelayService<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> {
     _greet_delivery: Lifeline,
     _greet_receiving: Lifeline,
     _chain_info: PhantomData<CI>,
     _subquery_info: PhantomData<SI>,
 }
 
-impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> BridgeService
+impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> BridgeService
     for SourceToTargetMessageRelayService<CI, SI>
 {
 }
 
-impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetMessageRelayService<CI, SI> {
+impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetMessageRelayService<CI, SI> {
     type Bus = BridgeBus;
     type Lifeline = SupportLifelineResult<Self>;
 
@@ -97,11 +98,11 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetMessageRe
     }
 }
 
-impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> SourceToTargetMessageRelayService<CI, SI> {
+impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> SourceToTargetMessageRelayService<CI, SI> {
     async fn message_input(
         bridge_config: BridgeConfig<CI, SI>,
     ) -> BinS2SResult<
-        MessageReceivingInput<<CI as S2SSoloChainInfo>::Client, <CI as S2SSoloChainInfo>::Client>,
+        MessageReceivingInput<<CI as S2SSoloBridgeSoloChainInfo>::Client, <CI as S2SSoloBridgeSoloChainInfo>::Client>,
     > {
         let relay_config = bridge_config.relay;
         let config_chain = bridge_config.chain;

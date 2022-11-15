@@ -33,7 +33,7 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetHeaderRel
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_name = format!(
-            "{}-{}-reader-relay-service",
+            "{}-{}-header-relay-service",
             config_chain.source.chain().name(),
             config_chain.target.chain().name(),
         );
@@ -42,7 +42,7 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetHeaderRel
             while let Err(e) = Self::start(bridge_config.clone()).await {
                 tracing::error!(
                     target: "bin-s2s",
-                    "[header-relay] [{}-to-{}] An error occurred for header relay {:?}",
+                    "[header-relay] [{}-to-{}] an error occurred for header relay {:?}",
                     config_chain.source.chain().name(),
                     config_chain.target.chain().name(),
                     e,
@@ -50,7 +50,7 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetHeaderRel
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 tracing::info!(
                     target: "bin-s2s",
-                    "[header-relay] [{}-to-{}] Try to restart header relay service.",
+                    "[header-relay] [{}-to-{}] try to restart header relay service.",
                     config_chain.source.chain().name(),
                     config_chain.target.chain().name(),
                 );
@@ -67,13 +67,15 @@ impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetHeaderRel
 
 impl<CI: S2SSoloChainInfo, SI: SubqueryInfo> SourceToTargetHeaderRelayService<CI, SI> {
     async fn start(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<()> {
-        tracing::info!(
-            target: "bin-s2s",
-            "[header-source-to-target] [source-to-target] SERVICE RESTARTING..."
-        );
         let relay_config = bridge_config.relay;
         let config_chain = bridge_config.chain;
         let config_index = bridge_config.index;
+        tracing::info!(
+            target: "bin-s2s",
+            "[header-{}-to-{}] SERVICE RESTARTING...",
+            config_chain.source.chain().name(),
+            config_chain.target.chain().name(),
+        );
 
         let input = SolochainHeaderInput {
             client_source: config_chain.source.client().await?,

@@ -483,6 +483,7 @@ dependencies = [
  "bp-messages",
  "bp-runtime",
  "bridge-runtime-common",
+ "client-common-traits",
  "jsonrpsee-core",
  "parity-scale-codec",
  "scale-info",
@@ -567,6 +568,13 @@ dependencies = [
  "textwrap",
  "unicode-width",
  "vec_map",
+]
+
+[[package]]
+name = "client-common-traits"
+version = "0.7.0"
+dependencies = [
+ "bp-runtime",
 ]
 
 [[package]]
@@ -1062,6 +1070,7 @@ version = "0.7.0"
 dependencies = [
  "async-trait",
  "bp-runtime",
+ "client-common-traits",
  "pallet-fee-market",
  "parity-scale-codec",
  "subxt",

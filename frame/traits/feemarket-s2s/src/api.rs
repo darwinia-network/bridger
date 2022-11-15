@@ -1,16 +1,11 @@
 use bp_runtime::Chain;
+use client_common_traits::ClientCommon;
 
 use crate::error::AbstractFeemarketResult;
 use crate::types::{LaneId, MessageNonce, Order, Relayer};
 
 #[async_trait::async_trait]
-pub trait FeemarketApiBase: 'static + Send + Sync + Clone {
-    /// chain name
-    const CHAIN: &'static str;
-
-    /// chain types
-    type Chain: Chain;
-
+pub trait FeemarketApiBase: ClientCommon {
     /// best finalized block number
     async fn best_finalized_header_number(
         &self,

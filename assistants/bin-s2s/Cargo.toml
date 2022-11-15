@@ -38,10 +38,12 @@ support-lifeline   = { path = "../../frame/supports/support-lifeline" }
 support-toolkit    = { path = "../../frame/supports/support-toolkit" }
 support-types      = { path = "../../frame/supports/support-types" }
 
-bridge-s2s-traits   = { path = "../../frame/traits/bridge-s2s" }
-subquery            = { path = "../subquery", features = [ "bridge-s2s" ] }
-relay-s2s           = { path = "../relay-s2s" }
-feemarket-s2s       = { path = "../feemarket-s2s" }
+bridge-s2s-traits    = { path = "../../frame/traits/bridge-s2s" }
+feemarket-s2s-traits = { path = "../../frame/traits/feemarket-s2s" }
+client-common-traits = { path = "../../frame/traits/client-common" }
+subquery             = { path = "../subquery", features = [ "bridge-s2s" ] }
+relay-s2s            = { path = "../relay-s2s" }
+feemarket-s2s        = { path = "../feemarket-s2s" }
 
 [features]
 default        = []

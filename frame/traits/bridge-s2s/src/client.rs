@@ -1,6 +1,7 @@
 use core::fmt::Debug;
 use std::ops::RangeInclusive;
 
+use client_common_traits::ClientCommon;
 use codec::{Codec, Decode, Encode, EncodeLike};
 use jsonrpsee_core::client::Subscription;
 use sp_runtime::generic::{Block, SignedBlock};
@@ -10,9 +11,7 @@ use crate::error::S2SClientResult;
 use crate::types::bp_runtime::Chain;
 
 /// S2S bridge client types defined
-pub trait S2SClientBase: 'static + Send + Sync + Sized + Clone {
-    const CHAIN: &'static str;
-    type Chain: Chain;
+pub trait S2SClientBase: ClientCommon {
     type Extrinsic: Send
         + Sync
         + Codec

@@ -1,5 +1,5 @@
 [package]
-name          = "feemarket-s2s-traits"
+name          = "client-common-traits"
 authors       = ["Darwinia Network <hello@darwinia.network>"]
 description   = "Darwinia bridger"
 documentation = "https://rust-docs.darwinia.network/bridger"
@@ -13,19 +13,7 @@ repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.7.0"
 
 [dependencies]
-thiserror   = "1"
-async-trait = "0.1"
-
-codec             = { package = "parity-scale-codec", version = "2" }
 bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
-pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
-
-client-common-traits = { path = "../client-common" }
-
-subxt             = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
 
 [features]
-default = []
-advanced-types = [
-  "subxt",
-]
+

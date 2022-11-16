@@ -580,6 +580,7 @@ dependencies = [
  "async-trait",
  "bp-kusama",
  "bridge-s2s-traits",
+ "client-common-traits",
  "finality-grandpa",
  "parity-scale-codec",
  "serde 1.0.137",

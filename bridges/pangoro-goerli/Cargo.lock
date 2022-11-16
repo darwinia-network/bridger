@@ -595,6 +595,7 @@ dependencies = [
  "microkv",
  "serde 1.0.145",
  "support-common",
+ "support-types",
  "thiserror",
  "tracing",
 ]

@@ -39,7 +39,7 @@ impl<
         SI: SubqueryInfo,
     > BridgeTask<SCI, RCI, PCI, SI>
 {
-    pub fn new(bridge_config: BridgeConfig<SCI, RCI, PCI, SI>) -> BinS2SResult<Self> {
+    pub fn new(bridge_config: BridgeConfig<SCI, RCI, PCI, SI>) -> color_eyre::Result<Self> {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
         stack.bus().store_resource(bridge_config);

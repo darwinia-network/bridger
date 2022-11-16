@@ -6,7 +6,6 @@ use support_lifeline::task::TaskStack;
 
 use crate::bridge::config::solo_with_solo::BridgeConfig;
 use crate::bridge::BridgeBus;
-use crate::error::BinS2SResult;
 use crate::service::feemarket::FeemarketService;
 use crate::service::solo_with_solo::SubscribeService;
 use crate::service::solo_with_solo::{
@@ -30,7 +29,7 @@ pub struct BridgeTask<
 impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
     BridgeTask<SCI, TCI, SI>
 {
-    pub fn new(bridge_config: BridgeConfig<SCI, TCI, SI>) -> BinS2SResult<Self> {
+    pub fn new(bridge_config: BridgeConfig<SCI, TCI, SI>) -> color_eyre::Result<Self> {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
         stack.bus().store_resource(bridge_config);

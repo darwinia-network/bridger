@@ -5,12 +5,11 @@ use lifeline::{Lifeline, Service, Task};
 use relay_s2s::header::SolochainHeaderRunner;
 use relay_s2s::types::SolochainHeaderInput;
 
-use support_lifeline::error::SupportLifelineResult;
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::config::solo_with_para::BridgeConfig;
 use crate::bridge::BridgeBus;
-use crate::error::{BinS2SError, BinS2SResult};
+use crate::error::BinS2SResult;
 use crate::traits::{
     S2SParaBridgeRelayChainInfo, S2SParaBridgeSoloChainInfo, S2SSoloBridgeSoloChainInfo,
     SubqueryInfo,
@@ -47,11 +46,10 @@ impl<
     > Service for SolochainToParachainHeaderRelayService<SCI, RCI, PCI, SI>
 {
     type Bus = BridgeBus;
-    type Lifeline = SupportLifelineResult<Self>;
+    type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let bridge_config: BridgeConfig<SCI, RCI, PCI, SI> =
-            bus.storage().clone_resource().map_err(BinS2SError::from)?;
+        let bridge_config: BridgeConfig<SCI, RCI, PCI, SI> = bus.storage().clone_resource()?;
         let config_chain = bridge_config.chain.clone();
         let task_name = format!(
             "{}-{}-header-relay-service",

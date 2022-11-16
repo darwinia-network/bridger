@@ -6,12 +6,11 @@ use lifeline::{Lifeline, Service, Task};
 use relay_s2s::message::{BridgeSolochainDeliveryRunner, BridgeSolochainReceivingRunner};
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
 
-use support_lifeline::error::SupportLifelineResult;
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::config::solo_with_solo::BridgeConfig;
 use crate::bridge::BridgeBus;
-use crate::error::{BinS2SError, BinS2SResult};
+use crate::error::BinS2SResult;
 use crate::traits::{S2SSoloBridgeSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
@@ -36,11 +35,10 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
     for SourceToTargetMessageRelayService<SCI, TCI, SI>
 {
     type Bus = BridgeBus;
-    type Lifeline = SupportLifelineResult<Self>;
+    type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let bridge_config: BridgeConfig<SCI, TCI, SI> =
-            bus.storage().clone_resource().map_err(BinS2SError::from)?;
+        let bridge_config: BridgeConfig<SCI, TCI, SI> = bus.storage().clone_resource()?;
         let config_chain = bridge_config.chain.clone();
         let task_delivery_name = format!(
             "{}-{}-message-delivery-service",
@@ -68,8 +66,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
             Ok(())
         });
 
-        let bridge_config: BridgeConfig<SCI, TCI, SI> =
-            bus.storage().clone_resource().map_err(BinS2SError::from)?;
+        let bridge_config: BridgeConfig<SCI, TCI, SI> = bus.storage().clone_resource()?;
         let config_chain = bridge_config.chain.clone();
         let task_receiving_name = format!(
             "{}-{}-message-receiving-service",

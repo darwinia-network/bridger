@@ -10,7 +10,7 @@ endpoint             = "wss://parachain-rpc.darwinia.network"
 signer               = "//Alice"
 
 [relay]
-lanes            = ["70616c69"] # todo: please update lane id
+lanes            = ["00000001"]
 para_id          = 2046
 enable_mandatory = false
 

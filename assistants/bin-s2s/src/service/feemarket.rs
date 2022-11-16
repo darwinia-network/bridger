@@ -1,6 +1,5 @@
 use lifeline::{Lifeline, Service, Task};
 
-use support_lifeline::error::SupportLifelineResult;
 use support_lifeline::service::BridgeService;
 
 use crate::bridge::BridgeBus;
@@ -14,7 +13,7 @@ impl BridgeService for FeemarketService {}
 
 impl Service for FeemarketService {
     type Bus = BridgeBus;
-    type Lifeline = SupportLifelineResult<Self>;
+    type Lifeline = color_eyre::Result<Self>;
 
     fn spawn(_bus: &Self::Bus) -> Self::Lifeline {
         let _greet = Self::try_task("feemarket-service", async move { Ok(()) });

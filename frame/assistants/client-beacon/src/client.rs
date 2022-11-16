@@ -1,9 +1,13 @@
 use super::types::{
-    BlockMessage, Finality, FinalityUpdate, ForkVersion, GetBlockResponse, GetHeaderResponse,
-    Proof, ResponseWrapper, Snapshot, SyncCommitteePeriodUpdate,
+    Finality, FinalityUpdate, ForkVersion, GetHeaderResponse, Proof, ResponseWrapper, Snapshot,
+    SyncCommitteePeriodUpdate,
 };
-use crate::error::{BeaconApiError, BeaconApiResult};
+use crate::{
+    error::{BeaconApiError, BeaconApiResult},
+    types::BeaconBlockWrapper,
+};
 use reqwest::header::CONTENT_TYPE;
+use types::{BeaconBlockMerge, MainnetEthSpec};
 
 pub struct BeaconApiClient {
     api_client: reqwest::Client,
@@ -53,7 +57,14 @@ impl BeaconApiClient {
         &self,
         current_slot: u64,
         mut slot: u64,
-    ) -> BeaconApiResult<Option<(u64, u64, GetHeaderResponse, BlockMessage)>> {
+    ) -> BeaconApiResult<
+        Option<(
+            u64,
+            u64,
+            GetHeaderResponse,
+            BeaconBlockMerge<MainnetEthSpec>,
+        )>,
+    > {
         loop {
             if slot > current_slot {
                 return Ok(None);
@@ -81,13 +92,11 @@ impl BeaconApiClient {
         }
     }
 
-    fn is_valid_sync_aggregate_block(block: &BlockMessage) -> BeaconApiResult<bool> {
-        let bytes = hex::decode(&block.body.sync_aggregate.sync_committee_bits.clone()[2..]);
-        if let Ok(bytes) = bytes {
-            Ok(hamming::weight(&bytes) * 3 > 512 * 2)
-        } else {
-            Err(BeaconApiError::Custom(String::from("Failed to decode sync_committee_bits")).into())
-        }
+    fn is_valid_sync_aggregate_block(
+        block: &BeaconBlockMerge<MainnetEthSpec>,
+    ) -> BeaconApiResult<bool> {
+        let sync_committee_bits = &block.body.sync_aggregate.sync_committee_bits.as_slice();
+        Ok(hamming::weight(sync_committee_bits) * 3 > 512 * 2)
     }
 
     pub async fn get_beacon_block_root(&self, id: impl ToString) -> BeaconApiResult<String> {
@@ -122,13 +131,27 @@ impl BeaconApiClient {
         Err(BeaconApiError::Custom("Not found valid snapshot".into()).into())
     }
 
-    pub async fn get_beacon_block(&self, id: impl ToString) -> BeaconApiResult<BlockMessage> {
+    // pub async fn get_beacon_block(&self, id: impl ToString) -> BeaconApiResult<BlockMessage> {
+    //     let url = format!(
+    //         "{}/eth/v2/beacon/blocks/{}",
+    //         self.api_base_url,
+    //         id.to_string(),
+    //     );
+    //     let res: ResponseWrapper<GetBlockResponse> =
+    //         self.api_client.get(url).send().await?.json().await?;
+    //     Ok(res.data.message)
+    // }
+
+    pub async fn get_beacon_block(
+        &self,
+        id: impl ToString,
+    ) -> BeaconApiResult<BeaconBlockMerge<MainnetEthSpec>> {
         let url = format!(
             "{}/eth/v2/beacon/blocks/{}",
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<GetBlockResponse> =
+        let res: ResponseWrapper<BeaconBlockWrapper> =
             self.api_client.get(url).send().await?.json().await?;
         Ok(res.data.message)
     }
@@ -232,10 +255,14 @@ impl BeaconApiClient {
 #[cfg(test)]
 mod tests {
 
+    use tree_hash::TreeHash;
+    use types::ExecPayload;
+
     use super::*;
 
     fn test_client() -> BeaconApiClient {
-        BeaconApiClient::new("http://localhost:5052").unwrap()
+        // BeaconApiClient::new("http://localhost:5052").unwrap()
+        BeaconApiClient::new("https://lodestar-goerli.chainsafe.io").unwrap()
     }
 
     #[ignore]
@@ -275,8 +302,30 @@ mod tests {
         let block_body = client.get_beacon_block(100).await.unwrap();
         println!(
             "Block body: {:?}",
-            block_body.body.execution_payload.block_number
+            block_body.body.execution_payload.block_number()
         );
+    }
+
+    #[tokio::test]
+    async fn test_get_beacon_block_r() {
+        let client = test_client();
+        let block_body = client.get_beacon_block(2223426).await.unwrap();
+        let h0 = block_body.body.randao_reveal.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.eth1_data.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.graffiti.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.proposer_slashings.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.attester_slashings.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.attestations.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.deposits.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.voluntary_exits.tree_hash_root();
+        dbg!(h0);
     }
 
     #[ignore]

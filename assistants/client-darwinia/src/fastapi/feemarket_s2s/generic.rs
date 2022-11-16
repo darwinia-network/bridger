@@ -6,10 +6,6 @@ use crate::client::DarwiniaClient;
 
 #[async_trait::async_trait]
 impl FeemarketApiBase for DarwiniaClient {
-    const CHAIN: &'static str = "darwinia";
-
-    type Chain = bp_darwinia::Darwinia;
-
     async fn best_finalized_header_number(
         &self,
     ) -> AbstractFeemarketResult<<Self::Chain as Chain>::BlockNumber> {

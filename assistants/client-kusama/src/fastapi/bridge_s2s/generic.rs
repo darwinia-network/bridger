@@ -75,9 +75,6 @@ impl KusamaClient {
 }
 
 impl S2SClientBase for KusamaClient {
-    const CHAIN: &'static str = "kusama";
-
-    type Chain = bp_kusama::Kusama;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

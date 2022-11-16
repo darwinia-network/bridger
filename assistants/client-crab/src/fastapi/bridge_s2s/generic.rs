@@ -80,9 +80,6 @@ impl CrabClient {
 }
 
 impl S2SClientBase for CrabClient {
-    const CHAIN: &'static str = "crab";
-
-    type Chain = bp_crab::Crab;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

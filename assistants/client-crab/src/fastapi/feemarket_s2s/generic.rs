@@ -6,10 +6,6 @@ use crate::client::CrabClient;
 
 #[async_trait::async_trait]
 impl FeemarketApiBase for CrabClient {
-    const CHAIN: &'static str = "crab";
-
-    type Chain = bp_crab::Crab;
-
     async fn best_finalized_header_number(
         &self,
     ) -> AbstractFeemarketResult<<Self::Chain as Chain>::BlockNumber> {

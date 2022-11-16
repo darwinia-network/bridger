@@ -75,9 +75,6 @@ impl PolkadotClient {
 }
 
 impl S2SClientBase for PolkadotClient {
-    const CHAIN: &'static str = "polkadot";
-
-    type Chain = bp_polkadot::Polkadot;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

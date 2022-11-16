@@ -1,12 +1,11 @@
 use std::ops::RangeInclusive;
 
-use bridge_s2s_traits::client::{
-    S2SClientBase, S2SClientGeneric, S2SClientRelay, S2SParaBridgeClientSolochain,
-};
+use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay, S2SParaBridgeClientSolochain};
 use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
 use bridge_s2s_traits::types::{
     bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,
 };
+use client_common_traits::ClientCommon;
 use sp_runtime::AccountId32;
 use subxt::sp_core::storage::StorageKey;
 use subxt::storage::StorageKeyPrefix;
@@ -109,7 +108,7 @@ impl S2SClientRelay for CrabClient {
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
                 "send transaction failed {}: {:?}",
-                <Self as S2SClientBase>::CHAIN,
+                <Self as ClientCommon>::CHAIN,
                 e
             ))
         })?;
@@ -135,7 +134,7 @@ impl S2SClientRelay for CrabClient {
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
                 "send transaction failed {}: {:?}",
-                <Self as S2SClientBase>::CHAIN,
+                <Self as ClientCommon>::CHAIN,
                 e
             ))
         })?;
@@ -215,7 +214,7 @@ impl S2SClientRelay for CrabClient {
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
                 "send transaction failed {}: {:?}",
-                <Self as S2SClientBase>::CHAIN,
+                <Self as ClientCommon>::CHAIN,
                 e
             ))
         })?;
@@ -241,7 +240,7 @@ impl S2SClientRelay for CrabClient {
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
                 "send transaction failed {}: {:?}",
-                <Self as S2SClientBase>::CHAIN,
+                <Self as ClientCommon>::CHAIN,
                 e
             ))
         })?;
@@ -286,7 +285,7 @@ impl S2SParaBridgeClientSolochain for CrabClient {
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
                 "send transaction failed {}: {:?}",
-                <Self as S2SClientBase>::CHAIN,
+                <Self as ClientCommon>::CHAIN,
                 e
             ))
         })?;

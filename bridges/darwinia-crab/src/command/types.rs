@@ -2,13 +2,13 @@ use structopt::StructOpt;
 
 use crate::types::BridgeFlow;
 
-/// Bridge pangolin-pangoro operations
+/// Bridge darwinia-crab operations
 #[derive(Debug, StructOpt)]
-#[structopt(name = "pangolin-pangoro", about = "Bridge pangolin-pangoro")]
+#[structopt(name = "darwinia-crab", about = "Bridge darwinia-crab")]
 pub enum Opts {
     /// Init bridge
     Init {
-        /// Bridge flow direction, [pangolin-to-pangoro | pangoro-to-pangolin]
+        /// Bridge flow direction, [darwinia-to-crab | crab-to-darwinia]
         #[structopt()]
         bridge: BridgeFlow,
     },

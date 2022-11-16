@@ -580,6 +580,7 @@ dependencies = [
  "async-trait",
  "bp-crab",
  "bridge-s2s-traits",
+ "client-common-traits",
  "feemarket-s2s-traits",
  "finality-grandpa",
  "parity-scale-codec",

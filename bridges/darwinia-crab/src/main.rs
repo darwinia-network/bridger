@@ -2,10 +2,8 @@ use structopt::StructOpt;
 
 use crate::command::types::Opts;
 
-mod bridge;
 mod cli;
 mod command;
-mod service;
 mod types;
 
 #[tokio::main]

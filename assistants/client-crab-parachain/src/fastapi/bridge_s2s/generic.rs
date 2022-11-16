@@ -18,9 +18,6 @@ type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::He
 >;
 
 impl S2SClientBase for CrabParachainClient {
-    const CHAIN: &'static str = "crabparachain";
-
-    type Chain = bp_crab_parachain::CrabParachain;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

@@ -6,10 +6,6 @@ use crate::client::DarwiniaParachainClient;
 
 #[async_trait::async_trait]
 impl FeemarketApiBase for DarwiniaParachainClient {
-    const CHAIN: &'static str = "darwiniaparachain";
-
-    type Chain = bp_darwinia_parachain::DarwiniaParachain;
-
     async fn best_finalized_header_number(
         &self,
     ) -> AbstractFeemarketResult<<Self::Chain as Chain>::BlockNumber> {

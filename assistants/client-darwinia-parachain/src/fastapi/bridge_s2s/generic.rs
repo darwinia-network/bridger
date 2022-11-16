@@ -18,9 +18,6 @@ type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::He
 >;
 
 impl S2SClientBase for DarwiniaParachainClient {
-    const CHAIN: &'static str = "darwiniaparachain";
-
-    type Chain = bp_darwinia_parachain::DarwiniaParachain;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

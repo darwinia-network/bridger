@@ -81,9 +81,6 @@ impl DarwiniaClient {
 }
 
 impl S2SClientBase for DarwiniaClient {
-    const CHAIN: &'static str = "darwinia";
-
-    type Chain = bp_darwinia::Darwinia;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

@@ -1,16 +1,14 @@
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 
 use support_common::error::BridgerError;
+use support_types::mark::BridgeName;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, strum::EnumString)]
-#[strum(serialize_all = "kebab_case")]
-pub enum BridgeName {
-    DarwiniaToCrab,
-    CrabToDarwinia,
-}
+use crate::error::BinS2SResult;
+use crate::traits::SubqueryInfo;
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct HexLaneId(pub [u8; 4]);
@@ -51,5 +49,29 @@ impl Serialize for HexLaneId {
     {
         let hex_text = self.to_string();
         serializer.serialize_str(&hex_text[..])
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct BasicSubqueryInfo {
+    bridge_name: BridgeName,
+    config: SubqueryConfig,
+}
+
+impl BasicSubqueryInfo {
+    pub fn new(bridge_name: BridgeName, config: SubqueryConfig) -> Self {
+        Self {
+            bridge_name,
+            config,
+        }
+    }
+}
+
+impl SubqueryInfo for BasicSubqueryInfo {
+    fn subquery(&self) -> BinS2SResult<Subquery> {
+        Ok(SubqueryComponent::component(
+            self.config.clone(),
+            self.bridge_name.clone(),
+        ))
     }
 }

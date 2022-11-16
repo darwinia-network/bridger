@@ -31,6 +31,9 @@ sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-netw
 sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
 sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
 
+## common traits
+client-common-traits  = { optional = true, path = "../../frame/traits/client-common" }
+
 ## s2s client
 finality-grandpa      = { optional = true, version = "0.14" }
 bridge-s2s-traits     = { optional = true, path = "../../frame/traits/bridge-s2s", features = ["advanced-types"] }
@@ -55,6 +58,7 @@ bridge-s2s  = [
   "substrate",
   "async-trait",
   "finality-grandpa",
+  "client-common-traits",
   "bridge-s2s-traits",
 ]
 bridge-s2s-pangoro                  = ["bridge-s2s"]
@@ -63,6 +67,7 @@ bridge-s2s-pangolin-parachain-alpha = ["bridge-s2s", "bridge-s2s-traits/bridge-p
 
 feemarket-s2s = [
   "async-trait",
+  "client-common-traits",
   "feemarket-s2s-traits",
 ]
 feemarket-s2s-pangoro                  = ["feemarket-s2s"]

@@ -143,7 +143,7 @@ impl<
 
         let input = MessageReceivingInput {
             lanes,
-            relayer_account: config_chain.para.account(),
+            relayer_account: config_chain.para.account()?,
             client_source: config_chain.para.client().await?,
             client_target: config_chain.solo.client().await?,
             subquery_source: config_index.para.subquery()?,
@@ -163,7 +163,7 @@ impl<
         let config_relay = bridge_config.relay.clone();
         let input = Self::message_input(bridge_config).await?;
         let relay_strategy =
-            BasicRelayStrategy::new(input.client_source.clone(), config_chain.para.account());
+            BasicRelayStrategy::new(input.client_source.clone(), config_chain.para.account()?);
         let input = MessageDeliveryInput {
             lanes: input.lanes,
             nonces_limit: 11,

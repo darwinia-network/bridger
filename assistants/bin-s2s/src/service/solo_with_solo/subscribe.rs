@@ -14,21 +14,31 @@ use crate::error::{BinS2SError, BinS2SResult};
 use crate::traits::{S2SSoloBridgeSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
-pub struct SubscribeService<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> {
+pub struct SubscribeService<
+    SCI: S2SSoloBridgeSoloChainInfo,
+    TCI: S2SSoloBridgeSoloChainInfo,
+    SI: SubqueryInfo,
+> {
     _greet_source: Lifeline,
     _greet_target: Lifeline,
-    _chain_info: PhantomData<CI>,
+    _source_chain_info: PhantomData<SCI>,
+    _target_chain_info: PhantomData<TCI>,
     _subquery_info: PhantomData<SI>,
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> BridgeService for SubscribeService<CI, SI> {}
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
+    BridgeService for SubscribeService<SCI, TCI, SI>
+{
+}
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service for SubscribeService<CI, SI> {
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service
+    for SubscribeService<SCI, TCI, SI>
+{
     type Bus = BridgeBus;
     type Lifeline = SupportLifelineResult<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let bridge_config: BridgeConfig<CI, SI> =
+        let bridge_config: BridgeConfig<SCI, TCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_name = format!("subscribe-{}", config_chain.source.chain().name(),);
@@ -50,7 +60,7 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service for SubscribeServ
             }
             Ok(())
         });
-        let bridge_config: BridgeConfig<CI, SI> =
+        let bridge_config: BridgeConfig<SCI, TCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_name = format!("subscribe-{}", config_chain.target.chain().name(),);
@@ -74,14 +84,17 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service for SubscribeServ
         Ok(Self {
             _greet_source,
             _greet_target,
-            _chain_info: Default::default(),
+            _source_chain_info: Default::default(),
+            _target_chain_info: Default::default(),
             _subquery_info: Default::default(),
         })
     }
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> SubscribeService<CI, SI> {
-    async fn start_source(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<()> {
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
+    SubscribeService<SCI, TCI, SI>
+{
+    async fn start_source(bridge_config: BridgeConfig<SCI, TCI, SI>) -> BinS2SResult<()> {
         let config_chain = &bridge_config.chain;
         let client = config_chain.source.client().await?;
 
@@ -91,7 +104,7 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> SubscribeService<CI, SI> 
         Ok(())
     }
 
-    async fn start_target(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<()> {
+    async fn start_target(bridge_config: BridgeConfig<SCI, TCI, SI>) -> BinS2SResult<()> {
         let config_chain = &bridge_config.chain;
         let client = config_chain.target.client().await?;
 

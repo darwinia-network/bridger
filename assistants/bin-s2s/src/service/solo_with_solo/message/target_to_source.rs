@@ -15,26 +15,31 @@ use crate::error::{BinS2SError, BinS2SResult};
 use crate::traits::{S2SSoloBridgeSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
-pub struct TargetToSourceMessageRelayService<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> {
+pub struct TargetToSourceMessageRelayService<
+    SCI: S2SSoloBridgeSoloChainInfo,
+    TCI: S2SSoloBridgeSoloChainInfo,
+    SI: SubqueryInfo,
+> {
     _greet_delivery: Lifeline,
     _greet_receiving: Lifeline,
-    _chain_info: PhantomData<CI>,
+    _source_chain_info: PhantomData<SCI>,
+    _target_chain_info: PhantomData<TCI>,
     _subquery_info: PhantomData<SI>,
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> BridgeService
-    for TargetToSourceMessageRelayService<CI, SI>
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
+    BridgeService for TargetToSourceMessageRelayService<SCI, TCI, SI>
 {
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service
-    for TargetToSourceMessageRelayService<CI, SI>
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service
+    for TargetToSourceMessageRelayService<SCI, TCI, SI>
 {
     type Bus = BridgeBus;
     type Lifeline = SupportLifelineResult<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let bridge_config: BridgeConfig<CI, SI> =
+        let bridge_config: BridgeConfig<SCI, TCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_delivery_name = format!(
@@ -63,7 +68,7 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service
             Ok(())
         });
 
-        let bridge_config: BridgeConfig<CI, SI> =
+        let bridge_config: BridgeConfig<SCI, TCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_receiving_name = format!(
@@ -93,19 +98,22 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service
         Ok(Self {
             _greet_delivery,
             _greet_receiving,
-            _chain_info: Default::default(),
+            _source_chain_info: Default::default(),
+            _target_chain_info: Default::default(),
             _subquery_info: Default::default(),
         })
     }
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> TargetToSourceMessageRelayService<CI, SI> {
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
+    TargetToSourceMessageRelayService<SCI, TCI, SI>
+{
     async fn message_input(
-        bridge_config: BridgeConfig<CI, SI>,
+        bridge_config: BridgeConfig<SCI, TCI, SI>,
     ) -> BinS2SResult<
         MessageReceivingInput<
-            <CI as S2SSoloBridgeSoloChainInfo>::Client,
-            <CI as S2SSoloBridgeSoloChainInfo>::Client,
+            <TCI as S2SSoloBridgeSoloChainInfo>::Client,
+            <SCI as S2SSoloBridgeSoloChainInfo>::Client,
         >,
     > {
         let relay_config = bridge_config.relay;
@@ -116,7 +124,7 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> TargetToSourceMessageRela
 
         let input = MessageReceivingInput {
             lanes,
-            relayer_account: config_chain.target.account(),
+            relayer_account: config_chain.target.account()?,
             client_source: config_chain.target.client().await?,
             client_target: config_chain.source.client().await?,
             subquery_source: config_index.target.subquery()?,
@@ -125,7 +133,7 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> TargetToSourceMessageRela
         Ok(input)
     }
 
-    async fn start_delivery(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<()> {
+    async fn start_delivery(bridge_config: BridgeConfig<SCI, TCI, SI>) -> BinS2SResult<()> {
         tracing::info!(
             target: "bin-s2s",
             "[message-delivery] [delivery-{}-to-{}] SERVICE RESTARTING...",
@@ -135,7 +143,7 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> TargetToSourceMessageRela
         let config_chain = bridge_config.chain.clone();
         let input = Self::message_input(bridge_config).await?;
         let relay_strategy =
-            BasicRelayStrategy::new(input.client_target.clone(), config_chain.target.account());
+            BasicRelayStrategy::new(input.client_source.clone(), config_chain.target.account()?);
         let input = MessageDeliveryInput {
             lanes: input.lanes,
             nonces_limit: 11,
@@ -151,7 +159,7 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> TargetToSourceMessageRela
         Ok(runner.start().await?)
     }
 
-    async fn start_receiving(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<()> {
+    async fn start_receiving(bridge_config: BridgeConfig<SCI, TCI, SI>) -> BinS2SResult<()> {
         tracing::info!(
             target: "bin-s2s",
             "[message-receiving] [receiving-{}-to-{}] SERVICE RESTARTING...",

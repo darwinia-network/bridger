@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Allow bridges
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum BridgeName {
     /// bridge darwinia-ethereum
     #[serde(rename = "darwinia-ethereum")]
@@ -15,7 +15,7 @@ pub enum BridgeName {
     /// bridge pangolin<>pangoro
     #[serde(rename = "pangolin-pangoro")]
     PangolinPangoro,
-    /// bridge pangolin<>pangolin-parachain
+    /// bridge crab<>crab-parachain
     #[serde(rename = "crab-crabparachain")]
     CrabCrabParachain,
     /// bridge darwinia<>crab
@@ -24,7 +24,7 @@ pub enum BridgeName {
     /// bridge pangoro<>goerli (goerli)
     #[serde(rename = "pangoro-goerli")]
     PangoroGoerli,
-    /// bridge darwinia<>darwiniaparachain
+    /// bridge darwinia<>darwinia-parachain
     #[serde(rename = "darwinia-darwiniaparachain")]
     DarwiniaDarwiniaParachain,
 }
@@ -67,6 +67,14 @@ pub enum ChainName {
     Ethereum,
     #[serde(rename = "goerli")]
     Goerli,
+    #[serde(rename = "rococo")]
+    Rococo,
+    #[serde(rename = "kusama")]
+    Kusama,
+    #[serde(rename = "polkadot")]
+    Polkadot,
+    #[serde(rename = "moonbase")]
+    Moonbase,
 }
 
 impl ChainName {
@@ -82,6 +90,10 @@ impl ChainName {
             Self::DarwiniaParachain => "darwiniaparachain",
             Self::Ethereum => "ethereum",
             Self::Goerli => "goerli",
+            Self::Rococo => "rococo",
+            Self::Kusama => "kusama",
+            Self::Polkadot => "polkadot",
+            Self::Moonbase => "moonbase",
         }
     }
 }

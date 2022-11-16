@@ -75,9 +75,6 @@ impl RococoClient {
 }
 
 impl S2SClientBase for RococoClient {
-    const CHAIN: &'static str = "rococo";
-
-    type Chain = bp_rococo::Rococo;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

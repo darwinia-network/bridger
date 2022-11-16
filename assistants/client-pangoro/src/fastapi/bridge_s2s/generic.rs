@@ -81,9 +81,6 @@ impl PangoroClient {
 }
 
 impl S2SClientBase for PangoroClient {
-    const CHAIN: &'static str = "pangoro";
-
-    type Chain = bp_pangoro::Pangoro;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

@@ -24,11 +24,10 @@ thiserror   = "1.0"
 
 array-bytes = "2"
 async-trait = "0.1"
+clap        = "4"
 tokio       = { version = "1", features = ["full"] }
-
-structopt = "0.3"
-strum     = { version = "0.21", features = ["derive"] }
-serde     = { version = "1", features = ["derive"] }
+strum       = { version = "0.24", features = ["derive"] }
+serde       = { version = "1", features = ["derive"] }
 
 lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 postage  = "0.4"

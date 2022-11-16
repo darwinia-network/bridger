@@ -3,6 +3,7 @@ use bridge_s2s_traits::{
     client::{S2SClientBase, S2SClientGeneric},
     types::bp_runtime::Chain,
 };
+use client_common_traits::ClientCommon;
 use sp_runtime::generic::{Block, SignedBlock};
 use subxt::rpc::{Subscription, SubscriptionClientT};
 use subxt::{sp_core, sp_runtime};
@@ -18,9 +19,6 @@ type BundleHeader = crate::types::runtime_types::sp_runtime::generic::header::He
 >;
 
 impl S2SClientBase for PangolinParachainClient {
-    const CHAIN: &'static str = "pangolinparachain";
-
-    type Chain = bp_pangolin_parachain::PangolinParachain;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 
@@ -74,7 +72,7 @@ impl S2SClientGeneric for PangolinParachainClient {
     async fn prepare_initialization_data(&self) -> S2SClientResult<Self::InitializationData> {
         Err(S2SClientError::Custom(format!(
             "[{}] not needed prepare_initialization_data",
-            <Self as S2SClientBase>::CHAIN
+            <Self as ClientCommon>::CHAIN
         )))
     }
 }

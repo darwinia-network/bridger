@@ -6,10 +6,6 @@ use crate::client::PangoroClient;
 
 #[async_trait::async_trait]
 impl FeemarketApiBase for PangoroClient {
-    const CHAIN: &'static str = "pangoro";
-
-    type Chain = bp_pangoro::Pangoro;
-
     async fn best_finalized_header_number(
         &self,
     ) -> AbstractFeemarketResult<<Self::Chain as Chain>::BlockNumber> {

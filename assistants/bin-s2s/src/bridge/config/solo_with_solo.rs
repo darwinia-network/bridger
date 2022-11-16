@@ -7,32 +7,38 @@ use crate::traits::{S2SSoloBridgeSoloChainInfo, SubqueryInfo};
 
 /// Solo with solo bridge config
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct BridgeConfig<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> {
+pub struct BridgeConfig<
+    SCI: S2SSoloBridgeSoloChainInfo,
+    TCI: S2SSoloBridgeSoloChainInfo,
+    SI: SubqueryInfo,
+> {
     /// Chain config
-    pub chain: ChainConfig<CI>,
+    pub chain: ChainConfig<SCI, TCI>,
     /// Relay config
     pub relay: RelayConfig,
     /// Index config
     pub index: IndexConfig<SI>,
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Storage for BridgeConfig<CI, SI> {
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Storage
+    for BridgeConfig<SCI, TCI, SI>
+{
     fn take_or_clone(res: &mut Option<Self>) -> Option<Self> {
         res.clone()
     }
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> lifeline::Resource<BridgeBus>
-    for BridgeConfig<CI, SI>
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
+    lifeline::Resource<BridgeBus> for BridgeConfig<SCI, TCI, SI>
 {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ChainConfig<CI: S2SSoloBridgeSoloChainInfo> {
+pub struct ChainConfig<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo> {
     /// Source chain
-    pub source: CI,
+    pub source: SCI,
     /// Target chain
-    pub target: CI,
+    pub target: TCI,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

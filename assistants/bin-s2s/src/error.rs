@@ -14,6 +14,8 @@ pub enum BinS2SError {
     LifelineTakeResource(#[from] TakeResourceError),
     #[error(transparent)]
     Relay(#[from] RelayError),
+    #[error("Client: {0}")]
+    Client(String),
     #[error("Custom: {0}")]
     Custom(String),
 }

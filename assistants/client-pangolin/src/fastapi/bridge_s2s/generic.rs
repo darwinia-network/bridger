@@ -81,9 +81,6 @@ impl PangolinClient {
 }
 
 impl S2SClientBase for PangolinClient {
-    const CHAIN: &'static str = "pangolin";
-
-    type Chain = bp_pangolin::Pangolin;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }
 

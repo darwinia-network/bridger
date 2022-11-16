@@ -16,33 +16,43 @@ use crate::service::solo_with_solo::{
 use crate::traits::{S2SSoloBridgeSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
-pub struct BridgeTask<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> {
+pub struct BridgeTask<
+    SCI: S2SSoloBridgeSoloChainInfo,
+    TCI: S2SSoloBridgeSoloChainInfo,
+    SI: SubqueryInfo,
+> {
     stack: TaskStack<BridgeBus>,
-    _chain_info: PhantomData<CI>,
+    _source_chain_info: PhantomData<SCI>,
+    _target_chain_info: PhantomData<TCI>,
     _subquery_info: PhantomData<SI>,
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
-    pub fn new(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<Self> {
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
+    BridgeTask<SCI, TCI, SI>
+{
+    pub fn new(bridge_config: BridgeConfig<SCI, TCI, SI>) -> BinS2SResult<Self> {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
         stack.bus().store_resource(bridge_config);
-        stack.spawn_service::<SubscribeService<CI, SI>>()?;
+        stack.spawn_service::<SubscribeService<SCI, TCI, SI>>()?;
         stack.spawn_service::<FeemarketService>()?;
-        stack.spawn_service::<SourceToTargetHeaderRelayService<CI, SI>>()?;
-        stack.spawn_service::<TargetToSourceHeaderRelayService<CI, SI>>()?;
-        stack.spawn_service::<SourceToTargetMessageRelayService<CI, SI>>()?;
-        stack.spawn_service::<TargetToSourceMessageRelayService<CI, SI>>()?;
+        stack.spawn_service::<SourceToTargetHeaderRelayService<SCI, TCI, SI>>()?;
+        stack.spawn_service::<TargetToSourceHeaderRelayService<SCI, TCI, SI>>()?;
+        stack.spawn_service::<SourceToTargetMessageRelayService<SCI, TCI, SI>>()?;
+        stack.spawn_service::<TargetToSourceMessageRelayService<SCI, TCI, SI>>()?;
 
         Ok(Self {
             stack,
-            _chain_info: Default::default(),
+            _source_chain_info: Default::default(),
+            _target_chain_info: Default::default(),
             _subquery_info: Default::default(),
         })
     }
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> BridgeTask<CI, SI> {
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
+    BridgeTask<SCI, TCI, SI>
+{
     #[allow(dead_code)]
     pub fn stack(&self) -> &TaskStack<BridgeBus> {
         &self.stack

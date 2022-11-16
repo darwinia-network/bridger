@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 
-use bridge_s2s_traits::client::{
-    S2SClientRelay, S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain,
-};
+use bridge_s2s_traits::client::S2SClientRelay;
+#[cfg(any(feature = "solo-with-para", feature = "para-with-para"))]
+use bridge_s2s_traits::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClientSolochain};
 use bridge_s2s_traits::types::bp_runtime;
 use client_common_traits::ClientCommon;
 use feemarket_s2s_traits::api::FeemarketApiRelay;
@@ -16,8 +16,6 @@ use crate::error::BinS2SResult;
 pub trait S2SBasicChainInfo: 'static + Sync + Send + Sized + Clone + Debug {
     const CHAIN: ChainName;
 
-    fn origin_type(&self) -> OriginType;
-
     fn chain(&self) -> ChainName {
         Self::CHAIN
     }
@@ -28,7 +26,11 @@ pub trait S2SBasicChainInfo: 'static + Sync + Send + Sized + Clone + Debug {
 pub trait S2SSoloBridgeSoloChainInfo: S2SBasicChainInfo {
     type Client: S2SClientRelay + FeemarketApiRelay;
 
-    fn account(&self) -> <<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId;
+    fn origin_type(&self) -> OriginType;
+
+    fn account(
+        &self,
+    ) -> BinS2SResult<<<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId>;
 
     async fn client(&self) -> BinS2SResult<Self::Client>;
 }
@@ -39,7 +41,11 @@ pub trait S2SSoloBridgeSoloChainInfo: S2SBasicChainInfo {
 pub trait S2SParaBridgeSoloChainInfo: S2SBasicChainInfo {
     type Client: S2SParaBridgeClientSolochain + FeemarketApiRelay;
 
-    fn account(&self) -> <<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId;
+    fn origin_type(&self) -> OriginType;
+
+    fn account(
+        &self,
+    ) -> BinS2SResult<<<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId>;
 
     async fn client(&self) -> BinS2SResult<Self::Client>;
 }

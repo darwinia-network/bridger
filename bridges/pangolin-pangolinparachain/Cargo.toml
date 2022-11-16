@@ -18,4 +18,24 @@ readme = 'README.md'
 edition = "2021"
 
 [dependencies]
-bin-s2s = { path = "../../assistants/bin-s2s", features = ["solo-with-para"] }
+tracing     = "0.1"
+color-eyre  = "0.6"
+structopt   = "0.3"
+async-trait = "0.1"
+strum       = { version = "0.24", features = ["derive"] }
+serde       = { version = "1", features = ["derive"] }
+tokio       = { version = "1", features = ["full"] }
+
+bin-s2s         = { path = "../../assistants/bin-s2s", features = ["solo-with-para"] }
+subquery        = { path = "../../assistants/subquery" }
+support-common  = { path = "../../frame/supports/support-common" }
+support-toolkit = { path = "../../frame/supports/support-toolkit" }
+support-types   = { path = "../../frame/supports/support-types" }
+
+bridge-s2s-traits    = { path = "../../frame/traits/bridge-s2s" }
+feemarket-s2s-traits = { path = "../../frame/traits/feemarket-s2s" }
+client-common-traits = { path = "../../frame/traits/client-common" }
+
+client-pangolin           = { path = "../../assistants/client-pangolin", features = [ "bridge-s2s-pangolin-parachain", "feemarket-s2s-pangolin-parachain" ]}
+client-rococo             = { path = "../../assistants/client-rococo", features = [ "bridge-s2s-pangolin" ] }
+client-pangolin-parachain = { path = "../../assistants/client-pangolin-parachain", features = [ "bridge-s2s-pangolin", "feemarket-s2s-pangolin" ] }

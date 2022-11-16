@@ -6,10 +6,6 @@ use crate::client::PangolinClient;
 
 #[async_trait::async_trait]
 impl FeemarketApiBase for PangolinClient {
-    const CHAIN: &'static str = "pangolin";
-
-    type Chain = bp_pangolin::Pangolin;
-
     async fn best_finalized_header_number(
         &self,
     ) -> AbstractFeemarketResult<<Self::Chain as Chain>::BlockNumber> {

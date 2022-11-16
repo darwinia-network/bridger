@@ -14,23 +14,30 @@ use crate::error::{BinS2SError, BinS2SResult};
 use crate::traits::{S2SSoloBridgeSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
-pub struct SourceToTargetHeaderRelayService<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> {
+pub struct SourceToTargetHeaderRelayService<
+    SCI: S2SSoloBridgeSoloChainInfo,
+    TCI: S2SSoloBridgeSoloChainInfo,
+    SI: SubqueryInfo,
+> {
     _greet: Lifeline,
-    _chain_info: PhantomData<CI>,
+    _source_chain_info: PhantomData<SCI>,
+    _target_chain_info: PhantomData<TCI>,
     _subquery_info: PhantomData<SI>,
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> BridgeService
-    for SourceToTargetHeaderRelayService<CI, SI>
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
+    BridgeService for SourceToTargetHeaderRelayService<SCI, TCI, SI>
 {
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service for SourceToTargetHeaderRelayService<CI, SI> {
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service
+    for SourceToTargetHeaderRelayService<SCI, TCI, SI>
+{
     type Bus = BridgeBus;
     type Lifeline = SupportLifelineResult<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let bridge_config: BridgeConfig<CI, SI> =
+        let bridge_config: BridgeConfig<SCI, TCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_name = format!(
@@ -60,14 +67,17 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service for SourceToTarge
         });
         Ok(Self {
             _greet,
-            _chain_info: Default::default(),
+            _source_chain_info: Default::default(),
+            _target_chain_info: Default::default(),
             _subquery_info: Default::default(),
         })
     }
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> SourceToTargetHeaderRelayService<CI, SI> {
-    async fn start(bridge_config: BridgeConfig<CI, SI>) -> BinS2SResult<()> {
+impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
+    SourceToTargetHeaderRelayService<SCI, TCI, SI>
+{
+    async fn start(bridge_config: BridgeConfig<SCI, TCI, SI>) -> BinS2SResult<()> {
         let relay_config = bridge_config.relay;
         let config_chain = bridge_config.chain;
         let config_index = bridge_config.index;

@@ -9,8 +9,9 @@ use crate::bridge::BridgeBus;
 use crate::error::BinS2SResult;
 use crate::service::feemarket::FeemarketService;
 use crate::service::solo_with_para::{
-    ParaHeadToSolochainRelayService, RelaychainToSolochainHeaderRelayService,
-    SolochainToParachainHeaderRelayService, SubscribeService,
+    ParaHeadToSolochainRelayService, ParachainToSolochainMessageRelayService,
+    RelaychainToSolochainHeaderRelayService, SolochainToParachainHeaderRelayService,
+    SolochainToParachainMessageRelayService, SubscribeService,
 };
 use crate::traits::{
     S2SParaBridgeRelayChainInfo, S2SParaBridgeSoloChainInfo, S2SSoloBridgeSoloChainInfo,
@@ -47,6 +48,8 @@ impl<
         stack.spawn_service::<SolochainToParachainHeaderRelayService<CSI, CRI, CPI, SI>>()?;
         stack.spawn_service::<RelaychainToSolochainHeaderRelayService<CSI, CRI, CPI, SI>>()?;
         stack.spawn_service::<ParaHeadToSolochainRelayService<CSI, CRI, CPI, SI>>()?;
+        stack.spawn_service::<ParachainToSolochainMessageRelayService<CSI, CRI, CPI, SI>>()?;
+        stack.spawn_service::<SolochainToParachainMessageRelayService<CSI, CRI, CPI, SI>>()?;
 
         Ok(Self {
             stack,

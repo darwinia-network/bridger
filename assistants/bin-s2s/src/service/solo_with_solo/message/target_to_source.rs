@@ -27,7 +27,9 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> BridgeService
 {
 }
 
-impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service for TargetToSourceMessageRelayService<CI, SI> {
+impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> Service
+    for TargetToSourceMessageRelayService<CI, SI>
+{
     type Bus = BridgeBus;
     type Lifeline = SupportLifelineResult<Self>;
 
@@ -101,27 +103,24 @@ impl<CI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo> TargetToSourceMessageRela
     async fn message_input(
         bridge_config: BridgeConfig<CI, SI>,
     ) -> BinS2SResult<
-        MessageReceivingInput<<CI as S2SSoloBridgeSoloChainInfo>::Client, <CI as S2SSoloBridgeSoloChainInfo>::Client>,
+        MessageReceivingInput<
+            <CI as S2SSoloBridgeSoloChainInfo>::Client,
+            <CI as S2SSoloBridgeSoloChainInfo>::Client,
+        >,
     > {
         let relay_config = bridge_config.relay;
         let config_chain = bridge_config.chain;
-
-        let client_source = config_chain.source.client().await?;
-        let client_target = config_chain.target.client().await?;
-
         let config_index = bridge_config.index;
-        let subquery_source = config_index.source.subquery()?;
-        let subquery_target = config_index.target.subquery()?;
 
         let lanes = relay_config.raw_lanes();
 
         let input = MessageReceivingInput {
             lanes,
             relayer_account: config_chain.target.account(),
-            client_source: client_target,
-            client_target: client_source,
-            subquery_source: subquery_target,
-            subquery_target: subquery_source,
+            client_source: config_chain.target.client().await?,
+            client_target: config_chain.source.client().await?,
+            subquery_source: config_index.target.subquery()?,
+            subquery_target: config_index.source.subquery()?,
         };
         Ok(input)
     }

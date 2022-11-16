@@ -19,40 +19,40 @@ use crate::traits::{
 
 #[derive(Debug)]
 pub struct ParachainToSolochainMessageRelayService<
-    CSI: S2SParaBridgeSoloChainInfo,
-    CRI: S2SParaBridgeRelayChainInfo,
-    CPI: S2SSoloBridgeSoloChainInfo,
+    SCI: S2SParaBridgeSoloChainInfo,
+    RCI: S2SParaBridgeRelayChainInfo,
+    PCI: S2SSoloBridgeSoloChainInfo,
     SI: SubqueryInfo,
 > {
     _greet_delivery: Lifeline,
     _greet_receiving: Lifeline,
-    _relaychain_info: PhantomData<CRI>,
-    _solochain_info: PhantomData<CSI>,
-    _parachain_info: PhantomData<CPI>,
+    _relaychain_info: PhantomData<RCI>,
+    _solochain_info: PhantomData<SCI>,
+    _parachain_info: PhantomData<PCI>,
     _subquery_info: PhantomData<SI>,
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > BridgeService for ParachainToSolochainMessageRelayService<CSI, CRI, CPI, SI>
+    > BridgeService for ParachainToSolochainMessageRelayService<SCI, RCI, PCI, SI>
 {
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > Service for ParachainToSolochainMessageRelayService<CSI, CRI, CPI, SI>
+    > Service for ParachainToSolochainMessageRelayService<SCI, RCI, PCI, SI>
 {
     type Bus = BridgeBus;
     type Lifeline = SupportLifelineResult<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let bridge_config: BridgeConfig<CSI, CRI, CPI, SI> =
+        let bridge_config: BridgeConfig<SCI, RCI, PCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_delivery_name = format!(
@@ -81,7 +81,7 @@ impl<
             Ok(())
         });
 
-        let bridge_config: BridgeConfig<CSI, CRI, CPI, SI> =
+        let bridge_config: BridgeConfig<SCI, RCI, PCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_receiving_name = format!(
@@ -121,18 +121,18 @@ impl<
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > ParachainToSolochainMessageRelayService<CSI, CRI, CPI, SI>
+    > ParachainToSolochainMessageRelayService<SCI, RCI, PCI, SI>
 {
     async fn message_input(
-        bridge_config: BridgeConfig<CSI, CRI, CPI, SI>,
+        bridge_config: BridgeConfig<SCI, RCI, PCI, SI>,
     ) -> BinS2SResult<
         MessageReceivingInput<
-            <CPI as S2SSoloBridgeSoloChainInfo>::Client,
-            <CSI as S2SParaBridgeSoloChainInfo>::Client,
+            <PCI as S2SSoloBridgeSoloChainInfo>::Client,
+            <SCI as S2SParaBridgeSoloChainInfo>::Client,
         >,
     > {
         let relay_config = bridge_config.relay;
@@ -152,7 +152,7 @@ impl<
         Ok(input)
     }
 
-    async fn start_delivery(bridge_config: BridgeConfig<CSI, CRI, CPI, SI>) -> BinS2SResult<()> {
+    async fn start_delivery(bridge_config: BridgeConfig<SCI, RCI, PCI, SI>) -> BinS2SResult<()> {
         let config_chain = bridge_config.chain.clone();
         tracing::info!(
             target: "bin-s2s",
@@ -179,7 +179,7 @@ impl<
         Ok(runner.start().await?)
     }
 
-    async fn start_receiving(bridge_config: BridgeConfig<CSI, CRI, CPI, SI>) -> BinS2SResult<()> {
+    async fn start_receiving(bridge_config: BridgeConfig<SCI, RCI, PCI, SI>) -> BinS2SResult<()> {
         tracing::info!(
             target: "bin-s2s",
             "[message-receiving] [receiving-{}-to-{}] SERVICE RESTARTING...",

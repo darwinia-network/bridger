@@ -20,36 +20,36 @@ use crate::traits::{
 
 #[derive(Debug)]
 pub struct BridgeTask<
-    CSI: S2SParaBridgeSoloChainInfo,
-    CRI: S2SParaBridgeRelayChainInfo,
-    CPI: S2SSoloBridgeSoloChainInfo,
+    SCI: S2SParaBridgeSoloChainInfo,
+    RCI: S2SParaBridgeRelayChainInfo,
+    PCI: S2SSoloBridgeSoloChainInfo,
     SI: SubqueryInfo,
 > {
     stack: TaskStack<BridgeBus>,
-    _relaychain_info: PhantomData<CRI>,
-    _solochain_info: PhantomData<CSI>,
-    _parachain_info: PhantomData<CPI>,
+    _relaychain_info: PhantomData<RCI>,
+    _solochain_info: PhantomData<SCI>,
+    _parachain_info: PhantomData<PCI>,
     _subquery_info: PhantomData<SI>,
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > BridgeTask<CSI, CRI, CPI, SI>
+    > BridgeTask<SCI, RCI, PCI, SI>
 {
-    pub fn new(bridge_config: BridgeConfig<CSI, CRI, CPI, SI>) -> BinS2SResult<Self> {
+    pub fn new(bridge_config: BridgeConfig<SCI, RCI, PCI, SI>) -> BinS2SResult<Self> {
         let bus = BridgeBus::default();
         let mut stack = TaskStack::new(bus);
         stack.bus().store_resource(bridge_config);
-        stack.spawn_service::<SubscribeService<CSI, CRI, CPI, SI>>()?;
+        stack.spawn_service::<SubscribeService<SCI, RCI, PCI, SI>>()?;
         stack.spawn_service::<FeemarketService>()?;
-        stack.spawn_service::<SolochainToParachainHeaderRelayService<CSI, CRI, CPI, SI>>()?;
-        stack.spawn_service::<RelaychainToSolochainHeaderRelayService<CSI, CRI, CPI, SI>>()?;
-        stack.spawn_service::<ParaHeadToSolochainRelayService<CSI, CRI, CPI, SI>>()?;
-        stack.spawn_service::<ParachainToSolochainMessageRelayService<CSI, CRI, CPI, SI>>()?;
-        stack.spawn_service::<SolochainToParachainMessageRelayService<CSI, CRI, CPI, SI>>()?;
+        stack.spawn_service::<SolochainToParachainHeaderRelayService<SCI, RCI, PCI, SI>>()?;
+        stack.spawn_service::<RelaychainToSolochainHeaderRelayService<SCI, RCI, PCI, SI>>()?;
+        stack.spawn_service::<ParaHeadToSolochainRelayService<SCI, RCI, PCI, SI>>()?;
+        stack.spawn_service::<ParachainToSolochainMessageRelayService<SCI, RCI, PCI, SI>>()?;
+        stack.spawn_service::<SolochainToParachainMessageRelayService<SCI, RCI, PCI, SI>>()?;
 
         Ok(Self {
             stack,
@@ -62,11 +62,11 @@ impl<
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > BridgeTask<CSI, CRI, CPI, SI>
+    > BridgeTask<SCI, RCI, PCI, SI>
 {
     #[allow(dead_code)]
     pub fn stack(&self) -> &TaskStack<BridgeBus> {

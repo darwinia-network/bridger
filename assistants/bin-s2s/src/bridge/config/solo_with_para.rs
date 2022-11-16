@@ -11,13 +11,13 @@ use crate::traits::{
 /// Solo with solo bridge config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig<
-    CSI: S2SParaBridgeSoloChainInfo,
-    CRI: S2SParaBridgeRelayChainInfo,
-    CPI: S2SSoloBridgeSoloChainInfo,
+    SCI: S2SParaBridgeSoloChainInfo,
+    RCI: S2SParaBridgeRelayChainInfo,
+    PCI: S2SSoloBridgeSoloChainInfo,
     SI: SubqueryInfo,
 > {
     /// Chain config
-    pub chain: ChainConfig<CSI, CRI, CPI>,
+    pub chain: ChainConfig<SCI, RCI, PCI>,
     /// Relay config
     pub relay: RelayConfig,
     /// Index config
@@ -25,11 +25,11 @@ pub struct BridgeConfig<
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > Storage for BridgeConfig<CSI, CRI, CPI, SI>
+    > Storage for BridgeConfig<SCI, RCI, PCI, SI>
 {
     fn take_or_clone(res: &mut Option<Self>) -> Option<Self> {
         res.clone()
@@ -37,26 +37,26 @@ impl<
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > lifeline::Resource<BridgeBus> for BridgeConfig<CSI, CRI, CPI, SI>
+    > lifeline::Resource<BridgeBus> for BridgeConfig<SCI, RCI, PCI, SI>
 {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChainConfig<
-    CSI: S2SParaBridgeSoloChainInfo,
-    CRI: S2SParaBridgeRelayChainInfo,
-    CPI: S2SSoloBridgeSoloChainInfo,
+    SCI: S2SParaBridgeSoloChainInfo,
+    RCI: S2SParaBridgeRelayChainInfo,
+    PCI: S2SSoloBridgeSoloChainInfo,
 > {
     /// Solo chain
-    pub solo: CSI,
+    pub solo: SCI,
     /// Para chain
-    pub para: CPI,
+    pub para: PCI,
     /// Relay chain
-    pub relay: CRI,
+    pub relay: RCI,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

@@ -18,40 +18,40 @@ use crate::traits::{
 
 #[derive(Debug)]
 pub struct SubscribeService<
-    CSI: S2SParaBridgeSoloChainInfo,
-    CRI: S2SParaBridgeRelayChainInfo,
-    CPI: S2SSoloBridgeSoloChainInfo,
+    SCI: S2SParaBridgeSoloChainInfo,
+    RCI: S2SParaBridgeRelayChainInfo,
+    PCI: S2SSoloBridgeSoloChainInfo,
     SI: SubqueryInfo,
 > {
     _greet_solochain: Lifeline,
     _greet_relaychain: Lifeline,
-    _relaychain_info: PhantomData<CRI>,
-    _solochain_info: PhantomData<CSI>,
-    _parachain_info: PhantomData<CPI>,
+    _relaychain_info: PhantomData<RCI>,
+    _solochain_info: PhantomData<SCI>,
+    _parachain_info: PhantomData<PCI>,
     _subquery_info: PhantomData<SI>,
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > BridgeService for SubscribeService<CSI, CRI, CPI, SI>
+    > BridgeService for SubscribeService<SCI, RCI, PCI, SI>
 {
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > Service for SubscribeService<CSI, CRI, CPI, SI>
+    > Service for SubscribeService<SCI, RCI, PCI, SI>
 {
     type Bus = BridgeBus;
     type Lifeline = SupportLifelineResult<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let bridge_config: BridgeConfig<CSI, CRI, CPI, SI> =
+        let bridge_config: BridgeConfig<SCI, RCI, PCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_name = format!("subscribe-{}", config_chain.solo.chain().name(),);
@@ -73,7 +73,7 @@ impl<
             }
             Ok(())
         });
-        let bridge_config: BridgeConfig<CSI, CRI, CPI, SI> =
+        let bridge_config: BridgeConfig<SCI, RCI, PCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_name = format!("subscribe-{}", config_chain.relay.chain().name(),);
@@ -106,13 +106,13 @@ impl<
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > SubscribeService<CSI, CRI, CPI, SI>
+    > SubscribeService<SCI, RCI, PCI, SI>
 {
-    async fn start_solochain(bridge_config: BridgeConfig<CSI, CRI, CPI, SI>) -> BinS2SResult<()> {
+    async fn start_solochain(bridge_config: BridgeConfig<SCI, RCI, PCI, SI>) -> BinS2SResult<()> {
         let config_chain = &bridge_config.chain;
         let client = config_chain.solo.client().await?;
 
@@ -122,7 +122,7 @@ impl<
         Ok(())
     }
 
-    async fn start_relaychain(bridge_config: BridgeConfig<CSI, CRI, CPI, SI>) -> BinS2SResult<()> {
+    async fn start_relaychain(bridge_config: BridgeConfig<SCI, RCI, PCI, SI>) -> BinS2SResult<()> {
         let config_chain = &bridge_config.chain;
         let client = config_chain.relay.client().await?;
 

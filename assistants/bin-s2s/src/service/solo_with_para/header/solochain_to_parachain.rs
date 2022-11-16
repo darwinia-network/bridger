@@ -18,39 +18,39 @@ use crate::traits::{
 
 #[derive(Debug)]
 pub struct SolochainToParachainHeaderRelayService<
-    CSI: S2SParaBridgeSoloChainInfo,
-    CRI: S2SParaBridgeRelayChainInfo,
-    CPI: S2SSoloBridgeSoloChainInfo,
+    SCI: S2SParaBridgeSoloChainInfo,
+    RCI: S2SParaBridgeRelayChainInfo,
+    PCI: S2SSoloBridgeSoloChainInfo,
     SI: SubqueryInfo,
 > {
     _greet: Lifeline,
-    _relaychain_info: PhantomData<CRI>,
-    _solochain_info: PhantomData<CSI>,
-    _parachain_info: PhantomData<CPI>,
+    _relaychain_info: PhantomData<RCI>,
+    _solochain_info: PhantomData<SCI>,
+    _parachain_info: PhantomData<PCI>,
     _subquery_info: PhantomData<SI>,
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > BridgeService for SolochainToParachainHeaderRelayService<CSI, CRI, CPI, SI>
+    > BridgeService for SolochainToParachainHeaderRelayService<SCI, RCI, PCI, SI>
 {
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > Service for SolochainToParachainHeaderRelayService<CSI, CRI, CPI, SI>
+    > Service for SolochainToParachainHeaderRelayService<SCI, RCI, PCI, SI>
 {
     type Bus = BridgeBus;
     type Lifeline = SupportLifelineResult<Self>;
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
-        let bridge_config: BridgeConfig<CSI, CRI, CPI, SI> =
+        let bridge_config: BridgeConfig<SCI, RCI, PCI, SI> =
             bus.storage().clone_resource().map_err(BinS2SError::from)?;
         let config_chain = bridge_config.chain.clone();
         let task_name = format!(
@@ -89,13 +89,13 @@ impl<
 }
 
 impl<
-        CSI: S2SParaBridgeSoloChainInfo,
-        CRI: S2SParaBridgeRelayChainInfo,
-        CPI: S2SSoloBridgeSoloChainInfo,
+        SCI: S2SParaBridgeSoloChainInfo,
+        RCI: S2SParaBridgeRelayChainInfo,
+        PCI: S2SSoloBridgeSoloChainInfo,
         SI: SubqueryInfo,
-    > SolochainToParachainHeaderRelayService<CSI, CRI, CPI, SI>
+    > SolochainToParachainHeaderRelayService<SCI, RCI, PCI, SI>
 {
-    async fn start(bridge_config: BridgeConfig<CSI, CRI, CPI, SI>) -> BinS2SResult<()> {
+    async fn start(bridge_config: BridgeConfig<SCI, RCI, PCI, SI>) -> BinS2SResult<()> {
         let relay_config = bridge_config.relay;
         let config_chain = bridge_config.chain;
         let config_index = bridge_config.index;

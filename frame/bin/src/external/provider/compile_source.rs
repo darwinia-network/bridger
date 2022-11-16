@@ -51,7 +51,7 @@ impl CompileSourceExecutor {
         tracing::trace!(target: "bridger", "The execute path is: {}", path_exe.display());
 
         let mut exists = false;
-        for prefix in support_common::constants::ALLOW_BINARY_PREFIX {
+        for prefix in support_types::constants::ALLOW_BINARY_PREFIX {
             let mut path_bridge = path_exe.join("../../../bridges").join(&self.command);
             tracing::trace!(target: "bridger", "Try detect binary for path: {}", path_bridge.display());
             let full_command = format!("{}{}", prefix, self.command);

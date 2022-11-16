@@ -21,7 +21,7 @@ pub fn list_externals(
             Some(v) => v.to_string_lossy().to_string(),
             None => continue,
         };
-        if !support_common::constants::ALLOW_BINARY_PREFIX
+        if !support_types::constants::ALLOW_BINARY_PREFIX
             .iter()
             .any(|&item| name.starts_with(item))
         {

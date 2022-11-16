@@ -45,7 +45,7 @@ zip = "0.5"
 
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
-support-common     = { path = "../supports/support-common" }
-support-terminal   = { path = "../supports/support-terminal" }
-
-component-state    = { path = "../components/state" }
+support-common   = { path = "../supports/support-common" }
+support-types    = { path = "../supports/support-types" }
+support-terminal = { path = "../supports/support-terminal" }
+component-state  = { path = "../components/state" }

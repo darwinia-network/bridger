@@ -15,19 +15,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint8",
-        "name": "version",
-        "type": "uint8"
-      }
-    ],
-    "name": "Initialized",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "bytes32",
         "name": "state_root",
         "type": "bytes32"
@@ -55,28 +42,133 @@
         "components": [
           {
             "internalType": "bytes32",
-            "name": "latest_execution_payload_state_root",
+            "name": "randao_reveal",
             "type": "bytes32"
           },
           {
-            "internalType": "bytes32[]",
-            "name": "latest_execution_payload_state_root_branch",
-            "type": "bytes32[]"
+            "internalType": "bytes32",
+            "name": "eth1_data",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "graffiti",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "proposer_slashings",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "attester_slashings",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "attestations",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "deposits",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "voluntary_exits",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "sync_aggregate",
+            "type": "bytes32"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "parent_hash",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "address",
+                "name": "fee_recipient",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "state_root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "receipts_root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "logs_bloom",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "prev_randao",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint64",
+                "name": "block_number",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "gas_limit",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "gas_used",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "timestamp",
+                "type": "uint64"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "extra_data",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "base_fee_per_gas",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "block_hash",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "transactions",
+                "type": "bytes32"
+              }
+            ],
+            "internalType": "struct BeaconChain.ExecutionPayload",
+            "name": "execution_payload",
+            "type": "tuple"
           }
         ],
-        "internalType": "struct ExecutionLayer.ExecutionPayloadStateRootUpdate",
-        "name": "update",
+        "internalType": "struct BeaconChain.BeaconBlockBody",
+        "name": "body",
         "type": "tuple"
       }
     ],
     "name": "import_latest_execution_payload_state_root",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

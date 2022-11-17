@@ -11,7 +11,7 @@ use crate::types::BridgeFlow;
 pub enum Opts {
     /// Init bridge
     Init {
-        /// Bridge flow direction, [polkadot-to-darwinia | darwinia-to-darwinia-parachain]
+        /// Bridge flow direction, [polkadot-to-darwinia | darwinia-to-darwiniaparachain]
         #[structopt()]
         bridge: BridgeFlow,
     },

@@ -11,7 +11,7 @@ use crate::types::BridgeFlow;
 pub enum Opts {
     /// Init bridge
     Init {
-        /// Bridge flow direction, [rococo-to-pangolin | pangolin-to-pangolin-parachain]
+        /// Bridge flow direction, [rococo-to-pangolin | pangolin-to-pangolinparachain]
         #[structopt()]
         bridge: BridgeFlow,
     },

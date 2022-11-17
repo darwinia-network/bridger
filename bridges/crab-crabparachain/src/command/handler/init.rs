@@ -20,7 +20,7 @@ async fn init_bridge(bridge: BridgeFlow, bridge_config: RawBridgeConfig) -> colo
     let client_kusama = bridge_config.kusama.client().await?;
     let client_crab_parachain = bridge_config.crab_parachain.client().await?;
     let hash = match bridge {
-        BridgeFlow::CrabToCrabParachain => {
+        BridgeFlow::CrabToCrabparachain => {
             let initialization_data = client_crab.prepare_initialization_data().await?;
             let expected_data = SmartCodecMapper::map_to(&initialization_data)?;
             client_crab_parachain.initialize(expected_data).await?

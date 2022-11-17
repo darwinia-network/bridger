@@ -19,7 +19,7 @@ use support_types::mark::ChainName;
 #[strum(serialize_all = "kebab_case")]
 pub enum BridgeFlow {
     MoonbaseToPangolin,
-    PangolinToPangolinParachainAlpha,
+    PangolinToPangolinparachainalpha,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

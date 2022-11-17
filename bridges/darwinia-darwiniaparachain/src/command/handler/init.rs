@@ -20,7 +20,7 @@ async fn init_bridge(bridge: BridgeFlow, bridge_config: RawBridgeConfig) -> colo
     let client_polkadot = bridge_config.polkadot.client().await?;
     let client_darwinia_parachain = bridge_config.darwinia_parachain.client().await?;
     let hash = match bridge {
-        BridgeFlow::DarwiniaToDarwiniaParachain => {
+        BridgeFlow::DarwiniaToDarwiniaparachain => {
             let initialization_data = client_darwinia.prepare_initialization_data().await?;
             let expected_data = SmartCodecMapper::map_to(&initialization_data)?;
             client_darwinia_parachain.initialize(expected_data).await?

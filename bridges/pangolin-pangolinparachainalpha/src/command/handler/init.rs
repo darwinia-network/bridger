@@ -21,7 +21,7 @@ async fn init_bridge(bridge: BridgeFlow, bridge_config: RawBridgeConfig) -> colo
     let client_moonbase = bridge_config.moonbase.client().await?;
     let client_pangolin_parachain = bridge_config.pangolin_parachain_alpha.client().await?;
     let hash = match bridge {
-        BridgeFlow::PangolinToPangolinParachainAlpha => {
+        BridgeFlow::PangolinToPangolinparachainalpha => {
             let initialization_data = client_pangolin.prepare_initialization_data().await?;
             let expected_data = SmartCodecMapper::map_to(&initialization_data)?;
             client_pangolin_parachain.initialize(expected_data).await?

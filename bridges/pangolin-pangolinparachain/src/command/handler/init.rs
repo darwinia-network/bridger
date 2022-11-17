@@ -20,7 +20,7 @@ async fn init_bridge(bridge: BridgeFlow, bridge_config: RawBridgeConfig) -> colo
     let client_rococo = bridge_config.rococo.client().await?;
     let client_pangolin_parachain = bridge_config.pangolin_parachain.client().await?;
     let hash = match bridge {
-        BridgeFlow::PangolinToPangolinParachain => {
+        BridgeFlow::PangolinToPangolinparachain => {
             let initialization_data = client_pangolin.prepare_initialization_data().await?;
             let expected_data = SmartCodecMapper::map_to(&initialization_data)?;
             client_pangolin_parachain.initialize(expected_data).await?

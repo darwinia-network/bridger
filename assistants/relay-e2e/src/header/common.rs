@@ -22,23 +22,15 @@ pub struct EthLightClient {
 impl EthLightClient {
     pub fn new(
         endpoint: &str,
-        contract_address: &str,
-        execution_layer_contract_address: &str,
+        contract_address: Address,
+        execution_layer_contract_address: Address,
         private_key: &str,
         max_gas_price: U256,
     ) -> RelayResult<Self> {
         let transport = Http::new(endpoint)?;
         let client = web3::Web3::new(transport);
-        let beacon_light_client = BeaconLightClient::new(
-            &client,
-            Address::from_str(contract_address)
-                .map_err(|e| RelayError::Custom(format!("{}", e)))?,
-        )?;
-        let execution_layer = ExecutionLayer::new(
-            &client,
-            Address::from_str(execution_layer_contract_address)
-                .map_err(|e| RelayError::Custom(format!("{}", e)))?,
-        )?;
+        let beacon_light_client = BeaconLightClient::new(&client, contract_address)?;
+        let execution_layer = ExecutionLayer::new(&client, execution_layer_contract_address)?;
         let private_key = SecretKey::from_str(private_key)?;
         Ok(Self {
             client,

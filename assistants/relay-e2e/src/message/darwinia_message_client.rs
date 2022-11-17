@@ -9,7 +9,7 @@ use client_beacon::client::BeaconApiClient;
 use client_contracts::{
     inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
     outbound_types::{MessageAccepted, ReceiveMessagesDeliveryProof},
-    ChainMessageCommitter, Inbound, LaneMessageCommitter, Outbound,
+    ChainMessageCommitter, FeeMarket, Inbound, LaneMessageCommitter, Outbound,
 };
 use secp256k1::SecretKey;
 use thegraph::Thegraph;
@@ -17,25 +17,79 @@ use types::ExecPayload;
 use web3::{
     contract::tokens::Tokenizable,
     ethabi::encode,
+    signing::Key,
     transports::Http,
     types::{Address, BlockId, BlockNumber, Bytes, U256},
     Web3,
 };
 
+use super::fee_market::FeeMarketRelayStrategy;
 use crate::header::common::EthLightClient;
 
-pub struct DarwiniaMessageClient<T: RelayStrategy> {
+pub struct DarwiniaMessageClient<T: RelayStrategy = FeeMarketRelayStrategy> {
     pub client: Web3<Http>,
     pub inbound: Inbound,
     pub outbound: Outbound,
     pub chain_message_committer: ChainMessageCommitter,
     pub lane_message_committer: LaneMessageCommitter,
     pub strategy: T,
-    pub private_key: SecretKey,
     pub indexer: Thegraph,
-
     pub beacon_rpc_client: BeaconApiClient,
     pub eth_light_client: EthLightClient,
+}
+
+impl<T: RelayStrategy> DarwiniaMessageClient<T> {
+    pub fn new_with_fee_market(
+        endpoint: &str,
+        beacon_api_endpoint: &str,
+        inbound_address: Address,
+        outbound_address: Address,
+        chain_message_committer_address: Address,
+        lane_message_committer_address: Address,
+        fee_market_address: Address,
+        light_client_address: Address,
+        execution_layer_address: Address,
+        max_gas_price: U256,
+        private_key: &str,
+        indexer: Thegraph,
+    ) -> E2EClientResult<DarwiniaMessageClient> {
+        let transport = Http::new(endpoint)?;
+        let client = Web3::new(transport);
+
+        let beacon_rpc_client = BeaconApiClient::new(beacon_api_endpoint)
+            .map_err(|_| E2EClientError::Custom("Failed to build beacon api client".into()))?;
+
+        let inbound = Inbound::new(&client, inbound_address)?;
+        let outbound = Outbound::new(&client, outbound_address)?;
+        let fee_market = FeeMarket::new(&client, fee_market_address)?;
+        let chain_message_committer =
+            ChainMessageCommitter::new(&client, chain_message_committer_address)?;
+        let lane_message_committer =
+            LaneMessageCommitter::new(&client, lane_message_committer_address)?;
+
+        let eth_light_client = EthLightClient::new(
+            endpoint,
+            light_client_address,
+            execution_layer_address,
+            private_key,
+            max_gas_price,
+        )
+        .map_err(|e| E2EClientError::Custom(format!("Failed to build EthLightClient: {}", e)))?;
+        let account = eth_light_client.private_key().address();
+        let strategy = FeeMarketRelayStrategy::new(fee_market, account);
+
+        Ok(DarwiniaMessageClient {
+            client,
+            inbound,
+            outbound,
+            chain_message_committer,
+            lane_message_committer,
+            strategy,
+            indexer,
+            beacon_rpc_client,
+            eth_light_client,
+        })
+    }
 }
 
 impl<T: RelayStrategy> Web3Client for DarwiniaMessageClient<T> {
@@ -65,7 +119,7 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
     }
 
     fn private_key(&self) -> &SecretKey {
-        &self.private_key
+        &self.eth_light_client.private_key
     }
 
     async fn decide(&mut self, encoded_key: U256) -> E2EClientResult<bool> {

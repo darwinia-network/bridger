@@ -16,7 +16,7 @@ pub struct PosaLightClient {
 }
 
 impl PosaLightClient {
-    pub fn new(client: Web3<Http>, address: Address) -> BridgeContractResult<Self> {
+    pub fn new(client: &Web3<Http>, address: Address) -> BridgeContractResult<Self> {
         let contract = Contract::from_json(
             client.eth(),
             address,
@@ -185,7 +185,7 @@ mod tests {
                 .unwrap();
         let client = web3::Web3::new(transport);
         PosaLightClient::new(
-            client,
+            &client,
             Address::from_str("0x82afDD48E3a06672c7C87A6742eC14d1088f6eF7").unwrap(),
         )
         .unwrap()
@@ -205,7 +205,7 @@ mod tests {
                 .unwrap();
         let client = web3::Web3::new(transport);
         let lclient = PosaLightClient::new(
-            client,
+            &client,
             Address::from_str("0x6c74a72444048A8588dEBeb749Ee60DB842aD90f").unwrap(),
         )
         .unwrap();

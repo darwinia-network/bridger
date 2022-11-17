@@ -40,7 +40,7 @@ pub struct EthMessageClient<T: RelayStrategy = SimpleFeeMarketRelayStrategy> {
 }
 
 impl<T: RelayStrategy> EthMessageClient<T> {
-    async fn new_with_simple_fee_market(
+    pub fn new_with_simple_fee_market(
         endpoint: &str,
         inbound_address: Address,
         outbound_address: Address,

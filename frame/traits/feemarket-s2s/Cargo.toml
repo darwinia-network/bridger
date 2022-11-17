@@ -20,7 +20,9 @@ codec             = { package = "parity-scale-codec", version = "2" }
 bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
 pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
 
-subxt       = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
+client-common-traits = { path = "../client-common" }
+
+subxt             = { optional = true, git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
 
 [features]
 default = []

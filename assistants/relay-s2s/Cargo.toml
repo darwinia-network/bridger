@@ -1,0 +1,42 @@
+[package]
+name = "relay-s2s"
+version = "0.7.0"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://rust-docs.darwinia.network/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2021"
+
+[dependencies]
+tracing        = "0.1"
+thiserror      = "1.0"
+array-bytes    = "2"
+tokio          = { version = "1", features = ["time"] }
+once_cell      = "1"
+async-trait    = "0.1"
+jsonrpsee-core = "0.8"
+
+sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+
+support-toolkit     = { path = "../../frame/supports/support-toolkit", features = ["convert", "log"] }
+
+bridge-s2s-traits = { path = "../../frame/traits/bridge-s2s" }
+subquery          = { path = "../subquery" }
+
+[features]
+default = ["subquery/bridge-s2s"]
+bridge-parachain = [
+  "bridge-s2s-traits/bridge-parachain",
+  "subquery/bridge-parachain"
+]

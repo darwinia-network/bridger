@@ -53,7 +53,7 @@ impl PrecompiledBinaryExecutor {
             .registry
             .version
             .unwrap_or_else(|| VERSION.to_string());
-        for prefix in support_common::constants::ALLOW_BINARY_PREFIX {
+        for prefix in support_types::constants::ALLOW_BINARY_PREFIX {
             let command = format!("{}{}", prefix, self.command);
 
             output::output_text(format!("Try execute {}@{}", command, version));
@@ -259,7 +259,7 @@ impl PrecompiledBinaryExecutor {
                 );
                 if let Some(p) = outpath.parent() {
                     if !p.exists() {
-                        std::fs::create_dir_all(&p)?;
+                        std::fs::create_dir_all(p)?;
                     }
                 }
                 let mut outfile = std::fs::File::create(&outpath)?;

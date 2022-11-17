@@ -3,7 +3,7 @@ use std::fmt::{Debug, Formatter};
 use microkv::namespace::NamespaceMicroKV;
 use microkv::MicroKV;
 
-use support_common::constants;
+use support_types::constants;
 
 use crate::config::MicrokvConfig;
 

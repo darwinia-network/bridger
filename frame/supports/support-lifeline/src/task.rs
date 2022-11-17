@@ -78,9 +78,4 @@ impl<B: lifeline::Bus> TaskStack<B> {
         self.carries.push(lifeline);
         Ok(())
     }
-
-    // pub fn carry(&mut self, lifeline: lifeline::Lifeline) -> color_eyre::Result<()> {
-    //     self.carries.push(lifeline);
-    //     Ok(())
-    // }
 }

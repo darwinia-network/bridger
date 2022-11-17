@@ -1,0 +1,83 @@
+[package]
+name = "client-pangoro"
+version = "0.7.0"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://rust-docs.darwinia.network/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2021"
+
+[dependencies]
+tracing = "0.1"
+thiserror = "1"
+
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
+
+array-bytes = "2"
+codec       = { package = "parity-scale-codec", version = "2" }
+subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
+bp-pangoro  = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
+
+## maybe common
+async-trait           = { optional = true, version = "0.1" }
+
+## substrate
+sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+
+## common traits
+client-common-traits  = { optional = true, path = "../../frame/traits/client-common" }
+
+## s2s client
+finality-grandpa    = { optional = true, version = "0.14" }
+bridge-s2s-traits   = { optional = true, path = "../../frame/traits/bridge-s2s", features = ["advanced-types"] }
+
+## feemarket s2s
+feemarket-s2s-traits = { optional = true, path = "../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
+
+## e2e client
+bridge-e2e-traits = { optional = true, path = "../../frame/traits/bridge-e2e" }
+
+support-toolkit  = { path = "../../frame/supports/support-toolkit", features = ["convert"] }
+
+[features]
+default     = []
+substrate   = [
+  "sp-finality-grandpa",
+  "sp-runtime",
+  "sp-core",
+]
+bridge-s2s  = [
+  "substrate",
+  "async-trait",
+  "finality-grandpa",
+  "client-common-traits",
+  "bridge-s2s-traits",
+]
+bridge-s2s-pangolin = ["bridge-s2s"]
+feemarket-s2s = [
+  "async-trait",
+  "client-common-traits",
+  "feemarket-s2s-traits",
+]
+feemarket-s2s-pangolin = ["feemarket-s2s"]
+bridge-ethv2  = [
+  "bridge-e2e-traits",
+  "async-trait",
+]
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+

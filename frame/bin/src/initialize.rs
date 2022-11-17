@@ -14,5 +14,9 @@ fn init_default_config() -> color_eyre::Result<()> {
     }
     tracing::info!(target: "bridger", "The config not found, create default config");
     let config = BridgerConfig::default();
-    Config::store_with_format(Names::Bridger, config, ConfigFormat::Toml)
+    Ok(Config::store_with_format(
+        Names::Bridger,
+        config,
+        ConfigFormat::Toml,
+    )?)
 }

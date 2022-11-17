@@ -20,5 +20,5 @@ web3        = { version = "0.18.0", features = ["signing"] }
 secp256k1   = { version = "0.21" }
 
 support-etherscan     = { path = "../../../frame/supports/support-etherscan" }
-client-contracts      = { path = "../../../frame/assistants/client-contracts" }
+client-contracts      = { path = "../../../assistants/client-contracts" }
 subxt                 = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }

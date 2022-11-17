@@ -17,7 +17,7 @@ name = "bridge-darwinia-ethereum"
 path = "src/main.rs"
 
 [dependencies]
-color-eyre  = "0.5"
+color-eyre  = "0.6"
 tracing     = "0.1"
 async-trait = "0.1"
 
@@ -26,7 +26,7 @@ tokio   = { version = "1", features = ["full"] }
 
 serde     = { version = "1", features = ["derive"] }
 structopt = "0.3"
-strum     = { version = "0.21", features = ["derive"] }
+strum     = { version = "0.24", features = ["derive"] }
 
 bytes       = "1.0"
 futures     = "0.3"
@@ -51,9 +51,9 @@ component-http-client = { path = "../../../frame/components/http-client" }
 component-state       = { path = "../../../frame/components/state" }
 
 bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
-subquery              = { path = "../../../frame/assistants/subquery", features = [ "bridge-ethv2" ] }
-client-contracts      = { path = "../../../frame/assistants/client-contracts" }
-client-darwinia       = { path = "../../../frame/assistants/client-darwinia", features = [ "ecdsa-authority" ] }
-relay-e2e             = { path = "../../../frame/assistants/relay-e2e" }
-thegraph              = { path = "../../../frame/assistants/thegraph", features = [ "bridge-ethv2" ] }
+subquery              = { path = "../../../assistants/subquery", features = [ "bridge-ethv2" ] }
+client-contracts      = { path = "../../../assistants/client-contracts" }
+client-darwinia       = { path = "../../../assistants/client-darwinia", features = [ "ecdsa-authority" ] }
+relay-e2e             = { path = "../../../assistants/relay-e2e" }
+thegraph              = { path = "../../../assistants/thegraph", features = [ "bridge-ethv2" ] }
 

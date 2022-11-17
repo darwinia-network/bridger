@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use bridge_e2e_traits::{
     client::{GasPriceOracle, MessageClient, Web3Client},
     error::{E2EClientError, E2EClientResult},
@@ -8,23 +10,25 @@ use client_contracts::{
     error::BridgeContractError,
     inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
     outbound_types::{MessageAccepted, ReceiveMessagesDeliveryProof},
-    Inbound, Outbound, PosaLightClient,
+    Inbound, Outbound, PosaLightClient, SimpleFeeMarket,
 };
 use secp256k1::SecretKey;
 use support_etherscan::EtherscanClient;
 use web3::{
     ethabi::{encode, RawLog},
-    signing::keccak256,
+    signing::{keccak256, Key},
     transports::Http,
     types::{Address, BlockId, BlockNumber, Bytes, FilterBuilder, Proof as Web3Proof, H256, U256},
     Web3,
 };
 
+use super::simple_fee_market::SimpleFeeMarketRelayStrategy;
+
 pub const LANE_IDENTIFY_SLOT: u64 = 0u64;
 pub const LANE_NONCE_SLOT: u64 = 1u64;
 pub const LANE_MESSAGE_SLOT: u64 = 2u64;
 
-pub struct EthMessageClient<T: RelayStrategy> {
+pub struct EthMessageClient<T: RelayStrategy = SimpleFeeMarketRelayStrategy> {
     pub client: Web3<Http>,
     pub inbound: Inbound,
     pub outbound: Outbound,
@@ -33,6 +37,42 @@ pub struct EthMessageClient<T: RelayStrategy> {
     pub private_key: SecretKey,
     pub max_gas_price: U256,
     pub etherscan_client: EtherscanClient,
+}
+
+impl<T: RelayStrategy> EthMessageClient<T> {
+    async fn new_with_simple_fee_market(
+        endpoint: &str,
+        inbound_address: Address,
+        outbound_address: Address,
+        fee_market_address: Address,
+        darwinia_light_client_address: Address,
+        private_key: &str,
+        max_gas_price: U256,
+        etherscan_api_key: &str,
+    ) -> E2EClientResult<EthMessageClient> {
+        let transport = Http::new(endpoint)?;
+        let client = Web3::new(transport);
+        let inbound = Inbound::new(&client, inbound_address)?;
+        let outbound = Outbound::new(&client, outbound_address)?;
+        let fee_market = SimpleFeeMarket::new(&client, fee_market_address)?;
+        let private_key = SecretKey::from_str(private_key)
+            .map_err(|e| E2EClientError::Custom(format!("Failed to decode private key: {}", e)))?;
+        let account = (&private_key).address();
+        let darwinia_light_client = PosaLightClient::new(&client, darwinia_light_client_address)?;
+        let strategy = SimpleFeeMarketRelayStrategy::new(fee_market, account);
+        let etherscan_client = EtherscanClient::new(etherscan_api_key)
+            .map_err(|_| E2EClientError::Custom("Failed to build etherscan client".into()))?;
+        Ok(EthMessageClient {
+            client,
+            inbound,
+            outbound,
+            darwinia_light_client,
+            strategy,
+            private_key,
+            max_gas_price,
+            etherscan_client,
+        })
+    }
 }
 
 impl<T: RelayStrategy> Web3Client for EthMessageClient<T> {

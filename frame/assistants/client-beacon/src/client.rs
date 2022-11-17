@@ -261,8 +261,8 @@ mod tests {
     use super::*;
 
     fn test_client() -> BeaconApiClient {
-        // BeaconApiClient::new("http://localhost:5052").unwrap()
-        BeaconApiClient::new("https://lodestar-goerli.chainsafe.io").unwrap()
+        BeaconApiClient::new("http://g2.dev.darwinia.network:9596").unwrap()
+        // BeaconApiClient::new("https://lodestar-goerli.chainsafe.io").unwrap()
     }
 
     #[ignore]
@@ -309,7 +309,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_beacon_block_r() {
         let client = test_client();
-        let block_body = client.get_beacon_block(2223426).await.unwrap();
+        let block_body = client.get_beacon_block("head").await.unwrap();
         let h0 = block_body.body.randao_reveal.tree_hash_root();
         dbg!(h0);
         let h0 = block_body.body.eth1_data.tree_hash_root();
@@ -325,6 +325,13 @@ mod tests {
         let h0 = block_body.body.deposits.tree_hash_root();
         dbg!(h0);
         let h0 = block_body.body.voluntary_exits.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body
+            .body
+            .execution_payload
+            .execution_payload
+            .logs_bloom
+            .tree_hash_root();
         dbg!(h0);
     }
 

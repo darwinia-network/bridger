@@ -5,6 +5,7 @@ use client_contracts::beacon_light_client_types::SyncCommittee as ContractSyncCo
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::str::FromStr;
+use types::BeaconBlockMerge;
 use types::MainnetEthSpec;
 use web3::{
     contract::tokens::{Tokenizable, Tokenize},
@@ -16,8 +17,6 @@ use serde::de::{self, Deserializer};
 
 use crate::error::BeaconApiError;
 use crate::error::BeaconApiResult;
-
-use tree_hash::TreeHash;
 
 fn h256_from_str(value: &str) -> BeaconApiResult<H256> {
     H256::from_str(value).or(Err(BeaconApiError::DecodeError(
@@ -111,7 +110,7 @@ pub struct GetBlockResponse {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BeaconBlockWrapper {
-    pub message: types::BeaconBlockMerge<MainnetEthSpec>,
+    pub message: BeaconBlockMerge<MainnetEthSpec>,
     pub signature: String,
 }
 

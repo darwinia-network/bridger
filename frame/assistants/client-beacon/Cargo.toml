@@ -1,6 +1,6 @@
 [package]
 name = "client-beacon"
-version = "0.6.4"
+version = "0.7.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"
@@ -29,8 +29,7 @@ hex         = "0.4"
 hamming     = "0.1"
 reqwest     = { version = "0.11", features = ["json", "stream"] }
 types       = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-
-tree_hash = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+tree_hash   = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
 client-contracts  = { path = "../../../frame/assistants/client-contracts" }
 
 [patch.crates-io]

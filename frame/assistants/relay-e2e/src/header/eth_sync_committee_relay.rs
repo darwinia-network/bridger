@@ -1,7 +1,7 @@
 use std::{ops::Div, str::FromStr, time::Duration};
 
 use bridge_e2e_traits::client::EthTruthLayerLightClient;
-use client_beacon::{client::BeaconApiClient, types::Proof};
+use client_beacon::client::BeaconApiClient;
 use client_contracts::beacon_light_client_types::{
     FinalizedHeaderUpdate, SyncCommitteePeriodUpdate,
 };
@@ -51,9 +51,8 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 period + 1,
             );
 
-            let (finalized_header_update, sync_committee_update) = self
-                .get_sync_committee_update_parameter(period, last_relayed_header.slot)
-                .await?;
+            let (finalized_header_update, sync_committee_update) =
+                self.get_sync_committee_update_parameter(period).await?;
 
             let gas_price = self.eth_light_client.gas_price().await?;
             let tx = self
@@ -99,7 +98,6 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
     async fn get_sync_committee_update_parameter(
         &self,
         period: u64,
-        slot: u64,
     ) -> RelayResult<(FinalizedHeaderUpdate, SyncCommitteePeriodUpdate)> {
         let sync_committee_update = self
             .beacon_api_client
@@ -120,7 +118,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             .iter()
             .map(|x| H256::from_str(x))
             .collect::<Result<Vec<H256>, _>>()
-            .map_err(|e| {
+            .map_err(|_| {
                 RelayError::Custom("Failed to decode next_sync_committee_branch".into())
             })?;
         let current_head = self.beacon_api_client.get_header("head").await?;
@@ -140,11 +138,11 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 .iter()
                 .map(|x| H256::from_str(x))
                 .collect::<Result<Vec<H256>, _>>()
-                .map_err(|e| RelayError::Custom("Failed to decode finality_branch".into()))?,
+                .map_err(|_| RelayError::Custom("Failed to decode finality_branch".into()))?,
             sync_aggregate: sync_committee_update.sync_aggregate.to_contract_type()?,
             fork_version: Bytes(
                 H32::from_str(&sync_committee_update.fork_version)
-                    .map_err(|e| RelayError::Custom("Failed to decode fork_version".into()))?
+                    .map_err(|_| RelayError::Custom("Failed to decode fork_version".into()))?
                     .as_ref()
                     .to_vec(),
             ),

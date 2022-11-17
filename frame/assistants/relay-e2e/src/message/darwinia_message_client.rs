@@ -13,11 +13,12 @@ use client_contracts::{
 };
 use secp256k1::SecretKey;
 use thegraph::Thegraph;
+use types::ExecPayload;
 use web3::{
     contract::tokens::Tokenizable,
     ethabi::encode,
     transports::Http,
-    types::{Address, BlockId, BlockNumber, Bytes, H256, U256},
+    types::{Address, BlockId, BlockNumber, Bytes, U256},
     Web3,
 };
 
@@ -138,17 +139,11 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
             .execution_layer()
             .merkle_root(None)
             .await?;
-        let latest_state_root = H256::from_str(&block.body.execution_payload.state_root)
-            .map_err(|e| E2EClientError::Custom(format!("{}", e)))?;
+        let latest_state_root = block.body.execution_payload.execution_payload.state_root;
         if execution_state_root != latest_state_root {
             Ok(None)
         } else {
-            let block_number: u64 = block
-                .body
-                .execution_payload
-                .block_number
-                .parse()
-                .map_err(|e| E2EClientError::Custom(format!("{}", e)))?;
+            let block_number: u64 = block.body.execution_payload.block_number();
 
             // Since the header at block number x from Darwinia means the state at block number x - 1,
             // we need to minus 1 to get the relay block number.

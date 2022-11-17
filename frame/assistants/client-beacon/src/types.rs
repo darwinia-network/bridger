@@ -96,6 +96,7 @@ impl SyncCommittee {
 pub struct SyncCommitteePeriodUpdate {
     pub attested_header: HeaderMessage,
     pub next_sync_committee: SyncCommittee,
+    pub next_sync_committee_branch: Vec<String>,
     pub finalized_header: HeaderMessage,
     pub finality_branch: Vec<String>,
     pub sync_aggregate: SyncAggregate,

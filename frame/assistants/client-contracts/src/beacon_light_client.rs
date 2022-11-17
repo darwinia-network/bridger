@@ -73,6 +73,7 @@ impl BeaconLightClient {
 
     pub async fn import_next_sync_committee(
         &self,
+        finalized_header_update: FinalizedHeaderUpdate,
         sync_committee_update: SyncCommitteePeriodUpdate,
         private_key: &SecretKey,
         options: Options,
@@ -81,7 +82,7 @@ impl BeaconLightClient {
             .contract
             .signed_call(
                 "import_next_sync_committee",
-                (sync_committee_update,),
+                (finalized_header_update, sync_committee_update),
                 options,
                 private_key,
             )

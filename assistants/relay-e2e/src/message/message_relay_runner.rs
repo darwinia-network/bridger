@@ -18,7 +18,7 @@ pub struct MessageRelayRunner<S0: MessageClient, S1: MessageClient> {
     target: S1,
 }
 
-#[derive(Debug)]
+#[derive(Default, Debug)]
 pub struct ChannelState {
     // Latest status of outbound at source side
     source_outbound: OutboundLaneNonce,

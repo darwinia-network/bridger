@@ -116,29 +116,10 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             return Ok(());
         }
 
-        let (_slot, sync_aggregate_slot, _attested_header, _sync_aggregate_block) = match self
+        let (signature_slot, _) = self
             .beacon_api_client
-            .find_valid_attested_header(
-                state.current_slot,
-                finality_update.attested_header.slot - 1,
-            )
-            .await?
-        {
-            None => {
-                tracing::info!(
-                    target: "relay-e2e",
-                    "[Header] Wait for valid attested header",
-                );
-                return Ok(());
-            }
-            Some((slot, sync_aggregate_slot, attested_header, sync_aggregate_block)) => (
-                slot,
-                sync_aggregate_slot,
-                attested_header,
-                sync_aggregate_block,
-            ),
-        };
-
+            .find_valid_header_since(state.current_slot, finality_update.attested_header.slot + 1)
+            .await?;
         let sync_change = self
             .beacon_api_client
             .get_sync_committee_period_update(update_finality_period - 1, 1)
@@ -148,7 +129,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
         }
         let fork_version = self
             .beacon_api_client
-            .get_fork_version(sync_aggregate_slot)
+            .get_fork_version(signature_slot)
             .await?;
 
         let finalized_header_update = FinalizedHeaderUpdate {
@@ -163,7 +144,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                 .map_err(|e| RelayError::Custom(format!("{}", e)))?,
             sync_aggregate: finality_update.sync_aggregate.to_contract_type()?,
             fork_version: Bytes(fork_version.current_version.as_ref().to_vec()),
-            signature_slot: sync_aggregate_slot,
+            signature_slot,
         };
         self.import_finalized_header_with_confirmation(finalized_header_update)
             .await?;
@@ -179,25 +160,10 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
 
         if let [last_finality, target_finality] = sync_change.as_slice() {
             let attested_slot: u64 = target_finality.attested_header.slot;
-            let (_slot, sync_aggregate_slot, _attested_header, _sync_aggregate_block) = match self
+            let (signature_slot, _) = self
                 .beacon_api_client
-                .find_valid_attested_header(state.current_slot, attested_slot)
-                .await?
-            {
-                None => {
-                    tracing::info!(
-                        target: "relay-e2e",
-                        "[Header] Wait for valid attested header",
-                    );
-                    return Ok(());
-                }
-                Some((slot, sync_aggregate_slot, attested_header, sync_aggregate_block)) => (
-                    slot,
-                    sync_aggregate_slot,
-                    attested_header,
-                    sync_aggregate_block,
-                ),
-            };
+                .find_valid_header_since(state.current_slot, attested_slot + 1)
+                .await?;
             let fork_version = H32::from_str(&target_finality.fork_version)
                 .map_err(|e| RelayError::Custom(format!("{}", e)))?
                 .as_ref()
@@ -215,7 +181,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                     .map_err(|e| RelayError::Custom(format!("{}", e)))?,
                 sync_aggregate: target_finality.sync_aggregate.to_contract_type()?,
                 fork_version: Bytes(fork_version),
-                signature_slot: sync_aggregate_slot,
+                signature_slot,
             };
             self.import_finalized_header_with_confirmation(finalized_header_update)
                 .await?;

@@ -1,0 +1,26 @@
+[package]
+authors       = ["Darwinia Network <hello@darwinia.network>"]
+description   = "Darwinia bridger"
+documentation = "https://rust-docs.darwinia.network/bridger"
+edition       = "2021"
+homepage      = "https://github.com/darwinia-network/bridger"
+include       = ["Cargo.toml", "**/*.rs", "README.md", "LICENSE"]
+keywords      = ["substrate", "darwinia"]
+license       = "MIT"
+name          = "feemarket-s2s"
+readme        = 'README.md'
+repository    = "https://github.com/darwinia-network/bridger"
+version       = "0.7.0"
+
+[dependencies]
+
+async-trait = "0.1"
+serde       = { version = "1", features = ["derive"] }
+thiserror   = "1.0"
+tracing     = "0.1"
+
+component-subscan   = { path = "../../frame/components/subscan" }
+
+bridge-s2s-traits    = { path = "../../frame/traits/bridge-s2s" }
+feemarket-s2s-traits = { path = "../../frame/traits/feemarket-s2s" }
+support-toolkit      = { path = "../../frame/supports/support-toolkit", features = ["log"] }

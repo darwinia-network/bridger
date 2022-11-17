@@ -24,28 +24,28 @@ path = "src/main.rs"
 
 [dependencies]
 
-colored = "2"
+colored   = "2"
 requestty = "0.1"
 
 structopt = "0.3"
 
-tracing = "0.1"
-color-eyre = "0.5"
+tracing    = "0.1"
+color-eyre = "0.6"
 term-table = "1.3"
 
-strum = { version = "0.21", features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
+strum      = { version = "0.24", features = ["derive"] }
+serde      = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_with = "1"
-reqwest = { version = "0.11", features = ["blocking", "rustls-tls"] }
+reqwest    = { version = "0.11", features = ["blocking", "rustls-tls"] }
 cargo-util = "0.1"
-sys-info = "0.9"
-sysinfo = "0.22"
-zip = "0.5"
+sys-info   = "0.9"
+sysinfo    = "0.22"
+zip        = "0.5"
 
 microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
-support-common     = { path = "../supports/support-common" }
-support-terminal   = { path = "../supports/support-terminal" }
-
-component-state    = { path = "../components/state" }
+support-common   = { path = "../supports/support-common" }
+support-types    = { path = "../supports/support-types" }
+support-terminal = { path = "../supports/support-terminal" }
+component-state  = { path = "../components/state" }

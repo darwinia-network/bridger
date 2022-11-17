@@ -53,7 +53,7 @@ impl PrecompiledBinaryExecutor {
             .registry
             .version
             .unwrap_or_else(|| VERSION.to_string());
-        for prefix in support_common::constants::ALLOW_BINARY_PREFIX {
+        for prefix in support_types::constants::ALLOW_BINARY_PREFIX {
             let command = format!("{}{}", prefix, self.command);
 
             output::output_text(format!("Try execute {}@{}", command, version));

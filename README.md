@@ -16,7 +16,7 @@ Darwinia Bridger (this repo) is an implementation of a relayer client written in
 
 Download the binary from [latest release](https://github.com/darwinia-network/bridger/releases/latest).
 
-* The asset name for macOs is `bridger-darwin-x86_64.zip`.
+* The asset name for macOS is `bridger-darwin-x86_64.zip`.
 * The asset name for Linux is `bridger-linux-x86_64.zip`.
 * The asset name for Windows is `bridger-windows-x86_64.zip`.
 
@@ -77,11 +77,11 @@ If you use docker to run the bridger. You should put your configuration file to 
 | substrate-substrate | crab-crabparachain | [Guide](./bridges/crab-crabparachain/docs/Guide.md)             |
 
 ### Testnet
-| TYPE                | BRIDGE NAME                 |                                                                 |
-|---------------------| --------------------------- |-----------------------------------------------------------------|
-| evm-ethereum        | pangoro-goerli              | [Guide](https://github.com/darwinia-network/bridger/issues/528) |
-| substrate-substrate | pangolin-pangoro            | [Guide](./bridges/pangolin-pangoro/docs/Guide.md)               |
-| substrate-substrate | pangolin-pangolinparachain  | [Guide](./bridges/pangolin-pangolinparachain/docs/Guide.md)     |
+| TYPE                | BRIDGE NAME                |                                                                 |
+|---------------------|----------------------------|-----------------------------------------------------------------|
+| evm-ethereum        | pangoro-goerli             | [Guide](https://github.com/darwinia-network/bridger/issues/528) |
+| substrate-substrate | pangolin-pangoro           | [Guide](./bridges/pangolin-pangoro/docs/Guide.md)               |
+| substrate-substrate | pangolin-pangolinparachain | [Guide](./bridges/pangolin-pangolinparachain/docs/Guide.md)     |
 
 > Goerli is the testnet of Ethereum.
 > Pangolin is the testnet of Crab.

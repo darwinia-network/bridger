@@ -20,8 +20,8 @@ read [What Can A Cross-Chain Message Relayer Earn?](https://medium.com/darwinian
 So if you have good ideas, you can modify it yourself.
 
 1. Create your strategy
-   in [feemarket-s2s](../frame/assistants/feemarket-s2s/src/relay)
-   reference [Basic strategy](../frame/assistants/feemarket-s2s/src/relay/basic.rs)
+   in [feemarket-s2s](../assistants/feemarket-s2s/src/relay)
+   reference [Basic strategy](../assistants/feemarket-s2s/src/relay/basic.rs)
 2. Replace strategy from message relay endpoint
   - [Crab > Darwinia](../bridges/darwinia-crab/bridge/src/service/message/crab_to_darwinia.rs#L100)
   - [Darwinia > Crab](../bridges/darwinia-crab/bridge/src/service/message/darwinia_to_crab.rs#L100)

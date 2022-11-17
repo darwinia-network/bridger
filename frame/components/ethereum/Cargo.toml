@@ -19,7 +19,7 @@ edition = "2021"
 
 [dependencies]
 tracing = "0.1"
-color-eyre = "0.5"
+color-eyre = "0.6"
 thiserror = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 

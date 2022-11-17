@@ -12,10 +12,10 @@ use crate::error::RelayResult;
 
 #[derive(Debug)]
 pub struct MessageRelayRunner<S0: MessageClient, S1: MessageClient> {
-    state: ChannelState,
-    max_message_num_per_relaying: u64,
-    source: S0,
-    target: S1,
+    pub state: ChannelState,
+    pub max_message_num_per_relaying: u64,
+    pub source: S0,
+    pub target: S1,
 }
 
 #[derive(Default, Debug)]

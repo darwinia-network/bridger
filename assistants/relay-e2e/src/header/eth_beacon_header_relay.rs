@@ -17,10 +17,10 @@ use web3::{
 use crate::error::{RelayError, RelayResult};
 
 pub struct BeaconHeaderRelayRunner<C: EthTruthLayerLightClient> {
-    eth_light_client: C,
-    beacon_api_client: BeaconApiClient,
-    minimal_interval: u64,
-    last_relay_time: u64,
+    pub eth_light_client: C,
+    pub beacon_api_client: BeaconApiClient,
+    pub minimal_interval: u64,
+    pub last_relay_time: u64,
 }
 
 #[derive(Debug)]

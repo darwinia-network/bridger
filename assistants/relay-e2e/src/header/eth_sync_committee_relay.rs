@@ -14,8 +14,8 @@ use web3::{
 use crate::error::{RelayError, RelayResult};
 
 pub struct SyncCommitteeRelayRunner<C: EthTruthLayerLightClient> {
-    eth_light_client: C,
-    beacon_api_client: BeaconApiClient,
+    pub eth_light_client: C,
+    pub beacon_api_client: BeaconApiClient,
 }
 
 impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {

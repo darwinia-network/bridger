@@ -39,7 +39,7 @@ pub struct EthMessageClient<T: RelayStrategy = SimpleFeeMarketRelayStrategy> {
     pub etherscan_client: EtherscanClient,
 }
 
-impl<T: RelayStrategy> EthMessageClient<T> {
+impl EthMessageClient {
     pub fn new_with_simple_fee_market(
         endpoint: &str,
         inbound_address: Address,

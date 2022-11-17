@@ -12,8 +12,8 @@ use web3::{
 use crate::error::RelayResult;
 
 pub struct ExecutionLayerRelayRunner<C: EthTruthLayerLightClient> {
-    eth_light_client: C,
-    beacon_api_client: BeaconApiClient,
+    pub eth_light_client: C,
+    pub beacon_api_client: BeaconApiClient,
 }
 
 impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {

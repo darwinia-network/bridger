@@ -38,7 +38,7 @@ pub struct DarwiniaMessageClient<T: RelayStrategy = FeeMarketRelayStrategy> {
     pub eth_light_client: EthLightClient,
 }
 
-impl<T: RelayStrategy> DarwiniaMessageClient<T> {
+impl DarwiniaMessageClient {
     pub fn new_with_fee_market(
         endpoint: &str,
         beacon_api_endpoint: &str,

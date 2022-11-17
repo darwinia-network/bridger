@@ -8,7 +8,7 @@ use web3::{
     Web3,
 };
 
-use crate::error::{RelayError, RelayResult};
+use crate::error::RelayResult;
 
 #[derive(Debug, Clone)]
 pub struct EthLightClient {

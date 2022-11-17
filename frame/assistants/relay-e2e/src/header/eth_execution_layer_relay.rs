@@ -1,14 +1,15 @@
-use std::{str::FromStr, time::Duration};
-
 use bridge_e2e_traits::client::EthTruthLayerLightClient;
-use client_beacon::{client::BeaconApiClient, types::Proof};
+use client_beacon::client::BeaconApiClient;
+use client_contracts::execution_layer::types::{BeaconBlockBody, ExecutionPayload};
+use std::time::Duration;
+use tree_hash::TreeHash;
+use types::{BeaconBlockMerge, ExecPayload, MainnetEthSpec};
 use web3::{
-    contract::{tokens::Tokenize, Options},
-    ethabi::Token,
+    contract::Options,
     types::{H256, U256},
 };
 
-use crate::error::{RelayError, RelayResult};
+use crate::error::RelayResult;
 
 pub struct ExecutionLayerRelayRunner<C: EthTruthLayerLightClient> {
     eth_light_client: C,
@@ -33,9 +34,12 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
             .beacon_api_client
             .get_beacon_block(last_relayed_header.slot)
             .await?;
-        let latest_execution_payload_state_root =
-            H256::from_str(&finalized_block.body.execution_payload.state_root)
-                .map_err(|e| RelayError::Custom(format!("{}", e)))?;
+        let latest_execution_payload_state_root = finalized_block
+            .body
+            .execution_payload
+            .execution_payload
+            .state_root
+            .clone();
         let relayed_state_root = self
             .eth_light_client
             .execution_layer()
@@ -49,35 +53,19 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
                 last_relayed_header.slot,
             );
 
-            let state_root_branch = self
-                .beacon_api_client
-                .get_latest_execution_payload_state_root_branch(last_relayed_header.slot)
-                .await?;
-            let witnesses = match state_root_branch {
-                Proof::SingleProof {
-                    gindex: _,
-                    leaf: _,
-                    witnesses,
-                } => witnesses,
-                _ => return Err(RelayError::Custom("Not implemented!".to_string()).into()),
-            };
-            let parameter =
-                Token::Tuple((latest_execution_payload_state_root, witnesses).into_tokens());
-
+            let parameter = build_execution_layer_update(&finalized_block);
             let gas_price = self.eth_light_client.gas_price().await?;
             let tx = self
                 .eth_light_client
                 .execution_layer()
-                .contract
-                .signed_call(
-                    "import_latest_execution_payload_state_root",
-                    (parameter,),
+                .import_latest_execution_payload_state_root(
+                    parameter,
+                    self.eth_light_client.private_key(),
                     Options {
                         gas: Some(U256::from(10000000)),
                         gas_price: Some(gas_price),
                         ..Default::default()
                     },
-                    self.eth_light_client.private_key(),
                 )
                 .await?;
             tracing::info!(
@@ -101,5 +89,59 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
             );
         }
         Ok(())
+    }
+}
+
+fn build_execution_layer_update(block: &BeaconBlockMerge<MainnetEthSpec>) -> BeaconBlockBody {
+    BeaconBlockBody {
+        randao_reveal: block.body.randao_reveal.tree_hash_root(),
+        eth1_data: block.body.eth1_data.tree_hash_root(),
+        graffiti: H256::from(block.body.graffiti.0),
+        proposer_slashings: block.body.proposer_slashings.tree_hash_root(),
+        attester_slashings: block.body.attester_slashings.tree_hash_root(),
+        attestations: block.body.attestations.tree_hash_root(),
+        deposits: block.body.deposits.tree_hash_root(),
+        voluntary_exits: block.body.voluntary_exits.tree_hash_root(),
+        sync_aggregate: block.body.sync_aggregate.tree_hash_root(),
+        execution_payload: ExecutionPayload {
+            parent_hash: block.body.execution_payload.parent_hash().into_root(),
+            fee_recipient: block.body.execution_payload.fee_recipient(),
+            state_root: block.body.execution_payload.execution_payload.state_root,
+            receipts_root: block.body.execution_payload.execution_payload.receipts_root,
+            logs_bloom: block
+                .body
+                .execution_payload
+                .execution_payload
+                .logs_bloom
+                .tree_hash_root(),
+            prev_randao: block.body.execution_payload.execution_payload.prev_randao,
+            block_number: block.body.execution_payload.block_number(),
+            gas_limit: block.body.execution_payload.gas_limit(),
+            gas_used: block.body.execution_payload.execution_payload.gas_used,
+            timestamp: block.body.execution_payload.timestamp(),
+            extra_data: block
+                .body
+                .execution_payload
+                .execution_payload
+                .extra_data
+                .tree_hash_root(),
+            base_fee_per_gas: block
+                .body
+                .execution_payload
+                .execution_payload
+                .base_fee_per_gas,
+            block_hash: block
+                .body
+                .execution_payload
+                .execution_payload
+                .block_hash
+                .into_root(),
+            transactions: block
+                .body
+                .execution_payload
+                .execution_payload
+                .transactions
+                .tree_hash_root(),
+        },
     }
 }

@@ -54,7 +54,7 @@ pub struct MoonbaseChainConfig {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct RawIndexConfig {
     pub pangolin: SubqueryConfig,
-    pub pangolin_parachain: SubqueryConfig,
+    pub pangolin_parachain_alpha: SubqueryConfig,
     pub moonbase: SubqueryConfig,
 }
 

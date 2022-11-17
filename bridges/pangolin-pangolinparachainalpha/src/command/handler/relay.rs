@@ -25,7 +25,7 @@ pub async fn handle_relay() -> color_eyre::Result<()> {
             ),
             para: BasicSubqueryInfo::new(
                 BridgeName::PangolinPangolinParachainAlpha,
-                raw_config_index.pangolin_parachain,
+                raw_config_index.pangolin_parachain_alpha,
             ),
             relay: BasicSubqueryInfo::new(
                 BridgeName::PangolinPangolinParachainAlpha,

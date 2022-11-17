@@ -119,6 +119,19 @@
   },
   {
     "inputs": [],
+    "name": "body_root",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "finalized_header",
     "outputs": [
       {
@@ -253,7 +266,7 @@
                 "type": "bytes"
               }
             ],
-            "internalType": "struct BeaconLightClient.SyncAggregate",
+            "internalType": "struct BeaconLightClientUpdate.SyncAggregate",
             "name": "sync_aggregate",
             "type": "tuple"
           },
@@ -268,18 +281,138 @@
             "type": "uint64"
           }
         ],
-        "internalType": "struct BeaconLightClient.FinalizedHeaderUpdate",
+        "internalType": "struct BeaconLightClientUpdate.FinalizedHeaderUpdate",
         "name": "update",
         "type": "tuple"
       }
     ],
     "name": "import_finalized_header",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "uint64",
+                "name": "slot",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "proposer_index",
+                "type": "uint64"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "parent_root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "state_root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "body_root",
+                "type": "bytes32"
+              }
+            ],
+            "internalType": "struct BeaconChain.BeaconBlockHeader",
+            "name": "attested_header",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes[512]",
+                "name": "pubkeys",
+                "type": "bytes[512]"
+              },
+              {
+                "internalType": "bytes",
+                "name": "aggregate_pubkey",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct BeaconChain.SyncCommittee",
+            "name": "signature_sync_committee",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint64",
+                "name": "slot",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "proposer_index",
+                "type": "uint64"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "parent_root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "state_root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "body_root",
+                "type": "bytes32"
+              }
+            ],
+            "internalType": "struct BeaconChain.BeaconBlockHeader",
+            "name": "finalized_header",
+            "type": "tuple"
+          },
+          {
+            "internalType": "bytes32[]",
+            "name": "finality_branch",
+            "type": "bytes32[]"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32[2]",
+                "name": "sync_committee_bits",
+                "type": "bytes32[2]"
+              },
+              {
+                "internalType": "bytes",
+                "name": "sync_committee_signature",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct BeaconLightClientUpdate.SyncAggregate",
+            "name": "sync_aggregate",
+            "type": "tuple"
+          },
+          {
+            "internalType": "bytes4",
+            "name": "fork_version",
+            "type": "bytes4"
+          },
+          {
+            "internalType": "uint64",
+            "name": "signature_slot",
+            "type": "uint64"
+          }
+        ],
+        "internalType": "struct BeaconLightClientUpdate.FinalizedHeaderUpdate",
+        "name": "header_update",
+        "type": "tuple"
+      },
       {
         "components": [
           {
@@ -305,40 +438,14 @@
             "type": "bytes32[]"
           }
         ],
-        "internalType": "struct BeaconLightClient.SyncCommitteePeriodUpdate",
-        "name": "update",
+        "internalType": "struct BeaconLightClientUpdate.SyncCommitteePeriodUpdate",
+        "name": "sc_update",
         "type": "tuple"
       }
     ],
     "name": "import_next_sync_committee",
     "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "latest_execution_payload_state_root",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "state_root",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

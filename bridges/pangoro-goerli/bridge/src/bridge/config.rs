@@ -91,7 +91,7 @@ impl ChainInfoConfig {
         let transport = Http::new(&self.execution_layer_endpoint)?;
         let client = Web3::new(transport);
         let address = Address::from_str(&self.posa_light_client_address)?;
-        Ok(PosaLightClient::new(client, address)?)
+        Ok(PosaLightClient::new(&client, address)?)
     }
 
     pub fn to_ethereum_account(&self) -> FastEthereumAccount {

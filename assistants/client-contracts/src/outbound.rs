@@ -100,7 +100,7 @@ pub mod types {
         error::BridgeContractError, inbound_types::InboundLaneData, outbound::BridgeContractResult,
     };
 
-    #[derive(Debug)]
+    #[derive(Default, Debug)]
     pub struct OutboundLaneNonce {
         pub latest_received_nonce: u64,
         pub latest_generated_nonce: u64,

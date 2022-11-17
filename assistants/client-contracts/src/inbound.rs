@@ -81,7 +81,7 @@ pub mod types {
         types::{Address, Bytes, U256},
     };
 
-    #[derive(Debug)]
+    #[derive(Default, Debug)]
     pub struct InboundLaneNonce {
         pub last_confirmed_nonce: u64,
         pub last_delivered_nonce: u64,

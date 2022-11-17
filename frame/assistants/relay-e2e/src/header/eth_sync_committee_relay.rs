@@ -1,9 +1,15 @@
-use std::{ops::Div, time::Duration};
+use std::{ops::Div, str::FromStr, time::Duration};
 
 use bridge_e2e_traits::client::EthTruthLayerLightClient;
 use client_beacon::{client::BeaconApiClient, types::Proof};
-use client_contracts::beacon_light_client_types::SyncCommitteePeriodUpdate;
-use web3::{contract::Options, types::U256};
+use client_contracts::beacon_light_client_types::{
+    FinalizedHeaderUpdate, SyncCommitteePeriodUpdate,
+};
+use web3::{
+    contract::Options,
+    ethabi::ethereum_types::H32,
+    types::{Bytes, H256, U256},
+};
 
 use crate::error::{RelayError, RelayResult};
 
@@ -45,7 +51,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 period + 1,
             );
 
-            let sync_committee_update = self
+            let (finalized_header_update, sync_committee_update) = self
                 .get_sync_committee_update_parameter(period, last_relayed_header.slot)
                 .await?;
 
@@ -54,6 +60,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 .eth_light_client
                 .beacon_light_client()
                 .import_next_sync_committee(
+                    finalized_header_update,
                     sync_committee_update,
                     self.eth_light_client.private_key(),
                     Options {
@@ -93,7 +100,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
         &self,
         period: u64,
         slot: u64,
-    ) -> RelayResult<SyncCommitteePeriodUpdate> {
+    ) -> RelayResult<(FinalizedHeaderUpdate, SyncCommitteePeriodUpdate)> {
         let sync_committee_update = self
             .beacon_api_client
             .get_sync_committee_period_update(period, 1)
@@ -101,26 +108,56 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
         if sync_committee_update.is_empty() {
             return Err(RelayError::Custom("Failed to get sync committee update".into()).into());
         }
-        let next_sync_committee = sync_committee_update
-            .get(0)
-            .expect("Unreachable!")
-            .next_sync_committee
-            .clone();
-        let next_sync_committee_branch = self
+        let sync_committee_update = sync_committee_update.get(0).expect("Unreachable!");
+        let header_root = self
             .beacon_api_client
-            .get_next_sync_committee_branch(slot)
+            .get_beacon_block_root(sync_committee_update.finalized_header.slot)
             .await?;
-        let witnesses = match next_sync_committee_branch {
-            Proof::SingleProof {
-                gindex: _,
-                leaf: _,
-                witnesses,
-            } => witnesses,
-            _ => return Err(RelayError::Custom("Not implemented!".to_string()).into()),
+        let snapshot = self.beacon_api_client.get_bootstrap(&header_root).await?;
+        let next_sync_committee_branch = sync_committee_update
+            .next_sync_committee_branch
+            .clone()
+            .iter()
+            .map(|x| H256::from_str(x))
+            .collect::<Result<Vec<H256>, _>>()
+            .map_err(|e| {
+                RelayError::Custom("Failed to decode next_sync_committee_branch".into())
+            })?;
+        let current_head = self.beacon_api_client.get_header("head").await?;
+        let (signature_slot, _) = self
+            .beacon_api_client
+            .find_valid_header_since(
+                current_head.header.message.slot,
+                sync_committee_update.attested_header.slot + 1,
+            )
+            .await?;
+        let finalized_header_update = FinalizedHeaderUpdate {
+            attested_header: sync_committee_update.attested_header.to_contract_type()?,
+            signature_sync_committee: snapshot.current_sync_committee.to_contract_type()?,
+            finalized_header: sync_committee_update.finalized_header.to_contract_type()?,
+            finality_branch: sync_committee_update
+                .finality_branch
+                .iter()
+                .map(|x| H256::from_str(x))
+                .collect::<Result<Vec<H256>, _>>()
+                .map_err(|e| RelayError::Custom("Failed to decode finality_branch".into()))?,
+            sync_aggregate: sync_committee_update.sync_aggregate.to_contract_type()?,
+            fork_version: Bytes(
+                H32::from_str(&sync_committee_update.fork_version)
+                    .map_err(|e| RelayError::Custom("Failed to decode fork_version".into()))?
+                    .as_ref()
+                    .to_vec(),
+            ),
+            signature_slot,
         };
-        Ok(SyncCommitteePeriodUpdate {
-            sync_committee: next_sync_committee.to_contract_type()?,
-            next_sync_committee_branch: witnesses,
-        })
+        Ok((
+            finalized_header_update,
+            SyncCommitteePeriodUpdate {
+                sync_committee: sync_committee_update
+                    .next_sync_committee
+                    .to_contract_type()?,
+                next_sync_committee_branch,
+            },
+        ))
     }
 }

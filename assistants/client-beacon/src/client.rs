@@ -4,9 +4,9 @@ use super::types::{
 };
 use crate::{
     error::{BeaconApiError, BeaconApiResult},
-    types::BeaconBlockWrapper,
+    types::{BeaconBlockRoot, BeaconBlockWrapper},
 };
-use reqwest::header::CONTENT_TYPE;
+use reqwest::{header::CONTENT_TYPE, RequestBuilder};
 use types::{BeaconBlockMerge, MainnetEthSpec};
 
 pub struct BeaconApiClient {
@@ -23,14 +23,18 @@ impl BeaconApiClient {
         })
     }
 
+    fn get(&self, url: &str) -> RequestBuilder {
+        tracing::trace!(target: "client-beacon", "Request to {:?}", &url);
+        self.api_client.get(url)
+    }
+
     pub async fn get_header(&self, id: impl ToString) -> BeaconApiResult<GetHeaderResponse> {
         let url = format!(
             "{}/eth/v1/beacon/headers/{}",
             self.api_base_url,
             id.to_string()
         );
-        let res: ResponseWrapper<GetHeaderResponse> =
-            self.api_client.get(url).send().await?.json().await?;
+        let res: ResponseWrapper<GetHeaderResponse> = self.get(&url).send().await?.json().await?;
         Ok(res.data)
     }
 
@@ -105,8 +109,8 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string()
         );
-        let res: ResponseWrapper<String> = self.api_client.get(url).send().await?.json().await?;
-        Ok(res.data)
+        let res: ResponseWrapper<BeaconBlockRoot> = self.get(&url).send().await?.json().await?;
+        Ok(res.data.root)
     }
 
     pub async fn get_bootstrap(&self, header_root: &str) -> BeaconApiResult<Snapshot> {
@@ -114,7 +118,7 @@ impl BeaconApiClient {
             "{}/eth/v1/beacon/light_client/bootstrap/{}",
             self.api_base_url, header_root,
         );
-        let res: ResponseWrapper<Snapshot> = self.api_client.get(url).send().await?.json().await?;
+        let res: ResponseWrapper<Snapshot> = self.get(&url).send().await?.json().await?;
         Ok(res.data)
     }
 
@@ -151,8 +155,7 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<BeaconBlockWrapper> =
-            self.api_client.get(url).send().await?.json().await?;
+        let res: ResponseWrapper<BeaconBlockWrapper> = self.get(&url).send().await?.json().await?;
         Ok(res.data.message)
     }
 
@@ -163,7 +166,7 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<Finality> = self.api_client.get(url).send().await?.json().await?;
+        let res: ResponseWrapper<Finality> = self.get(&url).send().await?.json().await?;
         Ok(res.data)
     }
 
@@ -220,8 +223,7 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<ForkVersion> =
-            self.api_client.get(url).send().await?.json().await?;
+        let res: ResponseWrapper<ForkVersion> = self.get(&url).send().await?.json().await?;
         Ok(res.data)
     }
 
@@ -230,8 +232,7 @@ impl BeaconApiClient {
             "{}/eth/v1/beacon/light_client/finality_update/",
             self.api_base_url,
         );
-        let res: ResponseWrapper<FinalityUpdate> =
-            self.api_client.get(url).send().await?.json().await?;
+        let res: ResponseWrapper<FinalityUpdate> = self.get(&url).send().await?.json().await?;
         Ok(res.data)
     }
 
@@ -247,7 +248,7 @@ impl BeaconApiClient {
             count.to_string(),
         );
         let res: ResponseWrapper<Vec<SyncCommitteePeriodUpdate>> =
-            self.api_client.get(url).send().await?.json().await?;
+            self.get(&url).send().await?.json().await?;
         Ok(res.data)
     }
 }

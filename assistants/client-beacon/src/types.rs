@@ -100,7 +100,8 @@ pub struct SyncCommitteePeriodUpdate {
     pub finalized_header: HeaderMessage,
     pub finality_branch: Vec<String>,
     pub sync_aggregate: SyncAggregate,
-    pub fork_version: String,
+    pub signature_slot: String,
+    // pub fork_version: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -315,4 +316,9 @@ where
 {
     let s = String::deserialize(deserializer)?;
     T::from_str(&s).map_err(de::Error::custom)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BeaconBlockRoot {
+    pub root: String,
 }

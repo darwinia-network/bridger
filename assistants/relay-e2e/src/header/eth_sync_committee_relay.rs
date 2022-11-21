@@ -129,6 +129,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 sync_committee_update.attested_header.slot + 1,
             )
             .await?;
+        let fork_version = self.beacon_api_client.get_fork_version("head").await?;
         let finalized_header_update = FinalizedHeaderUpdate {
             attested_header: sync_committee_update.attested_header.to_contract_type()?,
             signature_sync_committee: snapshot.current_sync_committee.to_contract_type()?,
@@ -140,12 +141,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 .collect::<Result<Vec<H256>, _>>()
                 .map_err(|_| RelayError::Custom("Failed to decode finality_branch".into()))?,
             sync_aggregate: sync_committee_update.sync_aggregate.to_contract_type()?,
-            fork_version: Bytes(
-                H32::from_str(&sync_committee_update.fork_version)
-                    .map_err(|_| RelayError::Custom("Failed to decode fork_version".into()))?
-                    .as_ref()
-                    .to_vec(),
-            ),
+            fork_version: Bytes(fork_version.current_version.as_ref().to_vec()),
             signature_slot,
         };
         Ok((

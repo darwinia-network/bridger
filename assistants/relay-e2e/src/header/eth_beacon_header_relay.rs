@@ -164,11 +164,11 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                 .beacon_api_client
                 .find_valid_header_since(state.current_slot, attested_slot + 1)
                 .await?;
-            let fork_version = H32::from_str(&target_finality.fork_version)
-                .map_err(|e| RelayError::Custom(format!("{}", e)))?
-                .as_ref()
-                .to_vec();
-
+            let fork_version = self
+                .beacon_api_client
+                // .get_fork_version(&target_finality.signature_slot)
+                .get_fork_version("head")
+                .await?;
             let finalized_header_update = FinalizedHeaderUpdate {
                 attested_header: target_finality.attested_header.to_contract_type()?,
                 signature_sync_committee: last_finality.next_sync_committee.to_contract_type()?,
@@ -180,7 +180,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                     .collect::<Result<Vec<H256>, _>>()
                     .map_err(|e| RelayError::Custom(format!("{}", e)))?,
                 sync_aggregate: target_finality.sync_aggregate.to_contract_type()?,
-                fork_version: Bytes(fork_version),
+                fork_version: Bytes(fork_version.current_version.as_ref().to_vec()),
                 signature_slot,
             };
             self.import_finalized_header_with_confirmation(finalized_header_update)

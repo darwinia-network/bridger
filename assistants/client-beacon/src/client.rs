@@ -33,7 +33,14 @@ impl BeaconApiClient {
         if response.status().is_success() {
             Ok(response.json().await?)
         } else {
-            let res: ErrorResponse = response.json().await?;
+            let url: String = response.url().as_str().into();
+            let status_code = response.status();
+            let res: ErrorResponse = response.json().await.map_err(|_| {
+                BeaconApiError::Custom(format!(
+                    "Failed to connect to beacon api servcice. url: {:?}, status code: {:?}",
+                    url, status_code
+                ))
+            })?;
             Err(BeaconApiError::BeaconApiError {
                 status_code: res.status_code,
                 error: res.error,

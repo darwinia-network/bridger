@@ -55,7 +55,7 @@ impl Service for PangoroGoerliMessageRelay {
     }
 }
 
-async fn message_relay_client_builder(
+pub async fn message_relay_client_builder(
 ) -> color_eyre::Result<MessageRelayRunner<DarwiniaMessageClient, EthMessageClient>> {
     let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
 

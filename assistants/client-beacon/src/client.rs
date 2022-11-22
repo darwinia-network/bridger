@@ -289,7 +289,7 @@ mod tests {
         println!("Finalized header: {:?}", header);
     }
 
-    // #[ignore]
+    #[ignore]
     #[tokio::test]
     async fn test_get_beacon_block_root() {
         let client = test_client();

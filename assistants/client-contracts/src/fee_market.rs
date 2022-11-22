@@ -1,13 +1,14 @@
-use crate::error::BridgeContractResult;
+use crate::error::{BridgeContractError, BridgeContractResult};
 use secp256k1::SecretKey;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenizable, Contract, Options},
+    ethabi::Token,
     transports::Http,
     types::{Address, H256, U256},
     Web3,
 };
 
-use self::types::{Order, OrderExt};
+use self::types::{Order, OrderExt, RelayerInfo};
 
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
@@ -110,6 +111,55 @@ impl FeeMarket {
             .await?;
         Ok(tx)
     }
+    pub async fn get_top_relayers(&self) -> BridgeContractResult<Vec<Address>> {
+        let token: Token = self
+            .contract
+            .query("getTopRelayers", (), None, Options::default(), None)
+            .await?;
+        let tokens = token
+            .into_array()
+            .ok_or(BridgeContractError::Custom("unreachable!".into()))?;
+        let result = tokens
+            .iter()
+            .map(|t| Address::from_token(t.clone()))
+            .collect::<Result<Vec<Address>, _>>()?;
+        Ok(result)
+    }
+
+    pub async fn balance_of(&self, relayer_address: Address) -> BridgeContractResult<U256> {
+        Ok(self
+            .contract
+            .query(
+                "balanceOf",
+                (relayer_address,),
+                None,
+                Options::default(),
+                None,
+            )
+            .await?)
+    }
+
+    pub async fn fee_of(&self, relayer_address: Address) -> BridgeContractResult<U256> {
+        Ok(self
+            .contract
+            .query("feeOf", (relayer_address,), None, Options::default(), None)
+            .await?)
+    }
+
+    pub async fn get_relayer_info(&self) -> BridgeContractResult<Vec<RelayerInfo>> {
+        let relayers = self.get_top_relayers().await?;
+        let mut result = vec![];
+        for address in relayers {
+            let balance = self.balance_of(address).await?;
+            let fee = self.fee_of(address).await?;
+            result.push(RelayerInfo {
+                address,
+                balance,
+                fee,
+            })
+        }
+        Ok(result)
+    }
 }
 
 pub mod types {
@@ -117,6 +167,13 @@ pub mod types {
     use web3::contract::Error;
     use web3::ethabi::Token;
     use web3::types::{Address, U256};
+
+    #[derive(Debug, Clone)]
+    pub struct RelayerInfo {
+        pub address: Address,
+        pub balance: U256,
+        pub fee: U256,
+    }
 
     #[derive(Debug, Clone)]
     pub struct Order {
@@ -246,9 +303,9 @@ mod tests {
         }
     }
 
-    #[ignore]
+    // #[ignore]
     #[tokio::test]
-    async fn test_query() {
+    async fn test_query_relayers() {
         let (_, fee_market) = test_fee_market();
         let r: Token = fee_market
             .contract

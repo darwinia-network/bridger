@@ -1,4 +1,6 @@
-use crate::{error::BridgeContractResult, simple_fee_market::types::Order};
+use crate::{
+    error::BridgeContractResult, fee_market_types::RelayerInfo, simple_fee_market::types::Order,
+};
 use secp256k1::SecretKey;
 use web3::{
     contract::{Contract, Options},
@@ -93,6 +95,30 @@ impl SimpleFeeMarket {
             .contract
             .query("feeOf", (relayer_address,), None, Options::default(), None)
             .await?)
+    }
+
+    pub async fn balance_of(&self, relayer_address: Address) -> BridgeContractResult<U256> {
+        Ok(self
+            .contract
+            .query(
+                "balanceOf",
+                (relayer_address,),
+                None,
+                Options::default(),
+                None,
+            )
+            .await?)
+    }
+
+    pub async fn relayer_info(&self) -> BridgeContractResult<RelayerInfo> {
+        let address = self.get_top_relayer().await?;
+        let balance = self.balance_of(address).await?;
+        let fee = self.fee_of(address).await?;
+        Ok(RelayerInfo {
+            address,
+            balance,
+            fee,
+        })
     }
 }
 
@@ -238,5 +264,14 @@ mod tests {
             println!("{:?}", rl);
             println!("-----");
         }
+    }
+
+    #[tokio::test]
+    async fn test_get_top_relayer() {
+        let (_, fee_market) = test_fee_market();
+        let relayer = fee_market.get_top_relayer().await.unwrap();
+        dbg!(&relayer);
+        let fee = fee_market.fee_of(relayer).await.unwrap();
+        dbg!(&fee);
     }
 }

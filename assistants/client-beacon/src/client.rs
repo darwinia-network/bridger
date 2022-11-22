@@ -34,6 +34,7 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string()
         );
+        let response = self.get(&url).send().await?;
         let res: ResponseWrapper<GetHeaderResponse> = self.get(&url).send().await?.json().await?;
         Ok(res.data)
     }
@@ -229,7 +230,7 @@ impl BeaconApiClient {
 
     pub async fn get_finality_update(&self) -> BeaconApiResult<FinalityUpdate> {
         let url = format!(
-            "{}/eth/v1/beacon/light_client/finality_update/",
+            "{}/eth/v1/beacon/light_client/finality_update",
             self.api_base_url,
         );
         let res: ResponseWrapper<FinalityUpdate> = self.get(&url).send().await?.json().await?;

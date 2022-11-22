@@ -7,7 +7,6 @@ use client_contracts::beacon_light_client_types::{
 };
 use web3::{
     contract::Options,
-    ethabi::ethereum_types::H32,
     types::{Bytes, H256, U256},
 };
 
@@ -101,17 +100,17 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
     ) -> RelayResult<(FinalizedHeaderUpdate, SyncCommitteePeriodUpdate)> {
         let sync_committee_update = self
             .beacon_api_client
-            .get_sync_committee_period_update(period, 1)
+            .get_sync_committee_period_update(period - 1, 2)
             .await?;
-        if sync_committee_update.is_empty() {
+
+        if sync_committee_update.len() != 2 {
             return Err(RelayError::Custom("Failed to get sync committee update".into()).into());
         }
-        let sync_committee_update = sync_committee_update.get(0).expect("Unreachable!");
-        let header_root = self
-            .beacon_api_client
-            .get_beacon_block_root(sync_committee_update.finalized_header.slot)
-            .await?;
-        let snapshot = self.beacon_api_client.get_bootstrap(&header_root).await?;
+        let last_sync_committee_update = sync_committee_update.get(0).expect("Unreachable!");
+        let current_sync_committee = last_sync_committee_update
+            .next_sync_committee
+            .to_contract_type()?;
+        let sync_committee_update = sync_committee_update.get(1).expect("Unreachable!");
         let next_sync_committee_branch = sync_committee_update
             .next_sync_committee_branch
             .clone()
@@ -129,10 +128,11 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 sync_committee_update.attested_header.slot + 1,
             )
             .await?;
+
         let fork_version = self.beacon_api_client.get_fork_version("head").await?;
         let finalized_header_update = FinalizedHeaderUpdate {
             attested_header: sync_committee_update.attested_header.to_contract_type()?,
-            signature_sync_committee: snapshot.current_sync_committee.to_contract_type()?,
+            signature_sync_committee: current_sync_committee,
             finalized_header: sync_committee_update.finalized_header.to_contract_type()?,
             finality_branch: sync_committee_update
                 .finality_branch

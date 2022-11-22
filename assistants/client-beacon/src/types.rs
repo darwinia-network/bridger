@@ -26,6 +26,14 @@ fn h256_from_str(value: &str) -> BeaconApiResult<H256> {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ErrorResponse {
+    #[serde(rename = "statusCode")]
+    pub status_code: u64,
+    pub error: String,
+    pub message: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResponseWrapper<T> {
     pub data: T,
 }

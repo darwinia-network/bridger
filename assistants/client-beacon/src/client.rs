@@ -4,9 +4,10 @@ use super::types::{
 };
 use crate::{
     error::{BeaconApiError, BeaconApiResult},
-    types::{BeaconBlockRoot, BeaconBlockWrapper},
+    types::{BeaconBlockRoot, BeaconBlockWrapper, ErrorResponse},
 };
-use reqwest::{header::CONTENT_TYPE, RequestBuilder};
+use reqwest::{header::CONTENT_TYPE, RequestBuilder, Response};
+use serde::de::DeserializeOwned;
 use types::{BeaconBlockMerge, MainnetEthSpec};
 
 pub struct BeaconApiClient {
@@ -28,6 +29,19 @@ impl BeaconApiClient {
         self.api_client.get(url)
     }
 
+    async fn parse_reponse<R: DeserializeOwned>(response: Response) -> BeaconApiResult<R> {
+        if response.status().is_success() {
+            Ok(response.json().await?)
+        } else {
+            let res: ErrorResponse = response.json().await?;
+            Err(BeaconApiError::BeaconApiError {
+                status_code: res.status_code,
+                error: res.error,
+                message: res.message,
+            })
+        }
+    }
+
     pub async fn get_header(&self, id: impl ToString) -> BeaconApiResult<GetHeaderResponse> {
         let url = format!(
             "{}/eth/v1/beacon/headers/{}",
@@ -35,7 +49,7 @@ impl BeaconApiClient {
             id.to_string()
         );
         let response = self.get(&url).send().await?;
-        let res: ResponseWrapper<GetHeaderResponse> = self.get(&url).send().await?.json().await?;
+        let res: ResponseWrapper<GetHeaderResponse> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
@@ -110,7 +124,8 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string()
         );
-        let res: ResponseWrapper<BeaconBlockRoot> = self.get(&url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res = Self::parse_reponse::<ResponseWrapper<BeaconBlockRoot>>(response).await?;
         Ok(res.data.root)
     }
 
@@ -119,7 +134,8 @@ impl BeaconApiClient {
             "{}/eth/v1/beacon/light_client/bootstrap/{}",
             self.api_base_url, header_root,
         );
-        let res: ResponseWrapper<Snapshot> = self.get(&url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<Snapshot> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
@@ -136,17 +152,6 @@ impl BeaconApiClient {
         Err(BeaconApiError::Custom("Not found valid snapshot".into()).into())
     }
 
-    // pub async fn get_beacon_block(&self, id: impl ToString) -> BeaconApiResult<BlockMessage> {
-    //     let url = format!(
-    //         "{}/eth/v2/beacon/blocks/{}",
-    //         self.api_base_url,
-    //         id.to_string(),
-    //     );
-    //     let res: ResponseWrapper<GetBlockResponse> =
-    //         self.api_client.get(url).send().await?.json().await?;
-    //     Ok(res.data.message)
-    // }
-
     pub async fn get_beacon_block(
         &self,
         id: impl ToString,
@@ -156,7 +161,8 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<BeaconBlockWrapper> = self.get(&url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<BeaconBlockWrapper> = Self::parse_reponse(response).await?;
         Ok(res.data.message)
     }
 
@@ -167,7 +173,8 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<Finality> = self.get(&url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<Finality> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
@@ -224,7 +231,8 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<ForkVersion> = self.get(&url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<ForkVersion> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
@@ -233,7 +241,8 @@ impl BeaconApiClient {
             "{}/eth/v1/beacon/light_client/finality_update",
             self.api_base_url,
         );
-        let res: ResponseWrapper<FinalityUpdate> = self.get(&url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<FinalityUpdate> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
@@ -248,8 +257,9 @@ impl BeaconApiClient {
             start_period.to_string(),
             count.to_string(),
         );
+        let response = self.get(&url).send().await?;
         let res: ResponseWrapper<Vec<SyncCommitteePeriodUpdate>> =
-            self.get(&url).send().await?.json().await?;
+            Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 }
@@ -263,22 +273,23 @@ mod tests {
     use super::*;
 
     fn test_client() -> BeaconApiClient {
-        BeaconApiClient::new("http://g2.dev.darwinia.network:9596").unwrap()
-        // BeaconApiClient::new("https://lodestar-goerli.chainsafe.io").unwrap()
+        // BeaconApiClient::new("http://g2.dev.darwinia.network:9596").unwrap()
+        BeaconApiClient::new("https://lodestar-goerli.chainsafe.io").unwrap()
     }
 
-    #[ignore]
+    // #[ignore]
     #[tokio::test]
     async fn test_get_header() {
         let client = test_client();
-        let header = client.get_header(1000).await.unwrap();
-        println!("Header at slot 651232: {:?}", header);
+        let slot = 4382849;
+        let header = client.get_header(slot).await.unwrap();
+        println!("Header at slot {}  : {:?}", slot, header);
 
         let header = client.get_header("finalized").await.unwrap();
         println!("Finalized header: {:?}", header);
     }
 
-    #[ignore]
+    // #[ignore]
     #[tokio::test]
     async fn test_get_beacon_block_root() {
         let client = test_client();

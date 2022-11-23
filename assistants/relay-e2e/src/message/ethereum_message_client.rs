@@ -36,7 +36,7 @@ pub struct EthMessageClient<T: RelayStrategy = SimpleFeeMarketRelayStrategy> {
     pub strategy: T,
     pub private_key: SecretKey,
     pub max_gas_price: U256,
-    pub etherscan_client: EtherscanClient,
+    pub etherscan_client: Option<EtherscanClient>,
 }
 
 impl EthMessageClient {
@@ -60,8 +60,13 @@ impl EthMessageClient {
         let account = (&private_key).address();
         let darwinia_light_client = PosaLightClient::new(&client, darwinia_light_client_address)?;
         let strategy = SimpleFeeMarketRelayStrategy::new(fee_market, account);
-        let etherscan_client = EtherscanClient::new(etherscan_api_key)
-            .map_err(|_| E2EClientError::Custom("Failed to build etherscan client".into()))?;
+        let etherscan_client =
+            match etherscan_api_key.is_empty() {
+                true => None,
+                false => Some(EtherscanClient::new(etherscan_api_key).map_err(|_| {
+                    E2EClientError::Custom("Failed to build etherscan client".into())
+                })?),
+            };
         Ok(EthMessageClient {
             client,
             inbound,
@@ -83,7 +88,7 @@ impl<T: RelayStrategy> Web3Client for EthMessageClient<T> {
 
 impl<T: RelayStrategy> GasPriceOracle for EthMessageClient<T> {
     fn get_etherscan_client(&self) -> Option<&EtherscanClient> {
-        Some(&self.etherscan_client)
+        self.etherscan_client.as_ref()
     }
 
     fn max_gas_price(&self) -> U256 {

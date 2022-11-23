@@ -29,9 +29,15 @@ pub trait GasPriceOracle: Web3Client {
         let price: U256 = match self.get_etherscan_client() {
             Some(etherscan_client) => {
                 let oracle = etherscan_client.get_gas_oracle().await?;
-                U256::from_dec_str(&oracle.propose_gas_price)? * 1_000_000_000i64
+                let gas_price = U256::from_dec_str(&oracle.propose_gas_price)? * 1_000_000_000i64;
+                tracing::trace!(target: "bridge-e2e-traits", "Using etherscan gas price oracle: {:?} Wei", &gas_price);
+                gas_price
             }
-            None => self.get_web3().eth().gas_price().await?,
+            None => {
+                let gas_price = self.get_web3().eth().gas_price().await?;
+                tracing::trace!(target: "bridge-e2e-traits", "Using eth_gasPrice: {:?} Wei", &gas_price);
+                gas_price
+            }
         };
         Ok(cmp::min(self.max_gas_price(), price))
     }

@@ -376,6 +376,7 @@ dependencies = [
  "subxt",
  "support-etherscan",
  "thiserror",
+ "tracing",
  "web3",
 ]
 

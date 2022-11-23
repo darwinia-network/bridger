@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use bridge_e2e_traits::client::EcdsaClient;
 use support_tracker::Tracker;
 
@@ -19,6 +21,18 @@ pub enum EcdsaScanType {
     CollectedMessage,
     CollectingAuthority,
     CollectedAuthority,
+}
+
+impl Display for EcdsaScanType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            EcdsaScanType::CollectedMessage => "collectedMessages",
+            EcdsaScanType::CollectingMessage => "collectingMessages",
+            EcdsaScanType::CollectingAuthority => "collectingAuthorities",
+            EcdsaScanType::CollectedAuthority => "collectedAuthorities",
+        };
+        write!(f, "{}", s)
+    }
 }
 
 #[async_trait::async_trait]
@@ -46,7 +60,8 @@ pub trait EcdsaScanner<T: EcdsaClient> {
                 .map_err(|e| RelayError::Custom(format!("{}", e)))?;
             tracing::info!(
                 target: "relay-e2e",
-                "[Darwinia][ECDSA] Track darwinia scan block: {} ",
+                "[Darwinia][ECDSA][{}] Track darwinia scan block: {} ",
+                scan_type,
                 from,
             );
             source.block = Some(from as u32);

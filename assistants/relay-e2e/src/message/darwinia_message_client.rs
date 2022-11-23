@@ -149,7 +149,7 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
     }
 
     fn delivery_gas_unit(&self) -> E2EClientResult<U256> {
-        Ok(U256::from_dec_str("30000000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
+        Ok(U256::from_dec_str("2000000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
     }
 
     async fn prepare_for_confirmation(

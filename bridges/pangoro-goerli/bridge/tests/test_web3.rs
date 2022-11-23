@@ -76,12 +76,31 @@ async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
         target_contract: Address::from_str("0x0000000000000000000000000000000000000000").unwrap(),
         encoded: web3::types::Bytes(vec![]),
     };
-    let tx = msg
-        .source
-        .outbound
-        .send_message(message, msg.source.private_key(), fee, Options::default())
-        .await
-        .unwrap();
-    dbg!(tx);
+    let options = Options {
+        gas: Some(U256::from_dec_str("10000000")?),
+        gas_price: Some(U256::from_dec_str("20000000000")?),
+        ..Default::default()
+    };
+    for _ in 0..10 {
+        let tx = msg
+            .target
+            .outbound
+            .send_message(
+                message.clone(),
+                msg.target.private_key(),
+                fee,
+                options.clone(),
+            )
+            .await
+            .unwrap();
+        dbg!(&tx);
+        wait_for_transaction_confirmation(
+            tx,
+            msg.target.get_web3().transport(),
+            Duration::from_secs(3),
+            1,
+        )
+        .await?;
+    }
     Ok(())
 }

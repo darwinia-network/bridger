@@ -27,7 +27,7 @@ impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
         if cacse.is_none() {
             tracing::debug!(
                 target: "relay-e2e",
-                "[darwinia] [ecdsa] no more authorities change events after {}",
+                "[Darwinia][ECDSA][collectingAuthorities] no more events after {}",
                 from_block,
             );
             return Ok(None);
@@ -39,7 +39,7 @@ impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
         {
             tracing::warn!(
                 target: "relay-e2e",
-                "[darwinia] [ecdsa] you are not authority account. nothing to do."
+                "[Darwinia][ECDSA][collectingAuthorities] you are not authority account. nothing to do."
             );
             return Ok(Some(event.block_number));
         }
@@ -51,7 +51,7 @@ impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
             .await?;
         tracing::info!(
             target: "relay-e2e",
-            "[darwinia] [ecdsa] submitted new message root signature: {}",
+            "[Darwinia][ECDSA][collectingAuthorities] submitted signature: {}",
             array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(Some(event.block_number))

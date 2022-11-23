@@ -30,7 +30,7 @@ impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
         if cacse.is_none() {
             tracing::debug!(
                 target: "relay-e2e",
-                "[darwinia] [ecdsa] no more new message root signatures events after {}",
+                "[Darwinia][ECDSA][collectedAuthorities] no more events after {}",
                 from_block,
             );
             return Ok(None);
@@ -116,7 +116,7 @@ impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
 
         tracing::info!(
             target: "relay-e2e",
-            "[darwinia] [ecdsa] authorities change submitted: {}",
+            "[Darwinia][ECDSA][collectedAuthorities] authorities change submitted: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
         support_etherscan::wait_for_transaction_confirmation(

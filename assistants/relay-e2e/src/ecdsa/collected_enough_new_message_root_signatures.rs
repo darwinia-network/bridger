@@ -32,7 +32,7 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
         if now - self.last_relay_time <= self.interval {
             tracing::info!(
                 target: "relay-e2e",
-                "[darwinia] [ecdsa] Last relaying time is {:?}, wait for {} seconds to scan new message root",
+                "[Darwinia][ECDSA][collectedMessages] Last relaying time is {:?}, wait for {} seconds to scan new message root",
                 self.last_relay_time,
                 self.interval - (now - self.last_relay_time)
             );
@@ -51,7 +51,7 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
         if cacse.is_none() {
             tracing::debug!(
                 target: "relay-e2e",
-                "[darwinia] [ecdsa] no more new message root signatures events after {}",
+                "[Darwinia][ECDSA][collectedMessages] no more events after {}",
                 from_block,
             );
             return Ok(None);
@@ -61,7 +61,7 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
         if latest_relayed_block_number.as_u32() >= event.commitment_block_number {
             tracing::info!(
                 target: "relay-e2e",
-                "[darwinia] [ecdsa] [collectedMessage] Latest relayed block number is: {:?}",
+                "[Darwinia][ECDSA][collectedMessages] Latest relayed block number is: {:?}",
                 event.block_number
             );
             return Ok(Some(event.block_number));
@@ -99,7 +99,7 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
             .await?;
         tracing::info!(
             target: "relay-e2e",
-            "[darwinia] [ecdsa] submitted collected enouth new message root signature: {}",
+            "[Darwinia][ECDSA][collectedMessages] submitted collected enouth new message root signature: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
         support_etherscan::wait_for_transaction_confirmation(

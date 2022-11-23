@@ -27,7 +27,7 @@ impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<T> {
         if cacse.is_none() {
             tracing::debug!(
                 target: "relay-e2e",
-                "[darwinia] [ecdsa] no more new message root signatures events after {}",
+                "[Darwinia][ECDSA][collectingMessages] no more events after {}",
                 from_block,
             );
             return Ok(None);
@@ -37,7 +37,7 @@ impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<T> {
         if latest_relayed_block_number.as_u32() >= event.block_number {
             tracing::info!(
                 target: "relay-e2e",
-                "[darwinia] [ecdsa] [collectingMessage] Latest relayed block number is: {:?}",
+                "[Darwinia][ECDSA][collectingMessages] Latest relayed block number is: {:?}",
                 event.block_number
             );
             return Ok(Some(event.block_number));
@@ -45,7 +45,7 @@ impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<T> {
 
         tracing::info!(
             target: "relay-e2e",
-            "[darwinia] [ecdsa] found new message root signature event from block {}",
+            "[Darwinia][ECDSA][collectingMessages] found new event from block {}",
             event.block_number,
         );
         if !client_darwinia_substrate
@@ -54,7 +54,7 @@ impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<T> {
         {
             tracing::warn!(
                 target: "relay-e2e",
-                "[darwinia] [ecdsa] you are not authority account. nothing to do.",
+                "[Darwinia][ECDSA][collectingMessages] you are not authority account. nothing to do.",
             );
             return Ok(Some(event.block_number));
         }
@@ -67,7 +67,7 @@ impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<T> {
 
         tracing::info!(
             target: "relay-e2e",
-            "[darwinia] [ecdsa] submitted new message root signature: {}",
+            "[Darwinia][ECDSA][collectingMessages] submitted new message root signature: {}",
             array_bytes::bytes2hex("0x", hash.as_ref()),
         );
         Ok(Some(event.block_number))

@@ -110,7 +110,7 @@ impl SimpleFeeMarket {
             .await?)
     }
 
-    pub async fn relayer_info(&self) -> BridgeContractResult<RelayerInfo> {
+    pub async fn get_relayer_info(&self) -> BridgeContractResult<RelayerInfo> {
         let address = self.get_top_relayer().await?;
         let balance = self.balance_of(address).await?;
         let fee = self.fee_of(address).await?;

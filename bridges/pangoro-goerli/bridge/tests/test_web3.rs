@@ -1,10 +1,11 @@
-use std::str::FromStr;
+use std::{str::FromStr, time::Duration};
 
-use bridge_e2e_traits::client::MessageClient;
+use bridge_e2e_traits::client::{MessageClient, Web3Client};
 use bridge_pangoro_goerli::service::message_relay::pangoro_to_goerli::message_relay_client_builder;
 use client_contracts::outbound_types::SendMessage;
 use relay_e2e::types::ethereum::FastEthereumAccount;
-use web3::{contract::Options, ethabi::Address, types::U256};
+use support_etherscan::wait_for_transaction_confirmation;
+use web3::{confirm::wait_for_confirmations, contract::Options, ethabi::Address, types::U256};
 
 #[test]
 fn test_signing() {
@@ -27,6 +28,48 @@ async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
     let relayer_info = msg.source.strategy.fee_market.get_relayer_info().await?;
     dbg!(&relayer_info);
     let fee = relayer_info.get(0).expect("There are no relayers!").fee;
+    dbg!(fee);
+    // Send messages
+    let message = SendMessage {
+        target_contract: Address::from_str("0x0000000000000000000000000000000000000000").unwrap(),
+        encoded: web3::types::Bytes(vec![]),
+    };
+    let options = Options {
+        gas: Some(U256::from_dec_str("10000000")?),
+        ..Default::default()
+    };
+    let num = 10;
+    for _ in 0..num {
+        let tx = msg
+            .source
+            .outbound
+            .send_message(
+                message.clone(),
+                msg.source.private_key(),
+                fee,
+                options.clone(),
+            )
+            .await
+            .unwrap();
+        wait_for_transaction_confirmation(
+            tx,
+            msg.source.get_web3().transport(),
+            Duration::from_secs(3),
+            1,
+        )
+        .await?;
+        dbg!(&tx);
+    }
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
+    let msg = message_relay_client_builder().await?;
+    // Get fee from fee market
+    let relayer_info = msg.target.strategy.fee_market.get_relayer_info().await?;
+    dbg!(&relayer_info);
+    let fee = relayer_info.fee;
     dbg!(fee);
     // Send messages
     let message = SendMessage {

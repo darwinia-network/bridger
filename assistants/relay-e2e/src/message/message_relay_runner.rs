@@ -58,7 +58,7 @@ where
             .outbound_lane_nonce(source_block_at_target.map(BlockId::Number))
             .await?;
         let target_inbound_relayed = self
-            .source
+            .target
             .inbound()
             .inbound_lane_nonce(target_block_at_source.map(BlockId::Number))
             .await?;
@@ -75,6 +75,7 @@ where
     }
 
     pub async fn message_relay(&mut self) -> RelayResult<()> {
+        self.update_channel_state().await?;
         if self.state.target_inbound.last_delivered_nonce
             == self.state.source_outbound.latest_generated_nonce
         {
@@ -219,7 +220,8 @@ where
         Ok(())
     }
 
-    pub async fn message_confirm(&self) -> RelayResult<()> {
+    pub async fn message_confirm(&mut self) -> RelayResult<()> {
+        self.update_channel_state().await?;
         if self.state.source_outbound.latest_received_nonce
             == self.state.source_outbound.latest_generated_nonce
         {
@@ -278,7 +280,7 @@ where
             .await?;
 
         tracing::info!(
-            target: "relay-s2s",
+            target: "relay-e2e",
             "[MessageConfirmation] Messages confirmation tx: {:?}",
             hash
         );

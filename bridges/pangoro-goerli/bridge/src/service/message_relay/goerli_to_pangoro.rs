@@ -108,7 +108,7 @@ async fn start_delivery() -> color_eyre::Result<()> {
 }
 
 async fn start_confirmation() -> color_eyre::Result<()> {
-    let message_relay_service = message_relay_client_builder().await?;
+    let mut message_relay_service = message_relay_client_builder().await?;
     loop {
         if let Err(error) = message_relay_service.message_confirm().await {
             tracing::error!(

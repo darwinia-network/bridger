@@ -70,14 +70,18 @@ pub trait EcdsaClient: Send + Sync + Clone {
 
 #[async_trait::async_trait]
 pub trait MessageClient: GasPriceOracle {
+    // Inbound contract
     fn inbound(&self) -> &Inbound;
 
+    // Outbound contract
     fn outbound(&self) -> &Outbound;
 
     fn private_key(&self) -> &SecretKey;
 
+    // Retruns true to relay this message, or returns false to not relay this message
     async fn decide(&mut self, encoded_key: U256) -> E2EClientResult<bool>;
 
+    // Returns proof for messages delivery in the range of nonce from begin to end
     async fn prepare_for_delivery(
         &self,
         begin: u64,
@@ -85,8 +89,10 @@ pub trait MessageClient: GasPriceOracle {
         block_number: Option<BlockNumber>,
     ) -> E2EClientResult<ReceiveMessagesProof>;
 
+    // Returns estimated gas used for one message delivery
     fn delivery_gas_unit(&self) -> E2EClientResult<U256>;
 
+    // Returns proof for messages confirmation in the range of nonce from begin to end
     async fn prepare_for_confirmation(
         &self,
         begin: u64,
@@ -94,7 +100,9 @@ pub trait MessageClient: GasPriceOracle {
         block_number: Option<BlockNumber>,
     ) -> E2EClientResult<ReceiveMessagesDeliveryProof>;
 
+    // Returns estimated gas used for one message confirmation
     fn confirmation_gas_unit(&self) -> E2EClientResult<U256>;
 
+    // Returns latest block number of the light client of the other chain
     async fn latest_light_client_block_number(&self) -> E2EClientResult<Option<u64>>;
 }

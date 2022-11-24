@@ -53,5 +53,5 @@ max_gas_price = 9000000000
 etherscan_api_key = "api_key..."
 
 [index]
-darwinia = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia/" }
-darwinia_evm = { endpoint = "https://thegraph.darwinia.network/ethv2/subgraphs/name/bridge-darwinia" }
+substrate_chain = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia/" }
+evm_chain = { endpoint = "https://thegraph.darwinia.network/ethv2/subgraphs/name/bridge-darwinia" }

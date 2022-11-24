@@ -51,5 +51,5 @@ etherscan_api_key = "api_key..."
 
 
 [index]
-pangoro = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro/" }
-pangoro_evm = { endpoint = "http://localhost:8000/subgraphs/name/ethv2" }
+substrate_chain = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro/" }
+evm_chain = { endpoint = "http://localhost:8000/subgraphs/name/ethv2" }

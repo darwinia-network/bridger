@@ -187,6 +187,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "bin-e2e"
+version = "0.7.0"
+dependencies = [
+ "client-beacon",
+ "client-contracts",
+ "color-eyre 0.6.2",
+ "relay-e2e",
+ "serde 1.0.145",
+ "subquery",
+ "thegraph",
+ "thiserror",
+ "tracing",
+ "web3",
+]
+
+[[package]]
 name = "bincode"
 version = "1.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -386,6 +402,7 @@ version = "0.7.0"
 dependencies = [
  "array-bytes",
  "async-trait",
+ "bin-e2e",
  "bridge-e2e-traits",
  "bytes",
  "client-beacon",

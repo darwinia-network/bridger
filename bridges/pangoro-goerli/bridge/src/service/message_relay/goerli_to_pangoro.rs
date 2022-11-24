@@ -9,6 +9,7 @@ use crate::bridge::{BridgeBus, BridgeConfig};
 use lifeline::{Lifeline, Service, Task};
 use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
+use thegraph::types::LikethChain;
 
 #[derive(Debug)]
 pub struct GoerliPangoroMessageRelay {
@@ -83,7 +84,7 @@ async fn message_relay_client_builder(
         Address::from_str(&config.pangoro_evm.execution_layer_contract_address)?,
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
         &config.pangoro_evm.private_key,
-        config.index.to_pangoro_thegraph()?,
+        config.index.to_evm_thegraph(LikethChain::Pangoro)?,
     )?;
 
     Ok(MessageRelayRunner {

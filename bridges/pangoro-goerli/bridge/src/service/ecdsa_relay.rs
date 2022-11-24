@@ -13,6 +13,7 @@ use relay_e2e::ecdsa::{
     ecdsa_scanner::{EcdsaScanType, EcdsaScanner as EcdsaScannerTrait},
     types::EcdsaSource,
 };
+use subquery::types::BridgeName;
 
 #[derive(Debug)]
 pub struct ECDSARelayService {
@@ -100,7 +101,9 @@ impl EcdsaScannerTrait<PangoroClient> for EcdsaScanner {
     async fn get_ecdsa_source(&self) -> RelayResult<EcdsaSource<PangoroClient>> {
         let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)
             .map_err(|e| RelayError::Custom(format!("{}", e)))?;
-        let subquery = config.index.to_pangoro_subquery();
+        let subquery = config
+            .index
+            .to_substrate_subquery(BridgeName::PangoroGoerli);
         let client_darwinia_web3 = config
             .pangoro_evm
             .to_web3_client()
@@ -118,7 +121,7 @@ impl EcdsaScannerTrait<PangoroClient> for EcdsaScanner {
             .goerli
             .to_posa_client()
             .map_err(|e| RelayError::Custom(format!("{}", e)))?;
-        let darwinia_evm_account = config.pangoro_evm.to_fast_ethereum_account();
+        let darwinia_evm_account = config.pangoro_evm.to_ethereum_account();
         let ethereum_account = config.goerli.to_ethereum_account();
         let minimal_interval = config.general.header_relay_minimum_interval;
         Ok(EcdsaSource {

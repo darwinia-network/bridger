@@ -43,54 +43,55 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             .beacon_light_client()
             .sync_committee_roots(period + 1)
             .await?;
-        if next_sync_committee.is_zero() {
-            tracing::info!(
-                target: "relay-e2e",
-                "[SyncCommittee] Try to relay SyncCommittee at period {:?}",
-                period + 1,
-            );
-
-            let (finalized_header_update, sync_committee_update) =
-                self.get_sync_committee_update_parameter(period).await?;
-
-            let gas_price = self.eth_light_client.gas_price().await?;
-            let tx = self
-                .eth_light_client
-                .beacon_light_client()
-                .import_next_sync_committee(
-                    finalized_header_update,
-                    sync_committee_update,
-                    self.eth_light_client.private_key(),
-                    Options {
-                        gas: Some(
-                            U256::from_dec_str("10000000")
-                                .map_err(|e| RelayError::Custom(format!("{}", e)))?,
-                        ),
-                        gas_price: Some(gas_price),
-                        ..Default::default()
-                    },
-                )
-                .await?;
-
-            tracing::info!(
-                target: "relay-e2e",
-                "[SyncCommittee] Sending tx: {:?}",
-                &tx
-            );
-            support_etherscan::wait_for_transaction_confirmation(
-                tx,
-                self.eth_light_client.get_web3().transport(),
-                Duration::from_secs(5),
-                3,
-            )
-            .await?;
-        } else {
+        if !next_sync_committee.is_zero() {
             tracing::info!(
                 target: "relay-e2e",
                 "[SyncCommittee] Next sync committee is {:?}",
                 next_sync_committee
             );
+            return Ok(());
         }
+
+        tracing::info!(
+            target: "relay-e2e",
+            "[SyncCommittee] Try to relay SyncCommittee at period {:?}",
+            period + 1,
+        );
+
+        let (finalized_header_update, sync_committee_update) =
+            self.get_sync_committee_update_parameter(period).await?;
+
+        let gas_price = self.eth_light_client.gas_price().await?;
+        let tx = self
+            .eth_light_client
+            .beacon_light_client()
+            .import_next_sync_committee(
+                finalized_header_update,
+                sync_committee_update,
+                self.eth_light_client.private_key(),
+                Options {
+                    gas: Some(
+                        U256::from_dec_str("10000000")
+                            .map_err(|e| RelayError::Custom(format!("{}", e)))?,
+                    ),
+                    gas_price: Some(gas_price),
+                    ..Default::default()
+                },
+            )
+            .await?;
+
+        tracing::info!(
+            target: "relay-e2e",
+            "[SyncCommittee] Sending tx: {:?}",
+            &tx
+        );
+        support_etherscan::wait_for_transaction_confirmation(
+            tx,
+            self.eth_light_client.get_web3().transport(),
+            Duration::from_secs(5),
+            3,
+        )
+        .await?;
         Ok(())
     }
 

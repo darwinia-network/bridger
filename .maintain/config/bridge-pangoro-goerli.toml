@@ -1,16 +1,16 @@
 [general]
-# Whether to relay beacon headers from goerli to pangoro
-header_goerli_to_pangoro = true
-# Whether to relay sync commit from goerli to pangoro
-sync_commit_goerli_to_pangoro = true
-# Whether to relay execution layer state root from goerli to pangoro
-execution_layer_goerli_to_pangoro = true
-# Whether to sign the messages root and relay headers from pangoro to goerli
-ecdsa_service = true
-# Whether to relay messages from goerli to pangoro
-msg_goerli_to_pangoro = true
-# Whether to relay messages from pangoro to goerli
-msg_pangoro_to_goerli = true
+# Whether to relay beacon chain header to evm chain
+enable_beacon_header_relay = true
+# Whether to relay sync commit from beacon chain to evm chain
+enable_sync_commit_relay = true
+# Whether to relay execution layer state root from execution chain to evm chain
+enable_execution_header_layer = true
+# Whether to sign the messages root and relay headers from evm chain to beacon chain
+enable_ecdsa_relay = true
+# Whether to relay messages from execution chain to evm chain
+enable_message_execution_to_evm = true
+# Whether to relay messages from evm chain to execution chain
+enable_message_evm_to_execution = true
 # Max number of messages every delivery
 max_message_num_per_relaying = 15
 # Minimum seconds between two header relay

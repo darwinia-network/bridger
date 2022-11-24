@@ -69,16 +69,17 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             state
         );
         if state.current_period == state.relayed_period {
+            self.relay_latest(state).await?;
+            return Ok(());
+        }
+
+        if next_sync_aggregate_root.is_zero() {
+            return Ok(());
+        }
+        if state.current_period == state.relayed_period + 1 {
             self.relay_latest(state).await
         } else {
-            if next_sync_aggregate_root.is_zero() {
-                return Ok(());
-            }
-            if state.current_period == state.relayed_period + 1 {
-                self.relay_latest(state).await
-            } else {
-                self.relay_next_period(state).await
-            }
+            self.relay_next_period(state).await
         }
     }
 
@@ -184,10 +185,9 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             };
             self.import_finalized_header_with_confirmation(finalized_header_update)
                 .await?;
-            Ok(())
-        } else {
-            Err(RelayError::Custom("Failed to get sync committee update".into()).into())
+            return Ok(());
         }
+        Err(RelayError::Custom("Failed to get sync committee update".into()).into())
     }
 
     async fn import_finalized_header_with_confirmation(

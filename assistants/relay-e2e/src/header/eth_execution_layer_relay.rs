@@ -46,48 +46,49 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
             .merkle_root(None)
             .await?;
 
-        if relayed_state_root != latest_execution_payload_state_root {
-            tracing::info!(
-                target: "relay-e2e",
-                "[ExecutionLayer] Try to relay execution layer state at slot: {:?}",
-                last_relayed_header.slot,
-            );
-
-            let parameter = build_execution_layer_update(&finalized_block);
-            let gas_price = self.eth_light_client.gas_price().await?;
-            let tx = self
-                .eth_light_client
-                .execution_layer()
-                .import_latest_execution_payload_state_root(
-                    parameter,
-                    self.eth_light_client.private_key(),
-                    Options {
-                        gas: Some(U256::from(10000000)),
-                        gas_price: Some(gas_price),
-                        ..Default::default()
-                    },
-                )
-                .await?;
-            tracing::info!(
-                target: "relay-e2e",
-                "[ExecutionLayer] Sending tx: {:?}",
-                &tx
-            );
-            support_etherscan::wait_for_transaction_confirmation(
-                tx,
-                self.eth_light_client.get_web3().transport(),
-                Duration::from_secs(5),
-                3,
-            )
-            .await?;
-        } else {
+        if relayed_state_root == latest_execution_payload_state_root {
             tracing::info!(
                 target: "relay-e2e",
                 "[ExecutionLayer] Latest execution payload state root at slot {:?} is : {:?}",
                 last_relayed_header.slot,
                 &relayed_state_root,
             );
+            return Ok(());
         }
+
+        tracing::info!(
+            target: "relay-e2e",
+            "[ExecutionLayer] Try to relay execution layer state at slot: {:?}",
+            last_relayed_header.slot,
+        );
+
+        let parameter = build_execution_layer_update(&finalized_block);
+        let gas_price = self.eth_light_client.gas_price().await?;
+        let tx = self
+            .eth_light_client
+            .execution_layer()
+            .import_latest_execution_payload_state_root(
+                parameter,
+                self.eth_light_client.private_key(),
+                Options {
+                    gas: Some(U256::from(10000000)),
+                    gas_price: Some(gas_price),
+                    ..Default::default()
+                },
+            )
+            .await?;
+        tracing::info!(
+            target: "relay-e2e",
+            "[ExecutionLayer] Sending tx: {:?}",
+            &tx
+        );
+        support_etherscan::wait_for_transaction_confirmation(
+            tx,
+            self.eth_light_client.get_web3().transport(),
+            Duration::from_secs(5),
+            3,
+        )
+        .await?;
         Ok(())
     }
 }

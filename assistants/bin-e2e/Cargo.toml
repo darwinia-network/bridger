@@ -1,0 +1,45 @@
+[package]
+name = "bin-e2e"
+version = "0.7.0"
+authors = ["Darwinia Network <hello@darwinia.network>"]
+description = "Darwinia bridger"
+repository = "https://github.com/darwinia-network/bridger"
+license = "MIT"
+documentation = "https://rust-docs.darwinia.network/bridger"
+homepage = "https://github.com/darwinia-network/bridger"
+include = [
+  "Cargo.toml",
+  "**/*.rs",
+  "README.md",
+  "LICENSE"
+]
+keywords = ["substrate", "darwinia"]
+readme = 'README.md'
+edition = "2021"
+
+
+[dependencies]
+tracing     = "0.1"
+thiserror   = "1.0"
+color-eyre  = "0.6"
+
+serde     = { version = "1", features = ["derive"] }
+
+web3        = { version = "0.18", features = ["signing"] }
+
+
+relay-e2e = { path = "../relay-e2e" }
+subquery  = { path = "../subquery", features = [ "bridge-ethv2" ] }
+thegraph  = { path = "../thegraph", features = [ "bridge-ethv2" ] }
+
+client-contracts      = { path = "../client-contracts" }
+client-beacon         = { path = "../client-beacon" }
+
+[patch.crates-io]
+eth2_hashing     = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_serde_utils = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_ssz         = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_ssz_derive  = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_ssz_types   = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+tree_hash        = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+tree_hash_derive = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }

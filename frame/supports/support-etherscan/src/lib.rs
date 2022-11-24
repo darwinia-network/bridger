@@ -84,20 +84,22 @@ pub async fn wait_for_transaction_confirmation<T: Transport>(
     poll_interval: Duration,
     confirmations: usize,
 ) -> web3::error::Result<()> {
-    let eth = Eth::new(transport.clone());
-    if confirmations > 0 {
-        let confirmation_check = || transaction_receipt_block_number_check(&eth, hash);
-        let eth_filter = EthFilter::new(transport.clone());
-        let eth = eth.clone();
-        wait_for_confirmations(
-            eth,
-            eth_filter,
-            poll_interval,
-            confirmations,
-            confirmation_check,
-        )
-        .await?;
+    if confirmations == 0 {
+        return Ok(());
     }
+
+    let eth = Eth::new(transport.clone());
+    let confirmation_check = || transaction_receipt_block_number_check(&eth, hash);
+    let eth_filter = EthFilter::new(transport.clone());
+    let eth = eth.clone();
+    wait_for_confirmations(
+        eth,
+        eth_filter,
+        poll_interval,
+        confirmations,
+        confirmation_check,
+    )
+    .await?;
     Ok(())
 }
 

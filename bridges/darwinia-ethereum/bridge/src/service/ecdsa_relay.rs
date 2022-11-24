@@ -2,18 +2,18 @@ use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
 use component_state::state::BridgeState;
+use relay_e2e::error::{RelayError, RelayResult};
+use support_common::config::{Config, Names};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
 
-use crate::bridge::{BridgeBus, BridgeTask};
-use crate::service::ecdsa_relay::ecdsa_scanner::{EcdsaScanType, EcdsaScanner};
-
-mod collected_enough_authorities_change_signatures;
-mod collected_enough_new_message_root_signatures;
-mod collecting_authorities_change_signatures;
-mod collecting_new_message_root_signatures;
-mod ecdsa_scanner;
-mod types;
+use crate::bridge::{BridgeBus, BridgeConfig, BridgeTask};
+use client_darwinia::client::DarwiniaClient;
+use relay_e2e::ecdsa::{
+    ecdsa_scanner::{EcdsaScanType, EcdsaScanner as EcdsaScannerTrait},
+    types::EcdsaSource,
+};
+use subquery::types::BridgeName;
 
 #[derive(Debug)]
 pub struct ECDSARelayService {
@@ -41,7 +41,7 @@ impl Service for ECDSARelayService {
         let tracker_collected_authorities =
             Tracker::new(microkv, "scan.darwinia.collected-authorities");
         let _greet_collecting_message =
-            Self::try_task("darwinia-to-ethereum-ecdsa-collecting-message", async move {
+            Self::try_task("darwinia-to-eth-ecdsa-collecting-message", async move {
                 EcdsaScanner
                     .start(
                         tracker_collecting_message.clone(),
@@ -51,7 +51,7 @@ impl Service for ECDSARelayService {
                 Ok(())
             });
         let _greet_collected_message =
-            Self::try_task("darwinia-to-ethereum-ecdsa-collected-message", async move {
+            Self::try_task("darwinia-to-eth-ecdsa-collected-message", async move {
                 EcdsaScanner
                     .start(
                         tracker_collected_message.clone(),
@@ -60,9 +60,8 @@ impl Service for ECDSARelayService {
                     .await;
                 Ok(())
             });
-        let _greet_collecting_authorities = Self::try_task(
-            "darwinia-to-ethereum-ecdsa-collecting-authorities",
-            async move {
+        let _greet_collecting_authorities =
+            Self::try_task("darwinia-to-eth-ecdsa-collecting-authorities", async move {
                 EcdsaScanner
                     .start(
                         tracker_collecting_authorities.clone(),
@@ -70,11 +69,9 @@ impl Service for ECDSARelayService {
                     )
                     .await;
                 Ok(())
-            },
-        );
-        let _greet_collected_authorities = Self::try_task(
-            "darwinia-to-ethereum-ecdsa-collected-authorities",
-            async move {
+            });
+        let _greet_collected_authorities =
+            Self::try_task("darwinia-to-eth-ecdsa-collected-authorities", async move {
                 EcdsaScanner
                     .start(
                         tracker_collected_authorities.clone(),
@@ -82,13 +79,57 @@ impl Service for ECDSARelayService {
                     )
                     .await;
                 Ok(())
-            },
-        );
+            });
         Ok(Self {
             _greet_collecting_message,
             _greet_collected_message,
             _greet_collecting_authorities,
             _greet_collected_authorities,
+        })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct EcdsaScanner;
+
+#[async_trait::async_trait]
+impl EcdsaScannerTrait<DarwiniaClient> for EcdsaScanner {
+    async fn get_ecdsa_source(&self) -> RelayResult<EcdsaSource<DarwiniaClient>> {
+        let config: BridgeConfig = Config::restore(Names::BridgeDarwiniaEthereum)
+            .map_err(|e| RelayError::Custom(format!("{}", e)))?;
+        let subquery = config
+            .index
+            .to_substrate_subquery(BridgeName::DarwiniaEthereum);
+        let client_darwinia_web3 = config
+            .darwinia_evm
+            .to_web3_client()
+            .map_err(|e| RelayError::Custom(format!("{}", e)))?;
+        let client_eth_web3 = config
+            .eth
+            .to_web3_client()
+            .map_err(|e| RelayError::Custom(format!("{}", e)))?;
+        let client_darwinia_substrate = config
+            .darwinia_substrate
+            .to_substrate_client()
+            .await
+            .map_err(|e| RelayError::Custom(format!("{}", e)))?;
+        let client_posa = config
+            .eth
+            .to_posa_client()
+            .map_err(|e| RelayError::Custom(format!("{}", e)))?;
+        let darwinia_evm_account = config.darwinia_evm.to_ethereum_account();
+        let ethereum_account = config.eth.to_ethereum_account();
+        let minimal_interval = config.general.header_relay_minimum_interval;
+        Ok(EcdsaSource {
+            block: None,
+            client_darwinia_web3,
+            client_eth_web3,
+            subquery,
+            client_posa,
+            client_darwinia_substrate,
+            ethereum_account,
+            darwinia_evm_account,
+            minimal_interval,
         })
     }
 }

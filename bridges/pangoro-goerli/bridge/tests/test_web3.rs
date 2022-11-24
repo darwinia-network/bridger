@@ -5,7 +5,7 @@ use bridge_pangoro_goerli::service::message_relay::pangoro_to_goerli::message_re
 use client_contracts::outbound_types::SendMessage;
 use relay_e2e::types::ethereum::FastEthereumAccount;
 use support_etherscan::wait_for_transaction_confirmation;
-use web3::{confirm::wait_for_confirmations, contract::Options, ethabi::Address, types::U256};
+use web3::{contract::Options, ethabi::Address, types::U256};
 
 #[test]
 fn test_signing() {

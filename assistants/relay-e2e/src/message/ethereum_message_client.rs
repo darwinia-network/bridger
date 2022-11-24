@@ -29,6 +29,7 @@ pub const LANE_NONCE_SLOT: u64 = 1u64;
 pub const LANE_MESSAGE_SLOT: u64 = 2u64;
 
 pub struct EthMessageClient<T: RelayStrategy = SimpleFeeMarketRelayStrategy> {
+    pub chain: String,
     pub client: Web3<Http>,
     pub inbound: Inbound,
     pub outbound: Outbound,
@@ -41,6 +42,7 @@ pub struct EthMessageClient<T: RelayStrategy = SimpleFeeMarketRelayStrategy> {
 
 impl EthMessageClient {
     pub fn new_with_simple_fee_market(
+        chain: &str,
         endpoint: &str,
         inbound_address: Address,
         outbound_address: Address,
@@ -68,6 +70,7 @@ impl EthMessageClient {
                 })?),
             };
         Ok(EthMessageClient {
+            chain: chain.into(),
             client,
             inbound,
             outbound,
@@ -98,6 +101,10 @@ impl<T: RelayStrategy> GasPriceOracle for EthMessageClient<T> {
 
 #[async_trait::async_trait]
 impl<T: RelayStrategy> MessageClient for EthMessageClient<T> {
+    fn chain(&self) -> &str {
+        &self.chain
+    }
+
     fn inbound(&self) -> &Inbound {
         &self.inbound
     }

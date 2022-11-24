@@ -60,7 +60,7 @@ pub trait EcdsaScanner<T: EcdsaClient> {
                 .map_err(|e| RelayError::Custom(format!("{}", e)))?;
             tracing::info!(
                 target: "relay-e2e",
-                "[Darwinia][ECDSA][{}] Track darwinia scan block: {} ",
+                "[Darwinia][ECDSA][{}] Track scan block: {} ",
                 scan_type,
                 from,
             );

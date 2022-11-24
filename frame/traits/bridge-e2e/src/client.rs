@@ -76,6 +76,9 @@ pub trait EcdsaClient: Send + Sync + Clone {
 
 #[async_trait::async_trait]
 pub trait MessageClient: GasPriceOracle {
+    // Returns the chain name
+    fn chain(&self) -> &str;
+
     // Inbound contract
     fn inbound(&self) -> &Inbound;
 

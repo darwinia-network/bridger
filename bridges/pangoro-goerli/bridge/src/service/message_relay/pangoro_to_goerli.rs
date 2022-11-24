@@ -60,6 +60,7 @@ pub async fn message_relay_client_builder(
     let config: BridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
 
     let eth_message_client = EthMessageClient::new_with_simple_fee_market(
+        "Goerli",
         &config.goerli.execution_layer_endpoint,
         Address::from_str(&config.goerli.inbound_address)?,
         Address::from_str(&config.goerli.outbound_address)?,
@@ -70,6 +71,7 @@ pub async fn message_relay_client_builder(
         &config.goerli.etherscan_api_key,
     )?;
     let darwinia_message_client = DarwiniaMessageClient::new_with_fee_market(
+        "Pangoro",
         &config.pangoro_evm.endpoint,
         &config.goerli.endpoint,
         Address::from_str(&config.pangoro_evm.inbound_address)?,

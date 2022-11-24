@@ -81,7 +81,9 @@ where
         {
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageDelivery] Last delivered nonce is {:?}, equal to lastest generated. Do nothing.",
+                "[MessageDelivery][{}=>{}] Last delivered nonce is {:?}, equal to lastest generated. Do nothing.",
+                self.source.chain(),
+                self.target.chain(),
                 self.state.target_inbound.last_delivered_nonce,
             );
             return Ok(());
@@ -108,7 +110,9 @@ where
         {
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageDelivery] Messages: [{:?}, {:?}] need to be relayed, wait for header relay",
+                "[MessageDelivery][{}=>{}] Messages: [{:?}, {:?}] need to be relayed, wait for header relay",
+                self.source.chain(),
+                self.target.chain(),
                 begin,
                 end
             );
@@ -121,7 +125,9 @@ where
         );
         tracing::info!(
             target: "relay-e2e",
-            "[MessageDelivery] Try to relay messages: [{:?}, {:?}]",
+            "[MessageDelivery][{}=>{}] Try to relay messages: [{:?}, {:?}]",
+            self.source.chain(),
+            self.target.chain(),
             self.state.target_inbound.last_delivered_nonce + 1,
             end
         );
@@ -174,14 +180,18 @@ where
         if count == delivered {
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageDelivery] No need to relay",
+                "[MessageDelivery][{}=>{}] No need to relay",
+                self.source.chain(),
+                self.target.chain(),
             );
             return Ok(());
         }
 
         tracing::info!(
             target: "relay-e2e",
-            "[MessageDelivery] Relaying messages: [{:?}, {:?}]",
+            "[MessageDelivery][{}={}] Relaying messages: [{:?}, {:?}]",
+            self.source.chain(),
+            self.target.chain(),
             begin + delivered,
             begin + count - 1,
         );
@@ -205,7 +215,9 @@ where
 
         tracing::info!(
             target: "relay-e2e",
-            "[MessageDelivery] Sending tx: {:?}",
+            "[MessageDelivery][{}={}] Sending tx: {:?}",
+            self.source.chain(),
+            self.target.chain(),
             tx
         );
 
@@ -227,7 +239,9 @@ where
         {
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageConfirmation] All confirmed({:?}), nothing to do.",
+                "[MessageConfirmation][{}={}] All confirmed({:?}), nothing to do.",
+                self.source.chain(),
+                self.target.chain(),
                 self.state.source_outbound
             );
             return Ok(());
@@ -243,7 +257,9 @@ where
         {
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageConfirmation] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
+                "[MessageConfirmation][{}={}] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
+                self.source.chain(),
+                self.target.chain(),
                 self.state.source_outbound.latest_received_nonce,
                 self.state.target_inbound_relayed.last_delivered_nonce + 1,
                 self.state.source_outbound.latest_generated_nonce
@@ -253,7 +269,9 @@ where
 
         tracing::info!(
             target: "relay-e2e",
-            "[MessageConfirmation] Try to confirm nonces [{:?}:{:?}]",
+            "[MessageConfirmation][{}={}] Try to confirm nonces [{:?}:{:?}]",
+            self.source.chain(),
+            self.target.chain(),
             begin,
             end,
         );
@@ -281,7 +299,9 @@ where
 
         tracing::info!(
             target: "relay-e2e",
-            "[MessageConfirmation] Messages confirmation tx: {:?}",
+            "[MessageConfirmation][{}={}] Messages confirmation tx: {:?}",
+            self.source.chain(),
+            self.target.chain(),
             hash
         );
         wait_for_transaction_confirmation(

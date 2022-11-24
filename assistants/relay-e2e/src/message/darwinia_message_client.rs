@@ -27,6 +27,7 @@ use super::fee_market::FeeMarketRelayStrategy;
 use crate::header::common::EthLightClient;
 
 pub struct DarwiniaMessageClient<T: RelayStrategy = FeeMarketRelayStrategy> {
+    pub chain: String,
     pub client: Web3<Http>,
     pub inbound: Inbound,
     pub outbound: Outbound,
@@ -40,6 +41,7 @@ pub struct DarwiniaMessageClient<T: RelayStrategy = FeeMarketRelayStrategy> {
 
 impl DarwiniaMessageClient {
     pub fn new_with_fee_market(
+        chain: &str,
         endpoint: &str,
         beacon_api_endpoint: &str,
         inbound_address: Address,
@@ -79,6 +81,7 @@ impl DarwiniaMessageClient {
         let strategy = FeeMarketRelayStrategy::new(fee_market, account);
 
         Ok(DarwiniaMessageClient {
+            chain: chain.into(),
             client,
             inbound,
             outbound,
@@ -110,6 +113,10 @@ impl<T: RelayStrategy> GasPriceOracle for DarwiniaMessageClient<T> {
 
 #[async_trait::async_trait]
 impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
+    fn chain(&self) -> &str {
+        &self.chain
+    }
+
     fn inbound(&self) -> &Inbound {
         &self.inbound
     }

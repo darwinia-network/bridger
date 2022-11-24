@@ -44,6 +44,9 @@ client-common-traits  = { optional = true, path = "../../frame/traits/client-com
 finality-grandpa      = { optional = true, version = "0.14" }
 bridge-s2s-traits     = { optional = true, path = "../../frame/traits/bridge-s2s", features = ["advanced-types"] }
 
+## e2e client
+bridge-e2e-traits = { optional = true, path = "../../frame/traits/bridge-e2e" }
+
 ## feemarket s2s
 feemarket-s2s-traits = { optional = true, path = "../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
 
@@ -72,7 +75,7 @@ feemarket-s2s   = [
 ]
 feemarket-s2s-crab = ["feemarket-s2s"]
 feemarket-s2s-darwinia-parachain = ["feemarket-s2s"]
-ecdsa-authority = []
+bridge-e2e = ["async-trait", "bridge-e2e-traits"]
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

@@ -5,7 +5,7 @@ use bridge_e2e_traits::{
     error::{E2EClientError, E2EClientResult},
     strategy::RelayStrategy,
 };
-use client_beacon::client::BeaconApiClient;
+use client_beacon::client::{ApiSupplier, BeaconApiClient};
 use client_contracts::{
     inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
     outbound_types::{MessageAccepted, ReceiveMessagesDeliveryProof},
@@ -44,6 +44,7 @@ impl DarwiniaMessageClient {
         chain: &str,
         endpoint: &str,
         beacon_api_endpoint: &str,
+        beacon_api_supplier: ApiSupplier,
         inbound_address: Address,
         outbound_address: Address,
         chain_message_committer_address: Address,
@@ -58,7 +59,7 @@ impl DarwiniaMessageClient {
         let transport = Http::new(endpoint)?;
         let client = Web3::new(transport);
 
-        let beacon_rpc_client = BeaconApiClient::new(beacon_api_endpoint)
+        let beacon_rpc_client = BeaconApiClient::new(beacon_api_endpoint, beacon_api_supplier)
             .map_err(|_| E2EClientError::Custom("Failed to build beacon api client".into()))?;
 
         let inbound = Inbound::new(&client, inbound_address)?;

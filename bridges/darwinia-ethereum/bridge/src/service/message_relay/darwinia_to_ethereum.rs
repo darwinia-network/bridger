@@ -75,6 +75,7 @@ pub async fn message_relay_client_builder(
         "Darwinia",
         &config.darwinia_evm.endpoint,
         &config.eth.endpoint,
+        config.eth.api_supplier,
         Address::from_str(&config.darwinia_evm.inbound_address)?,
         Address::from_str(&config.darwinia_evm.outbound_address)?,
         Address::from_str(&config.darwinia_evm.chain_message_committer_address)?,

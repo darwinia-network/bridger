@@ -53,7 +53,10 @@ component-state       = { path = "../../../frame/components/state" }
 bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
 subquery              = { path = "../../../assistants/subquery", features = [ "bridge-ethv2" ] }
 client-contracts      = { path = "../../../assistants/client-contracts" }
-client-darwinia       = { path = "../../../assistants/client-darwinia", features = [ "ecdsa-authority" ] }
+client-darwinia       = { path = "../../../assistants/client-darwinia", features = [ "bridge-e2e" ] }
+client-beacon         = { path = "../../../assistants/client-beacon" }
 relay-e2e             = { path = "../../../assistants/relay-e2e" }
 thegraph              = { path = "../../../assistants/thegraph", features = [ "bridge-ethv2" ] }
+
+bin-e2e               = { path ="../../../assistants/bin-e2e" }
 

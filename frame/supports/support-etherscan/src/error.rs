@@ -2,7 +2,7 @@ use reqwest::Error as ReqwestError;
 use serde_json::Error as SerdeJsonError;
 use std::result::Result as StdResult;
 use thiserror::Error as ThisError;
-use web3::Error as Web3Error;
+use web3::{ethabi::ethereum_types::FromDecStrErr, Error as Web3Error};
 
 pub type Result<T> = StdResult<T, Error>;
 
@@ -16,4 +16,6 @@ pub enum Error {
     Reqwest(#[from] ReqwestError),
     #[error(transparent)]
     SerdeJson(#[from] SerdeJsonError),
+    #[error(transparent)]
+    FromDecStrErr(#[from] FromDecStrErr),
 }

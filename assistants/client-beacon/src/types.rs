@@ -5,6 +5,8 @@ use client_contracts::beacon_light_client_types::SyncCommittee as ContractSyncCo
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::str::FromStr;
+use types::BeaconBlockMerge;
+use types::MainnetEthSpec;
 use web3::{
     contract::tokens::{Tokenizable, Tokenize},
     ethabi::{ethereum_types::H32, Token},
@@ -21,6 +23,14 @@ fn h256_from_str(value: &str) -> BeaconApiResult<H256> {
         value.into(),
         "H256".into(),
     )))
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ErrorResponse {
+    #[serde(rename = "statusCode")]
+    pub status_code: u64,
+    pub error: String,
+    pub message: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -94,15 +104,23 @@ impl SyncCommittee {
 pub struct SyncCommitteePeriodUpdate {
     pub attested_header: HeaderMessage,
     pub next_sync_committee: SyncCommittee,
+    pub next_sync_committee_branch: Vec<String>,
     pub finalized_header: HeaderMessage,
     pub finality_branch: Vec<String>,
     pub sync_aggregate: SyncAggregate,
-    pub fork_version: String,
+    pub signature_slot: String,
+    // pub fork_version: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GetBlockResponse {
     pub message: BlockMessage,
+    pub signature: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct BeaconBlockWrapper {
+    pub message: BeaconBlockMerge<MainnetEthSpec>,
     pub signature: String,
 }
 
@@ -306,4 +324,9 @@ where
 {
     let s = String::deserialize(deserializer)?;
     T::from_str(&s).map_err(de::Error::custom)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BeaconBlockRoot {
+    pub root: String,
 }

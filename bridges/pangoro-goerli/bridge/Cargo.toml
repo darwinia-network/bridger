@@ -58,3 +58,4 @@ client-beacon         = { path = "../../../assistants/client-beacon" }
 relay-e2e             = { path = "../../../assistants/relay-e2e" }
 thegraph              = { path = "../../../assistants/thegraph", features = [ "bridge-ethv2" ] }
 
+bin-e2e               = { path ="../../../assistants/bin-e2e" }

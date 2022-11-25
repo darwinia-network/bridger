@@ -1,16 +1,16 @@
 [general]
-# Whether to relay beacon headers from ethereum to darwinia
-header_ethereum_to_darwinia = true
-# Whether to relay sync commit from ethereum to darwinia
-sync_commit_ethereum_to_darwinia = true
-# Whether to relay execution layer state root from ethereum to darwinia
-execution_layer_ethereum_to_darwinia = true
-# Whether to sign the messages root and relay headers from darwinia to ethereum
-ecdsa_service = true
-# Whether to relay messages from ethereum to darwinia
-msg_ethereum_to_darwinia = true
-# Whether to relay messages from darwinia to ethereum
-msg_darwinia_to_ethereum = true
+# Whether to relay beacon chain header to evm chain
+enable_beacon_header_relay = true
+# Whether to relay sync commit from beacon chain to evm chain
+enable_sync_commit_relay = true
+# Whether to relay execution layer state root from execution chain to evm chain
+enable_execution_header_layer = true
+# Whether to sign the messages root and relay headers from evm chain to beacon chain
+enable_ecdsa_relay = true
+# Whether to relay messages from execution chain to evm chain
+enable_message_execution_to_evm = true
+# Whether to relay messages from evm chain to execution chain
+enable_message_evm_to_execution = true
 # Max number of messages every delivery
 max_message_num_per_relaying = 15
 # Minimum seconds between two header relay
@@ -53,5 +53,5 @@ max_gas_price = 9000000000
 etherscan_api_key = "api_key..."
 
 [index]
-darwinia = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia/" }
-darwinia_evm = { endpoint = "https://thegraph.darwinia.network/ethv2/subgraphs/name/bridge-darwinia" }
+substrate_chain = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia/" }
+evm_chain = { endpoint = "https://thegraph.darwinia.network/ethv2/subgraphs/name/bridge-darwinia" }

@@ -21,8 +21,30 @@ edition = "2021"
 tracing     = "0.1"
 thiserror   = "1.0"
 array-bytes = "2"
+tokio       = { version = "1", features = ["time"] }
+futures     = "0.3"
 
-secp256k1 = { version = "0.21" }
-web3      = { version = "0.18", features = ["signing"] }
+hex         = "0.4"
+rlp         = "0.5"
+secp256k1   = { version = "0.21" }
+web3        = { version = "0.18", features = ["signing"] }
+async-trait = "0.1"
+types       = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+tree_hash   = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
 
-bridge-e2e-traits = { path = "../../frame/traits/bridge-e2e" }
+bridge-e2e-traits     = { path = "../../frame/traits/bridge-e2e" }
+client-contracts      = { path = "../client-contracts" }
+client-beacon         = { path = "../client-beacon" }
+support-etherscan     = { path = "../../frame/supports/support-etherscan" }
+support-tracker       = { path = "../../frame/supports/support-tracker" }
+subquery              = { path = "../subquery", features = [ "bridge-ethv2" ] }
+thegraph              = { path = "../thegraph", features = [ "bridge-ethv2" ] }
+
+[patch.crates-io]
+eth2_hashing     = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_serde_utils = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_ssz         = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_ssz_derive  = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_ssz_types   = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+tree_hash        = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+tree_hash_derive = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }

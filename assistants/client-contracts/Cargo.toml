@@ -27,6 +27,3 @@ hamming     = "0.1"
 rlp         = "0.5.1"
 thiserror   = "1.0"
 anyhow      = "1.0"
-
-bridge-e2e-traits = { path = "../../frame/traits/bridge-e2e" }
-

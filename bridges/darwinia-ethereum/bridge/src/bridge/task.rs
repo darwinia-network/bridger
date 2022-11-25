@@ -11,8 +11,8 @@ use crate::{
     bridge::BridgeBus,
     service::{
         header_relay::{
-            execution_layer_update::ExecutionLayerRelay,
             ethereum_to_darwinia::EthereumToDarwiniaHeaderRelayService,
+            execution_layer_update::ExecutionLayerRelay,
             sync_committee_update::SyncCommitteeUpdateService,
         },
         message_relay::ethereum_to_darwinia::EthereumDarwiniaMessageRelay,
@@ -43,22 +43,22 @@ impl BridgeTask {
         bus.store_resource::<BridgeState>(state);
 
         let mut stack = TaskStack::new(bus);
-        if bridge_config.general.header_ethereum_to_darwinia {
+        if bridge_config.general.enable_beacon_header_relay {
             stack.spawn_service::<EthereumToDarwiniaHeaderRelayService>()?;
         }
-        if bridge_config.general.sync_commit_ethereum_to_darwinia {
+        if bridge_config.general.enable_sync_commit_relay {
             stack.spawn_service::<SyncCommitteeUpdateService>()?;
         }
-        if bridge_config.general.execution_layer_ethereum_to_darwinia {
+        if bridge_config.general.enable_execution_header_layer {
             stack.spawn_service::<ExecutionLayerRelay>()?;
         }
-        if bridge_config.general.ecdsa_service {
+        if bridge_config.general.enable_ecdsa_relay {
             stack.spawn_service::<ECDSARelayService>()?;
         }
-        if bridge_config.general.msg_ethereum_to_darwinia {
+        if bridge_config.general.enable_message_execution_to_evm {
             stack.spawn_service::<EthereumDarwiniaMessageRelay>()?;
         }
-        if bridge_config.general.msg_darwinia_to_ethereum {
+        if bridge_config.general.enable_message_evm_to_execution {
             stack.spawn_service::<DarwiniaEthereumMessageRelay>()?;
         }
         Ok(Self { stack })

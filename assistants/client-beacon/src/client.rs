@@ -1,9 +1,14 @@
 use super::types::{
-    BlockMessage, Finality, FinalityUpdate, ForkVersion, GetBlockResponse, GetHeaderResponse,
-    Proof, ResponseWrapper, Snapshot, SyncCommitteePeriodUpdate,
+    Finality, FinalityUpdate, ForkVersion, GetHeaderResponse, Proof, ResponseWrapper, Snapshot,
+    SyncCommitteePeriodUpdate,
 };
-use crate::error::{BeaconApiError, BeaconApiResult};
-use reqwest::header::CONTENT_TYPE;
+use crate::{
+    error::{BeaconApiError, BeaconApiResult},
+    types::{BeaconBlockRoot, BeaconBlockWrapper, ErrorResponse},
+};
+use reqwest::{header::CONTENT_TYPE, RequestBuilder, Response};
+use serde::de::DeserializeOwned;
+use types::{BeaconBlockMerge, MainnetEthSpec};
 
 pub struct BeaconApiClient {
     api_client: reqwest::Client,
@@ -19,14 +24,39 @@ impl BeaconApiClient {
         })
     }
 
+    fn get(&self, url: &str) -> RequestBuilder {
+        tracing::trace!(target: "client-beacon", "Request to {:?}", &url);
+        self.api_client.get(url)
+    }
+
+    async fn parse_reponse<R: DeserializeOwned>(response: Response) -> BeaconApiResult<R> {
+        if response.status().is_success() {
+            Ok(response.json().await?)
+        } else {
+            let url: String = response.url().as_str().into();
+            let status_code = response.status();
+            let res: ErrorResponse = response.json().await.map_err(|_| {
+                BeaconApiError::Custom(format!(
+                    "Failed to connect to beacon api servcice. url: {:?}, status code: {:?}",
+                    url, status_code
+                ))
+            })?;
+            Err(BeaconApiError::BeaconApiError {
+                status_code: res.status_code,
+                error: res.error,
+                message: res.message,
+            })
+        }
+    }
+
     pub async fn get_header(&self, id: impl ToString) -> BeaconApiResult<GetHeaderResponse> {
         let url = format!(
             "{}/eth/v1/beacon/headers/{}",
             self.api_base_url,
             id.to_string()
         );
-        let res: ResponseWrapper<GetHeaderResponse> =
-            self.api_client.get(url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<GetHeaderResponse> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
@@ -53,7 +83,14 @@ impl BeaconApiClient {
         &self,
         current_slot: u64,
         mut slot: u64,
-    ) -> BeaconApiResult<Option<(u64, u64, GetHeaderResponse, BlockMessage)>> {
+    ) -> BeaconApiResult<
+        Option<(
+            u64,
+            u64,
+            GetHeaderResponse,
+            BeaconBlockMerge<MainnetEthSpec>,
+        )>,
+    > {
         loop {
             if slot > current_slot {
                 return Ok(None);
@@ -81,13 +118,11 @@ impl BeaconApiClient {
         }
     }
 
-    fn is_valid_sync_aggregate_block(block: &BlockMessage) -> BeaconApiResult<bool> {
-        let bytes = hex::decode(&block.body.sync_aggregate.sync_committee_bits.clone()[2..]);
-        if let Ok(bytes) = bytes {
-            Ok(hamming::weight(&bytes) * 3 > 512 * 2)
-        } else {
-            Err(BeaconApiError::Custom(String::from("Failed to decode sync_committee_bits")).into())
-        }
+    fn is_valid_sync_aggregate_block(
+        block: &BeaconBlockMerge<MainnetEthSpec>,
+    ) -> BeaconApiResult<bool> {
+        let sync_committee_bits = &block.body.sync_aggregate.sync_committee_bits.as_slice();
+        Ok(hamming::weight(sync_committee_bits) * 3 > 512 * 2)
     }
 
     pub async fn get_beacon_block_root(&self, id: impl ToString) -> BeaconApiResult<String> {
@@ -96,8 +131,9 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string()
         );
-        let res: ResponseWrapper<String> = self.api_client.get(url).send().await?.json().await?;
-        Ok(res.data)
+        let response = self.get(&url).send().await?;
+        let res = Self::parse_reponse::<ResponseWrapper<BeaconBlockRoot>>(response).await?;
+        Ok(res.data.root)
     }
 
     pub async fn get_bootstrap(&self, header_root: &str) -> BeaconApiResult<Snapshot> {
@@ -105,7 +141,8 @@ impl BeaconApiClient {
             "{}/eth/v1/beacon/light_client/bootstrap/{}",
             self.api_base_url, header_root,
         );
-        let res: ResponseWrapper<Snapshot> = self.api_client.get(url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<Snapshot> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
@@ -122,14 +159,17 @@ impl BeaconApiClient {
         Err(BeaconApiError::Custom("Not found valid snapshot".into()).into())
     }
 
-    pub async fn get_beacon_block(&self, id: impl ToString) -> BeaconApiResult<BlockMessage> {
+    pub async fn get_beacon_block(
+        &self,
+        id: impl ToString,
+    ) -> BeaconApiResult<BeaconBlockMerge<MainnetEthSpec>> {
         let url = format!(
             "{}/eth/v2/beacon/blocks/{}",
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<GetBlockResponse> =
-            self.api_client.get(url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<BeaconBlockWrapper> = Self::parse_reponse(response).await?;
         Ok(res.data.message)
     }
 
@@ -140,7 +180,8 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<Finality> = self.api_client.get(url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<Finality> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
@@ -197,18 +238,18 @@ impl BeaconApiClient {
             self.api_base_url,
             id.to_string(),
         );
-        let res: ResponseWrapper<ForkVersion> =
-            self.api_client.get(url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<ForkVersion> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
     pub async fn get_finality_update(&self) -> BeaconApiResult<FinalityUpdate> {
         let url = format!(
-            "{}/eth/v1/beacon/light_client/finality_update/",
+            "{}/eth/v1/beacon/light_client/finality_update",
             self.api_base_url,
         );
-        let res: ResponseWrapper<FinalityUpdate> =
-            self.api_client.get(url).send().await?.json().await?;
+        let response = self.get(&url).send().await?;
+        let res: ResponseWrapper<FinalityUpdate> = Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 
@@ -223,8 +264,9 @@ impl BeaconApiClient {
             start_period.to_string(),
             count.to_string(),
         );
+        let response = self.get(&url).send().await?;
         let res: ResponseWrapper<Vec<SyncCommitteePeriodUpdate>> =
-            self.api_client.get(url).send().await?.json().await?;
+            Self::parse_reponse(response).await?;
         Ok(res.data)
     }
 }
@@ -232,18 +274,23 @@ impl BeaconApiClient {
 #[cfg(test)]
 mod tests {
 
+    use tree_hash::TreeHash;
+    use types::ExecPayload;
+
     use super::*;
 
     fn test_client() -> BeaconApiClient {
-        BeaconApiClient::new("http://localhost:5052").unwrap()
+        // BeaconApiClient::new("http://g2.dev.darwinia.network:9596").unwrap()
+        BeaconApiClient::new("https://lodestar-goerli.chainsafe.io").unwrap()
     }
 
-    #[ignore]
+    // #[ignore]
     #[tokio::test]
     async fn test_get_header() {
         let client = test_client();
-        let header = client.get_header(1000).await.unwrap();
-        println!("Header at slot 651232: {:?}", header);
+        let slot = 4382849;
+        let header = client.get_header(slot).await.unwrap();
+        println!("Header at slot {}  : {:?}", slot, header);
 
         let header = client.get_header("finalized").await.unwrap();
         println!("Finalized header: {:?}", header);
@@ -275,8 +322,37 @@ mod tests {
         let block_body = client.get_beacon_block(100).await.unwrap();
         println!(
             "Block body: {:?}",
-            block_body.body.execution_payload.block_number
+            block_body.body.execution_payload.block_number()
         );
+    }
+
+    #[tokio::test]
+    async fn test_get_beacon_block_r() {
+        let client = test_client();
+        let block_body = client.get_beacon_block("head").await.unwrap();
+        let h0 = block_body.body.randao_reveal.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.eth1_data.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.graffiti.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.proposer_slashings.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.attester_slashings.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.attestations.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.deposits.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body.body.voluntary_exits.tree_hash_root();
+        dbg!(h0);
+        let h0 = block_body
+            .body
+            .execution_payload
+            .execution_payload
+            .logs_bloom
+            .tree_hash_root();
+        dbg!(h0);
     }
 
     #[ignore]

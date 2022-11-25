@@ -18,4 +18,12 @@ pub enum BeaconApiError {
     FromUtf8Error(#[from] FromUtf8Error),
     #[error(transparent)]
     ApiError(#[from] ReqwestError),
+    #[error(
+        "Beacon api error: Status code: {status_code:?}, Error: {error:?}, Message: {message:?}"
+    )]
+    BeaconApiError {
+        status_code: u64,
+        error: String,
+        message: String,
+    },
 }

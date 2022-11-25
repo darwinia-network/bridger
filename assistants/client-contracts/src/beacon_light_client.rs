@@ -9,6 +9,7 @@ use web3::{
 
 use crate::error::BridgeContractResult;
 
+#[derive(Debug, Clone)]
 pub struct BeaconLightClient {
     pub contract: Contract<Http>,
 }
@@ -25,10 +26,10 @@ impl BeaconLightClient {
     }
 
     pub async fn finalized_header(&self) -> BridgeContractResult<HeaderMessage> {
-        let query = self
+        let (slot, proposer_index, parent_root, state_root, body_root) = self
             .contract
-            .query("finalized_header", (), None, Options::default(), None);
-        let (slot, proposer_index, parent_root, state_root, body_root) = query.await?;
+            .query("finalized_header", (), None, Options::default(), None)
+            .await?;
         let header = HeaderMessage {
             slot,
             proposer_index,
@@ -40,15 +41,16 @@ impl BeaconLightClient {
     }
 
     pub async fn sync_committee_roots(&self, period: u64) -> BridgeContractResult<H256> {
-        let query = self.contract.query(
-            "sync_committee_roots",
-            (period,),
-            None,
-            Options::default(),
-            None,
-        );
-        let root: H256 = query.await?;
-        Ok(root)
+        Ok(self
+            .contract
+            .query(
+                "sync_committee_roots",
+                (period,),
+                None,
+                Options::default(),
+                None,
+            )
+            .await?)
     }
 
     pub async fn import_finalized_header(
@@ -71,6 +73,7 @@ impl BeaconLightClient {
 
     pub async fn import_next_sync_committee(
         &self,
+        finalized_header_update: FinalizedHeaderUpdate,
         sync_committee_update: SyncCommitteePeriodUpdate,
         private_key: &SecretKey,
         options: Options,
@@ -79,7 +82,7 @@ impl BeaconLightClient {
             .contract
             .signed_call(
                 "import_next_sync_committee",
-                (sync_committee_update,),
+                (finalized_header_update, sync_committee_update),
                 options,
                 private_key,
             )

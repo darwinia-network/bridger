@@ -1,6 +1,5 @@
 [general]
-# Whether to relay beacon chain header to evm chain
-enable_beacon_header_relay = true
+# Whether to relay beacon chain header to evm chain enable_beacon_header_relay = true
 # Whether to relay sync commit from beacon chain to evm chain
 enable_sync_commit_relay = true
 # Whether to relay execution layer state root from execution chain to evm chain
@@ -38,6 +37,8 @@ private_key = "..."
 [ethereum]
 # Beacon chain rpc endpoint
 endpoint                  = "https://lodestar-mainnet-rpc.darwinia.network"
+# Beacon chain rpc supplier: Nimbus or Lodestar
+api_supplier              = "Lodestar"
 # Execution layer rpc endpoint, register one at https://dashboard.alchemy.com/
 execution_layer_endpoint  = "..."
 inbound_address           = "0x4E210866d089856a8A0435965FefEe19640487E5"

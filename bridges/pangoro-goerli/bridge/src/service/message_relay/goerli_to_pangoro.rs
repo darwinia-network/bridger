@@ -75,6 +75,7 @@ async fn message_relay_client_builder(
         "Pangoro",
         &config.pangoro_evm.endpoint,
         &config.goerli.endpoint,
+        config.goerli.api_supplier,
         Address::from_str(&config.pangoro_evm.inbound_address)?,
         Address::from_str(&config.pangoro_evm.outbound_address)?,
         Address::from_str(&config.pangoro_evm.chain_message_committer_address)?,

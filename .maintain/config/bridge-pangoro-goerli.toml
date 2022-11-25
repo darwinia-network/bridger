@@ -36,6 +36,7 @@ private_key = "//Alice"
 
 [goerli]
 endpoint                  = "http://unstable.prater.beacon-api.nimbus.team"
+# Beacon chain rpc supplier: Nimbus or Lodestar
 api_supplier              = "Nimbus"
 execution_layer_endpoint  = "http://localhost:8545"
 inbound_address           = "0x588abe3F7EE935137102C5e2B8042788935f4CB0"

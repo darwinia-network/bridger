@@ -21,6 +21,7 @@ fn test_signing() {
     assert_eq!(&compare[..], expected);
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
     let msg = message_relay_client_builder().await?;
@@ -63,6 +64,7 @@ async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
     Ok(())
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
     let msg = message_relay_client_builder().await?;

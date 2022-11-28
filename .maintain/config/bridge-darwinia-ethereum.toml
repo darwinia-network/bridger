@@ -36,10 +36,14 @@ endpoint    = "wss://darwinia-rpc.darwinia.network"
 private_key = "..."
 
 [beacon]
-# Beacon chain api endpoint
-endpoint                  = "https://lodestar-mainnet-rpc.darwinia.network"
-# Beacon chain api supplier: Nimbus or Lodestar
-api_supplier              = "Lodestar"
+# Beacon chain api endpoint and api supplier
+endpoint                  = "http://unstable.mainnet.beacon-api.nimbus.team/"
+api_supplier              = "Nimbus"
+# Bridger also support Lodestar api
+# endpoint                  = "https://lodestar-mainnet-rpc.darwinia.network"
+# api_supplier              = "Lodestar"
+
+
 
 [ethereum]
 # Execution layer api endpoint, register one at https://dashboard.alchemy.com/

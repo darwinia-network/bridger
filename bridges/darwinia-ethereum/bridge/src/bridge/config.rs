@@ -9,7 +9,7 @@ pub struct BridgeConfig {
     pub general: GeneralConfig,
     pub darwinia_evm: EVMChainConfig,
     pub darwinia_substrate: DarwiniaSubstrateConfig,
-    pub eth: BeaconChainInfoConfig,
+    pub ethereum: BeaconChainInfoConfig,
     pub index: IndexConfig,
 }
 

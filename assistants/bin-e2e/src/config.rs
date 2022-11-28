@@ -29,11 +29,8 @@ pub struct GeneralConfig {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct BeaconChainInfoConfig {
+pub struct ExecutionLayerInfoConfig {
     pub endpoint: String,
-    pub api_supplier: ApiSupplier,
-    // todo: disscus: maybe add new chain info config struct?
-    pub execution_layer_endpoint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contract_address: Option<String>,
     #[serde(deserialize_with = "evm_secret_key_from_str")]
@@ -44,6 +41,12 @@ pub struct BeaconChainInfoConfig {
     pub posa_light_client_address: String,
     pub max_gas_price: String,
     pub etherscan_api_key: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct BeaconApiConfig {
+    pub endpoint: String,
+    pub api_supplier: ApiSupplier,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -79,9 +82,9 @@ impl EVMChainConfig {
     }
 }
 
-impl BeaconChainInfoConfig {
+impl ExecutionLayerInfoConfig {
     pub fn to_posa_client(&self) -> color_eyre::Result<PosaLightClient> {
-        let transport = Http::new(&self.execution_layer_endpoint)?;
+        let transport = Http::new(&self.endpoint)?;
         let client = Web3::new(transport);
         let address = Address::from_str(&self.posa_light_client_address)?;
         Ok(PosaLightClient::new(&client, address)?)
@@ -92,7 +95,7 @@ impl BeaconChainInfoConfig {
     }
 
     pub fn to_web3_client(&self) -> color_eyre::Result<Web3<Http>> {
-        let transport = Http::new(&self.execution_layer_endpoint)?;
+        let transport = Http::new(&self.endpoint)?;
         let client = Web3::new(transport);
         Ok(client)
     }

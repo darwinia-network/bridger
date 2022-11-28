@@ -62,7 +62,7 @@ pub async fn message_relay_client_builder(
 
     let eth_message_client = EthMessageClient::new_with_simple_fee_market(
         "Goerli",
-        &config.goerli.execution_layer_endpoint,
+        &config.goerli.endpoint,
         Address::from_str(&config.goerli.inbound_address)?,
         Address::from_str(&config.goerli.outbound_address)?,
         Address::from_str(&config.goerli.fee_market_address)?,
@@ -74,8 +74,8 @@ pub async fn message_relay_client_builder(
     let darwinia_message_client = DarwiniaMessageClient::new_with_fee_market(
         "Pangoro",
         &config.pangoro_evm.endpoint,
-        &config.goerli.endpoint,
-        config.goerli.api_supplier,
+        &config.beacon.endpoint,
+        config.beacon.api_supplier,
         Address::from_str(&config.pangoro_evm.inbound_address)?,
         Address::from_str(&config.pangoro_evm.outbound_address)?,
         Address::from_str(&config.pangoro_evm.chain_message_committer_address)?,

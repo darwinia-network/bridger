@@ -62,7 +62,7 @@ async fn message_relay_client_builder(
 
     let eth_message_client = EthMessageClient::new_with_simple_fee_market(
         "Eth",
-        &config.ethereum.execution_layer_endpoint,
+        &config.ethereum.endpoint,
         Address::from_str(&config.ethereum.inbound_address)?,
         Address::from_str(&config.ethereum.outbound_address)?,
         Address::from_str(&config.ethereum.fee_market_address)?,
@@ -74,8 +74,8 @@ async fn message_relay_client_builder(
     let darwinia_message_client = DarwiniaMessageClient::new_with_fee_market(
         "Darwinia",
         &config.darwinia_evm.endpoint,
-        &config.ethereum.endpoint,
-        config.ethereum.api_supplier,
+        &config.beacon.endpoint,
+        config.beacon.api_supplier,
         Address::from_str(&config.darwinia_evm.inbound_address)?,
         Address::from_str(&config.darwinia_evm.outbound_address)?,
         Address::from_str(&config.darwinia_evm.chain_message_committer_address)?,

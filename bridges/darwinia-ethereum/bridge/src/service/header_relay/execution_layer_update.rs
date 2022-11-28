@@ -47,7 +47,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.darwinia_evm.private_key,
         U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
     )?;
-    let eth_client = BeaconApiClient::new(&config.ethereum.endpoint, config.ethereum.api_supplier)?;
+    let eth_client = BeaconApiClient::new(&config.beacon.endpoint, config.beacon.api_supplier)?;
     let mut execution_layer_relay = ExecutionLayerRelayRunner {
         eth_light_client: darwinia_client,
         beacon_api_client: eth_client,

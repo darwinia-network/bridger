@@ -105,7 +105,7 @@ impl EcdsaScannerTrait<DarwiniaClient> for EcdsaScanner {
             .to_web3_client()
             .map_err(|e| RelayError::Custom(format!("{}", e)))?;
         let client_eth_web3 = config
-            .eth
+            .ethereum
             .to_web3_client()
             .map_err(|e| RelayError::Custom(format!("{}", e)))?;
         let client_darwinia_substrate = config
@@ -114,11 +114,11 @@ impl EcdsaScannerTrait<DarwiniaClient> for EcdsaScanner {
             .await
             .map_err(|e| RelayError::Custom(format!("{}", e)))?;
         let client_posa = config
-            .eth
+            .ethereum
             .to_posa_client()
             .map_err(|e| RelayError::Custom(format!("{}", e)))?;
         let darwinia_evm_account = config.darwinia_evm.to_ethereum_account();
-        let ethereum_account = config.eth.to_ethereum_account();
+        let ethereum_account = config.ethereum.to_ethereum_account();
         let minimal_interval = config.general.header_relay_minimum_interval;
         Ok(EcdsaSource {
             block: None,

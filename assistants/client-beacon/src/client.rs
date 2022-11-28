@@ -7,20 +7,28 @@ use crate::{
     types::{BeaconBlockRoot, BeaconBlockWrapper, ErrorResponse},
 };
 use reqwest::{header::CONTENT_TYPE, RequestBuilder, Response};
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use types::{BeaconBlockMerge, MainnetEthSpec};
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+pub enum ApiSupplier {
+    Lodestar,
+    Nimbus,
+}
 
 pub struct BeaconApiClient {
     api_client: reqwest::Client,
     api_base_url: String,
+    api_supplier: ApiSupplier,
 }
 
 impl BeaconApiClient {
-    pub fn new(api_endpoint: &str) -> BeaconApiResult<Self> {
+    pub fn new(api_endpoint: &str, api_supplier: ApiSupplier) -> BeaconApiResult<Self> {
         let api_client = reqwest::Client::new();
         Ok(Self {
             api_client,
             api_base_url: String::from(api_endpoint),
+            api_supplier,
         })
     }
 
@@ -265,9 +273,21 @@ impl BeaconApiClient {
             count.to_string(),
         );
         let response = self.get(&url).send().await?;
-        let res: ResponseWrapper<Vec<SyncCommitteePeriodUpdate>> =
-            Self::parse_reponse(response).await?;
-        Ok(res.data)
+        let result = match self.api_supplier {
+            ApiSupplier::Nimbus => {
+                Self::parse_reponse::<Vec<ResponseWrapper<SyncCommitteePeriodUpdate>>>(response)
+                    .await?
+                    .into_iter()
+                    .map(|x| x.data)
+                    .collect()
+            }
+            ApiSupplier::Lodestar => {
+                Self::parse_reponse::<ResponseWrapper<Vec<SyncCommitteePeriodUpdate>>>(response)
+                    .await?
+                    .data
+            }
+        };
+        Ok(result)
     }
 }
 
@@ -281,7 +301,7 @@ mod tests {
 
     fn test_client() -> BeaconApiClient {
         // BeaconApiClient::new("http://g2.dev.darwinia.network:9596").unwrap()
-        BeaconApiClient::new("https://lodestar-goerli.chainsafe.io").unwrap()
+        BeaconApiClient::new("https://lodestar-goerli.chainsafe.io", ApiSupplier::Nimbus).unwrap()
     }
 
     // #[ignore]

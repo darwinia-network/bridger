@@ -22,6 +22,7 @@ contract_address                 = "0x59EA974B74ec6A49338438bCc5d0388E294E4E20"
 execution_layer_contract_address = "0x43258d32E29b2C866d882183758B864471A26b96"
 inbound_address                  = "0x6229BD8Ae2A0f97b8a1CEa47f552D0B54B402207"
 outbound_address                 = "0xEe8CA1000c0310afF74BA0D71a99EC02650798E5"
+fee_market_address               = "0x25ee4212CfA2DC29E6a5e4A857b9656E439259c9"
 chain_message_committer_address  = "0x01D1Cb6D629536b893f2343B95124aDB6a8ae68b"
 lane_message_committer_address   = "0x5313Bf259a4C723cdD6bE4B6387d21321f180D03"
 # private_key in format of 0x... or ...
@@ -34,9 +35,13 @@ endpoint    = "https://pangoro-rpc.darwinia.network"
 # private_key in format of 0x... or BIP39 mnemonic code
 private_key = "//Alice"
 
+[beacon]
+endpoint                  = "http://unstable.prater.beacon-api.nimbus.team"
+# Beacon chain rpc supplier: Nimbus or Lodestar
+api_supplier              = "Nimbus"
+
 [goerli]
-endpoint                  = "http://localhost:5052"
-execution_layer_endpoint  = "http://localhost:8545"
+endpoint  = "http://localhost:8545"
 inbound_address           = "0x588abe3F7EE935137102C5e2B8042788935f4CB0"
 outbound_address          = "0xee4f69fc69F2C203a0572e43375f68a6e9027998"
 fee_market_address        = "0x4ca59Ec46543E10De53C97332B8fe656e7a22878"

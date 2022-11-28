@@ -35,11 +35,19 @@ endpoint    = "wss://darwinia-rpc.darwinia.network"
 # private_key in format of 0x... or BIP39 mnemonic code
 private_key = "..."
 
+[beacon]
+# Beacon chain api endpoint and api supplier
+endpoint                  = "http://unstable.mainnet.beacon-api.nimbus.team/"
+api_supplier              = "Nimbus"
+# Bridger also support Lodestar api
+# endpoint                  = "https://lodestar-mainnet-rpc.darwinia.network"
+# api_supplier              = "Lodestar"
+
+
+
 [ethereum]
-# Beacon chain rpc endpoint
-endpoint                  = "https://lodestar-mainnet-rpc.darwinia.network"
-# Execution layer rpc endpoint, register one at https://dashboard.alchemy.com/
-execution_layer_endpoint  = "..."
+# Execution layer api endpoint, register one at https://dashboard.alchemy.com/
+endpoint  = "..."
 inbound_address           = "0x4E210866d089856a8A0435965FefEe19640487E5"
 outbound_address          = "0x169F28bfbfFCddFdc772A94Cf020bbB4CAdc8E01"
 fee_market_address        = "0xCD97185B7d05f8ea91d241C8dfD51a2Cc9c0547a"

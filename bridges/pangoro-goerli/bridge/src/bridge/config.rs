@@ -2,14 +2,17 @@ use client_pangoro::client::PangoroClient;
 use client_pangoro::component::PangoroClientComponent;
 use serde::{Deserialize, Serialize};
 
-use bin_e2e::config::{BeaconChainInfoConfig, EVMChainConfig, GeneralConfig, IndexConfig};
+use bin_e2e::config::{
+    BeaconApiConfig, EVMChainConfig, ExecutionLayerInfoConfig, GeneralConfig, IndexConfig,
+};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
     pub general: GeneralConfig,
     pub pangoro_evm: EVMChainConfig,
     pub pangoro_substrate: PangoroSubstrateConfig,
-    pub goerli: BeaconChainInfoConfig,
+    pub goerli: ExecutionLayerInfoConfig,
+    pub beacon: BeaconApiConfig,
     pub index: IndexConfig,
 }
 

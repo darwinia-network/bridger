@@ -1,9 +1,10 @@
 use std::fmt::Display;
 use std::str::FromStr;
 
+use client_beacon::client::ApiSupplier;
 use client_contracts::PosaLightClient;
 use relay_e2e::types::ethereum::FastEthereumAccount;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use subquery::types::BridgeName;
 use subquery::{Subquery, SubqueryComponent, SubqueryConfig};
 use thegraph::Thegraph;
@@ -28,12 +29,11 @@ pub struct GeneralConfig {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct BeaconChainInfoConfig {
+pub struct ExecutionLayerInfoConfig {
     pub endpoint: String,
-    // todo: disscus: maybe add new chain info config struct?
-    pub execution_layer_endpoint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contract_address: Option<String>,
+    #[serde(deserialize_with = "evm_secret_key_from_str")]
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,
@@ -44,10 +44,17 @@ pub struct BeaconChainInfoConfig {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct BeaconApiConfig {
+    pub endpoint: String,
+    pub api_supplier: ApiSupplier,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct EVMChainConfig {
     pub endpoint: String,
     pub contract_address: String,
     pub execution_layer_contract_address: String,
+    #[serde(deserialize_with = "evm_secret_key_from_str")]
     pub private_key: String,
     pub inbound_address: String,
     pub outbound_address: String,
@@ -75,9 +82,9 @@ impl EVMChainConfig {
     }
 }
 
-impl BeaconChainInfoConfig {
+impl ExecutionLayerInfoConfig {
     pub fn to_posa_client(&self) -> color_eyre::Result<PosaLightClient> {
-        let transport = Http::new(&self.execution_layer_endpoint)?;
+        let transport = Http::new(&self.endpoint)?;
         let client = Web3::new(transport);
         let address = Address::from_str(&self.posa_light_client_address)?;
         Ok(PosaLightClient::new(&client, address)?)
@@ -88,7 +95,7 @@ impl BeaconChainInfoConfig {
     }
 
     pub fn to_web3_client(&self) -> color_eyre::Result<Web3<Http>> {
-        let transport = Http::new(&self.execution_layer_endpoint)?;
+        let transport = Http::new(&self.endpoint)?;
         let client = Web3::new(transport);
         Ok(client)
     }
@@ -105,4 +112,14 @@ impl IndexConfig {
     ) -> color_eyre::Result<Thegraph> {
         Ok(ThegraphComponent::component(self.evm_chain.clone(), chain)?)
     }
+}
+
+fn evm_secret_key_from_str<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+    T: FromStr,
+    T::Err: Display,
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?.replace("0x", "");
+    T::from_str(&s).map_err(serde::de::Error::custom)
 }

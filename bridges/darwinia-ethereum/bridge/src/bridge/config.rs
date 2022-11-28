@@ -2,14 +2,17 @@ use client_darwinia::client::DarwiniaClient;
 use client_darwinia::component::DarwiniaClientComponent;
 use serde::{Deserialize, Serialize};
 
-use bin_e2e::config::{BeaconChainInfoConfig, EVMChainConfig, GeneralConfig, IndexConfig};
+use bin_e2e::config::{
+    BeaconApiConfig, EVMChainConfig, ExecutionLayerInfoConfig, GeneralConfig, IndexConfig,
+};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig {
     pub general: GeneralConfig,
     pub darwinia_evm: EVMChainConfig,
     pub darwinia_substrate: DarwiniaSubstrateConfig,
-    pub eth: BeaconChainInfoConfig,
+    pub ethereum: ExecutionLayerInfoConfig,
+    pub beacon: BeaconApiConfig,
     pub index: IndexConfig,
 }
 

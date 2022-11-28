@@ -70,7 +70,6 @@ where
             source_block_at_target,
             target_block_at_source,
         };
-
         Ok(())
     }
 
@@ -107,6 +106,7 @@ where
 
         if self.state.target_inbound.last_delivered_nonce
             >= self.state.source_outbound_relayed.latest_generated_nonce
+            || self.state.source_block_at_target.is_none()
         {
             tracing::info!(
                 target: "relay-e2e",
@@ -154,7 +154,7 @@ where
             // Messages less or equal than last_delivered_nonce have been delivered.
             let is_delivered = current <= self.state.target_inbound.last_delivered_nonce;
             let beyond_confirm_limit =
-                current - self.state.target_inbound.last_confirmed_nonce > confirm_limit;
+                current - proof.outbound_lane_data.latest_received_nonce > confirm_limit;
 
             if beyond_confirm_limit {
                 break;
@@ -263,6 +263,17 @@ where
                 self.state.source_outbound.latest_received_nonce,
                 self.state.target_inbound_relayed.last_delivered_nonce + 1,
                 self.state.source_outbound.latest_generated_nonce
+            );
+            return Ok(());
+        }
+        if self.state.target_block_at_source.is_none() {
+            tracing::info!(
+                target: "relay-e2e",
+                "[MessageConfirmation][{}={}] Nonce [{:?}:{:?}] was delivered, wait for header relay",
+                self.source.chain(),
+                self.target.chain(),
+                self.state.source_outbound.latest_received_nonce + 1,
+                self.state.target_inbound_relayed.last_delivered_nonce,
             );
             return Ok(());
         }

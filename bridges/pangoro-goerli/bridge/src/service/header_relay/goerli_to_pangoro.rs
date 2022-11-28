@@ -45,7 +45,7 @@ async fn start() -> color_eyre::Result<()> {
         &config.pangoro_evm.private_key,
         U256::from_dec_str(&config.pangoro_evm.max_gas_price)?,
     )?;
-    let goerli_client = BeaconApiClient::new(&config.goerli.endpoint)?;
+    let goerli_client = BeaconApiClient::new(&config.beacon.endpoint, config.beacon.api_supplier)?;
     let mut header_relay = BeaconHeaderRelayRunner {
         eth_light_client: pangoro_client,
         beacon_api_client: goerli_client,

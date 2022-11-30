@@ -23,17 +23,19 @@ tracing     = "0.1"
 thiserror   = "1.0"
 color-eyre  = "0.6"
 
-serde     = { version = "1", features = ["derive"] }
+tokio    = { version = "1", features = ["full"] }
+serde    = { version = "1", features = ["derive"] }
+web3     = { version = "0.18", features = ["signing"] }
+lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
 
-web3        = { version = "0.18", features = ["signing"] }
-
-
-relay-e2e = { path = "../relay-e2e" }
-subquery  = { path = "../subquery", features = [ "bridge-ethv2" ] }
-thegraph  = { path = "../thegraph", features = [ "bridge-ethv2" ] }
+bridge-e2e-traits = { path = "../../frame/traits/bridge-e2e" }
+relay-e2e         = { path = "../relay-e2e" }
+subquery          = { path = "../subquery", features = [ "bridge-ethv2" ] }
+thegraph          = { path = "../thegraph", features = [ "bridge-ethv2" ] }
 
 client-contracts      = { path = "../client-contracts" }
 client-beacon         = { path = "../client-beacon" }
+support-lifeline      = { path = "../../frame/supports/support-lifeline" }
 
 [patch.crates-io]
 eth2_hashing     = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }

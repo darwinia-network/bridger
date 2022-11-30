@@ -1,4 +1,5 @@
 use std::cmp;
+use std::fmt::Debug;
 
 use client_contracts::outbound_types::ReceiveMessagesDeliveryProof;
 use client_contracts::{inbound_types::ReceiveMessagesProof, Inbound, Outbound};
@@ -52,7 +53,7 @@ pub trait EthTruthLayerLightClient: GasPriceOracle {
 }
 
 #[async_trait::async_trait()]
-pub trait EcdsaClient: Send + Sync + Clone {
+pub trait EcdsaClient: Debug + Send + Sync + Clone + 'static {
     type SubxtConfig: subxt::Config;
 
     async fn is_ecdsa_authority(

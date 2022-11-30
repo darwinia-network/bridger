@@ -17,14 +17,15 @@ use web3::Web3;
 
 use crate::bridge::BridgeBus;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug)]
 pub struct BridgeConfig<T: EcdsaClient> {
+    pub name: String,
     pub general: GeneralConfig,
     pub darwinia_evm: EVMChainConfig,
     pub substrate_client: T,
     pub ethereum: ExecutionLayerInfoConfig,
     pub beacon: BeaconApiConfig,
-    pub index: IndexConfig,
+    pub index: Subquery,
 }
 
 impl<T: EcdsaClient> lifeline::Storage for BridgeConfig<T> {

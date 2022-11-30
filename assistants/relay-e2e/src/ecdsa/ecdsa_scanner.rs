@@ -98,3 +98,10 @@ pub trait EcdsaScanner<T: EcdsaClient> {
         }
     }
 }
+
+#[async_trait::async_trait]
+impl<T: EcdsaClient> EcdsaScanner<T> for EcdsaSource<T> {
+    async fn get_ecdsa_source(&self) -> RelayResult<EcdsaSource<T>> {
+        Ok(self.clone())
+    }
+}

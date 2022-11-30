@@ -19,9 +19,9 @@ edition = "2021"
 
 
 [dependencies]
-tracing     = "0.1"
-thiserror   = "1.0"
-color-eyre  = "0.6"
+tracing      = "0.1"
+thiserror    = "1.0"
+color-eyre   = "0.6"
 
 tokio    = { version = "1", features = ["full"] }
 serde    = { version = "1", features = ["derive"] }
@@ -36,6 +36,9 @@ thegraph          = { path = "../thegraph", features = [ "bridge-ethv2" ] }
 client-contracts      = { path = "../client-contracts" }
 client-beacon         = { path = "../client-beacon" }
 support-lifeline      = { path = "../../frame/supports/support-lifeline" }
+component-state       = { path = "../../frame/components/state" }
+support-tracker    = { path = "../../frame/supports/support-tracker" }
+
 
 [patch.crates-io]
 eth2_hashing     = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }

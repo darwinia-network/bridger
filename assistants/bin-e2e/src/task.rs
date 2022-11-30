@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 
 use bridge_e2e_traits::client::EcdsaClient;
+use component_state::state::{BridgeState, StateOptions};
 use lifeline::dyn_bus::DynBus;
 
 use support_lifeline::task::TaskStack;
@@ -20,6 +21,11 @@ pub struct BridgeTask<T: EcdsaClient> {
 impl<T: EcdsaClient> BridgeTask<T> {
     pub fn new(bridge_config: BridgeConfig<T>) -> color_eyre::Result<Self> {
         let bus = BridgeBus::default();
+        let state = BridgeState::new(StateOptions {
+            db_name: bridge_config.name.clone(),
+        })?;
+
+        bus.store_resource::<BridgeState>(state);
         let mut stack = TaskStack::new(bus);
         stack.bus().store_resource(bridge_config);
         stack.spawn_service::<EthereumToDarwiniaHeaderRelayService<T>>()?;

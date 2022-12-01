@@ -12,7 +12,6 @@ use crate::bridge::BridgeBus;
 use crate::config::BridgeConfig;
 use lifeline::{Lifeline, Service, Task};
 use support_lifeline::service::BridgeService;
-use thegraph::types::LikethChain;
 
 #[derive(Debug)]
 pub struct DarwiniaEthereumMessageRelay<T: EcdsaClient> {

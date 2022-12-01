@@ -25,7 +25,8 @@ pub struct BridgeConfig<T: EcdsaClient> {
     pub substrate_client: T,
     pub ethereum: ExecutionLayerInfoConfig,
     pub beacon: BeaconApiConfig,
-    pub index: Subquery,
+    pub substrate_index: Subquery,
+    pub evm_index: Thegraph,
 }
 
 impl<T: EcdsaClient> lifeline::Storage for BridgeConfig<T> {

@@ -5,6 +5,7 @@ use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
 
 use component_state::state::BridgeState;
+use relay_e2e::ecdsa::ecdsa_scanner::EcdsaScanner;
 use relay_e2e::error::{RelayError, RelayResult};
 use support_lifeline::service::BridgeService;
 use support_tracker::Tracker;
@@ -96,7 +97,7 @@ impl<T: EcdsaClient> Service for ECDSARelayService<T> {
 
 impl<T: EcdsaClient> ECDSARelayService<T> {
     fn get_ecdsa_source(config: BridgeConfig<T>) -> RelayResult<EcdsaSource<T>> {
-        let subquery = config.index;
+        let subquery = config.substrate_index;
         let client_darwinia_web3 = config
             .darwinia_evm
             .to_web3_client()

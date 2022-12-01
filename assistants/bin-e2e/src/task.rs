@@ -11,6 +11,8 @@ use crate::config::BridgeConfig;
 use crate::service::header_relay::beacon_header_relay::EthereumToDarwiniaHeaderRelayService;
 use crate::service::header_relay::execution_layer_relay::ExecutionLayerRelay;
 use crate::service::header_relay::sync_committee_relay::SyncCommitteeUpdateService;
+use crate::service::message_relay::darwinia_to_eth::DarwiniaEthereumMessageRelay;
+use crate::service::message_relay::eth_to_darwinia::EthereumDarwiniaMessageRelay;
 
 #[derive(Debug)]
 pub struct BridgeTask<T: EcdsaClient> {
@@ -31,6 +33,8 @@ impl<T: EcdsaClient> BridgeTask<T> {
         stack.spawn_service::<EthereumToDarwiniaHeaderRelayService<T>>()?;
         stack.spawn_service::<ExecutionLayerRelay<T>>()?;
         stack.spawn_service::<SyncCommitteeUpdateService<T>>()?;
+        stack.spawn_service::<EthereumDarwiniaMessageRelay<T>>()?;
+        stack.spawn_service::<DarwiniaEthereumMessageRelay<T>>()?;
 
         Ok(Self {
             stack,

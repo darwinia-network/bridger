@@ -78,7 +78,7 @@ pub async fn message_relay_client_builder<T: EcdsaClient>(
         &config.ethereum.etherscan_api_key,
     )?;
     let darwinia_message_client = DarwiniaMessageClient::new_with_fee_market(
-        "Darwinia",
+        "Substrate",
         &config.darwinia_evm.endpoint,
         &config.beacon.endpoint,
         config.beacon.api_supplier,

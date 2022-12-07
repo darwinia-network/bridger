@@ -5,8 +5,7 @@
 
 ## Changed
 
-- Eth2 bridger refactor (#535 #538 #546)
-- Eth2 bridger support nimbus api, format configs (#548)
+- Fix eth_getProof issue (#550)
 
 ## Resources
 

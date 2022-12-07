@@ -227,38 +227,37 @@ impl<T: RelayStrategy> EthMessageClient<T> {
         end: u64,
         block_number: Option<BlockNumber>,
     ) -> E2EClientResult<MessagesProof> {
-        let lane_id_proof = self
-            .get_storage_proof_with_retry(
-                self.outbound.contract.address(),
-                vec![U256::from(LANE_IDENTIFY_SLOT)],
-                block_number,
-            )
+        let message_keys = Self::build_message_storage_keys(begin, end);
+        let lane_id_storage_key = U256::from(LANE_IDENTIFY_SLOT);
+        let lane_nonce_storage_key = U256::from(LANE_NONCE_SLOT);
+        let keys = [
+            vec![lane_id_storage_key, lane_nonce_storage_key],
+            message_keys,
+        ]
+        .concat();
+        let storage_proof = self
+            .get_storage_proof_with_retry(self.outbound.contract.address(), keys, block_number)
             .await?
             .ok_or_else(|| E2EClientError::Custom("Failed to get lane_id_proof".into()))?;
-        let lane_nonce_proof = self
-            .get_storage_proof_with_retry(
-                self.outbound.contract.address(),
-                vec![U256::from(LANE_NONCE_SLOT)],
-                block_number,
-            )
-            .await?
-            .ok_or_else(|| E2EClientError::Custom("Failed to get lane_nonce_proof".into()))?;
-        let message_keys = Self::build_message_storage_keys(begin, end);
-        let message_proof = self
-            .get_storage_proof_with_retry(
-                self.outbound.contract.address(),
-                message_keys,
-                block_number,
-            )
-            .await?
-            .ok_or_else(|| E2EClientError::Custom("Failed to get message_proof".into()))?;
-
-        let account_proof = Self::encode_proof(&lane_id_proof.account_proof);
-        let lane_id_proof = Self::encode_proof(&lane_id_proof.storage_proof[0].proof);
-        let lane_nonce_proof = Self::encode_proof(&lane_nonce_proof.storage_proof[0].proof);
-        let lane_messages_proof = message_proof
+        let account_proof = Self::encode_proof(&storage_proof.account_proof);
+        let lane_id_proof = storage_proof
             .storage_proof
             .iter()
+            .find(|x| x.key == lane_id_storage_key)
+            .ok_or(E2EClientError::Custom("Lane id proof not found!".into()))?;
+        let lane_id_proof = Self::encode_proof(&lane_id_proof.proof);
+
+        let lane_nonce_proof = storage_proof
+            .storage_proof
+            .iter()
+            .find(|x| x.key == lane_nonce_storage_key)
+            .ok_or(E2EClientError::Custom("Lane id proof not found!".into()))?;
+        let lane_nonce_proof = Self::encode_proof(&lane_nonce_proof.proof);
+
+        let lane_messages_proof = storage_proof
+            .storage_proof
+            .iter()
+            .filter(|x| x.key != lane_id_storage_key && x.key != lane_nonce_storage_key)
             .map(|x| Self::encode_proof(&x.proof))
             .collect::<Vec<Bytes>>();
 
@@ -276,40 +275,31 @@ impl<T: RelayStrategy> EthMessageClient<T> {
         end: u64,
         block_number: Option<BlockNumber>,
     ) -> E2EClientResult<Bytes> {
-        let lane_id_proof = self
-            .get_storage_proof_with_retry(
-                self.inbound.contract.address(),
-                vec![U256::from(LANE_IDENTIFY_SLOT)],
-                block_number,
-            )
-            .await?
-            .ok_or_else(|| E2EClientError::Custom("Failed to get lane_id_proof".into()))?;
-        let lane_nonce_proof = self
-            .get_storage_proof_with_retry(
-                self.inbound.contract.address(),
-                vec![U256::from(LANE_NONCE_SLOT)],
-                block_number,
-            )
-            .await?
-            .ok_or_else(|| E2EClientError::Custom("Failed to get lane_nonce_proof".into()))?;
         let relayer_keys = Self::build_relayer_keys(begin, end)?;
-        let lane_relayers_proof = self
-            .get_storage_proof_with_retry(
-                self.inbound.contract.address(),
-                relayer_keys,
-                block_number,
-            )
+        let lane_nonce_storage_key = U256::from(LANE_NONCE_SLOT);
+        let keys = [vec![lane_nonce_storage_key], relayer_keys].concat();
+
+        let storage_proof = self
+            .get_storage_proof_with_retry(self.inbound.contract.address(), keys, block_number)
             .await?
-            .ok_or_else(|| E2EClientError::Custom("Failed to get lane_nonce_proof".into()))?;
+            .ok_or_else(|| E2EClientError::Custom("Failed to get storage proof".into()))?;
+
+        let lane_nonce_proof = storage_proof
+            .storage_proof
+            .iter()
+            .find(|x| x.key == lane_nonce_storage_key)
+            .ok_or(E2EClientError::Custom("Lane id proof not found!".into()))?;
+        let lane_relayers_proof = storage_proof
+            .storage_proof
+            .iter()
+            .filter(|x| x.key != lane_nonce_storage_key)
+            .map(|x| Self::encode_proof(&x.proof))
+            .collect();
 
         let proof = MessagesConfirmationProof {
-            account_proof: Self::encode_proof(&lane_id_proof.account_proof),
-            lane_nonce_proof: Self::encode_proof(&lane_nonce_proof.storage_proof[0].proof),
-            lane_relayers_proof: lane_relayers_proof
-                .storage_proof
-                .iter()
-                .map(|x| Self::encode_proof(&x.proof))
-                .collect(),
+            account_proof: Self::encode_proof(&storage_proof.account_proof),
+            lane_nonce_proof: Self::encode_proof(&lane_nonce_proof.proof),
+            lane_relayers_proof,
         };
         Ok(Bytes(encode(&[proof
             .get_token()

@@ -238,7 +238,7 @@ impl<T: RelayStrategy> EthMessageClient<T> {
         let storage_proof = self
             .get_storage_proof_with_retry(self.outbound.contract.address(), keys, block_number)
             .await?
-            .ok_or_else(|| E2EClientError::Custom("Failed to get lane_id_proof".into()))?;
+            .ok_or_else(|| E2EClientError::Custom("Failed to get storage proof".into()))?;
         let account_proof = Self::encode_proof(&storage_proof.account_proof);
         let lane_id_proof = storage_proof
             .storage_proof
@@ -251,7 +251,7 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             .storage_proof
             .iter()
             .find(|x| x.key == lane_nonce_storage_key)
-            .ok_or(E2EClientError::Custom("Lane id proof not found!".into()))?;
+            .ok_or(E2EClientError::Custom("Lane nonce proof not found!".into()))?;
         let lane_nonce_proof = Self::encode_proof(&lane_nonce_proof.proof);
 
         let lane_messages_proof = storage_proof
@@ -288,7 +288,7 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             .storage_proof
             .iter()
             .find(|x| x.key == lane_nonce_storage_key)
-            .ok_or(E2EClientError::Custom("Lane id proof not found!".into()))?;
+            .ok_or(E2EClientError::Custom("Lane nonce proof not found!".into()))?;
         let lane_relayers_proof = storage_proof
             .storage_proof
             .iter()

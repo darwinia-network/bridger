@@ -188,7 +188,7 @@ dependencies = [
 
 [[package]]
 name = "bin-s2s"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -426,7 +426,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangolin-pangoro"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "async-trait",
  "bin-s2s",
@@ -477,7 +477,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-s2s-traits"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -574,14 +574,14 @@ dependencies = [
 
 [[package]]
 name = "client-common-traits"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "bp-runtime",
 ]
 
 [[package]]
 name = "client-pangolin"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -603,7 +603,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangoro"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -680,7 +680,7 @@ dependencies = [
 
 [[package]]
 name = "component-subscan"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "reqwest",
  "serde 1.0.136",
@@ -1064,7 +1064,7 @@ dependencies = [
 
 [[package]]
 name = "feemarket-s2s"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "async-trait",
  "bridge-s2s-traits",
@@ -1078,7 +1078,7 @@ dependencies = [
 
 [[package]]
 name = "feemarket-s2s-traits"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "async-trait",
  "bp-runtime",
@@ -2932,7 +2932,7 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 
 [[package]]
 name = "relay-s2s"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -3973,7 +3973,7 @@ dependencies = [
 
 [[package]]
 name = "subquery"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -4073,7 +4073,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "color-eyre 0.6.2",
  "config",
@@ -4092,7 +4092,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "color-eyre 0.5.11",
  "lifeline",
@@ -4100,7 +4100,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "once_cell",
  "pad",
@@ -4110,7 +4110,7 @@ dependencies = [
 
 [[package]]
 name = "support-types"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "dirs",
  "serde 1.0.136",

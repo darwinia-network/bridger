@@ -188,7 +188,7 @@ dependencies = [
 
 [[package]]
 name = "bin-e2e"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "client-beacon",
  "client-contracts",
@@ -384,7 +384,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-e2e-traits"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "async-trait",
  "client-contracts",
@@ -398,7 +398,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangoro-goerli"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -531,7 +531,7 @@ dependencies = [
 
 [[package]]
 name = "client-beacon"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "bytes",
  "client-contracts",
@@ -550,7 +550,7 @@ dependencies = [
 
 [[package]]
 name = "client-contracts"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -565,7 +565,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangoro"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -661,7 +661,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "color-eyre 0.6.2",
  "reqwest",
@@ -671,7 +671,7 @@ dependencies = [
 
 [[package]]
 name = "component-state"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "color-eyre 0.6.2",
  "lifeline",
@@ -2948,7 +2948,7 @@ checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
 
 [[package]]
 name = "relay-e2e"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -4053,7 +4053,7 @@ dependencies = [
 
 [[package]]
 name = "subquery"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "async-trait",
  "gql_client",
@@ -4166,7 +4166,7 @@ dependencies = [
 
 [[package]]
 name = "support-command-kv"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "color-eyre 0.6.2",
  "component-state",
@@ -4184,7 +4184,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "color-eyre 0.6.2",
  "config",
@@ -4203,7 +4203,7 @@ dependencies = [
 
 [[package]]
 name = "support-etherscan"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "async-trait",
  "reqwest",
@@ -4216,7 +4216,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "color-eyre 0.5.11",
  "lifeline",
@@ -4224,7 +4224,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "colored",
  "serde 1.0.145",
@@ -4234,7 +4234,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "parity-scale-codec",
  "thiserror",
@@ -4242,7 +4242,7 @@ dependencies = [
 
 [[package]]
 name = "support-tracker"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "color-eyre 0.6.2",
  "microkv",
@@ -4254,7 +4254,7 @@ dependencies = [
 
 [[package]]
 name = "support-types"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "dirs 4.0.0",
  "serde 1.0.145",
@@ -4343,7 +4343,7 @@ dependencies = [
 
 [[package]]
 name = "thegraph"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "async-trait",
  "gql_client",

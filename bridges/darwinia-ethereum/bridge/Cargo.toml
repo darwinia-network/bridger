@@ -19,44 +19,18 @@ path = "src/main.rs"
 [dependencies]
 color-eyre  = "0.6"
 tracing     = "0.1"
-async-trait = "0.1"
-
-reqwest = { version = "0.11", features = ["json", "stream"] }
-tokio   = { version = "1", features = ["full"] }
-
+tokio       = { version = "1", features = ["full"] }
 serde     = { version = "1", features = ["derive"] }
 structopt = "0.3"
-strum     = { version = "0.24", features = ["derive"] }
-
-bytes       = "1.0"
-futures     = "0.3"
-hex         = "0.4"
-lifeline    = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
-postage     = "0.4"
-secp256k1   = { version = "0.21" }
-web3        = { version = "0.18", features = ["signing"] }
-hamming     = "0.1"
-rlp         = "0.5"
-array-bytes = "2"
-microkv     = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
 
 support-common     = { path = "../../../frame/supports/support-common" }
-support-lifeline   = { path = "../../../frame/supports/support-lifeline" }
-support-terminal   = { path = "../../../frame/supports/support-terminal" }
-support-tracker    = { path = "../../../frame/supports/support-tracker" }
 support-command-kv = { path = "../../../frame/supports/support-command-kv" }
-support-etherscan  = { path = "../../../frame/supports/support-etherscan" }
-
-component-http-client = { path = "../../../frame/components/http-client" }
 component-state       = { path = "../../../frame/components/state" }
 
 bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
 subquery              = { path = "../../../assistants/subquery", features = [ "bridge-ethv2" ] }
-client-contracts      = { path = "../../../assistants/client-contracts" }
 client-darwinia       = { path = "../../../assistants/client-darwinia", features = [ "bridge-e2e" ] }
-client-beacon         = { path = "../../../assistants/client-beacon" }
 relay-e2e             = { path = "../../../assistants/relay-e2e" }
 thegraph              = { path = "../../../assistants/thegraph", features = [ "bridge-ethv2" ] }
-
 bin-e2e               = { path ="../../../assistants/bin-e2e" }
 

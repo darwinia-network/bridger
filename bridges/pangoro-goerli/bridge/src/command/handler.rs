@@ -10,7 +10,7 @@ pub async fn handle_start() -> color_eyre::Result<()> {
     tracing::info!("Start bridge pangoro-goerli");
     let raw_config: RawBridgeConfig = Config::restore(Names::BridgePangoroGoerli)?;
     let bridge_config = BridgeConfig {
-        name: Names::BridgePangoroGoerli.name().into(),
+        name: "pangoro-goerli".into(),
         general: raw_config.general,
         darwinia_evm: raw_config.pangoro_evm,
         substrate_client: raw_config.pangoro_substrate.to_substrate_client().await?,

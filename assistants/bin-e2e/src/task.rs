@@ -8,6 +8,7 @@ use support_lifeline::task::TaskStack;
 
 use crate::bridge::BridgeBus;
 use crate::config::BridgeConfig;
+use crate::service::ecdsa_relay::ECDSARelayService;
 use crate::service::header_relay::beacon_header_relay::EthereumToDarwiniaHeaderRelayService;
 use crate::service::header_relay::execution_layer_relay::ExecutionLayerRelay;
 use crate::service::header_relay::sync_committee_relay::SyncCommitteeUpdateService;
@@ -35,6 +36,7 @@ impl<T: EcdsaClient> BridgeTask<T> {
         stack.spawn_service::<SyncCommitteeUpdateService<T>>()?;
         stack.spawn_service::<EthereumDarwiniaMessageRelay<T>>()?;
         stack.spawn_service::<DarwiniaEthereumMessageRelay<T>>()?;
+        stack.spawn_service::<ECDSARelayService<T>>()?;
 
         Ok(Self {
             stack,

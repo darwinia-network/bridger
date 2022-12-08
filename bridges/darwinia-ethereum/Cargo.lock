@@ -190,14 +190,20 @@ dependencies = [
 name = "bin-e2e"
 version = "0.7.1"
 dependencies = [
+ "bridge-e2e-traits",
  "client-beacon",
  "client-contracts",
  "color-eyre 0.6.2",
+ "component-state",
+ "lifeline",
  "relay-e2e",
  "serde 1.0.145",
  "subquery",
+ "support-lifeline",
+ "support-tracker",
  "thegraph",
  "thiserror",
+ "tokio",
  "tracing",
  "web3",
 ]

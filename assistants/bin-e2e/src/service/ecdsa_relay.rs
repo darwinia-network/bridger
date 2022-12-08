@@ -43,7 +43,7 @@ impl<T: EcdsaClient> Service for ECDSARelayService<T> {
             Tracker::new(microkv, "scan.darwinia.collected-authorities");
         let ecdsa_source = Self::get_ecdsa_source(bridge_config.clone())?;
         let _greet_collecting_message =
-            Self::try_task("darwinia-to-eth-ecdsa-collecting-message", async move {
+            Self::try_task("substrate-to-eth-ecdsa-collecting-message", async move {
                 ecdsa_source
                     .start(
                         tracker_collecting_message.clone(),
@@ -54,7 +54,7 @@ impl<T: EcdsaClient> Service for ECDSARelayService<T> {
             });
         let ecdsa_source = Self::get_ecdsa_source(bridge_config.clone())?;
         let _greet_collected_message =
-            Self::try_task("darwinia-to-eth-ecdsa-collected-message", async move {
+            Self::try_task("substrate-to-eth-ecdsa-collected-message", async move {
                 ecdsa_source
                     .start(
                         tracker_collected_message.clone(),
@@ -64,8 +64,9 @@ impl<T: EcdsaClient> Service for ECDSARelayService<T> {
                 Ok(())
             });
         let ecdsa_source = Self::get_ecdsa_source(bridge_config.clone())?;
-        let _greet_collecting_authorities =
-            Self::try_task("darwinia-to-eth-ecdsa-collecting-authorities", async move {
+        let _greet_collecting_authorities = Self::try_task(
+            "substrate-to-eth-ecdsa-collecting-authorities",
+            async move {
                 ecdsa_source
                     .start(
                         tracker_collecting_authorities.clone(),
@@ -73,10 +74,11 @@ impl<T: EcdsaClient> Service for ECDSARelayService<T> {
                     )
                     .await;
                 Ok(())
-            });
+            },
+        );
         let ecdsa_source = Self::get_ecdsa_source(bridge_config.clone())?;
         let _greet_collected_authorities =
-            Self::try_task("darwinia-to-eth-ecdsa-collected-authorities", async move {
+            Self::try_task("substrate-to-eth-ecdsa-collected-authorities", async move {
                 ecdsa_source
                     .start(
                         tracker_collected_authorities.clone(),

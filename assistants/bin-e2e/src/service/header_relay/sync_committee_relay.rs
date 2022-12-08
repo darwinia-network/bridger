@@ -29,8 +29,8 @@ impl<T: EcdsaClient> Service for SyncCommitteeUpdateService<T> {
         let _greet = Self::try_task("sync-committee-update-eth-to-darwinia", async move {
             while let Err(error) = Self::start(bridge_config.clone()).await {
                 tracing::error!(
-                    target: "darwinia-eth",
-                    "Failed to start eth-to-darwinia sync committee update relay service, restart after some seconds: {:?}",
+                    target: "substrate-eth",
+                    "Failed to start sync committee update relay service, restart after some seconds: {:?}",
                     error
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;

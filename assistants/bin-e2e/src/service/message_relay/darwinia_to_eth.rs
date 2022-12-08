@@ -107,8 +107,8 @@ async fn start_delivery<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::
     loop {
         if let Err(error) = service.message_relay().await {
             tracing::error!(
-                target: "darwinia-eth",
-                "[MessagesDelivery][Darwinia=>Eth] Failed to relay messages: {:?}",
+                target: "substrate-eth",
+                "[MessagesDelivery][Substrate=>Eth] Failed to relay messages: {:?}",
                 error
             );
             return Err(error.into());
@@ -122,8 +122,8 @@ async fn start_confirmation<T: EcdsaClient>(config: BridgeConfig<T>) -> color_ey
     loop {
         if let Err(error) = service.message_confirm().await {
             tracing::error!(
-                target: "darwinia-eth",
-                "[MessagesConfirmation][Darwinia=>Eth] Failed to confirm messages: {:?}",
+                target: "substrate-eth",
+                "[MessagesConfirmation][Substrate=>Eth] Failed to confirm messages: {:?}",
                 error
             );
             return Err(error.into());

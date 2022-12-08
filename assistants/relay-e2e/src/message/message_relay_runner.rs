@@ -70,7 +70,6 @@ where
             source_block_at_target,
             target_block_at_source,
         };
-        dbg!(&self.state);
         Ok(())
     }
 

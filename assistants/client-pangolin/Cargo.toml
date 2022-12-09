@@ -10,7 +10,7 @@ license       = "MIT"
 name          = "client-pangolin"
 readme        = 'README.md'
 repository    = "https://github.com/darwinia-network/bridger"
-version       = "0.7.1"
+version       = "0.7.2"
 
 [dependencies]
 thiserror = "1"

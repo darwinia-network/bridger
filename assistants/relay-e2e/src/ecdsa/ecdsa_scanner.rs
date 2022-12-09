@@ -52,6 +52,13 @@ pub trait EcdsaScanner<T: EcdsaClient> {
     }
 
     async fn run(&self, tracker: Tracker, scan_type: EcdsaScanType) -> RelayResult<()> {
+        if !tracker
+            .is_running()
+            .map_err(|e| RelayError::Custom(format!("{:?}", e)))?
+        {
+            return Ok(());
+        }
+
         let mut source = self.get_ecdsa_source().await?;
         loop {
             let from = tracker

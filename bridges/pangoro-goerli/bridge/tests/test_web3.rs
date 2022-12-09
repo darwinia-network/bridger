@@ -45,6 +45,7 @@ async fn get_bridge_config() -> color_eyre::Result<BridgeConfig<PangoroClient>> 
     Ok(bridge_config)
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
@@ -88,6 +89,7 @@ async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
     Ok(())
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;

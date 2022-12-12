@@ -42,11 +42,8 @@ jobs:
     strategy:
       matrix:
         package:
-          - crab-crabparachain
           - darwinia-crab
-          - pangolin-pangoro
-          - pangolin-pangolinparachain
-          - pangolin-pangolinparachainalpha
+          - darwinia-ethereum
           - pangoro-chapel
           - pangoro-goerli
           - template

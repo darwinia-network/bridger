@@ -26,7 +26,7 @@ strum       = { version = "0.24", features = ["derive"] }
 serde       = { version = "1", features = ["derive"] }
 tokio       = { version = "1", features = ["full"] }
 
-bin-s2s         = { path = "../../assistants/bin-s2s", features = ["solo-with-solo"] }
+bin-s2s         = { path = "../../assistants/bin-s2s", features = ["para-with-para"] }
 subquery        = { path = "../../assistants/subquery" }
 support-common  = { path = "../../frame/supports/support-common" }
 support-toolkit = { path = "../../frame/supports/support-toolkit" }

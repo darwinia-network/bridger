@@ -37,6 +37,16 @@ impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
         }
         let event = cacse.expect("Unreachable");
 
+        let latest_relayed_block_number = self.source.client_posa.block_number().await?;
+        if latest_relayed_block_number.as_u32() >= event.block_number {
+            tracing::info!(
+                target: "relay-e2e",
+                "[Darwinia][ECDSA][collectedAuthorities] Latest relayed block number is: {:?}",
+                event.block_number
+            );
+            return Ok(Some(event.block_number));
+        }
+
         let mut signature_nodes = event.signatures.nodes;
         signature_nodes.sort_by(|a, b| a.address.cmp(&b.address));
         let signatures = signature_nodes

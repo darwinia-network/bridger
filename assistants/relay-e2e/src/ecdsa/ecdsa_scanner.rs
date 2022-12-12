@@ -52,6 +52,13 @@ pub trait EcdsaScanner<T: EcdsaClient> {
     }
 
     async fn run(&self, tracker: Tracker, scan_type: EcdsaScanType) -> RelayResult<()> {
+        if !tracker
+            .is_running()
+            .map_err(|e| RelayError::Custom(format!("{:?}", e)))?
+        {
+            return Ok(());
+        }
+
         let mut source = self.get_ecdsa_source().await?;
         loop {
             let from = tracker
@@ -96,5 +103,12 @@ pub trait EcdsaScanner<T: EcdsaClient> {
 
             tokio::time::sleep(std::time::Duration::from_secs(10)).await;
         }
+    }
+}
+
+#[async_trait::async_trait]
+impl<T: EcdsaClient> EcdsaScanner<T> for EcdsaSource<T> {
+    async fn get_ecdsa_source(&self) -> RelayResult<EcdsaSource<T>> {
+        Ok(self.clone())
     }
 }

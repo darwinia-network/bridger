@@ -190,14 +190,20 @@ dependencies = [
 name = "bin-e2e"
 version = "0.7.2"
 dependencies = [
+ "bridge-e2e-traits",
  "client-beacon",
  "client-contracts",
  "color-eyre 0.6.2",
+ "component-state",
+ "lifeline",
  "relay-e2e",
  "serde 1.0.145",
  "subquery",
+ "support-lifeline",
+ "support-tracker",
  "thegraph",
  "thiserror",
+ "tokio",
  "tracing",
  "web3",
 ]
@@ -401,36 +407,19 @@ name = "bridge-pangoro-goerli"
 version = "0.7.2"
 dependencies = [
  "array-bytes",
- "async-trait",
  "bin-e2e",
  "bridge-e2e-traits",
- "bytes",
- "client-beacon",
  "client-contracts",
  "client-pangoro",
  "color-eyre 0.6.2",
- "component-http-client",
  "component-state",
- "futures",
- "hamming",
- "hex",
- "lifeline",
- "microkv",
- "postage",
  "relay-e2e",
- "reqwest",
- "rlp",
- "secp256k1",
  "serde 1.0.145",
  "structopt",
- "strum",
  "subquery",
  "support-command-kv",
  "support-common",
  "support-etherscan",
- "support-lifeline",
- "support-terminal",
- "support-tracker",
  "thegraph",
  "tokio",
  "tracing",
@@ -657,16 +646,6 @@ source = "git+https://github.com/sigp/lighthouse.git?branch=stable#6d5a2b509fac7
 dependencies = [
  "quote",
  "syn",
-]
-
-[[package]]
-name = "component-http-client"
-version = "0.7.2"
-dependencies = [
- "color-eyre 0.6.2",
- "reqwest",
- "serde 1.0.145",
- "tracing",
 ]
 
 [[package]]
@@ -1710,19 +1689,6 @@ dependencies = [
  "tower-service",
  "tracing",
  "want",
-]
-
-[[package]]
-name = "hyper-rustls"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d87c48c02e0dc5e3b849a2041db3029fd066650f8f717c07bf8ed78ccb895cac"
-dependencies = [
- "http",
- "hyper",
- "rustls",
- "tokio",
- "tokio-rustls",
 ]
 
 [[package]]
@@ -2995,7 +2961,6 @@ dependencies = [
  "http",
  "http-body",
  "hyper",
- "hyper-rustls",
  "hyper-tls",
  "ipnet",
  "js-sys",
@@ -3005,21 +2970,17 @@ dependencies = [
  "once_cell",
  "percent-encoding",
  "pin-project-lite",
- "rustls",
- "rustls-pemfile",
  "serde 1.0.145",
  "serde_json",
  "serde_urlencoded",
  "tokio",
  "tokio-native-tls",
- "tokio-rustls",
  "tokio-util 0.7.4",
  "tower-service",
  "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
- "webpki-roots",
  "winreg",
 ]
 

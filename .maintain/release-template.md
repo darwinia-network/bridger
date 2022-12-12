@@ -5,7 +5,7 @@
 
 ## Changed
 
-- Fix eth_getProof issue (#550)
+-  bin-e2e refactor (#555)
 
 ## Resources
 

@@ -188,7 +188,7 @@ dependencies = [
 
 [[package]]
 name = "bin-s2s"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -426,7 +426,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-darwinia-crab"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "async-trait",
  "bin-s2s",
@@ -477,7 +477,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-s2s-traits"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -574,14 +574,14 @@ dependencies = [
 
 [[package]]
 name = "client-common-traits"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "bp-runtime",
 ]
 
 [[package]]
 name = "client-crab"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -603,7 +603,7 @@ dependencies = [
 
 [[package]]
 name = "client-darwinia"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -680,7 +680,7 @@ dependencies = [
 
 [[package]]
 name = "component-subscan"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "reqwest",
  "serde 1.0.136",
@@ -1064,7 +1064,7 @@ dependencies = [
 
 [[package]]
 name = "feemarket-s2s"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "async-trait",
  "bridge-s2s-traits",
@@ -1078,7 +1078,7 @@ dependencies = [
 
 [[package]]
 name = "feemarket-s2s-traits"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "async-trait",
  "bp-runtime",
@@ -1678,9 +1678,9 @@ dependencies = [
 
 [[package]]
 name = "include_dir"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "482a2e29200b7eed25d7fdbd14423326760b7f6658d21a4cf12d55a50713c69f"
+checksum = "18762faeff7122e89e0857b02f7ce6fcc0d101d5e9ad2ad7846cc01d61b7f19e"
 dependencies = [
  "include_dir_macros",
 ]
@@ -2932,7 +2932,7 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 
 [[package]]
 name = "relay-s2s"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -3973,7 +3973,7 @@ dependencies = [
 
 [[package]]
 name = "subquery"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -4073,7 +4073,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "color-eyre 0.6.2",
  "config",
@@ -4092,7 +4092,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "color-eyre 0.5.11",
  "lifeline",
@@ -4100,7 +4100,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "once_cell",
  "pad",
@@ -4110,7 +4110,7 @@ dependencies = [
 
 [[package]]
 name = "support-types"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "dirs",
  "serde 1.0.136",

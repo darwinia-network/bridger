@@ -156,7 +156,7 @@ checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
 name = "bridge-pangoro-ropsten"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "color-eyre 0.6.2",
  "component-http-client",
@@ -305,7 +305,7 @@ dependencies = [
 
 [[package]]
 name = "component-http-client"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "color-eyre 0.6.2",
  "reqwest",
@@ -2013,7 +2013,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "color-eyre 0.6.2",
  "config",
@@ -2032,7 +2032,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "color-eyre 0.5.11",
  "lifeline",
@@ -2040,7 +2040,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "colored",
  "serde 1.0.136",
@@ -2050,7 +2050,7 @@ dependencies = [
 
 [[package]]
 name = "support-types"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "dirs",
  "serde 1.0.136",

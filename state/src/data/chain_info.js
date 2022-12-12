@@ -21,8 +21,8 @@ const darwinia = {
     },
     ethereum: {
       contract: {
-        lc_consensus: '0x9C266C48F07121181d8424768f0deD0170cC63A6',
-        lc_execution: '0xe50F1Ddf0C8778773f07Eb2759d045Ece19F6Cc1',
+        lc_consensus: '0xD2A37C4523542F2dFD7Cb792D2aeAd5c61C1bAAE',
+        lc_execution: '0xeC3c9B4d3674B3D03fdf20b082A3C2c669075990',
         inbound: '0xf1B8a9F8436800499DB8186f2da2fb3e78Ff7c2B',
         outbound: '0xcA3749C8C3aF04278D596a3fBe461481B6aa1b01',
         feemarket: '0xcA927Df15afb7629b79dA4713a871190315c7409',

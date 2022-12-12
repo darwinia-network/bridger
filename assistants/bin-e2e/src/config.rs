@@ -1,6 +1,7 @@
 use std::fmt::Display;
 use std::str::FromStr;
 
+use bridge_e2e_traits::client::EcdsaClient;
 use client_beacon::client::ApiSupplier;
 use client_contracts::PosaLightClient;
 use relay_e2e::types::ethereum::FastEthereumAccount;
@@ -13,6 +14,27 @@ use thegraph::ThegraphConfig;
 use web3::transports::Http;
 use web3::types::Address;
 use web3::Web3;
+
+use crate::bridge::BridgeBus;
+
+#[derive(Clone, Debug)]
+pub struct BridgeConfig<T: EcdsaClient> {
+    pub name: String,
+    pub general: GeneralConfig,
+    pub darwinia_evm: EVMChainConfig,
+    pub substrate_client: T,
+    pub ethereum: ExecutionLayerInfoConfig,
+    pub beacon: BeaconApiConfig,
+    pub substrate_index: Subquery,
+    pub evm_index: Thegraph,
+}
+
+impl<T: EcdsaClient> lifeline::Storage for BridgeConfig<T> {
+    fn take_or_clone(res: &mut Option<Self>) -> Option<Self> {
+        res.clone()
+    }
+}
+impl<T: EcdsaClient> lifeline::Resource<BridgeBus> for BridgeConfig<T> {}
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GeneralConfig {

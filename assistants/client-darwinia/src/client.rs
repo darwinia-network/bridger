@@ -5,7 +5,7 @@ use crate::subxt_runtime::api::RuntimeApi;
 use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
 
 /// Darwinia client
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct DarwiniaClient {
     /// Runtime api
     client: Client<DarwiniaSubxtConfig>,

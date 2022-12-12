@@ -33,6 +33,17 @@ impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
             return Ok(None);
         }
         let event = cacse.expect("Unreachable");
+        let collected = subquery
+            .next_collected_enough_authorities_change_signatures_event(event.block_number)
+            .await?;
+        if collected.is_some() {
+            tracing::debug!(
+                target: "relay-e2e",
+                "[Darwinia][ECDSA][collectingAuthorities] Collected. Skip this event at {}",
+                event.block_number,
+            );
+            return Ok(Some(event.block_number));
+        }
         if !client_darwinia_substrate
             .is_ecdsa_authority(Some(event.block_number), &darwinia_evm_account.address()?.0)
             .await?

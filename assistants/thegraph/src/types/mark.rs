@@ -1,4 +1,5 @@
 /// Chain name
+#[derive(Clone, Debug)]
 pub enum LikethChain {
     Ethereum,
     Ropsten,

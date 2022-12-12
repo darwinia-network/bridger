@@ -189,7 +189,7 @@ where
 
         tracing::info!(
             target: "relay-e2e",
-            "[MessageDelivery][{}={}] Relaying messages: [{:?}, {:?}]",
+            "[MessageDelivery][{}=>{}] Relaying messages: [{:?}, {:?}]",
             self.source.chain(),
             self.target.chain(),
             begin + delivered,
@@ -215,7 +215,7 @@ where
 
         tracing::info!(
             target: "relay-e2e",
-            "[MessageDelivery][{}={}] Sending tx: {:?}",
+            "[MessageDelivery][{}=>{}] Sending tx: {:?}",
             self.source.chain(),
             self.target.chain(),
             tx
@@ -239,7 +239,7 @@ where
         {
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageConfirmation][{}={}] All confirmed({:?}), nothing to do.",
+                "[MessageConfirmation][{}=>{}] All confirmed({:?}), nothing to do.",
                 self.source.chain(),
                 self.target.chain(),
                 self.state.source_outbound
@@ -257,7 +257,7 @@ where
         {
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageConfirmation][{}={}] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
+                "[MessageConfirmation][{}=>{}] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
                 self.source.chain(),
                 self.target.chain(),
                 self.state.source_outbound.latest_received_nonce,
@@ -269,7 +269,7 @@ where
         if self.state.target_block_at_source.is_none() {
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageConfirmation][{}={}] Nonce [{:?}:{:?}] was delivered, wait for header relay",
+                "[MessageConfirmation][{}=>{}] Nonce [{:?}:{:?}] was delivered, wait for header relay",
                 self.source.chain(),
                 self.target.chain(),
                 self.state.source_outbound.latest_received_nonce + 1,
@@ -280,7 +280,7 @@ where
 
         tracing::info!(
             target: "relay-e2e",
-            "[MessageConfirmation][{}={}] Try to confirm nonces [{:?}:{:?}]",
+            "[MessageConfirmation][{}=>{}] Try to confirm nonces [{:?}:{:?}]",
             self.source.chain(),
             self.target.chain(),
             begin,
@@ -310,7 +310,7 @@ where
 
         tracing::info!(
             target: "relay-e2e",
-            "[MessageConfirmation][{}={}] Messages confirmation tx: {:?}",
+            "[MessageConfirmation][{}=>{}] Messages confirmation tx: {:?}",
             self.source.chain(),
             self.target.chain(),
             hash

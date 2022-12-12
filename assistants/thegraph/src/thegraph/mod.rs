@@ -11,6 +11,7 @@ mod bridge_ethv2;
 static GRAPHQL_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/graphql");
 
 /// thegraph toolkit, query ethereum/ropsten
+#[derive(Clone, Debug)]
 pub struct Thegraph {
     client: Client,
     chain: LikethChain,

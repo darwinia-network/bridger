@@ -5,7 +5,7 @@ use crate::subxt_runtime::api::RuntimeApi;
 use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
 
 /// Pangoro client
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PangoroClient {
     /// Runtime api
     client: Client<PangoroSubxtConfig>,

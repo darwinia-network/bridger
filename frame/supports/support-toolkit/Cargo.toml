@@ -22,7 +22,7 @@ thiserror = "1"
 once_cell = { optional = true, version = "1" }
 pad       = { optional = true, version = "0.1" }
 
-codec     = { optional = true, package = "parity-scale-codec", version = "2" }
+codec     = { optional = true, package = "parity-scale-codec", version = "3" }
 
 [features]
 convert = ["codec"]

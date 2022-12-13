@@ -13,15 +13,15 @@ pub enum S2SClientError {
 }
 
 #[cfg(feature = "subxt")]
-impl From<subxt::BasicError> for S2SClientError {
-    fn from(error: subxt::BasicError) -> Self {
+impl From<subxt::error::Error> for S2SClientError {
+    fn from(error: subxt::error::Error) -> Self {
         Self::RPC(format!("{:?}", error))
     }
 }
 
 #[cfg(feature = "subxt")]
-impl From<subxt::rpc::RpcError> for S2SClientError {
-    fn from(error: subxt::rpc::RpcError) -> Self {
+impl From<subxt::error::RpcError> for S2SClientError {
+    fn from(error: subxt::error::RpcError) -> Self {
         Self::RPC(format!("{:?}", error))
     }
 }

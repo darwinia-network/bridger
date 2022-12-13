@@ -19,7 +19,7 @@ tracing   = "0.1"
 serde       = { version = "1", features = ["derive"] }
 
 array-bytes = "2"
-codec       = { package = "parity-scale-codec", version = "2" }
+codec       = { package = "parity-scale-codec", version = "3" }
 subxt       = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.30" }
 bp-kusama   = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
 
@@ -35,7 +35,7 @@ sp-core             = { optional = true, git = "https://github.com/paritytech/su
 client-common-traits  = { optional = true, path = "../../frame/traits/client-common" }
 
 ## s2s client
-finality-grandpa      = { optional = true, version = "0.14" }
+finality-grandpa      = { optional = true, version = "0.16" }
 bridge-s2s-traits     = { optional = true, path = "../../frame/traits/bridge-s2s", features = ["advanced-types"] }
 
 support-toolkit  = { path = "../../frame/supports/support-toolkit", features = ["convert"] }

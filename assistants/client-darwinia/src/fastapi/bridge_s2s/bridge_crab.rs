@@ -1,23 +1,18 @@
 use std::ops::RangeInclusive;
 
-use subxt::sp_core::storage::StorageKey;
-use subxt::storage::StorageKeyPrefix;
-use subxt::StorageEntry;
-
 use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay};
 use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
 use bridge_s2s_traits::types::{
     bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,
 };
 use client_common_traits::ClientCommon;
+use sp_core::storage::StorageKey;
 use sp_runtime::AccountId32;
+
 use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::DarwiniaClient;
 use crate::error::ClientError;
-use crate::subxt_runtime::api::bridge_crab_messages::storage::{
-    InboundLanes, OutboundLanes, OutboundMessages,
-};
 
 type BundleMessageKey = crate::types::runtime_types::bp_messages::MessageKey;
 
@@ -32,13 +27,21 @@ type FromThisChainMessagePayload = crate::types::runtime_types::bp_message_dispa
 #[async_trait::async_trait]
 impl S2SClientRelay for DarwiniaClient {
     fn gen_outbound_messages_storage_key(&self, lane: [u8; 4], message_nonce: u64) -> StorageKey {
-        let prefix = StorageKeyPrefix::new::<OutboundMessages>();
-        OutboundMessages(BundleMessageKey {
-            lane_id: lane,
-            nonce: message_nonce,
-        })
-        .key()
-        .final_key(prefix)
+        // let prefix = StorageKeyPrefix::new::<OutboundMessages>();
+        // OutboundMessages(BundleMessageKey {
+        //     lane_id: lane,
+        //     nonce: message_nonce,
+        // })
+        // .key()
+        // .final_key(prefix)
+        crate::subxt_runtime::api::storage()
+            .bridge_crab_messages()
+            .outbound_messages(
+                crate::subxt_runtime::api::runtime_types::bp_messages::MessageKey {
+                    lane_id: lane,
+                    nonce: message_nonce,
+                },
+            )
     }
 
     fn gen_outbound_lanes_storage_key(&self, lane: [u8; 4]) -> StorageKey {
@@ -177,13 +180,10 @@ impl S2SClientRelay for DarwiniaClient {
         hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<Option<bp_messages::MessageData<u128>>> {
         let expected_message_key = SmartCodecMapper::map_to(&message_key)?;
-        match self
-            .runtime()
-            .storage()
+        let key = crate::subxt_runtime::api::storage()
             .bridge_crab_messages()
-            .outbound_messages(expected_message_key, hash)
-            .await?
-        {
+            .outbound_messages(expected_message_key);
+        match self.subxt().storage().fetch(key, hash).await? {
             Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
             None => Ok(None),
         }
@@ -198,24 +198,28 @@ impl S2SClientRelay for DarwiniaClient {
         messages_count: u32,
         dispatch_weight: u64,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
+        let relayer_id_at_bridged_chain = SmartCodecMapper::map_to(&relayer_id_at_bridged_chain)?;
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
-        let runtime = self.runtime();
-        let track = runtime
-            .tx()
+        let call = crate::subxt_runtime::api::tx()
             .bridge_crab_messages()
             .receive_messages_proof(
                 relayer_id_at_bridged_chain,
                 expected_proof,
                 messages_count,
-                dispatch_weight,
-            )
-            .sign_and_submit_then_watch(self.account().signer())
+                crate::subxt_runtime::api::runtime_types::sp_weights::weight_v2::Weight {
+                    ref_time: dispatch_weight,
+                },
+            );
+        let track = self
+            .subxt()
+            .tx()
+            .sign_and_submit_then_watch_default(&call, self.account().signer())
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
                 "send transaction failed {}: {:?}",
                 <Self as ClientCommon>::CHAIN,
-                e
+                e,
             ))
         })?;
         Ok(events.extrinsic_hash())
@@ -230,18 +234,20 @@ impl S2SClientRelay for DarwiniaClient {
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
         let expected_relayers_state = SmartCodecMapper::map_to(&relayers_state)?;
-        let runtime = self.runtime();
-        let track = runtime
-            .tx()
+
+        let call = crate::subxt_runtime::api::tx()
             .bridge_crab_messages()
-            .receive_messages_delivery_proof(expected_proof, expected_relayers_state)
-            .sign_and_submit_then_watch(self.account().signer())
+            .receive_messages_delivery_proof(expected_proof, expected_relayers_state);
+        let track = self
+            .subxt()
+            .tx()
+            .sign_and_submit_then_watch_default(&call, self.account().signer())
             .await?;
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             S2SClientError::RPC(format!(
                 "send transaction failed {}: {:?}",
                 <Self as ClientCommon>::CHAIN,
-                e
+                e,
             ))
         })?;
         Ok(events.extrinsic_hash())

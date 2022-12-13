@@ -1,21 +1,20 @@
-use subxt::Client;
+use subxt::client::OnlineClient;
 
 use crate::config::DarwiniaSubxtConfig;
-use crate::subxt_runtime::api::RuntimeApi;
-use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
+use crate::types::DarwiniaAccount;
 
 /// Darwinia client
 #[derive(Debug, Clone)]
 pub struct DarwiniaClient {
     /// Runtime api
-    client: Client<DarwiniaSubxtConfig>,
+    client: OnlineClient<DarwiniaSubxtConfig>,
     /// Darwinia Account
     account: DarwiniaAccount,
 }
 
 impl DarwiniaClient {
     /// Create a new darwinia client
-    pub fn new(client: Client<DarwiniaSubxtConfig>, account: DarwiniaAccount) -> Self {
+    pub fn new(client: OnlineClient<DarwiniaSubxtConfig>, account: DarwiniaAccount) -> Self {
         Self { client, account }
     }
 }
@@ -30,12 +29,7 @@ impl DarwiniaClient {
 /// patch rpc api
 impl DarwiniaClient {
     /// Get original subxt client
-    pub fn subxt(&self) -> &Client<DarwiniaSubxtConfig> {
+    pub fn subxt(&self) -> &OnlineClient<DarwiniaSubxtConfig> {
         &self.client
-    }
-
-    /// Runtime api
-    pub fn runtime(&self) -> RuntimeApi<DarwiniaSubxtConfig, NodeRuntimeSignedExtra> {
-        self.client.clone().to_runtime_api()
     }
 }

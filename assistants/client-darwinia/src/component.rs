@@ -1,9 +1,10 @@
 use std::{thread, time};
 
-use subxt::ClientBuilder;
+use subxt::OnlineClient;
 
 use crate::client::DarwiniaClient;
 use crate::config::ClientConfig;
+use crate::config::DarwiniaSubxtConfig;
 use crate::error::ClientResult;
 use crate::types::DarwiniaAccount;
 
@@ -22,7 +23,7 @@ impl DarwiniaClientComponent {
             DarwiniaAccount::new(config.relayer_private_key, config.relayer_real_account)?;
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
-            return match ClientBuilder::new().set_url(&endpoint).build().await {
+            return match OnlineClient::<DarwiniaSubxtConfig>::from_url(&endpoint).await {
                 Ok(client) => Ok(DarwiniaClient::new(client, account.clone())),
                 Err(err) => {
                     if attempts < MAX_ATTEMPTS {

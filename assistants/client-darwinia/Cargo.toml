@@ -33,9 +33,9 @@ bp-darwinia-core = { git = "https://github.com/darwinia-network/darwinia-message
 async-trait           = { optional = true, version = "0.1" }
 
 ## substrate
-sp-finality-grandpa = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+sp-core             = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
 sp-runtime          = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
-sp-core             = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+sp-finality-grandpa = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
 
 ## common traits
 client-common-traits  = { optional = true, path = "../../frame/traits/client-common" }
@@ -57,7 +57,6 @@ default     = []
 substrate   = [
   "sp-finality-grandpa",
   "sp-runtime",
-  "sp-core",
 ]
 bridge-s2s         = [
   "substrate",
@@ -66,15 +65,13 @@ bridge-s2s         = [
   "client-common-traits",
   "bridge-s2s-traits",
 ]
-bridge-s2s-crab = ["bridge-s2s"]
-bridge-s2s-darwinia-parachain = ["bridge-s2s", "bridge-s2s-traits/bridge-parachain"]
+bridge-s2s-crab = ["bridge-s2s", "bridge-s2s-traits/bridge-parachain"]
 feemarket-s2s   = [
   "async-trait",
   "client-common-traits",
   "feemarket-s2s-traits",
 ]
 feemarket-s2s-crab = ["feemarket-s2s"]
-feemarket-s2s-darwinia-parachain = ["feemarket-s2s"]
 bridge-e2e = ["async-trait", "bridge-e2e-traits"]
 
 [dev-dependencies]

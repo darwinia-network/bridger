@@ -20087,9 +20087,9 @@ pub mod api {
             pub struct DeliveredMessages {
                 pub begin: ::core::primitive::u64,
                 pub end: ::core::primitive::u64,
-                pub dispatch_results: ::subxt::ext::bitvec::vec::BitVec<
+                pub dispatch_results: ::subxt::utils::bits::DecodedBits<
                     ::core::primitive::u8,
-                    ::subxt::ext::bitvec::order::Msb0,
+                    ::subxt::utils::bits::Msb0,
                 >,
             }
             #[derive(

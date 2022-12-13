@@ -16,13 +16,13 @@ pub struct ClientConfig {
 pub enum DarwiniaSubxtConfig {}
 
 impl subxt::Config for DarwiniaSubxtConfig {
-    type Index = bp_darwinia::Nonce;
-    type BlockNumber = bp_darwinia::BlockNumber;
-    type Hash = bp_darwinia::Hash;
-    type Hashing = bp_darwinia::Hashing;
-    type AccountId = bp_darwinia::AccountId;
-    type Address = bp_darwinia::Address;
-    type Header = bp_darwinia::Header;
-    type Signature = bp_darwinia::Signature;
+    type Index = bp_darwinia_core::Nonce;
+    type BlockNumber = bp_darwinia_core::BlockNumber;
+    type Hash = bp_darwinia_core::Hash;
+    type Hashing = bp_darwinia_core::Hashing;
+    type AccountId = bp_darwinia_core::AccountId;
+    type Address = bp_darwinia_core::Address;
+    type Header = bp_darwinia_core::Header;
+    type Signature = bp_darwinia_core::Signature;
     type Extrinsic = sp_runtime::OpaqueExtrinsic;
 }

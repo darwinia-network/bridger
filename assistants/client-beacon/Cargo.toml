@@ -28,15 +28,15 @@ serde       = { version = "1", features = ["derive"] }
 hex         = "0.4"
 hamming     = "0.1"
 reqwest     = { version = "0.11", features = ["json", "stream"] }
-types       = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-tree_hash   = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+types       = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+tree_hash   = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
 client-contracts  = { path = "../client-contracts" }
 
 [patch.crates-io]
-eth2_hashing     = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_serde_utils = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_ssz         = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_ssz_derive  = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_ssz_types   = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-tree_hash        = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-tree_hash_derive = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_hashing     = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_serde_utils = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_ssz         = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_ssz_derive  = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_ssz_types   = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+tree_hash        = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+tree_hash_derive = { git = "https://github.com/sigp/lighthouse", branch = "stable" }

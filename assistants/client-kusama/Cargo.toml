@@ -20,16 +20,16 @@ serde       = { version = "1", features = ["derive"] }
 
 array-bytes = "2"
 codec       = { package = "parity-scale-codec", version = "2" }
-subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
-bp-kusama   = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
+subxt       = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.30" }
+bp-kusama   = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
 
 ## maybe common
 async-trait = { optional = true, version = "0.1" }
 
 ## substrate
-sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
-sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
-sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+sp-finality-grandpa = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+sp-runtime          = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+sp-core             = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
 
 ## common traits
 client-common-traits  = { optional = true, path = "../../frame/traits/client-common" }

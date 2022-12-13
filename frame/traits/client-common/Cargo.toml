@@ -13,7 +13,7 @@ repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.7.3"
 
 [dependencies]
-bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
+bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
 
 [features]
 

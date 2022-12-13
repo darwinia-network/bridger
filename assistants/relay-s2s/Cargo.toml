@@ -26,8 +26,8 @@ once_cell      = "1"
 async-trait    = "0.1"
 jsonrpsee-core = "0.8"
 
-sp-core             = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
-sp-runtime          = { git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+sp-core             = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+sp-runtime          = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
 
 support-toolkit     = { path = "../../frame/supports/support-toolkit", features = ["convert", "log"] }
 

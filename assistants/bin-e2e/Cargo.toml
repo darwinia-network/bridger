@@ -26,7 +26,7 @@ color-eyre   = "0.6"
 tokio    = { version = "1", features = ["full"] }
 serde    = { version = "1", features = ["derive"] }
 web3     = { version = "0.18", features = ["signing"] }
-lifeline = { git = "https://github.com/fewensa/lifeline-rs.git", branch = "threads-safely" }
+lifeline = { git = "https://github.com/fewensa/lifeline-rs", branch = "threads-safely" }
 
 bridge-e2e-traits = { path = "../../frame/traits/bridge-e2e" }
 relay-e2e         = { path = "../relay-e2e" }
@@ -41,10 +41,10 @@ support-tracker    = { path = "../../frame/supports/support-tracker" }
 
 
 [patch.crates-io]
-eth2_hashing     = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_serde_utils = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_ssz         = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_ssz_derive  = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_ssz_types   = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-tree_hash        = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-tree_hash_derive = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_hashing     = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_serde_utils = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_ssz         = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_ssz_derive  = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_ssz_types   = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+tree_hash        = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+tree_hash_derive = { git = "https://github.com/sigp/lighthouse", branch = "stable" }

@@ -996,7 +996,7 @@ checksum = "e74d72e0f9b65b5b4ca49a346af3976df0f9c61d550727f349ecd559f251a26c"
 [[package]]
 name = "lifeline"
 version = "0.6.1"
-source = "git+https://github.com/fewensa/lifeline-rs.git?branch=threads-safely#6e45414f81e9905d8e018e6627cf3146184aa152"
+source = "git+https://github.com/fewensa/lifeline-rs?branch=threads-safely#6e45414f81e9905d8e018e6627cf3146184aa152"
 dependencies = [
  "anyhow",
  "async-trait",

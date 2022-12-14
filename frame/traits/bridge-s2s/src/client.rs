@@ -152,7 +152,7 @@ pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
         &self,
         para_id: crate::types::ParaId,
         hash: Option<<Self::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<Option<crate::types::BestParaHead>>;
+    ) -> S2SClientResult<Option<crate::types::ParaInfo>>;
 
     /// submit parachain heads
     async fn submit_parachain_heads(

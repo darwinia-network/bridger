@@ -23,12 +23,15 @@ mod bridge_parachain {
 
     /// Best known parachain head as it is stored in the runtime storage.
     #[derive(codec::Encode, codec::Decode, Debug, Clone, PartialEq, Deserialize, Serialize)]
-    pub struct BestParaHead {
-        /// Number of relay block where this head has been updated.
-        pub at_relay_block_number: u32,
-        /// Hash of parachain head.
-        pub head_hash: ParaHash,
+    pub struct ParaInfo {
+        pub best_head_hash: BestParaHeadHash,
         /// Current ring buffer position for this parachain.
         pub next_imported_hash_position: u32,
+    }
+
+    #[derive(codec::Encode, codec::Decode, Debug, Clone, PartialEq, Deserialize, Serialize)]
+    pub struct BestParaHeadHash {
+        pub at_relay_block_number: u32,
+        pub head_hash: ParaHash,
     }
 }

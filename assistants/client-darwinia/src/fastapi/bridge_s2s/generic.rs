@@ -31,12 +31,7 @@ impl DarwiniaClient {
             sp_core::Bytes(Vec::new()),
             at
         ];
-        let hex: String = self
-            .subxt()
-            .rpc()
-            .client
-            .request("state_call", params)
-            .await?;
+        let hex: String = self.subxt().rpc().request("state_call", params).await?;
         let raw_authorities_set = array_bytes::hex2bytes(hex.as_ref())?;
         let authorities = codec::Decode::decode(&mut &raw_authorities_set[..]).map_err(|err| {
             ClientError::Custom(format!(
@@ -94,7 +89,6 @@ impl S2SClientGeneric for DarwiniaClient {
         Ok(self
             .subxt()
             .rpc()
-            .client
             .subscribe(
                 "grandpa_subscribeJustifications",
                 None,
@@ -240,7 +234,7 @@ impl S2SClientGeneric for DarwiniaClient {
             } else {
                 initial_authorities_set_id
             },
-            is_halted: false,
+            operating_mode: Default::default(),
         };
         let bytes = codec::Encode::encode(&initialization_data);
         Ok(codec::Decode::decode(&mut &bytes[..]).map_err(|e| {

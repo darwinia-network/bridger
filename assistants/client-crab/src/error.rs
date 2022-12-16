@@ -9,7 +9,7 @@ pub type ClientResult<T> = Result<T, ClientError>;
 #[derive(ThisError, Debug)]
 pub enum ClientError {
     #[error(transparent)]
-    SubxtBasicError(subxt::BasicError),
+    SubxtBasicError(subxt::Error),
 
     #[error("Please reconnect to rpc server")]
     ClientRestartNeed,
@@ -38,21 +38,6 @@ pub enum ClientError {
     #[error("`hex2bytes` - FAILED: {0}")]
     Hex2Bytes(String),
 
-    #[error("Wrong mmr_root({0}) in Darwinia header({1})")]
-    WrongMmrRootInDarwiniaHeader(String, u32),
-
-    #[error("No mmr_root in Darwinia header({0})")]
-    NoMmrRootInDarwiniaHeader(u32),
-
-    #[error("Failed to fetch Darwinia header({0})")]
-    FailedToFetchDarwiniaHeader(u32),
-
-    #[error("No storage data found by {0} {1}")]
-    NoStorageDataFound(String, String),
-
-    #[error("Not technical committee member")]
-    NotTechnicalCommitteeMember,
-
     #[error(transparent)]
     Tk(#[from] TkError),
 }
@@ -64,18 +49,18 @@ impl ClientError {
     }
 }
 
-impl From<subxt::BasicError> for ClientError {
-    fn from(error: subxt::BasicError) -> Self {
-        if let subxt::BasicError::Rpc(_) = &error {
+impl From<subxt::Error> for ClientError {
+    fn from(error: subxt::Error) -> Self {
+        if let subxt::Error::Rpc(_) = &error {
             return Self::ClientRestartNeed;
         }
         Self::SubxtBasicError(error)
     }
 }
 
-impl From<subxt::rpc::RpcError> for ClientError {
-    fn from(error: subxt::rpc::RpcError) -> Self {
-        Self::SubxtBasicError(subxt::BasicError::Rpc(error))
+impl From<subxt::error::RpcError> for ClientError {
+    fn from(error: subxt::error::RpcError) -> Self {
+        Self::SubxtBasicError(subxt::error::Error::Rpc(error))
     }
 }
 

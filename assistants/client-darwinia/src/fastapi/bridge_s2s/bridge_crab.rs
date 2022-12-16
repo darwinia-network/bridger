@@ -66,7 +66,7 @@ impl S2SClientRelay for DarwiniaClient {
                 .await?
                 .ok_or_else(|| {
                     ClientError::Custom(format!(
-                        "Can not read message data by nonce {} in crab",
+                        "Can not read message data by nonce {} in darwinia",
                         message_nonce
                     ))
                 })?;

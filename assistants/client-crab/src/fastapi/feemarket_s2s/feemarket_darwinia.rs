@@ -9,7 +9,7 @@ use crate::client::CrabClient;
 impl FeemarketApiRelay for CrabClient {
     async fn order(
         &self,
-        laned_id: feemarket_s2s_traits::types::LaneId,
+        lane_id: feemarket_s2s_traits::types::LaneId,
         message_nonce: feemarket_s2s_traits::types::MessageNonce,
     ) -> AbstractFeemarketResult<
         Option<
@@ -20,13 +20,11 @@ impl FeemarketApiRelay for CrabClient {
             >,
         >,
     > {
-        match self
-            .runtime()
-            .storage()
+        let address = crate::subxt_runtime::api::storage()
             .darwinia_fee_market()
-            .orders(laned_id, message_nonce, None)
-            .await?
-        {
+            .orders(lane_id, message_nonce);
+
+        match self.subxt().storage().fetch(&address, None).await? {
             Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
             None => Ok(None),
         }

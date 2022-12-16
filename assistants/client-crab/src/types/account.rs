@@ -1,22 +1,20 @@
-use subxt::{sp_core::sr25519::Pair, PairSigner};
+use sp_core::ecdsa::Pair;
+use subxt::tx::PairSigner;
 
 use crate::config::CrabSubxtConfig;
-use crate::types::NodeRuntimeSignedExtra;
 
 pub use self::darwinia::*;
 
 /// AccountId
 pub type AccountId = <CrabSubxtConfig as subxt::Config>::AccountId;
 /// Signer
-pub type Signer = PairSigner<CrabSubxtConfig, NodeRuntimeSignedExtra, Pair>;
+pub type Signer = PairSigner<CrabSubxtConfig, Pair>;
 
 mod darwinia {
     use std::fmt::{Debug, Formatter};
 
-    use subxt::{
-        sp_core::{sr25519::Pair, Pair as PairTrait},
-        PairSigner,
-    };
+    use sp_core::{ecdsa::Pair, Pair as TraitPair};
+    use subxt::tx::PairSigner;
 
     use crate::error::{ClientError, ClientResult};
 
@@ -50,13 +48,11 @@ mod darwinia {
             let pair = Pair::from_string(&seed, None)
                 .map_err(|e| ClientError::Seed(format!("{:?}", e)))?; // if not a valid seed
             let signer = PairSigner::new(pair);
-            let public = signer.signer().public().0;
-            let account_id = AccountId::from(public);
+            let account_id = AccountId::from(array_bytes::hex2array_unchecked(seed.as_ref()));
 
             // real account, convert to account id
             let real =
                 real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real.as_ref())));
-
             Ok(Self {
                 account_id,
                 signer,

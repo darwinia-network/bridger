@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
-use subxt::sp_runtime;
+// use subxt::sp_runtime;
+
+use subxt::tx::SubstrateExtrinsicParams;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientConfig {
@@ -24,5 +26,5 @@ impl subxt::Config for CrabSubxtConfig {
     type Address = bp_darwinia_core::Address;
     type Header = bp_darwinia_core::Header;
     type Signature = bp_darwinia_core::Signature;
-    type Extrinsic = sp_runtime::OpaqueExtrinsic;
+    type ExtrinsicParams = SubstrateExtrinsicParams<Self>;
 }

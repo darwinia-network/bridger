@@ -556,7 +556,6 @@ dependencies = [
  "bp-runtime",
  "bridge-runtime-common",
  "client-common-traits",
- "jsonrpsee-core",
  "parity-scale-codec",
  "scale-info",
  "serde 1.0.150",

@@ -1,10 +1,7 @@
 use serde::{Deserialize, Serialize};
 // use subxt::sp_runtime;
 
-use subxt::{
-    config::{Config, SubstrateConfig},
-    tx::SubstrateExtrinsicParams,
-};
+use subxt::tx::SubstrateExtrinsicParams;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientConfig {

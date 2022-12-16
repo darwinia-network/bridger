@@ -9,7 +9,7 @@ pub type ClientResult<T> = Result<T, ClientError>;
 #[derive(ThisError, Debug)]
 pub enum ClientError {
     #[error(transparent)]
-    SubxtBasicError(subxt::error::Error),
+    SubxtBasicError(subxt::Error),
 
     #[error("Please reconnect to rpc server")]
     ClientRestartNeed,
@@ -64,9 +64,9 @@ impl ClientError {
     }
 }
 
-impl From<subxt::error::Error> for ClientError {
-    fn from(error: subxt::error::Error) -> Self {
-        if let subxt::error::Error::Rpc(_) = &error {
+impl From<subxt::Error> for ClientError {
+    fn from(error: subxt::Error) -> Self {
+        if let subxt::Error::Rpc(_) = &error {
             return Self::ClientRestartNeed;
         }
         Self::SubxtBasicError(error)

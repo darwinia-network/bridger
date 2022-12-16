@@ -1,8 +1,9 @@
+use bridge_e2e_traits::{client::EcdsaClient, error::E2EClientResult};
+
 use crate::client::DarwiniaClient;
 use crate::config::DarwiniaSubxtConfig;
 use crate::error::ClientError;
 use crate::types::runtime_types;
-use bridge_e2e_traits::{client::EcdsaClient, error::E2EClientResult};
 
 #[async_trait::async_trait]
 impl EcdsaClient for DarwiniaClient {

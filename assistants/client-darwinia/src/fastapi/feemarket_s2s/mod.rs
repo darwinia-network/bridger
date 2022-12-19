@@ -1,3 +1,3 @@
-#[cfg(feature = "feemarket-s2s-crab")]
-mod feemarket_crab;
+#[cfg(feature = "feemarket-darwinia-crab")]
+mod feemarket_darwinia_crab;
 mod generic;

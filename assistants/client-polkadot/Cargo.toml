@@ -53,4 +53,4 @@ bridge-s2s         = [
   "client-common-traits",
   "bridge-s2s-traits",
 ]
-bridge-s2s-crab = ["bridge-s2s", "bridge-s2s-traits/bridge-parachain"]
+bridge-darwinia-crab = ["bridge-s2s", "bridge-s2s-traits/bridge-parachain"]

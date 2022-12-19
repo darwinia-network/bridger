@@ -65,13 +65,13 @@ bridge-s2s         = [
   "client-common-traits",
   "bridge-s2s-traits",
 ]
-bridge-s2s-crab = ["bridge-s2s", "bridge-s2s-traits/bridge-parachain"]
+bridge-darwinia-crab = ["bridge-s2s", "bridge-s2s-traits/bridge-parachain"]
 feemarket-s2s   = [
   "async-trait",
   "client-common-traits",
   "feemarket-s2s-traits",
 ]
-feemarket-s2s-crab = ["feemarket-s2s"]
+feemarket-darwinia-crab = ["feemarket-s2s"]
 bridge-e2e = ["async-trait", "bridge-e2e-traits"]
 
 [dev-dependencies]

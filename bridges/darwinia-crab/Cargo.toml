@@ -38,3 +38,5 @@ client-common-traits = { path = "../../frame/traits/client-common" }
 
 client-darwinia = { path = "../../assistants/client-darwinia", features = [ "bridge-s2s-crab", "feemarket-s2s-crab" ]}
 client-crab     = { path = "../../assistants/client-crab", features = [ "bridge-s2s-darwinia", "feemarket-s2s-darwinia" ]}
+client-polkadot = { path = "../../assistants/client-polkadot", features = [ "bridge-s2s-crab" ] }
+client-kusama   = { path = "../../assistants/client-kusama", features = [ "bridge-s2s-darwinia" ] }

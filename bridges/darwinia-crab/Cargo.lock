@@ -501,6 +501,8 @@ dependencies = [
  "client-common-traits",
  "client-crab",
  "client-darwinia",
+ "client-kusama",
+ "client-polkadot",
  "color-eyre 0.6.2",
  "feemarket-s2s-traits",
  "serde 1.0.150",
@@ -689,6 +691,48 @@ dependencies = [
  "parity-scale-codec",
  "serde 1.0.150",
  "serde_json",
+ "sp-core",
+ "sp-finality-grandpa",
+ "sp-runtime",
+ "subxt",
+ "support-toolkit",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "client-kusama"
+version = "0.7.3"
+dependencies = [
+ "array-bytes 2.0.2",
+ "async-trait",
+ "bp-polkadot-core",
+ "bridge-s2s-traits",
+ "client-common-traits",
+ "finality-grandpa",
+ "parity-scale-codec",
+ "serde 1.0.150",
+ "sp-core",
+ "sp-finality-grandpa",
+ "sp-runtime",
+ "subxt",
+ "support-toolkit",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "client-polkadot"
+version = "0.7.3"
+dependencies = [
+ "array-bytes 2.0.2",
+ "async-trait",
+ "bp-polkadot-core",
+ "bridge-s2s-traits",
+ "client-common-traits",
+ "finality-grandpa",
+ "parity-scale-codec",
+ "serde 1.0.150",
  "sp-core",
  "sp-finality-grandpa",
  "sp-runtime",

@@ -1,18 +1,15 @@
 use std::fmt::{Debug, Formatter};
 
-use subxt::{
-    sp_core::{sr25519::Pair, Pair as PairTrait},
-    PairSigner,
-};
+use sp_core::{sr25519::Pair, Pair as PairTrait};
+use subxt::tx::PairSigner;
 
 use crate::config::KusamaSubxtConfig;
 use crate::error::{ClientError, ClientResult};
-use crate::types::NodeRuntimeSignedExtra;
 
 /// AccountId
 pub type AccountId = <KusamaSubxtConfig as subxt::Config>::AccountId;
 /// Signer
-pub type Signer = PairSigner<KusamaSubxtConfig, NodeRuntimeSignedExtra, Pair>;
+pub type Signer = PairSigner<KusamaSubxtConfig, Pair>;
 
 /// Account
 #[derive(Clone)]

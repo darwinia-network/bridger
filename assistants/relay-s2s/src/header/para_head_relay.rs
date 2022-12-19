@@ -105,18 +105,13 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             (Some(head_at_source), Some(head_at_target))
                 if head_at_target.best_head_hash.at_relay_block_number
                     < best_finalized_source_block_at_target_number
-                    && head_at_target.best_head_hash.head_hash
-                        != sp_runtime::traits::BlakeTwo256::hash(head_at_source.0.as_slice()) =>
+                    && head_at_target.best_head_hash.head_hash != head_at_source.hash() =>
             {
-                para_head_hash = Some(sp_runtime::traits::BlakeTwo256::hash(
-                    head_at_source.0.as_slice(),
-                ));
+                para_head_hash = Some(head_at_source.hash());
                 true
             }
             (Some(head_at_source), None) => {
-                para_head_hash = Some(sp_runtime::traits::BlakeTwo256::hash(
-                    head_at_source.0.as_slice(),
-                ));
+                para_head_hash = Some(head_at_source.hash());
                 true
             }
             (None, Some(head_at_target)) => {

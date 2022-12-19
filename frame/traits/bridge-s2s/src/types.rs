@@ -34,4 +34,11 @@ mod bridge_parachain {
         pub at_relay_block_number: u32,
         pub head_hash: ParaHash,
     }
+
+    impl HeadData {
+        /// Returns the hash of this head data.
+        pub fn hash(&self) -> sp_core::H256 {
+            sp_runtime::traits::BlakeTwo256::hash(&self.0)
+        }
+    }
 }

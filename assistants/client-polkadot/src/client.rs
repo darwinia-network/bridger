@@ -1,21 +1,20 @@
-use subxt::Client;
+use subxt::OnlineClient;
 
 use crate::config::PolkadotSubxtConfig;
-use crate::subxt_runtime::api::RuntimeApi;
-use crate::types::{PolkadotAccount, NodeRuntimeSignedExtra};
+use crate::types::PolkadotAccount;
 
 /// Polkadot client
 #[derive(Clone)]
 pub struct PolkadotClient {
     /// Runtime api
-    client: Client<PolkadotSubxtConfig>,
+    client: OnlineClient<PolkadotSubxtConfig>,
     /// Darwinia Account
     account: PolkadotAccount,
 }
 
 impl PolkadotClient {
     /// Create a new Polkadot client
-    pub fn new(client: Client<PolkadotSubxtConfig>, account: PolkadotAccount) -> Self {
+    pub fn new(client: OnlineClient<PolkadotSubxtConfig>, account: PolkadotAccount) -> Self {
         Self { client, account }
     }
 }
@@ -30,12 +29,7 @@ impl PolkadotClient {
 /// patch rpc api
 impl PolkadotClient {
     /// Get original subxt client
-    pub fn subxt(&self) -> &Client<PolkadotSubxtConfig> {
+    pub fn subxt(&self) -> &OnlineClient<PolkadotSubxtConfig> {
         &self.client
-    }
-
-    /// Runtime api
-    pub fn runtime(&self) -> RuntimeApi<PolkadotSubxtConfig, NodeRuntimeSignedExtra> {
-        self.client.clone().to_runtime_api()
     }
 }

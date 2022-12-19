@@ -4,9 +4,8 @@ use lifeline::dyn_bus::DynBus;
 
 use support_lifeline::task::TaskStack;
 
-use crate::bridge::config::solo_with_para::BridgeConfig;
+use crate::bridge::config::para_with_para::BridgeConfig;
 use crate::bridge::BridgeBus;
-use crate::error::BinS2SResult;
 use crate::service::feemarket::FeemarketService;
 use crate::service::para_with_para::{
     SourceToTargetMessageRelayService, SourceToTargetParaHeadRelayService,
@@ -14,10 +13,7 @@ use crate::service::para_with_para::{
     TargetToSourceMessageRelayService, TargetToSourceParaHeadRelayService,
     TargetToSourceRelaychainGrandpaRelayService,
 };
-use crate::traits::{
-    S2SParaBridgeRelayChainInfo, S2SParaBridgeSoloChainInfo, S2SSoloBridgeSoloChainInfo,
-    SubqueryInfo,
-};
+use crate::traits::{S2SParaBridgeRelayChainInfo, S2SParaBridgeSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
 pub struct BridgeTask<

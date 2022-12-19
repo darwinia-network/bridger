@@ -133,8 +133,8 @@ impl<
         bridge_config: BridgeConfig<SRCI, SPCI, TRCI, TPCI, SI>,
     ) -> BinS2SResult<
         MessageReceivingInput<
-            <SCI as S2SParaBridgeSoloChainInfo>::Client,
-            <PCI as S2SParaBridgeSoloChainInfo>::Client,
+            <TPCI as S2SParaBridgeSoloChainInfo>::Client,
+            <SPCI as S2SParaBridgeSoloChainInfo>::Client,
         >,
     > {
         let relay_config = bridge_config.relay;
@@ -193,9 +193,9 @@ impl<
             bridge_config.chain.target_para.chain().name(),
             bridge_config.chain.source_para.chain().name(),
         );
-        let config_relay = bridge_config.relay.clone();
+        let config_para = bridge_config.para_config.clone();
         let input = Self::message_input(bridge_config).await?;
-        let runner = BridgeParachainReceivingRunner::new(input, config_relay.para_id);
+        let runner = BridgeParachainReceivingRunner::new(input, config_para.target_para_id);
         Ok(runner.start().await?)
     }
 }

@@ -6,7 +6,6 @@ use support_lifeline::task::TaskStack;
 
 use crate::bridge::config::solo_with_para::BridgeConfig;
 use crate::bridge::BridgeBus;
-use crate::error::BinS2SResult;
 use crate::service::feemarket::FeemarketService;
 use crate::service::solo_with_para::{
     ParaHeadToSolochainRelayService, ParachainToSolochainMessageRelayService,

@@ -10,10 +10,7 @@ use support_lifeline::service::BridgeService;
 use crate::bridge::config::para_with_para::BridgeConfig;
 use crate::bridge::BridgeBus;
 use crate::error::BinS2SResult;
-use crate::traits::{
-    S2SParaBridgeRelayChainInfo, S2SParaBridgeSoloChainInfo, S2SSoloBridgeSoloChainInfo,
-    SubqueryInfo,
-};
+use crate::traits::{S2SParaBridgeRelayChainInfo, S2SParaBridgeSoloChainInfo, SubqueryInfo};
 
 #[derive(Debug)]
 pub struct SubscribeService<

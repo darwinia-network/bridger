@@ -24,6 +24,29 @@ pub struct BridgeConfig<
     pub index: IndexConfig<SI>,
 }
 
+impl<
+        SRCI: S2SParaBridgeRelayChainInfo,
+        SPCI: S2SParaBridgeSoloChainInfo,
+        TRCI: S2SParaBridgeRelayChainInfo,
+        TPCI: S2SParaBridgeSoloChainInfo,
+        SI: SubqueryInfo,
+    > Storage for BridgeConfig<SRCI, SPCI, TRCI, TPCI, SI>
+{
+    fn take_or_clone(res: &mut Option<Self>) -> Option<Self> {
+        res.clone()
+    }
+}
+
+impl<
+        SRCI: S2SParaBridgeRelayChainInfo,
+        SPCI: S2SParaBridgeSoloChainInfo,
+        TRCI: S2SParaBridgeRelayChainInfo,
+        TPCI: S2SParaBridgeSoloChainInfo,
+        SI: SubqueryInfo,
+    > lifeline::Resource<BridgeBus> for BridgeConfig<SRCI, SPCI, TRCI, TPCI, SI>
+{
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChainConfig<
     SRCI: S2SParaBridgeRelayChainInfo,

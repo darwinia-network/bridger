@@ -173,7 +173,7 @@ pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
 #[async_trait::async_trait]
 pub trait S2SParaBridgeClientRelaychain: S2SClientGeneric {
     /// generate parachain head storage key
-    fn gen_parachain_head_storage_key(&self, para_id: u32) -> sp_core::storage::StorageKey;
+    fn gen_parachain_head_storage_key(&self, para_id: u32) -> Vec<u8>;
 
     /// query head data
     async fn para_head_data(

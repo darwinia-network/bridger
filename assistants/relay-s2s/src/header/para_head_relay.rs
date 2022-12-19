@@ -2,6 +2,7 @@ use bridge_s2s_traits::client::{S2SParaBridgeClientRelaychain, S2SParaBridgeClie
 use bridge_s2s_traits::types::ParaId;
 use sp_runtime::traits::Hash;
 use sp_runtime::traits::Header;
+
 use support_toolkit::{convert::SmartCodecMapper, logk};
 
 use crate::error::{RelayError, RelayResult};
@@ -49,12 +50,30 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             "{} the last para-head on {}: {}",
             logk::prefix_with_bridge(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
             SC::CHAIN,
-            para_head_at_target.clone().map(|v| v.at_relay_block_number.to_string()).unwrap_or("None".to_string()),
+            if let Some(phat) = &para_head_at_target {
+                format!("{}@{}", phat.best_head_hash.at_relay_block_number, phat.best_head_hash.head_hash)
+            } else {
+                "".to_string()
+            }
         );
 
-        let best_finalized_source_block_hash = client_solochain
+        let best_finalized_source_block_hash = match client_solochain
             .best_target_finalized(Some(best_target_header.hash()))
-            .await?;
+            .await?
+        {
+            Some(v) => v,
+            None => {
+                tracing::warn!(
+                    target: "relay-s2s",
+                    "{} no best target finalized block queried from {} at block {}@{}",
+                    logk::prefix_with_bridge(M_PARA_HEAD, SC::CHAIN, TC::CHAIN),
+                    TC::CHAIN,
+                    best_target_header.number(),
+                    best_target_header.hash(),
+                );
+                return Ok(());
+            }
+        };
 
         let expected_source_block_hash =
             SmartCodecMapper::map_to(&best_finalized_source_block_hash)?;
@@ -81,17 +100,29 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             best_finalized_source_block_at_target_number,
         );
 
+        let mut para_head_hash = None;
         let need_relay = match (para_head_at_source, para_head_at_target) {
             (Some(head_at_source), Some(head_at_target))
-                if head_at_target.at_relay_block_number
+                if head_at_target.best_head_hash.at_relay_block_number
                     < best_finalized_source_block_at_target_number
-                    && head_at_target.head_hash
+                    && head_at_target.best_head_hash.head_hash
                         != sp_runtime::traits::BlakeTwo256::hash(head_at_source.0.as_slice()) =>
             {
+                para_head_hash = Some(sp_runtime::traits::BlakeTwo256::hash(
+                    head_at_source.0.as_slice(),
+                ));
                 true
             }
-            (Some(_), None) => true,
-            (None, Some(_)) => true,
+            (Some(head_at_source), None) => {
+                para_head_hash = Some(sp_runtime::traits::BlakeTwo256::hash(
+                    head_at_source.0.as_slice(),
+                ));
+                true
+            }
+            (None, Some(head_at_target)) => {
+                para_head_hash = Some(head_at_target.best_head_hash.head_hash);
+                true
+            }
             (None, None) => {
                 tracing::info!(
                     target: "relay-s2s",
@@ -130,7 +161,10 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
         let hash = client_solochain
             .submit_parachain_heads(
                 best_finalized_source_block_hash,
-                vec![ParaId(self.input.para_id)],
+                vec![(
+                    ParaId(self.input.para_id),
+                    SmartCodecMapper::map_to(&para_head_hash.expect("Unreachable"))?,
+                )],
                 heads_proofs,
             )
             .await?;

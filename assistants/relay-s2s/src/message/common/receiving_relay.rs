@@ -47,6 +47,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
             .client_target
             .inbound_lanes(lane, Some(at_block))
             .await?;
+        let last_delivered_nonce = inbound_lane_data.last_delivered_nonce();
         let max_confirm_end_at_target = inbound_lane_data
             .relayers
             .iter()
@@ -104,6 +105,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                     .map(|entry| 1 + entry.messages.end - entry.messages.begin)
                     .unwrap_or(u64::MAX),
                 total_messages: total_unrewarded_messages.expect("Unreachable"),
+                last_delivered_nonce,
             },
         )))
     }

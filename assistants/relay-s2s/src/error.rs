@@ -7,6 +7,7 @@ pub type RelayResult<T> = Result<T, RelayError>;
 
 #[derive(ThisError, Debug)]
 pub enum RelayError {
+    Subxt(#[from] subxt::Error),
     #[error(transparent)]
     Subquery(#[from] SubqueryComponentError),
     #[error(transparent)]

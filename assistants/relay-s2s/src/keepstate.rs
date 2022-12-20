@@ -49,6 +49,5 @@ pub fn set_recently_justification(chain: &'static str, justification: sp_core::B
 pub(crate) fn get_recently_justification(chain: &'static str) -> Option<sp_core::Bytes> {
     let recently_justifications = RECENTLY_JUSTIFICATIONS.lock().unwrap();
     let justification_queue = recently_justifications.get(chain);
-    let justification = justification_queue.map(|v| v.back().cloned()).flatten();
-    justification
+    justification_queue.and_then(|v| v.back().cloned())
 }

@@ -135,7 +135,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         self.submit_finality(block_to_relay.block_hash, justification.justification)
             .await?;
 
-        return Ok(());
+        Ok(())
     }
 
     async fn try_to_relay_header_on_demand(&self, last_block_number: u32) -> RelayResult<()> {

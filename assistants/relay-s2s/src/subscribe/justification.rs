@@ -96,7 +96,7 @@ async fn safe_read_justification(
 ) -> RelayResult<Option<Result<sp_core::Bytes, RelayError>>> {
     let timeout = tokio::time::sleep(timeout);
     tokio::select! {
-        res = subscribe.next() => Ok(res.map(|v| v.map_err(|e| RelayError::Subxt(e)))),
+        res = subscribe.next() => Ok(res.map(|v| v.map_err(RelayError::Subxt))),
         _ = timeout => Err(RelayError::Custom("subscribe timeout".to_string()))
     }
 }

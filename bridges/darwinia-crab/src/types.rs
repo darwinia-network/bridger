@@ -85,7 +85,7 @@ impl S2SParaBridgeSoloChainInfo for DarwiniaChainConfig {
     ) -> BinS2SResult<<<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId> {
         let account = client_darwinia::types::DarwiniaAccount::new(self.signer.clone(), None)
             .map_err(|e| BinS2SError::Client(format!("{:?}", e)))?;
-        Ok(account.account_id().clone())
+        Ok(*account.account_id())
     }
 
     async fn client(&self) -> BinS2SResult<Self::Client> {
@@ -117,7 +117,7 @@ impl S2SParaBridgeSoloChainInfo for CrabChainConfig {
     ) -> BinS2SResult<<<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId> {
         let account = client_crab::types::DarwiniaAccount::new(self.signer.clone(), None)
             .map_err(|e| BinS2SError::Client(format!("{:?}", e)))?;
-        Ok(account.account_id().clone())
+        Ok(*account.account_id())
     }
 
     async fn client(&self) -> BinS2SResult<Self::Client> {

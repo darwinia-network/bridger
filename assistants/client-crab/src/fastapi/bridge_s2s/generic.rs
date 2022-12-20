@@ -32,7 +32,7 @@ impl CrabClient {
             at
         ];
         let hex: String = self.subxt().rpc().request("state_call", params).await?;
-        let raw_authorities_set = array_bytes::hex2bytes(hex.as_ref())?;
+        let raw_authorities_set = array_bytes::hex2bytes(hex)?;
         let authorities = codec::Decode::decode(&mut &raw_authorities_set[..]).map_err(|err| {
             ClientError::Custom(format!(
                 "[DecodeAuthorities] Can not decode authorities: {:?}",

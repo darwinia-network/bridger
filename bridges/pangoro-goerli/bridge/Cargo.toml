@@ -23,7 +23,7 @@ tokio       = { version = "1", features = ["full"] }
 serde       = { version = "1", features = ["derive"] }
 structopt   = "0.3"
 web3        = { version = "0.18", features = ["signing"] }
-array-bytes = "2"
+array-bytes = "6"
 
 support-common     = { path = "../../../frame/supports/support-common" }
 support-command-kv = { path = "../../../frame/supports/support-command-kv" }

@@ -103,15 +103,15 @@ dependencies = [
 
 [[package]]
 name = "array-bytes"
-version = "2.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7f7a24ce32a5b4b22ad44104f308c9266ed22f1ddb9d5e9c25d21e85af80302"
-
-[[package]]
-name = "array-bytes"
 version = "4.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f52f63c5c1316a16a4b35eaac8b76a98248961a533f061684cb2a7cb0eafb6c6"
+
+[[package]]
+name = "array-bytes"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22f72e9d6fac4bc80778ea470b20197b88d28c292bb7d60c3fb099280003cd19"
 
 [[package]]
 name = "array-init"
@@ -254,7 +254,7 @@ dependencies = [
 name = "bin-s2s"
 version = "0.7.3"
 dependencies = [
- "array-bytes 2.0.2",
+ "array-bytes 6.0.0",
  "async-trait",
  "bridge-s2s-traits",
  "client-common-traits",
@@ -551,7 +551,7 @@ dependencies = [
 name = "bridge-s2s-traits"
 version = "0.7.3"
 dependencies = [
- "array-bytes 2.0.2",
+ "array-bytes 6.0.0",
  "async-trait",
  "bp-header-chain",
  "bp-messages",
@@ -659,7 +659,7 @@ dependencies = [
 name = "client-crab"
 version = "0.7.3"
 dependencies = [
- "array-bytes 2.0.2",
+ "array-bytes 6.0.0",
  "async-trait",
  "bp-darwinia-core",
  "bridge-s2s-traits",
@@ -681,7 +681,7 @@ dependencies = [
 name = "client-darwinia"
 version = "0.7.3"
 dependencies = [
- "array-bytes 2.0.2",
+ "array-bytes 6.0.0",
  "async-trait",
  "bp-darwinia-core",
  "bridge-s2s-traits",
@@ -704,7 +704,7 @@ dependencies = [
 name = "client-kusama"
 version = "0.7.3"
 dependencies = [
- "array-bytes 2.0.2",
+ "array-bytes 6.0.0",
  "async-trait",
  "bp-polkadot-core",
  "bridge-s2s-traits",
@@ -725,7 +725,7 @@ dependencies = [
 name = "client-polkadot"
 version = "0.7.3"
 dependencies = [
- "array-bytes 2.0.2",
+ "array-bytes 6.0.0",
  "async-trait",
  "bp-polkadot-core",
  "bridge-s2s-traits",
@@ -3294,7 +3294,7 @@ checksum = "456c603be3e8d448b072f410900c09faf164fbce2d480456f50eea6e25f9c848"
 name = "relay-s2s"
 version = "0.7.3"
 dependencies = [
- "array-bytes 2.0.2",
+ "array-bytes 6.0.0",
  "async-trait",
  "bridge-s2s-traits",
  "once_cell",
@@ -4466,7 +4466,7 @@ dependencies = [
 name = "subquery"
 version = "0.7.3"
 dependencies = [
- "array-bytes 2.0.2",
+ "array-bytes 6.0.0",
  "async-trait",
  "gql_client",
  "hex",

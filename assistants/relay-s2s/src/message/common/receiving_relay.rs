@@ -41,7 +41,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
         at_block: <TC::Chain as Chain>::Hash,
         source_outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<(u64, UnrewardedRelayersState)>> {
-        let block_hex = array_bytes::bytes2hex("0x", at_block.as_ref());
+        let block_hex = array_bytes::bytes2hex("0x", at_block);
         let inbound_lane_data = self
             .input
             .client_target
@@ -227,7 +227,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                 TC::CHAIN,
                 vec![array_bytes::bytes2hex("0x", &lane),],
             ),
-            array_bytes::bytes2hex("0x", hash.as_ref()),
+            array_bytes::bytes2hex("0x", hash),
         );
         Ok(Some(max_confirmed_nonce_at_target))
     }

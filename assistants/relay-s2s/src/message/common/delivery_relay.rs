@@ -218,7 +218,7 @@ where
             .ok_or_else(|| {
                 RelayError::Custom(format!(
                     "Failed to query block by [{}] in {}",
-                    array_bytes::bytes2hex("0x", expected_source_hash.as_ref()),
+                    array_bytes::bytes2hex("0x", expected_source_hash),
                     SC::CHAIN,
                 ))
             })?;
@@ -324,7 +324,7 @@ where
                 vec![array_bytes::bytes2hex("0x", &lane),],
             ),
             nonces,
-            array_bytes::bytes2hex("0x", hash.as_ref()),
+            array_bytes::bytes2hex("0x", hash),
         );
         Ok(Some(*nonces.end()))
     }

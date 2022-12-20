@@ -33,7 +33,7 @@ bp-header-chain       = { git = "https://github.com/darwinia-network/darwinia-me
 
 client-common-traits = { path = "../client-common" }
 
-array-bytes = { optional = true, version = "2" }
+array-bytes = { optional = true, version = "6" }
 
 
 [features]

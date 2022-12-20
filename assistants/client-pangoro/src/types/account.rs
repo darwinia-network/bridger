@@ -46,7 +46,7 @@ impl DarwiniaAccount {
 
         // real account, convert to account id
         let real =
-            real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real.as_ref())));
+            real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real)));
 
         Ok(Self {
             account_id,

@@ -20,7 +20,7 @@ edition = "2021"
 [dependencies]
 tracing     = "0.1"
 thiserror   = "1.0"
-array-bytes = "2"
+array-bytes = "6"
 tokio       = { version = "1", features = ["time"] }
 futures     = "0.3"
 

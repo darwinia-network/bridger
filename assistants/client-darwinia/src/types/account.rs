@@ -48,11 +48,10 @@ mod darwinia {
             let pair = Pair::from_string(&seed, None)
                 .map_err(|e| ClientError::Seed(format!("{:?}", e)))?; // if not a valid seed
             let signer = PairSigner::new(pair);
-            let account_id = AccountId::from(array_bytes::hex2array_unchecked(seed.as_ref()));
+            let account_id = AccountId::from(array_bytes::hex2array_unchecked(seed));
 
             // real account, convert to account id
-            let real =
-                real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real.as_ref())));
+            let real = real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real)));
             Ok(Self {
                 account_id,
                 signer,

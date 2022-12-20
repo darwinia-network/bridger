@@ -18,7 +18,7 @@ tracing   = "0.1"
 
 serde       = { version = "1", features = ["derive"] }
 
-array-bytes      = "2"
+array-bytes      = "6"
 codec            = { package = "parity-scale-codec", version = "3" }
 subxt            = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.30" }
 bp-darwinia-core = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }

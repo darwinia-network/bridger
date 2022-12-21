@@ -24,19 +24,20 @@ mod darwinia {
     /// Account
     #[derive(Clone)]
     pub struct DarwiniaAccount {
-        /// Account Id
-        account_id: AccountId,
         /// signer of the account
         signer: Signer,
         /// proxy real
-        real: Option<AccountId>,
+        real: Option<Signer>,
     }
 
     impl Debug for DarwiniaAccount {
         fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-            f.write_str(&format!("account: {},", self.account_id))?;
+            f.write_str(&format!("account: {},", self.signer.account_id()))?;
             f.write_str(" signer: <..>,")?;
-            f.write_str(&format!(" real: {:?}", self.real))?;
+            f.write_str(&format!(
+                " real: {:?}",
+                self.real.clone().map(|v| v.account_id().clone())
+            ))?;
             Ok(())
         }
     }
@@ -48,14 +49,16 @@ mod darwinia {
             let pair = Pair::from_string(&seed, None)
                 .map_err(|e| ClientError::Seed(format!("{:?}", e)))?; // if not a valid seed
             let signer = PairSigner::new(pair);
-            let account_id = AccountId::from(array_bytes::hex2array_unchecked(seed));
 
-            // real account, convert to account id
-            let real = real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real)));
+            let mut real_signer = None;
+            if let Some(real_seed) = real {
+                let pair = Pair::from_string(&real_seed, None)
+                    .map_err(|e| ClientError::Seed(format!("{:?}", e)))?;
+                real_signer = Some(PairSigner::new(pair))
+            };
             Ok(Self {
-                account_id,
                 signer,
-                real,
+                real: real_signer,
             })
         }
     }
@@ -63,7 +66,7 @@ mod darwinia {
     impl DarwiniaAccount {
         /// get account id
         pub fn account_id(&self) -> &AccountId {
-            &self.account_id
+            &self.signer.account_id()
         }
 
         /// get signer
@@ -71,17 +74,12 @@ mod darwinia {
             &self.signer
         }
 
-        /// get real account
-        pub fn real(&self) -> &Option<AccountId> {
-            &self.real
-        }
-
         /// get raw real account
         pub fn real_account(&self) -> &AccountId {
-            if let Some(real_account_id) = &self.real {
-                real_account_id
+            if let Some(real_signer) = &self.real {
+                real_signer.account_id()
             } else {
-                &self.account_id
+                &self.signer.account_id()
             }
         }
     }

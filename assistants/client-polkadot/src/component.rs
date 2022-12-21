@@ -18,8 +18,7 @@ impl PolkadotClientComponent {
         let mut attempts = 1;
         let mut wait_secs = 1;
         let endpoint = support_toolkit::url::correct_endpoint(&config.endpoint)?;
-        let account =
-            PolkadotAccount::new(config.relayer_private_key, config.relayer_real_account)?;
+        let account = PolkadotAccount::new(config.relayer_private_key)?;
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
             return match OnlineClient::<PolkadotSubxtConfig>::from_url(&endpoint).await {

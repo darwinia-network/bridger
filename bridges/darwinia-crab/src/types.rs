@@ -146,7 +146,6 @@ impl S2SParaBridgeRelayChainInfo for PolkadotChainConfig {
         let config = client_polkadot::config::ClientConfig {
             endpoint: self.endpoint.clone(),
             relayer_private_key: "//Alice".to_string(),
-            relayer_real_account: None,
         };
         Ok(PolkadotClientComponent::component(config)
             .await
@@ -166,7 +165,6 @@ impl S2SParaBridgeRelayChainInfo for KusamaChainConfig {
         let config = client_kusama::config::ClientConfig {
             endpoint: self.endpoint.clone(),
             relayer_private_key: "//Alice".to_string(),
-            relayer_real_account: None,
         };
         Ok(KusamaClientComponent::component(config)
             .await

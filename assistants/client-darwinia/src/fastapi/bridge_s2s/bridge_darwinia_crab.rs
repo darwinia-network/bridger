@@ -102,6 +102,10 @@ impl S2SClientRelay for DarwiniaClient {
         let call = crate::subxt_runtime::api::tx()
             .bridge_kusama_grandpa()
             .initialize(initialization_data);
+
+        let tx = self.subxt().tx().call_data(&call).unwrap();
+        println!("{:?}", self.account().signer().account_id());
+        println!("{:?}", array_bytes::bytes2hex("0x", tx));
         let track = self
             .subxt()
             .tx()

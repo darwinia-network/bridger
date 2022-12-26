@@ -15,7 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! Simple ECDSA secp256k1 API.
+//! Simple ethereum secp256k1 API.
 
 use codec::{Decode, Encode, MaxEncodedLen};
 use scale_info::TypeInfo;
@@ -332,7 +332,7 @@ impl Signature {
     /// Recover the public key from this signature and a message.
     #[cfg(feature = "full_crypto")]
     pub fn recover<M: AsRef<[u8]>>(&self, message: M) -> Option<Public> {
-        self.recover_prehashed(&blake2_256(message.as_ref()))
+        self.recover_prehashed(&keccak_256(message.as_ref()))
     }
 
     /// Recover the public key from this signature and a pre-hashed message.
@@ -472,7 +472,7 @@ impl TraitPair for Pair {
 
     /// Sign a message.
     fn sign(&self, message: &[u8]) -> Signature {
-        self.sign_prehashed(&blake2_256(message))
+        self.sign_prehashed(&keccak_256(message))
     }
 
     /// Verify a signature on a message. Returns true if the signature is good.
@@ -546,7 +546,7 @@ impl Pair {
     /// Parses Signature using parse_overflowing_slice.
     #[deprecated(note = "please use `verify` instead")]
     pub fn verify_deprecated<M: AsRef<[u8]>>(sig: &Signature, message: M, pubkey: &Public) -> bool {
-        let message = libsecp256k1::Message::parse(&blake2_256(message.as_ref()));
+        let message = libsecp256k1::Message::parse(&keccak_256(message.as_ref()));
 
         let parse_signature_overflowing = |x: [u8; 65]| {
             let sig = libsecp256k1::Signature::parse_overflowing_slice(&x[..64]).ok()?;
@@ -648,7 +648,7 @@ mod test {
             ).unwrap(),
         );
         let message = b"";
-        let signature = array_bytes::hex2array_unchecked("3dde91174bd9359027be59a428b8146513df80a2a3c7eda2194f64de04a69ab97b753169e94db6ffd50921a2668a48b94ca11e3d32c1ff19cfe88890aa7e8f3c00");
+        let signature = array_bytes::hex2array_unchecked("4e1fd58a98bbce5fe948c4e5fec7662d253130a300156c037429dca66f9f6a0728e8b5e8bc55f4bcf445af4b75928a876d54949aaee93a62e3eb1cf12aefb60800");
         let signature = Signature::from_raw(signature);
         assert!(pair.sign(&message[..]) == signature);
         assert!(Pair::verify(&signature, &message[..], &public));
@@ -669,7 +669,7 @@ mod test {
             ).unwrap(),
         );
         let message = b"";
-        let signature = array_bytes::hex2array_unchecked("3dde91174bd9359027be59a428b8146513df80a2a3c7eda2194f64de04a69ab97b753169e94db6ffd50921a2668a48b94ca11e3d32c1ff19cfe88890aa7e8f3c00");
+        let signature = array_bytes::hex2array_unchecked("4e1fd58a98bbce5fe948c4e5fec7662d253130a300156c037429dca66f9f6a0728e8b5e8bc55f4bcf445af4b75928a876d54949aaee93a62e3eb1cf12aefb60800");
         let signature = Signature::from_raw(signature);
         assert!(pair.sign(&message[..]) == signature);
         assert!(Pair::verify(&signature, &message[..], &public));
@@ -843,7 +843,7 @@ mod test {
 
         // using pre-hashed `msg` works
         let msg = b"this should be hashed";
-        let sig1 = pair.sign_prehashed(&blake2_256(msg));
+        let sig1 = pair.sign_prehashed(&keccak_256(msg));
         let sig2 = pair.sign(msg);
         assert_eq!(sig1, sig2);
     }
@@ -853,12 +853,12 @@ mod test {
         let (pair, _, _) = Pair::generate_with_phrase(Some("password"));
 
         // `msg` and `sig` match
-        let msg = blake2_256(b"this should be hashed");
+        let msg = keccak_256(b"this should be hashed");
         let sig = pair.sign_prehashed(&msg);
         assert!(Pair::verify_prehashed(&sig, &msg, &pair.public()));
 
         // `msg` and `sig` don't match
-        let msg = blake2_256(b"this is a different message");
+        let msg = keccak_256(b"this is a different message");
         assert!(!Pair::verify_prehashed(&sig, &msg, &pair.public()));
     }
 
@@ -867,7 +867,7 @@ mod test {
         let (pair, _, _) = Pair::generate_with_phrase(Some("password"));
 
         // recovered key matches signing key
-        let msg = blake2_256(b"this should be hashed");
+        let msg = keccak_256(b"this should be hashed");
         let sig = pair.sign_prehashed(&msg);
         let key = sig.recover_prehashed(&msg).unwrap();
         assert_eq!(pair.public(), key);
@@ -876,7 +876,7 @@ mod test {
         assert!(Pair::verify_prehashed(&sig, &msg, &key));
 
         // recovered key and signing key don't match
-        let msg = blake2_256(b"this is a different message");
+        let msg = keccak_256(b"this is a different message");
         let key = sig.recover_prehashed(&msg).unwrap();
         assert_ne!(pair.public(), key);
     }

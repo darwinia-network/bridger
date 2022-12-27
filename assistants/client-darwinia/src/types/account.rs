@@ -1,5 +1,6 @@
-use sp_core::ecdsa::Pair;
 use subxt::tx::PairSigner;
+
+use patch_substrate::crypto::ethereum::Pair;
 
 use crate::config::DarwiniaSubxtConfig;
 
@@ -13,12 +14,13 @@ pub type Signer = PairSigner<DarwiniaSubxtConfig, Pair>;
 mod darwinia {
     use std::fmt::{Debug, Formatter};
 
-    use sp_core::{ecdsa::Pair, Pair as TraitPair};
+    use sp_core::Pair as TraitPair;
     use subxt::tx::PairSigner;
 
     use crate::error::{ClientError, ClientResult};
 
     use super::AccountId;
+    use super::Pair;
     use super::Signer;
 
     /// Account
@@ -36,7 +38,7 @@ mod darwinia {
             f.write_str(" signer: <..>,")?;
             f.write_str(&format!(
                 " real: {:?}",
-                self.real.clone().map(|v| v.account_id().clone())
+                self.real.clone().map(|v| *v.account_id())
             ))?;
             Ok(())
         }
@@ -66,7 +68,7 @@ mod darwinia {
     impl DarwiniaAccount {
         /// get account id
         pub fn account_id(&self) -> &AccountId {
-            &self.signer.account_id()
+            self.signer.account_id()
         }
 
         /// get signer
@@ -79,7 +81,7 @@ mod darwinia {
             if let Some(real_signer) = &self.real {
                 real_signer.account_id()
             } else {
-                &self.signer.account_id()
+                self.signer.account_id()
             }
         }
     }

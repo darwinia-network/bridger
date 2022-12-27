@@ -63,6 +63,8 @@ sp-runtime-interface = { version = "6.0.0", default-features = false, git = "htt
 
 sp-core = { version = "6.0.0", default_features = false, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
 
+account = { default-features = false, git = "https://github.com/darwinia-network/moonbeam", branch = "polkadot-v0.9.30" }
+
 [dev-dependencies]
 sp-serializer = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
 rand = "0.7.2"
@@ -80,6 +82,7 @@ sp-core-hashing-proc-macro = { version = "5.0.0", git = "https://github.com/pari
 [features]
 default = ["std"]
 std = [
+  "account/std",
   "parity-util-mem/std",
   "merlin?/std",
   "full_crypto",

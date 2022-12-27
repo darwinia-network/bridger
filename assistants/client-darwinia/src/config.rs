@@ -1,6 +1,5 @@
+use client_common_traits::subxt_darwinia_like::DarwiniaLikeExtrinsicParams;
 use serde::{Deserialize, Serialize};
-
-use subxt::tx::SubstrateExtrinsicParams;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientConfig {
@@ -25,7 +24,7 @@ impl subxt::Config for DarwiniaSubxtConfig {
     type Address = bp_darwinia_core::Address;
     type Header = bp_darwinia_core::Header;
     type Signature = bp_darwinia_core::Signature;
-    type ExtrinsicParams = SubstrateExtrinsicParams<Self>;
+    type ExtrinsicParams = DarwiniaLikeExtrinsicParams;
 
     // type Index = <SubstrateConfig as Config>::Index;
     // type BlockNumber = <SubstrateConfig as Config>::BlockNumber;

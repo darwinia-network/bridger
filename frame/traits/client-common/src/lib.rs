@@ -1,9 +1,5 @@
-use bp_runtime::Chain;
+pub use self::common::*;
+pub use self::subxt::*;
 
-pub trait ClientCommon: 'static + Send + Sync + Clone {
-    /// chain name
-    const CHAIN: &'static str;
-
-    /// chain types
-    type Chain: Chain;
-}
+mod common;
+mod subxt;

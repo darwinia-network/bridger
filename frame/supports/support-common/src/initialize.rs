@@ -33,8 +33,8 @@ fn init_log() -> color_eyre::Result<()> {
         "client-pangolin=trace",
         "client-pangoro=trace",
         "feemarket=trace",
-        "shadow=trace",
         "relay-s2s=info",
+        "bin-s2s=trace",
     ]
     .join(",");
 

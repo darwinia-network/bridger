@@ -56,7 +56,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             }
         );
 
-        let best_finalized_source_block_hash = match client_solochain
+        let best_finalized_source_block = match client_solochain
             .best_target_finalized(Some(best_target_header.hash()))
             .await?
         {
@@ -74,8 +74,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
             }
         };
 
-        let expected_source_block_hash =
-            SmartCodecMapper::map_to(&best_finalized_source_block_hash)?;
+        let expected_source_block_hash = SmartCodecMapper::map_to(&best_finalized_source_block.1)?;
         let best_finalized_source_block_at_target = client_relaychain
             .block(Some(expected_source_block_hash))
             .await?
@@ -154,7 +153,7 @@ impl<SC: S2SParaBridgeClientRelaychain, TC: S2SParaBridgeClientSolochain> ParaHe
 
         let hash = client_solochain
             .submit_parachain_heads(
-                best_finalized_source_block_hash,
+                best_finalized_source_block,
                 vec![(
                     ParaId(self.input.para_id),
                     SmartCodecMapper::map_to(&para_head_hash.expect("Unreachable"))?,

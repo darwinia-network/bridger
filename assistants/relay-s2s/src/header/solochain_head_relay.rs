@@ -35,8 +35,20 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         let client_source = &self.input.client_source;
         let client_target = &self.input.client_target;
 
-        let last_relayed_source_hash_in_target = client_target.best_target_finalized(None).await?;
-        let expected_source_hash = SmartCodecMapper::map_to(&last_relayed_source_hash_in_target)?;
+        let last_relayed_source_block_in_target =
+            match client_target.best_target_finalized(None).await? {
+                Some(v) => v,
+                None => {
+                    tracing::warn!(
+                        target: "relay-s2s",
+                        "{} the bridge not initialized.please init first.",
+                        logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
+                    );
+                    return Ok(());
+                }
+            };
+        let expected_source_hash =
+            SmartCodecMapper::map_to(&last_relayed_source_block_in_target.1)?;
         let last_relayed_source_block_in_target = client_source
             .block(Some(expected_source_hash))
             .await?

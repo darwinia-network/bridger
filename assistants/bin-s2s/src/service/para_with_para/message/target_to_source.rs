@@ -196,7 +196,7 @@ impl<
         );
         let config_para = bridge_config.para_config.clone();
         let input = Self::message_input(bridge_config).await?;
-        let runner = BridgeParachainReceivingRunner::new(input, config_para.target_para_id);
+        let runner = BridgeParachainReceivingRunner::new(input, config_para.source_para_id);
         Ok(runner.start().await?)
     }
 }

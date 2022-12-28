@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use feemarket_s2s::relay::basic::BasicRelayStrategy;
 use lifeline::dyn_bus::DynBus;
 use lifeline::{Lifeline, Service, Task};
-use relay_s2s::message::{BridgeParachainDeliveryRunner, BridgeSolochainReceivingRunner};
+use relay_s2s::message::{BridgeParachainDeliveryRunner, BridgeParachainReceivingRunner};
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
 
 use support_lifeline::service::BridgeService;
@@ -194,8 +194,9 @@ impl<
             bridge_config.chain.source_para.chain().name(),
             bridge_config.chain.target_para.chain().name(),
         );
+        let config_para = bridge_config.para_config.clone();
         let input = Self::message_input(bridge_config).await?;
-        let runner = BridgeSolochainReceivingRunner::new(input);
+        let runner = BridgeParachainReceivingRunner::new(input, config_para.source_para_id);
         Ok(runner.start().await?)
     }
 }

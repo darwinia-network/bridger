@@ -163,7 +163,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                 None => {
                     tracing::warn!(
                         target: "relay-s2s",
-                        "{} the bridge not initialized.please init first.",
+                        "{} the bridge not initialized, please init first.",
                         logk::prefix_with_bridge(
                             M_RECEIVING,
                             SC::CHAIN,

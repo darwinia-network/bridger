@@ -215,7 +215,7 @@ where
                 None => {
                     tracing::warn!(
                         target: "relay-s2s",
-                        "{} the bridge not initialized.please init first.",
+                        "{} the bridge not initialized, please init first.",
                         logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
                     );
                     return Ok(None);
@@ -240,7 +240,7 @@ where
         if relayed_block_number < last_relay.block_number {
             tracing::warn!(
                 target: "relay-s2s",
-                "{} the last nonce({}) at block {} is less then last relayed header {}, please wait header relay.",
+                "{} the last nonce({}) at block {} is large than last relayed header {}, please wait header relay.",
                 logk::prefix_with_bridge_and_others(
                     M_DELIVERY,
                     SC::CHAIN,

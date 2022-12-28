@@ -40,7 +40,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
                 None => {
                     tracing::warn!(
                         target: "relay-s2s",
-                        "{} the bridge not initialized.please init first.",
+                        "{} the bridge not initialized, please init first.",
                         logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
                     );
                     return Ok(());

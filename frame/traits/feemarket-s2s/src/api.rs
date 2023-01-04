@@ -18,7 +18,7 @@ pub trait FeemarketApiRelay: FeemarketApiBase {
     /// order
     async fn order(
         &self,
-        laned_id: LaneId,
+        lane_id: LaneId,
         message_nonce: MessageNonce,
     ) -> AbstractFeemarketResult<
         Option<

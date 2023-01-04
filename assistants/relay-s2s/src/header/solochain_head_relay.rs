@@ -35,15 +35,27 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         let client_source = &self.input.client_source;
         let client_target = &self.input.client_target;
 
-        let last_relayed_source_hash_in_target = client_target.best_target_finalized(None).await?;
-        let expected_source_hash = SmartCodecMapper::map_to(&last_relayed_source_hash_in_target)?;
+        let last_relayed_source_block_in_target =
+            match client_target.best_target_finalized(None).await? {
+                Some(v) => v,
+                None => {
+                    tracing::warn!(
+                        target: "relay-s2s",
+                        "{} the bridge not initialized, please init first.",
+                        logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
+                    );
+                    return Ok(());
+                }
+            };
+        let expected_source_hash =
+            SmartCodecMapper::map_to(&last_relayed_source_block_in_target.1)?;
         let last_relayed_source_block_in_target = client_source
             .block(Some(expected_source_hash))
             .await?
             .ok_or_else(|| {
                 RelayError::Custom(format!(
                     "Failed to query block by [{}] in {}",
-                    array_bytes::bytes2hex("0x", expected_source_hash.as_ref()),
+                    array_bytes::bytes2hex("0x", expected_source_hash),
                     SC::CHAIN,
                 ))
             })?;
@@ -110,7 +122,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
             target: "relay-s2s",
             "{} header relayed: {:?}",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", hash.as_ref()),
+            array_bytes::bytes2hex("0x", hash),
         );
         Ok(())
     }
@@ -135,7 +147,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         self.submit_finality(block_to_relay.block_hash, justification.justification)
             .await?;
 
-        return Ok(());
+        Ok(())
     }
 
     async fn try_to_relay_header_on_demand(&self, last_block_number: u32) -> RelayResult<()> {
@@ -194,10 +206,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
                     SmartCodecMapper::map_to(&grandpa_justification.commit.target_number)?;
                 if target_number > last_block_number {
                     self.submit_finality(
-                        array_bytes::bytes2hex(
-                            "",
-                            grandpa_justification.commit.target_hash.as_ref(),
-                        ),
+                        array_bytes::bytes2hex("", grandpa_justification.commit.target_hash),
                         justification.to_vec(),
                     )
                     .await?;

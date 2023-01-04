@@ -157,7 +157,7 @@ impl<
             config_chain.para.chain().name(),
             config_chain.solo.chain().name(),
         );
-        let config_relay = bridge_config.relay.clone();
+        let config_para = bridge_config.para_config.clone();
         let input = Self::message_input(bridge_config).await?;
         let relay_strategy =
             BasicRelayStrategy::new(input.client_source.clone(), config_chain.para.account()?);
@@ -172,7 +172,7 @@ impl<
             relay_block_origin: config_chain.solo.origin_type(),
             relay_strategy,
         };
-        let runner = BridgeParachainDeliveryRunner::new(input, config_relay.para_id);
+        let runner = BridgeParachainDeliveryRunner::new(input, config_para.para_id);
         Ok(runner.start().await?)
     }
 

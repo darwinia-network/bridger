@@ -1,44 +1,45 @@
-use subxt::{sp_core::sr25519::Pair, PairSigner};
+use subxt::tx::PairSigner;
+
+use patch_substrate::crypto::ethereum::Pair;
 
 use crate::config::DarwiniaSubxtConfig;
-use crate::types::NodeRuntimeSignedExtra;
 
 pub use self::darwinia::*;
 
 /// AccountId
 pub type AccountId = <DarwiniaSubxtConfig as subxt::Config>::AccountId;
 /// Signer
-pub type Signer = PairSigner<DarwiniaSubxtConfig, NodeRuntimeSignedExtra, Pair>;
+pub type Signer = PairSigner<DarwiniaSubxtConfig, Pair>;
 
 mod darwinia {
     use std::fmt::{Debug, Formatter};
 
-    use subxt::{
-        sp_core::{sr25519::Pair, Pair as PairTrait},
-        PairSigner,
-    };
+    use sp_core::Pair as TraitPair;
+    use subxt::tx::PairSigner;
 
     use crate::error::{ClientError, ClientResult};
 
     use super::AccountId;
+    use super::Pair;
     use super::Signer;
 
     /// Account
     #[derive(Clone)]
     pub struct DarwiniaAccount {
-        /// Account Id
-        account_id: AccountId,
         /// signer of the account
         signer: Signer,
         /// proxy real
-        real: Option<AccountId>,
+        real: Option<Signer>,
     }
 
     impl Debug for DarwiniaAccount {
         fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-            f.write_str(&format!("account: {},", self.account_id))?;
+            f.write_str(&format!("account: {},", self.signer.account_id()))?;
             f.write_str(" signer: <..>,")?;
-            f.write_str(&format!(" real: {:?}", self.real))?;
+            f.write_str(&format!(
+                " real: {:?}",
+                self.real.clone().map(|v| *v.account_id())
+            ))?;
             Ok(())
         }
     }
@@ -50,17 +51,16 @@ mod darwinia {
             let pair = Pair::from_string(&seed, None)
                 .map_err(|e| ClientError::Seed(format!("{:?}", e)))?; // if not a valid seed
             let signer = PairSigner::new(pair);
-            let public = signer.signer().public().0;
-            let account_id = AccountId::from(public);
 
-            // real account, convert to account id
-            let real =
-                real.map(|real| AccountId::from(array_bytes::hex2array_unchecked(real.as_ref())));
-
+            let mut real_signer = None;
+            if let Some(real_seed) = real {
+                let pair = Pair::from_string(&real_seed, None)
+                    .map_err(|e| ClientError::Seed(format!("{:?}", e)))?;
+                real_signer = Some(PairSigner::new(pair))
+            };
             Ok(Self {
-                account_id,
                 signer,
-                real,
+                real: real_signer,
             })
         }
     }
@@ -68,7 +68,7 @@ mod darwinia {
     impl DarwiniaAccount {
         /// get account id
         pub fn account_id(&self) -> &AccountId {
-            &self.account_id
+            self.signer.account_id()
         }
 
         /// get signer
@@ -76,17 +76,12 @@ mod darwinia {
             &self.signer
         }
 
-        /// get real account
-        pub fn real(&self) -> &Option<AccountId> {
-            &self.real
-        }
-
         /// get raw real account
         pub fn real_account(&self) -> &AccountId {
-            if let Some(real_account_id) = &self.real {
-                real_account_id
+            if let Some(real_signer) = &self.real {
+                real_signer.account_id()
             } else {
-                &self.account_id
+                self.signer.account_id()
             }
         }
     }

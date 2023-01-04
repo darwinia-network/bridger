@@ -20,7 +20,7 @@ edition = "2021"
 [dependencies]
 tracing     = "0.1"
 thiserror   = "1.0"
-array-bytes = "2"
+array-bytes = "6"
 tokio       = { version = "1", features = ["time"] }
 futures     = "0.3"
 
@@ -29,8 +29,8 @@ rlp         = "0.5"
 secp256k1   = { version = "0.21" }
 web3        = { version = "0.18", features = ["signing"] }
 async-trait = "0.1"
-types       = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-tree_hash   = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+types       = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+tree_hash   = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
 
 bridge-e2e-traits     = { path = "../../frame/traits/bridge-e2e" }
 client-contracts      = { path = "../client-contracts" }
@@ -41,10 +41,10 @@ subquery              = { path = "../subquery", features = [ "bridge-ethv2" ] }
 thegraph              = { path = "../thegraph", features = [ "bridge-ethv2" ] }
 
 [patch.crates-io]
-eth2_hashing     = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_serde_utils = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_ssz         = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_ssz_derive  = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-eth2_ssz_types   = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-tree_hash        = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
-tree_hash_derive = { git = "https://github.com/sigp/lighthouse.git", branch = "stable" }
+eth2_hashing     = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_serde_utils = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_ssz         = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_ssz_derive  = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+eth2_ssz_types   = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+tree_hash        = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
+tree_hash_derive = { git = "https://github.com/sigp/lighthouse", branch = "stable" }

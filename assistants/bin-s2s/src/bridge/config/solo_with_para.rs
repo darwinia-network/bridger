@@ -1,14 +1,14 @@
 use lifeline::Storage;
 use serde::{Deserialize, Serialize};
 
-use crate::bridge::config::RelayConfig;
+use crate::bridge::config::{RelayConfig, SoloWithParaConfig};
 use crate::bridge::BridgeBus;
 use crate::traits::{
     S2SParaBridgeRelayChainInfo, S2SParaBridgeSoloChainInfo, S2SSoloBridgeSoloChainInfo,
     SubqueryInfo,
 };
 
-/// Solo with solo bridge config
+/// Solo with para bridge config
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BridgeConfig<
     SCI: S2SParaBridgeSoloChainInfo,
@@ -20,6 +20,8 @@ pub struct BridgeConfig<
     pub chain: ChainConfig<SCI, RCI, PCI>,
     /// Relay config
     pub relay: RelayConfig,
+    /// Para config
+    pub para_config: SoloWithParaConfig,
     /// Index config
     pub index: IndexConfig<SI>,
 }

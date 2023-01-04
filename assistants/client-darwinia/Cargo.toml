@@ -18,30 +18,28 @@ readme = 'README.md'
 edition = "2021"
 
 [dependencies]
-tracing = "0.1"
-thiserror = "1"
+thiserror  = "1"
+tracing    = "0.1"
+serde      = { version = "1", features = ["derive"] }
 
-serde       = { version = "1", features = ["derive"] }
-serde_json  = "1"
-
-array-bytes = "2"
-codec       = { package = "parity-scale-codec", version = "2" }
-subxt       = { git = "https://github.com/darwinia-network/subxt.git", branch = "darwinia-v0.12.5" }
-bp-darwinia = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
+array-bytes      = "6"
+codec            = { package = "parity-scale-codec", version = "3" }
+subxt            = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.30" }
+bp-darwinia-core = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
 
 ## maybe common
 async-trait           = { optional = true, version = "0.1" }
 
 ## substrate
-sp-finality-grandpa = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
-sp-runtime          = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
-sp-core             = { optional = true, git = "https://github.com/darwinia-network/substrate.git", branch = "darwinia-v0.12.5" }
+sp-core             = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+sp-runtime          = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+sp-finality-grandpa = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
 
 ## common traits
-client-common-traits  = { optional = true, path = "../../frame/traits/client-common" }
+client-common-traits  = { path = "../../frame/traits/client-common", features = ["subxt-darwinia"] }
 
 ## s2s client
-finality-grandpa      = { optional = true, version = "0.14" }
+finality-grandpa      = { optional = true, version = "0.16" }
 bridge-s2s-traits     = { optional = true, path = "../../frame/traits/bridge-s2s", features = ["advanced-types"] }
 
 ## e2e client
@@ -50,6 +48,8 @@ bridge-e2e-traits = { optional = true, path = "../../frame/traits/bridge-e2e" }
 ## feemarket s2s
 feemarket-s2s-traits = { optional = true, path = "../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
 
+patch-substrate      = { path = "../../frame/traits/patch-substrate" }
+
 support-toolkit  = { path = "../../frame/supports/support-toolkit", features = ["convert"] }
 
 [features]
@@ -57,24 +57,19 @@ default     = []
 substrate   = [
   "sp-finality-grandpa",
   "sp-runtime",
-  "sp-core",
 ]
 bridge-s2s         = [
   "substrate",
   "async-trait",
   "finality-grandpa",
-  "client-common-traits",
   "bridge-s2s-traits",
 ]
-bridge-s2s-crab = ["bridge-s2s"]
-bridge-s2s-darwinia-parachain = ["bridge-s2s", "bridge-s2s-traits/bridge-parachain"]
+bridge-darwinia-crab = ["bridge-s2s", "bridge-s2s-traits/bridge-parachain"]
 feemarket-s2s   = [
   "async-trait",
-  "client-common-traits",
   "feemarket-s2s-traits",
 ]
-feemarket-s2s-crab = ["feemarket-s2s"]
-feemarket-s2s-darwinia-parachain = ["feemarket-s2s"]
+feemarket-darwinia-crab = ["feemarket-s2s"]
 bridge-e2e = ["async-trait", "bridge-e2e-traits"]
 
 [dev-dependencies]

@@ -8,6 +8,8 @@ pub type RelayResult<T> = Result<T, RelayError>;
 #[derive(ThisError, Debug)]
 pub enum RelayError {
     #[error(transparent)]
+    Subxt(#[from] subxt::Error),
+    #[error(transparent)]
     Subquery(#[from] SubqueryComponentError),
     #[error(transparent)]
     Client(#[from] S2SClientError),

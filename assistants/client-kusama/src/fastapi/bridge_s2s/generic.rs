@@ -1,22 +1,23 @@
-use bridge_s2s_traits::client::{S2SClientBase, S2SClientGeneric};
 use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
-use bridge_s2s_traits::types::bp_header_chain;
-use bridge_s2s_traits::types::bp_runtime::Chain;
+use bridge_s2s_traits::{
+    client::{S2SClientBase, S2SClientGeneric},
+    types::bp_header_chain,
+    types::bp_runtime::Chain,
+};
 use finality_grandpa::voter_set::VoterSet;
 use sp_finality_grandpa::{AuthorityList, ConsensusLog, ScheduledChange};
 use sp_runtime::generic::{Block, SignedBlock};
 use sp_runtime::{ConsensusEngineId, DigestItem};
-use subxt::rpc::{ClientT, Subscription, SubscriptionClientT};
-use subxt::{sp_core, sp_runtime};
+use subxt::rpc::Subscription;
 
 use support_toolkit::convert::SmartCodecMapper;
 
 use crate::client::KusamaClient;
 use crate::error::{ClientError, ClientResult};
 
-type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
-
 const GRANDPA_ENGINE_ID: ConsensusEngineId = *b"FRNK";
+
+type SpHeader = sp_runtime::generic::Header<u32, sp_runtime::traits::BlakeTwo256>;
 
 impl KusamaClient {
     async fn grandpa_authorities(&self, at: sp_core::H256) -> ClientResult<AuthorityList> {
@@ -25,13 +26,8 @@ impl KusamaClient {
             sp_core::Bytes(Vec::new()),
             at
         ];
-        let hex: String = self
-            .subxt()
-            .rpc()
-            .client
-            .request("state_call", params)
-            .await?;
-        let raw_authorities_set = array_bytes::hex2bytes(hex.as_ref())?;
+        let hex: String = self.subxt().rpc().request("state_call", params).await?;
+        let raw_authorities_set = array_bytes::hex2bytes(hex)?;
         let authorities = codec::Decode::decode(&mut &raw_authorities_set[..]).map_err(|err| {
             ClientError::Custom(format!(
                 "[DecodeAuthorities] Can not decode authorities: {:?}",
@@ -88,10 +84,9 @@ impl S2SClientGeneric for KusamaClient {
         Ok(self
             .subxt()
             .rpc()
-            .client
             .subscribe(
                 "grandpa_subscribeJustifications",
-                None,
+                subxt::rpc::rpc_params![],
                 "grandpa_unsubscribeJustifications",
             )
             .await?)
@@ -112,15 +107,32 @@ impl S2SClientGeneric for KusamaClient {
         hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<Option<SignedBlock<Block<<Self::Chain as Chain>::Header, Self::Extrinsic>>>>
     {
-        Ok(self.subxt().rpc().block(hash).await?)
+        match self.subxt().rpc().block(hash).await? {
+            Some(v) => {
+                let mut extrinsics = vec![];
+                for be in v.block.extrinsics {
+                    extrinsics.push(sp_runtime::OpaqueExtrinsic::from_bytes(&be.0)?);
+                }
+                let block = SignedBlock {
+                    block: Block {
+                        header: SmartCodecMapper::map_to(&v.block.header)?,
+                        extrinsics,
+                    },
+                    justifications: v.justifications,
+                };
+                Ok(Some(block))
+            }
+            None => Ok(None),
+        }
     }
 
     async fn read_proof(
         &self,
-        storage_keys: Vec<sp_core::storage::StorageKey>,
+        storage_keys: Vec<Vec<u8>>,
         hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<Vec<Vec<u8>>> {
-        let read_proof = self.subxt().rpc().read_proof(storage_keys, hash).await?;
+        let skeys: Vec<&[u8]> = storage_keys.iter().map(|v| v.as_slice()).collect();
+        let read_proof = self.subxt().rpc().read_proof(skeys, hash).await?;
         let proof: Vec<Vec<u8>> = read_proof.proof.into_iter().map(|item| item.0).collect();
         Ok(proof)
     }
@@ -234,7 +246,7 @@ impl S2SClientGeneric for KusamaClient {
             } else {
                 initial_authorities_set_id
             },
-            is_halted: false,
+            operating_mode: Default::default(),
         };
         let bytes = codec::Encode::encode(&initialization_data);
         Ok(codec::Decode::decode(&mut &bytes[..]).map_err(|e| {

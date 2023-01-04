@@ -29,7 +29,7 @@ strum = { version = "0.24", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
-microkv = { git = "https://github.com/fewensa/microkv.git", branch = "master" }
+microkv = { git = "https://github.com/fewensa/microkv", branch = "master" }
 
 support-common     = { path = "../support-common" }
 support-terminal   = { path = "../support-terminal" }

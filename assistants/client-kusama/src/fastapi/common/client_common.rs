@@ -5,5 +5,5 @@ use crate::client::KusamaClient;
 impl ClientCommon for KusamaClient {
     const CHAIN: &'static str = "kusama";
 
-    type Chain = bp_kusama::Kusama;
+    type Chain = bp_polkadot_core::PolkadotLike;
 }

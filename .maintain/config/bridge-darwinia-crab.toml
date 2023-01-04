@@ -1,10 +1,12 @@
 [darwinia]
 endpoint = "wss://rpc.darwinia.network"
 signer   = "//Alice"
+para_id  = 2046
 
 [crab]
 endpoint = "wss://crab-rpc.darwinia.network"
 signer   = "//Alice"
+para_id  = 2105
 
 [relay]
 lanes            = ["00000000"]
@@ -13,3 +15,5 @@ enable_mandatory = false
 [index]
 darwinia = { endpoint = "https://subql.darwinia.network/subql-bridger-darwinia" }
 crab     = { endpoint = "https://subql.darwinia.network/subql-bridger-crab" }
+polkadot = { endpoint = "https://subql.darwinia.network/subql-bridger-polkadot" }
+kusama   = { endpoint = "https://subql.darwinia.network/subql-bridger-kusama" }

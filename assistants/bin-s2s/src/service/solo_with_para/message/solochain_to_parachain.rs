@@ -182,9 +182,9 @@ impl<
             bridge_config.chain.solo.chain().name(),
             bridge_config.chain.para.chain().name(),
         );
-        let config_relay = bridge_config.relay.clone();
+        let config_para = bridge_config.para_config.clone();
         let input = Self::message_input(bridge_config).await?;
-        let runner = BridgeParachainReceivingRunner::new(input, config_relay.para_id);
+        let runner = BridgeParachainReceivingRunner::new(input, config_para.para_id);
         Ok(runner.start().await?)
     }
 }

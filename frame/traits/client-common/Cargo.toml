@@ -13,7 +13,21 @@ repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.7.3"
 
 [dependencies]
-bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-bridges-substrate.git", branch = "darwinia-v0.12.5" }
+bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
+
+subxt            = { optional = true, git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.30" }
+bp-darwinia-core = { optional = true, git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
+sp-runtime       = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+codec            = { optional = true, package = "parity-scale-codec", version = "3" }
+
+
 
 [features]
+
+subxt-darwinia = [
+  "subxt",
+  "bp-darwinia-core",
+  "sp-runtime",
+  "codec",
+]
 

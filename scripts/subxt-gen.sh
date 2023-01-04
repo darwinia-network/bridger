@@ -42,7 +42,8 @@ if [ "${CHAIN}" == "pangoro" ]; then
 fi
 
 if [ "${CHAIN}" == "darwinia" ]; then
-  ENDPOINT='https://rpc.darwinia.network'
+  ENDPOINT='http://g2.dev.darwinia.network:1133'
+#  ENDPOINT='https://rpc.darwinia.network'
 #  ENDPOINT='http://127.0.0.1:9936'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-darwinia
 fi
@@ -69,7 +70,8 @@ fi
 #fi
 
 if [ "${CHAIN}" == "crab" ]; then
-  ENDPOINT='https://crab-rpc.darwinia.network'
+  ENDPOINT='http://g2.dev.darwinia.network:2233'
+#  ENDPOINT='https://crab-rpc.darwinia.network'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-crab
 fi
 
@@ -79,7 +81,8 @@ if [ "${CHAIN}" == "crab-parachain" ]; then
 fi
 
 if [ "${CHAIN}" == "kusama" ]; then
-  ENDPOINT='https://kusama-rpc.dwellir.com'
+  ENDPOINT='http://g2.dev.darwinia.network:5533'
+#  ENDPOINT='https://kusama-rpc.dwellir.com'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-kusama
 fi
 
@@ -89,7 +92,8 @@ if [ "${CHAIN}" == "moonbase" ]; then
 fi
 
 if [ "${CHAIN}" == "polkadot" ]; then
-  ENDPOINT='https://rpc.polkadot.io'
+  ENDPOINT='http://g2.dev.darwinia.network:3333'
+#  ENDPOINT='https://rpc.polkadot.io'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-polkadot
 fi
 

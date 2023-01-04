@@ -1,5 +1,5 @@
+use client_common_traits::subxt_darwinia_like::DarwiniaLikeExtrinsicParams;
 use serde::{Deserialize, Serialize};
-use subxt::sp_runtime;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientConfig {
@@ -16,13 +16,13 @@ pub struct ClientConfig {
 pub enum CrabSubxtConfig {}
 
 impl subxt::Config for CrabSubxtConfig {
-    type Index = bp_crab::Nonce;
-    type BlockNumber = bp_crab::BlockNumber;
-    type Hash = bp_crab::Hash;
-    type Hashing = bp_crab::Hashing;
-    type AccountId = bp_crab::AccountId;
-    type Address = bp_crab::Address;
-    type Header = bp_crab::Header;
-    type Signature = bp_crab::Signature;
-    type Extrinsic = sp_runtime::OpaqueExtrinsic;
+    type Index = bp_darwinia_core::Nonce;
+    type BlockNumber = bp_darwinia_core::BlockNumber;
+    type Hash = bp_darwinia_core::Hash;
+    type Hashing = bp_darwinia_core::Hashing;
+    type AccountId = bp_darwinia_core::AccountId;
+    type Address = bp_darwinia_core::Address;
+    type Header = bp_darwinia_core::Header;
+    type Signature = bp_darwinia_core::Signature;
+    type ExtrinsicParams = DarwiniaLikeExtrinsicParams;
 }

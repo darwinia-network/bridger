@@ -1,3 +1,3 @@
-#[cfg(feature = "bridge-s2s-crab")]
-mod bridge_crab;
+#[cfg(feature = "bridge-darwinia-crab")]
+mod bridge_darwinia_crab;
 mod generic;

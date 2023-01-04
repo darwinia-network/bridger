@@ -3,9 +3,9 @@ use std::ops::RangeInclusive;
 
 use client_common_traits::ClientCommon;
 use codec::{Codec, Decode, Encode, EncodeLike};
-use jsonrpsee_core::client::Subscription;
 use sp_runtime::generic::{Block, SignedBlock};
 use sp_runtime::traits::{Extrinsic, MaybeSerializeDeserialize};
+use subxt::rpc::Subscription;
 
 use crate::error::S2SClientResult;
 use crate::types::bp_runtime::Chain;
@@ -41,6 +41,7 @@ pub trait S2SClientGeneric: S2SClientBase {
     ) -> S2SClientResult<Option<<Self::Chain as Chain>::Header>>;
 
     /// query block by hash
+    // -> SignedBlock<Block<<Self::Chain as Chain>::Header, Self::Extrinsic>>
     async fn block(
         &self,
         hash: Option<<Self::Chain as Chain>::Hash>,
@@ -49,7 +50,7 @@ pub trait S2SClientGeneric: S2SClientBase {
     /// read proof
     async fn read_proof(
         &self,
-        storage_keys: Vec<sp_core::storage::StorageKey>,
+        storage_keys: Vec<Vec<u8>>,
         hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<Vec<Vec<u8>>>;
 
@@ -61,17 +62,13 @@ pub trait S2SClientGeneric: S2SClientBase {
 #[async_trait::async_trait]
 pub trait S2SClientRelay: S2SClientGeneric {
     /// generate outbound messages storage key
-    fn gen_outbound_messages_storage_key(
-        &self,
-        lane: [u8; 4],
-        message_nonce: u64,
-    ) -> sp_core::storage::StorageKey;
+    fn gen_outbound_messages_storage_key(&self, lane: [u8; 4], message_nonce: u64) -> Vec<u8>;
 
     /// generate outbound lanes storage key
-    fn gen_outbound_lanes_storage_key(&self, lane: [u8; 4]) -> sp_core::storage::StorageKey;
+    fn gen_outbound_lanes_storage_key(&self, lane: [u8; 4]) -> Vec<u8>;
 
     /// generate inbound lanes storage key
-    fn gen_inbound_lanes_storage_key(&self, lane: [u8; 4]) -> sp_core::storage::StorageKey;
+    fn gen_inbound_lanes_storage_key(&self, lane: [u8; 4]) -> Vec<u8>;
 
     /// calculate dispatchh width by message nonces
     async fn calculate_dispatch_weight(
@@ -84,7 +81,12 @@ pub trait S2SClientRelay: S2SClientGeneric {
     async fn best_target_finalized(
         &self,
         at_block: Option<<Self::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<<Self::Chain as Chain>::Hash>;
+    ) -> S2SClientResult<
+        Option<(
+            <Self::Chain as Chain>::BlockNumber,
+            <Self::Chain as Chain>::Hash,
+        )>,
+    >;
 
     /// initialize bridge
     async fn initialize(
@@ -113,7 +115,7 @@ pub trait S2SClientRelay: S2SClientGeneric {
         &self,
         lane: [u8; 4],
         hash: Option<<Self::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<bp_messages::InboundLaneData<sp_core::crypto::AccountId32>>;
+    ) -> S2SClientResult<bp_messages::InboundLaneData<<Self::Chain as Chain>::AccountId>>;
 
     /// query oubound message data
     async fn outbound_messages(
@@ -125,7 +127,7 @@ pub trait S2SClientRelay: S2SClientGeneric {
     /// send receive messages proof extrinsics
     async fn receive_messages_proof(
         &self,
-        relayer_id_at_bridged_chain: sp_core::crypto::AccountId32,
+        relayer_id_at_bridged_chain: <Self::Chain as Chain>::AccountId,
         proof: bridge_runtime_common::messages::target::FromBridgedChainMessagesProof<
             <Self::Chain as Chain>::Hash,
         >,
@@ -152,13 +154,16 @@ pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
         &self,
         para_id: crate::types::ParaId,
         hash: Option<<Self::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<Option<crate::types::BestParaHead>>;
+    ) -> S2SClientResult<Option<crate::types::ParaInfo>>;
 
     /// submit parachain heads
     async fn submit_parachain_heads(
         &self,
-        relay_block_hash: <Self::Chain as Chain>::Hash,
-        parachains: Vec<crate::types::ParaId>,
+        relay_block: (
+            <Self::Chain as Chain>::BlockNumber,
+            <Self::Chain as Chain>::Hash,
+        ),
+        parachains: Vec<(crate::types::ParaId, <Self::Chain as Chain>::Hash)>,
         parachain_heads_proof: Vec<Vec<u8>>,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash>;
 }
@@ -168,7 +173,7 @@ pub trait S2SParaBridgeClientSolochain: S2SClientRelay {
 #[async_trait::async_trait]
 pub trait S2SParaBridgeClientRelaychain: S2SClientGeneric {
     /// generate parachain head storage key
-    fn gen_parachain_head_storage_key(&self, para_id: u32) -> sp_core::storage::StorageKey;
+    fn gen_parachain_head_storage_key(&self, para_id: u32) -> Vec<u8>;
 
     /// query head data
     async fn para_head_data(

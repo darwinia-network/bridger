@@ -1,5 +1,3 @@
-#[cfg(feature = "feemarket-s2s-crab-parachain")]
-pub mod feemarket_crabparachain;
-#[cfg(feature = "feemarket-s2s-darwinia")]
-pub mod feemarket_darwinia;
+#[cfg(feature = "feemarket-darwinia-crab")]
+pub mod feemarket_darwinia_crab;
 pub mod generic;

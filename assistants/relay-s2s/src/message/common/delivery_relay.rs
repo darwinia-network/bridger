@@ -209,16 +209,27 @@ where
         };
 
         // query last relayed header
-        // let last_relayed_source_hash_in_target = client_target.best_target_finalized(None).await?;
-        let last_relayed_source_hash_in_target = self.different.best_target_finalized(None).await?;
-        let expected_source_hash = SmartCodecMapper::map_to(&last_relayed_source_hash_in_target)?;
+        let last_relayed_source_block_in_target =
+            match self.different.best_target_finalized(None).await? {
+                Some(v) => v,
+                None => {
+                    tracing::warn!(
+                        target: "relay-s2s",
+                        "{} the bridge not initialized, please init first.",
+                        logk::prefix_with_bridge(M_DELIVERY, SC::CHAIN, TC::CHAIN),
+                    );
+                    return Ok(None);
+                }
+            };
+        let expected_source_hash =
+            SmartCodecMapper::map_to(&last_relayed_source_block_in_target.1)?;
         let last_relayed_source_block_in_target = client_source
             .block(Some(expected_source_hash))
             .await?
             .ok_or_else(|| {
                 RelayError::Custom(format!(
                     "Failed to query block by [{}] in {}",
-                    array_bytes::bytes2hex("0x", expected_source_hash.as_ref()),
+                    array_bytes::bytes2hex("0x", expected_source_hash),
                     SC::CHAIN,
                 ))
             })?;
@@ -229,7 +240,7 @@ where
         if relayed_block_number < last_relay.block_number {
             tracing::warn!(
                 target: "relay-s2s",
-                "{} the last nonce({}) at block {} is less then last relayed header {}, please wait header relay.",
+                "{} the last nonce({}) at block {} is large than last relayed header {}, please wait header relay.",
                 logk::prefix_with_bridge_and_others(
                     M_DELIVERY,
                     SC::CHAIN,
@@ -324,7 +335,7 @@ where
                 vec![array_bytes::bytes2hex("0x", &lane),],
             ),
             nonces,
-            array_bytes::bytes2hex("0x", hash.as_ref()),
+            array_bytes::bytes2hex("0x", hash),
         );
         Ok(Some(*nonces.end()))
     }

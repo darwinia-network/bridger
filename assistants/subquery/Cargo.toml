@@ -28,7 +28,7 @@ serde-hex   = "0.1"
 async-trait = "0.1"
 strum       = { version = "0.24", features = ["derive"] }
 hex         = "0.4"
-array-bytes = { optional = true, version = "2" }
+array-bytes = { optional = true, version = "6" }
 
 gql_client  = "1"
 

@@ -8,5 +8,5 @@ pub trait DifferentClientApi<T: S2SClientRelay> {
     async fn best_target_finalized(
         &self,
         at_block: Option<<T::Chain as Chain>::Hash>,
-    ) -> S2SClientResult<<T::Chain as Chain>::Hash>;
+    ) -> S2SClientResult<Option<(<T::Chain as Chain>::BlockNumber, <T::Chain as Chain>::Hash)>>;
 }

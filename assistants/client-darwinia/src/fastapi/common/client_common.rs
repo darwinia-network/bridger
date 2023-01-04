@@ -5,5 +5,5 @@ use crate::client::DarwiniaClient;
 impl ClientCommon for DarwiniaClient {
     const CHAIN: &'static str = "darwinia";
 
-    type Chain = bp_darwinia::Darwinia;
+    type Chain = bp_darwinia_core::DarwiniaLike;
 }

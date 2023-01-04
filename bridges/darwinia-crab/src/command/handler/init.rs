@@ -1,6 +1,6 @@
+use bin_s2s::traits::{S2SParaBridgeRelayChainInfo, S2SParaBridgeSoloChainInfo};
 use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay};
 
-use bin_s2s::traits::S2SSoloBridgeSoloChainInfo;
 use support_common::config::{Config, Names};
 use support_toolkit::convert::SmartCodecMapper;
 
@@ -14,18 +14,20 @@ pub async fn handle_init(bridge: BridgeFlow) -> color_eyre::Result<()> {
 }
 
 async fn init_bridge(bridge: BridgeFlow, bridge_config: RawBridgeConfig) -> color_eyre::Result<()> {
+    let client_polkadot = bridge_config.polkadot.client().await?;
+    let client_kusama = bridge_config.kusama.client().await?;
     let client_darwinia = bridge_config.darwinia.client().await?;
     let client_crab = bridge_config.crab.client().await?;
     let hash = match bridge {
         BridgeFlow::CrabToDarwinia => {
-            let initialization_data = client_darwinia.prepare_initialization_data().await?;
-            let expected_data = SmartCodecMapper::map_to(&initialization_data)?;
-            client_crab.initialize(expected_data).await?
-        }
-        BridgeFlow::DarwiniaToCrab => {
-            let initialization_data = client_crab.prepare_initialization_data().await?;
+            let initialization_data = client_kusama.prepare_initialization_data().await?;
             let expected_data = SmartCodecMapper::map_to(&initialization_data)?;
             client_darwinia.initialize(expected_data).await?
+        }
+        BridgeFlow::DarwiniaToCrab => {
+            let initialization_data = client_polkadot.prepare_initialization_data().await?;
+            let expected_data = SmartCodecMapper::map_to(&initialization_data)?;
+            client_crab.initialize(expected_data).await?
         }
     };
     tracing::info!(

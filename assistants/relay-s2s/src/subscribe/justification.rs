@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bridge_s2s_traits::client::S2SClientGeneric;
 use bridge_s2s_traits::error::S2SClientError;
-use jsonrpsee_core::client::Subscription;
+use subxt::rpc::Subscription;
 
 use support_toolkit::logk;
 
@@ -93,10 +93,10 @@ where
 async fn safe_read_justification(
     timeout: Duration,
     subscribe: &mut Subscription<sp_core::Bytes>,
-) -> RelayResult<Option<Result<sp_core::Bytes, jsonrpsee_core::Error>>> {
+) -> RelayResult<Option<Result<sp_core::Bytes, RelayError>>> {
     let timeout = tokio::time::sleep(timeout);
     tokio::select! {
-        res = subscribe.next() => Ok(res),
+        res = subscribe.next() => Ok(res.map(|v| v.map_err(RelayError::Subxt))),
         _ = timeout => Err(RelayError::Custom("subscribe timeout".to_string()))
     }
 }

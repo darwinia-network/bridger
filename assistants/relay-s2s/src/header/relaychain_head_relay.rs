@@ -34,10 +34,20 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
     async fn run(&self) -> RelayResult<()> {
         let client_relaychain = &self.input.client_relaychain;
         let client_solochain = &self.input.client_solochain;
-        let last_relayed_relaychain_hash_in_solochain =
-            client_solochain.best_target_finalized(None).await?;
+        let last_relayed_relaychain_block_in_solochain =
+            match client_solochain.best_target_finalized(None).await? {
+                Some(v) => v,
+                None => {
+                    tracing::warn!(
+                        target: "relay-s2s",
+                        "{} the bridge not initialized, please init first.",
+                        logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
+                    );
+                    return Ok(());
+                }
+            };
         let expected_relaychain_hash =
-            SmartCodecMapper::map_to(&last_relayed_relaychain_hash_in_solochain)?;
+            SmartCodecMapper::map_to(&last_relayed_relaychain_block_in_solochain.1)?;
         // tracing::debug!(
         //     target: "relay-s2s",
         //     "{} get last relayed relaychain block hash: {:?}",
@@ -50,7 +60,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             .ok_or_else(|| {
                 RelayError::Custom(format!(
                     "Failed to query block by [{}] in relaychain",
-                    array_bytes::bytes2hex("0x", expected_relaychain_hash.as_ref())
+                    array_bytes::bytes2hex("0x", expected_relaychain_hash)
                 ))
             })?;
 
@@ -120,7 +130,7 @@ impl<SC: S2SClientGeneric, TC: S2SClientRelay> RelaychainHeaderRunner<SC, TC> {
             target: "relay-s2s",
             "{} header relayed: {:?}",
             logk::prefix_with_bridge(M_HEADER, SC::CHAIN, TC::CHAIN),
-            array_bytes::bytes2hex("0x", hash.as_ref()),
+            array_bytes::bytes2hex("0x", hash),
         );
         Ok(())
     }

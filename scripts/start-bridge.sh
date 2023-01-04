@@ -19,6 +19,9 @@ mkdir -p ${LOG_PATH}
 
 LOG_FILE=${LOG_PATH}/${BRIDGE}.log
 
+cargo build \
+  --manifest-path ${WORK_PATH}/bridges/${BRIDGE}/Cargo.toml
+
 rm -rf ${LOG_FILE} || true
-${BRIDGER} ${BRIDGE} start | tee ${LOG_FILE}
+${WORK_PATH}/bridges/${BRIDGE}/target/debug/bridge-${BRIDGE} start | tee ${LOG_FILE}
 

@@ -1,5 +1,3 @@
-#[cfg(feature = "bridge-s2s-crab-parachain")]
-pub mod bridge_crabparachain;
-#[cfg(feature = "bridge-s2s-darwinia")]
-pub mod bridge_darwinia;
+#[cfg(feature = "bridge-darwinia-crab")]
+pub mod bridge_darwinia_crab;
 pub mod generic;

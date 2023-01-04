@@ -3,13 +3,13 @@ use feemarket_s2s_traits::error::AbstractFeemarketResult;
 use feemarket_s2s_traits::types::{Chain, Order};
 use support_toolkit::convert::SmartCodecMapper;
 
-use crate::client::DarwiniaClient;
+use crate::client::CrabClient;
 
 #[async_trait::async_trait]
-impl FeemarketApiRelay for DarwiniaClient {
+impl FeemarketApiRelay for CrabClient {
     async fn order(
         &self,
-        laned_id: feemarket_s2s_traits::types::LaneId,
+        lane_id: feemarket_s2s_traits::types::LaneId,
         message_nonce: feemarket_s2s_traits::types::MessageNonce,
     ) -> AbstractFeemarketResult<
         Option<
@@ -20,13 +20,11 @@ impl FeemarketApiRelay for DarwiniaClient {
             >,
         >,
     > {
-        match self
-            .runtime()
-            .storage()
-            .fee_market()
-            .orders(laned_id, message_nonce, None)
-            .await?
-        {
+        let address = crate::subxt_runtime::api::storage()
+            .darwinia_fee_market()
+            .orders(lane_id, message_nonce);
+
+        match self.subxt().storage().fetch(&address, None).await? {
             Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
             None => Ok(None),
         }

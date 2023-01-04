@@ -5,5 +5,5 @@ use crate::client::PolkadotClient;
 impl ClientCommon for PolkadotClient {
     const CHAIN: &'static str = "polkadot";
 
-    type Chain = bp_polkadot::Polkadot;
+    type Chain = bp_polkadot_core::PolkadotLike;
 }

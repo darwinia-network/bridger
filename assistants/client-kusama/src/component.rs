@@ -1,9 +1,9 @@
 use std::{thread, time};
 
-use subxt::ClientBuilder;
+use subxt::OnlineClient;
 
 use crate::client::KusamaClient;
-use crate::config::ClientConfig;
+use crate::config::{ClientConfig, KusamaSubxtConfig};
 use crate::error::ClientResult;
 use crate::types::KusamaAccount;
 
@@ -18,10 +18,10 @@ impl KusamaClientComponent {
         let mut attempts = 1;
         let mut wait_secs = 1;
         let endpoint = support_toolkit::url::correct_endpoint(&config.endpoint)?;
-        let account = KusamaAccount::new(config.relayer_private_key, config.relayer_real_account)?;
+        let account = KusamaAccount::new(config.relayer_private_key)?;
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
-            return match ClientBuilder::new().set_url(&endpoint).build().await {
+            return match OnlineClient::<KusamaSubxtConfig>::from_url(&endpoint).await {
                 Ok(client) => Ok(KusamaClient::new(client, account.clone())),
                 Err(err) => {
                     if attempts < MAX_ATTEMPTS {

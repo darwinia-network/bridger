@@ -94,7 +94,7 @@ impl<
     > ParaHeadToSolochainRelayService<SCI, RCI, PCI, SI>
 {
     async fn start(bridge_config: BridgeConfig<SCI, RCI, PCI, SI>) -> BinS2SResult<()> {
-        let relay_config = bridge_config.relay;
+        let para_config = bridge_config.para_config;
         let config_chain = bridge_config.chain;
         tracing::info!(
             target: "bin-s2s",
@@ -106,7 +106,7 @@ impl<
         let input = ParaHeaderInput {
             client_relaychain: config_chain.relay.client().await?,
             client_solochain: config_chain.solo.client().await?,
-            para_id: relay_config.para_id,
+            para_id: para_config.para_id,
         };
         let runner = ParaHeaderRunner::new(input);
         Ok(runner.start().await?)

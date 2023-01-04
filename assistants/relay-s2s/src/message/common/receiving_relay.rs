@@ -41,12 +41,13 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
         at_block: <TC::Chain as Chain>::Hash,
         source_outbound_lane_data: &OutboundLaneData,
     ) -> RelayResult<Option<(u64, UnrewardedRelayersState)>> {
-        let block_hex = array_bytes::bytes2hex("0x", at_block.as_ref());
+        let block_hex = array_bytes::bytes2hex("0x", at_block);
         let inbound_lane_data = self
             .input
             .client_target
             .inbound_lanes(lane, Some(at_block))
             .await?;
+        let last_delivered_nonce = inbound_lane_data.last_delivered_nonce();
         let max_confirm_end_at_target = inbound_lane_data
             .relayers
             .iter()
@@ -104,6 +105,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                     .map(|entry| 1 + entry.messages.end - entry.messages.begin)
                     .unwrap_or(u64::MAX),
                 total_messages: total_unrewarded_messages.expect("Unreachable"),
+                last_delivered_nonce,
             },
         )))
     }
@@ -155,8 +157,24 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
         }
 
         // query last relayed header (from source chain)
-        let last_relayed_target_hash_in_source = self.different.best_target_finalized(None).await?;
-        let expected_target_hash = SmartCodecMapper::map_to(&last_relayed_target_hash_in_source)?;
+        let last_relayed_target_block_in_source =
+            match self.different.best_target_finalized(None).await? {
+                Some(v) => v,
+                None => {
+                    tracing::warn!(
+                        target: "relay-s2s",
+                        "{} the bridge not initialized, please init first.",
+                        logk::prefix_with_bridge(
+                            M_RECEIVING,
+                            SC::CHAIN,
+                            TC::CHAIN,
+                        ),
+                    );
+                    return Ok(None);
+                }
+            };
+        let expected_target_hash =
+            SmartCodecMapper::map_to(&last_relayed_target_block_in_source.1)?;
 
         // assemble unrewarded relayers state
         let (max_confirmed_nonce_at_target, relayers_state) = match self
@@ -190,7 +208,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
             .read_proof(vec![inbound_data_key], Some(expected_target_hash))
             .await?;
         let proof = FromBridgedChainMessagesDeliveryProof {
-            bridged_header_hash: last_relayed_target_hash_in_source,
+            bridged_header_hash: last_relayed_target_block_in_source.1,
             storage_proof: proof,
             lane,
         };
@@ -209,7 +227,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                 TC::CHAIN,
                 vec![array_bytes::bytes2hex("0x", &lane),],
             ),
-            array_bytes::bytes2hex("0x", hash.as_ref()),
+            array_bytes::bytes2hex("0x", hash),
         );
         Ok(Some(max_confirmed_nonce_at_target))
     }

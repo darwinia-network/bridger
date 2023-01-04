@@ -6,7 +6,7 @@ use crate::client::PangoroClient;
 
 #[async_trait::async_trait]
 impl FeemarketApiBase for PangoroClient {
-    async fn best_finalized_header_number(
+    async fn finalized_header_number(
         &self,
     ) -> AbstractFeemarketResult<<Self::Chain as Chain>::BlockNumber> {
         let head_hash = self.subxt().rpc().finalized_head().await?;

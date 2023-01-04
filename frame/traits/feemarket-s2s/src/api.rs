@@ -7,7 +7,7 @@ use crate::types::{LaneId, MessageNonce, Order, Relayer};
 #[async_trait::async_trait]
 pub trait FeemarketApiBase: ClientCommon {
     /// best finalized block number
-    async fn best_finalized_header_number(
+    async fn finalized_header_number(
         &self,
     ) -> AbstractFeemarketResult<<Self::Chain as Chain>::BlockNumber>;
 }

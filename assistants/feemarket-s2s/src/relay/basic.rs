@@ -80,32 +80,42 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
         }
 
         // -----
-
         let prior_relayer = relayers.iter().find(|item| item.id == self.account);
         let is_assigned_relayer = prior_relayer.is_some();
+
+        let finalized_block_number = self
+            .api
+            .finalized_header_number()
+            .await
+            .map_err(|e| S2SClientError::Custom(format!("[feemarket]: {:?}", e)))?;
 
         // If you are assigned relayer, you must relay this nonce.
         // If you don't do that, the fee market pallet will slash your deposit.
         // Even though it is a timeout, although it will slash your deposit after the timeout is delivered,
         // you can still get relay rewards.
         if is_assigned_relayer {
+            let relayer = prior_relayer.unwrap();
+            let valid_range = &relayer.valid_range;
+            if valid_range.contains(&finalized_block_number) {
+                tracing::info!(
+                    target: "feemarket",
+                    "{} you are assigned relayer and this order is in your slot, you must be relay this nonce({})",
+                    logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
+                    nonce,
+                );
+                return Ok(true);
+            }
             tracing::info!(
                 target: "feemarket",
-                "{} you are assigned relayer, you must be relay this nonce({})",
+                "{} you are assigned relayer but this order isn't in your slot, skip this nonce({})",
                 logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
                 nonce,
             );
-            return Ok(true);
+            return Ok(false);
         }
 
         // -----
-
         // If you aren't assigned relayer, only participate in the part about time out, earn more rewards
-        let latest_block_number = self
-            .api
-            .best_finalized_header_number()
-            .await
-            .map_err(|e| S2SClientError::Custom(format!("[feemarket]: {:?}", e)))?;
         let ranges = relayers
             .iter()
             .map(|item| item.valid_range.clone())
@@ -116,7 +126,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
             maximum_timeout = std::cmp::max(maximum_timeout, range.end);
         }
         // If this order has timed out, decide to relay
-        if latest_block_number > maximum_timeout {
+        if finalized_block_number > maximum_timeout {
             tracing::info!(
                 target: "feemarket",
                 "{} you aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",

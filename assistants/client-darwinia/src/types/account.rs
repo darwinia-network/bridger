@@ -1,6 +1,6 @@
 use subxt::tx::PairSigner;
 
-use patch_substrate::crypto::ethereum::Pair;
+use ecdsa_pair::crypto::ethereum::Pair;
 
 use crate::config::DarwiniaSubxtConfig;
 

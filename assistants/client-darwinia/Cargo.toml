@@ -36,19 +36,19 @@ sp-runtime          = { optional = true, git = "https://github.com/paritytech/su
 sp-finality-grandpa = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
 
 ## common traits
-client-common-traits  = { path = "../../frame/traits/client-common", features = ["subxt-darwinia"] }
+client-common-traits  = { path = "../../traits/client-common", features = ["subxt-darwinia"] }
 
 ## s2s client
 finality-grandpa      = { optional = true, version = "0.16" }
-bridge-s2s-traits     = { optional = true, path = "../../frame/traits/bridge-s2s", features = ["advanced-types"] }
+bridge-s2s-traits     = { optional = true, path = "../../traits/bridge-s2s", features = ["advanced-types"] }
 
 ## e2e client
-bridge-e2e-traits = { optional = true, path = "../../frame/traits/bridge-e2e" }
+bridge-e2e-traits = { optional = true, path = "../../traits/bridge-e2e" }
 
 ## feemarket s2s
-feemarket-s2s-traits = { optional = true, path = "../../frame/traits/feemarket-s2s", features = ["advanced-types"] }
+feemarket-s2s-traits = { optional = true, path = "../../traits/feemarket-s2s", features = ["advanced-types"] }
 
-patch-substrate      = { path = "../../frame/traits/patch-substrate" }
+ecdsa-pair      = { path = "../ecdsa-pair" }
 
 support-toolkit  = { path = "../../frame/supports/support-toolkit", features = ["convert"] }
 

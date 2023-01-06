@@ -27,7 +27,7 @@ support-common     = { path = "../../../frame/supports/support-common" }
 support-command-kv = { path = "../../../frame/supports/support-command-kv" }
 component-state       = { path = "../../../frame/components/state" }
 
-bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
+bridge-e2e-traits     = { path = "../../../traits/bridge-e2e" }
 subquery              = { path = "../../../assistants/subquery", features = [ "bridge-ethv2" ] }
 client-darwinia       = { path = "../../../assistants/client-darwinia", features = [ "bridge-e2e" ] }
 relay-e2e             = { path = "../../../assistants/relay-e2e" }

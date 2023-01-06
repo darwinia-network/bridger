@@ -23,16 +23,16 @@ tokio       = { version = "1", features = ["full"] }
 serde     = { version = "1", features = ["derive"] }
 structopt = "0.3"
 
-support-common     = { path = "../../../frame/supports/support-common" }
-support-command-kv = { path = "../../../frame/supports/support-command-kv" }
-component-state       = { path = "../../../frame/components/state" }
+support-common     = { path = "../../frame/supports/support-common" }
+support-command-kv = { path = "../../frame/supports/support-command-kv" }
+component-state       = { path = "../../frame/components/state" }
 
-bridge-e2e-traits     = { path = "../../../traits/bridge-e2e" }
-subquery              = { path = "../../../assistants/subquery", features = [ "bridge-ethv2" ] }
-client-darwinia       = { path = "../../../assistants/client-darwinia", features = [ "bridge-e2e" ] }
-relay-e2e             = { path = "../../../assistants/relay-e2e" }
-thegraph              = { path = "../../../assistants/thegraph", features = [ "bridge-ethv2" ] }
-bin-e2e               = { path ="../../../assistants/bin-e2e" }
+bridge-e2e-traits     = { path = "../../traits/bridge-e2e" }
+subquery              = { path = "../../assistants/subquery", features = [ "bridge-ethv2" ] }
+client-darwinia       = { path = "../../assistants/client-darwinia", features = [ "bridge-e2e" ] }
+relay-e2e             = { path = "../../assistants/relay-e2e" }
+thegraph              = { path = "../../assistants/thegraph", features = [ "bridge-ethv2" ] }
+bin-e2e               = { path ="../../assistants/bin-e2e" }
 
 
 [patch.crates-io]

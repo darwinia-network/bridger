@@ -1,5 +1,5 @@
 [package]
-name          = "patch-substrate"
+name          = "ecdsa-pair"
 authors       = ["Darwinia Network <hello@darwinia.network>"]
 description   = "Darwinia bridger"
 documentation = "https://rust-docs.darwinia.network/bridger"

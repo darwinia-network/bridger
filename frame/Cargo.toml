@@ -4,6 +4,3 @@ members = [
   "supports/*",
   "components/*",
 ]
-exclude = [
-  "traits",
-]

@@ -32,7 +32,7 @@ async-trait = "0.1"
 types       = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
 tree_hash   = { git = "https://github.com/sigp/lighthouse", branch = "stable" }
 
-bridge-e2e-traits     = { path = "../../frame/traits/bridge-e2e" }
+bridge-e2e-traits     = { path = "../../traits/bridge-e2e" }
 client-contracts      = { path = "../client-contracts" }
 client-beacon         = { path = "../client-beacon" }
 support-etherscan     = { path = "../../frame/supports/support-etherscan" }

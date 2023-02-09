@@ -32,7 +32,7 @@ pub enum RelayError {
 
 impl From<array_bytes::Error> for RelayError {
     fn from(e: array_bytes::Error) -> Self {
-        Self::Bytes(format!("{:?}", e))
+        Self::Bytes(format!("{e:?}"))
     }
 }
 

@@ -65,7 +65,7 @@ impl PrecompiledBinaryExecutor {
             ) {
                 Ok(v) => return Ok((command, v)),
                 Err(e) => {
-                    output::output_err(format!("{:?}", e.to_string()));
+                    output::output_err(format!("{e:?}"));
                 }
             }
         }

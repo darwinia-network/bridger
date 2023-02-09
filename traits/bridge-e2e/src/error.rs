@@ -19,12 +19,12 @@ pub enum E2EClientError {
 
 impl From<subxt::Error> for E2EClientError {
     fn from(error: subxt::Error) -> Self {
-        Self::RPC(format!("{:?}", error))
+        Self::RPC(format!("{error:?}"))
     }
 }
 
 impl From<subxt::error::RpcError> for E2EClientError {
     fn from(error: subxt::error::RpcError) -> Self {
-        Self::RPC(format!("{:?}", error))
+        Self::RPC(format!("{error:?}"))
     }
 }

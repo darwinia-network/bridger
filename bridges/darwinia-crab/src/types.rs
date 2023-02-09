@@ -84,7 +84,7 @@ impl S2SParaBridgeSoloChainInfo for DarwiniaChainConfig {
         &self,
     ) -> BinS2SResult<<<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId> {
         let account = client_darwinia::types::DarwiniaAccount::new(self.signer.clone(), None)
-            .map_err(|e| BinS2SError::Client(format!("{:?}", e)))?;
+            .map_err(|e| BinS2SError::Client(format!("{e:?}")))?;
         Ok(*account.account_id())
     }
 
@@ -96,7 +96,7 @@ impl S2SParaBridgeSoloChainInfo for DarwiniaChainConfig {
         };
         Ok(DarwiniaClientComponent::component(config)
             .await
-            .map_err(|e| BinS2SError::Client(format!("{:?}", e)))?)
+            .map_err(|e| BinS2SError::Client(format!("{e:?}")))?)
     }
 }
 
@@ -116,7 +116,7 @@ impl S2SParaBridgeSoloChainInfo for CrabChainConfig {
         &self,
     ) -> BinS2SResult<<<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId> {
         let account = client_crab::types::DarwiniaAccount::new(self.signer.clone(), None)
-            .map_err(|e| BinS2SError::Client(format!("{:?}", e)))?;
+            .map_err(|e| BinS2SError::Client(format!("{e:?}")))?;
         Ok(*account.account_id())
     }
 
@@ -128,7 +128,7 @@ impl S2SParaBridgeSoloChainInfo for CrabChainConfig {
         };
         Ok(CrabClientComponent::component(config)
             .await
-            .map_err(|e| BinS2SError::Client(format!("{:?}", e)))?)
+            .map_err(|e| BinS2SError::Client(format!("{e:?}")))?)
     }
 }
 
@@ -149,7 +149,7 @@ impl S2SParaBridgeRelayChainInfo for PolkadotChainConfig {
         };
         Ok(PolkadotClientComponent::component(config)
             .await
-            .map_err(|e| BinS2SError::Client(format!("{:?}", e)))?)
+            .map_err(|e| BinS2SError::Client(format!("{e:?}")))?)
     }
 }
 
@@ -168,6 +168,6 @@ impl S2SParaBridgeRelayChainInfo for KusamaChainConfig {
         };
         Ok(KusamaClientComponent::component(config)
             .await
-            .map_err(|e| BinS2SError::Client(format!("{:?}", e)))?)
+            .map_err(|e| BinS2SError::Client(format!("{e:?}")))?)
     }
 }

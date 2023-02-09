@@ -119,7 +119,7 @@ impl CompileSourceExecutor {
             return Err(BridgerError::Process(
                 "cargo".to_string(),
                 args.join(" "),
-                format!("{:?}", e),
+                format!("{e:?}"),
             )
             .into());
         }

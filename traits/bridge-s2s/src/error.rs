@@ -14,13 +14,13 @@ pub enum S2SClientError {
 
 impl From<subxt::Error> for S2SClientError {
     fn from(error: subxt::Error) -> Self {
-        Self::RPC(format!("{:?}", error))
+        Self::RPC(format!("{error:?}"))
     }
 }
 
 impl From<subxt::error::RpcError> for S2SClientError {
     fn from(error: subxt::error::RpcError) -> Self {
-        Self::RPC(format!("{:?}", error))
+        Self::RPC(format!("{error:?}"))
     }
 }
 

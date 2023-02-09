@@ -15,13 +15,13 @@ pub enum AbstractFeemarketError {
 #[cfg(feature = "subxt")]
 impl From<subxt::error::Error> for AbstractFeemarketError {
     fn from(error: subxt::error::Error) -> Self {
-        Self::RPC(format!("{:?}", error))
+        Self::RPC(format!("{error:?}"))
     }
 }
 
 #[cfg(feature = "subxt")]
 impl From<subxt::error::RpcError> for AbstractFeemarketError {
     fn from(error: subxt::error::RpcError) -> Self {
-        Self::RPC(format!("{:?}", error))
+        Self::RPC(format!("{error:?}"))
     }
 }

@@ -39,7 +39,7 @@ impl DarwiniaAccount {
     pub fn new(seed: String, real: Option<String>) -> ClientResult<Self> {
         // signer to sign darwinia extrinsic
         let pair =
-            Pair::from_string(&seed, None).map_err(|e| ClientError::Seed(format!("{:?}", e)))?; // if not a valid seed
+            Pair::from_string(&seed, None).map_err(|e| ClientError::Seed(format!("{e:?}")))?; // if not a valid seed
         let signer = PairSigner::new(pair);
         let public = signer.signer().public().0;
         let account_id = AccountId::from(public);

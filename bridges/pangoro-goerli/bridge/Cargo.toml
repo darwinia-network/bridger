@@ -35,6 +35,6 @@ client-contracts      = { path = "../../../assistants/client-contracts" }
 client-pangoro        = { path = "../../../assistants/client-pangoro", features = [ "bridge-ethv2" ] }
 thegraph              = { path = "../../../assistants/thegraph", features = [ "bridge-ethv2" ] }
 
-bridge-e2e-traits     = { path = "../../../frame/traits/bridge-e2e" }
+bridge-e2e-traits     = { path = "../../../traits/bridge-e2e" }
 relay-e2e             = { path = "../../../assistants/relay-e2e" }
 bin-e2e               = { path ="../../../assistants/bin-e2e" }

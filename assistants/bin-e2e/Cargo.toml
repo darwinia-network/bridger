@@ -28,7 +28,7 @@ serde    = { version = "1", features = ["derive"] }
 web3     = { version = "0.18", features = ["signing"] }
 lifeline = { git = "https://github.com/fewensa/lifeline-rs", branch = "threads-safely" }
 
-bridge-e2e-traits = { path = "../../frame/traits/bridge-e2e" }
+bridge-e2e-traits = { path = "../../traits/bridge-e2e" }
 relay-e2e         = { path = "../relay-e2e" }
 subquery          = { path = "../subquery", features = [ "bridge-ethv2" ] }
 thegraph          = { path = "../thegraph", features = [ "bridge-ethv2" ] }

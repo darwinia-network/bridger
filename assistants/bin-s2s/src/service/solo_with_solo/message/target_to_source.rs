@@ -61,7 +61,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
                     tokio::time::sleep(duration).await;
                     tracing::error!(
                         target: "bin-s2s",
-                        "[message-relay] [{}-to-{}] many errors occured, wait {} seconds",
+                        "[message-relay] [{}-to-{}] many errors occurred, wait {} seconds",
                         config_chain.target.chain().name(),
                         config_chain.source.chain().name(),
                         duration.as_secs(),
@@ -99,7 +99,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
                     tokio::time::sleep(duration).await;
                     tracing::error!(
                         target: "bin-s2s",
-                        "[message-relay] [{}-to-{}] many errors occured, wait {} seconds",
+                        "[message-relay] [{}-to-{}] many errors occurred, wait {} seconds",
                         config_chain.target.chain().name(),
                         config_chain.source.chain().name(),
                         duration.as_secs(),

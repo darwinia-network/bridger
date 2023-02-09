@@ -74,7 +74,7 @@ impl<
                     tokio::time::sleep(duration).await;
                     tracing::error!(
                         target: "bin-s2s",
-                        "[message-relay] [{}-to-{}] many errors occured, wait {} seconds",
+                        "[message-relay] [{}-to-{}] many errors occurred, wait {} seconds",
                         config_chain.para.chain().name(),
                         config_chain.solo.chain().name(),
                         duration.as_secs(),
@@ -113,7 +113,7 @@ impl<
                     tokio::time::sleep(duration).await;
                     tracing::error!(
                         target: "bin-s2s",
-                        "[message-relay] [{}-to-{}] many errors occured, wait {} seconds",
+                        "[message-relay] [{}-to-{}] many errors occurred, wait {} seconds",
                         config_chain.para.chain().name(),
                         config_chain.solo.chain().name(),
                         duration.as_secs(),

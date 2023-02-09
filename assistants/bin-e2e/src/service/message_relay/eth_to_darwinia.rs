@@ -11,6 +11,7 @@ use web3::types::{Address, U256};
 use crate::bridge::BridgeBus;
 use crate::config::BridgeConfig;
 use lifeline::{Lifeline, Service, Task};
+use support_toolkit::timecount::TimeCount;
 use support_lifeline::service::BridgeService;
 
 #[derive(Debug)]
@@ -30,12 +31,21 @@ impl<T: EcdsaClient> Service for EthereumDarwiniaMessageRelay<T> {
         let bridge_config: BridgeConfig<T> = bus.storage().clone_resource()?;
         let config = bridge_config.clone();
         let _greet_delivery = Self::try_task("message-relay-eth-to-darwinia", async move {
+            let mut timecount = TimeCount::new();
             while let Err(error) = start_delivery(config.clone()).await {
                 tracing::error!(
                     target: "darwinia-eth",
                     "Failed to start eth-to-darwinia message relay service, restart after some seconds: {:?}",
                     error
                 );
+                if let Err(duration) = timecount.plus_and_check() {
+                    tokio::time::sleep(duration).await;
+                    tracing::error!(
+                        target: "darwinia-eth",
+                        "[message-eth-darwinia-delivery] many errors occurred, wait {} seconds",
+                        duration.as_secs(),
+                    );
+                }
                 tokio::time::sleep(std::time::Duration::from_secs(15)).await;
             }
             Ok(())
@@ -45,11 +55,20 @@ impl<T: EcdsaClient> Service for EthereumDarwiniaMessageRelay<T> {
             "message-confirmation-darwinia-to-eth",
             async move {
                 while let Err(error) = start_confirmation(config.clone()).await {
+                    let mut timecount = TimeCount::new();
                     tracing::error!(
                         target: "darwinia-eth",
                         "Failed to start eth-to-darwinia message confirmation service, restart after some seconds: {:?}",
                         error
                     );
+                    if let Err(duration) = timecount.plus_and_check() {
+                        tokio::time::sleep(duration).await;
+                        tracing::error!(
+                            target: "darwinia-eth",
+                            "[message-eth-darwinia-confirmation] many errors occurred, wait {} seconds",
+                            duration.as_secs(),
+                        );
+                    }
                     tokio::time::sleep(std::time::Duration::from_secs(15)).await;
                 }
                 Ok(())

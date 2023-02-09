@@ -5,6 +5,7 @@ use crate::config::BridgeConfig;
 use bridge_e2e_traits::client::EcdsaClient;
 use client_beacon::client::BeaconApiClient;
 
+use support_toolkit::timecount::TimeCount;
 use lifeline::{dyn_bus::DynBus, Lifeline, Service, Task};
 use relay_e2e::header::{common::EthLightClient, eth_beacon_header_relay::BeaconHeaderRelayRunner};
 use support_lifeline::service::BridgeService;
@@ -25,12 +26,21 @@ impl<T: EcdsaClient> Service for EthereumToDarwiniaHeaderRelayService<T> {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let bridge_config: BridgeConfig<T> = bus.storage().clone_resource()?;
         let _greet = Self::try_task("header-eth-to-darwinia", async move {
+            let mut timecount = TimeCount::new();
             while let Err(error) = Self::start(bridge_config.clone()).await {
                 tracing::error!(
                     target: "substrate-eth",
                     "Failed to start header relay service, restart after some seconds: {:?}",
                     error
                 );
+                if let Err(duration) = timecount.plus_and_check() {
+                    tokio::time::sleep(duration).await;
+                    tracing::error!(
+                        target: "substrate-eth",
+                        "[beacon-header-relay] many errors occurred, wait {} seconds",
+                        duration.as_secs(),
+                    );
+                }
                 tokio::time::sleep(std::time::Duration::from_secs(10)).await;
             }
             Ok(())

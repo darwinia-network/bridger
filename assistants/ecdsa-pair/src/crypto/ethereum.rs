@@ -205,7 +205,7 @@ impl<'de> Deserialize<'de> for Public {
         D: Deserializer<'de>,
     {
         Public::from_ss58check(&String::deserialize(deserializer)?)
-            .map_err(|e| de::Error::custom(format!("{:?}", e)))
+            .map_err(|e| de::Error::custom(format!("{e:?}")))
     }
 }
 
@@ -245,9 +245,9 @@ impl<'de> Deserialize<'de> for Signature {
         D: Deserializer<'de>,
     {
         let signature_hex = array_bytes::hex2bytes(&String::deserialize(deserializer)?)
-            .map_err(|e| de::Error::custom(format!("{:?}", e)))?;
+            .map_err(|e| de::Error::custom(format!("{e:?}")))?;
         Signature::try_from(signature_hex.as_ref())
-            .map_err(|e| de::Error::custom(format!("{:?}", e)))
+            .map_err(|e| de::Error::custom(format!("{e:?}")))
     }
 }
 

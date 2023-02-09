@@ -187,7 +187,7 @@ fn spec_serialize_value(
     let value = value.trim().to_string();
     let value_type = match value_type {
         None => {
-            output::output_warning(format!("Schema of '{}' not found, use String as default", key));
+            output::output_warning(format!("Schema of '{key}' not found, use String as default"));
             "String".to_owned()
         },
         Some(v) => v.as_ref().to_owned()
@@ -215,7 +215,7 @@ fn spec_serialize_value(
         }
         _ => {
             return Err(
-                BridgerError::Custom(format!("Not support value type: {}", value_type)).into(),
+                BridgerError::Custom(format!("Not support value type: {value_type}")).into(),
             );
         }
     }

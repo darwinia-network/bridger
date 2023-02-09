@@ -33,11 +33,12 @@ relay-e2e         = { path = "../relay-e2e" }
 subquery          = { path = "../subquery", features = [ "bridge-ethv2" ] }
 thegraph          = { path = "../thegraph", features = [ "bridge-ethv2" ] }
 
-client-contracts      = { path = "../client-contracts" }
-client-beacon         = { path = "../client-beacon" }
-support-lifeline      = { path = "../../frame/supports/support-lifeline" }
-component-state       = { path = "../../frame/components/state" }
-support-tracker    = { path = "../../frame/supports/support-tracker" }
+client-contracts = { path = "../client-contracts" }
+client-beacon    = { path = "../client-beacon" }
+support-lifeline = { path = "../../frame/supports/support-lifeline" }
+component-state  = { path = "../../frame/components/state" }
+support-tracker  = { path = "../../frame/supports/support-tracker" }
+support-toolkit  = { path = "../../frame/supports/support-toolkit" }
 
 
 [patch.crates-io]

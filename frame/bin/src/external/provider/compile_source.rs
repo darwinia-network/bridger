@@ -94,7 +94,7 @@ impl CompileSourceExecutor {
         );
         let mut args = Vec::<String>::new();
         if let Some(toolchain) = &self.toolchain_version {
-            args.push(format!("+{}", toolchain));
+            args.push(format!("+{toolchain}"));
         }
         args.push("build".to_string());
         if self.channel == CompileChannel::Release {
@@ -119,7 +119,7 @@ impl CompileSourceExecutor {
             return Err(BridgerError::Process(
                 "cargo".to_string(),
                 args.join(" "),
-                format!("{:?}", e),
+                format!("{e:?}"),
             )
             .into());
         }

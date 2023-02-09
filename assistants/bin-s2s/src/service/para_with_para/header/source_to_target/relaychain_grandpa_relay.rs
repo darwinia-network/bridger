@@ -6,6 +6,7 @@ use relay_s2s::header::RelaychainHeaderRunner;
 use relay_s2s::types::RelaychainHeaderInput;
 
 use support_lifeline::service::BridgeService;
+use support_toolkit::timecount::TimeCount;
 
 use crate::bridge::config::para_with_para::BridgeConfig;
 use crate::bridge::BridgeBus;
@@ -60,6 +61,7 @@ impl<
         );
 
         let _greet = Self::try_task(&task_name, async move {
+            let mut timecount = TimeCount::new();
             while let Err(e) = Self::start(bridge_config.clone()).await {
                 tracing::error!(
                     target: "bin-s2s",
@@ -68,6 +70,16 @@ impl<
                     config_chain.target_para.chain().name(),
                     e,
                 );
+                if let Err(duration) = timecount.plus_and_check() {
+                    tokio::time::sleep(duration).await;
+                    tracing::error!(
+                        target: "bin-s2s",
+                        "[header-relay] [{}-to-{}] many errors occurred, wait {} seconds",
+                        config_chain.source_relay.chain().name(),
+                        config_chain.target_para.chain().name(),
+                        duration.as_secs(),
+                    );
+                }
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 tracing::info!(
                     target: "bin-s2s",

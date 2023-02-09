@@ -16,6 +16,6 @@ pub enum TheGraphLikethComponentError {
 
 impl From<GraphQLError> for TheGraphLikethComponentError {
     fn from(error: GraphQLError) -> Self {
-        Self::GraphQL(format!("{:?}", error))
+        Self::GraphQL(format!("{error:?}"))
     }
 }

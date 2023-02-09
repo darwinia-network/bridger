@@ -56,7 +56,7 @@ impl PrecompiledBinaryExecutor {
         for prefix in support_types::constants::ALLOW_BINARY_PREFIX {
             let command = format!("{}{}", prefix, self.command);
 
-            output::output_text(format!("Try execute {}@{}", command, version));
+            output::output_text(format!("Try execute {command}@{version}"));
             match self.download_and_extract_binary_with_command(
                 path.clone(),
                 &version,
@@ -65,7 +65,7 @@ impl PrecompiledBinaryExecutor {
             ) {
                 Ok(v) => return Ok((command, v)),
                 Err(e) => {
-                    output::output_err(format!("{:?}", e.to_string()));
+                    output::output_err(format!("{e:?}"));
                 }
             }
         }
@@ -90,7 +90,7 @@ impl PrecompiledBinaryExecutor {
             BridgerError::Subcommand("Missing remote base url for precompiled binary".to_string())
         })?;
         let package_name = self.package_name(command)?;
-        let remote_url = format!("{}/releases/download/v{}/{}", path, version, package_name);
+        let remote_url = format!("{path}/releases/download/v{version}/{package_name}");
         let path_binary_base = std::env::current_exe()?
             .parent()
             .map(|v| v.join(""))
@@ -99,7 +99,7 @@ impl PrecompiledBinaryExecutor {
             })?;
 
         let path_binary = path_binary_base.join(if cfg!(windows) {
-            format!("{}.exe", command)
+            format!("{command}.exe")
         } else {
             command.to_string()
         });
@@ -143,16 +143,13 @@ impl PrecompiledBinaryExecutor {
                         }
                         if cfg!(windows) {
                             return Err(BridgerError::Custom(format!(
-                                "The {} is running (PID: {}), can not update to new version",
-                                command, pid
+                                "The {command} is running (PID: {pid}), can not update to new version"
                             ))
                             .into());
                         } else {
                             tracing::warn!(
                                 target: "bridger",
-                                "The binary ({}) will updated to {}, when finished, please restart your running progress.",
-                                command,
-                                version
+                                "The binary ({command}) will updated to {version}, when finished, please restart your running progress.",
                             );
                         }
                         break;
@@ -194,7 +191,7 @@ impl PrecompiledBinaryExecutor {
                     ))
                     .into());
                 }
-                output::output_text(format!("Downloading `{}`", url_package));
+                output::output_text(format!("Downloading `{url_package}`"));
                 response = reqwest::blocking::get(&url_package)?;
                 let code = response.status().as_u16();
                 tracing::trace!(target: "bridger", "Response code is: {}", code);
@@ -209,8 +206,7 @@ impl PrecompiledBinaryExecutor {
             let code = response.status().as_u16();
             if code != 200 && code != 201 {
                 return Err(BridgerError::Custom(format!(
-                    "[{}] Failed to download package. the url is: {}",
-                    code, remote_url
+                    "[{code}] Failed to download package. the url is: {remote_url}"
                 ))
                 .into());
             }

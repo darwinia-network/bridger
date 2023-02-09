@@ -54,7 +54,7 @@ pub trait EcdsaScanner<T: EcdsaClient> {
     async fn run(&self, tracker: Tracker, scan_type: EcdsaScanType) -> RelayResult<()> {
         if !tracker
             .is_running()
-            .map_err(|e| RelayError::Custom(format!("{:?}", e)))?
+            .map_err(|e| RelayError::Custom(format!("{e:?}")))?
         {
             return Ok(());
         }

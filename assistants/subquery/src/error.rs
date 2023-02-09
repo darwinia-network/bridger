@@ -16,13 +16,13 @@ pub enum SubqueryComponentError {
 
 impl From<GraphQLError> for SubqueryComponentError {
     fn from(error: GraphQLError) -> Self {
-        Self::GraphQL(format!("{:?}", error))
+        Self::GraphQL(format!("{error:?}"))
     }
 }
 
 #[cfg(feature = "array-bytes")]
 impl From<array_bytes::Error> for SubqueryComponentError {
     fn from(error: array_bytes::Error) -> Self {
-        Self::Bytes(format!("{:?}", error))
+        Self::Bytes(format!("{error:?}"))
     }
 }

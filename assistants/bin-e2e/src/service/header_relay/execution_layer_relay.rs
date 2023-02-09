@@ -9,6 +9,7 @@ use relay_e2e::header::{
     common::EthLightClient, eth_execution_layer_relay::ExecutionLayerRelayRunner,
 };
 
+use support_toolkit::timecount::TimeCount;
 use support_lifeline::service::BridgeService;
 use web3::types::{Address, U256};
 
@@ -27,12 +28,21 @@ impl<T: EcdsaClient> Service for ExecutionLayerRelay<T> {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let bridge_config: BridgeConfig<T> = bus.storage().clone_resource()?;
         let _greet = Self::try_task("execution-layer-eth-to-darwinia", async move {
+            let mut timecount = TimeCount::new();
             while let Err(error) = Self::start(bridge_config.clone()).await {
                 tracing::error!(
                     target: "substrate-eth",
                     "Failed to start execution payload state root relay service, restart after some seconds: {:?}",
                     error
                 );
+                if let Err(duration) = timecount.plus_and_check() {
+                    tokio::time::sleep(duration).await;
+                    tracing::error!(
+                        target: "substrate-eth",
+                        "[execution-layer-relay] many errors occurred, wait {} seconds",
+                        duration.as_secs(),
+                    );
+                }
                 tokio::time::sleep(std::time::Duration::from_secs(15)).await;
             }
             Ok(())

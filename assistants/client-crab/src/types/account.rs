@@ -48,14 +48,14 @@ mod darwinia {
         /// Create a new Account
         pub fn new(seed: String, real: Option<String>) -> ClientResult<Self> {
             // signer to sign darwinia extrinsic
-            let pair = Pair::from_string(&seed, None)
-                .map_err(|e| ClientError::Seed(format!("{:?}", e)))?; // if not a valid seed
+            let pair =
+                Pair::from_string(&seed, None).map_err(|e| ClientError::Seed(format!("{e:?}")))?; // if not a valid seed
             let signer = PairSigner::new(pair);
 
             let mut real_signer = None;
             if let Some(real_seed) = real {
                 let pair = Pair::from_string(&real_seed, None)
-                    .map_err(|e| ClientError::Seed(format!("{:?}", e)))?;
+                    .map_err(|e| ClientError::Seed(format!("{e:?}")))?;
                 real_signer = Some(PairSigner::new(pair))
             };
             Ok(Self {

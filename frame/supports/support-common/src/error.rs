@@ -35,24 +35,24 @@ pub enum BridgerError {
 
 impl From<serde_yaml::Error> for BridgerError {
     fn from(e: serde_yaml::Error) -> Self {
-        Self::Config(format!("{:?}", e))
+        Self::Config(format!("{e:?}"))
     }
 }
 
 impl From<serde_json::Error> for BridgerError {
     fn from(e: Error) -> Self {
-        Self::Config(format!("{:?}", e))
+        Self::Config(format!("{e:?}"))
     }
 }
 
 impl From<toml::ser::Error> for BridgerError {
     fn from(e: toml::ser::Error) -> Self {
-        Self::Config(format!("{:?}", e))
+        Self::Config(format!("{e:?}"))
     }
 }
 
 impl From<config::ConfigError> for BridgerError {
     fn from(e: ConfigError) -> Self {
-        Self::Config(format!("{:?}", e))
+        Self::Config(format!("{e:?}"))
     }
 }

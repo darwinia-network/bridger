@@ -28,7 +28,7 @@ impl<C: S2SClientGeneric> SubscribeJustification<C> {
         }));
         join_a
             .await
-            .map_err(|e| S2SClientError::RPC(format!("{:?}", e)))??;
+            .map_err(|e| S2SClientError::RPC(format!("{e:?}")))??;
         Ok(())
     }
 }
@@ -66,7 +66,7 @@ where
         match next_justification {
             Some(justification) => {
                 let justification =
-                    justification.map_err(|e| S2SClientError::RPC(format!("{:?}", e)))?;
+                    justification.map_err(|e| S2SClientError::RPC(format!("{e:?}")))?;
                 tracing::info!(
                     target: "relay-s2s",
                     "{} subscribed new justification for {}",

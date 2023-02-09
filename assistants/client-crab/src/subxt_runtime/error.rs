@@ -9,6 +9,6 @@ pub enum ConvertTypeError {
 
 impl From<array_bytes::Error> for ConvertTypeError {
     fn from(error: array_bytes::Error) -> Self {
-        Self::ArrayBytes(format!("{:?}", error))
+        Self::ArrayBytes(format!("{error:?}"))
     }
 }

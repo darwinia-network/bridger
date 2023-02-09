@@ -64,13 +64,13 @@ impl Subscan {
         page: u32,
         row: u32,
     ) -> SubscanComponentResult<SubscanResponse<ExtrinsicsData>> {
-        let data = format!(r#"{{"row": {},"page": {}, "signed": "signed"}}"#, row, page);
+        let data = format!(r#"{{"row": {row},"page": {page}, "signed": "signed"}}"#);
         self._post("/api/scan/extrinsics", data).await
     }
 
     // https://docs.api.subscan.io/#price
     pub async fn price(&self, time: u64) -> SubscanComponentResult<SubscanResponse<OpenPrice>> {
-        let data = format!(r#"{{"time": {}}}"#, time);
+        let data = format!(r#"{{"time": {time}}}"#);
         self._post("/api/open/price", data).await
     }
 }

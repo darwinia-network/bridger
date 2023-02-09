@@ -6,6 +6,7 @@ use relay_s2s::header::SolochainHeaderRunner;
 use relay_s2s::types::SolochainHeaderInput;
 
 use support_lifeline::service::BridgeService;
+use support_toolkit::timecount::TimeCount;
 
 use crate::bridge::config::solo_with_solo::BridgeConfig;
 use crate::bridge::BridgeBus;
@@ -45,22 +46,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
         );
 
         let _greet = Self::try_task(&task_name, async move {
-            while let Err(e) = Self::start(bridge_config.clone()).await {
-                tracing::error!(
-                    target: "bin-s2s",
-                    "[header-relay] [{}-to-{}] an error occurred for header relay {:?}",
-                    config_chain.source.chain().name(),
-                    config_chain.target.chain().name(),
-                    e,
-                );
-                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                tracing::info!(
-                    target: "bin-s2s",
-                    "[header-relay] [{}-to-{}] try to restart header relay service.",
-                    config_chain.source.chain().name(),
-                    config_chain.target.chain().name(),
-                );
-            }
+            Self::start(bridge_config.clone()).await;
             Ok(())
         });
         Ok(Self {
@@ -75,7 +61,37 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
 impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: SubqueryInfo>
     SourceToTargetHeaderRelayService<SCI, TCI, SI>
 {
-    async fn start(bridge_config: BridgeConfig<SCI, TCI, SI>) -> BinS2SResult<()> {
+    async fn start(bridge_config: BridgeConfig<SCI, TCI, SI>) {
+        let mut timecount = TimeCount::new();
+        while let Err(e) = Self::run(bridge_config.clone()).await {
+            tracing::error!(
+                target: "bin-s2s",
+                "[header-relay] [{}-to-{}] an error occurred for header relay {:?}",
+                config_chain.source.chain().name(),
+                config_chain.target.chain().name(),
+                e,
+            );
+            if let Err(_) = timecount.plus_and_check() {
+                tokio::time::sleep(std::time::Duration::from_secs(60 * 10)).await;
+                tracing::error!(
+                    target: "bin-s2s",
+                    "[header-relay] [{}-to-{}] many error occured, wait 10 minutes",
+                    config_chain.source.chain().name(),
+                    config_chain.target.chain().name(),
+                );
+                continue;
+            }
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            tracing::info!(
+                target: "bin-s2s",
+                "[header-relay] [{}-to-{}] try to restart header relay service.",
+                config_chain.source.chain().name(),
+                config_chain.target.chain().name(),
+            );
+        }
+    }
+
+    async fn run(bridge_config: BridgeConfig<SCI, TCI, SI>) -> BinS2SResult<()> {
         let relay_config = bridge_config.relay;
         let config_chain = bridge_config.chain;
         let config_index = bridge_config.index;

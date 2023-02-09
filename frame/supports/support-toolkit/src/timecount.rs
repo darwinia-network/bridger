@@ -5,22 +5,28 @@ pub struct TimeCount {
     time: Vec<u128>,
     max_count: u32,
     max_time_interval: Duration,
+    sleep_interval: Duration,
 }
 
 impl Default for TimeCount {
     fn default() -> Self {
-        Self::custom(3, Duration::from_secs(60 * 2))
+        Self::custom(3, Duration::from_secs(60 * 2), Duration::from_secs(60 * 10))
     }
 }
 
 impl TimeCount {
-    pub fn custom(max_count: u32, max_time_interval: Duration) -> Self {
+    pub fn custom(max_count: u32, max_time_interval: Duration, sleep_interval: Duration) -> Self {
         Self {
             count: 0,
             time: vec![timestamp()],
             max_count,
             max_time_interval,
+            sleep_interval,
         }
+    }
+
+    pub fn simple(sleep_interval: Duration) -> Self {
+        Self::custom(3, Duration::from_secs(60 * 2), sleep_interval)
     }
 
     pub fn new() -> Self {
@@ -35,7 +41,7 @@ impl TimeCount {
         self
     }
 
-    pub fn plus_and_check(&mut self) -> Result<&mut Self, &str> {
+    pub fn plus_and_check(&mut self) -> Result<&mut Self, Duration> {
         let now = timestamp();
         let last_time = self.time.get(self.count as usize).copied().unwrap_or(now);
         let interval = now - last_time;
@@ -55,7 +61,7 @@ impl TimeCount {
 
         self.reset();
 
-        Err("check failed")
+        Err(self.sleep_interval)
     }
 }
 

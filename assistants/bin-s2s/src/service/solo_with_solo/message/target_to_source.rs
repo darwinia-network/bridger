@@ -7,6 +7,7 @@ use relay_s2s::message::{BridgeSolochainDeliveryRunner, BridgeSolochainReceiving
 use relay_s2s::types::{MessageDeliveryInput, MessageReceivingInput};
 
 use support_lifeline::service::BridgeService;
+use support_toolkit::timecount::TimeCount;
 
 use crate::bridge::config::solo_with_solo::BridgeConfig;
 use crate::bridge::BridgeBus;
@@ -47,6 +48,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
         );
 
         let _greet_delivery = Self::try_task(&task_delivery_name, async move {
+            let mut timecount = TimeCount::new();
             while let Err(e) = Self::start_delivery(bridge_config.clone()).await {
                 tracing::error!(
                     target: "bin-s2s",
@@ -55,6 +57,16 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
                     config_chain.source.chain().name(),
                     e,
                 );
+                if let Err(duration) = timecount.plus_and_check() {
+                    tokio::time::sleep(duration).await;
+                    tracing::error!(
+                        target: "bin-s2s",
+                        "[message-relay] [{}-to-{}] many errors occured, wait {} seconds",
+                        config_chain.target.chain().name(),
+                        config_chain.source.chain().name(),
+                        duration.as_secs(),
+                    );
+                }
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 tracing::info!(
                     target: "bin-s2s",
@@ -74,6 +86,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
             config_chain.source.chain().name(),
         );
         let _greet_receiving = Self::try_task(&task_receiving_name, async move {
+            let mut timecount = TimeCount::new();
             while let Err(e) = Self::start_receiving(bridge_config.clone()).await {
                 tracing::error!(
                     target: "bin-s2s",
@@ -82,6 +95,16 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
                     config_chain.source.chain().name(),
                     e,
                 );
+                if let Err(duration) = timecount.plus_and_check() {
+                    tokio::time::sleep(duration).await;
+                    tracing::error!(
+                        target: "bin-s2s",
+                        "[message-relay] [{}-to-{}] many errors occured, wait {} seconds",
+                        config_chain.target.chain().name(),
+                        config_chain.source.chain().name(),
+                        duration.as_secs(),
+                    );
+                }
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 tracing::info!(
                     target: "bin-s2s",

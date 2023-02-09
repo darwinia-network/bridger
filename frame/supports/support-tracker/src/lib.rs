@@ -33,9 +33,9 @@ impl Tracker {
         let key = key.as_ref();
         Self {
             microkv,
-            key_current: format!("{}.current", key),
-            key_planned: format!("{}.planned", key),
-            key_running: format!("{}.running", key),
+            key_current: format!("{key}.current"),
+            key_planned: format!("{key}.planned"),
+            key_running: format!("{key}.running"),
         }
     }
 }

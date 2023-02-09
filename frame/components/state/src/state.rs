@@ -34,7 +34,7 @@ impl BridgeState {
             .db_name
             .clone()
             .unwrap_or_else(|| "database".to_string());
-        let store_path = &config_microkv.base_path.join(format!("{}.kv", db_name));
+        let store_path = &config_microkv.base_path.join(format!("{db_name}.kv"));
         tracing::debug!(
             target: "component-state",
             "KVDB PATH: {} and the auto_commit is opened",

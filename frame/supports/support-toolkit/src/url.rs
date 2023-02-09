@@ -21,7 +21,7 @@ pub fn correct_endpoint(url: impl AsRef<str>) -> TkResult<String> {
         );
         return Ok(better_url);
     }
-    Err(TkError::Custom(format!("Wrong url: {}", url)))
+    Err(TkError::Custom(format!("Wrong url: {url}")))
 }
 
 fn common_correct_endpoint(is_ssl: bool, fixed: impl AsRef<str>) -> TkResult<String> {
@@ -32,7 +32,7 @@ fn common_correct_endpoint(is_ssl: bool, fixed: impl AsRef<str>) -> TkResult<Str
     let mut better_host = origin_host.to_string();
     if !origin_host.contains(':') {
         let port = if is_ssl { 443 } else { 80 };
-        better_host = format!("{}:{}", better_host, port);
+        better_host = format!("{better_host}:{port}");
     }
     parts.remove(0);
     Ok(format!("{}{}", better_host, parts.join("/")))

@@ -75,7 +75,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
                 tokio::time::sleep(std::time::Duration::from_secs(60 * 10)).await;
                 tracing::error!(
                     target: "bin-s2s",
-                    "[header-relay] [{}-to-{}] many error occured, wait 10 minutes",
+                    "[header-relay] [{}-to-{}] many errors occured, wait 10 minutes",
                     config_chain.source.chain().name(),
                     config_chain.target.chain().name(),
                 );

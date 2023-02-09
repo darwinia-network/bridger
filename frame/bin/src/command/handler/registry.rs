@@ -57,7 +57,7 @@ fn handle_set(type_: RegistryType, mut path: Option<String>) -> color_eyre::Resu
     tracing::trace!(
         target: "bridger",
         "Set registry [{}]{}",
-        format!("{:?}", type_).cyan(),
+        format!("{type_:?}").cyan(),
         if let Some(v) = &path { format!(": {}", v) } else { Default::default() }
     );
     config.registry.type_ = type_;

@@ -64,13 +64,11 @@ pub trait EcdsaClient: Debug + Send + Sync + Clone + 'static {
 
     async fn submit_authorities_change_signature(
         &self,
-        address: [u8; 20],
         signatures: Vec<u8>,
     ) -> E2EClientResult<<Self::SubxtConfig as Config>::Hash>;
 
     async fn submit_new_message_root_signature(
         &self,
-        address: [u8; 20],
         signatures: Vec<u8>,
     ) -> E2EClientResult<<Self::SubxtConfig as Config>::Hash>;
 }

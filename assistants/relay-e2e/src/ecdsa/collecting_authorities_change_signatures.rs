@@ -55,10 +55,9 @@ impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
             return Ok(Some(event.block_number));
         }
 
-        let address = darwinia_evm_account.address()?;
         let signature = darwinia_evm_account.sign(event.message.as_slice())?;
         let hash = client_darwinia_substrate
-            .submit_authorities_change_signature(address.0, signature)
+            .submit_authorities_change_signature(signature)
             .await?;
         tracing::info!(
             target: "relay-e2e",

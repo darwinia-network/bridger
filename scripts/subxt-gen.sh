@@ -48,6 +48,11 @@ if [ "${CHAIN}" == "darwinia" ]; then
   OUTPUT_PATH=${WORK_PATH}/assistants/client-darwinia
 fi
 
+if [ "${CHAIN}" == "darwinia2" ]; then
+  ENDPOINT='http://g1.dev.darwinia.network:10000'
+  OUTPUT_PATH=${WORK_PATH}/assistants/client-darwinia
+fi
+
 if [ "${CHAIN}" == "darwinia-parachain" ]; then
   ENDPOINT='http://127.0.0.1:9988'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-darwinia-parachain

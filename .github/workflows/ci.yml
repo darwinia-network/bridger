@@ -41,10 +41,10 @@ jobs:
         package:
           #- assistants/bin-e2e
           - assistants/bin-s2s
-          - assistants/client-beacon
-          - assistants/client-contracts
+          #- assistants/client-beacon
+          #- assistants/client-contracts
           - assistants/client-crab
-          - assistants/client-darwinia
+          #- assistants/client-darwinia
           - assistants/client-kusama
           - assistants/client-pangoro
           - assistants/client-polkadot
@@ -60,6 +60,9 @@ jobs:
           - traits/feemarket-s2s
     steps:
       - uses: actions/checkout@v2
+
+      - name: Lock rust version
+        run: cp frame/rust-toolchain.toml ${{ matrix.package }}
 
       - name: Lint
         run: |

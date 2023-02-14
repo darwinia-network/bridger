@@ -7,8 +7,8 @@ on:
     branches: [master]
 
 jobs:
-  check-bridger:
-    name: Check bridger
+  check-frame:
+    name: Check frame
     runs-on: ubuntu-latest
     container:
       image: rust:1
@@ -30,6 +30,53 @@ jobs:
           repo: darwinia-network/bridger
           workflow_id: ${{ github.run_id }}
           access_token: ${{ github.token }}
+
+  check-crate:
+    name: Check crate
+    runs-on: ubuntu-latest
+    container:
+      image: rust:1
+    strategy:
+      matrix:
+        package:
+          - assistants/bin-e2e
+          - assistants/bin-s2s
+          - assistants/client-beacon
+          - assistants/client-contracts
+          - assistants/client-crab
+          - assistants/client-darwinia
+          - assistants/client-kusama
+          - assistants/client-pangoro
+          - assistants/client-polkadot
+          - assistants/ecdsa-pair
+          - assistants/feemarket-s2s
+          - assistants/relay-e2e
+          - assistants/relay-s2s
+          - assistants/subquery
+          - assistants/thegraph
+          - traits/bridge-e2e
+          - traits/bridge-s2s
+          - traits/client-common
+          - traits/feemarket-s2s
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Lint
+        run: |
+          cd ${{ matrix.package }}
+          cargo clippy --release --all -- -D warnings
+      - name: Run tests
+        run: |
+          cd ${{ matrix.package }}
+          cargo test --release
+
+      - uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: darwinia-network/bridger
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
+
 
   check-bridges:
     name: Check bridge-${{ matrix.bridge }}

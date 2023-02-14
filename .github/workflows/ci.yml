@@ -46,7 +46,7 @@ jobs:
           - assistants/client-crab
           #- assistants/client-darwinia
           - assistants/client-kusama
-          - assistants/client-pangoro
+          #- assistants/client-pangoro
           - assistants/client-polkadot
           - assistants/ecdsa-pair
           - assistants/feemarket-s2s

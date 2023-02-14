@@ -150,7 +150,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                     M_RECEIVING,
                     SC::CHAIN,
                     TC::CHAIN,
-                    vec![array_bytes::bytes2hex("0x", &lane),],
+                    vec![array_bytes::bytes2hex("0x", lane),],
                 ),
             );
             return Ok(None);
@@ -194,7 +194,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                         M_RECEIVING,
                         SC::CHAIN,
                         TC::CHAIN,
-                        vec![array_bytes::bytes2hex("0x", &lane),],
+                        vec![array_bytes::bytes2hex("0x", lane),],
                     ),
                     TC::CHAIN,
                 );
@@ -225,7 +225,7 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay, DC: DifferentClientApi<SC>>
                 M_RECEIVING,
                 SC::CHAIN,
                 TC::CHAIN,
-                vec![array_bytes::bytes2hex("0x", &lane),],
+                vec![array_bytes::bytes2hex("0x", lane),],
             ),
             array_bytes::bytes2hex("0x", hash),
         );

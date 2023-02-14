@@ -88,7 +88,7 @@ async fn test_transfer_call() {
 
 #[test]
 fn test_sign() {
-    let pair = patch_substrate::crypto::ethereum::Pair::from_string(ALITH, None).unwrap();
+    let pair = ecdsa_pair::crypto::ethereum::Pair::from_string(ALITH, None).unwrap();
     let message = b"a";
     let signature = pair.sign(message);
     println!("{:?}", signature);

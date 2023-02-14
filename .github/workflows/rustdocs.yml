@@ -11,7 +11,7 @@ env:
 
 jobs:
 
-  build-rust-docs-frame:
+  build-frame:
     name: Build rust docs (frame)
     runs-on: ubuntu-latest
     steps:
@@ -36,7 +36,7 @@ jobs:
           name: shared-artifact
           path: rust_docs
 
-  build-rust-docs-bridge:
+  build-bridge:
     name: Build rust docs (${{ matrix.package }})
     runs-on: ubuntu-latest
     strategy:
@@ -69,7 +69,7 @@ jobs:
           path: rust_docs
 
 
-  build-rust-docs-assistants:
+  build-assistants:
     name: Build rust docs (${{ matrix.package }})
     runs-on: ubuntu-latest
     strategy:
@@ -103,7 +103,7 @@ jobs:
           path: rust_docs
 
 
-  build-rust-docs-traits:
+  build-traits:
     name: Build rust docs (${{ matrix.package }})
     runs-on: ubuntu-latest
     strategy:
@@ -138,10 +138,10 @@ jobs:
     name: Deploy rust docs
     runs-on: ubuntu-latest
     needs:
-      - build-rust-docs-frame
-      - build-rust-docs-bridge
-      - build-rust-docs-assistants
-      - build-rust-docs-traits
+      - build-frame
+      - build-bridge
+      - build-assistants
+      - build-traits
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2

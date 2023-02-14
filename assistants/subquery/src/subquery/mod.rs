@@ -11,12 +11,15 @@ mod bridge_ethv2;
 mod bridge_s2s;
 
 /// Graphql dir
+#[allow(dead_code)]
 static GRAPHQL_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/graphql");
 
 /// Subquery client
 #[derive(Clone, Debug)]
 pub struct Subquery {
+    #[allow(dead_code)]
     client: Client,
+    #[allow(dead_code)]
     bridge: BridgeName,
 }
 
@@ -28,12 +31,13 @@ impl Subquery {
 }
 
 impl Subquery {
+    #[allow(dead_code)]
     fn read_graphql(&self, file: impl AsRef<str>) -> SubqueryComponentResult<&str> {
         let file = file.as_ref();
         let dir = self.bridge.name();
         let graph = GRAPHQL_DIR
-            .get_file(format!("{}/{}", dir, file))
-            .or_else(|| GRAPHQL_DIR.get_file(format!("generic/{}", file)))
+            .get_file(format!("{dir}/{file}"))
+            .or_else(|| GRAPHQL_DIR.get_file(format!("generic/{file}")))
             .ok_or_else(|| SubqueryComponentError::GraphQL("No graphql fround".to_string()))?;
         graph.contents_utf8().ok_or_else(|| {
             SubqueryComponentError::GraphQL("Failed to read graphql file".to_string())

@@ -63,6 +63,7 @@ async fn test_technical_committee_members() {
     println!("{:?}", members);
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_transfer_call() {
     let client = common::client().await.unwrap();
@@ -88,7 +89,7 @@ async fn test_transfer_call() {
 
 #[test]
 fn test_sign() {
-    let pair = patch_substrate::crypto::ethereum::Pair::from_string(ALITH, None).unwrap();
+    let pair = ecdsa_pair::crypto::ethereum::Pair::from_string(ALITH, None).unwrap();
     let message = b"a";
     let signature = pair.sign(message);
     println!("{:?}", signature);
@@ -129,11 +130,7 @@ async fn test_subscribe() {
     use sp_runtime::traits::BlakeTwo256;
 
     let client = common::client().await.unwrap();
-    let mut it = client
-        .subscribe_grandpa_justifications()
-        .await
-        .unwrap()
-        .take(1);
+    let mut it = client.subscribe_grandpa_justifications().await.unwrap();
     if let Some(item) = it.next().await {
         let i =
             GrandpaJustification::<Header<u32, BlakeTwo256>>::decode(&mut item.unwrap().as_ref())

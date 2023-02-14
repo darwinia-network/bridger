@@ -17,22 +17,22 @@ static RECENTLY_JUSTIFICATIONS: Lazy<Mutex<HashMap<&str, VecDeque<sp_core::Bytes
 
 pub fn get_last_delivery_relayed_nonce(chain: &str) -> Option<u64> {
     let data = LAST_RELAYED_NONCE.lock().unwrap();
-    data.get(&format!("{}-delivery", chain)).cloned()
+    data.get(&format!("{chain}-delivery")).cloned()
 }
 
 pub fn set_last_delivery_relayed_nonce(chain: &str, nonce: u64) {
     let mut data = LAST_RELAYED_NONCE.lock().unwrap();
-    data.insert(format!("{}-delivery", chain), nonce);
+    data.insert(format!("{chain}-delivery"), nonce);
 }
 
 pub fn get_last_receiving_relayed_nonce(chain: &str) -> Option<u64> {
     let data = LAST_RELAYED_NONCE.lock().unwrap();
-    data.get(&format!("{}-receiving", chain)).cloned()
+    data.get(&format!("{chain}-receiving")).cloned()
 }
 
 pub fn set_last_receiving_relayed_nonce(chain: &str, nonce: u64) {
     let mut data = LAST_RELAYED_NONCE.lock().unwrap();
-    data.insert(format!("{}-receiving", chain), nonce);
+    data.insert(format!("{chain}-receiving"), nonce);
 }
 
 pub fn set_recently_justification(chain: &'static str, justification: sp_core::Bytes) {

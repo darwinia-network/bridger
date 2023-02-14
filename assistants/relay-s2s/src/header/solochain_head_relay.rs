@@ -102,16 +102,13 @@ impl<SC: S2SClientRelay, TC: S2SClientRelay> SolochainHeaderRunner<SC, TC> {
         let client_source = &self.input.client_source;
         let client_target = &self.input.client_target;
         let block_hash = block_hash.as_ref();
-        let block_hash = sp_core::H256::from_str(block_hash).map_err(|e| {
-            RelayError::Custom(format!("Wrong block hash [{}] {:?}", block_hash, e))
-        })?;
+        let block_hash = sp_core::H256::from_str(block_hash)
+            .map_err(|e| RelayError::Custom(format!("Wrong block hash [{block_hash}] {e:?}")))?;
         let expected_block_hash = SmartCodecMapper::map_to(&block_hash)?;
         let header = client_source
             .header(Some(expected_block_hash))
             .await?
-            .ok_or_else(|| {
-                RelayError::Custom(format!("Not found header by hash: {}", block_hash))
-            })?;
+            .ok_or_else(|| RelayError::Custom(format!("Not found header by hash: {block_hash}")))?;
         let grandpa_justification =
             sp_runtime::codec::Decode::decode(&mut justification.as_slice())?;
         let expected_header = SmartCodecMapper::map_to(&header)?;

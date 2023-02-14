@@ -9,6 +9,7 @@ pub enum LikethChain {
 
 impl LikethChain {
     /// Graphql query directory
+    #[allow(dead_code)]
     pub(crate) fn directory(&self) -> &str {
         match self {
             Self::Ethereum => "ethereum",

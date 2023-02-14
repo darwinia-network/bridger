@@ -18,7 +18,7 @@ impl FromStr for HexLaneId {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let hex = array_bytes::hex2array(s)
-            .map_err(|e| BridgerError::Hex(format!("Failed to parse lane id: {:?}", e)))?;
+            .map_err(|e| BridgerError::Hex(format!("Failed to parse lane id: {e:?}")))?;
         Ok(HexLaneId(hex))
     }
 }

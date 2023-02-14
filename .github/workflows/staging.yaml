@@ -103,9 +103,6 @@ jobs:
           registry: quay.io
 
       - uses: benjlevesque/short-sha@v1.2
-        id: short-sha
-        with:
-          length: 7
 
       - name: Extract linux package
         run: |

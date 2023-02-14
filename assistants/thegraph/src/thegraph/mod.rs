@@ -8,12 +8,15 @@ use crate::types::LikethChain;
 mod bridge_ethv2;
 
 /// Graphql dir
+#[allow(dead_code)]
 static GRAPHQL_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/graphql");
 
 /// thegraph toolkit, query ethereum/ropsten
 #[derive(Clone, Debug)]
 pub struct Thegraph {
+    #[allow(dead_code)]
     client: Client,
+    #[allow(dead_code)]
     chain: LikethChain,
 }
 
@@ -24,12 +27,13 @@ impl Thegraph {
 }
 
 impl Thegraph {
+    #[allow(dead_code)]
     fn read_graphql(&self, file: impl AsRef<str>) -> ThegraphComponentReuslt<&str> {
         let file = file.as_ref();
         let dir = self.chain.directory();
         let graph = GRAPHQL_DIR
-            .get_file(format!("{}/{}", dir, file))
-            .or_else(|| GRAPHQL_DIR.get_file(format!("generic/{}", file)))
+            .get_file(format!("{dir}/{file}"))
+            .or_else(|| GRAPHQL_DIR.get_file(format!("generic/{file}")))
             .ok_or_else(|| {
                 TheGraphLikethComponentError::GraphQL("No graphql fround".to_string())
             })?;

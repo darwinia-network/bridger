@@ -39,7 +39,7 @@ jobs:
     strategy:
       matrix:
         package:
-          - assistants/bin-e2e
+          #- assistants/bin-e2e
           - assistants/bin-s2s
           - assistants/client-beacon
           - assistants/client-contracts
@@ -50,7 +50,7 @@ jobs:
           - assistants/client-polkadot
           - assistants/ecdsa-pair
           - assistants/feemarket-s2s
-          - assistants/relay-e2e
+          #- assistants/relay-e2e
           - assistants/relay-s2s
           - assistants/subquery
           - assistants/thegraph

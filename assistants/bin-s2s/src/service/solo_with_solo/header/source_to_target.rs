@@ -6,6 +6,7 @@ use relay_s2s::header::SolochainHeaderRunner;
 use relay_s2s::types::SolochainHeaderInput;
 
 use support_lifeline::service::BridgeService;
+use support_toolkit::timecount::TimeCount;
 
 use crate::bridge::config::solo_with_solo::BridgeConfig;
 use crate::bridge::BridgeBus;
@@ -45,6 +46,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
         );
 
         let _greet = Self::try_task(&task_name, async move {
+            let mut timecount = TimeCount::new();
             while let Err(e) = Self::start(bridge_config.clone()).await {
                 tracing::error!(
                     target: "bin-s2s",
@@ -53,6 +55,16 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
                     config_chain.target.chain().name(),
                     e,
                 );
+                if let Err(duration) = timecount.plus_and_check() {
+                    tokio::time::sleep(duration).await;
+                    tracing::error!(
+                        target: "bin-s2s",
+                        "[header-relay] [{}-to-{}] many errors occurred, wait {} seconds",
+                        config_chain.source.chain().name(),
+                        config_chain.target.chain().name(),
+                        duration.as_secs(),
+                    );
+                }
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 tracing::info!(
                     target: "bin-s2s",

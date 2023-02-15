@@ -88,6 +88,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
         );
 
         let _greet_receiving = Self::try_task(&task_receiving_name, async move {
+            let mut timecount = TimeCount::new();
             while let Err(e) = Self::start_receiving(bridge_config.clone()).await {
                 tracing::error!(
                     target: "bin-s2s",

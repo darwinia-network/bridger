@@ -48,6 +48,7 @@ impl<SCI: S2SSoloBridgeSoloChainInfo, TCI: S2SSoloBridgeSoloChainInfo, SI: Subqu
         );
 
         let _greet_delivery = Self::try_task(&task_delivery_name, async move {
+            let mut timecount = TimeCount::new();
             while let Err(e) = Self::start_delivery(bridge_config.clone()).await {
                 tracing::error!(
                     target: "bin-s2s",

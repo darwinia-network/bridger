@@ -4,7 +4,7 @@ const darwinia = {
     evm: 'https://rpc.darwinia.network',
   },
   name: 'Darwinia',
-  logo: 'https://polkadot.js.org/apps/static/darwinia.70c5ca41..svg',
+  logo: 'https://docs.darwinia.network/img/favicon.svg',
   color: 'pink',
   explorer: 'https://darwinia.subscan.io',
   currency: 'RING',
@@ -39,7 +39,7 @@ const crab = {
     websocket: 'wss://crab-rpc.darwinia.network',
   },
   name: 'Crab',
-  logo: 'https://polkadot.js.org/apps/static/crab.ebc98461..svg',
+  logo: 'https://docs.crab.network/img/favicon.svg',
   color: 'deep-purple',
   explorer: 'https://crab.subscan.io',
   currency: 'CRAB',
@@ -287,7 +287,7 @@ const ethereum = {
 
 const lodestarMainnet = {
   endpoint: {
-    http: 'https://lodestar-mainnet-rpc.darwinia.network',
+    http: 'https://cors.kahub.in/https://www.lightclientdata.org',
   },
   name: 'Lodestar',
   logo: 'https://chainsafe.github.io/lodestar/assets/lodestar_icon_300.png',

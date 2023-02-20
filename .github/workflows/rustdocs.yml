@@ -44,6 +44,7 @@ jobs:
         package:
           - darwinia-crab
           - darwinia-ethereum
+          - pangolin-pangoro
           - pangoro-chapel
           - pangoro-goerli
           - template

@@ -87,7 +87,7 @@ if [ "${CHAIN}" == "kusama" ]; then
 fi
 
 if [ "${CHAIN}" == "moonbase" ]; then
-  ENDPOINT='https://frag-moonbase-relay-rpc.g.moonbase.moonbeam.network'
+  ENDPOINT='https://frag-moonbase-relay-rpc.g.moonbase.moonbeam.network:443'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-moonbase
 fi
 

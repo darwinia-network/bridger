@@ -9,7 +9,7 @@ use crate::client::RococoClient;
 impl S2SParaBridgeClientRelaychain for RococoClient {
     fn gen_parachain_head_storage_key(&self, para_id: u32) -> Vec<u8> {
         let address = crate::subxt_runtime::api::storage().paras().heads(
-            &crate::subxt_runtime::api::runtime_types::rococo_parachain::primitives::Id(para_id),
+            &crate::subxt_runtime::api::runtime_types::polkadot_parachain::primitives::Id(para_id),
         );
         address.to_bytes()
     }
@@ -20,7 +20,7 @@ impl S2SParaBridgeClientRelaychain for RococoClient {
         hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<Option<HeadData>> {
         let address = crate::subxt_runtime::api::storage().paras().heads(
-            &crate::subxt_runtime::api::runtime_types::rococo_parachain::primitives::Id(para_id.0),
+            &crate::subxt_runtime::api::runtime_types::polkadot_parachain::primitives::Id(para_id.0),
         );
         Ok(self
             .subxt()

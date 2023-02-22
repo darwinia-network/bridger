@@ -31,7 +31,7 @@ OUTPUT_FILE=
 
 
 if [ "${CHAIN}" == "pangolin" ]; then
-  ENDPOINT='https://pangolin-rpc.darwinia.network'
+  ENDPOINT='https://pangolin-rpc.darwinia.network:443'
 #  ENDPOINT='http://127.0.0.1:9966'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-pangolin
 fi

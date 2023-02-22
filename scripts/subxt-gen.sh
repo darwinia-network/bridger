@@ -54,7 +54,7 @@ if [ "${CHAIN}" == "darwinia-parachain" ]; then
 fi
 
 if [ "${CHAIN}" == "rococo" ]; then
-  ENDPOINT='https://rococo-rpc.polkadot.io'
+  ENDPOINT='https://rococo-rpc.polkadot.io:443'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-rococo
 fi
 

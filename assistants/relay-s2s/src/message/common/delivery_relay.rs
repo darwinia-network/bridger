@@ -2,7 +2,7 @@ use std::ops::RangeInclusive;
 
 use bridge_s2s_traits::client::S2SClientRelay;
 use bridge_s2s_traits::strategy::RelayStrategy;
-use bridge_s2s_traits::types::bp_messages::OutboundLaneData;
+use bridge_s2s_traits::types::bp_messages::{OutboundLaneData, Weight};
 use bridge_s2s_traits::types::bridge_runtime_common::messages::target::FromBridgedChainMessagesProof;
 use sp_runtime::traits::Header;
 
@@ -321,7 +321,7 @@ where
                 expected_relayer_id,
                 expected_proof,
                 (nonces.end() - nonces.start() + 1) as _,
-                total_weight,
+                Weight::from_ref_time(total_weight),
             )
             .await?;
 

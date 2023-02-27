@@ -1,21 +1,20 @@
-use subxt::Client;
+use subxt::client::OnlineClient;
 
 use crate::config::PangoroSubxtConfig;
-use crate::subxt_runtime::api::RuntimeApi;
-use crate::types::{DarwiniaAccount, NodeRuntimeSignedExtra};
+use crate::types::DarwiniaAccount;
 
 /// Pangoro client
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub struct PangoroClient {
     /// Runtime api
-    client: Client<PangoroSubxtConfig>,
-    /// Darwinia Account
+    client: OnlineClient<PangoroSubxtConfig>,
+    /// Pangoro Account
     account: DarwiniaAccount,
 }
 
 impl PangoroClient {
-    /// Create a new Pangoro client
-    pub fn new(client: Client<PangoroSubxtConfig>, account: DarwiniaAccount) -> Self {
+    /// Create a new darwinia client
+    pub fn new(client: OnlineClient<PangoroSubxtConfig>, account: DarwiniaAccount) -> Self {
         Self { client, account }
     }
 }
@@ -30,12 +29,7 @@ impl PangoroClient {
 /// patch rpc api
 impl PangoroClient {
     /// Get original subxt client
-    pub fn subxt(&self) -> &Client<PangoroSubxtConfig> {
+    pub fn subxt(&self) -> &OnlineClient<PangoroSubxtConfig> {
         &self.client
-    }
-
-    /// Runtime api
-    pub fn runtime(&self) -> RuntimeApi<PangoroSubxtConfig, NodeRuntimeSignedExtra> {
-        self.client.clone().to_runtime_api()
     }
 }

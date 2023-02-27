@@ -1,3 +1,3 @@
-#[cfg(feature = "bridge-s2s-pangolin")]
-pub mod bridge_pangolin;
+#[cfg(feature = "bridge-pangolin-pangoro")]
+pub mod bridge_pangolin_pangoro;
 pub mod generic;

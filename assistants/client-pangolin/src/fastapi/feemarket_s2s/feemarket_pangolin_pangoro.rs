@@ -21,7 +21,7 @@ impl FeemarketApiRelay for PangolinClient {
         >,
     > {
         let address = crate::subxt_runtime::api::storage()
-            .darwinia_fee_market()
+            .pangoro_fee_market()
             .orders(lane_id, message_nonce);
 
         match self.subxt().storage().fetch(&address, None).await? {

@@ -2,6 +2,7 @@ use std::ops::RangeInclusive;
 
 use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay, S2SParaBridgeClientSolochain};
 use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
+use bridge_s2s_traits::types::bp_messages::Weight;
 use bridge_s2s_traits::types::{
     bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,
 };
@@ -24,7 +25,7 @@ type FromThisChainMessagePayload = crate::types::runtime_types::bp_message_dispa
 impl S2SClientRelay for PangolinClient {
     fn gen_outbound_messages_storage_key(&self, lane: [u8; 4], message_nonce: u64) -> Vec<u8> {
         let address = crate::subxt_runtime::api::storage()
-            .bridge_darwinia_messages()
+            .bridge_pangoro_messages()
             .outbound_messages(
                 &crate::subxt_runtime::api::runtime_types::bp_messages::MessageKey {
                     lane_id: lane,
@@ -36,14 +37,14 @@ impl S2SClientRelay for PangolinClient {
 
     fn gen_outbound_lanes_storage_key(&self, lane: [u8; 4]) -> Vec<u8> {
         let address = crate::subxt_runtime::api::storage()
-            .bridge_darwinia_messages()
+            .bridge_pangoro_messages()
             .outbound_lanes(&lane);
         address.to_bytes()
     }
 
     fn gen_inbound_lanes_storage_key(&self, lane: [u8; 4]) -> Vec<u8> {
         let address = crate::subxt_runtime::api::storage()
-            .bridge_darwinia_messages()
+            .bridge_pangoro_messages()
             .inbound_lanes(&lane);
         address.to_bytes()
     }
@@ -87,7 +88,7 @@ impl S2SClientRelay for PangolinClient {
         )>,
     > {
         let address = crate::subxt_runtime::api::storage()
-            .bridge_polkadot_grandpa()
+            .bridge_moonbase_grandpa()
             .best_finalized();
         match self.subxt().storage().fetch(&address, at_block).await? {
             Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
@@ -100,7 +101,7 @@ impl S2SClientRelay for PangolinClient {
         initialization_data: <Self as S2SClientGeneric>::InitializationData,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let call = crate::subxt_runtime::api::tx()
-            .bridge_polkadot_grandpa()
+            .bridge_moonbase_grandpa()
             .initialize(initialization_data);
         let track = self
             .subxt()
@@ -128,7 +129,7 @@ impl S2SClientRelay for PangolinClient {
         let expected_justification = SmartCodecMapper::map_to(&justification)?;
 
         let call = crate::subxt_runtime::api::tx()
-            .bridge_polkadot_grandpa()
+            .bridge_moonbase_grandpa()
             .submit_finality_proof(expected_target, expected_justification);
         let track = self
             .subxt()
@@ -152,7 +153,7 @@ impl S2SClientRelay for PangolinClient {
         hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<bp_messages::OutboundLaneData> {
         let address = crate::subxt_runtime::api::storage()
-            .bridge_darwinia_messages()
+            .bridge_pangoro_messages()
             .outbound_lanes(&lane);
         let outbound_lane_data = self
             .subxt()
@@ -169,7 +170,7 @@ impl S2SClientRelay for PangolinClient {
         hash: Option<<Self::Chain as Chain>::Hash>,
     ) -> S2SClientResult<bp_messages::InboundLaneData<<Self::Chain as Chain>::AccountId>> {
         let address = crate::subxt_runtime::api::storage()
-            .bridge_darwinia_messages()
+            .bridge_pangoro_messages()
             .inbound_lanes(&lane);
         let inbound_lane_data = self
             .subxt()
@@ -187,7 +188,7 @@ impl S2SClientRelay for PangolinClient {
     ) -> S2SClientResult<Option<bp_messages::MessageData<u128>>> {
         let expected_message_key = SmartCodecMapper::map_to(&message_key)?;
         let address = crate::subxt_runtime::api::storage()
-            .bridge_darwinia_messages()
+            .bridge_pangoro_messages()
             .outbound_messages(&expected_message_key);
         match self.subxt().storage().fetch(&address, hash).await? {
             Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
@@ -202,19 +203,18 @@ impl S2SClientRelay for PangolinClient {
             <Self::Chain as Chain>::Hash,
         >,
         messages_count: u32,
-        dispatch_weight: u64,
+        dispatch_weight: Weight,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let relayer_id_at_bridged_chain = SmartCodecMapper::map_to(&relayer_id_at_bridged_chain)?;
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
+        let expected_dispatch_weight = SmartCodecMapper::map_to(&dispatch_weight)?;
         let call = crate::subxt_runtime::api::tx()
-            .bridge_darwinia_messages()
+            .bridge_pangoro_messages()
             .receive_messages_proof(
                 relayer_id_at_bridged_chain,
                 expected_proof,
                 messages_count,
-                crate::subxt_runtime::api::runtime_types::sp_weights::weight_v2::Weight {
-                    ref_time: dispatch_weight,
-                },
+                expected_dispatch_weight,
             );
         let track = self
             .subxt()
@@ -241,7 +241,7 @@ impl S2SClientRelay for PangolinClient {
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
         let expected_relayers_state = SmartCodecMapper::map_to(&relayers_state)?;
         let call = crate::subxt_runtime::api::tx()
-            .bridge_darwinia_messages()
+            .bridge_pangoro_messages()
             .receive_messages_delivery_proof(expected_proof, expected_relayers_state);
         let track = self
             .subxt()
@@ -268,7 +268,7 @@ impl S2SParaBridgeClientSolochain for PangolinClient {
     ) -> S2SClientResult<Option<bridge_s2s_traits::types::ParaInfo>> {
         let expected_para_id = SmartCodecMapper::map_to(&para_id)?;
         let address = crate::subxt_runtime::api::storage()
-            .bridge_polkadot_parachain()
+            .bridge_moonbase_parachain()
             .paras_info(&expected_para_id);
         match self.subxt().storage().fetch(&address, hash).await? {
             Some(v) => Ok(Some(SmartCodecMapper::map_to(&v)?)),
@@ -292,7 +292,7 @@ impl S2SParaBridgeClientSolochain for PangolinClient {
         let expected_parachains = SmartCodecMapper::map_to(&parachains)?;
 
         let call = crate::subxt_runtime::api::tx()
-            .bridge_polkadot_parachain()
+            .bridge_moonbase_parachain()
             .submit_parachain_heads(
             expected_relay_block,
             expected_parachains,

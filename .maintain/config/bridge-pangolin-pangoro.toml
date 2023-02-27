@@ -1,0 +1,19 @@
+[pangolin]
+endpoint = "wss://pangolin-rpc.darwinia.network"
+signer   = "//Alice"
+para_id  = 2105
+
+[crab]
+endpoint = "wss://pangoro-rpc.darwinia.network"
+signer   = "//Alice"
+para_id  = 2105
+
+[relay]
+lanes            = ["726f6c69"]
+enable_mandatory = false
+
+[index]
+pangolin = { endpoint = "https://subql.darwinia.network/subql-bridger-pangolin" }
+pangoro  = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro" }
+rococo   = { endpoint = "https://subql.darwinia.network/subql-bridger-rococo" }
+moonbase = { endpoint = "https://subql.darwinia.network/subql-bridger-moonbase" }

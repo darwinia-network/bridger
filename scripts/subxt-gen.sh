@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 
 set -e
@@ -37,7 +37,7 @@ if [ "${CHAIN}" == "pangolin" ]; then
 fi
 
 if [ "${CHAIN}" == "pangoro" ]; then
-  ENDPOINT='https://pangoro-rpc.darwinia.network'
+  ENDPOINT='http://g1.dev.darwinia.network:10000'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-pangoro
 fi
 

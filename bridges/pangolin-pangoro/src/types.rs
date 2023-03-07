@@ -83,7 +83,7 @@ impl S2SParaBridgeSoloChainInfo for PangolinChainConfig {
     fn account(
         &self,
     ) -> BinS2SResult<<<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId> {
-        let account = client_pangolin::types::PangolinAccount::new(self.signer.clone(), None)
+        let account = client_pangolin::types::DarwiniaAccount::new(self.signer.clone(), None)
             .map_err(|e| BinS2SError::Client(format!("{e:?}")))?;
         Ok(*account.account_id())
     }
@@ -115,7 +115,7 @@ impl S2SParaBridgeSoloChainInfo for PangoroChainConfig {
     fn account(
         &self,
     ) -> BinS2SResult<<<Self::Client as ClientCommon>::Chain as bp_runtime::Chain>::AccountId> {
-        let account = client_pangoro::types::PangolinAccount::new(self.signer.clone(), None)
+        let account = client_pangoro::types::DarwiniaAccount::new(self.signer.clone(), None)
             .map_err(|e| BinS2SError::Client(format!("{e:?}")))?;
         Ok(*account.account_id())
     }

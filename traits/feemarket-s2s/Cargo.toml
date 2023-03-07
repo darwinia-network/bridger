@@ -17,12 +17,12 @@ thiserror   = "1"
 async-trait = "0.1"
 
 codec             = { package = "parity-scale-codec", version = "3" }
-bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
-pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
+bp-runtime        = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.37" }
+pallet-fee-market = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.37" }
 
 client-common-traits = { path = "../client-common" }
 
-subxt             = { optional = true, git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.30" }
+subxt             = { optional = true, git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.37" }
 
 [features]
 default = []

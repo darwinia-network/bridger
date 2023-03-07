@@ -90,7 +90,7 @@ jobs:
       matrix:
         bridge:
           - pangolin-pangoro
-          - darwinia-crab
+#          - darwinia-crab
 #          - pangoro-chapel
 #          - pangoro-goerli
     steps:

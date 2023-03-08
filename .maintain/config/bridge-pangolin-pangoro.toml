@@ -1,16 +1,22 @@
 [pangolin]
 endpoint = "wss://pangolin-rpc.darwinia.network"
-signer   = "//Alice"
+signer   = "0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133"
 para_id  = 2105
 
-[crab]
+[pangoro]
 endpoint = "wss://pangoro-rpc.darwinia.network"
-signer   = "//Alice"
+signer   = "0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133"
 para_id  = 2105
+
+[rococo]
+endpoint = "wss://rococo-rpc.polkadot.io"
+
+[moonbase]
+endpoint = "wss://frag-moonbase-relay-rpc-ws.g.moonbase.moonbeam.network"
 
 [relay]
 lanes            = ["726f6c69"]
-enable_mandatory = false
+enable_mandatory = true
 
 [index]
 pangolin = { endpoint = "https://subql.darwinia.network/subql-bridger-pangolin" }

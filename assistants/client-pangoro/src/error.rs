@@ -68,3 +68,11 @@ impl From<ClientError> for bridge_s2s_traits::error::S2SClientError {
         }
     }
 }
+
+
+#[cfg(feature = "bridge-ethv2")]
+impl From<ClientError> for bridge_e2e_traits::error::E2EClientError {
+    fn from(error: ClientError) -> Self {
+        Self::Custom(format!("{error:?}"))
+    }
+}

@@ -71,7 +71,7 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
                 parameter,
                 self.eth_light_client.private_key(),
                 Options {
-                    gas: Some(U256::from(10000000)),
+                    gas: Some(U256::from(5000000)),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },

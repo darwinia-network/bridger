@@ -126,15 +126,15 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             .beacon_api_client
             .find_valid_header_since(
                 current_head.header.message.slot,
-                sync_committee_update.attested_header.slot + 1,
+                sync_committee_update.attested_header.beacon.slot + 1,
             )
             .await?;
 
         let fork_version = self.beacon_api_client.get_fork_version("head").await?;
         let finalized_header_update = FinalizedHeaderUpdate {
-            attested_header: sync_committee_update.attested_header.to_contract_type()?,
+            attested_header: sync_committee_update.attested_header.beacon.to_contract_type()?,
             signature_sync_committee: current_sync_committee,
-            finalized_header: sync_committee_update.finalized_header.to_contract_type()?,
+            finalized_header: sync_committee_update.finalized_header.beacon.to_contract_type()?,
             finality_branch: sync_committee_update
                 .finality_branch
                 .iter()

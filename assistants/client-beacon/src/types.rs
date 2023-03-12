@@ -52,6 +52,11 @@ pub struct Header {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct BeaconHeaderMessage {
+    pub beacon: HeaderMessage,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct HeaderMessage {
     #[serde(deserialize_with = "from_str")]
     pub slot: u64,
@@ -102,10 +107,10 @@ impl SyncCommittee {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SyncCommitteePeriodUpdate {
-    pub attested_header: HeaderMessage,
+    pub attested_header: BeaconHeaderMessage,
     pub next_sync_committee: SyncCommittee,
     pub next_sync_committee_branch: Vec<String>,
-    pub finalized_header: HeaderMessage,
+    pub finalized_header: BeaconHeaderMessage,
     pub finality_branch: Vec<String>,
     pub sync_aggregate: SyncAggregate,
     pub signature_slot: String,
@@ -258,8 +263,8 @@ pub struct ForkVersion {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FinalityUpdate {
-    pub attested_header: HeaderMessage,
-    pub finalized_header: HeaderMessage,
+    pub attested_header: BeaconHeaderMessage,
+    pub finalized_header: BeaconHeaderMessage,
     pub finality_branch: Vec<String>,
     pub sync_aggregate: SyncAggregate,
 }

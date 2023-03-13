@@ -37,6 +37,9 @@ client-common-traits  = { path = "../../traits/client-common", features = ["subx
 finality-grandpa      = { optional = true, version = "0.16" }
 bridge-s2s-traits     = { optional = true, path = "../../traits/bridge-s2s", features = ["advanced-types"] }
 
+## e2e client
+bridge-e2e-traits     = { optional = true, path = "../../traits/bridge-e2e" }
+
 ## feemarket s2s
 feemarket-s2s-traits = { optional = true, path = "../../traits/feemarket-s2s", features = ["advanced-types"] }
 
@@ -67,3 +70,4 @@ feemarket-s2s   = [
   "feemarket-s2s-traits",
 ]
 feemarket-pangolin-pangoro = ["feemarket-s2s"]
+bridge-e2e      = ["bridge-e2e-traits", "async-trait"]

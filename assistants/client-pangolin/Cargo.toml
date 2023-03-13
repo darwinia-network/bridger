@@ -70,4 +70,4 @@ feemarket-s2s   = [
   "feemarket-s2s-traits",
 ]
 feemarket-pangolin-pangoro = ["feemarket-s2s"]
-bridge-e2e      = ["bridge-e2e-traits", "async-trait"]
+bridge-ethv2      = ["bridge-e2e-traits", "async-trait"]

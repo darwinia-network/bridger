@@ -103,7 +103,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
 
     pub async fn relay_latest(&mut self, state: HeaderRelayState) -> RelayResult<()> {
         let finality_update: FinalityUpdate = self.beacon_api_client.get_finality_update().await?;
-        let update_finality_slot = finality_update.finalized_header.slot;
+        let update_finality_slot = finality_update.finalized_header.beacon.slot;
         let update_finality_period = update_finality_slot.div(32).div(256);
 
         tracing::info!(
@@ -118,7 +118,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
 
         let (signature_slot, _) = self
             .beacon_api_client
-            .find_valid_header_since(state.current_slot, finality_update.attested_header.slot + 1)
+            .find_valid_header_since(state.current_slot, finality_update.attested_header.beacon.slot + 1)
             .await?;
         let sync_change = self
             .beacon_api_client
@@ -133,9 +133,9 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             .await?;
 
         let finalized_header_update = FinalizedHeaderUpdate {
-            attested_header: finality_update.attested_header.to_contract_type()?,
+            attested_header: finality_update.attested_header.beacon.to_contract_type()?,
             signature_sync_committee: sync_change[0].next_sync_committee.to_contract_type()?,
-            finalized_header: finality_update.finalized_header.to_contract_type()?,
+            finalized_header: finality_update.finalized_header.beacon.to_contract_type()?,
             finality_branch: finality_update
                 .finality_branch
                 .iter()
@@ -159,7 +159,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             .await?;
 
         if let [last_finality, target_finality] = sync_change.as_slice() {
-            let attested_slot: u64 = target_finality.attested_header.slot;
+            let attested_slot: u64 = target_finality.attested_header.beacon.slot;
             let (signature_slot, _) = self
                 .beacon_api_client
                 .find_valid_header_since(state.current_slot, attested_slot + 1)
@@ -170,9 +170,9 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                 .get_fork_version("head")
                 .await?;
             let finalized_header_update = FinalizedHeaderUpdate {
-                attested_header: target_finality.attested_header.to_contract_type()?,
+                attested_header: target_finality.attested_header.beacon.to_contract_type()?,
                 signature_sync_committee: last_finality.next_sync_committee.to_contract_type()?,
-                finalized_header: target_finality.finalized_header.to_contract_type()?,
+                finalized_header: target_finality.finalized_header.beacon.to_contract_type()?,
                 finality_branch: target_finality
                     .finality_branch
                     .iter()

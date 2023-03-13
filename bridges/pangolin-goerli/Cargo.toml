@@ -11,3 +11,4 @@ eth2_ssz_derive  = { git = "https://github.com/sigp/lighthouse", tag = "v3.3.0" 
 eth2_ssz_types   = { git = "https://github.com/sigp/lighthouse", tag = "v3.3.0" }
 tree_hash        = { git = "https://github.com/sigp/lighthouse", tag = "v3.3.0" }
 tree_hash_derive = { git = "https://github.com/sigp/lighthouse", tag = "v3.3.0" }
+

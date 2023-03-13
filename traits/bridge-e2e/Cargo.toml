@@ -20,6 +20,6 @@ tracing     = "0.1"
 web3        = { version = "0.18.0", features = ["signing"] }
 secp256k1   = { version = "0.21" }
 
-support-etherscan     = { path = "../../../frame/supports/support-etherscan" }
-client-contracts      = { path = "../../../assistants/client-contracts" }
-subxt                 = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.30" }
+support-etherscan     = { path = "../../frame/supports/support-etherscan" }
+client-contracts      = { path = "../../assistants/client-contracts" }
+subxt                 = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.37" }

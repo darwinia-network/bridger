@@ -1,3 +1,4 @@
+use bp_messages::Weight;
 use core::fmt::Debug;
 use std::ops::RangeInclusive;
 
@@ -132,7 +133,7 @@ pub trait S2SClientRelay: S2SClientGeneric {
             <Self::Chain as Chain>::Hash,
         >,
         messages_count: u32,
-        dispatch_weight: u64,
+        dispatch_weight: Weight,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash>;
 
     /// receive messages delivery proof

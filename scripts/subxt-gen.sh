@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 
 set -e
@@ -31,13 +31,13 @@ OUTPUT_FILE=
 
 
 if [ "${CHAIN}" == "pangolin" ]; then
-  ENDPOINT='https://pangolin-rpc.darwinia.network'
+  ENDPOINT='https://pangolin-rpc.darwinia.network:443'
 #  ENDPOINT='http://127.0.0.1:9966'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-pangolin
 fi
 
 if [ "${CHAIN}" == "pangoro" ]; then
-  ENDPOINT='https://pangoro-rpc.darwinia.network'
+  ENDPOINT='http://g1.dev.darwinia.network:10000'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-pangoro
 fi
 
@@ -54,7 +54,7 @@ if [ "${CHAIN}" == "darwinia-parachain" ]; then
 fi
 
 if [ "${CHAIN}" == "rococo" ]; then
-  ENDPOINT='https://rococo-rpc.polkadot.io'
+  ENDPOINT='https://rococo-rpc.polkadot.io:443'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-rococo
 fi
 
@@ -87,7 +87,7 @@ if [ "${CHAIN}" == "kusama" ]; then
 fi
 
 if [ "${CHAIN}" == "moonbase" ]; then
-  ENDPOINT='https://frag-moonbase-relay-rpc.g.moonbase.moonbeam.network'
+  ENDPOINT='https://frag-moonbase-relay-rpc.g.moonbase.moonbeam.network:443'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-moonbase
 fi
 

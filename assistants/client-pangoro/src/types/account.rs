@@ -1,83 +1,88 @@
-use std::fmt::{Debug, Formatter};
+use subxt::tx::PairSigner;
 
-use subxt::{
-    sp_core::{sr25519::Pair, Pair as PairTrait},
-    PairSigner,
-};
+use ecdsa_pair::crypto::ethereum::Pair;
 
 use crate::config::PangoroSubxtConfig;
-use crate::error::{ClientError, ClientResult};
-use crate::types::NodeRuntimeSignedExtra;
+
+pub use self::darwinia::*;
 
 /// AccountId
 pub type AccountId = <PangoroSubxtConfig as subxt::Config>::AccountId;
 /// Signer
-pub type Signer = PairSigner<PangoroSubxtConfig, NodeRuntimeSignedExtra, Pair>;
+pub type Signer = PairSigner<PangoroSubxtConfig, Pair>;
 
-/// Account
-#[derive(Clone)]
-pub struct DarwiniaAccount {
-    /// Account Id
-    account_id: AccountId,
-    /// signer of the account
-    signer: Signer,
-    /// proxy real
-    real: Option<AccountId>,
-}
+mod darwinia {
+    use std::fmt::{Debug, Formatter};
 
-impl Debug for DarwiniaAccount {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("account: {},", self.account_id))?;
-        f.write_str(" signer: <..>,")?;
-        f.write_str(&format!(" real: {:?}", self.real))?;
-        Ok(())
-    }
-}
+    use sp_core::Pair as TraitPair;
+    use subxt::tx::PairSigner;
 
-impl DarwiniaAccount {
-    /// Create a new Account
-    pub fn new(seed: String, real: Option<String>) -> ClientResult<Self> {
-        // signer to sign darwinia extrinsic
-        let pair =
-            Pair::from_string(&seed, None).map_err(|e| ClientError::Seed(format!("{e:?}")))?; // if not a valid seed
-        let signer = PairSigner::new(pair);
-        let public = signer.signer().public().0;
-        let account_id = AccountId::from(public);
+    use crate::error::{ClientError, ClientResult};
 
-        // real account, convert to account id
-        let real =
-            real.map(|real| AccountId::from(array_bytes::hex_n_into_unchecked::<String, AccountId, 20>(real)));
+    use super::AccountId;
+    use super::Pair;
+    use super::Signer;
 
-        Ok(Self {
-            account_id,
-            signer,
-            real,
-        })
-    }
-}
-
-impl DarwiniaAccount {
-    /// get account id
-    pub fn account_id(&self) -> &AccountId {
-        &self.account_id
+    /// Account
+    #[derive(Clone)]
+    pub struct DarwiniaAccount {
+        /// signer of the account
+        signer: Signer,
+        /// proxy real
+        real: Option<Signer>,
     }
 
-    /// get signer
-    pub fn signer(&self) -> &Signer {
-        &self.signer
+    impl Debug for DarwiniaAccount {
+        fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+            f.write_str(&format!("account: {},", self.signer.account_id()))?;
+            f.write_str(" signer: <..>,")?;
+            f.write_str(&format!(
+                " real: {:?}",
+                self.real.clone().map(|v| *v.account_id())
+            ))?;
+            Ok(())
+        }
     }
 
-    /// get real account
-    pub fn real(&self) -> &Option<AccountId> {
-        &self.real
+    impl DarwiniaAccount {
+        /// Create a new Account
+        pub fn new(seed: String, real: Option<String>) -> ClientResult<Self> {
+            // signer to sign darwinia extrinsic
+            let pair =
+                Pair::from_string(&seed, None).map_err(|e| ClientError::Seed(format!("{e:?}")))?; // if not a valid seed
+            let signer = PairSigner::new(pair);
+
+            let mut real_signer = None;
+            if let Some(real_seed) = real {
+                let pair = Pair::from_string(&real_seed, None)
+                    .map_err(|e| ClientError::Seed(format!("{e:?}")))?;
+                real_signer = Some(PairSigner::new(pair))
+            };
+            Ok(Self {
+                signer,
+                real: real_signer,
+            })
+        }
     }
 
-    /// get raw real account
-    pub fn real_account(&self) -> &AccountId {
-        if let Some(real_account_id) = &self.real {
-            real_account_id
-        } else {
-            &self.account_id
+    impl DarwiniaAccount {
+        /// get account id
+        pub fn account_id(&self) -> &AccountId {
+            self.signer.account_id()
+        }
+
+        /// get signer
+        pub fn signer(&self) -> &Signer {
+            &self.signer
+        }
+
+        /// get raw real account
+        pub fn real_account(&self) -> &AccountId {
+            if let Some(real_signer) = &self.real {
+                real_signer.account_id()
+            } else {
+                self.signer.account_id()
+            }
         }
     }
 }

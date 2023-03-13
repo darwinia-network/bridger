@@ -20,16 +20,16 @@ serde       = { version = "1", features = ["derive"] }
 
 array-bytes      = "6"
 codec            = { package = "parity-scale-codec", version = "3" }
-subxt            = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.30" }
-bp-polkadot-core = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
+subxt            = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.37" }
+bp-polkadot-core = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.37" }
 
 ## maybe common
 async-trait = { optional = true, version = "0.1" }
 
 ## substrate
-sp-core             = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
-sp-runtime          = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
-sp-finality-grandpa = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+sp-core             = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37" }
+sp-runtime          = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37" }
+sp-finality-grandpa = { optional = true, git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37" }
 
 ## common traits
 client-common-traits  = { optional = true, path = "../../traits/client-common" }

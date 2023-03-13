@@ -22,6 +22,7 @@ jobs:
           - bridger
           - darwinia-ethereum
           - darwinia-crab
+          - pangolin-pangoro
           - pangoro-chapel
           - pangoro-goerli
     steps:
@@ -98,6 +99,7 @@ jobs:
           - bridger
           - darwinia-ethereum
           - darwinia-crab
+          - pangolin-pangoro
           - pangoro-chapel
           - pangoro-goerli
     steps:
@@ -169,6 +171,7 @@ jobs:
           - bridger
           - darwinia-ethereum
           - darwinia-crab
+          - pangolin-pangoro
           - pangoro-chapel
           - pangoro-goerli
     steps:

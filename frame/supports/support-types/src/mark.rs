@@ -24,6 +24,9 @@ pub enum BridgeName {
     /// bridge pangoro<>goerli (goerli)
     #[serde(rename = "pangoro-goerli")]
     PangoroGoerli,
+    /// bridge pangoro<>goerli (goerli)
+    #[serde(rename = "pangolin-goerli")]
+    PangolinGoerli,
     /// bridge darwinia<>darwinia-parachain
     #[serde(rename = "darwinia-darwiniaparachain")]
     DarwiniaDarwiniaParachain,
@@ -40,6 +43,7 @@ impl BridgeName {
             Self::CrabCrabParachain => "crab-crabparachain",
             Self::DarwiniaCrab => "darwinia-crab",
             Self::PangoroGoerli => "pangoro-goerli",
+            Self::PangolinGoerli => "pangolin-goerli",
             Self::DarwiniaDarwiniaParachain => "darwinia-darwiniaparachain",
         }
     }

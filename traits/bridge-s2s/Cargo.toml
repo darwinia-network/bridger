@@ -21,15 +21,15 @@ async-trait = "0.1"
 serde      = { version = "1", features = ["derive"] }
 codec      = { package = "parity-scale-codec", version = "3" }
 scale-info = { version = "2", features = ["bit-vec"] }
-subxt      = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.30" }
+subxt      = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.37" }
 
-sp-core               = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
-sp-runtime            = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.30" }
+sp-core               = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37" }
+sp-runtime            = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37" }
 
-bp-runtime            = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
-bp-messages           = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
-bridge-runtime-common = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
-bp-header-chain       = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.30" }
+bp-runtime            = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.37" }
+bp-messages           = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.37" }
+bridge-runtime-common = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.37" }
+bp-header-chain       = { git = "https://github.com/darwinia-network/darwinia-messages-substrate", branch = "polkadot-v0.9.37" }
 
 client-common-traits = { path = "../client-common" }
 

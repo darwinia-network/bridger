@@ -89,8 +89,8 @@ jobs:
     strategy:
       matrix:
         bridge:
-#          - darwinia-ethereum
-          - darwinia-crab
+          - pangolin-pangoro
+#          - darwinia-crab
 #          - pangoro-chapel
 #          - pangoro-goerli
     steps:

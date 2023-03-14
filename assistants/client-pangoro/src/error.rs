@@ -1,8 +1,7 @@
 #![allow(missing_docs)]
 
-use thiserror::Error as ThisError;
-
 use support_toolkit::error::TkError;
+use thiserror::Error as ThisError;
 
 pub type ClientResult<T> = Result<T, ClientError>;
 
@@ -10,16 +9,10 @@ pub type ClientResult<T> = Result<T, ClientError>;
 #[derive(ThisError, Debug)]
 pub enum ClientError {
     #[error(transparent)]
-    SubxtBasicError(subxt::BasicError),
-
-    #[error("Subxt Runtime Error: {0}")]
-    SubxtRuntime(String),
+    SubxtBasicError(subxt::Error),
 
     #[error("Please reconnect to rpc server")]
     ClientRestartNeed,
-
-    #[error(transparent)]
-    Codec(#[from] codec::Error),
 
     #[error("Wrong seed: {0}")]
     Seed(String),
@@ -27,7 +20,7 @@ pub enum ClientError {
     #[error("Bytes error: {0}")]
     Bytes(String),
 
-    #[error("Custom error: {0}")]
+    #[error("Other error: {0}")]
     Custom(String),
 
     #[error("Io error: {0}")]
@@ -44,18 +37,18 @@ impl ClientError {
     }
 }
 
-impl From<subxt::BasicError> for ClientError {
-    fn from(error: subxt::BasicError) -> Self {
-        if let subxt::BasicError::Rpc(_) = &error {
+impl From<subxt::Error> for ClientError {
+    fn from(error: subxt::Error) -> Self {
+        if let subxt::Error::Rpc(_) = &error {
             return Self::ClientRestartNeed;
         }
         Self::SubxtBasicError(error)
     }
 }
 
-impl From<subxt::rpc::RpcError> for ClientError {
-    fn from(error: subxt::rpc::RpcError) -> Self {
-        Self::SubxtBasicError(subxt::BasicError::Rpc(error))
+impl From<subxt::error::RpcError> for ClientError {
+    fn from(error: subxt::error::RpcError) -> Self {
+        Self::SubxtBasicError(subxt::error::Error::Rpc(error))
     }
 }
 
@@ -73,12 +66,5 @@ impl From<ClientError> for bridge_s2s_traits::error::S2SClientError {
             ClientError::ClientRestartNeed => Self::RPC(format!("Client restart need")),
             _ => Self::Custom(format!("{error:?}")),
         }
-    }
-}
-
-#[cfg(feature = "bridge-ethv2")]
-impl From<ClientError> for bridge_e2e_traits::error::E2EClientError {
-    fn from(error: ClientError) -> Self {
-        Self::Custom(format!("{error:?}"))
     }
 }

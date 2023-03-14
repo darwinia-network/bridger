@@ -1,3 +1,3 @@
-#[cfg(feature = "feemarket-s2s-pangolin")]
-mod feemarket_pangolin;
+#[cfg(feature = "feemarket-pangolin-pangoro")]
+mod feemarket_pangolin_pangoro;
 mod generic;

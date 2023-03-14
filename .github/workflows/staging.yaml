@@ -21,7 +21,8 @@ jobs:
         package:
           - bridger
 #          - darwinia-ethereum
-          - darwinia-crab
+#          - darwinia-crab
+          - pangolin-pangoro
 #          - pangoro-chapel
 #          - pangoro-goerli
     steps:

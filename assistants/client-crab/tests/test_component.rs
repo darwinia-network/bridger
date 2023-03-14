@@ -31,7 +31,7 @@ async fn test_spec_version() {
     let version = client.subxt().rpc().runtime_version(None).await.unwrap();
     assert_eq!(
         version.other.get("specName"),
-        Some(&serde_json::Value::String("Crab".to_string()))
+        Some(&serde_json::Value::String("Crab2".to_string()))
     );
 }
 

@@ -6,7 +6,7 @@ export default [
     bridges: [
       {enable: true, name: 'darwinia-crab', mode: 'mainnet', bridge_type: 's2s'},
       // {enable: true, name: 'crab-crabparachain', mode: 'mainnet', bridge_type: 'parachain'},
-      // {enable: true, name: 'pangolin-pangoro', mode: 'testnet', bridge_type: 's2s'},
+      {enable: true, name: 'pangolin-pangoro', mode: 'testnet', bridge_type: 's2s'},
     ],
   },
   {

@@ -15,6 +15,7 @@ import {AppSettings} from "@/types/app";
 const state = reactive({
   settings: {
     enableTestnet: true,
+    allowDisabled: false,
   } as AppSettings
 });
 
@@ -24,12 +25,20 @@ const {
 
 const emit = defineEmits(['change']);
 
+function loadData() {
+  const saved = localStorage.getItem('APP_SETTINGS');
+  if (!saved) return;
+  settings.value = JSON.parse(saved);
+}
 
 function changedData() {
+  const jsonValue = JSON.stringify(settings.value);
+  localStorage.setItem('APP_SETTINGS', jsonValue);
   emit('change', settings.value);
 }
 
 onMounted(() => {
+  loadData();
   changedData();
 });
 </script>

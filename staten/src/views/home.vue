@@ -71,10 +71,7 @@ const {
 } = toRefs(state);
 
 function initBridgeGroups(settings?: AppSettings) {
-  bridge_groups.value = dataSource.bridgerGroups({
-    allowDisabled: true,
-    enableTestnet: settings?.enableTestnet || false,
-  });
+  bridge_groups.value = dataSource.bridgerGroups(settings);
 }
 
 onMounted(() => {

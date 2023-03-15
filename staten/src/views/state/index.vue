@@ -1,7 +1,7 @@
 <template>
-  <v-container>
-    hello
-  </v-container>
+  <v-row>
+    <v-col cols="12">hello</v-col>
+  </v-row>
 </template>
 
 <script lang="ts" setup>

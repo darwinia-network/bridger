@@ -1,5 +1,6 @@
 
 
 export interface AppSettings {
-  enableTestnet: boolean,
+  allowDisabled: boolean;
+  enableTestnet: boolean;
 }

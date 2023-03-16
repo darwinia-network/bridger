@@ -2,6 +2,7 @@ import {Bridge, BridgeGroup, BridgeInfo} from "@/types/bridge";
 import * as bridgeGroups from './bridge_groups'
 import * as chainInfoData from './chain_info'
 import {AppSettings} from "@/types/app";
+import {BasicChainInfo, EthereumChainInfo, SubstrateChainInfo} from "@/types/chain";
 
 
 function savedSettings(def: AppSettings): AppSettings {
@@ -54,6 +55,6 @@ export function findBridge(name: string): BridgeInfo | undefined {
   }
 }
 
-export function chainInfo(chain: string) {
+export function chainInfo(chain: string): BasicChainInfo | SubstrateChainInfo | EthereumChainInfo {
   return chainInfoData.default[chain];
 }

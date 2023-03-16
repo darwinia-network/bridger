@@ -8,5 +8,11 @@ export interface Bridge {
   name: string;
   enable: boolean;
   mode?: string;
+  bridge_type?: string;
+}
+
+export interface BridgeInfo {
+  group: string;
+  bridge: Bridge;
 }
 

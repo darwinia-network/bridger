@@ -1,5 +1,6 @@
-import {Bridge, BridgeGroup} from "@/types/bridge";
+import {Bridge, BridgeGroup, BridgeInfo} from "@/types/bridge";
 import * as bridgeGroups from './bridge_groups'
+import * as chainInfoData from './chain_info'
 import {AppSettings} from "@/types/app";
 
 
@@ -38,4 +39,21 @@ export function bridgerGroups(
     groups.push(allowGroup);
   }
   return groups;
+}
+
+export function findBridge(name: string): BridgeInfo | undefined {
+  console.log(name);
+  const sources = bridgeGroups.default;
+  for (const group of sources) {
+    const bridges = group.bridges;
+    for (const bridge of bridges) {
+      if (bridge.name === name) {
+        return {group: group.name, bridge};
+      }
+    }
+  }
+}
+
+export function chainInfo(chain: string) {
+  return chainInfoData.default[chain];
 }

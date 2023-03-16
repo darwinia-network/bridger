@@ -1,7 +1,8 @@
-const darwinia = {
+import {BasicChainInfo, EthereumChainInfo, SubstrateChainInfo} from "@/types/chain";
+
+const darwinia: SubstrateChainInfo = {
   endpoint: {
     websocket: 'wss://rpc.darwinia.network',
-    evm: 'https://rpc.darwinia.network',
   },
   name: 'Darwinia',
   logo: 'https://docs.darwinia.network/img/favicon.svg',
@@ -34,7 +35,7 @@ const darwinia = {
   subql: 'https://subql.darwinia.network/subql-bridger-darwinia',
 };
 
-const crab = {
+const crab: SubstrateChainInfo = {
   endpoint: {
     websocket: 'wss://crab-rpc.darwinia.network',
   },
@@ -53,22 +54,11 @@ const crab = {
       },
       lanes: ['0x00000000'],
     },
-    crabparachain: {
-      query_name: {
-        feemarket: 'crabParachainFeeMarket',
-        grandpa: 'bridgeKusamaGrandpa',
-        messages: 'bridgeCrabParachainMessages',
-        parachains: 'bridgeKusamaParachain',
-      },
-      lanes: ['0x70616372'],
-      para_id: 2105,
-      relay_chain: 'kusama',
-    },
   },
   subql: 'https://subql.darwinia.network/subql-bridger-crab',
 };
 
-const pangolin = {
+const pangolin: SubstrateChainInfo = {
   endpoint: {
     websocket: 'wss://pangolin-rpc.darwinia.network',
   },
@@ -84,7 +74,7 @@ const pangolin = {
         feemarket: 'pangoroFeeMarket',
         grandpa: 'bridgeMoonbaseGrandpa',
         messages: 'bridgePangoroMessages',
-        parachains: 'bridgeMoonbaseParachain',
+        parachain: 'bridgeMoonbaseParachain',
       },
       lanes: ['0x726f6c69'],
       para_id: 2105,
@@ -94,7 +84,7 @@ const pangolin = {
   subql: 'https://subql.darwinia.network/subql-bridger-pangolin',
 };
 
-const pangoro = {
+const pangoro: SubstrateChainInfo = {
   endpoint: {
     websocket: 'wss://pangoro-rpc.darwinia.network',
   },
@@ -110,7 +100,7 @@ const pangoro = {
         feemarket: 'pangolinFeeMarket',
         grandpa: 'bridgeRococoGrandpa',
         messages: 'bridgePangolinMessages',
-        parachains: 'bridgeRococoParachain',
+        parachain: 'bridgeRococoParachain',
       },
       lanes: ['0x726f6c69'],
       para_id: 2105,
@@ -120,7 +110,7 @@ const pangoro = {
   subql: 'https://subql.darwinia.network/subql-bridger-pangoro',
 };
 
-const kusama = {
+const kusama: SubstrateChainInfo = {
   endpoint: {
     websocket: 'wss://kusama-rpc.polkadot.io',
   },
@@ -133,7 +123,7 @@ const kusama = {
   subql: 'https://subql.darwinia.network/subql-bridger-kusama',
 };
 
-const rococo = {
+const rococo: SubstrateChainInfo = {
   endpoint: {
     websocket: 'wss://rococo-rpc.polkadot.io',
   },
@@ -146,20 +136,19 @@ const rococo = {
   subql: 'https://subql.darwinia.network/subql-bridger-rococo',
 };
 
-const moonbase = {
+const moonbase: SubstrateChainInfo = {
   endpoint: {
     websocket: 'wss://frag-moonbase-relay-rpc-ws.g.moonbase.moonbeam.network',
   },
   name: 'Moonbase',
   logo: 'https://polkadot.js.org/apps/static/polkadot-circle.1eea41b2..svg',
   color: '#FF4081',
-  explorer: null,
   currency: 'M',
   precision: 9,
   subql: 'https://subql.darwinia.network/subql-bridger-moonbase',
 };
 
-const goerli = {
+const goerli: BasicChainInfo = {
   endpoint: {
     http: 'https://lodestar-mainnet-rpc.darwinia.network',
   },
@@ -171,7 +160,7 @@ const goerli = {
   precision: 18,
 };
 
-const ethereum = {
+const ethereum: EthereumChainInfo = {
   endpoint: {
     http: 'https://eth-mainnet.g.alchemy.com/v2/x-Yy-QAog0fzfJQlr0VKreOZaq4KgVUJ',
   },
@@ -194,14 +183,13 @@ const ethereum = {
   }
 };
 
-const lodestarMainnet = {
+const lodestarMainnet: BasicChainInfo = {
   endpoint: {
     http: 'https://cors.kahub.in/https://www.lightclientdata.org',
   },
   name: 'Lodestar',
   logo: 'https://chainsafe.github.io/lodestar/assets/lodestar_icon_300.png',
   color: '#ce8596',
-  explorer: null,
   currency: 'ETH',
   precision: 18,
 };

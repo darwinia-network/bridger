@@ -37,7 +37,7 @@ impl FeeMarket {
                 "enroll",
                 (prev, fee),
                 Options {
-                    gas: Some(U256::from(10000000)),
+                    gas: Some(U256::from(8000000)),
                     gas_price: Some(U256::from(1300000000)),
                     value: Some(fee),
                     ..Default::default()
@@ -56,7 +56,7 @@ impl FeeMarket {
                 "deposit",
                 (),
                 Options {
-                    gas: Some(U256::from(10000000)),
+                    gas: Some(U256::from(8000000)),
                     gas_price: Some(U256::from(1300000000)),
                     value: Some(fee),
                     ..Default::default()

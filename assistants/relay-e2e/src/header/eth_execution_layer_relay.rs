@@ -86,7 +86,7 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
             tx,
             self.eth_light_client.get_web3().transport(),
             Duration::from_secs(5),
-            3,
+            1,
         )
         .await?;
         Ok(())

@@ -488,6 +488,7 @@ dependencies = [
  "color-eyre 0.6.2",
  "component-state",
  "relay-e2e",
+ "secp256k1 0.21.3",
  "serde 1.0.155",
  "structopt",
  "subquery",

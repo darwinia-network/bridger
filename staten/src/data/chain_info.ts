@@ -77,37 +77,18 @@ const pangolin = {
   color: 'teal',
   explorer: 'https://pangolin.subscan.io',
   currency: 'PRING',
-  precision: 9,
+  precision: 18,
   bridge_target: {
     pangoro: {
       query_name: {
         feemarket: 'pangoroFeeMarket',
-        grandpa: 'bridgePangoroGrandpa',
+        grandpa: 'bridgeMoonbaseGrandpa',
         messages: 'bridgePangoroMessages',
+        parachains: 'bridgeMoonbaseParachain',
       },
       lanes: ['0x726f6c69'],
-    },
-    pangolinparachain: {
-      query_name: {
-        feemarket: 'pangolinParachainFeeMarket',
-        grandpa: 'bridgeRococoGrandpa',
-        messages: 'bridgePangolinParachainMessages',
-        parachains: 'bridgeRococoParachains',
-      },
-      lanes: ['0x70616c69'],
       para_id: 2105,
       relay_chain: 'rococo',
-    },
-    pangolinparachainalpha: {
-      query_name: {
-        feemarket: 'pangolinParachainAlphaFeeMarket',
-        grandpa: 'bridgeMoonbaseRelayGrandpa',
-        messages: 'bridgePangolinParachainAlphaMessages',
-        parachains: 'bridgeMoonbaseRelayParachains',
-      },
-      lanes: ['0x706c7061'],
-      para_id: 2105,
-      relay_chain: 'moonbase',
     },
   },
   subql: 'https://subql.darwinia.network/subql-bridger-pangolin',
@@ -122,93 +103,21 @@ const pangoro = {
   color: 'lime',
   explorer: 'https://pangoro.subscan.io',
   currency: 'ORING',
-  precision: 9,
+  precision: 18,
   bridge_target: {
     pangolin: {
       query_name: {
         feemarket: 'pangolinFeeMarket',
-        grandpa: 'bridgePangolinGrandpa',
+        grandpa: 'bridgeRococoGrandpa',
         messages: 'bridgePangolinMessages',
+        parachains: 'bridgeRococoParachain',
       },
       lanes: ['0x726f6c69'],
-    },
-  },
-  subql: 'https://subql.darwinia.network/subql-bridger-pangoro',
-};
-
-const pangolin_parachain = {
-  endpoint: {
-    websocket: 'wss://pangolin-parachain-rpc.darwinia.network',
-  },
-  name: 'Pangolin Parachain',
-  logo: 'https://polkadot.js.org/apps/static/pangolin.db0518f6..svg',
-  color: 'teal',
-  explorer: 'https://pangolin-parachain.subscan.io',
-  currency: 'PRING',
-  precision: 18,
-  bridge_target: {
-    pangolin: {
-      query_name: {
-        feemarket: 'pangolinFeeMarket',
-        grandpa: 'bridgePangolinGrandpa',
-        messages: 'bridgePangolinMessages',
-      },
-      lanes: ['0x70616c69'],
-      para_id: 2105,
-      relay_chain: 'rococo',
-    },
-  },
-  subql: 'https://subql.darwinia.network/subql-bridger-pangolin-parachain',
-};
-
-const pangolin_parachain_alpha = {
-  endpoint: {
-    websocket: 'wss://pangolin-parachain-alpha-rpc.darwinia.network',
-  },
-  name: 'Pangolin Parachain Alpha',
-  logo: 'https://polkadot.js.org/apps/static/pangolin.db0518f6..svg',
-  color: 'teal',
-  explorer: null,
-  currency: 'PRING',
-  precision: 18,
-  bridge_target: {
-    pangolin: {
-      query_name: {
-        feemarket: 'pangolinFeeMarket',
-        grandpa: 'bridgePangolinGrandpa',
-        messages: 'bridgePangolinMessages',
-      },
-      lanes: ['0x706c7061'],
       para_id: 2105,
       relay_chain: 'moonbase',
     },
   },
-  subql: 'https://subql.darwinia.network/subql-bridger-pangolin-parachainalpha',
-};
-
-const crab_parachain = {
-  endpoint: {
-    websocket: 'wss://crab-parachain-rpc.darwinia.network',
-  },
-  name: 'Crab Parachain',
-  logo: 'https://polkadot.js.org/apps/static/crab.ebc98461..svg',
-  color: 'deep-purple',
-  explorer: 'https://crab-parachain.subscan.io',
-  currency: 'CRAB',
-  precision: 18,
-  bridge_target: {
-    crab: {
-      query_name: {
-        feemarket: 'crabFeeMarket',
-        grandpa: 'bridgeCrabGrandpa',
-        messages: 'bridgeCrabMessages',
-      },
-      lanes: ['0x70616372'],
-      para_id: 2105,
-      relay_chain: 'kusama',
-    }
-  },
-  subql: 'https://subql.darwinia.network/subql-bridger-crab-parachain',
+  subql: 'https://subql.darwinia.network/subql-bridger-pangoro',
 };
 
 const kusama = {
@@ -303,9 +212,6 @@ export default {
   crab,
   pangolin,
   pangoro,
-  'pangolinparachain': pangolin_parachain,
-  'pangolinparachainalpha': pangolin_parachain_alpha,
-  'crabparachain': crab_parachain,
   kusama,
   rococo,
   moonbase,

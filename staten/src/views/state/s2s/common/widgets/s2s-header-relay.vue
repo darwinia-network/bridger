@@ -43,8 +43,8 @@
             <div
               v-else
               :class="{
-                'green--text': source.nextMandatoryHeader <= source.bestFinalizedBlock,
-                'red--text': source.nextMandatoryHeader > source.bestFinalizedBlock,
+                'text-green': source.nextMandatoryHeader <= source.bestFinalizedBlock,
+                'text-red': source.nextMandatoryHeader > source.bestFinalizedBlock,
                 }"
             >
               <external-explorer
@@ -63,8 +63,8 @@
             <div
               v-else
               :class="{
-                'green--text': source.nextOnDemandBlock <= source.bestFinalizedBlock,
-                'red--text': source.nextOnDemandBlock > source.bestFinalizedBlock,
+                'text-green': source.nextOnDemandBlock <= source.bestFinalizedBlock,
+                'text-red': source.nextOnDemandBlock > source.bestFinalizedBlock,
                 }"
             >
               <external-explorer
@@ -147,7 +147,6 @@ const {
   source, loading, subscriber
 } = toRefs(state);
 
-
 function _grandpaPalletName(): string {
   if (props.parachainBridge) {
     return props.grandpaPalletName ?? '';
@@ -202,9 +201,11 @@ async function queryNextOnDemandBlock() {
 
 async function initState() {
   const {targetClient} = props;
+  const grandpaPalletName = _grandpaPalletName();
   // @ts-ignore
-  subscriber.value.bestFinalizedHash = await targetClient?.query[_grandpaPalletName()]
+  subscriber.value.bestFinalizedHash = await targetClient?.query[grandpaPalletName]
     .bestFinalized(async (v: any) => {
+      console.log('subscribed best finalized hash');
       loading.value.bestFinalizedHash = false;
       const [blockNumber, blockHash] = v.toHuman() as unknown as [string, string];
       source.value.bestFinalizedBlock = +(blockNumber.replaceAll(',', ''));
@@ -219,6 +220,8 @@ async function initState() {
 
 onMounted(() => {
   initState();
+  subscribeNextMandatoryBlock();
+  subscribeNextOnDemandBlock();
 });
 
 onBeforeUnmount(() => {

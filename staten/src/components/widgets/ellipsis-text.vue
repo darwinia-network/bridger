@@ -8,7 +8,7 @@
     </v-col>
     <v-col cols="5">
       <!--      v-clipboard:copy="text" v-clipboard:success="onCopy"-->
-      <v-btn size="x-small" icon="mdi-content-copy"></v-btn>
+      <v-btn variant="plain" size="x-small" icon="mdi-content-copy"></v-btn>
     </v-col>
   </v-row>
 </template>

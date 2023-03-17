@@ -1,6 +1,13 @@
 <template>
   <div>
+    <v-progress-linear
+      class="mt-15"
+      :color="paraChain.color"
+      indeterminate
+      v-if="!source.grandpaPalletName || !relayClient || !targetClient"
+    />
     <s2s-header-relay
+      v-else
       :key="`s2s-header-${relayChain.name}-${targetChain.name}`"
       :parachain-bridge="true"
       :grandpa-pallet-name="source.grandpaPalletName"
@@ -21,8 +28,8 @@
             <template v-else>
               <div
                 :class="{
-                'green--text': source.nextOnDemandBlock <= source.bestFinalizedBlock,
-                'red--text': source.nextOnDemandBlock > source.bestFinalizedBlock,
+                'text-green': source.nextOnDemandBlock <= source.bestFinalizedBlock,
+                'text-red': source.nextOnDemandBlock > source.bestFinalizedBlock,
                 }"
               >
                 <external-explorer
@@ -43,7 +50,7 @@
 
 <script lang="ts" setup>
 
-import {defineProps, inject, onBeforeUnmount, PropType, reactive, toRefs} from 'vue'
+import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRefs} from 'vue'
 import {BridgeSubstrateChainInfo} from "@/types/app";
 import {ApiPromise} from "@polkadot/api";
 import S2sHeaderRelay from "@/views/state/s2s/common/widgets/s2s-header-relay.vue";
@@ -54,10 +61,6 @@ import ExternalExplorer from "@/components/widgets/external-explorer.vue";
 const subql = inject('subql') as Subql;
 
 const props = defineProps({
-  parachainBridge: {
-    type: Boolean,
-    default: false,
-  },
   relayChain: {
     type: Object as PropType<BridgeSubstrateChainInfo>,
   },
@@ -75,9 +78,6 @@ const props = defineProps({
   },
   targetClient: {
     type: Object as PropType<ApiPromise>,
-  },
-  grandpaPalletName: {
-    type: String,
   },
 });
 
@@ -136,6 +136,7 @@ async function queryNextOnDemandBlock() {
 
 async function initState() {
   source.value.grandpaPalletName = props.targetChain.bridge_target[props.paraChain.bridge_chain_name].query_name.grandpa;
+  console.log(props.targetClient);
   // @ts-ignore
   subscriber.value.bestFinalizedHash = await props.targetClient?.query[source.value.grandpaPalletName]
     .bestFinalized(async (v: any) => {
@@ -148,7 +149,7 @@ async function initState() {
     });
 }
 
-onBeforeUnmount(() => {
+onMounted(() => {
   initState();
   subscribeNextOnDemandBlock();
 });

@@ -7,8 +7,8 @@
       </v-tooltip>
     </v-col>
     <v-col cols="5">
-      <v-btn size="x-small" icon="mdi-content-copy" v-clipboard:copy="identity"></v-btn>
-      <v-btn size="x-small" icon="mdi-open-in-new"
+      <v-btn variant="plain" size="x-small" icon="mdi-content-copy" v-clipboard:copy="identity"></v-btn>
+      <v-btn variant="plain" size="x-small" icon="mdi-open-in-new"
              :href="`${chain.explorer}/${type}/${identity}`" target="_blank"
       ></v-btn>
     </v-col>

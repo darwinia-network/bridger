@@ -9,15 +9,16 @@
             class="mt-15"
             :color="pickedChain.leftParaChain.color"
             indeterminate
-            v-if="loading.leftParaClient || loading.rightParaClient"
+            v-if="!pickedClient.leftParaClient || !pickedClient.rightParaClient || !pickedClient.leftRelayClient"
           />
           <parachain-header-relay
             v-else
-            :parachain-bridge="true"
-            :source-chain="pickedChain.leftParaChain"
-            :source-client="pickedClient.leftParaClient"
+            :para-chain="pickedChain.leftParaChain"
+            :para-client="pickedClient.leftParaClient"
             :target-chain="pickedChain.rightParaChain"
             :target-client="pickedClient.rightParaClient"
+            :relay-chain="pickedChain.leftRelayChain"
+            :relay-client="pickedClient.leftRelayClient"
           />
         </bridge-skeleton>
       </v-col>

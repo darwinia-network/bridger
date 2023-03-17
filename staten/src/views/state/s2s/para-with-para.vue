@@ -11,8 +11,9 @@
             indeterminate
             v-if="loading.leftParaClient || loading.rightParaClient"
           />
-          <bridge-s2s-basic
+          <parachain-header-relay
             v-else
+            :parachain-bridge="true"
             :source-chain="pickedChain.leftParaChain"
             :source-client="pickedClient.leftParaClient"
             :target-chain="pickedChain.rightParaChain"
@@ -38,6 +39,7 @@ import {useRouter} from "vue-router";
 import {SubstrateChainInfo} from "@/types/chain";
 import {ApiPromise, WsProvider} from "@polkadot/api";
 import {ParaWithParaChainPair, ParaWithParaClientPair} from "@/types/app";
+import ParachainHeaderRelay from "@/views/state/s2s/common/widgets/parachain-header-relay.vue";
 
 const router = useRouter();
 
@@ -86,10 +88,10 @@ async function initState() {
     dataSource.chainInfo(rightRelayChainName) as SubstrateChainInfo,
   ];
   pickedChain.value = {
-    leftParaChain,
-    leftRelayChain,
-    rightParaChain,
-    rightRelayChain,
+    leftParaChain: {...leftParaChain, bridge_chain_name: leftParaChainName },
+    leftRelayChain: {...leftRelayChain, bridge_chain_name: leftRelayChainName },
+    rightParaChain: {...rightParaChain, bridge_chain_name: rightParaChainName },
+    rightRelayChain: {...rightRelayChain, bridge_chain_name: rightRelayChainName },
   };
 
   const leftParaChainProvider = new WsProvider(leftParaChain.endpoint.websocket);

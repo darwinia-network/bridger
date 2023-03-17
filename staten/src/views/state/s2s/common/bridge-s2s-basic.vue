@@ -2,6 +2,7 @@
   <v-row>
     <v-col md="6" sm="12" xs="12">
       <s2s-header-relay
+        v-if="props.sourceClient && props.targetClient"
         :key="`s2s-basic-header-${props.sourceChain.name}-${props.targetChain.name}`"
         :source-chain="props.sourceChain"
         :source-client="props.sourceClient"
@@ -18,6 +19,7 @@ import S2sHeaderRelay from "@/views/state/s2s/common/widgets/s2s-header-relay.vu
 import {Bridge} from "@/types/bridge";
 import {SubstrateChainInfo} from "@/types/chain";
 import {ApiPromise} from "@polkadot/api";
+import {BridgeSubstrateChainInfo} from "@/types/app";
 
 const props = defineProps({
   parachainBridge: {
@@ -25,13 +27,13 @@ const props = defineProps({
     default: false,
   },
   sourceChain: {
-    type: Object as PropType<SubstrateChainInfo>,
+    type: Object as PropType<BridgeSubstrateChainInfo>,
   },
   sourceClient: {
     type: Object as PropType<ApiPromise>,
   },
   targetChain: {
-    type: Object as PropType<SubstrateChainInfo>,
+    type: Object as PropType<BridgeSubstrateChainInfo>,
   },
   targetClient: {
     type: Object as PropType<ApiPromise>,

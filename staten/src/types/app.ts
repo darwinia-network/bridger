@@ -8,11 +8,15 @@ export interface AppSettings {
 }
 
 
+export interface BridgeSubstrateChainInfo extends SubstrateChainInfo {
+  bridge_chain_name: string;
+}
+
 export interface ParaWithParaChainPair {
-  leftParaChain: SubstrateChainInfo;
-  rightParaChain: SubstrateChainInfo;
-  leftRelayChain: SubstrateChainInfo;
-  rightRelayChain: SubstrateChainInfo;
+  leftParaChain: BridgeSubstrateChainInfo;
+  rightParaChain: BridgeSubstrateChainInfo;
+  leftRelayChain: BridgeSubstrateChainInfo;
+  rightRelayChain: BridgeSubstrateChainInfo;
 }
 
 export interface ParaWithParaClientPair {

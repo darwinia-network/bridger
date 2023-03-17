@@ -205,7 +205,6 @@ async function initState() {
   // @ts-ignore
   subscriber.value.bestFinalizedHash = await targetClient?.query[grandpaPalletName]
     .bestFinalized(async (v: any) => {
-      console.log('subscribed best finalized hash');
       loading.value.bestFinalizedHash = false;
       const [blockNumber, blockHash] = v.toHuman() as unknown as [string, string];
       source.value.bestFinalizedBlock = +(blockNumber.replaceAll(',', ''));
@@ -215,7 +214,6 @@ async function initState() {
         await queryNextOnDemandBlock();
       }
     });
-
 }
 
 onMounted(() => {

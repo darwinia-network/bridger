@@ -136,7 +136,6 @@ async function queryNextOnDemandBlock() {
 
 async function initState() {
   source.value.grandpaPalletName = props.targetChain.bridge_target[props.paraChain.bridge_chain_name].query_name.grandpa;
-  console.log(props.targetClient);
   // @ts-ignore
   subscriber.value.bestFinalizedHash = await props.targetClient?.query[source.value.grandpaPalletName]
     .bestFinalized(async (v: any) => {

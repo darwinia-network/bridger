@@ -11,7 +11,7 @@
             indeterminate
             v-if="!pickedClient.leftParaClient || !pickedClient.rightParaClient || !pickedClient.leftRelayClient"
           />
-          <parachain-header-relay
+          <bridge-s2s-parachain-header
             v-else
             :para-chain="pickedChain.leftParaChain"
             :para-client="pickedClient.leftParaClient"
@@ -41,6 +41,7 @@ import {SubstrateChainInfo} from "@/types/chain";
 import {ApiPromise, WsProvider} from "@polkadot/api";
 import {ParaWithParaChainPair, ParaWithParaClientPair} from "@/types/app";
 import ParachainHeaderRelay from "@/views/state/s2s/common/widgets/parachain-header-relay.vue";
+import BridgeS2sParachainHeader from "@/views/state/s2s/common/bridge-s2s-parachain-header.vue";
 
 const router = useRouter();
 

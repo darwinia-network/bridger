@@ -4,7 +4,7 @@
       <h2 class="text-h5 font-weight-thin">Header</h2>
     </v-col>
     <v-col cols="12">
-      <v-table>
+      <v-table density="compact">
         <thead>
         <tr>
           <th>Title</th>

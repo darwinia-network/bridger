@@ -1,12 +1,12 @@
 <template>
   <v-row>
-    <v-col cols="7">
+    <v-col cols="3">
       <span class="ellipsis-text">{{ identity }}</span>
       <v-tooltip activator="parent" location="bottom">
         {{ identity }}
       </v-tooltip>
     </v-col>
-    <v-col cols="5">
+    <v-col cols="3">
       <v-btn variant="plain" size="x-small" icon="mdi-content-copy" v-clipboard:copy="identity"></v-btn>
       <v-btn variant="plain" size="x-small" icon="mdi-open-in-new"
              :href="`${chain.explorer}/${type}/${identity}`" target="_blank"
@@ -37,7 +37,7 @@ const props = defineProps({
 </script>
 <style>
 .ellipsis-text {
-  width: 80%;
+  width: 100%;
   display: block;
   overflow: hidden;
   white-space: nowrap;

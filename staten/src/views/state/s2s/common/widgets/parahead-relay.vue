@@ -4,7 +4,7 @@
       <h2 class="text-h5 font-weight-thin">Para head</h2>
     </v-col>
     <v-col cols="12">
-      <v-table>
+      <v-table density="compact">
         <thead>
         <tr>
           <th>Title</th>
@@ -156,8 +156,7 @@ async function initState() {
       loading.value.relayedGrandpaBlockHash = false;
       loading.value.paraHeadAtSourceByLastRelayedGrandpa = true;
 
-      // const api = await relayClient?.isReady;
-      // console.log(api);
+      // todo: fix this.
       // const atBlockRelayClient = await relayClient?.at(blockHash);
       // const paraHeadAtSourceByLastRelayedGrandpa = await atBlockRelayClient?.query.paras.heads(bridgeTarget.para_id);
       // // @ts-ignore

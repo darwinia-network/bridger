@@ -3,7 +3,12 @@
     <v-row>
       <v-col cols="12">
         <bridge-skeleton
-          v-if="pickedChain.leftParaChain && pickedChain.rightParaChain"
+          v-if="pickedClient.leftParaClient && pickedChain.rightParaChain"
+          chain-type="substrate"
+          :key="`s2s-parachain-${pickedChain.leftParaChain.name}-${pickedChain.rightParaChain.name}`"
+          :source-client="pickedClient.leftParaClient"
+          :source-chain="pickedChain.leftParaChain"
+          :target-chain="pickedChain.rightParaChain"
         >
           <v-progress-linear
             class="mt-15"
@@ -11,16 +16,65 @@
             indeterminate
             v-if="!pickedClient.leftParaClient || !pickedClient.rightParaClient || !pickedClient.leftRelayClient"
           />
-          <bridge-s2s-parachain-header
-            v-else
-            :para-chain="pickedChain.leftParaChain"
-            :para-client="pickedClient.leftParaClient"
-            :target-chain="pickedChain.rightParaChain"
-            :target-client="pickedClient.rightParaClient"
-            :relay-chain="pickedChain.leftRelayChain"
-            :relay-client="pickedClient.leftRelayClient"
-          />
+          <template v-else>
+            <bridge-s2s-parachain-header
+              :para-chain="pickedChain.leftParaChain"
+              :para-client="pickedClient.leftParaClient"
+              :target-chain="pickedChain.rightParaChain"
+              :target-client="pickedClient.rightParaClient"
+              :relay-chain="pickedChain.leftRelayChain"
+              :relay-client="pickedClient.leftRelayClient"
+            />
+            <bridge-s2s-parachain-message
+              :para-chain="pickedChain.leftParaChain"
+              :para-client="pickedClient.leftParaClient"
+              :relay-chain="pickedChain.leftRelayChain"
+              :relay-client="pickedClient.leftRelayClient"
+              :target-chain="pickedChain.rightParaChain"
+              :target-client=" pickedClient.rightParaClient"
+            />
+          </template>
         </bridge-skeleton>
+        <v-progress-linear v-else class="mt-15" indeterminate/>
+      </v-col>
+      <v-col cols="12">
+        <v-divider/>
+      </v-col>
+      <v-col cols="12">
+        <bridge-skeleton
+          v-if="pickedChain.leftParaChain && pickedClient.rightParaClient"
+          chain-type="substrate"
+          :key="`s2s-parachain-${pickedChain.rightParaChain.name}-${pickedChain.leftParaChain.name}`"
+          :source-client="pickedClient.rightParaClient"
+          :source-chain="pickedChain.rightParaChain"
+          :target-chain="pickedChain.leftParaChain"
+        >
+          <v-progress-linear
+            class="mt-15"
+            :color="pickedChain.rightParaChain.color"
+            indeterminate
+            v-if="!pickedClient.rightParaClient || !pickedClient.leftParaClient || !pickedClient.rightRelayClient"
+          />
+          <template v-else>
+            <bridge-s2s-parachain-header
+              :para-chain="pickedChain.rightParaChain"
+              :para-client="pickedClient.rightParaClient"
+              :target-chain="pickedChain.leftParaChain"
+              :target-client="pickedClient.leftParaClient"
+              :relay-chain="pickedChain.rightRelayChain"
+              :relay-client="pickedClient.rightRelayClient"
+            />
+            <bridge-s2s-parachain-message
+              :para-chain="pickedChain.rightParaChain"
+              :para-client="pickedClient.rightParaClient"
+              :relay-chain="pickedChain.rightRelayChain"
+              :relay-client="pickedClient.rightRelayClient"
+              :target-chain="pickedChain.leftParaChain"
+              :target-client=" pickedClient.leftParaClient"
+            />
+          </template>
+        </bridge-skeleton>
+        <v-progress-linear v-else class="mt-15" indeterminate/>
       </v-col>
     </v-row>
   </v-container>
@@ -29,7 +83,6 @@
 <script lang="ts" setup>
 
 import BridgeSkeleton from "@/components/skeleton/bridge-skeleton.vue"
-import BridgeS2sBasic from "@/views/state/s2s/common/bridge-s2s-basic.vue";
 
 import {defineProps, onMounted, PropType, reactive, toRefs} from 'vue'
 
@@ -40,8 +93,8 @@ import {useRouter} from "vue-router";
 import {SubstrateChainInfo} from "@/types/chain";
 import {ApiPromise, WsProvider} from "@polkadot/api";
 import {ParaWithParaChainPair, ParaWithParaClientPair} from "@/types/app";
-import ParachainHeaderRelay from "@/views/state/s2s/common/widgets/parachain-header-relay.vue";
 import BridgeS2sParachainHeader from "@/views/state/s2s/common/bridge-s2s-parachain-header.vue";
+import BridgeS2sParachainMessage from "@/views/state/s2s/common/bridge-s2s-parachain-message.vue";
 
 const router = useRouter();
 
@@ -90,10 +143,10 @@ async function initState() {
     dataSource.chainInfo(rightRelayChainName) as SubstrateChainInfo,
   ];
   pickedChain.value = {
-    leftParaChain: {...leftParaChain, bridge_chain_name: leftParaChainName },
-    leftRelayChain: {...leftRelayChain, bridge_chain_name: leftRelayChainName },
-    rightParaChain: {...rightParaChain, bridge_chain_name: rightParaChainName },
-    rightRelayChain: {...rightRelayChain, bridge_chain_name: rightRelayChainName },
+    leftParaChain: {...leftParaChain, bridge_chain_name: leftParaChainName},
+    leftRelayChain: {...leftRelayChain, bridge_chain_name: leftRelayChainName},
+    rightParaChain: {...rightParaChain, bridge_chain_name: rightParaChainName},
+    rightRelayChain: {...rightRelayChain, bridge_chain_name: rightRelayChainName},
   };
 
   const leftParaChainProvider = new WsProvider(leftParaChain.endpoint.websocket);

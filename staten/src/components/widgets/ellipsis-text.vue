@@ -1,12 +1,12 @@
 <template>
   <v-row>
-    <v-col cols="7" >
+    <v-col cols="5" >
       <span class="ellipsis-text">{{ text }}</span>
       <v-tooltip activator="parent" location="bottom">
         {{ text }}
       </v-tooltip>
     </v-col>
-    <v-col cols="5">
+    <v-col cols="3">
       <!--      v-clipboard:copy="text" v-clipboard:success="onCopy"-->
       <v-btn variant="plain" size="x-small" icon="mdi-content-copy"></v-btn>
     </v-col>

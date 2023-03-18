@@ -15,7 +15,7 @@
 
 import ParaWithPara from "@/views/state/s2s/para-with-para.vue";
 
-import {onMounted, reactive, toRefs} from 'vue'
+import {onMounted, reactive, toRefs, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
 import * as dataSource from "@/data/data_source";
@@ -34,6 +34,12 @@ const {
   status_bridge,
 } = toRefs(state);
 
+watch(
+  () => route.path,
+  async () => {
+    initState();
+  }
+)
 
 function initState() {
   const params = route.params

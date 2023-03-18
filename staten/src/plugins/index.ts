@@ -13,6 +13,7 @@ import router from '../router'
 // @ts-ignore
 import VueClipboard from 'vue3-clipboard'
 import Subql from './subql'
+import Eth2 from './eth2'
 
 // Types
 import type { App } from 'vue'
@@ -29,4 +30,6 @@ export function registerPlugins (app: App) {
     })
     // @ts-ignore
     .use(Subql)
+    // @ts-ignore
+    .use(Eth2)
 }

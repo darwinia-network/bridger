@@ -1,5 +1,9 @@
-import {SubstrateChainInfo} from "@/types/chain";
+import {EthereumChainInfo, SubstrateChainInfo} from "@/types/chain";
 import {ApiPromise} from "@polkadot/api";
+import {Eth2Client} from "@/plugins/eth2";
+import {EvmClient} from "@/plugins/eth2/evm";
+import {ExecutionClient} from "@/plugins/eth2/execution";
+import {ConsensusClient} from "@/plugins/eth2/consensus";
 
 
 export interface AppSettings {
@@ -9,6 +13,10 @@ export interface AppSettings {
 
 
 export interface BridgeSubstrateChainInfo extends SubstrateChainInfo {
+  bridge_chain_name: string;
+}
+
+export interface BridgeEthereumChainInfo extends EthereumChainInfo {
   bridge_chain_name: string;
 }
 
@@ -46,4 +54,16 @@ export interface ParaWithParaClientPair {
   rightParaClient: ApiPromise,
   leftRelayClient: ApiPromise,
   rightRelayClient: ApiPromise,
+}
+
+export interface SubstrateEvmWithEthereumChainPair {
+  evm: BridgeEthereumChainInfo,
+  execution: BridgeEthereumChainInfo
+  consensus: BridgeEthereumChainInfo,
+}
+
+export interface SubstrateEvmWithEthereumClientPair {
+  evm: EvmClient,
+  execution: ExecutionClient,
+  consensus: ConsensusClient,
 }

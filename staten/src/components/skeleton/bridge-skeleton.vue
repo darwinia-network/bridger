@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="source.lastBlock && source.finalizedBlock">
+  <v-row v-if="chainType !== 'substrate' || (source.lastBlock && source.finalizedBlock)">
     <v-col cols="12" md="2" class="pt-8" v-if="sourceChain">
       <v-row>
         <v-col cols="12" class="d-flex flex-column align-center">
@@ -12,13 +12,13 @@
           </span>
         </v-col>
         <v-col cols="12" class="text-center">
-          <p class="title text-block-number">
+          <p class="title text-block-number" v-if="source.lastBlock">
             <span v-text="source.lastBlock.number"/>
             <v-btn icon size="x-small" variant="plain" :href="`${sourceChain.explorer}/block/${source.lastBlock.number}`" target="_blank">
               <v-icon size="x-small">mdi-open-in-new</v-icon>
             </v-btn>
           </p>
-          <p class="subtitle-1 text-block-number" v-bind="attrs" v-on="on">
+          <p class="subtitle-1 text-block-number" v-if="source.finalizedBlock">
             <span v-text="source.finalizedBlock.number"/>
             <v-btn icon size="x-small" variant="plain" :href="`${sourceChain.explorer}/block/${source.finalizedBlock.number}`"
                    target="_blank">

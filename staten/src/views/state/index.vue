@@ -8,6 +8,13 @@
         <para-with-para :key="status_bridge.bridge.name" :bridge="status_bridge.bridge"/>
       </v-col>
     </template>
+
+    <template v-if="status_bridge.group === 'E2E'">
+      <v-col cols="12">
+        <e2e-raw :key="status_bridge.bridge.name" :bridge="status_bridge.bridge"/>
+      </v-col>
+    </template>
+
   </v-row>
 </template>
 
@@ -20,6 +27,7 @@ import {useRoute, useRouter} from 'vue-router'
 
 import * as dataSource from "@/data/data_source";
 import {BridgeInfo} from "@/types/bridge";
+import E2eRaw from "@/views/state/e2e/e2e-raw.vue";
 
 const route = useRoute();
 const router = useRouter();

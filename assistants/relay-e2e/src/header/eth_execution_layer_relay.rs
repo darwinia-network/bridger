@@ -3,10 +3,10 @@ use client_beacon::client::BeaconApiClient;
 use client_contracts::execution_layer::types::{BeaconBlockBody, ExecutionPayload};
 use std::time::Duration;
 use tree_hash::TreeHash;
-use types::{BeaconBlockMerge, ExecPayload, MainnetEthSpec};
+use types::{ExecPayload, MainnetEthSpec, BeaconBlockCapella};
 use web3::{
     contract::Options,
-    types::{H256, U256},
+    types::{H256, U256, H160},
 };
 
 use crate::error::RelayResult;
@@ -34,12 +34,12 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
             .beacon_api_client
             .get_beacon_block(last_relayed_header.slot)
             .await?;
-        let latest_execution_payload_state_root = finalized_block
+        let latest_execution_payload_state_root = H256::from(finalized_block
             .body
             .execution_payload
             .execution_payload
             .state_root
-            .clone();
+            .clone().0);
         let relayed_state_root = self
             .eth_light_client
             .execution_layer()
@@ -93,56 +93,56 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
     }
 }
 
-fn build_execution_layer_update(block: &BeaconBlockMerge<MainnetEthSpec>) -> BeaconBlockBody {
+fn build_execution_layer_update(block: &BeaconBlockCapella<MainnetEthSpec>) -> BeaconBlockBody {
     BeaconBlockBody {
-        randao_reveal: block.body.randao_reveal.tree_hash_root(),
-        eth1_data: block.body.eth1_data.tree_hash_root(),
+        randao_reveal: H256::from(block.body.randao_reveal.tree_hash_root().0),
+        eth1_data: H256::from(block.body.eth1_data.tree_hash_root().0),
         graffiti: H256::from(block.body.graffiti.0),
-        proposer_slashings: block.body.proposer_slashings.tree_hash_root(),
-        attester_slashings: block.body.attester_slashings.tree_hash_root(),
-        attestations: block.body.attestations.tree_hash_root(),
-        deposits: block.body.deposits.tree_hash_root(),
-        voluntary_exits: block.body.voluntary_exits.tree_hash_root(),
-        sync_aggregate: block.body.sync_aggregate.tree_hash_root(),
+        proposer_slashings: H256::from(block.body.proposer_slashings.tree_hash_root().0),
+        attester_slashings: H256::from(block.body.attester_slashings.tree_hash_root().0),
+        attestations: H256::from(block.body.attestations.tree_hash_root().0),
+        deposits: H256::from(block.body.deposits.tree_hash_root().0),
+        voluntary_exits: H256::from(block.body.voluntary_exits.tree_hash_root().0),
+        sync_aggregate: H256::from(block.body.sync_aggregate.tree_hash_root().0),
         execution_payload: ExecutionPayload {
-            parent_hash: block.body.execution_payload.parent_hash().into_root(),
-            fee_recipient: block.body.execution_payload.fee_recipient(),
-            state_root: block.body.execution_payload.execution_payload.state_root,
-            receipts_root: block.body.execution_payload.execution_payload.receipts_root,
-            logs_bloom: block
+            parent_hash: H256::from(block.body.execution_payload.parent_hash().into_root().0),
+            fee_recipient: H160::from(block.body.execution_payload.fee_recipient().0),
+            state_root: H256::from(block.body.execution_payload.execution_payload.state_root.0),
+            receipts_root: H256::from(block.body.execution_payload.execution_payload.receipts_root.0),
+            logs_bloom: H256::from(block
                 .body
                 .execution_payload
                 .execution_payload
                 .logs_bloom
-                .tree_hash_root(),
-            prev_randao: block.body.execution_payload.execution_payload.prev_randao,
+                .tree_hash_root().0),
+            prev_randao: H256::from(block.body.execution_payload.execution_payload.prev_randao.0),
             block_number: block.body.execution_payload.block_number(),
             gas_limit: block.body.execution_payload.gas_limit(),
             gas_used: block.body.execution_payload.execution_payload.gas_used,
             timestamp: block.body.execution_payload.timestamp(),
-            extra_data: block
+            extra_data: H256::from(block
                 .body
                 .execution_payload
                 .execution_payload
                 .extra_data
-                .tree_hash_root(),
-            base_fee_per_gas: block
+                .tree_hash_root().0),
+            base_fee_per_gas: U256::from(block
                 .body
                 .execution_payload
                 .execution_payload
-                .base_fee_per_gas,
-            block_hash: block
+                .base_fee_per_gas.as_u128()),
+            block_hash: H256::from(block
                 .body
                 .execution_payload
                 .execution_payload
                 .block_hash
-                .into_root(),
-            transactions: block
+                .into_root().0),
+            transactions: H256::from(block
                 .body
                 .execution_payload
                 .execution_payload
                 .transactions
-                .tree_hash_root(),
+                .tree_hash_root().0),
         },
     }
 }

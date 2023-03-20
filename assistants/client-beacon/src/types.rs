@@ -3,10 +3,9 @@ use client_contracts::beacon_light_client_types::HeaderMessage as ContractHeader
 use client_contracts::beacon_light_client_types::SyncAggregate as ContractSyncAggregate;
 use client_contracts::beacon_light_client_types::SyncCommittee as ContractSyncCommittee;
 use serde::{Deserialize, Serialize};
-use types::BeaconBlockCapella;
+use types::BeaconBlock;
 use std::fmt::Display;
 use std::str::FromStr;
-use types::BeaconBlockMerge;
 use types::MainnetEthSpec;
 use web3::{
     contract::tokens::{Tokenizable, Tokenize},
@@ -37,6 +36,7 @@ pub struct ErrorResponse {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResponseWrapper<T> {
     pub data: T,
+    pub version: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -50,6 +50,11 @@ pub struct GetHeaderResponse {
 pub struct Header {
     pub message: HeaderMessage,
     pub signature: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct BeaconHeaderMessage {
+    pub beacon: HeaderMessage,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -126,7 +131,7 @@ pub struct GetBlockResponse {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BeaconBlockWrapper {
-    pub message: BeaconBlockCapella<MainnetEthSpec>,
+    pub message: BeaconBlock<MainnetEthSpec>,
     pub signature: String,
 }
 

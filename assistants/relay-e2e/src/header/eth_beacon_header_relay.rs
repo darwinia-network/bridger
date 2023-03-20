@@ -118,10 +118,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
 
         let (signature_slot, _) = self
             .beacon_api_client
-            .find_valid_header_since(
-                state.current_slot,
-                finality_update.attested_header.beacon.slot + 1,
-            )
+            .find_valid_header_since(state.current_slot, finality_update.attested_header.beacon.slot + 1)
             .await?;
         let sync_change = self
             .beacon_api_client

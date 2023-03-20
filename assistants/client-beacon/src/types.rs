@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use types::BeaconBlockCapella;
 use std::fmt::Display;
 use std::str::FromStr;
-use types::BeaconBlockMerge;
 use types::MainnetEthSpec;
 use web3::{
     contract::tokens::{Tokenizable, Tokenize},

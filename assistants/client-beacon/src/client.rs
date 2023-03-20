@@ -8,7 +8,7 @@ use crate::{
 };
 use reqwest::{header::CONTENT_TYPE, RequestBuilder, Response};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use types::{BeaconBlockMerge, MainnetEthSpec};
+use types::{MainnetEthSpec, BeaconBlockCapella};
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum ApiSupplier {
@@ -96,7 +96,7 @@ impl BeaconApiClient {
             u64,
             u64,
             GetHeaderResponse,
-            BeaconBlockMerge<MainnetEthSpec>,
+            BeaconBlockCapella<MainnetEthSpec>,
         )>,
     > {
         loop {
@@ -127,7 +127,7 @@ impl BeaconApiClient {
     }
 
     fn is_valid_sync_aggregate_block(
-        block: &BeaconBlockMerge<MainnetEthSpec>,
+        block: &BeaconBlockCapella<MainnetEthSpec>,
     ) -> BeaconApiResult<bool> {
         let sync_committee_bits = &block.body.sync_aggregate.sync_committee_bits.as_slice();
         Ok(hamming::weight(sync_committee_bits) * 3 > 512 * 2)
@@ -170,7 +170,7 @@ impl BeaconApiClient {
     pub async fn get_beacon_block(
         &self,
         id: impl ToString,
-    ) -> BeaconApiResult<BeaconBlockMerge<MainnetEthSpec>> {
+    ) -> BeaconApiResult<BeaconBlockCapella<MainnetEthSpec>> {
         let url = format!(
             "{}/eth/v2/beacon/blocks/{}",
             self.api_base_url,

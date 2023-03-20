@@ -19,7 +19,7 @@ use web3::{
     ethabi::encode,
     signing::Key,
     transports::Http,
-    types::{Address, BlockId, BlockNumber, Bytes, U256},
+    types::{Address, BlockId, BlockNumber, Bytes, U256, H256},
     Web3,
 };
 
@@ -201,7 +201,7 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
             .execution_layer()
             .merkle_root(None)
             .await?;
-        let latest_state_root = block.body.execution_payload.execution_payload.state_root;
+        let latest_state_root = H256::from(block.body.execution_payload.execution_payload.state_root.0);
         if execution_state_root != latest_state_root {
             Ok(None)
         } else {

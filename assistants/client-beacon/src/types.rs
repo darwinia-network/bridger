@@ -3,6 +3,7 @@ use client_contracts::beacon_light_client_types::HeaderMessage as ContractHeader
 use client_contracts::beacon_light_client_types::SyncAggregate as ContractSyncAggregate;
 use client_contracts::beacon_light_client_types::SyncCommittee as ContractSyncCommittee;
 use serde::{Deserialize, Serialize};
+use types::BeaconBlockCapella;
 use std::fmt::Display;
 use std::str::FromStr;
 use types::BeaconBlockMerge;
@@ -125,7 +126,7 @@ pub struct GetBlockResponse {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BeaconBlockWrapper {
-    pub message: BeaconBlockMerge<MainnetEthSpec>,
+    pub message: BeaconBlockCapella<MainnetEthSpec>,
     pub signature: String,
 }
 

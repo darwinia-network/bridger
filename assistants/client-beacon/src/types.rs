@@ -119,11 +119,6 @@ pub struct SyncCommitteePeriodUpdate {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct BeaconHeaderMessage {
-    pub beacon: HeaderMessage,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GetBlockResponse {
     pub message: BlockMessage,
     pub signature: String,

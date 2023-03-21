@@ -4,7 +4,7 @@
       <h2 class="text-h5 font-weight-thin">Fee market</h2>
     </v-col>
     <v-col cols="12" v-if="source.ampleRelayers">
-      <v-simple-table dense>
+      <v-table density="compact">
         <template v-slot:default>
           <thead>
           <tr>
@@ -36,7 +36,7 @@
           </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </v-table>
     </v-col>
     <v-col cols="12" v-else>
       <p>No assigned relayers</p>
@@ -44,68 +44,76 @@
   </v-row>
 </template>
 
-<script>
+<script lang="ts" setup>
 
-import BigNumber from 'bignumber.js'
-import ExternalExplorer from '@/components/widgets/external-explorer';
+import BigNumber from "bignumber.js";
+import {defineProps, onBeforeUnmount, onMounted, PropType, reactive, toRaw, toRefs} from "vue";
+import {BridgeSubstrateChainInfo} from "@/types/app";
+import {ApiPromise} from "@polkadot/api";
+import ExternalExplorer from "@/components/widgets/external-explorer.vue";
 
-async function initState(vm) {
-  const bridgeTarget = vm.sourceChain.bridge_target[vm.targetChain.bridge_chain_name];
-  vm.subscriber.assignedRelayers = await vm.sourceClient.query[bridgeTarget.query_name.feemarket]
-    .assignedRelayers(v => {
-      vm.source.ampleRelayers = v.isSome;
-      vm.source.assignedRelayers = v.toJSON();
-      vm.loading.assignedRelayers = false;
-      const precision = new BigNumber(10).pow(vm.sourceChain.precision);
-      vm.source.assignedRelayers = vm.$stream(vm.source.assignedRelayers)
-        .map(item => {
-          const collateral = new BigNumber(item.collateral);
-          const fee = new BigNumber(item.fee);
-          return {
-            ...item,
-            collateral: collateral.div(precision),
-            fee: fee.div(precision),
-          }
-        })
-        .toArray();
+
+const props = defineProps({
+  sourceChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
+  },
+  sourceClient: {
+    type: Object as PropType<ApiPromise>,
+  },
+  targetChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
+  },
+});
+
+interface _StateSource {
+  ampleRelayers: boolean,
+  assignedRelayers: Record<string, any>[],
+}
+
+interface _StateLoading {
+  assignedRelayers: boolean,
+}
+
+const state = reactive({
+  source: {} as _StateSource,
+  loading: {} as _StateLoading,
+  subscriber: {
+    assignedRelayers: null,
+  },
+});
+
+const {source, loading, subscriber} = toRefs(state);
+
+async function initState() {
+  const {sourceChain, targetChain} = props;
+  const sourceClient = toRaw(props.sourceClient);
+  const bridgeTarget = sourceChain.bridge_target[targetChain.bridge_chain_name];
+  subscriber.value.assignedRelayers = await sourceClient.query[bridgeTarget.query_name.feemarket]
+    .assignedRelayers((v: any) => {
+      source.value.ampleRelayers = v.isSome;
+      source.value.assignedRelayers = v.toJSON();
+      loading.value.assignedRelayers = false;
+      const precision = new BigNumber(10).pow(sourceChain.precision);
+      source.value.assignedRelayers = source.value.assignedRelayers.map(item => {
+        const collateral = new BigNumber(item.collateral);
+        const fee = new BigNumber(item.fee);
+        return {
+          ...item,
+          collateral: collateral.div(precision),
+          fee: fee.div(precision),
+        }
+      });
     });
 }
 
-export default {
-  components: {ExternalExplorer},
-  props: {
-    sourceClient: {
-      type: Object,
-    },
-    sourceChain: {
-      type: Object,
-    },
-    targetChain: {
-      type: Object,
-    },
-  },
-  data: () => ({
-    source: {
-      ampleRelayers: true,
-      assignedRelayers: [],
-    },
-    subscriber: {
-      assignedRelayers: null,
-    },
-    loading: {
-      assignedRelayers: true,
-    }
-  }),
-  created() {
-    initState(this);
-  },
-  destroyed() {
-    const vm = this;
-    vm.subscriber.assignedRelayers && vm.subscriber.assignedRelayers();
-  }
-}
+onMounted(() => {
+  initState();
+});
+
+
+onBeforeUnmount(() => {
+  // @ts-ignore
+  subscriber.value.assignedRelayers && subscriber.value.assignedRelayers();
+});
+
 </script>
-
-<style scoped>
-
-</style>

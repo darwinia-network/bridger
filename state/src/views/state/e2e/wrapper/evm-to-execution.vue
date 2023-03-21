@@ -27,39 +27,41 @@
   </v-row>
 </template>
 
-<script>
-import MessageRelay from "@/views/state/e2e/widgets/message-relay";
-import E2eFeemarket from "@/views/state/e2e/widgets/e2e-feemarket";
-import HeaderEvmToExecution from "@/views/state/e2e/widgets/header-evm-to-execution";
+<script lang="ts" setup>
 
-export default {
-  components: {HeaderEvmToExecution, E2eFeemarket, MessageRelay},
-  props: {
-    evmChain: {
-      type: Object,
-    },
-    executionChain: {
-      type: Object,
-    },
-    consensusChain: {
-      type: Object,
-    },
-    evmClient: {
-      type: Object,
-    },
-    executionClient: {
-      type: Object,
-    },
-    consensusClient: {
-      type: Object,
-    },
+import {defineProps, onMounted, PropType} from 'vue'
+import {EvmClient} from "@/plugins/eth2/evm";
+import {ExecutionClient} from "@/plugins/eth2/execution";
+import {ConsensusClient} from "@/plugins/eth2/consensus";
+import {BridgeEthereumChainInfo} from "@/types/app";
+import HeaderEvmToExecution from "@/views/state/e2e/widgets/header-evm-to-execution.vue";
+import E2eFeemarket from "@/views/state/e2e/widgets/e2e-feemarket.vue";
+import MessageRelay from "@/views/state/e2e/widgets/message-relay.vue";
+
+
+const props = defineProps({
+  evmChain: {
+    type: Object as PropType<BridgeEthereumChainInfo>,
   },
-  data: () => ({}),
-  created() {
-  }
-}
+  executionChain: {
+    type: Object as PropType<BridgeEthereumChainInfo>,
+  },
+  consensusChain: {
+    type: Object as PropType<BridgeEthereumChainInfo>,
+  },
+  evmClient: {
+    type: Object as PropType<EvmClient>,
+  },
+  executionClient: {
+    type: Object as PropType<ExecutionClient>,
+  },
+  consensusClient: {
+    type: Object as PropType<ConsensusClient>,
+  },
+});
+
+onMounted(() => {
+});
+
+
 </script>
-
-<style scoped>
-
-</style>

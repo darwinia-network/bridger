@@ -1,59 +1,33 @@
 <template>
-  <v-row>
+  <v-row v-if="chainType !== 'substrate' || (source.lastBlock && source.finalizedBlock)">
     <v-col cols="12" md="2" class="pt-8" v-if="sourceChain">
       <v-row>
         <v-col cols="12" class="d-flex flex-column align-center">
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-avatar v-bind="attrs" v-on="on" size="64" v-ripple>
-                <img :src="sourceChain.logo" :alt="sourceChain.name" v-if="sourceChain.logo">
-                <v-icon v-if="!sourceChain.logo" size="54">mdi-alpha-c</v-icon>
-              </v-avatar>
-              <span v-bind="attrs" class="body-1 font-weight-light">
-                <vue-ellipsis :text="sourceChain.name"/>
-              </span>
-            </template>
-            <span>Source chain</span>
-          </v-tooltip>
+          <v-avatar size="64" v-ripple>
+            <img :src="sourceChain.logo" :alt="sourceChain.name" v-if="sourceChain.logo">
+            <v-icon v-if="!sourceChain.logo" size="54">mdi-alpha-c</v-icon>
+          </v-avatar>
+          <span class="body-1 font-weight-light">
+            <span v-text="sourceChain.name"/>
+          </span>
         </v-col>
         <v-col cols="12" class="text-center">
-          <v-tooltip bottom v-if="source.header.last">
-            <template v-slot:activator="{ on, attrs }">
-              <p class="title text-block-number" v-bind="attrs" v-on="on">
-                <span
-                  class="yellow lighten-5"
-                  v-if="cond.highlight.last"
-                  v-text="source.header.last.number"
-                />
-                <span v-else v-text="source.header.last.number"/>
-                <v-btn icon small :href="`${sourceChain.explorer}/block/${source.header.last.number}`" target="_blank">
-                  <v-icon small>mdi-open-in-new</v-icon>
-                </v-btn>
-              </p>
-            </template>
-            <span>Last block</span>
-          </v-tooltip>
-          <v-tooltip bottom v-if="source.header.finalized">
-            <template v-slot:activator="{ on, attrs }">
-              <p class="subtitle-1 text-block-number" v-bind="attrs" v-on="on">
-                <span
-                  class="yellow lighten-5"
-                  v-if="cond.highlight.finalized"
-                  v-text="source.header.finalized.number"
-                />
-                <span v-else v-text="source.header.finalized.number"/>
-                <v-btn icon x-small :href="`${sourceChain.explorer}/block/${source.header.finalized.number}`"
-                       target="_blank">
-                  <v-icon x-small>mdi-open-in-new</v-icon>
-                </v-btn>
-              </p>
-            </template>
-            <span>Finalized block</span>
-          </v-tooltip>
+          <p class="title text-block-number" v-if="source.lastBlock">
+            <span v-text="source.lastBlock.number"/>
+            <v-btn icon size="x-small" variant="plain" :href="`${sourceChain.explorer}/block/${source.lastBlock.number}`" target="_blank">
+              <v-icon size="x-small">mdi-open-in-new</v-icon>
+            </v-btn>
+          </p>
+          <p class="subtitle-1 text-block-number" v-if="source.finalizedBlock">
+            <span v-text="source.finalizedBlock.number"/>
+            <v-btn icon size="x-small" variant="plain" :href="`${sourceChain.explorer}/block/${source.finalizedBlock.number}`"
+                   target="_blank">
+              <v-icon size="x-small">mdi-open-in-new</v-icon>
+            </v-btn>
+          </p>
         </v-col>
       </v-row>
     </v-col>
-
     <v-col cols="12" md="8">
       <slot/>
     </v-col>
@@ -61,88 +35,68 @@
     <v-col cols="12" md="2" class="pt-8" v-if="targetChain">
       <v-row>
         <v-col cols="12" class="d-flex flex-column align-center">
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-avatar v-bind="attrs" v-on="on" size="64" v-ripple>
-                <img :src="targetChain.logo" :alt="targetChain.name" v-if="targetChain.logo">
-                <v-icon v-if="!targetChain.logo" size="54">mdi-alpha-c</v-icon>
-              </v-avatar>
-              <span v-bind="attrs" class="body-1 font-weight-light">
-                <vue-ellipsis :text="targetChain.name"/>
-              </span>
-            </template>
-            <span>Target chain</span>
-          </v-tooltip>
+          <v-avatar size="64">
+            <img :src="targetChain.logo" :alt="targetChain.name" v-if="targetChain.logo">
+            <v-icon v-if="!targetChain.logo" size="54">mdi-alpha-c</v-icon>
+          </v-avatar>
+          <span class="body-1 font-weight-light" v-text="targetChain.name"></span>
         </v-col>
       </v-row>
     </v-col>
   </v-row>
 </template>
 
-<script>
+<script lang="ts" setup>
 
-async function _initState(vm) {
-  if (vm.chainType === 'substrate') {
-    vm.client.rpc.chain.subscribeNewHeads(header => {
-      vm.source.header.last = header;
-      vm.cond.highlight.last = true;
-      setTimeout(() => vm.cond.highlight.last = false, 500);
+import {defineProps, onMounted, PropType, reactive, toRefs} from 'vue'
+import {BridgeSubstrateChainInfo} from "@/types/app";
+import {ApiPromise} from "@polkadot/api";
+import EllipsisText from "@/components/widgets/ellipsis-text.vue";
+
+
+const props = defineProps({
+  chainType: {
+    type: String,
+  },
+  sourceChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
+  },
+  sourceClient: {
+    type: Object as PropType<ApiPromise>,
+  },
+  targetChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
+  },
+  targetClient: {
+    type: Object as PropType<ApiPromise>,
+  },
+  grandpaPalletName: {
+    type: String,
+  },
+});
+
+const state = reactive({
+  source: {
+    lastBlock: null,
+    finalizedBlock: null,
+  }
+});
+
+const {source} = toRefs(state);
+
+async function initState() {
+  if (props.chainType == 'substrate') {
+    props.sourceClient.rpc.chain.subscribeNewHeads(header => {
+      source.value.lastBlock = header.toJSON();
     });
-    vm.client.rpc.chain.subscribeFinalizedHeads(header => {
-      vm.source.header.finalized = header;
-      vm.cond.highlight.finalized = true;
-      setTimeout(() => vm.cond.highlight.finalized = false, 500);
+    props.sourceClient.rpc.chain.subscribeFinalizedHeads(header => {
+      source.value.finalizedBlock = header.toJSON();
     });
   }
 }
 
-export default {
-  props: {
-    chainType: {
-      type: String,
-    },
-    sourceClient: {
-      type: Object,
-    },
-    sourceChain: {
-      type: Object,
-    },
-    targetChain: {
-      type: Object,
-    },
-  },
-  data: () => ({
-    source: {
-      delaySourceClient: null,
-      header: {
-        last: null,
-        finalized: null,
-      }
-    },
-    cond: {
-      highlight: {
-        last: false,
-        finalized: false,
-      }
-    }
-  }),
-  methods: {
-    initState(sourceClient) {
-      this.source.delaySourceClient = sourceClient;
-      _initState(this);
-    },
-  },
-  computed: {
-    client() {
-      return this.sourceClient || this.source.delaySourceClient;
-    }
-  },
-  created() {
-    // initState(this);
-  }
-}
+
+onMounted(() => {
+  initState()
+});
 </script>
-
-<style scoped>
-
-</style>

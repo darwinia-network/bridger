@@ -4,7 +4,7 @@
       <h2 class="text-h5 font-weight-thin">Execution header</h2>
     </v-col>
     <v-col cols="12">
-      <v-simple-table dense>
+      <v-table density="compact">
         <template v-slot:default>
           <thead>
           <tr>
@@ -55,95 +55,123 @@
           </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </v-table>
     </v-col>
   </v-row>
 </template>
 
-<script>
 
-import ExternalExplorer from '@/components/widgets/external-explorer';
-import EllipsisText from "@/components/widgets/ellipsis-text";
+<script lang="ts" setup>
 
-async function initState(vm) {
-  vm.subscriber.relayInfo = setInterval(() => {
-    queryRelayInfo(vm);
-  }, 1000 * 15);
+import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRaw, toRefs} from 'vue'
+import BigNumber from "bignumber.js";
+import {Eth2Client} from "@/plugins/eth2";
+import {BridgeEthereumChainInfo} from "@/types/app";
+import {EvmClient} from "@/plugins/eth2/evm";
+import {ExecutionClient} from "@/plugins/eth2/execution";
+import {ConsensusClient} from "@/plugins/eth2/consensus";
+import EllipsisText from "@/components/widgets/ellipsis-text.vue";
+import ExternalExplorer from "@/components/widgets/external-explorer.vue";
+
+const eth2 = inject('eth2') as Eth2Client;
+
+
+const props = defineProps({
+  evmChain: {
+    type: Object as PropType<BridgeEthereumChainInfo>,
+  },
+  executionChain: {
+    type: Object as PropType<BridgeEthereumChainInfo>,
+  },
+  consensusChain: {
+    type: Object as PropType<BridgeEthereumChainInfo>,
+  },
+  evmClient: {
+    type: Object as PropType<EvmClient>,
+  },
+  executionClient: {
+    type: Object as PropType<ExecutionClient>,
+  },
+  consensusClient: {
+    type: Object as PropType<ConsensusClient>,
+  },
+});
+
+interface _StateSource {
+  relayedPeriod: BigNumber;
+  relayedHeader: Record<string, any>;
+  lastFinalizedBlock: string;
+  relayedStateRoot: string;
 }
 
-async function queryRelayInfo(vm) {
-  const bridgeTarget = vm.evmChain.bridge_target[vm.executionChain.bridge_chain_name];
+interface _StateLoading {
+  relayedHeader: boolean;
+  lastFinalizedBlock: boolean;
+  relayedStateRoot: boolean;
+}
+
+const state = reactive({
+  source: {} as _StateSource,
+  loading: {
+    relayedHeader: true,
+    lastFinalizedBlock: true,
+    relayedStateRoot: true,
+  } as _StateLoading,
+  subscriber: {
+    relayInfo: null,
+  },
+});
+
+const {source, loading, subscriber} = toRefs(state);
+
+async function initState() {
+  subscriber.value.relayInfo = setInterval(queryRelayInfo, 1000 * 15);
+}
+
+
+async function queryRelayInfo() {
+  const {evmChain, executionChain} = props;
+  const bridgeTarget = evmChain.bridge_target[executionChain.bridge_chain_name];
   const {lc_consensus, lc_execution} = bridgeTarget.contract;
 
+  const evmClient = toRaw(props.evmClient);
+  const consensusClient = toRaw(props.consensusClient);
+
   // query relayed header
-  vm.loading.relayedHeader = true;
-  vm.source.relayedHeader = await vm.evmClient
+  loading.value.relayedHeader = true;
+  const [slot, proposer_index, parent_root, state_root, body_root] = await evmClient
     .consensusLightClient(lc_consensus)
     .finalizedHeader();
-  vm.source.relayedPeriod = vm.$eth2.toolkit.calcPeriod(vm.source.relayedHeader.slot);
-  vm.loading.relayedHeader = false;
+  source.value.relayedHeader = {
+    slot, proposer_index, parent_root, state_root, body_root,
+  };
+  source.value.relayedPeriod = eth2.toolkit.calcPeriod(source.value.relayedHeader.slot);
+  loading.value.relayedHeader = false;
 
   // query consensus block
-  vm.loading.lastFinalizedBlock = true;
-  const lastFinalizedBlock = await vm.consensusClient.block(vm.source.relayedHeader.slot);
-  vm.source.lastFinalizedBlock = lastFinalizedBlock.data;
-  vm.loading.lastFinalizedBlock = false;
+  loading.value.lastFinalizedBlock = true;
+  const lastFinalizedBlock = await consensusClient.block(source.value.relayedHeader.slot);
+  source.value.lastFinalizedBlock = lastFinalizedBlock.data;
+  loading.value.lastFinalizedBlock = false;
 
-  vm.loading.relayedStateRoot = true;
-  vm.source.relayedStateRoot = await vm.evmClient.executionLightClient(lc_execution)
+  loading.value.relayedStateRoot = true;
+  source.value.relayedStateRoot = await evmClient.executionLightClient(lc_execution)
     .stateRoot();
-  vm.loading.relayedStateRoot = false;
+  loading.value.relayedStateRoot = false;
 }
 
-export default {
-  components: {EllipsisText, ExternalExplorer},
-  props: {
-    evmChain: {
-      type: Object,
-    },
-    executionChain: {
-      type: Object,
-    },
-    consensusChain: {
-      type: Object,
-    },
-    evmClient: {
-      type: Object,
-    },
-    executionClient: {
-      type: Object,
-    },
-    consensusClient: {
-      type: Object,
-    },
-  },
-  data: () => ({
-    source: {
-      relayedPeriod: null,
-      relayedHeader: null,
-      lastFinalizedBlock: null,
-      relayedStateRoot: null,
-    },
-    loading: {
-      relayedHeader: true,
-      lastFinalizedBlock: true,
-      relayedStateRoot: true,
-    },
-    subscriber: {
-      relayInfo: null,
-    },
-  }),
-  async created() {
-    await queryRelayInfo(this);
-    await initState(this);
-  },
-  destroyed() {
-    const vm = this;
-    vm.subscriber.relayInfo && clearInterval(vm.subscriber.relayInfo);
-  }
-}
+
+onMounted(() => {
+  queryRelayInfo();
+  initState();
+});
+
+
+onBeforeUnmount(() => {
+  // @ts-ignore
+  subscriber.value.queryMessage && clearInterval(subscriber.value.queryMessage);
+  subscriber.value.relayInfo && clearInterval(subscriber.value.relayInfo);
+});
+
 </script>
 
-<style scoped>
-
-</style>

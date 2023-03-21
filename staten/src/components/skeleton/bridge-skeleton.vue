@@ -35,7 +35,7 @@
     <v-col cols="12" md="2" class="pt-8" v-if="targetChain">
       <v-row>
         <v-col cols="12" class="d-flex flex-column align-center">
-          <v-avatar size="64" v-ripple>
+          <v-avatar size="64">
             <img :src="targetChain.logo" :alt="targetChain.name" v-if="targetChain.logo">
             <v-icon v-if="!targetChain.logo" size="54">mdi-alpha-c</v-icon>
           </v-avatar>

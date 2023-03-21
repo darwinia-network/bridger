@@ -2,7 +2,6 @@
   <v-container fluid>
     <v-row>
       <v-col cols="12">
-        <span v-if="pickedChain.evm && pickedChain.execution">abcd</span>
         <bridge-skeleton
           ref="left_to_right"
           chain-type="execution"
@@ -12,7 +11,6 @@
           :target-chain="pickedChain.execution"
           v-if="pickedChain.evm && pickedChain.execution"
         >
-          asdfasdf
           <v-progress-linear
             class="mt-15"
             :color="pickedChain.evm.color"

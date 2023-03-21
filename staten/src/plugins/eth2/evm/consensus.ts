@@ -20,6 +20,7 @@ export class ConsensusLightClient {
   }
 
   async syncCommitteeRoots(period: BigNumber) {
+    console.log('----->', period);
     return await this.contract.sync_committee_roots(period);
   }
 }

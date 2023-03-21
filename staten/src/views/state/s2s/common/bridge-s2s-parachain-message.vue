@@ -10,6 +10,14 @@
         :target-chain="targetChain"
       />
     </v-col>
+    <v-col cols="12">
+      <s2s-feemarket
+        :key="`s2s-feemarket-${paraChain.name}-${targetChain.name}`"
+        :source-client="paraClient"
+        :source-chain="paraChain"
+        :target-chain="targetChain"
+      />
+    </v-col>
   </v-row>
 </template>
 
@@ -18,6 +26,7 @@ import S2sMessageRelay from '@/views/state/s2s/common/widgets/s2s-message-relay/
 import {defineProps, onMounted, PropType} from 'vue'
 import {ApiPromise} from "@polkadot/api";
 import {BridgeSubstrateChainInfo} from "@/types/app";
+import S2sFeemarket from "@/views/state/s2s/common/widgets/s2s-feemarket.vue";
 
 const props = defineProps({
   relayChain: {

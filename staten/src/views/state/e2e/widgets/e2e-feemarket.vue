@@ -49,7 +49,7 @@
 
 
 <script lang="ts" setup>
-import {defineProps, onMounted, PropType, reactive, toRefs} from 'vue'
+import {defineProps, onMounted, PropType, reactive, toRaw, toRefs} from 'vue'
 import {EvmClient} from "@/plugins/eth2/evm";
 import {ExecutionClient} from "@/plugins/eth2/execution";
 import {BridgeEthereumChainInfo} from "@/types/app";
@@ -100,7 +100,7 @@ async function initState() {
   const {sourceChain, targetChain, sourceClient} = props;
   loading.value.assignedRelayers = true;
   const bridgeTarget = sourceChain.bridge_target[targetChain.bridge_chain_name];
-  const assignedRelayers = await sourceClient
+  const assignedRelayers = await toRaw(sourceClient)
     .feemarket(bridgeTarget.contract.feemarket)
     .assignedRelayers();
   loading.value.assignedRelayers = false;

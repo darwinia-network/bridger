@@ -84,7 +84,7 @@
 
 import BridgeSkeleton from "@/components/skeleton/bridge-skeleton.vue"
 
-import {defineProps, onMounted, PropType, reactive, toRefs} from 'vue'
+import {defineProps, onMounted, PropType, reactive, toRefs, provide, inject, onBeforeUnmount} from 'vue'
 
 import * as dataSource from '@/data/data_source'
 
@@ -165,6 +165,7 @@ async function initState() {
   loading.value.rightParaClient = false;
   const rightRelayClient = await ApiPromise.create({provider: rightRelayChainProvider});
   loading.value.rightRelayClient = false;
+
   pickedClient.value = {
     leftParaClient,
     leftRelayClient,
@@ -176,6 +177,13 @@ async function initState() {
 
 onMounted(() => {
   initState();
+});
+
+onBeforeUnmount(() => {
+  pickedClient.value.leftParaClient && pickedClient.value.leftParaClient.disconnect();
+  pickedClient.value.rightParaClient && pickedClient.value.rightParaClient.disconnect();
+  pickedClient.value.leftRelayClient && pickedClient.value.leftRelayClient.disconnect();
+  pickedClient.value.rightRelayClient && pickedClient.value.rightRelayClient.disconnect();
 });
 </script>
 

@@ -1,11 +1,11 @@
 export interface ChainEndpointSubstrate {
   websocket: string;
   http?: string;
+  evm?: string;
 }
 
 export interface ChainEndpointEvm {
   http: string;
-  evm?: string;
 }
 
 export type ChainName = 'crab' | 'darwinia' | 'pangolin' | 'pangoro' | 'rococo' | 'moonbase' | 'ethereum';

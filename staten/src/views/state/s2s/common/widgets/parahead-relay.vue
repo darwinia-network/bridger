@@ -58,14 +58,13 @@
         <tr>
           <td>Last parachain by relayed at source (relaychain)</td>
           <td>
-<!--            <v-progress-linear v-if="loading.paraHeadAtSourceByLastRelayedGrandpa" :color="relayChain.color" indeterminate/>
+            <v-progress-linear v-if="loading.paraHeadAtSourceByLastRelayedGrandpa" :color="relayChain.color" indeterminate/>
             <external-explorer
               v-else
               :identity="`${source.paraHeadAtSourceByLastRelayedGrandpa}`"
               type="block"
               :chain="relayChain"
-            />-->
-            TODO
+            />
           </td>
         </tr>
         </tbody>
@@ -76,7 +75,7 @@
 
 <script lang="ts" setup>
 
-import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRefs} from 'vue'
+import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRefs, toRaw } from 'vue'
 import {BridgeSubstrateChainInfo} from "@/types/app";
 import {ApiPromise} from "@polkadot/api";
 import ExternalExplorer from "@/components/widgets/external-explorer.vue";
@@ -156,12 +155,12 @@ async function initState() {
       loading.value.relayedGrandpaBlockHash = false;
       loading.value.paraHeadAtSourceByLastRelayedGrandpa = true;
 
-      // todo: fix this.
-      // const atBlockRelayClient = await relayClient?.at(blockHash);
-      // const paraHeadAtSourceByLastRelayedGrandpa = await atBlockRelayClient?.query.paras.heads(bridgeTarget.para_id);
-      // // @ts-ignore
-      // source.value.paraHeadAtSourceByLastRelayedGrandpa = paraHeadAtSourceByLastRelayedGrandpa?.toJSON();
-      // loading.value.paraHeadAtSourceByLastRelayedGrandpa = false;
+      // @ts-ignore
+      const atBlockRelayClient = await toRaw(relayClient).at(blockHash);
+      const paraHeadAtSourceByLastRelayedGrandpa = await atBlockRelayClient.query.paras.heads(bridgeTarget.para_id);
+      // @ts-ignore
+      source.value.paraHeadAtSourceByLastRelayedGrandpa = paraHeadAtSourceByLastRelayedGrandpa?.toJSON();
+      loading.value.paraHeadAtSourceByLastRelayedGrandpa = false;
     });
 }
 

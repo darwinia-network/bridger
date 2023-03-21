@@ -51,7 +51,7 @@
 
 <script lang="ts" setup>
 
-import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRefs} from 'vue'
+import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRaw, toRefs} from 'vue'
 import {BridgeEthereumChainInfo} from "@/types/app";
 import {EvmClient} from "@/plugins/eth2/evm";
 import {ExecutionClient} from "@/plugins/eth2/execution";
@@ -121,7 +121,7 @@ async function queryRelyInfo() {
   const consensusLightClientAddress = bridgeTarget.contract.lc_consensus;
   // query relayed header
   loading.value.relayedHeader = true;
-  source.value.relayedHeader = await evmClient
+  source.value.relayedHeader = await toRaw(evmClient)
     .consensusLightClient(consensusLightClientAddress)
     .finalizedHeader();
   source.value.relayedPeriod = eth2.toolkit.calcPeriod(source.value.relayedHeader.slot);

@@ -93,7 +93,7 @@
 
 import BridgeSkeleton from "@/components/skeleton/bridge-skeleton.vue"
 
-import {defineProps, onMounted, PropType, reactive, toRefs} from 'vue'
+import {defineProps, onMounted, PropType, provide, reactive, toRefs} from 'vue'
 
 import * as dataSource from '@/data/data_source'
 
@@ -101,7 +101,12 @@ import {Bridge} from "@/types/bridge";
 import {useRouter} from "vue-router";
 import {SubstrateChainInfo} from "@/types/chain";
 import {ApiPromise, WsProvider} from "@polkadot/api";
-import {SoloWithParaChainPair, SoloWithParaClientPair} from "@/types/app";
+import {
+  ParaWithParaChainPair,
+  ParaWithParaClientPair,
+  SoloWithParaChainPair,
+  SoloWithParaClientPair
+} from "@/types/app";
 import BridgeS2sParachainHeader from "@/views/state/s2s/common/bridge-s2s-parachain-header.vue";
 import BridgeS2sBasic from "@/views/state/s2s/common/bridge-s2s-basic.vue";
 import BridgeS2sParachainMessage from "@/views/state/s2s/common/bridge-s2s-parachain-message.vue";

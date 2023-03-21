@@ -63,7 +63,7 @@
 
 <script lang="ts" setup>
 
-import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRefs} from 'vue'
+import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRaw, toRefs} from 'vue'
 import BigNumber from "bignumber.js";
 import {Eth2Client} from "@/plugins/eth2";
 import {BridgeEthereumChainInfo} from "@/types/app";
@@ -99,7 +99,7 @@ const props = defineProps({
 
 interface _StateSource {
   relayedPeriod: BigNumber;
-  relayedHeader: string;
+  relayedHeader: Record<string, any>;
   lastFinalizedBlock: string;
   relayedStateRoot: string;
 }
@@ -130,21 +130,27 @@ async function initState() {
 
 
 async function queryRelayInfo() {
-  const {evmChain, consensusClient, evmClient, executionChain} = props;
+  const {evmChain, executionChain} = props;
   const bridgeTarget = evmChain.bridge_target[executionChain.bridge_chain_name];
   const {lc_consensus, lc_execution} = bridgeTarget.contract;
 
+  const evmClient = toRaw(props.evmClient);
+  const consensusClient = toRaw(props.consensusClient);
+
   // query relayed header
   loading.value.relayedHeader = true;
-  source.value.relayedHeader = await evmClient
+  const [slot, proposer_index, parent_root, state_root, body_root] = await evmClient
     .consensusLightClient(lc_consensus)
     .finalizedHeader();
+  source.value.relayedHeader = {
+    slot, proposer_index, parent_root, state_root, body_root,
+  };
   source.value.relayedPeriod = eth2.toolkit.calcPeriod(source.value.relayedHeader.slot);
   loading.value.relayedHeader = false;
 
   // query consensus block
   loading.value.lastFinalizedBlock = true;
-  const lastFinalizedBlock = await consensusClient.block(source.relayedHeader.slot);
+  const lastFinalizedBlock = await consensusClient.block(source.value.relayedHeader.slot);
   source.value.lastFinalizedBlock = lastFinalizedBlock.data;
   loading.value.lastFinalizedBlock = false;
 

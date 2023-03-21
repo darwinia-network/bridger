@@ -125,7 +125,7 @@
 <script lang="ts" setup>
 
 
-import {defineProps, onBeforeUnmount, onMounted, PropType, reactive, toRefs} from "vue";
+import {defineProps, onBeforeUnmount, onMounted, PropType, reactive, toRaw, toRefs} from "vue";
 import {BridgeEthereumChainInfo} from "@/types/app";
 import {EvmClient} from "@/plugins/eth2/evm";
 import {ExecutionClient} from "@/plugins/eth2/execution";
@@ -202,7 +202,7 @@ async function queryOutbound() {
   const bridgeTargetAtSource = sourceChain.bridge_target[targetChain.bridge_chain_name];
 
   loading.value.sourceChainOutboundLaneData = true;
-  const outboundLaneNonce = await sourceClient.message({
+  const outboundLaneNonce = await toRaw(sourceClient).message({
     inbound: bridgeTargetAtSource.contract.inbound,
     outbound: bridgeTargetAtSource.contract.outbound,
   }).outboundLaneNonce();
@@ -215,9 +215,12 @@ async function queryOutbound() {
 }
 
 async function queryInbound() {
-  const {direction, sourceChain, targetChain, sourceClient, targetClient} = props;
+  const {direction, sourceChain, targetChain} = props;
   const bridgeTargetAtSource = sourceChain.bridge_target[targetChain.bridge_chain_name];
   const bridgeTargetAtTarget = targetChain.bridge_target[sourceChain.bridge_chain_name];
+  const sourceClient = toRaw(props.sourceClient);
+  const targetClient = toRaw(props.targetClient);
+  const consensusClient = toRaw(props.consensusClient);
 
   // query last relayed target chain header at source
   loading.value.lastTargetChainRelayedBlockAtSource = true;

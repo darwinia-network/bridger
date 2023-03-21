@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
 
-import {defineProps, inject, onMounted, PropType, reactive, toRefs} from 'vue'
+import {defineProps, inject, onMounted, PropType, reactive, toRaw, toRefs} from 'vue'
 import {EvmClient} from "@/plugins/eth2/evm";
 import {ExecutionClient} from "@/plugins/eth2/execution";
 import {ConsensusClient} from "@/plugins/eth2/consensus";
@@ -99,9 +99,12 @@ const state = reactive({
 const {source, loading} = toRefs(state);
 
 async function initState() {
-  const {evmChain, executionChain, evmClient} = props;
+  const {evmChain, executionChain} = props;
   const bridgeTarget = evmChain?.bridge_target[executionChain.bridge_chain_name];
   const consensusLightClientAddress = bridgeTarget.contract.lc_consensus;
+
+  const evmClient = toRaw(props.evmClient);
+
   const header = await evmClient?.consensusLightClient(consensusLightClientAddress)
     .finalizedHeader();
   loading.value.relayedHeader = false;

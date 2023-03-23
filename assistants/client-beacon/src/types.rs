@@ -3,9 +3,9 @@ use client_contracts::beacon_light_client_types::HeaderMessage as ContractHeader
 use client_contracts::beacon_light_client_types::SyncAggregate as ContractSyncAggregate;
 use client_contracts::beacon_light_client_types::SyncCommittee as ContractSyncCommittee;
 use serde::{Deserialize, Serialize};
-use types::BeaconBlock;
 use std::fmt::Display;
 use std::str::FromStr;
+use types::BeaconBlock;
 use types::MainnetEthSpec;
 use web3::{
     contract::tokens::{Tokenizable, Tokenize},
@@ -36,7 +36,6 @@ pub struct ErrorResponse {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResponseWrapper<T> {
     pub data: T,
-    pub version: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -272,23 +271,22 @@ pub struct FinalityUpdate {
 
 #[derive(Debug, Clone)]
 pub struct MessagesProof {
-    pub account_proof: web3::types::Bytes,
-    pub lane_id_proof: web3::types::Bytes,
-    pub lane_nonce_proof: web3::types::Bytes,
-    pub lane_messages_proof: Vec<web3::types::Bytes>,
+    pub account_proof: Vec<web3::types::Bytes>,
+    pub lane_nonce_proof: Vec<web3::types::Bytes>,
+    pub lane_messages_proof: Vec<Vec<web3::types::Bytes>>,
 }
 
 impl MessagesProof {
     pub fn get_token(&self) -> BeaconApiResult<Token> {
         Ok(Token::Tuple(
             (
-                self.account_proof.clone(),
-                self.lane_id_proof.clone(),
-                self.lane_nonce_proof.clone(),
+                bytes_vec_to_token(self.account_proof.clone()),
+                bytes_vec_to_token(self.lane_nonce_proof.clone()),
                 Token::Array(
                     self.lane_messages_proof
-                        .iter()
-                        .map(|x| x.clone().into_token())
+                        .clone()
+                        .into_iter()
+                        .map(|x| bytes_vec_to_token(x))
                         .collect::<Vec<Token>>(),
                 ),
             )
@@ -299,27 +297,37 @@ impl MessagesProof {
 
 #[derive(Debug, Clone)]
 pub struct MessagesConfirmationProof {
-    pub account_proof: web3::types::Bytes,
-    pub lane_nonce_proof: web3::types::Bytes,
-    pub lane_relayers_proof: Vec<web3::types::Bytes>,
+    pub account_proof: Vec<web3::types::Bytes>,
+    pub lane_nonce_proof: Vec<web3::types::Bytes>,
+    pub lane_relayers_proof: Vec<Vec<web3::types::Bytes>>,
 }
 
 impl MessagesConfirmationProof {
     pub fn get_token(&self) -> BeaconApiResult<Token> {
         Ok(Token::Tuple(
             (
-                self.account_proof.clone(),
-                self.lane_nonce_proof.clone(),
+                bytes_vec_to_token(self.account_proof.clone()),
+                bytes_vec_to_token(self.lane_nonce_proof.clone()),
                 Token::Array(
                     self.lane_relayers_proof
-                        .iter()
-                        .map(|x| x.clone().into_token())
+                        .clone()
+                        .into_iter()
+                        .map(bytes_vec_to_token)
                         .collect::<Vec<Token>>(),
                 ),
             )
                 .into_tokens(),
         ))
     }
+}
+
+fn bytes_vec_to_token(bytes: Vec<web3::types::Bytes>) -> Token {
+    Token::Array(
+        bytes
+            .into_iter()
+            .map(|x| x.into_token())
+            .collect::<Vec<Token>>(),
+    )
 }
 
 fn from_str<'de, T, D>(deserializer: D) -> Result<T, D::Error>

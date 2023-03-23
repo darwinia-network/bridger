@@ -2,7 +2,8 @@ pub use crate::error::BridgeContractResult;
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenize, Contract, Options},
+    signing::Key,
     transports::Http,
     types::{Address, BlockId, H256, U256},
     Web3,
@@ -35,13 +36,25 @@ impl Outbound {
         message: SendMessage,
         private_key: &SecretKey,
         fee: U256,
-        options: Options,
+        mut options: Options,
     ) -> BridgeContractResult<H256> {
+        let call = "send_message";
+        let params = message.into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options::default(),
+            )
+            .await?;
+        options.gas = Some(gas);
         let tx = self
             .contract
             .signed_call(
-                "send_message",
-                message,
+                call,
+                params.as_slice(),
                 Options {
                     value: Some(fee),
                     ..options
@@ -74,16 +87,23 @@ impl Outbound {
         &self,
         proof: ReceiveMessagesDeliveryProof,
         private_key: &SecretKey,
-        options: Options,
+        mut options: Options,
     ) -> BridgeContractResult<H256> {
+        let call = "receive_messages_delivery_proof";
+        let params = (proof.inbound_lane_data, proof.messages_proof).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options::default(),
+            )
+            .await?;
+        options.gas = Some(gas);
         let tx = self
             .contract
-            .signed_call(
-                "receive_messages_delivery_proof",
-                (proof.inbound_lane_data, proof.messages_proof),
-                options,
-                private_key,
-            )
+            .signed_call(call, params.as_slice(), options, private_key)
             .await?;
         Ok(tx)
     }

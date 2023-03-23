@@ -118,7 +118,10 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
 
         let (signature_slot, _) = self
             .beacon_api_client
-            .find_valid_header_since(state.current_slot, finality_update.attested_header.beacon.slot + 1)
+            .find_valid_header_since(
+                state.current_slot,
+                finality_update.attested_header.beacon.slot + 1,
+            )
             .await?;
         let sync_change = self
             .beacon_api_client
@@ -212,10 +215,6 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                 finalized_header_update,
                 &self.eth_light_client.private_key(),
                 Options {
-                    gas: Some(
-                        U256::from_dec_str("5000000")
-                            .map_err(|e| RelayError::Custom(format!("{}", e)))?,
-                    ),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },

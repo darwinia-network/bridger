@@ -70,10 +70,6 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 sync_committee_update,
                 self.eth_light_client.private_key(),
                 Options {
-                    gas: Some(
-                        U256::from_dec_str("8000000")
-                            .map_err(|e| RelayError::Custom(format!("{}", e)))?,
-                    ),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },

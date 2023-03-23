@@ -3,7 +3,8 @@ use crate::error::BridgeContractResult;
 
 use secp256k1::SecretKey;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenize, Contract, Options},
+    signing::Key,
     transports::Http,
     types::{Address, BlockId, H256},
     Web3,
@@ -31,7 +32,7 @@ impl ExecutionLayer {
             .query("merkle_root", (), None, Options::default(), at_block)
             .await?)
     }
-    
+
     pub async fn is_capella(&self) -> BridgeContractResult<bool> {
         Ok(self
             .contract
@@ -43,16 +44,23 @@ impl ExecutionLayer {
         &self,
         beacon_block_body: BeaconBlockBodyBellatrix,
         private_key: &SecretKey,
-        options: Options,
+        mut options: Options,
     ) -> BridgeContractResult<H256> {
+        let call = "import_block_body_bellatrix";
+        let params = (beacon_block_body,).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options::default(),
+            )
+            .await?;
+        options.gas = Some(gas);
         let tx = self
             .contract
-            .signed_call(
-                "import_latest_execution_payload_state_root",
-                (beacon_block_body,),
-                options,
-                private_key,
-            )
+            .signed_call(call, params.as_slice(), options, private_key)
             .await?;
         Ok(tx)
     }
@@ -61,16 +69,23 @@ impl ExecutionLayer {
         &self,
         beacon_block_body: BeaconBlockBodyCapella,
         private_key: &SecretKey,
-        options: Options,
+        mut options: Options,
     ) -> BridgeContractResult<H256> {
+        let call = "import_block_body_capella";
+        let params = (beacon_block_body,).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options::default(),
+            )
+            .await?;
+        options.gas = Some(gas);
         let tx = self
             .contract
-            .signed_call(
-                "import_latest_execution_payload_state_root",
-                (beacon_block_body,),
-                options,
-                private_key,
-            )
+            .signed_call(call, params.as_slice(), options, private_key)
             .await?;
         Ok(tx)
     }
@@ -136,7 +151,7 @@ pub mod types {
         pub voluntary_exits: H256,
         pub sync_aggregate: H256,
         pub execution_payload: ExecutionPayloadCapella,
-        pub bls_to_execution_changes: H256
+        pub bls_to_execution_changes: H256,
     }
 
     impl Tokenizable for BeaconBlockBodyCapella {
@@ -166,8 +181,6 @@ pub mod types {
             )
         }
     }
-
-
 
     #[derive(Debug, Clone)]
     pub struct ExecutionPayload {

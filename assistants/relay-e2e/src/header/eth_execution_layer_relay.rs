@@ -35,6 +35,7 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
             .finalized_header()
             .await?;
         let is_capella = self.eth_light_client.execution_layer().is_capella().await?;
+        dbg!(is_capella);
         let finalized_block = self
             .beacon_api_client
             .get_beacon_block(last_relayed_header.slot)
@@ -77,7 +78,6 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
 
         let gas_price = self.eth_light_client.gas_price().await?;
         let options = Options {
-            gas: Some(U256::from(10000000)),
             gas_price: Some(gas_price),
             ..Default::default()
         };
@@ -85,10 +85,10 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
         let tx = match is_capella {
             true => {
                 let parameter =
-                    build_execution_layer_update_bellatrix(finalized_block.body_merge()?);
+                    build_execution_layer_update_capella(finalized_block.body_capella()?);
                 self.eth_light_client
                     .execution_layer()
-                    .import_block_body_bellatrix(
+                    .import_block_body_capella(
                         parameter,
                         self.eth_light_client.private_key(),
                         options,
@@ -97,10 +97,10 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
             }
             false => {
                 let parameter =
-                    build_execution_layer_update_capella(finalized_block.body_capella()?);
+                    build_execution_layer_update_bellatrix(finalized_block.body_merge()?);
                 self.eth_light_client
                     .execution_layer()
-                    .import_block_body_capella(
+                    .import_block_body_bellatrix(
                         parameter,
                         self.eth_light_client.private_key(),
                         options,

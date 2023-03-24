@@ -142,10 +142,6 @@ impl<T: RelayStrategy> MessageClient for EthMessageClient<T> {
         })
     }
 
-    fn delivery_gas_unit(&self) -> E2EClientResult<U256> {
-        Ok(U256::from_dec_str("300000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
-    }
-
     async fn prepare_for_confirmation(
         &self,
         begin: u64,

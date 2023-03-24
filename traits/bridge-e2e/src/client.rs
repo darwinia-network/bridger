@@ -97,9 +97,6 @@ pub trait MessageClient: GasPriceOracle {
         block_number: Option<BlockNumber>,
     ) -> E2EClientResult<ReceiveMessagesProof>;
 
-    // Returns estimated gas used for one message delivery
-    fn delivery_gas_unit(&self) -> E2EClientResult<U256>;
-
     // Returns proof for messages confirmation in the range of nonce from begin to end
     async fn prepare_for_confirmation(
         &self,

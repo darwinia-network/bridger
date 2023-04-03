@@ -110,7 +110,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
                 .last()
                 .map(|item| item.valid_range.end)
                 .expect("Unreachable");
-            if finalized_block_number.gt(range_max_number) {
+            if finalized_block_number.gt(&range_max_number) {
                 tracing::info!(
                     target: "feemarket",
                     "{} your are assigned relayer and this nonce is timeout device to relay this nonce: {}",

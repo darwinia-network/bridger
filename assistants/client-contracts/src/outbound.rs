@@ -46,7 +46,10 @@ impl Outbound {
                 call,
                 params.as_slice(),
                 private_key.address(),
-                Options::default(),
+                Options {
+                    value: Some(fee),
+                    ..Default::default()
+                },
             )
             .await?;
         options.gas = Some(gas);

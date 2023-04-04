@@ -1,3 +1,5 @@
+use std::ops::{Add, Div, Mul};
+
 use crate::error::{BridgeContractError, BridgeContractResult};
 use secp256k1::SecretKey;
 use web3::{
@@ -37,14 +39,13 @@ impl FeeMarket {
     ) -> BridgeContractResult<H256> {
         let call = "enroll";
         let params = (prev, fee).into_tokens();
+        let options = Options {
+            value: Some(fee),
+            ..Default::default()
+        };
         let gas = self
             .contract
-            .estimate_gas(
-                call,
-                params.as_slice(),
-                private_key.address(),
-                Options::default(),
-            )
+            .estimate_gas(call, params.as_slice(), private_key.address(), options)
             .await?;
         let tx = self
             .contract
@@ -65,9 +66,14 @@ impl FeeMarket {
     #[allow(dead_code)]
     pub async fn deposit(&self, fee: U256, private_key: &SecretKey) -> BridgeContractResult<H256> {
         let call = "deposit";
+        let option = Options {
+            gas: None,
+            value: Some(fee),
+            ..Default::default()
+        };
         let gas = self
             .contract
-            .estimate_gas(call, (), private_key.address(), Options::default())
+            .estimate_gas(call, (), private_key.address(), option)
             .await?;
         let tx = self
             .contract

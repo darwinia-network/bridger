@@ -42,7 +42,10 @@ impl SimpleFeeMarket {
                 call,
                 params.as_slice(),
                 private_key.address(),
-                Options::default(),
+                Options {
+                    value: Some(fee),
+                    ..Default::default()
+                },
             )
             .await?;
         let tx = self
@@ -59,6 +62,13 @@ impl SimpleFeeMarket {
             )
             .await?;
         Ok(tx)
+    }
+
+    pub async fn get_relayer(&self, prev: Address) -> BridgeContractResult<Address> {
+        Ok(self
+            .contract
+            .query("relayers", (prev,), None, Options::default(), None)
+            .await?)
     }
 
     #[allow(dead_code)]

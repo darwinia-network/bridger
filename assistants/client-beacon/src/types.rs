@@ -36,7 +36,6 @@ pub struct ErrorResponse {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResponseWrapper<T> {
     pub data: T,
-    pub version: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

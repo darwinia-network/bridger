@@ -85,7 +85,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             tx,
             self.eth_light_client.get_web3().transport(),
             Duration::from_secs(5),
-            3,
+            1,
         )
         .await?;
         Ok(())
@@ -125,12 +125,26 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 sync_committee_update.attested_header.beacon.slot + 1,
             )
             .await?;
-
-        let fork_version = self.beacon_api_client.get_fork_version("head").await?;
+        let signature_epoch = signature_slot.div(32);
+        let fork_version_data = self.beacon_api_client.get_fork_version("head").await?;
+        let fork_version = if signature_epoch
+            >= u64::from_str(&fork_version_data.epoch)
+                .map_err(|_| RelayError::Custom("Failed to decode fork_version.epoch".into()))?
+        {
+            fork_version_data.current_version
+        } else {
+            fork_version_data.previous_version
+        };
         let finalized_header_update = FinalizedHeaderUpdate {
-            attested_header: sync_committee_update.attested_header.beacon.to_contract_type()?,
+            attested_header: sync_committee_update
+                .attested_header
+                .beacon
+                .to_contract_type()?,
             signature_sync_committee: current_sync_committee,
-            finalized_header: sync_committee_update.finalized_header.beacon.to_contract_type()?,
+            finalized_header: sync_committee_update
+                .finalized_header
+                .beacon
+                .to_contract_type()?,
             finality_branch: sync_committee_update
                 .finality_branch
                 .iter()
@@ -138,7 +152,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 .collect::<Result<Vec<H256>, _>>()
                 .map_err(|_| RelayError::Custom("Failed to decode finality_branch".into()))?,
             sync_aggregate: sync_committee_update.sync_aggregate.to_contract_type()?,
-            fork_version: Bytes(fork_version.current_version.as_ref().to_vec()),
+            fork_version: Bytes(fork_version.as_ref().to_vec()),
             signature_slot,
         };
         Ok((

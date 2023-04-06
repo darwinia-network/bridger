@@ -35,7 +35,6 @@ impl<C: EthTruthLayerLightClient> ExecutionLayerRelayRunner<C> {
             .finalized_header()
             .await?;
         let is_capella = self.eth_light_client.execution_layer().is_capella().await?;
-        dbg!(is_capella);
         let finalized_block = self
             .beacon_api_client
             .get_beacon_block(last_relayed_header.slot)

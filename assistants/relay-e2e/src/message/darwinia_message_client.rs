@@ -13,13 +13,12 @@ use client_contracts::{
 };
 use secp256k1::SecretKey;
 use thegraph::Thegraph;
-use types::ExecPayload;
 use web3::{
     contract::tokens::Tokenizable,
     ethabi::encode,
     signing::Key,
     transports::Http,
-    types::{Address, BlockId, BlockNumber, Bytes, U256},
+    types::{Address, BlockId, BlockNumber, Bytes, H256, U256},
     Web3,
 };
 
@@ -201,11 +200,16 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
             .execution_layer()
             .merkle_root(None)
             .await?;
-        let latest_state_root = block.body.execution_payload.execution_payload.state_root;
+        let execution_payload = block
+            .body()
+            .execution_payload()
+            .map_err(|_| E2EClientError::Custom("No execution payload".into()))?
+            .execution_payload_ref();
+        let latest_state_root = H256::from(execution_payload.state_root().0);
         if execution_state_root != latest_state_root {
             Ok(None)
         } else {
-            let block_number: u64 = block.body.execution_payload.block_number();
+            let block_number: u64 = execution_payload.block_number();
             Ok(Some(block_number))
         }
     }

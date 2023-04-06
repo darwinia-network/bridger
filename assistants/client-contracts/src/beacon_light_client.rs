@@ -1,7 +1,8 @@
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenize, Contract, Options},
+    signing::Key,
     transports::Http,
     types::{Address, H256},
     Web3,
@@ -57,16 +58,23 @@ impl BeaconLightClient {
         &self,
         finalized_header_update: FinalizedHeaderUpdate,
         private_key: &SecretKey,
-        options: Options,
+        mut options: Options,
     ) -> BridgeContractResult<H256> {
+        let call = "import_finalized_header";
+        let params = (finalized_header_update,).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options::default(),
+            )
+            .await?;
+        options.gas = Some(gas);
         let tx = self
             .contract
-            .signed_call(
-                "import_finalized_header",
-                (finalized_header_update,),
-                options,
-                private_key,
-            )
+            .signed_call(call, params.as_slice(), options, private_key)
             .await?;
         Ok(tx)
     }
@@ -76,16 +84,23 @@ impl BeaconLightClient {
         finalized_header_update: FinalizedHeaderUpdate,
         sync_committee_update: SyncCommitteePeriodUpdate,
         private_key: &SecretKey,
-        options: Options,
+        mut options: Options,
     ) -> BridgeContractResult<H256> {
+        let call = "import_next_sync_committee";
+        let params = (finalized_header_update, sync_committee_update).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options::default(),
+            )
+            .await?;
+        options.gas = Some(gas);
         let tx = self
             .contract
-            .signed_call(
-                "import_next_sync_committee",
-                (finalized_header_update, sync_committee_update),
-                options,
-                private_key,
-            )
+            .signed_call(call, params.as_slice(), options, private_key)
             .await?;
         Ok(tx)
     }

@@ -196,7 +196,6 @@ where
             begin + count - 1,
         );
 
-        let gas = self.target.delivery_gas_unit()? * (end - begin + 2);
         let gas_price = self.target.gas_price().await?;
         let tx = self
             .target
@@ -206,7 +205,6 @@ where
                 U256::from(count),
                 &self.target.private_key(),
                 Options {
-                    gas: Some(gas),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },
@@ -301,7 +299,6 @@ where
                 proof,
                 &self.source.private_key(),
                 Options {
-                    gas: Some(self.source.confirmation_gas_unit()?),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },

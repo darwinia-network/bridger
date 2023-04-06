@@ -10,7 +10,7 @@ use client_contracts::beacon_light_client_types::FinalizedHeaderUpdate;
 use support_etherscan::wait_for_transaction_confirmation;
 use web3::{
     contract::Options,
-    types::{Bytes, H256, U256},
+    types::{Bytes, H256},
 };
 
 use crate::error::{RelayError, RelayResult};

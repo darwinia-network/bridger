@@ -6,7 +6,7 @@ use web3::{
     contract::{tokens::Tokenize, Contract, Options},
     signing::Key,
     transports::Http,
-    types::{Address, BlockId, H256},
+    types::{Address, BlockId, H256, U256},
     Web3,
 };
 

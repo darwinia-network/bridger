@@ -4,7 +4,7 @@ use web3::{
     contract::{tokens::Tokenize, Contract, Options},
     signing::Key,
     transports::Http,
-    types::{Address, H256},
+    types::{Address, H256, U256},
     Web3,
 };
 
@@ -62,16 +62,16 @@ impl BeaconLightClient {
     ) -> BridgeContractResult<H256> {
         let call = "import_finalized_header";
         let params = (finalized_header_update,).into_tokens();
-        let gas = self
-            .contract
-            .estimate_gas(
-                call,
-                params.as_slice(),
-                private_key.address(),
-                Options::default(),
-            )
-            .await?;
-        options.gas = Some(gas);
+        // let gas = self
+        //     .contract
+        //     .estimate_gas(
+        //         call,
+        //         params.as_slice(),
+        //         private_key.address(),
+        //         Options::default(),
+        //     )
+        //     .await?;
+        options.gas = Some(U256::from_dec_str("4000000").unwrap());
         let tx = self
             .contract
             .signed_call(call, params.as_slice(), options, private_key)
@@ -88,16 +88,17 @@ impl BeaconLightClient {
     ) -> BridgeContractResult<H256> {
         let call = "import_next_sync_committee";
         let params = (finalized_header_update, sync_committee_update).into_tokens();
-        let gas = self
-            .contract
-            .estimate_gas(
-                call,
-                params.as_slice(),
-                private_key.address(),
-                Options::default(),
-            )
-            .await?;
-        options.gas = Some(gas);
+        // let gas = self
+        //     .contract
+        //     .estimate_gas(
+        //         call,
+        //         params.as_slice(),
+        //         private_key.address(),
+        //         Options::default(),
+        //     )
+        //     .await?;
+        // dbg!(&gas);
+        options.gas = Some(U256::from_dec_str("9000000").unwrap());
         let tx = self
             .contract
             .signed_call(call, params.as_slice(), options, private_key)

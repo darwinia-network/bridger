@@ -82,7 +82,6 @@ example: `/home/ubuntu/bridger_config_dir/pangolin-pangoro`.
 |---------------------|--------------------|-----------------------------------------------------------------|
 | evm-ethereum        | darwinia-ethereum  | [Guide](https://github.com/darwinia-network/bridger/issues/528) |
 | substrate-substrate | darwinia-crab      | [Guide](./bridges/darwinia-crab/docs/Guide.md)                  |
-| substrate-substrate | crab-crabparachain | [Guide](./bridges/crab-crabparachain/docs/Guide.md)             |
 
 ### Testnet
 
@@ -90,7 +89,6 @@ example: `/home/ubuntu/bridger_config_dir/pangolin-pangoro`.
 |---------------------|----------------------------|-----------------------------------------------------------------|
 | evm-ethereum        | pangoro-goerli             | [Guide](https://github.com/darwinia-network/bridger/issues/528) |
 | substrate-substrate | pangolin-pangoro           | [Guide](./bridges/pangolin-pangoro/docs/Guide.md)               |
-| substrate-substrate | pangolin-pangolinparachain | [Guide](./bridges/pangolin-pangolinparachain/docs/Guide.md)     |
 
 > Goerli is the testnet of Ethereum.
 > Pangolin is the testnet of Crab.
@@ -121,7 +119,7 @@ Open your `~/.bridger/bridger.toml` and update the version to the new one.
 [registry]
 path = "https://github.com/darwinia-network/bridger"
 type = "Github"
-version = "0.6.4"
+version = "0.8.0"
 ```
 
 Run `bridger pangolin-pangoro start`, It will automatically update the new
@@ -134,7 +132,7 @@ docker run -d \
   --name pangolin-pangoro \
   --restart always \
   -v /home/ubuntu/bridger_config_dir/pangolin-pangoro:/root/.bridger \
-  quay.io/darwinia-network/bridger:v0.6.3 \
+  quay.io/darwinia-network/bridger:v0.8.0 \
   pangolin-pangoro start
 ```
 
@@ -154,7 +152,7 @@ docker run -d \
   --name pangolin-pangoro \
   --restart always \
   -v /home/ubuntu/bridger_config_dir/pangolin-pangoro:/root/.bridger \
-  quay.io/darwinia-network/bridger:v0.6.4 \
+  quay.io/darwinia-network/bridger:v0.8.0 \
   pangolin-pangoro start
 ```
 
@@ -168,7 +166,7 @@ version: '3'
 services:
   pangolin-pangoro:
     container_name: pangolin-pangoro
-    image: quay.io/darwinia-network/bridger:v0.6.4
+    image: quay.io/darwinia-network/bridger:v0.8.0
     restart: always
     volumes:
       - /etc/localtime:/etc/localtime
@@ -177,20 +175,9 @@ services:
       - pangolin-pangoro
       - start
 
-  pangolin-pangolinparachain:
-    container_name: pangolin-pangolinparachain
-    image: quay.io/darwinia-network/bridger:v0.6.4
-    restart: always
-    volumes:
-      - /etc/localtime:/etc/localtime
-      - /home/ubuntu/bridger_config_dir/pangolin-pangolinparachain:/root/.bridger
-    command:
-      - pangolin-pangolinparachain
-      - start
-
   pangoro-goerli:
     container_name: pangoro-goerli
-    image: quay.io/darwinia-network/bridger:v0.6.4
+    image: quay.io/darwinia-network/bridger:v0.8.0
     restart: always
     volumes:
       - /etc/localtime:/etc/localtime

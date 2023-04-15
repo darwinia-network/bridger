@@ -24,10 +24,10 @@ array-bytes    = "6"
 tokio          = { version = "1", features = ["time"] }
 once_cell      = "1"
 async-trait    = "0.1"
-subxt          = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.37" }
+subxt          = { git = "https://github.com/darwinia-network/subxt", branch = "polkadot-v0.9.38" }
 
-sp-core             = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37" }
-sp-runtime          = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37" }
+sp-core             = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38" }
+sp-runtime          = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38" }
 
 support-toolkit     = { path = "../../frame/supports/support-toolkit", features = ["convert", "log"] }
 

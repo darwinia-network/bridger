@@ -76,7 +76,15 @@ impl SimpleFeeMarket {
         let call = "deposit";
         let gas = self
             .contract
-            .estimate_gas(call, (), private_key.address(), Options::default())
+            .estimate_gas(
+                call,
+                (),
+                private_key.address(),
+                Options {
+                    value: Some(fee),
+                    ..Default::default()
+                },
+            )
             .await?;
 
         let tx = self

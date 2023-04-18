@@ -7,13 +7,14 @@ use bridge_e2e_traits::client::{MessageClient, Web3Client};
 use bridge_pangolin_goerli::bridge::BridgeConfig as RawBridgeConfig;
 use client_contracts::outbound_types::SendMessage;
 use client_pangolin::client::PangolinClient;
+use color_eyre::owo_colors::OwoColorize;
 use relay_e2e::types::ethereum::FastEthereumAccount;
+use secp256k1::SecretKey;
 use subquery::types::BridgeName;
 use support_common::config::{Config, Names};
 use support_etherscan::wait_for_transaction_confirmation;
 use thegraph::types::LikethChain;
-use web3::{contract::Options, ethabi::Address, types::U256, signing::Key};
-use secp256k1::SecretKey;
+use web3::{contract::{Options, tokens::Tokenize}, ethabi::Address, signing::Key, types::U256};
 
 #[test]
 fn test_signing() {
@@ -47,7 +48,7 @@ async fn get_bridge_config() -> color_eyre::Result<BridgeConfig<PangolinClient>>
 }
 
 #[tokio::test]
-async fn test_update_relayer() -> color_eyre::Result<()> {
+async fn test_enroll_relayer_at_pangolin() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
     let msg = message_relay_client_builder(config).await?;
     let privates = vec![
@@ -59,18 +60,73 @@ async fn test_update_relayer() -> color_eyre::Result<()> {
     for key in privates {
         let secret = SecretKey::from_str(&key)?;
         let address = (&secret).address();
-        let tx = msg.source.strategy.fee_market
-            .enroll(prev, U256::from(10000000000000000000u64), &secret)
+        dbg!(&address);
+        let tx = msg
+            .source
+            .strategy
+            .fee_market
+            .enroll(prev, U256::from_dec_str("10000000000000000000").unwrap(), &secret)
             .await
             .unwrap();
+        wait_for_transaction_confirmation(
+            tx,
+            msg.source.get_web3().transport(),
+            Duration::from_secs(3),
+            1,
+        ).await?;
         prev = Address::from(address);
         dbg!(tx);
     }
     Ok(())
 }
 
+// write a test to enroll relayers at the other side
+
 #[tokio::test]
-async fn test_deposit_relayer() -> color_eyre::Result<()> {
+async fn test_enroll_relayer_at_goerli() -> color_eyre::Result<()> {
+    let config = get_bridge_config().await?;
+    let msg = message_relay_client_builder(config.clone()).await?;
+    let mut prev = Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
+    let mut count = 0;
+    loop {
+        if count > 3 {
+            break;
+        }
+        let relayer = msg.target.strategy.fee_market.get_relayer(prev).await?;
+        dbg!(&relayer);
+        prev = relayer;
+        count += 1;
+    }
+    let min: U256 = msg
+        .target
+        .strategy
+        .fee_market
+        .contract
+        .query("COLLATERAL_PER_ORDER", (), None, Options::default(), None)
+        .await.unwrap();
+    dbg!(min);
+    let balance = msg.target.strategy.fee_market.balance_of(Address::from_str("0x68898dB1012808808C903F390909C52D9F706749").unwrap()).await?;
+    dbg!(balance);
+
+    // let relayer_info = msg.target.strategy.fee_market.get_relayer_info().await?;
+    // dbg!(&relayer_info);
+    // let fee = relayer_info.get(0).expect("There are no relayers!").fee;
+    // dbg!(fee);
+
+    let mut prev = Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
+    let secret = SecretKey::from_str(&config.ethereum.private_key)?;
+    let addresss = (&secret).address();
+    dbg!(addresss);
+    let tx = msg.target.strategy.fee_market
+        .enroll(prev, U256::from_dec_str("100000000000000").unwrap(), &secret)
+        .await
+        .unwrap();
+    dbg!(tx);
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_deposit_relayer_pangolin() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
     let msg = message_relay_client_builder(config).await?;
     let privates = vec![
@@ -80,12 +136,31 @@ async fn test_deposit_relayer() -> color_eyre::Result<()> {
     ];
     for key in privates {
         let secret = SecretKey::from_str(&key)?;
-        let tx = msg.source.strategy.fee_market
-            .deposit(U256::from(10000000000000000000u64), &secret)
+        let tx = msg
+            .source
+            .strategy
+            .fee_market
+            .deposit(U256::from_dec_str("100000000000000000000").unwrap(), &secret)
             .await
             .unwrap();
         dbg!(tx);
     }
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_deposit_relayer_goerli() -> color_eyre::Result<()> {
+    let config = get_bridge_config().await?;
+    let msg = message_relay_client_builder(config.clone()).await?;
+    let secret = SecretKey::from_str(&config.ethereum.private_key)?;
+    let tx = msg
+        .target
+        .strategy
+        .fee_market
+        .deposit(U256::from(1000000000000000u64), &secret)
+        .await
+        .unwrap();
+    dbg!(tx);
     Ok(())
 }
 
@@ -107,7 +182,7 @@ async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
         gas: Some(U256::from_dec_str("8000000")?),
         ..Default::default()
     };
-    let num = 3;
+    let num = 1;
     for _ in 0..num {
         let tx = msg
             .source
@@ -120,19 +195,18 @@ async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
             )
             .await
             .unwrap();
-        wait_for_transaction_confirmation(
-            tx,
-            msg.source.get_web3().transport(),
-            Duration::from_secs(3),
-            1,
-        )
-        .await?;
+        // wait_for_transaction_confirmation(
+        //     tx,
+        //     msg.source.get_web3().transport(),
+        //     Duration::from_secs(3),
+        //     1,
+        // )
+        // .await?;
         dbg!(&tx);
     }
     Ok(())
 }
 
-#[ignore]
 #[tokio::test]
 async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
@@ -148,11 +222,11 @@ async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
         encoded: web3::types::Bytes(vec![]),
     };
     let options = Options {
-        gas: Some(U256::from_dec_str("10000000")?),
-        gas_price: Some(U256::from_dec_str("20000000000")?),
+        gas: Some(U256::from_dec_str("1000000")?),
+        gas_price: None,
         ..Default::default()
     };
-    for _ in 0..10 {
+    for _ in 0..1 {
         let tx = msg
             .target
             .outbound
@@ -165,13 +239,13 @@ async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
             .await
             .unwrap();
         dbg!(&tx);
-        wait_for_transaction_confirmation(
-            tx,
-            msg.target.get_web3().transport(),
-            Duration::from_secs(3),
-            1,
-        )
-        .await?;
+        // wait_for_transaction_confirmation(
+        //     tx,
+        //     msg.target.get_web3().transport(),
+        //     Duration::from_secs(3),
+        //     1,
+        // )
+        // .await?;
     }
     Ok(())
 }

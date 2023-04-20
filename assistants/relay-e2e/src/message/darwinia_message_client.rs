@@ -50,7 +50,6 @@ impl DarwiniaMessageClient {
         lane_message_committer_address: Address,
         fee_market_address: Address,
         light_client_address: Address,
-        execution_layer_address: Address,
         max_gas_price: U256,
         private_key: &str,
         indexer: Thegraph,
@@ -72,7 +71,6 @@ impl DarwiniaMessageClient {
         let eth_light_client = EthLightClient::new(
             endpoint,
             light_client_address,
-            execution_layer_address,
             private_key,
             max_gas_price,
         )
@@ -193,7 +191,7 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
             .map_err(|e| E2EClientError::Custom(format!("Beacon api error: {}", e)))?;
         let execution_state_root = self
             .eth_light_client
-            .execution_layer()
+            .beacon_light_client()
             .merkle_root(None)
             .await?;
         let execution_payload = block

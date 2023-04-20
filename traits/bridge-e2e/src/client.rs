@@ -2,8 +2,8 @@ use std::cmp;
 use std::fmt::Debug;
 
 use client_contracts::outbound_types::ReceiveMessagesDeliveryProof;
+use client_contracts::BeaconLightClient;
 use client_contracts::{inbound_types::ReceiveMessagesProof, Inbound, Outbound};
-use client_contracts::{BeaconLightClient, ExecutionLayer};
 use secp256k1::SecretKey;
 use subxt::Config;
 use support_etherscan::{EtherscanClient, Result as EtherscanResult};
@@ -46,8 +46,6 @@ pub trait GasPriceOracle: Web3Client {
 
 pub trait EthTruthLayerLightClient: GasPriceOracle {
     fn beacon_light_client(&self) -> &BeaconLightClient;
-
-    fn execution_layer(&self) -> &ExecutionLayer;
 
     fn private_key(&self) -> &SecretKey;
 }

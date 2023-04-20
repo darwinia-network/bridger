@@ -117,14 +117,24 @@ impl FeeMarket {
         new_fee: U256,
         private_key: &SecretKey,
     ) -> BridgeContractResult<H256> {
+        let call = "move";
+        let option = Options {
+            value: Some(new_fee),
+            ..Default::default()
+        };
+        let params = (old_prev, new_prev, new_fee).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(call, params.as_slice(), private_key.address(), option)
+            .await?;
+
         let tx = self
             .contract
             .signed_call(
-                "move",
-                (old_prev, new_prev, new_fee),
+                call,
+                params.as_slice(),
                 Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
+                    gas: Some(gas),
                     value: Some(new_fee),
                     ..Default::default()
                 },

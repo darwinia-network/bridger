@@ -8,7 +8,7 @@ use crate::{
 };
 use reqwest::{header::CONTENT_TYPE, RequestBuilder, Response};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use types::{MainnetEthSpec, BeaconBlock};
+use types::{BeaconBlock, MainnetEthSpec};
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum ApiSupplier {
@@ -91,14 +91,7 @@ impl BeaconApiClient {
         &self,
         current_slot: u64,
         mut slot: u64,
-    ) -> BeaconApiResult<
-        Option<(
-            u64,
-            u64,
-            GetHeaderResponse,
-            BeaconBlock<MainnetEthSpec>,
-        )>,
-    > {
+    ) -> BeaconApiResult<Option<(u64, u64, GetHeaderResponse, BeaconBlock<MainnetEthSpec>)>> {
         loop {
             if slot > current_slot {
                 return Ok(None);
@@ -110,7 +103,14 @@ impl BeaconApiClient {
                         .await?;
 
                     let sync_block = self.get_beacon_block(sync_slot).await?;
-                    match Self::is_valid_sync_aggregate_block(&sync_block.body().sync_aggregate().unwrap().sync_committee_bits.as_slice())? {
+                    match Self::is_valid_sync_aggregate_block(
+                        &sync_block
+                            .body()
+                            .sync_aggregate()
+                            .unwrap()
+                            .sync_committee_bits
+                            .as_slice(),
+                    )? {
                         true => return Ok(Some((attest_slot, sync_slot, header, sync_block))),
                         false => {
                             slot += 1;
@@ -126,9 +126,7 @@ impl BeaconApiClient {
         }
     }
 
-    fn is_valid_sync_aggregate_block(
-        sync_committee_bits: &[u8],
-    ) -> BeaconApiResult<bool> {
+    fn is_valid_sync_aggregate_block(sync_committee_bits: &[u8]) -> BeaconApiResult<bool> {
         Ok(hamming::weight(sync_committee_bits) * 3 > 512 * 2)
     }
 

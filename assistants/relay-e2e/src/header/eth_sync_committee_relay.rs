@@ -136,15 +136,9 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             fork_version_data.previous_version
         };
         let finalized_header_update = FinalizedHeaderUpdate {
-            attested_header: sync_committee_update
-                .attested_header
-                .beacon
-                .to_contract_type()?,
+            attested_header: sync_committee_update.attested_header.to_contract_type()?,
             signature_sync_committee: current_sync_committee,
-            finalized_header: sync_committee_update
-                .finalized_header
-                .beacon
-                .to_contract_type()?,
+            finalized_header: sync_committee_update.finalized_header.to_contract_type()?,
             finality_branch: sync_committee_update
                 .finality_branch
                 .iter()

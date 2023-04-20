@@ -132,9 +132,9 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
         }
         let fork_version = self.get_fork_version(signature_slot).await?;
         let finalized_header_update = FinalizedHeaderUpdate {
-            attested_header: finality_update.attested_header.beacon.to_contract_type()?,
+            attested_header: finality_update.attested_header.to_contract_type()?,
             signature_sync_committee: sync_change[0].next_sync_committee.to_contract_type()?,
-            finalized_header: finality_update.finalized_header.beacon.to_contract_type()?,
+            finalized_header: finality_update.finalized_header.to_contract_type()?,
             finality_branch: finality_update
                 .finality_branch
                 .iter()
@@ -165,9 +165,9 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                 .await?;
             let fork_version = self.get_fork_version(signature_slot).await?;
             let finalized_header_update = FinalizedHeaderUpdate {
-                attested_header: target_finality.attested_header.beacon.to_contract_type()?,
+                attested_header: target_finality.attested_header.to_contract_type()?,
                 signature_sync_committee: last_finality.next_sync_committee.to_contract_type()?,
-                finalized_header: target_finality.finalized_header.beacon.to_contract_type()?,
+                finalized_header: target_finality.finalized_header.to_contract_type()?,
                 finality_branch: target_finality
                     .finality_branch
                     .iter()

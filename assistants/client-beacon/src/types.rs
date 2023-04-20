@@ -1,12 +1,18 @@
 use bytes::{Buf, Bytes};
+use client_contracts::beacon_light_client_types::ExecutionPayloadHeader as ContractExecutionPayloadHeader;
 use client_contracts::beacon_light_client_types::HeaderMessage as ContractHeaderMessage;
+use client_contracts::beacon_light_client_types::LightClientHeader;
 use client_contracts::beacon_light_client_types::SyncAggregate as ContractSyncAggregate;
 use client_contracts::beacon_light_client_types::SyncCommittee as ContractSyncCommittee;
 use serde::{Deserialize, Serialize};
+use types::ExecutionPayloadHeaderCapella;
 use std::fmt::Display;
 use std::str::FromStr;
+use tree_hash::TreeHash;
 use types::BeaconBlock;
 use types::MainnetEthSpec;
+use web3::types::H160;
+use web3::types::U256;
 use web3::{
     contract::tokens::{Tokenizable, Tokenize},
     ethabi::{ethereum_types::H32, Token},
@@ -54,6 +60,38 @@ pub struct Header {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BeaconHeaderMessage {
     pub beacon: HeaderMessage,
+    pub execution: ExecutionPayloadHeaderCapella<MainnetEthSpec>,
+    pub execution_branch: Vec<String>,
+}
+
+impl BeaconHeaderMessage {
+    pub fn to_contract_type(&self) -> BeaconApiResult<LightClientHeader> {
+        Ok(LightClientHeader {
+            beacon: self.beacon.to_contract_type()?,
+            execution: ContractExecutionPayloadHeader {
+                parent_hash: H256::from(self.execution.parent_hash.into_root().0),
+                fee_recipient: H160::from(self.execution.fee_recipient.0),
+                state_root: H256::from(self.execution.state_root.0),
+                receipts_root: H256::from(self.execution.receipts_root.0),
+                logs_bloom: H256::from(self.execution.logs_bloom.tree_hash_root().0),
+                prev_randao: H256::from(self.execution.prev_randao.0),
+                block_number: self.execution.block_number,
+                gas_limit: self.execution.gas_limit,
+                gas_used: self.execution.gas_used,
+                timestamp: self.execution.timestamp,
+                extra_data: H256::from(self.execution.extra_data.tree_hash_root().0),
+                base_fee_per_gas: U256::from(self.execution.base_fee_per_gas.as_u128()),
+                block_hash: H256::from(self.execution.block_hash.into_root().0),
+                transactions_root: H256::from(self.execution.transactions_root.0),
+                withdrawals_root: H256::from(self.execution.withdrawals_root.0),
+            },
+            execution_branch: self
+                .execution_branch
+                .iter()
+                .map(|x| h256_from_str(&x.to_string()))
+                .collect::<Result<Vec<H256>, BeaconApiError>>()?,
+        })
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

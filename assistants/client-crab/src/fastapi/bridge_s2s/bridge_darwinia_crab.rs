@@ -2,6 +2,7 @@ use std::ops::RangeInclusive;
 
 use bridge_s2s_traits::client::{S2SClientGeneric, S2SClientRelay, S2SParaBridgeClientSolochain};
 use bridge_s2s_traits::error::{S2SClientError, S2SClientResult};
+use bridge_s2s_traits::types::bp_messages::Weight;
 use bridge_s2s_traits::types::{
     bp_header_chain, bp_messages, bp_runtime::Chain, bridge_runtime_common,
 };
@@ -202,19 +203,18 @@ impl S2SClientRelay for CrabClient {
             <Self::Chain as Chain>::Hash,
         >,
         messages_count: u32,
-        dispatch_weight: u64,
+        dispatch_weight: Weight,
     ) -> S2SClientResult<<Self::Chain as Chain>::Hash> {
         let relayer_id_at_bridged_chain = SmartCodecMapper::map_to(&relayer_id_at_bridged_chain)?;
         let expected_proof = SmartCodecMapper::map_to(&proof)?;
+        let expected_dispatch_weight = SmartCodecMapper::map_to(&dispatch_weight)?;
         let call = crate::subxt_runtime::api::tx()
             .bridge_darwinia_messages()
             .receive_messages_proof(
                 relayer_id_at_bridged_chain,
                 expected_proof,
                 messages_count,
-                crate::subxt_runtime::api::runtime_types::sp_weights::weight_v2::Weight {
-                    ref_time: dispatch_weight,
-                },
+                expected_dispatch_weight,
             );
         let track = self
             .subxt()

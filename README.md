@@ -6,19 +6,23 @@
 [![downloads](https://img.shields.io/crates/d/darwinia-bridger.svg)](https://github.com/darwinia-network/bridger/releases/latest)
 [![license](https://img.shields.io/github/license/darwinia-network/bridger)](https://choosealicense.com/licenses/gpl)
 
-Relayers (aka. Bridgers) in Darwinia Network are offchain worker clients which help relay the headers and messages between source chains and target chains, they work between two chains and require RPC access of two chains.
+Relayers (aka. Bridgers) in Darwinia Network are offchain worker clients which
+help relay the headers and messages between source chains and target chains,
+they work between two chains and require RPC access of two chains.
 
-Darwinia Bridger (this repo) is an implementation of a relayer client written in Rust.
+Darwinia Bridger (this repo) is an implementation of a relayer client written in
+Rust.
 
 ## Installation
 
 ### Download from GitHub releases
 
-Download the binary from [latest release](https://github.com/darwinia-network/bridger/releases/latest).
+Download the binary
+from [latest release](https://github.com/darwinia-network/bridger/releases/latest)
+.
 
 * The asset name for macOS is `bridger-darwin-x86_64.zip`.
 * The asset name for Linux is `bridger-linux-x86_64.zip`.
-* The asset name for Windows is `bridger-windows-x86_64.zip`.
 
 ### Pull the Docker image
 
@@ -41,7 +45,7 @@ cd bridger/
 ##### Set registry
 
 You need set registry when you want to compile from source, because default
-registry from download precompile binary from Github release page. So set
+registry download precompile binary from Github release page. So set
 registry to local
 
 ```text
@@ -62,26 +66,29 @@ The bridger program will read some environments.
 
 ## Configuration
 
-The currently darwinia-bridger supports muliti bridges. Each bridge has its own configuration file. The configuration filename pattern is `bridge-<BRIDGE_NAME>.toml`
+The currently darwinia-bridger supports muliti bridges. Each bridge has its own
+configuration file. The configuration filename pattern
+is `bridge-<BRIDGE_NAME>.toml`
 
 The default configuration dir is your `BRIDGER_HOME` env var.
 
-If you use docker to run the bridger. You should put your configuration file to your dir that will be mapped to the container's `/root/.bridger`. For example: `/home/ubuntu/bridger_config_dir/pangolin-pangoro`.
-
+If you use docker to run the bridger. You should put your configuration file to
+your dir that will be mapped to the container's `/root/.bridger`. For
+example: `/home/ubuntu/bridger_config_dir/pangolin-pangoro`.
 
 ### Mainnet
+
 | TYPE                | BRIDGE NAME        |                                                                 |
 |---------------------|--------------------|-----------------------------------------------------------------|
 | evm-ethereum        | darwinia-ethereum  | [Guide](https://github.com/darwinia-network/bridger/issues/528) |
 | substrate-substrate | darwinia-crab      | [Guide](./bridges/darwinia-crab/docs/Guide.md)                  |
-| substrate-substrate | crab-crabparachain | [Guide](./bridges/crab-crabparachain/docs/Guide.md)             |
 
 ### Testnet
+
 | TYPE                | BRIDGE NAME                |                                                                 |
 |---------------------|----------------------------|-----------------------------------------------------------------|
 | evm-ethereum        | pangoro-goerli             | [Guide](https://github.com/darwinia-network/bridger/issues/528) |
 | substrate-substrate | pangolin-pangoro           | [Guide](./bridges/pangolin-pangoro/docs/Guide.md)               |
-| substrate-substrate | pangolin-pangolinparachain | [Guide](./bridges/pangolin-pangolinparachain/docs/Guide.md)     |
 
 > Goerli is the testnet of Ethereum.
 > Pangolin is the testnet of Crab.
@@ -94,10 +101,12 @@ If you use docker to run the bridger. You should put your configuration file to 
 ```bash
 bridger pangolin-pangoro start
 ```
-The `pangolin-pangoro` here is a bridge name listed in the previous `Configuration` section.
 
+The `pangolin-pangoro` here is a bridge name listed in the
+previous `Configuration` section.
 
 `-h` will list all commands it supports.
+
 ```bash
 bridger pangolin-pangoro -h
 ```
@@ -110,11 +119,11 @@ Open your `~/.bridger/bridger.toml` and update the version to the new one.
 [registry]
 path = "https://github.com/darwinia-network/bridger"
 type = "Github"
-version = "0.6.4"
+version = "0.8.0"
 ```
 
-Run `bridger pangolin-pangoro start`, It will automatically update the new version bridge.
-
+Run `bridger pangolin-pangoro start`, It will automatically update the new
+version bridge.
 
 ### Docker
 
@@ -123,15 +132,19 @@ docker run -d \
   --name pangolin-pangoro \
   --restart always \
   -v /home/ubuntu/bridger_config_dir/pangolin-pangoro:/root/.bridger \
-  quay.io/darwinia-network/bridger:v0.6.3 \
+  quay.io/darwinia-network/bridger:v0.8.0 \
   pangolin-pangoro start
 ```
 
-Note: It is recommended that you create a directory specific to a bridge if you use docker to run bridger. Here we have a `pangolin-pangoro` dir in your local config dir.
+Note: It is recommended that you create a directory specific to a bridge if you
+use docker to run bridger. Here we have a `pangolin-pangoro` dir in your local
+config dir.
 
 ##### Update
 
-First delete your container, then rerun the docker run command with the new version.
+First delete your container, then rerun the docker run command with the new
+version.
+
 ```bash
 docker stop pangolin-pangoro
 docker rm pangolin-pangoro
@@ -139,20 +152,21 @@ docker run -d \
   --name pangolin-pangoro \
   --restart always \
   -v /home/ubuntu/bridger_config_dir/pangolin-pangoro:/root/.bridger \
-  quay.io/darwinia-network/bridger:v0.6.4 \
+  quay.io/darwinia-network/bridger:v0.8.0 \
   pangolin-pangoro start
 ```
 
 ### docker-compose
 
-If you run multiple bridges, you can use docker-compose to simplify the process. What you need to do is create a `docker-compose.yml` file. Here is an example:
+If you run multiple bridges, you can use docker-compose to simplify the process.
+What you need to do is create a `docker-compose.yml` file. Here is an example:
 
 ```yml
 version: '3'
 services:
   pangolin-pangoro:
     container_name: pangolin-pangoro
-    image: quay.io/darwinia-network/bridger:v0.6.4
+    image: quay.io/darwinia-network/bridger:v0.8.0
     restart: always
     volumes:
       - /etc/localtime:/etc/localtime
@@ -161,20 +175,9 @@ services:
       - pangolin-pangoro
       - start
 
-  pangolin-pangolinparachain:
-    container_name: pangolin-pangolinparachain
-    image: quay.io/darwinia-network/bridger:v0.6.4
-    restart: always
-    volumes:
-      - /etc/localtime:/etc/localtime
-      - /home/ubuntu/bridger_config_dir/pangolin-pangolinparachain:/root/.bridger
-    command:
-      - pangolin-pangolinparachain
-      - start
-
   pangoro-goerli:
     container_name: pangoro-goerli
-    image: quay.io/darwinia-network/bridger:v0.6.4
+    image: quay.io/darwinia-network/bridger:v0.8.0
     restart: always
     volumes:
       - /etc/localtime:/etc/localtime
@@ -203,7 +206,8 @@ docker-compose up -d
 
 ### Init bridge
 
-After the blockchain is reset, the bridge needs to be initialized. The user does not need to do this, it is usually done by the developer.
+After the blockchain is reset, the bridge needs to be initialized. The user does
+not need to do this, it is usually done by the developer.
 
 ```bash
 bridger pangolin-pangoro init pangolin-to-pangoro

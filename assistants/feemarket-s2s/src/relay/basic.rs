@@ -113,7 +113,7 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
             if finalized_block_number.gt(&range_max_number) {
                 tracing::info!(
                     target: "feemarket",
-                    "{} your are assigned relayer and this nonce is timeout device to relay this nonce: {}",
+                    "{} your are assigned relayer and this nonce is timeout decide to relay this nonce: {}",
                     logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
                     nonce,
                 );

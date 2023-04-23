@@ -1,15 +1,21 @@
 [darwinia]
 endpoint = "wss://rpc.darwinia.network"
-signer   = "//Alice"
+signer   = "0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133"
 para_id  = 2046
 
 [crab]
 endpoint = "wss://crab-rpc.darwinia.network"
-signer   = "//Alice"
+signer   = "0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133"
 para_id  = 2105
 
+[polkadot]
+endpoint = "wss://rpc.polkadot.io"
+
+[kusama]
+endpoint = "wss://kusama-rpc.polkadot.io"
+
 [relay]
-lanes            = ["00000000"]
+lanes            = ["64616362"]
 enable_mandatory = false
 
 [index]

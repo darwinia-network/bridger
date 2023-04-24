@@ -10,6 +10,13 @@ use bridge_e2e_traits::{
 impl EcdsaClient for PangolinClient {
     type SubxtConfig = PangolinSubxtConfig;
 
+    async fn reconnect(&mut self) -> E2EClientResult<()> {
+        self.reconnect_client()
+            .await
+            .map_err(|e| E2EClientError::Custom(format!("{:?}", e)))?;
+        Ok(())
+    }
+
     /// current account is ecdsa authority account
     async fn is_ecdsa_authority(
         &self,

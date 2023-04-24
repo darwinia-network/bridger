@@ -7,14 +7,14 @@ use crate::error::{RelayError, RelayResult};
 
 use super::types::EcdsaSource;
 
-pub struct CollectedEnoughNewMessageRootSignaturesRunner<T: EcdsaClient> {
-    source: EcdsaSource<T>,
+pub struct CollectedEnoughNewMessageRootSignaturesRunner<'a, T: EcdsaClient> {
+    source: &'a EcdsaSource<T>,
     interval: u64,
     last_relay_time: u64,
 }
 
-impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
-    pub fn new(source: EcdsaSource<T>, interval: u64) -> Self {
+impl<'a, T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<'a, T> {
+    pub fn new(source: &'a EcdsaSource<T>, interval: u64) -> Self {
         Self {
             source,
             interval,
@@ -23,7 +23,7 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
     }
 }
 
-impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
+impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<'_, T> {
     pub async fn start(&mut self) -> RelayResult<Option<u32>> {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -94,12 +94,8 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
             message_root: H256(mr_slice),
             nonce: event.commitment_nonce.into(),
         };
-        dbg!(&commitment);
-        dbg!(&signatures);
         let nonce = client_posa.nonce().await?;
-        dbg!(nonce);
         let block_number = client_posa.block_number().await?;
-        dbg!(block_number);
         let hash = client_posa
             .import_message_commitment(commitment, signatures, &ethereum_account.secret_key()?)
             .await?;

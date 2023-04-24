@@ -4,17 +4,17 @@ use crate::error::RelayResult;
 
 use super::types::EcdsaSource;
 
-pub struct CollectingAuthoritiesChangeSignaturesRunner<T: EcdsaClient> {
-    source: EcdsaSource<T>,
+pub struct CollectingAuthoritiesChangeSignaturesRunner<'a, T: EcdsaClient> {
+    source: &'a EcdsaSource<T>,
 }
 
-impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
-    pub fn new(source: EcdsaSource<T>) -> Self {
+impl<'a, T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<'a, T> {
+    pub fn new(source: &'a EcdsaSource<T>) -> Self {
         Self { source }
     }
 }
 
-impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
+impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<'_, T> {
     pub async fn start(&self) -> RelayResult<Option<u32>> {
         let client_darwinia_substrate = &self.source.client_darwinia_substrate;
         let subquery = &self.source.subquery;

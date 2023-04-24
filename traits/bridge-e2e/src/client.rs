@@ -54,6 +54,8 @@ pub trait EthTruthLayerLightClient: GasPriceOracle {
 pub trait EcdsaClient: Debug + Send + Sync + Clone + 'static {
     type SubxtConfig: subxt::Config;
 
+    async fn reconnect(&mut self) -> E2EClientResult<()>;
+
     async fn is_ecdsa_authority(
         &self,
         block_number: Option<u32>,

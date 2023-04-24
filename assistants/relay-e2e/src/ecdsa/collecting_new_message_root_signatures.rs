@@ -60,6 +60,10 @@ impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<'_, T> {
         }
 
         let signature = darwinia_evm_account.sign(event.message.as_slice())?;
+        tracing::trace!(
+            target: "relay-e2e",
+            "[Darwinia][ECDSA][collectingMessages] Signature signed"
+        );
         let hash = client_darwinia_substrate
             .submit_new_message_root_signature(signature)
             .await?;

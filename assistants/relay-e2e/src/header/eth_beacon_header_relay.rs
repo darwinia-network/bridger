@@ -7,7 +7,7 @@ use std::{
 use bridge_e2e_traits::client::EthTruthLayerLightClient;
 use client_beacon::{client::BeaconApiClient, types::FinalityUpdate};
 use client_contracts::beacon_light_client_types::FinalizedHeaderUpdate;
-use support_etherscan::wait_for_transaction_confirmation;
+use support_etherscan::wait_for_transaction_confirmation_with_timeout;
 use web3::{
     contract::Options,
     types::{Bytes, H256},
@@ -225,11 +225,12 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             "[Header] Sending tx: {:?}",
             &tx
         );
-        wait_for_transaction_confirmation(
+        wait_for_transaction_confirmation_with_timeout(
             tx,
             self.eth_light_client.get_web3().transport(),
             Duration::from_secs(5),
             1,
+            75,
         )
         .await?;
         self.last_relay_time = SystemTime::now()

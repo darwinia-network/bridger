@@ -28,12 +28,16 @@ impl EcdsaClient for PangolinClient {
             .rpc()
             .block_hash(block_number.map(Into::into))
             .await?;
+        tracing::trace!(target: "client-pangolin", "[is_ecdsa_authority] Block hash: {:?}", hash);
         let authorities = crate::subxt_runtime::api::storage()
             .ecdsa_authority()
             .authorities();
         let authorities = self.subxt().storage().fetch(&authorities, hash).await?;
+        tracing::trace!(target: "client-pangolin", "[is_ecdsa_authority] Authorities fetched");
         match authorities {
-            None => Ok(false),
+            None => {
+                Ok(false)
+            },
             Some(authorities) => {
                 let authorities = authorities.0;
                 let iam = authorities.iter().any(|item| {
@@ -92,6 +96,8 @@ impl EcdsaClient for PangolinClient {
             .tx()
             .sign_and_submit_then_watch(&tx, self.account().signer(), Default::default())
             .await?;
+        let hash = track.extrinsic_hash();
+        tracing::trace!(target: "client-pangolin", "[submit_new_message_root_signature] tx hash: {:?}", hash);
         let events = track.wait_for_finalized_success().await.map_err(|e| {
             E2EClientError::Custom(format!("send transaction failed pangolin: {:?}", e))
         })?;

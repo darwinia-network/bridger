@@ -129,11 +129,12 @@ impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<'_, T> {
             "[Darwinia][ECDSA][collectedAuthorities] authorities change submitted: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
-        support_etherscan::wait_for_transaction_confirmation(
+        support_etherscan::wait_for_transaction_confirmation_with_timeout(
             hash,
             self.source.client_eth_web3.transport(),
             Duration::from_secs(5),
             3,
+            150,
         )
         .await?;
 

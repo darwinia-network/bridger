@@ -81,11 +81,12 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             "[SyncCommittee] Sending tx: {:?}",
             &tx
         );
-        support_etherscan::wait_for_transaction_confirmation(
+        support_etherscan::wait_for_transaction_confirmation_with_timeout(
             tx,
             self.eth_light_client.get_web3().transport(),
             Duration::from_secs(5),
             1,
+            75,
         )
         .await?;
         Ok(())

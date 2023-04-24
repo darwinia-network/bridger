@@ -33,7 +33,7 @@ component-state    = { path = "../../../frame/components/state" }
 
 subquery              = { path = "../../../assistants/subquery", features = [ "bridge-ethv2" ] }
 client-contracts      = { path = "../../../assistants/client-contracts" }
-client-pangolin        = { path = "../../../assistants/client-pangolin", features = [ "bridge-ethv2" ] }
+client-pangolin       = { path = "../../../assistants/client-pangolin", features = [ "bridge-ethv2" ] }
 thegraph              = { path = "../../../assistants/thegraph", features = [ "bridge-ethv2" ] }
 
 bridge-e2e-traits     = { path = "../../../traits/bridge-e2e" }

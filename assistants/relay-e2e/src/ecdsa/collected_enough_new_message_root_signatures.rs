@@ -94,8 +94,6 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<'_, T> {
             message_root: H256(mr_slice),
             nonce: event.commitment_nonce.into(),
         };
-        let nonce = client_posa.nonce().await?;
-        let block_number = client_posa.block_number().await?;
         let hash = client_posa
             .import_message_commitment(commitment, signatures, &ethereum_account.secret_key()?)
             .await?;

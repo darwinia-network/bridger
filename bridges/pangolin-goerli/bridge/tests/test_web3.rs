@@ -53,8 +53,8 @@ async fn test_enroll_relayer_at_pangolin() -> color_eyre::Result<()> {
     let msg = message_relay_client_builder(config).await?;
     let privates = vec![
         "40b50cd43ccbfe7da7e594216710eac2ab0036fa59a957a85c5d8ee4f3761f49",
-        "eb67cea5965fb74aa9fd439f746444dd69cef8d6164af86c04d259f2f35799e8",
-        "8111947fa1a4c5d7c2b81e66f930e3dd08e2001aa5f4e316301395b9e0423206",
+        // "eb67cea5965fb74aa9fd439f746444dd69cef8d6164af86c04d259f2f35799e8",
+        // "8111947fa1a4c5d7c2b81e66f930e3dd08e2001aa5f4e316301395b9e0423206",
     ];
     let mut prev = Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
     for key in privates {
@@ -131,8 +131,8 @@ async fn test_deposit_relayer_pangolin() -> color_eyre::Result<()> {
     let msg = message_relay_client_builder(config).await?;
     let privates = vec![
         "40b50cd43ccbfe7da7e594216710eac2ab0036fa59a957a85c5d8ee4f3761f49",
-        "eb67cea5965fb74aa9fd439f746444dd69cef8d6164af86c04d259f2f35799e8",
-        "8111947fa1a4c5d7c2b81e66f930e3dd08e2001aa5f4e316301395b9e0423206",
+        // "eb67cea5965fb74aa9fd439f746444dd69cef8d6164af86c04d259f2f35799e8",
+        // "8111947fa1a4c5d7c2b81e66f930e3dd08e2001aa5f4e316301395b9e0423206",
     ];
     for key in privates {
         let secret = SecretKey::from_str(&key)?;
@@ -140,7 +140,7 @@ async fn test_deposit_relayer_pangolin() -> color_eyre::Result<()> {
             .source
             .strategy
             .fee_market
-            .deposit(U256::from_dec_str("100000000000000000000").unwrap(), &secret)
+            .deposit(U256::from_dec_str("1000000000000000000000").unwrap(), &secret)
             .await
             .unwrap();
         dbg!(tx);
@@ -157,7 +157,7 @@ async fn test_deposit_relayer_goerli() -> color_eyre::Result<()> {
         .target
         .strategy
         .fee_market
-        .deposit(U256::from(1000000000000000u64), &secret)
+        .deposit(U256::from(2100000000000000u64), &secret)
         .await
         .unwrap();
     dbg!(tx);

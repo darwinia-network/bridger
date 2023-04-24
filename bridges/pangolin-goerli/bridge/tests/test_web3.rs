@@ -51,6 +51,7 @@ async fn get_bridge_config() -> color_eyre::Result<BridgeConfig<PangolinClient>>
     Ok(bridge_config)
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_enroll_relayer_at_pangolin() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
@@ -90,8 +91,7 @@ async fn test_enroll_relayer_at_pangolin() -> color_eyre::Result<()> {
     Ok(())
 }
 
-// write a test to enroll relayers at the other side
-
+#[ignore]
 #[tokio::test]
 async fn test_enroll_relayer_at_goerli() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
@@ -148,6 +148,7 @@ async fn test_enroll_relayer_at_goerli() -> color_eyre::Result<()> {
     Ok(())
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_deposit_relayer_pangolin() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
@@ -174,6 +175,7 @@ async fn test_deposit_relayer_pangolin() -> color_eyre::Result<()> {
     Ok(())
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_deposit_relayer_goerli() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
@@ -190,6 +192,7 @@ async fn test_deposit_relayer_goerli() -> color_eyre::Result<()> {
     Ok(())
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
@@ -233,6 +236,7 @@ async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
     Ok(())
 }
 
+#[ignore]
 #[tokio::test]
 async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;

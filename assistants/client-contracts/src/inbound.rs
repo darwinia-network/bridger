@@ -1,10 +1,13 @@
+use std::ops::Div;
+
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
     contract::{tokens::Tokenize, Contract, Options},
+    signing::Key,
     transports::Http,
     types::{Address, BlockId, H256, U256},
-    Web3, signing::Key,
+    Web3,
 };
 
 use crate::error::BridgeContractResult;
@@ -53,7 +56,7 @@ impl Inbound {
             delivery_size,
         )
             .into_tokens();
-        let gas = self
+        let mut gas = self
             .contract
             .estimate_gas(
                 call,
@@ -62,15 +65,11 @@ impl Inbound {
                 Options::default(),
             )
             .await?;
+        gas += gas.div(10);
         options.gas = Some(gas);
         let tx = self
             .contract
-            .signed_call(
-                call,
-                params.as_slice(),
-                options,
-                private_key,
-            )
+            .signed_call(call, params.as_slice(), options, private_key)
             .await?;
         Ok(tx)
     }

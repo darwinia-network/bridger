@@ -105,6 +105,20 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
                 );
                 return Ok(true);
             }
+
+            let range_max_number = relayers
+                .last()
+                .map(|item| item.valid_range.end)
+                .expect("Unreachable");
+            if finalized_block_number.gt(&range_max_number) {
+                tracing::info!(
+                    target: "feemarket",
+                    "{} your are assigned relayer and this nonce is timeout decide to relay this nonce: {}",
+                    logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
+                    nonce,
+                );
+                return Ok(true);
+            }
             tracing::info!(
                 target: "feemarket",
                 "{} you are assigned relayer but this order isn't in your slot, skip this nonce({})",

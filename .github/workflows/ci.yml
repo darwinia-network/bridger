@@ -44,7 +44,7 @@ jobs:
           #- assistants/client-beacon
           #- assistants/client-contracts
           - assistants/client-crab
-          #- assistants/client-darwinia
+          - assistants/client-darwinia
           - assistants/client-kusama
           #- assistants/client-pangoro
           - assistants/client-polkadot
@@ -91,7 +91,7 @@ jobs:
         bridge:
           - pangolin-pangoro
           - pangolin-goerli
-#          - darwinia-crab
+          - darwinia-crab
 #          - pangoro-chapel
 #          - pangoro-goerli
     steps:

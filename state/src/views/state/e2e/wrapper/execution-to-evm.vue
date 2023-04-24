@@ -49,41 +49,43 @@
   </v-row>
 </template>
 
-<script>
-import CommitteeConsensusToEvm from '@/views/state/e2e/widgets/committee-consensus-to-evm';
-import HeaderConsensusToEvm from '@/views/state/e2e/widgets/header-consensus-to-evm';
-import HeaderExecutionToEvm from "@/views/state/e2e/widgets/header-execution-to-evm";
-import MessageRelay from "@/views/state/e2e/widgets/message-relay";
-import E2eFeemarket from "@/views/state/e2e/widgets/e2e-feemarket";
+<script lang="ts" setup>
 
-export default {
-  components: {E2eFeemarket, MessageRelay, HeaderExecutionToEvm, HeaderConsensusToEvm, CommitteeConsensusToEvm},
-  props: {
-    evmChain: {
-      type: Object,
-    },
-    executionChain: {
-      type: Object,
-    },
-    consensusChain: {
-      type: Object,
-    },
-    evmClient: {
-      type: Object,
-    },
-    executionClient: {
-      type: Object,
-    },
-    consensusClient: {
-      type: Object,
-    },
+import {defineProps, onMounted, PropType} from 'vue'
+import {EvmClient} from "@/plugins/eth2/evm";
+import {ExecutionClient} from "@/plugins/eth2/execution";
+import {ConsensusClient} from "@/plugins/eth2/consensus";
+import {BridgeEthereumChainInfo} from "@/types/app";
+import E2eFeemarket from "@/views/state/e2e/widgets/e2e-feemarket.vue";
+import MessageRelay from "@/views/state/e2e/widgets/message-relay.vue";
+import CommitteeConsensusToEvm from "@/views/state/e2e/widgets/committee-consensus-to-evm.vue";
+import HeaderConsensusToEvm from "@/views/state/e2e/widgets/header-consensus-to-evm.vue";
+import HeaderExecutionToEvm from "@/views/state/e2e/widgets/header-execution-to-evm.vue";
+
+
+const props = defineProps({
+  evmChain: {
+    type: Object as PropType<BridgeEthereumChainInfo>,
   },
-  data: () => ({}),
-  created() {
-  }
-}
+  executionChain: {
+    type: Object as PropType<BridgeEthereumChainInfo>,
+  },
+  consensusChain: {
+    type: Object as PropType<BridgeEthereumChainInfo>,
+  },
+  evmClient: {
+    type: Object as PropType<EvmClient>,
+  },
+  executionClient: {
+    type: Object as PropType<ExecutionClient>,
+  },
+  consensusClient: {
+    type: Object as PropType<ConsensusClient>,
+  },
+});
+
+onMounted(() => {
+});
+
+
 </script>
-
-<style scoped>
-
-</style>

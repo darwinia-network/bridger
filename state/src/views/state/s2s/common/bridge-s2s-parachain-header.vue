@@ -2,60 +2,63 @@
   <v-row>
     <v-col md="6" sm="12" xs="12">
       <parachain-header-relay
-        :solo-client="soloClient"
-        :para-client="paraClient"
         :relay-client="relayClient"
-        :solo-chain="soloChain"
-        :para-chain="paraChain"
         :relay-chain="relayChain"
+        :para-client="paraClient"
+        :para-chain="paraChain"
+        :target-chain="targetChain"
+        :target-client="targetClient"
       />
     </v-col>
     <v-col md="6" sm="12" xs="12">
       <parahead-relay
-        :solo-client="soloClient"
-        :para-client="paraClient"
-        :relay-client="relayClient"
-        :solo-chain="soloChain"
-        :para-chain="paraChain"
         :relay-chain="relayChain"
+        :relay-client="relayClient"
+        :para-chain="paraChain"
+        :para-client="paraClient"
+        :target-chain="targetChain"
+        :target-client="targetClient"
       />
     </v-col>
   </v-row>
 </template>
 
-<script>
+<script lang="ts" setup>
 
-import ParachainHeaderRelay from "@/views/state/s2s/common/widgets/parachain-header-relay";
-import ParaheadRelay from "@/views/state/s2s/common/widgets/parahead-relay";
+import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRefs} from 'vue'
+import {BridgeSubstrateChainInfo} from "@/types/app";
+import {ApiPromise} from "@polkadot/api";
+import ParachainHeaderRelay from "@/views/state/s2s/common/widgets/parachain-header-relay.vue";
+import ParaheadRelay from "@/views/state/s2s/common/widgets/parahead-relay.vue";
 
-export default {
-  components: {ParaheadRelay, ParachainHeaderRelay},
-  props: {
-    soloClient: {
-      type: Object,
-    },
-    paraClient: {
-      type: Object,
-    },
-    relayClient: {
-      type: Object,
-    },
-    soloChain: {
-      type: Object,
-    },
-    paraChain: {
-      type: Object,
-    },
-    relayChain: {
-      type: Object,
-    },
+const props = defineProps({
+  relayChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
   },
-  data: () => ({}),
-  created() {
-  }
+  relayClient: {
+    type: Object as PropType<ApiPromise>,
+  },
+  paraChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
+  },
+  paraClient: {
+    type: Object as PropType<ApiPromise>,
+  },
+  targetChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
+  },
+  targetClient: {
+    type: Object as PropType<ApiPromise>,
+  },
+});
+
+
+async function initState() {
+  //
 }
+
+onMounted(() => {
+  initState();
+});
+
 </script>
-
-<style scoped>
-
-</style>

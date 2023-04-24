@@ -1,24 +1,35 @@
 <template>
   <div>
+    <v-progress-linear
+      class="mt-15"
+      :color="paraChain.color"
+      indeterminate
+      v-if="!source.grandpaPalletName || !relayClient || !targetClient"
+    />
     <s2s-header-relay
-      :key="`s2s-header-${relayChain.name}-${soloChain.name}`"
+      v-else
+      :key="`s2s-header-${relayChain.name}-${targetChain.name}`"
       :parachain-bridge="true"
       :grandpa-pallet-name="source.grandpaPalletName"
       :source-client="relayClient"
-      :target-client="soloClient"
       :source-chain="relayChain"
-      :target-chain="soloChain"
+      :target-chain="targetChain"
+      :target-client="targetClient"
     >
       <template v-slot:default>
-        <tr :key="`on-demand-${paraChain.name}-${soloChain.name}`">
+        <tr :key="`on-demand-${paraChain.name}-${targetChain.name}`">
           <td class="subtitle-2">Next on-demand block</td>
           <td>
-            <v-progress-linear v-if="loading.nextOnDemandBlock || loading.bestFinalizedBlock" :color="relayChain.color" indeterminate/>
+            <v-progress-linear
+              v-if="loading.nextOnDemandBlock || loading.bestFinalizedHash"
+              :color="relayChain.color"
+              indeterminate
+            />
             <template v-else>
               <div
                 :class="{
-                'green--text': source.nextOnDemandBlock <= source.bestFinalizedBlock.block.header.number,
-                'red--text': source.nextOnDemandBlock > source.bestFinalizedBlock.block.header.number,
+                'text-green': source.nextOnDemandBlock <= source.bestFinalizedBlock,
+                'text-red': source.nextOnDemandBlock > source.bestFinalizedBlock,
                 }"
               >
                 <external-explorer
@@ -36,108 +47,115 @@
   </div>
 </template>
 
-<script>
 
-import S2sHeaderRelay from '@/views/state/s2s/common/widgets/s2s-header-relay';
-import ExternalExplorer from '@/components/widgets/external-explorer';
+<script lang="ts" setup>
+
+import {defineProps, inject, onBeforeUnmount, onMounted, PropType, reactive, toRefs} from 'vue'
+import {BridgeSubstrateChainInfo} from "@/types/app";
+import {ApiPromise} from "@polkadot/api";
+import S2sHeaderRelay from "@/views/state/s2s/common/widgets/s2s-header-relay.vue";
+import {Subql} from "@/plugins/subql";
+import ExternalExplorer from "@/components/widgets/external-explorer.vue";
 
 
-async function initState(vm) {
-  vm.source.grandpaPalletName = vm.soloChain.bridge_target[vm.paraChain.bridge_chain_name].query_name.grandpa;
-  vm.subscriber.bestFinalized = await vm.soloClient.query[vm.source.grandpaPalletName]
-    .bestFinalized(async v => {
-      vm.loading.bestFinalizedHash = false;
-      vm.loading.bestFinalizedBlock = true;
+const subql = inject('subql') as Subql;
 
-      // query block from best finalized
-      const blockHash = v.toHuman();
-      vm.source.bestFinalizedHash = blockHash;
-      const block = await vm.relayClient.rpc.chain.getBlock(blockHash);
-      vm.source.bestFinalizedBlock = block.toJSON();
-      vm.loading.bestFinalizedBlock = false;
-      await queryNextOnDemandBlock(vm);
-    });
+const props = defineProps({
+  relayChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
+  },
+  relayClient: {
+    type: Object as PropType<ApiPromise>,
+  },
+  paraChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
+  },
+  paraClient: {
+    type: Object as PropType<ApiPromise>,
+  },
+  targetChain: {
+    type: Object as PropType<BridgeSubstrateChainInfo>,
+  },
+  targetClient: {
+    type: Object as PropType<ApiPromise>,
+  },
+});
+
+
+interface _StateSource {
+  grandpaPalletName?: string;
+  bestFinalizedBlock?: number;
+  bestFinalizedHash?: string;
+  nextOnDemandBlock?: number;
 }
 
-async function subscribeNextOnDemandBlock(vm) {
-  vm.subscriber.nextOnDemandBlock = setInterval(async () => {
+interface _StateLoading {
+  bestFinalizedHash: boolean;
+  nextOnDemandBlock: boolean;
+}
+
+const state = reactive({
+  source: {} as _StateSource,
+  loading: {
+    bestFinalizedHash: true,
+    nextOnDemandBlock: true,
+  } as _StateLoading,
+  subscriber: {
+    bestFinalizedHash: null,
+    nextOnDemandBlock: null,
+  },
+});
+
+const {
+  source, loading, subscriber
+} = toRefs(state);
+
+async function subscribeNextOnDemandBlock() {
+  subscriber.value.nextOnDemandBlock = setInterval(async () => {
     try {
-      await queryNextOnDemandBlock(vm);
+      await queryNextOnDemandBlock();
     } catch (e) {
-      vm.$toast.error(`Failed query subql, more details please view browser console.`);
-      vm.$log.error('Failed query subql: ', e);
+      console.error('Failed query subql: ', e);
     }
   }, 10000);
 }
 
-async function queryNextOnDemandBlock(vm) {
-  vm.loading.nextOnDemandBlock = true;
-  const nextOnDemandBlock = await vm.$subql.bridge_s2s(vm.paraChain.subql)
-    .nextOnDemandBlock(`bridge-${vm.soloChain.bridge_chain_name}`);
+async function queryNextOnDemandBlock() {
+  loading.value.nextOnDemandBlock = true;
+  const nextOnDemandBlock = await subql.bridge_s2s(props.paraChain.subql)
+    .nextOnDemandBlock(`bridge-${props.targetChain.bridge_chain_name}`);
   if (!nextOnDemandBlock || !nextOnDemandBlock.blockHash) {
-    vm.loading.nextOnDemandBlock = false;
+    loading.value.nextOnDemandBlock = false;
     return;
   }
-  const nextCandidate = await vm.$subql.bridge_s2s(vm.relayChain.subql)
+  const nextCandidate = await subql.bridge_s2s(props.relayChain.subql)
     .queryNextCandidateIncludedEvent(nextOnDemandBlock.blockHash);
-  vm.source.nextOnDemandBlock = nextCandidate.includedRelayBlock;
-  vm.loading.nextOnDemandBlock = false;
-  // vm.$set(vm.source, 'nextOnDemandBlock', false);
+  source.value.nextOnDemandBlock = nextCandidate.includedRelayBlock;
+  loading.value.nextOnDemandBlock = false;
 }
 
-export default {
-  components: {ExternalExplorer, S2sHeaderRelay},
-  props: {
-    soloClient: {
-      type: Object,
-    },
-    paraClient: {
-      type: Object,
-    },
-    relayClient: {
-      type: Object,
-    },
-    soloChain: {
-      type: Object,
-    },
-    paraChain: {
-      type: Object,
-    },
-    relayChain: {
-      type: Object,
-    },
-  },
-  data: () => ({
-    source: {
-      grandpaPalletName: null,
+async function initState() {
+  source.value.grandpaPalletName = props.targetChain.bridge_target[props.paraChain.bridge_chain_name].query_name.grandpa;
+  // @ts-ignore
+  subscriber.value.bestFinalizedHash = await props.targetClient?.query[source.value.grandpaPalletName]
+    .bestFinalized(async (v: any) => {
+      loading.value.bestFinalizedHash = false;
+      const [blockNumber, blockHash] = v.toHuman() as unknown as [string, string];
+      source.value.bestFinalizedBlock = +(blockNumber.replaceAll(',', ''));
+      source.value.bestFinalizedHash = blockHash;
 
-      bestFinalizedHash: null,
-      bestFinalizedBlock: null,
-      nextOnDemandBlock: null,
-    },
-    subscriber: {
-      nextOnDemandBlock: null,
-      bestFinalized: null,
-    },
-    loading: {
-      bestFinalizedHash: true,
-      bestFinalizedBlock: true,
-      nextOnDemandBlock: false,
-    }
-  }),
-  async created() {
-    const vm = this;
-    await initState(vm);
-    await subscribeNextOnDemandBlock(vm);
-  },
-  destroyed() {
-    const vm = this;
-    vm.subscriber.bestFinalized && vm.subscriber.bestFinalized();
-    vm.subscriber.nextOnDemandBlock && clearInterval(vm.subscriber.nextOnDemandBlock);
-  }
+      await queryNextOnDemandBlock();
+    });
 }
+
+onMounted(() => {
+  initState();
+  subscribeNextOnDemandBlock();
+});
+
+onBeforeUnmount(() => {
+  // @ts-ignore
+  subscriber.value.bestFinalizedHash && subscriber.value.bestFinalizedHash();
+  subscriber.value.nextOnDemandBlock && clearInterval(subscriber.value.nextOnDemandBlock);
+});
 </script>
-
-<style scoped>
-
-</style>

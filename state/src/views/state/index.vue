@@ -1,84 +1,66 @@
 <template>
   <v-row>
-    <template v-if="source.status_bridge.group === 'S2S'">
+    <template v-if="status_bridge.group === 'S2S'">
       <v-col
         cols="12"
-        v-if="source.status_bridge.bridge.bridge_type === 's2s'"
+        v-if="status_bridge.bridge.bridge_type === 'para-with-para'"
       >
-        <s2s-raw :key="source.status_bridge.bridge.name" :bridge="source.status_bridge.bridge"/>
-      </v-col>
-      <v-col
-        cols="12"
-        v-if="source.status_bridge.bridge.bridge_type === 'parachain'"
-      >
-        <s2s-parachain :key="source.status_bridge.bridge.name" :bridge="source.status_bridge.bridge"/>
+        <para-with-para :key="status_bridge.bridge.name" :bridge="status_bridge.bridge"/>
       </v-col>
     </template>
 
-    <template v-if="source.status_bridge.group === 'E2E'">
+    <template v-if="status_bridge.group === 'E2E'">
       <v-col cols="12">
-        <e2e-raw :key="source.status_bridge.bridge.name" :bridge="source.status_bridge.bridge"/>
+        <e2e-raw :key="status_bridge.bridge.name" :bridge="status_bridge.bridge"/>
       </v-col>
     </template>
 
-    <v-col cols="12">
-      <v-container>
-        <v-alert text color="grey accent-4" icon="mdi-information">
-          More feemarket operation please visit
-          <v-btn text small href="https://feemarket.darwinia.network" target="_blank">
-            feemarket ui
-          </v-btn>
-          project.
-        </v-alert>
-      </v-container>
-    </v-col>
   </v-row>
 </template>
 
-<script>
+<script lang="ts" setup>
 
-import * as dataSource from '@/data/data_source.js'
+import ParaWithPara from "@/views/state/s2s/para-with-para.vue";
 
-import S2sRaw from '@/views/state/s2s/s2s-raw';
-import S2sParachain from '@/views/state/s2s/s2s-parachain';
-import E2eRaw from "@/views/state/e2e/e2e-raw";
+import {onMounted, reactive, toRefs, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 
-function initState(vm) {
-  const params = vm.$route.params;
-  const gbridge = dataSource.findBridge(params.bridge);
-  if (!gbridge) {
-    vm.$router.push({path: '/'});
+import * as dataSource from "@/data/data_source";
+import {BridgeInfo} from "@/types/bridge";
+import E2eRaw from "@/views/state/e2e/e2e-raw.vue";
+
+const route = useRoute();
+const router = useRouter();
+
+
+const state = reactive({
+  status_bridge: {} as BridgeInfo,
+});
+
+
+const {
+  status_bridge,
+} = toRefs(state);
+
+watch(
+  () => route.path,
+  async () => {
+    initState();
+  }
+)
+
+function initState() {
+  const params = route.params
+  const bridgeInfo = dataSource.findBridge(params.bridge.toString());
+  if (!bridgeInfo) {
+    router.push({path: '/'});
     return;
   }
-  vm.source.status_bridge = gbridge;
+  status_bridge.value = bridgeInfo;
 }
 
-export default {
-  components: {
-    E2eRaw,
-    S2sParachain,
-    S2sRaw,
-  },
-  data: () => ({
-    source: {
-      status_bridge: null,
-    },
-  }),
-  watch: {
-    '$route.path': {
-      handler() {
-        initState(this);
-      },
-      deep: true,
-    }
-  },
-  created() {
-    const vm = this;
-    initState(vm);
-  }
-}
+
+onMounted(() => {
+  initState();
+});
 </script>
-
-<style scoped>
-
-</style>

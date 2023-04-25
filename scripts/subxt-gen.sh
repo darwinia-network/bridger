@@ -42,8 +42,8 @@ if [ "${CHAIN}" == "pangoro" ]; then
 fi
 
 if [ "${CHAIN}" == "darwinia" ]; then
-  ENDPOINT='http://g2.dev.darwinia.network:1133'
-#  ENDPOINT='https://rpc.darwinia.network'
+  # ENDPOINT='http://g2.dev.darwinia.network:1133'
+ ENDPOINT='https://rpc.darwinia.network:443'
 #  ENDPOINT='http://127.0.0.1:9936'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-darwinia
 fi

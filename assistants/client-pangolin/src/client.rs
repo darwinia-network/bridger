@@ -29,7 +29,7 @@ impl PangolinClient {
         }
     }
 
-    pub async fn reconnect_client(&mut self) -> ClientResult<()>{
+    pub async fn reconnect_client(&mut self) -> ClientResult<()> {
         self.client = OnlineClient::from_url(&self.endpoint).await?;
         Ok(())
     }

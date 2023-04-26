@@ -14,8 +14,6 @@ pub enum Names {
     Bridger,
     /// Bridge tempalte
     BridgeTemplate,
-    /// Bridge pangolin-ropsten
-    BridgePangolinRopsten,
     /// Bridge darwinia-ethereum
     BridgeDarwiniaEthereum,
     /// Bridge pangolin-pangoro
@@ -24,18 +22,8 @@ pub enum Names {
     BridgeDarwiniaCrab,
     /// bridge pangoro-chapel
     BridgePangoroChapel,
-    /// bridge pangolin-pangolinparachain
-    BridgePangolinPangolinParachain,
-    /// bridge pangolin-pangolinparachainalpha
-    BridgePangolinPangolinParachainAlpha,
-    /// bridge pangolin-pangolinparachain
-    BridgeCrabCrabParachain,
-    /// bridge pangoro-goerli
-    BridgePangoroGoerli,
     /// bridge pangolin-goerli
     BridgePangolinGoerli,
-    /// bridge darwinia-darwiniaparachain,
-    BridgeDarwiniaDarwiniaParachain,
 }
 
 impl Names {
@@ -43,17 +31,11 @@ impl Names {
         match self {
             Self::Bridger => "bridger",
             Self::BridgeTemplate => "bridge-template",
-            Self::BridgePangolinRopsten => "bridge-pangolin-ropsten",
             Self::BridgeDarwiniaEthereum => "bridge-darwinia-ethereum",
             Self::BridgePangolinPangoro => "bridge-pangolin-pangoro",
             Self::BridgeDarwiniaCrab => "bridge-darwinia-crab",
             Self::BridgePangoroChapel => "bridge-pangoro-chapel",
-            Self::BridgePangolinPangolinParachain => "bridge-pangolin-pangolinparachain",
-            Self::BridgePangolinPangolinParachainAlpha => "bridge-pangolin-pangolinparachainalpha",
-            Self::BridgeCrabCrabParachain => "bridge-crab-crabparachain",
-            Self::BridgePangoroGoerli => "bridge-pangoro-goerli",
             Self::BridgePangolinGoerli => "bridge-pangolin-goerli",
-            Self::BridgeDarwiniaDarwiniaParachain => "bridge-darwinia-darwiniaparachain",
         }
     }
 }

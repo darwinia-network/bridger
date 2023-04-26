@@ -188,7 +188,7 @@ dependencies = [
 
 [[package]]
 name = "bin-e2e"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "bridge-e2e-traits",
  "client-beacon",
@@ -247,7 +247,7 @@ dependencies = [
 
 [[package]]
 name = "block-buffer"
-version = "0.7.3"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c0940dc441f31689269e10ac70eb1002a3a1d3ad1390e030043662eb7fe4688b"
 dependencies = [
@@ -390,7 +390,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-e2e-traits"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "client-contracts",
@@ -404,7 +404,7 @@ dependencies = [
 
 [[package]]
 name = "bridge-pangoro-goerli"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "array-bytes",
  "bin-e2e",
@@ -520,7 +520,7 @@ dependencies = [
 
 [[package]]
 name = "client-beacon"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "bytes",
  "client-contracts",
@@ -539,7 +539,7 @@ dependencies = [
 
 [[package]]
 name = "client-contracts"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -554,7 +554,7 @@ dependencies = [
 
 [[package]]
 name = "client-pangoro"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -650,7 +650,7 @@ dependencies = [
 
 [[package]]
 name = "component-state"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "color-eyre 0.6.2",
  "lifeline",
@@ -1784,7 +1784,7 @@ dependencies = [
 
 [[package]]
 name = "include_dir"
-version = "0.7.3"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "18762faeff7122e89e0857b02f7ce6fcc0d101d5e9ad2ad7846cc01d61b7f19e"
 dependencies = [
@@ -2734,7 +2734,7 @@ checksum = "643f8f41a8ebc4c5dc4515c82bb8abd397b527fc20fd681b7c011c2aee5d44fb"
 
 [[package]]
 name = "rand"
-version = "0.7.3"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a6b1679d49b24bbfe0c803429aa1874472f50d9b363131f0e89fc356b544d03"
 dependencies = [
@@ -2914,7 +2914,7 @@ checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
 
 [[package]]
 name = "relay-e2e"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "array-bytes",
  "async-trait",
@@ -4014,7 +4014,7 @@ dependencies = [
 
 [[package]]
 name = "subquery"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "gql_client",
@@ -4127,7 +4127,7 @@ dependencies = [
 
 [[package]]
 name = "support-command-kv"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "color-eyre 0.6.2",
  "component-state",
@@ -4145,7 +4145,7 @@ dependencies = [
 
 [[package]]
 name = "support-common"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "color-eyre 0.6.2",
  "config",
@@ -4164,7 +4164,7 @@ dependencies = [
 
 [[package]]
 name = "support-etherscan"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "reqwest",
@@ -4177,7 +4177,7 @@ dependencies = [
 
 [[package]]
 name = "support-lifeline"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "color-eyre 0.5.11",
  "lifeline",
@@ -4185,7 +4185,7 @@ dependencies = [
 
 [[package]]
 name = "support-terminal"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "colored",
  "serde 1.0.145",
@@ -4195,7 +4195,7 @@ dependencies = [
 
 [[package]]
 name = "support-toolkit"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "parity-scale-codec",
  "thiserror",
@@ -4203,7 +4203,7 @@ dependencies = [
 
 [[package]]
 name = "support-tracker"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "color-eyre 0.6.2",
  "microkv",
@@ -4215,7 +4215,7 @@ dependencies = [
 
 [[package]]
 name = "support-types"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "dirs 4.0.0",
  "serde 1.0.145",
@@ -4304,7 +4304,7 @@ dependencies = [
 
 [[package]]
 name = "thegraph"
-version = "0.7.3"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "gql_client",

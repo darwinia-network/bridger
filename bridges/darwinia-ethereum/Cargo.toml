@@ -10,7 +10,7 @@ license       = "MIT"
 name          = "bridge-darwinia-ethereum"
 readme        = 'README.md'
 repository    = "https://github.com/darwinia-network/bridger"
-version       = "0.7.3"
+version       = "0.8.0"
 
 [[bin]]
 name = "bridge-darwinia-ethereum"

@@ -28,7 +28,7 @@ private_key = "..."
 max_gas_price = 9000000000
 
 [darwinia_substrate]
-endpoint = "wss://darwinia-rpc.darwinia.network"
+endpoint = "wss://rpc.darwinia.network"
 # private_key in format of 0x... or BIP39 mnemonic code
 private_key = "..."
 

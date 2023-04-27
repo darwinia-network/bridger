@@ -36,7 +36,7 @@ private_key = "..."
 [beacon]
 # Beacon chain api endpoint and api supplier
 api_supplier = "Nimbus"
-endpoint     = "http://unstable.mainnet.beacon-api.nimbus.team"
+endpoint     = "https://lodestar-mainnet.chainsafe.io"
 
 [ethereum]
 # Execution layer api endpoint, register one at https://dashboard.alchemy.com/

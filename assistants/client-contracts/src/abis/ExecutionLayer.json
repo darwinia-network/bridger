@@ -5,6 +5,11 @@
         "internalType": "address",
         "name": "consensus_layer",
         "type": "address"
+      },
+      {
+        "internalType": "uint64",
+        "name": "capella_fork_epoch",
+        "type": "uint64"
       }
     ],
     "stateMutability": "nonpayable",
@@ -15,13 +20,32 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "block_number",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "bytes32",
         "name": "state_root",
         "type": "bytes32"
       }
     ],
-    "name": "LatestExecutionPayloadStateRootImported",
+    "name": "LatestExecutionPayloadImported",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "CAPELLA_FORK_EPOCH",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -31,6 +55,19 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "block_number",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -158,19 +195,179 @@
                 "type": "bytes32"
               }
             ],
-            "internalType": "struct BeaconChain.ExecutionPayload",
+            "internalType": "struct BeaconChain.ExecutionPayloadBellatrix",
             "name": "execution_payload",
             "type": "tuple"
           }
         ],
-        "internalType": "struct BeaconChain.BeaconBlockBody",
+        "internalType": "struct BeaconChain.BeaconBlockBodyBellatrix",
         "name": "body",
         "type": "tuple"
       }
     ],
-    "name": "import_latest_execution_payload_state_root",
+    "name": "import_block_body_bellatrix",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "randao_reveal",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "eth1_data",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "graffiti",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "proposer_slashings",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "attester_slashings",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "attestations",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "deposits",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "voluntary_exits",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "sync_aggregate",
+            "type": "bytes32"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "parent_hash",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "address",
+                "name": "fee_recipient",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "state_root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "receipts_root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "logs_bloom",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "prev_randao",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint64",
+                "name": "block_number",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "gas_limit",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "gas_used",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "timestamp",
+                "type": "uint64"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "extra_data",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "base_fee_per_gas",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "block_hash",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "transactions_root",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "withdrawals_root",
+                "type": "bytes32"
+              }
+            ],
+            "internalType": "struct BeaconChain.ExecutionPayloadCapella",
+            "name": "execution_payload",
+            "type": "tuple"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "bls_to_execution_changes",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct BeaconChain.BeaconBlockBodyCapella",
+        "name": "body",
+        "type": "tuple"
+      }
+    ],
+    "name": "import_block_body_capella",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "is_capella",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

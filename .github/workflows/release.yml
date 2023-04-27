@@ -20,9 +20,10 @@ jobs:
       matrix:
         package:
           - bridger
-#          - darwinia-ethereum
+          - darwinia-ethereum
           - darwinia-crab
           - pangolin-pangoro
+          - pangolin-goerli
 #          - pangoro-chapel
 #          - pangoro-goerli
     steps:
@@ -169,9 +170,10 @@ jobs:
       matrix:
         package:
           - bridger
-#          - darwinia-ethereum
+          - darwinia-ethereum
           - darwinia-crab
           - pangolin-pangoro
+          - pangolin-goerli
 #          - pangoro-chapel
 #          - pangoro-goerli
     steps:

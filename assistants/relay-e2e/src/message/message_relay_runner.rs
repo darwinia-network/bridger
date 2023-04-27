@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bridge_e2e_traits::client::MessageClient;
 use client_contracts::{inbound_types::InboundLaneNonce, outbound_types::OutboundLaneNonce};
-use support_etherscan::wait_for_transaction_confirmation;
+use support_etherscan::wait_for_transaction_confirmation_with_timeout;
 use web3::{
     contract::Options,
     types::{BlockId, BlockNumber, U256},
@@ -196,7 +196,6 @@ where
             begin + count - 1,
         );
 
-        let gas = self.target.delivery_gas_unit()? * (end - begin + 2);
         let gas_price = self.target.gas_price().await?;
         let tx = self
             .target
@@ -206,7 +205,6 @@ where
                 U256::from(count),
                 &self.target.private_key(),
                 Options {
-                    gas: Some(gas),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },
@@ -221,11 +219,12 @@ where
             tx
         );
 
-        wait_for_transaction_confirmation(
+        wait_for_transaction_confirmation_with_timeout(
             tx,
             self.target.get_web3().transport(),
             Duration::from_secs(5),
             1,
+            150
         )
         .await?;
 
@@ -301,7 +300,6 @@ where
                 proof,
                 &self.source.private_key(),
                 Options {
-                    gas: Some(self.source.confirmation_gas_unit()?),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },
@@ -315,11 +313,12 @@ where
             self.target.chain(),
             hash
         );
-        wait_for_transaction_confirmation(
+        wait_for_transaction_confirmation_with_timeout(
             hash,
             self.source.get_web3().transport(),
             Duration::from_secs(5),
             1,
+            150
         )
         .await?;
 

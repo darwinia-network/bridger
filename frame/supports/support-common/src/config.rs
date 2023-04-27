@@ -10,12 +10,20 @@ use crate::error::BridgerError;
 /// The config names
 #[derive(Clone, Debug)]
 pub enum Names {
+    /// Bridger
     Bridger,
+    /// Bridge tempalte
     BridgeTemplate,
+    /// Bridge darwinia-ethereum
     BridgeDarwiniaEthereum,
+    /// Bridge pangolin-pangoro
     BridgePangolinPangoro,
+    /// bridge darwinia-crab
     BridgeDarwiniaCrab,
-    BridgePangoroGoerli,
+    /// bridge pangoro-chapel
+    BridgePangoroChapel,
+    /// bridge pangolin-goerli
+    BridgePangolinGoerli,
 }
 
 impl Names {
@@ -26,7 +34,8 @@ impl Names {
             Self::BridgeDarwiniaEthereum => "bridge-darwinia-ethereum",
             Self::BridgePangolinPangoro => "bridge-pangolin-pangoro",
             Self::BridgeDarwiniaCrab => "bridge-darwinia-crab",
-            Self::BridgePangoroGoerli => "bridge-pangoro-goerli",
+            Self::BridgePangoroChapel => "bridge-pangoro-chapel",
+            Self::BridgePangolinGoerli => "bridge-pangolin-goerli",
         }
     }
 }

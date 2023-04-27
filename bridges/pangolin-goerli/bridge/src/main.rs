@@ -1,5 +1,5 @@
-use bridge_pangoro_goerli::cli;
-use bridge_pangoro_goerli::command::types::Opts;
+use bridge_pangolin_goerli::cli;
+use bridge_pangolin_goerli::command::types::Opts;
 use structopt::StructOpt;
 
 #[tokio::main]

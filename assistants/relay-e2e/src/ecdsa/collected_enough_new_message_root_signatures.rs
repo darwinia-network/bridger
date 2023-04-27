@@ -7,14 +7,14 @@ use crate::error::{RelayError, RelayResult};
 
 use super::types::EcdsaSource;
 
-pub struct CollectedEnoughNewMessageRootSignaturesRunner<T: EcdsaClient> {
-    source: EcdsaSource<T>,
+pub struct CollectedEnoughNewMessageRootSignaturesRunner<'a, T: EcdsaClient> {
+    source: &'a EcdsaSource<T>,
     interval: u64,
     last_relay_time: u64,
 }
 
-impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
-    pub fn new(source: EcdsaSource<T>, interval: u64) -> Self {
+impl<'a, T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<'a, T> {
+    pub fn new(source: &'a EcdsaSource<T>, interval: u64) -> Self {
         Self {
             source,
             interval,
@@ -23,7 +23,7 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
     }
 }
 
-impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
+impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<'_, T> {
     pub async fn start(&mut self) -> RelayResult<Option<u32>> {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -102,11 +102,12 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<T> {
             "[Darwinia][ECDSA][collectedMessages] submitted collected enouth new message root signature: {}",
             array_bytes::bytes2hex("0x", &hash.0),
         );
-        support_etherscan::wait_for_transaction_confirmation(
+        support_etherscan::wait_for_transaction_confirmation_with_timeout(
             hash,
             self.source.client_eth_web3.transport(),
             Duration::from_secs(5),
             3,
+            150
         )
         .await?;
         self.last_relay_time = SystemTime::now()

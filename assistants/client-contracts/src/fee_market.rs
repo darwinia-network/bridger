@@ -1,8 +1,12 @@
 use crate::error::{BridgeContractError, BridgeContractResult};
 use secp256k1::SecretKey;
 use web3::{
-    contract::{tokens::Tokenizable, Contract, Options},
+    contract::{
+        tokens::{Tokenizable, Tokenize},
+        Contract, Options,
+    },
     ethabi::Token,
+    signing::Key,
     transports::Http,
     types::{Address, H256, U256},
     Web3,
@@ -31,14 +35,23 @@ impl FeeMarket {
         fee: U256,
         private_key: &SecretKey,
     ) -> BridgeContractResult<H256> {
+        let call = "enroll";
+        let params = (prev, fee).into_tokens();
+        let options = Options {
+            value: Some(fee),
+            ..Default::default()
+        };
+        let gas = self
+            .contract
+            .estimate_gas(call, params.as_slice(), private_key.address(), options)
+            .await?;
         let tx = self
             .contract
             .signed_call(
-                "enroll",
-                (prev, fee),
+                call,
+                params.as_slice(),
                 Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
+                    gas: Some(gas),
                     value: Some(fee),
                     ..Default::default()
                 },
@@ -50,14 +63,23 @@ impl FeeMarket {
 
     #[allow(dead_code)]
     pub async fn deposit(&self, fee: U256, private_key: &SecretKey) -> BridgeContractResult<H256> {
+        let call = "deposit";
+        let option = Options {
+            gas: None,
+            value: Some(fee),
+            ..Default::default()
+        };
+        let gas = self
+            .contract
+            .estimate_gas(call, (), private_key.address(), option)
+            .await?;
         let tx = self
             .contract
             .signed_call(
-                "deposit",
+                call,
                 (),
                 Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
+                    gas: Some(gas),
                     value: Some(fee),
                     ..Default::default()
                 },
@@ -95,14 +117,24 @@ impl FeeMarket {
         new_fee: U256,
         private_key: &SecretKey,
     ) -> BridgeContractResult<H256> {
+        let call = "move";
+        let option = Options {
+            value: Some(new_fee),
+            ..Default::default()
+        };
+        let params = (old_prev, new_prev, new_fee).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(call, params.as_slice(), private_key.address(), option)
+            .await?;
+
         let tx = self
             .contract
             .signed_call(
-                "move",
-                (old_prev, new_prev, new_fee),
+                call,
+                params.as_slice(),
                 Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
+                    gas: Some(gas),
                     value: Some(new_fee),
                     ..Default::default()
                 },

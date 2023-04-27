@@ -5,6 +5,7 @@ use subquery::SubqueryComponentError;
 use support_etherscan::Error as SupportEtherscanError;
 use thiserror::Error as ThisError;
 use web3::Error as Web3Error;
+use types::BeaconStateError;
 
 pub type RelayResult<T> = Result<T, RelayError>;
 
@@ -39,5 +40,17 @@ impl From<array_bytes::Error> for RelayError {
 impl From<secp256k1::Error> for RelayError {
     fn from(e: secp256k1::Error) -> Self {
         Self::Seed(format!("Wrong secret key: {:?}", e))
+    }
+}
+
+impl From<()> for RelayError {
+    fn from(_: ()) -> Self {
+        Self::Custom("Incorrect beacon api version.".into())
+    }
+}
+
+impl From<BeaconStateError> for RelayError {
+    fn from(value: BeaconStateError) -> Self {
+        Self::Custom(format!("{:?}", value))
     }
 }

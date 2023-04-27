@@ -1,9 +1,10 @@
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenize, Contract, Options},
+    signing::Key,
     transports::Http,
-    types::{Address, H256},
+    types::{Address, H256, BlockId},
     Web3,
 };
 
@@ -53,20 +54,34 @@ impl BeaconLightClient {
             .await?)
     }
 
+    pub async fn merkle_root(&self, at_block: Option<BlockId>) -> BridgeContractResult<H256> {
+        Ok(self
+            .contract
+            .query("merkle_root", (), None, Options::default(), at_block)
+            .await?)
+    }
+
     pub async fn import_finalized_header(
         &self,
         finalized_header_update: FinalizedHeaderUpdate,
         private_key: &SecretKey,
-        options: Options,
+        mut options: Options,
     ) -> BridgeContractResult<H256> {
+        let call = "import_finalized_header";
+        let params = (finalized_header_update,).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options::default(),
+            )
+            .await?;
+        options.gas = Some(gas);
         let tx = self
             .contract
-            .signed_call(
-                "import_finalized_header",
-                (finalized_header_update,),
-                options,
-                private_key,
-            )
+            .signed_call(call, params.as_slice(), options, private_key)
             .await?;
         Ok(tx)
     }
@@ -76,16 +91,23 @@ impl BeaconLightClient {
         finalized_header_update: FinalizedHeaderUpdate,
         sync_committee_update: SyncCommitteePeriodUpdate,
         private_key: &SecretKey,
-        options: Options,
+        mut options: Options,
     ) -> BridgeContractResult<H256> {
+        let call = "import_next_sync_committee";
+        let params = (finalized_header_update, sync_committee_update).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options::default(),
+            )
+            .await?;
+        options.gas = Some(gas);
         let tx = self
             .contract
-            .signed_call(
-                "import_next_sync_committee",
-                (finalized_header_update, sync_committee_update),
-                options,
-                private_key,
-            )
+            .signed_call(call, params.as_slice(), options, private_key)
             .await?;
         Ok(tx)
     }
@@ -95,18 +117,96 @@ pub mod types {
     use web3::{
         contract::tokens::{Detokenize, Tokenizable, Tokenize},
         ethabi::Token,
-        types::{Bytes, H256},
+        types::{Address, Bytes, H256, U256},
     };
 
     #[derive(Debug, Clone)]
     pub struct FinalizedHeaderUpdate {
-        pub attested_header: HeaderMessage,
+        pub attested_header: LightClientHeader,
         pub signature_sync_committee: SyncCommittee,
-        pub finalized_header: HeaderMessage,
+        pub finalized_header: LightClientHeader,
         pub finality_branch: Vec<H256>,
         pub sync_aggregate: SyncAggregate,
         pub fork_version: Bytes,
         pub signature_slot: u64,
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct LightClientHeader {
+        pub beacon: HeaderMessage,
+        pub execution: ExecutionPayloadHeader,
+        pub execution_branch: Vec<H256>,
+    }
+
+    impl Tokenizable for LightClientHeader {
+        fn from_token(_token: web3::ethabi::Token) -> Result<Self, web3::contract::Error>
+        where
+            Self: Sized,
+        {
+            todo!()
+        }
+
+        fn into_token(self) -> web3::ethabi::Token {
+            Token::Tuple(
+                (
+                    self.beacon.clone(),
+                    self.execution.clone(),
+                    self.execution_branch.clone(),
+                )
+                    .into_tokens(),
+            )
+        }
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct ExecutionPayloadHeader {
+        pub parent_hash: H256,
+        pub fee_recipient: Address,
+        pub state_root: H256,
+        pub receipts_root: H256,
+        pub logs_bloom: H256,
+        pub prev_randao: H256,
+        pub block_number: u64,
+        pub gas_limit: u64,
+        pub gas_used: u64,
+        pub timestamp: u64,
+        pub extra_data: H256,
+        pub base_fee_per_gas: U256,
+        pub block_hash: H256,
+        pub transactions_root: H256,
+        pub withdrawals_root: H256,
+    }
+
+    impl Tokenizable for ExecutionPayloadHeader {
+        fn from_token(_token: Token) -> Result<Self, web3::contract::Error>
+        where
+            Self: Sized,
+        {
+            todo!()
+        }
+
+        fn into_token(self) -> Token {
+            Token::Tuple(
+                (
+                    self.parent_hash.clone(),
+                    self.fee_recipient.clone(),
+                    self.state_root.clone(),
+                    self.receipts_root.clone(),
+                    self.logs_bloom.clone(),
+                    self.prev_randao.clone(),
+                    self.block_number,
+                    self.gas_limit,
+                    self.gas_used,
+                    self.timestamp,
+                    self.extra_data.clone(),
+                    self.base_fee_per_gas.clone(),
+                    self.block_hash.clone(),
+                    self.transactions_root.clone(),
+                    self.withdrawals_root.clone(),
+                )
+                    .into_tokens(),
+            )
+        }
     }
 
     #[derive(Debug, Clone)]

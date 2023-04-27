@@ -2,8 +2,8 @@ use std::cmp;
 use std::fmt::Debug;
 
 use client_contracts::outbound_types::ReceiveMessagesDeliveryProof;
+use client_contracts::BeaconLightClient;
 use client_contracts::{inbound_types::ReceiveMessagesProof, Inbound, Outbound};
-use client_contracts::{BeaconLightClient, ExecutionLayer};
 use secp256k1::SecretKey;
 use subxt::Config;
 use support_etherscan::{EtherscanClient, Result as EtherscanResult};
@@ -47,14 +47,14 @@ pub trait GasPriceOracle: Web3Client {
 pub trait EthTruthLayerLightClient: GasPriceOracle {
     fn beacon_light_client(&self) -> &BeaconLightClient;
 
-    fn execution_layer(&self) -> &ExecutionLayer;
-
     fn private_key(&self) -> &SecretKey;
 }
 
 #[async_trait::async_trait()]
 pub trait EcdsaClient: Debug + Send + Sync + Clone + 'static {
     type SubxtConfig: subxt::Config;
+
+    async fn reconnect(&mut self) -> E2EClientResult<()>;
 
     async fn is_ecdsa_authority(
         &self,
@@ -64,13 +64,11 @@ pub trait EcdsaClient: Debug + Send + Sync + Clone + 'static {
 
     async fn submit_authorities_change_signature(
         &self,
-        address: [u8; 20],
         signatures: Vec<u8>,
     ) -> E2EClientResult<<Self::SubxtConfig as Config>::Hash>;
 
     async fn submit_new_message_root_signature(
         &self,
-        address: [u8; 20],
         signatures: Vec<u8>,
     ) -> E2EClientResult<<Self::SubxtConfig as Config>::Hash>;
 }
@@ -98,9 +96,6 @@ pub trait MessageClient: GasPriceOracle {
         end: u64,
         block_number: Option<BlockNumber>,
     ) -> E2EClientResult<ReceiveMessagesProof>;
-
-    // Returns estimated gas used for one message delivery
-    fn delivery_gas_unit(&self) -> E2EClientResult<U256>;
 
     // Returns proof for messages confirmation in the range of nonce from begin to end
     async fn prepare_for_confirmation(

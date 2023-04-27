@@ -7,13 +7,13 @@ homepage      = "https://github.com/darwinia-network/bridger"
 include       = ["Cargo.toml", "**/*.rs", "README.md", "LICENSE", "src/BSCValidatorSet_abi.json"]
 keywords      = ["substrate", "darwinia"]
 license       = "MIT"
-name          = "bridge-pangoro-goerli"
+name          = "bridge-pangolin-goerli"
 readme        = 'README.md'
 repository    = "https://github.com/darwinia-network/bridger"
 version       = "0.7.3"
 
 [[bin]]
-name = "bridge-pangoro-goerli"
+name = "bridge-pangolin-goerli"
 path = "src/main.rs"
 
 [dependencies]
@@ -24,6 +24,7 @@ serde       = { version = "1", features = ["derive"] }
 structopt   = "0.3"
 web3        = { version = "0.18", features = ["signing"] }
 array-bytes = "6"
+secp256k1   = "0.21"
 
 support-common     = { path = "../../../frame/supports/support-common" }
 support-command-kv = { path = "../../../frame/supports/support-command-kv" }
@@ -32,7 +33,7 @@ component-state    = { path = "../../../frame/components/state" }
 
 subquery              = { path = "../../../assistants/subquery", features = [ "bridge-ethv2" ] }
 client-contracts      = { path = "../../../assistants/client-contracts" }
-client-pangoro        = { path = "../../../assistants/client-pangoro", features = [ "bridge-ethv2" ] }
+client-pangolin       = { path = "../../../assistants/client-pangolin", features = [ "bridge-ethv2" ] }
 thegraph              = { path = "../../../assistants/thegraph", features = [ "bridge-ethv2" ] }
 
 bridge-e2e-traits     = { path = "../../../traits/bridge-e2e" }

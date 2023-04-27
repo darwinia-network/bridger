@@ -76,7 +76,7 @@ impl<T: EcdsaClient> Service for ECDSARelayService<T> {
                 Ok(())
             },
         );
-        let mut ecdsa_source = Self::get_ecdsa_source(bridge_config.clone())?;
+        let mut ecdsa_source = Self::get_ecdsa_source(bridge_config)?;
         let _greet_collected_authorities =
             Self::try_task("substrate-to-eth-ecdsa-collected-authorities", async move {
                 ecdsa_source

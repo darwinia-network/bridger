@@ -50,12 +50,11 @@ impl<T: EcdsaClient> Service for DarwiniaEthereumMessageRelay<T> {
             }
             Ok(())
         });
-        let config = bridge_config.clone();
         let _greet_confirmation = Self::try_task(
             "message-confirmation-darwinia-to-eth",
             async move {
                 let mut timecount = TimeCount::new();
-                while let Err(error) = start_confirmation(config.clone()).await {
+                while let Err(error) = start_confirmation(bridge_config.clone()).await {
                     tracing::error!(
                         target: "darwinia-eth",
                         "Failed to start darwinia-to-eth message confirmation service, restart after some seconds: {:?}",

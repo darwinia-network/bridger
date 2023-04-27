@@ -50,7 +50,7 @@ impl<T: EcdsaClient> Service for EthereumDarwiniaMessageRelay<T> {
             }
             Ok(())
         });
-        let config = bridge_config.clone();
+        let config = bridge_config;
         let _greet_confirmation = Self::try_task(
             "message-confirmation-darwinia-to-eth",
             async move {

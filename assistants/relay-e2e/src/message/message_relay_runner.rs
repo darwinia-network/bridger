@@ -203,7 +203,7 @@ where
             .receive_messages_proof(
                 proof,
                 U256::from(count),
-                &self.target.private_key(),
+                self.target.private_key(),
                 Options {
                     gas_price: Some(gas_price),
                     ..Default::default()
@@ -298,7 +298,7 @@ where
             .outbound()
             .receive_messages_delivery_proof(
                 proof,
-                &self.source.private_key(),
+                self.source.private_key(),
                 Options {
                     gas_price: Some(gas_price),
                     ..Default::default()

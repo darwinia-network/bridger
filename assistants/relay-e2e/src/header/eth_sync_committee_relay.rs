@@ -102,7 +102,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             .await?;
 
         if sync_committee_update.len() != 2 {
-            return Err(RelayError::Custom("Failed to get sync committee update".into()).into());
+            return Err(RelayError::Custom("Failed to get sync committee update".into()));
         }
         let last_sync_committee_update = sync_committee_update.get(0).expect("Unreachable!");
         let current_sync_committee = last_sync_committee_update

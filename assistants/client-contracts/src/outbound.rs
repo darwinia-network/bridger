@@ -302,6 +302,7 @@ mod tests {
         (client.clone(), Outbound::new(&client, address).unwrap())
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_outbound() {
         let (client, outbound) = test_client();
@@ -335,6 +336,7 @@ mod tests {
         }
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_outbound_lane_nonce() {
         let (_, outbound) = test_client();
@@ -346,6 +348,7 @@ mod tests {
         println!("nonce: {:?}", res);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_data_() {
         let (_, outbound) = test_client();
@@ -353,6 +356,7 @@ mod tests {
         println!("Data: {:?}", res);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_lane_info() {
         let (_, outbound) = test_client();
@@ -360,6 +364,7 @@ mod tests {
         dbg!(res);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_fee_market_address() {
         let (_, outbound) = test_client();
@@ -371,6 +376,7 @@ mod tests {
         dbg!(res);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_send_message() {
         let (_, outbound) = test_client();

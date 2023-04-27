@@ -42,11 +42,11 @@ jobs:
     strategy:
       matrix:
         package:
-          - darwinia-crab
           - darwinia-ethereum
+          - pangolin-goerli
+          - darwinia-crab
           - pangolin-pangoro
           - pangoro-chapel
-          - pangoro-goerli
           - template
     steps:
       - uses: actions/checkout@v2

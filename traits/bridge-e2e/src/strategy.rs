@@ -31,7 +31,7 @@ impl<Strategy: RelayStrategy> EnforcementRelayStrategy<Strategy> {
 impl<Strategy: RelayStrategy> EnforcementRelayStrategy<Strategy> {
     pub async fn decide(&mut self, encoded_keys: &[U256]) -> E2EClientResult<bool> {
         for key in encoded_keys {
-            let result = self.strategy.decide(key.clone()).await?;
+            let result = self.strategy.decide(*key).await?;
             if !result {
                 return Ok(false);
             }

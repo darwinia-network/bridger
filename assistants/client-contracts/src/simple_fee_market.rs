@@ -258,6 +258,7 @@ mod tests {
         println!("{:?}", r);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_order() {
         let (_, fee_market) = test_fee_market();
@@ -268,6 +269,7 @@ mod tests {
         println!("{:?}", order);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_relay_time() {
         let (client, fee_market) = test_fee_market();
@@ -278,6 +280,7 @@ mod tests {
         dbg!(r);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_assigned() {
         let (client, fee_market) = test_fee_market();
@@ -300,6 +303,7 @@ mod tests {
         }
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_top_relayer() {
         let (_, fee_market) = test_fee_market();

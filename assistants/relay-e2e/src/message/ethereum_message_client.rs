@@ -40,6 +40,7 @@ pub struct EthMessageClient<T: RelayStrategy = SimpleFeeMarketRelayStrategy> {
     pub etherscan_client: Option<EtherscanClient>,
 }
 
+#[allow(clippy::too_many_arguments)]
 impl EthMessageClient {
     pub fn new_with_simple_fee_market(
         chain: &str,
@@ -160,7 +161,7 @@ impl<T: RelayStrategy> MessageClient for EthMessageClient<T> {
     }
 
     fn confirmation_gas_unit(&self) -> E2EClientResult<U256> {
-        Ok(U256::from_dec_str("200000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
+        U256::from_dec_str("200000").map_err(|e| E2EClientError::Custom(format!("{}", e)))
     }
 
     async fn latest_light_client_block_number(&self) -> E2EClientResult<Option<u64>> {
@@ -195,12 +196,11 @@ impl<T: RelayStrategy> EthMessageClient<T> {
         );
 
         if (end - begin + 1) as usize != messages.len() {
-            return Err(E2EClientError::Custom("Build messages data failed".into()).into());
+            return Err(E2EClientError::Custom("Build messages data failed".into()));
         }
 
         let accepted_events = self.query_message_accepted_events(begin, end).await?;
         let messages: Vec<Message> = std::iter::zip(messages, accepted_events)
-            .into_iter()
             .map(|(message, event)| Message {
                 encoded_key: message.encoded_key,
                 payload: Payload {
@@ -327,8 +327,7 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             Err(E2EClientError::Custom(format!(
                 "Failed to get message events from {:?} to {:?}",
                 begin, end
-            ))
-            .into())
+            )))
         }
     }
 

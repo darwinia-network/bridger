@@ -21,11 +21,10 @@ jobs:
         package:
           - bridger
           - darwinia-ethereum
+          - pangolin-goerli
           - darwinia-crab
           - pangolin-pangoro
-          - pangolin-goerli
 #          - pangoro-chapel
-#          - pangoro-goerli
     steps:
       - uses: actions/checkout@v2
 

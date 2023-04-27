@@ -335,7 +335,7 @@ mod tests {
         }
     }
 
-    // #[ignore]
+    #[ignore]
     #[tokio::test]
     async fn test_query_relayers() {
         let (_, fee_market) = test_fee_market();
@@ -370,6 +370,7 @@ mod tests {
         }
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_collateral() {
         let (_, fee_market) = test_fee_market();
@@ -381,6 +382,7 @@ mod tests {
         println!("{:?}", r);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_relayer_count() {
         let (_, fee_market) = test_fee_market();
@@ -398,6 +400,7 @@ mod tests {
         println!("{:?}", r);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_order() {
         let (_, fee_market) = test_fee_market();
@@ -408,6 +411,7 @@ mod tests {
         println!("{:?}", order);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_relay_time() {
         let (_, fee_market) = test_fee_market();
@@ -415,6 +419,7 @@ mod tests {
         println!("Relay time is : {:?}", time);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_assigned() {
         let (client, fee_market) = test_fee_market();

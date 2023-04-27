@@ -8,7 +8,7 @@ pub async fn execute(opts: Opts) -> color_eyre::Result<()> {
     match opts {
         Opts::Start => handler::handle_start().await,
         Opts::Kv { command } => {
-            let task_name = BridgeName::PangoroGoerli.name();
+            let task_name = BridgeName::PangolinGoerli.name();
             let namespace = command.namespace.unwrap_or_else(|| task_name.to_string());
             let state_options = StateOptions {
                 db_name: task_name.to_string(),

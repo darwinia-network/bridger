@@ -4,17 +4,17 @@ use crate::error::RelayResult;
 
 use super::types::EcdsaSource;
 
-pub struct CollectingNewMessageRootSignaturesRunner<T: EcdsaClient> {
-    source: EcdsaSource<T>,
+pub struct CollectingNewMessageRootSignaturesRunner<'a, T: EcdsaClient> {
+    source: &'a EcdsaSource<T>,
 }
 
-impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<T> {
-    pub fn new(source: EcdsaSource<T>) -> Self {
+impl<'a, T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<'a, T> {
+    pub fn new(source: &'a EcdsaSource<T>) -> Self {
         Self { source }
     }
 }
 
-impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<T> {
+impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<'_, T> {
     pub async fn start(&self) -> RelayResult<Option<u32>> {
         let client_darwinia_substrate = &self.source.client_darwinia_substrate;
         let subquery = &self.source.subquery;
@@ -59,10 +59,13 @@ impl<T: EcdsaClient> CollectingNewMessageRootSignaturesRunner<T> {
             return Ok(Some(event.block_number));
         }
 
-        let address = darwinia_evm_account.address()?;
         let signature = darwinia_evm_account.sign(event.message.as_slice())?;
+        tracing::trace!(
+            target: "relay-e2e",
+            "[Darwinia][ECDSA][collectingMessages] Signature signed"
+        );
         let hash = client_darwinia_substrate
-            .submit_new_message_root_signature(address.0, signature)
+            .submit_new_message_root_signature(signature)
             .await?;
 
         tracing::info!(

@@ -20,11 +20,11 @@ jobs:
       matrix:
         package:
           - bridger
-#          - darwinia-ethereum
+          - darwinia-ethereum
+          - pangoro-goerli
           - darwinia-crab
           - pangolin-pangoro
-#          - pangoro-chapel
-#          - pangoro-goerli
+    #          - pangoro-chapel
     steps:
       - uses: actions/checkout@v2
 

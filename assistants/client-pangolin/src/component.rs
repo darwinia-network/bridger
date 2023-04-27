@@ -24,7 +24,7 @@ impl PangolinClientComponent {
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
             return match OnlineClient::<PangolinSubxtConfig>::from_url(&endpoint).await {
-                Ok(client) => Ok(PangolinClient::new(client, account.clone())),
+                Ok(client) => Ok(PangolinClient::new(&endpoint, client, account.clone())),
                 Err(err) => {
                     if attempts < MAX_ATTEMPTS {
                         attempts += 1;

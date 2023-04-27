@@ -4,17 +4,17 @@ use crate::error::RelayResult;
 
 use super::types::EcdsaSource;
 
-pub struct CollectingAuthoritiesChangeSignaturesRunner<T: EcdsaClient> {
-    source: EcdsaSource<T>,
+pub struct CollectingAuthoritiesChangeSignaturesRunner<'a, T: EcdsaClient> {
+    source: &'a EcdsaSource<T>,
 }
 
-impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
-    pub fn new(source: EcdsaSource<T>) -> Self {
+impl<'a, T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<'a, T> {
+    pub fn new(source: &'a EcdsaSource<T>) -> Self {
         Self { source }
     }
 }
 
-impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
+impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<'_, T> {
     pub async fn start(&self) -> RelayResult<Option<u32>> {
         let client_darwinia_substrate = &self.source.client_darwinia_substrate;
         let subquery = &self.source.subquery;
@@ -55,10 +55,9 @@ impl<T: EcdsaClient> CollectingAuthoritiesChangeSignaturesRunner<T> {
             return Ok(Some(event.block_number));
         }
 
-        let address = darwinia_evm_account.address()?;
         let signature = darwinia_evm_account.sign(event.message.as_slice())?;
         let hash = client_darwinia_substrate
-            .submit_authorities_change_signature(address.0, signature)
+            .submit_authorities_change_signature(signature)
             .await?;
         tracing::info!(
             target: "relay-e2e",

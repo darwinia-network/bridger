@@ -1,7 +1,10 @@
+use std::ops::Div;
+
 use secp256k1::SecretKey;
 pub use types::*;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenize, Contract, Options},
+    signing::Key,
     transports::Http,
     types::{Address, BlockId, H256, U256},
     Web3,
@@ -44,20 +47,29 @@ impl Inbound {
         messages_proof: ReceiveMessagesProof,
         delivery_size: U256,
         private_key: &SecretKey,
-        options: Options,
+        mut options: Options,
     ) -> BridgeContractResult<H256> {
+        let call = "receive_messages_proof";
+        let params = (
+            messages_proof.outbound_lane_data,
+            messages_proof.messages_proof,
+            delivery_size,
+        )
+            .into_tokens();
+        let mut gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options::default(),
+            )
+            .await?;
+        gas += gas.div(10);
+        options.gas = Some(gas);
         let tx = self
             .contract
-            .signed_call(
-                "receive_messages_proof",
-                (
-                    messages_proof.outbound_lane_data,
-                    messages_proof.messages_proof,
-                    delivery_size,
-                ),
-                options,
-                private_key,
-            )
+            .signed_call(call, params.as_slice(), options, private_key)
             .await?;
         Ok(tx)
     }

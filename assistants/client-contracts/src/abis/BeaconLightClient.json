@@ -49,6 +49,25 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "block_number",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "state_root",
+        "type": "bytes32"
+      }
+    ],
+    "name": "FinalizedExecutionPayloadHeaderImported",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "components": [
           {
             "internalType": "uint64",
@@ -119,12 +138,12 @@
   },
   {
     "inputs": [],
-    "name": "body_root",
+    "name": "block_number",
     "outputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "uint256",
         "name": "",
-        "type": "bytes32"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -170,32 +189,126 @@
           {
             "components": [
               {
-                "internalType": "uint64",
-                "name": "slot",
-                "type": "uint64"
+                "components": [
+                  {
+                    "internalType": "uint64",
+                    "name": "slot",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "proposer_index",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "parent_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "state_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "body_root",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct BeaconChain.BeaconBlockHeader",
+                "name": "beacon",
+                "type": "tuple"
               },
               {
-                "internalType": "uint64",
-                "name": "proposer_index",
-                "type": "uint64"
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "parent_hash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "fee_recipient",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "state_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "receipts_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "logs_bloom",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "prev_randao",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "block_number",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "gas_limit",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "gas_used",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "timestamp",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "extra_data",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "base_fee_per_gas",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "block_hash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "transactions_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "withdrawals_root",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct BeaconChain.ExecutionPayloadHeader",
+                "name": "execution",
+                "type": "tuple"
               },
               {
-                "internalType": "bytes32",
-                "name": "parent_root",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "state_root",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "body_root",
-                "type": "bytes32"
+                "internalType": "bytes32[]",
+                "name": "execution_branch",
+                "type": "bytes32[]"
               }
             ],
-            "internalType": "struct BeaconChain.BeaconBlockHeader",
+            "internalType": "struct BeaconChain.LightClientHeader",
             "name": "attested_header",
             "type": "tuple"
           },
@@ -219,32 +332,126 @@
           {
             "components": [
               {
-                "internalType": "uint64",
-                "name": "slot",
-                "type": "uint64"
+                "components": [
+                  {
+                    "internalType": "uint64",
+                    "name": "slot",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "proposer_index",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "parent_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "state_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "body_root",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct BeaconChain.BeaconBlockHeader",
+                "name": "beacon",
+                "type": "tuple"
               },
               {
-                "internalType": "uint64",
-                "name": "proposer_index",
-                "type": "uint64"
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "parent_hash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "fee_recipient",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "state_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "receipts_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "logs_bloom",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "prev_randao",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "block_number",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "gas_limit",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "gas_used",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "timestamp",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "extra_data",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "base_fee_per_gas",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "block_hash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "transactions_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "withdrawals_root",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct BeaconChain.ExecutionPayloadHeader",
+                "name": "execution",
+                "type": "tuple"
               },
               {
-                "internalType": "bytes32",
-                "name": "parent_root",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "state_root",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "body_root",
-                "type": "bytes32"
+                "internalType": "bytes32[]",
+                "name": "execution_branch",
+                "type": "bytes32[]"
               }
             ],
-            "internalType": "struct BeaconChain.BeaconBlockHeader",
+            "internalType": "struct BeaconChain.LightClientHeader",
             "name": "finalized_header",
             "type": "tuple"
           },
@@ -298,32 +505,126 @@
           {
             "components": [
               {
-                "internalType": "uint64",
-                "name": "slot",
-                "type": "uint64"
+                "components": [
+                  {
+                    "internalType": "uint64",
+                    "name": "slot",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "proposer_index",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "parent_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "state_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "body_root",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct BeaconChain.BeaconBlockHeader",
+                "name": "beacon",
+                "type": "tuple"
               },
               {
-                "internalType": "uint64",
-                "name": "proposer_index",
-                "type": "uint64"
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "parent_hash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "fee_recipient",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "state_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "receipts_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "logs_bloom",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "prev_randao",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "block_number",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "gas_limit",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "gas_used",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "timestamp",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "extra_data",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "base_fee_per_gas",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "block_hash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "transactions_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "withdrawals_root",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct BeaconChain.ExecutionPayloadHeader",
+                "name": "execution",
+                "type": "tuple"
               },
               {
-                "internalType": "bytes32",
-                "name": "parent_root",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "state_root",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "body_root",
-                "type": "bytes32"
+                "internalType": "bytes32[]",
+                "name": "execution_branch",
+                "type": "bytes32[]"
               }
             ],
-            "internalType": "struct BeaconChain.BeaconBlockHeader",
+            "internalType": "struct BeaconChain.LightClientHeader",
             "name": "attested_header",
             "type": "tuple"
           },
@@ -347,32 +648,126 @@
           {
             "components": [
               {
-                "internalType": "uint64",
-                "name": "slot",
-                "type": "uint64"
+                "components": [
+                  {
+                    "internalType": "uint64",
+                    "name": "slot",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "proposer_index",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "parent_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "state_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "body_root",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct BeaconChain.BeaconBlockHeader",
+                "name": "beacon",
+                "type": "tuple"
               },
               {
-                "internalType": "uint64",
-                "name": "proposer_index",
-                "type": "uint64"
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "parent_hash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "fee_recipient",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "state_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "receipts_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "logs_bloom",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "prev_randao",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "block_number",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "gas_limit",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "gas_used",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "timestamp",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "extra_data",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "base_fee_per_gas",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "block_hash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "transactions_root",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "withdrawals_root",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct BeaconChain.ExecutionPayloadHeader",
+                "name": "execution",
+                "type": "tuple"
               },
               {
-                "internalType": "bytes32",
-                "name": "parent_root",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "state_root",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "body_root",
-                "type": "bytes32"
+                "internalType": "bytes32[]",
+                "name": "execution_branch",
+                "type": "bytes32[]"
               }
             ],
-            "internalType": "struct BeaconChain.BeaconBlockHeader",
+            "internalType": "struct BeaconChain.LightClientHeader",
             "name": "finalized_header",
             "type": "tuple"
           },
@@ -446,6 +841,32 @@
     "name": "import_next_sync_committee",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "merkle_root",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "slot",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

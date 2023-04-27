@@ -1,3 +1,5 @@
+#[cfg(feature = "bridge-ethv2")]
+pub mod bridge_ethv2;
 #[cfg(feature = "bridge-s2s")]
 pub mod bridge_s2s;
 mod common;

@@ -37,9 +37,6 @@ private_key = "..."
 # Beacon chain api endpoint and api supplier
 api_supplier = "Nimbus"
 endpoint     = "http://unstable.mainnet.beacon-api.nimbus.team"
-# Bridger also support Lodestar api
-# endpoint                  = "https://lodestar-mainnet-rpc.darwinia.network"
-# api_supplier              = "Lodestar"
 
 [ethereum]
 # Execution layer api endpoint, register one at https://dashboard.alchemy.com/

@@ -38,6 +38,7 @@ pub struct DarwiniaMessageClient<T: RelayStrategy = FeeMarketRelayStrategy> {
     pub eth_light_client: EthLightClient,
 }
 
+#[allow(clippy::too_many_arguments)]
 impl DarwiniaMessageClient {
     pub fn new_with_fee_market(
         chain: &str,
@@ -68,13 +69,11 @@ impl DarwiniaMessageClient {
         let lane_message_committer =
             LaneMessageCommitter::new(&client, lane_message_committer_address)?;
 
-        let eth_light_client = EthLightClient::new(
-            endpoint,
-            light_client_address,
-            private_key,
-            max_gas_price,
-        )
-        .map_err(|e| E2EClientError::Custom(format!("Failed to build EthLightClient: {}", e)))?;
+        let eth_light_client =
+            EthLightClient::new(endpoint, light_client_address, private_key, max_gas_price)
+                .map_err(|e| {
+                    E2EClientError::Custom(format!("Failed to build EthLightClient: {}", e))
+                })?;
         let account = eth_light_client.private_key().address();
         let strategy = FeeMarketRelayStrategy::new(fee_market, account);
 
@@ -175,7 +174,7 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
     }
 
     fn confirmation_gas_unit(&self) -> E2EClientResult<U256> {
-        Ok(U256::from_dec_str("8000000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
+        U256::from_dec_str("8000000").map_err(|e| E2EClientError::Custom(format!("{}", e)))
     }
 
     async fn latest_light_client_block_number(&self) -> E2EClientResult<Option<u64>> {
@@ -247,12 +246,11 @@ pub async fn build_messages_data(
     );
 
     if (end - begin + 1) as usize != messages.len() {
-        return Err(E2EClientError::Custom("Build messages data failed".into()).into());
+        return Err(E2EClientError::Custom("Build messages data failed".into()));
     }
 
     let accepted_events = query_message_accepted_events_thegraph(indexer, begin, end).await?;
     let messages: Vec<Message> = std::iter::zip(messages, accepted_events)
-        .into_iter()
         .map(|(message, event)| Message {
             encoded_key: message.encoded_key,
             payload: Payload {
@@ -341,7 +339,6 @@ pub async fn query_message_accepted_events_thegraph(
         Err(E2EClientError::Custom(format!(
             "Failed to get message events from {:?} to {:?}",
             begin, end
-        ))
-        .into())
+        )))
     }
 }

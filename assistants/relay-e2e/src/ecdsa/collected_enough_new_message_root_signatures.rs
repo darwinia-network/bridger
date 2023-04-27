@@ -100,7 +100,7 @@ impl<T: EcdsaClient> CollectedEnoughNewMessageRootSignaturesRunner<'_, T> {
         tracing::info!(
             target: "relay-e2e",
             "[Darwinia][ECDSA][collectedMessages] submitted collected enouth new message root signature: {}",
-            array_bytes::bytes2hex("0x", &hash.0),
+            array_bytes::bytes2hex("0x", hash.0),
         );
         support_etherscan::wait_for_transaction_confirmation_with_timeout(
             hash,

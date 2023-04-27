@@ -128,7 +128,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             .get_sync_committee_period_update(update_finality_period - 1, 1)
             .await?;
         if sync_change.is_empty() {
-            return Err(RelayError::Custom("Failed to get sync committee update".into()).into());
+            return Err(RelayError::Custom("Failed to get sync committee update".into()));
         }
         let fork_version = self.get_fork_version(signature_slot).await?;
         let finalized_header_update = FinalizedHeaderUpdate {
@@ -182,7 +182,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                 .await?;
             return Ok(());
         }
-        Err(RelayError::Custom("Failed to get sync committee update".into()).into())
+        Err(RelayError::Custom("Failed to get sync committee update".into()))
     }
 
     async fn get_fork_version(
@@ -213,7 +213,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             .beacon_light_client()
             .import_finalized_header(
                 finalized_header_update,
-                &self.eth_light_client.private_key(),
+                self.eth_light_client.private_key(),
                 Options {
                     gas_price: Some(gas_price),
                     ..Default::default()

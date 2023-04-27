@@ -90,22 +90,22 @@ pub trait EcdsaScanner<T: EcdsaClient> {
 
             let finished_block = match scan_type {
                 EcdsaScanType::CollectingMessage => {
-                    let runner = CollectingNewMessageRootSignaturesRunner::new(&source);
+                    let runner = CollectingNewMessageRootSignaturesRunner::new(source);
                     runner.start().await?
                 }
                 EcdsaScanType::CollectedMessage => {
                     let mut runner = CollectedEnoughNewMessageRootSignaturesRunner::new(
-                        &source,
+                        source,
                         source.minimal_interval,
                     );
                     runner.start().await?
                 }
                 EcdsaScanType::CollectingAuthority => {
-                    let runner = CollectingAuthoritiesChangeSignaturesRunner::new(&source);
+                    let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source);
                     runner.start().await?
                 }
                 EcdsaScanType::CollectedAuthority => {
-                    let runner = CollectedEnoughAuthoritiesChangeSignaturesRunner::new(&source);
+                    let runner = CollectedEnoughAuthoritiesChangeSignaturesRunner::new(source);
                     runner.start().await?
                 }
             };

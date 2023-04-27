@@ -25,7 +25,7 @@ outbound_address                = "0xAbd165DE531d26c229F9E43747a8d683eAD54C6c"
 # private_key in format of 0x... or ...
 private_key = "..."
 # Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
-max_gas_price = 24513218380275
+max_gas_price = 25000000000000 # 25000 Gwei
 
 [pangolin_substrate]
 endpoint = "wss://pangolin-rpc.darwinia.network"
@@ -46,7 +46,7 @@ posa_light_client_address = "0x66aB6f080b37Df0a99687A0bBB65A798bC1067C1"
 # private_key in format of 0x... or ...
 private_key = "..."
 # Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
-max_gas_price = 9000000000
+max_gas_price = 20000000000 # 20 Gwei
 # Bridger use etherscan gas oracle to get more appropriate gas price.
 # Register to get a free etherescan api key at https://docs.etherscan.io/api-endpoints/gas-tracker
 etherscan_api_key = "api_key..."

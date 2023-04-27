@@ -104,7 +104,7 @@ impl BeaconApiClient {
 
                     let sync_block = self.get_beacon_block(sync_slot).await?;
                     match Self::is_valid_sync_aggregate_block(
-                        &sync_block
+                        sync_block
                             .body()
                             .sync_aggregate()
                             .unwrap()
@@ -161,7 +161,7 @@ impl BeaconApiClient {
                 }
             };
         }
-        Err(BeaconApiError::Custom("Not found valid snapshot".into()).into())
+        Err(BeaconApiError::Custom("Not found valid snapshot".into()))
     }
 
     pub async fn get_beacon_block(
@@ -234,7 +234,7 @@ impl BeaconApiClient {
         }
 
         let data = response.bytes().await?;
-        Ok(Proof::try_from(data)?)
+        Proof::try_from(data)
     }
 
     pub async fn get_fork_version(&self, id: impl ToString) -> BeaconApiResult<ForkVersion> {

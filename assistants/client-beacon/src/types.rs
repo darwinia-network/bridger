@@ -324,7 +324,7 @@ impl MessagesProof {
                     self.lane_messages_proof
                         .clone()
                         .into_iter()
-                        .map(|x| bytes_vec_to_token(x))
+                        .map(bytes_vec_to_token)
                         .collect::<Vec<Token>>(),
                 ),
             )

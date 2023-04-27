@@ -149,9 +149,9 @@ pub mod types {
         fn into_token(self) -> web3::ethabi::Token {
             Token::Tuple(
                 (
-                    self.beacon.clone(),
-                    self.execution.clone(),
-                    self.execution_branch.clone(),
+                    self.beacon,
+                    self.execution,
+                    self.execution_branch,
                 )
                     .into_tokens(),
             )
@@ -188,21 +188,21 @@ pub mod types {
         fn into_token(self) -> Token {
             Token::Tuple(
                 (
-                    self.parent_hash.clone(),
-                    self.fee_recipient.clone(),
-                    self.state_root.clone(),
-                    self.receipts_root.clone(),
-                    self.logs_bloom.clone(),
-                    self.prev_randao.clone(),
+                    self.parent_hash,
+                    self.fee_recipient,
+                    self.state_root,
+                    self.receipts_root,
+                    self.logs_bloom,
+                    self.prev_randao,
                     self.block_number,
                     self.gas_limit,
                     self.gas_used,
                     self.timestamp,
-                    self.extra_data.clone(),
-                    self.base_fee_per_gas.clone(),
-                    self.block_hash.clone(),
-                    self.transactions_root.clone(),
-                    self.withdrawals_root.clone(),
+                    self.extra_data,
+                    self.base_fee_per_gas,
+                    self.block_hash,
+                    self.transactions_root,
+                    self.withdrawals_root,
                 )
                     .into_tokens(),
             )
@@ -265,13 +265,13 @@ pub mod types {
         fn into_token(self) -> web3::ethabi::Token {
             Token::Tuple(
                 (
-                    self.attested_header.clone(),
-                    self.signature_sync_committee.clone(),
-                    self.finalized_header.clone(),
-                    self.finality_branch.clone(),
-                    self.sync_aggregate.clone(),
-                    Token::FixedBytes(self.fork_version.clone().0),
-                    self.signature_slot.clone(),
+                    self.attested_header,
+                    self.signature_sync_committee,
+                    self.finalized_header,
+                    self.finality_branch,
+                    self.sync_aggregate,
+                    Token::FixedBytes(self.fork_version.0),
+                    self.signature_slot,
                 )
                     .into_tokens(),
             )
@@ -307,7 +307,7 @@ pub mod types {
                             .map(|x| x.into_token())
                             .collect(),
                     ),
-                    self.sync_committee_signature.clone(),
+                    self.sync_committee_signature,
                 )
                     .into_tokens(),
             )

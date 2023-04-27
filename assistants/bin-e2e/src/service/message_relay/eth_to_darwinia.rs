@@ -50,7 +50,7 @@ impl<T: EcdsaClient> Service for EthereumDarwiniaMessageRelay<T> {
             }
             Ok(())
         });
-        let config = bridge_config.clone();
+        let config = bridge_config;
         let _greet_confirmation = Self::try_task(
             "message-confirmation-darwinia-to-eth",
             async move {
@@ -107,7 +107,6 @@ async fn message_relay_client_builder<T: EcdsaClient>(
         Address::from_str(&config.darwinia_evm.lane_message_committer_address)?,
         Address::from_str(&config.darwinia_evm.fee_market_address)?,
         Address::from_str(&config.darwinia_evm.contract_address)?,
-        Address::from_str(&config.darwinia_evm.execution_layer_contract_address)?,
         U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
         &config.darwinia_evm.private_key,
         config.evm_index,

@@ -7,10 +7,10 @@ use std::{
 use bridge_e2e_traits::client::EthTruthLayerLightClient;
 use client_beacon::{client::BeaconApiClient, types::FinalityUpdate};
 use client_contracts::beacon_light_client_types::FinalizedHeaderUpdate;
-use support_etherscan::wait_for_transaction_confirmation;
+use support_etherscan::wait_for_transaction_confirmation_with_timeout;
 use web3::{
     contract::Options,
-    types::{Bytes, H256, U256},
+    types::{Bytes, H256},
 };
 
 use crate::error::{RelayError, RelayResult};
@@ -103,7 +103,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
 
     pub async fn relay_latest(&mut self, state: HeaderRelayState) -> RelayResult<()> {
         let finality_update: FinalityUpdate = self.beacon_api_client.get_finality_update().await?;
-        let update_finality_slot = finality_update.finalized_header.slot;
+        let update_finality_slot = finality_update.finalized_header.beacon.slot;
         let update_finality_period = update_finality_slot.div(32).div(256);
 
         tracing::info!(
@@ -118,20 +118,19 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
 
         let (signature_slot, _) = self
             .beacon_api_client
-            .find_valid_header_since(state.current_slot, finality_update.attested_header.slot + 1)
+            .find_valid_header_since(
+                state.current_slot,
+                finality_update.attested_header.beacon.slot + 1,
+            )
             .await?;
         let sync_change = self
             .beacon_api_client
             .get_sync_committee_period_update(update_finality_period - 1, 1)
             .await?;
         if sync_change.is_empty() {
-            return Err(RelayError::Custom("Failed to get sync committee update".into()).into());
+            return Err(RelayError::Custom("Failed to get sync committee update".into()));
         }
-        let fork_version = self
-            .beacon_api_client
-            .get_fork_version(signature_slot)
-            .await?;
-
+        let fork_version = self.get_fork_version(signature_slot).await?;
         let finalized_header_update = FinalizedHeaderUpdate {
             attested_header: finality_update.attested_header.to_contract_type()?,
             signature_sync_committee: sync_change[0].next_sync_committee.to_contract_type()?,
@@ -143,7 +142,7 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                 .collect::<Result<Vec<H256>, _>>()
                 .map_err(|e| RelayError::Custom(format!("{}", e)))?,
             sync_aggregate: finality_update.sync_aggregate.to_contract_type()?,
-            fork_version: Bytes(fork_version.current_version.as_ref().to_vec()),
+            fork_version: Bytes(fork_version.as_ref().to_vec()),
             signature_slot,
         };
         self.import_finalized_header_with_confirmation(finalized_header_update)
@@ -159,16 +158,12 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             .await?;
 
         if let [last_finality, target_finality] = sync_change.as_slice() {
-            let attested_slot: u64 = target_finality.attested_header.slot;
+            let attested_slot: u64 = target_finality.attested_header.beacon.slot;
             let (signature_slot, _) = self
                 .beacon_api_client
                 .find_valid_header_since(state.current_slot, attested_slot + 1)
                 .await?;
-            let fork_version = self
-                .beacon_api_client
-                // .get_fork_version(&target_finality.signature_slot)
-                .get_fork_version("head")
-                .await?;
+            let fork_version = self.get_fork_version(signature_slot).await?;
             let finalized_header_update = FinalizedHeaderUpdate {
                 attested_header: target_finality.attested_header.to_contract_type()?,
                 signature_sync_committee: last_finality.next_sync_committee.to_contract_type()?,
@@ -180,14 +175,31 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                     .collect::<Result<Vec<H256>, _>>()
                     .map_err(|e| RelayError::Custom(format!("{}", e)))?,
                 sync_aggregate: target_finality.sync_aggregate.to_contract_type()?,
-                fork_version: Bytes(fork_version.current_version.as_ref().to_vec()),
+                fork_version: Bytes(fork_version.as_ref().to_vec()),
                 signature_slot,
             };
             self.import_finalized_header_with_confirmation(finalized_header_update)
                 .await?;
             return Ok(());
         }
-        Err(RelayError::Custom("Failed to get sync committee update".into()).into())
+        Err(RelayError::Custom("Failed to get sync committee update".into()))
+    }
+
+    async fn get_fork_version(
+        &mut self,
+        signature_slot: u64,
+    ) -> Result<web3::ethabi::ethereum_types::H32, RelayError> {
+        let signature_epoch = signature_slot.div(32);
+        let fork_version_data = self.beacon_api_client.get_fork_version("head").await?;
+        let fork_version = if signature_epoch
+            >= u64::from_str(&fork_version_data.epoch)
+                .map_err(|_| RelayError::Custom("Failed to decode fork_version.epoch".into()))?
+        {
+            fork_version_data.current_version
+        } else {
+            fork_version_data.previous_version
+        };
+        Ok(fork_version)
     }
 
     async fn import_finalized_header_with_confirmation(
@@ -201,12 +213,8 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             .beacon_light_client()
             .import_finalized_header(
                 finalized_header_update,
-                &self.eth_light_client.private_key(),
+                self.eth_light_client.private_key(),
                 Options {
-                    gas: Some(
-                        U256::from_dec_str("5000000")
-                            .map_err(|e| RelayError::Custom(format!("{}", e)))?,
-                    ),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },
@@ -217,11 +225,12 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             "[Header] Sending tx: {:?}",
             &tx
         );
-        wait_for_transaction_confirmation(
+        wait_for_transaction_confirmation_with_timeout(
             tx,
             self.eth_light_client.get_web3().transport(),
             Duration::from_secs(5),
-            3,
+            1,
+            75,
         )
         .await?;
         self.last_relay_time = SystemTime::now()

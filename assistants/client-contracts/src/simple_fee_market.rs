@@ -3,7 +3,8 @@ use crate::{
 };
 use secp256k1::SecretKey;
 use web3::{
-    contract::{Contract, Options},
+    contract::{tokens::Tokenize, Contract, Options},
+    signing::Key,
     transports::Http,
     types::{Address, H256, U256},
     Web3,
@@ -33,14 +34,27 @@ impl SimpleFeeMarket {
         fee: U256,
         private_key: &SecretKey,
     ) -> BridgeContractResult<H256> {
+        let call = "enroll";
+        let params = (prev, fee).into_tokens();
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                params.as_slice(),
+                private_key.address(),
+                Options {
+                    value: Some(fee),
+                    ..Default::default()
+                },
+            )
+            .await?;
         let tx = self
             .contract
             .signed_call(
-                "enroll",
-                (prev, fee),
+                call,
+                params.as_slice(),
                 Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
+                    gas: Some(gas),
                     value: Some(fee),
                     ..Default::default()
                 },
@@ -50,16 +64,36 @@ impl SimpleFeeMarket {
         Ok(tx)
     }
 
+    pub async fn get_relayer(&self, prev: Address) -> BridgeContractResult<Address> {
+        Ok(self
+            .contract
+            .query("relayers", (prev,), None, Options::default(), None)
+            .await?)
+    }
+
     #[allow(dead_code)]
     pub async fn deposit(&self, fee: U256, private_key: &SecretKey) -> BridgeContractResult<H256> {
+        let call = "deposit";
+        let gas = self
+            .contract
+            .estimate_gas(
+                call,
+                (),
+                private_key.address(),
+                Options {
+                    value: Some(fee),
+                    ..Default::default()
+                },
+            )
+            .await?;
+
         let tx = self
             .contract
             .signed_call(
-                "deposit",
+                call,
                 (),
                 Options {
-                    gas: Some(U256::from(10000000)),
-                    gas_price: Some(U256::from(1300000000)),
+                    gas: Some(gas),
                     value: Some(fee),
                     ..Default::default()
                 },
@@ -224,6 +258,7 @@ mod tests {
         println!("{:?}", r);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_order() {
         let (_, fee_market) = test_fee_market();
@@ -234,6 +269,7 @@ mod tests {
         println!("{:?}", order);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_relay_time() {
         let (client, fee_market) = test_fee_market();
@@ -244,6 +280,7 @@ mod tests {
         dbg!(r);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_assigned() {
         let (client, fee_market) = test_fee_market();
@@ -266,6 +303,7 @@ mod tests {
         }
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_top_relayer() {
         let (_, fee_market) = test_fee_market();

@@ -8,7 +8,7 @@ use crate::{
 };
 use reqwest::{header::CONTENT_TYPE, RequestBuilder, Response};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use types::{BeaconBlockMerge, MainnetEthSpec};
+use types::{BeaconBlock, MainnetEthSpec};
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum ApiSupplier {
@@ -91,14 +91,7 @@ impl BeaconApiClient {
         &self,
         current_slot: u64,
         mut slot: u64,
-    ) -> BeaconApiResult<
-        Option<(
-            u64,
-            u64,
-            GetHeaderResponse,
-            BeaconBlockMerge<MainnetEthSpec>,
-        )>,
-    > {
+    ) -> BeaconApiResult<Option<(u64, u64, GetHeaderResponse, BeaconBlock<MainnetEthSpec>)>> {
         loop {
             if slot > current_slot {
                 return Ok(None);
@@ -110,7 +103,14 @@ impl BeaconApiClient {
                         .await?;
 
                     let sync_block = self.get_beacon_block(sync_slot).await?;
-                    match Self::is_valid_sync_aggregate_block(&sync_block)? {
+                    match Self::is_valid_sync_aggregate_block(
+                        sync_block
+                            .body()
+                            .sync_aggregate()
+                            .unwrap()
+                            .sync_committee_bits
+                            .as_slice(),
+                    )? {
                         true => return Ok(Some((attest_slot, sync_slot, header, sync_block))),
                         false => {
                             slot += 1;
@@ -126,10 +126,7 @@ impl BeaconApiClient {
         }
     }
 
-    fn is_valid_sync_aggregate_block(
-        block: &BeaconBlockMerge<MainnetEthSpec>,
-    ) -> BeaconApiResult<bool> {
-        let sync_committee_bits = &block.body.sync_aggregate.sync_committee_bits.as_slice();
+    fn is_valid_sync_aggregate_block(sync_committee_bits: &[u8]) -> BeaconApiResult<bool> {
         Ok(hamming::weight(sync_committee_bits) * 3 > 512 * 2)
     }
 
@@ -164,13 +161,13 @@ impl BeaconApiClient {
                 }
             };
         }
-        Err(BeaconApiError::Custom("Not found valid snapshot".into()).into())
+        Err(BeaconApiError::Custom("Not found valid snapshot".into()))
     }
 
     pub async fn get_beacon_block(
         &self,
         id: impl ToString,
-    ) -> BeaconApiResult<BeaconBlockMerge<MainnetEthSpec>> {
+    ) -> BeaconApiResult<BeaconBlock<MainnetEthSpec>> {
         let url = format!(
             "{}/eth/v2/beacon/blocks/{}",
             self.api_base_url,
@@ -237,7 +234,7 @@ impl BeaconApiClient {
         }
 
         let data = response.bytes().await?;
-        Ok(Proof::try_from(data)?)
+        Proof::try_from(data)
     }
 
     pub async fn get_fork_version(&self, id: impl ToString) -> BeaconApiResult<ForkVersion> {
@@ -339,40 +336,11 @@ mod tests {
     #[tokio::test]
     async fn test_get_beacon_block() {
         let client = test_client();
-        let block_body = client.get_beacon_block(100).await.unwrap();
+        let block_body = client.get_beacon_block(5202400).await.unwrap();
         println!(
             "Block body: {:?}",
-            block_body.body.execution_payload.block_number()
+            block_body.body().execution_payload().unwrap().block_hash()
         );
-    }
-
-    #[tokio::test]
-    async fn test_get_beacon_block_r() {
-        let client = test_client();
-        let block_body = client.get_beacon_block("head").await.unwrap();
-        let h0 = block_body.body.randao_reveal.tree_hash_root();
-        dbg!(h0);
-        let h0 = block_body.body.eth1_data.tree_hash_root();
-        dbg!(h0);
-        let h0 = block_body.body.graffiti.tree_hash_root();
-        dbg!(h0);
-        let h0 = block_body.body.proposer_slashings.tree_hash_root();
-        dbg!(h0);
-        let h0 = block_body.body.attester_slashings.tree_hash_root();
-        dbg!(h0);
-        let h0 = block_body.body.attestations.tree_hash_root();
-        dbg!(h0);
-        let h0 = block_body.body.deposits.tree_hash_root();
-        dbg!(h0);
-        let h0 = block_body.body.voluntary_exits.tree_hash_root();
-        dbg!(h0);
-        let h0 = block_body
-            .body
-            .execution_payload
-            .execution_payload
-            .logs_bloom
-            .tree_hash_root();
-        dbg!(h0);
     }
 
     #[ignore]

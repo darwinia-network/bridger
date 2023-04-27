@@ -56,7 +56,7 @@ impl EtherscanClient {
             "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={api_key}",
             api_key = self.api_key,
         );
-        dbg!(&url);
+        tracing::trace!("get_gas_oracle:{:?}", &url);
         let response: ApiResult<Value> = self.client.get(url).send().await?.json().await?;
         if response.status == "1" {
             Ok(from_value(response.result)?)
@@ -72,24 +72,40 @@ impl EtherscanClient {
 async fn transaction_receipt_block_number_check<T: Transport>(
     eth: &Eth<T>,
     hash: H256,
+    since: u64,
+    timeout: u64,
 ) -> web3::error::Result<Option<U64>> {
     let receipt = eth.transaction_receipt(hash).await?;
-    Ok(receipt.and_then(|receipt| receipt.block_number))
+    let current_block_number = eth.block_number().await?;
+    tracing::trace!(
+        target: "support-etherscan",
+        "hash:{:?}, current:{:?}, timeout:{:?}, since:{:?}",
+        hash, current_block_number.as_u64(), timeout, since
+    );
+    if current_block_number.as_u64() < timeout + since {
+        Ok(receipt.and_then(|receipt| receipt.block_number))
+    } else {
+        tracing::warn!(target: "support-etherscan", "Transaction({:?}) confirmation timeout.", hash);
+        Ok(Some(since.into()))
+    }
 }
 
 // Given a transaction hash, wait for confirmations.
-pub async fn wait_for_transaction_confirmation<T: Transport>(
+pub async fn wait_for_transaction_confirmation_with_timeout<T: Transport>(
     hash: H256,
     transport: T,
     poll_interval: Duration,
     confirmations: usize,
+    timeout: u64,
 ) -> web3::error::Result<()> {
     if confirmations == 0 {
         return Ok(());
     }
 
     let eth = Eth::new(transport.clone());
-    let confirmation_check = || transaction_receipt_block_number_check(&eth, hash);
+    let current = eth.block_number().await?;
+    let confirmation_check =
+        || transaction_receipt_block_number_check(&eth, hash, current.as_u64(), timeout);
     let eth_filter = EthFilter::new(transport.clone());
     let eth = eth.clone();
     wait_for_confirmations(

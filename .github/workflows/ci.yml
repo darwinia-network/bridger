@@ -39,22 +39,22 @@ jobs:
     strategy:
       matrix:
         package:
-          #- assistants/bin-e2e
+          - assistants/bin-e2e
           - assistants/bin-s2s
-          #- assistants/client-beacon
-          #- assistants/client-contracts
+          - assistants/client-beacon
+          - assistants/client-contracts
           - assistants/client-crab
           - assistants/client-darwinia
           - assistants/client-kusama
-          #- assistants/client-pangoro
+          - assistants/client-pangoro
           - assistants/client-polkadot
           - assistants/ecdsa-pair
           - assistants/feemarket-s2s
-          #- assistants/relay-e2e
+          - assistants/relay-e2e
           - assistants/relay-s2s
           - assistants/subquery
           - assistants/thegraph
-          #- traits/bridge-e2e
+          - traits/bridge-e2e
           - traits/bridge-s2s
           - traits/client-common
           - traits/feemarket-s2s
@@ -90,9 +90,10 @@ jobs:
       matrix:
         bridge:
           - pangolin-pangoro
+          - pangolin-goerli
           - darwinia-crab
+          - darwinia-ethereum
 #          - pangoro-chapel
-#          - pangoro-goerli
     steps:
       - uses: actions/checkout@v2
 

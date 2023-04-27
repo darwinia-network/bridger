@@ -6,17 +6,17 @@ use web3::types::H160;
 
 use super::types::EcdsaSource;
 
-pub struct CollectedEnoughAuthoritiesChangeSignaturesRunner<T: EcdsaClient> {
-    source: EcdsaSource<T>,
+pub struct CollectedEnoughAuthoritiesChangeSignaturesRunner<'a, T: EcdsaClient> {
+    source: &'a EcdsaSource<T>,
 }
 
-impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
-    pub fn new(source: EcdsaSource<T>) -> Self {
+impl<'a, T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<'a, T> {
+    pub fn new(source: &'a EcdsaSource<T>) -> Self {
         Self { source }
     }
 }
 
-impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
+impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<'_, T> {
     pub async fn start(&self) -> RelayResult<Option<u32>> {
         let client_posa = &self.source.client_posa;
         let _client_darwinia_substrate = &self.source.client_darwinia_substrate;
@@ -127,13 +127,14 @@ impl<T: EcdsaClient> CollectedEnoughAuthoritiesChangeSignaturesRunner<T> {
         tracing::info!(
             target: "relay-e2e",
             "[Darwinia][ECDSA][collectedAuthorities] authorities change submitted: {}",
-            array_bytes::bytes2hex("0x", &hash.0),
+            array_bytes::bytes2hex("0x", hash.0),
         );
-        support_etherscan::wait_for_transaction_confirmation(
+        support_etherscan::wait_for_transaction_confirmation_with_timeout(
             hash,
             self.source.client_eth_web3.transport(),
             Duration::from_secs(5),
             3,
+            150,
         )
         .await?;
 

@@ -37,9 +37,9 @@ impl Display for EcdsaScanType {
 
 #[async_trait::async_trait]
 pub trait EcdsaScanner<T: EcdsaClient> {
-    async fn get_ecdsa_source(&self) -> RelayResult<EcdsaSource<T>>;
+    fn get_ecdsa_source(&mut self) -> &mut EcdsaSource<T>;
 
-    async fn start(&self, tracker: Tracker, scan_type: EcdsaScanType) {
+    async fn start(&mut self, tracker: Tracker, scan_type: EcdsaScanType) {
         while let Err(err) = self.run(tracker.clone(), scan_type).await {
             tracing::error!(
                 target: "relay-e2e",
@@ -48,10 +48,25 @@ pub trait EcdsaScanner<T: EcdsaClient> {
             );
             // Prevent too fast refresh errors
             tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+            while let Err(why) = self
+                .get_ecdsa_source()
+                .client_darwinia_substrate
+                .reconnect()
+                .await
+            {
+                tracing::error!(
+                    target: "relay-e2e",
+                    "[Darwinia][ECDSA] An error occurred while reconnecting {:?}, try later...",
+                    why
+                );
+
+                tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                continue;
+            }
         }
     }
 
-    async fn run(&self, tracker: Tracker, scan_type: EcdsaScanType) -> RelayResult<()> {
+    async fn run(&mut self, tracker: Tracker, scan_type: EcdsaScanType) -> RelayResult<()> {
         if !tracker
             .is_running()
             .map_err(|e| RelayError::Custom(format!("{e:?}")))?
@@ -59,7 +74,7 @@ pub trait EcdsaScanner<T: EcdsaClient> {
             return Ok(());
         }
 
-        let mut source = self.get_ecdsa_source().await?;
+        let mut source = self.get_ecdsa_source();
         loop {
             let from = tracker
                 .current()
@@ -75,23 +90,22 @@ pub trait EcdsaScanner<T: EcdsaClient> {
 
             let finished_block = match scan_type {
                 EcdsaScanType::CollectingMessage => {
-                    let runner = CollectingNewMessageRootSignaturesRunner::new(source.clone());
+                    let runner = CollectingNewMessageRootSignaturesRunner::new(source);
                     runner.start().await?
                 }
                 EcdsaScanType::CollectedMessage => {
                     let mut runner = CollectedEnoughNewMessageRootSignaturesRunner::new(
-                        source.clone(),
+                        source,
                         source.minimal_interval,
                     );
                     runner.start().await?
                 }
                 EcdsaScanType::CollectingAuthority => {
-                    let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source.clone());
+                    let runner = CollectingAuthoritiesChangeSignaturesRunner::new(source);
                     runner.start().await?
                 }
                 EcdsaScanType::CollectedAuthority => {
-                    let runner =
-                        CollectedEnoughAuthoritiesChangeSignaturesRunner::new(source.clone());
+                    let runner = CollectedEnoughAuthoritiesChangeSignaturesRunner::new(source);
                     runner.start().await?
                 }
             };
@@ -106,9 +120,8 @@ pub trait EcdsaScanner<T: EcdsaClient> {
     }
 }
 
-#[async_trait::async_trait]
 impl<T: EcdsaClient> EcdsaScanner<T> for EcdsaSource<T> {
-    async fn get_ecdsa_source(&self) -> RelayResult<EcdsaSource<T>> {
-        Ok(self.clone())
+    fn get_ecdsa_source(&mut self) -> &mut EcdsaSource<T> {
+        self
     }
 }

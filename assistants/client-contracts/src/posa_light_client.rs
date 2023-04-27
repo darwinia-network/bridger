@@ -191,6 +191,7 @@ mod tests {
         .unwrap()
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_query() {
         let lclient = test_client();
@@ -198,6 +199,7 @@ mod tests {
         dbg!(result);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_get_relayers() {
         let transport =
@@ -213,6 +215,7 @@ mod tests {
         dbg!(result);
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_nonce() {
         let client = test_client();

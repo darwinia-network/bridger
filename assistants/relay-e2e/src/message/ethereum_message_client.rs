@@ -40,6 +40,7 @@ pub struct EthMessageClient<T: RelayStrategy = SimpleFeeMarketRelayStrategy> {
     pub etherscan_client: Option<EtherscanClient>,
 }
 
+#[allow(clippy::too_many_arguments)]
 impl EthMessageClient {
     pub fn new_with_simple_fee_market(
         chain: &str,
@@ -142,10 +143,6 @@ impl<T: RelayStrategy> MessageClient for EthMessageClient<T> {
         })
     }
 
-    fn delivery_gas_unit(&self) -> E2EClientResult<U256> {
-        Ok(U256::from_dec_str("300000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
-    }
-
     async fn prepare_for_confirmation(
         &self,
         begin: u64,
@@ -164,7 +161,7 @@ impl<T: RelayStrategy> MessageClient for EthMessageClient<T> {
     }
 
     fn confirmation_gas_unit(&self) -> E2EClientResult<U256> {
-        Ok(U256::from_dec_str("2000000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
+        U256::from_dec_str("200000").map_err(|e| E2EClientError::Custom(format!("{}", e)))
     }
 
     async fn latest_light_client_block_number(&self) -> E2EClientResult<Option<u64>> {
@@ -199,12 +196,11 @@ impl<T: RelayStrategy> EthMessageClient<T> {
         );
 
         if (end - begin + 1) as usize != messages.len() {
-            return Err(E2EClientError::Custom("Build messages data failed".into()).into());
+            return Err(E2EClientError::Custom("Build messages data failed".into()));
         }
 
         let accepted_events = self.query_message_accepted_events(begin, end).await?;
         let messages: Vec<Message> = std::iter::zip(messages, accepted_events)
-            .into_iter()
             .map(|(message, event)| Message {
                 encoded_key: message.encoded_key,
                 payload: Payload {
@@ -239,31 +235,23 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             .get_storage_proof_with_retry(self.outbound.contract.address(), keys, block_number)
             .await?
             .ok_or_else(|| E2EClientError::Custom("Failed to get storage proof".into()))?;
-        let account_proof = Self::encode_proof(&storage_proof.account_proof);
-        let lane_id_proof = storage_proof
-            .storage_proof
-            .iter()
-            .find(|x| x.key == lane_id_storage_key)
-            .ok_or(E2EClientError::Custom("Lane id proof not found!".into()))?;
-        let lane_id_proof = Self::encode_proof(&lane_id_proof.proof);
-
+        let account_proof = storage_proof.account_proof;
         let lane_nonce_proof = storage_proof
             .storage_proof
             .iter()
             .find(|x| x.key == lane_nonce_storage_key)
-            .ok_or(E2EClientError::Custom("Lane nonce proof not found!".into()))?;
-        let lane_nonce_proof = Self::encode_proof(&lane_nonce_proof.proof);
+            .ok_or(E2EClientError::Custom("Lane nonce proof not found!".into()))?.proof.clone();
 
         let lane_messages_proof = storage_proof
             .storage_proof
             .iter()
             .filter(|x| x.key != lane_id_storage_key && x.key != lane_nonce_storage_key)
-            .map(|x| Self::encode_proof(&x.proof))
-            .collect::<Vec<Bytes>>();
+            .map(|x| x.proof.clone())
+            .collect::<Vec<Vec<Bytes>>>();
 
         Ok(MessagesProof {
             account_proof,
-            lane_id_proof,
+            // lane_id_proof,
             lane_nonce_proof,
             lane_messages_proof,
         })
@@ -293,12 +281,12 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             .storage_proof
             .iter()
             .filter(|x| x.key != lane_nonce_storage_key)
-            .map(|x| Self::encode_proof(&x.proof))
+            .map(|x| x.proof.clone())
             .collect();
 
         let proof = MessagesConfirmationProof {
-            account_proof: Self::encode_proof(&storage_proof.account_proof),
-            lane_nonce_proof: Self::encode_proof(&lane_nonce_proof.proof),
+            account_proof: storage_proof.account_proof.clone(),
+            lane_nonce_proof: lane_nonce_proof.proof.clone(),
             lane_relayers_proof,
         };
         Ok(Bytes(encode(&[proof
@@ -339,8 +327,7 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             Err(E2EClientError::Custom(format!(
                 "Failed to get message events from {:?} to {:?}",
                 begin, end
-            ))
-            .into())
+            )))
         }
     }
 
@@ -397,18 +384,6 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             [x] => Ok(Some(x.clone())),
             _ => Ok(None),
         }
-    }
-
-    fn encode_proof(proofs: &[Bytes]) -> Bytes {
-        Bytes::from(
-            &rlp::encode_list::<Vec<u8>, _>(
-                proofs
-                    .iter()
-                    .map(|x| x.0.clone())
-                    .collect::<Vec<Vec<u8>>>()
-                    .as_slice(),
-            )[..],
-        )
     }
 
     pub fn build_message_storage_keys(begin: u64, end: u64) -> Vec<U256> {

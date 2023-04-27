@@ -13,13 +13,12 @@ use client_contracts::{
 };
 use secp256k1::SecretKey;
 use thegraph::Thegraph;
-use types::ExecPayload;
 use web3::{
     contract::tokens::Tokenizable,
     ethabi::encode,
     signing::Key,
     transports::Http,
-    types::{Address, BlockId, BlockNumber, Bytes, U256},
+    types::{Address, BlockId, BlockNumber, Bytes, H256, U256},
     Web3,
 };
 
@@ -39,6 +38,7 @@ pub struct DarwiniaMessageClient<T: RelayStrategy = FeeMarketRelayStrategy> {
     pub eth_light_client: EthLightClient,
 }
 
+#[allow(clippy::too_many_arguments)]
 impl DarwiniaMessageClient {
     pub fn new_with_fee_market(
         chain: &str,
@@ -51,7 +51,6 @@ impl DarwiniaMessageClient {
         lane_message_committer_address: Address,
         fee_market_address: Address,
         light_client_address: Address,
-        execution_layer_address: Address,
         max_gas_price: U256,
         private_key: &str,
         indexer: Thegraph,
@@ -70,14 +69,11 @@ impl DarwiniaMessageClient {
         let lane_message_committer =
             LaneMessageCommitter::new(&client, lane_message_committer_address)?;
 
-        let eth_light_client = EthLightClient::new(
-            endpoint,
-            light_client_address,
-            execution_layer_address,
-            private_key,
-            max_gas_price,
-        )
-        .map_err(|e| E2EClientError::Custom(format!("Failed to build EthLightClient: {}", e)))?;
+        let eth_light_client =
+            EthLightClient::new(endpoint, light_client_address, private_key, max_gas_price)
+                .map_err(|e| {
+                    E2EClientError::Custom(format!("Failed to build EthLightClient: {}", e))
+                })?;
         let account = eth_light_client.private_key().address();
         let strategy = FeeMarketRelayStrategy::new(fee_market, account);
 
@@ -156,10 +152,6 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
         })
     }
 
-    fn delivery_gas_unit(&self) -> E2EClientResult<U256> {
-        Ok(U256::from_dec_str("2000000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
-    }
-
     async fn prepare_for_confirmation(
         &self,
         _begin: u64,
@@ -182,7 +174,7 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
     }
 
     fn confirmation_gas_unit(&self) -> E2EClientResult<U256> {
-        Ok(U256::from_dec_str("10000000").map_err(|e| E2EClientError::Custom(format!("{}", e)))?)
+        U256::from_dec_str("8000000").map_err(|e| E2EClientError::Custom(format!("{}", e)))
     }
 
     async fn latest_light_client_block_number(&self) -> E2EClientResult<Option<u64>> {
@@ -198,14 +190,19 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
             .map_err(|e| E2EClientError::Custom(format!("Beacon api error: {}", e)))?;
         let execution_state_root = self
             .eth_light_client
-            .execution_layer()
+            .beacon_light_client()
             .merkle_root(None)
             .await?;
-        let latest_state_root = block.body.execution_payload.execution_payload.state_root;
+        let execution_payload = block
+            .body()
+            .execution_payload()
+            .map_err(|_| E2EClientError::Custom("No execution payload".into()))?
+            .execution_payload_ref();
+        let latest_state_root = H256::from(execution_payload.state_root().0);
         if execution_state_root != latest_state_root {
             Ok(None)
         } else {
-            let block_number: u64 = block.body.execution_payload.block_number();
+            let block_number: u64 = execution_payload.block_number();
             Ok(Some(block_number))
         }
     }
@@ -249,12 +246,11 @@ pub async fn build_messages_data(
     );
 
     if (end - begin + 1) as usize != messages.len() {
-        return Err(E2EClientError::Custom("Build messages data failed".into()).into());
+        return Err(E2EClientError::Custom("Build messages data failed".into()));
     }
 
     let accepted_events = query_message_accepted_events_thegraph(indexer, begin, end).await?;
     let messages: Vec<Message> = std::iter::zip(messages, accepted_events)
-        .into_iter()
         .map(|(message, event)| Message {
             encoded_key: message.encoded_key,
             payload: Payload {
@@ -343,7 +339,6 @@ pub async fn query_message_accepted_events_thegraph(
         Err(E2EClientError::Custom(format!(
             "Failed to get message events from {:?} to {:?}",
             begin, end
-        ))
-        .into())
+        )))
     }
 }

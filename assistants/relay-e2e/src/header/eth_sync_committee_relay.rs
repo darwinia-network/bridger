@@ -7,7 +7,7 @@ use client_contracts::beacon_light_client_types::{
 };
 use web3::{
     contract::Options,
-    types::{Bytes, H256, U256},
+    types::{Bytes, H256},
 };
 
 use crate::error::{RelayError, RelayResult};
@@ -70,10 +70,6 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 sync_committee_update,
                 self.eth_light_client.private_key(),
                 Options {
-                    gas: Some(
-                        U256::from_dec_str("10000000")
-                            .map_err(|e| RelayError::Custom(format!("{}", e)))?,
-                    ),
                     gas_price: Some(gas_price),
                     ..Default::default()
                 },
@@ -85,11 +81,12 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             "[SyncCommittee] Sending tx: {:?}",
             &tx
         );
-        support_etherscan::wait_for_transaction_confirmation(
+        support_etherscan::wait_for_transaction_confirmation_with_timeout(
             tx,
             self.eth_light_client.get_web3().transport(),
             Duration::from_secs(5),
-            3,
+            1,
+            75,
         )
         .await?;
         Ok(())
@@ -105,7 +102,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             .await?;
 
         if sync_committee_update.len() != 2 {
-            return Err(RelayError::Custom("Failed to get sync committee update".into()).into());
+            return Err(RelayError::Custom("Failed to get sync committee update".into()));
         }
         let last_sync_committee_update = sync_committee_update.get(0).expect("Unreachable!");
         let current_sync_committee = last_sync_committee_update
@@ -126,11 +123,19 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
             .beacon_api_client
             .find_valid_header_since(
                 current_head.header.message.slot,
-                sync_committee_update.attested_header.slot + 1,
+                sync_committee_update.attested_header.beacon.slot + 1,
             )
             .await?;
-
-        let fork_version = self.beacon_api_client.get_fork_version("head").await?;
+        let signature_epoch = signature_slot.div(32);
+        let fork_version_data = self.beacon_api_client.get_fork_version("head").await?;
+        let fork_version = if signature_epoch
+            >= u64::from_str(&fork_version_data.epoch)
+                .map_err(|_| RelayError::Custom("Failed to decode fork_version.epoch".into()))?
+        {
+            fork_version_data.current_version
+        } else {
+            fork_version_data.previous_version
+        };
         let finalized_header_update = FinalizedHeaderUpdate {
             attested_header: sync_committee_update.attested_header.to_contract_type()?,
             signature_sync_committee: current_sync_committee,
@@ -142,7 +147,7 @@ impl<C: EthTruthLayerLightClient> SyncCommitteeRelayRunner<C> {
                 .collect::<Result<Vec<H256>, _>>()
                 .map_err(|_| RelayError::Custom("Failed to decode finality_branch".into()))?,
             sync_aggregate: sync_committee_update.sync_aggregate.to_contract_type()?,
-            fork_version: Bytes(fork_version.current_version.as_ref().to_vec()),
+            fork_version: Bytes(fork_version.as_ref().to_vec()),
             signature_slot,
         };
         Ok((

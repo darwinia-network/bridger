@@ -24,7 +24,7 @@ impl DarwiniaClientComponent {
         loop {
             thread::sleep(time::Duration::from_secs(wait_secs));
             return match OnlineClient::<DarwiniaSubxtConfig>::from_url(&endpoint).await {
-                Ok(client) => Ok(DarwiniaClient::new(client, account.clone())),
+                Ok(client) => Ok(DarwiniaClient::new(&endpoint, client, account.clone())),
                 Err(err) => {
                     if attempts < MAX_ATTEMPTS {
                         attempts += 1;

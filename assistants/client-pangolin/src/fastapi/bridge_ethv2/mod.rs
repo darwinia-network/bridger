@@ -1,16 +1,14 @@
+use crate::client::PangolinClient;
+use crate::config::PangolinSubxtConfig;
+use crate::types::runtime_types;
 use bridge_e2e_traits::{
     client::EcdsaClient,
     error::{E2EClientError, E2EClientResult},
 };
 
-use crate::client::DarwiniaClient;
-use crate::config::DarwiniaSubxtConfig;
-use crate::error::ClientError;
-use crate::types::runtime_types;
-
 #[async_trait::async_trait]
-impl EcdsaClient for DarwiniaClient {
-    type SubxtConfig = DarwiniaSubxtConfig;
+impl EcdsaClient for PangolinClient {
+    type SubxtConfig = PangolinSubxtConfig;
 
     async fn reconnect(&mut self) -> E2EClientResult<()> {
         self.reconnect_client()
@@ -30,12 +28,16 @@ impl EcdsaClient for DarwiniaClient {
             .rpc()
             .block_hash(block_number.map(Into::into))
             .await?;
+        tracing::trace!(target: "client-pangolin", "[is_ecdsa_authority] Block hash: {:?}", hash);
         let authorities = crate::subxt_runtime::api::storage()
             .ecdsa_authority()
             .authorities();
         let authorities = self.subxt().storage().fetch(&authorities, hash).await?;
+        tracing::trace!(target: "client-pangolin", "[is_ecdsa_authority] Authorities fetched");
         match authorities {
-            None => Ok(false),
+            None => {
+                Ok(false)
+            },
             Some(authorities) => {
                 let authorities = authorities.0;
                 let iam = authorities.iter().any(|item| {
@@ -50,9 +52,9 @@ impl EcdsaClient for DarwiniaClient {
     async fn submit_authorities_change_signature(
         &self,
         signatures: Vec<u8>,
-    ) -> E2EClientResult<<DarwiniaSubxtConfig as subxt::Config>::Hash> {
+    ) -> E2EClientResult<<PangolinSubxtConfig as subxt::Config>::Hash> {
         let fixed_signatures: [u8; 65] = signatures.try_into().map_err(|e: Vec<u8>| {
-            ClientError::Custom(format!(
+            E2EClientError::Custom(format!(
                 "Wrong signatures data: {}",
                 array_bytes::bytes2hex("0x", e.as_slice())
             ))
@@ -67,9 +69,8 @@ impl EcdsaClient for DarwiniaClient {
             .tx()
             .sign_and_submit_then_watch(&tx, self.account().signer(), Default::default())
             .await?;
-
         let events = track.wait_for_finalized_success().await.map_err(|e| {
-            ClientError::Custom(format!("send transaction failed darwinia: {:?}", e))
+            E2EClientError::Custom(format!("send transaction failed pangolin: {:?}", e))
         })?;
         Ok(events.extrinsic_hash())
     }
@@ -77,9 +78,9 @@ impl EcdsaClient for DarwiniaClient {
     async fn submit_new_message_root_signature(
         &self,
         signatures: Vec<u8>,
-    ) -> E2EClientResult<<DarwiniaSubxtConfig as subxt::Config>::Hash> {
+    ) -> E2EClientResult<<PangolinSubxtConfig as subxt::Config>::Hash> {
         let fixed_signatures: [u8; 65] = signatures.try_into().map_err(|e: Vec<u8>| {
-            ClientError::Custom(format!(
+            E2EClientError::Custom(format!(
                 "Wrong signatures data: {}",
                 array_bytes::bytes2hex("0x", e.as_slice())
             ))
@@ -96,9 +97,9 @@ impl EcdsaClient for DarwiniaClient {
             .sign_and_submit_then_watch(&tx, self.account().signer(), Default::default())
             .await?;
         let hash = track.extrinsic_hash();
-        tracing::trace!(target: "client-darwinia", "[submit_new_message_root_signature] tx hash: {:?}", hash);
+        tracing::trace!(target: "client-pangolin", "[submit_new_message_root_signature] tx hash: {:?}", hash);
         let events = track.wait_for_finalized_success().await.map_err(|e| {
-            ClientError::Custom(format!("send transaction failed darwinia: {:?}", e))
+            E2EClientError::Custom(format!("send transaction failed pangolin: {:?}", e))
         })?;
         Ok(events.extrinsic_hash())
     }

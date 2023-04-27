@@ -40,7 +40,6 @@ impl<T: EcdsaClient> lifeline::Resource<BridgeBus> for BridgeConfig<T> {}
 pub struct GeneralConfig {
     pub enable_beacon_header_relay: bool,
     pub enable_sync_commit_relay: bool,
-    pub enable_execution_header_layer: bool,
     pub enable_ecdsa_relay: bool,
     pub enable_message_execution_to_evm: bool,
     pub enable_message_evm_to_execution: bool,
@@ -75,7 +74,6 @@ pub struct BeaconApiConfig {
 pub struct EVMChainConfig {
     pub endpoint: String,
     pub contract_address: String,
-    pub execution_layer_contract_address: String,
     #[serde(deserialize_with = "evm_secret_key_from_str")]
     pub private_key: String,
     pub inbound_address: String,

@@ -139,6 +139,7 @@ mod tests {
     #[allow(unused_imports)]
     use std::str::FromStr;
 
+    #[ignore]
     #[tokio::test]
     async fn test_query_commitment() {
         let transport = Http::new("https://pangoro-rpc.darwinia.network").unwrap();

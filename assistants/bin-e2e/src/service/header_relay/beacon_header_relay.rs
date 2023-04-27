@@ -57,7 +57,6 @@ impl<T: EcdsaClient> EthereumToDarwiniaHeaderRelayService<T> {
         let darwinia_client = EthLightClient::new(
             &config.darwinia_evm.endpoint,
             Address::from_str(&config.darwinia_evm.contract_address)?,
-            Address::from_str(&config.darwinia_evm.execution_layer_contract_address)?,
             &config.darwinia_evm.private_key,
             U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
         )?;

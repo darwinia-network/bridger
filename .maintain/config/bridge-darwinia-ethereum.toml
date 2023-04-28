@@ -15,42 +15,40 @@ max_message_num_per_relaying = 15
 header_relay_minimum_interval = 900
 
 [darwinia_evm]
-chain_message_committer_address = "0xea7d0fE22AF25d9655f7AdDd6a59E37e84B3AB5F"
-contract_address                = "0xD2A37C4523542F2dFD7Cb792D2aeAd5c61C1bAAE"
 endpoint                        = "https://rpc.darwinia.network"
-fee_market_address              = "0xcA927Df15afb7629b79dA4713a871190315c7409"
-inbound_address                 = "0xf1B8a9F8436800499DB8186f2da2fb3e78Ff7c2B"
-lane_message_committer_address  = "0x56746a8099a7e6D962802A23e01FeDdc1282cDAe"
-outbound_address                = "0xcA3749C8C3aF04278D596a3fBe461481B6aa1b01"
+chain_message_committer_address = "0x1829ee0c5E556D50cb4c11791777afd7fF00019a"
+contract_address                = "0x0b51a80A37dD1629FcE060BBec6D9fcDB7eFcCfd"
+fee_market_address              = "0x9bd2F907B33E25126CD4e4342a75dE8F8eff76Bf"
+inbound_address                 = "0x1cE84Cc75847374Ae41B4c1070d5B42A06BB42E7"
+lane_message_committer_address  = "0xb1a9585B0739F6ad91d8647699420d7284B71C10"
+outbound_address                = "0x7e10D91862E7477C0FedE95D291f7101AE1Aec4d"
 # private_key in format of 0x... or ...
 private_key = "..."
 # Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
-max_gas_price = 9000000000
+max_gas_price = 25000000000000 # 25000 Gwei
 
 [darwinia_substrate]
 endpoint = "wss://rpc.darwinia.network"
-# private_key in format of 0x... or BIP39 mnemonic code
+# private_key in format of 0x... or ..., 
+# this should equal to the private_key in darwinia_evm, if you are the member of ECDSA authority.
 private_key = "..."
 
 [beacon]
 # Beacon chain api endpoint and api supplier
 api_supplier = "Nimbus"
-endpoint     = "http://unstable.mainnet.beacon-api.nimbus.team"
-# Bridger also support Lodestar api
-# endpoint                  = "https://lodestar-mainnet-rpc.darwinia.network"
-# api_supplier              = "Lodestar"
+endpoint     = "https://lodestar-mainnet.chainsafe.io"
 
 [ethereum]
 # Execution layer api endpoint, register one at https://dashboard.alchemy.com/
 endpoint           = "..."
-fee_market_address = "0xCD97185B7d05f8ea91d241C8dfD51a2Cc9c0547a"
-inbound_address    = "0x4E210866d089856a8A0435965FefEe19640487E5"
-outbound_address   = "0x169F28bfbfFCddFdc772A94Cf020bbB4CAdc8E01"
+fee_market_address = "0xC71593F6Cb1642DD95bd1330f7c0a59d9f66Db97"
+inbound_address    = "0x9bd2F907B33E25126CD4e4342a75dE8F8eff76Bf"
+outbound_address   = "0x171A87e3969fC82c8d25A0866316FCc6378B5c10"
 # private_key in format of 0x... or ...
-posa_light_client_address = "0xf46349a32cA70C0B9fFbD19937Fb1623e7F3db19"
+posa_light_client_address = "0x2802E5fa6251B1D0Be2aE57cD1e17422B5B35839"
 private_key               = "..."
 # Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
-max_gas_price = 9000000000
+max_gas_price = 20000000000 # 20 Gwei
 # Bridger use etherscan gas oracle to get more appropriate gas price.
 # Register to get a free etherescan api key at https://docs.etherscan.io/api-endpoints/gas-tracker
 etherscan_api_key = "api_key..."

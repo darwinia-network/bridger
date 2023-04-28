@@ -1,11 +1,14 @@
 
 
 ## Upgrade Guide
-- [Upgrade guid for v0.7.1](https://github.com/darwinia-network/bridger/issues/547)
+- [Upgrade guide for release v0.8.0](https://github.com/darwinia-network/bridger/issues/581)
 
 ## Changed
 
--  bin-e2e refactor (#555)
+- Pangolin2<>Pangoro2 (#568)
+- Darwinia2<>Crab2 (#577)
+- Darwinia2<>Ethereum2 (#578)
+- Pangolin2<>Goerli (#578)
 
 ## Resources
 

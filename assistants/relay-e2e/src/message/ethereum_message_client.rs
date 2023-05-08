@@ -1,14 +1,14 @@
 use std::str::FromStr;
 
 use bridge_e2e_traits::{
-    client::{GasPriceOracle, MessageClient, Web3Client},
+    client::{GasPriceOracle, MessageClient, Web3Client, MessageEventsQuery},
     error::{E2EClientError, E2EClientResult},
     strategy::RelayStrategy,
 };
 use client_beacon::types::{MessagesConfirmationProof, MessagesProof};
 use client_contracts::{
     error::BridgeContractError,
-    inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
+    inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof, MessageDispatched},
     outbound_types::{MessageAccepted, ReceiveMessagesDeliveryProof},
     Inbound, Outbound, PosaLightClient, SimpleFeeMarket,
 };
@@ -169,11 +169,30 @@ impl<T: RelayStrategy> MessageClient for EthMessageClient<T> {
         // we need to minus 1 to get the relay block number.
         // The reason of this issue is that EVM on substrate is invoked after the substrate execution, So the
         // message root at block X, which is generated at substrate runtime, only includes the state of block X-1 at EVM.
-        Ok(Some(
-            self.darwinia_light_client.block_number().await?.as_u64() - 1,
-        ))
+        let block_number = self.darwinia_light_client.block_number().await?.as_u64();
+        if block_number > 0 {
+            Ok(Some(block_number - 1))
+        } else {
+            Ok(None)
+        }
     }
 }
+
+#[async_trait::async_trait]
+impl<T: RelayStrategy> MessageEventsQuery for EthMessageClient<T> {
+    async fn query_message_accepted(&self, nonce: u64) -> E2EClientResult<Option<MessageAccepted>> {
+        self.query_message_accepted(nonce).await
+    }
+
+    async fn query_message_dispatched(&self, since: BlockNumber) -> E2EClientResult<Vec<MessageDispatched>> {
+        todo!()
+    }
+
+    async fn query_all_message_dispatched(&self) -> E2EClientResult<Vec<MessageDispatched>> {
+        todo!()
+    }
+}
+
 
 impl<T: RelayStrategy> EthMessageClient<T> {
     pub async fn build_messages_data(

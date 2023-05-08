@@ -1,13 +1,15 @@
 use std::str::FromStr;
 
 use bridge_e2e_traits::{
-    client::{EthTruthLayerLightClient, GasPriceOracle, MessageClient, Web3Client},
+    client::{
+        EthTruthLayerLightClient, GasPriceOracle, MessageClient, MessageEventsQuery, Web3Client,
+    },
     error::{E2EClientError, E2EClientResult},
     strategy::RelayStrategy,
 };
 use client_beacon::client::{ApiSupplier, BeaconApiClient};
 use client_contracts::{
-    inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
+    inbound_types::{Message, MessageDispatched, OutboundLaneData, Payload, ReceiveMessagesProof},
     outbound_types::{MessageAccepted, ReceiveMessagesDeliveryProof},
     ChainMessageCommitter, FeeMarket, Inbound, LaneMessageCommitter, Outbound,
 };
@@ -178,33 +180,13 @@ impl<T: RelayStrategy> MessageClient for DarwiniaMessageClient<T> {
     }
 
     async fn latest_light_client_block_number(&self) -> E2EClientResult<Option<u64>> {
-        let header = self
-            .eth_light_client
-            .beacon_light_client()
-            .finalized_header()
-            .await?;
-        let block = self
-            .beacon_rpc_client
-            .get_beacon_block(header.slot)
-            .await
-            .map_err(|e| E2EClientError::Custom(format!("Beacon api error: {}", e)))?;
-        let execution_state_root = self
-            .eth_light_client
-            .beacon_light_client()
-            .merkle_root(None)
-            .await?;
-        let execution_payload = block
-            .body()
-            .execution_payload()
-            .map_err(|_| E2EClientError::Custom("No execution payload".into()))?
-            .execution_payload_ref();
-        let latest_state_root = H256::from(execution_payload.state_root().0);
-        if execution_state_root != latest_state_root {
-            Ok(None)
-        } else {
-            let block_number: u64 = execution_payload.block_number();
-            Ok(Some(block_number))
-        }
+        Ok(Some(
+            self.eth_light_client
+                .beacon_light_client()
+                .block_number()
+                .await?
+                .as_u64(),
+        ))
     }
 }
 
@@ -340,5 +322,23 @@ pub async fn query_message_accepted_events_thegraph(
             "Failed to get message events from {:?} to {:?}",
             begin, end
         )))
+    }
+}
+
+#[async_trait::async_trait]
+impl<T: RelayStrategy> MessageEventsQuery for DarwiniaMessageClient<T> {
+    async fn query_message_accepted(&self, nonce: u64) -> E2EClientResult<Option<MessageAccepted>> {
+        query_message_accepted_thegraph(&self.indexer, nonce).await
+    }
+
+    async fn query_message_dispatched(
+        &self,
+        since: BlockNumber,
+    ) -> E2EClientResult<Vec<MessageDispatched>> {
+        todo!()
+    }
+
+    async fn query_all_message_dispatched(&self) -> E2EClientResult<Vec<MessageDispatched>> {
+        todo!()
     }
 }

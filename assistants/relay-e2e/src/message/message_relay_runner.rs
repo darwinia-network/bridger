@@ -1,19 +1,21 @@
 use std::time::Duration;
 
-use bridge_e2e_traits::client::MessageClient;
+use bridge_e2e_traits::client::{MessageClient, MessageEventsQuery, OnDemandHeader};
 use client_contracts::{inbound_types::InboundLaneNonce, outbound_types::OutboundLaneNonce};
 use support_etherscan::wait_for_transaction_confirmation_with_timeout;
+use tokio::sync::broadcast::Sender;
 use web3::{
     contract::Options,
     types::{BlockId, BlockNumber, U256},
 };
 
-use crate::error::RelayResult;
+use crate::error::{RelayError, RelayResult};
 
 #[derive(Debug)]
-pub struct MessageRelayRunner<S0: MessageClient, S1: MessageClient> {
+pub struct MessageRelayRunner<S0: MessageClient, S1: MessageClient, O: OnDemandHeader> {
     pub state: ChannelState,
     pub max_message_num_per_relaying: u64,
+    pub relay_notifier: Option<Sender<O>>,
     pub source: S0,
     pub target: S1,
 }
@@ -34,10 +36,11 @@ pub struct ChannelState {
     target_block_at_source: Option<BlockNumber>,
 }
 
-impl<S0, S1> MessageRelayRunner<S0, S1>
+impl<S0, S1, O> MessageRelayRunner<S0, S1, O>
 where
-    S0: MessageClient,
+    S0: MessageClient + MessageEventsQuery,
     S1: MessageClient,
+    O: OnDemandHeader,
 {
     pub async fn update_channel_state(&mut self) -> RelayResult<()> {
         let target_inbound = self.target.inbound().inbound_lane_nonce(None).await?;
@@ -88,6 +91,13 @@ where
             return Ok(());
         }
 
+        let (begin, end) = (
+            self.state.source_outbound.latest_received_nonce + 1,
+            self.state.source_outbound.latest_generated_nonce,
+        );
+        self.delivery_notify_on_demand_header(self.state.target_inbound.last_delivered_nonce + 1)
+            .await?;
+
         match self.state.source_block_at_target {
             None => {
                 tracing::info!(
@@ -98,11 +108,6 @@ where
             }
             Some(num) => num,
         };
-
-        let (begin, end) = (
-            self.state.source_outbound.latest_received_nonce + 1,
-            self.state.source_outbound.latest_generated_nonce,
-        );
 
         if self.state.target_inbound.last_delivered_nonce
             >= self.state.source_outbound_relayed.latest_generated_nonce
@@ -224,7 +229,7 @@ where
             self.target.get_web3().transport(),
             Duration::from_secs(5),
             1,
-            150
+            150,
         )
         .await?;
 
@@ -318,10 +323,41 @@ where
             self.source.get_web3().transport(),
             Duration::from_secs(5),
             1,
-            150
+            150,
         )
         .await?;
 
+        Ok(())
+    }
+
+    async fn delivery_notify_on_demand_header(&mut self, nonce: u64) -> RelayResult<()> {
+        if let Some(s) = self.relay_notifier.as_ref() {
+            let event = self.source.query_message_accepted(nonce).await?;
+            if event.is_none() {
+                return Ok(());
+            }
+
+            let event = event.unwrap();
+            if s.len() > 0 {
+                tracing::info!(
+                    target: "relay-e2e",
+                    "[MessageTunnel][{}=>{}] Tunnel length: {:?}, required header: {:?}, ...",
+                    self.source.chain(),
+                    self.target.chain(),
+                    s.len(),
+                    event.block_number,
+                );
+                return RelayResult::Ok(());
+            }
+            s.send(event.block_number.into())
+                .map_err(|_| RelayError::Custom("Tunnel error".into()))?;
+            tracing::info!(
+                target: "relay-e2e",
+                "[MessageTunnel][{}=>{}] Sending header-required signal",
+                self.source.chain(),
+                self.target.chain(),
+            );
+        }
         Ok(())
     }
 }

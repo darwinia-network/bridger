@@ -4,7 +4,7 @@ use web3::{
     contract::{tokens::Tokenize, Contract, Options},
     signing::Key,
     transports::Http,
-    types::{Address, H256, BlockId},
+    types::{Address, H256, BlockId, U256},
     Web3,
 };
 
@@ -58,6 +58,13 @@ impl BeaconLightClient {
         Ok(self
             .contract
             .query("merkle_root", (), None, Options::default(), at_block)
+            .await?)
+    }
+
+    pub async fn block_number(&self) -> BridgeContractResult<U256> {
+        Ok(self
+            .contract
+            .query("block_number", (), None, Options::default(), None)
             .await?)
     }
 

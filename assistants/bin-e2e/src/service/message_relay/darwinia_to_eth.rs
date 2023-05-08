@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 use std::str::FromStr;
 
-use bridge_e2e_traits::client::EcdsaClient;
+use bridge_e2e_traits::client::{EcdsaClient, OnDemandHeader};
 use lifeline::dyn_bus::DynBus;
 use relay_e2e::message::darwinia_message_client::DarwiniaMessageClient;
 use relay_e2e::message::ethereum_message_client::EthMessageClient;
@@ -10,9 +10,10 @@ use web3::types::{Address, U256};
 
 use crate::bridge::BridgeBus;
 use crate::config::BridgeConfig;
+use crate::service::header_relay::types::{DarwiniaHeader, EthereumHeader};
 use lifeline::{Lifeline, Service, Task};
-use support_toolkit::timecount::TimeCount;
 use support_lifeline::service::BridgeService;
+use support_toolkit::timecount::TimeCount;
 
 #[derive(Debug)]
 pub struct DarwiniaEthereumMessageRelay<T: EcdsaClient> {
@@ -81,9 +82,13 @@ impl<T: EcdsaClient> Service for DarwiniaEthereumMessageRelay<T> {
     }
 }
 
-pub async fn message_relay_client_builder<T: EcdsaClient>(
+pub fn message_relay_client_builder<T, O>(
     config: BridgeConfig<T>,
-) -> color_eyre::Result<MessageRelayRunner<DarwiniaMessageClient, EthMessageClient>> {
+) -> color_eyre::Result<MessageRelayRunner<DarwiniaMessageClient, EthMessageClient, O>>
+where
+    T: EcdsaClient,
+    O: OnDemandHeader,
+{
     let eth_message_client = EthMessageClient::new_with_simple_fee_market(
         "Eth",
         &config.ethereum.endpoint,
@@ -116,11 +121,12 @@ pub async fn message_relay_client_builder<T: EcdsaClient>(
         max_message_num_per_relaying: config.general.max_message_num_per_relaying,
         source: darwinia_message_client,
         target: eth_message_client,
+        relay_notifier: None,
     })
 }
 
 async fn start_delivery<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::Result<()> {
-    let mut service = message_relay_client_builder(config).await?;
+    let mut service = message_relay_client_builder::<_, DarwiniaHeader>(config)?;
     loop {
         if let Err(error) = service.message_relay().await {
             tracing::error!(
@@ -135,7 +141,7 @@ async fn start_delivery<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::
 }
 
 async fn start_confirmation<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::Result<()> {
-    let mut service = message_relay_client_builder(config).await?;
+    let mut service = message_relay_client_builder::<_, EthereumHeader>(config)?;
     loop {
         if let Err(error) = service.message_confirm().await {
             tracing::error!(

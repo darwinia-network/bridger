@@ -1,18 +1,20 @@
 use std::marker::PhantomData;
 use std::str::FromStr;
 
-use bridge_e2e_traits::client::EcdsaClient;
+use bridge_e2e_traits::client::{EcdsaClient, OnDemandHeader};
 use lifeline::dyn_bus::DynBus;
 use relay_e2e::message::darwinia_message_client::DarwiniaMessageClient;
 use relay_e2e::message::ethereum_message_client::EthMessageClient;
 use relay_e2e::message::message_relay_runner::{ChannelState, MessageRelayRunner};
+use tokio::sync::broadcast::Sender;
 use web3::types::{Address, U256};
 
 use crate::bridge::BridgeBus;
 use crate::config::BridgeConfig;
-use lifeline::{Lifeline, Service, Task};
-use support_toolkit::timecount::TimeCount;
+use crate::service::header_relay::types::{DarwiniaHeader, EthereumHeader};
+use lifeline::{Bus, Lifeline, Service, Task};
 use support_lifeline::service::BridgeService;
+use support_toolkit::timecount::TimeCount;
 
 #[derive(Debug)]
 pub struct EthereumDarwiniaMessageRelay<T: EcdsaClient> {
@@ -30,9 +32,11 @@ impl<T: EcdsaClient> Service for EthereumDarwiniaMessageRelay<T> {
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let bridge_config: BridgeConfig<T> = bus.storage().clone_resource()?;
         let config = bridge_config.clone();
+        let _rx = bus.rx::<EthereumHeader>()?;
+        let tx = bus.tx::<EthereumHeader>()?;
         let _greet_delivery = Self::try_task("message-relay-eth-to-darwinia", async move {
             let mut timecount = TimeCount::new();
-            while let Err(error) = start_delivery(config.clone()).await {
+            while let Err(error) = start_delivery(config.clone(), tx.clone()).await {
                 tracing::error!(
                     target: "darwinia-eth",
                     "Failed to start eth-to-darwinia message relay service, restart after some seconds: {:?}",
@@ -51,6 +55,7 @@ impl<T: EcdsaClient> Service for EthereumDarwiniaMessageRelay<T> {
             Ok(())
         });
         let config = bridge_config;
+        // let tx = bus.tx::<EthereumHeader>()?;
         let _greet_confirmation = Self::try_task(
             "message-confirmation-darwinia-to-eth",
             async move {
@@ -82,9 +87,14 @@ impl<T: EcdsaClient> Service for EthereumDarwiniaMessageRelay<T> {
     }
 }
 
-async fn message_relay_client_builder<T: EcdsaClient>(
+async fn message_relay_client_builder<T, O>(
     config: BridgeConfig<T>,
-) -> color_eyre::Result<MessageRelayRunner<EthMessageClient, DarwiniaMessageClient>> {
+    channel_tx: Option<Sender<O>>,
+) -> color_eyre::Result<MessageRelayRunner<EthMessageClient, DarwiniaMessageClient, O>>
+where
+    T: EcdsaClient,
+    O: OnDemandHeader,
+{
     let eth_message_client = EthMessageClient::new_with_simple_fee_market(
         "Eth",
         &config.ethereum.endpoint,
@@ -117,11 +127,15 @@ async fn message_relay_client_builder<T: EcdsaClient>(
         max_message_num_per_relaying: config.general.max_message_num_per_relaying,
         source: eth_message_client,
         target: darwinia_message_client,
+        relay_notifier: channel_tx,
     })
 }
 
-async fn start_delivery<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::Result<()> {
-    let mut message_relay_service = message_relay_client_builder(config).await?;
+async fn start_delivery<T: EcdsaClient>(
+    config: BridgeConfig<T>,
+    channel_tx: Sender<EthereumHeader>,
+) -> color_eyre::Result<()> {
+    let mut message_relay_service = message_relay_client_builder(config, Some(channel_tx)).await?;
     loop {
         if let Err(error) = message_relay_service.message_relay().await {
             tracing::error!(
@@ -136,7 +150,8 @@ async fn start_delivery<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::
 }
 
 async fn start_confirmation<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::Result<()> {
-    let mut message_relay_service = message_relay_client_builder(config).await?;
+    let mut message_relay_service =
+        message_relay_client_builder::<_, DarwiniaHeader>(config, None).await?;
     loop {
         if let Err(error) = message_relay_service.message_confirm().await {
             tracing::error!(

@@ -120,9 +120,6 @@ pub trait MessageEventsQuery {
 
     // Query MessageDispatched events from inbound contract since a block number
     async fn query_message_dispatched(&self, since: BlockNumber) -> E2EClientResult<Vec<MessageDispatched>>;
-
-    // Query all MessageDispatched events at cold start
-    async fn query_all_message_dispatched(&self) -> E2EClientResult<Vec<MessageDispatched>>;
 }
 
 pub trait OnDemandHeader: Clone + From<u64> {

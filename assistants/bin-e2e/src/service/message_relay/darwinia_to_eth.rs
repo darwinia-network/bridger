@@ -6,12 +6,13 @@ use lifeline::dyn_bus::DynBus;
 use relay_e2e::message::darwinia_message_client::DarwiniaMessageClient;
 use relay_e2e::message::ethereum_message_client::EthMessageClient;
 use relay_e2e::message::message_relay_runner::{ChannelState, MessageRelayRunner};
+use tokio::sync::broadcast::Sender;
 use web3::types::{Address, U256};
 
 use crate::bridge::BridgeBus;
 use crate::config::BridgeConfig;
 use crate::service::header_relay::types::{DarwiniaHeader, EthereumHeader};
-use lifeline::{Lifeline, Service, Task};
+use lifeline::{Lifeline, Service, Task, Bus};
 use support_lifeline::service::BridgeService;
 use support_toolkit::timecount::TimeCount;
 
@@ -51,11 +52,13 @@ impl<T: EcdsaClient> Service for DarwiniaEthereumMessageRelay<T> {
             }
             Ok(())
         });
+        let _rx = bus.rx::<EthereumHeader>()?;
+        let tx = bus.tx::<EthereumHeader>()?;
         let _greet_confirmation = Self::try_task(
             "message-confirmation-darwinia-to-eth",
             async move {
                 let mut timecount = TimeCount::new();
-                while let Err(error) = start_confirmation(bridge_config.clone()).await {
+                while let Err(error) = start_confirmation(bridge_config.clone(), tx.clone()).await {
                     tracing::error!(
                         target: "darwinia-eth",
                         "Failed to start darwinia-to-eth message confirmation service, restart after some seconds: {:?}",
@@ -82,12 +85,15 @@ impl<T: EcdsaClient> Service for DarwiniaEthereumMessageRelay<T> {
     }
 }
 
-pub fn message_relay_client_builder<T, O>(
+pub fn message_relay_client_builder<T, O1, O2>(
     config: BridgeConfig<T>,
-) -> color_eyre::Result<MessageRelayRunner<DarwiniaMessageClient, EthMessageClient, O>>
+    delivery_channel_tx: Option<Sender<O1>>,
+    confirm_channel_tx: Option<Sender<O2>>,
+) -> color_eyre::Result<MessageRelayRunner<DarwiniaMessageClient, EthMessageClient, O1, O2>>
 where
     T: EcdsaClient,
-    O: OnDemandHeader,
+    O1: OnDemandHeader,
+    O2: OnDemandHeader,
 {
     let eth_message_client = EthMessageClient::new_with_simple_fee_market(
         "Eth",
@@ -121,12 +127,14 @@ where
         max_message_num_per_relaying: config.general.max_message_num_per_relaying,
         source: darwinia_message_client,
         target: eth_message_client,
-        relay_notifier: None,
+        relay_notifier: delivery_channel_tx,
+        confirm_notifier: confirm_channel_tx,
     })
 }
 
 async fn start_delivery<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::Result<()> {
-    let mut service = message_relay_client_builder::<_, DarwiniaHeader>(config)?;
+    let mut service =
+        message_relay_client_builder::<_, DarwiniaHeader, EthereumHeader>(config, None, None)?;
     loop {
         if let Err(error) = service.message_relay().await {
             tracing::error!(
@@ -140,8 +148,15 @@ async fn start_delivery<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::
     }
 }
 
-async fn start_confirmation<T: EcdsaClient>(config: BridgeConfig<T>) -> color_eyre::Result<()> {
-    let mut service = message_relay_client_builder::<_, EthereumHeader>(config)?;
+async fn start_confirmation<T: EcdsaClient>(
+    config: BridgeConfig<T>,
+    confirm_channel_tx: Sender<EthereumHeader>,
+) -> color_eyre::Result<()> {
+    let mut service = message_relay_client_builder::<_, DarwiniaHeader, EthereumHeader>(
+        config,
+        None,
+        Some(confirm_channel_tx),
+    )?;
     loop {
         if let Err(error) = service.message_confirm().await {
             tracing::error!(

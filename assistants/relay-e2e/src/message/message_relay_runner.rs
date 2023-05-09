@@ -12,10 +12,17 @@ use web3::{
 use crate::error::{RelayError, RelayResult};
 
 #[derive(Debug)]
-pub struct MessageRelayRunner<S0: MessageClient, S1: MessageClient, O: OnDemandHeader> {
+pub struct MessageRelayRunner<S0, S1, O1, O2>
+where
+    S0: MessageClient + MessageEventsQuery,
+    S1: MessageClient + MessageEventsQuery,
+    O1: OnDemandHeader,
+    O2: OnDemandHeader,
+{
     pub state: ChannelState,
     pub max_message_num_per_relaying: u64,
-    pub relay_notifier: Option<Sender<O>>,
+    pub relay_notifier: Option<Sender<O1>>,
+    pub confirm_notifier: Option<Sender<O2>>,
     pub source: S0,
     pub target: S1,
 }
@@ -36,11 +43,12 @@ pub struct ChannelState {
     target_block_at_source: Option<BlockNumber>,
 }
 
-impl<S0, S1, O> MessageRelayRunner<S0, S1, O>
+impl<S0, S1, O1, O2> MessageRelayRunner<S0, S1, O1, O2>
 where
     S0: MessageClient + MessageEventsQuery,
-    S1: MessageClient,
-    O: OnDemandHeader,
+    S1: MessageClient + MessageEventsQuery,
+    O1: OnDemandHeader,
+    O2: OnDemandHeader,
 {
     pub async fn update_channel_state(&mut self) -> RelayResult<()> {
         let target_inbound = self.target.inbound().inbound_lane_nonce(None).await?;
@@ -256,20 +264,28 @@ where
             self.state.target_inbound_relayed.relayer_range_front,
             self.state.target_inbound_relayed.relayer_range_back,
         );
+
         if self.state.source_outbound.latest_received_nonce
             == self.state.target_inbound_relayed.last_delivered_nonce
         {
-            tracing::info!(
-                target: "relay-e2e",
-                "[MessageConfirmation][{}=>{}] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
-                self.source.chain(),
-                self.target.chain(),
-                self.state.source_outbound.latest_received_nonce,
-                self.state.target_inbound_relayed.last_delivered_nonce + 1,
-                self.state.source_outbound.latest_generated_nonce
-            );
+            if self.state.source_outbound.latest_received_nonce
+                < self.state.target_inbound.last_delivered_nonce
+            {
+                self.confirm_notify_on_demand_header().await?;
+            } else {
+                tracing::info!(
+                    target: "relay-e2e",
+                    "[MessageConfirmation][{}=>{}] Nonce {:?} was confirmed, wait for delivery from {:?} to {:?}. ",
+                    self.source.chain(),
+                    self.target.chain(),
+                    self.state.source_outbound.latest_received_nonce,
+                    self.state.target_inbound_relayed.last_delivered_nonce + 1,
+                    self.state.source_outbound.latest_generated_nonce
+                );
+            }
             return Ok(());
         }
+
         if self.state.target_block_at_source.is_none() {
             tracing::info!(
                 target: "relay-e2e",
@@ -330,6 +346,47 @@ where
         Ok(())
     }
 
+    async fn confirm_notify_on_demand_header(&mut self) -> RelayResult<()> {
+        if let Some(s) = self.confirm_notifier.as_ref() {
+            let mut block_number = self
+                .state
+                .target_block_at_source
+                .unwrap_or(BlockNumber::Earliest);
+
+            // Latest confirmed message is at block_number, so we need to search events after block_number
+            if let BlockNumber::Number(n) = block_number {
+                block_number = BlockNumber::Number(n + 1);
+            }
+            let events = self.target.query_message_dispatched(block_number).await?;
+            if events.is_empty() {
+                return Ok(());
+            }
+            let event = events.first().expect("Unreachable!");
+            if s.len() > 0 {
+                tracing::trace!(
+                    target: "relay-e2e",
+                    "[MessageConfirmation][{}=>{}] Tunnel length: {:?}, required header: {:?}",
+                    self.source.chain(),
+                    self.target.chain(),
+                    s.len(),
+                    event.block_number,
+                );
+                return Ok(());
+            }
+
+            s.send(event.block_number.into())
+                .map_err(|_| RelayError::Custom("Tunnel error".into()))?;
+            tracing::info!(
+                target: "relay-e2e",
+                "[MessageConfirmation][{}=>{}] Signal: required header({:?})",
+                self.source.chain(),
+                self.target.chain(),
+                event.block_number,
+            );
+        }
+        Ok(())
+    }
+
     async fn delivery_notify_on_demand_header(&mut self, nonce: u64) -> RelayResult<()> {
         if let Some(s) = self.relay_notifier.as_ref() {
             let event = self.source.query_message_accepted(nonce).await?;
@@ -339,23 +396,24 @@ where
 
             let event = event.unwrap();
             if s.len() > 0 {
-                tracing::info!(
+                tracing::trace!(
                     target: "relay-e2e",
-                    "[MessageTunnel][{}=>{}] Tunnel length: {:?}, required header: {:?}, ...",
+                    "[MessageDelivery][{}=>{}] Tunnel length: {:?}, required header: {:?}",
                     self.source.chain(),
                     self.target.chain(),
                     s.len(),
                     event.block_number,
                 );
-                return RelayResult::Ok(());
+                return Ok(());
             }
             s.send(event.block_number.into())
                 .map_err(|_| RelayError::Custom("Tunnel error".into()))?;
             tracing::info!(
                 target: "relay-e2e",
-                "[MessageTunnel][{}=>{}] Sending header-required signal",
+                "[MessageDelivery][{}=>{}] Signal: required header({:?})",
                 self.source.chain(),
                 self.target.chain(),
+                event.block_number,
             );
         }
         Ok(())

@@ -1,14 +1,14 @@
 use std::str::FromStr;
 
 use bridge_e2e_traits::{
-    client::{GasPriceOracle, MessageClient, Web3Client, MessageEventsQuery},
+    client::{GasPriceOracle, MessageClient, MessageEventsQuery, Web3Client},
     error::{E2EClientError, E2EClientResult},
     strategy::RelayStrategy,
 };
 use client_beacon::types::{MessagesConfirmationProof, MessagesProof};
 use client_contracts::{
     error::BridgeContractError,
-    inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof, MessageDispatched},
+    inbound_types::{Message, MessageDispatched, OutboundLaneData, Payload, ReceiveMessagesProof},
     outbound_types::{MessageAccepted, ReceiveMessagesDeliveryProof},
     Inbound, Outbound, PosaLightClient, SimpleFeeMarket,
 };
@@ -184,15 +184,13 @@ impl<T: RelayStrategy> MessageEventsQuery for EthMessageClient<T> {
         self.query_message_accepted(nonce).await
     }
 
-    async fn query_message_dispatched(&self, since: BlockNumber) -> E2EClientResult<Vec<MessageDispatched>> {
-        todo!()
-    }
-
-    async fn query_all_message_dispatched(&self) -> E2EClientResult<Vec<MessageDispatched>> {
-        todo!()
+    async fn query_message_dispatched(
+        &self,
+        since: BlockNumber,
+    ) -> E2EClientResult<Vec<MessageDispatched>> {
+        self.query_message_dispatched(since).await
     }
 }
-
 
 impl<T: RelayStrategy> EthMessageClient<T> {
     pub async fn build_messages_data(
@@ -259,7 +257,9 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             .storage_proof
             .iter()
             .find(|x| x.key == lane_nonce_storage_key)
-            .ok_or(E2EClientError::Custom("Lane nonce proof not found!".into()))?.proof.clone();
+            .ok_or(E2EClientError::Custom("Lane nonce proof not found!".into()))?
+            .proof
+            .clone();
 
         let lane_messages_proof = storage_proof
             .storage_proof
@@ -403,6 +403,35 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             [x] => Ok(Some(x.clone())),
             _ => Ok(None),
         }
+    }
+
+    pub async fn query_message_dispatched(
+        &self,
+        since: BlockNumber,
+    ) -> E2EClientResult<Vec<MessageDispatched>> {
+        let event = self.inbound.contract.abi().event("MessageDispatched")?;
+        let mut filter = FilterBuilder::default();
+        filter = filter.from_block(since);
+        filter = filter.address(vec![self.inbound.contract.address()]);
+        filter = filter.topics(Some(vec![event.signature()]), None, None, None);
+        let logs = self.client.eth().logs(filter.build()).await?;
+        let events: Vec<MessageDispatched> = logs
+            .into_iter()
+            .map(|l| {
+                let row_log = RawLog {
+                    topics: l.topics.clone(),
+                    data: l.data.0.clone(),
+                };
+                let block_number = l
+                    .block_number
+                    .ok_or_else(|| {
+                        BridgeContractError::Custom("Failed to get block number".into())
+                    })?
+                    .as_u64();
+                MessageDispatched::from_log(event.parse_log(row_log)?, block_number)
+            })
+            .collect::<Result<Vec<MessageDispatched>, BridgeContractError>>()?;
+        return Ok(events);
     }
 
     pub fn build_message_storage_keys(begin: u64, end: u64) -> Vec<U256> {

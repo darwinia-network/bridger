@@ -20,7 +20,7 @@ use web3::{
     ethabi::encode,
     signing::Key,
     transports::Http,
-    types::{Address, BlockId, BlockNumber, Bytes, H256, U256},
+    types::{Address, BlockId, BlockNumber, Bytes, U256},
     Web3,
 };
 
@@ -333,12 +333,8 @@ impl<T: RelayStrategy> MessageEventsQuery for DarwiniaMessageClient<T> {
 
     async fn query_message_dispatched(
         &self,
-        since: BlockNumber,
+        _since: BlockNumber,
     ) -> E2EClientResult<Vec<MessageDispatched>> {
-        todo!()
-    }
-
-    async fn query_all_message_dispatched(&self) -> E2EClientResult<Vec<MessageDispatched>> {
         todo!()
     }
 }

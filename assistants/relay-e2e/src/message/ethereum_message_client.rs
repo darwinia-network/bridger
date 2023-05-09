@@ -431,7 +431,7 @@ impl<T: RelayStrategy> EthMessageClient<T> {
                 MessageDispatched::from_log(event.parse_log(row_log)?, block_number)
             })
             .collect::<Result<Vec<MessageDispatched>, BridgeContractError>>()?;
-        return Ok(events);
+        Ok(events)
     }
 
     pub fn build_message_storage_keys(begin: u64, end: u64) -> Vec<U256> {

@@ -103,7 +103,7 @@ where
             if self.is_on_demand_header(update_finality_slot).await? {
                 self.relay_latest(state, finality_update).await
             } else {
-                return Ok(());
+                Ok(())
             }
         } else {
             tracing::trace!(target: "relay-e2e", "[Header] One more period behind");

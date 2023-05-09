@@ -362,7 +362,7 @@ where
                 return Ok(());
             }
             let event = events.first().expect("Unreachable!");
-            if s.len() > 0 {
+            if !s.is_empty() {
                 tracing::trace!(
                     target: "relay-e2e",
                     "[MessageConfirmation][{}=>{}] Tunnel length: {:?}, required header: {:?}",
@@ -395,7 +395,7 @@ where
             }
 
             let event = event.unwrap();
-            if s.len() > 0 {
+            if !s.is_empty() {
                 tracing::trace!(
                     target: "relay-e2e",
                     "[MessageDelivery][{}=>{}] Tunnel length: {:?}, required header: {:?}",

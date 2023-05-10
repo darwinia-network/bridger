@@ -5,11 +5,14 @@ use crate::config::BridgeConfig;
 use bridge_e2e_traits::client::EcdsaClient;
 use client_beacon::client::BeaconApiClient;
 
-use support_toolkit::timecount::TimeCount;
-use lifeline::{dyn_bus::DynBus, Lifeline, Service, Task};
+use lifeline::{dyn_bus::DynBus, Bus, Lifeline, Service, Task};
 use relay_e2e::header::{common::EthLightClient, eth_beacon_header_relay::BeaconHeaderRelayRunner};
 use support_lifeline::service::BridgeService;
+use support_toolkit::timecount::TimeCount;
+use tokio::sync::broadcast::Receiver;
 use web3::types::{Address, U256};
+
+use super::types::EthereumHeader;
 
 #[derive(Debug)]
 pub struct EthereumToDarwiniaHeaderRelayService<T: EcdsaClient> {
@@ -25,9 +28,23 @@ impl<T: EcdsaClient> Service for EthereumToDarwiniaHeaderRelayService<T> {
 
     fn spawn(bus: &Self::Bus) -> Self::Lifeline {
         let bridge_config: BridgeConfig<T> = bus.storage().clone_resource()?;
+        let rx = bus.rx::<EthereumHeader>()?;
         let _greet = Self::try_task("header-eth-to-darwinia", async move {
             let mut timecount = TimeCount::new();
-            while let Err(error) = Self::start(bridge_config.clone()).await {
+            let runner = Self::build_runner(bridge_config, rx);
+            if let Err(error) = runner {
+                loop {
+                    tracing::error!(
+                        target: "substrate-eth",
+                        "Failed to start header relay service, please check config: {:?}",
+                        error
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                }
+            }
+
+            let mut runner = runner.unwrap();
+            while let Err(error) = runner.start().await {
                 tracing::error!(
                     target: "substrate-eth",
                     "Failed to start header relay service, restart after some seconds: {:?}",
@@ -53,7 +70,10 @@ impl<T: EcdsaClient> Service for EthereumToDarwiniaHeaderRelayService<T> {
 }
 
 impl<T: EcdsaClient> EthereumToDarwiniaHeaderRelayService<T> {
-    async fn start(config: BridgeConfig<T>) -> color_eyre::Result<()> {
+    fn build_runner(
+        config: BridgeConfig<T>,
+        channel_rx: Receiver<EthereumHeader>,
+    ) -> color_eyre::Result<BeaconHeaderRelayRunner<EthLightClient, EthereumHeader>> {
         let darwinia_client = EthLightClient::new(
             &config.darwinia_evm.endpoint,
             Address::from_str(&config.darwinia_evm.contract_address)?,
@@ -61,14 +81,12 @@ impl<T: EcdsaClient> EthereumToDarwiniaHeaderRelayService<T> {
             U256::from_dec_str(&config.darwinia_evm.max_gas_price)?,
         )?;
         let eth_client = BeaconApiClient::new(&config.beacon.endpoint, config.beacon.api_supplier)?;
-        let mut header_relay = BeaconHeaderRelayRunner {
+        Ok(BeaconHeaderRelayRunner {
             eth_light_client: darwinia_client,
             beacon_api_client: eth_client,
             minimal_interval: config.general.header_relay_minimum_interval,
             last_relay_time: u64::MIN,
-        };
-
-        header_relay.start().await?;
-        Ok(())
+            receiver: Some(channel_rx),
+        })
     }
 }

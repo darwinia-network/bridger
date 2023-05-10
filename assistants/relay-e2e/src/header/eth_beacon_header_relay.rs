@@ -4,10 +4,11 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-use bridge_e2e_traits::client::EthTruthLayerLightClient;
+use bridge_e2e_traits::client::{EthTruthLayerLightClient, OnDemandHeader};
 use client_beacon::{client::BeaconApiClient, types::FinalityUpdate};
 use client_contracts::beacon_light_client_types::FinalizedHeaderUpdate;
 use support_etherscan::wait_for_transaction_confirmation_with_timeout;
+use tokio::sync::broadcast::Receiver;
 use web3::{
     contract::Options,
     types::{Bytes, H256},
@@ -15,9 +16,14 @@ use web3::{
 
 use crate::error::{RelayError, RelayResult};
 
-pub struct BeaconHeaderRelayRunner<C: EthTruthLayerLightClient> {
+pub struct BeaconHeaderRelayRunner<C, O>
+where
+    C: EthTruthLayerLightClient,
+    O: OnDemandHeader,
+{
     pub eth_light_client: C,
     pub beacon_api_client: BeaconApiClient,
+    pub receiver: Option<Receiver<O>>,
     pub minimal_interval: u64,
     pub last_relay_time: u64,
 }
@@ -34,7 +40,11 @@ pub struct HeaderRelayState {
     pub current_period: u64,
 }
 
-impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
+impl<C, O> BeaconHeaderRelayRunner<C, O>
+where
+    C: EthTruthLayerLightClient,
+    O: OnDemandHeader,
+{
     pub async fn start(&mut self) -> RelayResult<()> {
         loop {
             self.run().await?;
@@ -68,8 +78,20 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             "[Header] State: {:?}",
             state
         );
+
+        let finality_update: FinalityUpdate = self.beacon_api_client.get_finality_update().await?;
+        let update_finality_slot = finality_update.finalized_header.beacon.slot;
+
+        // This header has already been relayed
+        if update_finality_slot == state.relayed_slot {
+            return Ok(());
+        }
+
         if state.current_period == state.relayed_period {
-            self.relay_latest(state).await?;
+            tracing::trace!(target: "relay-e2e", "[Header] Same period");
+            if self.is_on_demand_header(update_finality_slot).await? {
+                self.relay_latest(state, finality_update).await?;
+            }
             return Ok(());
         }
 
@@ -77,9 +99,64 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             return Ok(());
         }
         if state.current_period == state.relayed_period + 1 {
-            self.relay_latest(state).await
+            tracing::trace!(target: "relay-e2e", "[Header] One period behind");
+            if self.is_on_demand_header(update_finality_slot).await? {
+                self.relay_latest(state, finality_update).await
+            } else {
+                Ok(())
+            }
         } else {
+            tracing::trace!(target: "relay-e2e", "[Header] One more period behind");
             self.relay_next_period(state).await
+        }
+    }
+
+    async fn is_on_demand_header(&mut self, update_finality_slot: u64) -> RelayResult<bool> {
+        match self.receiver.as_mut() {
+            // If there is no receiver, every finalized header will be relayed
+            None => Ok(true),
+
+            Some(receiver) => {
+                let mut required_header = None;
+                while let Ok(h) = receiver.try_recv() {
+                    required_header = Some(h);
+                }
+
+                if required_header.is_none() {
+                    tracing::trace!(
+                        target: "relay-e2e",
+                        "[Header] No signal yet",
+                    );
+                    return Ok(false);
+                }
+                let required_header = required_header.unwrap();
+
+                let update_finality_block = self
+                    .beacon_api_client
+                    .get_beacon_block(update_finality_slot)
+                    .await?;
+                let latest_block_number = update_finality_block
+                    .body()
+                    .execution_payload()?
+                    .execution_payload_capella()?
+                    .block_number;
+                tracing::info!(
+                    target: "relay-e2e",
+                    "[Header] Latest finalized slot: {:?}, finalized block number: {:?}, Required block number: {:?},",
+                    update_finality_slot,
+                    latest_block_number,
+                    required_header.block_number(),
+                );
+                if latest_block_number < required_header.block_number() {
+                    tracing::info!(
+                        target: "relay-e2e",
+                        "[Header] Wait for finalization of blocks",
+                    );
+                    return Ok(false);
+                }
+
+                Ok(true)
+            }
         }
     }
 
@@ -101,8 +178,11 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
         })
     }
 
-    pub async fn relay_latest(&mut self, state: HeaderRelayState) -> RelayResult<()> {
-        let finality_update: FinalityUpdate = self.beacon_api_client.get_finality_update().await?;
+    pub async fn relay_latest(
+        &mut self,
+        state: HeaderRelayState,
+        finality_update: FinalityUpdate,
+    ) -> RelayResult<()> {
         let update_finality_slot = finality_update.finalized_header.beacon.slot;
         let update_finality_period = update_finality_slot.div(32).div(256);
 
@@ -128,7 +208,9 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
             .get_sync_committee_period_update(update_finality_period - 1, 1)
             .await?;
         if sync_change.is_empty() {
-            return Err(RelayError::Custom("Failed to get sync committee update".into()));
+            return Err(RelayError::Custom(
+                "Failed to get sync committee update".into(),
+            ));
         }
         let fork_version = self.get_fork_version(signature_slot).await?;
         let finalized_header_update = FinalizedHeaderUpdate {
@@ -182,7 +264,9 @@ impl<C: EthTruthLayerLightClient> BeaconHeaderRelayRunner<C> {
                 .await?;
             return Ok(());
         }
-        Err(RelayError::Custom("Failed to get sync committee update".into()))
+        Err(RelayError::Custom(
+            "Failed to get sync committee update".into(),
+        ))
     }
 
     async fn get_fork_version(

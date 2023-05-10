@@ -87,9 +87,10 @@ impl Inbound {
 }
 
 pub mod types {
+    use crate::error::{BridgeContractResult, BridgeContractError};
     use web3::{
         contract::tokens::{Detokenize, Tokenizable, TokenizableItem},
-        ethabi::Token,
+        ethabi::{Token, Log},
         types::{Address, Bytes, U256},
     };
 
@@ -345,6 +346,36 @@ pub mod types {
                 self.target.into_token(),
                 self.encoded.into_token(),
             ])
+        }
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct MessageDispatched {
+        pub nonce: u64,
+        pub result: bool,
+        pub block_number: u64,
+    }
+
+    impl MessageDispatched {
+        pub fn from_log(log: Log, block_number: u64) -> BridgeContractResult<Self> {
+            fn get_value(log: &Log, name: &str) -> BridgeContractResult<Token> {
+                log.params
+                    .iter()
+                    .find(|&x| x.name == name)
+                    .map(|x| x.value.clone())
+                    .ok_or_else(|| {
+                        BridgeContractError::Custom(format!("Failed to get {:?} from event", name))
+                    })
+            }
+
+            let nonce = get_value(&log, "nonce")?;
+            let result = get_value(&log, "result")?;
+
+            Ok(Self {
+                nonce: Tokenizable::from_token(nonce)?,
+                result: Tokenizable::from_token(result)?,
+                block_number,
+            })
         }
     }
 }

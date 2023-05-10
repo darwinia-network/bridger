@@ -1,14 +1,14 @@
 use std::str::FromStr;
 
 use bridge_e2e_traits::{
-    client::{GasPriceOracle, MessageClient, Web3Client},
+    client::{GasPriceOracle, MessageClient, MessageEventsQuery, Web3Client},
     error::{E2EClientError, E2EClientResult},
     strategy::RelayStrategy,
 };
 use client_beacon::types::{MessagesConfirmationProof, MessagesProof};
 use client_contracts::{
     error::BridgeContractError,
-    inbound_types::{Message, OutboundLaneData, Payload, ReceiveMessagesProof},
+    inbound_types::{Message, MessageDispatched, OutboundLaneData, Payload, ReceiveMessagesProof},
     outbound_types::{MessageAccepted, ReceiveMessagesDeliveryProof},
     Inbound, Outbound, PosaLightClient, SimpleFeeMarket,
 };
@@ -169,9 +169,26 @@ impl<T: RelayStrategy> MessageClient for EthMessageClient<T> {
         // we need to minus 1 to get the relay block number.
         // The reason of this issue is that EVM on substrate is invoked after the substrate execution, So the
         // message root at block X, which is generated at substrate runtime, only includes the state of block X-1 at EVM.
-        Ok(Some(
-            self.darwinia_light_client.block_number().await?.as_u64() - 1,
-        ))
+        let block_number = self.darwinia_light_client.block_number().await?.as_u64();
+        if block_number > 0 {
+            Ok(Some(block_number - 1))
+        } else {
+            Ok(None)
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl<T: RelayStrategy> MessageEventsQuery for EthMessageClient<T> {
+    async fn query_message_accepted(&self, nonce: u64) -> E2EClientResult<Option<MessageAccepted>> {
+        self.query_message_accepted(nonce).await
+    }
+
+    async fn query_message_dispatched(
+        &self,
+        since: BlockNumber,
+    ) -> E2EClientResult<Vec<MessageDispatched>> {
+        self.query_message_dispatched(since).await
     }
 }
 
@@ -240,7 +257,9 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             .storage_proof
             .iter()
             .find(|x| x.key == lane_nonce_storage_key)
-            .ok_or(E2EClientError::Custom("Lane nonce proof not found!".into()))?.proof.clone();
+            .ok_or(E2EClientError::Custom("Lane nonce proof not found!".into()))?
+            .proof
+            .clone();
 
         let lane_messages_proof = storage_proof
             .storage_proof
@@ -384,6 +403,35 @@ impl<T: RelayStrategy> EthMessageClient<T> {
             [x] => Ok(Some(x.clone())),
             _ => Ok(None),
         }
+    }
+
+    pub async fn query_message_dispatched(
+        &self,
+        since: BlockNumber,
+    ) -> E2EClientResult<Vec<MessageDispatched>> {
+        let event = self.inbound.contract.abi().event("MessageDispatched")?;
+        let mut filter = FilterBuilder::default();
+        filter = filter.from_block(since);
+        filter = filter.address(vec![self.inbound.contract.address()]);
+        filter = filter.topics(Some(vec![event.signature()]), None, None, None);
+        let logs = self.client.eth().logs(filter.build()).await?;
+        let events: Vec<MessageDispatched> = logs
+            .into_iter()
+            .map(|l| {
+                let row_log = RawLog {
+                    topics: l.topics.clone(),
+                    data: l.data.0.clone(),
+                };
+                let block_number = l
+                    .block_number
+                    .ok_or_else(|| {
+                        BridgeContractError::Custom("Failed to get block number".into())
+                    })?
+                    .as_u64();
+                MessageDispatched::from_log(event.parse_log(row_log)?, block_number)
+            })
+            .collect::<Result<Vec<MessageDispatched>, BridgeContractError>>()?;
+        Ok(events)
     }
 
     pub fn build_message_storage_keys(begin: u64, end: u64) -> Vec<U256> {

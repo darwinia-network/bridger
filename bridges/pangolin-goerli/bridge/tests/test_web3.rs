@@ -1,11 +1,17 @@
 use std::{str::FromStr, time::Duration};
 
 use bin_e2e::{
-    config::BridgeConfig, service::message_relay::darwinia_to_eth::message_relay_client_builder,
+    config::BridgeConfig,
+    service::{
+        header_relay::types::{DarwiniaHeader, EthereumHeader},
+        message_relay::darwinia_to_eth::message_relay_client_builder,
+    },
 };
 use bridge_e2e_traits::client::{MessageClient, Web3Client};
 use bridge_pangolin_goerli::bridge::BridgeConfig as RawBridgeConfig;
-use client_contracts::outbound_types::SendMessage;
+use client_contracts::{
+    error::BridgeContractError, inbound_types::MessageDispatched, outbound_types::SendMessage,
+};
 use client_pangolin::client::PangolinClient;
 use relay_e2e::types::ethereum::FastEthereumAccount;
 use secp256k1::SecretKey;
@@ -15,9 +21,9 @@ use support_etherscan::wait_for_transaction_confirmation_with_timeout;
 use thegraph::types::LikethChain;
 use web3::{
     contract::{tokens::Tokenize, Options},
-    ethabi::Address,
+    ethabi::{Address, RawLog},
     signing::Key,
-    types::U256,
+    types::{BlockNumber, FilterBuilder, H256, U256},
 };
 
 #[test]
@@ -55,7 +61,7 @@ async fn get_bridge_config() -> color_eyre::Result<BridgeConfig<PangolinClient>>
 #[tokio::test]
 async fn test_enroll_relayer_at_pangolin() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
-    let msg = message_relay_client_builder(config).await?;
+    let msg = message_relay_client_builder::<_, DarwiniaHeader, EthereumHeader>(config, None, None)?;
     let privates = vec![
         "40b50cd43ccbfe7da7e594216710eac2ab0036fa59a957a85c5d8ee4f3761f49",
         // "eb67cea5965fb74aa9fd439f746444dd69cef8d6164af86c04d259f2f35799e8",
@@ -82,7 +88,7 @@ async fn test_enroll_relayer_at_pangolin() -> color_eyre::Result<()> {
             msg.source.get_web3().transport(),
             Duration::from_secs(3),
             1,
-            1
+            1,
         )
         .await?;
         prev = Address::from(address);
@@ -95,7 +101,7 @@ async fn test_enroll_relayer_at_pangolin() -> color_eyre::Result<()> {
 #[tokio::test]
 async fn test_enroll_relayer_at_goerli() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
-    let msg = message_relay_client_builder(config.clone()).await?;
+    let msg = message_relay_client_builder::<_, DarwiniaHeader, EthereumHeader>(config.clone(), None, None)?;
     let mut prev = Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
     let mut count = 0;
     loop {
@@ -152,7 +158,7 @@ async fn test_enroll_relayer_at_goerli() -> color_eyre::Result<()> {
 #[tokio::test]
 async fn test_deposit_relayer_pangolin() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
-    let msg = message_relay_client_builder(config).await?;
+    let msg = message_relay_client_builder::<_, DarwiniaHeader, EthereumHeader>(config, None, None)?;
     let privates = vec![
         "40b50cd43ccbfe7da7e594216710eac2ab0036fa59a957a85c5d8ee4f3761f49",
         // "eb67cea5965fb74aa9fd439f746444dd69cef8d6164af86c04d259f2f35799e8",
@@ -179,7 +185,7 @@ async fn test_deposit_relayer_pangolin() -> color_eyre::Result<()> {
 #[tokio::test]
 async fn test_deposit_relayer_goerli() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
-    let msg = message_relay_client_builder(config.clone()).await?;
+    let msg = message_relay_client_builder::<_, DarwiniaHeader, EthereumHeader>(config.clone(), None, None)?;
     let secret = SecretKey::from_str(&config.ethereum.private_key)?;
     let tx = msg
         .target
@@ -196,7 +202,7 @@ async fn test_deposit_relayer_goerli() -> color_eyre::Result<()> {
 #[tokio::test]
 async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
-    let msg = message_relay_client_builder(config).await?;
+    let msg = message_relay_client_builder::<_, DarwiniaHeader, EthereumHeader>(config, None, None)?;
     // Get fee from fee market
     let relayer_info = msg.source.strategy.fee_market.get_relayer_info().await?;
     dbg!(&relayer_info);
@@ -240,7 +246,7 @@ async fn test_msg_darwinia_to_eth() -> color_eyre::Result<()> {
 #[tokio::test]
 async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
     let config = get_bridge_config().await?;
-    let msg = message_relay_client_builder(config).await?;
+    let msg = message_relay_client_builder::<_, DarwiniaHeader, EthereumHeader>(config, None, None)?;
     // Get fee from fee market
     let relayer_info = msg.target.strategy.fee_market.get_relayer_info().await?;
     dbg!(&relayer_info);
@@ -274,9 +280,46 @@ async fn test_msg_eth_to_darwinia() -> color_eyre::Result<()> {
             msg.target.get_web3().transport(),
             Duration::from_secs(3),
             1,
-            1
+            1,
         )
         .await?;
     }
+    Ok(())
+}
+
+#[ignore]
+#[tokio::test]
+async fn test_query_contract_events() -> color_eyre::Result<()> {
+    let config = get_bridge_config().await?;
+    let msg = message_relay_client_builder::<_, DarwiniaHeader, EthereumHeader>(config, None, None)?;
+    let event = msg
+        .target
+        .inbound
+        .contract
+        .abi()
+        .event("MessageDispatched")?;
+    let mut filter = FilterBuilder::default();
+    filter = filter.from_block(BlockNumber::Number(8938219u64.into()));
+    filter = filter.address(vec![msg.target.inbound.contract.address()]);
+    filter = filter.topics(Some(vec![event.signature()]), None, None, None);
+    filter = filter.limit(1);
+    let logs = msg.target.client.eth().logs(filter.build()).await?;
+    dbg!(&logs);
+
+    let events: Vec<MessageDispatched> = logs
+        .into_iter()
+        .map(|l| {
+            let row_log = RawLog {
+                topics: l.topics.clone(),
+                data: l.data.0.clone(),
+            };
+            let block_number = l
+                .block_number
+                .ok_or_else(|| BridgeContractError::Custom("Failed toget block number".into()))?
+                .as_u64();
+            MessageDispatched::from_log(event.parse_log(row_log)?, block_number)
+        })
+        .collect::<Result<Vec<MessageDispatched>, BridgeContractError>>()?;
+    dbg!(events);
     Ok(())
 }

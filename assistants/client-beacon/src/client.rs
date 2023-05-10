@@ -301,7 +301,7 @@ mod tests {
         BeaconApiClient::new("https://lodestar-goerli.chainsafe.io", ApiSupplier::Nimbus).unwrap()
     }
 
-    // #[ignore]
+    #[ignore]
     #[tokio::test]
     async fn test_get_header() {
         let client = test_client();

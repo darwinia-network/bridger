@@ -1,7 +1,8 @@
 use std::cmp;
 use std::fmt::Debug;
 
-use client_contracts::outbound_types::ReceiveMessagesDeliveryProof;
+use client_contracts::inbound_types::MessageDispatched;
+use client_contracts::outbound_types::{ReceiveMessagesDeliveryProof, MessageAccepted};
 use client_contracts::BeaconLightClient;
 use client_contracts::{inbound_types::ReceiveMessagesProof, Inbound, Outbound};
 use secp256k1::SecretKey;
@@ -110,4 +111,17 @@ pub trait MessageClient: GasPriceOracle {
 
     // Returns latest block number of the light client of the other chain
     async fn latest_light_client_block_number(&self) -> E2EClientResult<Option<u64>>;
+}
+
+#[async_trait::async_trait]
+pub trait MessageEventsQuery {
+    // Query MessageAccepted events from outbound contract
+    async fn query_message_accepted(&self, nonce: u64) -> E2EClientResult<Option<MessageAccepted>>;
+
+    // Query MessageDispatched events from inbound contract since a block number
+    async fn query_message_dispatched(&self, since: BlockNumber) -> E2EClientResult<Vec<MessageDispatched>>;
+}
+
+pub trait OnDemandHeader: Clone + From<u64> {
+   fn block_number(&self) -> u64;
 }

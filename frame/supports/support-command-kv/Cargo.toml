@@ -1,6 +1,6 @@
 [package]
 name = "support-command-kv"
-version = "0.7.3"
+version = "0.8.0"
 authors = ["Darwinia Network <hello@darwinia.network>"]
 description = "Darwinia bridger"
 repository = "https://github.com/darwinia-network/bridger"

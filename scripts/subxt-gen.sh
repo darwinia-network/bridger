@@ -37,7 +37,7 @@ if [ "${CHAIN}" == "pangolin" ]; then
 fi
 
 if [ "${CHAIN}" == "pangoro" ]; then
-  ENDPOINT='http://g1.dev.darwinia.network:10000'
+  ENDPOINT='https://pangoro-rpc.darwinia.network:443'
   OUTPUT_PATH=${WORK_PATH}/assistants/client-pangoro
 fi
 

@@ -1,11 +1,14 @@
 use subxt::client::OnlineClient;
 
 use crate::config::PangoroSubxtConfig;
+use crate::error::ClientResult;
 use crate::types::DarwiniaAccount;
 
 /// Pangoro client
 #[derive(Debug, Clone)]
 pub struct PangoroClient {
+    /// Endpoint
+    pub endpoint: String,
     /// Runtime api
     client: OnlineClient<PangoroSubxtConfig>,
     /// Pangoro Account
@@ -14,8 +17,21 @@ pub struct PangoroClient {
 
 impl PangoroClient {
     /// Create a new darwinia client
-    pub fn new(client: OnlineClient<PangoroSubxtConfig>, account: DarwiniaAccount) -> Self {
-        Self { client, account }
+    pub fn new(
+        endpoint: &str,
+        client: OnlineClient<PangoroSubxtConfig>,
+        account: DarwiniaAccount,
+    ) -> Self {
+        Self {
+            endpoint: endpoint.into(),
+            client,
+            account,
+        }
+    }
+
+    pub async fn reconnect_client(&mut self) -> ClientResult<()> {
+        self.client = OnlineClient::from_url(&self.endpoint).await?;
+        Ok(())
     }
 }
 

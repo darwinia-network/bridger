@@ -1,0 +1,57 @@
+[general]
+# Whether to relay beacon chain header to evm chain
+enable_beacon_header_relay = true
+# Whether to relay sync commit from beacon chain to evm chain
+enable_sync_commit_relay = true
+# Whether to sign the messages root and relay headers from evm chain to beacon chain
+enable_ecdsa_relay = true
+# Whether to relay messages from execution chain to evm chain
+enable_message_execution_to_evm = true
+# Whether to relay messages from evm chain to execution chain
+enable_message_evm_to_execution = true
+# Max number of messages every delivery
+max_message_num_per_relaying = 15
+# Minimum seconds between two header relay
+header_relay_minimum_interval = 900
+
+[pangoro_evm]
+chain_message_committer_address = "0x5Ee6D2D75BA57d971372e46edcD3B53ECd542eab"
+contract_address                = "0x6aAC5D0E9263341a5408Bac8F3CBE6258bB03058"
+endpoint                        = "https://pangoro-rpc.darwinia.network"
+fee_market_address              = "0x387059464B3321Afb59C531eF0dCF2969EC2da23"
+inbound_address                 = "0xe0E33336159125B69C5631Fb3edd2BF5aF731Fed"
+lane_message_committer_address  = "0x92B700B3bA93929a38AC7B068Be8c16cA49B2016"
+outbound_address                = "0x4435E99c467fD48E3a4eBE1514De1ca7eEEed610"
+# private_key in format of 0x... or ...
+private_key = "..."
+# Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
+max_gas_price = 25000000000000 # 25000 Gwei
+
+[pangoro_substrate]
+endpoint = "wss://pangoro-rpc.darwinia.network"
+# private_key in format of 0x... or BIP39 mnemonic code
+private_key = "//Alice"
+
+[beacon]
+endpoint = "https://lodestar-goerli.chainsafe.io"
+# Beacon chain rpc supplier: Nimbus or Lodestar
+api_supplier = "Nimbus"
+
+[goerli]
+endpoint                  = "https://eth-goerli.g.alchemy.com/v2/3Jsx6GWpt8x8g783OqtWoGSHxIsIji2O"
+fee_market_address        = "0x04001fBd3988215055f6F1ED0A9d1fB07e4af0B2"
+inbound_address           = "0xaE18634E9a8Ab240Bf1a28b07Bf2A93264048983"
+outbound_address          = "0x5Edc9cDFb3671802D2E645f1f30f4bB926055fd8"
+posa_light_client_address = "0x9920317f841F3653464bf37512c939744502CA74"
+# private_key in format of 0x... or ...
+private_key = "..."
+# Max gas price bridger would use, if eth_gasPrice returns a bigger one. Unit is wei.
+max_gas_price = 20000000000 # 20 Gwei
+# Bridger use etherscan gas oracle to get more appropriate gas price.
+# Register to get a free etherescan api key at https://docs.etherscan.io/api-endpoints/gas-tracker
+etherscan_api_key = "api_key..."
+
+
+[index]
+evm_chain       = { endpoint = "https://thegraph.darwinia.network/ethv2/subgraphs/name/bridge-pangoro" }
+substrate_chain = { endpoint = "https://subql.darwinia.network/subql-bridger-pangoro/" }

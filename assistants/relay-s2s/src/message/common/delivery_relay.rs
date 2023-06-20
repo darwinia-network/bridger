@@ -50,14 +50,14 @@ where
         Ok(outbound_lane_data)
     }
 
-    async fn last_delivered_nonce(&self, lane: LaneId, chain: &str) -> u64 {
+    async fn last_delivered_nonce(&self, lane: LaneId) -> RelayResult<u64> {
         if let Some(nonce) = keepstate::get_last_delivery_relayed_nonce(SC::CHAIN) {
-            return nonce;
+            return Ok(nonce);
         }
         let client_target = &self.input.client_target;
         let target_inbound_lane_data = client_target.inbound_lanes(lane, None).await?;
         let last_delivered_nonce = target_inbound_lane_data.last_delivered_nonce();
-        last_delivered_nonce
+        Ok(last_delivered_nonce)
     }
 
     async fn assemble_nonces(
@@ -88,7 +88,7 @@ where
 
         // assemble nonce range
         let start: u64 = latest_confirmed_nonce + 1;
-        let last_relayed_nonce = self.last_delivered_nonce(lane, SC::CHAIN).await?;
+        let last_relayed_nonce = self.last_delivered_nonce(lane).await?;
         if last_relayed_nonce >= start {
             tracing::warn!(
                 target: "relay-s2s",

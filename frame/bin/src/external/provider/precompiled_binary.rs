@@ -179,6 +179,7 @@ impl PrecompiledBinaryExecutor {
             path_download_package.display(),
         );
         if !path_download_package.exists() {
+            #[allow(clippy::redundant_clone)]
             let mut url_package = remote_url.clone();
             let mut response;
             let mut times = 0;

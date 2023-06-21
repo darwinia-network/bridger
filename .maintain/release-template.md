@@ -1,14 +1,12 @@
-
-
 ## Upgrade Guide
-- [Upgrade guide for release v0.8.0](https://github.com/darwinia-network/bridger/issues/581)
+
+Just upgrade version, if you run bridger use docker, maybe you should
+add `--privileged` https://github.com/dani-garcia/vaultwarden/issues/2497
 
 ## Changed
 
-- Pangolin2<>Pangoro2 (#568)
-- Darwinia2<>Crab2 (#577)
-- Darwinia2<>Ethereum2 (#578)
-- Pangolin2<>Goerli (#578)
+- Support pangoro-goerli (#584)
+- Improve latest delivered nonce (#586)
 
 ## Resources
 

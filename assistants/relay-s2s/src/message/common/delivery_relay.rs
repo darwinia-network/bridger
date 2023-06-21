@@ -50,6 +50,16 @@ where
         Ok(outbound_lane_data)
     }
 
+    async fn last_delivered_nonce(&self, lane: LaneId) -> RelayResult<u64> {
+        if let Some(nonce) = keepstate::get_last_delivery_relayed_nonce(SC::CHAIN) {
+            return Ok(nonce);
+        }
+        let client_target = &self.input.client_target;
+        let target_inbound_lane_data = client_target.inbound_lanes(lane, None).await?;
+        let last_delivered_nonce = target_inbound_lane_data.last_delivered_nonce();
+        Ok(last_delivered_nonce)
+    }
+
     async fn assemble_nonces(
         &self,
         lane: LaneId,
@@ -78,22 +88,21 @@ where
 
         // assemble nonce range
         let start: u64 = latest_confirmed_nonce + 1;
-        if let Some(last_relayed_nonce) = keepstate::get_last_delivery_relayed_nonce(SC::CHAIN) {
-            if last_relayed_nonce >= start {
-                tracing::warn!(
-                    target: "relay-s2s",
-                    "{} last relayed nonce is {} but start nonce is {}, please wait receiving.",
-                    logk::prefix_with_bridge_and_others(
-                        M_DELIVERY,
-                        SC::CHAIN,
-                        TC::CHAIN,
-                        vec![array_bytes::bytes2hex("0x", lane),],
-                    ),
-                    last_relayed_nonce,
-                    start,
-                );
-                return Ok(None);
-            }
+        let last_relayed_nonce = self.last_delivered_nonce(lane).await?;
+        if last_relayed_nonce >= start {
+            tracing::warn!(
+                target: "relay-s2s",
+                "{} last relayed nonce is {} but start nonce is {}, please wait receiving.",
+                logk::prefix_with_bridge_and_others(
+                    M_DELIVERY,
+                    SC::CHAIN,
+                    TC::CHAIN,
+                    vec![array_bytes::bytes2hex("0x", lane),],
+                ),
+                last_relayed_nonce,
+                start,
+            );
+            return Ok(None);
         }
 
         let inclusive_limit = limit - 1;
@@ -141,7 +150,7 @@ where
                         last_relayed_nonce.expect("Unreachable"),
                     );
                 }
-                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                tokio::time::sleep(std::time::Duration::from_secs(20)).await;
             }
         }
     }

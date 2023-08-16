@@ -89,6 +89,28 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
             .await
             .map_err(|e| S2SClientError::Custom(format!("[feemarket]: {:?}", e)))?;
 
+        // -----
+        // If the order timeout, anyone can relay this.
+        let ranges = relayers
+            .iter()
+            .map(|item| item.valid_range.clone())
+            .collect::<Vec<Range<<A::Chain as Chain>::BlockNumber>>>();
+
+        let mut maximum_timeout: <A::Chain as Chain>::BlockNumber = Default::default();
+        for range in ranges {
+            maximum_timeout = std::cmp::max(maximum_timeout, range.end);
+        }
+        // If this order has timed out, decide to relay
+        if finalized_block_number > maximum_timeout {
+            tracing::info!(
+                target: "feemarket",
+                "{} this nonce is timeout. so the decide is relay this nonce: {}",
+                logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
+                nonce,
+            );
+            return Ok(true);
+        }
+
         // If you are assigned relayer, you must relay this nonce.
         // If you don't do that, the fee market pallet will slash your deposit.
         // Even though it is a timeout, although it will slash your deposit after the timeout is delivered,
@@ -128,27 +150,6 @@ impl<A: FeemarketApiRelay> RelayStrategy for BasicRelayStrategy<A> {
             return Ok(false);
         }
 
-        // -----
-        // If you aren't assigned relayer, only participate in the part about time out, earn more rewards
-        let ranges = relayers
-            .iter()
-            .map(|item| item.valid_range.clone())
-            .collect::<Vec<Range<<A::Chain as Chain>::BlockNumber>>>();
-
-        let mut maximum_timeout: <A::Chain as Chain>::BlockNumber = Default::default();
-        for range in ranges {
-            maximum_timeout = std::cmp::max(maximum_timeout, range.end);
-        }
-        // If this order has timed out, decide to relay
-        if finalized_block_number > maximum_timeout {
-            tracing::info!(
-                target: "feemarket",
-                "{} you aren't assigned relayer. but this nonce is timeout. so the decide is relay this nonce: {}",
-                logk::prefix_with_relation("feemarket", "relay", A::CHAIN, "::"),
-                nonce,
-            );
-            return Ok(true);
-        }
         tracing::info!(
             target: "feemarket",
             "{} you aren't assigned relay. and this nonce({}) is on-time. so don't relay this",

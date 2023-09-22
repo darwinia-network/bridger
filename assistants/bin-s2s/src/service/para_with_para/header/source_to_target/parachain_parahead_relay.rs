@@ -65,7 +65,7 @@ impl<
             while let Err(e) = Self::start(bridge_config.clone()).await {
                 tracing::error!(
                     target: "bin-s2s",
-                    "[header-relay] [{}-to-{}] an error occurred for header relay {:?}",
+                    "[parahead-header-relay] [{}-to-{}] an error occurred for header relay {:?}",
                     config_chain.source_relay.chain().name(),
                     config_chain.target_para.chain().name(),
                     e,
@@ -74,7 +74,7 @@ impl<
                     tokio::time::sleep(duration).await;
                     tracing::error!(
                         target: "bin-s2s",
-                        "[header-relay] [{}-to-{}] many errors occurred, wait {} seconds",
+                        "[parahead-header-relay] [{}-to-{}] many errors occurred, wait {} seconds",
                         config_chain.source_relay.chain().name(),
                         config_chain.target_para.chain().name(),
                         duration.as_secs(),
@@ -83,7 +83,7 @@ impl<
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 tracing::info!(
                     target: "bin-s2s",
-                    "[header-relay] [{}-to-{}] try to restart header relay service.",
+                    "[parahead-header-relay] [{}-to-{}] try to restart header relay service.",
                     config_chain.source_relay.chain().name(),
                     config_chain.target_para.chain().name(),
                 );
@@ -114,7 +114,7 @@ impl<
         let config_chain = bridge_config.chain;
         tracing::info!(
             target: "bin-s2s",
-            "[header-{}-to-{}] SERVICE RESTARTING...",
+            "[parahead-header-{}-to-{}] SERVICE RESTARTING...",
             config_chain.source_relay.chain().name(),
             config_chain.target_para.chain().name(),
         );

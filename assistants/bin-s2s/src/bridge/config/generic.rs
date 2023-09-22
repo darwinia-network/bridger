@@ -22,7 +22,7 @@ pub struct SoloWithParaConfig {
     pub para_id: u32,
 }
 
-#[cfg(any(feature = "para-with-para"))]
+#[cfg(feature = "para-with-para")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ParaWithParaConfig {
     pub source_para_id: u32,

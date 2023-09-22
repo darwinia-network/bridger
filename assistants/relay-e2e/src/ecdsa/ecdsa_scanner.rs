@@ -74,7 +74,7 @@ pub trait EcdsaScanner<T: EcdsaClient> {
             return Ok(());
         }
 
-        let mut source = self.get_ecdsa_source();
+        let source = self.get_ecdsa_source();
         loop {
             let from = tracker
                 .current()

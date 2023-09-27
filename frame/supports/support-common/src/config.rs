@@ -135,6 +135,7 @@ impl Config {
         &self,
         name: impl AsRef<str>,
     ) -> Result<Option<(PathBuf, ConfigFormat)>, BridgerError> {
+        let name = name.as_ref();
         let mut config_file = None;
         if !self.base_path.exists() {
             tracing::warn!(target: "bridger", "The base_path ({}) is not found.", self.base_path.display());
@@ -153,7 +154,7 @@ impl Config {
                 },
                 None => continue,
             };
-            if file_name.starts_with(name.as_ref()) {
+            if file_name.starts_with(name) && file_name.contains('.') {
                 config_file = Some(file);
                 break;
             }
@@ -201,6 +202,7 @@ impl Config {
     }
 
     fn load<T: DeserializeOwned>(&self, name: impl AsRef<str>) -> Result<T, BridgerError> {
+        let name = name.as_ref();
         if !self.base_path.exists() {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
@@ -209,10 +211,10 @@ impl Config {
             .into());
         }
 
-        let (path, _) = self.find_config_file(name.as_ref())?.ok_or_else(|| {
+        let (path, _) = self.find_config_file(name)?.ok_or_else(|| {
             BridgerError::Config(format!(
                 "Not found config file for name: {} in path: {}",
-                name.as_ref(),
+                name,
                 self.base_path.display()
             ))
         })?;
@@ -223,7 +225,7 @@ impl Config {
                 "Failed to load config: {:?} in path: {:?} for name {}",
                 e,
                 path,
-                name.as_ref()
+                name
             ))
         })?;
         Ok(tc)
